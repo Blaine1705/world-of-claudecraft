@@ -47,10 +47,13 @@ import {
 import { sfx } from './game/sfx';
 import { voice } from './game/voice';
 import { createNativeAttestationProof } from './net/native_attestation';
+import { desktopBridge } from './runtime';
 import {
   Api,
+  ApiError,
   type CharacterSummary,
   ClientWorld,
+  DESKTOP_APP,
   isAuthError,
   NATIVE_APP,
   type ReleaseEntry,
@@ -159,6 +162,7 @@ const HOMEPAGE_MUSIC_VOLUME = 0.225;
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 document.body.classList.toggle('native-app', NATIVE_APP);
+document.body.classList.toggle('desktop-app', DESKTOP_APP);
 if (NATIVE_APP) document.body.classList.add('mobile-touch');
 // Free every WebGL context (game renderer, character preview, portrait rig) when
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
@@ -2825,6 +2829,39 @@ const revalidateAccountSession = (): Promise<void> => loadAccountPortal(true);
 // Navigating to the Account view: refresh the portal without touching the chrome.
 const renderAccountPortal = (): Promise<void> => loadAccountPortal(false);
 
+function isDesktopLoginPage(): boolean {
+  return location.pathname === '/desktop-login' || location.pathname === '/desktop-login/';
+}
+
+async function completeDesktopBrowserLogin(): Promise<boolean> {
+  if (!isDesktopLoginPage()) return false;
+  if (!api.token) {
+    show('#login-panel');
+    return true;
+  }
+  try {
+    const { code } = await api.createDesktopLoginCode();
+    if (!code) throw new Error('missing desktop login code');
+    location.href = `worldofclaudecraft://desktop-login?code=${encodeURIComponent(code)}`;
+  } catch (err) {
+    loginError(userFacingApiError(err));
+    show('#login-panel');
+  }
+  return true;
+}
+
+async function completeDesktopAppLogin(code: string): Promise<void> {
+  try {
+    await api.exchangeDesktopLoginCode(code);
+    api.saveSession();
+    enterLoggedInChrome();
+    await enterRealmFlow();
+  } catch (err) {
+    loginError(userFacingApiError(err));
+    show('#login-panel');
+  }
+}
+
 // `focusWallet` differentiates the Wallet card's CTA from "View Characters":
 // both land on the realm/character picker, but Manage Wallet then scrolls to and
 // focuses the wallet control once it renders.
@@ -4272,12 +4309,12 @@ let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
 let walletHiddenNoticeTimeout: number | null = null;
 
 // Feature flag: Wallet Standard support needs no project id. Keep an escape
-// hatch for deploys that want to hide the wallet UI entirely. Native app builds
-// intentionally exclude wallet verification for now.
+// hatch for deploys that want to hide the wallet UI entirely. Native and desktop
+// app builds intentionally exclude wallet verification for now.
 // client_shell.test guards the native exclusion:
 // const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
 const WALLET_ENABLED =
-  !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
+  !NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
 
 function walletCharacterScreenVisible(): boolean {
   try {
@@ -5058,6 +5095,7 @@ function wireStartScreens(): void {
   const btnStartOffline = $('#btn-start-offline') as HTMLButtonElement;
   const offlineNameInput = $('#char-name') as HTMLInputElement;
   const offlineError = $('#offline-error');
+  let pendingSteamAuth: { ticket: string; displayName: string } | null = null;
 
   const goToLoggedInPlay = () => {
     void enterRealmFlow().catch((err) => {
@@ -5080,9 +5118,43 @@ function wireStartScreens(): void {
     show('#mode-select');
   };
 
+  const completeOnlineAuth = async () => {
+    $('#charselect-user').textContent = api.username ?? '';
+    api.saveSession();
+    enterLoggedInChrome();
+    if (await completeDesktopBrowserLogin()) return;
+    void refreshWalletLinkStatus();
+    await enterRealmFlow();
+  };
+
+  const handleDesktopSteamLogin = async (bridge: NonNullable<ReturnType<typeof desktopBridge>>) => {
+    loginError('');
+    let steamAuth: { ticket: string; displayName: string } | null = null;
+    try {
+      steamAuth = await bridge.requestSteamAuthTicket();
+      await api.steamLogin(steamAuth.ticket);
+      pendingSteamAuth = null;
+      await completeOnlineAuth();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409 && steamAuth) {
+        pendingSteamAuth = { ticket: steamAuth.ticket, displayName: steamAuth.displayName };
+        show('#login-panel');
+        loginError(userFacingApiError(new Error('not authenticated')));
+        return;
+      }
+      loginError(userFacingApiError(err));
+      show('#login-panel');
+    }
+  };
+
   const handleOnlineSelect = () => {
     if (api.token) {
       goToLoggedInPlay();
+      return;
+    }
+    const bridge = DESKTOP_APP ? desktopBridge() : null;
+    if (bridge) {
+      void handleDesktopSteamLogin(bridge);
       return;
     }
     show('#login-panel');
@@ -5408,6 +5480,25 @@ function wireStartScreens(): void {
     const username = ($('#login-user') as unknown as HTMLInputElement).value.trim();
     const password = ($('#login-pass') as unknown as HTMLInputElement).value;
     loginError('');
+    if (pendingSteamAuth) {
+      if (mode !== 'login') {
+        loginError(userFacingApiError(new Error('invalid username or password')));
+        return;
+      }
+      try {
+        await api.linkSteamAccount(username, password, pendingSteamAuth.ticket, pendingSteamAuth.displayName);
+        pendingSteamAuth = null;
+      } catch (err) {
+        loginError(userFacingApiError(err));
+        return;
+      }
+      try {
+        await completeOnlineAuth();
+      } catch (err) {
+        loginError(userFacingApiError(err));
+      }
+      return;
+    }
     const token = turnstileToken();
     if (!NATIVE_APP && TURNSTILE_SITEKEY && !token) {
       loginError(t('errors.api.verificationFailed'));
@@ -5453,15 +5544,7 @@ function wireStartScreens(): void {
     // Auth succeeded — a later realm-entry error is NOT a verification failure,
     // so don't reset the widget or let the user re-submit the (now duplicate) auth.
     try {
-      $('#charselect-user').textContent = api.username ?? '';
-      // Persist the session so a reload restores the logged-in "Account" tab,
-      // and reveal that tab now.
-      api.saveSession();
-      enterLoggedInChrome();
-      // bind-on-login: surface the account's linked wallet (and flip a
-      // connected-but-unlinked button into a "Link" call-to-action).
-      void refreshWalletLinkStatus();
-      await enterRealmFlow();
+      await completeOnlineAuth();
     } catch (err) {
       loginError(userFacingApiError(err));
     }
@@ -5540,6 +5623,7 @@ function wireStartScreens(): void {
 
   $('#btn-login-back').addEventListener('click', (e) => {
     e.preventDefault();
+    pendingSteamAuth = null;
     // Clear validation state on back
     [userInput, passInput].forEach((input) => {
       input.classList.remove('user-invalid-fallback');
@@ -5550,6 +5634,16 @@ function wireStartScreens(): void {
     loginError('');
     show('#mode-select');
   });
+  const bridge = DESKTOP_APP ? desktopBridge() : null;
+  if (bridge) {
+    bridge.onLoginCode((code) => {
+      void bridge.takeLoginCode();
+      void completeDesktopAppLogin(code);
+    });
+    void bridge.takeLoginCode().then((code) => {
+      if (typeof code === 'string' && code) void completeDesktopAppLogin(code);
+    });
+  }
   $('#btn-realm-back').addEventListener('click', () => show('#mode-select'));
   // Change Realm is now an inline dropdown on the character-select screen.
   $('#btn-change-realm').addEventListener('click', (e) => {
@@ -5882,8 +5976,10 @@ function wireStartScreens(): void {
   if (api.restoreSession()) {
     enterLoggedInChrome();
     void revalidateAccountSession();
+    if (isDesktopLoginPage()) void completeDesktopBrowserLogin();
   } else {
     enterLoggedOutChrome();
+    if (isDesktopLoginPage()) show('#login-panel');
   }
 
   // Header Logo click listener to return to homepage

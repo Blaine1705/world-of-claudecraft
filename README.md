@@ -84,6 +84,24 @@ Name your character, pick any of the nine classes, and you start in **Eastbrook 
 
 See [Host your own world](#host-your-own-world-one-command) below to stand up the real client/server game with accounts and persistent characters.
 
+### Desktop app for Steam
+
+The Electron desktop shell uses the same Vite client. Online play uses Steam auth in the desktop shell: Electron asks Steam for a Web API ticket, and the game server verifies it before issuing a normal World of ClaudeCraft session token.
+
+```bash
+npm run electron:dev     # Vite + Electron dev shell
+npm run electron:pack    # local unpacked desktop app
+npm run electron:build   # distributable Electron artifacts
+```
+
+For local Steam-auth testing before the backend routes are deployed, run the API locally with `STEAM_APP_ID`, `STEAM_WEB_API_KEY`, and `STEAM_AUTH_IDENTITY=worldofclaudecraft`, then launch Electron against it:
+
+```bash
+VITE_DESKTOP_API_ORIGIN=http://127.0.0.1:8787 npm run electron:dev
+```
+
+Override the production API origin for staging builds with `VITE_DESKTOP_API_ORIGIN=https://dev.worldofclaudecraft.com`. Local dev defaults to Steam AppID `480` when no `STEAM_APP_ID` is set; packaged Steam builds should run with the real Steam app context.
+
 ## Host your own world (one command)
 
 ```bash

@@ -61,6 +61,10 @@ services:
       APPLE_DEVICECHECK_ENV: ${APPLE_DEVICECHECK_ENV:-production}
       # Runtime: protects the loopback-only deploy countdown endpoint.
       RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
+      # Runtime: Steam desktop auth verification. STEAM_WEB_API_KEY is server-only.
+      STEAM_APP_ID: ${STEAM_APP_ID:-}
+      STEAM_AUTH_IDENTITY: ${STEAM_AUTH_IDENTITY:-worldofclaudecraft}
+      STEAM_WEB_API_KEY: ${STEAM_WEB_API_KEY:-}
     # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"

@@ -7,6 +7,12 @@ import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online'
 import { Sim } from '../src/sim/sim';
 import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
 import {
+  consumeDesktopLoginCode,
+  createDesktopLoginCode,
+  resetDesktopLoginCodesForTest,
+} from '../server/desktop_login';
+import { isWebClientRequest } from '../server/web_login_guard';
+import {
   rateLimited,
   requestIp,
   authThrottled,
@@ -75,6 +81,38 @@ describe('websocket authentication', () => {
       character: 42,
       clientSeed: 'seed-123',
     });
+  });
+});
+
+describe('desktop app request origins', () => {
+  it('allows the Electron app protocol through the web-client login guard', () => {
+    const req = fakeReq({ origin: 'app://worldofclaudecraft' }, '127.0.0.1');
+
+    expect(isWebClientRequest(req)).toBe(true);
+  });
+});
+
+describe('desktop login handoff codes', () => {
+  beforeEach(() => {
+    resetDesktopLoginCodesForTest();
+  });
+
+  it('exchanges a code once for the same client IP', () => {
+    const req = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '172.18.0.1');
+    const { code, expiresInMs } = createDesktopLoginCode(req, { id: 42, username: 'titoisking' });
+
+    expect(code).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(expiresInMs).toBeGreaterThan(0);
+    expect(consumeDesktopLoginCode(req, code)).toEqual({ accountId: 42, username: 'titoisking' });
+    expect(consumeDesktopLoginCode(req, code)).toBeNull();
+  });
+
+  it('rejects a code exchange from a different client IP', () => {
+    const issuer = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '172.18.0.1');
+    const attacker = fakeReq({ 'x-forwarded-for': '198.51.100.77' }, '172.18.0.1');
+    const { code } = createDesktopLoginCode(issuer, { id: 42, username: 'titoisking' });
+
+    expect(consumeDesktopLoginCode(attacker, code)).toBeNull();
   });
 });
 

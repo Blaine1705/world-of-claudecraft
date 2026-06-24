@@ -3,13 +3,15 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { WebSocketServer, WebSocket } from 'ws';
 import {
-  ensureSchema, pool, createAccount, findAccount, getAccountsCount, touchLogin, saveToken, accountForToken,
+  ensureSchema, pool, createAccount, findAccount, accountForIdentity, linkAccountIdentity, getAccountsCount, touchLogin, saveToken, accountForToken,
   listCharacters, getCharacter, createCharacterCapped, reclaimDeactivatedName, deleteCharacter, closeOrphanSessions,
   pruneChatLogs, pruneClientPerfReports, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
   findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount, loadAccountCosmetics,
   referralCountForAccount, primarySlugForAccount, lifetimeXpStanding, isAdminAccount,
   accountById, characterCountForAccount, updatePasswordHash, revokeTokensExcept, setAccountEmail, setAccountDeactivated,
 } from './db';
+import { consumeDesktopLoginCode, createDesktopLoginCode } from './desktop_login';
+import { normalizeSteamTicket, verifySteamAuthTicket } from './steam_auth';
 import { virtualLevel } from '../src/sim/types';
 import { paginateLeaderboard, LEADERBOARD_PAGE_SIZE, LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
@@ -41,7 +43,7 @@ import { handleInternalApi } from './internal';
 import { handlePerfReport } from './perf_report';
 import { GameServer } from './game';
 import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
-import { webLoginEnforced, isWebClientRequest, isNativeAppRequest, NATIVE_APP_ORIGINS } from './web_login_guard';
+import { webLoginEnforced, isWebClientRequest, isNativeAppRequest, NATIVE_APP_ORIGINS, DESKTOP_APP_ORIGINS } from './web_login_guard';
 import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
@@ -358,7 +360,7 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
 // token (no cookies), so reflecting these specific origins is safe.
 function maybeCors(req: http.IncomingMessage, res: http.ServerResponse): void {
   const origin = req.headers.origin;
-  if (typeof origin === 'string' && (REALM_ORIGINS.has(origin) || NATIVE_APP_ORIGINS.has(origin))) {
+  if (typeof origin === 'string' && (REALM_ORIGINS.has(origin) || NATIVE_APP_ORIGINS.has(origin) || DESKTOP_APP_ORIGINS.has(origin))) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -475,6 +477,87 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const token = newToken();
       await saveToken(token, account.id);
       return json(res, 200, { token, username: account.username });
+    }
+    if (req.method === 'POST' && url === '/api/steam/login') {
+      const body = await readBody(req);
+      const ticket = normalizeSteamTicket(body.ticket);
+      if (!ticket) return json(res, 400, { error: 'invalid steam ticket' });
+      let steam;
+      try {
+        steam = await verifySteamAuthTicket(ticket);
+      } catch (err) {
+        console.error('steam auth unavailable:', err);
+        return json(res, 503, { error: 'steam auth unavailable' });
+      }
+      if (!steam) return json(res, 403, { error: 'steam verification failed' });
+      if (steam.vacBanned || steam.publisherBanned) return json(res, 403, { error: 'steam account is not allowed' });
+      const account = await accountForIdentity('steam', steam.steamId);
+      if (!account) return json(res, 409, { error: 'steam account is not linked' });
+      const status = await moderationStatusForAccount(account.id);
+      if (status.locked) return json(res, 403, { error: status.message });
+      await touchLogin(account.id, requestMetadata(req));
+      const token = newToken();
+      await saveToken(token, account.id);
+      return json(res, 200, { token, username: account.username });
+    }
+    if (req.method === 'POST' && url === '/api/steam/link') {
+      const body = await readBody(req);
+      const ticket = normalizeSteamTicket(body.ticket);
+      if (!ticket) return json(res, 400, { error: 'invalid steam ticket' });
+      let steam;
+      try {
+        steam = await verifySteamAuthTicket(ticket);
+      } catch (err) {
+        console.error('steam auth unavailable:', err);
+        return json(res, 503, { error: 'steam auth unavailable' });
+      }
+      if (!steam) return json(res, 403, { error: 'steam verification failed' });
+      if (steam.vacBanned || steam.publisherBanned) return json(res, 403, { error: 'steam account is not allowed' });
+      const existing = await accountForIdentity('steam', steam.steamId);
+      const username = typeof body.username === 'string' ? body.username : '';
+      if (username && authThrottled(username)) {
+        return json(res, 429, { error: 'too many failed attempts — wait a few minutes and try again' });
+      }
+      const account = username ? await findAccount(username) : null;
+      if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
+        if (username) recordAuthFailure(username);
+        return json(res, 401, { error: 'invalid username or password' });
+      }
+      if (existing && existing.id !== account.id) return json(res, 409, { error: 'steam account is already linked' });
+      const status = await moderationStatusForAccount(account.id);
+      if (status.locked) return json(res, 403, { error: status.message });
+      try {
+        await linkAccountIdentity(account.id, 'steam', steam.steamId, typeof body.displayName === 'string' ? body.displayName : null);
+      } catch {
+        return json(res, 409, { error: 'account already has a steam link' });
+      }
+      clearAuthFailures(username);
+      await touchLogin(account.id, requestMetadata(req));
+      const token = newToken();
+      await saveToken(token, account.id);
+      return json(res, 200, { token, username: account.username });
+    }
+    if (req.method === 'POST' && url === '/api/desktop-login/create') {
+      const token = bearerToken(req);
+      if (!token) return json(res, 401, { error: 'not authenticated' });
+      const accountId = await accountForToken(token);
+      if (accountId === null) return json(res, 401, { error: 'not authenticated' });
+      const account = await accountById(accountId);
+      if (account === null) return json(res, 401, { error: 'not authenticated' });
+      const status = await moderationStatusForAccount(account.id);
+      if (status.locked) return json(res, 403, { error: status.message });
+      return json(res, 200, createDesktopLoginCode(req, account));
+    }
+    if (req.method === 'POST' && url === '/api/desktop-login/exchange') {
+      const body = await readBody(req);
+      const entry = consumeDesktopLoginCode(req, body.code);
+      if (!entry) return json(res, 401, { error: 'invalid or expired desktop login code' });
+      const status = await moderationStatusForAccount(entry.accountId);
+      if (status.locked) return json(res, 403, { error: status.message });
+      await touchLogin(entry.accountId, requestMetadata(req));
+      const token = newToken();
+      await saveToken(token, entry.accountId);
+      return json(res, 200, { token, username: entry.username });
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);

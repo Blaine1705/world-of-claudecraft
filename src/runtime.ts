@@ -1,0 +1,67 @@
+const DEFAULT_DESKTOP_API_ORIGIN = 'https://worldofclaudecraft.com';
+
+export function normalizeOrigin(raw: string): string {
+  const trimmed = raw.trim().replace(/\/+$/, '');
+  if (!trimmed) return '';
+  const url = new URL(trimmed);
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error(`unsupported origin protocol: ${url.protocol}`);
+  }
+  return url.origin;
+}
+
+export function isElectronRuntime(userAgent = globalThis.navigator?.userAgent ?? ''): boolean {
+  return /\bElectron\//.test(userAgent);
+}
+
+export function isDesktopAppRuntime(userAgent = globalThis.navigator?.userAgent ?? ''): boolean {
+  return String(import.meta.env.VITE_DESKTOP_APP ?? '') === '1' || isElectronRuntime(userAgent);
+}
+
+export function desktopApiOrigin(): string {
+  const configured = String(import.meta.env.VITE_DESKTOP_API_ORIGIN ?? '').trim();
+  return normalizeOrigin(configured || DEFAULT_DESKTOP_API_ORIGIN);
+}
+
+export function runtimeApiOrigin(userAgent = globalThis.navigator?.userAgent ?? ''): string {
+  if (String(import.meta.env.VITE_DESKTOP_RELATIVE_API ?? '') === '1') return '';
+  return isDesktopAppRuntime(userAgent) ? desktopApiOrigin() : '';
+}
+
+export function runtimeWebSocketUrl(
+  protocol: string,
+  host: string,
+  origin = runtimeApiOrigin(),
+): string {
+  if (origin) {
+    const url = new URL(normalizeOrigin(origin));
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    url.pathname = '/ws';
+    url.search = '';
+    url.hash = '';
+    return url.toString();
+  }
+  const proto = protocol === 'https:' ? 'wss' : 'ws';
+  return `${proto}://${host}/ws`;
+}
+
+export interface DesktopBridge {
+  openBrowserLogin(): Promise<void>;
+  requestSteamAuthTicket(): Promise<{ ticket: string; steamId: string; displayName: string }>;
+  takeLoginCode(): Promise<string | null>;
+  onLoginCode(callback: (code: string) => void): () => void;
+}
+
+export function desktopBridge(): DesktopBridge | null {
+  const candidate = (globalThis as unknown as { wocDesktop?: unknown }).wocDesktop;
+  if (!candidate || typeof candidate !== 'object') return null;
+  const bridge = candidate as Partial<DesktopBridge>;
+  if (
+    typeof bridge.openBrowserLogin !== 'function' ||
+    typeof bridge.requestSteamAuthTicket !== 'function' ||
+    typeof bridge.takeLoginCode !== 'function' ||
+    typeof bridge.onLoginCode !== 'function'
+  )
+    return null;
+  return bridge as DesktopBridge;
+}
