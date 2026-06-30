@@ -46,6 +46,12 @@
   height: 1px;
   background: #463a1c;
 }
+/* The shared .auth-or has a bottom-only margin, which leaves the first-login chooser's
+   "already have an account?" divider hugging the Create button instead of centered
+   between the two choices. Give it symmetric vertical margin so it sits centered. */
+#discord-choice-panel .auth-or {
+  margin: 10px 0;
+}
 /* Linked-Discord PFP next to a nameplate name (and the inspect-card discord pfp). */
 .np-discord {
   display: inline-block;
