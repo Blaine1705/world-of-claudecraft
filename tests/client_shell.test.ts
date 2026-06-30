@@ -473,6 +473,14 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('} else {\n    enterLoggedOutChrome();\n  }');
   });
 
+  it('keeps the Discord unlink panel clickable over the pre-game shell', () => {
+    const startZ = Number(shellCss.match(/#start-screen \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const modalZ = Number(shellCss.match(/\.modal-backdrop \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const discordZ = Number(indexExtraCss.match(/#discord-window \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    expect(discordZ).toBeGreaterThan(startZ);
+    expect(discordZ).toBeLessThan(modalZ);
+  });
+
   it('shows a logged-in Logout nav item next to Account', () => {
     expect(html).toContain('id="nav-btn-account"');
     expect(html).toContain('id="nav-btn-logout"');
