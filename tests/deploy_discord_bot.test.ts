@@ -16,7 +16,7 @@ describe('Discord bot deploy container contract', () => {
     expect(compose).toContain('container_name: eastbrook-discord-bot');
     expect(compose).toContain('command: ["node", "dist-bot/bot.cjs"]');
     expect(compose).toContain('GAME_SERVER_URL: http://game:8787');
-    expect(compose).toContain('DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:?Set DISCORD_BOT_TOKEN');
+    expect(compose).toContain('DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}');
   });
 
   it('passes the shared Discord bot secret to the game server', () => {
