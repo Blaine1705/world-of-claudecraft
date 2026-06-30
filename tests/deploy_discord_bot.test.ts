@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const dockerfile = readFileSync('Dockerfile', 'utf8');
+const dockerignore = readFileSync('.dockerignore', 'utf8');
 const compose = readFileSync('docker-compose.yml', 'utf8');
 const composeEnv = (name: string) => `$${`{${name}:-}`}`;
 
@@ -10,6 +11,10 @@ describe('Discord bot deploy container contract', () => {
     expect(dockerfile).toContain('COPY bot ./bot');
     expect(dockerfile).toContain('npm run build:bot');
     expect(dockerfile).toContain('COPY --from=build /app/dist-bot ./dist-bot');
+  });
+
+  it('keeps the Discord bot build script in the Docker build context', () => {
+    expect(dockerignore).toContain('!scripts/build_bot.mjs');
   });
 
   it('runs the Discord bot as a separate compose service', () => {
