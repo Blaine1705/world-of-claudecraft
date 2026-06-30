@@ -725,128 +725,121 @@ export const ru_RU: EnTranslations = {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
       "open": "Discord",
-      "close": "Close",
-      "keybind": "Discord Panel",
-      "disabled": "Discord integration is not available right now.",
+      "close": "Закрыть",
+      "keybind": "Панель Discord",
+      "disabled": "Интеграция с Discord сейчас недоступна.",
       "tiers": {
-        "none": "Unranked",
-        "initiate": "Initiate",
-        "squire": "Squire",
-        "footman": "Footman",
-        "knight": "Knight",
-        "champion": "Champion",
-        "warlord": "Warlord",
-        "legend": "Legend",
-        "mythic": "Mythic"
+        "none": "Без ранга",
+        "initiate": "Послушник",
+        "squire": "Оруженосец",
+        "footman": "Пехотинец",
+        "knight": "Рыцарь",
+        "champion": "Чемпион",
+        "warlord": "Полководец",
+        "legend": "Легенда",
+        "mythic": "Мифический"
       },
-      "loginCta": "Continue with Discord",
-      "orEmail": "or use email",
+      "loginCta": "Продолжить через Discord",
+      "orEmail": "или войти по почте",
       "cta": {
-        "title": "Link your Discord to earn points and rank up",
-        "stats": "{online} online · {total} members in the server",
-        "statsLoading": "Join the community and earn rewards",
-        "button": "Link in one click",
-        "dismiss": "Dismiss"
+        "title": "Привяжите Discord, чтобы получать очки и повышать ранг",
+        "stats": "{online} в сети · {total} участников на сервере",
+        "statsLoading": "Присоединяйтесь к сообществу и получайте награды",
+        "button": "Привязать в один клик",
+        "dismiss": "Скрыть"
       },
       "link": {
-        "cta": "Link Discord",
-        "relink": "Relink Discord",
-        "connecting": "Opening Discord...",
-        "benefits": "Link your Discord to earn points from play and community activity, and climb the status tiers.",
-        "error": "Could not link Discord. Please try again.",
-        "success": "Discord linked."
+        "cta": "Привязать Discord",
+        "relink": "Перепривязать Discord",
+        "connecting": "Открываем Discord...",
+        "benefits": "Привяжите Discord, чтобы получать очки за игру и активность в сообществе и подниматься по рангам статуса.",
+        "error": "Не удалось привязать Discord. Пожалуйста, попробуйте снова.",
+        "success": "Discord привязан."
       },
-      "linkedAs": "Linked as {name}",
+      "linkedAs": "Привязан как {name}",
       "linkedTitle": "Discord: {name}",
       "viewCharacter": "View {name}",
-      "viewProfile": "Open this character's public profile",
-      "unlink": "Unlink",
-      "visit": "Visit Discord",
-      "unlinkConfirm": "Unlink your Discord account from this game account?",
-      "statusLabel": "Status",
+      "viewProfile": "Открыть публичный профиль этого персонажа",
+      "unlink": "Отвязать",
+      "visit": "Перейти в Discord",
+      "unlinkConfirm": "Отвязать аккаунт Discord от этого игрового аккаунта?",
+      "statusLabel": "Статус",
       "rank": "Rank",
-      "points": "Points",
-      "lifetime": "Lifetime",
-      "toNext": "{points} to next rank",
-      "maxRank": "Top rank reached",
-      "tiersTitle": "Status Tiers",
-      "tierLocked": "Locked",
-      "tierCurrent": "Current",
-      "earnTitle": "How to earn points",
-      "earnBody": "Earn points from time played in game and from staying active in the Discord. Points raise your status tier.",
-      "memberSince": "Member since",
-      "memberSinceDays": "{days}d in the Discord",
+      "points": "Очки",
+      "lifetime": "За все время",
+      "toNext": "{points} до следующего ранга",
+      "maxRank": "Достигнут высший ранг",
+      "tiersTitle": "Ранги статуса",
+      "tierLocked": "Заблокировано",
+      "tierCurrent": "Текущий",
+      "earnTitle": "Как получать очки",
+      "earnBody": "Получайте очки за время в игре и за активность в Discord. Очки повышают ваш ранг статуса.",
+      "memberSince": "Участник с",
+      "memberSinceDays": "{days} дн. в Discord",
       "roleTag": {
         "levyst": "Levy St",
         "devs": "Dev",
         "mods": "Mod",
-        "artists": "Artist"
+        "artists": "Художник"
       },
-      "guildMember": "Verified member",
-      "notMember": "Not in the server yet",
-      "joinCta": "Join the Discord",
-      "online": "{count} online",
-      "community": "Community",
-      "rewards": "Rewards",
+      "guildMember": "Подтвержденный участник",
+      "notMember": "Еще не на сервере",
+      "joinCta": "Присоединиться к Discord",
+      "online": "{count} в сети",
+      "community": "Сообщество",
+      "rewards": "Награды",
       "voice": {
-        "title": "Voice",
+        "title": "Голос",
         "channel": "In {channel}",
-        "empty": "No one is in voice right now.",
-        "speaking": "Speaking",
-        "muted": "Muted",
-        "join": "Join voice",
-        "connect": "Connect to voice channel"
+        "empty": "Сейчас в голосовом канале никого нет.",
+        "speaking": "Говорит",
+        "muted": "Без звука",
+        "join": "Войти в голосовой канал",
+        "connect": "Подключиться к голосовому каналу"
       },
       "swag": {
         "title": "Swag",
-        "claim": "Claim",
-        "claimed": "Claimed",
-        "locked": "Locked",
+        "claim": "Получить",
+        "claimed": "Получено",
+        "locked": "Заблокировано",
         "free": "Free",
         "cost": "{points} pts",
-        "needTier": "Reach a higher rank to claim this.",
-        "needPoints": "Not enough points.",
-        "claimError": "Could not claim that reward. Please try again.",
-        "claimedToast": "Claimed: {name}",
-        "titleDiscordian": "Title: Discordian",
-        "titleSquire": "Title: Squire of the Realm",
-        "chromaBlurple": "Blurple Mech Chroma",
-        "titleChampion": "Title: Champion of Claudemoon",
-        "swagStickers": "Sticker Pack (shipped)",
-        "swagTee": "T-Shirt (shipped)"
-      },
-      "flex": {
-        "cta": "Flex to Discord",
-        "posting": "Posting...",
-        "done": "Posted your champion to Discord.",
-        "error": "Could not post to Discord.",
-        "needLink": "Link Discord first to flex your character."
+        "needTier": "Достигните более высокого ранга, чтобы получить это.",
+        "needPoints": "Недостаточно очков.",
+        "claimError": "Не удалось получить эту награду. Пожалуйста, попробуйте снова.",
+        "claimedToast": "Получено: {name}",
+        "titleDiscordian": "Титул: Discordian",
+        "titleSquire": "Титул: Оруженосец Королевства",
+        "chromaBlurple": "Расцветка меха Blurple",
+        "titleChampion": "Титул: Чемпион Claudemoon",
+        "swagStickers": "Набор стикеров (с доставкой)",
+        "swagTee": "Футболка (с доставкой)"
       },
       "relay": {
-        "tooFast": "You are posting too fast. Wait a moment and try again.",
+        "tooFast": "Вы отправляете сообщения слишком часто. Подождите немного и попробуйте снова.",
         "lfg": {
-          "label": "Looking for Group",
-          "hint": "Find players for a dungeon or quest"
+          "label": "Поиск группы",
+          "hint": "Найдите игроков для подземелья или задания"
         },
         "wts": {
           "label": "Want to Sell",
-          "hint": "Advertise an item or service for sale"
+          "hint": "Объявите о продаже предмета или услуги"
         },
         "wtb": {
           "label": "Want to Buy",
-          "hint": "Request an item you want to buy"
+          "hint": "Запросите предмет, который хотите купить"
         },
         "recruit": {
-          "label": "Guild Recruiting",
-          "hint": "Recruit players for your guild"
+          "label": "Набор в гильдию",
+          "hint": "Набирайте игроков в свою гильдию"
         },
         "event": {
-          "label": "Event / Raid",
-          "hint": "Announce a raid, meetup or event"
+          "label": "Событие / Рейд",
+          "hint": "Объявите о рейде, встрече или событии"
         },
         "help": {
           "label": "Need Help",
-          "hint": "Ask the community for help"
+          "hint": "Попросите сообщество о помощи"
         }
       }
     }

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canClaimSwag,
   DISCORD_REWARD_GRANTS,
   DISCORD_STATUS_DEFS,
   DISCORD_SWAG,
-  canClaimSwag,
   discordStatusByIndex,
   discordStatusForPoints,
   discordStatusIndexForPoints,
@@ -43,7 +43,9 @@ describe('discord status ladder', () => {
 
   it('keeps thresholds monotonically increasing', () => {
     for (let i = 1; i < DISCORD_STATUS_DEFS.length; i++) {
-      expect(DISCORD_STATUS_DEFS[i].threshold).toBeGreaterThan(DISCORD_STATUS_DEFS[i - 1].threshold);
+      expect(DISCORD_STATUS_DEFS[i].threshold).toBeGreaterThan(
+        DISCORD_STATUS_DEFS[i - 1].threshold,
+      );
     }
   });
 });
@@ -65,17 +67,19 @@ describe('swag catalog + claim rules', () => {
 
   it('allows a claim only when tier, points, and not-already-claimed all hold', () => {
     const swag = DISCORD_SWAG.find((s) => s.id === 'chroma_blurple')!; // cost 1000, minTier 3
-    expect(
-      canClaimSwag({ swag, spendablePoints: 1_000, statusTier: 3, claimedIds: [] }),
-    ).toEqual({ ok: true, reason: 'ok' });
+    expect(canClaimSwag({ swag, spendablePoints: 1_000, statusTier: 3, claimedIds: [] })).toEqual({
+      ok: true,
+      reason: 'ok',
+    });
     expect(
       canClaimSwag({ swag, spendablePoints: 1_000, statusTier: 2, claimedIds: [] }).reason,
     ).toBe('tier');
+    expect(canClaimSwag({ swag, spendablePoints: 999, statusTier: 3, claimedIds: [] }).reason).toBe(
+      'points',
+    );
     expect(
-      canClaimSwag({ swag, spendablePoints: 999, statusTier: 3, claimedIds: [] }).reason,
-    ).toBe('points');
-    expect(
-      canClaimSwag({ swag, spendablePoints: 9_999, statusTier: 9, claimedIds: ['chroma_blurple'] }).reason,
+      canClaimSwag({ swag, spendablePoints: 9_999, statusTier: 9, claimedIds: ['chroma_blurple'] })
+        .reason,
     ).toBe('claimed');
   });
 

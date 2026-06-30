@@ -5,16 +5,21 @@
 // (attachTooltip/hideTooltip) and the action callbacks via an injected `deps`
 // object. It owns no state and never imports Hud. The branching logic lives in
 // the pure view (discord_widget_view.ts); this just paints + wires clicks.
-import { t, formatNumber } from './i18n';
-import { esc } from './esc';
-import { svgIcon } from './ui_icons';
+
+import type {
+  DiscordAccountStatus,
+  DiscordPresenceState,
+  DiscordVoiceMember,
+} from './discord_status';
 import {
   DISCORD_STATUS_TIERS,
   discordStatusBadgeDataUrl,
   discordStatusDisplayName,
 } from './discord_tier';
 import { buildDiscordWidgetView, type DiscordTierRow } from './discord_widget_view';
-import type { DiscordAccountStatus, DiscordPresenceState, DiscordVoiceMember } from './discord_status';
+import { esc } from './esc';
+import { formatNumber, t } from './i18n';
+import { svgIcon } from './ui_icons';
 
 export interface DiscordWidgetDeps {
   attachTooltip: (el: HTMLElement, html: () => string) => void;
@@ -55,7 +60,9 @@ function tierRowHtml(row: DiscordTierRow): string {
       : `<span class="dc-tier-chip is-locked">${esc(t('hudChrome.discord.tierLocked'))}</span>`;
   // Requirement line is the lifetime-points threshold (e.g. "2,000 pts").
   const reqText =
-    row.threshold > 0 ? t('hudChrome.discord.swag.cost', { points: formatNumber(row.threshold) }) : '';
+    row.threshold > 0
+      ? t('hudChrome.discord.swag.cost', { points: formatNumber(row.threshold) })
+      : '';
   return (
     `<li class="dc-tier-row${row.current ? ' is-current' : ''}${row.reached ? ' is-reached' : ' is-locked'}" style="--dc-tier:${ring}">` +
     `<img class="dc-tier-badge" src="${badge}" alt="" draggable="false" />` +
@@ -152,8 +159,16 @@ export function renderDiscordWidget(
 
   // ── wire clicks ────────────────────────────────────────────────────────────
   el.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => deps.onClose());
-  el.querySelector<HTMLElement>('[data-action="link"]')?.addEventListener('click', () => deps.onLink());
-  el.querySelector<HTMLElement>('[data-action="unlink"]')?.addEventListener('click', () => deps.onUnlink());
-  el.querySelector<HTMLElement>('[data-action="visit"]')?.addEventListener('click', () => deps.onOpenUrl(input.inviteUrl));
-  el.querySelector<HTMLElement>('[data-action="join"]')?.addEventListener('click', () => deps.onOpenUrl(input.inviteUrl));
+  el.querySelector<HTMLElement>('[data-action="link"]')?.addEventListener('click', () =>
+    deps.onLink(),
+  );
+  el.querySelector<HTMLElement>('[data-action="unlink"]')?.addEventListener('click', () =>
+    deps.onUnlink(),
+  );
+  el.querySelector<HTMLElement>('[data-action="visit"]')?.addEventListener('click', () =>
+    deps.onOpenUrl(input.inviteUrl),
+  );
+  el.querySelector<HTMLElement>('[data-action="join"]')?.addEventListener('click', () =>
+    deps.onOpenUrl(input.inviteUrl),
+  );
 }

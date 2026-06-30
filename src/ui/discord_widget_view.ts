@@ -6,9 +6,9 @@
 // (discord_widget.ts) maps the stable keys to t() and paints. Unit-tested in
 // tests/discord_widget_view.test.ts. Mirrors src/ui/vendor_view.ts.
 import {
+  canClaimSwag,
   DISCORD_STATUS_DEFS,
   DISCORD_SWAG,
-  canClaimSwag,
   pointsToNextStatus,
   type SwagItem,
 } from '../sim/discord_tier';

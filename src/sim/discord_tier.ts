@@ -33,7 +33,7 @@ export const DISCORD_STATUS_DEFS = [
   { index: 8, key: 'mythic', threshold: 150_000 },
 ] as const satisfies readonly DiscordStatusTierCore[];
 
-export type DiscordStatusKey = typeof DISCORD_STATUS_DEFS[number]['key'];
+export type DiscordStatusKey = (typeof DISCORD_STATUS_DEFS)[number]['key'];
 
 /** Highest rung a lifetime-points total qualifies for (never null for >= 0). */
 export function discordStatusForPoints(lifetimePoints: number): DiscordStatusTierCore {
@@ -104,10 +104,38 @@ export interface SwagItem {
 // Cosmetic-only rewards unlocked by status tier (no physical/real-world swag): a
 // title or chroma you earn as you climb the points ladder.
 export const DISCORD_SWAG: readonly SwagItem[] = [
-  { id: 'title_discordian', key: 'titleDiscordian', kind: 'title', cost: 0, minTier: 1, grantId: 'discordian' },
-  { id: 'title_squire', key: 'titleSquire', kind: 'title', cost: 200, minTier: 2, grantId: 'squire_of_the_realm' },
-  { id: 'chroma_blurple', key: 'chromaBlurple', kind: 'cosmetic', cost: 1_000, minTier: 3, grantId: 'vanguard_azure' },
-  { id: 'title_champion', key: 'titleChampion', kind: 'title', cost: 2_500, minTier: 5, grantId: 'champion_of_claudemoon' },
+  {
+    id: 'title_discordian',
+    key: 'titleDiscordian',
+    kind: 'title',
+    cost: 0,
+    minTier: 1,
+    grantId: 'discordian',
+  },
+  {
+    id: 'title_squire',
+    key: 'titleSquire',
+    kind: 'title',
+    cost: 200,
+    minTier: 2,
+    grantId: 'squire_of_the_realm',
+  },
+  {
+    id: 'chroma_blurple',
+    key: 'chromaBlurple',
+    kind: 'cosmetic',
+    cost: 1_000,
+    minTier: 3,
+    grantId: 'vanguard_azure',
+  },
+  {
+    id: 'title_champion',
+    key: 'titleChampion',
+    kind: 'title',
+    cost: 2_500,
+    minTier: 5,
+    grantId: 'champion_of_claudemoon',
+  },
 ] as const;
 
 export function swagById(id: string): SwagItem | undefined {

@@ -87,6 +87,13 @@ import {
   touchLogin,
   updatePasswordHash,
 } from './db';
+import {
+  handleDiscordCallback,
+  handleDiscordStart,
+  handleDiscordStatus,
+  handleDiscordUnlink,
+} from './discord';
+import { pruneDiscordOAuthStates } from './discord_db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
 import { isUniqueViolation, json, readBody } from './http_util';
@@ -132,13 +139,6 @@ import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { verifyTurnstile } from './turnstile';
-import {
-  handleDiscordCallback,
-  handleDiscordStart,
-  handleDiscordStatus,
-  handleDiscordUnlink,
-} from './discord';
-import { pruneDiscordOAuthStates } from './discord_db';
 import {
   handleWalletChallenge,
   handleWalletGet,

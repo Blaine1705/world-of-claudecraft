@@ -6,7 +6,7 @@
 // localized here through t().
 import { isRelayInput, matchRelayCommands, type RelayCommand } from '../sim/discord_relay';
 import { esc } from './esc';
-import { t, type TranslationKey } from './i18n';
+import { type TranslationKey, t } from './i18n';
 
 // Localized label/hint per command id (the catalog keeps English for the Discord
 // embed; the in-game dropdown is localized).
@@ -14,8 +14,14 @@ const RELAY_TEXT: Record<string, { label: TranslationKey; hint: TranslationKey }
   lfg: { label: 'hudChrome.discord.relay.lfg.label', hint: 'hudChrome.discord.relay.lfg.hint' },
   wts: { label: 'hudChrome.discord.relay.wts.label', hint: 'hudChrome.discord.relay.wts.hint' },
   wtb: { label: 'hudChrome.discord.relay.wtb.label', hint: 'hudChrome.discord.relay.wtb.hint' },
-  recruit: { label: 'hudChrome.discord.relay.recruit.label', hint: 'hudChrome.discord.relay.recruit.hint' },
-  event: { label: 'hudChrome.discord.relay.event.label', hint: 'hudChrome.discord.relay.event.hint' },
+  recruit: {
+    label: 'hudChrome.discord.relay.recruit.label',
+    hint: 'hudChrome.discord.relay.recruit.hint',
+  },
+  event: {
+    label: 'hudChrome.discord.relay.event.label',
+    hint: 'hudChrome.discord.relay.event.hint',
+  },
   help: { label: 'hudChrome.discord.relay.help.label', hint: 'hudChrome.discord.relay.help.hint' },
 };
 

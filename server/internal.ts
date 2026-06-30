@@ -1,8 +1,10 @@
-import * as http from 'node:http';
 import { timingSafeEqual } from 'node:crypto';
-import { json, readBody } from './http_util';
-import type { GameServer } from './game';
+import type * as http from 'node:http';
+import { specialRoleByKey } from '../src/sim/discord_roles';
+import { DISCORD_REWARD_GRANTS, discordStatusIndexForPoints } from '../src/sim/discord_tier';
 import { pool } from './db';
+import { discordFlexForAccount, setDiscordPresenceCache } from './discord';
+import { drainActivity } from './discord_activity';
 import {
   accountForDiscord,
   discordForAccount,
@@ -12,10 +14,8 @@ import {
   setDiscordMemberMeta,
 } from './discord_db';
 import { drainRelay } from './discord_relay';
-import { drainActivity } from './discord_activity';
-import { specialRoleByKey } from '../src/sim/discord_roles';
-import { discordFlexForAccount, setDiscordPresenceCache } from './discord';
-import { DISCORD_REWARD_GRANTS, discordStatusIndexForPoints } from '../src/sim/discord_tier';
+import type { GameServer } from './game';
+import { json, readBody } from './http_util';
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -28,7 +28,9 @@ function fail(res: http.ServerResponse, status: number, error: string, data: unk
 function secretsMatch(actual: string, expected: string): boolean {
   const actualBuffer = Buffer.from(actual);
   const expectedBuffer = Buffer.from(expected);
-  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+  return (
+    actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer)
+  );
 }
 
 export async function handleInternalApi(
@@ -196,8 +198,7 @@ async function handleDiscordInternal(
       const joinedAtMs =
         typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
       // Only accept a known special-role key; anything else clears the role.
-      const roleKey =
-        typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
+      const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
       await setDiscordMemberMeta(pool, id, name, joinedAtMs, roleKey);
       updated++;
     }
@@ -212,7 +213,12 @@ function clampInt(value: unknown, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-function sanitizeVoiceMember(m: unknown): { id: string; name: string; speaking: boolean; selfMute: boolean } {
+function sanitizeVoiceMember(m: unknown): {
+  id: string;
+  name: string;
+  speaking: boolean;
+  selfMute: boolean;
+} {
   const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
   return {
     id: typeof o.id === 'string' ? o.id.slice(0, 32) : '',

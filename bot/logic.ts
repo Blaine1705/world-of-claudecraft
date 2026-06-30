@@ -3,11 +3,7 @@
 // and voice-presence shaping. Kept separate from the ws/fetch IO (gateway.ts,
 // discord_api.ts, server_client.ts) so it is unit-tested without a network. This
 // is the same pure/IO split the server uses (wallet_link.ts vs wallet.ts).
-import {
-  DISCORD_STATUS_DEFS,
-  discordStatusByIndex,
-  type DiscordStatusKey,
-} from '../src/sim/discord_tier';
+import { DISCORD_STATUS_DEFS, discordStatusByIndex } from '../src/sim/discord_tier';
 
 // ── Gateway ──────────────────────────────────────────────────────────────────
 // Intents we need: guild metadata, members (privileged), voice states (who is in
@@ -32,9 +28,9 @@ export const GATEWAY_OP = {
 
 /** Heartbeat interval from a HELLO payload (ms), defaulting to 41.25s. */
 export function heartbeatIntervalMs(hello: unknown): number {
-  const d = (hello && typeof hello === 'object' ? (hello as Record<string, unknown>).d : null) as
-    | Record<string, unknown>
-    | null;
+  const d = (
+    hello && typeof hello === 'object' ? (hello as Record<string, unknown>).d : null
+  ) as Record<string, unknown> | null;
   const interval = d && typeof d.heartbeat_interval === 'number' ? d.heartbeat_interval : 41250;
   return Math.max(1000, interval);
 }
@@ -50,7 +46,11 @@ export function identifyPayload(token: string): Record<string, unknown> {
   };
 }
 
-export function resumePayload(token: string, sessionId: string, seq: number | null): Record<string, unknown> {
+export function resumePayload(
+  token: string,
+  sessionId: string,
+  seq: number | null,
+): Record<string, unknown> {
   return { op: GATEWAY_OP.RESUME, d: { token, session_id: sessionId, seq } };
 }
 
@@ -60,7 +60,7 @@ export const SLASH_COMMANDS = [
   { name: 'link', description: 'Get the link to connect your Discord to World of ClaudeCraft' },
 ] as const;
 
-export type SlashCommandName = typeof SLASH_COMMANDS[number]['name'];
+export type SlashCommandName = (typeof SLASH_COMMANDS)[number]['name'];
 
 export function isSlashCommand(name: string): name is SlashCommandName {
   return SLASH_COMMANDS.some((c) => c.name === name);
@@ -112,7 +112,7 @@ export function computeRoleSync(opts: {
   tierRoleIds: ReadonlyMap<number, string>;
 }): { toAdd: string[]; toRemove: string[] } {
   const { tier, memberRoleIds, tierRoleIds } = opts;
-  const desired = tier >= 1 ? tierRoleIds.get(tier) ?? null : null;
+  const desired = tier >= 1 ? (tierRoleIds.get(tier) ?? null) : null;
   const allTierRoleIds = new Set(tierRoleIds.values());
   const have = new Set(memberRoleIds);
   const toAdd = desired && !have.has(desired) ? [desired] : [];
@@ -152,7 +152,10 @@ export function levelNickSuffix(level: number, className: string): string {
 export function buildLevelNick(baseName: string, level: number, className: string): string {
   const suffix = levelNickSuffix(level, className);
   const suffixLen = [...suffix].length;
-  const base = [...baseName].slice(0, Math.max(1, NICK_MAX - suffixLen)).join('').trimEnd();
+  const base = [...baseName]
+    .slice(0, Math.max(1, NICK_MAX - suffixLen))
+    .join('')
+    .trimEnd();
   const nick = `${base}${suffix}`;
   const cps = [...nick];
   return cps.length > NICK_MAX ? cps.slice(0, NICK_MAX).join('') : nick;
@@ -349,7 +352,9 @@ function mentionFor(name: string, parts: readonly ActivityParticipant[]): string
 export function buildActivityMessage(item: ActivityItem): Record<string, unknown> {
   const subject = item.participants[0];
   const subjectName = subject?.name ?? item.winnerName ?? '';
-  const subjectAvatar = subject ? relayAvatarUrl(subject.discordUserId, subject.discordAvatar) : null;
+  const subjectAvatar = subject
+    ? relayAvatarUrl(subject.discordUserId, subject.discordAvatar)
+    : null;
   const linkedIds = item.participants
     .map((p) => p.discordUserId)
     .filter((id): id is string => !!id);

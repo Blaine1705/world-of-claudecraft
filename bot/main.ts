@@ -10,12 +10,13 @@
 // Discord state (gateway/REST) lives entirely here; the game server stays the
 // authority for rewards. Pure protocol/diff/embed logic is in ./logic (tested);
 // this file is the wiring. esbuild-bundled for Node via `npm run bot`.
+
+import { DISCORD_SPECIAL_ROLES } from '../src/sim/discord_roles';
+import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
 import { loadConfig } from './config';
 import { DiscordApi } from './discord_api';
 import { Gateway } from './gateway';
-import { ServerClient, type VoiceMemberPush } from './server_client';
 import {
-  SLASH_COMMANDS,
   allTierRoleNames,
   buildActivityMessage,
   buildLevelNick,
@@ -24,12 +25,12 @@ import {
   buildWhoamiContent,
   computeRoleSync,
   isSlashCommand,
+  type RawVoiceState,
+  SLASH_COMMANDS,
   tierRoleColor,
   voiceMembersForChannel,
-  type RawVoiceState,
 } from './logic';
-import { DISCORD_SPECIAL_ROLES } from '../src/sim/discord_roles';
-import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
+import { ServerClient, type VoiceMemberPush } from './server_client';
 
 const ROLE_SYNC_INTERVAL_MS = 5 * 60_000;
 const PRESENCE_DEBOUNCE_MS = 4_000;
@@ -135,7 +136,7 @@ async function main(): Promise<void> {
     await server.pushPresence({
       onlineCount: onlineUsers.size,
       memberTotal,
-      voiceChannelName: cfg.voiceChannelId ? voiceChannelName ?? 'Voice' : null,
+      voiceChannelName: cfg.voiceChannelId ? (voiceChannelName ?? 'Voice') : null,
       voice,
     });
   };
@@ -172,7 +173,9 @@ async function main(): Promise<void> {
         points: 0,
         lifetimePoints: 0,
       };
-      await discord.editOriginalResponse(cfg.clientId, token, { content: buildWhoamiContent(roles) });
+      await discord.editOriginalResponse(cfg.clientId, token, {
+        content: buildWhoamiContent(roles),
+      });
     }
   };
 
@@ -183,7 +186,11 @@ async function main(): Promise<void> {
     if (!flex || !flex.linked) return;
     const { toAdd, toRemove } =
       tierRoleIds.size > 0
-        ? computeRoleSync({ tier: flex.statusTier, memberRoleIds: memberRoles.get(userId) ?? [], tierRoleIds })
+        ? computeRoleSync({
+            tier: flex.statusTier,
+            memberRoleIds: memberRoles.get(userId) ?? [],
+            tierRoleIds,
+          })
         : { toAdd: [] as string[], toRemove: [] as string[] };
     // Only update the cached role set when the Discord API call actually
     // succeeds, so a failed add/remove is retried on the next sync (not masked
@@ -199,7 +206,10 @@ async function main(): Promise<void> {
     for (const roleId of toRemove) {
       try {
         await discord.removeMemberRole(cfg.guildId, userId, roleId);
-        memberRoles.set(userId, (memberRoles.get(userId) ?? []).filter((r) => r !== roleId));
+        memberRoles.set(
+          userId,
+          (memberRoles.get(userId) ?? []).filter((r) => r !== roleId),
+        );
       } catch (e) {
         console.error(e);
       }
@@ -209,9 +219,9 @@ async function main(): Promise<void> {
     if (cfg.syncNicknames && flex.character) {
       const base = flex.username ?? memberNames.get(userId) ?? 'Member';
       const nick = buildLevelNick(base, flex.character.level, flex.character.class);
-      await discord.setNickname(cfg.guildId, userId, nick).catch((e) =>
-        console.error('[bot] setNickname failed', e),
-      );
+      await discord
+        .setNickname(cfg.guildId, userId, nick)
+        .catch((e) => console.error('[bot] setNickname failed', e));
     }
   };
   const syncAllOnlineRoles = async (): Promise<void> => {
@@ -311,7 +321,8 @@ async function main(): Promise<void> {
     for (const v of asArray(d.voice_states)) {
       const id = String(v.user_id ?? '');
       const channelId = typeof v.channel_id === 'string' ? v.channel_id : null;
-      if (id && channelId) voiceStates.set(id, { userId: id, channelId, selfMute: v.self_mute === true });
+      if (id && channelId)
+        voiceStates.set(id, { userId: id, channelId, selfMute: v.self_mute === true });
     }
     for (const p of asArray(d.presences)) {
       const u = (p.user ?? {}) as Record<string, unknown>;
@@ -343,9 +354,9 @@ async function main(): Promise<void> {
     if (dailyActiveSeen.has(key)) return;
     dailyActiveSeen.add(key);
     const g = DISCORD_REWARD_GRANTS.dailyActive;
-    void server.grant(userId, g.reason, g.points, `${g.reason}:${userId}:${day}`).catch((e) =>
-      console.error('[bot] daily-active grant failed', e),
-    );
+    void server
+      .grant(userId, g.reason, g.points, `${g.reason}:${userId}:${day}`)
+      .catch((e) => console.error('[bot] daily-active grant failed', e));
   };
 
   // Drain + deliver queued in-game "!" community posts (LFG etc.) to the relay
@@ -372,8 +383,14 @@ async function main(): Promise<void> {
   };
 
   gateway.connect(false);
-  setInterval(() => void syncAllOnlineRoles().catch((e) => console.error(e)), ROLE_SYNC_INTERVAL_MS).unref();
-  setInterval(() => void refreshTierRoles().catch((e) => console.error(e)), ROLE_SYNC_INTERVAL_MS).unref();
+  setInterval(
+    () => void syncAllOnlineRoles().catch((e) => console.error(e)),
+    ROLE_SYNC_INTERVAL_MS,
+  ).unref();
+  setInterval(
+    () => void refreshTierRoles().catch((e) => console.error(e)),
+    ROLE_SYNC_INTERVAL_MS,
+  ).unref();
   setInterval(() => void pollRelay().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
   setInterval(() => void pollActivity().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
   setInterval(() => {

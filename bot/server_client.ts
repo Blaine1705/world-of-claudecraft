@@ -57,11 +57,17 @@ export class ServerClient {
   }
 
   flex(discordUserId: string): Promise<(FlexData & { linked: boolean }) | null> {
-    return this.call('GET', `/internal/discord/flex?discord_user_id=${encodeURIComponent(discordUserId)}`);
+    return this.call(
+      'GET',
+      `/internal/discord/flex?discord_user_id=${encodeURIComponent(discordUserId)}`,
+    );
   }
 
   roles(discordUserId: string): Promise<RolesData | null> {
-    return this.call('GET', `/internal/discord/roles?discord_user_id=${encodeURIComponent(discordUserId)}`);
+    return this.call(
+      'GET',
+      `/internal/discord/roles?discord_user_id=${encodeURIComponent(discordUserId)}`,
+    );
   }
 
   pushPresence(snapshot: {
@@ -73,7 +79,12 @@ export class ServerClient {
     return this.call('POST', '/internal/discord/presence', snapshot);
   }
 
-  grant(discordUserId: string, reason: string, points: number, dedupeKey?: string): Promise<unknown> {
+  grant(
+    discordUserId: string,
+    reason: string,
+    points: number,
+    dedupeKey?: string,
+  ): Promise<unknown> {
     return this.call('POST', '/internal/discord/grant', {
       discord_user_id: discordUserId,
       reason,

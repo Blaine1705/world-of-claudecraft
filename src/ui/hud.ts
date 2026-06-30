@@ -57,6 +57,7 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
+import { specialRoleColor } from '../sim/discord_roles';
 import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
@@ -143,6 +144,7 @@ import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
 import { DelveMapPainter } from './delve_map_painter';
 import { markDialogRoot } from './dialog_root';
+import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { emoteIconUrl } from './emote_icons';
 import {
@@ -157,8 +159,6 @@ import { esc } from './esc';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
-import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
-import { specialRoleColor } from '../sim/discord_roles';
 import {
   holderTierBadgeDataUrl,
   holderTierByIndex,

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
-  RELAY_COMMANDS,
-  RELAY_MAX_MESSAGE,
   isRelayInput,
   matchRelayCommands,
   parseRelayCommand,
+  RELAY_COMMANDS,
+  RELAY_MAX_MESSAGE,
   relayCommandById,
 } from '../src/sim/discord_relay';
 

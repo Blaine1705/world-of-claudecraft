@@ -102,9 +102,24 @@ import {
   validateForm,
 } from './ui/auth_utils';
 import { assembleBugReportMeta } from './ui/bug_report';
-import { chatInputSize } from './ui/chat_input_autosize';
 import { ChatCommandMenu } from './ui/chat_command_menu';
+import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import {
+  type DiscordAccountStatus,
+  type DiscordPresenceState,
+  type DiscordVoiceMember,
+  discordInviteUrl,
+  discordPresence,
+  discordStatus,
+  discordUiEnabled,
+  onDiscordStatusChange,
+  setDiscordInviteUrl,
+  setDiscordPresence,
+  setDiscordStatus,
+  setDiscordUiEnabled,
+} from './ui/discord_status';
+import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { Hud } from './ui/hud';
@@ -144,21 +159,6 @@ import {
 } from './ui/two_factor_setup';
 import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
-import { renderDiscordWidget } from './ui/discord_widget';
-import {
-  discordInviteUrl,
-  discordPresence,
-  discordStatus,
-  discordUiEnabled,
-  onDiscordStatusChange,
-  setDiscordInviteUrl,
-  setDiscordPresence,
-  setDiscordStatus,
-  setDiscordUiEnabled,
-  type DiscordAccountStatus,
-  type DiscordPresenceState,
-  type DiscordVoiceMember,
-} from './ui/discord_status';
 import {
   resolveWocBalanceUpdate,
   setWalletDisplayAvailable,

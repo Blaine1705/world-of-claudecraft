@@ -24,12 +24,54 @@ export interface RelayCommand {
 export const RELAY_MAX_MESSAGE = 280;
 
 export const RELAY_COMMANDS: readonly RelayCommand[] = [
-  { id: 'lfg', label: 'Looking for Group', hint: 'Find players for a dungeon or quest', tag: 'LFG', color: 0x5865f2, placeholder: 'e.g. Need a healer for Cragmaw Crypt' },
-  { id: 'wts', label: 'Want to Sell', hint: 'Advertise an item or service for sale', tag: 'WTS', color: 0xc8941a, placeholder: 'e.g. Selling Ember Greatsword, 5g' },
-  { id: 'wtb', label: 'Want to Buy', hint: 'Request an item you want to buy', tag: 'WTB', color: 0x2ea33c, placeholder: 'e.g. Buying linen cloth, paying well' },
-  { id: 'recruit', label: 'Guild Recruiting', hint: 'Recruit players for your guild', tag: 'GUILD', color: 0x9b6cff, placeholder: 'e.g. <Vanguard> recruiting all classes' },
-  { id: 'event', label: 'Event / Raid', hint: 'Announce a raid, meetup or event', tag: 'EVENT', color: 0xe0913f, placeholder: 'e.g. Crypt raid forming at the fountain' },
-  { id: 'help', label: 'Need Help', hint: 'Ask the community for help', tag: 'HELP', color: 0xc0563f, placeholder: 'e.g. Stuck on the Aldric quest, any tips?' },
+  {
+    id: 'lfg',
+    label: 'Looking for Group',
+    hint: 'Find players for a dungeon or quest',
+    tag: 'LFG',
+    color: 0x5865f2,
+    placeholder: 'e.g. Need a healer for Cragmaw Crypt',
+  },
+  {
+    id: 'wts',
+    label: 'Want to Sell',
+    hint: 'Advertise an item or service for sale',
+    tag: 'WTS',
+    color: 0xc8941a,
+    placeholder: 'e.g. Selling Ember Greatsword, 5g',
+  },
+  {
+    id: 'wtb',
+    label: 'Want to Buy',
+    hint: 'Request an item you want to buy',
+    tag: 'WTB',
+    color: 0x2ea33c,
+    placeholder: 'e.g. Buying linen cloth, paying well',
+  },
+  {
+    id: 'recruit',
+    label: 'Guild Recruiting',
+    hint: 'Recruit players for your guild',
+    tag: 'GUILD',
+    color: 0x9b6cff,
+    placeholder: 'e.g. <Vanguard> recruiting all classes',
+  },
+  {
+    id: 'event',
+    label: 'Event / Raid',
+    hint: 'Announce a raid, meetup or event',
+    tag: 'EVENT',
+    color: 0xe0913f,
+    placeholder: 'e.g. Crypt raid forming at the fountain',
+  },
+  {
+    id: 'help',
+    label: 'Need Help',
+    hint: 'Ask the community for help',
+    tag: 'HELP',
+    color: 0xc0563f,
+    placeholder: 'e.g. Stuck on the Aldric quest, any tips?',
+  },
 ];
 
 export function relayCommandById(id: string): RelayCommand | undefined {

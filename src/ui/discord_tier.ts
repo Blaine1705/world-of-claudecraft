@@ -7,11 +7,11 @@
 // t() against the English-only hudChrome.discord.tiers.* keys.
 import {
   DISCORD_STATUS_DEFS,
+  type DiscordStatusKey,
   discordStatusByIndex as sharedStatusByIndex,
   discordStatusForPoints as sharedStatusForPoints,
-  type DiscordStatusKey,
 } from '../sim/discord_tier';
-import { t, type TranslationKey } from './i18n';
+import { type TranslationKey, t } from './i18n';
 
 export interface DiscordStatusTier {
   index: number;
@@ -36,10 +36,12 @@ const DISCORD_STATUS_ACCENTS: Record<DiscordStatusKey, { ring: string; glow: str
   mythic: { ring: '#ff6fb5', glow: '#e0348a' },
 };
 
-export const DISCORD_STATUS_TIERS: readonly DiscordStatusTier[] = DISCORD_STATUS_DEFS.map((tier) => ({
-  ...tier,
-  ...DISCORD_STATUS_ACCENTS[tier.key],
-}));
+export const DISCORD_STATUS_TIERS: readonly DiscordStatusTier[] = DISCORD_STATUS_DEFS.map(
+  (tier) => ({
+    ...tier,
+    ...DISCORD_STATUS_ACCENTS[tier.key],
+  }),
+);
 
 const DISCORD_STATUS_TEXT_KEYS = {
   initiate: 'hudChrome.discord.tiers.initiate',

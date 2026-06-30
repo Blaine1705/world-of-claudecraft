@@ -1,25 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import {
-  GATEWAY_INTENTS,
-  NICK_MAX,
+  type ActivityItem,
   allTierRoleNames,
-  buildLevelNick,
-  levelNickSuffix,
   buildActivityMessage,
+  buildLevelNick,
   buildLinkContent,
   buildRelayMessage,
   buildWelcomeMessage,
   buildWhoamiContent,
   computeRoleSync,
+  GATEWAY_INTENTS,
   heartbeatIntervalMs,
   identifyPayload,
   isSlashCommand,
+  levelNickSuffix,
+  NICK_MAX,
+  type RelayItem,
   relayAvatarUrl,
   relayRespondUrl,
   tierRoleName,
   voiceMembersForChannel,
-  type ActivityItem,
-  type RelayItem,
 } from '../bot/logic';
 
 describe('gateway protocol helpers', () => {
@@ -61,7 +61,10 @@ describe('status-tier roles', () => {
   });
 
   it('removes all rung roles when the member is unranked (tier 0)', () => {
-    const tierRoleIds = new Map<number, string>([[1, 'r1'], [4, 'r4']]);
+    const tierRoleIds = new Map<number, string>([
+      [1, 'r1'],
+      [4, 'r4'],
+    ]);
     const { toAdd, toRemove } = computeRoleSync({ tier: 0, memberRoleIds: ['r4'], tierRoleIds });
     expect(toAdd).toEqual([]);
     expect(toRemove).toEqual(['r4']);
@@ -85,8 +88,12 @@ describe('slash commands + messages', () => {
   });
 
   it('builds whoami + link + welcome text', () => {
-    expect(buildWhoamiContent({ linked: false, statusTier: 0, points: 0, lifetimePoints: 0 })).toContain('/link');
-    expect(buildWhoamiContent({ linked: true, statusTier: 5, points: 100, lifetimePoints: 5000 })).toContain('Champion');
+    expect(
+      buildWhoamiContent({ linked: false, statusTier: 0, points: 0, lifetimePoints: 0 }),
+    ).toContain('/link');
+    expect(
+      buildWhoamiContent({ linked: true, statusTier: 5, points: 100, lifetimePoints: 5000 }),
+    ).toContain('Champion');
     expect(buildLinkContent('https://woc')).toContain('https://woc');
     expect(buildWelcomeMessage({ userMention: '<@1>', gameUrl: 'https://woc' })).toContain('<@1>');
   });
@@ -217,7 +224,11 @@ describe('significant-activity cards', () => {
       profileUrl: 'https://woc.test/c/Aldric',
       level: 20,
       participants: [linked('Aldric', '111')],
-    }) as { content: string; allowed_mentions: { users: string[] }; embeds: Array<Record<string, any>> };
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
     expect(msg.content).toBe('<@111>');
     expect(msg.allowed_mentions).toEqual({ users: ['111'] });
     expect(msg.embeds[0].title).toContain('level 20');
@@ -247,7 +258,11 @@ describe('significant-activity cards', () => {
       winnerName: 'Aldric',
       loserName: 'Mira',
       participants: [linked('Aldric', '111'), linked('Mira', '222')],
-    }) as { content: string; allowed_mentions: { users: string[] }; embeds: Array<Record<string, any>> };
+    }) as {
+      content: string;
+      allowed_mentions: { users: string[] };
+      embeds: Array<Record<string, any>>;
+    };
     expect(msg.embeds[0].title).toContain('Aldric wins');
     expect(msg.embeds[0].description).toContain('<@111>');
     expect(msg.embeds[0].description).toContain('<@222>');

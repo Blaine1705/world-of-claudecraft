@@ -254,7 +254,11 @@ const discordIpAttempts = new Map<string, number[]>();
 const discordAccountAttempts = new Map<number, number[]>();
 
 export function discordRateLimited(req: http.IncomingMessage, accountId: number): boolean {
-  const ipLimited = recordSlidingWindowAttempt(discordIpAttempts, requestIp(req), DISCORD_MAX_PER_MINUTE);
+  const ipLimited = recordSlidingWindowAttempt(
+    discordIpAttempts,
+    requestIp(req),
+    DISCORD_MAX_PER_MINUTE,
+  );
   const accountLimited =
     accountId > 0
       ? recordSlidingWindowAttempt(discordAccountAttempts, accountId, DISCORD_MAX_PER_MINUTE)

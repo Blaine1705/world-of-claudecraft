@@ -805,14 +805,15 @@ export const hudChromeStrings = {
       cta: 'Link Discord',
       relink: 'Relink Discord',
       connecting: 'Opening Discord...',
-      benefits: 'Link your Discord to earn points from play and community activity, and climb the status tiers.',
+      benefits:
+        'Link your Discord to earn points from play and community activity, and climb the status tiers.',
       error: 'Could not link Discord. Please try again.',
       success: 'Discord linked.',
     },
     linkedAs: 'Linked as {name}',
     linkedTitle: 'Discord: {name}',
     viewCharacter: 'View {name}',
-    viewProfile: 'Open this character\'s public profile',
+    viewProfile: "Open this character's public profile",
     unlink: 'Unlink',
     visit: 'Visit Discord',
     unlinkConfirm: 'Unlink your Discord account from this game account?',
@@ -869,13 +870,6 @@ export const hudChromeStrings = {
       titleChampion: 'Title: Champion of Claudemoon',
       swagStickers: 'Sticker Pack (shipped)',
       swagTee: 'T-Shirt (shipped)',
-    },
-    flex: {
-      cta: 'Flex to Discord',
-      posting: 'Posting...',
-      done: 'Posted your champion to Discord.',
-      error: 'Could not post to Discord.',
-      needLink: 'Link Discord first to flex your character.',
     },
     // "!" community commands: an interactive chat dropdown that broadcasts in-game
     // and cross-posts to Discord (looking-for-group, trade, recruiting, events).

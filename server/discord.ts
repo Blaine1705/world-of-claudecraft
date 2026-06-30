@@ -4,23 +4,26 @@
 // link/status/unlink + reward/swag endpoints, and a process-local presence cache
 // the bot pushes into. Mirrors the wallet.ts shell shape (each account-scoped
 // handler takes a pre-resolved accountId from the route).
-import type http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { json } from './http_util';
-import { isUniqueViolation } from './http_util';
-import { newToken, hashPassword, offensiveName } from './auth';
-import { discordRateLimited, requestIp } from './ratelimit';
-import { publicOriginFromRequest, REALM_PUBLIC_ORIGIN } from './realm';
+import type http from 'node:http';
 import {
-  pool,
+  canClaimSwag,
+  DISCORD_REWARD_GRANTS,
+  discordStatusIndexForPoints,
+  swagById,
+} from '../src/sim/discord_tier';
+import { hashPassword, newToken, offensiveName } from './auth';
+import {
   type AccountRow,
+  accountById,
   createAccount,
   findAccount,
-  accountById,
+  highestCharacterForAccount,
+  moderationStatusForAccount,
+  pool,
   saveToken,
   touchLogin,
-  moderationStatusForAccount,
-  highestCharacterForAccount,
 } from './db';
 import {
   accountForDiscord,
@@ -38,25 +41,22 @@ import {
 import {
   buildAuthorizeUrl,
   buildTokenRequestBody,
-  discordAvatarUrl,
-  discordDisplayName,
   DISCORD_API_BASE,
   DISCORD_TOKEN_URL,
+  type DiscordLinkMode,
+  type DiscordUser,
+  discordAvatarUrl,
+  discordDisplayName,
   isDiscordLinkMode,
   isMemberOfGuild,
   parseDiscordUser,
   parseGuildIds,
   parseTokenResponse,
   pkceChallengeFromVerifier,
-  type DiscordLinkMode,
-  type DiscordUser,
 } from './discord_oauth';
-import {
-  DISCORD_REWARD_GRANTS,
-  canClaimSwag,
-  discordStatusIndexForPoints,
-  swagById,
-} from '../src/sim/discord_tier';
+import { isUniqueViolation, json } from './http_util';
+import { discordRateLimited, requestIp } from './ratelimit';
+import { publicOriginFromRequest, REALM_PUBLIC_ORIGIN } from './realm';
 
 const STATE_TTL_MINUTES = 10;
 const DEFAULT_INVITE = 'https://discord.gg/GjhnUsBtw';
@@ -117,7 +117,9 @@ let presenceCache: DiscordPresenceSnapshot = {
   updatedAt: 0,
 };
 
-export function setDiscordPresenceCache(snapshot: Omit<DiscordPresenceSnapshot, 'updatedAt'>): void {
+export function setDiscordPresenceCache(
+  snapshot: Omit<DiscordPresenceSnapshot, 'updatedAt'>,
+): void {
   presenceCache = { ...snapshot, updatedAt: Date.now() };
 }
 
@@ -192,7 +194,8 @@ export async function handleDiscordCallback(
     // User clicked "Cancel" on Discord's consent screen.
     return bouncePage(res, 200, { ok: false, mode: 'login', error: 'cancelled' });
   }
-  if (!code || !state) return bouncePage(res, 400, { ok: false, mode: 'login', error: 'bad_request' });
+  if (!code || !state)
+    return bouncePage(res, 400, { ok: false, mode: 'login', error: 'bad_request' });
 
   const stateRow = await consumeDiscordOAuthState(pool, state);
   if (!stateRow) {
@@ -201,7 +204,12 @@ export async function handleDiscordCallback(
   }
   const mode: DiscordLinkMode = isDiscordLinkMode(stateRow.mode) ? stateRow.mode : 'login';
 
-  const identity = await exchangeCodeForIdentity(code, redirectUriFor(req), stateRow.code_verifier, cfg);
+  const identity = await exchangeCodeForIdentity(
+    code,
+    redirectUriFor(req),
+    stateRow.code_verifier,
+    cfg,
+  );
   if (!identity) {
     note('discord.callback.exchange_failed');
     return bouncePage(res, 502, { ok: false, mode, error: 'discord_error' });
@@ -319,7 +327,9 @@ async function exchangeCodeForIdentity(
   if (!user) return null;
   let guildMember = false;
   if (cfg.guildId) {
-    const guilds = parseGuildIds(await getJson(`${DISCORD_API_BASE}/users/@me/guilds`, token.accessToken));
+    const guilds = parseGuildIds(
+      await getJson(`${DISCORD_API_BASE}/users/@me/guilds`, token.accessToken),
+    );
     guildMember = isMemberOfGuild(guilds, cfg.guildId);
   }
   return { user, guildMember };
@@ -337,7 +347,11 @@ async function getJson(url: string, accessToken: string): Promise<unknown> {
   return fetchJsonWithTimeout(url, { headers: { Authorization: `Bearer ${accessToken}` } });
 }
 
-async function fetchJsonWithTimeout(url: string, init: RequestInit, timeoutMs = 8000): Promise<unknown> {
+async function fetchJsonWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs = 8000,
+): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {

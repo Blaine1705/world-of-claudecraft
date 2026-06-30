@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  LFG_INTENT_TTL_MS,
   buildLfgWhisper,
+  LFG_INTENT_TTL_MS,
   lfgIntentTarget,
   parseLfgCommand,
   parseLfgTarget,

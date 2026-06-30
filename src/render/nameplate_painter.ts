@@ -18,6 +18,7 @@
 
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
+import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
 import { tEntity } from '../ui/entity_i18n';
 import {
@@ -25,9 +26,8 @@ import {
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, t, type TranslationKey } from '../ui/i18n';
+import { formatNumber, type TranslationKey, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
-import { specialRoleColor } from '../sim/discord_roles';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 // Staff/special Discord role -> localized nameplate tag label key.
@@ -41,6 +41,7 @@ function discordRoleTag(key: string | undefined): string {
   const tk = key ? DISCORD_ROLE_TAG_KEYS[key] : undefined;
   return tk ? t(tk) : '';
 }
+
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
@@ -334,7 +335,11 @@ export class NameplatePainter {
 
   // Show/hide the linked-Discord PFP on a player's nameplate. Cheap-diffed on the
   // avatar URL so the external image is only (re)fetched when it changes.
-  private setNameplateDiscord(v: EntityView, avatar: string | undefined, name: string | undefined): void {
+  private setNameplateDiscord(
+    v: EntityView,
+    avatar: string | undefined,
+    name: string | undefined,
+  ): void {
     const sig = avatar ?? '';
     if (sig === v.discordAvatarSig) return;
     v.discordAvatarSig = sig;

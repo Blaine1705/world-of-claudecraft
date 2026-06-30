@@ -74,7 +74,12 @@ describe('linkDiscordToAccount', () => {
       return NONE;
     });
     await expect(
-      linkDiscordToAccount(pool, 1, { discordUserId: '80351110224678912', username: 'x', avatar: null, guildMember: false }),
+      linkDiscordToAccount(pool, 1, {
+        discordUserId: '80351110224678912',
+        username: 'x',
+        avatar: null,
+        guildMember: false,
+      }),
     ).resolves.toBe(false);
   });
 });
@@ -94,7 +99,13 @@ describe('accountForDiscord', () => {
 
 describe('consumeDiscordOAuthState', () => {
   it('returns the row on a live state and null on a missing/expired one', async () => {
-    const row = { state: 'st', code_verifier: 'v', mode: 'login', account_id: null, redirect_to: null };
+    const row = {
+      state: 'st',
+      code_verifier: 'v',
+      mode: 'login',
+      account_id: null,
+      redirect_to: null,
+    };
     const live = makePool((s) =>
       s.includes('DELETE FROM discord_oauth_states') ? { rows: [row], rowCount: 1 } : NONE,
     );
@@ -120,7 +131,8 @@ describe('grantRewardPoints idempotency', () => {
 
   it('credits both spendable and lifetime on a fresh grant', async () => {
     const { pool, didRun } = makePool((s) => {
-      if (s.includes('INSERT INTO reward_ledger') && s.includes('ON CONFLICT')) return { rows: [{ id: 1 }], rowCount: 1 };
+      if (s.includes('INSERT INTO reward_ledger') && s.includes('ON CONFLICT'))
+        return { rows: [{ id: 1 }], rowCount: 1 };
       if (s.includes('INSERT INTO reward_points'))
         return { rows: [{ points: '300', lifetime_points: '300' }], rowCount: 1 };
       return NONE;
@@ -133,10 +145,13 @@ describe('grantRewardPoints idempotency', () => {
 
 describe('claimSwag', () => {
   it('reports already-claimed when the unique claim row conflicts', async () => {
-    const { pool } = makePool((s) =>
-      s.includes('INSERT INTO swag_claims') ? NONE : NONE, // ON CONFLICT DO NOTHING -> 0 rows
+    const { pool } = makePool(
+      (s) => (s.includes('INSERT INTO swag_claims') ? NONE : NONE), // ON CONFLICT DO NOTHING -> 0 rows
     );
-    expect(await claimSwag(pool, 1, 'title_discordian', 0)).toEqual({ ok: false, reason: 'claimed' });
+    expect(await claimSwag(pool, 1, 'title_discordian', 0)).toEqual({
+      ok: false,
+      reason: 'claimed',
+    });
   });
 
   it('reports insufficient points when the guarded deduction fails', async () => {
@@ -145,13 +160,17 @@ describe('claimSwag', () => {
       if (s.includes('UPDATE reward_points SET points = points -')) return NONE; // points < cost
       return NONE;
     });
-    expect(await claimSwag(pool, 1, 'chroma_blurple', 1000)).toEqual({ ok: false, reason: 'points' });
+    expect(await claimSwag(pool, 1, 'chroma_blurple', 1000)).toEqual({
+      ok: false,
+      reason: 'points',
+    });
   });
 
   it('succeeds when the claim is new and points cover the cost', async () => {
     const { pool, didRun } = makePool((s) => {
       if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 1 }], rowCount: 1 };
-      if (s.includes('UPDATE reward_points SET points = points -')) return { rows: [{ points: '500' }], rowCount: 1 };
+      if (s.includes('UPDATE reward_points SET points = points -'))
+        return { rows: [{ points: '500' }], rowCount: 1 };
       return NONE;
     });
     const res = await claimSwag(pool, 1, 'chroma_blurple', 1000);
@@ -162,7 +181,8 @@ describe('claimSwag', () => {
   it('claims a free item without touching the points balance', async () => {
     const { pool, didRun } = makePool((s) => {
       if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 1 }], rowCount: 1 };
-      if (s.includes('SELECT points FROM reward_points')) return { rows: [{ points: '0' }], rowCount: 1 };
+      if (s.includes('SELECT points FROM reward_points'))
+        return { rows: [{ points: '0' }], rowCount: 1 };
       return NONE;
     });
     const res = await claimSwag(pool, 1, 'title_discordian', 0);

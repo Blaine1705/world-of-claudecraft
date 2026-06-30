@@ -725,128 +725,121 @@ export const zh_TW: EnTranslations = {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
       "open": "Discord",
-      "close": "Close",
-      "keybind": "Discord Panel",
-      "disabled": "Discord integration is not available right now.",
+      "close": "關閉",
+      "keybind": "Discord 面板",
+      "disabled": "Discord 整合目前無法使用。",
       "tiers": {
-        "none": "Unranked",
-        "initiate": "Initiate",
-        "squire": "Squire",
-        "footman": "Footman",
-        "knight": "Knight",
-        "champion": "Champion",
-        "warlord": "Warlord",
-        "legend": "Legend",
-        "mythic": "Mythic"
+        "none": "未定級",
+        "initiate": "新兵",
+        "squire": "侍從",
+        "footman": "步兵",
+        "knight": "騎士",
+        "champion": "勇士",
+        "warlord": "統帥",
+        "legend": "傳奇",
+        "mythic": "神話"
       },
-      "loginCta": "Continue with Discord",
-      "orEmail": "or use email",
+      "loginCta": "使用 Discord 繼續",
+      "orEmail": "或使用電子郵件",
       "cta": {
-        "title": "Link your Discord to earn points and rank up",
-        "stats": "{online} online · {total} members in the server",
-        "statsLoading": "Join the community and earn rewards",
-        "button": "Link in one click",
-        "dismiss": "Dismiss"
+        "title": "連結你的 Discord 以賺取點數並提升階級",
+        "stats": "{online} 人在線 · 伺服器共 {total} 名成員",
+        "statsLoading": "加入社群並獲得獎勵",
+        "button": "一鍵連結",
+        "dismiss": "關閉"
       },
       "link": {
-        "cta": "Link Discord",
-        "relink": "Relink Discord",
-        "connecting": "Opening Discord...",
-        "benefits": "Link your Discord to earn points from play and community activity, and climb the status tiers.",
-        "error": "Could not link Discord. Please try again.",
-        "success": "Discord linked."
+        "cta": "連結 Discord",
+        "relink": "重新連結 Discord",
+        "connecting": "正在開啟 Discord...",
+        "benefits": "連結你的 Discord，從遊玩與社群活動中賺取點數，並攀升階級。",
+        "error": "無法連結 Discord。請再試一次。",
+        "success": "Discord 已連結。"
       },
-      "linkedAs": "Linked as {name}",
-      "linkedTitle": "Discord: {name}",
+      "linkedAs": "已連結為 {name}",
+      "linkedTitle": "Discord：{name}",
       "viewCharacter": "View {name}",
-      "viewProfile": "Open this character's public profile",
-      "unlink": "Unlink",
-      "visit": "Visit Discord",
-      "unlinkConfirm": "Unlink your Discord account from this game account?",
-      "statusLabel": "Status",
+      "viewProfile": "開啟此角色的公開檔案",
+      "unlink": "解除連結",
+      "visit": "前往 Discord",
+      "unlinkConfirm": "要將你的 Discord 帳號從這個遊戲帳號解除連結嗎？",
+      "statusLabel": "階級",
       "rank": "Rank",
-      "points": "Points",
-      "lifetime": "Lifetime",
-      "toNext": "{points} to next rank",
-      "maxRank": "Top rank reached",
-      "tiersTitle": "Status Tiers",
-      "tierLocked": "Locked",
-      "tierCurrent": "Current",
-      "earnTitle": "How to earn points",
-      "earnBody": "Earn points from time played in game and from staying active in the Discord. Points raise your status tier.",
-      "memberSince": "Member since",
-      "memberSinceDays": "{days}d in the Discord",
+      "points": "點數",
+      "lifetime": "累計",
+      "toNext": "距離下一階級還差 {points} 點",
+      "maxRank": "已達最高階級",
+      "tiersTitle": "階級等級",
+      "tierLocked": "未解鎖",
+      "tierCurrent": "目前",
+      "earnTitle": "如何賺取點數",
+      "earnBody": "透過遊戲遊玩時間以及在 Discord 中保持活躍來賺取點數。點數可提升你的階級。",
+      "memberSince": "加入時間",
+      "memberSinceDays": "已加入 Discord {days} 天",
       "roleTag": {
         "levyst": "Levy St",
         "devs": "Dev",
         "mods": "Mod",
-        "artists": "Artist"
+        "artists": "美術"
       },
-      "guildMember": "Verified member",
-      "notMember": "Not in the server yet",
-      "joinCta": "Join the Discord",
-      "online": "{count} online",
-      "community": "Community",
-      "rewards": "Rewards",
+      "guildMember": "已驗證成員",
+      "notMember": "尚未加入伺服器",
+      "joinCta": "加入 Discord",
+      "online": "{count} 人在線",
+      "community": "社群",
+      "rewards": "獎勵",
       "voice": {
-        "title": "Voice",
+        "title": "語音",
         "channel": "In {channel}",
-        "empty": "No one is in voice right now.",
-        "speaking": "Speaking",
-        "muted": "Muted",
-        "join": "Join voice",
-        "connect": "Connect to voice channel"
+        "empty": "目前沒有人在語音中。",
+        "speaking": "發言中",
+        "muted": "已靜音",
+        "join": "加入語音",
+        "connect": "連接到語音頻道"
       },
       "swag": {
         "title": "Swag",
-        "claim": "Claim",
-        "claimed": "Claimed",
-        "locked": "Locked",
+        "claim": "領取",
+        "claimed": "已領取",
+        "locked": "未解鎖",
         "free": "Free",
         "cost": "{points} pts",
-        "needTier": "Reach a higher rank to claim this.",
-        "needPoints": "Not enough points.",
-        "claimError": "Could not claim that reward. Please try again.",
-        "claimedToast": "Claimed: {name}",
-        "titleDiscordian": "Title: Discordian",
-        "titleSquire": "Title: Squire of the Realm",
-        "chromaBlurple": "Blurple Mech Chroma",
-        "titleChampion": "Title: Champion of Claudemoon",
-        "swagStickers": "Sticker Pack (shipped)",
-        "swagTee": "T-Shirt (shipped)"
-      },
-      "flex": {
-        "cta": "Flex to Discord",
-        "posting": "Posting...",
-        "done": "Posted your champion to Discord.",
-        "error": "Could not post to Discord.",
-        "needLink": "Link Discord first to flex your character."
+        "needTier": "達到更高階級才能領取此項目。",
+        "needPoints": "點數不足。",
+        "claimError": "無法領取該獎勵。請再試一次。",
+        "claimedToast": "已領取：{name}",
+        "titleDiscordian": "稱號：Discordian",
+        "titleSquire": "稱號：王國侍從",
+        "chromaBlurple": "Blurple 機甲塗裝",
+        "titleChampion": "稱號：Claudemoon 勇士",
+        "swagStickers": "貼紙包（實體寄送）",
+        "swagTee": "T恤（實體寄送）"
       },
       "relay": {
-        "tooFast": "You are posting too fast. Wait a moment and try again.",
+        "tooFast": "你發送得太快了。請稍候再試。",
         "lfg": {
-          "label": "Looking for Group",
-          "hint": "Find players for a dungeon or quest"
+          "label": "尋找隊伍",
+          "hint": "尋找一同挑戰地城或任務的玩家"
         },
         "wts": {
           "label": "Want to Sell",
-          "hint": "Advertise an item or service for sale"
+          "hint": "宣傳出售物品或服務"
         },
         "wtb": {
           "label": "Want to Buy",
-          "hint": "Request an item you want to buy"
+          "hint": "徵求你想購買的物品"
         },
         "recruit": {
-          "label": "Guild Recruiting",
-          "hint": "Recruit players for your guild"
+          "label": "公會招募",
+          "hint": "為你的公會招募玩家"
         },
         "event": {
-          "label": "Event / Raid",
-          "hint": "Announce a raid, meetup or event"
+          "label": "活動 / 團隊副本",
+          "hint": "宣布團隊副本、聚會或活動"
         },
         "help": {
           "label": "Need Help",
-          "hint": "Ask the community for help"
+          "hint": "向社群尋求協助"
         }
       }
     }

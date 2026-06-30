@@ -3166,7 +3166,18 @@ export class Renderer {
     const castLabel = document.createElement('div');
     castLabel.className = 'np-castlabel';
     castBar.append(castFill, castLabel);
-    np.append(emoteEl, raidMark, comboRow, marker, tierEl, discordEl, nameEl, guildEl, hpBar, castBar);
+    np.append(
+      emoteEl,
+      raidMark,
+      comboRow,
+      marker,
+      tierEl,
+      discordEl,
+      nameEl,
+      guildEl,
+      hpBar,
+      castBar,
+    );
     this.nameplateLayer.appendChild(np);
 
     // object views gate their own casters; character shadows live in visual

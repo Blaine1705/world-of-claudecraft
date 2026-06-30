@@ -13,9 +13,9 @@
 //                            balance, so it is stored, audited (append-only
 //                            ledger), and mutated server-side only.
 import type { Pool } from 'pg';
-import { isUniqueViolation } from './http_util';
 import { discordStatusIndexForPoints } from '../src/sim/discord_tier';
 import { discordAvatarUrl } from './discord_oauth';
+import { isUniqueViolation } from './http_util';
 
 export const DISCORD_SCHEMA = `
 -- One Discord identity per account (account_id PK) and one account per Discord
@@ -92,7 +92,10 @@ export interface DiscordLinkRow {
   linked_at: Date | string;
 }
 
-export async function discordForAccount(pool: Pool, accountId: number): Promise<DiscordLinkRow | null> {
+export async function discordForAccount(
+  pool: Pool,
+  accountId: number,
+): Promise<DiscordLinkRow | null> {
   const res = await pool.query(
     `SELECT account_id, discord_user_id, discord_username, discord_avatar, guild_member, linked_at
        FROM discord_links WHERE account_id = $1`,
@@ -116,7 +119,12 @@ export async function accountForDiscord(pool: Pool, discordUserId: string): Prom
 export async function linkDiscordToAccount(
   pool: Pool,
   accountId: number,
-  info: { discordUserId: string; username: string | null; avatar: string | null; guildMember: boolean },
+  info: {
+    discordUserId: string;
+    username: string | null;
+    avatar: string | null;
+    guildMember: boolean;
+  },
 ): Promise<boolean> {
   const owner = await accountForDiscord(pool, info.discordUserId);
   if (owner !== null && owner !== accountId) return false;
@@ -181,7 +189,14 @@ export async function createDiscordOAuthState(
   await pool.query(
     `INSERT INTO discord_oauth_states (state, code_verifier, mode, account_id, redirect_to, expires_at)
      VALUES ($1, $2, $3, $4, $5, now() + ($6 || ' minutes')::interval)`,
-    [params.state, params.codeVerifier, params.mode, params.accountId, params.redirectTo, String(params.ttlMinutes)],
+    [
+      params.state,
+      params.codeVerifier,
+      params.mode,
+      params.accountId,
+      params.redirectTo,
+      String(params.ttlMinutes),
+    ],
   );
 }
 
@@ -210,7 +225,9 @@ export interface RewardState {
   lifetimePoints: number;
 }
 
-function rowToRewardState(row: { points?: unknown; lifetime_points?: unknown } | undefined): RewardState {
+function rowToRewardState(
+  row: { points?: unknown; lifetime_points?: unknown } | undefined,
+): RewardState {
   return {
     points: Number(row?.points ?? 0),
     lifetimePoints: Number(row?.lifetime_points ?? 0),
@@ -264,11 +281,10 @@ export async function grantRewardPoints(
         return rowToRewardState(cur.rows[0]);
       }
     } else {
-      await client.query('INSERT INTO reward_ledger (account_id, delta, reason) VALUES ($1, $2, $3)', [
-        accountId,
-        amount,
-        reason,
-      ]);
+      await client.query(
+        'INSERT INTO reward_ledger (account_id, delta, reason) VALUES ($1, $2, $3)',
+        [accountId, amount, reason],
+      );
     }
     const upd = await client.query(
       // On a brand-new row, floor points at 0: a negative grant (bot/operator
@@ -339,7 +355,9 @@ export async function claimSwag(
         [accountId, -price, `swag:${swagId}`],
       );
     } else {
-      const cur = await client.query('SELECT points FROM reward_points WHERE account_id = $1', [accountId]);
+      const cur = await client.query('SELECT points FROM reward_points WHERE account_id = $1', [
+        accountId,
+      ]);
       points = Number(cur.rows[0]?.points ?? 0);
     }
     await client.query('COMMIT');
@@ -353,7 +371,9 @@ export async function claimSwag(
 }
 
 export async function listSwagClaims(pool: Pool, accountId: number): Promise<string[]> {
-  const res = await pool.query('SELECT swag_id FROM swag_claims WHERE account_id = $1', [accountId]);
+  const res = await pool.query('SELECT swag_id FROM swag_claims WHERE account_id = $1', [
+    accountId,
+  ]);
   return res.rows.map((r) => r.swag_id as string);
 }
 
@@ -390,7 +410,10 @@ export interface DiscordFlair {
  * Null when the account has no linked Discord (so unlinked players broadcast
  * nothing). One round-trip joining the link to the reward balance.
  */
-export async function discordFlairForAccount(pool: Pool, accountId: number): Promise<DiscordFlair | null> {
+export async function discordFlairForAccount(
+  pool: Pool,
+  accountId: number,
+): Promise<DiscordFlair | null> {
   const res = await pool.query(
     `SELECT dl.discord_user_id, dl.discord_username, dl.discord_avatar,
             dl.discord_joined_at, dl.discord_role,

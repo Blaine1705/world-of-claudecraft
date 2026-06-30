@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Repo DB-test pattern: stub DATABASE_URL + mock pg so db.ts loads and pool.query
 // / pool.connect are spies we control. This drives the REAL Discord handlers
@@ -17,18 +17,23 @@ vi.mock('pg', () => ({
 }));
 
 import {
+  handleDiscordCallback,
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
   handleSwagClaim,
-  handleDiscordCallback,
 } from '../server/discord';
 import { resetDiscordRateLimits } from '../server/ratelimit';
 
 function makeReq(opts: { url?: string; body?: unknown } = {}): any {
-  const req: any = opts.body !== undefined
-    ? Readable.from([Buffer.from(JSON.stringify(opts.body))])
-    : new Readable({ read() { this.push(null); } });
+  const req: any =
+    opts.body !== undefined
+      ? Readable.from([Buffer.from(JSON.stringify(opts.body))])
+      : new Readable({
+          read() {
+            this.push(null);
+          },
+        });
   req.url = opts.url ?? '/';
   req.headers = { host: 'worldofclaudecraft.com' };
   req.socket = { remoteAddress: '127.0.0.1' };
@@ -44,7 +49,10 @@ function makeRes(): any {
       if (headers) this.headers = headers;
       return this;
     },
-    end(data: string) { this.body = data ?? ''; return this; },
+    end(data: string) {
+      this.body = data ?? '';
+      return this;
+    },
   };
 }
 
@@ -58,15 +66,21 @@ let stateRows: any[] = [];
 function defaultRouter(sql: string) {
   const s = String(sql).replace(/\s+/g, ' ').trim();
   if (s.includes('INSERT INTO discord_oauth_states')) return { rows: [], rowCount: 0 };
-  if (s.includes('DELETE FROM discord_oauth_states')) return { rows: stateRows, rowCount: stateRows.length };
-  if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id')) return { rows: ownerRows, rowCount: ownerRows.length };
-  if (s.includes('FROM discord_links WHERE account_id')) return { rows: linkRow, rowCount: linkRow.length };
+  if (s.includes('DELETE FROM discord_oauth_states'))
+    return { rows: stateRows, rowCount: stateRows.length };
+  if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id'))
+    return { rows: ownerRows, rowCount: ownerRows.length };
+  if (s.includes('FROM discord_links WHERE account_id'))
+    return { rows: linkRow, rowCount: linkRow.length };
   if (s.includes('INSERT INTO discord_links')) return { rows: [], rowCount: 1 };
   if (s.includes('DELETE FROM discord_links WHERE account_id')) return { rows: [], rowCount: 0 };
-  if (s.includes('SELECT points, lifetime_points FROM reward_points')) return { rows: rewardRows, rowCount: rewardRows.length };
+  if (s.includes('SELECT points, lifetime_points FROM reward_points'))
+    return { rows: rewardRows, rowCount: rewardRows.length };
   if (s.includes('INSERT INTO reward_ledger')) return { rows: [{ id: 1 }], rowCount: 1 };
-  if (s.includes('INSERT INTO reward_points')) return { rows: [{ points: '250', lifetime_points: '250' }], rowCount: 1 };
-  if (s.includes('SELECT swag_id FROM swag_claims')) return { rows: swagClaimRows, rowCount: swagClaimRows.length };
+  if (s.includes('INSERT INTO reward_points'))
+    return { rows: [{ points: '250', lifetime_points: '250' }], rowCount: 1 };
+  if (s.includes('SELECT swag_id FROM swag_claims'))
+    return { rows: swagClaimRows, rowCount: swagClaimRows.length };
   return { rows: [], rowCount: 0 };
 }
 
@@ -74,7 +88,11 @@ beforeEach(() => {
   process.env.DISCORD_CLIENT_ID = 'client123';
   process.env.DISCORD_CLIENT_SECRET = 'secret456';
   process.env.DISCORD_GUILD_ID = '111111111111111111';
-  linkRow = []; ownerRows = []; rewardRows = []; swagClaimRows = []; stateRows = [];
+  linkRow = [];
+  ownerRows = [];
+  rewardRows = [];
+  swagClaimRows = [];
+  stateRows = [];
   resetDiscordRateLimits();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
@@ -91,7 +109,10 @@ function parse(res: any) {
 describe('POST /api/auth/discord/start', () => {
   it('returns a discord.com authorize URL and persists the state row', async () => {
     const res = makeRes();
-    await handleDiscordStart(makeReq({ url: '/api/auth/discord/start?mode=login' }), res, { mode: 'login', accountId: null });
+    await handleDiscordStart(makeReq({ url: '/api/auth/discord/start?mode=login' }), res, {
+      mode: 'login',
+      accountId: null,
+    });
     const { status, data } = parse(res);
     expect(status).toBe(200);
     const url = new URL(data.url);
@@ -100,7 +121,9 @@ describe('POST /api/auth/discord/start', () => {
     expect(url.searchParams.get('redirect_uri')).toContain('/api/auth/discord/callback');
     expect(url.searchParams.get('code_challenge_method')).toBe('S256');
     // state row persisted (PKCE verifier stays server-side, never in the URL).
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO discord_oauth_states'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO discord_oauth_states'),
+    );
     expect(insert).toBeTruthy();
     expect(url.searchParams.get('code_challenge')).not.toBeNull();
   });
@@ -126,7 +149,16 @@ describe('GET /api/discord (status)', () => {
   });
 
   it('reports linked status, points and derived tier', async () => {
-    linkRow = [{ account_id: 1, discord_user_id: '80351110224678912', discord_username: 'maxp', discord_avatar: null, guild_member: true, linked_at: 'now' }];
+    linkRow = [
+      {
+        account_id: 1,
+        discord_user_id: '80351110224678912',
+        discord_username: 'maxp',
+        discord_avatar: null,
+        guild_member: true,
+        linked_at: 'now',
+      },
+    ];
     rewardRows = [{ points: '1500', lifetime_points: '2500' }];
     swagClaimRows = [{ swag_id: 'title_discordian' }];
     const res = makeRes();
@@ -147,7 +179,9 @@ describe('DELETE /api/discord (unlink)', () => {
     const res = makeRes();
     await handleDiscordUnlink(makeReq(), res, 1);
     expect(parse(res)).toEqual({ status: 200, data: { unlinked: true } });
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('DELETE FROM discord_links'))).toBe(true);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('DELETE FROM discord_links')),
+    ).toBe(true);
   });
 });
 
@@ -166,7 +200,16 @@ describe('POST /api/discord/swag/claim', () => {
   });
 
   it('409s a tier-gated claim before spending anything', async () => {
-    linkRow = [{ account_id: 1, discord_user_id: '8', discord_username: 'm', discord_avatar: null, guild_member: false, linked_at: 'now' }];
+    linkRow = [
+      {
+        account_id: 1,
+        discord_user_id: '8',
+        discord_username: 'm',
+        discord_avatar: null,
+        guild_member: false,
+        linked_at: 'now',
+      },
+    ];
     rewardRows = [{ points: '5000', lifetime_points: '0' }]; // tier 1, below chroma minTier 3
     swagClaimRows = [];
     const res = makeRes();
@@ -175,14 +218,19 @@ describe('POST /api/discord/swag/claim', () => {
     expect(status).toBe(409);
     expect(data.error).toBe('tier');
     // No claim insert attempted on a gated request.
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO swag_claims'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO swag_claims')),
+    ).toBe(false);
   });
 });
 
 describe('GET /api/auth/discord/callback', () => {
   it('renders a cancelled bounce page when the user declines on Discord', async () => {
     const res = makeRes();
-    await handleDiscordCallback(makeReq({ url: '/api/auth/discord/callback?error=access_denied' }), res);
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?error=access_denied' }),
+      res,
+    );
     expect(res.headers['Content-Type']).toContain('text/html');
     expect(res.body).toContain('woc-discord');
     expect(res.body).toContain('cancelled');
@@ -192,28 +240,57 @@ describe('GET /api/auth/discord/callback', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch' as any);
     stateRows = []; // consume returns nothing
     const res = makeRes();
-    await handleDiscordCallback(makeReq({ url: '/api/auth/discord/callback?code=abc&state=forged' }), res);
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=forged' }),
+      res,
+    );
     expect(res.body).toContain('expired');
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it('409s a link when the Discord id already belongs to another account', async () => {
     // A live state row for a 'link' on account 1...
-    stateRows = [{ state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null }];
+    stateRows = [
+      { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
+    ];
     // ...but the Discord id is already owned by account 2.
     ownerRows = [{ account_id: 2 }];
     const fetchSpy = vi.spyOn(globalThis, 'fetch' as any).mockImplementation((url: any) => {
       const u = String(url);
       if (u.includes('/oauth2/token'))
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ access_token: 'tok', token_type: 'Bearer', scope: 'identify guilds', expires_in: 600 }) } as any);
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              access_token: 'tok',
+              token_type: 'Bearer',
+              scope: 'identify guilds',
+              expires_in: 600,
+            }),
+        } as any);
       if (u.includes('/users/@me/guilds'))
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([{ id: '111111111111111111' }]) } as any);
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([{ id: '111111111111111111' }]),
+        } as any);
       if (u.includes('/users/@me'))
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: '999999999999999999', username: 'taken', global_name: 'Taken', avatar: null }) } as any);
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              id: '999999999999999999',
+              username: 'taken',
+              global_name: 'Taken',
+              avatar: null,
+            }),
+        } as any);
       return Promise.resolve({ ok: false, json: () => Promise.resolve({}) } as any);
     });
     const res = makeRes();
-    await handleDiscordCallback(makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }), res);
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
     expect(fetchSpy).toHaveBeenCalled();
     expect(res.body).toContain('already_linked');
   });

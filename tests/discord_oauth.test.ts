@@ -72,15 +72,27 @@ describe('buildTokenRequestBody', () => {
 
 describe('response parsers', () => {
   it('parses a valid token response and rejects a bad one', () => {
-    expect(parseTokenResponse({ access_token: 'tok', token_type: 'Bearer', scope: 'identify', expires_in: 604800 }))
-      .toEqual({ accessToken: 'tok', tokenType: 'Bearer', scope: 'identify', expiresIn: 604800 });
+    expect(
+      parseTokenResponse({
+        access_token: 'tok',
+        token_type: 'Bearer',
+        scope: 'identify',
+        expires_in: 604800,
+      }),
+    ).toEqual({ accessToken: 'tok', tokenType: 'Bearer', scope: 'identify', expiresIn: 604800 });
     expect(parseTokenResponse({ error: 'invalid_grant' })).toBeNull();
     expect(parseTokenResponse(null)).toBeNull();
   });
 
   it('parses a valid user and rejects a non-snowflake id', () => {
-    expect(parseDiscordUser({ id: '80351110224678912', username: 'nelly', global_name: 'Nelly', avatar: 'abc' }))
-      .toEqual({ id: '80351110224678912', username: 'nelly', globalName: 'Nelly', avatar: 'abc' });
+    expect(
+      parseDiscordUser({
+        id: '80351110224678912',
+        username: 'nelly',
+        global_name: 'Nelly',
+        avatar: 'abc',
+      }),
+    ).toEqual({ id: '80351110224678912', username: 'nelly', globalName: 'Nelly', avatar: 'abc' });
     expect(parseDiscordUser({ id: 'not-a-snowflake', username: 'x' })).toBeNull();
     expect(parseDiscordUser({})).toBeNull();
   });
@@ -92,7 +104,9 @@ describe('response parsers', () => {
   });
 
   it('builds CDN avatar urls and detects animated avatars', () => {
-    expect(discordAvatarUrl('80351110224678912', 'abc')).toContain('/avatars/80351110224678912/abc.png');
+    expect(discordAvatarUrl('80351110224678912', 'abc')).toContain(
+      '/avatars/80351110224678912/abc.png',
+    );
     expect(discordAvatarUrl('80351110224678912', 'a_anim')).toContain('.gif');
     expect(discordAvatarUrl('80351110224678912', null)).toBeNull();
   });

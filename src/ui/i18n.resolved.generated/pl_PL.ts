@@ -815,13 +815,6 @@ export const pl_PL: EnTranslations = {
         "swagStickers": "Sticker Pack (shipped)",
         "swagTee": "T-Shirt (shipped)"
       },
-      "flex": {
-        "cta": "Flex to Discord",
-        "posting": "Posting...",
-        "done": "Posted your champion to Discord.",
-        "error": "Could not post to Discord.",
-        "needLink": "Link Discord first to flex your character."
-      },
       "relay": {
         "tooFast": "You are posting too fast. Wait a moment and try again.",
         "lfg": {

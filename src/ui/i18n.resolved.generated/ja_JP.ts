@@ -725,128 +725,121 @@ export const ja_JP: EnTranslations = {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
       "open": "Discord",
-      "close": "Close",
-      "keybind": "Discord Panel",
-      "disabled": "Discord integration is not available right now.",
+      "close": "閉じる",
+      "keybind": "Discordパネル",
+      "disabled": "Discord連携は現在利用できません。",
       "tiers": {
-        "none": "Unranked",
-        "initiate": "Initiate",
-        "squire": "Squire",
-        "footman": "Footman",
-        "knight": "Knight",
-        "champion": "Champion",
-        "warlord": "Warlord",
-        "legend": "Legend",
-        "mythic": "Mythic"
+        "none": "ランク外",
+        "initiate": "見習い",
+        "squire": "従者",
+        "footman": "歩兵",
+        "knight": "騎士",
+        "champion": "チャンピオン",
+        "warlord": "軍団長",
+        "legend": "伝説",
+        "mythic": "神話"
       },
-      "loginCta": "Continue with Discord",
-      "orEmail": "or use email",
+      "loginCta": "Discordで続ける",
+      "orEmail": "またはメールを使用",
       "cta": {
-        "title": "Link your Discord to earn points and rank up",
-        "stats": "{online} online · {total} members in the server",
-        "statsLoading": "Join the community and earn rewards",
-        "button": "Link in one click",
-        "dismiss": "Dismiss"
+        "title": "Discordを連携してポイントを獲得し、ランクを上げましょう",
+        "stats": "{online}人オンライン · サーバーメンバー{total}人",
+        "statsLoading": "コミュニティに参加して報酬を獲得しましょう",
+        "button": "ワンクリックで連携",
+        "dismiss": "非表示にする"
       },
       "link": {
-        "cta": "Link Discord",
-        "relink": "Relink Discord",
-        "connecting": "Opening Discord...",
-        "benefits": "Link your Discord to earn points from play and community activity, and climb the status tiers.",
-        "error": "Could not link Discord. Please try again.",
-        "success": "Discord linked."
+        "cta": "Discordを連携",
+        "relink": "Discordを再連携",
+        "connecting": "Discordを開いています...",
+        "benefits": "Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。",
+        "error": "Discordを連携できませんでした。もう一度お試しください。",
+        "success": "Discordを連携しました。"
       },
-      "linkedAs": "Linked as {name}",
-      "linkedTitle": "Discord: {name}",
+      "linkedAs": "{name}として連携済み",
+      "linkedTitle": "Discord：{name}",
       "viewCharacter": "View {name}",
-      "viewProfile": "Open this character's public profile",
-      "unlink": "Unlink",
-      "visit": "Visit Discord",
-      "unlinkConfirm": "Unlink your Discord account from this game account?",
-      "statusLabel": "Status",
+      "viewProfile": "このキャラクターの公開プロフィールを開く",
+      "unlink": "連携解除",
+      "visit": "Discordを開く",
+      "unlinkConfirm": "このゲームアカウントからDiscordアカウントの連携を解除しますか？",
+      "statusLabel": "ステータス",
       "rank": "Rank",
-      "points": "Points",
-      "lifetime": "Lifetime",
-      "toNext": "{points} to next rank",
-      "maxRank": "Top rank reached",
-      "tiersTitle": "Status Tiers",
-      "tierLocked": "Locked",
-      "tierCurrent": "Current",
-      "earnTitle": "How to earn points",
-      "earnBody": "Earn points from time played in game and from staying active in the Discord. Points raise your status tier.",
-      "memberSince": "Member since",
-      "memberSinceDays": "{days}d in the Discord",
+      "points": "ポイント",
+      "lifetime": "累計",
+      "toNext": "次のランクまで{points}",
+      "maxRank": "最高ランク到達",
+      "tiersTitle": "ステータスランク",
+      "tierLocked": "ロック中",
+      "tierCurrent": "現在",
+      "earnTitle": "ポイントの獲得方法",
+      "earnBody": "ゲームのプレイ時間とDiscordでの活動からポイントを獲得できます。ポイントはステータスランクを上げます。",
+      "memberSince": "加入日",
+      "memberSinceDays": "Discord加入{days}日",
       "roleTag": {
         "levyst": "Levy St",
         "devs": "Dev",
         "mods": "Mod",
-        "artists": "Artist"
+        "artists": "アーティスト"
       },
-      "guildMember": "Verified member",
-      "notMember": "Not in the server yet",
-      "joinCta": "Join the Discord",
-      "online": "{count} online",
-      "community": "Community",
-      "rewards": "Rewards",
+      "guildMember": "認証済みメンバー",
+      "notMember": "まだサーバーに参加していません",
+      "joinCta": "Discordに参加",
+      "online": "{count}人オンライン",
+      "community": "コミュニティ",
+      "rewards": "報酬",
       "voice": {
-        "title": "Voice",
+        "title": "ボイス",
         "channel": "In {channel}",
-        "empty": "No one is in voice right now.",
-        "speaking": "Speaking",
-        "muted": "Muted",
-        "join": "Join voice",
-        "connect": "Connect to voice channel"
+        "empty": "現在ボイスに参加している人はいません。",
+        "speaking": "発言中",
+        "muted": "ミュート中",
+        "join": "ボイスに参加",
+        "connect": "ボイスチャンネルに接続"
       },
       "swag": {
         "title": "Swag",
-        "claim": "Claim",
-        "claimed": "Claimed",
-        "locked": "Locked",
+        "claim": "受け取る",
+        "claimed": "受取済み",
+        "locked": "ロック中",
         "free": "Free",
         "cost": "{points} pts",
-        "needTier": "Reach a higher rank to claim this.",
-        "needPoints": "Not enough points.",
-        "claimError": "Could not claim that reward. Please try again.",
-        "claimedToast": "Claimed: {name}",
-        "titleDiscordian": "Title: Discordian",
-        "titleSquire": "Title: Squire of the Realm",
-        "chromaBlurple": "Blurple Mech Chroma",
-        "titleChampion": "Title: Champion of Claudemoon",
-        "swagStickers": "Sticker Pack (shipped)",
-        "swagTee": "T-Shirt (shipped)"
-      },
-      "flex": {
-        "cta": "Flex to Discord",
-        "posting": "Posting...",
-        "done": "Posted your champion to Discord.",
-        "error": "Could not post to Discord.",
-        "needLink": "Link Discord first to flex your character."
+        "needTier": "これを受け取るにはより高いランクが必要です。",
+        "needPoints": "ポイントが足りません。",
+        "claimError": "その報酬を受け取れませんでした。もう一度お試しください。",
+        "claimedToast": "受け取りました：{name}",
+        "titleDiscordian": "称号：Discordian",
+        "titleSquire": "称号：レルムの従者",
+        "chromaBlurple": "Blurpleメックカラー",
+        "titleChampion": "称号：Claudemoonのチャンピオン",
+        "swagStickers": "ステッカーパック（発送）",
+        "swagTee": "Tシャツ（発送）"
       },
       "relay": {
-        "tooFast": "You are posting too fast. Wait a moment and try again.",
+        "tooFast": "投稿が速すぎます。少し待ってからもう一度お試しください。",
         "lfg": {
-          "label": "Looking for Group",
-          "hint": "Find players for a dungeon or quest"
+          "label": "パーティ募集",
+          "hint": "ダンジョンやクエストの仲間を探す"
         },
         "wts": {
           "label": "Want to Sell",
-          "hint": "Advertise an item or service for sale"
+          "hint": "販売するアイテムやサービスを宣伝する"
         },
         "wtb": {
           "label": "Want to Buy",
-          "hint": "Request an item you want to buy"
+          "hint": "購入したいアイテムを募集する"
         },
         "recruit": {
-          "label": "Guild Recruiting",
-          "hint": "Recruit players for your guild"
+          "label": "ギルドメンバー募集",
+          "hint": "ギルドの仲間を募集する"
         },
         "event": {
-          "label": "Event / Raid",
-          "hint": "Announce a raid, meetup or event"
+          "label": "イベント / レイド",
+          "hint": "レイドや集会、イベントを告知する"
         },
         "help": {
           "label": "Need Help",
-          "hint": "Ask the community for help"
+          "hint": "コミュニティに助けを求める"
         }
       }
     }

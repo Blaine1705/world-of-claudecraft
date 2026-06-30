@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildDiscordWidgetView } from '../src/ui/discord_widget_view';
 import type { DiscordAccountStatus, DiscordPresenceState } from '../src/ui/discord_status';
+import { buildDiscordWidgetView } from '../src/ui/discord_widget_view';
 
 const UNLINKED: DiscordAccountStatus = {
   linked: false,
@@ -40,24 +40,56 @@ describe('avatar + character profile link', () => {
   });
 
   it('has no character link when unlinked or no character name', () => {
-    expect(buildDiscordWidgetView({ enabled: true, status: UNLINKED, presence: NO_PRESENCE, inviteUrl: 'u', characterName: 'Aldric' }).characterUrl).toBeNull();
-    expect(buildDiscordWidgetView({ enabled: true, status: linked(), presence: NO_PRESENCE, inviteUrl: 'u' }).characterUrl).toBeNull();
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: UNLINKED,
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+        characterName: 'Aldric',
+      }).characterUrl,
+    ).toBeNull();
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: linked(),
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+      }).characterUrl,
+    ).toBeNull();
   });
 
   it('url-encodes the character name', () => {
-    const v = buildDiscordWidgetView({ enabled: true, status: linked(), presence: NO_PRESENCE, inviteUrl: 'u', characterName: 'Sir Lancelot', origin: 'https://woc' });
+    const v = buildDiscordWidgetView({
+      enabled: true,
+      status: linked(),
+      presence: NO_PRESENCE,
+      inviteUrl: 'u',
+      characterName: 'Sir Lancelot',
+      origin: 'https://woc',
+    });
     expect(v.characterUrl).toBe('https://woc/c/Sir%20Lancelot');
   });
 });
 
 describe('buildDiscordWidgetView modes', () => {
   it('is disabled when the feature flag is off', () => {
-    const v = buildDiscordWidgetView({ enabled: false, status: linked(), presence: NO_PRESENCE, inviteUrl: 'u' });
+    const v = buildDiscordWidgetView({
+      enabled: false,
+      status: linked(),
+      presence: NO_PRESENCE,
+      inviteUrl: 'u',
+    });
     expect(v.mode).toBe('disabled');
   });
 
   it('is unlinked when enabled but no account link', () => {
-    const v = buildDiscordWidgetView({ enabled: true, status: UNLINKED, presence: NO_PRESENCE, inviteUrl: 'u' });
+    const v = buildDiscordWidgetView({
+      enabled: true,
+      status: UNLINKED,
+      presence: NO_PRESENCE,
+      inviteUrl: 'u',
+    });
     expect(v.mode).toBe('unlinked');
     expect(v.swag).toEqual([]);
     expect(v.pointsToNext).toBeNull();
@@ -80,9 +112,30 @@ describe('buildDiscordWidgetView modes', () => {
 
 describe('join CTA + presence', () => {
   it('shows the join nudge only when linked and not a guild member', () => {
-    expect(buildDiscordWidgetView({ enabled: true, status: linked({ guildMember: false }), presence: NO_PRESENCE, inviteUrl: 'u' }).showJoinCta).toBe(true);
-    expect(buildDiscordWidgetView({ enabled: true, status: linked({ guildMember: true }), presence: NO_PRESENCE, inviteUrl: 'u' }).showJoinCta).toBe(false);
-    expect(buildDiscordWidgetView({ enabled: true, status: UNLINKED, presence: NO_PRESENCE, inviteUrl: 'u' }).showJoinCta).toBe(false);
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: linked({ guildMember: false }),
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+      }).showJoinCta,
+    ).toBe(true);
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: linked({ guildMember: true }),
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+      }).showJoinCta,
+    ).toBe(false);
+    expect(
+      buildDiscordWidgetView({
+        enabled: true,
+        status: UNLINKED,
+        presence: NO_PRESENCE,
+        inviteUrl: 'u',
+      }).showJoinCta,
+    ).toBe(false);
   });
 
   it('passes presence + voice through and clamps a negative online count', () => {
@@ -115,7 +168,12 @@ describe('swag claimability', () => {
   it('marks already-claimed swag as claimed and not claimable', () => {
     const v = buildDiscordWidgetView({
       enabled: true,
-      status: linked({ points: 10_000, lifetimePoints: 10_000, statusTier: 5, claimedSwagIds: ['title_discordian'] }),
+      status: linked({
+        points: 10_000,
+        lifetimePoints: 10_000,
+        statusTier: 5,
+        claimedSwagIds: ['title_discordian'],
+      }),
       presence: NO_PRESENCE,
       inviteUrl: 'u',
     });

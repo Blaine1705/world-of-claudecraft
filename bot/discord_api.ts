@@ -8,7 +8,12 @@ const API = 'https://discord.com/api/v10';
 export class DiscordApi {
   constructor(private token: string) {}
 
-  private async request(method: string, path: string, body?: unknown, retry = true): Promise<unknown> {
+  private async request(
+    method: string,
+    path: string,
+    body?: unknown,
+    retry = true,
+  ): Promise<unknown> {
     const resp = await fetch(`${API}${path}`, {
       method,
       headers: {
@@ -37,7 +42,11 @@ export class DiscordApi {
     return data?.url || 'wss://gateway.discord.gg';
   }
 
-  async registerGuildCommands(clientId: string, guildId: string, commands: unknown[]): Promise<void> {
+  async registerGuildCommands(
+    clientId: string,
+    guildId: string,
+    commands: unknown[],
+  ): Promise<void> {
     await this.request('PUT', `/applications/${clientId}/guilds/${guildId}/commands`, commands);
   }
 
