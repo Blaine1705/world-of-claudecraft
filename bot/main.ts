@@ -39,7 +39,11 @@ const RELAY_POLL_MS = 3_000; // how often the bot pulls queued in-game "!" posts
 async function main(): Promise<void> {
   // Load .env (and optional .env.local) into process.env, matching server/db.ts.
   // Existing ambient env wins; missing file is fine (rely on the ambient env).
-  process.loadEnvFile?.();
+  try {
+    process.loadEnvFile?.();
+  } catch {
+    /* no .env */
+  }
   try {
     process.loadEnvFile?.('.env.local');
   } catch {
