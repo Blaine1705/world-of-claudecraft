@@ -1342,6 +1342,10 @@ export class Sim {
     // throwaway build, persist the PRE-fiesta snapshot so an autosave or
     // mid-match disconnect never writes the temporary state to the database.
     const restore = meta.fiestaRestore;
+    // Warlock demons are not persisted across logout: drop the snapshot so a relog
+    // forces a fresh re-summon instead of laundering the summon cooldown for free.
+    // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
+    const petSnapshot = this.serializePet(pid);
     const state: CharacterState = {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
@@ -1390,8 +1394,8 @@ export class Sim {
       raidLockouts: Object.fromEntries(
         [...meta.raidLockouts].filter(([, until]) => until > this.lockoutNowMs()),
       ),
+      pet: petCommands.isDemonPetState(petSnapshot) ? null : petSnapshot,
       cooldowns: serializeCooldowns(e.cooldowns, e.potionCooldownUntil, this.time),
-      pet: this.serializePet(pid),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
       pendingSkinRank: meta.pendingSkinRank,
@@ -2175,9 +2179,9 @@ export class Sim {
 
   // Mark a player as a GM: invulnerable (see dealDamage). Server-side only —
   // set at join time from the characters.is_gm column.
-  setGm(pid?: number): void {
+  setGm(pid?: number, enabled = true): void {
     const r = this.resolve(pid);
-    if (r) r.e.gm = true;
+    if (r) r.e.gm = enabled;
   }
 
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
@@ -3198,6 +3202,14 @@ export class Sim {
   // despawnPersistentPet/despawnPet/clearNonPlayerStatAuras into the module.
   petOf(ownerPid: number, includeDead = false): Entity | null {
     return petCommands.petOf(this.ctx, ownerPid, includeDead);
+  }
+
+  stowPetForSpectate(ownerPid: number): PetState | null {
+    return petCommands.stowPetForSpectate(this.ctx, ownerPid);
+  }
+
+  restorePetAfterSpectate(ownerPid: number, state: PetState | null): void {
+    petCommands.restorePetAfterSpectate(this.ctx, ownerPid, state);
   }
 
   private serializePet(ownerPid: number): PetState | null {

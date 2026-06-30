@@ -103,7 +103,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "es_ES": [
     "hudChrome.discord.close",
@@ -199,7 +200,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "fr_FR": [
     "hudChrome.discord.close",
@@ -295,7 +297,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "fr_CA": [
     "hudChrome.discord.close",
@@ -391,7 +394,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "en_CA": [],
   "it_IT": [
@@ -488,7 +492,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "de_DE": [
     "hudChrome.discord.close",
@@ -584,7 +589,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "zh_CN": [
     "hudChrome.discord.open",
@@ -748,7 +754,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "ru_RU": [
     "hudChrome.discord.open",
@@ -861,7 +868,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "pl_PL": [
     "hudChrome.discord.close",
@@ -957,7 +965,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "id_ID": [
     "hudChrome.discord.close",
@@ -1053,7 +1062,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "tr_TR": [
     "hudChrome.discord.close",
@@ -1149,7 +1159,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "sv_SE": [
     "hudChrome.discord.close",
@@ -1245,7 +1256,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "vi_VN": [
     "hudChrome.discord.close",
@@ -1341,7 +1353,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ],
   "da_DK": [
     "hudChrome.discord.close",
@@ -1437,6 +1450,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.voice.join",
     "hudChrome.discord.voice.muted",
     "hudChrome.discord.voice.speaking",
-    "hudChrome.discord.voice.title"
+    "hudChrome.discord.voice.title",
+    "hudChrome.spectate.banner"
   ]
 };

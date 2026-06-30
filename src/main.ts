@@ -39,6 +39,7 @@ import {
   setInterfaceMode,
   useTouchInterface,
 } from './game/mobile_controls';
+import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
@@ -150,6 +151,7 @@ import {
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { tServer } from './ui/server_i18n';
+import { createSpectateBadge } from './ui/spectate_badge';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -189,6 +191,8 @@ const IMMOBILE_AURA_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph'
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
 const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
 const HOMEPAGE_MUSIC_VOLUME = 0.225;
+const GRAPHICS_PRESET_HIGH = 3;
+const GRAPHICS_PRESET_ULTRA = 4;
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 document.body.classList.toggle('native-app', NATIVE_APP);
@@ -202,6 +206,12 @@ let homepageMusic: HTMLAudioElement | null = null;
 let homepageMusicStarted = false;
 let homepageMusicMuted = readHomepageMusicMuted();
 let removeHomepageMusicGestureListeners: (() => void) | null = null;
+
+function isNativeRuntime(): boolean {
+  if (NATIVE_APP) return true;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return cap?.isNativePlatform?.() === true;
+}
 
 const SITE_URL = 'https://worldofclaudecraft.com/';
 
@@ -790,6 +800,7 @@ function enterLoadingState(statusText: string): void {
   hideMobilePreflightPrompt();
   showLoadingScreen(statusText);
   $('#start-screen').style.display = 'none';
+  releaseStartScreenPreview();
 }
 
 async function prepareWorldEntry(): Promise<boolean> {
@@ -862,6 +873,7 @@ async function startGame(
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
   // Renderer/Hud build freezes the main thread for a beat.
@@ -888,6 +900,13 @@ async function startGame(
   if (autoPreset !== null) {
     settings.set('graphicsPreset', autoPreset);
     settings.set('graphicsDefaultApplied', true);
+  }
+  // Native iOS WebKit can terminate the WebContent process during Ultra world
+  // startup on recent phones, which reloads back to the start screen before the
+  // in-game options menu is reachable. Persist the safe startup tier so a saved
+  // Ultra/Advanced choice cannot trap the native app in that reload loop.
+  if (isNativeRuntime() && settings.get('graphicsPreset') >= GRAPHICS_PRESET_ULTRA) {
+    settings.set('graphicsPreset', GRAPHICS_PRESET_HIGH);
   }
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
@@ -1909,6 +1928,14 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  // Tracks classic right-mouse mouselook across frames so its falling edge can
+  // commit the final camera yaw to the player facing (see mouselook_release.ts).
+  let prevMouselook = false;
+  // The release yaw, latched until a sim tick actually commits it. Offline a tick
+  // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
+  // the release frame would drop the one-shot when release lands on a zero-tick
+  // frame. Held here until consumed, then cleared.
+  let pendingReleaseFacing: number | null = null;
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !world.player.dead;
@@ -2137,7 +2164,20 @@ async function startGame(
     const mouselook = input.isMouselookActive() && !world.player.dead;
     const controllerFacing = input.controllerFacingOverride();
     const renderFacing = renderFacingOverride();
-    const movementFacing = !world.player.dead ? (renderFacing ?? controllerFacing) : null;
+    // On the frame mouselook is released, latch the final camera yaw so the player
+    // facing ends exactly where the camera ended; otherwise the last slice of the
+    // turn is dropped and the character lags the camera. The render/controller
+    // overrides take precedence and reclaim the heading, clearing any stale latch.
+    const edgeReleaseFacing = mouselookReleaseFacing(prevMouselook, mouselook, input.camYaw);
+    prevMouselook = mouselook;
+    if (renderFacing !== null || controllerFacing !== null) {
+      pendingReleaseFacing = null;
+    } else if (edgeReleaseFacing !== null) {
+      pendingReleaseFacing = edgeReleaseFacing;
+    }
+    const movementFacing = !world.player.dead
+      ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
+      : null;
 
     if (offlineSim) {
       acc += frameDt;
@@ -2164,6 +2204,9 @@ async function startGame(
             events: events.length,
           }),
         );
+        // A tick consumed the latched release facing (movementFacing fed
+        // stepFacing above); drop it so it is not re-applied next frame.
+        pendingReleaseFacing = null;
         acc -= DT;
       }
       const pp = offlineSim.player;
@@ -2196,6 +2239,9 @@ async function startGame(
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online!;
+    spectateBadge.update(net.spectating);
+    const spectateFacing = net.consumeSpectateFacing();
+    if (spectateFacing !== null) input.camYaw = spectateFacing;
     const resolved = resolveMove(
       mouselook,
       world.player.pos,
@@ -2205,6 +2251,9 @@ async function startGame(
     const netFacing = movementFacing ?? resolved.facing;
     Object.assign(net.moveInput, resolved.mi);
     net.setMouselookFacing(netFacing);
+    // Online streams facing every frame, so the latched release yaw is consumed
+    // here; drop it so it is not re-applied next frame.
+    pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
@@ -2269,7 +2318,13 @@ async function startGame(
     perf.time('renderer', () =>
       perf.trace(
         'renderer.sync',
-        () => renderer.sync(alpha, frameDt, movementFacing, ONLINE_SELF_RENDER_ALPHA_LEAD),
+        () =>
+          renderer.sync(
+            alpha,
+            frameDt,
+            net.spectating === null ? movementFacing : null,
+            ONLINE_SELF_RENDER_ALPHA_LEAD,
+          ),
         {
           mode: 'online',
           views: renderer.views.size,
@@ -2432,6 +2487,12 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+
+function releaseStartScreenPreview(): void {
+  if (!characterPreview) return;
+  characterPreview.destroy();
+  characterPreview = null;
+}
 
 /** Fill a skin-picker row with one option per available skin, each showing an
  *  actual 2D portrait preview of the character in that chroma. */

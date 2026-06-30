@@ -127,6 +127,19 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
   };
 }
 
+/** A summoned warlock demon (imp/voidwalker/succubus/felhunter/doomguard/infernal,
+ * anything in the 'demon' MOBS family) is NOT persisted across logout: classic
+ * warlocks re-summon their demon (paying its cost and the 180s summon cooldown) on
+ * login rather than getting it back for free, which would let a relog launder the
+ * cooldown. serializeCharacter drops a demon snapshot to null at the persistence
+ * boundary so a reload forces a fresh summon. Hunter pets (beast/spider family)
+ * persist. This lives at the save boundary, NOT inside serializePet, because the
+ * in-session delve pet-park (stowPetForDelve) reuses serializePet and must keep
+ * preserving demons across a delve. */
+export function isDemonPetState(state: PetState | null | undefined): boolean {
+  return !!state && MOBS[state.templateId]?.family === 'demon';
+}
+
 export function restorePet(ctx: SimContext, owner: Entity, state: PetState): void {
   const template = MOBS[state.templateId];
   if (!template) return;
@@ -340,6 +353,24 @@ export function despawnPersistentPet(ctx: SimContext, pet: Entity): void {
     if (m.aggroTargetId === pet.id && !m.dead && m.aiState !== 'dead') ctx.retargetMob(m);
   }
   ctx.dropEntity(pet.id);
+}
+
+export function stowPetForSpectate(ctx: SimContext, ownerPid: number): PetState | null {
+  const pet = petOf(ctx, ownerPid, true);
+  if (!pet) return null;
+  const state = serializePet(ctx, ownerPid);
+  despawnPersistentPet(ctx, pet);
+  return state;
+}
+
+export function restorePetAfterSpectate(
+  ctx: SimContext,
+  ownerPid: number,
+  state: PetState | null,
+): void {
+  if (!state || petOf(ctx, ownerPid, true)) return;
+  const owner = ctx.entities.get(ownerPid);
+  if (owner) restorePet(ctx, owner, state);
 }
 
 export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
