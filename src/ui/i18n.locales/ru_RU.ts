@@ -4811,7 +4811,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.link.cta': 'Привязать Discord',
   'hudChrome.discord.link.relink': 'Перепривязать Discord',
   'hudChrome.discord.link.connecting': 'Открываем Discord...',
-  'hudChrome.discord.link.benefits': 'Привяжите Discord, чтобы получать очки за игру и активность в сообществе и подниматься по рангам статуса.',
+  'hudChrome.discord.link.benefits':
+    'Привяжите Discord, чтобы получать очки за игру и активность в сообществе и подниматься по рангам статуса.',
   'hudChrome.discord.link.error': 'Не удалось привязать Discord. Пожалуйста, попробуйте снова.',
   'hudChrome.discord.link.success': 'Discord привязан.',
   'hudChrome.discord.linkedAs': 'Привязан как {name}',
@@ -4829,7 +4830,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierLocked': 'Заблокировано',
   'hudChrome.discord.tierCurrent': 'Текущий',
   'hudChrome.discord.earnTitle': 'Как получать очки',
-  'hudChrome.discord.earnBody': 'Получайте очки за время в игре и за активность в Discord. Очки повышают ваш ранг статуса.',
+  'hudChrome.discord.earnBody':
+    'Получайте очки за время в игре и за активность в Discord. Очки повышают ваш ранг статуса.',
   'hudChrome.discord.memberSince': 'Участник с',
   'hudChrome.discord.memberSinceDays': '{days} дн. в Discord',
   'hudChrome.discord.roleTag.artists': 'Художник',
@@ -4850,7 +4852,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.locked': 'Заблокировано',
   'hudChrome.discord.swag.needTier': 'Достигните более высокого ранга, чтобы получить это.',
   'hudChrome.discord.swag.needPoints': 'Недостаточно очков.',
-  'hudChrome.discord.swag.claimError': 'Не удалось получить эту награду. Пожалуйста, попробуйте снова.',
+  'hudChrome.discord.swag.claimError':
+    'Не удалось получить эту награду. Пожалуйста, попробуйте снова.',
   'hudChrome.discord.swag.claimedToast': 'Получено: {name}',
   'hudChrome.discord.swag.titleDiscordian': 'Титул: Discordian',
   'hudChrome.discord.swag.titleSquire': 'Титул: Оруженосец Королевства',
@@ -4858,7 +4861,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.titleChampion': 'Титул: Чемпион Claudemoon',
   'hudChrome.discord.swag.swagStickers': 'Набор стикеров (с доставкой)',
   'hudChrome.discord.swag.swagTee': 'Футболка (с доставкой)',
-  'hudChrome.discord.relay.tooFast': 'Вы отправляете сообщения слишком часто. Подождите немного и попробуйте снова.',
+  'hudChrome.discord.relay.tooFast':
+    'Вы отправляете сообщения слишком часто. Подождите немного и попробуйте снова.',
   'hudChrome.discord.relay.lfg.label': 'Поиск группы',
   'hudChrome.discord.relay.lfg.hint': 'Найдите игроков для подземелья или задания',
   'hudChrome.discord.relay.wts.hint': 'Объявите о продаже предмета или услуги',

@@ -67,7 +67,7 @@ export function buildLfgWhisper(target: string, command: string | null | undefin
  * older than the TTL. Pure (now is injected) so the freshness rule is testable.
  */
 export function lfgIntentTarget(intent: LfgIntent | null, now: number): string | null {
-  if (!intent || !intent.target) return null;
+  if (!intent?.target) return null;
   if (!Number.isFinite(intent.ts) || now - intent.ts > LFG_INTENT_TTL_MS) return null;
   return intent.target;
 }

@@ -4709,7 +4709,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.link.cta': 'Discord 연결',
   'hudChrome.discord.link.relink': 'Discord 다시 연결',
   'hudChrome.discord.link.connecting': 'Discord 여는 중...',
-  'hudChrome.discord.link.benefits': '플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.',
+  'hudChrome.discord.link.benefits':
+    '플레이와 커뮤니티 활동으로 포인트를 얻고 상태 등급을 올리려면 Discord를 연결하세요.',
   'hudChrome.discord.link.error': 'Discord를 연결할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.discord.link.success': 'Discord가 연결되었습니다.',
   'hudChrome.discord.linkedAs': '{name}(으)로 연결됨',
@@ -4727,7 +4728,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierLocked': '잠김',
   'hudChrome.discord.tierCurrent': '현재',
   'hudChrome.discord.earnTitle': '포인트 획득 방법',
-  'hudChrome.discord.earnBody': '게임 플레이 시간과 Discord 활동으로 포인트를 얻으세요. 포인트는 상태 등급을 올려줍니다.',
+  'hudChrome.discord.earnBody':
+    '게임 플레이 시간과 Discord 활동으로 포인트를 얻으세요. 포인트는 상태 등급을 올려줍니다.',
   'hudChrome.discord.memberSince': '가입일',
   'hudChrome.discord.memberSinceDays': 'Discord 가입 {days}일',
   'hudChrome.discord.roleTag.artists': '아티스트',

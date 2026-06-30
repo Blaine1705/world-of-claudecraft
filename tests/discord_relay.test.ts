@@ -44,7 +44,7 @@ describe('parseRelayCommand', () => {
   });
 
   it('caps the message length', () => {
-    const long = '!help ' + 'a'.repeat(RELAY_MAX_MESSAGE + 50);
+    const long = `!help ${'a'.repeat(RELAY_MAX_MESSAGE + 50)}`;
     expect(parseRelayCommand(long)?.message.length).toBe(RELAY_MAX_MESSAGE);
   });
 

@@ -112,7 +112,7 @@ export function parseDiscordUser(value: unknown): DiscordUser | null {
 
 /** Preferred display name: the global (display) name, else the legacy username. */
 export function discordDisplayName(user: Pick<DiscordUser, 'username' | 'globalName'>): string {
-  return (user.globalName && user.globalName.trim()) || user.username || 'Discord user';
+  return user.globalName?.trim() || user.username || 'Discord user';
 }
 
 /** CDN avatar URL for a user, or null when they use a default avatar. */

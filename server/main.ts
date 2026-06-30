@@ -42,10 +42,8 @@ import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from '.
 import { characterSheet, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
-  accountById,
   accountForToken,
   type CharacterRow,
-  characterCountForAccount,
   characterCountsByRealm,
   chatMuteStatusForAccount,
   closeOrphanSessions,
@@ -75,17 +73,14 @@ import {
   referralCountForAccount,
   renameCharacter,
   revokeCompanionToken,
-  revokeTokensExcept,
   saveToken,
   scopeAllowsMutation,
   searchCharacters,
-  setAccountDeactivated,
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
   topLifetimeXp,
   touchLogin,
-  updatePasswordHash,
 } from './db';
 import {
   handleDiscordCallback,
@@ -156,10 +151,6 @@ import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
-// DEPRECATED: the standalone community MediaWiki is being retired in favour of the
-// curated in-app guide, which now serves at /wiki. This constant and its (now removed)
-// /wiki -> MediaWiki redirect are dead and slated for deletion in a follow-up ticket.
-const WIKI_URL = process.env.WIKI_URL ?? 'http://localhost:8080/wiki/index.php/Main_Page';
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
   ['/links', '/links.html'],

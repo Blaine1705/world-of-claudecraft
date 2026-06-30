@@ -5091,7 +5091,7 @@ function startDiscordOAuth(mode: 'login' | 'link'): void {
 window.addEventListener('message', (e: MessageEvent) => {
   if (e.origin !== location.origin) return;
   const d = e.data as { source?: string; ok?: boolean; mode?: string } | null;
-  if (!d || d.source !== 'woc-discord') return;
+  if (d?.source !== 'woc-discord') return;
   discordPopup?.close();
   discordPopup = null;
   if (!d.ok) {

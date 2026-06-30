@@ -155,7 +155,7 @@ export function renderDiscordWidget(
     `<div class="dc-voice"><div class="dc-voice-head">${voiceHead}</div>${voiceMembers}</div>` +
     `</section>`;
 
-  el.innerHTML = header + `<div class="dc-body">` + account + ladder + community + `</div>`;
+  el.innerHTML = `${header}<div class="dc-body">${account}${ladder}${community}</div>`;
 
   // ── wire clicks ────────────────────────────────────────────────────────────
   el.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => deps.onClose());

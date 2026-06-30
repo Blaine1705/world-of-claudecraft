@@ -183,7 +183,7 @@ async function main(): Promise<void> {
   const syncRolesFor = async (userId: string): Promise<void> => {
     // One flex read drives both the status-tier roles AND the level-on-name nick.
     const flex = await server.flex(userId);
-    if (!flex || !flex.linked) return;
+    if (!flex?.linked) return;
     const { toAdd, toRemove } =
       tierRoleIds.size > 0
         ? computeRoleSync({

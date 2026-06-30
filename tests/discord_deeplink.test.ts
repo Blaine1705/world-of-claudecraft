@@ -19,7 +19,7 @@ describe('discord relay deep link', () => {
     expect(parseLfgTarget('?lfg=1bad')).toBeNull(); // must start with a letter
     expect(parseLfgTarget('?lfg=has%20space')).toBeNull();
     expect(parseLfgTarget('?lfg=a')).toBeNull(); // too short (min 2)
-    expect(parseLfgTarget('?lfg=' + 'a'.repeat(40))).toBeNull(); // too long
+    expect(parseLfgTarget(`?lfg=${'a'.repeat(40)}`)).toBeNull(); // too long
   });
 
   it('parses the relay command id, or null when unknown', () => {

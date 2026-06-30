@@ -4459,7 +4459,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.link.cta': '关联 Discord',
   'hudChrome.discord.link.relink': '重新关联 Discord',
   'hudChrome.discord.link.connecting': '正在打开 Discord...',
-  'hudChrome.discord.link.benefits': '关联你的 Discord，通过游玩和社区活动赚取积分，并攀登段位阶梯。',
+  'hudChrome.discord.link.benefits':
+    '关联你的 Discord，通过游玩和社区活动赚取积分，并攀登段位阶梯。',
   'hudChrome.discord.link.error': '无法关联 Discord，请重试。',
   'hudChrome.discord.link.success': 'Discord 已关联。',
   'hudChrome.discord.linkedAs': '已关联为 {name}',
@@ -4477,7 +4478,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierLocked': '未解锁',
   'hudChrome.discord.tierCurrent': '当前',
   'hudChrome.discord.earnTitle': '如何赚取积分',
-  'hudChrome.discord.earnBody': '通过游戏时长以及在 Discord 中保持活跃来赚取积分。积分会提升你的段位。',
+  'hudChrome.discord.earnBody':
+    '通过游戏时长以及在 Discord 中保持活跃来赚取积分。积分会提升你的段位。',
   'hudChrome.discord.memberSince': '加入于',
   'hudChrome.discord.memberSinceDays': '已加入 Discord {days} 天',
   'hudChrome.discord.roleTag.artists': '画师',

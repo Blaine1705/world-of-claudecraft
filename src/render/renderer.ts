@@ -725,7 +725,9 @@ export class Renderer {
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
   private frameMsEma = 16.7;
   private adaptiveGrace = 2.0;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private adaptiveCooldown = 0;
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
   private stableFrameTime = 0;
   private viewCreateBackoff = 0;
   private renderBudgetGovernor!: RenderBudgetGovernor;

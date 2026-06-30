@@ -4698,7 +4698,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.link.cta': 'Discordを連携',
   'hudChrome.discord.link.relink': 'Discordを再連携',
   'hudChrome.discord.link.connecting': 'Discordを開いています...',
-  'hudChrome.discord.link.benefits': 'Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。',
+  'hudChrome.discord.link.benefits':
+    'Discordを連携すると、プレイやコミュニティ活動からポイントを獲得し、ステータスランクを上げられます。',
   'hudChrome.discord.link.error': 'Discordを連携できませんでした。もう一度お試しください。',
   'hudChrome.discord.link.success': 'Discordを連携しました。',
   'hudChrome.discord.linkedAs': '{name}として連携済み',
@@ -4706,7 +4707,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.viewProfile': 'このキャラクターの公開プロフィールを開く',
   'hudChrome.discord.unlink': '連携解除',
   'hudChrome.discord.visit': 'Discordを開く',
-  'hudChrome.discord.unlinkConfirm': 'このゲームアカウントからDiscordアカウントの連携を解除しますか？',
+  'hudChrome.discord.unlinkConfirm':
+    'このゲームアカウントからDiscordアカウントの連携を解除しますか？',
   'hudChrome.discord.statusLabel': 'ステータス',
   'hudChrome.discord.points': 'ポイント',
   'hudChrome.discord.lifetime': '累計',
@@ -4716,7 +4718,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierLocked': 'ロック中',
   'hudChrome.discord.tierCurrent': '現在',
   'hudChrome.discord.earnTitle': 'ポイントの獲得方法',
-  'hudChrome.discord.earnBody': 'ゲームのプレイ時間とDiscordでの活動からポイントを獲得できます。ポイントはステータスランクを上げます。',
+  'hudChrome.discord.earnBody':
+    'ゲームのプレイ時間とDiscordでの活動からポイントを獲得できます。ポイントはステータスランクを上げます。',
   'hudChrome.discord.memberSince': '加入日',
   'hudChrome.discord.memberSinceDays': 'Discord加入{days}日',
   'hudChrome.discord.roleTag.artists': 'アーティスト',

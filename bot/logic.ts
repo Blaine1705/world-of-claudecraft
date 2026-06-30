@@ -341,7 +341,7 @@ function qualityColor(quality: string | undefined): number {
 // Resolve a character name to its Discord mention (when linked) or plain name.
 function mentionFor(name: string, parts: readonly ActivityParticipant[]): string {
   const p = parts.find((x) => x.name === name);
-  return p && p.discordUserId ? `<@${p.discordUserId}>` : name;
+  return p?.discordUserId ? `<@${p.discordUserId}>` : name;
 }
 
 /**

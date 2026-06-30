@@ -4479,7 +4479,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.tierLocked': '未解鎖',
   'hudChrome.discord.tierCurrent': '目前',
   'hudChrome.discord.earnTitle': '如何賺取點數',
-  'hudChrome.discord.earnBody': '透過遊戲遊玩時間以及在 Discord 中保持活躍來賺取點數。點數可提升你的階級。',
+  'hudChrome.discord.earnBody':
+    '透過遊戲遊玩時間以及在 Discord 中保持活躍來賺取點數。點數可提升你的階級。',
   'hudChrome.discord.memberSince': '加入時間',
   'hudChrome.discord.memberSinceDays': '已加入 Discord {days} 天',
   'hudChrome.discord.roleTag.artists': '美術',
