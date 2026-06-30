@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const dockerfile = readFileSync('Dockerfile', 'utf8');
 const compose = readFileSync('docker-compose.yml', 'utf8');
+const composeEnv = (name: string) => `$${`{${name}:-}`}`;
 
 describe('Discord bot deploy container contract', () => {
   it('builds and ships the bundled Discord bot artifact', () => {
@@ -16,10 +17,10 @@ describe('Discord bot deploy container contract', () => {
     expect(compose).toContain('container_name: eastbrook-discord-bot');
     expect(compose).toContain('command: ["node", "dist-bot/bot.cjs"]');
     expect(compose).toContain('GAME_SERVER_URL: http://game:8787');
-    expect(compose).toContain('DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}');
+    expect(compose).toContain(`DISCORD_BOT_TOKEN: ${composeEnv('DISCORD_BOT_TOKEN')}`);
   });
 
   it('passes the shared Discord bot secret to the game server', () => {
-    expect(compose).toContain('DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}');
+    expect(compose).toContain(`DISCORD_BOT_SECRET: ${composeEnv('DISCORD_BOT_SECRET')}`);
   });
 });
