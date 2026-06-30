@@ -481,6 +481,21 @@ describe('client HTML shell', () => {
     expect(discordZ).toBeLessThan(modalZ);
   });
 
+  it('keeps the Discord unlink modal at top level so it shows in-game', () => {
+    // #start-screen is display:none once the game starts (main.ts hides it) and is a
+    // lower z-index:100 stacking context, so a keep-modal nested inside it would be
+    // invisible in-game and trapped below the top-level #discord-window. It must be a
+    // top-level sibling declared above #start-screen, exactly like #discord-window.
+    const modalAt = html.indexOf('id="discord-keep-modal"');
+    const windowAt = html.indexOf('id="discord-window"');
+    const startAt = html.indexOf('id="start-screen"');
+    expect(modalAt).toBeGreaterThan(-1);
+    expect(windowAt).toBeGreaterThan(-1);
+    // Declared before #start-screen opens, hence a top-level sibling, never a descendant.
+    expect(modalAt).toBeLessThan(startAt);
+    expect(windowAt).toBeLessThan(startAt);
+  });
+
   it('shows a logged-in Logout nav item next to Account', () => {
     expect(html).toContain('id="nav-btn-account"');
     expect(html).toContain('id="nav-btn-logout"');

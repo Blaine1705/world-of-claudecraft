@@ -130,6 +130,14 @@ function parse(res: any) {
   return { status: res.statusCode, data: res.body ? JSON.parse(res.body) : {} };
 }
 
+// The two login endpoints take an isIpBlocked predicate (the route passes
+// game.isIpBlocked). Default it to "not blocked" so the existing cases read clean; the
+// blocked-IP cases pass `() => true` explicitly.
+const loginNew = (req: any, res: any, isIpBlocked: (ip: string) => boolean = () => false) =>
+  handleDiscordLoginNew(req, res, isIpBlocked);
+const loginLink = (req: any, res: any, isIpBlocked: (ip: string) => boolean = () => false) =>
+  handleDiscordLoginLink(req, res, isIpBlocked);
+
 // Stub the discord.com token + identity + guilds calls for a callback test.
 function mockDiscordFetch(
   user: Record<string, unknown> = {
@@ -270,8 +278,6 @@ describe('DELETE /api/discord (unlink)', () => {
     const { status, data } = parse(res);
     expect(status).toBe(400);
     expect(data.error).toBe('password_required');
-    expect(data.needsPassword).toBe(true);
-    expect(data.username).toBe('disc123');
     // The link must NOT be removed when the account would be stranded.
     expect(
       dbMock.query.mock.calls.some((c) => String(c[0]).includes('DELETE FROM discord_links')),
@@ -457,7 +463,7 @@ describe('POST /api/auth/discord/login/new', () => {
   it('400s on a missing/expired link token', async () => {
     pendingRows = []; // consume returns nothing
     const res = makeRes();
-    await handleDiscordLoginNew(makeReq({ body: { linkToken: 'gone' } }), res);
+    await loginNew(makeReq({ body: { linkToken: 'gone' } }), res);
     expect(parse(res).status).toBe(400);
   });
 
@@ -475,7 +481,7 @@ describe('POST /api/auth/discord/login/new', () => {
     findAccountRows = []; // username 'Maxp' is free
     accountInsertRow = [{ id: 5, username: 'Maxp', password_hash: 'h' }];
     const res = makeRes();
-    await handleDiscordLoginNew(makeReq({ body: { linkToken: 't' } }), res);
+    await loginNew(makeReq({ body: { linkToken: 't' } }), res);
     const { status, data } = parse(res);
     expect(status).toBe(200);
     expect(data.username).toBe('Maxp');
@@ -487,6 +493,25 @@ describe('POST /api/auth/discord/login/new', () => {
     expect(insertAcct?.[1]?.[4]).toBe(false);
     expect(calls.some((c) => String(c[0]).includes('INSERT INTO discord_links'))).toBe(true);
     expect(calls.some((c) => String(c[0]).includes('INSERT INTO auth_tokens'))).toBe(true);
+  });
+
+  it('429s a blocked IP before consuming the token or provisioning', async () => {
+    pendingRows = [
+      {
+        token: 't',
+        discord_user_id: '999999999999999999',
+        discord_username: 'Maxp',
+        discord_avatar: null,
+        guild_member: false,
+      },
+    ];
+    const res = makeRes();
+    await loginNew(makeReq({ body: { linkToken: 't' } }), res, () => true);
+    expect(parse(res).status).toBe(429);
+    // The block short-circuits before any DB work: no token consume, no account insert.
+    const calls = dbMock.query.mock.calls.map((c) => String(c[0]));
+    expect(calls.some((c) => c.includes('DELETE FROM discord_pending_logins'))).toBe(false);
+    expect(calls.some((c) => c.includes('INSERT INTO accounts'))).toBe(false);
   });
 });
 
@@ -502,7 +527,7 @@ describe('POST /api/auth/discord/login/link', () => {
   it('400s on a missing/expired link token', async () => {
     pendingRows = [];
     const res = makeRes();
-    await handleDiscordLoginLink(
+    await loginLink(
       makeReq({ body: { linkToken: 'gone', username: 'maxp', password: 'whatever' } }),
       res,
     );
@@ -515,7 +540,7 @@ describe('POST /api/auth/discord/login/link', () => {
       { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
     ];
     const res = makeRes();
-    await handleDiscordLoginLink(
+    await loginLink(
       makeReq({ body: { linkToken: 't', username: 'maxp', password: 'wrongpassword' } }),
       res,
     );
@@ -539,7 +564,7 @@ describe('POST /api/auth/discord/login/link', () => {
       },
     ];
     const res = makeRes();
-    await handleDiscordLoginLink(
+    await loginLink(
       makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
       res,
     );
@@ -567,7 +592,7 @@ describe('POST /api/auth/discord/login/link', () => {
     for (let i = 0; i < 13; i++) {
       pendingRows = [{ ...PENDING }]; // token survives a failed attempt (peek, not consumed)
       const res = makeRes();
-      await handleDiscordLoginLink(
+      await loginLink(
         makeReq({
           body: {
             linkToken: 't',
@@ -594,7 +619,7 @@ describe('POST /api/auth/discord/login/link', () => {
     ];
     ownerRows = []; // the Discord id is free to link
     const res = makeRes();
-    await handleDiscordLoginLink(
+    await loginLink(
       makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
       res,
     );
@@ -607,5 +632,23 @@ describe('POST /api/auth/discord/login/link', () => {
     expect(calls.some((c) => c.includes('INSERT INTO discord_links'))).toBe(true);
     expect(calls.some((c) => c.includes('INSERT INTO auth_tokens'))).toBe(true);
     expect(calls.some((c) => c.includes('INSERT INTO accounts'))).toBe(false);
+  });
+
+  it('429s a blocked IP before consuming the token or verifying the password', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    const res = makeRes();
+    await loginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+      () => true,
+    );
+    expect(parse(res).status).toBe(429);
+    // No token consume and no link write: the gate fires before any of that.
+    const calls = dbMock.query.mock.calls.map((c) => String(c[0]));
+    expect(calls.some((c) => c.includes('DELETE FROM discord_pending_logins'))).toBe(false);
+    expect(calls.some((c) => c.includes('INSERT INTO discord_links'))).toBe(false);
   });
 });

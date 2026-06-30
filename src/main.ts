@@ -2797,13 +2797,18 @@ function show(el: string): void {
   ];
   document.body.dataset.startPanel = el.slice(1);
 
-  // Find currently visible panel
-  const currentActiveId = panels.find((id) => !$(id).hasAttribute('hidden'));
+  // Find currently visible panel. Not every entry carries every panel: play.html omits
+  // #discord-choice-panel (the chooser is an index.html-only flow), so resolve each id
+  // defensively and skip a missing one rather than dereferencing null.
+  const currentActiveId = panels.find((id) => {
+    const panel = document.querySelector(id);
+    return panel !== null && !panel.hasAttribute('hidden');
+  });
 
   if (!currentActiveId || currentActiveId === el) {
     // Show instantly on initial load or same panel
     for (const id of panels) {
-      $(id).toggleAttribute('hidden', id !== el);
+      document.querySelector(id)?.toggleAttribute('hidden', id !== el);
     }
     if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
       updatePreviewContainer(el);
@@ -6675,6 +6680,10 @@ function wireStartScreens(): void {
     show('#discord-choice-panel');
   };
   const wireDiscordChoice = () => {
+    // The first-login chooser lives only on the main entry (index.html); play.html omits
+    // it (Discord OAuth always redirects to '/'), so bail before touching nodes that are
+    // not present, mirroring the null-guarded sibling wirings (CTA banner, keep modal).
+    if (!document.getElementById('discord-choice-panel')) return;
     $('#btn-discord-create').addEventListener('click', () => {
       if (!pendingDiscordChoice) return;
       discordChoiceError('');
@@ -6756,7 +6765,13 @@ function wireStartScreens(): void {
   }
   // A first-time Discord login with no account yet parks a choice here: show the
   // create-new / link-existing chooser instead of the normal session restore.
-  const parkedDiscordChoice = DISCORD_BUILD_ENABLED ? readDiscordChoice() : null;
+  // The chooser only exists on index.html (the OAuth callback always redirects to '/').
+  // Guard on its presence so other entries (play.html) fall through to normal session
+  // restore instead of stranding the user on a chooser panel that is not in the DOM.
+  const parkedDiscordChoice =
+    DISCORD_BUILD_ENABLED && document.getElementById('discord-choice-panel')
+      ? readDiscordChoice()
+      : null;
   // Restore a persisted session: show the Account tab immediately, then confirm
   // the stored token is still valid against the server (clearing it if not).
   if (parkedDiscordChoice) {

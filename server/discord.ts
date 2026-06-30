@@ -340,8 +340,13 @@ function requestMeta(req: http.IncomingMessage): { ip: string; userAgent: string
 export async function handleDiscordLoginNew(
   req: http.IncomingMessage,
   res: http.ServerResponse,
+  isIpBlocked: (ip: string) => boolean,
 ): Promise<void> {
   if (discordRateLimited(req, 0)) return json(res, 429, { error: 'rate limited' });
+  // A blocked IP must not mint a fresh account + session through Discord, exactly as
+  // /api/register and /api/login refuse one. Reuse the rate-limit response so the block
+  // stays invisible (matches the throttle bucket above; the client already localizes it).
+  if (isIpBlocked(requestIp(req))) return json(res, 429, { error: 'rate limited' });
   const body = await readJsonBody(req);
   const linkToken = typeof body.linkToken === 'string' ? body.linkToken : '';
   const pending = await consumeDiscordPendingLogin(pool, linkToken);
@@ -402,8 +407,12 @@ export async function handleDiscordLoginNew(
 export async function handleDiscordLoginLink(
   req: http.IncomingMessage,
   res: http.ServerResponse,
+  isIpBlocked: (ip: string) => boolean,
 ): Promise<void> {
   if (discordRateLimited(req, 0)) return json(res, 429, { error: 'rate limited' });
+  // A blocked IP must not log into (and link Discord onto) an account through this
+  // unauthenticated path either, mirroring the /api/login IP gate. Same opaque 429.
+  if (isIpBlocked(requestIp(req))) return json(res, 429, { error: 'rate limited' });
   const body = await readJsonBody(req);
   const linkToken = typeof body.linkToken === 'string' ? body.linkToken : '';
   const pending = await peekDiscordPendingLogin(pool, linkToken);
@@ -627,14 +636,11 @@ export async function handleDiscordUnlink(
     const body = await readJsonBody(req);
     const next = typeof body.password === 'string' ? body.password : '';
     if (!validPassword(next)) {
-      // The client surfaces a "set a password to keep your account" prompt; the
-      // username is returned so it can show what the player will log in with.
+      // The client opens the "set a password to keep your account" modal off the 400
+      // status alone (it pre-fills the read-only username locally), so the response
+      // needs only the error code.
       note('discord.unlink.password_required');
-      return json(res, 400, {
-        error: 'password_required',
-        needsPassword: true,
-        username: acct.username,
-      });
+      return json(res, 400, { error: 'password_required' });
     }
     // Set the real password first (this also flips password_set = TRUE), so the
     // account survives even if the unlink below were to fail (a benign retry).

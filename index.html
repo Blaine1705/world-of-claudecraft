@@ -429,6 +429,35 @@
     <button type="button" id="discord-cta-close" class="dc-cta-x" data-i18n-aria="hudChrome.discord.cta.dismiss" aria-label="Dismiss">&#10005;</button>
   </div>
 
+  <!-- Shown when unlinking a Discord-provisioned account that has no real password yet:
+       the player must set one (username fixed, shown read-only) so the account stays
+       reachable after the link is removed. Kept top level (NOT inside #start-screen, which
+       is display:none in-game and a lower z-index:100 stacking context) so the modal shows
+       over the game and the in-game Discord panel when unlinking. Wired in main.ts. -->
+  <div id="discord-keep-modal" class="modal-backdrop" hidden>
+    <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="discord-keep-title">
+      <h2 id="discord-keep-title" data-i18n="hudChrome.discord.keep.title">Set a password</h2>
+      <p data-i18n="hudChrome.discord.keep.body">Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.</p>
+      <div class="auth-field">
+        <label for="discord-keep-username" class="auth-label" data-i18n="hudChrome.discord.keep.usernameLabel">Your username</label>
+        <input id="discord-keep-username" type="text" autocomplete="username" readonly />
+      </div>
+      <div class="auth-field">
+        <label for="discord-keep-pass" class="auth-label" data-i18n="auth.password">Password</label>
+        <input id="discord-keep-pass" type="password" maxlength="128" autocomplete="new-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
+      </div>
+      <div class="auth-field">
+        <label for="discord-keep-confirm" class="auth-label" data-i18n="hudChrome.discord.keep.confirmLabel">Confirm password</label>
+        <input id="discord-keep-confirm" type="password" maxlength="128" autocomplete="new-password" />
+      </div>
+      <div id="discord-keep-error" class="auth-error" aria-live="polite"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" id="btn-discord-keep-cancel" data-i18n="hudChrome.discord.keep.cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-discord-keep-submit" data-i18n="hudChrome.discord.keep.submit">Set password and unlink</button>
+      </div>
+    </div>
+  </div>
+
   <main id="start-screen">
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
@@ -1074,33 +1103,6 @@
         <div class="confirm-actions">
           <button type="button" class="btn btn-secondary" id="btn-cancel-delete-character" data-i18n="deleteCharacter.cancel">Cancel</button>
           <button type="button" class="btn btn-danger" id="btn-confirm-delete-character" disabled data-i18n="deleteCharacter.confirm">Delete Permanently</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Shown when unlinking a Discord-provisioned account that has no real password
-         yet: the player must set one (the username is fixed, shown read-only) so the
-         account stays reachable after the Discord link is removed. Wired in main.ts. -->
-    <div id="discord-keep-modal" class="modal-backdrop" hidden>
-      <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="discord-keep-title">
-        <h2 id="discord-keep-title" data-i18n="hudChrome.discord.keep.title">Set a password</h2>
-        <p data-i18n="hudChrome.discord.keep.body">Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.</p>
-        <div class="auth-field">
-          <label for="discord-keep-username" class="auth-label" data-i18n="hudChrome.discord.keep.usernameLabel">Your username</label>
-          <input id="discord-keep-username" type="text" autocomplete="username" readonly />
-        </div>
-        <div class="auth-field">
-          <label for="discord-keep-pass" class="auth-label" data-i18n="auth.password">Password</label>
-          <input id="discord-keep-pass" type="password" maxlength="128" autocomplete="new-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
-        </div>
-        <div class="auth-field">
-          <label for="discord-keep-confirm" class="auth-label" data-i18n="hudChrome.discord.keep.confirmLabel">Confirm password</label>
-          <input id="discord-keep-confirm" type="password" maxlength="128" autocomplete="new-password" />
-        </div>
-        <div id="discord-keep-error" class="auth-error" aria-live="polite"></div>
-        <div class="confirm-actions">
-          <button type="button" class="btn btn-secondary" id="btn-discord-keep-cancel" data-i18n="hudChrome.discord.keep.cancel">Cancel</button>
-          <button type="button" class="btn btn-danger" id="btn-discord-keep-submit" data-i18n="hudChrome.discord.keep.submit">Set password and unlink</button>
         </div>
       </div>
     </div>

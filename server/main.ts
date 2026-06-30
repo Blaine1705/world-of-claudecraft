@@ -1342,10 +1342,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     // verified Discord OAuth), and the handlers carry their own Discord rate-limit
     // bucket + (for the link path) the same password/2FA/moderation checks as login.
     if (req.method === 'POST' && url === '/api/auth/discord/login/new') {
-      return handleDiscordLoginNew(req, res);
+      return handleDiscordLoginNew(req, res, (ip) => game.isIpBlocked(ip));
     }
     if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
-      return handleDiscordLoginLink(req, res);
+      return handleDiscordLoginLink(req, res, (ip) => game.isIpBlocked(ip));
     }
     if (req.method === 'GET' && url === '/api/discord') {
       const accountId = await bearerActiveAccount(req, res);
