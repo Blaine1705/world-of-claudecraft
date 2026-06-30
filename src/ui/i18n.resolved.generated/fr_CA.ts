@@ -759,6 +759,27 @@ export const fr_CA: EnTranslations = {
         "error": "Could not link Discord. Please try again.",
         "success": "Discord linked."
       },
+      "choice": {
+        "title": "Continue with Discord",
+        "intro": "Create a new account, or link your Discord to one you already have.",
+        "greeting": "Welcome, {name}!",
+        "createCta": "Create a new account",
+        "haveAccount": "Already have an account?",
+        "linkCta": "Link an existing account",
+        "linkSubmit": "Link account",
+        "error": "Could not continue. Please try again.",
+        "expired": "That Discord sign-in expired. Please sign in with Discord again."
+      },
+      "keep": {
+        "title": "Set a password",
+        "body": "Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.",
+        "usernameLabel": "Your username",
+        "confirmLabel": "Confirm password",
+        "submit": "Set password and unlink",
+        "cancel": "Cancel",
+        "mismatch": "Passwords do not match.",
+        "tooShort": "Password must be at least 6 characters."
+      },
       "linkedAs": "Linked as {name}",
       "linkedTitle": "Discord: {name}",
       "viewCharacter": "View {name}",

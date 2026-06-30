@@ -3,9 +3,12 @@ import {
   accountForDiscord,
   claimSwag,
   consumeDiscordOAuthState,
+  consumeDiscordPendingLogin,
+  createDiscordPendingLogin,
   grantRewardPoints,
   linkDiscordToAccount,
   loadRewardState,
+  peekDiscordPendingLogin,
 } from '../server/discord_db';
 
 // discord_db functions take the pg `pool` as an argument, so a fake pool (no
@@ -195,5 +198,53 @@ describe('loadRewardState', () => {
   it('defaults to zeros when no row exists', async () => {
     const { pool } = makePool(() => NONE);
     expect(await loadRewardState(pool, 1)).toEqual({ points: 0, lifetimePoints: 0 });
+  });
+});
+
+describe('discord pending logins', () => {
+  const ROW = {
+    token: 'tok',
+    discord_user_id: '80351110224678912',
+    discord_username: 'Maxp',
+    discord_avatar: null,
+    guild_member: true,
+  };
+
+  it('createDiscordPendingLogin inserts with the verified identity + TTL', async () => {
+    const { pool, calls, didRun } = makePool(() => NONE);
+    await createDiscordPendingLogin(pool, {
+      token: 'tok',
+      discordUserId: '80351110224678912',
+      username: 'Maxp',
+      avatar: null,
+      guildMember: true,
+      ttlMinutes: 15,
+    });
+    expect(didRun('INSERT INTO discord_pending_logins')).toBe(true);
+    const insert = calls.find((c) => c.sql.includes('INSERT INTO discord_pending_logins'));
+    expect(insert?.params).toEqual(['tok', '80351110224678912', 'Maxp', null, true, '15']);
+  });
+
+  it('peekDiscordPendingLogin reads WITHOUT deleting (live row, then null)', async () => {
+    const live = makePool((s) =>
+      s.includes('SELECT') && s.includes('FROM discord_pending_logins')
+        ? { rows: [ROW], rowCount: 1 }
+        : NONE,
+    );
+    expect(await peekDiscordPendingLogin(live.pool, 'tok')).toEqual(ROW);
+    // A peek must never delete the row (it stays reusable for the retry).
+    expect(live.didRun('DELETE FROM discord_pending_logins')).toBe(false);
+    const dead = makePool(() => NONE);
+    expect(await peekDiscordPendingLogin(dead.pool, 'tok')).toBeNull();
+  });
+
+  it('consumeDiscordPendingLogin deletes-and-returns (single use)', async () => {
+    const live = makePool((s) =>
+      s.includes('DELETE FROM discord_pending_logins') ? { rows: [ROW], rowCount: 1 } : NONE,
+    );
+    expect(await consumeDiscordPendingLogin(live.pool, 'tok')).toEqual(ROW);
+    expect(live.didRun('DELETE FROM discord_pending_logins')).toBe(true);
+    const dead = makePool(() => NONE);
+    expect(await consumeDiscordPendingLogin(dead.pool, 'tok')).toBeNull();
   });
 });

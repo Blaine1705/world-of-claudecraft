@@ -521,13 +521,48 @@ export class Api {
     return this.post(`/api/auth/discord/start?mode=${mode}`, {});
   }
 
+  // First-time Discord login chooser: create a brand-new account for the verified
+  // Discord identity (parked under `linkToken`) and start a session.
+  async discordLoginNew(linkToken: string): Promise<void> {
+    const data = await this.post('/api/auth/discord/login/new', { linkToken });
+    this.token = data.token;
+    this.username = data.username;
+  }
+
+  // First-time Discord login chooser: link the verified Discord identity to an
+  // EXISTING account (username + password, plus a 2FA code if that account has it).
+  // Returns { twoFactorRequired: true } when a code is needed (the caller re-invokes
+  // with `code`/`recoveryCode`), mirroring login(); a wrong code/password throws.
+  async discordLoginLink(
+    linkToken: string,
+    username: string,
+    password: string,
+    code = '',
+    recoveryCode = '',
+  ): Promise<{ twoFactorRequired?: boolean }> {
+    const data = await this.post('/api/auth/discord/login/link', {
+      linkToken,
+      username,
+      password,
+      code,
+      recoveryCode,
+    });
+    if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
+    this.token = data.token;
+    this.username = data.username;
+    return {};
+  }
+
   // Current account's Discord link status + reward points + live guild presence.
   async discordStatus(): Promise<Record<string, unknown>> {
     return this.get('/api/discord');
   }
 
-  async unlinkDiscord(): Promise<void> {
-    await this.delete('/api/discord', {});
+  // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
+  // `password` so it stays reachable after unlinking; the server 400s with
+  // 'password_required' otherwise. A normal account passes nothing.
+  async unlinkDiscord(password?: string): Promise<void> {
+    await this.delete('/api/discord', password ? { password } : {});
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────

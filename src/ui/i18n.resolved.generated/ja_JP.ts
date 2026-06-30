@@ -759,6 +759,27 @@ export const ja_JP: EnTranslations = {
         "error": "Discordを連携できませんでした。もう一度お試しください。",
         "success": "Discordを連携しました。"
       },
+      "choice": {
+        "title": "Discordで続ける",
+        "intro": "新しいアカウントを作成するか、Discordを既存のアカウントに連携します。",
+        "greeting": "ようこそ、{name}さん！",
+        "createCta": "新しいアカウントを作成",
+        "haveAccount": "すでにアカウントをお持ちですか？",
+        "linkCta": "既存のアカウントを連携",
+        "linkSubmit": "アカウントを連携",
+        "error": "続行できませんでした。もう一度お試しください。",
+        "expired": "このDiscordログインは期限切れです。もう一度Discordでログインしてください。"
+      },
+      "keep": {
+        "title": "パスワードを設定",
+        "body": "このアカウントはDiscordでログインします。連携を解除した後もユーザー名でログインできるよう、パスワードを設定してください。",
+        "usernameLabel": "ユーザー名",
+        "confirmLabel": "パスワードの確認",
+        "submit": "パスワードを設定して連携解除",
+        "cancel": "キャンセル",
+        "mismatch": "パスワードが一致しません。",
+        "tooShort": "パスワードは6文字以上にしてください。"
+      },
       "linkedAs": "{name}として連携済み",
       "linkedTitle": "Discord：{name}",
       "viewCharacter": "View {name}",

@@ -2789,6 +2789,7 @@ function show(el: string): void {
   const panels = [
     '#mode-select',
     '#login-panel',
+    '#discord-choice-panel',
     '#realm-panel',
     '#charselect-panel',
     '#charcreate-panel',
@@ -5175,6 +5176,9 @@ function coerceDiscordStatus(d: Record<string, unknown>): DiscordAccountStatus {
     claimedSwagIds: Array.isArray(d.claimedSwagIds)
       ? d.claimedSwagIds.filter((s): s is string => typeof s === 'string')
       : [],
+    // Default true: only an explicit false (a Discord-provisioned account with no
+    // real password yet) makes unlink demand one.
+    passwordSet: d.passwordSet !== false,
   };
 }
 
@@ -5282,10 +5286,24 @@ function renderDiscordPanel(): void {
       hideTooltip: () => {},
       onLink: () => startDiscordOAuth('link'),
       onUnlink: () => {
+        // A Discord-provisioned account (no real password) must set one first, or
+        // unlinking would strand it. Collect it via the keep-account modal.
+        if (!discordStatus().passwordSet) {
+          openDiscordKeepModal();
+          return;
+        }
         void api
           .unlinkDiscord()
           .then(() => refreshDiscordStatus())
-          .catch((err) => console.error('[discord] unlink failed', err));
+          .catch((err) => {
+            // Defensive: if status was stale and the server still demands a password,
+            // fall back to the keep-account modal instead of a console-only failure.
+            if ((err as { status?: number })?.status === 400) {
+              openDiscordKeepModal();
+              return;
+            }
+            console.error('[discord] unlink failed', err);
+          });
       },
       onOpenUrl: (url) => {
         if (url) window.open(url, '_blank', 'noopener,noreferrer');
@@ -5321,6 +5339,124 @@ window.addEventListener('keydown', (e) => {
 setInterval(() => {
   if (DISCORD_BUILD_ENABLED && api.token) void refreshDiscordStatus();
 }, 45_000);
+
+// ── Keep-account-before-unlink modal (#discord-keep-modal) ───────────────────
+// A Discord-provisioned account has no real password, so unlinking it as-is would
+// strand it. This modal makes the player set one first (the username is fixed and
+// shown read-only); the server sets the password and removes the link atomically.
+const DISCORD_KEEP_PASSWORD_MIN = 6;
+
+function openDiscordKeepModal(): void {
+  const modal = document.getElementById('discord-keep-modal');
+  if (!modal) return;
+  const userEl = document.getElementById('discord-keep-username') as HTMLInputElement | null;
+  const passEl = document.getElementById('discord-keep-pass') as HTMLInputElement | null;
+  const confirmEl = document.getElementById('discord-keep-confirm') as HTMLInputElement | null;
+  const errEl = document.getElementById('discord-keep-error');
+  if (userEl) userEl.value = api.username ?? discordStatus().username ?? '';
+  if (passEl) passEl.value = '';
+  if (confirmEl) confirmEl.value = '';
+  if (errEl) errEl.textContent = '';
+  modal.hidden = false;
+  passEl?.focus();
+}
+
+function closeDiscordKeepModal(): void {
+  const modal = document.getElementById('discord-keep-modal');
+  if (modal) modal.hidden = true;
+}
+
+function wireDiscordKeepModal(): void {
+  const modal = document.getElementById('discord-keep-modal');
+  if (!modal) return;
+  const passEl = document.getElementById('discord-keep-pass') as HTMLInputElement | null;
+  const confirmEl = document.getElementById('discord-keep-confirm') as HTMLInputElement | null;
+  const errEl = document.getElementById('discord-keep-error');
+  const submit = () => {
+    const pass = passEl?.value ?? '';
+    const confirm = confirmEl?.value ?? '';
+    if (pass.length < DISCORD_KEEP_PASSWORD_MIN) {
+      if (errEl) errEl.textContent = t('hudChrome.discord.keep.tooShort');
+      return;
+    }
+    if (pass !== confirm) {
+      if (errEl) errEl.textContent = t('hudChrome.discord.keep.mismatch');
+      return;
+    }
+    if (errEl) errEl.textContent = '';
+    void api
+      .unlinkDiscord(pass)
+      .then(() => {
+        closeDiscordKeepModal();
+        return refreshDiscordStatus();
+      })
+      .then(() => renderDiscordPanel())
+      .catch((err) => {
+        if (errEl) errEl.textContent = userFacingApiError(err);
+      });
+  };
+  document.getElementById('btn-discord-keep-submit')?.addEventListener('click', submit);
+  document
+    .getElementById('btn-discord-keep-cancel')
+    ?.addEventListener('click', closeDiscordKeepModal);
+  // Backdrop click closes; Enter in the confirm field submits.
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeDiscordKeepModal();
+  });
+  confirmEl?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submit();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!modal.hidden && e.key === 'Escape') closeDiscordKeepModal();
+  });
+}
+
+// ── First-time Discord login chooser persistence (#discord-choice-panel) ─────
+// The OAuth bounce page parks a single-use link token + Discord name here when a
+// first-time login has no account yet; main.ts reads it on boot to show the
+// chooser. Stale/expired/garbled entries are cleared so they never trap a visitor.
+const DISCORD_CHOICE_KEY = 'woc_discord_choice';
+const DISCORD_CHOICE_TTL_MS = 15 * 60 * 1000;
+
+interface DiscordLoginChoice {
+  linkToken: string;
+  username: string;
+}
+
+function readDiscordChoice(): DiscordLoginChoice | null {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(DISCORD_CHOICE_KEY);
+  } catch {
+    return null;
+  }
+  if (!raw) return null;
+  try {
+    const d = JSON.parse(raw) as { linkToken?: unknown; username?: unknown; ts?: unknown };
+    const fresh = typeof d.ts === 'number' && Date.now() - d.ts < DISCORD_CHOICE_TTL_MS;
+    if (typeof d.linkToken === 'string' && d.linkToken && fresh) {
+      return {
+        linkToken: d.linkToken,
+        username: typeof d.username === 'string' ? d.username : '',
+      };
+    }
+  } catch {
+    /* fall through to clear a garbled entry */
+  }
+  clearDiscordChoice();
+  return null;
+}
+
+function clearDiscordChoice(): void {
+  try {
+    localStorage.removeItem(DISCORD_CHOICE_KEY);
+  } catch {
+    /* storage disabled */
+  }
+}
 
 async function refreshWalletLinkStatus(): Promise<void> {
   if (!WALLET_ENABLED) {
@@ -6486,6 +6622,130 @@ function wireStartScreens(): void {
     });
   }
   wireDiscordCtaBanner();
+  wireDiscordKeepModal();
+
+  // First-time Discord login chooser: create a new account, or link an existing one.
+  let pendingDiscordChoice: DiscordLoginChoice | null = null;
+  const discordChoiceError = (msg: string) => {
+    const el = document.getElementById('discord-choice-error');
+    if (el) el.textContent = msg;
+  };
+  // A chooser path that minted a session: persist it and drop straight into play.
+  const finishDiscordChoice = () => {
+    clearDiscordChoice();
+    pendingDiscordChoice = null;
+    discordChoiceError('');
+    api.saveSession();
+    enterLoggedInChrome();
+    void refreshWalletLinkStatus();
+    goToLoggedInPlay();
+  };
+  const onDiscordChoiceError = (err: unknown) => {
+    // A dead/used pending token (400) can't be retried: clear it and ask the player
+    // to sign in with Discord again. Other errors stay on the chooser to retry.
+    if ((err as { status?: number })?.status === 400) {
+      clearDiscordChoice();
+      pendingDiscordChoice = null;
+      discordChoiceError(t('hudChrome.discord.choice.expired'));
+      return;
+    }
+    // Server codes userFacingApiError doesn't localize (a unique-link race, a 500, or
+    // the discord rate-limit bucket) would otherwise render raw; show the localized
+    // generic instead. The credential / 2FA / moderation messages it DOES localize
+    // pass through unchanged.
+    const code = err instanceof Error ? err.message : '';
+    if (code === 'already_linked' || code === 'server_error' || code === 'rate limited') {
+      discordChoiceError(t('hudChrome.discord.choice.error'));
+      return;
+    }
+    discordChoiceError(userFacingApiError(err));
+  };
+  const showDiscordChoice = (choice: DiscordLoginChoice) => {
+    pendingDiscordChoice = choice;
+    const greet = document.getElementById('discord-choice-greeting');
+    if (greet && choice.username) {
+      greet.textContent = t('hudChrome.discord.choice.greeting', { name: choice.username });
+    }
+    const linkBlock = document.getElementById('discord-link-existing');
+    if (linkBlock) linkBlock.hidden = true;
+    const twoFaField = document.getElementById('discord-link-2fa-field');
+    if (twoFaField) twoFaField.hidden = true;
+    document.getElementById('btn-discord-link-toggle')?.setAttribute('aria-expanded', 'false');
+    discordChoiceError('');
+    show('#discord-choice-panel');
+  };
+  const wireDiscordChoice = () => {
+    $('#btn-discord-create').addEventListener('click', () => {
+      if (!pendingDiscordChoice) return;
+      discordChoiceError('');
+      void api
+        .discordLoginNew(pendingDiscordChoice.linkToken)
+        .then(finishDiscordChoice)
+        .catch(onDiscordChoiceError);
+    });
+    $('#btn-discord-link-toggle').addEventListener('click', () => {
+      const linkBlock = document.getElementById('discord-link-existing');
+      if (!linkBlock) return;
+      const reveal = linkBlock.hidden;
+      linkBlock.hidden = !reveal;
+      $('#btn-discord-link-toggle').setAttribute('aria-expanded', String(reveal));
+      if (reveal) ($('#discord-link-user') as HTMLInputElement).focus();
+    });
+    const submitLink = () => {
+      if (!pendingDiscordChoice) return;
+      const username = ($('#discord-link-user') as HTMLInputElement).value.trim();
+      const password = ($('#discord-link-pass') as HTMLInputElement).value;
+      const twoFaField = document.getElementById('discord-link-2fa-field');
+      const rawCode =
+        twoFaField && !twoFaField.hidden ? ($('#discord-link-2fa') as HTMLInputElement).value : '';
+      const factor = rawCode ? classifyAuthCode(rawCode) : { code: '', recoveryCode: '' };
+      if (!username || !password) {
+        discordChoiceError(t('hudChrome.discord.choice.error'));
+        return;
+      }
+      discordChoiceError('');
+      void api
+        .discordLoginLink(
+          pendingDiscordChoice.linkToken,
+          username,
+          password,
+          factor.code,
+          factor.recoveryCode,
+        )
+        .then((res) => {
+          if (res.twoFactorRequired) {
+            // Password accepted; the account needs a second factor. Reveal the code
+            // field for the follow-up submit (the pending token stays valid).
+            if (twoFaField) twoFaField.hidden = false;
+            ($('#discord-link-2fa') as HTMLInputElement).focus();
+            discordChoiceError(t('auth.twoFactorHint'));
+            return;
+          }
+          finishDiscordChoice();
+        })
+        .catch(onDiscordChoiceError);
+    };
+    $('#btn-discord-link-submit').addEventListener('click', submitLink);
+    ($('#discord-link-pass') as HTMLInputElement).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitLink();
+      }
+    });
+    ($('#discord-link-2fa') as HTMLInputElement).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitLink();
+      }
+    });
+    $('#btn-discord-choice-back').addEventListener('click', () => {
+      clearDiscordChoice();
+      pendingDiscordChoice = null;
+      show('#mode-select');
+    });
+  };
+  if (DISCORD_BUILD_ENABLED) wireDiscordChoice();
+
   // A just-completed Discord login should land straight in online play, not home.
   let discordOnboarding = false;
   try {
@@ -6494,9 +6754,15 @@ function wireStartScreens(): void {
   } catch {
     /* storage disabled */
   }
+  // A first-time Discord login with no account yet parks a choice here: show the
+  // create-new / link-existing chooser instead of the normal session restore.
+  const parkedDiscordChoice = DISCORD_BUILD_ENABLED ? readDiscordChoice() : null;
   // Restore a persisted session: show the Account tab immediately, then confirm
   // the stored token is still valid against the server (clearing it if not).
-  if (api.restoreSession()) {
+  if (parkedDiscordChoice) {
+    enterLoggedOutChrome();
+    showDiscordChoice(parkedDiscordChoice);
+  } else if (api.restoreSession()) {
     enterLoggedInChrome();
     void revalidateAccountSession();
     // Re-bind the account's linked wallet on a restored session (not just on fresh

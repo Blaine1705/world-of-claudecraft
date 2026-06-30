@@ -759,6 +759,27 @@ export const zh_CN: EnTranslations = {
         "error": "无法关联 Discord，请重试。",
         "success": "Discord 已关联。"
       },
+      "choice": {
+        "title": "使用 Discord 继续",
+        "intro": "创建新账号，或将 Discord 关联到你已有的账号。",
+        "greeting": "欢迎，{name}！",
+        "createCta": "创建新账号",
+        "haveAccount": "已经有账号了？",
+        "linkCta": "关联已有账号",
+        "linkSubmit": "关联账号",
+        "error": "无法继续，请重试。",
+        "expired": "该 Discord 登录已过期，请重新使用 Discord 登录。"
+      },
+      "keep": {
+        "title": "设置密码",
+        "body": "你的账号通过 Discord 登录。请设置密码，这样取消关联后仍可使用用户名登录。",
+        "usernameLabel": "你的用户名",
+        "confirmLabel": "确认密码",
+        "submit": "设置密码并取消关联",
+        "cancel": "取消",
+        "mismatch": "两次输入的密码不一致。",
+        "tooShort": "密码至少需要 6 个字符。"
+      },
       "linkedAs": "已关联为 {name}",
       "linkedTitle": "Discord：{name}",
       "viewCharacter": "View {name}",

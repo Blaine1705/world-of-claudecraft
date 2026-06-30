@@ -759,6 +759,27 @@ export const ko_KR: EnTranslations = {
         "error": "Discord를 연결할 수 없습니다. 다시 시도해 주세요.",
         "success": "Discord가 연결되었습니다."
       },
+      "choice": {
+        "title": "Discord로 계속하기",
+        "intro": "새 계정을 만들거나 Discord를 기존 계정에 연결하세요.",
+        "greeting": "{name}님, 환영합니다!",
+        "createCta": "새 계정 만들기",
+        "haveAccount": "이미 계정이 있으신가요?",
+        "linkCta": "기존 계정 연결",
+        "linkSubmit": "계정 연결",
+        "error": "계속할 수 없습니다. 다시 시도해 주세요.",
+        "expired": "이 Discord 로그인이 만료되었습니다. Discord로 다시 로그인해 주세요."
+      },
+      "keep": {
+        "title": "비밀번호 설정",
+        "body": "이 계정은 Discord로 로그인합니다. 연결을 해제한 후에도 사용자 이름으로 로그인할 수 있도록 비밀번호를 설정하세요.",
+        "usernameLabel": "사용자 이름",
+        "confirmLabel": "비밀번호 확인",
+        "submit": "비밀번호 설정 후 연결 해제",
+        "cancel": "취소",
+        "mismatch": "비밀번호가 일치하지 않습니다.",
+        "tooShort": "비밀번호는 6자 이상이어야 합니다."
+      },
       "linkedAs": "{name}(으)로 연결됨",
       "linkedTitle": "Discord: {name}",
       "viewCharacter": "View {name}",

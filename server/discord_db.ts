@@ -47,6 +47,22 @@ CREATE TABLE IF NOT EXISTS discord_oauth_states (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS discord_oauth_states_expires ON discord_oauth_states(expires_at);
+-- Single-use, short-lived "what next?" rows for a FIRST-TIME Discord login. The
+-- callback has VERIFIED the Discord identity (via the OAuth code exchange) but the
+-- player has not yet chosen to create a new account or link an existing one, so the
+-- verified identity is parked here under an unguessable token. The chooser endpoints
+-- (login/new, login/link) consume it. No account_id: by definition this Discord id
+-- is not linked to any account yet. Mirrors discord_oauth_states (CSRF/replay guard).
+CREATE TABLE IF NOT EXISTS discord_pending_logins (
+  token TEXT PRIMARY KEY,
+  discord_user_id TEXT NOT NULL,
+  discord_username TEXT,
+  discord_avatar TEXT,
+  guild_member BOOLEAN NOT NULL DEFAULT FALSE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS discord_pending_logins_expires ON discord_pending_logins(expires_at);
 -- Authored, account-wide reward balance. points = spendable, lifetime_points =
 -- monotonic total that drives the status tier (status never drops on a spend).
 CREATE TABLE IF NOT EXISTS reward_points (
@@ -216,6 +232,77 @@ export async function consumeDiscordOAuthState(
 
 export async function pruneDiscordOAuthStates(pool: Pool): Promise<void> {
   await pool.query('DELETE FROM discord_oauth_states WHERE expires_at <= now()');
+}
+
+// ── Pending first-time logins (verified Discord identity, choice not yet made) ──
+
+export interface DiscordPendingLoginRow {
+  token: string;
+  discord_user_id: string;
+  discord_username: string | null;
+  discord_avatar: string | null;
+  guild_member: boolean;
+}
+
+export async function createDiscordPendingLogin(
+  pool: Pool,
+  params: {
+    token: string;
+    discordUserId: string;
+    username: string | null;
+    avatar: string | null;
+    guildMember: boolean;
+    ttlMinutes: number;
+  },
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO discord_pending_logins
+       (token, discord_user_id, discord_username, discord_avatar, guild_member, expires_at)
+     VALUES ($1, $2, $3, $4, $5, now() + ($6 || ' minutes')::interval)`,
+    [
+      params.token,
+      params.discordUserId,
+      params.username,
+      params.avatar,
+      params.guildMember,
+      String(params.ttlMinutes),
+    ],
+  );
+}
+
+/**
+ * Read an unexpired pending-login row WITHOUT consuming it. The link-existing flow
+ * peeks first so a wrong password (or a 2FA challenge) leaves the token reusable
+ * for the retry; only the final commit calls consumeDiscordPendingLogin.
+ */
+export async function peekDiscordPendingLogin(
+  pool: Pool,
+  token: string,
+): Promise<DiscordPendingLoginRow | null> {
+  const res = await pool.query(
+    `SELECT token, discord_user_id, discord_username, discord_avatar, guild_member
+       FROM discord_pending_logins WHERE token = $1 AND expires_at > now()`,
+    [token],
+  );
+  return res.rows[0] ?? null;
+}
+
+/** Atomically consume an unexpired pending-login row (single use). Null if gone/expired. */
+export async function consumeDiscordPendingLogin(
+  pool: Pool,
+  token: string,
+): Promise<DiscordPendingLoginRow | null> {
+  const res = await pool.query(
+    `DELETE FROM discord_pending_logins
+      WHERE token = $1 AND expires_at > now()
+      RETURNING token, discord_user_id, discord_username, discord_avatar, guild_member`,
+    [token],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function pruneDiscordPendingLogins(pool: Pool): Promise<void> {
+  await pool.query('DELETE FROM discord_pending_logins WHERE expires_at <= now()');
 }
 
 // ── Reward economy (authored balance + ledger + swag) ─────────────────────────

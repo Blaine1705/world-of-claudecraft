@@ -759,6 +759,27 @@ export const zh_TW: EnTranslations = {
         "error": "無法連結 Discord。請再試一次。",
         "success": "Discord 已連結。"
       },
+      "choice": {
+        "title": "使用 Discord 繼續",
+        "intro": "建立新帳號，或將 Discord 連結到你已有的帳號。",
+        "greeting": "歡迎，{name}！",
+        "createCta": "建立新帳號",
+        "haveAccount": "已經有帳號了？",
+        "linkCta": "連結已有帳號",
+        "linkSubmit": "連結帳號",
+        "error": "無法繼續，請重試。",
+        "expired": "該 Discord 登入已過期，請重新使用 Discord 登入。"
+      },
+      "keep": {
+        "title": "設定密碼",
+        "body": "你的帳號透過 Discord 登入。請設定密碼，這樣取消連結後仍可使用使用者名稱登入。",
+        "usernameLabel": "你的使用者名稱",
+        "confirmLabel": "確認密碼",
+        "submit": "設定密碼並取消連結",
+        "cancel": "取消",
+        "mismatch": "兩次輸入的密碼不一致。",
+        "tooShort": "密碼至少需要 6 個字元。"
+      },
       "linkedAs": "已連結為 {name}",
       "linkedTitle": "Discord：{name}",
       "viewCharacter": "View {name}",

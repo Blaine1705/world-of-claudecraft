@@ -11,6 +11,7 @@ const UNLINKED: DiscordAccountStatus = {
   lifetimePoints: 0,
   statusTier: 0,
   claimedSwagIds: [],
+  passwordSet: true,
 };
 
 const NO_PRESENCE: DiscordPresenceState = {

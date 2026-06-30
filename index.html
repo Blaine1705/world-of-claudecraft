@@ -654,6 +654,43 @@
           </p>
         </form>
 
+        <!-- First-time Discord login chooser: create a new account, or link an
+             existing one (username + password, plus a 2FA code if it has one).
+             Shown after the Discord OAuth redirect when the identity has no account
+             yet (main.ts reads the parked woc_discord_choice token). -->
+        <div id="discord-choice-panel" class="panel auth-panel auth-panel-premium" hidden>
+          <h2 class="auth-title" data-i18n="hudChrome.discord.choice.title">Continue with Discord</h2>
+          <p class="account-hint" id="discord-choice-greeting" data-i18n="hudChrome.discord.choice.intro">Create a new account, or link your Discord to one you already have.</p>
+
+          <button type="button" class="btn btn-primary" id="btn-discord-create" style="width:100%;margin:4px 0;" data-i18n="hudChrome.discord.choice.createCta">Create a new account</button>
+
+          <div class="auth-or"><span data-i18n="hudChrome.discord.choice.haveAccount">Already have an account?</span></div>
+
+          <button type="button" class="btn btn-secondary" id="btn-discord-link-toggle" style="width:100%;margin:4px 0;" data-i18n="hudChrome.discord.choice.linkCta" aria-expanded="false" aria-controls="discord-link-existing">Link an existing account</button>
+
+          <div id="discord-link-existing" hidden>
+            <div class="auth-field">
+              <label for="discord-link-user" class="auth-label" data-i18n="auth.username">Username</label>
+              <input id="discord-link-user" type="text" maxlength="24" autocomplete="username" data-i18n-placeholder="auth.usernamePlaceholder" placeholder="Enter username" />
+            </div>
+            <div class="auth-field">
+              <label for="discord-link-pass" class="auth-label" data-i18n="auth.password">Password</label>
+              <input id="discord-link-pass" type="password" maxlength="128" autocomplete="current-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
+            </div>
+            <div class="auth-field" id="discord-link-2fa-field" hidden>
+              <label for="discord-link-2fa" class="auth-label" data-i18n="auth.twoFactorLabel">Authentication code</label>
+              <input id="discord-link-2fa" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="14" data-i18n-placeholder="auth.twoFactorPlaceholder" placeholder="6-digit or recovery code" />
+            </div>
+            <button type="button" class="btn btn-primary" id="btn-discord-link-submit" style="width:100%;margin:4px 0;" data-i18n="hudChrome.discord.choice.linkSubmit">Link account</button>
+          </div>
+
+          <div id="discord-choice-error" class="auth-error" aria-live="polite"></div>
+
+          <div class="auth-actions">
+            <button type="button" class="btn btn-back" id="btn-discord-choice-back" data-i18n="auth.back">Back</button>
+          </div>
+        </div>
+
         <div id="realm-panel" class="panel auth-panel auth-panel-premium" hidden>
           <h2 class="auth-title"><span data-i18n="auth.realmList">Realm List</span> <span id="realm-list-user" class="cs-realm"></span></h2>
           <div id="realm-list"><div class="realm-loading" data-i18n="auth.loadingRealms">Loading realms...</div></div>
@@ -1037,6 +1074,33 @@
         <div class="confirm-actions">
           <button type="button" class="btn btn-secondary" id="btn-cancel-delete-character" data-i18n="deleteCharacter.cancel">Cancel</button>
           <button type="button" class="btn btn-danger" id="btn-confirm-delete-character" disabled data-i18n="deleteCharacter.confirm">Delete Permanently</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shown when unlinking a Discord-provisioned account that has no real password
+         yet: the player must set one (the username is fixed, shown read-only) so the
+         account stays reachable after the Discord link is removed. Wired in main.ts. -->
+    <div id="discord-keep-modal" class="modal-backdrop" hidden>
+      <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="discord-keep-title">
+        <h2 id="discord-keep-title" data-i18n="hudChrome.discord.keep.title">Set a password</h2>
+        <p data-i18n="hudChrome.discord.keep.body">Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.</p>
+        <div class="auth-field">
+          <label for="discord-keep-username" class="auth-label" data-i18n="hudChrome.discord.keep.usernameLabel">Your username</label>
+          <input id="discord-keep-username" type="text" autocomplete="username" readonly />
+        </div>
+        <div class="auth-field">
+          <label for="discord-keep-pass" class="auth-label" data-i18n="auth.password">Password</label>
+          <input id="discord-keep-pass" type="password" maxlength="128" autocomplete="new-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
+        </div>
+        <div class="auth-field">
+          <label for="discord-keep-confirm" class="auth-label" data-i18n="hudChrome.discord.keep.confirmLabel">Confirm password</label>
+          <input id="discord-keep-confirm" type="password" maxlength="128" autocomplete="new-password" />
+        </div>
+        <div id="discord-keep-error" class="auth-error" aria-live="polite"></div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-secondary" id="btn-discord-keep-cancel" data-i18n="hudChrome.discord.keep.cancel">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-discord-keep-submit" data-i18n="hudChrome.discord.keep.submit">Set password and unlink</button>
         </div>
       </div>
     </div>

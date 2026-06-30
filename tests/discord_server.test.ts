@@ -16,14 +16,17 @@ vi.mock('pg', () => ({
   }),
 }));
 
+import { hashPassword } from '../server/auth';
 import {
   handleDiscordCallback,
+  handleDiscordLoginLink,
+  handleDiscordLoginNew,
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
   handleSwagClaim,
 } from '../server/discord';
-import { resetDiscordRateLimits } from '../server/ratelimit';
+import { resetAuthFailures, resetDiscordRateLimits } from '../server/ratelimit';
 
 function makeReq(opts: { url?: string; body?: unknown } = {}): any {
   const req: any =
@@ -62,18 +65,34 @@ let ownerRows: any[] = [];
 let rewardRows: any[] = [];
 let swagClaimRows: any[] = [];
 let stateRows: any[] = [];
+let pendingRows: any[] = []; // discord_pending_logins peek/consume
+let accountByIdRows: any[] = []; // accountById (password_set / username)
+let findAccountRows: any[] = []; // findAccount (login/link password path)
+let accountInsertRow: any[] = [{ id: 5, username: 'Maxp', password_hash: 'h' }]; // createAccount
 
 function defaultRouter(sql: string) {
   const s = String(sql).replace(/\s+/g, ' ').trim();
   if (s.includes('INSERT INTO discord_oauth_states')) return { rows: [], rowCount: 0 };
   if (s.includes('DELETE FROM discord_oauth_states'))
     return { rows: stateRows, rowCount: stateRows.length };
+  if (s.includes('DELETE FROM discord_pending_logins'))
+    return { rows: pendingRows, rowCount: pendingRows.length };
+  if (s.includes('FROM discord_pending_logins'))
+    return { rows: pendingRows, rowCount: pendingRows.length };
   if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id'))
     return { rows: ownerRows, rowCount: ownerRows.length };
   if (s.includes('FROM discord_links WHERE account_id'))
     return { rows: linkRow, rowCount: linkRow.length };
   if (s.includes('INSERT INTO discord_links')) return { rows: [], rowCount: 1 };
   if (s.includes('DELETE FROM discord_links WHERE account_id')) return { rows: [], rowCount: 0 };
+  // accounts table: distinct column lists / clauses disambiguate the helpers.
+  if (s.includes('INSERT INTO accounts'))
+    return { rows: accountInsertRow, rowCount: accountInsertRow.length };
+  if (s.includes('FROM accounts WHERE username'))
+    return { rows: findAccountRows, rowCount: findAccountRows.length };
+  if (s.includes('password_set, email') && s.includes('FROM accounts WHERE id'))
+    return { rows: accountByIdRows, rowCount: accountByIdRows.length };
+  if (s.includes('banned_at, suspended_until')) return { rows: [], rowCount: 0 }; // not locked
   if (s.includes('SELECT points, lifetime_points FROM reward_points'))
     return { rows: rewardRows, rowCount: rewardRows.length };
   if (s.includes('INSERT INTO reward_ledger')) return { rows: [{ id: 1 }], rowCount: 1 };
@@ -93,7 +112,12 @@ beforeEach(() => {
   rewardRows = [];
   swagClaimRows = [];
   stateRows = [];
+  pendingRows = [];
+  accountByIdRows = [];
+  findAccountRows = [];
+  accountInsertRow = [{ id: 5, username: 'Maxp', password_hash: 'h' }];
   resetDiscordRateLimits();
+  resetAuthFailures();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
 });
@@ -104,6 +128,40 @@ afterEach(() => {
 const noopGrant = () => {};
 function parse(res: any) {
   return { status: res.statusCode, data: res.body ? JSON.parse(res.body) : {} };
+}
+
+// Stub the discord.com token + identity + guilds calls for a callback test.
+function mockDiscordFetch(
+  user: Record<string, unknown> = {
+    id: '999999999999999999',
+    username: 'maxp',
+    global_name: 'Maxp',
+    avatar: null,
+  },
+  inGuild = true,
+) {
+  return vi.spyOn(globalThis, 'fetch' as any).mockImplementation((url: any) => {
+    const u = String(url);
+    if (u.includes('/oauth2/token'))
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            access_token: 'tok',
+            token_type: 'Bearer',
+            scope: 'identify guilds',
+            expires_in: 600,
+          }),
+      } as any);
+    if (u.includes('/users/@me/guilds'))
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(inGuild ? [{ id: '111111111111111111' }] : []),
+      } as any);
+    if (u.includes('/users/@me'))
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(user) } as any);
+    return Promise.resolve({ ok: false, json: () => Promise.resolve({}) } as any);
+  });
 }
 
 describe('POST /api/auth/discord/start', () => {
@@ -172,16 +230,76 @@ describe('GET /api/discord (status)', () => {
     expect(data.statusTier).toBe(4); // 2500 lifetime -> knight (rung 4)
     expect(data.claimedSwagIds).toEqual(['title_discordian']);
   });
+
+  it('surfaces passwordSet=false for a Discord-provisioned (password-less) account', async () => {
+    accountByIdRows = [{ id: 1, username: 'disc123', password_set: false }];
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 1);
+    expect(parse(res).data.passwordSet).toBe(false);
+  });
+
+  it('defaults passwordSet=true when the account has a real password', async () => {
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 1);
+    expect(parse(res).data.passwordSet).toBe(true);
+  });
 });
 
 describe('DELETE /api/discord (unlink)', () => {
-  it('removes the link', async () => {
+  it('removes the link for an account that already has a password', async () => {
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
     const res = makeRes();
     await handleDiscordUnlink(makeReq(), res, 1);
     expect(parse(res)).toEqual({ status: 200, data: { unlinked: true } });
     expect(
       dbMock.query.mock.calls.some((c) => String(c[0]).includes('DELETE FROM discord_links')),
     ).toBe(true);
+    // A real-password account is never asked to set one, and nothing is reset.
+    expect(
+      dbMock.query.mock.calls.some((c) =>
+        String(c[0]).includes('UPDATE accounts SET password_hash'),
+      ),
+    ).toBe(false);
+  });
+
+  it('refuses to strand a password-less account: requires a password first', async () => {
+    accountByIdRows = [{ id: 1, username: 'disc123', password_set: false }];
+    const res = makeRes();
+    await handleDiscordUnlink(makeReq(), res, 1); // no password in the body
+    const { status, data } = parse(res);
+    expect(status).toBe(400);
+    expect(data.error).toBe('password_required');
+    expect(data.needsPassword).toBe(true);
+    expect(data.username).toBe('disc123');
+    // The link must NOT be removed when the account would be stranded.
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('DELETE FROM discord_links')),
+    ).toBe(false);
+  });
+
+  it('sets the password then unlinks when one is supplied', async () => {
+    accountByIdRows = [{ id: 1, username: 'disc123', password_set: false }];
+    const res = makeRes();
+    await handleDiscordUnlink(makeReq({ body: { password: 'hunter2pass' } }), res, 1);
+    expect(parse(res)).toEqual({ status: 200, data: { unlinked: true } });
+    const calls = dbMock.query.mock.calls.map((c) => String(c[0]));
+    const setIdx = calls.findIndex((c) => c.includes('UPDATE accounts SET password_hash'));
+    const unlinkIdx = calls.findIndex((c) => c.includes('DELETE FROM discord_links'));
+    expect(setIdx).toBeGreaterThanOrEqual(0);
+    expect(unlinkIdx).toBeGreaterThanOrEqual(0);
+    // Password is set BEFORE the link is removed, so a later failure can't strand it.
+    expect(setIdx).toBeLessThan(unlinkIdx);
+  });
+
+  it('rejects a too-short password without unlinking', async () => {
+    accountByIdRows = [{ id: 1, username: 'disc123', password_set: false }];
+    const res = makeRes();
+    await handleDiscordUnlink(makeReq({ body: { password: 'short' } }), res, 1);
+    expect(parse(res).status).toBe(400);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('DELETE FROM discord_links')),
+    ).toBe(false);
   });
 });
 
@@ -293,5 +411,201 @@ describe('GET /api/auth/discord/callback', () => {
     );
     expect(fetchSpy).toHaveBeenCalled();
     expect(res.body).toContain('already_linked');
+  });
+
+  it('first-time login parks a chooser instead of auto-provisioning an account', async () => {
+    stateRows = [
+      { state: 's', code_verifier: 'v', mode: 'login', account_id: null, redirect_to: null },
+    ];
+    ownerRows = []; // this Discord id has no account yet
+    mockDiscordFetch();
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    const calls = dbMock.query.mock.calls.map((c) => String(c[0]));
+    // The whole point of issue 1: NO account is auto-created on first login.
+    expect(calls.some((c) => c.includes('INSERT INTO accounts'))).toBe(false);
+    // The verified identity is parked for the chooser, and the page offers the choice.
+    expect(calls.some((c) => c.includes('INSERT INTO discord_pending_logins'))).toBe(true);
+    // Assert on the inlined PAYLOAD (the static script always mentions both literals).
+    expect(res.body).toContain('"choose":true');
+    expect(res.body).toContain('"linkToken"');
+    expect(res.body).not.toContain('"token"'); // no session minted yet
+  });
+
+  it('logs a returning Discord user straight in (mints a session, no chooser)', async () => {
+    stateRows = [
+      { state: 's', code_verifier: 'v', mode: 'login', account_id: null, redirect_to: null },
+    ];
+    ownerRows = [{ account_id: 1 }]; // already linked
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    mockDiscordFetch();
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // A session token is minted in the payload; the chooser is not offered.
+    expect(res.body).toContain('"token"');
+    expect(res.body).not.toContain('"choose":true');
+  });
+});
+
+describe('POST /api/auth/discord/login/new', () => {
+  it('400s on a missing/expired link token', async () => {
+    pendingRows = []; // consume returns nothing
+    const res = makeRes();
+    await handleDiscordLoginNew(makeReq({ body: { linkToken: 'gone' } }), res);
+    expect(parse(res).status).toBe(400);
+  });
+
+  it('provisions a password-less account, links it, and returns a session', async () => {
+    pendingRows = [
+      {
+        token: 't',
+        discord_user_id: '999999999999999999',
+        discord_username: 'Maxp',
+        discord_avatar: null,
+        guild_member: false,
+      },
+    ];
+    ownerRows = []; // not yet linked
+    findAccountRows = []; // username 'Maxp' is free
+    accountInsertRow = [{ id: 5, username: 'Maxp', password_hash: 'h' }];
+    const res = makeRes();
+    await handleDiscordLoginNew(makeReq({ body: { linkToken: 't' } }), res);
+    const { status, data } = parse(res);
+    expect(status).toBe(200);
+    expect(data.username).toBe('Maxp');
+    expect(typeof data.token).toBe('string');
+    const calls = dbMock.query.mock.calls;
+    const insertAcct = calls.find((c) => String(c[0]).includes('INSERT INTO accounts'));
+    expect(insertAcct).toBeTruthy();
+    // The provisioned account is created password-less (issue 2 hinges on this).
+    expect(insertAcct?.[1]?.[4]).toBe(false);
+    expect(calls.some((c) => String(c[0]).includes('INSERT INTO discord_links'))).toBe(true);
+    expect(calls.some((c) => String(c[0]).includes('INSERT INTO auth_tokens'))).toBe(true);
+  });
+});
+
+describe('POST /api/auth/discord/login/link', () => {
+  const PENDING = {
+    token: 't',
+    discord_user_id: '999999999999999999',
+    discord_username: 'Maxp',
+    discord_avatar: null,
+    guild_member: false,
+  };
+
+  it('400s on a missing/expired link token', async () => {
+    pendingRows = [];
+    const res = makeRes();
+    await handleDiscordLoginLink(
+      makeReq({ body: { linkToken: 'gone', username: 'maxp', password: 'whatever' } }),
+      res,
+    );
+    expect(parse(res).status).toBe(400);
+  });
+
+  it('401s on a wrong password and does NOT consume the token', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    const res = makeRes();
+    await handleDiscordLoginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'wrongpassword' } }),
+      res,
+    );
+    expect(parse(res).status).toBe(401);
+    expect(
+      dbMock.query.mock.calls.some((c) =>
+        String(c[0]).includes('DELETE FROM discord_pending_logins'),
+      ),
+    ).toBe(false);
+  });
+
+  it('returns twoFactorRequired (token preserved) when the account has 2FA and no code', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      {
+        id: 1,
+        username: 'maxp',
+        password_hash: await hashPassword('correcthorse'),
+        totp_enabled_at: '2026-01-01T00:00:00Z',
+        totp_secret: 'SECRET',
+      },
+    ];
+    const res = makeRes();
+    await handleDiscordLoginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+    );
+    expect(parse(res).data.twoFactorRequired).toBe(true);
+    expect(
+      dbMock.query.mock.calls.some((c) =>
+        String(c[0]).includes('DELETE FROM discord_pending_logins'),
+      ),
+    ).toBe(false);
+  });
+
+  it('feeds the per-account brute-force lockout on a bad 2FA code (parity with /api/login)', async () => {
+    // Correct password, wrong second factor each time. A recovery code is used so the
+    // verification is deterministic (consumeRecoveryCode finds nothing -> false).
+    findAccountRows = [
+      {
+        id: 1,
+        username: 'maxp',
+        password_hash: await hashPassword('correcthorse'),
+        totp_enabled_at: '2026-01-01T00:00:00Z',
+        totp_secret: 'SECRET',
+      },
+    ];
+    let throttled = false;
+    for (let i = 0; i < 13; i++) {
+      pendingRows = [{ ...PENDING }]; // token survives a failed attempt (peek, not consumed)
+      const res = makeRes();
+      await handleDiscordLoginLink(
+        makeReq({
+          body: {
+            linkToken: 't',
+            username: 'maxp',
+            password: 'correcthorse',
+            recoveryCode: `bad${i}`,
+          },
+        }),
+        res,
+      );
+      const { status, data } = parse(res);
+      if (status === 429 && /too many failed attempts/.test(data.error)) {
+        throttled = true; // the per-account lockout (not the per-IP bucket) tripped
+        break;
+      }
+    }
+    expect(throttled).toBe(true);
+  });
+
+  it('links the existing account on a correct password (never provisions a new one)', async () => {
+    pendingRows = [{ ...PENDING }];
+    findAccountRows = [
+      { id: 1, username: 'maxp', password_hash: await hashPassword('correcthorse') },
+    ];
+    ownerRows = []; // the Discord id is free to link
+    const res = makeRes();
+    await handleDiscordLoginLink(
+      makeReq({ body: { linkToken: 't', username: 'maxp', password: 'correcthorse' } }),
+      res,
+    );
+    const { status, data } = parse(res);
+    expect(status).toBe(200);
+    expect(data.username).toBe('maxp');
+    expect(typeof data.token).toBe('string');
+    const calls = dbMock.query.mock.calls.map((c) => String(c[0]));
+    expect(calls.some((c) => c.includes('DELETE FROM discord_pending_logins'))).toBe(true);
+    expect(calls.some((c) => c.includes('INSERT INTO discord_links'))).toBe(true);
+    expect(calls.some((c) => c.includes('INSERT INTO auth_tokens'))).toBe(true);
+    expect(calls.some((c) => c.includes('INSERT INTO accounts'))).toBe(false);
   });
 });

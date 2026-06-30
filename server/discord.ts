@@ -13,7 +13,8 @@ import {
   discordStatusIndexForPoints,
   swagById,
 } from '../src/sim/discord_tier';
-import { hashPassword, newToken, offensiveName } from './auth';
+import { verifyLoginTwoFactor } from './account';
+import { hashPassword, newToken, offensiveName, validPassword, verifyPassword } from './auth';
 import {
   type AccountRow,
   accountById,
@@ -24,17 +25,21 @@ import {
   pool,
   saveToken,
   touchLogin,
+  updatePasswordHash,
 } from './db';
 import {
   accountForDiscord,
   claimSwag,
   consumeDiscordOAuthState,
+  consumeDiscordPendingLogin,
   createDiscordOAuthState,
+  createDiscordPendingLogin,
   discordForAccount,
   grantRewardPoints,
   linkDiscordToAccount,
   listSwagClaims,
   loadRewardState,
+  peekDiscordPendingLogin,
   setDiscordGuildMember,
   unlinkDiscord,
 } from './discord_db';
@@ -55,10 +60,20 @@ import {
   pkceChallengeFromVerifier,
 } from './discord_oauth';
 import { isUniqueViolation, json } from './http_util';
-import { discordRateLimited, requestIp } from './ratelimit';
+import {
+  authThrottled,
+  clearAuthFailures,
+  discordRateLimited,
+  recordAuthFailure,
+  requestIp,
+} from './ratelimit';
 import { publicOriginFromRequest, REALM_PUBLIC_ORIGIN } from './realm';
 
 const STATE_TTL_MINUTES = 10;
+// A first-time login's "create new or link existing?" choice is parked this long
+// (the player may also type a password / 2FA code on the link path), a bit longer
+// than the OAuth state TTL since a human decision sits in the middle.
+const PENDING_LOGIN_TTL_MINUTES = 15;
 const DEFAULT_INVITE = 'https://discord.gg/GjhnUsBtw';
 
 // Lightweight local instrumentation hook. Admin-dashboard usage metrics require a
@@ -251,7 +266,11 @@ async function completeLink(
   return bouncePage(res, 200, { ok: true, mode, username: discordDisplayName(user) });
 }
 
-// Log in (or provision) the account that owns this Discord identity.
+// Log in the account that owns this Discord identity, OR (first time) hand the
+// browser a one-time link token so the player can CHOOSE to create a new account
+// or link an existing one. We never auto-provision or auto-link to an existing
+// account by email/username (Discord's email is not verified to us, so that would
+// be an account-takeover vector).
 async function completeLogin(
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -259,37 +278,179 @@ async function completeLogin(
   guildMember: boolean,
 ): Promise<void> {
   const meta = { ip: requestIp(req), userAgent: String(req.headers['user-agent'] ?? '') };
-  let accountId = await accountForDiscord(pool, user.id);
-  let username: string;
+  const accountId = await accountForDiscord(pool, user.id);
   if (accountId === null) {
-    // First-time Discord login: provision a fresh, password-less account and link
-    // it. Never auto-link to an existing account by email/username (Discord's email
-    // is not verified to us, so that would be an account-takeover vector).
-    const account = await provisionDiscordAccount(user, meta);
-    accountId = account.id;
-    username = account.username;
-    await linkDiscordToAccount(pool, accountId, {
+    // First-time Discord login: the identity is verified, but the player has not
+    // chosen what to do with it. Park it under a single-use token and let the SPA
+    // offer "create new account" / "link an existing account" (the chooser then
+    // calls /api/auth/discord/login/new or /login/link).
+    const linkToken = newToken();
+    await createDiscordPendingLogin(pool, {
+      token: linkToken,
       discordUserId: user.id,
       username: discordDisplayName(user),
       avatar: user.avatar,
       guildMember,
+      ttlMinutes: PENDING_LOGIN_TTL_MINUTES,
     });
-    await grantLinkRewards(accountId, guildMember);
-    note('discord.login.provisioned');
-  } else {
-    const acct = await accountById(accountId);
-    username = acct?.username ?? 'player';
-    // Keep the membership flag + reward fresh on every login.
-    await setDiscordGuildMember(pool, accountId, guildMember);
-    if (guildMember) await grantGuildReward(accountId);
-    note('discord.login.returning');
+    note('discord.login.choose');
+    return bouncePage(res, 200, {
+      ok: true,
+      mode: 'login',
+      choose: true,
+      linkToken,
+      username: discordDisplayName(user),
+    });
   }
+  // Returning Discord user: keep membership + reward fresh, then mint a session.
+  const acct = await accountById(accountId);
+  await setDiscordGuildMember(pool, accountId, guildMember);
+  if (guildMember) await grantGuildReward(accountId);
+  note('discord.login.returning');
   const status = await moderationStatusForAccount(accountId);
   if (status.locked) return bouncePage(res, 403, { ok: false, mode: 'login', error: 'locked' });
+  const token = await issueDiscordSession(accountId, meta);
+  return bouncePage(res, 200, {
+    ok: true,
+    mode: 'login',
+    token,
+    username: acct?.username ?? 'player',
+  });
+}
+
+// Touch last-login + mint a fresh full session token labelled 'discord'. Shared by
+// the returning-login bounce and the create-new / link-existing chooser endpoints.
+async function issueDiscordSession(
+  accountId: number,
+  meta: { ip: string; userAgent: string },
+): Promise<string> {
   await touchLogin(accountId, meta);
   const token = newToken();
   await saveToken(token, accountId, undefined, 'full', 'discord');
-  return bouncePage(res, 200, { ok: true, mode: 'login', token, username });
+  return token;
+}
+
+function requestMeta(req: http.IncomingMessage): { ip: string; userAgent: string } {
+  return { ip: requestIp(req), userAgent: String(req.headers['user-agent'] ?? '') };
+}
+
+// ── POST /api/auth/discord/login/new { linkToken } ─────────────────────────────
+// "Create a new account" from the first-time chooser: consume the parked identity,
+// provision a fresh (password-less) account, link it, and mint a session.
+export async function handleDiscordLoginNew(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  if (discordRateLimited(req, 0)) return json(res, 429, { error: 'rate limited' });
+  const body = await readJsonBody(req);
+  const linkToken = typeof body.linkToken === 'string' ? body.linkToken : '';
+  const pending = await consumeDiscordPendingLogin(pool, linkToken);
+  if (!pending) return json(res, 400, { error: 'expired' });
+  const meta = requestMeta(req);
+  const user: DiscordUser = {
+    id: pending.discord_user_id,
+    username: pending.discord_username ?? '',
+    globalName: pending.discord_username,
+    avatar: pending.discord_avatar,
+  };
+  try {
+    // Defensive: if this Discord id is already linked (a rare double-submit / two-tab
+    // race), log into the OWNING account instead of provisioning a duplicate.
+    let accountId = await accountForDiscord(pool, user.id);
+    let username: string;
+    if (accountId === null) {
+      const account = await provisionDiscordAccount(user, meta);
+      const linked = await linkDiscordToAccount(pool, account.id, {
+        discordUserId: user.id,
+        username: discordDisplayName(user),
+        avatar: user.avatar,
+        guildMember: pending.guild_member,
+      });
+      if (!linked) {
+        // Lost the race: another account grabbed this Discord id between our check
+        // and the insert. Fall back to logging into the real owner.
+        const ownerId = await accountForDiscord(pool, user.id);
+        if (ownerId === null) return json(res, 409, { error: 'already_linked' });
+        accountId = ownerId;
+        username = (await accountById(ownerId))?.username ?? 'player';
+      } else {
+        accountId = account.id;
+        username = account.username;
+        await grantLinkRewards(accountId, pending.guild_member);
+        note('discord.login.provisioned');
+      }
+    } else {
+      username = (await accountById(accountId))?.username ?? 'player';
+      await setDiscordGuildMember(pool, accountId, pending.guild_member);
+      if (pending.guild_member) await grantGuildReward(accountId);
+    }
+    const status = await moderationStatusForAccount(accountId);
+    if (status.locked) return json(res, 403, { error: status.message });
+    const token = await issueDiscordSession(accountId, meta);
+    return json(res, 200, { token, username });
+  } catch (err) {
+    console.error('discord login/new error:', err);
+    return json(res, 500, { error: 'server_error' });
+  }
+}
+
+// ── POST /api/auth/discord/login/link { linkToken, username, password, code? } ─
+// "Link an existing account" from the first-time chooser: verify the account's
+// password (and 2FA / moderation, exactly like /api/login), then attach the parked
+// Discord identity and mint a session. The pending token is only consumed on the
+// final commit, so a wrong password or a 2FA challenge leaves it reusable.
+export async function handleDiscordLoginLink(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  if (discordRateLimited(req, 0)) return json(res, 429, { error: 'rate limited' });
+  const body = await readJsonBody(req);
+  const linkToken = typeof body.linkToken === 'string' ? body.linkToken : '';
+  const pending = await peekDiscordPendingLogin(pool, linkToken);
+  if (!pending) return json(res, 400, { error: 'expired' });
+  const username = typeof body.username === 'string' ? body.username : '';
+  // Per-account brute-force throttle, message identical to a bad password so it
+  // never reveals whether the account exists (mirrors /api/login).
+  if (username && authThrottled(username)) {
+    return json(res, 429, { error: 'too many failed attempts, wait a few minutes and try again' });
+  }
+  const account = username ? await findAccount(username) : null;
+  const password = typeof body.password === 'string' ? body.password : '';
+  if (!account || !(await verifyPassword(password, account.password_hash))) {
+    if (username) recordAuthFailure(username);
+    return json(res, 401, { error: 'invalid username or password' });
+  }
+  const status = await moderationStatusForAccount(account.id);
+  if (status.locked) return json(res, 403, { error: status.message });
+  // Second factor: like /api/login, a 2FA account needs a code. With none supplied
+  // we return the challenge (token NOT consumed) so the chooser can ask for it.
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) return json(res, 200, { twoFactorRequired: true });
+    if (!(await verifyLoginTwoFactor(account, code, recoveryCode))) {
+      // Feed the per-account brute-force lockout on a bad second factor, exactly like
+      // /api/login: the password is already correct here, so without this a known
+      // password could brute-force TOTP codes throttled only per-IP.
+      recordAuthFailure(username);
+      return json(res, 401, { error: 'that code is not valid, try again' });
+    }
+  }
+  clearAuthFailures(username);
+  // Commit: consume the token (single-use guard) only now, then link + mint.
+  const consumed = await consumeDiscordPendingLogin(pool, linkToken);
+  if (!consumed) return json(res, 400, { error: 'expired' });
+  const linked = await linkDiscordToAccount(pool, account.id, {
+    discordUserId: consumed.discord_user_id,
+    username: consumed.discord_username,
+    avatar: consumed.discord_avatar,
+    guildMember: consumed.guild_member,
+  });
+  if (!linked) return json(res, 409, { error: 'already_linked' });
+  await grantLinkRewards(account.id, consumed.guild_member);
+  note('discord.login.linked_existing');
+  const token = await issueDiscordSession(account.id, requestMeta(req));
+  return json(res, 200, { token, username: account.username });
 }
 
 async function grantLinkRewards(accountId: number, guildMember: boolean): Promise<void> {
@@ -383,15 +544,19 @@ async function provisionDiscordAccount(
     if (await findAccount(candidate)) continue;
     try {
       // Random unguessable password so the row satisfies NOT NULL password_hash
-      // while staying password-unusable until the user sets one in the portal.
-      return await createAccount(candidate, await hashPassword(newToken()), meta);
+      // while staying password-unusable. passwordSet:false records that the owner
+      // never chose it, so the account is reachable only through Discord until a
+      // real password is set (which is what the unlink flow requires first).
+      return await createAccount(candidate, await hashPassword(newToken()), meta, {
+        passwordSet: false,
+      });
     } catch (err) {
       if (isUniqueViolation(err)) continue;
       throw err;
     }
   }
   const fallback = `disc${randomBytes(8).toString('hex').slice(0, 18)}`;
-  return createAccount(fallback, await hashPassword(newToken()), meta);
+  return createAccount(fallback, await hashPassword(newToken()), meta, { passwordSet: false });
 }
 
 // ── GET /api/discord (status + presence for the HUD widget) ────────────────────
@@ -404,10 +569,11 @@ export async function handleDiscordStatus(
 }
 
 export async function discordStatusPayload(accountId: number): Promise<Record<string, unknown>> {
-  const [link, reward, claimedSwagIds] = await Promise.all([
+  const [link, reward, claimedSwagIds, acct] = await Promise.all([
     discordForAccount(pool, accountId),
     loadRewardState(pool, accountId),
     listSwagClaims(pool, accountId),
+    accountById(accountId),
   ]);
   const presence = discordPresenceCache();
   const cfg = discordConfig();
@@ -418,6 +584,11 @@ export async function discordStatusPayload(accountId: number): Promise<Record<st
     // Discord. Null when no guild is configured.
     widgetUrl: cfg?.guildId ? `https://discord.com/widget?id=${cfg.guildId}&theme=dark` : null,
     linked: link !== null,
+    // Whether the account has a real (owner-chosen) password. The client reads this
+    // to decide whether unlinking must first set one (a Discord-only account with no
+    // usable password would otherwise be stranded). Defaults true if the account row
+    // is somehow missing, so we never wrongly demand a password.
+    passwordSet: acct?.password_set ?? true,
     username: link?.discord_username ?? null,
     // Discord profile picture (CDN), shown in the HUD widget. Null for a default
     // (avatar-less) Discord account.
@@ -439,11 +610,37 @@ export async function discordStatusPayload(accountId: number): Promise<Record<st
 }
 
 // ── DELETE /api/discord (unlink) ───────────────────────────────────────────────
+// A Discord-provisioned account (password_set = false) is reachable ONLY through
+// Discord, so unlinking it as-is would strand it forever. For those accounts the
+// unlink requires a `password` in the body: we set it (which makes the existing
+// username + password a working login) BEFORE removing the link, so even a failure
+// after this point leaves the account reachable. Accounts that already have a real
+// password unlink with no extra input, exactly as before.
 export async function handleDiscordUnlink(
-  _req: http.IncomingMessage,
+  req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
+  const acct = await accountById(accountId);
+  if (!acct) return json(res, 404, { error: 'account not found' });
+  if (!acct.password_set) {
+    const body = await readJsonBody(req);
+    const next = typeof body.password === 'string' ? body.password : '';
+    if (!validPassword(next)) {
+      // The client surfaces a "set a password to keep your account" prompt; the
+      // username is returned so it can show what the player will log in with.
+      note('discord.unlink.password_required');
+      return json(res, 400, {
+        error: 'password_required',
+        needsPassword: true,
+        username: acct.username,
+      });
+    }
+    // Set the real password first (this also flips password_set = TRUE), so the
+    // account survives even if the unlink below were to fail (a benign retry).
+    await updatePasswordHash(accountId, await hashPassword(next));
+    note('discord.unlink.set_password');
+  }
   await unlinkDiscord(pool, accountId);
   note('discord.unlink');
   return json(res, 200, { unlinked: true });
@@ -555,6 +752,10 @@ interface BouncePayload {
   token?: string;
   username?: string;
   error?: string;
+  // First-time login: no session yet. The verified identity is parked server-side
+  // under `linkToken`; the SPA shows the create-new / link-existing chooser.
+  choose?: boolean;
+  linkToken?: string;
 }
 
 // Render the callback result as an HTML page that messages the SPA. Works whether
@@ -578,6 +779,10 @@ function bouncePage(res: http.ServerResponse, status: number, payload: BouncePay
   try {
     if (p.ok && p.mode === 'login' && p.token) {
       localStorage.setItem('woc_session', JSON.stringify({ token: p.token, username: p.username }));
+    } else if (p.ok && p.mode === 'login' && p.choose && p.linkToken) {
+      // First-time login: stash the one-time link token + Discord name so the SPA
+      // can show the "create new / link existing" chooser after the redirect.
+      localStorage.setItem('woc_discord_choice', JSON.stringify({ linkToken: p.linkToken, username: p.username || '', ts: Date.now() }));
     }
   } catch (e) {}
   var msg = { source: 'woc-discord', ok: p.ok, mode: p.mode, error: p.error || null };

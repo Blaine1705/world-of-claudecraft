@@ -84,11 +84,13 @@ import {
 } from './db';
 import {
   handleDiscordCallback,
+  handleDiscordLoginLink,
+  handleDiscordLoginNew,
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
 } from './discord';
-import { pruneDiscordOAuthStates } from './discord_db';
+import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
 import { isUniqueViolation, json, readBody } from './http_util';
@@ -1279,6 +1281,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/auth/discord/callback') {
       return handleDiscordCallback(req, res);
     }
+    // First-time-login chooser endpoints. Unauthenticated like /callback: the
+    // authorization is the single-use pending-login token (minted only after a
+    // verified Discord OAuth), and the handlers carry their own Discord rate-limit
+    // bucket + (for the link path) the same password/2FA/moderation checks as login.
+    if (req.method === 'POST' && url === '/api/auth/discord/login/new') {
+      return handleDiscordLoginNew(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
+      return handleDiscordLoginLink(req, res);
+    }
     if (req.method === 'GET' && url === '/api/discord') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -1386,6 +1398,9 @@ async function main(): Promise<void> {
       );
       void pruneDiscordOAuthStates(pool).catch((err) =>
         console.error('discord oauth state prune failed:', err),
+      );
+      void pruneDiscordPendingLogins(pool).catch((err) =>
+        console.error('discord pending login prune failed:', err),
       );
     },
     24 * 3600 * 1000,

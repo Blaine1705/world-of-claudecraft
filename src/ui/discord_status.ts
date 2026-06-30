@@ -32,6 +32,13 @@ export interface DiscordAccountStatus {
   statusTier: number;
   /** Swag ids already claimed by this account. */
   claimedSwagIds: string[];
+  /**
+   * Whether the account has a real (owner-chosen) password. False for a
+   * Discord-provisioned account that can currently log in ONLY through Discord, so
+   * the widget makes unlinking first set a password. Defaults true (never demand a
+   * password we don't need).
+   */
+  passwordSet: boolean;
 }
 
 /** Live Discord presence pushed by the bot via the server. */
@@ -55,6 +62,7 @@ const UNLINKED: DiscordAccountStatus = {
   lifetimePoints: 0,
   statusTier: 0,
   claimedSwagIds: [],
+  passwordSet: true,
 };
 
 const NO_PRESENCE: DiscordPresenceState = {
