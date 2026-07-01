@@ -7,27 +7,30 @@
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
-import { esc } from './esc';
 import { itemDisplayName } from './entity_i18n';
-import { formatMoney as formatLocalizedMoney, t } from './i18n';
+import { esc } from './esc';
+import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
+import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
-import type { ItemDef } from '../sim/types';
 import type { VendorView } from './vendor_view';
 
 /**
- * Hud-supplied glue. The icon/money/tooltip painters live on Hud (shared with
- * every other window); the action callbacks let Hud keep buy/buyback dispatch
- * and re-render scheduling. The module never reaches into Hud directly.
+ * Hud-supplied glue. The icon/money/tooltip painters are the shared
+ * PainterHostPresentation bag (Hud builds it once and hands it to every window
+ * that renders item rows); this composes that base and adds the vendor-specific
+ * tooltip teardown, the buy/buyback/sell-junk dispatch, and the sell-junk state.
+ * The module never reaches into Hud directly.
  */
-export interface VendorWindowDeps {
-  itemIcon(item: ItemDef): string;
-  moneyHtml(copper: number): string;
-  itemTooltip(item: ItemDef): string;
-  attachTooltip(el: HTMLElement, html: () => string): void;
+export interface VendorWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
   onBuy(itemId: string): void;
   onBuyBack(itemId: string): void;
+  onSellJunk(): void;
   onClose(): void;
+  sellJunk: {
+    enabled: boolean;
+    proceeds: number;
+  };
 }
 
 /** Paint the vendor panel from a prepared view. */
@@ -43,18 +46,49 @@ export function renderVendorWindow(
   const scrollTop = el.scrollTop;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
-  for (const { itemId, item, price: priceCopper } of view.goods) {
+  for (const { itemId, item, price: priceCopper, quantity } of view.goods) {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'vendor-item';
     const price = formatLocalizedMoney(priceCopper);
     const itemName = itemDisplayName(item);
-    row.setAttribute('aria-label', t('itemUi.vendor.buyAria', { item: itemName, price }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    const stack =
+      quantity > 1
+        ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
+        : '';
+    row.setAttribute(
+      'aria-label',
+      t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+    );
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
-    deps.attachTooltip(row, () => deps.itemTooltip(item) + `<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`);
+    deps.attachTooltip(
+      row,
+      () =>
+        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
+    );
     el.appendChild(row);
   }
+
+  const sellJunk = document.createElement('button');
+  sellJunk.type = 'button';
+  sellJunk.className = 'vendor-sell-junk';
+  sellJunk.disabled = !deps.sellJunk.enabled;
+  sellJunk.innerHTML = `<span class="vi-name">${esc(t('itemUi.vendor.sellJunk'))}</span>${deps.sellJunk.enabled ? `<span class="vi-price">${deps.moneyHtml(deps.sellJunk.proceeds)}</span>` : ''}`;
+  sellJunk.setAttribute(
+    'aria-label',
+    deps.sellJunk.enabled
+      ? t('itemUi.vendor.sellJunkAria', {
+          price: formatLocalizedMoney(deps.sellJunk.proceeds),
+        })
+      : t('itemUi.vendor.sellJunk'),
+  );
+  sellJunk.addEventListener('click', () => deps.onSellJunk());
+  deps.attachTooltip(
+    sellJunk,
+    () => `<div class="tt-sub">${esc(t('itemUi.vendor.sellJunkHint'))}</div>`,
+  );
+  el.appendChild(sellJunk);
 
   const buybackTitle = document.createElement('div');
   buybackTitle.className = 'vendor-section-title';
@@ -74,9 +108,13 @@ export function renderVendorWindow(
     const price = formatLocalizedMoney(priceCopper);
     const itemName = itemDisplayName(item);
     row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` x${count}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
     row.addEventListener('click', () => deps.onBuyBack(itemId));
-    deps.attachTooltip(row, () => deps.itemTooltip(item) + `<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`);
+    deps.attachTooltip(
+      row,
+      () =>
+        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`,
+    );
     el.appendChild(row);
   }
 

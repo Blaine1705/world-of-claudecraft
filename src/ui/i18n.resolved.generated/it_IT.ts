@@ -151,6 +151,9 @@ export const it_IT: EnTranslations = {
     }
   },
   "hudChrome": {
+    "spectate": {
+      "banner": "Stai osservando {name}"
+    },
     "emotes": {
       "wave": "Saluta",
       "laugh": "Ridi",
@@ -222,6 +225,24 @@ export const it_IT: EnTranslations = {
     "rest": {
       "resting": "A riposo"
     },
+    "abilityScaling": {
+      "bonus": "(+{value})"
+    },
+    "unitFrame": {
+      "playerLabel": "Il tuo personaggio",
+      "targetLabel": "Il tuo bersaglio",
+      "targetAnnounce": "Bersaglio: {name}",
+      "partyLabel": "Il tuo gruppo",
+      "partyGroup": "Gruppo {n}",
+      "durationUnitSeconds": "s"
+    },
+    "character": {
+      "modelPreview": "Anteprima del modello del personaggio"
+    },
+    "skipLinks": {
+      "mainHud": "Vai all'interfaccia principale",
+      "chat": "Vai alla chat"
+    },
     "mobile": {
       "autorun": "Corsa automatica",
       "jump": "Salta",
@@ -243,6 +264,21 @@ export const it_IT: EnTranslations = {
       "coordinates": "Coordinate",
       "heading": "Direzione",
       "minimapZoom": "Zoom minimappa"
+    },
+    "castBar": {
+      "playerAria": "La tua barra di lancio",
+      "targetAria": "Barra di lancio del bersaglio"
+    },
+    "leaderboard": {
+      "close": "Chiudi",
+      "tabsLabel": "Classifiche dei punteggi",
+      "tabPlayers": "Giocatori",
+      "tabGuilds": "Gilde",
+      "guildName": "Gilda",
+      "members": "Membri",
+      "topLevel": "Top",
+      "guildXp": "XP totali",
+      "guildEmpty": "Ancora nessuna gilda classificata."
     },
     "raidLockout": {
       "title": "Blocchi incursione",
@@ -272,7 +308,8 @@ export const it_IT: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Ruota emote",
       "targetFriendly": "Bersaglia l'amico più vicino",
-      "targetFriendlyNext": "Scorri i bersagli amici"
+      "targetFriendlyNext": "Scorri i bersagli amici",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clic sinistro",
@@ -295,7 +332,12 @@ export const it_IT: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostra portafoglio nella schermata personaggi",
       "showWalletOnPlayerCard": "Mostra portafoglio nella scheda giocatore",
       "uiScale": "Scala dell'interfaccia",
-      "highContrastBackground": "Sfondo a contrasto elevato"
+      "highContrastBackground": "Sfondo a contrasto elevato",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
+      "showItemLevel": "Mostra livello oggetto",
+      "itemLevelLine": "Livello oggetto {level}",
+      "itemScoreLine": "Punteggio {score}",
+      "showSecondaryActionBar": "Mostra la barra delle azioni secondaria"
     },
     "controller": {
       "title": "Controller",
@@ -426,6 +468,25 @@ export const it_IT: EnTranslations = {
     "tips": {
       "joinChannels": "Suggerimento: digita /join world o /join lfg per chattare con i giocatori di tutto il reame."
     },
+    "itemSet": {
+      "header": "{name} ({have}/{total})",
+      "bonusLine": "({pieces}) {bonus}"
+    },
+    "questShare": {
+      "notShareable": "Questa missione non può essere condivisa.",
+      "notInSharerParty": "Devi essere nel gruppo di {name} per accettare quella missione.",
+      "accepted": "{name} ha accettato la tua missione condivisa.",
+      "dialogTitle": "Missione condivisa",
+      "viewOnlyHint": "Unisciti al gruppo di chi la condivide per accettare questa missione.",
+      "alreadyOn": "Hai già questa missione.",
+      "alreadyDone": "Hai già completato questa missione.",
+      "ineligible": "Non soddisfi i requisiti di questa missione.",
+      "noQuestSelected": "Seleziona una missione nel registro da condividere.",
+      "linkTitle": "Maiusc + clic per collegare questa missione in chat."
+    },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "sei {rank}, {count} membro",
@@ -450,6 +511,12 @@ export const it_IT: EnTranslations = {
         "few": "Chi: {count} giocatori online su {realm}.",
         "many": "Chi: {count} giocatori online su {realm}.",
         "other": "Chi: {count} giocatori online su {realm}."
+      },
+      "playersMatching": {
+        "one": "Chi: {count} giocatore corrispondente a \"{query}\" su {realm}.",
+        "few": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
+        "many": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
+        "other": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}."
       }
     },
     "bugReport": {
@@ -550,6 +617,29 @@ export const it_IT: EnTranslations = {
       "exportDone": "I tuoi dati sono stati scaricati. Ti abbiamo inviato una conferma via email.",
       "exportFailed": "Impossibile esportare i tuoi dati. Riprova tra un momento."
     },
+    "masterLoot": {
+      "title": "Bottino maestro",
+      "enableLabel": "Bottino maestro",
+      "enableAria": "Attiva bottino maestro",
+      "looterLabel": "Maestro del bottino",
+      "leaderOption": "Capogruppo",
+      "thresholdLabel": "Soglia",
+      "thresholdUncommon": "Non comune e superiore",
+      "thresholdRare": "Raro e superiore",
+      "thresholdEpic": "Epico e superiore",
+      "assignPrompt": "Assegna {item}",
+      "assignAria": "Assegna {item} a {name}",
+      "rollButton": "Tira",
+      "selectAll": "Seleziona tutto",
+      "methodMaster": "Metodo bottino impostato su bottino maestro. Maestro del bottino: {name}.",
+      "methodGroup": "Metodo bottino impostato su bottino di gruppo.",
+      "assigned": "{looter} ha assegnato {item} a {target}.",
+      "unassigned": "{item} non e stato assegnato ed e libero per tutti.",
+      "leaderOnly": "Solo il capogruppo puo cambiare il metodo bottino."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
+    },
     "bags": {
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
@@ -571,6 +661,234 @@ export const it_IT: EnTranslations = {
       "notRaid": "Il tuo gruppo non è un'incursione.",
       "leaderOnly": "Solo il capo incursione può convertire in un gruppo.",
       "tooLarge": "Un'incursione con più di cinque membri non può tornare a essere un gruppo."
+    },
+    "itemArmorType": {
+      "cloth": "Stoffa",
+      "leather": "Cuoio",
+      "mail": "Maglia"
+    },
+    "auraEffect": {
+      "dot": "Infligge {value} danni da {school} ogni {interval} s",
+      "hot": "Ripristina {value} salute ogni {interval} s",
+      "absorb": "Assorbe {value} danni",
+      "healAbsorb": "Assorbe {value} cure ricevute",
+      "thorns": "Infligge {value} danni da {school} agli attaccanti",
+      "slow": "Riduce la velocità di movimento del {pct}%",
+      "speed": "Aumenta la velocità di movimento del {pct}%",
+      "attackSpeedSlow": "Rallenta la velocità di attacco del {pct}%",
+      "attackSpeedFast": "Aumenta la velocità di attacco del {pct}%",
+      "haste": "Aumenta la velocità di attacco e lancio del {pct}%",
+      "tongues": "Aumenta il tempo di lancio del {pct}%",
+      "increase": {
+        "ap": "Aumenta la potenza di attacco di {value}",
+        "armor": "Aumenta l'armatura di {value}",
+        "int": "Aumenta l'intelletto di {value}",
+        "agi": "Aumenta l'agilità di {value}",
+        "sta": "Aumenta la tempra di {value}",
+        "spi": "Aumenta lo spirito di {value}",
+        "allStats": "Aumenta tutti gli attributi di {value}"
+      },
+      "reduce": {
+        "ap": "Riduce la potenza di attacco di {value}",
+        "armor": "Riduce l'armatura di {value}",
+        "int": "Riduce l'intelletto di {value}",
+        "agi": "Riduce l'agilità di {value}",
+        "sta": "Riduce la tempra di {value}",
+        "spi": "Riduce lo spirito di {value}",
+        "allStats": "Riduce tutti gli attributi di {value}"
+      },
+      "dodge": "Aumenta la probabilità di schivata del {pct}%",
+      "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
+      "armorFlat": "Riduce l'armatura di {value}",
+      "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
+      "mortalWound": "Riduce le cure ricevute del {pct}%",
+      "vulnerability": "Aumenta i danni subiti del {pct}%",
+      "physVuln": "Aumenta i danni fisici subiti del {pct}%",
+      "spellVuln": "Aumenta i danni magici subiti del {pct}%",
+      "critVuln": "Aumenta la probabilità di subire colpi critici del {pct}%",
+      "costTax": "Aumenta i costi delle abilità del {pct}%",
+      "stun": "Stordito: impossibile agire",
+      "root": "Radicato: impossibile muoversi",
+      "incapacitate": "Incapacitato: impossibile agire",
+      "polymorph": "Trasformato: impossibile agire",
+      "hex": "Riduce danni e cure effettuati del {pct}%",
+      "blind": "Accecato: impossibile agire",
+      "silence": "Silenziato: impossibile lanciare incantesimi",
+      "disarm": "Disarmato: impossibile usare attacchi con arma",
+      "lockout": "Scuola di magia bloccata",
+      "imbue": "Arma infusa con effetti bonus",
+      "imbueRange": "Arma infusa: da {min} a {max} danni bonus al giudizio",
+      "stealth": "Nascosto; velocità di movimento ridotta del {pct}%",
+      "formBear": "Forma d’orso: salute e armatura aumentate",
+      "formCat": "Forma felina: danni in mischia ed energia",
+      "formTravel": "Forma di viaggio: velocità di movimento aumentata del {pct}%",
+      "defensiveStance": "Posizione difensiva: danni subiti ridotti, più minaccia",
+      "righteousFury": "Furia Virtuosa: minaccia da danni Sacri molto aumentata",
+      "scale": "Taglia aumentata del {pct}%",
+      "jump": "Altezza di salto aumentata del {pct}%",
+      "school": {
+        "physical": "Fisico",
+        "fire": "Fuoco",
+        "frost": "Gelo",
+        "arcane": "Arcano",
+        "shadow": "Ombra",
+        "holy": "Sacro",
+        "nature": "Natura"
+      }
+    },
+    "loot": {
+      "chestTitle": "Scrigno"
+    },
+    "spellbook": {
+      "addToBarAria": "Aggiungi {name} alla barra azioni",
+      "removeFromBarAria": "Rimuovi {name} dalla barra azioni"
+    },
+    "nameplate": {
+      "mob": "[{level}] {name}",
+      "mobElite": "[{level}+] {name}"
+    },
+    "discord": {
+      "title": "Discord",
+      "panelTitle": "World of ClaudeCraft",
+      "open": "Discord",
+      "close": "Chiudi",
+      "keybind": "Pannello Discord",
+      "disabled": "L'integrazione con Discord non e disponibile al momento.",
+      "tiers": {
+        "none": "Senza grado",
+        "initiate": "Iniziato",
+        "squire": "Scudiero",
+        "footman": "Fante",
+        "knight": "Cavaliere",
+        "champion": "Campione",
+        "warlord": "Signore della Guerra",
+        "legend": "Leggenda",
+        "mythic": "Mitico"
+      },
+      "loginCta": "Continua con Discord",
+      "orEmail": "oppure usa l'email",
+      "cta": {
+        "title": "Collega il tuo Discord per ottenere punti e salire di grado",
+        "stats": "{online} online · {total} membri nel server",
+        "statsLoading": "Unisciti alla comunita e ottieni ricompense",
+        "button": "Collega con un clic",
+        "dismiss": "Ignora"
+      },
+      "link": {
+        "cta": "Collega Discord",
+        "relink": "Ricollega Discord",
+        "connecting": "Apertura di Discord...",
+        "benefits": "Collega il tuo Discord per ottenere punti dal gioco e dall'attivita nella comunita, e scalare i gradi di stato.",
+        "error": "Impossibile collegare Discord. Riprova.",
+        "success": "Discord collegato."
+      },
+      "choice": {
+        "title": "Continua con Discord",
+        "intro": "Crea un nuovo account oppure collega il tuo Discord a uno che hai già.",
+        "greeting": "Benvenuto, {name}!",
+        "createCta": "Crea un nuovo account",
+        "haveAccount": "Hai già un account?",
+        "linkCta": "Collega un account esistente",
+        "linkSubmit": "Collega account",
+        "error": "Impossibile continuare. Riprova.",
+        "expired": "L'accesso con Discord è scaduto. Accedi di nuovo con Discord."
+      },
+      "keep": {
+        "title": "Imposta una password",
+        "body": "Il tuo account accede con Discord. Imposta una password per continuare ad accedere con il nome utente dopo aver scollegato Discord.",
+        "usernameLabel": "Il tuo nome utente",
+        "confirmLabel": "Conferma password",
+        "submit": "Imposta password e scollega",
+        "cancel": "Annulla",
+        "mismatch": "Le password non corrispondono.",
+        "tooShort": "La password deve contenere almeno 6 caratteri."
+      },
+      "linkedAs": "Collegato come {name}",
+      "linkedTitle": "Discord: {name}",
+      "viewCharacter": "Mostra {name}",
+      "viewProfile": "Apri il profilo pubblico di questo personaggio",
+      "unlink": "Scollega",
+      "visit": "Visita Discord",
+      "unlinkConfirm": "Scollegare il tuo account Discord da questo account di gioco?",
+      "statusLabel": "Stato",
+      "rank": "Grado",
+      "points": "Punti",
+      "lifetime": "Totale",
+      "toNext": "{points} al grado successivo",
+      "maxRank": "Grado massimo raggiunto",
+      "tiersTitle": "Gradi di stato",
+      "tierLocked": "Bloccato",
+      "tierCurrent": "Attuale",
+      "earnTitle": "Come ottenere punti",
+      "earnBody": "Ottieni punti dal tempo di gioco e restando attivo su Discord. I punti aumentano il tuo grado di stato.",
+      "memberSince": "Membro dal",
+      "memberSinceDays": "{days}g nel Discord",
+      "roleTag": {
+        "levyst": "Levy St",
+        "devs": "Dev",
+        "mods": "Mod",
+        "artists": "Artista"
+      },
+      "guildMember": "Membro verificato",
+      "notMember": "Non ancora nel server",
+      "joinCta": "Unisciti al Discord",
+      "online": "{count} online",
+      "community": "Comunita",
+      "rewards": "Ricompense",
+      "voice": {
+        "title": "Vocale",
+        "channel": "In {channel}",
+        "empty": "Non c'e nessuno in vocale al momento.",
+        "speaking": "Sta parlando",
+        "muted": "Silenziato",
+        "join": "Entra in vocale",
+        "connect": "Connettiti al canale vocale"
+      },
+      "swag": {
+        "title": "Gadget",
+        "claim": "Riscatta",
+        "claimed": "Riscattato",
+        "locked": "Bloccato",
+        "free": "Gratis",
+        "cost": "{points} pti",
+        "needTier": "Raggiungi un grado piu alto per riscattarlo.",
+        "needPoints": "Punti insufficienti.",
+        "claimError": "Impossibile riscattare questa ricompensa. Riprova.",
+        "claimedToast": "Riscattato: {name}",
+        "titleDiscordian": "Titolo: Discordiano",
+        "titleSquire": "Titolo: Scudiero del Reame",
+        "chromaBlurple": "Cromatura Mech Blurple",
+        "titleChampion": "Titolo: Campione di Claudemoon",
+        "swagStickers": "Pacchetto adesivi (spedito)",
+        "swagTee": "Maglietta (spedita)"
+      },
+      "relay": {
+        "tooFast": "Stai pubblicando troppo in fretta. Aspetta un momento e riprova.",
+        "lfg": {
+          "label": "Cerco gruppo",
+          "hint": "Trova giocatori per un dungeon o una missione"
+        },
+        "wts": {
+          "label": "Cerco di vendere",
+          "hint": "Pubblicizza un oggetto o un servizio in vendita"
+        },
+        "wtb": {
+          "label": "Cerco di comprare",
+          "hint": "Richiedi un oggetto che vuoi comprare"
+        },
+        "recruit": {
+          "label": "Reclutamento gilda",
+          "hint": "Recluta giocatori per la tua gilda"
+        },
+        "event": {
+          "label": "Evento / Incursione",
+          "hint": "Annuncia un'incursione, un raduno o un evento"
+        },
+        "help": {
+          "label": "Serve aiuto",
+          "hint": "Chiedi aiuto alla comunita"
+        }
+      }
     }
   },
   "guide": {
@@ -595,6 +913,7 @@ export const it_IT: EnTranslations = {
       "world": "Mondo",
       "quests": "Missioni",
       "dungeons": "Dungeon e Incursioni",
+      "delves": "Incursioni",
       "reference": "Riferimento",
       "controls": "Comandi",
       "combat": "Combattimento",
@@ -649,6 +968,7 @@ export const it_IT: EnTranslations = {
       "typeZone": "Zona",
       "typeCreature": "Creature",
       "typeDungeon": "Dungeon",
+      "typeDelve": "Incursione",
       "typeTerm": "Termine"
     },
     "home": {
@@ -736,7 +1056,7 @@ export const it_IT: EnTranslations = {
       "questsTitle": "Missioni",
       "questsBody": "Accetta missioni dalle persone con un indicatore sopra la testa, completa l'obiettivo e consegnale per esperienza, monete ed equipaggiamento. Il tracciatore a schermo tiene in vista i tuoi obiettivi.",
       "deathTitle": "La morte non è la fine",
-      "deathBody": "Se cadi, liberi il tuo spirito al cimitero più vicino e torni di corsa al tuo corpo. Non si perde esperienza.",
+      "deathBody": "Se cadi, liberi il tuo spirito e risorgi al cimitero più vicino, di nuovo a piena salute, poi raggiungi il punto in cui eri. Non si perde esperienza.",
       "groupingTitle": "Giocare insieme",
       "groupingBody": "Invita altri in un gruppo per condividere il credito delle missioni e affrontare i dungeon. Gran parte del mondo è affrontabile in solitaria, perciò raggrupparsi è una scelta, non un obbligo.",
       "onlineTitle": "Online o offline",
@@ -750,21 +1070,26 @@ export const it_IT: EnTranslations = {
       "actionHeader": "Azione",
       "groupMovement": "Movimento",
       "groupCombat": "Selezione bersaglio e combattimento",
-      "groupInterface": "Finestre",
+      "groupInterface": "Interfaccia",
       "groupCamera": "Telecamera",
       "talents": "Talenti",
       "arena": "Arena",
       "leaderboard": "Classifica",
-      "abilities": "Usa abilità",
+      "abilities": "Usa le abilità della barra delle azioni (la fila dei numeri; una seconda barra è sul tastierino numerico)",
+      "targetFriendly": "Bersaglia l'amico più vicino",
+      "cycleFriendly": "Scorri i bersagli amici",
+      "gameMenu": "Apri il menu di gioco e le opzioni",
       "mobileHeading": "Su mobile",
-      "mobileBody": "I comandi touch compaiono automaticamente su telefoni e tablet: un joystick di movimento a sinistra, trascina ovunque a destra per guardarti intorno, e pulsanti a schermo per abilità e menu."
+      "mobileBody": "I comandi touch compaiono automaticamente su telefoni e tablet: un joystick di movimento a sinistra, trascina ovunque a destra per guardarti intorno, e pulsanti a schermo per abilità e menu.",
+      "controllerHeading": "Con un controller",
+      "controllerBody": "Funzionano anche i gamepad, e il supporto al controller è attivo di default. La levetta sinistra ti sposta, la destra orienta la telecamera, e i pulsanti frontali e dorsali coprono abilità, salto e interazioni. Apri una finestra qualsiasi per far comparire un puntatore a schermo per i menu. Puoi rimappare i pulsanti e regolare la zona morta delle levette, la velocità della telecamera, la vibrazione e la vista invertita dalle impostazioni del controller nelle opzioni."
     },
     "combat": {
       "intro": "Il combattimento segue le familiari regole degli MMO classici. Non hai mai bisogno di studiarne nulla per giocare bene, questa è solo la forma di come funzionano gli scontri.",
       "hitTitle": "Non tutti i colpi vanno a segno",
-      "hitBody": "Gli attacchi possono mancare o essere schivati, parati e bloccati, e lo stesso vale per quelli del nemico. Combattere vicino al tuo livello e tenere aggiornato l'equipaggiamento è ciò che fa andare a segno i tuoi colpi.",
-      "mitigationTitle": "Corazza ed equipaggiamento ti tengono in piedi",
-      "mitigationBody": "La corazza attenua i colpi fisici e l'equipaggiamento giusto smorza la magia, perciò i potenziamenti sono la tua principale fonte di resistenza. Le classi con corazza più pesante incassano di più, ma nulla ti rende invulnerabile.",
+      "hitBody": "Gli attacchi possono mancare o essere schivati, e lo stesso vale per quelli del nemico, mentre gli incantesimi possono essere resistiti del tutto. Combattere vicino al tuo livello è ciò che fa andare a segno i tuoi colpi; più ampio è il divario di livello, più colpisci a vuoto.",
+      "mitigationTitle": "Corazza e salute ti tengono in piedi",
+      "mitigationBody": "La corazza attenua i colpi fisici, perciò una corazza migliore è la tua principale fonte di resistenza nel corpo a corpo. La magia è un altro paio di maniche: agli incantesimi resisti con una riserva di salute più ampia e la possibilità di resistere del tutto a uno di essi, non con la corazza. Le classi con corazza più pesante incassano di più, ma nulla ti rende invulnerabile.",
       "resourcesTitle": "Ogni classe ha il suo ritmo",
       "resourcesBody": "I guerrieri accumulano Ira nel vivo dello scontro, i ladri spendono Energia che si rigenera costantemente, e gli incantatori gestiscono una riserva di Mana. Imparare la tua risorsa è metà del giocare bene la tua classe.",
       "growTitle": "Diventi più forte ad ogni livello",
@@ -773,7 +1098,7 @@ export const it_IT: EnTranslations = {
       "effectsBody": "Molte abilità applicano un effetto che permane. Quelli benefici (potenziamenti) aumentano le tue statistiche, ti proteggono o ti curano un po' alla volta; quelli dannosi (malus) ti prosciugano la salute con danno nel tempo o ti indeboliscono. Tieni d'occhio le piccole icone vicino alla barra delle azioni per vedere cosa hai addosso e quanto dura.",
       "ccBody": "Il controllo della folla è un tipo speciale di malus che limita ciò che un bersaglio può fare: stordimenti, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure, e la metamorfosi che rende un nemico inoffensivo per un momento. Alcuni di questi, come radicamenti, paure e metamorfosi, perdono presa se riapplicati troppo in fretta, perciò non possono essere concatenati all'infinito.",
       "deathTitle": "Quando cadi",
-      "deathBody": "Se la tua salute arriva a zero, cadi. Risorgi dopo una breve attesa e riprendi da dove avevi lasciato, perciò una morte ti costa un po' di tempo, non i tuoi progressi. Tra uno scontro e l'altro, siediti a mangiare e bere così affronti il prossimo a piena forza."
+      "deathBody": "Se la tua salute arriva a zero, cadi. Libera il tuo spirito per risorgere al cimitero più vicino a piena salute, poi torna sui tuoi passi, così una morte ti costa un po' di tempo, non i tuoi progressi. Tra uno scontro e l'altro, siediti a mangiare e bere così affronti il prossimo a piena forza."
     },
     "glossary": {
       "intro": "Un rapido riferimento per i termini usati in questa guida e nella chat.",
@@ -784,7 +1109,7 @@ export const it_IT: EnTranslations = {
       "gcdTerm": "Recupero globale",
       "gcdDef": "La breve pausa condivisa dopo l'uso della maggior parte delle abilità, così non puoi lanciare tutto in una volta.",
       "dpsTerm": "DPS",
-      "dpsDef": "Danni al secondo, una misura approssimativa della velocità con cui qualcosa infligge danni.",
+      "dpsDef": "Danni al secondo, una misura approssimativa della velocità con cui qualcosa infligge danni. Si usa anche per il ruolo stesso di chi infligge danni, come in un tank, un guaritore e tre DPS.",
       "buffTerm": "Potenziamento",
       "buffDef": "Un effetto utile su di te o un alleato, come una benedizione che aumenta una statistica per un po'.",
       "debuffTerm": "Indebolimento",
@@ -810,7 +1135,13 @@ export const it_IT: EnTranslations = {
       "pullTerm": "Pull",
       "pullDef": "Attirare un nemico o un gruppo in uno scontro, di solito deliberatamente e un'ondata alla volta.",
       "instanceTerm": "Istanza",
-      "instanceDef": "Una copia privata di un dungeon o incursione creata solo per il tuo gruppo."
+      "instanceDef": "Una copia privata di un dungeon o incursione creata solo per il tuo gruppo.",
+      "raidTerm": "Incursione",
+      "raidDef": "Un gruppo più numeroso, qui fino a dieci giocatori, formato per lo scontro di fine gioco più arduo; un gruppo si converte in un'incursione una volta pieno.",
+      "delveTerm": "Incursione",
+      "delveDef": "Una breve discesa istanziata e rigiocabile per uno o due giocatori, avviata dal tabellone di un custode con una compagna al tuo fianco.",
+      "augmentTerm": "Potenziamento",
+      "augmentDef": "Un potenziamento temporaneo che arruoli durante una partita d'arena Fiesta due contro due e che rimodella il tuo arsenale solo per quella partita."
     },
     "faqPage": {
       "intro": "Le domande che i nuovi giocatori pongono più spesso.",
@@ -823,7 +1154,7 @@ export const it_IT: EnTranslations = {
       "q4": "Posso giocare offline o in solitaria?",
       "a4": "Sì. C'è una modalità offline per giocatore singolo immediata, e il mondo online è pienamente affrontabile in solitaria a parte dungeon e incursione.",
       "q5": "Quante classi ci sono?",
-      "a5": "Nove, che coprono i ruoli classici di tank, guaritore e danno, ognuna con la propria risorsa e abilità distintive.",
+      "a5": "Nove, che coprono i ruoli classici di tank, guaritore e danno, ognuna con un sistema di risorse (ira, mana o energia) e le proprie abilità distintive.",
       "q6": "Qual è il livello massimo?",
       "a6": "Livello {cap}, raggiunto attraverso tre zone collegate di missioni, dungeon ed esplorazione.",
       "q7": "Il mio personaggio verrà salvato?",
@@ -986,7 +1317,7 @@ export const it_IT: EnTranslations = {
       },
       "spider": {
         "name": "Ragni",
-        "desc": "Tessitori di ragnatele e agguatatori velenosi che fanno il nido in luoghi bui e intricati."
+        "desc": "Tessitori di ragnatele e agguatatori velenosi che fanno il nido in luoghi bui e intricati. I cacciatori possono domarli, proprio come le bestie."
       },
       "murloc": {
         "name": "Murloc",
@@ -1002,7 +1333,7 @@ export const it_IT: EnTranslations = {
       },
       "troll": {
         "name": "Troll",
-        "desc": "Bruti imponenti dalla rapida guarigione che si annidano nella palude e nelle alte terre."
+        "desc": "Bruti imponenti che si annidano nelle paludi dell'acquitrino."
       },
       "ogre": {
         "name": "Ogre",
@@ -1015,6 +1346,10 @@ export const it_IT: EnTranslations = {
       "elemental": {
         "name": "Elementali",
         "desc": "Tempesta e pietra viventi, legate ai luoghi selvaggi dove gli elementi scorrono potenti."
+      },
+      "dragonkin": {
+        "name": "Draconici",
+        "desc": "Creature squamose e serpentine delle antiche profondità. Rare, fiere e ben più forti di quanto sembrino."
       }
     },
     "worldPage": {
@@ -1034,11 +1369,11 @@ export const it_IT: EnTranslations = {
       "marshGreeter": "Guardiano Fenwick, Fenbridge",
       "peaksGreeting": "Duecento anni ha retto questo muro. Non cederà sotto la mia guardia, ma geme.",
       "peaksGreeter": "Capitano Thessaly, Highwatch",
-      "valePlaceNotes": "Eastbrook è la tua prima base. Il Sentiero dei Lupi e il Prato dei Cinghiali sono terreni di caccia tranquilli; il Lago a Specchio è acqua quieta dove pescare; il Boscoragnatela e lo Scavo di Rame nascondono ragni e scavatori avidi di minerale; un Campo di Banditi e la Cappella Caduta custodiscono lavori più duri; la Radura di Brightwood è una serena radura di natura selvaggia a nord.",
+      "valePlaceNotes": "Eastbrook è la tua prima base. Il Sentiero dei Lupi e il Prato dei Cinghiali sono terreni di caccia tranquilli; il Lago a Specchio è acqua quieta dove pescare; il Boscoragnatela e lo Scavo di Rame nascondono ragni e scavatori avidi di minerale; un Campo di Banditi e la Cappella Caduta custodiscono lavori più duri; il Colle del Reliquiario scende nel Reliquiario Crollato, il primo delve del reame; e Brightwood Glade è una serena radura assolata a nord.",
       "marshPlaceNotes": "Fenbridge custodisce l'unica strada asciutta. Le Canne del Predatore e le Secche di Deepfen brulicano di bestie di palude e murloc; il Roveto della Vedova è fittamente intessuto di ragnatele; la Cappella Annegata e i Tumuli dei Troll custodiscono pericoli più antichi; l'Accampamento dei Richiamatombe è il culto trincerato, e il Bastione Sommerso è il cuore istanziato della palude.",
       "peaksPlaceNotes": "Highwatch tiene il muro. La Cresta del Cacciatore e le Tane di Deeprock appartengono ai felini di cresta e ai kobold; le Pendici degli Ogre e l'Accampamento di Guerra di Drogmar ai bruti a pagamento; Stormcrag crepita di elementali e il Glimmermere risplende sotto di esso; le Tende del Culto del Wyrm e i Campi dei Revenant cingono l'altura del culto, con il Santuario del Gravewyrm alla sua sommità.",
       "gladeTitle": "Un angolo quieto: la Radura di Brightwood",
-      "gladeBody": "Non ogni storia della Valle parla dei morti. A nord, una radura assolata chiamata Brightwood mantiene un ritmo più gentile tutto suo, con sentieri silenziosi, cervi al pascolo e bestie guardinghe sotto i rami. È un contrappunto lieve alla pista che stai seguendo e vale la pena vederla quando la strada ti lascia spazio per vagare."
+      "gladeBody": "Non ogni storia della Valle parla dei morti. A nord, una radura assolata chiamata Brightwood Glade mantiene un ritmo più gentile tutto suo, fatto di sentieri silenziosi e luce screziata sotto i rami. È un contrappunto lieve alla pista che stai seguendo e vale la pena vederla quando la strada ti lascia spazio per vagare."
     },
     "questsPage": {
       "heading": "Missioni",
@@ -1046,14 +1381,14 @@ export const it_IT: EnTranslations = {
       "acceptTitle": "Trovare e accettare",
       "acceptBody": "Le persone con un indicatore sopra la testa hanno del lavoro per te. Parla con loro per accettare una missione. La tua primissima è Lupi alla Porta, dal Maresciallo Redbrook a Eastbrook.",
       "objectivesTitle": "Obiettivi",
-      "objectivesBody": "Uccidi certi nemici, raccogli oggetti o interagisci con qualcosa nel mondo. Il tracciatore a schermo conta i tuoi progressi mentre avanzi.",
+      "objectivesBody": "Uccidi certi nemici, raccogli oggetti o interagisci con qualcosa nel mondo. Il tracciatore a schermo conta i tuoi progressi mentre avanzi. Se cambi idea, puoi abbandonare una missione dal tuo registro delle missioni e riprenderla più tardi da chi te l'ha affidata.",
       "turninTitle": "Consegna",
-      "turninBody": "Torna da chi ti ha dato la missione, la mappa ti mostra dove, per esperienza, monete e spesso un pezzo di equipaggiamento scelto per la tua classe.",
+      "turninBody": "Porta una missione completata al suo indicatore di consegna, la mappa ti mostra dove, per esperienza, monete e spesso un pezzo di equipaggiamento scelto per la tua classe. Di solito è chi te l'ha affidata, anche se alcune missioni ti mandano da qualcun altro.",
       "partyTitle": "Missioni in gruppo",
-      "partyBody": "I membri del gruppo nelle vicinanze condividono il credito di uccisioni e obiettivi, quindi affrontare le missioni insieme è più veloce, mai più lento.",
+      "partyBody": "I membri del gruppo nelle vicinanze condividono il credito di uccisioni e obiettivi, quindi affrontare le missioni insieme è più veloce, mai più lento. Puoi anche condividere una missione con il tuo gruppo: pubblicala in chat come collegamento cliccabile con il comando /share, e qualsiasi membro vicino che ne ha i requisiti può accettare la stessa missione con un clic.",
       "storyTitle": "Un filo li attraversa tutti",
       "storyBody": "Fin dalle tue prime commissioni a Eastbrook, qualcosa non va con i morti. Un culto è all'opera, e la pista conduce a nord attraverso ogni zona. Seguila per scoprire chi c'è dietro.",
-      "soloNote": "La storia principale è pienamente affrontabile in solitaria; solo i suoi capitoli finali richiedono un gruppo.",
+      "soloNote": "La storia principale è affrontabile in solitaria fino al finale di ogni capitolo, che è un dungeon per cinque giocatori.",
       "typesTitle": "I tipi di missione che incontrerai",
       "typesBody": "Gran parte delle missioni rientra in poche forme familiari. Il tracciatore a schermo spiega esattamente cosa vuole ciascuna, così non resti mai a tirare a indovinare.",
       "typeSlayTitle": "Uccidi",
@@ -1062,10 +1397,10 @@ export const it_IT: EnTranslations = {
       "typeGatherBody": "Raccogli oggetti dal mondo o da ciò che i nemici lasciano cadere: erbe, minerale, lettere perdute, i tetri reagenti di un culto. Alcuni pezzi cadono solo da un nemico particolare, perciò la caccia e il bottino vanno di pari passo.",
       "typeInteractTitle": "Interagisci",
       "typeInteractBody": "Usa, purifica o leggi qualcosa di fisso nel mondo: una tomba profanata, un avvertimento inciso su una roccia della riva, una porta di cripta sigillata. Avvicinati al segnale e agisci su di esso.",
-      "typeMusterTitle": "Scorta e raduno",
-      "typeMusterBody": "Scorta sano e salvo un volto amico da un luogo a un altro, o raduna i difensori di una città prima di una spinta verso nord. Questi ti tengono in movimento con le persone della cui storia fai parte.",
+      "typeMusterTitle": "Raduna la difesa",
+      "typeMusterBody": "Alcune missioni ti fanno radunare una città prima di una spinta verso nord: riduci la minaccia alle porte e raccogli ciò di cui hanno bisogno i difensori. Sono obiettivi di uccisione e raccolta al servizio delle persone della cui storia fai parte, e ti tengono in movimento con loro.",
       "typeGroupTitle": "Finali di gruppo",
-      "typeGroupBody": "Ogni capitolo della storia principale si conclude a una porta di dungeon. L'introduzione è affrontabile in solitaria, ma il colpo finale contro il cattivo di un capitolo è pensato per un gruppo di cinque (e l'ultimissimo, per dieci).",
+      "typeGroupBody": "Ogni capitolo della storia principale si conclude a una porta di dungeon. L'introduzione è affrontabile in solitaria, ma il colpo finale contro il cattivo di un capitolo è pensato per un gruppo di cinque.",
       "sagaTitle": "Segui la pista verso nord",
       "sagaBody": "La storia principale è una sola lunga caccia. Un culto della morte è all'opera sulle tombe del reame, e ogni capitolo che chiudi ti indica una zona più avanti lungo la strada. Non affronti mai l'intera cospirazione tutta insieme; tiri un filo, e questo ti porta alla mano successiva che lo regge.",
       "sagaValeTitle": "La Valle: un nome su un sigillo",
@@ -1073,12 +1408,14 @@ export const it_IT: EnTranslations = {
       "sagaMarshTitle": "La palude: una decima di anime",
       "sagaMarshBody": "A Mirefen gli annegamenti non sono casuali. Qualcuno sta riempiendo l'acquitrino come una cassetta delle decime, rialzando morti obbedienti da ogni viaggiatore che l'acqua si prende. Risali gli ordini lungo la catena fino a un Richiamanebbie nel bastione annegato, le cui ultime parole nominano qualcosa di ancora più antico, che si agita sotto le vette.",
       "sagaPeaksTitle": "Le vette: a cosa serviva la decima",
-      "sagaPeaksBody": "Su Thornpeak l'intero disegno si fa chiaro. Ogni anima rubata fin dalla Valle era una decima versata per risvegliare un'antica creatura sigillata sotto la montagna. La pista che cominciò nel cortile di una cappella finisce qui, a una porta che ci vogliono in dieci per aprire. Lasceremo a te scoprire chi attende dietro di essa.",
+      "sagaPeaksBody": "Su Thornpeak l'intero disegno si fa chiaro. Ogni anima rubata fin dalla Valle era una decima versata per l'oscura opera del culto nel cuore della montagna. La pista che cominciò nel cortile di una cappella finisce qui, in una discesa per cinque giocatori per affrontare la mano dietro a tutto. Lasceremo a te scoprire chi attende in fondo.",
       "sideTitle": "Fili che si staccano dalla strada principale",
       "sideWardenTitle": "Guadagnarsi il proprio nome",
-      "sideWardenBody": "Accanto alla storia, i guardiani della Valle e dell'acquitrino offrono una scala di taglie permanente. Scalala, nemico dopo nemico, nel modo in cui ogni guardiano prima di te si è guadagnato il proprio posto. È una crescita di livello onesta e un giro tra i peggiori piantagrane di ogni zona.",
+      "sideWardenBody": "Accanto alla storia, i marescialli e i guardiani della Valle e dell'acquitrino offrono una scala di taglie permanente. Scalala, nemico dopo nemico, nel modo in cui ogni cacciatore di taglie prima di te si è guadagnato il proprio posto. È una crescita di livello onesta e un giro tra i peggiori piantagrane di ogni zona.",
       "sideCryptTitle": "Il re dimenticato",
-      "sideCryptBody": "In alto sulle vette corre un mistero più silenzioso: vecchie tombe segnate da una corona di cui nessuna cronaca conserva memoria. Leggi i morti, raccogli ciò che custodivano e dissigilla un sepolcro che doveva restare chiuso. È la pista di un investigatore che apre la via a una seconda prova di fine gioco per un'intera incursione."
+      "sideCryptBody": "In alto sulle vette corre un mistero più silenzioso: vecchie tombe segnate da una corona di cui nessuna cronaca conserva memoria. Leggi i morti, raccogli ciò che custodivano e dissigilla un sepolcro che doveva restare chiuso. È la pista di un investigatore che apre la via all'incursione di fine gioco per dieci giocatori del reame.",
+      "sideTempleTitle": "Il Tempio Annegato",
+      "sideTempleBody": "Un cancello di pallida luce su un alto laghetto montano tra le vette si apre su un santuario sommerso dove un culto annegato canta ancora. La sua breve catena di missioni resta separata dalla storia principale, un mistero a sé stante per chiunque salga fino alla riva, legga gli avvertimenti incisi sulle rocce e scenda a scoprire a cosa servissero."
     },
     "lore": {
       "figuresTitle": "Volti che imparerai a conoscere",
@@ -1111,7 +1448,35 @@ export const it_IT: EnTranslations = {
       "templeLoreTitle": "Il Tempio Annegato, un po' più a fondo",
       "templeLoreBody": "Il tempio ha una sua leggenda, più antica del culto che insegui altrove. Sulla riva del Glimmermere, un laghetto che beve la luce della luna e restituisce gli annegati, un solitario guardiano custodisce una porta di pallida luce. Sotto la superficie, una scalinata di pietra fredda scende fino ad esso. Coloro che vi affondarono non annegarono per disgrazia: erano il Coro Pallido, che si immerse in preghiera e non smise mai di cantare. I vecchi custodi incisero un solo avvertimento nelle rocce prima che l'acqua li prendesse, una preghiera a qualcosa che chiamavano la Luna Annegata, con una mano più ferma che aggiunse due parole sotto di essa: dorme soltanto.",
       "cryptLeadTitle": "Una porta che i morti dovevano tenere chiusa",
-      "cryptLeadBody": "In alto sulle vette, lontano dallo scontro principale, giace un mistero più gelido. Vecchie tombe portano una corona di cui nessuna cronaca conserva memoria, e i morti che le custodiscono servirono un tempo un re dimenticato. Leggi le loro lapidi, raccogli le chiavi di volta che custodivano, e potrai dissigillare un sepolcro che tre anime fedeli morirono per tenere chiuso, aprendo una seconda prova per dieci giocatori a chi segue gli indizi fino in fondo."
+      "cryptLeadBody": "In alto sulle vette, lontano dallo scontro principale, giace un mistero più gelido. Vecchie tombe portano una corona di cui nessuna cronaca conserva memoria, e i morti che le custodiscono servirono un tempo un re dimenticato. Leggi le loro lapidi, raccogli le chiavi di volta che custodivano, e potrai dissigillare un sepolcro che tre anime fedeli morirono per tenere chiuso: la prova facoltativa che apre il reame alla sua incursione per dieci giocatori, per chi segue gli indizi fino in fondo."
+    },
+    "delvesPage": {
+      "heading": "Incursioni",
+      "intro": "Le incursioni sono brevi discese rigiocabili per uno o due giocatori, con una compagna fedele al tuo fianco ogni volta che scendi da solo. Trova il tabellone, scegli un'incursione e risali con il bottino.",
+      "fromLevel": "Dal livello {n}",
+      "partyLabel": "Per uno o due",
+      "keeperLabel": "Custode",
+      "keeperFmt": "{name}, {title}",
+      "companionLabel": "Compagna",
+      "companionFmt": "{name}, {role}",
+      "tiersLabel": "Difficoltà",
+      "affixesLabel": "Modificatori possibili",
+      "whatHeading": "Cos'è un'incursione",
+      "whatBody": "Un'incursione è un piccolo dungeon istanziato creato solo per te e al più un alleato, una copia privata in cui nessuno può disturbarti. La avvii da un tabellone tenuto da un custode delle incursioni sparso per il mondo, scendi, ti fai strada attraverso una manciata di stanze e finisci su un unico guardiano. Le incursioni sono rapide e pensate per essere ripetute, perciò un'incursione è un progresso affidabile ogni volta che il mondo aperto si esaurisce.",
+      "howHeading": "Come funziona un'incursione",
+      "howBody": "Parla con il custode per aprire il tabellone, scegli una difficoltà e scendi. Ogni incursione concatena alcune brevi camere e si conclude sul suo guardiano: sconfiggilo per riscuotere la ricompensa e tornare in superficie. Porta un amico se ce l'hai, oppure appoggiati alla tua compagna se non l'hai.",
+      "companionHeading": "La tua compagna",
+      "companionBody": "Un'incursione manda con te una compagna, così una discesa in solitaria non è mai senza speranza. Combatte al tuo fianco, e man mano che investi su di lei tra una discesa e l'altra diventa via via più forte, fino a poter strappare un alleato dall'orlo della morte una volta per discesa. È al tuo servizio per l'incursione e ti aspetta al tabellone tra una discesa e l'altra.",
+      "lockpickHeading": "Le serrature e ciò che nascondono",
+      "lockpickBody": "Alcune porte e alcuni nascondigli sono sigillati, e aprirne uno è una piccola prova di sangue freddo più che di statistiche: forza la serratura in modo pulito e costante e otterrai un premio migliore di chi va di fretta e pasticcia. È facoltativo, ma chi esplora con prudenza è chi torna più ricco.",
+      "tiersHeading": "Difficoltà",
+      "tiersBody": "Un'incursione offre più di una difficoltà. Quella più alta rende i nemici più forti e introduce un modificatore d'incursione, e in cambio paga di più. Chiede anche che tu abbia qualche livello sulle spalle prima di lasciarti entrare.",
+      "affixesHeading": "Modificatori dell'incursione",
+      "affixesBody": "Le incursioni più difficili estraggono un modificatore che cambia come si svolge la discesa, dai morti inquieti all'aria viziata fino alle volte cadenti. Alzano insieme il pericolo e la ricompensa. Un'incursione a tema cripta può estrarne uno qualsiasi tra questi:",
+      "marksHeading": "Sigilli d'Incursione",
+      "marksBody": "Completare le incursioni fa guadagnare Sigilli d'Incursione, una valuta tenuta separata dalle tue monete. Spendili dal custode per rafforzare la tua compagna e procurarti equipaggiamento che non troverai da nessun'altra parte.",
+      "whereHeading": "Dove trovarne una",
+      "whereBody": "La prima incursione, il Reliquiario Crollato, si apre alla Collina del Reliquiario, nella valle iniziale della Valle di Eastbrook. Fratello Halven custodisce lì il tabellone, e ti manderà giù quando sarai pronto."
     },
     "talentsPage": {
       "heading": "Talenti e specializzazioni",
@@ -1120,8 +1485,9 @@ export const it_IT: EnTranslations = {
       "whatBody": "Salendo di livello, guadagni punti talento da spendere in piccoli, permanenti miglioramenti alle tue abilità e statistiche. Plasmano il modo in cui una classe si sente, orientandola verso più danno, una difesa più solida o cure più potenti.",
       "howHeading": "Come funzionano",
       "howBody": "I talenti si sbloccano al livello 10, e continui a guadagnare punti man mano che sali verso il limite. Li spendi nel pannello dei talenti della tua classe, e puoi salvare più di una configurazione per passare da una costruzione all'altra.",
+      "shareNote": "Una configurazione finita può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla direttamente nel proprio pannello dei talenti per caricarla.",
       "resetTitle": "Niente è permanente",
-      "resetNote": "Puoi reimpostare i tuoi talenti in qualsiasi momento, quindi una scelta iniziale non è mai una trappola. Prova le cose, scopri cosa ti piace e cambia idea liberamente.",
+      "resetNote": "Puoi reimpostare i tuoi talenti in qualsiasi momento, purché tu sia fuori dal combattimento, quindi una scelta iniziale non è mai una trappola. Prova le cose, scopri cosa ti piace e cambia idea liberamente.",
       "specsHeading": "Specializzazioni per classe",
       "specsBody": "Ogni classe ha una manciata di specializzazioni, ciascuna con il proprio ruolo e un'impronta caratteristica. Ecco la forma di tutte quante. Apri una classe per il suo arsenale completo."
     },
@@ -1131,7 +1497,7 @@ export const it_IT: EnTranslations = {
       "duelsHeading": "Duelli",
       "duelsBody": "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
       "coliseumHeading": "Il Colosseo di Cenere",
-      "coliseumBody": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate. Vinci e la tua posizione sale, e i combattenti più forti scalano la classifica davanti a tutti.",
+      "coliseumBody": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate, uno contro uno o due contro due. Ogni categoria mantiene la propria classifica, perciò una vittoria ti fa salire in quella graduatoria sotto gli occhi di tutto il reame.",
       "fiestaHeading": "Fiesta due contro due",
       "fiestaBody": "Fiesta è una modalità rapida due contro due giocata in round brevi. Tra un round e l'altro arruoli potenziamenti, boost veloci che rimodellano il tuo arsenale al volo, così non ci sono due partite uguali.",
       "augmentsNote": "Potenziamenti e bonus durano solo per la partita. Sono pensati per costruzioni giocose e improvvisate, non per un potere duraturo, così nessuno si compra la vittoria.",
@@ -1154,7 +1520,7 @@ export const it_IT: EnTranslations = {
       "i1Title": "Non puoi scegliere una classe sbagliata",
       "i1Body": "Ogni classe può cavarsela e raggiungere il limite. Scegli la fantasia che ti piace, non quella che qualcun altro definisce la migliore.",
       "i2Title": "Morire ti costa pochissimo",
-      "i2Body": "Quando cadi, ti risvegli a un cimitero e corri indietro fino al tuo corpo. Non si perde esperienza, quindi puoi correre rischi e imparare in tutta sicurezza.",
+      "i2Body": "Quando cadi, liberi il tuo spirito e risorgi al cimitero più vicino, poi torni sui tuoi passi. Non si perde esperienza, quindi puoi correre rischi e imparare in tutta sicurezza.",
       "i3Title": "I talenti non sono una trappola",
       "i3Body": "Si sbloccano al livello 10 e si reimpostano quando vuoi, quindi le tue scelte iniziali non sono mai permanenti.",
       "i4Title": "Segui la scia delle missioni",
@@ -1174,7 +1540,8 @@ export const it_IT: EnTranslations = {
       "loading": "Caricamento del modello...",
       "error": "Impossibile caricare il modello 3D. L'illustrazione sopra mostra comunque questo {name}.",
       "dragHint": "Trascina per girare il modello. Usa i tasti freccia sinistra e destra quando è a fuoco.",
-      "canvasLabel": "Modello 3D ruotabile di {name}"
+      "canvasLabel": "Modello 3D ruotabile di {name}",
+      "posterAlt": "{name}"
     },
     "models": {
       "title": "Visualizzatore di modelli 3D",
@@ -1190,7 +1557,7 @@ export const it_IT: EnTranslations = {
     "gear": {
       "intro": "L'equipaggiamento è ciò che il tuo personaggio indossa e gli oggetti che porta con sé. Un equipaggiamento migliore è il modo più costante per diventare più forte, e ne raccogli gran parte semplicemente giocando.",
       "slotsTitle": "Cosa puoi equipaggiare",
-      "slotsBody": "Hai uno slot per l'arma e sette slot per l'armatura. Ogni pezzo che equipaggi si aggiunge al tuo personaggio, e puoi mescolare e abbinare liberamente man mano che trovi miglioramenti.",
+      "slotsBody": "Hai uno slot per l'arma e sette slot per l'armatura. Ogni classe può usare solo certe armi e indossa armatura fino al proprio peso, stoffa, cuoio o maglia, perciò i miglioramenti adatti a te sono quelli fatti per la tua classe. Detto questo, riempi ogni slot con il pezzo migliore che trovi.",
       "slotMainhand": "Arma",
       "slotHelmet": "Testa",
       "slotShoulder": "Spalle",
@@ -1210,29 +1577,35 @@ export const it_IT: EnTranslations = {
       "qualityNote": "Una qualità superiore di solito significa statistiche migliori, ma la qualità è un indizio, non una regola. Un pezzo ben adatto alla tua classe e al tuo livello può battere uno più appariscente.",
       "upgradeTitle": "Tieni il tuo equipaggiamento aggiornato",
       "upgradeBody": "Sostituire un vecchio pezzo con un miglioramento fresco fa di più per te che giocare alla perfezione con un equipaggiamento che hai superato. Quando cade qualcosa di migliore o una missione te lo offre, prendilo. Non conservare i tuoi oggetti buoni per dopo.",
+      "itemLevelBody": "Se vuoi un modo rapido per confrontare due pezzi, attiva Mostra livello oggetto nelle opzioni. Ogni arma e ogni pezzo d'armatura mostrerà allora un livello oggetto, un singolo numero che indica all'incirca quanto è potente in base alla sua provenienza, così puoi capire a colpo d'occhio quale miglioramento conta di più, anche tra slot diversi.",
       "sourcesTitle": "Da dove arriva l'equipaggiamento",
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, e il mercato dei giocatori ti permette di comprare da altri avventurieri.",
+      "setsTitle": "Le tenute e i loro bonus",
+      "setsBody": "L'armatura più rara arriva in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Cadono dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.",
       "consumablesTitle": "Consumabili",
       "consumablesIntro": "Alcuni oggetti si usano una sola volta per un beneficio immediato. Sono un'assicurazione economica, perciò tienine qualcuno a portata di mano.",
       "consumablesPotions": "Le pozioni ripristinano salute o mana nell'istante in cui le usi, anche in pieno scontro, il che le rende una salvezza decisiva quando un attacco va storto. Condividono un breve tempo di recupero, perciò pianifica un buon momento per usarle.",
       "consumablesFood": "Cibo e bevande ti ristorano mentre ti siedi a riposare tra uno scontro e l'altro. Mangiare recupera salute, bere recupera mana, e riposare in questo modo è gratuito. Siediti per qualche secondo dopo uno scontro duro invece di lanciarti nel successivo curato a metà.",
       "consumablesElixirs": "Gli elisir concedono un potenziamento temporaneo mentre sei all'avventura, un piccolo vantaggio che aiuta quando vuoi spingerti un po' oltre.",
       "fishingTitle": "Pesca",
-      "fishingBody": "La pesca è un sereno cambio di ritmo. Equipaggia una canna da pesca, lancia in acque aperte e tira su ciò che abbocca. Per lo più catturi pesci che puoi cucinare per farne cibo, qualche cianfrusaglia da vendere per pochi spiccioli, e di tanto in tanto una preziosa cattura rara. Ciò che trovi dipende dalle acque in cui peschi.",
-      "fishingFood": "I pesci che tiri su sono crudi, e il pesce crudo è cibo. Cucina la tua cattura e curerà di più quando ti siedi a mangiare, con i pesci migliori che vengono dalle acque più fredde e profonde a nord. Una lenza nel lago è un modo tranquillo per tenere la sacca rifornita tra uno scontro e l'altro.",
+      "fishingBody": "La pesca è un sereno cambio di ritmo. Equipaggia una canna da pesca, lancia in acque aperte e tira su ciò che abbocca. Per lo più catturi pesci che sono cibo che puoi mangiare, qualche cianfrusaglia da vendere per pochi spiccioli, e di tanto in tanto una preziosa cattura rara. Ciò che trovi dipende dalle acque in cui peschi.",
+      "fishingFood": "I pesci che tiri su sono cibo: mangiane uno mentre ti siedi a riposare e ti ripristina la salute, con i pesci più sostanziosi che vengono dalle acque più fredde e profonde a nord. Una lenza nel lago è un modo tranquillo per tenere la sacca rifornita tra uno scontro e l'altro.",
       "fishingRare": "Di tanto in tanto la tua lenza pesca qualcosa di ben migliore di una cena: uno scintillante pesce pregiato in cui qualunque pescatore può imbattersi per fortuna in qualunque acqua. Aggancialo e il tuo registro si illuminerà per la cattura. È il genere di colpo fortunato che rende un pigro pomeriggio al lago degno di essere raccontato.",
       "cosmeticsTitle": "Aspetti ed estetica",
       "cosmeticsBody": "Alcune ricompense cambiano solo l'aspetto del tuo personaggio, mai quanto sei forte. Queste skin estetiche ti permettono di distinguerti senza influire sul gioco, perciò indossa quella che preferisci.",
       "cosmeticsRanks": "Gli oggetti estetici hanno i propri gradi di rarità, e i più rari sono una bella cosa da inseguire. Guadagnare un grado superiore sblocca anche gli aspetti sottostanti.",
-      "cosmeticsSkins": "Ci sono due linee estetiche da collezionare. Ogni classe ha una manciata di aspetti alternativi, una nuova interpretazione del suo look che è tua soltanto da indossare. Accanto a essi ci sono i chroma: schemi di colore bicolore con nome che ridipingono interamente un aspetto, dai metalli sobri ai vivaci colori imperiali.",
-      "cosmeticsCache": "Alcune di queste provengono da un misterioso scrigno estetico, un premio sigillato che estrae uno di tre gradi di qualità quando lo apri e ti concede l'aspetto corrispondente. È puramente estetico: nulla al suo interno ti rende più forte, solo più bello da vedere."
+      "cosmeticsSkins": "Ci sono due linee estetiche da collezionare. La maggior parte delle classi ha diversi aspetti alternativi, una nuova interpretazione del look della classe che è tua da indossare. Accanto a essi ci sono i chroma: schemi di colore bicolore con nome che ridipingono interamente un aspetto, dai metalli sobri ai vivaci colori imperiali.",
+      "cosmeticsCache": "Alcune di queste provengono da un misterioso scrigno estetico, un premio sigillato che estrae uno di tre gradi di qualità quando lo apri e ti concede l'aspetto corrispondente. È puramente estetico: nulla al suo interno ti rende più forte, solo più bello da vedere.",
+      "cosmeticsApply": "Imposta il tuo aspetto attivo dalla riga dell'aspetto nella schermata del personaggio, e passa liberamente tra tutto ciò che hai sbloccato."
     },
     "economy": {
-      "intro": "Le monete fanno girare tutto il mondo: comprano equipaggiamento e provviste, pagano le tue riparazioni e i costi delle missioni, e passano di mano tra i giocatori. Raccogli tutto questo semplicemente giocando, perciò considera questa pagina come una mappa di dove arriva e dove va il tuo denaro.",
+      "intro": "Le monete fanno girare tutto il mondo: comprano il tuo equipaggiamento, le provviste e l'attrezzatura da viaggio, e passano di mano tra i giocatori. Raccogli tutto questo semplicemente giocando, perciò considera questa pagina come una mappa di dove arriva e dove va il tuo denaro.",
       "coinTitle": "Oro, argento e rame",
       "coinBody": "Il denaro si presenta in tre monete. Cento rame fanno un argento, e cento argenti fanno un oro, perciò la tua borsa si riempie a partire dalla moneta più piccola. Lo guadagni dalle ricompense delle missioni, saccheggiando i nemici caduti e vendendo ciò che non ti serve più.",
       "vendorsTitle": "I venditori e ciò che tengono",
-      "vendorsBody": "Città e avamposti sono disseminati di mercanti, ognuno con il proprio commercio. I provvigionieri tengono cibo e bevande, armaioli e fabbri portano equipaggiamento, gli erboristi trattano reagenti, e un quartiermastro tiene attrezzatura pratica da viaggio. Avvicinati a uno per vedere cosa vende.",
+      "vendorsBody": "Città e avamposti sono disseminati di mercanti, ognuno con il proprio commercio. I provvigionieri tengono cibo e bevande, armaioli e fabbri portano equipaggiamento, e un quartiermastro tiene attrezzatura pratica da viaggio. Avvicinati a uno per vedere cosa vende.",
+      "marksTitle": "Una seconda valuta: i Sigilli d'Incursione",
+      "marksBody": "Le monete non sono l'unica cosa che metti da parte. Le incursioni pagano in Sigilli d'Incursione, una valuta separata che spendi solo dal custode delle incursioni, in potenziamenti per la compagna ed equipaggiamento che non troverai altrove. Non si mescolano mai con le tue monete.",
       "buyingTitle": "Comprare e vendere",
       "buyingBody": "Avvicinati a un mercante per aprire la sua finestra. Puoi comprare qualunque cosa abbia in vendita, se te la puoi permettere, e vendere gran parte di ciò che hai nelle borse in cambio di monete. Se vendi qualcosa per errore, un venditore ti terrà da parte le tue vendite recenti così potrai riacquistarle.",
       "junkTitle": "Liberarsi delle cianfrusaglie",
@@ -1240,7 +1613,7 @@ export const it_IT: EnTranslations = {
       "tradeTitle": "Scambiare con altri giocatori",
       "tradeBody": "Puoi scambiare faccia a faccia con chiunque ti stia vicino. Entrambi mettete oggetti e monete in una finestra condivisa e lo scambio avviene solo dopo che entrambi lo confermate, così nessuno dei due può essere ingannato. È il modo semplice per passare un bottino a un amico o concludere un accordo.",
       "marketTitle": "Il Mercato Mondiale",
-      "marketBody": "Il Mercante gestisce il Mercato Mondiale, una piazza di scambio guidata dai giocatori dove puoi comprare e vendere con persone che forse non incontrerai mai. Parla con il Mercante per aprirlo.",
+      "marketBody": "Il Mercante gestisce il Mercato Mondiale, una piazza di scambio guidata dai giocatori dove puoi comprare e vendere con persone che forse non incontrerai mai. Parla con il Mercante per aprirlo. Il Mercante tiene anche una scorta fissa di merce propria in vendita lì, così c'è sempre qualcosa da comprare anche quando nessun altro giocatore ha messo in vendita nulla.",
       "marketBrowse": "Sfogliare: scorri gli annunci o cerca per nome per trovare ciò che è in vendita. Ogni annuncio mostra la merce, il venditore e il prezzo richiesto per l'intera pila.",
       "marketPost": "Mettere in vendita: scegli una pila dalle tue borse, fissa il prezzo e mettila in lista. La merce resta in custodia del Mercante finché qualcuno non la compra. Gli annunci invenduti ti tornano dopo un po', e puoi recuperarne uno in anticipo se cambi idea.",
       "marketCollect": "Riscuotere: quando la tua merce viene venduta, i proventi ti aspettano dal Mercante. Torna a riscuotere le monete, insieme a tutto ciò che è tornato invenduto. Il Mercante trattiene una piccola percentuale su ogni vendita completata.",
@@ -1259,7 +1632,7 @@ export const it_IT: EnTranslations = {
       "chanParty": "Gruppo.",
       "chanPartyBody": "Parla con tutti nel tuo gruppo, per quanto siate sparpagliati.",
       "chanGeneral": "Generale.",
-      "chanGeneralBody": "Un canale locale sempre attivo per le persone intorno a te, buono per fare una domanda o chiacchierare.",
+      "chanGeneralBody": "Un canale di tutto il reame sempre attivo che raggiunge tutti gli online, buono per fare una domanda o chiacchierare in generale. A differenza dei canali Mondo e Cerca gruppo, non devi mai iscriverti.",
       "chanWorld": "Mondo.",
       "chanWorldBody": "Un canale esteso a tutto il reame a cui aderisci. Apri la sua scheda per unirti, e vedrai e raggiungerai tutti gli online.",
       "chanLfg": "Cerca Gruppo.",
@@ -1267,7 +1640,7 @@ export const it_IT: EnTranslations = {
       "chanGuild": "Gilda e Ufficiali.",
       "chanGuildBody": "Canali per la tua gilda. La chat di gilda raggiunge ogni membro; il canale degli ufficiali è solo per gli ufficiali.",
       "partyHeading": "Formare un gruppo",
-      "partyBody": "Invita un altro giocatore facendo clic destro sul suo nome e scegliendo di invitarlo, oppure con un comando di chat. Un gruppo ospita fino a cinque giocatori, e uno di voi è il capo.",
+      "partyBody": "Invita un altro giocatore facendo clic destro sul suo nome e scegliendo di invitarlo. Un gruppo ospita fino a cinque giocatori, e uno di voi è il capo.",
       "partyCredit": "I membri del gruppo vicini tra loro condividono il credito di uccisioni e missioni, perciò fare missioni insieme è più rapido, mai più lento. Un gruppo è anche il modo per entrare in un dungeon come squadra.",
       "raidBody": "Una volta che hai un gruppo completo di cinque, il capo può convertirlo in un'incursione fino a dieci, per l'incursione di fine gioco.",
       "lootHeading": "Bottino di gruppo",
@@ -1278,6 +1651,8 @@ export const it_IT: EnTranslations = {
       "lootCommonBody": "I bottini ordinari possono andare a chi saccheggia, mentre quelli migliori vengono messi a tiro così tutti hanno una possibilità equa.",
       "lootRollTitle": "Bisogno, Brama o Passa.",
       "lootRollBody": "Quando un oggetto va a tiro, ogni membro idoneo sceglie Bisogno se lo vuole, Brama se lo prenderebbe solo come scorta, o Passa per chiamarsi fuori. Il tiro più alto vince.",
+      "lootMasterTitle": "Saccheggiatore designato.",
+      "lootMasterBody": "Il capo può invece occuparsi del bottino migliore, assegnando ogni pezzo al membro che dovrebbe riceverlo. Evita che l'equipaggiamento più ambito finisca a un tiro di dado casuale, come fa un gruppo organizzato quando affronta un dungeon.",
       "friendsHeading": "Amici e ignorati",
       "friendsBody": "Aggiungi giocatori alla tua lista amici per vedere quando sono online e dove si trovano, così puoi fare gruppo nel momento in cui si connettono.",
       "ignoreBody": "Se qualcuno ti dà fastidio, aggiungilo alla tua lista ignorati e smetterai di vedere la sua chat.",
@@ -1298,17 +1673,21 @@ export const it_IT: EnTranslations = {
       "staTitle": "Costituzione",
       "staBody": "La Costituzione è la tua tenuta. Più Costituzione significa una riserva di salute più ampia, e accelera la salute che recuperi mentre riposi fuori dal combattimento. Ogni classe ne vuole un po'.",
       "intTitle": "Intelletto",
-      "intBody": "L'Intelletto accresce la riserva di mana di un incantatore e migliora la probabilità che i suoi incantesimi colpiscano in critico. Conta per le classi che lanciano dal mana; per una classe a Ira o Energia fa poco.",
+      "intBody": "L'Intelletto accresce la riserva di mana di un incantatore, ne aumenta il potere magico così che i suoi incantesimi colpiscano più forte, e migliora la probabilità che i suoi incantesimi colpiscano in critico. Conta per le classi che lanciano dal mana; per una classe a Ira o Energia fa poco.",
       "spiTitle": "Spirito",
       "spiBody": "Lo Spirito governa la rapidità con cui torna il mana di un incantatore fuori dal combattimento. Come l'Intelletto, serve le classi a mana e conta poco per le altre.",
       "armorTitle": "Armatura",
       "armorBody": "L'armatura riduce il danno fisico che subisci. Proviene per lo più da ciò che indossi, e le classi con armatura più pesante ne portano molta di più. Più armatura contro un nemico vicino al tuo livello significa che ognuno dei suoi colpi arriva più attenuato.",
       "apTitle": "Potenza d'attacco",
       "apBody": "La potenza d'attacco misura quanto forte colpisce la tua arma. I tuoi attributi primari la alimentano, e armi ed equipaggiamento più forti la innalzano ulteriormente, ed è per questo che un miglioramento può essere un vero salto di danno.",
+      "spTitle": "Potenza magica",
+      "spBody": "La potenza magica è la controparte da incantatore della potenza d'attacco: aumenta i danni che infliggono i tuoi incantesimi. L'Intelletto la alimenta, ed equipaggiamento e potenziamenti da incantatore ne aggiungono ancora, perciò un incantatore tiene d'occhio la potenza magica come un combattente in mischia tiene d'occhio la potenza d'attacco.",
       "critTitle": "Colpo critico",
       "critBody": "La tua probabilità di colpo critico è quanto spesso un attacco arriva infliggendo danno extra. Tutti partono con una piccola probabilità di base, e l'Agilità (più alcuni talenti ed equipaggiamento) la accresce.",
       "dodgeTitle": "Schivata",
       "dodgeBody": "La schivata è la tua probabilità di evitare del tutto un attacco in mischia in arrivo. Inizi con una piccola probabilità di base, e l'Agilità la accresce, così le classi più agili scansano più colpi.",
+      "dpsTitle": "Danno al secondo",
+      "dpsBody": "La tua scheda mostra anche una stima del danno al secondo: all'incirca quanto rendono nel tempo la tua arma, la velocità dei suoi colpi e la tua potenza d'attacco. È un modo rapido per confrontare due armi a colpo d'occhio.",
       "sheetHeading": "Leggere la tua scheda del personaggio",
       "sheetBody": "Apri la finestra del personaggio in gioco per vedere tutto questo in un unico posto: i tuoi cinque attributi da un lato e le statistiche che alimentano dall'altro. Passa sopra un qualsiasi valore e una descrizione scompone ciò che fa per la tua classe, così puoi vedere a colpo d'occhio quali numeri ha effettivamente mosso un miglioramento.",
       "growHeading": "Come crescono le tue statistiche",
@@ -1323,10 +1702,10 @@ export const it_IT: EnTranslations = {
       "journeyBody": "Il mondo è una terra continua, tre zone disposte da sud a nord, ciascuna un gradino più alta di livello. Inizi nella verde valle, prosegui attraverso la palude e concludi tra le fredde alte vette. Segui la pista delle missioni e la terra ti porta dall'una all'altra.",
       "bandLabel": "Livelli da {min} a {max}",
       "restedTitle": "Esperienza da riposo",
-      "restedBody": "Quando ti disconnetti, o riposi in un luogo sicuro come una locanda, il tuo personaggio accumula esperienza da riposo mentre sei via. La prossima volta che esci a combattere, quella riserva dà alle tue uccisioni una spinta extra finché non si esaurisce. Si accumula nel tempo e accelera i tuoi primi livelli, perciò disconnetterti in città non è mai tempo sprecato.",
+      "restedBody": "Riposa in un luogo sicuro come una locanda, fuori dal combattimento, e il tuo personaggio accumula esperienza da riposo mentre sei seduto lì. La prossima volta che esci a combattere, quella riserva dà alle tue uccisioni una spinta extra finché non si esaurisce. Una pausa alla locanda non è mai tempo sprecato; accelera il tuo prossimo tratto di salita di livello.",
       "capTitle": "Raggiungere il livello {cap}",
       "capJourneyBody": "Il livello {cap} è il limite, la fine della crescita di livello ma non della crescita in sé. Da lì affronti i dungeon e l'incursione, insegui un equipaggiamento migliore e ti metti alla prova nell'arena.",
-      "prestigeBody": "L'esperienza continua a contare anche dopo il limite. Alimenta un livello virtuale puramente estetico, così la tua barra dell'esperienza continua a salire, e un grado di prestigio a lungo termine che puoi guadagnare per il riconoscimento. È del tutto facoltativo e non concede mai potere, solo un segno della strada che hai percorso.",
+      "prestigeBody": "L'esperienza continua a contare anche dopo il limite. Alimenta un livello virtuale puramente estetico, così la tua barra dell'esperienza continua a salire, e un grado di prestigio a lungo termine che puoi guadagnare per il riconoscimento. Superare grandi traguardi di esperienza totale sblocca anche titoli estetici e bordi della targhetta che compaiono sulla tua scheda del personaggio. È tutto del tutto facoltativo e non concede mai potere, solo un segno della strada che hai percorso.",
       "noRush": "Non c'è fretta. Il mondo è lì per essere goduto al tuo ritmo, perciò vaga, prendi le missioni che attirano il tuo sguardo e lascia che il tuo eroe cresca lungo il cammino."
     },
     "placeholder": {
@@ -1394,6 +1773,7 @@ export const it_IT: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "Progetto open source",
+    "whitepaper": "Libro bianco",
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy",
     "discordLabel": "Entra nel Discord"
@@ -1709,6 +2089,263 @@ export const it_IT: EnTranslations = {
     "friends": "Amici e gilda",
     "chat": "Apri chat"
   },
+  "sim": {
+    "delve": {
+      "cannotEnterNow": "Non puoi entrare in un'incursione in questo momento.",
+      "leaveDungeonFirst": "Esci prima dal dungeon.",
+      "leaveArenaFirst": "Esci prima dall'arena.",
+      "alreadyInDelve": "Sei già in un'incursione.",
+      "whileTrading": "Non puoi entrare in un'incursione mentre commerci.",
+      "duringDuel": "Non puoi entrare in un'incursione durante un duello.",
+      "duringArena": "Non puoi entrare in un'incursione durante una partita d'arena.",
+      "unknownTier": "Difficoltà d'incursione sconosciuta.",
+      "levelRequired": "Devi essere di livello {level} per entrare in {name}.",
+      "levelRequiredTier": "Devi essere di livello {level} per entrare in {name} a {tier}.",
+      "instancesBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco.",
+      "runFailed": "Incursione di {name} fallita.",
+      "complete": "{name} completata.",
+      "mechanismOpen": "Un meccanismo scatta aprendosi nelle vicinanze. Un passaggio si apre a nord: trova il portale d'uscita più avanti.",
+      "raiseDead": "{name} inizia a evocare i morti.",
+      "graveFalters": "Il rito sepolcrale vacilla.",
+      "doorAlreadyOpen": "La porta è già aperta.",
+      "companionRankUp": "{name} raggiunge il grado {rank}.",
+      "bossChest": "Il boss cade. Sul piedistallo si leva uno scrigno reliquiario protetto da incantesimi: scassinane la serratura per reclamare il bottino.",
+      "surfaceStairs": "Si apre una scalinata verso la superficie. Premi F alle scale per uscire.",
+      "moduleEnter": "{name}: {objective}",
+      "objectiveClearRoom": "Ripulisci la stanza.",
+      "objectiveDefeatBoss": "Sconfiggi il boss.",
+      "tombstoneHint": "Un passaggio attraverso una lapide si apre a nord quando la stanza è ripulita.",
+      "tombstoneOpen": "Un passaggio sigillato attraverso una lapide si apre stridendo a nord. Entraci per proseguire.",
+      "tombstoneInto": "Attraversi la lapide ed entri in {name}.",
+      "chestEmpty": "Lo scrigno è vuoto.",
+      "notInDelve": "Non sei in un'incursione.",
+      "cannotInteract": "Non puoi interagire con questo.",
+      "tooFar": "Sei troppo lontano.",
+      "graveSilent": "La tomba è silenziosa per ora.",
+      "doorLocked": "La porta è chiusa a chiave.",
+      "strikeWall": "Colpisci il muro per sfondarlo.",
+      "nothingHappens": "Non succede nulla.",
+      "unknownCompanion": "Compagno sconosciuto.",
+      "companionMaxRank": "Questo compagno è già completamente potenziato.",
+      "companionMarksRequired": "Ti servono {marks} Sigilli d'Incursione per potenziare {name}.",
+      "cannotAffordCompanionUpgrade": "Non puoi permetterti questo potenziamento.",
+      "shopItemLocked": "Non hai ancora sbloccato quell'oggetto.",
+      "shopMarksRequired": "Ti servono {marks} Sigilli d'Incursione per comprare {name}.",
+      "shopSealPremiumOnly": "Questo sigillo cede solo alla mano di un maestro: solo la puntata Pregiata può aprirlo.",
+      "passageSealed": "Il passaggio è sigillato.",
+      "moveCloserPassage": "Avvicinati al passaggio.",
+      "moveCloserChest": "Avvicinati allo scrigno.",
+      "nothingToTake": "Non è rimasto nulla da prendere.",
+      "wayOutNotOpen": "La via d'uscita non è ancora aperta.",
+      "moveCloserStairs": "Avvicinati alle scale."
+    },
+    "lockpick": {
+      "lockYields": "La serratura cede! Bottino {tier}.",
+      "tierPremium": "Pregiato",
+      "tierMedium": "Medio",
+      "tierLow": "Modesto",
+      "alreadyInProgress": "Qualcuno sta già lavorando alla serratura.",
+      "cannotPickThat": "Non puoi scassinare quello.",
+      "chooseAnte": "Scegli 1, 2 o 3 grimaldelli.",
+      "noAttempt": "Nessun tentativo di scasso in corso.",
+      "notYours": "Quella non è la tua serratura.",
+      "toolSlips": "Quello strumento scivola via da questa serratura.",
+      "lockJammed": "La serratura è inceppata oltre ogni possibilità di scasso: completa di nuovo l'incursione per un altro tentativo.",
+      "lastPickSnaps": "L'ultimo grimaldello si spezza. La serratura si inceppa: lo scrigno è perduto, a meno che tu non completi di nuovo l'incursione."
+    }
+  },
+  "lockpickUi": {
+    "pickTitle": "Scassina la Serratura",
+    "cofferTitle": "Forziere Ricolmo",
+    "cache": "Scrigno {tier}",
+    "pickBlurb": "Uno scrigno più ricco è sigillato dietro più serrature. Le serrature più facili concedono più tentativi e più tempo; un tentativo fallito reimposta la serratura finché non esaurisci i tentativi.",
+    "cofferBlurb": "Questo sigillo cede solo alla mano di un maestro: solo la via Difficile, Pregiata può aprirlo. Forza tutte e tre le serrature per il premio esclusivo.",
+    "pagesAria": "{count} serrature",
+    "tries": "{count} tentativi",
+    "triesOne": "1 tentativo",
+    "perMove": "{seconds} s per mossa",
+    "seconds": "{seconds}s",
+    "boardTitle": "Via del Cilindro: scrigno {tier}",
+    "closeAria": "Chiudi",
+    "withdrawAria": "Ritirati",
+    "timerAria": "Tempo rimanente",
+    "lockOf": "Serratura {page}/{total}",
+    "lockOfAria": "Serratura {page} di {total}",
+    "triesOf": "Tentativi {tries}/{total}",
+    "triesOfAria": "{tries} di {total} tentativi rimasti",
+    "ward": "Guardia {col} / {total}",
+    "depthKeys": "Le scorciatoie impostano la profondità del grimaldello (Q/W/E/A/Z), non il numero della guardia.",
+    "withdraw": "Ritirati (Esc)",
+    "action": {
+      "hardSet": "Spinta Decisa",
+      "set": "Spingi",
+      "steady": "Mantieni",
+      "ease": "Allenta",
+      "drop": "Rilascia"
+    },
+    "feedback": {
+      "advanced": "Il perno cede...",
+      "slip": "Una guardia morde, il grimaldello scivola!",
+      "bind": "Il cilindro si blocca: profondità sbagliata!",
+      "trap": "Una falsa guardia scatta, la serratura si inceppa!",
+      "retry": "La serratura si reimposta. Prepara un nuovo tentativo.",
+      "pageCleared": "Una fila di perni cede. La serratura successiva si presenta.",
+      "success": "Il chiavistello scatta, lo scrigno è tuo!",
+      "fail": "La serratura si blocca. Non si muoverà più."
+    },
+    "summary": {
+      "success": "Serratura forzata, scrigno {tier} reclamato.",
+      "successGeneric": "Serratura forzata, lo scrigno è reclamato.",
+      "fail": "La serratura è rovinata. Completa di nuovo l'incursione per un altro tentativo.",
+      "abandoned": "Sfili di nuovo i grimaldelli. La serratura attende."
+    }
+  },
+  "delveUi": {
+    "board": {
+      "title": "Tabellone delle Incursioni",
+      "enter": "Entra nell'Incursione",
+      "enterAria": "Entra in {delve} a difficoltà {tier}",
+      "openDelve": "Reliquiario Crollato",
+      "openDelveAria": "Apri il Tabellone delle Incursioni da {name}",
+      "marks": "Sigilli d'Incursione: {count}",
+      "minLevel": "Richiede il livello {level}",
+      "tier": {
+        "normal": "Normale",
+        "heroic": "Eroica"
+      },
+      "companion": {
+        "pick": "Scegli un compagno",
+        "tessa": "Accolita Tessa",
+        "rank": "Grado {rank}",
+        "boon": "Cura il gruppo tra uno scontro e l'altro. Il grado 3 rianima un alleato caduto una volta per incursione.",
+        "upgrade": "Potenzia al grado {rank} ({marks} Sigilli)",
+        "upgradeAria": "Potenzia {name} al grado {rank} per {marks} Sigilli d'Incursione",
+        "maxRank": "Completamente potenziato"
+      },
+      "tabDelve": "Incursione",
+      "tabShop": "Negozio"
+    },
+    "shop": {
+      "price": "{marks} Sigilli",
+      "buy": "Compra",
+      "buyAria": "Compra {item} per {marks} Sigilli d'Incursione",
+      "reqHeroic": "Richiede un'incursione eroica completata",
+      "reqClears": "Richiede {count} incursioni completate",
+      "empty": "Niente in magazzino."
+    },
+    "tracker": {
+      "title": "Incursione",
+      "objective": "Obiettivo",
+      "module": "Modulo {current} di {total}",
+      "affix": "Affissi",
+      "complete": "Completata",
+      "marks": "Sigilli d'Incursione: {count}",
+      "exitHintOpen": "Entra nel passaggio della lapide (a nord)",
+      "exitHintLocked": "Ripulisci i nemici per aprire il passaggio a nord"
+    },
+    "objective": {
+      "kill_boss": "Uccidi {boss}",
+      "recover_artifact": "Recupera il registro funebre",
+      "clear_room": "Ripulisci la stanza"
+    },
+    "summary": {
+      "title": "Incursione Completata",
+      "marks": "{count} Sigilli d'Incursione ottenuti",
+      "loreUnlock": "Conoscenza sbloccata: {title}"
+    },
+    "death": {
+      "warning": "Un'altra morte porrà fine a questa incursione."
+    },
+    "run": {
+      "failed": "L'incursione è fallita. Vieni riportato da Fratello Halven."
+    },
+    "npc": {
+      "halven": {
+        "greeting": "Il reliquiario sottostante si è spostato di nuovo. Sentiamo nenie attraverso il pavimento dopo mezzanotte, e l'Accolita Tessa giura che i registri funebri stanno cambiando il proprio inchiostro. Se hai abbastanza coraggio, {playerName}, prendi una candela e scendi laggiù. Non fidarti di ogni voce che sentirai là sotto. Alcune di esse conoscevano il tuo nome prima che tu nascessi."
+      }
+    },
+    "intro": {
+      "normal": "La tromba delle scale è fredda e buia. Pietre dei santi spezzate cospargono la discesa, e una lieve nota di campana indugia nell'aria umida. L'Accolita Tessa sussurra: \"Il reliquiario non dovrebbe essere aperto fin quaggiù. Resta vicino, {playerName}.\"",
+      "heroic": "Le porte si chiudono cigolando dietro di te. I nomi raschiano sulla pietra come unghie. La candela di Tessa arde azzurra. \"Adesso non stanno chiamando i morti, {playerName}. Stanno rispondendo a qualcosa.\""
+    },
+    "module": {
+      "reliquary_sunken_ossuary": "L'acqua filtra attraverso gli scaffali sepolcrali, trascinando cenere antica in rivoli argento-neri.",
+      "reliquary_bell_niche": "Decine di campanelli pendono nel silenzio, ciascuno legato con un drappo funebre.",
+      "reliquary_saintless_hall": "Statue con i volti scalpellati via con accurato odio.",
+      "reliquary_finale": "La campana sepolta rintocca una volta sotto i tuoi stivali."
+    },
+    "moduleName": {
+      "reliquary_sunken_ossuary": "L'Ossario Sommerso",
+      "reliquary_bell_niche": "La Nicchia della Campana",
+      "reliquary_saintless_hall": "La Sala senza Santi",
+      "reliquary_finale": "La Stanza della Campana Sepolta"
+    },
+    "companion": {
+      "barkLine": "{name}: {line}",
+      "tessa": {
+        "combat_start": "Tieni saldo il passo, {playerName}. I morti sono inquieti qui.",
+        "low_hp": "Respira. Mi restano ancora preghiere per te.",
+        "trap_spotted": "Fermati: qualcosa nel pavimento ricorda i passi.",
+        "boss_pull": "Quella campana conosce il tuo peso, {playerName}. Non inginocchiarti.",
+        "completion": "Il registro può riposare un'altra notte. Ben fatto.",
+        "rank": {
+          "1": "Novizia della Cappella",
+          "2": "Portatrice di Candele",
+          "3": "Accolita del Reliquiario",
+          "4": "Testimone del Richiamo Sepolcrale",
+          "5": "Custode della Cappella"
+        }
+      }
+    },
+    "boss": {
+      "varric": {
+        "bell": {
+          "emote": "Il Diacono Varric afferra la campana sepolta con entrambe le mani!",
+          "log": "Il Diacono Varric inizia a far rintoccare la campana funebre.",
+          "warning": "Allontanati dal Diacono Varric!",
+          "impact": "Il rintocco della campana spacca il pavimento della camera!",
+          "lesson": "Rintocco della Campana: un colpo al suolo ogni dodici secondi. Allontanati prima che cada."
+        },
+        "raise": {
+          "emote": "Il Diacono Varric richiama i nomi dalle tombe spezzate!",
+          "log": "Il Diacono Varric inizia a evocare i morti.",
+          "warning": "Ferma il rito sepolcrale!",
+          "object": "La tomba incrinata freme di un respiro rubato.",
+          "interrupt_ok": "Il rito sepolcrale vacilla.",
+          "interrupt_fail": "I morti rispondono al richiamo del Diacono Varric!",
+          "lesson": "Interrompi la tomba incrinata entro cinque secondi o i morti si leveranno al suo richiamo."
+        },
+        "pull": "Calpesti la polvere consacrata con propositi immondi. Inginocchiati, e fatti contare.",
+        "intro": "Nessun'anima è perduta. Solo smarrita.",
+        "mid60": "Il Diacono Varric legge i nomi dal registro con tremante trionfo.",
+        "mid30": "La campana funebre risponde a ogni nome che pronuncia.",
+        "defeat": "No... avevo i nomi... li avevo tutti..."
+      }
+    },
+    "lore": {
+      "eastbrook_ledger": "Una pagina macchiata d'acqua dal registro funebre di Eastbrook. Nomi cancellati e riscritti da una mano che non è umana.",
+      "first_collapse": "Gli annali della cappella riportano il primo cedimento: pietre dei santi incrinate, scaffali inclinati, e una nota di campana udita dal sottosuolo.",
+      "gravecaller_mark": "Un sigillo inciso nel legno di una bara: non il marchio di Morthen, ma un più antico segno di evocatombe che precede la Cripta Vuota.",
+      "bell_below": "Nota a margine di Tessa: \"C'è una seconda campana sotto il reliquiario. Rintocca per gli smarriti, non per i morti.\"",
+      "tessa_note": "Foglietto piegato nella grafia di Tessa: \"Se i registri cambiano mentre siamo quaggiù, fidati della candela, non delle voci.\""
+    },
+    "affix": {
+      "restless_graves": "Tombe Inquiete",
+      "bad_air": "Aria Viziata",
+      "candleblind": "Cecità da Candele",
+      "old_mechanisms": "Vecchi Meccanismi",
+      "flooded_paths": "Vie Allagate",
+      "grave_tax": "Tributo delle Tombe",
+      "unstable_roof": "Volta Instabile",
+      "cult_remnants": "Resti del Culto"
+    },
+    "blessing": {
+      "chapel_candle": "Candela della Cappella: incursione più sicura, un Sigillo d'Incursione in meno al completamento."
+    },
+    "chest": {
+      "flavor": "I morti hanno ceduto ciò che potevano risparmiare."
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "Unisciti alla Fiesta!",
@@ -1981,7 +2618,14 @@ export const it_IT: EnTranslations = {
     "portraitAlt": "Ritratto di {name}",
     "viewProfile": "Vedi profilo",
     "profile": "Profilo",
-    "closeProfile": "Chiudi profilo"
+    "closeProfile": "Chiudi profilo",
+    "sortBy": "Ordina",
+    "sortByLabel": "Ordina personaggi",
+    "sortMenuLabel": "Opzioni di ordinamento",
+    "sortLevel": "Livello",
+    "sortName": "Nome",
+    "sortRecent": "Giocati di recente",
+    "sortPlaytime": "Tempo di gioco"
   },
   "deleteCharacter": {
     "title": "Elimina personaggio",
@@ -2038,7 +2682,7 @@ export const it_IT: EnTranslations = {
     "lore": {
       "warrior": "I guerrieri sono combattenti temprati che accumulano rabbia infliggendo o subendo danni. Incassano colpi pesanti o schiacciano i nemici.",
       "paladin": "I paladini sono crociati sacri che aiutano con benedizioni, curano con Luce Sacra e proteggono i deboli con armature robuste.",
-      "hunter": "I cacciatori dominano le terre selvagge, seguono i nemici da lontano con archi o armi da fuoco e controllano il campo con trappole.",
+      "hunter": "I cacciatori sono specialisti a distanza che combattono al fianco di una bestia addomesticata, tempestando i nemici con tiri mirati e rapidi, rallentandoli con punture e tiri storditori, e cambiando aspetto a seconda del momento.",
       "rogue": "I ladri sono assassini furtivi che spendono energia e punti combo per colpire dalle ombre.",
       "priest": "I sacerdoti invocano la Luce Sacra per curare e proteggere, mentre la magia d'Ombra prosciuga la vita nemica.",
       "shaman": "Gli sciamani comandano gli elementi, infondono potere nelle armi, colpiscono con fulmini e curano gli alleati.",
@@ -2133,7 +2777,9 @@ export const it_IT: EnTranslations = {
       "mobileMap": "Mappa",
       "closeMap": "Chiudi mappa",
       "zoomIn": "Aumenta zoom",
-      "zoomOut": "Riduci zoom"
+      "zoomOut": "Riduci zoom",
+      "mapCanvasLabel": "Mappa",
+      "mapSummary": "Mappa di {zone}."
     },
     "options": {
       "gameMenu": "Menu di gioco",
@@ -2334,6 +2980,7 @@ export const it_IT: EnTranslations = {
     "combat": {
       "floatingMiss": "Mancato",
       "floatingDodge": "Schivata",
+      "floatingResist": "Resistito",
       "cannotMove": "Non puoi muoverti!",
       "attack": "attacco",
       "damageDone": "Il tuo {ability} colpisce {target} per {amount}.",
@@ -2342,6 +2989,7 @@ export const it_IT: EnTranslations = {
       "damageTakenCrit": "{source} ti colpisce criticamente per {amount}.",
       "miss": "Il tuo {ability} manca {target}.",
       "dodged": "{target} schiva il tuo {ability}.",
+      "resisted": "{target} resiste al tuo {ability}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
       "healOther": "Il tuo {ability} cura {target} di {amount}.",
@@ -2459,6 +3107,8 @@ export const it_IT: EnTranslations = {
       "lootReceiveMoney": "Ricevi {money}.",
       "lootMoney": "Raccogli {money}.",
       "soldItem": "Hai venduto {item} per {money}.",
+      "soldJunkOne": "Hai venduto {count} oggetto grigio per {money}.",
+      "soldJunkMany": "Hai venduto {count} oggetti grigi per {money}.",
       "friendOnline": "{name} è entrato online.",
       "friendOffline": "{name} è uscito offline."
     },
@@ -2862,7 +3512,10 @@ export const it_IT: EnTranslations = {
       "sellQuantityTitle": "Vendi {item}",
       "sellQuantityInput": "Quantità da vendere",
       "sellQuantityConfirm": "Vendi",
-      "sellQuantityCancel": "Annulla"
+      "sellQuantityCancel": "Annulla",
+      "sellJunk": "Vendi cianfrusaglie",
+      "sellJunkAria": "Vendi tutte le cianfrusaglie per {price}",
+      "sellJunkHint": "Vende tutti gli oggetti grigi nelle borse tranne gli oggetti di missione."
     },
     "market": {
       "title": "Mercato Mondiale",
@@ -3067,7 +3720,7 @@ export const it_IT: EnTranslations = {
       },
       "arcane_missiles": {
         "name": "Dardi Arcani",
-        "description": "Lancia Dardi Arcani contro il nemico, infliggendo 8 danni Arcani ogni secondo per 3 s."
+        "description": "Lancia Dardi Arcani contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s."
       },
       "polymorph": {
         "name": "Metamorfosi",
@@ -3131,7 +3784,7 @@ export const it_IT: EnTranslations = {
       },
       "stealth": {
         "name": "Furtività",
-        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 30% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
+        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Furtività. Lanciala di nuovo per uscire."
       },
       "adrenaline_rush": {
         "name": "Scarica di Adrenalina",
@@ -3163,7 +3816,7 @@ export const it_IT: EnTranslations = {
       },
       "vanish": {
         "name": "Eclissarsi",
-        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 30% più lentamente mentre sei nascosto. Dura fino a 10 sec."
+        "description": "Scompari dalla vista, entrando in Furtività anche in combattimento. Ti muovi il 50% più lentamente mentre sei nascosto. Dura fino a 10 sec."
       },
       "instant_poison": {
         "name": "Veleno Istantaneo",
@@ -3315,7 +3968,7 @@ export const it_IT: EnTranslations = {
       },
       "mind_flay": {
         "name": "Flagello Mentale",
-        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo 12 danni ogni secondo per 3 s."
+        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s."
       },
       "flash_heal": {
         "name": "Cura Rapida",
@@ -3391,7 +4044,7 @@ export const it_IT: EnTranslations = {
       },
       "drain_life": {
         "name": "Risucchio di Vita",
-        "description": "Risucchia la vita del bersaglio, trasferendoti 7 salute ogni secondo per 5 s."
+        "description": "Risucchia la vita del bersaglio, trasferendoti {damage} salute ogni secondo per 5 s."
       },
       "fear": {
         "name": "Paura",
@@ -3571,7 +4224,7 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Agguato",
-        "description": "Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Sventramento",
@@ -3874,8 +4527,8 @@ export const it_IT: EnTranslations = {
       "ridge_stalker_pelt": {
         "name": "Pelliccia di predatore del crinale"
       },
-      "pristine_ridge_stalker_pelt": {
-        "name": "Pelliccia immacolata di predatore del crinale"
+      "old_cragmaws_pelt": {
+        "name": "Pelliccia del Vecchio Cragmaw"
       },
       "glowing_wax": {
         "name": "Cera luminosa"
@@ -4450,6 +5103,33 @@ export const it_IT: EnTranslations = {
       "wyrmshadow_talongrips": {
         "name": "Prese Artiglio Ombrawyrm"
       },
+      "reliquary_plate_chest": {
+        "name": "Usbergo della guardia del reliquiario"
+      },
+      "reliquary_leather_chest": {
+        "name": "Giaco del guardiano della polvere"
+      },
+      "reliquary_cloth_chest": {
+        "name": "Sudario del reliquiario"
+      },
+      "reliquary_legs": {
+        "name": "Gambiere della cripta"
+      },
+      "reliquary_helm": {
+        "name": "Elmo della guardia dell'ossario"
+      },
+      "reliquary_shoulder": {
+        "name": "Spallacci sgretolati"
+      },
+      "reliquary_gloves_rog": {
+        "name": "Manopole del guardiano delle ossa"
+      },
+      "deacon_reliquary_helm": {
+        "name": "Elmo del reliquiario del diacono"
+      },
+      "varric_shadow_cowl": {
+        "name": "Cappuccio d'ombra di Varric"
+      },
       "the_codfather": {
         "name": "Il Pescadrino"
       },
@@ -4740,6 +5420,27 @@ export const it_IT: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagello di Thornpeak"
       },
+      "reliquary_ledger_wraith": {
+        "name": "Spettro del Registro"
+      },
+      "reliquary_funeral_ringer": {
+        "name": "Campanaro Funebre"
+      },
+      "reliquary_gravecall_acolyte": {
+        "name": "Accolito del Richiamo Sepolcrale"
+      },
+      "reliquary_bonewalker": {
+        "name": "Camminaossa Risorto"
+      },
+      "reliquary_saintless_effigy": {
+        "name": "Effigie Senza Santo"
+      },
+      "deacon_varric": {
+        "name": "Diacono Varric"
+      },
+      "acolyte_tessa": {
+        "name": "Accolita Tessa"
+      },
       "ironvein_foreman": {
         "name": "Caposquadra Venaferrata"
       },
@@ -4949,6 +5650,11 @@ export const it_IT: EnTranslations = {
         "name": "Fratello Aldric",
         "title": "Sacerdote della Valle",
         "greeting": "Dal camposanto della cappella al tetto del mondo... la pista finisce qui. Sento la montagna ascoltare."
+      },
+      "brother_halven": {
+        "name": "Fratello Halven",
+        "title": "Custode del Reliquiario",
+        "greeting": "Il reliquiario sottostante si è spostato di nuovo."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -5804,6 +6510,9 @@ export const it_IT: EnTranslations = {
           },
           "8": {
             "label": "Radura di Brightwood"
+          },
+          "9": {
+            "label": "Radura di Brightwood"
           }
         }
       },
@@ -5905,12 +6614,59 @@ export const it_IT: EnTranslations = {
         "enterText": "Attraversi il cancello lunare — l'aria si fa acqua gelida e luce pallida, e il canto si richiude sopra la tua testa.",
         "leaveText": "Riemergi attraverso il cancello lunare nella notte della montagna."
       }
+    },
+    "delves": {
+      "collapsed_reliquary": {
+        "name": "Il Reliquiario Crollato",
+        "enterText": "Scendi nel reliquiario crollato.",
+        "leaveText": "Risali da Fratello Halven, alla rovina del reliquiario."
+      }
+    },
+    "itemSets": {
+      "crownforged": {
+        "name": "Tenuta da battaglia Forgiacorona",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta la forza di 15 e la vigoria di 15."
+      },
+      "deathlord": {
+        "name": "Tenuta da battaglia del Signore della Morte",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta la forza di 15 e la vigoria di 15."
+      },
+      "necromancers": {
+        "name": "Vesti del negromante",
+        "bonus2": "Riduce del 50% il ritardo al lancio causato dai danni.",
+        "bonus3": "I danni subiti non ritardano il lancio degli incantesimi."
+      },
+      "nighttalon": {
+        "name": "Tenuta di cuoio Artiglio Notturno",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta l’agilità di 15 e la probabilità di critico del 2%."
+      },
+      "soulflame": {
+        "name": "Vesti Fiamma dell’Anima",
+        "bonus2": "Riduce del 50% il ritardo al lancio causato dai danni.",
+        "bonus3": "I danni subiti non ritardano il lancio degli incantesimi."
+      },
+      "stormcallers": {
+        "name": "Vesti del Chiamatempeste",
+        "bonus2": "Riduce del 50% il ritardo al lancio causato dai danni.",
+        "bonus3": "I danni subiti non ritardano il lancio degli incantesimi."
+      },
+      "wyrmshadow": {
+        "name": "Tenuta Ombra del Dragone",
+        "bonus2": "Aumenta la potenza d'attacco di 40.",
+        "bonus3": "Aumenta l’agilità di 15 e la probabilità di critico del 2%."
+      }
     }
   },
   "worldContent": {
     "corpseName": "{name} (cadavere)",
     "dungeonExitName": "Uscita da {name}",
     "dungeonPartyWarning": "{name} è pensato per un gruppo completo di {count}. Procedi con cautela.",
-    "dungeonInstanceBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco."
+    "dungeonInstanceBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco.",
+    "delveLockedChestInteract": "Premi F per scassinare la serratura",
+    "delveRewardChestInteract": "Premi F per reclamare il bottino",
+    "delveSurfaceExitInteract": "Premi F per risalire"
   }
 };

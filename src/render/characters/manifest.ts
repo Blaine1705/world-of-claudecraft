@@ -4,7 +4,8 @@
 
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { MOBS } from '../../sim/data';
-import type { Entity } from '../../sim/types';
+import type { Entity, PlayerClass } from '../../sim/types';
+import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 
 export interface EmoteClipSpec {
@@ -61,6 +62,12 @@ export interface VisualDef {
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
   attach?: AttachDef[];
+  /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
+   *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
+   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). Usually [0]
+   *  (the mainhand); the rogue lists [0, 1] so a dagger shows in BOTH hands. A fixed
+   *  offhand left off this list stays as authored (the warlock spellbook). */
+  weaponSlots?: number[];
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -80,6 +87,11 @@ export interface VisualDef {
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
 }
+
+/** The slice of a VisualDef that decides how held weapons attach (which bones, and
+ *  which slots swap to the equipped item). Lets a cosmetic body adopt a different
+ *  class's hand layout without cloning the whole def. */
+export type WeaponLayoutOverride = Pick<VisualDef, 'attach' | 'weaponSlots'>;
 
 // ---------------------------------------------------------------------------
 // Clip sets per source rig family
@@ -213,6 +225,22 @@ const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 
+/** GLB url for an equipped mainhand item's held weapon model, or null if the item
+ *  has no mapped model (then the class default attach is kept). Mirrors the bag
+ *  icon via the shared ITEM_WEAPON_VARIANTS map, so held weapon == inventory icon. */
+export function itemWeaponModelUrl(itemId: string | null | undefined): string | null {
+  if (!itemId) return null;
+  const key = ITEM_WEAPON_VARIANTS[itemId];
+  return key ? `${WEAPONS}/${key}.glb` : null;
+}
+
+/** Distinct held-weapon GLB urls (one per variant), for the boot preload sweep so
+ *  setWeapon can attach any equipped weapon synchronously (resolvedGltf throws on
+ *  an un-preloaded url). */
+export function itemWeaponModelUrls(): string[] {
+  return [...new Set(Object.values(ITEM_WEAPON_VARIANTS).map((key) => `${WEAPONS}/${key}.glb`))];
+}
+
 const LOW_URL_ALIAS: Record<string, string> = {
   'models/chars/players/rogue_hooded.glb': 'models/chars/players/rogue.glb',
 };
@@ -331,6 +359,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
   },
   player_paladin: {
     url: `${PLAYERS}/paladin.glb`,
@@ -340,6 +369,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
     attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
   },
   player_hunter: {
     url: `${PLAYERS}/ranger.glb`,
@@ -358,6 +388,7 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
     ],
+    weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
   },
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
@@ -365,6 +396,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
     tint: 0xf0e9d6,
     tintStrength: 0.5,
   },
@@ -374,6 +406,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
     attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
     tint: 0x6f8fc9,
     tintStrength: 0.4,
   },
@@ -385,6 +418,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // chase-camera pitch (NPC mages keep theirs — they're seen from the side)
     show: ['Mage_Cape'],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
   },
   player_warlock: {
     url: `${PLAYERS}/mage.glb`,
@@ -395,6 +429,7 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
     ],
+    weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
     tint: 0x8d5fd3,
     tintStrength: 0.45,
   },
@@ -404,6 +439,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     // dedicated druid model (own texture, ships a Backpack mesh)
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
   },
 
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
@@ -416,6 +452,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
     // resolve like any other class. Lazy-loaded; see preloadMechAssets().
     clips: kaykit(['1H_Melee_Attack_Chop']),
+    // Class-agnostic cosmetic body, but it still holds the wearer's equipped
+    // mainhand: the shared handslot.r bone carries the grip (the mech reuses the
+    // exact KayKit rig), so weaponSlots swaps attach[0] to the equipped weapon's
+    // model just like every other class. The sword is only the no-weapon default.
+    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
     lazyPreload: true,
   },
 
@@ -574,6 +616,56 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.35,
   },
 
+  // -- delve-specific variants (same rigs, colour-differentiated via mob.color) -
+  delve_skel_wraith: {
+    // Ledger Wraith: pale skeleton, no weapon, stronger wash reads as near-transparent
+    url: `${ENEMIES}/skeleton_minion.glb`,
+    height: 2.5,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+  delve_skel_ringer: {
+    // Funeral Ringer: skeleton rogue rig, cloth-brown tint at mid strength
+    url: `${ENEMIES}/skeleton_rogue.glb`,
+    height: 2.5,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attach: [{ url: `${WEAPONS}/skeleton_axe.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.45,
+  },
+  delve_mob_acolyte: {
+    // Gravecall Acolyte: hooded mage with hat + staff, deep dark-brown saturation
+    url: `${PLAYERS}/mage.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    show: ['Mage_Hat'],
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.6,
+  },
+  delve_skel_effigy: {
+    // Saintless Effigy: armoured skeleton, high stone-pale wash, reads as carved stone
+    url: `${ENEMIES}/skeleton_warrior.glb`,
+    height: 2.5,
+    clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attach: [
+      { url: `${WEAPONS}/skeleton_blade.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/skeleton_shield_large_a.glb`, bone: 'handslot.l' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.65,
+  },
+  delve_skel_varric: {
+    // Deacon Varric: boss mage rig with Taunt flourish on pull
+    url: `${ENEMIES}/skeleton_mage.glb`,
+    height: 2.5,
+    clips: skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
+    attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+
   // -- undead (KayKit skeletons, shared 41-joint rig) ------------------------
   skel_minion: {
     url: `${ENEMIES}/skeleton_minion.glb`,
@@ -723,6 +815,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Brother Halven, the Reliquary Keeper: a devout male guardian tending the crypt
+  // door. Uses the KayKit paladin, one of the newer full-pack adventurer models
+  // (unused elsewhere), for a sturdier, holier silhouette than the old hooded
+  // rogue. Ships its accessories (helm/cape/shield) by default (no show filter).
+  npc_reliquary_keeper: {
+    url: `${PLAYERS}/paladin.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -763,6 +864,12 @@ const MOB_KEYS: Record<string, string> = {
   sexton_marrow: 'skel_mage',
   morthen: 'skel_boss',
   crypt_shambler: 'skel_rogue',
+  // delve enemies
+  reliquary_ledger_wraith: 'delve_skel_wraith',
+  reliquary_funeral_ringer: 'delve_skel_ringer',
+  reliquary_gravecall_acolyte: 'delve_mob_acolyte',
+  reliquary_saintless_effigy: 'delve_skel_effigy',
+  deacon_varric: 'delve_skel_varric',
   fallen_captain_aldren: 'skel_warrior',
   corrupted_priest_malric: 'skel_necromancer',
   deathstalker_voss: 'skel_rogue',
@@ -801,6 +908,7 @@ const NPC_KEYS: Record<string, string> = {
   fisherman_brandt: 'npc_villager',
   provisioner_hale: 'npc_villager',
   quartermaster_bree: 'npc_villager',
+  brother_halven: 'npc_reliquary_keeper',
 };
 
 export function visualKeyFor(e: Entity): string {
@@ -819,6 +927,18 @@ export function visualKeyFor(e: Entity): string {
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
 }
 
+/** Held-weapon layout override for the class-agnostic Combat Mech body. The mech
+ *  keeps its own model and clips but adopts the WEARER class's hand layout, so a
+ *  dual-wield class (the rogue) shows the equipped weapon in BOTH hands on the mech
+ *  (it shares the KayKit handslot.r/.l bones). Non-dual classes return null and keep
+ *  the mech's own single-mainhand default. Host-agnostic: the wearer's class arrives
+ *  as a player entity's templateId, so this applies the same offline and online. */
+export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride | null {
+  const classDef = VISUALS[`player_${cls}`];
+  if (!classDef || (classDef.weaponSlots?.length ?? 0) < 2) return null;
+  return { attach: classDef.attach, weaponSlots: classDef.weaponSlots };
+}
+
 /** Every glb the manifest can reference (for preloading). */
 export function manifestUrls(): string[] {
   const urls = new Set<string>();
@@ -828,6 +948,9 @@ export function manifestUrls(): string[] {
     for (const url of def.animUrls ?? []) urls.add(url);
     for (const a of def.attach ?? []) urls.add(a.url);
   }
+  // Equipped-weapon models a player may swap to at runtime (any nearby player's
+  // gear), so they are resolved-and-ready when setWeapon attaches them.
+  for (const url of itemWeaponModelUrls()) urls.add(url);
   return [...urls];
 }
 
@@ -839,6 +962,31 @@ export function manifestUrlsForGraphics(standardMaterials: boolean): string[] {
   return [
     ...new Set(manifestUrls().map((url) => visualAssetUrlForGraphics(url, standardMaterials))),
   ];
+}
+
+/**
+ * The character/weapon GLB URLs to PRELOAD, given the graphics tier guessed when
+ * assets.ts was first imported. This MUST be tier-INDEPENDENT (a superset of every
+ * tier's placement set).
+ *
+ * Character placement resolves asset URLs against the LIVE GFX tier through
+ * assetUrl()/visualAssetUrlForGraphics, and resolvedGltf() throws "character asset not
+ * preloaded" synchronously when the resolved URL was never loaded. The live tier is
+ * set by initGfxTier() inside the Renderer constructor, AFTER assets.ts froze its
+ * import-time GFX best-guess. On low gfx, LOW_URL_ALIAS swaps one body GLB
+ * (rogue_hooded.glb -> rogue.glb), so manifestUrlsForGraphics(false) is a STRICT
+ * subset of manifestUrlsForGraphics(true). If the import-time guess is low but the
+ * renderer resolves medium+, the very common mob_bandit body (rogue_hooded.glb, the
+ * humanoid-family default AND the global mob fallback) is placed yet was never
+ * preloaded, crashing world entry: the character-side twin of the v0.16.0 props P0.
+ * So preload the UNION across both tiers, exactly as foliage.ts is immune by sourcing
+ * one frozen list for both preload and placement.
+ *
+ * The arg is retained to document the invariant and to let the guard test assert it at
+ * the lowest (most dangerous) import tier; the result intentionally ignores it.
+ */
+export function characterPreloadUrls(_importTierStandardMaterials: boolean): string[] {
+  return [...new Set([...manifestUrlsForGraphics(true), ...manifestUrlsForGraphics(false)])];
 }
 
 export function visibleAttachmentsForGraphics(

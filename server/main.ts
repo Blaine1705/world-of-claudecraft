@@ -1,59 +1,166 @@
-import * as http from 'node:http';
 import * as fs from 'node:fs';
+import * as http from 'node:http';
 import * as path from 'node:path';
-import { WebSocketServer, WebSocket } from 'ws';
+import { type WebSocket, WebSocketServer } from 'ws';
 import {
-  ensureSchema, pool, createAccount, findAccount, accountForIdentity, linkAccountIdentity, getAccountsCount, touchLogin, saveToken, accountForToken,
-  listCharacters, getCharacter, createCharacterCapped, reclaimDeactivatedName, deleteCharacter, closeOrphanSessions,
-  pruneChatLogs, pruneClientPerfReports, searchCharacters, characterCountsByRealm, moderationStatusForAccount, renameCharacter,
-  findCharacterReportTargetByName, topArenaRatings, topLifetimeXp, chatMuteStatusForAccount, loadAccountCosmetics,
-  referralCountForAccount, primarySlugForAccount, lifetimeXpStanding, isAdminAccount,
-  accountById, characterCountForAccount, updatePasswordHash, revokeTokensExcept, setAccountEmail, setAccountDeactivated,
-} from './db';
-import { consumeDesktopLoginCode, createDesktopLoginCode } from './desktop_login';
-import { normalizeSteamTicket, verifySteamAuthTicket } from './steam_auth';
-import { virtualLevel } from '../src/sim/types';
-import { paginateLeaderboard, LEADERBOARD_PAGE_SIZE, LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
+  LEADERBOARD_MAX,
+  LEADERBOARD_PAGE_SIZE,
+  paginateGuildLeaderboard,
+  paginateLeaderboard,
+} from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
-import type { LeaderboardEntry } from '../src/world_api';
-import { cleanReportReason, createPlayerReport, createSuspiciousRegistrationReport } from './moderation_db';
-import { createBugReport, BugReportRateLimitError, BUG_DESCRIPTION_MAX } from './bug_report_db';
-import { resolveReportTarget } from './report_target';
-import { bufferHandshakeMessages } from './ws_buffer';
+import { virtualLevel } from '../src/sim/types';
+import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 import {
-  hashPassword, verifyPassword, newToken, validUsernameShape, offensiveName, validPassword, normalizeCharName,
-} from './auth';
-import { json, readBody, isUniqueViolation } from './http_util';
-import { requestIp, rateLimited, authThrottled, recordAuthFailure, clearAuthFailures, cardUploadRateLimited, wocBalanceRateLimited } from './ratelimit';
-import { verifyTurnstile } from './turnstile';
-import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from './wallet';
-import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
-import {
-  handleAccountWhoami, handleAccountChangePassword, handleAccountLogout, handleAccountSetEmail, handleAccountDeactivate,
-  handleAccountEmailChange, handleAccountEmailVerify, handleAccountExport, handleAccountMarketing, handleEmailUnsubscribe,
-  handleAccount2faSetup, handleAccount2faEnable, handleAccount2faDisable, verifyLoginTwoFactor,
+  handleAccount2faDisable,
+  handleAccount2faEnable,
+  handleAccount2faSetup,
+  handleAccountChangePassword,
+  handleAccountDeactivate,
+  handleAccountEmailChange,
+  handleAccountEmailVerify,
+  handleAccountExport,
+  handleAccountLogout,
+  handleAccountMarketing,
+  handleAccountSetEmail,
+  handleAccountWhoami,
+  handleEmailUnsubscribe,
+  verifyLoginTwoFactor,
 } from './account';
-import { emailAccountCreated } from './email';
-import { handleCardUpload, handleCardRoutes, captureReferral, cardUploadContentLengthTooLarge } from './player_card';
 import { handleAdminApi } from './admin';
-import { pruneExpiredBlockedIps } from './ip_block_db';
-import { isConnectionRefused } from './ip_block';
-import { handleInternalApi } from './internal';
-import { handlePerfReport } from './perf_report';
+import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
+import {
+  hashPassword,
+  newToken,
+  normalizeCharName,
+  offensiveName,
+  validPassword,
+  validUsernameShape,
+  verifyPassword,
+} from './auth';
+import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { characterSheet, type SheetRank } from './character_sheet';
+import {
+  accountAndScopeForToken,
+  accountById,
+  accountForIdentity,
+  accountForToken,
+  type CharacterRow,
+  characterCountsByRealm,
+  chatMuteStatusForAccount,
+  closeOrphanSessions,
+  createAccount,
+  createCharacterCapped,
+  createCompanionToken,
+  deleteCharacter,
+  ensureSchema,
+  findAccount,
+  findCharacterReportTargetByName,
+  getAccountsCount,
+  getCharacter,
+  getCharacterById,
+  guildNameForCharacter,
+  isAdminAccount,
+  lifetimeXpRankForCharacter,
+  lifetimeXpStanding,
+  linkAccountIdentity,
+  listCharacters,
+  listCompanionTokens,
+  loadAccountCosmetics,
+  moderationStatusForAccount,
+  pool,
+  primarySlugForAccount,
+  pruneChatLogs,
+  pruneClientPerfReports,
+  reclaimDeactivatedName,
+  referralCountForAccount,
+  renameCharacter,
+  revokeCompanionToken,
+  saveToken,
+  scopeAllowsMutation,
+  searchCharacters,
+  setAccountEmail,
+  type TokenScope,
+  topArenaRatings,
+  topGuilds,
+  topLifetimeXp,
+  touchLogin,
+} from './db';
+import { consumeDesktopLoginCode, createDesktopLoginCode } from './desktop_login';
+import {
+  handleDiscordCallback,
+  handleDiscordLoginLink,
+  handleDiscordLoginNew,
+  handleDiscordStart,
+  handleDiscordStatus,
+  handleDiscordUnlink,
+} from './discord';
+import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
+import { emailAccountCreated } from './email';
 import { GameServer } from './game';
-import { REALM, REALM_DIRECTORY, REALM_ORIGINS } from './realm';
-import { webLoginEnforced, isWebClientRequest, isNativeAppRequest, NATIVE_APP_ORIGINS, DESKTOP_APP_ORIGINS } from './web_login_guard';
+import { isUniqueViolation, json, readBody } from './http_util';
+import { handleInternalApi } from './internal';
+import { isConnectionRefused } from './ip_block';
+import { pruneExpiredBlockedIps } from './ip_block_db';
+import {
+  cleanReportReason,
+  createPlayerReport,
+  createSuspiciousRegistrationReport,
+} from './moderation_db';
 import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
-import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import { handleOAuth, seedOAuthClients } from './oauth';
+import { pruneExpiredOAuthGrants } from './oauth_db';
+import { handlePerfReport } from './perf_report';
+import {
+  captureReferral,
+  cardUploadContentLengthTooLarge,
+  handleCardRoutes,
+  handleCardUpload,
+} from './player_card';
+import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
+import {
+  authThrottled,
+  cardUploadRateLimited,
+  clearAuthFailures,
+  discordRateLimited,
+  publicReadRateLimited,
+  rateLimited,
+  recordAuthFailure,
+  requestIp,
+  wocBalanceRateLimited,
+} from './ratelimit';
+import {
+  isPublicCorsPath,
+  publicOriginFromRequest,
+  REALM,
+  REALM_DIRECTORY,
+  REALM_ORIGINS,
+} from './realm';
+import { resolveReportTarget } from './report_target';
+import { handleSitePresenceHeartbeat } from './site_presence';
+import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import { normalizeSteamTicket, type SteamAuthResult, verifySteamAuthTicket } from './steam_auth';
+import { verifyTurnstile } from './turnstile';
+import {
+  handleWalletChallenge,
+  handleWalletGet,
+  handleWalletLink,
+  handleWalletUnlink,
+} from './wallet';
+import {
+  DESKTOP_APP_ORIGINS,
+  isNativeAppRequest,
+  isWebClientRequest,
+  NATIVE_APP_ORIGINS,
+  webLoginEnforced,
+} from './web_login_guard';
+import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
-// DEPRECATED: the standalone community MediaWiki is being retired in favour of the
-// curated in-app guide, which now serves at /wiki. This constant and its (now removed)
-// /wiki -> MediaWiki redirect are dead and slated for deletion in a follow-up ticket.
-const WIKI_URL = process.env.WIKI_URL ?? 'http://localhost:8080/wiki/index.php/Main_Page';
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
   ['/links', '/links.html'],
@@ -70,6 +177,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/terms/', '/terms.html'],
   ['/merch', '/merch.html'],
   ['/merch/', '/merch.html'],
+  ['/press', '/press.html'],
+  ['/press/', '/press.html'],
   ['/data-deletion', '/data-deletion.html'],
   ['/data-deletion/', '/data-deletion.html'],
   ['/support', '/support.html'],
@@ -82,6 +191,7 @@ const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90
 // Client performance reports are operational telemetry, not permanent records.
 // Keep enough history for tuning runs while bounding table growth.
 const PERF_REPORT_RETENTION_DAYS = Number(process.env.PERF_REPORT_RETENTION_DAYS ?? 14);
+const ADMIN_ONLINE_SAMPLE_MS = 60_000;
 // Cloudflare Turnstile secret. When unset (local dev / tests) registration and
 // login skip human verification entirely — see requireTurnstile below.
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET ?? '';
@@ -93,10 +203,16 @@ const BLOCKED_IP_REFRESH_MS = 60_000;
 
 const game = new GameServer();
 
-function initialCharacterState(cls: PlayerClass, name: string, skin: number): import('../src/sim/sim').CharacterState {
+function initialCharacterState(
+  cls: PlayerClass,
+  name: string,
+  skin: number,
+): import('../src/sim/sim').CharacterState {
   const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
-  return sim.serializeCharacter(sim.playerId)!;
+  const character = sim.serializeCharacter(sim.playerId);
+  if (!character) throw new Error('failed to serialize initial character');
+  return character;
 }
 
 // ---------------------------------------------------------------------------
@@ -111,7 +227,10 @@ const LEADERBOARD_TTL_MS = 30_000;
 const LEADERBOARD_SIZE = LEADERBOARD_MAX;
 // One cache per scope: 'realm' for the in-game panel, 'global' for the
 // cross-realm home-page board.
-const leaderboardCache: Record<'realm' | 'global', { at: number; entries: LeaderboardEntry[] } | null> = {
+const leaderboardCache: Record<
+  'realm' | 'global',
+  { at: number; entries: LeaderboardEntry[] } | null
+> = {
   realm: null,
   global: null,
 };
@@ -139,6 +258,44 @@ async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEnt
     return await refreshLeaderboard(scope);
   } catch (err) {
     console.error(`leaderboard refresh failed (${scope}):`, err);
+    return cached?.entries ?? [];
+  }
+}
+
+// Guild high-score board cache. Same compute-once/serve-from-memory shape as the
+// player board above, one cache per scope. Guilds are ranked by summed member
+// lifetime XP (topGuilds); the REST handler pages through the cached window.
+const guildLeaderboardCache: Record<
+  'realm' | 'global',
+  { at: number; entries: GuildLeaderboardEntry[] } | null
+> = {
+  realm: null,
+  global: null,
+};
+
+async function refreshGuildLeaderboard(
+  scope: 'realm' | 'global',
+): Promise<GuildLeaderboardEntry[]> {
+  const rows = await topGuilds(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
+    rank: i + 1,
+    name: r.name,
+    memberCount: r.memberCount,
+    totalLifetimeXp: r.totalLifetimeXp,
+    topLevel: r.topLevel,
+    ...(scope === 'global' ? { realm: r.realm } : {}),
+  }));
+  guildLeaderboardCache[scope] = { at: Date.now(), entries };
+  return entries;
+}
+
+async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLeaderboardEntry[]> {
+  const cached = guildLeaderboardCache[scope];
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
+  try {
+    return await refreshGuildLeaderboard(scope);
+  } catch (err) {
+    console.error(`guild leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
   }
 }
@@ -188,7 +345,7 @@ async function refreshReleases(): Promise<ReleaseEntry[]> {
       },
     );
     if (!res.ok) throw new Error(`github releases ${res.status}`);
-    const raw = (await res.json()) as any[];
+    const raw = await res.json();
     const entries: ReleaseEntry[] = (Array.isArray(raw) ? raw : [])
       .filter((r) => r && !r.draft) // skip unpublished drafts
       .map((r) => ({
@@ -229,11 +386,59 @@ function normalizeDeleteConfirmation(name: unknown): string {
   return typeof name === 'string' ? name.trim().toLowerCase() : '';
 }
 
+// Shape a realm rank lookup into the character-sheet's rank field.
+function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | null {
+  return rank ? { scope: 'realm', rank: rank.rank, total: rank.total } : null;
+}
+
+// The character-list response shared by the full-session GET /api/characters and
+// the read-scoped GET /api/me/characters, so both stay byte-identical.
+function characterListPayload(chars: CharacterRow[]): {
+  realm: string;
+  characters: {
+    id: number;
+    name: string;
+    class: PlayerClass;
+    level: number;
+    skin: number;
+    online: boolean;
+    forceRename: boolean;
+    lastPlayed: string | null;
+    playtimeSeconds: number;
+  }[];
+} {
+  return {
+    realm: REALM,
+    characters: chars.map((c) => ({
+      id: c.id,
+      name: c.name,
+      class: c.class,
+      level: c.level,
+      skin: c.state?.skin ?? 0,
+      online: [...game.clients.values()].some((s) => s.characterId === c.id),
+      forceRename: c.force_rename,
+      lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
+      playtimeSeconds: Number(c.playtime_seconds ?? 0),
+    })),
+  };
+}
+
 async function bearerAccount(req: http.IncomingMessage): Promise<number | null> {
   const auth = req.headers.authorization ?? '';
   const m = /^Bearer ([a-f0-9]{64})$/.exec(auth);
   if (!m) return null;
   return accountForToken(m[1]);
+}
+
+// Account + token scope for the bearer (or null when unauthenticated). The scope
+// is what lets read-only companion/OAuth tokens be accepted on read routes and
+// rejected on mutating ones.
+async function bearerScopeAccount(
+  req: http.IncomingMessage,
+): Promise<{ accountId: number; scope: TokenScope } | null> {
+  const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
+  if (!m) return null;
+  return accountAndScopeForToken(m[1]);
 }
 
 // Raw bearer token string (or null) — needed when an account action must keep
@@ -243,18 +448,48 @@ function bearerToken(req: http.IncomingMessage): string | null {
   return m ? m[1] : null;
 }
 
-async function bearerActiveAccount(req: http.IncomingMessage, res: http.ServerResponse): Promise<number | null> {
-  const accountId = await bearerAccount(req);
-  if (accountId === null) {
+// Mutating + owner-scoped routes funnel through here. HARDENED: a read-only
+// token (scope!=='full') is rejected with 403, so every existing mutating route
+// (which already calls this) automatically refuses companion/OAuth read tokens —
+// the single choke point that keeps read tokens harmless.
+async function bearerActiveAccount(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<number | null> {
+  const info = await bearerScopeAccount(req);
+  if (info === null) {
     json(res, 401, { error: 'not authenticated' });
     return null;
   }
-  const status = await moderationStatusForAccount(accountId);
+  if (!scopeAllowsMutation(info.scope)) {
+    json(res, 403, { error: 'this token is read-only' });
+    return null;
+  }
+  const status = await moderationStatusForAccount(info.accountId);
   if (status.locked) {
     json(res, 403, { error: status.message });
     return null;
   }
-  return accountId;
+  return info.accountId;
+}
+
+// Read routes (the owner character sheet) accept both 'read' and 'full' tokens.
+// Moderation still applies — a banned account can't read through a read token.
+async function bearerReadAccount(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<number | null> {
+  const info = await bearerScopeAccount(req);
+  if (info === null) {
+    json(res, 401, { error: 'not authenticated' });
+    return null;
+  }
+  const status = await moderationStatusForAccount(info.accountId);
+  if (status.locked) {
+    json(res, 403, { error: status.message });
+    return null;
+  }
+  return info.accountId;
 }
 
 function requestMetadata(req: http.IncomingMessage): { ip: string; userAgent: string } {
@@ -268,18 +503,31 @@ function requestMetadata(req: http.IncomingMessage): { ip: string; userAgent: st
 // the request may proceed: trivially true when no secret is configured, else the
 // client-supplied token must verify. The English error is matched to a t() key
 // by userFacingApiError() in src/main.ts — keep the two strings in sync.
-async function passesTurnstile(req: http.IncomingMessage, body: Record<string, unknown>): Promise<boolean> {
+async function passesTurnstile(
+  req: http.IncomingMessage,
+  body: Record<string, unknown>,
+): Promise<boolean> {
   if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
   if (!TURNSTILE_SECRET) return true;
   return verifyTurnstile(String(body.turnstileToken ?? ''), TURNSTILE_SECRET, requestIp(req));
 }
 
 const MIME: Record<string, string> = {
-  '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
-  '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json',
-  '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream',
-  '.hdr': 'application/octet-stream', '.ktx2': 'image/ktx2', '.wasm': 'application/wasm',
-  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp',
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.css': 'text/css',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.json': 'application/json',
+  '.glb': 'model/gltf-binary',
+  '.gltf': 'model/gltf+json',
+  '.bin': 'application/octet-stream',
+  '.hdr': 'application/octet-stream',
+  '.ktx2': 'image/ktx2',
+  '.wasm': 'application/wasm',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
 };
 
 // The admin dashboard is reached via the admin.* subdomain (Caddy proxies it
@@ -329,7 +577,7 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
   const etag = etagFor(stats);
   const validators = {
     'Cache-Control': cacheControlFor(urlPath),
-    'ETag': etag,
+    ETag: etag,
     'Last-Modified': stats.mtime.toUTCString(),
   };
   if (isReadMethod && isNotModified(req.headers, etag, stats.mtime)) {
@@ -360,13 +608,34 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
 // token (no cookies), so reflecting these specific origins is safe.
 function maybeCors(req: http.IncomingMessage, res: http.ServerResponse): void {
   const origin = req.headers.origin;
-  if (typeof origin === 'string' && (REALM_ORIGINS.has(origin) || NATIVE_APP_ORIGINS.has(origin) || DESKTOP_APP_ORIGINS.has(origin))) {
+  if (
+    typeof origin === 'string' &&
+    (REALM_ORIGINS.has(origin) || NATIVE_APP_ORIGINS.has(origin) || DESKTOP_APP_ORIGINS.has(origin))
+  ) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     res.setHeader('Access-Control-Max-Age', '600');
   }
+}
+
+// Absolute public origin for building self-URLs (avatar/profile links) in JSON
+// and SSR pages. Prefer the configured/realm origin; fall back to the request's
+// own scheme+host so links work in local dev too. Mirrors player_card.ts.
+function publicOrigin(req: http.IncomingMessage): string {
+  return publicOriginFromRequest(req);
+}
+
+// Wide-open CORS for the public, unauthenticated read surfaces. These carry no
+// credentials and return only the public subset, so reflecting any origin (`*`)
+// is safe and lets browser-origin apps fetch them client-side.
+function publicCors(res: http.ServerResponse): void {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+  res.setHeader('Access-Control-Max-Age', '600');
 }
 
 // Anti-bot: when enabled, /api/login + /api/register require a same-origin browser
@@ -381,10 +650,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const action = typeof body.action === 'string' ? body.action : 'auth';
       return json(res, 200, createNativeAttestationChallenge(req, action));
     }
-    if (REQUIRE_WEB_LOGIN && req.method === 'POST' && (url === '/api/register' || url === '/api/login') && !isWebClientRequest(req)) {
+    if (url === '/api/site-presence') {
+      return await handleSitePresenceHeartbeat(req, res);
+    }
+    if (
+      REQUIRE_WEB_LOGIN &&
+      req.method === 'POST' &&
+      (url === '/api/register' || url === '/api/login') &&
+      !isWebClientRequest(req)
+    ) {
       return json(res, 403, { error: 'logins are only allowed from the game client' });
     }
-    if (req.method === 'POST' && (url === '/api/register' || url === '/api/login') && rateLimited(req)) {
+    if (
+      req.method === 'POST' &&
+      (url === '/api/register' || url === '/api/login') &&
+      rateLimited(req)
+    ) {
       return json(res, 429, { error: 'too many attempts — wait a minute and try again' });
     }
     // Reuse the rate-limit message so a blocked client gets no signal that the
@@ -395,15 +676,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/register') {
       const body = await readBody(req);
-      if (!(await passesTurnstile(req, body))) return json(res, 403, { error: 'verification failed, please try again' });
-      if (!validUsernameShape(body.username)) return json(res, 400, { error: 'username must be 3-24 chars (letters, digits, _)' });
+      if (!(await passesTurnstile(req, body)))
+        return json(res, 403, { error: 'verification failed, please try again' });
+      if (!validUsernameShape(body.username))
+        return json(res, 400, { error: 'username must be 3-24 chars (letters, digits, _)' });
       if (offensiveName(body.username)) return json(res, 400, { error: 'username is not allowed' });
-      if (!validPassword(body.password)) return json(res, 400, { error: 'password must be at least 6 chars' });
+      if (!validPassword(body.password))
+        return json(res, 400, { error: 'password must be at least 6 chars' });
       const existing = await findAccount(body.username);
       if (existing) return json(res, 409, { error: 'username already taken' });
-      let account;
+      let account: Awaited<ReturnType<typeof createAccount>>;
       try {
-        account = await createAccount(body.username, await hashPassword(body.password), requestMetadata(req));
+        account = await createAccount(
+          body.username,
+          await hashPassword(body.password),
+          requestMetadata(req),
+        );
       } catch (err: any) {
         // a concurrent registration can win the insert after our findAccount
         // check; the username UNIQUE index is the real guard. Surface it as a
@@ -418,11 +706,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // without an email are unaffected (the email is otherwise set later via
       // the account portal).
       const signupEmailRaw = typeof body.email === 'string' ? body.email.trim() : '';
-      if (signupEmailRaw && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmailRaw) && signupEmailRaw.length <= 254) {
+      if (
+        signupEmailRaw &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmailRaw) &&
+        signupEmailRaw.length <= 254
+      ) {
         await setAccountEmail(account.id, signupEmailRaw);
         emailAccountCreated({
-          id: account.id, username: account.username, email: signupEmailRaw,
-          locale: null, marketing_opt_in: false,
+          id: account.id,
+          username: account.username,
+          email: signupEmailRaw,
+          locale: null,
+          marketing_opt_in: false,
         });
       }
       void createSuspiciousRegistrationReport({
@@ -432,17 +727,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }).catch((err) => console.error('suspicious registration report failed:', err));
       // Capture the referral when this account signed up via a card link
       // (?ref=<slug>). Best-effort: never block or fail registration on it.
-      void captureReferral(account.id, body.ref).catch((err) => console.error('referral capture failed:', err));
+      void captureReferral(account.id, body.ref).catch((err) =>
+        console.error('referral capture failed:', err),
+      );
       return json(res, 200, { token, username: account.username });
     }
     if (req.method === 'POST' && url === '/api/login') {
       const body = await readBody(req);
-      if (!(await passesTurnstile(req, body))) return json(res, 403, { error: 'verification failed, please try again' });
+      if (!(await passesTurnstile(req, body)))
+        return json(res, 403, { error: 'verification failed, please try again' });
       const username = typeof body.username === 'string' ? body.username : '';
       // Per-account brute-force throttle (#93). The message is identical to a
       // bad-password response so it never reveals whether the account exists.
       if (username && authThrottled(username)) {
-        return json(res, 429, { error: 'too many failed attempts — wait a few minutes and try again' });
+        return json(res, 429, {
+          error: 'too many failed attempts — wait a few minutes and try again',
+        });
       }
       const account = username ? await findAccount(username) : null;
       if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
@@ -482,7 +782,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const body = await readBody(req);
       const ticket = normalizeSteamTicket(body.ticket);
       if (!ticket) return json(res, 400, { error: 'invalid steam ticket' });
-      let steam;
+      let steam: SteamAuthResult | null;
       try {
         steam = await verifySteamAuthTicket(ticket);
       } catch (err) {
@@ -490,7 +790,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 503, { error: 'steam auth unavailable' });
       }
       if (!steam) return json(res, 403, { error: 'steam verification failed' });
-      if (steam.vacBanned || steam.publisherBanned) return json(res, 403, { error: 'steam account is not allowed' });
+      if (steam.vacBanned || steam.publisherBanned)
+        return json(res, 403, { error: 'steam account is not allowed' });
       const account = await accountForIdentity('steam', steam.steamId);
       if (!account) return json(res, 409, { error: 'steam account is not linked' });
       const status = await moderationStatusForAccount(account.id);
@@ -504,7 +805,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const body = await readBody(req);
       const ticket = normalizeSteamTicket(body.ticket);
       if (!ticket) return json(res, 400, { error: 'invalid steam ticket' });
-      let steam;
+      let steam: SteamAuthResult | null;
       try {
         steam = await verifySteamAuthTicket(ticket);
       } catch (err) {
@@ -512,22 +813,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 503, { error: 'steam auth unavailable' });
       }
       if (!steam) return json(res, 403, { error: 'steam verification failed' });
-      if (steam.vacBanned || steam.publisherBanned) return json(res, 403, { error: 'steam account is not allowed' });
+      if (steam.vacBanned || steam.publisherBanned)
+        return json(res, 403, { error: 'steam account is not allowed' });
       const existing = await accountForIdentity('steam', steam.steamId);
       const username = typeof body.username === 'string' ? body.username : '';
       if (username && authThrottled(username)) {
-        return json(res, 429, { error: 'too many failed attempts — wait a few minutes and try again' });
+        return json(res, 429, {
+          error: 'too many failed attempts — wait a few minutes and try again',
+        });
       }
       const account = username ? await findAccount(username) : null;
       if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
         if (username) recordAuthFailure(username);
         return json(res, 401, { error: 'invalid username or password' });
       }
-      if (existing && existing.id !== account.id) return json(res, 409, { error: 'steam account is already linked' });
+      if (existing && existing.id !== account.id)
+        return json(res, 409, { error: 'steam account is already linked' });
       const status = await moderationStatusForAccount(account.id);
       if (status.locked) return json(res, 403, { error: status.message });
       try {
-        await linkAccountIdentity(account.id, 'steam', steam.steamId, typeof body.displayName === 'string' ? body.displayName : null);
+        await linkAccountIdentity(
+          account.id,
+          'steam',
+          steam.steamId,
+          typeof body.displayName === 'string' ? body.displayName : null,
+        );
       } catch {
         return json(res, 409, { error: 'account already has a steam link' });
       }
@@ -559,32 +869,62 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       await saveToken(token, entry.accountId);
       return json(res, 200, { token, username: entry.username });
     }
+    // Read-scoped "my characters" list: lets a companion holding a character:read
+    // token (OAuth or a pasted companion token) discover its character ids so it
+    // can then call /sheet. Same body as GET /api/characters, but gated by
+    // bearerReadAccount so a read token is accepted (the full-session list below
+    // still uses bearerActiveAccount and stays mutation-only). Placed before the
+    // generic /api routes.
+    if (req.method === 'GET' && url === '/api/me/characters') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return json(res, 200, characterListPayload(await listCharacters(accountId)));
+    }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (req.method === 'GET') {
-        const chars = await listCharacters(accountId);
-        return json(res, 200, {
-          realm: REALM,
-          characters: chars.map((c) => ({
-            id: c.id, name: c.name, class: c.class, level: c.level,
-            skin: c.state?.skin ?? 0,
-            online: [...game.clients.values()].some((s) => s.characterId === c.id),
-            forceRename: c.force_rename,
-          })),
-        });
+        return json(res, 200, characterListPayload(await listCharacters(accountId)));
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
         const name = normalizeCharName(body.name);
-        if (name === null) return json(res, 400, { error: 'invalid character name (2-16 letters)' });
+        if (name === null)
+          return json(res, 400, { error: 'invalid character name (2-16 letters)' });
         if (offensiveName(name)) return json(res, 400, { error: 'character name is not allowed' });
-        const validClasses = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
+        const validClasses = [
+          'warrior',
+          'paladin',
+          'hunter',
+          'rogue',
+          'priest',
+          'shaman',
+          'mage',
+          'warlock',
+          'druid',
+        ];
         if (!validClasses.includes(body.class)) return json(res, 400, { error: 'invalid class' });
-        const skin = Math.max(0, Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)));
-        const create = () => createCharacterCapped(accountId, name, body.class, 10, initialCharacterState(body.class, name, skin));
+        const skin = Math.max(
+          0,
+          Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
+        );
+        const create = () =>
+          createCharacterCapped(
+            accountId,
+            name,
+            body.class,
+            10,
+            initialCharacterState(body.class, name, skin),
+          );
         const created = (c: NonNullable<Awaited<ReturnType<typeof createCharacterCapped>>>) =>
-          json(res, 200, { id: c.id, name: c.name, class: c.class, level: c.level, skin: c.state?.skin ?? skin, forceRename: c.force_rename });
+          json(res, 200, {
+            id: c.id,
+            name: c.name,
+            class: c.class,
+            level: c.level,
+            skin: c.state?.skin ?? skin,
+            forceRename: c.force_rename,
+          });
         try {
           const c = await create();
           if (!c) return json(res, 400, { error: 'character limit reached' });
@@ -595,7 +935,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           // account, free it (the orphaned character is archived) and retry once;
           // otherwise it is genuinely taken. This is the self-service path that
           // replaces the hidden admin-only reactivate/force-rename recovery.
-          if (!(await reclaimDeactivatedName(name))) return json(res, 409, { error: 'that name is taken' });
+          if (!(await reclaimDeactivatedName(name)))
+            return json(res, 409, { error: 'that name is taken' });
           try {
             const c = await create();
             if (!c) return json(res, 400, { error: 'character limit reached' });
@@ -606,6 +947,57 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           }
         }
       }
+    }
+    // Public, unauthenticated character sheet (read-only safe subset). Resolved
+    // by name, rate-limited to deter scraping, CORS-open to any origin. MUST
+    // come before generic /api routes; it never touches a bearer token.
+    const publicSheetMatch = /^\/api\/public\/characters\/(.+)\/sheet$/.exec(url);
+    if (req.method === 'GET' && publicSheetMatch) {
+      if (publicReadRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      const rawName = decodeURIComponent(publicSheetMatch[1]);
+      const target = await findCharacterReportTargetByName(rawName);
+      if (!target) return json(res, 404, { error: 'character not found' });
+      const row = await getCharacterById(target.characterId);
+      if (!row) return json(res, 404, { error: 'character not found' });
+      const [guild, rank] = await Promise.all([
+        guildNameForCharacter(row.id),
+        lifetimeXpRankForCharacter(row.id),
+      ]);
+      return json(
+        res,
+        200,
+        characterSheet({
+          row,
+          visibility: 'public',
+          realm: REALM,
+          origin: publicOrigin(req),
+          guild,
+          rank: toSheetRank(rank),
+        }),
+      );
+    }
+    const ownerSheetMatch = /^\/api\/characters\/(\d+)\/sheet$/.exec(url);
+    if (req.method === 'GET' && ownerSheetMatch) {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      const row = await getCharacter(accountId, Number(ownerSheetMatch[1]));
+      if (!row) return json(res, 404, { error: 'character not found' });
+      const [guild, rank] = await Promise.all([
+        guildNameForCharacter(row.id),
+        lifetimeXpRankForCharacter(row.id),
+      ]);
+      return json(
+        res,
+        200,
+        characterSheet({
+          row,
+          visibility: 'owner',
+          realm: REALM,
+          origin: publicOrigin(req),
+          guild,
+          rank: toSheetRank(rank),
+        }),
+      );
     }
     const delMatch = /^\/api\/characters\/(\d+)$/.exec(url);
     const renameMatch = /^\/api\/characters\/(\d+)\/rename$/.exec(url);
@@ -659,7 +1051,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           }
           return json(res, 404, { error: 'character not found' });
         }
-        return json(res, 200, { id: c.id, name: c.name, class: c.class, level: c.level, forceRename: c.force_rename });
+        if (game.rekeyMarketSeller(characterId, character.name, c.name)) {
+          await game.saveMarket();
+        }
+        return json(res, 200, {
+          id: c.id,
+          name: c.name,
+          class: c.class,
+          level: c.level,
+          forceRename: c.force_rename,
+        });
       } catch (err: any) {
         if (isUniqueViolation(err)) return json(res, 409, { error: 'that name is taken' });
         throw err;
@@ -735,7 +1136,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         });
         return json(res, 200, { ok: true, reportId: report.id });
       } catch (err) {
-        return json(res, 400, { error: err instanceof Error ? err.message : 'could not submit report' });
+        return json(res, 400, {
+          error: err instanceof Error ? err.message : 'could not submit report',
+        });
       }
     }
     if (req.method === 'POST' && url === '/api/bug-reports') {
@@ -754,14 +1157,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       const description = typeof body.description === 'string' ? body.description.trim() : '';
       if (!description) return json(res, 400, { error: 'describe the bug' });
-      const characterId = Number.isFinite(Number(body.characterId)) ? Number(body.characterId) : null;
+      const characterId = Number.isFinite(Number(body.characterId))
+        ? Number(body.characterId)
+        : null;
       // Only trust a character name the server can verify the account owns. A
       // missing or unowned characterId resolves to no name (never the client value).
       let characterName = '';
       let resolvedCharacterId: number | null = null;
       if (characterId !== null) {
         const character = await getCharacter(accountId, characterId);
-        if (character) { resolvedCharacterId = character.id; characterName = character.name; }
+        if (character) {
+          resolvedCharacterId = character.id;
+          characterName = character.name;
+        }
       }
       const pos = body.pos && typeof body.pos === 'object' ? body.pos : {};
       try {
@@ -777,7 +1185,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           screenshot: typeof body.screenshot === 'string' ? body.screenshot : null,
           meta: body.meta,
         });
-        return json(res, 200, { ok: true, reportId: report.id, screenshotStored: report.screenshotStored });
+        return json(res, 200, {
+          ok: true,
+          reportId: report.id,
+          screenshotStored: report.screenshotStored,
+        });
       } catch (err) {
         if (err instanceof BugReportRateLimitError) return json(res, 429, { error: err.message });
         throw err;
@@ -802,6 +1214,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         names: [...game.clients.values()].map((s) => s.name),
       });
     }
+    // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
+    // harness. Gated by ALLOW_DEV_COMMANDS so it is never exposed in production.
+    if (req.method === 'GET' && url === '/api/perf' && process.env.ALLOW_DEV_COMMANDS === '1') {
+      return json(res, 200, game.perfProfile());
+    }
     if (req.method === 'GET' && url === '/api/arena/leaderboard') {
       // public all-time Ashen Coliseum ladder (top rated characters)
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
@@ -816,13 +1233,41 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // from req.url.
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
       const scope: 'realm' | 'global' = params.get('scope') === 'global' ? 'global' : 'realm';
+      // ?board=guilds ranks GUILDS by summed member lifetime XP (default 'players'
+      // is the per-character board below). Same cache + paging shape; the entry
+      // shape differs, so it is its own served slice.
+      if (params.get('board') === 'guilds') {
+        const guildEntries = await getGuildLeaderboard(scope);
+        const guildPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+        const guildPage = Number(params.get('page')) || 0;
+        const guildSlice = paginateGuildLeaderboard(guildEntries, guildPage, guildPageSize);
+        return json(res, 200, {
+          realm: REALM,
+          scope,
+          board: 'guilds',
+          metric: 'guildLifetimeXp',
+          ...guildSlice,
+        });
+      }
       const entries = await getLeaderboard(scope);
       // Legacy ?limit=N (home-page board): top N as a single page, no paging UI.
       const limitParam = params.get('limit');
       if (limitParam !== null) {
-        const limit = Math.max(1, Math.min(LEADERBOARD_SIZE, Number(limitParam) || LEADERBOARD_SIZE));
+        const limit = Math.max(
+          1,
+          Math.min(LEADERBOARD_SIZE, Number(limitParam) || LEADERBOARD_SIZE),
+        );
         const leaders = entries.slice(0, limit);
-        return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', leaders, page: 0, pageCount: 1, total: leaders.length, pageSize: limit });
+        return json(res, 200, {
+          realm: REALM,
+          scope,
+          metric: 'lifetimeXp',
+          leaders,
+          page: 0,
+          pageCount: 1,
+          total: leaders.length,
+          pageSize: limit,
+        });
       }
       // Paged in-game board: ?page=N (0-based) & ?pageSize=M, clamped server-side.
       const pageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
@@ -836,7 +1281,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // from the in-memory cache (refreshed at most every RELEASES_TTL_MS).
       // Optional ?limit=N (1..RELEASES_SIZE).
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
-      const limit = Math.max(1, Math.min(RELEASES_SIZE, Number(params.get('limit')) || RELEASES_SIZE));
+      const limit = Math.max(
+        1,
+        Math.min(RELEASES_SIZE, Number(params.get('limit')) || RELEASES_SIZE),
+      );
       const entries = await getReleases();
       return json(res, 200, { repo: GITHUB_REPO, releases: entries.slice(0, limit) });
     }
@@ -859,7 +1307,8 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
-      if (!callerToken || await accountForToken(callerToken) === null) return json(res, 401, { error: 'not authenticated' });
+      if (!callerToken || (await accountForToken(callerToken)) === null)
+        return json(res, 401, { error: 'not authenticated' });
       return handleAccountLogout(res, callerToken);
     }
     if (req.method === 'POST' && url === '/api/account/email') {
@@ -872,9 +1321,38 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleAccountDeactivate(req, res, accountId, {
         anyCharacterOnline: (characterIds) =>
-          [...game.clients.values()].some((s) => s.characterId != null && characterIds.includes(s.characterId)),
+          [...game.clients.values()].some(
+            (s) => s.characterId != null && characterIds.includes(s.characterId),
+          ),
         disconnectAccount: (id, reason) => game.disconnectAccount(id, reason),
       });
+    }
+    // Companion read-only tokens: a 90-day scope='read' token a user can paste
+    // into a companion app instead of running OAuth. Managed from a full web
+    // session only (bearerActiveAccount rejects read tokens, so a read token can
+    // never mint or list more — no privilege escalation).
+    if (url === '/api/account/companion-token') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (req.method === 'POST') {
+        const body = await readBody(req);
+        const rawLabel = typeof body.label === 'string' ? body.label.trim().slice(0, 64) : '';
+        const label = rawLabel || null;
+        const token = newToken();
+        const COMPANION_TOKEN_TTL_HOURS = 24 * 90;
+        await createCompanionToken(token, accountId, label, COMPANION_TOKEN_TTL_HOURS);
+        // The full secret is returned ONCE, on creation; it is never listed again.
+        return json(res, 200, { token, label, scope: 'read', expiresInDays: 90 });
+      }
+      if (req.method === 'GET') {
+        return json(res, 200, { tokens: await listCompanionTokens(accountId) });
+      }
+      if (req.method === 'DELETE') {
+        const body = await readBody(req);
+        const prefix = typeof body.prefix === 'string' ? body.prefix.trim().toLowerCase() : '';
+        const ok = await revokeCompanionToken(accountId, prefix);
+        return json(res, ok ? 200 : 404, ok ? { ok: true } : { error: 'token not found' });
+      }
     }
     if (req.method === 'POST' && url === '/api/account/email/change') {
       const accountId = await bearerActiveAccount(req, res);
@@ -938,6 +1416,49 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    // Discord integration: OAuth login/link, link status, unlink. `start` returns
+    // the authorize URL (the browser then navigates to Discord); `callback` is the
+    // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
+    // web-login guard, which is login/register-only). Mutations go through
+    // bearerActiveAccount; the dedicated Discord rate-limit bucket guards them.
+    if (req.method === 'POST' && url === '/api/auth/discord/start') {
+      const mode =
+        new URL(req.url ?? '/', 'http://localhost').searchParams.get('mode') === 'link'
+          ? 'link'
+          : 'login';
+      let accountId: number | null = null;
+      if (mode === 'link') {
+        accountId = await bearerActiveAccount(req, res);
+        if (accountId === null) return;
+      }
+      if (discordRateLimited(req, accountId ?? 0)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordStart(req, res, { mode, accountId });
+    }
+    if (req.method === 'GET' && url === '/api/auth/discord/callback') {
+      return handleDiscordCallback(req, res);
+    }
+    // First-time-login chooser endpoints. Unauthenticated like /callback: the
+    // authorization is the single-use pending-login token (minted only after a
+    // verified Discord OAuth), and the handlers carry their own Discord rate-limit
+    // bucket + (for the link path) the same password/2FA/moderation checks as login.
+    if (req.method === 'POST' && url === '/api/auth/discord/login/new') {
+      return handleDiscordLoginNew(req, res, (ip) => game.isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
+      return handleDiscordLoginLink(req, res, (ip) => game.isIpBlocked(ip));
+    }
+    if (req.method === 'GET' && url === '/api/discord') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordStatus(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/discord') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleDiscordUnlink(req, res, accountId);
+    }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
@@ -965,7 +1486,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         recordUsageMetric('card.publish.rate_limited');
         return json(res, 429, { error: 'rate limited' });
       }
-      return handleCardUpload(req, res, accountId);
+      return handleCardUpload(req, res, accountId, (characterId) =>
+        game.liveLevelForCharacter(characterId),
+      );
     }
     if (req.method === 'GET' && url === '/api/referrals') {
       const accountId = await bearerActiveAccount(req, res);
@@ -1000,30 +1523,72 @@ async function main(): Promise<void> {
     }
   }
   await ensureSchema();
+  await seedOAuthClients();
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);
-  if (pruned > 0) console.log(`pruned ${pruned} chat log row(s) older than ${CHAT_LOG_RETENTION_DAYS} days`);
+  if (pruned > 0)
+    console.log(`pruned ${pruned} chat log row(s) older than ${CHAT_LOG_RETENTION_DAYS} days`);
   const prunedPerfReports = await pruneClientPerfReports(PERF_REPORT_RETENTION_DAYS);
-  if (prunedPerfReports > 0) console.log(`pruned ${prunedPerfReports} client perf report row(s) older than ${PERF_REPORT_RETENTION_DAYS} days`);
+  if (prunedPerfReports > 0)
+    console.log(
+      `pruned ${prunedPerfReports} client perf report row(s) older than ${PERF_REPORT_RETENTION_DAYS} days`,
+    );
   await game.loadMarket();
   await game.loadChatFilter();
   await game.loadBlockedIps();
+  void game.recordOnlineSnapshot();
+  void currentSitePresenceUsers()
+    .then((count) => recordSitePresenceSample(count))
+    .catch((err) => console.error('site presence sample failed:', err));
+  setInterval(
+    () => {
+      void pruneChatLogs(CHAT_LOG_RETENTION_DAYS).catch((err) =>
+        console.error('chat log prune failed:', err),
+      );
+      void pruneClientPerfReports(PERF_REPORT_RETENTION_DAYS).catch((err) =>
+        console.error('perf report prune failed:', err),
+      );
+      void pruneExpiredOAuthGrants(pool).catch((err) =>
+        console.error('oauth grant prune failed:', err),
+      );
+      void pruneDiscordOAuthStates(pool).catch((err) =>
+        console.error('discord oauth state prune failed:', err),
+      );
+      void pruneDiscordPendingLogins(pool).catch((err) =>
+        console.error('discord pending login prune failed:', err),
+      );
+    },
+    24 * 3600 * 1000,
+  ).unref();
   setInterval(() => {
-    void pruneChatLogs(CHAT_LOG_RETENTION_DAYS).catch((err) => console.error('chat log prune failed:', err));
-    void pruneClientPerfReports(PERF_REPORT_RETENTION_DAYS).catch((err) => console.error('perf report prune failed:', err));
-  }, 24 * 3600 * 1000).unref();
+    void game.recordOnlineSnapshot();
+    void currentSitePresenceUsers()
+      .then((count) => recordSitePresenceSample(count))
+      .catch((err) => console.error('site presence sample failed:', err));
+  }, ADMIN_ONLINE_SAMPLE_MS).unref();
   setInterval(() => {
     void pruneExpiredBlockedIps().catch((err) => console.error('blocked IP prune failed:', err));
-    void game.reloadBlockedIps()
+    void game
+      .reloadBlockedIps()
       .then(() => game.disconnectBlockedSessions('Connection to the server was lost.'))
       .catch((err) => console.error('blocked IP refresh failed:', err));
   }, BLOCKED_IP_REFRESH_MS).unref();
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {
-    void refreshLeaderboard('realm').catch((err) => console.error('leaderboard refresh failed (realm):', err));
-    void refreshLeaderboard('global').catch((err) => console.error('leaderboard refresh failed (global):', err));
+    void refreshLeaderboard('realm').catch((err) =>
+      console.error('leaderboard refresh failed (realm):', err),
+    );
+    void refreshLeaderboard('global').catch((err) =>
+      console.error('leaderboard refresh failed (global):', err),
+    );
+    void refreshGuildLeaderboard('realm').catch((err) =>
+      console.error('guild leaderboard refresh failed (realm):', err),
+    );
+    void refreshGuildLeaderboard('global').catch((err) =>
+      console.error('guild leaderboard refresh failed (global):', err),
+    );
   };
   warmLeaderboards();
   setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
@@ -1031,13 +1596,28 @@ async function main(): Promise<void> {
 
   const server = http.createServer((req, res) => {
     const url = req.url ?? '';
+    const path = url.split('?')[0];
     const isApi = url.startsWith('/api/') || url.startsWith('/admin/api/');
-    if (isApi) maybeCors(req, res);
-    if (req.method === 'OPTIONS' && isApi) { res.writeHead(204); res.end(); return; }
+    // Public read surfaces (/api/public/..., /avatar/...) are CORS-open to any
+    // origin so browser-origin companion apps can call them client-side; every
+    // other /api route keeps the narrow realm/native allowlist.
+    const publicCorsPath = isPublicCorsPath(path);
+    if (publicCorsPath) publicCors(res);
+    else if (isApi) maybeCors(req, res);
+    if (req.method === 'OPTIONS' && (isApi || publicCorsPath)) {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
     if (url.startsWith('/internal/')) void handleInternalApi(req, res, game);
     else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);
+    else if (url.startsWith('/oauth/')) void handleOAuth(req, res);
     else if (req.method === 'GET' && url.startsWith('/p/')) void handleCardRoutes(req, res);
+    else if (req.method === 'GET' && path.startsWith('/avatar/')) void handleAvatar(req, res);
+    else if (req.method === 'GET' && path.startsWith('/c/')) void handleProfilePage(req, res);
+    else if (req.method === 'GET' && path === '/sitemap-characters.xml')
+      void handleCharacterSitemap(req, res);
     else serveStatic(req, res);
   });
 
@@ -1056,7 +1636,11 @@ async function main(): Promise<void> {
     });
   });
 
-  async function authenticateWebSocket(ws: WebSocket, raw: string, req: http.IncomingMessage): Promise<void> {
+  async function authenticateWebSocket(
+    ws: WebSocket,
+    raw: string,
+    req: http.IncomingMessage,
+  ): Promise<void> {
     let msg: any;
     try {
       msg = JSON.parse(raw);
@@ -1093,7 +1677,12 @@ async function main(): Promise<void> {
       return;
     }
     if (character.force_rename) {
-      ws.send(JSON.stringify({ t: 'error', error: 'This character must be renamed before entering the world.' }));
+      ws.send(
+        JSON.stringify({
+          t: 'error',
+          error: 'This character must be renamed before entering the world.',
+        }),
+      );
       ws.close();
       return;
     }
@@ -1103,7 +1692,14 @@ async function main(): Promise<void> {
     // they consume a session slot.
     const ip = requestMetadata(req).ip;
     const isAdmin = await isAdminAccount(accountId);
-    if (isConnectionRefused({ blocked: game.isIpBlocked(ip), isAdmin, ipSessions: game.countIpSessions(ip), hardLimit: MAX_WS_PER_IP_HARD })) {
+    if (
+      isConnectionRefused({
+        blocked: game.isIpBlocked(ip),
+        isAdmin,
+        ipSessions: game.countIpSessions(ip),
+        hardLimit: MAX_WS_PER_IP_HARD,
+      })
+    ) {
       ws.close(1008, 'Too many connections from your network');
       return;
     }
@@ -1157,7 +1753,11 @@ async function main(): Promise<void> {
     // post-auth game.leave handler is attached separately once joined.
     ws.on('error', () => {
       clearTimeout(authTimer);
-      try { ws.close(); } catch { /* already closing */ }
+      try {
+        ws.close();
+      } catch {
+        /* already closing */
+      }
     });
 
     ws.once('message', (data) => {

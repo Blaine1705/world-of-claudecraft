@@ -497,8 +497,8 @@ const mergeStringsEn = {
       ...itemNames.en.itemUi.tooltip,
       useFishing: 'Use: Fish in nearby waters.',
       useHealingPotion:
-        'Use: Instantly restores {amount} health. Usable in combat. 1 min cooldown.',
-      useManaPotion: 'Use: Instantly restores {amount} mana. Usable in combat. 1 min cooldown.',
+        'Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.',
+      useManaPotion: 'Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.',
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
       clickBuyback: 'Click to buy back',
@@ -512,6 +512,9 @@ const mergeStringsEn = {
       sellQuantityInput: 'Quantity to sell',
       sellQuantityConfirm: 'Sell',
       sellQuantityCancel: 'Cancel',
+      sellJunk: 'Sell Junk',
+      sellJunkAria: 'Sell all junk for {price}',
+      sellJunkHint: 'Sells every gray item in your bags except quest items.',
     },
     logs: {
       ...itemNames.en.itemUi.logs,
@@ -3688,7 +3691,11 @@ const mergeExtraEn = {
       'Demoralizing Roar',
       'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bear Form only.',
     ],
-    ['prowl', 'Prowl', 'Enter stealth while in Wolf Form. Cannot be used in combat.'],
+    [
+      'prowl',
+      'Prowl',
+      'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
+    ],
     [
       'rake',
       'Rake',

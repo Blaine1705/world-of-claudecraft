@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
@@ -15,8 +17,12 @@ vi.mock('../server/db', () => ({
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
+import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import { DELVES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { DT, type PlayerClass } from '../src/sim/types';
+import { type Aura, DT, type PlayerClass } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
+import { isAuraDebuff } from '../src/ui/auras_view';
 
 const DELTA_KEYS = [
   'inv',
@@ -80,6 +86,9 @@ function bareClient(pid: number): ClientWorld {
   c.cfg = { seed: 20061, playerClass: 'warrior' };
   c.entities = new Map();
   c.playerId = pid;
+  c.ownPlayerId = pid;
+  c.ownPlayerClass = 'warrior';
+  c.spectating = null;
   c.moveInput = {};
   c.inventory = [];
   c.vendorBuyback = [];
@@ -107,8 +116,116 @@ function bareClient(pid: number): ClientWorld {
   c.pendingInputSeqSentAt = new Map();
   c.ackedInputSeq = 0;
   c.inputEchoSamples = [];
+  c.spectateFacingPending = false;
+  c.pendingSpectateFacing = null;
   return c;
 }
+
+describe('spectate client POV', () => {
+  it('follows observed self, aligns on entry and respawn, then restores identity', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as {
+      applySnapshot(snapshot: unknown): void;
+      onMessage(raw: string): void;
+    };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Moderator',
+        lv: 10,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        res: 0,
+        mres: 100,
+        rtype: 'rage',
+      },
+    });
+    internals.onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+    expect(client.spectating).toBe('Suspect');
+
+    const snapshot = (facing: number, dead: boolean) => ({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 2,
+        k: 'player',
+        tid: 'rogue',
+        nm: 'Suspect',
+        lv: 10,
+        x: 5,
+        y: 0,
+        z: 7,
+        f: facing,
+        hp: dead ? 0 : 100,
+        mhp: 100,
+        dead,
+        res: dead ? 0 : 80,
+        mres: 100,
+        rtype: 'energy',
+      },
+    });
+
+    internals.applySnapshot(snapshot(1.25, false));
+    expect(client.playerId).toBe(2);
+    expect(client.player.name).toBe('Suspect');
+    expect(client.cfg.playerClass).toBe('rogue');
+    expect(client.consumeSpectateFacing()).toBe(1.25);
+    expect(client.consumeSpectateFacing()).toBeNull();
+
+    internals.applySnapshot(snapshot(2.5, true));
+    expect(client.consumeSpectateFacing()).toBeNull();
+    internals.applySnapshot(snapshot(-0.75, false));
+    expect(client.consumeSpectateFacing()).toBe(-0.75);
+    expect(client.consumeSpectateFacing()).toBeNull();
+
+    internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    expect(client.spectating).toBeNull();
+    expect(client.playerId).toBe(1);
+    expect(client.player.name).toBe('Moderator');
+    expect(client.cfg.playerClass).toBe('warrior');
+    expect(client.consumeSpectateFacing()).toBeNull();
+  });
+});
+
+describe('per-session isolation in the broadcast loop', () => {
+  it('keeps broadcasting to healthy sessions when one session throws', () => {
+    // Regression: the broadcast loop iterated every session unguarded, so a throw
+    // while building one player's snapshot unwound the whole call and starved every
+    // other session of its snapshot that tick (server/CLAUDE.md: one socket must
+    // not crash the loop). forEachGuarded must isolate the bad session.
+    const server = new GameServer();
+    const before = fakeWs();
+    const bad = fakeWs();
+    const after = fakeWs();
+    joinServer(server, before, 1, 'Before');
+    const badSession = joinServer(server, bad, 2, 'Broken');
+    // 'After' joins last, so it is iterated AFTER the throwing session: the real
+    // regression is that this one used to be starved when 'Broken' threw.
+    joinServer(server, after, 3, 'After');
+
+    // Force a throw only while serializing the bad session's self payload.
+    const original = (server as any).selfWireJson.bind(server);
+    vi.spyOn(server as any, 'selfWireJson').mockImplementation((session: any, ...rest: any[]) => {
+      if (session.pid === badSession.pid) throw new Error('corrupt self state');
+      return original(session, ...rest);
+    });
+
+    expect(() => broadcast(server)).not.toThrow();
+    // Both healthy sessions, on either side of the throw, still got a snapshot;
+    // only the broken one was skipped.
+    expect(lastSnap(before.sent)).not.toBeNull();
+    expect(lastSnap(after.sent)).not.toBeNull();
+    expect(lastSnap(bad.sent)).toBeNull();
+  });
+});
 
 describe('raid lockouts over the wire', () => {
   it('ships a granted lockout in self.lockouts and ClientWorld mirrors it end to end', () => {
@@ -149,6 +266,77 @@ describe('raid lockouts over the wire', () => {
   });
 });
 
+// The held-weapon-on-the-mech fix is client render, but it depends on three wire
+// fields the server must ship for a player: class (tid), cosmetic body (cat), and
+// equipped mainhand (mh). This drives the REAL server emit (wireEntity) into the
+// REAL client mirror (applySnapshot) and checks the visual layer's inputs, so the
+// mech weapon (and rogue dual-wield) is proven to work online, not just offline.
+describe('Combat Mech held weapon over the wire', () => {
+  it('mirrors class + mech skin + equipped weapon so a rogue mech dual-wields client-side', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
+    const pid = sim.playerId;
+    sim.setPlayerSkin(pid, 0, 'mech');
+    sim.addItem('keen_dirk', 1, pid);
+    sim.equipItem('keen_dirk', pid);
+    const e = sim.entities.get(pid)!;
+    expect(e.mainhandItemId).toBe('keen_dirk'); // recalcPlayerStats set the held-weapon id
+
+    // server emit
+    const w = wireEntity(e);
+    expect(w.tid).toBe('rogue'); // class drives visualKeyFor + the dual-wield override
+    expect(w.cat).toBe('mech'); // cosmetic body
+    expect(w.mh).toBe('keen_dirk'); // equipped mainhand -> held weapon model
+
+    // client mirror: a DIFFERENT local player seeing this rogue-mech in the world
+    const client = bareClient(pid + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.templateId).toBe('rogue');
+    expect(mirrored.skinCatalog).toBe('mech');
+    expect(mirrored.mainhandItemId).toBe('keen_dirk');
+
+    // what the renderer derives from the mirrored entity
+    expect(visualKeyFor(mirrored)).toBe('player_mech');
+    const override = mechHeldWeaponOverride(mirrored.templateId as PlayerClass);
+    expect(override?.weaponSlots).toEqual([0, 1]); // equipped weapon shows in BOTH hands
+  });
+
+  it('keeps a non-dual class (warrior) mech to a single mainhand over the wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.playerId;
+    sim.setPlayerSkin(pid, 0, 'mech');
+    sim.addItem('worn_sword', 1, pid);
+    sim.equipItem('worn_sword', pid);
+    const e = sim.entities.get(pid)!;
+
+    const client = bareClient(pid + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.skinCatalog).toBe('mech');
+    expect(mirrored.mainhandItemId).toBe('worn_sword');
+    expect(visualKeyFor(mirrored)).toBe('player_mech');
+    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)).toBeNull();
+  });
+});
+
+describe('combat ratings over the wire', () => {
+  it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.tick();
+    const e = sim.player;
+    expect(e.rangedPower).toBeGreaterThan(0);
+
+    const wire = wireEntity(e);
+    expect(wire.rp).toBe(e.rangedPower);
+
+    const client = bareClient(e.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(e.id)!;
+    expect(mirrored.rangedPower).toBe(e.rangedPower);
+  });
+});
+
 describe('delta snapshots', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -164,7 +352,9 @@ describe('delta snapshots', () => {
     broadcast(server);
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
-    for (const key of DELTA_KEYS) {
+    // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
+    // first snapshot (even the null-valued ones like party/trade); widened to all 25
+    for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
     expect(snap.self.party).toBeNull();
@@ -224,11 +414,26 @@ describe('delta snapshots', () => {
     server.sim.tick();
     broadcast(server);
     const snap = lastSnap(fc.sent);
+    // This single-tick test stays on the decay-safe subset: cds and the timer-backed
+    // keys (delve/arena timers, delveDaily) can re-emit after a real sim.tick(), so the
+    // widened all-25 omission is proven by the no-op re-broadcast test instead.
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
     // the always-on fields are still present every snapshot
-    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'swing', 'xp', 'copper', 'target']) {
+    for (const key of [
+      'x',
+      'z',
+      'hp',
+      'mhp',
+      'res',
+      'gcd',
+      'pcd',
+      'swing',
+      'xp',
+      'copper',
+      'target',
+    ]) {
       expect(snap.self).toHaveProperty(key);
     }
   });
@@ -242,6 +447,17 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.swingTimer).toBeCloseTo(1.7, 1);
+  });
+
+  it('mirrors the shared potion cooldown to the online client for the action-bar swipe', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.potionCdRemaining = 95.5;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.pcd).toBeCloseTo(95.5, 1);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
   });
 
   it('includes live aura and movement diagnostics in admin online rows', () => {
@@ -415,6 +631,50 @@ describe('delta snapshots', () => {
     expect(snap.self).not.toHaveProperty('stats');
   });
 
+  it('resends equip + inv on the next snapshot after an online unequip', () => {
+    // A fresh warrior starts with worn_sword equipped in mainhand (its class
+    // startWeapon). unequipItem returns the piece to bags via the sim's
+    // addItemSilent, which (unlike the addItem/removeItem hub) does NOT bump
+    // PlayerMeta.wireRev and emits only a log event, so the gated equip/inv block
+    // is resent promptly only because unequip_item is a HEAVY_SELF_CMD. Without
+    // that the client would show the item still equipped (and missing from bags)
+    // until the ~2 s staggered safety refresh.
+    const client = bareClient(session.pid);
+    expect(server.sim.meta(session.pid)!.equipment.mainhand).toBe('worn_sword');
+
+    // Flush the first full snapshot to the client so it has the equipped state,
+    // then confirm the heavy block is quiet: with the gate on, a no-op
+    // re-broadcast omits equip/inv (the staggered refresh is not due this tick),
+    // so any later resend is the command dirtying the session, not the refresh.
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.equipment.mainhand).toBe('worn_sword');
+    fc.sent.length = 0;
+    broadcast(server);
+    const quiet = lastSnap(fc.sent);
+    expect(quiet.self).not.toHaveProperty('equip');
+    expect(quiet.self).not.toHaveProperty('inv');
+
+    // Unequip the mainhand and broadcast once: the very next snapshot must carry
+    // the updated equip + inv, not wait for the safety refresh.
+    fc.sent.length = 0;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'unequip_item', slot: 'mainhand' }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self).toHaveProperty('equip');
+    expect(snap.self).toHaveProperty('inv');
+    expect(snap.self.equip.mainhand).toBeUndefined();
+    expect(snap.self.inv.some((s: any) => s.itemId === 'worn_sword')).toBe(true);
+
+    // and it round-trips: the client mirror clears the slot and shows it in bags.
+    (client as any).applySnapshot(snap);
+    expect(client.equipment.mainhand).toBeUndefined();
+    expect(client.inventory.some((s) => s.itemId === 'worn_sword')).toBe(true);
+  });
+
   it('mirrors vendor buyback deltas to the client', () => {
     const wilkes = [...server.sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     const player = server.sim.entities.get(session.pid)!;
@@ -476,13 +736,38 @@ describe('delta snapshots', () => {
     expect(snap.self.qdone).toEqual([]);
   });
 
+  it('dev quest completion resyncs qlog and qdone', () => {
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    try {
+      broadcast(server);
+      fc.sent.length = 0;
+
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'dev_complete_quest', quest: 'q_wolves' }),
+      );
+      broadcast(server);
+
+      const snap = lastSnap(fc.sent);
+      expect(snap.self).toHaveProperty('qlog');
+      expect(snap.self).toHaveProperty('qdone');
+      expect(snap.self.qlog).toEqual([]);
+      expect(snap.self.qdone).toContain('q_wolves');
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
+  });
+
   it('each client gets full state on its own first snapshot', () => {
     broadcast(server);
     const fc2 = fakeWs();
     joinServer(server, fc2, 2, 'Testb');
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
-    for (const key of DELTA_KEYS) {
+    // a fresh session always receives the full self state: all 25 delta keys
+    for (const key of ALL_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
     // the veteran session still gets deltas only
@@ -537,8 +822,8 @@ describe('raid party wire', () => {
     const client = bareClient(leader.pid);
     (client as any).applySnapshot(snap);
     expect(client.partyInfo).not.toBeNull();
-    expect(client.partyInfo!.raid).toBe(true);
-    expect(client.partyInfo!.members.find((m) => m.pid === member.pid)?.group).toBe(2);
+    expect(client.partyInfo?.raid).toBe(true);
+    expect(client.partyInfo?.members.find((m) => m.pid === member.pid)?.group).toBe(2);
   });
 });
 
@@ -967,6 +1252,72 @@ describe('client-side delta merge', () => {
     }
   });
 
+  it('reconstructs stacking-debuff stack counts from the wire (Sunder Armor)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      ents: [
+        {
+          id: 2,
+          k: 'mob',
+          tid: 'wolf',
+          nm: 'Wolf',
+          lv: 3,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 40,
+          mhp: 40,
+          auras: [
+            {
+              id: 'sunder_armor',
+              name: 'Sunder Armor',
+              kind: 'sunder',
+              rem: 30,
+              dur: 30,
+              stacks: 3,
+            },
+          ],
+        },
+      ],
+    });
+    const aura = client.entities.get(2)?.auras.find((a) => a.kind === 'sunder');
+    expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
+  });
+
+  it('reconstructs charge-limited aura charges from the wire (Lightning Shield)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      ents: [
+        {
+          id: 3,
+          k: 'player',
+          tid: '',
+          nm: 'Shaman',
+          lv: 12,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 200,
+          mhp: 200,
+          auras: [
+            {
+              id: 'lightning_shield',
+              name: 'Lightning Shield',
+              kind: 'thorns',
+              rem: 600,
+              dur: 600,
+              charges: 2,
+            },
+          ],
+        },
+      ],
+    });
+    const aura = client.entities.get(3)?.auras.find((a) => a.id === 'lightning_shield');
+    expect(aura?.charges, 'client should mirror the wire charge count').toBe(2);
+  });
+
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
     const client = bareClient(1);
     const ent = (x: number, z: number) => ({
@@ -1200,10 +1551,743 @@ describe('guild nameplate wire', () => {
     };
 
     (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, gd: 'Silver Hand' }] });
-    expect(client.entities.get(7)!.guild).toBe('Silver Hand');
+    expect(client.entities.get(7)?.guild).toBe('Silver Hand');
 
     // a later full record without `gd` means "no guild" → reset to ''
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
-    expect(client.entities.get(7)!.guild).toBe('');
+    expect(client.entities.get(7)?.guild).toBe('');
+  });
+});
+
+// Equipped mainhand item id rides the identity wire (terse key `mh`) so the
+// renderer can show each player's held weapon model. Recomputed in
+// recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
+describe('held weapon wire (mainhandItemId)', () => {
+  it('carries the equipped mainhand item through wireEntity', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    // a fresh warrior starts holding its class startWeapon
+    expect(e.mainhandItemId).toBe('worn_sword');
+    expect(wireEntity(e).mh).toBe('worn_sword');
+  });
+
+  it('restores entity.mainhandItemId on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, mh: 'zealotsbane_blade' }] });
+    expect(client.entities.get(7)?.mainhandItemId).toBe('zealotsbane_blade');
+
+    // a later full record without `mh` means "no equipped weapon" → reset to null
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.mainhandItemId).toBeNull();
+  });
+});
+
+describe('delve self-state mirrors over the wire', () => {
+  let server: GameServer;
+  let fc: FakeClient;
+  let session: ClientSession;
+
+  beforeEach(() => {
+    server = new GameServer();
+    fc = fakeWs();
+    session = joinServer(server, fc, 1, 'Delver');
+  });
+
+  function enterDelveOnServer(): void {
+    const sim = server.sim;
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const door = DELVES.collapsed_reliquary.doorPos;
+    const p = sim.entities.get(session.pid)!;
+    p.pos.x = door.x;
+    p.pos.z = door.z;
+    p.pos.y = terrainHeight(door.x, door.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    sim.enterDelve('collapsed_reliquary', 'normal', session.pid);
+  }
+
+  it('geo-gates companion_upgrade and enter_delve to the board NPC door', () => {
+    const sim = server.sim;
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const meta = sim.meta(session.pid)!;
+    meta.companionUpgrades.companion_tessa = 1;
+    meta.delveMarks = 100;
+    const p = sim.entities.get(session.pid)!;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    const place = (x: number, z: number) => {
+      p.pos.x = x;
+      p.pos.z = z;
+      p.pos.y = terrainHeight(x, z, sim.cfg.seed);
+      p.prevPos = { ...p.pos };
+    };
+    // Far from Brother Halven: the upgrade command is rejected (rank unchanged)...
+    place(door.x + 200, door.z);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'companion_upgrade', companionId: 'companion_tessa' }),
+    );
+    expect(meta.companionUpgrades.companion_tessa).toBe(1);
+    // ...and enter_delve does not claim a run from across the world.
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'enter_delve',
+        delveId: 'collapsed_reliquary',
+        tierId: 'normal',
+      }),
+    );
+    expect(sim.delveRunForPlayer(session.pid)).toBeNull();
+    // Standing on the board door: the upgrade goes through.
+    place(door.x, door.z);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'companion_upgrade', companionId: 'companion_tessa' }),
+    );
+    expect(meta.companionUpgrades.companion_tessa).toBe(2);
+  });
+
+  it('sends drun + dcompanion on entering a delve and the client mirrors them', () => {
+    enterDelveOnServer();
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self).toHaveProperty('drun');
+    expect(snap.self).toHaveProperty('dcompanion');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.delveRun).not.toBeNull();
+    expect(client.companionState?.companionId).toBe('companion_tessa');
+  });
+
+  it('mirrors delveMarks + delveClears + delveDaily to the client when they change', () => {
+    enterDelveOnServer();
+    broadcast(server);
+    fc.sent.length = 0;
+    server.sim.meta(session.pid)!.delveMarks = 5;
+    const meta = server.sim.meta(session.pid)!;
+    meta.delveClears['collapsed_reliquary:heroic'] = 1;
+    meta.delveDaily.markClears = 2;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.dmarks).toBe(5);
+    expect(snap.self.dclears['collapsed_reliquary:heroic']).toBe(1);
+    expect(snap.self.delveDaily.markClears).toBe(2);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.delveMarks).toBe(5);
+    expect(client.delveClears['collapsed_reliquary:heroic']).toBe(1);
+    // the shop view resolves the heroic-gated rare as unlocked off the mirror
+    expect(
+      client.delveShopOffers('collapsed_reliquary').find((o: any) => o.requiresHeroicClear)
+        ?.unlocked,
+    ).toBe(true);
+    expect(client.delveDaily.markClears).toBe(2);
+  });
+
+  it('does NOT resend drun on an unchanged delve-less first/second tick', () => {
+    // Outside a delve, drun is null and must be omitted after the first send.
+    broadcast(server);
+    fc.sent.length = 0;
+    server.sim.tick();
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self).not.toHaveProperty('drun');
+  });
+
+  it('clears drun + dcompanion (value to null) on leaving a delve and the client mirror follows', () => {
+    enterDelveOnServer();
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.delveRun).not.toBeNull();
+    fc.sent.length = 0;
+    server.sim.leaveDelve(session.pid);
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.drun).toBeNull();
+    expect(snap.self.dcompanion).toBeNull();
+    (client as any).applySnapshot(snap);
+    expect(client.delveRun).toBeNull();
+    expect(client.companionState).toBeNull();
+  });
+});
+
+describe('lockpick view rebuilds from events on the online client', () => {
+  function sessionEvent(sid: string, col: number, visible: any[]) {
+    return {
+      type: 'lockpickSession',
+      sessionId: sid,
+      objectId: 77,
+      w: 11,
+      h: 6,
+      col,
+      row: 2,
+      page: 1,
+      pageCount: 1,
+      tries: 1,
+      triesTotal: 1,
+      lootTier: 'premium',
+      allowed: ['hardSet', 'set', 'steady', 'ease', 'drop'],
+      visible,
+      stepTimeoutMs: 20000,
+    };
+  }
+  function feed(client: ClientWorld, ev: any) {
+    (client as any).onMessage(JSON.stringify({ t: 'events', list: [ev] }));
+  }
+
+  it('builds on session, advances on step, ignores foreign sessions, clears on end', () => {
+    const client = bareClient(1);
+    (client as any).lockpickState = null;
+    const v0 = [{ col: 0, row: 2, kind: 'channel' }];
+    feed(client, sessionEvent('s1', 0, v0));
+    expect(client.lockpickState).not.toBeNull();
+    expect(client.lockpickState?.sessionId).toBe('s1');
+    expect(client.lockpickState?.lootTier).toBe('premium');
+    expect(client.lockpickState?.visible).toEqual(v0);
+
+    // Step advances col + visible, leaves identity fields (w/h/lootTier) intact.
+    const v1 = [{ col: 1, row: 3, kind: 'channel' }];
+    feed(client, {
+      type: 'lockpickStep',
+      sessionId: 's1',
+      col: 1,
+      row: 3,
+      page: 1,
+      pageCount: 1,
+      tries: 1,
+      triesTotal: 1,
+      result: 'advanced',
+      visible: v1,
+    });
+    expect(client.lockpickState?.col).toBe(1);
+    expect(client.lockpickState?.visible).toEqual(v1);
+    expect(client.lockpickState?.w).toBe(11);
+    expect(client.lockpickState?.lootTier).toBe('premium');
+
+    // A step for a different session must not mutate the active view.
+    feed(client, {
+      type: 'lockpickStep',
+      sessionId: 'OTHER',
+      col: 9,
+      row: 9,
+      page: 1,
+      pageCount: 1,
+      tries: 1,
+      triesTotal: 1,
+      result: 'advanced',
+      visible: [],
+    });
+    expect(client.lockpickState?.col).toBe(1);
+
+    // End for the active session clears it; events still reach the HUD queue.
+    feed(client, { type: 'lockpickEnd', sessionId: 's1', outcome: 'success', lootTier: 'premium' });
+    expect(client.lockpickState).toBeNull();
+    expect(client.drainEvents().length).toBeGreaterThan(0);
+  });
+
+  it('does not clear the view on a foreign lockpickEnd', () => {
+    const client = bareClient(1);
+    (client as any).lockpickState = null;
+    feed(client, sessionEvent('s2', 0, []));
+    feed(client, { type: 'lockpickEnd', sessionId: 'OTHER', outcome: 'fail' });
+    expect(client.lockpickState).not.toBeNull();
+    expect(client.lockpickState?.sessionId).toBe('s2');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// W0a: full self-snapshot delta round-trip gate.
+//
+// `selfWireJson` (server/game.ts) emits 25 heavy "delta" fields through a
+// `maybe(key, value)` closure that ships a key only when its serialized form
+// changed since this session last received it; `applySnapshot` (src/net/
+// online.ts) mirrors each with `if (s.X !== undefined)` (or the inline
+// `s.X ?? e.X` form for `stats`/`weapon`). This is the single most fragile codec
+// in the workstream, so we pin: (a) the exact 25-key set against drift, (b) the
+// terse-key -> IWorld-name rename map, (c) that every dirtied value round-trips
+// onto the correct decode target, and (d) that a no-op re-broadcast omits all 25
+// while the prior decoded value is preserved.
+// ---------------------------------------------------------------------------
+
+// The pinned set of the 25 `maybe(...)` delta keys, sorted. Cross-checked below
+// against the live `maybe(...)` calls scraped from server/game.ts source, so a
+// 26th unregistered delta key reddens this gate.
+const ALL_DELTA_KEYS = [
+  'arena',
+  'buyback',
+  'cds',
+  'cosmetics',
+  'dclears',
+  'dcomp',
+  'dcompanion',
+  'delveDaily',
+  'dmarks',
+  'drun',
+  'duel',
+  'equip',
+  'inv',
+  'lockouts',
+  'lroll',
+  'market',
+  'marks',
+  'milestones',
+  'party',
+  'qdone',
+  'qlog',
+  'stats',
+  'tal',
+  'trade',
+  'weapon',
+] as const;
+
+// The terse wire key -> IWorld member name rename map, in sorted order. The wire
+// string IS the protocol (contract #4): a terse key renamed on one side passes tsc
+// and most per-field tests but silently breaks the world, so this map is pinned and
+// each target is validated as a survived value by the round-trip test below. It
+// carries the always-present self scalars (res/mres/rtype/lxp/rxp/prk) plus every
+// delta key whose IWorld name differs from its terse key (stats/weapon/delveDaily
+// keep their name; tal fans out to several members and is asserted directly).
+const TERSE_TO_IWORLD: Record<string, string> = {
+  arena: 'arenaInfo',
+  buyback: 'vendorBuyback',
+  cds: 'cooldowns',
+  cosmetics: 'accountCosmetics',
+  dclears: 'delveClears',
+  dcomp: 'companionUpgrades',
+  dcompanion: 'companionState',
+  dmarks: 'delveMarks',
+  drun: 'delveRun',
+  duel: 'duelInfo',
+  equip: 'equipment',
+  inv: 'inventory',
+  lockouts: 'selfLockouts',
+  lroll: 'lootRollPrompts',
+  lxp: 'lifetimeXp',
+  market: 'marketInfo',
+  marks: 'markers',
+  milestones: 'unlockedMilestones',
+  mres: 'maxResource',
+  party: 'partyInfo',
+  prk: 'prestigeRank',
+  qdone: 'questsDone',
+  qlog: 'questLog',
+  res: 'resource',
+  rtype: 'resourceType',
+  rxp: 'restedXp',
+};
+
+// Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
+// filter without a wall-clock read in test scaffolding.
+const FAR_FUTURE_MS = 8_000_000_000_000;
+
+// Dirty every one of the 25 `maybe()` delta fields with a distinguishable,
+// non-default value so the round-trip + no-op-omission assertions are meaningful
+// (a fresh session carries all 25 on snapshot #1 regardless, since lastSent is
+// empty). Most fields are set on their real PlayerMeta/Entity/session source;
+// for the few whose authentic setup is mutually exclusive in one player state we
+// poke the exact source field the encoder reads, per the brief (the gate asserts
+// the CODEC, not gameplay validity, which the parity/sim suites own):
+//   - `dcompanion`: the delve companion auto-spawns only for a `solo:` run, which
+//     a 2-player party precludes; we attach `run.companion` directly.
+//   - `marks`: setMarker requires a hostile-mob target the delve instance does
+//     not hand us deterministically; we seed the party's marker map directly.
+//   - `market`: marketInfoFor is null unless near the Merchant, so we relocate
+//     the Merchant entity onto the (in-delve) player.
+function dirtyEveryDeltaField(): {
+  server: GameServer;
+  fc: FakeClient;
+  leader: ClientSession;
+  memberPid: number;
+} {
+  const server = new GameServer();
+  const fc = fakeWs();
+  const leader = joinServer(server, fc, 1, 'Alld');
+  const fcMember = fakeWs();
+  const member = joinServer(server, fcMember, 2, 'Memb', 'mage');
+  const sim = server.sim;
+  const lp = leader.pid;
+  const mp = member.pid;
+  const meta = sim.meta(lp)!;
+
+  // Real 2-player party (party) and a real delve run (drun).
+  sim.partyInvite(mp, lp);
+  sim.partyAccept(mp);
+  sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, lp);
+  const door = DELVES.collapsed_reliquary.doorPos;
+  const pDoor = sim.entities.get(lp)!;
+  pDoor.pos.x = door.x;
+  pDoor.pos.z = door.z;
+  pDoor.pos.y = terrainHeight(door.x, door.z, sim.cfg.seed);
+  pDoor.prevPos = { ...pDoor.pos };
+  sim.enterDelve('collapsed_reliquary', 'normal', lp);
+  const p = sim.entities.get(lp)!;
+
+  // Poke the encoder's exact sources for the mutually-exclusive cases.
+  const run = sim.delveRunForPlayer(lp) as any;
+  run.companion = { companionId: 'companion_tessa', entityId: mp };
+  const party = (sim as any).partyOf(lp);
+  (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
+  const merchant = sim.entities.get(sim.market.merchantId);
+  if (merchant) merchant.pos = { ...p.pos };
+
+  // Direct PlayerMeta fields.
+  meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
+  meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
+  meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
+  meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });
+  meta.questsDone.add('q_wolves');
+  meta.raidLockouts.set('nythraxis_boss_arena', FAR_FUTURE_MS);
+  meta.unlockedMilestones.add('milestone_test');
+  meta.lifetimeXp = 555;
+  meta.restedXp = 222;
+  meta.prestigeRank = 3;
+  meta.delveMarks = 7;
+  meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
+  meta.companionUpgrades = { companion_tessa: 2 };
+  meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
+  meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  meta.talentMods.spec = 'arms';
+  meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] }];
+  meta.activeLoadout = 0;
+
+  // Session-scoped account cosmetics.
+  leader.accountCosmetics = {
+    completedQuestIds: ['q_aldrics_fallen_star'],
+    mechChromaIds: ['amber_crimson'],
+  };
+
+  // Player Entity fields.
+  p.cooldowns.set('heroic_strike', 5);
+  p.stats = { ...p.stats, str: 12345 };
+  p.weapon = { ...p.weapon, min: 999 };
+  p.resource = 42;
+  p.maxResource = 150;
+
+  // Trade / duel / loot-roll: poke the exact collections the encoder reads.
+  sim.trades.set(lp, {
+    a: lp,
+    b: mp,
+    offerA: { items: [], copper: 10 },
+    offerB: { items: [], copper: 0 },
+    acceptedA: true,
+    acceptedB: false,
+  });
+  sim.duels.set(lp, { a: lp, b: mp, state: 'countdown', timer: 3 });
+  (sim as any).pendingLootRolls.set(1, {
+    id: 1,
+    itemId: 'baked_bread',
+    itemName: 'Baked Bread',
+    quality: 'common',
+    expiresAt: 9999,
+    candidates: [lp],
+    choices: new Map(),
+  });
+
+  return { server, fc, leader, memberPid: mp };
+}
+
+describe('full self-state snapshot delta fixture', () => {
+  it('carries every one of the 25 dirtied delta keys on the first snapshot', () => {
+    const { server, fc } = dirtyEveryDeltaField();
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap).not.toBeNull();
+    for (const key of ALL_DELTA_KEYS) {
+      expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
+      // each was dirtied to a non-default value, so none rides the wire as null
+      expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
+    }
+  });
+
+  it('mirrors every dirtied self value onto the correct decode target', () => {
+    const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
+    broadcast(server);
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+
+    // --- fields that decode onto the player ENTITY (client.player), not the client ---
+    expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
+    expect(client.player.stats).toMatchObject({ str: 12345 }); // stats (inline s.X ?? e.X)
+    expect(client.player.weapon).toMatchObject({ min: 999 }); // weapon (inline s.X ?? e.X)
+    expect(client.player.resource).toBe(42); // res -> resource
+    expect(client.player.maxResource).toBe(150); // mres -> maxResource
+    expect(client.player.resourceType).toBe('rage'); // rtype -> resourceType
+
+    // --- always-present scalar renames ---
+    expect(client.lifetimeXp).toBe(555); // lxp -> lifetimeXp
+    expect(client.restedXp).toBe(222); // rxp -> restedXp
+    expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
+
+    // --- fields that decode onto the client ---
+    expect(client.inventory).toEqual([{ itemId: 'baked_bread', count: 3 }]); // inv -> inventory
+    expect(client.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]); // buyback -> vendorBuyback
+    expect(client.equipment).toMatchObject({ mainhand: 'zealotsbane_blade' }); // equip -> equipment
+    // cosmetics -> accountCosmetics, asserted against the normalized shape (the input
+    // is already the normal {completedQuestIds, mechChromaIds} form, see :192-202)
+    expect(client.accountCosmetics).toEqual({
+      completedQuestIds: ['q_aldrics_fallen_star'],
+      mechChromaIds: ['amber_crimson'],
+    });
+    expect([...client.questLog.values()]).toEqual([
+      { questId: 'q_widows', counts: [10, 0], state: 'active' },
+    ]); // qlog -> questLog (Map)
+    expect(client.questsDone.has('q_wolves')).toBe(true); // qdone -> questsDone (Set)
+    expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
+    // lockouts -> selfLockouts (private), via the raidLockouts() accessor
+    expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
+    expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
+    expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
+    expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
+    expect((client.tradeInfo as any)?.otherPid).toBe(memberPid); // trade -> tradeInfo
+    expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
+    expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
+    expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
+    expect(client.delveRun).not.toBeNull(); // drun -> delveRun
+    expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
+    expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
+    expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
+    expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
+    expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
+    // tal -> talents / talentSpec / loadouts / activeLoadout
+    expect(client.talents).toEqual({ spec: 'arms', ranks: {}, choices: {} });
+    expect(client.talentSpec).toBe('arms');
+    expect(client.loadouts).toEqual([
+      { name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] },
+    ]);
+    expect(client.activeLoadout).toBe(0);
+  });
+
+  it('omits all 25 delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
+    const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
+    broadcast(server);
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+
+    // capture the structures decoded from snapshot #1, by reference
+    const invRef = client.inventory;
+    const cooldownsRef = client.player.cooldowns;
+    const statsRef = client.player.stats;
+    const weaponRef = client.player.weapon;
+    const partyRef = client.partyInfo;
+    const delveRunRef = client.delveRun;
+
+    // a second broadcast with NO intervening sim.tick() and no state mutation: the
+    // maybe() closure sees byte-identical JSON for all 25 and omits every one
+    fc.sent.length = 0;
+    broadcast(server);
+    const snap2 = lastSnap(fc.sent);
+    for (const key of ALL_DELTA_KEYS) {
+      expect(snap2.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
+    }
+
+    // applying the delta-less snapshot keeps the prior mirror untouched, by reference
+    // (covers both the `if (s.X !== undefined)` and the inline `s.X ?? e.X` forms)
+    (client as any).applySnapshot(snap2);
+    expect(client.inventory).toBe(invRef); // if !== undefined (client field)
+    expect(client.player.cooldowns).toBe(cooldownsRef); // if !== undefined (player entity)
+    expect(client.player.stats).toBe(statsRef); // s.stats ?? e.stats (inline, player entity)
+    expect(client.player.weapon).toBe(weaponRef); // s.weapon ?? e.weapon (inline, player entity)
+    expect(client.partyInfo).toBe(partyRef);
+    expect(client.delveRun).toBe(delveRunRef);
+    expect(client.markerFor(memberPid)).toBe(3);
+    expect(client.delveMarks).toBe(7);
+    expect(client.companionState?.companionId).toBe('companion_tessa');
+  });
+});
+
+describe('delta-key contract pins (anti-drift)', () => {
+  it('ALL_DELTA_KEYS contains exactly 25 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(25);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(25);
+    expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
+    const src = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    // tolerate whitespace/newline between `(` and the quote so the multi-line
+    // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted to 24
+    const re = /\bmaybe\(\s*['"](\w+)['"]/g;
+    const scraped = new Set<string>();
+    for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
+    expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
+    expect(scraped.size).toBe(25);
+    expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('TERSE_TO_IWORLD pins the terse-key to IWorld-name renames in sorted membership', () => {
+    // the 11 non-obvious renames the brief calls out as where drift hides
+    const required: Record<string, string> = {
+      res: 'resource',
+      mres: 'maxResource',
+      rtype: 'resourceType',
+      lxp: 'lifetimeXp',
+      rxp: 'restedXp',
+      prk: 'prestigeRank',
+      drun: 'delveRun',
+      dcompanion: 'companionState',
+      dmarks: 'delveMarks',
+      dcomp: 'companionUpgrades',
+      dclears: 'delveClears',
+    };
+    for (const [terse, iworld] of Object.entries(required)) {
+      expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
+    }
+    // sorted-membership pin: adding or renaming an entry must be a deliberate,
+    // reviewable change landing in alphabetical order
+    expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
+    // every entry is either a delta key or one of the always-present self scalars
+    const SELF_SCALARS = new Set(['res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    for (const terse of Object.keys(TERSE_TO_IWORLD)) {
+      expect(
+        (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),
+        `${terse} is neither a delta key nor a known self scalar`,
+      ).toBe(true);
+    }
+  });
+});
+
+// A negative-value buff_* aura (a stat-sap: an intellect-draining curse on buff_int, an
+// attack-power drain on buff_ap) reads as a DEBUFF via auras_view.isAuraDebuff's
+// `value < 0` branch. That branch can only fire online if the wire carries the value. The
+// serializer sends `value` SPARSELY: only when it is negative (the sole case that flips the
+// classification), so an ordinary buff and the positive absorb shield stay off the wire and
+// decode to 0 exactly as before (no absorb-overlay regression; see target_frame.test.ts).
+// The client decode reads `a.value ?? 0`, so an old server that never sends it still decodes
+// to 0 (backward compatible). This drives a real Sim aura through the real serializer
+// (wireEntity) and the real client decode (ClientWorld.applySnapshot).
+describe('aura value over the wire (stat-sap debuff parity)', () => {
+  function roundTrip(aura: Aura): { wire: Record<string, unknown>; mirror: Aura } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Sapped');
+    const e = sim.entities.get(pid)!;
+    e.auras.push(aura);
+    const wire = wireEntity(e);
+    // A different pid than the wired entity, so the player is decoded as a regular entity.
+    const client = bareClient(999);
+    // Serialize through JSON exactly as production does (wireCacheFor -> JSON.stringify), so
+    // the round trip also catches any JSON-normalization divergence (e.g. -0 -> 0), not just
+    // the in-memory wire shape.
+    const snap = JSON.parse(JSON.stringify({ t: 'snap', ents: [wire] }));
+    (client as any).applySnapshot(snap);
+    const mirror = client.entities.get(pid)!.auras.find((a) => a.id === aura.id)!;
+    return { wire, mirror };
+  }
+
+  // Pull the wired aura record by id (the entity carries only the pushed aura here).
+  function wireAura(wire: Record<string, unknown>, id: string): Record<string, unknown> {
+    return (wire.auras as Array<Record<string, unknown>>).find((a) => a.id === id)!;
+  }
+
+  function sapInt(value: number): Aura {
+    return {
+      id: 'enfeeble',
+      name: 'Enfeeble',
+      kind: 'buff_int',
+      remaining: 8,
+      duration: 8,
+      value,
+      sourceId: 0,
+      school: 'physical',
+    };
+  }
+
+  it('sends a NEGATIVE buff_* value so the sap classifies as a debuff in BOTH worlds', () => {
+    const simSap = sapInt(-30);
+    const { wire, mirror } = roundTrip(simSap);
+    // the serializer carried the negative value...
+    expect(wireAura(wire, 'enfeeble').value).toBe(-30);
+    // ...and the client decoded it (not the old hardcoded 0).
+    expect(mirror.value).toBe(-30);
+    // so isAuraDebuff agrees across the wire: a debuff offline AND online.
+    expect(isAuraDebuff(simSap)).toBe(true);
+    expect(isAuraDebuff(mirror)).toBe(true);
+  });
+
+  it('does NOT send a POSITIVE buff value (sparse): a real buff stays a buff in both worlds', () => {
+    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Arcane Intellect' };
+    const { wire, mirror } = roundTrip(buff);
+    expect('value' in wireAura(wire, 'arcane_intellect')).toBe(false); // omitted on the wire
+    expect(mirror.value).toBe(0); // decodes to 0 (?? 0)
+    expect(isAuraDebuff(buff)).toBe(false);
+    expect(isAuraDebuff(mirror)).toBe(false);
+  });
+
+  it('does NOT send a POSITIVE absorb value: the shield overlay stays offline-only (no regression)', () => {
+    const shield: Aura = {
+      id: 'power_word_shield',
+      name: 'Power Word: Shield',
+      kind: 'absorb',
+      remaining: 12,
+      duration: 12,
+      value: 250,
+      sourceId: 0,
+      school: 'holy',
+    };
+    const { wire, mirror } = roundTrip(shield);
+    expect('value' in wireAura(wire, 'power_word_shield')).toBe(false);
+    // online absorb is still 0, so the shield overlay remains offline-only (target_frame parity).
+    expect(mirror.value).toBe(0);
+  });
+
+  it('does NOT send a NEGATIVE value for a non-buff_ aura (kind-gated): fear keeps its kind classification', () => {
+    // The emit mirrors isAuraDebuff's value branch (buff_* only), so a negative-value
+    // non-buff aura -- e.g. an incapacitate (fear) carrying a random facing angle that is
+    // negative about half the time -- never ships its value. It stays a debuff via its KIND,
+    // identically in both worlds, and no inert value rides the wire.
+    const fear: Aura = {
+      id: 'fear',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 4,
+      duration: 4,
+      value: -1.5,
+      sourceId: 0,
+      school: 'shadow',
+    };
+    const { wire, mirror } = roundTrip(fear);
+    expect('value' in wireAura(wire, 'fear')).toBe(false); // negative, but not buff_ -> omitted
+    expect(mirror.value).toBe(0);
+    expect(isAuraDebuff(fear)).toBe(true); // debuff via kind, in both worlds
+    expect(isAuraDebuff(mirror)).toBe(true);
+  });
+
+  it('tolerates an old-server wire aura with no value (backward compatible -> 0)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      ents: [
+        {
+          id: 2,
+          k: 'mob',
+          tid: 'wolf',
+          nm: 'Wolf',
+          lv: 3,
+          x: 0,
+          y: 0,
+          z: 0,
+          f: 0,
+          hp: 40,
+          mhp: 40,
+          auras: [{ id: 'enfeeble', name: 'Enfeeble', kind: 'buff_int', rem: 8, dur: 8 }],
+        },
+      ],
+    });
+    const mirror = client.entities.get(2)!.auras.find((a) => a.kind === 'buff_int')!;
+    expect(mirror.value).toBe(0);
   });
 });

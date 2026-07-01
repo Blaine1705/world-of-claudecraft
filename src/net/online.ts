@@ -1,5 +1,11 @@
 // Online play: REST auth client + WebSocket world mirror.
 
+import {
+  isDesktopAppRuntime,
+  normalizeOrigin,
+  runtimeApiOrigin,
+  runtimeWebSocketUrl,
+} from '../runtime';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -8,12 +14,15 @@ import {
   emptyAllocation,
   pointsSpent,
   type Role,
+  SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   type TalentAllocation,
   talentPointsAtLevel,
 } from '../sim/content/talents';
-import { abilitiesKnownAt, NPCS } from '../sim/data';
+import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
+import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
+import type { Ante, PickAction } from '../sim/lockpick';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
@@ -23,6 +32,7 @@ import {
   type InvSlot,
   type LootRollChoice,
   type LootRollPrompt,
+  type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
   type QuestProgress,
@@ -33,12 +43,19 @@ import {
   type AccountCosmetics,
   type ArenaInfo,
   type CharacterSearchResult,
+  type ClientCommand,
+  type DelveCompanionInfo,
+  type DelveDailyInfo,
+  type DelveRunInfo,
+  type DelveShopOfferView,
   type DuelInfo,
   type FriendInfo,
+  type GuildLeaderboardPage,
   type IWorld,
   isOverheadEmoteId,
   type LeaderboardEntry,
   type LeaderboardPage,
+  type LockpickView,
   type MarketInfo,
   type OverheadEmoteId,
   type PartyInfo,
@@ -47,7 +64,6 @@ import {
   type SocialInfo,
   type TradeInfo,
 } from '../world_api';
-import { isDesktopAppRuntime, normalizeOrigin, runtimeApiOrigin, runtimeWebSocketUrl } from '../runtime';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -61,6 +77,8 @@ export interface CharacterSummary {
   skin: number;
   online: boolean;
   forceRename: boolean;
+  lastPlayed?: string | null;
+  playtimeSeconds?: number;
 }
 
 function stringList(value: unknown): string[] {
@@ -292,7 +310,12 @@ export class Api {
     this.username = data.username;
   }
 
-  async linkSteamAccount(username: string, password: string, ticket: string, displayName = ''): Promise<void> {
+  async linkSteamAccount(
+    username: string,
+    password: string,
+    ticket: string,
+    displayName = '',
+  ): Promise<void> {
     const data = await this.post('/api/steam/link', { username, password, ticket, displayName });
     this.token = data.token;
     this.username = data.username;
@@ -359,11 +382,6 @@ export class Api {
 
   async logout(): Promise<void> {
     await this.post('/api/account/logout', {});
-  }
-
-  async setEmail(email: string): Promise<string> {
-    const data = await this.post('/api/account/email', { email });
-    return typeof data.email === 'string' ? data.email : '';
   }
 
   async deactivateAccount(username: string, password: string): Promise<void> {
@@ -531,6 +549,57 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  // ── Discord link/login + status ────────────────────────────────────────────
+  // Returns the discord.com authorize URL the browser navigates to (login = new
+  // session, link = attach to the current account).
+  async discordStart(mode: 'login' | 'link'): Promise<{ url: string }> {
+    return this.post(`/api/auth/discord/start?mode=${mode}`, {});
+  }
+
+  // First-time Discord login chooser: create a brand-new account for the verified
+  // Discord identity (parked under `linkToken`) and start a session.
+  async discordLoginNew(linkToken: string): Promise<void> {
+    const data = await this.post('/api/auth/discord/login/new', { linkToken });
+    this.token = data.token;
+    this.username = data.username;
+  }
+
+  // First-time Discord login chooser: link the verified Discord identity to an
+  // EXISTING account (username + password, plus a 2FA code if that account has it).
+  // Returns { twoFactorRequired: true } when a code is needed (the caller re-invokes
+  // with `code`/`recoveryCode`), mirroring login(); a wrong code/password throws.
+  async discordLoginLink(
+    linkToken: string,
+    username: string,
+    password: string,
+    code = '',
+    recoveryCode = '',
+  ): Promise<{ twoFactorRequired?: boolean }> {
+    const data = await this.post('/api/auth/discord/login/link', {
+      linkToken,
+      username,
+      password,
+      code,
+      recoveryCode,
+    });
+    if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
+    this.token = data.token;
+    this.username = data.username;
+    return {};
+  }
+
+  // Current account's Discord link status + reward points + live guild presence.
+  async discordStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/discord');
+  }
+
+  // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
+  // `password` so it stays reachable after unlinking; the server 400s with
+  // 'password_required' otherwise. A normal account passes nothing.
+  async unlinkDiscord(password?: string): Promise<void> {
+    await this.delete('/api/discord', password ? { password } : {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL
@@ -631,6 +700,7 @@ function blankEntity(id: number): Entity {
     warcryTimer: 0,
     petPath: [],
     petPathCooldown: 0,
+    castPushbackReduction: 0,
     pos: { x: 0, y: 0, z: 0 },
     prevPos: { x: 0, y: 0, z: 0 },
     facing: 0,
@@ -653,6 +723,7 @@ function blankEntity(id: number): Entity {
     weapon: { min: 1, max: 2, speed: 2 },
     attackPower: 0,
     rangedPower: 0,
+    spellPower: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
     moveSpeed: 7,
@@ -663,6 +734,7 @@ function blankEntity(id: number): Entity {
     inCombat: false,
     combatTimer: 99,
     auras: [],
+    stealthed: false,
     ccDr: new Map(),
     castingAbility: null,
     castRemaining: 0,
@@ -678,6 +750,7 @@ function blankEntity(id: number): Entity {
     comboTargetId: null,
     overpowerUntil: -1,
     potionCooldownUntil: -1,
+    potionCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -703,6 +776,8 @@ function blankEntity(id: number): Entity {
     ownerId: null,
     petMode: 'defensive',
     petTauntTimer: 0,
+    petAutoTaunt: false,
+    petManualTauntPending: false,
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
     evadeStall: 0,
@@ -714,6 +789,7 @@ function blankEntity(id: number): Entity {
     aggroTargetId: null,
     respawnTimer: 0,
     corpseTimer: 0,
+    lootFfaTimer: Infinity,
     lootable: false,
     loot: null,
     xpValue: 0,
@@ -726,20 +802,35 @@ function blankEntity(id: number): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mainhandItemId: null,
+    equippedItems: {},
     guild: '',
   };
 }
 
 export class ClientWorld implements IWorld {
+  // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
+  // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
+  // is IWorldCombat-owned but rides here as a self-wire mirror field with the rest
+  // of the roster data. ---
   cfg: { seed: number; playerClass: PlayerClass };
   entities = new Map<number, Entity>();
   playerId = -1;
+  private ownPlayerId = -1;
+  private readonly ownPlayerClass: PlayerClass;
+  spectating: string | null = null;
   moveInput: MoveInput = emptyMoveInput();
+  known: ResolvedAbility[] = [];
+  realm = '';
   inventory: InvSlot[] = [];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
-  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
   copper = 0;
+  // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
+  // mirrored from snapshot self. ---
+  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
+  // milestones, mirrored from snapshot self. ---
   xp = 0;
   // Post-cap progression (Max-Level XP Overflow), mirrored from snapshot self.
   lifetimeXp = 0;
@@ -747,8 +838,8 @@ export class ClientWorld implements IWorld {
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
   unlockedMilestones: string[] = [];
-  known: ResolvedAbility[] = [];
-  // Talents & Specializations, mirrored from snapshot self (display + staging).
+  // --- IWorldTalents: talents + spec/role + saved loadouts, mirrored from
+  // snapshot self (display + staging). ---
   talents: TalentAllocation = emptyAllocation();
   talentSpec: string | null = null;
   talentRole: Role | null = null;
@@ -756,15 +847,43 @@ export class ClientWorld implements IWorld {
   activeLoadout = -1;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
+  // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
+  // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
+  // field (pet state lives on the owned-mob entity wire). ---
   partyInfo: PartyInfo | null = null;
+  // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
+  // (`s.trade`, delta-omitted). ---
   tradeInfo: TradeInfo | null = null;
+  // --- IWorldDuelArena: duel + rated-arena state, mirrored from the snapshot self
+  // (`s.duel`/`s.arena`, delta-omitted); the live 2v2 Fiesta view rides
+  // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
-  socialInfo: SocialInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
+  // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
+  socialInfo: SocialInfo | null = null;
+  // --- IWorldMarket: World Market view, mirrored from the snapshot self
+  // (`s.market`, delta-omitted). ---
   marketInfo: MarketInfo | null = null;
+  // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
+  // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
+  // it has NO snapshot field and is rebuilt from the lockpick* events by the private
+  // applyLockpickEvent. delveClears is a NON-IWorld mirror behind delveShopOffers. ---
+  delveRun: DelveRunInfo | null = null;
+  companionState: DelveCompanionInfo | null = null;
+  // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
+  // Holds only the fog-windowed cells the server discloses.
+  lockpickState: LockpickView | null = null;
+  delveMarks = 0;
+  companionUpgrades: Record<string, number> = {};
+  // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
+  // delveShopOffers can resolve the shop lock badge client-side.
+  delveClears: Record<string, number> = {};
+  delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
+  // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
+  // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
-  realm = '';
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
@@ -802,12 +921,15 @@ export class ClientWorld implements IWorld {
   private pendingInputSeqSentAt = new Map<number, number>();
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
+  private spectateFacingPending = false;
+  private pendingSpectateFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
     this.clientSeed = clientSeed;
+    this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
     // when a realm was picked, connect to that realm's origin; otherwise the
     // page's own host
@@ -863,6 +985,12 @@ export class ClientWorld implements IWorld {
     return samples;
   }
 
+  consumeSpectateFacing(): number | null {
+    const facing = this.pendingSpectateFacing;
+    this.pendingSpectateFacing = null;
+    return facing;
+  }
+
   // -----------------------------------------------------------------------
   // Socket
   // -----------------------------------------------------------------------
@@ -884,7 +1012,13 @@ export class ClientWorld implements IWorld {
   }
 
   private sendInput(now = performance.now(), changedOnly = false): boolean {
-    if (!this.connected || this.ws.readyState !== WebSocket.OPEN) return false;
+    if (
+      typeof this.spectating === 'string' ||
+      !this.connected ||
+      this.ws.readyState !== WebSocket.OPEN
+    ) {
+      return false;
+    }
     const sig = this.inputSignature();
     if (changedOnly) {
       if (sig === this.lastInputSig) return false;
@@ -922,14 +1056,24 @@ export class ClientWorld implements IWorld {
     return this.connected && this.ws.readyState === WebSocket.OPEN;
   }
 
-  private cmd(payload: Record<string, unknown>): void {
+  private rawCmd(payload: Record<string, unknown>): void {
     if (!this.canSendCommand()) return;
     this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
 
+  // Typed IWorld command send (W0b): `cmd` must be a ClientCommand, i.e. a token
+  // from the shared COMMAND_NAMES table that is NOT dispatch-only. This is what
+  // makes "every ClientWorld send is in the server's dispatch-set" a compile-time
+  // guarantee rather than a runtime hope: a send of an unknown or dispatch-only
+  // token fails `tsc`. The raw escape hatch (devCmd) stays untyped on purpose.
+  private cmd(payload: { cmd: ClientCommand } & Record<string, unknown>): void {
+    if (typeof this.spectating === 'string' && payload.cmd !== 'chat') return;
+    this.rawCmd(payload);
+  }
+
   /** Raw WS command — used by dev scripts and browser console when online. */
   devCmd(payload: Record<string, unknown>): void {
-    this.cmd(payload);
+    this.rawCmd(payload);
   }
 
   private onMessage(raw: string): void {
@@ -941,6 +1085,7 @@ export class ClientWorld implements IWorld {
     }
     if (msg.t === 'hello') {
       this.playerId = msg.pid;
+      this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       if (Array.isArray(msg.softWords)) {
@@ -950,6 +1095,20 @@ export class ClientWorld implements IWorld {
         this.profanityDirty = true;
       }
       this.connected = true;
+      return;
+    }
+    if (msg.t === 'spectate') {
+      this.spectating = typeof msg.name === 'string' ? msg.name : null;
+      this.spectateFacingPending = true;
+      this.pendingSpectateFacing = null;
+      this.pendingInputSeqSentAt.clear();
+      this.inputEchoSamples = [];
+      if (typeof this.spectating !== 'string') {
+        this.playerId = this.ownPlayerId;
+        this.cfg.playerClass = this.ownPlayerClass;
+      }
+      Object.assign(this.moveInput, emptyMoveInput());
+      this.mouselookFacing = null;
       return;
     }
     if (msg.t === 'censor') {
@@ -966,7 +1125,10 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'events') {
-      for (const ev of msg.list) this.eventQueue.push(ev as SimEvent);
+      for (const ev of msg.list) {
+        this.applyLockpickEvent(ev as SimEvent);
+        this.eventQueue.push(ev as SimEvent);
+      }
       return;
     }
     if (msg.t === 'social') {
@@ -1033,6 +1195,9 @@ export class ClientWorld implements IWorld {
 
   private applySnapshot(snap: any): void {
     const now = performance.now();
+    if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
+      this.playerId = snap.self.id;
+    }
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
     // interpolation segment at the pose currently on screen
@@ -1049,6 +1214,7 @@ export class ClientWorld implements IWorld {
     const seen = new Set<number>();
     const prevSelf = this.entities.get(this.playerId);
     const prevSelfFacing = prevSelf?.facing;
+    const prevSelfDead = prevSelf?.dead ?? false;
 
     const applyWire = (w: any): Entity | null => {
       let e = this.entities.get(w.id);
@@ -1071,9 +1237,16 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
+        e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
+        e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
+        e.discordAvatar = typeof w.dav === 'string' ? w.dav : undefined; // Discord PFP (linked)
+        e.discordName = typeof w.dnm === 'string' ? w.dnm : undefined; // Discord handle/nickname
+        e.discordJoined = typeof w.dj === 'number' ? w.dj : undefined; // Discord join epoch ms
+        e.discordRole = typeof w.dr === 'string' ? w.dr : undefined; // top staff/special role key
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -1139,6 +1312,7 @@ export class ClientWorld implements IWorld {
       e.facing = w.f;
       e.hp = w.hp;
       e.maxHp = w.mhp;
+      e.rangedPower = w.rp ?? 0;
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
@@ -1155,6 +1329,8 @@ export class ClientWorld implements IWorld {
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
+      e.petAutoTaunt = !!w.pa;
+      e.petManualTauntPending = false;
       e.threat = new Map(w.thr ?? []);
       e.auras = (w.auras ?? []).map((a: any) => ({
         id: a.id,
@@ -1162,9 +1338,19 @@ export class ClientWorld implements IWorld {
         kind: a.kind,
         remaining: a.rem,
         duration: a.dur,
-        value: 0,
+        // The wire carries value only for negative-value buff_* stat-saps (sparse,
+        // server/game.ts), so the UI classifies them as debuffs identically to offline; a
+        // missing value (ordinary buffs, absorb, non-buff auras, an old server) decodes to 0
+        // as before. sourceId/school stay simplified (separate pre-existing wire reductions,
+        // not part of this change).
+        value: a.value ?? 0,
         sourceId: 0,
         school: 'physical' as const,
+        stacks: a.stacks,
+        // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire sends it
+        // only when defined (server/game.ts), so an ordinary aura or an old server decodes to
+        // undefined and the badge falls back to the stacks path, exactly as before.
+        charges: a.charges,
       }));
       e.loot = w.lootList ?? null;
       return e;
@@ -1183,6 +1369,15 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s) : null;
     if (s && e) {
+      if (typeof this.spectating === 'string' && e.kind === 'player' && e.templateId in CLASSES) {
+        this.cfg.playerClass = e.templateId as PlayerClass;
+      }
+      if (this.spectateFacingPending) {
+        this.pendingSpectateFacing = e.facing;
+        this.spectateFacingPending = false;
+      } else if (typeof this.spectating === 'string' && prevSelf && prevSelfDead && !e.dead) {
+        this.pendingSpectateFacing = e.facing;
+      }
       seen.add(s.id);
       if (typeof s.ack === 'number' && s.ack > this.ackedInputSeq) {
         for (let seq = this.ackedInputSeq + 1; seq <= s.ack; seq++) {
@@ -1202,6 +1397,7 @@ export class ClientWorld implements IWorld {
       if (s.cds !== undefined)
         e.cooldowns = new Map(Object.entries(s.cds).map(([k, v]) => [k, Number(v)]));
       e.gcdRemaining = s.gcd ?? 0;
+      e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
       e.comboTargetId = s.comboTgt ?? null;
       e.targetId = s.target ?? null;
@@ -1210,6 +1406,8 @@ export class ClientWorld implements IWorld {
       e.queuedOnSwing = s.queued ?? null;
       e.stats = s.stats ?? e.stats;
       e.attackPower = s.ap ?? 0;
+      e.rangedPower = s.rp ?? 0;
+      e.spellPower = s.sp ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
       e.weapon = s.weapon ?? e.weapon;
@@ -1219,11 +1417,19 @@ export class ClientWorld implements IWorld {
       e.drinking = s.drk
         ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
         : null;
+      // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
+      // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
+      // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
+      // milestones->unlockedMilestones) are unchanged by the re-group.
       this.xp = s.xp ?? 0;
       this.lifetimeXp = s.lxp ?? 0;
       this.restedXp = s.rxp ?? 0;
       this.prestigeRank = s.prk ?? 0;
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
+      // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
+      // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
+      // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
+      // the move; the offline counterpart is src/sim/items.ts.
       this.copper = s.copper ?? 0;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
@@ -1234,6 +1440,8 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
+      // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
@@ -1243,6 +1451,9 @@ export class ClientWorld implements IWorld {
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
+      // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
+      // the prior mirror); the known rebuild below is display-only (re-renders what
+      // the server already decided), not client authority.
       // talent state (heavy field, sent on change): mirror it, then resolve known
       // with the precomputed modifiers so granted abilities + tweaks show locally.
       if (s.tal !== undefined && s.tal) {
@@ -1259,13 +1470,25 @@ export class ClientWorld implements IWorld {
         e.level,
         computeTalentModifiers(this.cfg.playerClass, talents),
       );
+      // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
+      // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
       if (s.marks !== undefined) this.markers = s.marks ?? {}; // null = cleared (no party/disband)
+      // --- IWorldTrade / IWorldDuelArena: trade/duel/arena delta self-decode
+      // (W0a-covered; keep the prior mirror value when the field is omitted).
+      // IWorldSocialGraph.socialInfo has NO snapshot key - it is set only by the
+      // social/socialpos frames. ---
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
+      if (s.drun !== undefined) this.delveRun = s.drun;
+      if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
+      if (s.dmarks !== undefined) this.delveMarks = s.dmarks ?? 0;
+      if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
+      if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
+      if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -1286,6 +1509,14 @@ export class ClientWorld implements IWorld {
     const missingSince = this.missingSince;
     for (const [id, e] of this.entities) {
       if (id === this.playerId) continue;
+      // Keep the moderator's last own-self record while a different player is
+      // presented as self. The spectate-clear frame can then restore the original
+      // identity immediately instead of exposing a blank entity before the next
+      // server snapshot arrives.
+      if (typeof this.spectating === 'string' && id === this.ownPlayerId) {
+        missingSince.delete(id);
+        continue;
+      }
       if (seen.has(id)) {
         missingSince.delete(id);
         continue;
@@ -1343,12 +1574,13 @@ export class ClientWorld implements IWorld {
   // self-heals on the next GCD. (Mob respawn clears attackers' targetId, so it
   // has no such window.)
   private deadTargetCast(def: ResolvedAbility['def'] | undefined): boolean {
-    if (!def || !def.requiresTarget || def.targetType === 'friendly') return false;
+    if (!def?.requiresTarget || def.targetType === 'friendly') return false;
     const tid = this.player.targetId;
     const target = tid !== null ? this.entities.get(tid) : undefined;
     return !!target && target.dead;
   }
 
+  // --- IWorldCombat: ability casts, auto-attack, spirit release ---
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
@@ -1356,7 +1588,6 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'cast', ability: abilityId });
   }
-
   castAbilityBySlot(slot: number): void {
     if (this.deadTargetCast(this.known[slot]?.def)) {
       this.eventQueue.push({ type: 'error', text: 'You have no target.', reason: 'target_dead' });
@@ -1364,7 +1595,22 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'castSlot', slot });
   }
+  cancelAura(auraId: string): void {
+    // Authoritative on the server; the dropped aura disappears on the next self
+    // snapshot. No optimistic local removal (stat recalc is server-owned).
+    this.cmd({ cmd: 'cancel_aura', aura: auraId });
+  }
+  startAutoAttack(): void {
+    this.cmd({ cmd: 'attack' });
+  }
+  stopAutoAttack(): void {
+    this.cmd({ cmd: 'stopattack' });
+  }
+  releaseSpirit(): void {
+    this.cmd({ cmd: 'release' });
+  }
 
+  // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {
     // optimistic local update for snappy UI
     const p = this.entities.get(this.playerId);
@@ -1372,7 +1618,7 @@ export class ClientWorld implements IWorld {
       if (id === null) p.targetId = null;
       else {
         const e = this.entities.get(id);
-        if (e && (!e.dead || e.lootable)) p.targetId = id;
+        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) p.targetId = id;
       }
     }
     this.cmd({ cmd: 'target', id });
@@ -1386,11 +1632,11 @@ export class ClientWorld implements IWorld {
   friendlyTabTarget(): void {
     this.cmd({ cmd: 'tabFriendly' });
   }
-  startAutoAttack(): void {
-    this.cmd({ cmd: 'attack' });
-  }
-  stopAutoAttack(): void {
-    this.cmd({ cmd: 'stopattack' });
+
+  // --- IWorldTelemetry: fire-and-forget metrics sink ---
+  reportTelemetry(kind: string, data: Record<string, number>): void {
+    if (!this.canSendCommand()) return;
+    this.cmd({ cmd: 'telemetry', kind, ...data });
   }
   interact(): void {
     this.cmd({ cmd: 'interact' });
@@ -1398,6 +1644,7 @@ export class ClientWorld implements IWorld {
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });
   }
+  // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
     this.cmd({ cmd: 'lootRoll', rollId, choice });
   }
@@ -1417,16 +1664,18 @@ export class ClientWorld implements IWorld {
     this.pendingQuestCommands.set(questId, 'turnin');
     this.cmd({ cmd: 'turnin', quest: questId });
   }
-  reportTelemetry(kind: string, data: Record<string, number>): void {
-    if (!this.canSendCommand()) return;
-    this.cmd({ cmd: 'telemetry', kind, ...data });
-  }
   abandonQuest(questId: string): void {
     if (!this.canSendCommand()) return;
     this.questLog.delete(questId);
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
   }
+  acceptLinkedQuest(questId: string, fromPid: number): void {
+    this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
+  }
+  // IWorldInventory facet (W2): the eight item/vendor command senders. Each is a thin
+  // cmd() emit whose offline counterpart is the moved src/sim/items.ts body resolved on
+  // the server. The move changes no wire field or command string.
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }
@@ -1445,9 +1694,15 @@ export class ClientWorld implements IWorld {
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
   }
+  sellAllJunk(): void {
+    this.cmd({ cmd: 'sell_all_junk' });
+  }
   buyBackItem(itemId: string): void {
     this.cmd({ cmd: 'buyback', item: itemId });
   }
+  // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
+  // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
+  // server re-validates and the self-snapshot reconciles. ---
   changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
     const idx =
       catalog === 'mech'
@@ -1488,9 +1743,6 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'unequip_mech_chroma', chroma: chromaId });
   }
-  releaseSpirit(): void {
-    this.cmd({ cmd: 'release' });
-  }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
   }
@@ -1502,6 +1754,9 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'emote', emote: emoteId });
   }
+  // --- IWorldPet: hunter-pet commands (snake_case wire; pet state mirrors on the
+  // owned-mob entity wire, not the self frame). setPetAutoTaunt nudges the owned mob
+  // locally before the send (sanctioned trivial-UI optimism), re-confirmed next frame. ---
   abandonPet(): void {
     this.cmd({ cmd: 'pet_abandon' });
   }
@@ -1517,6 +1772,15 @@ export class ClientWorld implements IWorld {
   petTaunt(): void {
     this.cmd({ cmd: 'pet_taunt' });
   }
+  setPetAutoTaunt(enabled: boolean): void {
+    for (const e of this.entities.values()) {
+      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+        e.petAutoTaunt = enabled;
+        break;
+      }
+    }
+    this.cmd({ cmd: 'pet_auto_taunt', enabled });
+  }
   feedPet(itemId: string): void {
     this.cmd({ cmd: 'pet_feed', item: itemId });
   }
@@ -1526,6 +1790,9 @@ export class ClientWorld implements IWorld {
   setPetMode(mode: 'passive' | 'defensive' | 'aggressive'): void {
     this.cmd({ cmd: 'pet_mode', mode });
   }
+  // --- IWorldParty: party/raid commands + raid-target markers (terse wire strings;
+  // markers belong to IWorldParty, not IWorldTargeting; markerFor is a mirrored-state
+  // read, no send). ---
   // social systems
   partyInvite(targetPid: number): void {
     this.cmd({ cmd: 'pinvite', id: targetPid });
@@ -1542,6 +1809,9 @@ export class ClientWorld implements IWorld {
   partyKick(targetPid: number): void {
     this.cmd({ cmd: 'pkick', id: targetPid });
   }
+  partyPromote(targetPid: number): void {
+    this.cmd({ cmd: 'ppromote', id: targetPid });
+  }
   convertPartyToRaid(): void {
     this.cmd({ cmd: 'praid' });
   }
@@ -1550,6 +1820,12 @@ export class ClientWorld implements IWorld {
   }
   moveRaidMember(targetPid: number, group: 1 | 2): void {
     this.cmd({ cmd: 'pmoveRaid', id: targetPid, group });
+  }
+  setPartyLootMaster(enabled: boolean, looter: number, threshold: MasterLootThreshold): void {
+    this.cmd({ cmd: 'setLootMaster', enabled, looter, threshold });
+  }
+  assignMasterLoot(rollId: number, targetPids: number[]): void {
+    this.cmd({ cmd: 'masterAssign', rollId, pids: targetPids });
   }
   // raid/target markers
   markerFor(entityId: number): number | null {
@@ -1561,6 +1837,7 @@ export class ClientWorld implements IWorld {
   clearMarker(entityId: number): void {
     this.cmd({ cmd: 'clearMarker', id: entityId });
   }
+  // --- IWorldTrade: trade-window command sends (tradeInfo is a snapshot read). ---
   tradeRequest(targetPid: number): void {
     this.cmd({ cmd: 'trade_req', id: targetPid });
   }
@@ -1576,6 +1853,8 @@ export class ClientWorld implements IWorld {
   tradeCancel(): void {
     this.cmd({ cmd: 'trade_cancel' });
   }
+  // --- IWorldDuelArena: duel + rated-arena-queue + 2v2 Fiesta augment-pick sends
+  // (duelInfo/arenaInfo are snapshot reads; fiesta dynamics ride the events queue). ---
   duelRequest(targetPid: number): void {
     this.cmd({ cmd: 'duel_req', id: targetPid });
   }
@@ -1585,7 +1864,18 @@ export class ClientWorld implements IWorld {
   duelDecline(): void {
     this.cmd({ cmd: 'duel_decline' });
   }
-  // persistent social (resolved server-side by character name)
+  arenaQueueJoin(format?: import('../world_api').ArenaFormat): void {
+    this.cmd({ cmd: 'arena_queue', format: format ?? '1v1' });
+  }
+  arenaQueueLeave(): void {
+    this.cmd({ cmd: 'arena_leave' });
+  }
+  arenaAugmentPick(augmentId: string): void {
+    this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
+  // character name) + the REST character typeahead. socialInfo arrives via the
+  // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
   friendAdd(name: string): void {
     this.cmd({ cmd: 'friend_add', name });
   }
@@ -1641,15 +1931,8 @@ export class ClientWorld implements IWorld {
       return [];
     }
   }
-  arenaQueueJoin(format?: import('../world_api').ArenaFormat): void {
-    this.cmd({ cmd: 'arena_queue', format: format ?? '1v1' });
-  }
-  arenaQueueLeave(): void {
-    this.cmd({ cmd: 'arena_leave' });
-  }
-  arenaAugmentPick(augmentId: string): void {
-    this.cmd({ cmd: 'arena_augment', augment: augmentId });
-  }
+  // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
+  // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---
   marketSearch(query: string): void {
     this.cmd({ cmd: 'market_search', q: query });
   }
@@ -1665,6 +1948,11 @@ export class ClientWorld implements IWorld {
   marketCollect(): void {
     this.cmd({ cmd: 'market_collect' });
   }
+  // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
+  // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live
+  // countdown locally so it ticks without traffic. enter_crypt/leave_crypt are legacy
+  // dispatch-only aliases ClientWorld never sends (the enterCrypt/leaveCrypt helpers
+  // below just forward to enterDungeon/leaveDungeon). ---
   enterDungeon(dungeonId: string): void {
     this.cmd({ cmd: 'enter_dungeon', dungeon: dungeonId });
   }
@@ -1684,6 +1972,78 @@ export class ClientWorld implements IWorld {
     }
     return out;
   }
+  // --- IWorldDelves: delve enter/leave + interact + companion-upgrade + Marks-vendor
+  // buy + lockpick lifecycle + chest collect. delveShopOffers is a pure client read
+  // from the delveClears mirror (no command). lockpickState rides no snapshot field;
+  // the private applyLockpickEvent below rebuilds it from the lockpick* events. ---
+  enterDelve(delveId: string, tierId: string): void {
+    this.cmd({ cmd: 'enter_delve', delveId, tierId });
+  }
+  leaveDelve(): void {
+    this.cmd({ cmd: 'leave_delve' });
+  }
+  delveInteract(objectId: number): void {
+    this.cmd({ cmd: 'delve_interact', objectId });
+  }
+  companionUpgrade(companionId: string): void {
+    this.cmd({ cmd: 'companion_upgrade', companionId });
+  }
+  delveBuyShopItem(delveId: string, itemId: string): void {
+    this.cmd({ cmd: 'delve_buy', delveId, itemId });
+  }
+  delveShopOffers(delveId: string): DelveShopOfferView[] {
+    return resolveDelveShopOffers(delveId, this.delveClears);
+  }
+  lockpickEngage(objectId: number, ante: Ante): void {
+    this.cmd({ cmd: 'lockpick_engage', objectId, ante });
+  }
+  lockpickAction(action: PickAction): void {
+    this.cmd({ cmd: 'lockpick_action', sid: this.lockpickState?.sessionId, action });
+  }
+  lockpickAbort(): void {
+    this.cmd({ cmd: 'lockpick_abort', sid: this.lockpickState?.sessionId });
+  }
+  collectDelveChestLoot(chestId: number): void {
+    this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });
+  }
+  // Mirror the authoritative lockpick lifecycle into lockpickState. The events
+  // still flow to the HUD (drainEvents) for transient feedback (juice/sounds).
+  private applyLockpickEvent(ev: SimEvent): void {
+    if (ev.type === 'lockpickSession') {
+      this.lockpickState = {
+        sessionId: ev.sessionId,
+        objectId: ev.objectId,
+        w: ev.w,
+        h: ev.h,
+        col: ev.col,
+        row: ev.row,
+        page: ev.page,
+        pageCount: ev.pageCount,
+        tries: ev.tries,
+        triesTotal: ev.triesTotal,
+        lootTier: ev.lootTier,
+        allowed: ev.allowed,
+        visible: ev.visible,
+        stepTimeoutMs: ev.stepTimeoutMs,
+      };
+    } else if (ev.type === 'lockpickStep') {
+      const s = this.lockpickState;
+      if (s && s.sessionId === ev.sessionId) {
+        s.col = ev.col;
+        s.row = ev.row;
+        s.page = ev.page;
+        s.pageCount = ev.pageCount;
+        s.tries = ev.tries;
+        s.triesTotal = ev.triesTotal;
+        s.visible = ev.visible;
+      }
+    } else if (ev.type === 'lockpickEnd') {
+      if (this.lockpickState?.sessionId === ev.sessionId) this.lockpickState = null;
+    }
+  }
+  // --- IWorldProgressionXp: lifetime-XP leaderboard (REST GET, no wire command) +
+  // the opt-in prestige action (cmd 'prestige'). The XP/milestone reads ride the
+  // self-snapshot mirror fields above. ---
   async leaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<LeaderboardPage> {
     const empty: LeaderboardPage = { leaders: [], page: 0, pageCount: 1, total: 0, pageSize };
     try {
@@ -1703,10 +2063,44 @@ export class ClientWorld implements IWorld {
       return empty;
     }
   }
+  // Guild high-score board (REST GET, no wire command): ?board=guilds ranks
+  // guilds by summed member lifetime XP. Realm-scoped (default), paged exactly
+  // like the player board above.
+  async guildLeaderboard(
+    page = 0,
+    pageSize = LEADERBOARD_PAGE_SIZE,
+  ): Promise<GuildLeaderboardPage> {
+    const empty: GuildLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=guilds&page=${page}&pageSize=${pageSize}`, this.base),
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
   prestige(): void {
     this.cmd({ cmd: 'prestige' });
   }
-  // Talents & Specializations — the server re-validates every allocation.
+  // --- IWorldTalents: talentPoints is a local compute (no send); applyTalents/
+  // respec/setSpec/saveLoadout/switchLoadout/deleteLoadout send camelCase commands,
+  // saveLoadout/deleteLoadout carry sanctioned display-only local recompute.
+  // Talents & Specializations: the server re-validates every allocation. ---
   talentPoints(): { total: number; spent: number } {
     const level = this.entities.get(this.playerId)?.level ?? 1;
     return { total: talentPointsAtLevel(level), spent: pointsSpent(this.talents) };
@@ -1725,7 +2119,7 @@ export class ClientWorld implements IWorld {
     if (alloc) {
       const clean = (name || 'Build').toString().slice(0, 24);
       const safeBar = Array.isArray(bar)
-        ? bar.slice(0, 16).map((b) => (typeof b === 'string' ? b : null))
+        ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
         : [];
       const saved = { name: clean, alloc: cloneAllocation(alloc), bar: safeBar };
       this.talents = cloneAllocation(alloc);

@@ -8,6 +8,9 @@
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
 export const hudChromeStrings = {
+  spectate: {
+    banner: 'Spectating {name}',
+  },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
   // bubble text). Source ids/order mirror OVERHEAD_EMOTES in world_api.ts.
   emotes: {
@@ -85,6 +88,69 @@ export const hudChromeStrings = {
   rest: {
     resting: 'Resting',
   },
+  // The Spell Power / Attack Power contribution appended to an ability tooltip's
+  // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
+  // words), so it is locale-neutral and an English-only add.
+  abilityScaling: {
+    bonus: '(+{value})',
+  },
+  // Accessible group names for the unit frames (#player-frame and #target-frame are
+  // role="group" wrappers over a portrait, name, level, and health/resource bars).
+  // Kept short, non-prose labels so they read cleanly as screen-reader group names
+  // (and stay non-wordy so an English-filled non-Latin locale does not trip the
+  // untranslated-leak guard); the maintainer translates them per locale at release.
+  // targetLabel reads as the unit you have marked as your current target (faction
+  // neutral: it labels friendly and hostile targets alike).
+  unitFrame: {
+    playerLabel: 'Your Hero',
+    targetLabel: 'Your Mark',
+    // targetAnnounce is the polite #target-live announcement spoken once when the player's
+    // target CHANGES; {name} is the new target's display name. Kept NON-WORDY
+    // (no run of four-plus lowercase after stripping {name}) so an English-filled non-Latin
+    // locale does not trip the M16 untranslated-leak guard: "Target" would FAIL it ("arget"
+    // is a five-letter run), so this reuses the frame's own term for the target ("Mark", from
+    // targetLabel above), which a screen-reader user already hears as the target frame's name.
+    targetAnnounce: 'Mark {name}',
+    // partyLabel names the #party-frames region (a group of tappable / focusable
+    // party member buttons, each named by its visible member name). Kept short and
+    // non-wordy (no run of four+ lowercase) so an English-filled non-Latin locale
+    // does not trip the untranslated-leak guard; "Band" reads as your group of
+    // companions, parallel to playerLabel / targetLabel.
+    partyLabel: 'Your Band',
+    // partyGroup is the visually-hidden raid-group cue appended to a raid party row's
+    // accessible name (e.g. "Group 1"), so a screen reader conveys which raid group a
+    // member sits in. {n} is the group number (formatNumber). UNLIKE the labels above
+    // this one is WORDY by the M16 rule (a four-plus consecutive-lowercase run survives
+    // stripping {n}: "Group" to "roup"), so an English-filled non-Latin locale WOULD trip
+    // the untranslated-leak guard: the five non-Latin overlays (zh_CN/zh_TW/ja_JP/ko_KR/
+    // ru_RU) carry real fills, the Latin overlays stay pending. Title Case does not help
+    // (M16 is per-word consecutive-lowercase, not word count).
+    partyGroup: 'Group {n}',
+    // durationUnitSeconds is the unit suffix appended to an aura's remaining-seconds count on
+    // the buff/debuff strip (e.g. "5s"). The auras core (auras_view.ts) renders it via the
+    // injected durationUnitSuffix() dep so an in-game language switch lands next tick. A single
+    // char (non-wordy: no four-plus consecutive-lowercase run), so an English-filled non-Latin
+    // overlay does not trip the M16 untranslated-leak guard; the maintainer localizes at release.
+    durationUnitSeconds: 's',
+  },
+  // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
+  // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
+  // stay OUT of a11y scope). Like partyGroup this label is WORDY by M16
+  // ("Character"/"Model"/"Preview" each carry a four-plus consecutive-lowercase run), so
+  // the same five non-Latin overlays carry real fills and the Latin overlays stay
+  // pending; Title Case does not make it non-wordy.
+  character: {
+    modelPreview: 'Character Model Preview',
+  },
+  // Skip links: the first focusable elements on both game entries, a keyboard /
+  // screen-reader shortcut to the main HUD and the chat log (mirrors the src/guide
+  // .guide-skip precedent). English-only control labels (the hud_chrome exception);
+  // Title Case keeps them non-wordy (no run of four+ lowercase) so an English-filled
+  // non-Latin locale does not trip the untranslated-leak guard, like the labels above.
+  skipLinks: {
+    mainHud: 'Skip to Main HUD',
+    chat: 'Skip to Chat',
+  },
   // On-screen / mobile control labels and their accessible names. char/bags/music
   // reuse existing keys (hud.keybinds.actions.*, hud.options.music) at the call site.
   mobile: {
@@ -122,6 +188,30 @@ export const hudChromeStrings = {
     coordinates: 'Coordinates',
     heading: 'Heading',
     minimapZoom: 'Minimap zoom',
+  },
+  // Cast-bar progressbar accessible names (the visible spell name + seconds-left
+  // text are the live status; these name which bar is which). One for the player's
+  // own cast (#castbar) and one for the target/boss cast (#tf-castbar).
+  castBar: {
+    playerAria: 'Your Cast Bar',
+    targetAria: 'Unit Cast Bar',
+  },
+  // Leaderboard window chrome: the close-control accessible label only. The board's
+  // title / subtitle / column / loading / empty / retry strings live in the game.ts
+  // catalog (game.leaderboard.*); this is the one control label the inline window
+  // lacked an accessible name for.
+  leaderboard: {
+    close: 'Close',
+    // High-score board tabs: the per-character board and the per-guild board.
+    tabsLabel: 'High-score boards',
+    tabPlayers: 'Players',
+    tabGuilds: 'Guilds',
+    // Guild-board column headers + the guild-tab empty state.
+    guildName: 'Guild',
+    members: 'Members',
+    topLevel: 'Top',
+    guildXp: 'Total XP',
+    guildEmpty: 'No ranked guilds yet.',
   },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
@@ -165,6 +255,8 @@ export const hudChromeStrings = {
     emoteWheel: 'Emote Wheel',
     targetFriendly: 'Target Nearest Friendly',
     targetFriendlyNext: 'Cycle Friendly Target',
+    // Discord is a brand name; it stays identical across locales.
+    discord: 'Discord',
   },
   // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
   // 0/2 maps to these at the HUD render boundary.
@@ -205,6 +297,16 @@ export const hudChromeStrings = {
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
     highContrastBackground: 'High-Contrast Background',
+    // Interface panel toggle: also engage auto-attack when using an offensive
+    // ability, so white swings start without a separate Attack press (on by default).
+    startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle + the item-tooltip lines it reveals (off by default).
+    showItemLevel: 'Show Item Level',
+    itemLevelLine: 'Item Level {level}',
+    itemScoreLine: 'Score {score}',
+    // Interface panel toggle that reveals the optional second action bar row (off
+    // by default). The abilities bound to its slots stay castable via their keybinds.
+    showSecondaryActionBar: 'Show Secondary Action Bar',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
@@ -363,6 +465,30 @@ export const hudChromeStrings = {
   tips: {
     joinChannels: 'Tip: type /join world or /join lfg to chat with players across the realm.',
   },
+  // Item-set (tier set) tooltip block. The set name and per-tier bonus text come
+  // from content/item_sets.ts via entity_i18n; these two are the surrounding
+  // chrome, with `name`/`bonus` spliced in already-localized.
+  itemSet: {
+    header: '{name} ({have}/{total})',
+    bonusLine: '({pieces}) {bonus}',
+  },
+  // Quest-link sharing: the chat-link affordance and its sim-emitted notices
+  // (re-localized through the hud-local localizeErrorText/localizeSystemText arms).
+  questShare: {
+    notShareable: "This quest can't be shared.",
+    notInSharerParty: "You must be in {name}'s party to accept that quest.",
+    accepted: '{name} accepted your shared quest.',
+    dialogTitle: 'Shared Quest',
+    viewOnlyHint: "Join the sharer's party to accept this quest.",
+    alreadyOn: "You're already on this quest.",
+    alreadyDone: "You've already completed this quest.",
+    ineligible: "You don't meet the requirements for this quest.",
+    noQuestSelected: 'Select a quest in your log to share.',
+    linkTitle: 'Shift-click to link this quest in chat.',
+  },
+  itemShare: {
+    linkHint: 'Shift-click to link this item in chat.',
+  },
   // CLDR-categorized count strings resolved through tPlural(base, count) in
   // src/ui/i18n.ts: it selects the active locale's cardinal category (one / few /
   // many / other) via Intl.PluralRules and looks up the matching leaf, so e.g.
@@ -394,6 +520,12 @@ export const hudChromeStrings = {
       few: 'Who: {count} players online on {realm}.',
       many: 'Who: {count} players online on {realm}.',
       other: 'Who: {count} players online on {realm}.',
+    },
+    playersMatching: {
+      one: 'Who: {count} player matching "{query}" on {realm}.',
+      few: 'Who: {count} players matching "{query}" on {realm}.',
+      many: 'Who: {count} players matching "{query}" on {realm}.',
+      other: 'Who: {count} players matching "{query}" on {realm}.',
     },
   },
   // "Report a Bug" options sub-view (online only). Captures realm/character/
@@ -446,7 +578,7 @@ export const hudChromeStrings = {
     errPasswordConfirm: 'New passwords do not match.',
     // Email
     emailLabel: 'Email (optional)',
-    emailHint: 'Used only for account recovery. We never send marketing email.',
+    emailHint: 'Used only for account recovery. Use Change Email below to update it.',
     saveEmail: 'Save Email',
     emailSaved: 'Email saved.',
     errEmailInvalid: 'Enter a valid email address.',
@@ -517,6 +649,36 @@ export const hudChromeStrings = {
     exportDone: 'Your data was downloaded. We emailed you a confirmation.',
     exportFailed: 'Could not export your data. Try again in a moment.',
   },
+  // Master loot: the leader-only loot-method control in the party panel, the
+  // assignment prompt shown to the master looter, and the sim-emitted log lines
+  // re-localized through the hud matchers (localizeLootText/System/Error).
+  masterLoot: {
+    title: 'Master Loot',
+    enableLabel: 'Master loot',
+    enableAria: 'Enable master loot',
+    looterLabel: 'Master looter',
+    leaderOption: 'Party leader',
+    thresholdLabel: 'Threshold',
+    thresholdUncommon: 'Uncommon and up',
+    thresholdRare: 'Rare and up',
+    thresholdEpic: 'Epic and up',
+    assignPrompt: 'Assign {item}',
+    assignAria: 'Assign {item} to {name}',
+    rollButton: 'Roll',
+    selectAll: 'Select all',
+    methodMaster: 'Loot method set to master loot. Master looter: {name}.',
+    methodGroup: 'Loot method set to group loot.',
+    assigned: '{looter} assigned {item} to {target}.',
+    unassigned: '{item} was not assigned and is free for all.',
+    leaderOnly: 'Only the party leader can change the loot method.',
+  },
+  // Party leadership: the right-click "Promote to Leader" handoff action shown on a
+  // party member's context menu to the current leader. Lives in the English-only
+  // hud_chrome domain so an English-only PR compiles; the new-leader announcement
+  // itself is a sim emit re-localized through localizeSystemText (hud.logs.partyLeader).
+  party: {
+    promoteLeader: 'Promote to Leader',
+  },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {
@@ -544,5 +706,242 @@ export const hudChromeStrings = {
     notRaid: 'Your group is not a raid.',
     leaderOnly: 'Only the raid leader may convert to a party.',
     tooLarge: 'A raid with more than five members cannot convert back to a party.',
+  },
+  // Armor subtype shown on an armor item's slot line (classic shows the slot on the
+  // left, the armor class on the right). Resolved from src/ui/item_armor_type.ts via
+  // the sim's armorTypeForItem; tells the player which classes the gear is meant for.
+  itemArmorType: {
+    cloth: 'Cloth',
+    leather: 'Leather',
+    mail: 'Mail',
+  },
+  // Buff/debuff hover tooltip effect line: a one-line summary of what the active
+  // aura does, shown under its name and remaining time. Numbers are spliced in via
+  // formatNumber as {value}/{pct}/{interval}/{stacks}/{min}/{max}; {school} is the
+  // localized damage-school name (see schools below). Keys are produced by the pure
+  // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
+  auraEffect: {
+    dot: 'Deals {value} {school} damage every {interval} sec',
+    hot: 'Restores {value} health every {interval} sec',
+    absorb: 'Absorbs {value} damage',
+    healAbsorb: 'Absorbs {value} incoming healing',
+    thorns: 'Deals {value} {school} damage to attackers',
+    slow: 'Reduces movement speed by {pct}%',
+    speed: 'Increases movement speed by {pct}%',
+    attackSpeedSlow: 'Slows attack speed by {pct}%',
+    attackSpeedFast: 'Increases attack speed by {pct}%',
+    haste: 'Increases attack and casting speed by {pct}%',
+    tongues: 'Increases casting time by {pct}%',
+    increase: {
+      ap: 'Increases attack power by {value}',
+      armor: 'Increases armor by {value}',
+      int: 'Increases Intellect by {value}',
+      agi: 'Increases Agility by {value}',
+      sta: 'Increases Stamina by {value}',
+      spi: 'Increases Spirit by {value}',
+      allStats: 'Increases all attributes by {value}',
+    },
+    reduce: {
+      ap: 'Reduces attack power by {value}',
+      armor: 'Reduces armor by {value}',
+      int: 'Reduces Intellect by {value}',
+      agi: 'Reduces Agility by {value}',
+      sta: 'Reduces Stamina by {value}',
+      spi: 'Reduces Spirit by {value}',
+      allStats: 'Reduces all attributes by {value}',
+    },
+    dodge: 'Increases dodge chance by {pct}%',
+    dodgeReduce: 'Reduces dodge chance by {pct}%',
+    armorFlat: 'Reduces armor by {value}',
+    armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
+    mortalWound: 'Reduces healing received by {pct}%',
+    vulnerability: 'Increases damage taken by {pct}%',
+    physVuln: 'Increases physical damage taken by {pct}%',
+    spellVuln: 'Increases magic damage taken by {pct}%',
+    critVuln: 'Increases chance to be critically hit by {pct}%',
+    costTax: 'Increases ability costs by {pct}%',
+    stun: 'Stunned: unable to act',
+    root: 'Rooted: unable to move',
+    incapacitate: 'Incapacitated: unable to act',
+    polymorph: 'Polymorphed: unable to act',
+    hex: 'Reduces damage and healing dealt by {pct}%',
+    blind: 'Blinded: unable to act',
+    silence: 'Silenced: unable to cast spells',
+    disarm: 'Disarmed: cannot use weapon attacks',
+    lockout: 'Spell school locked out',
+    imbue: 'Weapon imbued with bonus effects',
+    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on judgement',
+    stealth: 'Concealed; movement speed reduced by {pct}%',
+    formBear: 'Bear Form: increased health and armor',
+    formCat: 'Cat Form: melee damage and energy',
+    formTravel: 'Travel Form: movement speed increased by {pct}%',
+    defensiveStance: 'Defensive Stance: reduced damage taken, more threat',
+    righteousFury: 'Righteous Fury: greatly increased threat from Holy damage',
+    scale: 'Size increased by {pct}%',
+    jump: 'Jump height increased by {pct}%',
+    // Localized damage-school names spliced into {school} above.
+    school: {
+      physical: 'Physical',
+      fire: 'Fire',
+      frost: 'Frost',
+      arcane: 'Arcane',
+      shadow: 'Shadow',
+      holy: 'Holy',
+      nature: 'Nature',
+    },
+  },
+  // Loot window title shown only when the chest entity is missing (the normal path
+  // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
+  loot: {
+    chestTitle: 'Chest',
+  },
+  // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
+  // accessible name states the action so a screen reader is not left with a bare
+  // symbol. {name} is the (already localized) ability name.
+  spellbook: {
+    addToBarAria: 'Add {name} to action bar',
+    removeFromBarAria: 'Remove {name} from action bar',
+  },
+  // Live overworld mob nameplate label: a bracketed level then the localized mob
+  // name (mirrors the corpse branch's worldContent.corpseName template). {level}
+  // runs through formatNumber; {name} is already localized. Format-only (brackets /
+  // order may reorder per locale), kept here so an English-only add compiles.
+  nameplate: {
+    mob: '[{level}] {name}',
+    mobElite: '[{level}+] {name}',
+  },
+  discord: {
+    title: 'Discord',
+    panelTitle: 'World of ClaudeCraft',
+    open: 'Discord',
+    close: 'Close',
+    keybind: 'Discord Panel',
+    disabled: 'Discord integration is not available right now.',
+    // Status-rung display names (the ladder lives in src/sim/discord_tier.ts).
+    tiers: {
+      none: 'Unranked',
+      initiate: 'Initiate',
+      squire: 'Squire',
+      footman: 'Footman',
+      knight: 'Knight',
+      champion: 'Champion',
+      warlord: 'Warlord',
+      legend: 'Legend',
+      mythic: 'Mythic',
+    },
+    loginCta: 'Continue with Discord',
+    orEmail: 'or use email',
+    cta: {
+      title: 'Link your Discord to earn points and rank up',
+      stats: '{online} online · {total} members in the server',
+      statsLoading: 'Join the community and earn rewards',
+      button: 'Link in one click',
+      dismiss: 'Dismiss',
+    },
+    link: {
+      cta: 'Link Discord',
+      relink: 'Relink Discord',
+      connecting: 'Opening Discord...',
+      benefits:
+        'Link your Discord to earn points from play and community activity, and climb the status tiers.',
+      error: 'Could not link Discord. Please try again.',
+      success: 'Discord linked.',
+    },
+    // First-time Discord login chooser (create a new account vs link an existing one).
+    choice: {
+      title: 'Continue with Discord',
+      intro: 'Create a new account, or link your Discord to one you already have.',
+      greeting: 'Welcome, {name}!',
+      createCta: 'Create a new account',
+      haveAccount: 'Already have an account?',
+      linkCta: 'Link an existing account',
+      linkSubmit: 'Link account',
+      error: 'Could not continue. Please try again.',
+      expired: 'That Discord sign-in expired. Please sign in with Discord again.',
+    },
+    // Unlinking a Discord-provisioned account: set a password first so it stays
+    // reachable (the username is fixed and shown read-only).
+    keep: {
+      title: 'Set a password',
+      body: 'Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.',
+      usernameLabel: 'Your username',
+      confirmLabel: 'Confirm password',
+      submit: 'Set password and unlink',
+      cancel: 'Cancel',
+      mismatch: 'Passwords do not match.',
+      tooShort: 'Password must be at least 6 characters.',
+    },
+    linkedAs: 'Linked as {name}',
+    linkedTitle: 'Discord: {name}',
+    viewCharacter: 'View {name}',
+    viewProfile: "Open this character's public profile",
+    unlink: 'Unlink',
+    visit: 'Visit Discord',
+    unlinkConfirm: 'Unlink your Discord account from this game account?',
+    statusLabel: 'Status',
+    rank: 'Rank',
+    points: 'Points',
+    lifetime: 'Lifetime',
+    toNext: '{points} to next rank',
+    maxRank: 'Top rank reached',
+    tiersTitle: 'Status Tiers',
+    tierLocked: 'Locked',
+    tierCurrent: 'Current',
+    earnTitle: 'How to earn points',
+    earnBody:
+      'Earn points from time played in game and from staying active in the Discord. Points raise your status tier.',
+    memberSince: 'Member since',
+    memberSinceDays: '{days}d in the Discord',
+    roleTag: {
+      levyst: 'Levy St',
+      devs: 'Dev',
+      mods: 'Mod',
+      artists: 'Artist',
+    },
+    guildMember: 'Verified member',
+    notMember: 'Not in the server yet',
+    joinCta: 'Join the Discord',
+    online: '{count} online',
+    community: 'Community',
+    rewards: 'Rewards',
+    voice: {
+      title: 'Voice',
+      channel: 'In {channel}',
+      empty: 'No one is in voice right now.',
+      speaking: 'Speaking',
+      muted: 'Muted',
+      join: 'Join voice',
+      connect: 'Connect to voice channel',
+    },
+    swag: {
+      title: 'Swag',
+      claim: 'Claim',
+      claimed: 'Claimed',
+      locked: 'Locked',
+      free: 'Free',
+      cost: '{points} pts',
+      needTier: 'Reach a higher rank to claim this.',
+      needPoints: 'Not enough points.',
+      claimError: 'Could not claim that reward. Please try again.',
+      claimedToast: 'Claimed: {name}',
+      // Swag item display names (catalog ids in src/sim/discord_tier.ts).
+      titleDiscordian: 'Title: Discordian',
+      titleSquire: 'Title: Squire of the Realm',
+      chromaBlurple: 'Blurple Mech Chroma',
+      titleChampion: 'Title: Champion of Claudemoon',
+      swagStickers: 'Sticker Pack (shipped)',
+      swagTee: 'T-Shirt (shipped)',
+    },
+    // "!" community commands: an interactive chat dropdown that broadcasts in-game
+    // and cross-posts to Discord (looking-for-group, trade, recruiting, events).
+    relay: {
+      tooFast: 'You are posting too fast. Wait a moment and try again.',
+      lfg: { label: 'Looking for Group', hint: 'Find players for a dungeon or quest' },
+      wts: { label: 'Want to Sell', hint: 'Advertise an item or service for sale' },
+      wtb: { label: 'Want to Buy', hint: 'Request an item you want to buy' },
+      recruit: { label: 'Guild Recruiting', hint: 'Recruit players for your guild' },
+      event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
+      help: { label: 'Need Help', hint: 'Ask the community for help' },
+    },
   },
 };

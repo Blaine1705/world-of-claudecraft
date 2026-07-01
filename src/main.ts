@@ -1,3 +1,8 @@
+// Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
+// index.html and play.html both bootstrap through this module, so this one import
+// styles both game entries; admin/guide use their own entries and inline CSS.
+import './styles/index.css';
+import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
 import { audio } from './game/audio';
 import {
   BROWSER_BODY_CLASSES,
@@ -35,6 +40,7 @@ import {
   setInterfaceMode,
   useTouchInterface,
 } from './game/mobile_controls';
+import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
@@ -45,9 +51,15 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { voice } from './game/voice';
+import {
+  CHAR_SORT_MODES,
+  type CharSortMode,
+  normalizeCharSortMode,
+  sortCharacters,
+} from './net/char_sort';
 import { createNativeAttestationProof } from './net/native_attestation';
-import { desktopBridge } from './runtime';
 import {
   Api,
   ApiError,
@@ -67,16 +79,20 @@ import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
-import { GFX } from './render/gfx';
+import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
+import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { ITEMS } from './sim/data';
+import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import { DT, dist2d, INTERACT_RANGE, MELEE_RANGE, type PlayerClass, RUN_SPEED } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
+import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
   deactivateConfirmReady,
@@ -91,9 +107,26 @@ import {
   validateForm,
 } from './ui/auth_utils';
 import { assembleBugReportMeta } from './ui/bug_report';
+import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
-import { tEntity } from './ui/entity_i18n';
+import {
+  type DiscordAccountStatus,
+  type DiscordPresenceState,
+  type DiscordVoiceMember,
+  discordInviteUrl,
+  discordPresence,
+  discordStatus,
+  discordUiEnabled,
+  onDiscordStatusChange,
+  setDiscordInviteUrl,
+  setDiscordPresence,
+  setDiscordStatus,
+  setDiscordUiEnabled,
+} from './ui/discord_status';
+import { renderDiscordWidget } from './ui/discord_widget';
+import { classDisplayName, tEntity } from './ui/entity_i18n';
+import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { Hud } from './ui/hud';
 import {
   ensureLocaleLoaded,
@@ -122,6 +155,7 @@ import {
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { tServer } from './ui/server_i18n';
+import { createSpectateBadge } from './ui/spectate_badge';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -129,12 +163,14 @@ import {
   formatSecretGroups,
   isCompleteTotpCode,
 } from './ui/two_factor_setup';
+import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
   setWalletDisplayAvailable,
   setWalletUiEnabled,
   setWocBalance,
+  shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
@@ -159,6 +195,8 @@ const IMMOBILE_AURA_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph'
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
 const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
 const HOMEPAGE_MUSIC_VOLUME = 0.225;
+const GRAPHICS_PRESET_HIGH = 3;
+const GRAPHICS_PRESET_ULTRA = 4;
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 document.body.classList.toggle('native-app', NATIVE_APP);
@@ -174,6 +212,12 @@ let homepageMusicStarted = false;
 let homepageMusicMuted = readHomepageMusicMuted();
 let removeHomepageMusicGestureListeners: (() => void) | null = null;
 
+function isNativeRuntime(): boolean {
+  if (NATIVE_APP) return true;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return cap?.isNativePlatform?.() === true;
+}
+
 const SITE_URL = 'https://worldofclaudecraft.com/';
 
 const RESOURCE_KEYS = {
@@ -181,10 +225,6 @@ const RESOURCE_KEYS = {
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
 } satisfies Record<string, TranslationKey>;
-
-function classDisplayName(className: PlayerClass): string {
-  return tEntity({ kind: 'class', id: className, field: 'name' });
-}
 
 function classDisplayDescription(className: PlayerClass): string {
   return tEntity({ kind: 'class', id: className, field: 'description' });
@@ -374,6 +414,37 @@ function resetTurnstile(): void {
   if (ts && turnstileWidgetId !== undefined) ts.reset(turnstileWidgetId);
 }
 
+function trackMetaPixel(eventName: string, data?: Record<string, unknown>): void {
+  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+  if (typeof fbq !== 'function') return;
+  fbq('trackCustom', eventName, data ?? {});
+}
+
+function trackCommunityLinkClicks(): void {
+  document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    let url: URL;
+    try {
+      url = new URL(link.href);
+    } catch {
+      return;
+    }
+    const host = url.hostname.toLowerCase();
+    const isGitHub = host === 'github.com' || host.endsWith('.github.com');
+    const isDiscord =
+      host === 'discord.gg' ||
+      host.endsWith('.discord.gg') ||
+      host === 'discord.com' ||
+      host.endsWith('.discord.com');
+    if (!isGitHub && !isDiscord) return;
+    link.addEventListener('click', () => {
+      trackMetaPixel(isGitHub ? 'GitHubClick' : 'DiscordClick', {
+        url: url.toString(),
+        path: url.pathname,
+      });
+    });
+  });
+}
+
 function localizedSiteUrl(lang: SupportedLanguage): string {
   if (lang === 'en') return SITE_URL;
   const url = new URL(SITE_URL);
@@ -397,26 +468,7 @@ function syncBuildInfo(): void {
 }
 
 function syncAppViewport(): void {
-  const useStableGameViewport =
-    document.body.classList.contains('game-active') && useTouchInterface();
-  const width = Math.max(
-    1,
-    Math.round(
-      useStableGameViewport
-        ? window.innerWidth
-        : (window.visualViewport?.width ?? window.innerWidth),
-    ),
-  );
-  const height = Math.max(
-    1,
-    Math.round(
-      useStableGameViewport
-        ? window.innerHeight
-        : (window.visualViewport?.height ?? window.innerHeight),
-    ),
-  );
-  document.documentElement.style.setProperty('--app-vw', `${width}px`);
-  document.documentElement.style.setProperty('--app-vh', `${height}px`);
+  syncAppViewportShared();
 }
 
 function preventMobileZoom(): void {
@@ -554,6 +606,7 @@ function showMobilePreflightPrompt(): Promise<void> {
   // Deliberately the device FACT (isPhoneTouchDevice), not the Interface Mode
   // override: the "install to home screen" preflight is phone-hardware-only, so a
   // desktop forced to Touch correctly skips it.
+  if (NATIVE_APP) return Promise.resolve();
   if (!isPhoneTouchDevice()) return Promise.resolve();
   if (mobilePreflightPromptPromise) return mobilePreflightPromptPromise;
   const prompt = document.getElementById('mobile-preflight') as HTMLElement | null;
@@ -733,6 +786,7 @@ function enterLoadingState(statusText: string): void {
   hideMobilePreflightPrompt();
   showLoadingScreen(statusText);
   $('#start-screen').style.display = 'none';
+  releaseStartScreenPreview();
 }
 
 async function prepareWorldEntry(): Promise<boolean> {
@@ -805,6 +859,7 @@ async function startGame(
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
   // Renderer/Hud build freezes the main thread for a beat.
@@ -816,6 +871,29 @@ async function startGame(
 
   const keybinds = new Keybinds(keybindScope);
   const settings = new Settings();
+  // First-run graphics default: until a device default has been applied (the dedicated
+  // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
+  // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
+  // PERSIST a device-appropriate preset over the medium default, BEFORE the effects applier and
+  // renderer read it, so the 3D tier, the data-fx-level cadence (nameplates), and the options UI
+  // all agree. A static one-shot probe (resolveDefaultGraphicsPreset), never the FPS governor.
+  // A masked/inconclusive device resolves to medium and returns null, so it stays on
+  // the medium default and re-detects next boot; only a CONCLUSIVE result is persisted + marked.
+  // An explicit player choice is never overridden: a recognized device is marked applied on its
+  // first boot so it never re-detects, and an inconclusive device returns null so it never
+  // overwrites a stored preset.
+  const autoPreset = firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
+  if (autoPreset !== null) {
+    settings.set('graphicsPreset', autoPreset);
+    settings.set('graphicsDefaultApplied', true);
+  }
+  // Native iOS WebKit can terminate the WebContent process during Ultra world
+  // startup on recent phones, which reloads back to the start screen before the
+  // in-game options menu is reachable. Persist the safe startup tier so a saved
+  // Ultra/Advanced choice cannot trap the native app in that reload loop.
+  if (isNativeRuntime() && settings.get('graphicsPreset') >= GRAPHICS_PRESET_ULTRA) {
+    settings.set('graphicsPreset', GRAPHICS_PRESET_HIGH);
+  }
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
   const themeStore = new ThemeStore();
@@ -825,6 +903,24 @@ async function startGame(
       document.documentElement.style.setProperty(name, vars[name]);
   }
   applyTheme();
+  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
+  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
+  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
+  // governable:false): the FPS governor cannot measure compositor blur cost (the
+  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
+  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
+  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
+  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
+  // body.reduce-motion class below stays only as the CSS hook it already is.
+  const uiEffectsApplier = new UiEffectsApplier({
+    resolve: (osReducedMotion) =>
+      resolveUiEffectsProfile({
+        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+        effectsQuality: settings.get('effectsQuality'),
+        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
+      }),
+  });
+  uiEffectsApplier.applyNow();
   let renderer!: Renderer;
   let hud!: Hud;
   const perf = createPerfMonitor(null);
@@ -899,11 +995,13 @@ async function startGame(
     }, 450);
   };
   const closeChat = (): void => {
+    chatCmdMenu.hide();
     chatInput.value = '';
     chatInput.style.display = 'none';
     chatInput.style.height = '';
     chatInput.style.overflowY = '';
     chatInput.blur();
+    hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
   function openChat(): void {
@@ -916,6 +1014,11 @@ async function startGame(
   }
   // Fired for every open path (keybind, whisper context menu, mobile toggle)
   // since they all call focus().
+  // Autocomplete dropdown for the in-game "!" community commands (!lfg etc.).
+  const chatCmdMenu = new ChatCommandMenu(chatInput, () => {
+    autosizeChatInput();
+    anchorChatInput();
+  });
   chatInput.addEventListener('focus', () => {
     anchorChatInput();
     autosizeChatInput();
@@ -923,6 +1026,7 @@ async function startGame(
   chatInput.addEventListener('input', () => {
     autosizeChatInput();
     anchorChatInput();
+    chatCmdMenu.update(chatInput.value);
   });
   window.addEventListener('resize', () => {
     if (chatInput.style.display === 'block') {
@@ -932,6 +1036,11 @@ async function startGame(
   });
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
+    // While the "!" command dropdown is open it owns Arrows/Enter/Tab/Escape.
+    if (chatCmdMenu.onKeydown(e)) {
+      e.preventDefault();
+      return;
+    }
     if (e.key === 'Enter' && !e.isComposing) {
       // single-message semantics (like classic chat): Enter always sends,
       // never inserts a newline into the textarea.
@@ -939,8 +1048,11 @@ async function startGame(
       // the active channel tab supplies the send prefix, so plain text goes to
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
-      const text = hud.composeChatSend(raw);
-      if (text) world.chat(text);
+      // "/share" links the selected quest into party chat; skip the normal send path.
+      if (!hud.maybeHandleQuestShareCommand(raw)) {
+        const text = hud.composeChatSend(raw);
+        if (text) world.chat(text);
+      }
       // a typed "/join world"/"/leave lfg" opens or closes its channel tab too,
       // mirroring the "+" menu (without hijacking the active send channel)
       hud.syncChatTabsForInput(raw);
@@ -1001,6 +1113,9 @@ async function startGame(
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
+          case 'discord':
+            toggleDiscordPanel();
+            break;
           case 'chat':
             openChat();
             break;
@@ -1035,6 +1150,7 @@ async function startGame(
     onChat: () => openChat(),
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
+    onDiscord: () => toggleDiscordPanel(true),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onQuestLog: () => hud.toggleQuestLog(),
@@ -1116,6 +1232,9 @@ async function startGame(
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();
+        break;
+      case 'discord':
+        toggleDiscordPanel();
         break;
       case 'chat':
         openChat();
@@ -1216,6 +1335,12 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
+    if (key === 'startAttackOnAbilityUse') {
+      // No live subsystem to update: the HUD reads this setting at ability-cast
+      // time (see hud.castSlot). Persist the choice and we are done.
+      settings.set('startAttackOnAbilityUse', !!value);
+      return;
+    }
     if (key === 'attackMove') {
       const v = settings.set('attackMove', !!value);
       if (!v) input.clearClickMove();
@@ -1223,9 +1348,12 @@ async function startGame(
       return;
     }
     // Interface & Comfort booleans: each toggles a body class (CSS does the rest)
-    // or flips a live subsystem flag. No sim involvement — purely presentational.
+    // or flips a live subsystem flag. No sim involvement, purely presentational.
     if (key === 'reduceMotion') {
+      // body.reduce-motion stays the CSS hook it already is; the applier folds the
+      // same flag into the graphics-tier effect profile so the two never fight.
       document.body.classList.toggle('reduce-motion', settings.set('reduceMotion', !!value));
+      uiEffectsApplier.applyNow();
       return;
     }
     if (key === 'highContrastText') {
@@ -1241,6 +1369,13 @@ async function startGame(
     }
     if (key === 'compactChat') {
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
+      return;
+    }
+    if (key === 'showSecondaryActionBar') {
+      document.body.classList.toggle(
+        'show-actionbar2',
+        settings.set('showSecondaryActionBar', !!value),
+      );
       return;
     }
     if (key === 'browserEffects') {
@@ -1379,6 +1514,17 @@ async function startGame(
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
         break;
+      // Graphics-tier HUD effects follow the STATIC preset + the advanced
+      // effectsQuality slider. The 3D renderer tier is resolved at renderer
+      // construction (a reload); here we only re-publish the HUD effect profile
+      // (data-fx-level + --fx-* tokens). The preset is a discrete change so it
+      // applies immediately; effectsQuality is a slider so it is debounced.
+      case 'graphicsPreset':
+        uiEffectsApplier.applyNow();
+        break;
+      case 'effectsQuality':
+        uiEffectsApplier.applyDebounced();
+        break;
     }
   }
   // apply persisted settings to the freshly-built subsystems
@@ -1470,13 +1616,25 @@ async function startGame(
       bestObjD = INTERACT_RANGE;
     let bestNpc: number | null = null,
       bestNpcD = INTERACT_RANGE + 1;
+    // Delve interactables (warded chest, cracked grave, sealed/tombstone passage,
+    // surface stairs) are driven through delveInteract, not the generic pickup
+    // path, the sim owns their per-object proximity + state gating and the
+    // lockpick offer. Selected a touch wider than INTERACT_RANGE so the sim can
+    // emit its precise "move closer to the chest/passage" hint.
+    let bestDelve: number | null = null,
+      bestDelveD = INTERACT_RANGE + 1;
     for (const e of world.entities.values()) {
       const d = dist2d(p.pos, e.pos);
       if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
         bestCorpse = e.id;
         bestCorpseD = d;
       }
-      if (e.kind === 'object' && e.lootable && d < bestObjD) {
+      if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
+        if (d < bestDelveD) {
+          bestDelve = e.id;
+          bestDelveD = d;
+        }
+      } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
         bestObj = e.id;
         bestObjD = d;
       }
@@ -1487,6 +1645,10 @@ async function startGame(
     }
     if (bestCorpse !== null) {
       world.lootCorpse(bestCorpse);
+      return;
+    }
+    if (bestDelve !== null) {
+      world.delveInteract(bestDelve);
       return;
     }
     if (bestObj !== null) {
@@ -1503,7 +1665,9 @@ async function startGame(
       return;
     }
     if (bestNpc !== null) {
-      hud.openQuestDialog(bestNpc);
+      const npc = world.entities.get(bestNpc);
+      if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
+      else hud.openQuestDialog(bestNpc);
       return;
     }
     hud.showError(t('errors.nothingInteract'));
@@ -1770,6 +1934,14 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  // Tracks classic right-mouse mouselook across frames so its falling edge can
+  // commit the final camera yaw to the player facing (see mouselook_release.ts).
+  let prevMouselook = false;
+  // The release yaw, latched until a sim tick actually commits it. Offline a tick
+  // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
+  // the release frame would drop the one-shot when release lands on a zero-tick
+  // frame. Held here until consumed, then cleared.
+  let pendingReleaseFacing: number | null = null;
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !world.player.dead;
@@ -1998,10 +2170,26 @@ async function startGame(
     const mouselook = input.isMouselookActive() && !world.player.dead;
     const controllerFacing = input.controllerFacingOverride();
     const renderFacing = renderFacingOverride();
-    const movementFacing = !world.player.dead ? (renderFacing ?? controllerFacing) : null;
+    // On the frame mouselook is released, latch the final camera yaw so the player
+    // facing ends exactly where the camera ended; otherwise the last slice of the
+    // turn is dropped and the character lags the camera. The render/controller
+    // overrides take precedence and reclaim the heading, clearing any stale latch.
+    const edgeReleaseFacing = mouselookReleaseFacing(prevMouselook, mouselook, input.camYaw);
+    prevMouselook = mouselook;
+    if (renderFacing !== null || controllerFacing !== null) {
+      pendingReleaseFacing = null;
+    } else if (edgeReleaseFacing !== null) {
+      pendingReleaseFacing = edgeReleaseFacing;
+    }
+    const movementFacing = !world.player.dead
+      ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
+      : null;
 
     if (offlineSim) {
       acc += frameDt;
+      // Supply the UTC day for the delve daily reset (the sim never reads the wall
+      // clock itself, to stay deterministic).
+      offlineSim.utcDay = new Date().toISOString().slice(0, 10);
       while (acc >= DT) {
         const { mi, facing } = resolveMove(
           mouselook,
@@ -2022,6 +2210,9 @@ async function startGame(
             events: events.length,
           }),
         );
+        // A tick consumed the latched release facing (movementFacing fed
+        // stepFacing above); drop it so it is not re-applied next frame.
+        pendingReleaseFacing = null;
         acc -= DT;
       }
       const pp = offlineSim.player;
@@ -2054,6 +2245,9 @@ async function startGame(
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online!;
+    spectateBadge.update(net.spectating);
+    const spectateFacing = net.consumeSpectateFacing();
+    if (spectateFacing !== null) input.camYaw = spectateFacing;
     const resolved = resolveMove(
       mouselook,
       world.player.pos,
@@ -2063,6 +2257,9 @@ async function startGame(
     const netFacing = movementFacing ?? resolved.facing;
     Object.assign(net.moveInput, resolved.mi);
     net.setMouselookFacing(netFacing);
+    // Online streams facing every frame, so the latched release yaw is consumed
+    // here; drop it so it is not re-applied next frame.
+    pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
@@ -2127,7 +2324,13 @@ async function startGame(
     perf.time('renderer', () =>
       perf.trace(
         'renderer.sync',
-        () => renderer.sync(alpha, frameDt, movementFacing, ONLINE_SELF_RENDER_ALPHA_LEAD),
+        () =>
+          renderer.sync(
+            alpha,
+            frameDt,
+            net.spectating === null ? movementFacing : null,
+            ONLINE_SELF_RENDER_ALPHA_LEAD,
+          ),
         {
           mode: 'online',
           views: renderer.views.size,
@@ -2187,6 +2390,13 @@ async function startGame(
           controller,
           perf,
           gamepad,
+          /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
+          lockpickEngage: (objectId: number, ante: number) =>
+            hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
+          /** Syncs HUD col/row from sim before acting; always drains step events. Use instead of sim.lockpickAction. */
+          lockpickAction: (action: string) =>
+            hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
+          flushLockpickEvents: () => hud.flushLockpickEvents(),
         };
       }, LOADING_FADE_MS);
     }),
@@ -2213,8 +2423,50 @@ function sanitizeOfflineName(raw: string): string {
 async function startOffline(playerClass: PlayerClass, name: string, skin = 0): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
-  const sim = new Sim({ seed: WORLD_SEED, playerClass, playerName: name });
+  const sim = new Sim({
+    seed: WORLD_SEED,
+    playerClass,
+    playerName: name,
+    devCommands: import.meta.env.DEV,
+  });
   sim.setPlayerSkin(sim.playerId, skin);
+  // Dev convenience: ?mech drops an offline session straight into the Combat Mech
+  // cosmetic body holding a spread of class-usable weapons, to eyeball the held
+  // weapon model on the mech (swap them in the bag to see each one). DEV builds
+  // only (mirrors devCommands gating); inert in production.
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has('mech')) {
+    sim.setPlayerSkin(sim.playerId, 0, 'mech');
+    // One weapon per held-model family (sword / axe / mace / dagger / staff / wand
+    // / polearm); only the ones this class can wield are granted, so every bag
+    // weapon is swappable and the first one auto-equips.
+    const TEST_WEAPONS = [
+      'worn_sword',
+      'redbrook_blade',
+      'wyrmfang_greatblade',
+      'highwatch_warblade',
+      'rusty_hatchet',
+      'drogmars_skullcleaver',
+      'gorraks_cleaver',
+      'tunnelkings_spade',
+      'bronzework_mace',
+      'voss_sanctified_mace',
+      'bristleback_maul',
+      'keen_dirk',
+      'skullsplitter_dirk',
+      'vale_carving_knife',
+      'gravecaller_staff',
+      'vaels_mist_staff',
+      'staff_of_the_gravewyrm',
+      'drowned_tide_scepter',
+      'drownedmoon_scepter',
+      'palecoil_rod',
+      'fen_reaver_glaive',
+      'tidereaver_gaff',
+    ];
+    const usable = TEST_WEAPONS.filter((id) => ITEMS[id] && canEquipItem(playerClass, ITEMS[id]));
+    for (const id of usable) sim.addItem(id, 1, sim.playerId);
+    if (usable[0]) sim.equipItem(usable[0], sim.playerId);
+  }
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`);
@@ -2241,6 +2493,12 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+
+function releaseStartScreenPreview(): void {
+  if (!characterPreview) return;
+  characterPreview.destroy();
+  characterPreview = null;
+}
 
 /** Fill a skin-picker row with one option per available skin, each showing an
  *  actual 2D portrait preview of the character in that chroma. */
@@ -2537,6 +2795,7 @@ function show(el: string): void {
   const panels = [
     '#mode-select',
     '#login-panel',
+    '#discord-choice-panel',
     '#realm-panel',
     '#charselect-panel',
     '#charcreate-panel',
@@ -2544,13 +2803,18 @@ function show(el: string): void {
   ];
   document.body.dataset.startPanel = el.slice(1);
 
-  // Find currently visible panel
-  const currentActiveId = panels.find((id) => !$(id).hasAttribute('hidden'));
+  // Find currently visible panel. Not every entry carries every panel: play.html omits
+  // #discord-choice-panel (the chooser is an index.html-only flow), so resolve each id
+  // defensively and skip a missing one rather than dereferencing null.
+  const currentActiveId = panels.find((id) => {
+    const panel = document.querySelector(id);
+    return panel !== null && !panel.hasAttribute('hidden');
+  });
 
   if (!currentActiveId || currentActiveId === el) {
     // Show instantly on initial load or same panel
     for (const id of panels) {
-      $(id).toggleAttribute('hidden', id !== el);
+      document.querySelector(id)?.toggleAttribute('hidden', id !== el);
     }
     if (el === '#charselect-panel' || el === '#charcreate-panel' || el === '#offline-select') {
       updatePreviewContainer(el);
@@ -2678,9 +2942,17 @@ function enterLoggedInChrome(): void {
   });
   const li = loginNavItem();
   if (li) li.hidden = true;
+  // Becoming logged-in (fresh login OR restored session): pull Discord status so
+  // the unlinked CTA banner can appear immediately, not only after opening the panel.
+  void refreshDiscordStatus();
 }
 
 function enterLoggedOutChrome(): void {
+  // Leaving the logged-in state hides the Discord CTA + panel.
+  setDiscordUiEnabled(false);
+  document.getElementById('discord-cta-banner')?.setAttribute('hidden', '');
+  const dw = document.getElementById('discord-window');
+  if (dw) dw.hidden = true;
   loggedInNavItems.forEach((sel) => {
     const li = document.querySelector<HTMLElement>(sel);
     if (li) li.hidden = true;
@@ -2926,22 +3198,6 @@ function setupAccountPortal(): void {
       ($('#account-confirm-pass') as HTMLInputElement).value = '';
     } catch (e2) {
       setAccountFieldMsg('#account-password-msg', userFacingApiError(e2), false);
-    }
-  });
-
-  ($('#account-email-form') as HTMLFormElement).addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = ($('#account-email') as HTMLInputElement).value;
-    if (!validateEmailShape(email)) {
-      setAccountFieldMsg('#account-email-msg', t('hudChrome.account.errEmailInvalid'), false);
-      return;
-    }
-    try {
-      const saved = await api.setEmail(email);
-      ($('#account-email') as HTMLInputElement).value = saved;
-      setAccountFieldMsg('#account-email-msg', t('hudChrome.account.emailSaved'), true);
-    } catch (e2) {
-      setAccountFieldMsg('#account-email-msg', userFacingApiError(e2), false);
     }
   });
 
@@ -3199,7 +3455,7 @@ function selectRealm(entry: import('./net/online').RealmEntry): void {
 }
 
 // --- Inline realm switcher (dropdown on the character-select screen) ----------
-const REALM_TYPE_KEYS = {
+const _REALM_TYPE_KEYS = {
   Normal: 'realmTypes.normal',
   PvP: 'realmTypes.pvp',
   RP: 'realmTypes.rp',
@@ -3285,6 +3541,63 @@ function selectRealmInline(entry: import('./net/online').RealmEntry): void {
   void refreshCharacters();
 }
 
+// --- Character sort dropdown (character-select screen) ------------------------
+const CHAR_SORT_KEY = 'wocc.charSort';
+const CHAR_SORT_LABEL_KEYS: Record<CharSortMode, TranslationKey> = {
+  level: 'character.sortLevel',
+  name: 'character.sortName',
+  recent: 'character.sortRecent',
+  playtime: 'character.sortPlaytime',
+};
+let charSortMode: CharSortMode = normalizeCharSortMode(localStorage.getItem(CHAR_SORT_KEY));
+let sortDropdownOpen = false;
+
+function updateSortButtonLabel(): void {
+  const el = document.getElementById('cs-sort-current');
+  if (el) el.textContent = t(CHAR_SORT_LABEL_KEYS[charSortMode]);
+}
+
+function closeSortDropdown(): void {
+  document.getElementById('cs-sort-menu')?.setAttribute('hidden', '');
+  document.getElementById('cs-sort-btn')?.setAttribute('aria-expanded', 'false');
+  sortDropdownOpen = false;
+}
+
+function setCharSort(mode: CharSortMode): void {
+  closeSortDropdown();
+  if (mode === charSortMode) return;
+  charSortMode = mode;
+  localStorage.setItem(CHAR_SORT_KEY, mode);
+  updateSortButtonLabel();
+  void refreshCharacters();
+}
+
+function renderSortDropdown(): void {
+  const menu = $('#cs-sort-menu');
+  menu.innerHTML = CHAR_SORT_MODES.map((m) => {
+    const sel = m === charSortMode;
+    return `<div class="realm-row cs-realm-row cs-sort-row${sel ? ' sel' : ''}" role="option" aria-selected="${sel}" data-mode="${m}">
+        <div class="realm-name">${escapeHtml(t(CHAR_SORT_LABEL_KEYS[m]))}</div>
+      </div>`;
+  }).join('');
+  menu.querySelectorAll('.cs-sort-row').forEach((row) => {
+    row.addEventListener('click', () => {
+      setCharSort(normalizeCharSortMode((row as HTMLElement).dataset.mode));
+    });
+  });
+}
+
+function toggleSortDropdown(): void {
+  if (sortDropdownOpen) {
+    closeSortDropdown();
+    return;
+  }
+  $('#cs-sort-btn').setAttribute('aria-expanded', 'true');
+  $('#cs-sort-menu').removeAttribute('hidden');
+  sortDropdownOpen = true;
+  renderSortDropdown();
+}
+
 function setDeleteCharacterError(message: string): void {
   $('#delete-character-error').textContent = message;
 }
@@ -3322,10 +3635,11 @@ function openDeleteCharacterDialog(character: CharacterSummary): void {
 
 async function refreshCharacters(): Promise<void> {
   if (api.realm) $('#charselect-realm').textContent = api.realm;
+  updateSortButtonLabel();
   const listEl = $('#char-list');
   listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.loading'))}</li>`;
   try {
-    const chars = await api.characters();
+    const chars = sortCharacters(await api.characters(), charSortMode);
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
     if (chars.length === 0) {
@@ -3364,14 +3678,14 @@ async function refreshCharacters(): Promise<void> {
               : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
         }`;
 
-      row.querySelector('.delete-char-btn')!.addEventListener('click', (e) => {
+      row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         openDeleteCharacterDialog(c);
       });
 
       if (c.forceRename) {
         const input = row.querySelector('.rename-input') as HTMLInputElement;
-        row.querySelector('.rename-btn')!.addEventListener('click', async (e) => {
+        row.querySelector('.rename-btn')?.addEventListener('click', async (e) => {
           e.stopPropagation();
           $('#charselect-error').textContent = '';
           try {
@@ -3382,7 +3696,7 @@ async function refreshCharacters(): Promise<void> {
           }
         });
       } else if (c.online) {
-        row.querySelector('.take-over-btn')!.addEventListener('click', async (e) => {
+        row.querySelector('.take-over-btn')?.addEventListener('click', async (e) => {
           e.stopPropagation();
           const btn = e.currentTarget as HTMLButtonElement;
           // Taking over disconnects the other live session with no undo, so guard a
@@ -3407,7 +3721,7 @@ async function refreshCharacters(): Promise<void> {
           }
         });
       } else {
-        row.querySelector('.enter-world-btn')!.addEventListener('click', (e) => {
+        row.querySelector('.enter-world-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
           void enterWorld(c, e.currentTarget as HTMLButtonElement);
         });
@@ -4303,6 +4617,11 @@ let linkedWocBalance: number | null = null;
 let connectedWocBalance: number | null = null;
 let walletVerifyPending = false;
 let walletVerifyInProgress = false;
+// True from when a logged-in session starts loading its linked-wallet status until
+// that load settles. While pending, an auto-reconnected wallet must NOT be treated
+// as unverified and disconnected; otherwise a restored session re-signs on every
+// reload (the link is durable server-side; we just haven't fetched it yet).
+let walletLinkStatusPending = false;
 let walletVerifyTimeout: number | null = null;
 let walletVerifyModalUnsubscribe: (() => void) | null = null;
 let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
@@ -4370,42 +4689,61 @@ const walletBalanceText = (n: number): string =>
   t('wallet.balanceAmount', { amount: formatWoc(n) });
 let walletPickerModal: HTMLDivElement | null = null;
 let walletPickerResolve: ((id: string | null) => void) | null = null;
-let walletPickerReturnFocus: HTMLElement | null = null;
+// One module-local FocusManager INSTANCE for the pre-game wallet-picker modal:
+// the shared focus-trap implementation, not a second hand-rolled one. It is an instance, NOT
+// a module singleton exported from focus_manager, mirroring
+// how Hud owns its own FocusManager; the pre-game shell cannot reach Hud's private instance, so
+// a dedicated instance is the correct unification. It owns trap + focus-first + return-to-opener
+// only; this modal keeps its OWN Escape + backdrop-click close (below) because the manager
+// deliberately owns no Escape and the wallet picker is not a hud.closeAll window.
+const walletFocusManager = new FocusManager();
+let walletPickerFocusHandle: FocusTrapHandle | null = null;
+// The control that opened the picker, captured on the FIRST open and preserved across a
+// re-entrant re-open so closing the (re-)opened modal still returns focus to where the flow
+// started. The re-entrant close detaches the prior modal (dropping focus to document.body), so
+// re-reading document.activeElement at the new open would record body, not the real opener.
+let walletPickerOpener: HTMLElement | null = null;
 
-function walletPickerFocusable(root: HTMLElement): HTMLElement[] {
-  return Array.from(
-    root.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    ),
-  ).filter(
-    (el) =>
-      !el.hasAttribute('disabled') &&
-      !el.getAttribute('aria-hidden') &&
-      (el.offsetParent !== null || el === document.activeElement),
-  );
-}
-
-function closeWalletPicker(id: string | null): void {
+function closeWalletPicker(id: string | null, returnFocus = true): void {
   const modal = walletPickerModal;
   const resolve = walletPickerResolve;
+  const focusHandle = walletPickerFocusHandle;
   walletPickerModal = null;
   walletPickerResolve = null;
+  walletPickerFocusHandle = null;
   if (modal) modal.remove();
-  const returnFocus = walletPickerReturnFocus;
-  walletPickerReturnFocus = null;
-  if (returnFocus?.isConnected) returnFocus.focus();
+  // Return focus to the opener through the shared FocusManager (replacing the manual
+  // returnFocus.focus()): release(true) pops the trap and refocuses the recorded opener. The
+  // re-entrant re-open path passes returnFocus=false so the FocusManager's deferred opener
+  // focus cannot land AFTER (and steal focus from) the new modal's synchronous initial focus;
+  // the original opener is preserved separately in walletPickerOpener for the eventual real
+  // close. Drop that recorded opener only on a real (returnFocus=true) close so a re-opened
+  // picker still returns to where the flow started.
+  focusHandle?.release(returnFocus);
+  if (returnFocus) walletPickerOpener = null;
   if (resolve) resolve(id);
 }
 
+// The wallet picker uses the shared src/ui/focus_manager FocusManager, so there
+// is ONE focus-trap implementation. It keeps its own Escape + backdrop-click close because the
+// manager owns no Escape and this is a pre-game shell modal, not a hud.closeAll window; the
+// FocusManager is a module-local INSTANCE, never a module singleton.
 function showWalletPicker(
   wallets: readonly WalletOption[],
   selectedId: string | null,
 ): Promise<string | null> {
-  if (walletPickerResolve) closeWalletPicker(null);
+  const reentrant = walletPickerResolve !== null;
+  if (reentrant) closeWalletPicker(null, false);
   return new Promise((resolve) => {
     walletPickerResolve = resolve;
-    walletPickerReturnFocus =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    // Capture the opener BEFORE focus moves into the modal; the FocusManager returns focus here
+    // on release(). On a re-entrant re-open keep the FIRST opener (the re-entrant close already
+    // detached its modal and dropped focus to body, so re-reading activeElement now would record
+    // body, not the control that started the flow).
+    if (!reentrant) {
+      walletPickerOpener =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
 
     const back = document.createElement('div');
     back.className = 'modal-backdrop wallet-picker-backdrop';
@@ -4477,33 +4815,31 @@ function showWalletPicker(
     back.appendChild(panel);
     document.body.appendChild(back);
     walletPickerModal = back;
+    // Install the shared focus trap over the panel: Tab/Shift+Tab cycle + return-to-opener.
+    // This replaces the deleted hand-rolled focusable list + inline Tab cycle, so there is one
+    // focus-trap implementation (the manager re-queries the panel's focusables on each Tab).
+    walletPickerFocusHandle = walletFocusManager.open({
+      root: () => panel,
+      returnFocusTo: walletPickerOpener,
+    });
 
     const close = () => closeWalletPicker(null);
     closeBtn.addEventListener('click', close);
     back.addEventListener('click', (e) => {
       if (e.target === back) close();
     });
+    // Keep ONLY the modal's own Escape (the FocusManager owns no Escape, and this is a
+    // pre-game shell modal, not a hud.closeAll window). Tab/Shift+Tab is the shared trap's job.
     back.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        close();
-        return;
-      }
-      if (e.key !== 'Tab') return;
-      const focusable = walletPickerFocusable(back);
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      close();
     });
 
+    // Initial focus preserved byte-faithfully: the selected option, else the first option,
+    // else the close button. Kept explicit (synchronous) so the initial-focus behavior is
+    // unchanged; the shared manager owns the Tab trap + return-to-opener.
     const initialFocus =
       back.querySelector<HTMLElement>('.wallet-picker-option.selected') ??
       back.querySelector<HTMLElement>('.wallet-picker-option') ??
@@ -4726,7 +5062,16 @@ async function disconnectUnverifiedWallet(): Promise<void> {
 }
 
 async function disconnectUnverifiedWalletIfIdle(): Promise<void> {
-  if (walletVerifyPending || walletVerifyInProgress) return;
+  if (
+    !shouldDisconnectUnverifiedWallet({
+      connectedAddress: walletMod?.currentWallet().address ?? null,
+      linkedPubkey: linkedWalletPubkey,
+      verifyPending: walletVerifyPending,
+      verifyInProgress: walletVerifyInProgress,
+      linkStatusPending: walletLinkStatusPending,
+    })
+  )
+    return;
   await disconnectUnverifiedWallet();
 }
 
@@ -4797,28 +5142,406 @@ function flashWalletError(message: string): void {
 
 // Refreshed after login: ask the server which wallet (if any) this account has
 // linked, so the button can show the verified ✓ state.
+// ── Discord login/onboarding ─────────────────────────────────────────────────
+// Discord UI is on unless the native app build disables it.
+const DISCORD_BUILD_ENABLED =
+  !NATIVE_APP && String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
+const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
+let discordPopup: Window | null = null;
+
+function flashDiscordError(): void {
+  const el = document.getElementById('login-error');
+  if (el) el.textContent = t('hudChrome.discord.link.error');
+}
+
+function startDiscordOAuth(mode: 'login' | 'link'): void {
+  // Mark a Discord LOGIN so the next boot drops the user straight into online play.
+  if (mode === 'login') {
+    try {
+      localStorage.setItem(DISCORD_ONBOARD_KEY, '1');
+    } catch {
+      /* storage disabled */
+    }
+    // LOGIN from the auth screen: a FULL-PAGE redirect, not a popup. The popup's
+    // window.opener is severed by the cross-origin hop to Discord (COOP), so the
+    // result never returns; a same-tab redirect always lands the callback, which
+    // writes the session + onboard flag and reloads us into play.
+    void api
+      .discordStart('login')
+      .then(({ url }) => {
+        window.location.href = url;
+      })
+      .catch((err) => {
+        console.error('[discord] could not start oauth', err);
+        flashDiscordError();
+      });
+    return;
+  }
+  // LINK (in-game): keep a popup so we never navigate away from a running game.
+  const popup = window.open('about:blank', 'woc-discord', 'width=520,height=720');
+  discordPopup = popup;
+  void api
+    .discordStart('link')
+    .then(({ url }) => {
+      if (popup) popup.location.href = url;
+      else flashDiscordError();
+    })
+    .catch((err) => {
+      console.error('[discord] could not start oauth', err);
+      popup?.close();
+      flashDiscordError();
+    });
+}
+
+// Popup bounce-page result (link mode; login uses a full redirect). Same-origin only.
+window.addEventListener('message', (e: MessageEvent) => {
+  if (e.origin !== location.origin) return;
+  const d = e.data as { source?: string; ok?: boolean; mode?: string } | null;
+  if (d?.source !== 'woc-discord') return;
+  discordPopup?.close();
+  discordPopup = null;
+  if (!d.ok) {
+    flashDiscordError();
+    return;
+  }
+  if (d.mode === 'login') window.location.reload();
+  else void refreshDiscordStatus(); // link succeeded: refresh the in-game panel
+});
+
+function coerceDiscordStatus(d: Record<string, unknown>): DiscordAccountStatus {
+  return {
+    linked: d.linked === true,
+    username: typeof d.username === 'string' ? d.username : null,
+    avatar: typeof d.avatar === 'string' ? d.avatar : null,
+    guildMember: d.guildMember === true,
+    points: typeof d.points === 'number' ? d.points : 0,
+    lifetimePoints: typeof d.lifetimePoints === 'number' ? d.lifetimePoints : 0,
+    statusTier: typeof d.statusTier === 'number' ? d.statusTier : 0,
+    claimedSwagIds: Array.isArray(d.claimedSwagIds)
+      ? d.claimedSwagIds.filter((s): s is string => typeof s === 'string')
+      : [],
+    // Default true: only an explicit false (a Discord-provisioned account with no
+    // real password yet) makes unlink demand one.
+    passwordSet: d.passwordSet !== false,
+  };
+}
+
+function coerceDiscordPresence(p: unknown): DiscordPresenceState {
+  const o = (p && typeof p === 'object' ? p : {}) as Record<string, unknown>;
+  const voice: DiscordVoiceMember[] = Array.isArray(o.voice)
+    ? o.voice.map((m) => {
+        const v = (m && typeof m === 'object' ? m : {}) as Record<string, unknown>;
+        return {
+          id: typeof v.id === 'string' ? v.id : '',
+          name: typeof v.name === 'string' ? v.name : '',
+          speaking: v.speaking === true,
+          selfMute: v.selfMute === true,
+        };
+      })
+    : [];
+  return {
+    onlineCount: typeof o.onlineCount === 'number' ? o.onlineCount : 0,
+    memberTotal: typeof o.memberTotal === 'number' ? o.memberTotal : 0,
+    voiceChannelName: typeof o.voiceChannelName === 'string' ? o.voiceChannelName : null,
+    voice,
+  };
+}
+
+// Pull current link status + rewards + live presence and feed the in-game widget.
+async function refreshDiscordStatus(): Promise<void> {
+  if (!DISCORD_BUILD_ENABLED || !api.token) {
+    setDiscordUiEnabled(false);
+    return;
+  }
+  try {
+    const d = await api.discordStatus();
+    setDiscordUiEnabled(d.enabled === true);
+    if (typeof d.inviteUrl === 'string') setDiscordInviteUrl(d.inviteUrl);
+    setDiscordStatus(coerceDiscordStatus(d));
+    setDiscordPresence(coerceDiscordPresence(d.presence));
+  } catch (err) {
+    console.error('[discord] could not load status', err);
+  }
+  updateDiscordCtaBanner();
+}
+
+const DISCORD_CTA_DISMISS_KEY = 'woc_discord_cta_dismissed';
+
+// Show the "link your Discord" CTA banner to a logged-in player who has not linked
+// yet (and has not dismissed it this session), with live online/total counts.
+function updateDiscordCtaBanner(): void {
+  const banner = document.getElementById('discord-cta-banner');
+  if (!banner) return;
+  let dismissed = false;
+  try {
+    dismissed = sessionStorage.getItem(DISCORD_CTA_DISMISS_KEY) === '1';
+  } catch {
+    /* storage disabled */
+  }
+  const status = discordStatus();
+  const show =
+    DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token && !status.linked && !dismissed;
+  banner.hidden = !show;
+  if (!show) return;
+  const stats = document.getElementById('discord-cta-stats');
+  if (stats) {
+    const p = discordPresence();
+    stats.textContent =
+      p.memberTotal > 0
+        ? t('hudChrome.discord.cta.stats', {
+            online: formatNumber(p.onlineCount),
+            total: formatNumber(p.memberTotal),
+          })
+        : t('hudChrome.discord.cta.statsLoading');
+  }
+}
+
+// Show/hide the Discord entry in the mobile "More" tray. Mobile has no keyboard,
+// so the U-key panel toggle is unreachable there; this button is the touch path
+// into the same #discord-window (link / unlink / status). It is only meaningful
+// when Discord is available: the client build enables it, the server has it on,
+// and the player is logged in. Driven off the same status-change signal as the
+// panel, so it tracks login/logout and the server's enabled flag.
+function syncDiscordMobileEntry(): void {
+  const btn = document.getElementById('mobile-discord');
+  if (!btn) return;
+  const available = DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token;
+  btn.hidden = !available;
+}
+
+function wireDiscordCtaBanner(): void {
+  document.getElementById('discord-cta-link')?.addEventListener('click', () => {
+    startDiscordOAuth('link');
+  });
+  document.getElementById('discord-cta-close')?.addEventListener('click', () => {
+    try {
+      sessionStorage.setItem(DISCORD_CTA_DISMISS_KEY, '1');
+    } catch {
+      /* storage disabled */
+    }
+    const banner = document.getElementById('discord-cta-banner');
+    if (banner) banner.hidden = true;
+  });
+}
+
+// In-game Discord panel (#discord-window): link status, status tiers, presence.
+let discordPanelOpen = false;
+function renderDiscordPanel(): void {
+  const el = document.getElementById('discord-window');
+  if (!el) return;
+  renderDiscordWidget(
+    el,
+    {
+      enabled: discordUiEnabled(),
+      status: discordStatus(),
+      presence: discordPresence(),
+      inviteUrl: discordInviteUrl(),
+      characterName: null,
+    },
+    {
+      attachTooltip: () => {},
+      hideTooltip: () => {},
+      onLink: () => startDiscordOAuth('link'),
+      onUnlink: () => {
+        // A Discord-provisioned account (no real password) must set one first, or
+        // unlinking would strand it. Collect it via the keep-account modal.
+        if (!discordStatus().passwordSet) {
+          openDiscordKeepModal();
+          return;
+        }
+        void api
+          .unlinkDiscord()
+          .then(() => refreshDiscordStatus())
+          .catch((err) => {
+            // Defensive: if status was stale and the server still demands a password,
+            // fall back to the keep-account modal instead of a console-only failure.
+            if ((err as { status?: number })?.status === 400) {
+              openDiscordKeepModal();
+              return;
+            }
+            console.error('[discord] unlink failed', err);
+          });
+      },
+      onOpenUrl: (url) => {
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      },
+      onClose: () => toggleDiscordPanel(false),
+    },
+  );
+}
+function toggleDiscordPanel(open?: boolean): void {
+  const el = document.getElementById('discord-window');
+  if (!el || !DISCORD_BUILD_ENABLED || !api.token) return;
+  discordPanelOpen = open ?? !discordPanelOpen;
+  el.hidden = !discordPanelOpen;
+  if (discordPanelOpen) {
+    void refreshDiscordStatus().then(renderDiscordPanel);
+    renderDiscordPanel();
+  }
+}
+// Keep an open panel in sync as status/presence updates arrive.
+onDiscordStatusChange(() => {
+  syncDiscordMobileEntry();
+  if (discordPanelOpen) renderDiscordPanel();
+});
+// The Discord panel toggles via the rebindable `discord` keybind action (default
+// U), dispatched through onUiKey above like every other interface window; the
+// build/token guard lives in toggleDiscordPanel.
+// Light periodic refresh so the panel's online/presence stays current while logged in.
+setInterval(() => {
+  if (DISCORD_BUILD_ENABLED && api.token) void refreshDiscordStatus();
+}, 45_000);
+
+// ── Keep-account-before-unlink modal (#discord-keep-modal) ───────────────────
+// A Discord-provisioned account has no real password, so unlinking it as-is would
+// strand it. This modal makes the player set one first (the username is fixed and
+// shown read-only); the server sets the password and removes the link atomically.
+const DISCORD_KEEP_PASSWORD_MIN = 6;
+
+function openDiscordKeepModal(): void {
+  const modal = document.getElementById('discord-keep-modal');
+  if (!modal) return;
+  const userEl = document.getElementById('discord-keep-username') as HTMLInputElement | null;
+  const passEl = document.getElementById('discord-keep-pass') as HTMLInputElement | null;
+  const confirmEl = document.getElementById('discord-keep-confirm') as HTMLInputElement | null;
+  const errEl = document.getElementById('discord-keep-error');
+  if (userEl) userEl.value = api.username ?? discordStatus().username ?? '';
+  if (passEl) passEl.value = '';
+  if (confirmEl) confirmEl.value = '';
+  if (errEl) errEl.textContent = '';
+  modal.hidden = false;
+  passEl?.focus();
+}
+
+function closeDiscordKeepModal(): void {
+  const modal = document.getElementById('discord-keep-modal');
+  if (modal) modal.hidden = true;
+}
+
+function wireDiscordKeepModal(): void {
+  const modal = document.getElementById('discord-keep-modal');
+  if (!modal) return;
+  const passEl = document.getElementById('discord-keep-pass') as HTMLInputElement | null;
+  const confirmEl = document.getElementById('discord-keep-confirm') as HTMLInputElement | null;
+  const errEl = document.getElementById('discord-keep-error');
+  const submit = () => {
+    const pass = passEl?.value ?? '';
+    const confirm = confirmEl?.value ?? '';
+    if (pass.length < DISCORD_KEEP_PASSWORD_MIN) {
+      if (errEl) errEl.textContent = t('hudChrome.discord.keep.tooShort');
+      return;
+    }
+    if (pass !== confirm) {
+      if (errEl) errEl.textContent = t('hudChrome.discord.keep.mismatch');
+      return;
+    }
+    if (errEl) errEl.textContent = '';
+    void api
+      .unlinkDiscord(pass)
+      .then(() => {
+        closeDiscordKeepModal();
+        return refreshDiscordStatus();
+      })
+      .then(() => renderDiscordPanel())
+      .catch((err) => {
+        if (errEl) errEl.textContent = userFacingApiError(err);
+      });
+  };
+  document.getElementById('btn-discord-keep-submit')?.addEventListener('click', submit);
+  document
+    .getElementById('btn-discord-keep-cancel')
+    ?.addEventListener('click', closeDiscordKeepModal);
+  // Backdrop click closes; Enter in the confirm field submits.
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeDiscordKeepModal();
+  });
+  confirmEl?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submit();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!modal.hidden && e.key === 'Escape') closeDiscordKeepModal();
+  });
+}
+
+// ── First-time Discord login chooser persistence (#discord-choice-panel) ─────
+// The OAuth bounce page parks a single-use link token + Discord name here when a
+// first-time login has no account yet; main.ts reads it on boot to show the
+// chooser. Stale/expired/garbled entries are cleared so they never trap a visitor.
+const DISCORD_CHOICE_KEY = 'woc_discord_choice';
+const DISCORD_CHOICE_TTL_MS = 15 * 60 * 1000;
+
+interface DiscordLoginChoice {
+  linkToken: string;
+  username: string;
+}
+
+function readDiscordChoice(): DiscordLoginChoice | null {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(DISCORD_CHOICE_KEY);
+  } catch {
+    return null;
+  }
+  if (!raw) return null;
+  try {
+    const d = JSON.parse(raw) as { linkToken?: unknown; username?: unknown; ts?: unknown };
+    const fresh = typeof d.ts === 'number' && Date.now() - d.ts < DISCORD_CHOICE_TTL_MS;
+    if (typeof d.linkToken === 'string' && d.linkToken && fresh) {
+      return {
+        linkToken: d.linkToken,
+        username: typeof d.username === 'string' ? d.username : '',
+      };
+    }
+  } catch {
+    /* fall through to clear a garbled entry */
+  }
+  clearDiscordChoice();
+  return null;
+}
+
+function clearDiscordChoice(): void {
+  try {
+    localStorage.removeItem(DISCORD_CHOICE_KEY);
+  } catch {
+    /* storage disabled */
+  }
+}
+
 async function refreshWalletLinkStatus(): Promise<void> {
   if (!WALLET_ENABLED) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     connectedWocBalance = null;
+    walletLinkStatusPending = false;
     updateWalletButton();
     return;
   }
   if (!api.token) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
+    walletLinkStatusPending = false;
     updateWalletButton();
     return;
   }
+  // Set synchronously (before the first await) so an auto-reconnecting wallet that
+  // fires mid-load is held, not disconnected, until we know whether it's the link.
+  walletLinkStatusPending = true;
+  let statusKnown = false;
   try {
     const wallet = await api.linkedWallet();
     linkedWalletPubkey = wallet?.pubkey ?? null;
     linkedWocBalance = null;
+    statusKnown = true;
   } catch (err) {
+    // Transient failure (offline/5xx): we genuinely don't know the link status, so
+    // keep any prior linked pubkey and do NOT disconnect a connected wallet, since
+    // that would force a needless re-sign. A later refresh resolves it.
     console.error('[wallet] could not load link status', err);
-    linkedWalletPubkey = null;
-    linkedWocBalance = null;
+  } finally {
+    walletLinkStatusPending = false;
   }
   updateWalletButton();
   const pubkey = linkedWalletPubkey;
@@ -4834,7 +5557,8 @@ async function refreshWalletLinkStatus(): Promise<void> {
       console.error('[wallet] could not load linked balance', err);
     }
   }
-  await disconnectUnverifiedWalletIfIdle();
+  // Only reap an unverified wallet once we've definitively learned the link status.
+  if (statusKnown) await disconnectUnverifiedWalletIfIdle();
 }
 
 // challenge → sign → link, with a verified mirror written server-side.
@@ -5041,8 +5765,10 @@ function applyLandingBackdrop(highContrast: boolean): void {
     return;
   }
 
-  // Video path: attach the source lazily and play. Reveal classes flip on the
-  // first painted frame so the poster cross-fades into live motion.
+  // Video path: attach the source lazily and play. The trailer is held hidden
+  // (opacity 0) until it is genuinely playing, so the static poster never flashes
+  // before the video. trailer-ready reveals the layer; trailer-playing adds the
+  // drift, and only on real playback.
   const src = video.dataset.trailerSrc;
   if (src && !video.src) {
     video.src = src;
@@ -5051,11 +5777,17 @@ function applyLandingBackdrop(highContrast: boolean): void {
       video.addEventListener('playing', () => {
         backdrop.classList.add('trailer-ready', 'trailer-playing');
       });
+      // Failure fallback: a trailer that cannot decode/load still reveals the
+      // static poster (trailer-ready, no drift) instead of leaving a black void.
+      video.addEventListener('error', () => {
+        backdrop.classList.add('trailer-ready');
+      });
     }
     video.load();
   }
   video.play().catch(() => {
-    /* autoplay blocked: poster stays, no error surfaced */
+    // autoplay blocked: reveal the static poster (no drift), not a black backdrop.
+    backdrop.classList.add('trailer-ready');
   });
 }
 
@@ -5071,7 +5803,7 @@ function wireStartScreens(): void {
   const bootLang = getLanguage();
   const startScreen = document.getElementById('start-screen');
   const gated = !!startScreen && !isLocaleResident(bootLang);
-  if (gated) startScreen!.style.visibility = 'hidden';
+  if (gated && startScreen) startScreen.style.visibility = 'hidden';
   const revealLocalized = () => {
     // Restore visibility even if translatePage() throws (e.g. a dev-build untracked-key
     // throw or any mid-translate DOM error), so a translation failure can never strand the
@@ -5079,7 +5811,7 @@ function wireStartScreens(): void {
     try {
       translatePage();
     } finally {
-      if (gated) startScreen!.style.visibility = '';
+      if (gated && startScreen) startScreen.style.visibility = '';
     }
   };
   void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
@@ -5486,7 +6218,12 @@ function wireStartScreens(): void {
         return;
       }
       try {
-        await api.linkSteamAccount(username, password, pendingSteamAuth.ticket, pendingSteamAuth.displayName);
+        await api.linkSteamAccount(
+          username,
+          password,
+          pendingSteamAuth.ticket,
+          pendingSteamAuth.displayName,
+        );
         pendingSteamAuth = null;
       } catch (err) {
         loginError(userFacingApiError(err));
@@ -5533,6 +6270,7 @@ function wireStartScreens(): void {
         }
       } else {
         await api.register(username, password, token, REFERRAL_SLUG, nativeAttestation);
+        trackMetaPixel('AccountCreated');
       }
     } catch (err) {
       // Auth itself failed (bad credentials, taken username, Turnstile reject…).
@@ -5661,6 +6399,20 @@ function wireStartScreens(): void {
   });
   document.addEventListener('keydown', (e) => {
     if (realmDropdownOpen && e.key === 'Escape') closeRealmDropdown();
+  });
+
+  // Character sort dropdown: toggle, outside-click, and Escape.
+  $('#cs-sort-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSortDropdown();
+  });
+  document.addEventListener('click', (e) => {
+    if (!sortDropdownOpen) return;
+    const sw = document.querySelector('.cs-sort-switch');
+    if (sw && !sw.contains(e.target as Node)) closeSortDropdown();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (sortDropdownOpen && e.key === 'Escape') closeSortDropdown();
   });
 
   // character creation
@@ -5970,12 +6722,179 @@ function wireStartScreens(): void {
     void renderAccountPortal();
   });
   setupNavBtn($('#nav-btn-logout'), '#hero-view', logoutAccount);
+  trackCommunityLinkClicks();
   setupAccountPortal();
+  // "Continue with Discord": first-class login at the top of the auth form.
+  const discordLoginBtn = $('#btn-login-discord');
+  const discordOrDivider = document.getElementById('auth-or-divider');
+  if (discordLoginBtn && DISCORD_BUILD_ENABLED) {
+    discordLoginBtn.hidden = false;
+    if (discordOrDivider) discordOrDivider.hidden = false;
+    discordLoginBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      startDiscordOAuth('login');
+    });
+  }
+  wireDiscordCtaBanner();
+  wireDiscordKeepModal();
+
+  // First-time Discord login chooser: create a new account, or link an existing one.
+  let pendingDiscordChoice: DiscordLoginChoice | null = null;
+  const discordChoiceError = (msg: string) => {
+    const el = document.getElementById('discord-choice-error');
+    if (el) el.textContent = msg;
+  };
+  // A chooser path that minted a session: persist it and drop straight into play.
+  const finishDiscordChoice = () => {
+    clearDiscordChoice();
+    pendingDiscordChoice = null;
+    discordChoiceError('');
+    api.saveSession();
+    enterLoggedInChrome();
+    void refreshWalletLinkStatus();
+    goToLoggedInPlay();
+  };
+  const onDiscordChoiceError = (err: unknown) => {
+    // A dead/used pending token (400) can't be retried: clear it and ask the player
+    // to sign in with Discord again. Other errors stay on the chooser to retry.
+    if ((err as { status?: number })?.status === 400) {
+      clearDiscordChoice();
+      pendingDiscordChoice = null;
+      discordChoiceError(t('hudChrome.discord.choice.expired'));
+      return;
+    }
+    // Server codes userFacingApiError doesn't localize (a unique-link race, a 500, or
+    // the discord rate-limit bucket) would otherwise render raw; show the localized
+    // generic instead. The credential / 2FA / moderation messages it DOES localize
+    // pass through unchanged.
+    const code = err instanceof Error ? err.message : '';
+    if (code === 'already_linked' || code === 'server_error' || code === 'rate limited') {
+      discordChoiceError(t('hudChrome.discord.choice.error'));
+      return;
+    }
+    discordChoiceError(userFacingApiError(err));
+  };
+  const showDiscordChoice = (choice: DiscordLoginChoice) => {
+    pendingDiscordChoice = choice;
+    const greet = document.getElementById('discord-choice-greeting');
+    if (greet && choice.username) {
+      greet.textContent = t('hudChrome.discord.choice.greeting', { name: choice.username });
+    }
+    const linkBlock = document.getElementById('discord-link-existing');
+    if (linkBlock) linkBlock.hidden = true;
+    const twoFaField = document.getElementById('discord-link-2fa-field');
+    if (twoFaField) twoFaField.hidden = true;
+    document.getElementById('btn-discord-link-toggle')?.setAttribute('aria-expanded', 'false');
+    discordChoiceError('');
+    show('#discord-choice-panel');
+  };
+  const wireDiscordChoice = () => {
+    // The first-login chooser lives only on the main entry (index.html); play.html omits
+    // it (Discord OAuth always redirects to '/'), so bail before touching nodes that are
+    // not present, mirroring the null-guarded sibling wirings (CTA banner, keep modal).
+    if (!document.getElementById('discord-choice-panel')) return;
+    $('#btn-discord-create').addEventListener('click', () => {
+      if (!pendingDiscordChoice) return;
+      discordChoiceError('');
+      void api
+        .discordLoginNew(pendingDiscordChoice.linkToken)
+        .then(finishDiscordChoice)
+        .catch(onDiscordChoiceError);
+    });
+    $('#btn-discord-link-toggle').addEventListener('click', () => {
+      const linkBlock = document.getElementById('discord-link-existing');
+      if (!linkBlock) return;
+      const reveal = linkBlock.hidden;
+      linkBlock.hidden = !reveal;
+      $('#btn-discord-link-toggle').setAttribute('aria-expanded', String(reveal));
+      if (reveal) ($('#discord-link-user') as HTMLInputElement).focus();
+    });
+    const submitLink = () => {
+      if (!pendingDiscordChoice) return;
+      const username = ($('#discord-link-user') as HTMLInputElement).value.trim();
+      const password = ($('#discord-link-pass') as HTMLInputElement).value;
+      const twoFaField = document.getElementById('discord-link-2fa-field');
+      const rawCode =
+        twoFaField && !twoFaField.hidden ? ($('#discord-link-2fa') as HTMLInputElement).value : '';
+      const factor = rawCode ? classifyAuthCode(rawCode) : { code: '', recoveryCode: '' };
+      if (!username || !password) {
+        discordChoiceError(t('hudChrome.discord.choice.error'));
+        return;
+      }
+      discordChoiceError('');
+      void api
+        .discordLoginLink(
+          pendingDiscordChoice.linkToken,
+          username,
+          password,
+          factor.code,
+          factor.recoveryCode,
+        )
+        .then((res) => {
+          if (res.twoFactorRequired) {
+            // Password accepted; the account needs a second factor. Reveal the code
+            // field for the follow-up submit (the pending token stays valid).
+            if (twoFaField) twoFaField.hidden = false;
+            ($('#discord-link-2fa') as HTMLInputElement).focus();
+            discordChoiceError(t('auth.twoFactorHint'));
+            return;
+          }
+          finishDiscordChoice();
+        })
+        .catch(onDiscordChoiceError);
+    };
+    $('#btn-discord-link-submit').addEventListener('click', submitLink);
+    ($('#discord-link-pass') as HTMLInputElement).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitLink();
+      }
+    });
+    ($('#discord-link-2fa') as HTMLInputElement).addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitLink();
+      }
+    });
+    $('#btn-discord-choice-back').addEventListener('click', () => {
+      clearDiscordChoice();
+      pendingDiscordChoice = null;
+      show('#mode-select');
+    });
+  };
+  if (DISCORD_BUILD_ENABLED) wireDiscordChoice();
+
+  // A just-completed Discord login should land straight in online play, not home.
+  let discordOnboarding = false;
+  try {
+    discordOnboarding = localStorage.getItem(DISCORD_ONBOARD_KEY) === '1';
+    localStorage.removeItem(DISCORD_ONBOARD_KEY);
+  } catch {
+    /* storage disabled */
+  }
+  // A first-time Discord login with no account yet parks a choice here: show the
+  // create-new / link-existing chooser instead of the normal session restore.
+  // The chooser only exists on index.html (the OAuth callback always redirects to '/').
+  // Guard on its presence so other entries (play.html) fall through to normal session
+  // restore instead of stranding the user on a chooser panel that is not in the DOM.
+  const parkedDiscordChoice =
+    DISCORD_BUILD_ENABLED && document.getElementById('discord-choice-panel')
+      ? readDiscordChoice()
+      : null;
   // Restore a persisted session: show the Account tab immediately, then confirm
   // the stored token is still valid against the server (clearing it if not).
-  if (api.restoreSession()) {
+  if (parkedDiscordChoice) {
+    enterLoggedOutChrome();
+    showDiscordChoice(parkedDiscordChoice);
+  } else if (api.restoreSession()) {
     enterLoggedInChrome();
     void revalidateAccountSession();
+    // Re-bind the account's linked wallet on a restored session (not just on fresh
+    // login), so an auto-reconnected wallet shows verified and is NOT treated as
+    // unverified and disconnected (the bug that forced a re-sign on every reload).
+    void refreshWalletLinkStatus();
+    // (Discord status is refreshed by enterLoggedInChrome above.)
+    if (discordOnboarding) enterOnlinePlayFlow();
     if (isDesktopLoginPage()) void completeDesktopBrowserLogin();
   } else {
     enterLoggedOutChrome();
@@ -6010,7 +6929,11 @@ function wireStartScreens(): void {
       void changeLanguage(selected, (msg) => {
         if (langStatus) langStatus.textContent = msg;
       }).then((ok) => {
-        if (!ok) langSelect.value = getLanguage();
+        if (!ok) {
+          langSelect.value = getLanguage();
+          return;
+        }
+        updateSortButtonLabel(); // char-select sort dropdown label follows the locale
       });
     });
   }
@@ -6213,5 +7136,6 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
   }
 })();
 
+startSitePresence('home');
 wireStartScreens();
 initHomepageMusic();

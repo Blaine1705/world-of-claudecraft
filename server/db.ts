@@ -5,7 +5,9 @@ import type { CharacterState, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import { DISCORD_SCHEMA } from './discord_db';
 import { isUniqueViolation } from './http_util';
+import { OAUTH_SCHEMA } from './oauth_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
@@ -53,6 +55,13 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
   expires_at TIMESTAMPTZ NOT NULL
 );
 CREATE INDEX IF NOT EXISTS auth_tokens_account ON auth_tokens(account_id);
+-- Token scope: 'full' sessions can do anything; 'read' tokens (companion apps,
+-- OAuth character:read) are accepted only on read routes and rejected on every
+-- mutating route. Defaulting to 'full' means every pre-existing session keeps
+-- full power with no behavior change. The label column names a companion/OAuth
+-- token in the account portal so a user can revoke a specific one.
+ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'full';
+ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS label TEXT;
 CREATE TABLE IF NOT EXISTS account_identities (
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   provider TEXT NOT NULL,
@@ -96,6 +105,13 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deactivated_at TIMESTAMPTZ;
+-- Whether the account has a password the OWNER set (and therefore can log in with
+-- via username + password). Defaults TRUE so every existing account keeps its
+-- usable password. Discord-provisioned accounts are created with FALSE: they have
+-- only a random unguessable placeholder hash, so they are reachable ONLY through
+-- Discord until a real password is set (which flips this back to TRUE). The unlink
+-- path reads this to avoid stranding a Discord-only account with no way back in.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS password_set BOOLEAN NOT NULL DEFAULT TRUE;
 -- Transactional + marketing email support. locale picks the language the server
 -- renders outbound mail in (emails have no client in the loop, so they are
 -- localized server-side, unlike chat which the client re-localizes). The
@@ -164,6 +180,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS account_totp_recovery_hash ON account_totp_rec
 CREATE INDEX IF NOT EXISTS accounts_created_at ON accounts(created_at DESC);
 CREATE INDEX IF NOT EXISTS accounts_created_ip_created ON accounts(created_ip, created_at DESC);
 CREATE INDEX IF NOT EXISTS accounts_created_user_agent_created ON accounts(created_user_agent, created_at DESC);
+CREATE INDEX IF NOT EXISTS accounts_last_login_ip_login ON accounts(last_login_ip, last_login DESC);
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS is_gm BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS force_rename BOOLEAN NOT NULL DEFAULT FALSE;
 CREATE TABLE IF NOT EXISTS play_sessions (
@@ -178,6 +195,33 @@ ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS ip_address TEXT;
 ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS user_agent TEXT;
 CREATE INDEX IF NOT EXISTS play_sessions_account ON play_sessions(account_id);
 CREATE INDEX IF NOT EXISTS play_sessions_started ON play_sessions(started_at);
+CREATE INDEX IF NOT EXISTS play_sessions_ip_started ON play_sessions(ip_address, started_at DESC);
+CREATE TABLE IF NOT EXISTS admin_online_samples (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  sampled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  online_players INT NOT NULL,
+  online_accounts INT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS admin_online_samples_realm_sampled
+  ON admin_online_samples(realm, sampled_at DESC);
+CREATE TABLE IF NOT EXISTS site_presence_sessions (
+  visitor_id TEXT PRIMARY KEY,
+  page TEXT NOT NULL DEFAULT 'unknown',
+  first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ip_hash TEXT NOT NULL DEFAULT '',
+  user_agent_hash TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS site_presence_sessions_last_seen
+  ON site_presence_sessions(last_seen_at DESC);
+CREATE TABLE IF NOT EXISTS admin_site_presence_samples (
+  id BIGSERIAL PRIMARY KEY,
+  sampled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  active_visitors INT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS admin_site_presence_samples_sampled
+  ON admin_site_presence_samples(sampled_at DESC);
 CREATE TABLE IF NOT EXISTS chat_logs (
   id BIGSERIAL PRIMARY KEY,
   account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
@@ -403,6 +447,12 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]); // "WOC\x01"
     await client.query(SCHEMA);
     await client.query(SOCIAL_SCHEMA);
+    await client.query(OAUTH_SCHEMA);
+    // Discord integration tables (links, oauth states, pending logins, reward
+    // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
+    // unconditionally (idempotent) so the tables exist before the feature is
+    // enabled, like the other schema modules.
+    await client.query(DISCORD_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -529,16 +579,21 @@ export async function createAccount(
   username: string,
   passwordHash: string,
   meta: RequestMetadata = {},
+  // passwordSet=false marks an account whose password is a placeholder the owner
+  // never chose (a Discord-provisioned account). Defaults TRUE for every normal
+  // (register / portal) signup so nothing changes for them.
+  opts: { passwordSet?: boolean } = {},
 ): Promise<AccountRow> {
   const res = await pool.query(
-    `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent, password_set)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING id, username, password_hash`,
     [
       username,
       passwordHash,
       cleanMetadataText(meta.ip, 128),
       cleanMetadataText(meta.userAgent, 512),
+      opts.passwordSet ?? true,
     ],
   );
   return res.rows[0];
@@ -553,7 +608,10 @@ export async function findAccount(username: string): Promise<AccountRow | null> 
   return res.rows[0] ?? null;
 }
 
-export async function accountForIdentity(provider: string, providerUserId: string): Promise<AccountRow | null> {
+export async function accountForIdentity(
+  provider: string,
+  providerUserId: string,
+): Promise<AccountRow | null> {
   const res = await pool.query(
     `SELECT a.id, a.username, a.password_hash
      FROM account_identities i
@@ -593,14 +651,30 @@ export async function touchLogin(accountId: number, meta: RequestMetadata = {}):
   );
 }
 
+// A bearer token's authority. 'full' is a normal web session; 'read' is a
+// companion-app / OAuth character:read token, accepted only on read routes.
+export type TokenScope = 'full' | 'read';
+
+// The single scope policy, named so it is testable and can't drift: only a full
+// token may hit a mutating/owner-action route; read and full may hit read routes.
+export function scopeAllowsMutation(scope: TokenScope): boolean {
+  return scope === 'full';
+}
+export function scopeAllowsRead(scope: TokenScope): boolean {
+  return scope === 'read' || scope === 'full';
+}
+
 export async function saveToken(
   token: string,
   accountId: number,
   ttlHours = 24 * 7,
+  scope: TokenScope = 'full',
+  label: string | null = null,
 ): Promise<void> {
   await pool.query(
-    `INSERT INTO auth_tokens (token, account_id, expires_at) VALUES ($1, $2, now() + ($3 || ' hours')::interval)`,
-    [token, accountId, String(ttlHours)],
+    `INSERT INTO auth_tokens (token, account_id, expires_at, scope, label)
+     VALUES ($1, $2, now() + ($3 || ' hours')::interval, $4, $5)`,
+    [token, accountId, String(ttlHours), scope, label],
   );
 }
 
@@ -612,10 +686,29 @@ export async function accountForToken(token: string): Promise<number | null> {
   return res.rows[0]?.account_id ?? null;
 }
 
+// Account + scope for a live token. Mirrors accountForToken but also returns the
+// token's scope so read routes can accept 'read'|'full' while mutating routes
+// (via bearerActiveAccount) reject anything that is not 'full'. Old tokens
+// predating the scope column read as 'full' via the column default.
+export async function accountAndScopeForToken(
+  token: string,
+): Promise<{ accountId: number; scope: TokenScope } | null> {
+  const res = await pool.query(
+    'SELECT account_id, scope FROM auth_tokens WHERE token = $1 AND expires_at > now()',
+    [token],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  return { accountId: row.account_id, scope: row.scope === 'read' ? 'read' : 'full' };
+}
+
 export interface AccountInfoRow {
   id: number;
   username: string;
   password_hash: string;
+  // Whether the owner set a real password (false for a Discord-provisioned account
+  // that still only has its placeholder hash). The unlink + portal flows read it.
+  password_set: boolean;
   email: string | null;
   created_at: string;
   deactivated_at: string | null;
@@ -628,7 +721,7 @@ export interface AccountInfoRow {
 // which keys on username for the login path.
 export async function accountById(accountId: number): Promise<AccountInfoRow | null> {
   const res = await pool.query(
-    `SELECT id, username, password_hash, email, created_at, deactivated_at, locale, marketing_opt_in
+    `SELECT id, username, password_hash, password_set, email, created_at, deactivated_at, locale, marketing_opt_in
      FROM accounts WHERE id = $1`,
     [accountId],
   );
@@ -647,7 +740,10 @@ export async function characterCountForAccount(accountId: number): Promise<numbe
 }
 
 export async function updatePasswordHash(accountId: number, passwordHash: string): Promise<void> {
-  await pool.query('UPDATE accounts SET password_hash = $2 WHERE id = $1', [
+  // Setting a password always makes it a real, owner-chosen one, so mark the
+  // account usable (a no-op for accounts that were already password_set = TRUE,
+  // and the conversion step for a Discord-provisioned account).
+  await pool.query('UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1', [
     accountId,
     passwordHash,
   ]);
@@ -672,6 +768,69 @@ export async function revokeTokensExcept(
 
 export async function revokeToken(token: string): Promise<void> {
   await pool.query('DELETE FROM auth_tokens WHERE token = $1', [token]);
+}
+
+// Revoke a read-scoped token by value (OAuth/RFC-7009 revocation, companion
+// logout). Restricted to scope='read' so a presented full web-session token can
+// never be deleted through this path. Returns true if a row was removed.
+export async function revokeReadToken(token: string): Promise<boolean> {
+  const res = await pool.query(`DELETE FROM auth_tokens WHERE token = $1 AND scope = 'read'`, [
+    token,
+  ]);
+  return (res.rowCount ?? 0) > 0;
+}
+
+// ── Companion read-only tokens (scope='read') ──────────────────────────────
+// Long-lived (default 90-day) read tokens a user can paste into a companion app
+// instead of running the OAuth flow. They are ordinary auth_tokens rows with
+// scope='read', so they work on /sheet and are rejected on every mutation.
+
+export interface CompanionTokenRow {
+  prefix: string;
+  label: string | null;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export async function createCompanionToken(
+  token: string,
+  accountId: number,
+  label: string | null,
+  ttlHours = 24 * 90,
+): Promise<void> {
+  await saveToken(token, accountId, ttlHours, 'read', label);
+}
+
+// Live (unexpired) read tokens for an account. Never returns the full secret —
+// only an 8-char prefix for display — so a leaked portal response can't be
+// replayed as a bearer token.
+export async function listCompanionTokens(accountId: number): Promise<CompanionTokenRow[]> {
+  const res = await pool.query(
+    `SELECT token, label, created_at, expires_at
+       FROM auth_tokens
+      WHERE account_id = $1 AND scope = 'read' AND expires_at > now()
+      ORDER BY created_at DESC`,
+    [accountId],
+  );
+  return res.rows.map((r) => ({
+    prefix: String(r.token).slice(0, 8),
+    label: r.label ?? null,
+    createdAt: r.created_at,
+    expiresAt: r.expires_at,
+  }));
+}
+
+// Revoke one of the account's read tokens, addressed by its 8-char prefix (what
+// the portal lists). Scoped to scope='read' so this can never delete the
+// caller's own full web session. Returns true if a row was removed.
+export async function revokeCompanionToken(accountId: number, prefix: string): Promise<boolean> {
+  if (!/^[a-f0-9]{8}$/.test(prefix)) return false;
+  const res = await pool.query(
+    `DELETE FROM auth_tokens
+      WHERE account_id = $1 AND scope = 'read' AND left(token, 8) = $2`,
+    [accountId, prefix],
+  );
+  return (res.rowCount ?? 0) > 0;
 }
 
 export async function setAccountEmail(accountId: number, email: string | null): Promise<void> {
@@ -915,7 +1074,7 @@ export async function claimTotpWindow(accountId: number, counter: number): Promi
      RETURNING id`,
     [accountId, counter],
   );
-  return res.rowCount! > 0;
+  return (res.rowCount ?? 0) > 0;
 }
 
 // Burn a recovery code atomically. The UPDATE ... WHERE consumed_at IS NULL is
@@ -928,7 +1087,7 @@ export async function consumeRecoveryCode(accountId: number, codeHash: string): 
      RETURNING id`,
     [accountId, codeHash],
   );
-  return res.rowCount! > 0;
+  return (res.rowCount ?? 0) > 0;
 }
 
 // GDPR-style data export bundle: the account's own profile plus every character
@@ -1111,15 +1270,24 @@ export async function getPlayerCardBySlug(slug: string): Promise<PlayerCardRow |
 // ~4 MB) PNG bytes — keeps getPlayerCardBySlug's heavy SELECT for the image route.
 export async function getPlayerCardMetaBySlug(
   slug: string,
-): Promise<{ title: string; description: string; locale: string } | null> {
+): Promise<{ title: string; description: string; locale: string; updatedAt: number } | null> {
   const res = await pool.query(
-    'SELECT title, description, locale FROM player_cards WHERE slug = $1',
+    'SELECT title, description, locale, updated_at FROM player_cards WHERE slug = $1',
     [slug],
   );
   const row = res.rows[0];
-  return row
-    ? { title: row.title ?? '', description: row.description ?? '', locale: row.locale ?? 'en' }
-    : null;
+  if (!row) return null;
+  // `updated_at` (a per-publish timestamp) is the og:image cache-buster: a
+  // re-published card gets a new ?v= so social/browser caches re-fetch the new PNG
+  // instead of serving the stale one. Surface it as epoch ms (0 when absent) so the
+  // caller versions the URL directly without re-parsing a string.
+  const updatedAt = row.updated_at != null ? new Date(row.updated_at).getTime() : 0;
+  return {
+    title: row.title ?? '',
+    description: row.description ?? '',
+    locale: row.locale ?? 'en',
+    updatedAt,
+  };
 }
 
 // The account that owns a card slug — i.e. the referrer credited when someone
@@ -1185,6 +1353,26 @@ export async function lifetimeXpStanding(
     [REALM, characterId, accountId],
   );
   if ((res.rowCount ?? 0) === 0) return null; // character isn't the caller's
+  return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
+}
+
+// Realm-scoped lifetime-XP rank for a character addressed by id, WITHOUT an
+// ownership check — for the public character sheet / profile page, where rank is
+// shown for any player. Same expression-index predicate as lifetimeXpStanding.
+// Returns null when no such character exists on this realm.
+export async function lifetimeXpRankForCharacter(
+  characterId: number,
+): Promise<{ rank: number; total: number } | null> {
+  const res = await pool.query(
+    `SELECT
+       (SELECT count(*) FROM characters
+         WHERE realm = $1 AND ${LIFETIME_XP_EXPR} > own.xp)::int AS ahead,
+       (SELECT count(*) FROM characters WHERE realm = $1)::int AS total
+     FROM (SELECT COALESCE(${LIFETIME_XP_EXPR}, 0) AS xp
+             FROM characters WHERE id = $2 AND realm = $1) own`,
+    [REALM, characterId],
+  );
+  if ((res.rowCount ?? 0) === 0) return null;
   return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
 }
 
@@ -1286,6 +1474,26 @@ export interface CharacterRow {
   state: CharacterState | null;
   is_gm: boolean;
   force_rename: boolean;
+  last_played?: Date | string | null;
+  playtime_seconds?: string | number | null;
+}
+
+// The account's "top" character on this realm (highest level, then lifetime XP),
+// for the Discord nameplate flair / level-on-nickname. Realm-scoped like the other
+// reads. Fully parameterized: the only inputs (accountId, REALM) are bound as $1/$2;
+// the ORDER BY uses a static JSONB expression literal (Postgres does not allow a
+// bound parameter for an ORDER BY expression), so the query string carries no
+// interpolation and there is no injection surface.
+export async function highestCharacterForAccount(accountId: number): Promise<CharacterRow | null> {
+  const res = await pool.query(
+    `SELECT id, account_id, name, class, level, state, is_gm, force_rename
+       FROM characters
+      WHERE account_id = $1 AND realm = $2
+      ORDER BY level DESC, ((state->>'lifetimeXp')::bigint) DESC NULLS LAST, id ASC
+      LIMIT 1`,
+    [accountId, REALM],
+  );
+  return res.rows[0] ?? null;
 }
 
 // Character reads/writes are scoped to this process's realm: an account may
@@ -1293,7 +1501,19 @@ export interface CharacterRow {
 // process only ever lists, loads, or creates characters on its own realm.
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE account_id = $1 AND realm = $2 ORDER BY id',
+    `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
+            ps.last_played, ps.playtime_seconds
+       FROM characters c
+       LEFT JOIN (
+         SELECT character_id,
+                MAX(started_at) AS last_played,
+                COALESCE(SUM(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))), 0)::bigint AS playtime_seconds
+           FROM play_sessions
+          WHERE account_id = $1
+          GROUP BY character_id
+       ) ps ON ps.character_id = c.id
+      WHERE c.account_id = $1 AND c.realm = $2
+      ORDER BY c.id`,
     [accountId, REALM],
   );
   return res.rows;
@@ -1306,6 +1526,28 @@ export async function getCharacter(
   const res = await pool.query(
     'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
+  );
+  return res.rows[0] ?? null;
+}
+
+// Active character names on this realm for the public character sitemap, ranked
+// by lifetime XP so the most significant players lead the file. Capped by the
+// caller (sitemap protocol allows 50k URLs/file).
+export async function listCharacterNamesForSitemap(limit = 50000): Promise<string[]> {
+  const res = await pool.query(
+    `SELECT name FROM characters WHERE realm = $1 ORDER BY ${LIFETIME_XP_EXPR} DESC NULLS LAST LIMIT $2`,
+    [REALM, Math.max(0, Math.min(50000, Math.floor(limit)))],
+  );
+  return res.rows.map((r) => r.name as string);
+}
+
+// Realm-scoped character read by id WITHOUT an ownership check — for the public
+// character sheet / profile page, which serve any character on the realm. Returns
+// the same shape as getCharacter so the sheet normalizer treats both alike.
+export async function getCharacterById(characterId: number): Promise<CharacterRow | null> {
+  const res = await pool.query(
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND realm = $2',
+    [characterId, REALM],
   );
   return res.rows[0] ?? null;
 }
@@ -1326,6 +1568,22 @@ export async function findCharacterReportTargetByName(
   return row
     ? { accountId: Number(row.account_id), characterId: Number(row.id), characterName: row.name }
     : null;
+}
+
+// Guild display name for a character (realm-scoped), or null when unguilded.
+// Read here rather than via PgSocialDb so the character-sheet/profile routes can
+// fetch it without constructing a SocialService, and to avoid a db↔social_db
+// import cycle. Mirrors the guilds/guild_members join in social_db.ts.
+export async function guildNameForCharacter(characterId: number): Promise<string | null> {
+  const res = await pool.query(
+    `SELECT g.name
+       FROM guild_members gm
+       JOIN guilds g ON g.id = gm.guild_id
+      WHERE gm.character_id = $1 AND g.realm = $2
+      LIMIT 1`,
+    [characterId, REALM],
+  );
+  return res.rows[0]?.name ?? null;
 }
 
 export async function createCharacter(
@@ -1508,6 +1766,44 @@ export async function saveCharacterState(
   );
 }
 
+// Persist a character row AND this realm's World Market blob in ONE transaction.
+// The two live in different tables (characters / world_state), but a Market
+// listing is an escrow: the item leaves the seller's bags (character state) and
+// becomes a listing (market state) in the same Sim action. Saving them as two
+// independent writes lets an unclean crash persist one half and not the other,
+// vaporising the item or duplicating it across bags and market. The leave path
+// uses this so a logout flush of bags can never tear away from the market.
+export async function saveCharacterAndMarketState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  market: MarketSave,
+): Promise<void> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+      [characterId, level, JSON.stringify(cleanState)],
+    );
+    await client.query(
+      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+      // Same realm-scoped key loadMarketState/saveMarketState use: the leave
+      // flush must land where the market is read back, or the escrowed listing
+      // is written to a key nothing loads and the item is stranded on next boot.
+      [marketStateKey(REALM), JSON.stringify(market)],
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 export async function isAdminAccount(accountId: number): Promise<boolean> {
   const res = await pool.query('SELECT is_admin FROM accounts WHERE id = $1', [accountId]);
   return res.rows[0]?.is_admin === true;
@@ -1624,6 +1920,64 @@ export async function topLifetimeXp(
     realm: r.realm,
     lifetimeXp: Number(r.lifetime_xp),
     prestigeRank: Number(r.prestige_rank),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Guild high-score board: ranks guilds by the SUM of every member's lifetimeXp.
+// Aggregate JOIN of guilds -> guild_members -> characters (all in this pool); an
+// INNER JOIN drops guilds with no seated members. Realm-scoped (the in-game
+// panel) or global (cross-realm), mirroring topLifetimeXp. Read through the
+// server-side cache in main.ts, never run per request under load.
+// ---------------------------------------------------------------------------
+
+export interface GuildLeaderRow {
+  name: string;
+  realm: string;
+  memberCount: number;
+  totalLifetimeXp: number;
+  topLevel: number;
+}
+
+export async function topGuilds(
+  limit = 100,
+  opts: { global?: boolean } = {},
+): Promise<GuildLeaderRow[]> {
+  // Capped at LEADERBOARD_MAX (1000) like the player board, so a realm with many
+  // guilds is fully ranked through the cached window.
+  const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
+  const selectAgg = `g.name, g.realm,
+                COUNT(gm.character_id)                                AS member_count,
+                COALESCE(SUM(COALESCE((c.state->>'lifetimeXp')::bigint, 0)), 0) AS total_lifetime_xp,
+                COALESCE(MAX(COALESCE((c.state->>'level')::int, 0)), 0)         AS top_level`;
+  const fromJoin = `FROM guilds g
+           JOIN guild_members gm ON gm.guild_id = g.id
+           JOIN characters c ON c.id = gm.character_id`;
+  const groupOrder = `GROUP BY g.id, g.name, g.realm
+          ORDER BY total_lifetime_xp DESC, member_count DESC, g.name ASC`;
+  const res = opts.global
+    ? await pool.query(
+        `SELECT ${selectAgg}
+           ${fromJoin}
+          WHERE c.state IS NOT NULL
+          ${groupOrder}
+          LIMIT $1`,
+        [cap],
+      )
+    : await pool.query(
+        `SELECT ${selectAgg}
+           ${fromJoin}
+          WHERE g.realm = $1 AND c.state IS NOT NULL
+          ${groupOrder}
+          LIMIT $2`,
+        [REALM, cap],
+      );
+  return res.rows.map((r) => ({
+    name: r.name,
+    realm: r.realm,
+    memberCount: Number(r.member_count),
+    totalLifetimeXp: Number(r.total_lifetime_xp),
+    topLevel: Number(r.top_level),
   }));
 }
 
@@ -1752,7 +2106,8 @@ export async function pruneClientPerfReports(retentionDays: number): Promise<num
 // ---------------------------------------------------------------------------
 // World state: a tiny key→JSONB store for shared, global game state that isn't
 // tied to one character. The World Market (the Merchant's auction house) lives
-// here under the 'market' key — listings + per-seller collections.
+// here under the per-realm `market:<realm>` key, listings plus per-seller
+// collections. See loadMarketState/saveMarketState below.
 // ---------------------------------------------------------------------------
 
 export async function loadWorldState<T>(key: string): Promise<T | null> {
@@ -1768,12 +2123,54 @@ export async function saveWorldState(key: string, data: unknown): Promise<void> 
   );
 }
 
+// The World Market is realm-scoped like characters, friends, guilds and
+// presence: each realm process keeps its own listings under `market:<realm>`.
+// Before this scoping the market lived in a single bare 'market' row shared by
+// every realm pointed at the same DATABASE_URL, so two realms silently
+// overwrote each other's listings and proceeds (and stomped nextListingId).
+const LEGACY_MARKET_KEY = 'market';
+
+export function marketStateKey(realm: string): string {
+  return `market:${realm}`;
+}
+
 export async function loadMarketState(): Promise<MarketSave | null> {
-  return loadWorldState<MarketSave>('market');
+  const key = marketStateKey(REALM);
+  const own = await loadWorldState<MarketSave>(key);
+  if (own !== null) return own;
+  // One-time GLOBAL migration: the first realm to boot after this scoping
+  // lands adopts the pre-scoping shared row into its own key, then deletes
+  // the legacy row so no later-added realm can re-adopt (and thereby
+  // duplicate) the same listings. The claiming SELECT ... FOR UPDATE plus
+  // the delete run in one transaction, so only one realm ever wins the row
+  // even if several boot at once.
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query('SELECT data FROM world_state WHERE key = $1 FOR UPDATE', [
+      LEGACY_MARKET_KEY,
+    ]);
+    const legacy = (res.rows[0]?.data as MarketSave) ?? null;
+    if (legacy !== null) {
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        [key, JSON.stringify(legacy)],
+      );
+      await client.query('DELETE FROM world_state WHERE key = $1', [LEGACY_MARKET_KEY]);
+    }
+    await client.query('COMMIT');
+    return legacy;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function saveMarketState(save: MarketSave): Promise<void> {
-  await saveWorldState('market', save);
+  await saveWorldState(marketStateKey(REALM), save);
 }
 
 // ---------------------------------------------------------------------------

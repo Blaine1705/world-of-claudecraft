@@ -1,17 +1,66 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
+export const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
 export const INTERACT_RANGE = 5;
+// /yell broadcast radius and ground-object respawn delay: neutral consts shared by
+// code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
+// Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
+export const YELL_RANGE = 100;
+export const OBJECT_RESPAWN = 30;
+// Pet tuning shared between the pet-AI slice (src/sim/pet/pet_ai.ts) and code that
+// stays on Sim, so it lives in this neutral module (the slice-only PET_* consts live
+// in pet_ai.ts). PET_GROWL_INTERVAL is read by the moved updatePet auto-taunt arm AND
+// the on-Sim manual-growl command; PET_TELEPORT_DISTANCE by the moved petFollow heel,
+// an on-Sim follow check, AND the I2c delve companion AI (delves/companion.ts) heel warp.
+export const PET_GROWL_INTERVAL = 10; // controlled pets can tank by forcing attention
+export const PET_TELEPORT_DISTANCE = 60; // owner this far AND no route exists: pet warps to heel (last resort)
+// Leash distance: how far a pulled mob may be dragged from its leash anchor before
+// it evades home. Shared between the mob-locomotion slice (chase/flee leash checks)
+// and the profiled-combat path that stays on Sim, so it lives in this neutral module.
+export const LEASH_DISTANCE = 45;
+export const DUNGEON_LEASH_DISTANCE = 70;
+// Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
+// updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
+export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
 export const GCD = 1.5; // seconds
+// Shared cooldown across ALL combat potions (classic-era potion sickness): one
+// potion locks every other potion for this long (#103). 2 minutes, vanilla value.
+export const POTION_COOLDOWN = 120; // seconds
 export const CAST_PUSHBACK_SEC = 0.5; // vanilla: each hit delays a cast by 0.5s
 export const CHANNEL_PUSHBACK_FRACTION = 0.25; // vanilla: each hit shaves 25% off a channel
+// Tolerance for "this per-tick timer is effectively complete" comparisons (casting,
+// channels, ground-AoE pulses). Shared across sim modules (sim.ts + entity_roster.ts).
+export const CAST_COMPLETE_EPS = 1e-9;
 export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
 export const FISHING_CAST_TIME = 5;
+// Seconds an empty instance idles before it resets. Shared by the dungeon instance
+// reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
+// (the dungeon raid-door seal also keys off it) lives lower in this file (C1 relocation).
+export const INSTANCE_EMPTY_TIMEOUT = 300;
+// Delve pressure-plate trigger radius (yards). Shared by the I2a run module
+// (delves/runs.ts: plate stepping + chest/exit proximity) and the I2b lockpick
+// controller still on Sim (resolveLockChest proximity gate). Relocated from sim.ts.
+export const DELVE_PLATE_RADIUS = 2.5;
+// Max purchasable companion rank. Shared by the I2a run module (companionUpgrade cap)
+// and the I2c companion AI (delves/companion.ts: updateDelveCompanion heal-pct index).
+export const DELVE_COMPANION_MAX_RANK = 3;
+// The warlock Demon Heal channel id. Shared by the casting/channel path on Sim (C4a
+// relocation) and the P1b pet-command healPet/applyDemonHealTick slice; here so both
+// import it cycle-free. (P1b's identical relocation deduped to this one decl.)
+export const DEMON_HEAL_CAST_ID = 'demon_heal';
+// Companion heal cadence (seconds). Shared by the I2c companion AI (delves/companion.ts:
+// updateDelveCompanion wanderTimer reset) and Sim.spawnDelveCompanion (initial timer).
+export const DELVE_COMPANION_HEAL_INTERVAL = 3;
+// PET_TELEPORT_DISTANCE (the pet/companion last-resort heel warp) was relocated to this
+// module by P1a (above); the I2c companion AI shares that same const, not re-declared here.
 
 export type PlayerClass =
   | 'warrior'
@@ -23,6 +72,12 @@ export type PlayerClass =
   | 'mage'
   | 'warlock'
   | 'druid';
+
+// Classes that command a persistent pet (hunter beast, warlock demon). Pure
+// predicate, here so the pet-command slice imports it without a sim.ts cycle.
+export function isPetClass(cls: PlayerClass): boolean {
+  return cls === 'hunter' || cls === 'warlock';
+}
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
 // ring) — see docs/design and the Fiesta region of sim.ts.
@@ -95,6 +150,7 @@ export type AuraKind =
   | 'buff_dodge'
   | 'buff_speed'
   | 'buff_haste'
+  | 'buff_spellpower'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -142,9 +198,18 @@ export interface Aura {
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
+  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
+  icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
 }
 
-export type CrowdControlDrCategory = 'root' | 'polymorph' | 'fear';
+export type CrowdControlDrCategory =
+  | 'root'
+  | 'polymorph'
+  | 'fear'
+  | 'openerStun'
+  | 'controlledStun'
+  | 'randomStun';
 
 export interface CrowdControlDrState {
   stage: number;
@@ -203,17 +268,32 @@ export type ItemUse =
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
 export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
-export interface ItemDef {
+export type ArmorType = 'cloth' | 'leather' | 'mail';
+
+type ItemKind =
+  | 'weapon'
+  | 'armor'
+  | 'quest'
+  | 'junk'
+  | 'food'
+  | 'drink'
+  | 'tool'
+  | 'potion'
+  | 'elixir';
+
+interface BaseItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'elixir';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
+  // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
+  // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
+  // not one of the six primary attributes.
+  spellPower?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
-  armorType?: 'cloth' | 'leather' | 'mail';
   questId?: string;
   noVendorSell?: boolean;
   noDiscard?: boolean;
@@ -234,7 +314,58 @@ export interface ItemDef {
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
+  /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
+  set?: string;
 }
+
+// Item-set bonuses (classic "tier set" style). Flat effects fold into
+// recalcPlayerStats: primary stats feed the AP/crit/HP derivations, `ap`/`crit`
+// add at their derivation steps, and `castPushbackReduction` (0..1) scales the
+// damage-driven cast pushback in Sim.pushbackCast. Balance values are authored in
+// content/item_sets.ts, never inline in engine code.
+export interface SetBonusEffect {
+  str?: number;
+  agi?: number;
+  sta?: number;
+  int?: number;
+  spi?: number;
+  ap?: number; // flat attack power
+  crit?: number; // flat crit chance, 0..1
+  castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
+}
+
+export interface SetBonusTier {
+  pieces: number; // equipped-piece threshold that unlocks this tier
+  effect: SetBonusEffect;
+  text: string; // English source, localized at the client tooltip
+}
+
+export interface ItemSet {
+  id: string;
+  name: string; // English source
+  bonuses: SetBonusTier[]; // ascending by `pieces`
+}
+
+export interface ArmorItemDef extends BaseItemDef {
+  kind: 'armor';
+  slot: Exclude<EquipSlot, 'mainhand'>;
+  armorType: ArmorType;
+  weapon?: never;
+}
+
+export interface WeaponItemDef extends BaseItemDef {
+  kind: 'weapon';
+  slot: 'mainhand';
+  weapon: WeaponInfo;
+  armorType?: never;
+}
+
+export interface OtherItemDef extends BaseItemDef {
+  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  armorType?: never;
+}
+
+export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
 export interface InvSlot {
   itemId: string;
@@ -269,16 +400,27 @@ export interface LootRollPrompt {
   expiresAt: number;
 }
 
+// Master loot intercepts roll-worthy drops at/above a quality threshold and hands
+// the assignment decision to a single designated looter (the leader, or 0 = leader).
+export type MasterLootThreshold = 'uncommon' | 'rare' | 'epic';
+export interface MasterLootSettings {
+  enabled: boolean;
+  looter: number; // pid of the master looter; 0 means "the current leader"
+  threshold: MasterLootThreshold;
+}
+
 export interface LootStrategies {
   currency: CurrencyLootStrategy;
   commonItems: ItemLootStrategy;
   premiumItems: ItemLootStrategy;
+  master: MasterLootSettings;
 }
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
   commonItems: 'looter-takes-all',
   premiumItems: 'need-greed',
+  master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };
 
 export interface LootEntry {
@@ -877,7 +1019,16 @@ export type AbilityEffect =
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
-  | { type: 'selfBuff'; kind: AuraKind; value: number; duration: number }
+  | {
+      type: 'selfBuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
+      // many melee hits reflect, gated by an internal cooldown between reflects.
+      charges?: number;
+      internalCooldown?: number;
+    }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
@@ -910,6 +1061,12 @@ export interface AbilityDef {
   range: number; // yards; 0 = melee range
   minRange?: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
+  // non-physical damage scales with Spell Power; physical damage scales with melee
+  // Attack Power (on top of the weapon/finisher paths, which already carry AP).
+  // 'ranged' marks a hunter "attack spell" that scales off Ranged Attack Power
+  // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
+  scalesWith?: 'ranged';
   requiresTarget: boolean;
   targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
@@ -922,6 +1079,11 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Mutually exclusive self-buff group: casting one ability in the group cancels
+  // any active buff from a sibling in the same group (e.g. hunter aspects, where
+  // only one aspect may be active at a time). Distinct from form toggles, which
+  // are excluded by aura kind, not by group.
+  exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
   learnLevel: number;
@@ -1046,6 +1208,9 @@ export interface ZonePropsDef {
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
   fences: { x1: number; z1: number; x2: number; z2: number }[];
   graveyards: { x: number; z: number }[]; // 6-headstone cluster anchor
+  // delveId resolves to the delve's localized name at render time (the carved
+  // entrance sign), so the marker carries no hardcoded English label.
+  delveMarkers?: { x: number; z: number; delveId: string }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -1092,6 +1257,7 @@ export interface QuestDef {
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
+  shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
 }
 
@@ -1166,8 +1332,10 @@ export interface Entity {
   weapon: WeaponInfo;
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
+  spellPower: number; // casters: added to spell damage via per-spell coefficients
   critChance: number; // 0..1
   dodgeChance: number;
+  castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   moveSpeed: number;
   hostile: boolean;
   // combat
@@ -1177,6 +1345,10 @@ export interface Entity {
   inCombat: boolean;
   combatTimer: number; // time since last combat event
   auras: Aura[];
+  // cached `auras.some(a => a.kind === 'stealth')`, refreshed in updateAuras.
+  // Hosts read it per interest-scan visit (O(viewers x neighbors)); recomputing
+  // it from auras each visit was a measurable cost in crowds.
+  stealthed: boolean;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
   castRemaining: number;
@@ -1192,6 +1364,10 @@ export interface Entity {
   comboTargetId: number | null;
   overpowerUntil: number; // sim-time until which overpower is usable
   potionCooldownUntil: number; // sim-time until a combat potion can be used again (#103)
+  // Same shared potion cooldown as REMAINING seconds, materialized per tick (like
+  // gcdRemaining) so the action bar can paint a cooldown swipe without a client
+  // clock. Derived from potionCooldownUntil; excluded from the parity trace.
+  potionCdRemaining: number;
   // warrior charge: forced run toward the target along a pathfound route
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
@@ -1213,6 +1389,8 @@ export interface Entity {
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
+  petAutoTaunt?: boolean; // right-click autocast toggle for controlled pet Growl
+  petManualTauntPending?: boolean; // manual Growl command waiting until the pet reaches range
   petPath: Vec3[]; // controlled pet heel route around obstacles; consumed front-to-back (like chargePath)
   petPathCooldown: number; // seconds until this pet may recompute its heel path again
   pulseTimer: number; // boss aoe pulse countdown
@@ -1243,6 +1421,7 @@ export interface Entity {
   gm?: boolean;
   respawnTimer: number;
   corpseTimer: number;
+  lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
@@ -1261,6 +1440,15 @@ export interface Entity {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Equipped mainhand item id (players only; null otherwise). Render-only: the
+  // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
+  // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
+  mainhandItemId: string | null;
+  // Full worn equipment (players only; empty otherwise). Render-only mirror of
+  // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
+  // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,
+  // the sim never reads it for gameplay (no effect on stats).
+  equippedItems: Partial<Record<EquipSlot, string>>;
   // $WOC holder-tier flair (cosmetic): 0/undefined = none, 1-10 = Ember…Sovereign.
   // Set server-side from the player's connected-wallet balance and synced in
   // identity fields like skin. The sim never reads it (no gameplay effect).
@@ -1268,6 +1456,15 @@ export interface Entity {
   // Exact $WOC balance backing the tier, for the inspect-profile readout. Rides
   // alongside holderTier in identity fields; like it, the sim never reads it.
   holderBalance?: number;
+  // Linked-Discord flair (cosmetic, server-set from the account's Discord link;
+  // the sim never reads any of it): status tier, profile-picture URL, handle/
+  // nickname, server-join epoch ms (for "member since"), and top staff/special
+  // role key (drives the in-world name color + tag).
+  discordTier?: number;
+  discordAvatar?: string;
+  discordName?: string;
+  discordJoined?: number;
+  discordRole?: string;
 }
 
 export interface NythraxisWardChannel {
@@ -1324,7 +1521,7 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
-      kind: 'hit' | 'miss' | 'dodge' | 'parry';
+      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -1344,6 +1541,16 @@ export type SimEvent = { pid?: number } & (
       quality: ItemDef['quality'];
       expiresAt: number;
     }
+  // master loot: sent only to the master looter; candidates are the eligible recipients
+  | {
+      type: 'masterLoot';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      expiresAt: number;
+      candidates: { pid: number; name: string }[];
+    }
   | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
   | { type: 'questProgress'; questId: string; text: string }
@@ -1355,7 +1562,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
   | { type: 'respawn' }
-  | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId: string }
+  // itemId names the single item for buy/sell/buyback; it is omitted for the
+  // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
+  | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is
@@ -1453,6 +1662,53 @@ export type SimEvent = { pid?: number } & (
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   | { type: 'log'; text: string; color?: string; entityId?: number }
+  | { type: 'delveEntered'; delveId: string; tierId: string }
+  | { type: 'delveComplete'; delveId: string; tierId: string }
+  | { type: 'delveFailed'; delveId: string; tierId: string }
+  | { type: 'delveLoreUnlock'; loreId: string }
+  | { type: 'companionBark'; barkId: string; pid?: number }
+  // Lockpicking minigame ("Tumbler's Path"). All personal (pid-scoped). The sim
+  // emits structured data only, the client builds every visible string. Cells
+  // are always limited to the fog window (anti-cheat: the full lock is never
+  // serialized).
+  | { type: 'lockpickOffer'; objectId: number; bountiful: boolean }
+  | {
+      type: 'lockpickSession';
+      sessionId: string;
+      objectId: number;
+      w: number;
+      h: number;
+      col: number;
+      row: number;
+      page: number;
+      pageCount: number;
+      tries: number;
+      triesTotal: number;
+      lootTier: LootTier;
+      allowed: Exclude<PickAction, 'abort'>[];
+      visible: VisibleCell[];
+      stepTimeoutMs: number | null;
+    }
+  | {
+      type: 'lockpickStep';
+      sessionId: string;
+      col: number;
+      row: number;
+      page: number;
+      pageCount: number;
+      tries: number;
+      triesTotal: number;
+      result: StepResult;
+      visible: VisibleCell[];
+    }
+  | {
+      type: 'lockpickEnd';
+      sessionId: string;
+      outcome: 'success' | 'fail' | 'abandoned';
+      lootTier?: LootTier;
+    }
+  | { type: 'lockpickBonus'; tier: LootTier; marks: number; copper: number }
+  | { type: 'delveChestLoot'; chestId: number; items: { itemId: string; count: number }[] }
   // personal cue (carries `pid`) to open the cosmetic skin-select overlay with
   // the server-rolled rank. Text-free on purpose — the client renders its own
   // localized copy, so no sim/server i18n matcher rule is needed.
@@ -1478,6 +1734,10 @@ export interface SimConfig {
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
+  // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
+  // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
+  raidResetMs?: (nowMs: number) => number;
 }
 
 export function emptyMoveInput(): MoveInput {
@@ -1518,6 +1778,14 @@ export const XP_TABLE = [
   17700, 19400, 21300, 23200,
 ];
 export const MAX_LEVEL = 20;
+
+// Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
+// core (src/sim/combat/damage.ts) can import them without a sim.ts cycle.
+export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/credit
+// Nythraxis raid boss template id. Used by the damage-core death path (lockout on
+// boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
+// the encounter. Kept here as the neutral shared seam in the meantime.
+export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
@@ -1700,7 +1968,251 @@ export function meleeMissChance(attackerLevel: number, targetLevel: number): num
   return Math.min(0.95, Math.max(0.005, miss / 100));
 }
 
+// Enemy mobs always connect at least this often against a player (or player-owned
+// pet), regardless of level difference.
+export const MOB_VS_PLAYER_MAX_MISS = 0.2;
+
+// Per-swing miss chance with the above-level penalty applied DIRECTIONALLY. The
+// steep penalty in meleeMissChance is an anti-power-level deterrent for PLAYERS
+// hitting higher-level mobs; because it keys off (target - attacker) level it would
+// otherwise also fire in reverse, making a low-level mob whiff on a higher-level
+// player most of the time. A hostile wild mob swinging at a player (or a player-owned
+// pet) caps its miss at MOB_VS_PLAYER_MAX_MISS (>= 80% hit); player/pet -> mob keeps
+// the full scaling. Dodge and blind are separate, intended effects the caller layers on.
+export function swingMissChance(attacker: Entity, target: Entity): number {
+  const miss = meleeMissChance(attacker.level, target.level);
+  const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
+  const playerSide = target.kind === 'player' || target.ownerId !== null;
+  return mobAttacker && playerSide ? Math.min(miss, MOB_VS_PLAYER_MAX_MISS) : miss;
+}
+
 export function armorReduction(armor: number, attackerLevel: number): number {
   const a = Math.max(0, armor);
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
+}
+
+// ---------------------------------------------------------------------------
+// Spell Power: caster damage scaling (vanilla-style cast-time / DoT-duration
+// coefficient model). Casters convert Intellect into Spell Power; Spell Power
+// then adds to each spell's damage via a per-spell coefficient. Hunter "attack
+// spells" (Arcane Shot, Serpent Sting, Aimed Shot) instead scale off Ranged
+// Attack Power, mirroring the physical attack-power path. The pure coefficient
+// helpers live in src/sim/spell_scaling.ts; these are the tuning knobs.
+// ---------------------------------------------------------------------------
+// Spell Power gained per point of Intellect (1 Spell Power per 2 Intellect). Tuned
+// (see tests/spell_power.test.ts) so a fully-leveled caster gets a meaningful but
+// not dominant damage lift, scaling further as caster gear adds Int + Spell Power.
+export const SPELL_POWER_PER_INT = 0.5;
+// Direct nuke coefficient = clamp(castTime, MIN, MAX) / DIVISOR (vanilla 3.5). The
+// max equals the divisor so the direct coefficient caps at 1.0 (a 3.5s+ cast gets
+// full Spell Power; a 6s Pyroblast does not exceed it).
+export const SPELL_COEFF_DIVISOR = 3.5;
+export const SPELL_COEFF_MIN_CAST = 1.5; // instant / sub-1.5s casts use this floor
+export const SPELL_COEFF_MAX_CAST = 3.5; // longer casts cap at a 1.0 coefficient
+// Total DoT coefficient = duration / DURATION (vanilla 15), spread across ticks.
+export const SPELL_DOT_COEFF_DURATION = 15;
+// AoE spells take a reduced coefficient (vanilla AoE penalty).
+export const SPELL_AOE_COEFF_MULT = 0.333;
+// Hunter ranged "attack spells" scale off Ranged Attack Power using the same
+// cast/duration shape, scaled down by this factor (RAP is far larger than SP).
+// Tuned so Arcane Shot / Aimed Shot / Serpent Sting gain a ~20-30% lift at cap.
+export const RANGED_SPELL_AP_SCALE = 0.15;
+// Melee physical "attack spells" (warrior Rend/Execute/Cleave, rogue Rupture/
+// Garrote bleeds, druid feral bleeds, etc.) take the flat-damage portion of a
+// special and scale it off melee Attack Power with the same shape. Melee AP is
+// the same magnitude as Ranged AP, so it reuses the same scale-down factor. The
+// weapon-swing and finisher portions already carry AP through their own paths;
+// this only lifts the flat directDamage / DoT / AoE riders.
+export const MELEE_SPELL_AP_SCALE = 0.15;
+
+// ---------------------------------------------------------------------------
+// Delves, replayable modular instances (see docs/prd/delves.md)
+// ---------------------------------------------------------------------------
+
+export type DelveTheme = 'crypt' | 'cave' | 'mine' | 'ruin' | 'sewer' | 'vault' | 'lair';
+
+export type DelveObjectiveKind =
+  | 'kill_boss'
+  | 'recover_artifact'
+  | 'seal_portal'
+  | 'survive_ambush'
+  | 'escort_researcher'
+  | 'investigate_clues';
+
+export interface DelveRewardTable {
+  copperMin: number;
+  copperMax: number;
+  firstClearXp: number;
+  repeatClearXp: number;
+}
+
+export interface DelveTierDef {
+  id: string;
+  label: string;
+  enemyLevelBonus: number;
+  affixCount: number;
+  rewardMult: number;
+  // Minimum player level required to select this tier (the Heroic gate). Omit for
+  // an unrestricted tier. Enforced server-side in `enterDelve`.
+  minPlayerLevel?: number;
+  // Per-tier reward overrides; fall back to `delve.baseRewards` when omitted, so a
+  // tier's XP/copper lives in content data, not inline in sim logic.
+  firstClearXp?: number;
+  repeatClearXp?: number;
+  copperMin?: number;
+  copperMax?: number;
+  unlock?: { delveId: string; tierId: string; clears: number };
+}
+
+export interface DelvePatrol {
+  mobId: string;
+  from: { x: number; z: number };
+  to: { x: number; z: number };
+}
+
+export interface DelveSpawnSet {
+  id: string;
+  weight: number;
+  spawns: DungeonSpawn[];
+  patrols?: DelvePatrol[];
+}
+
+export interface DelveInteractableSlot {
+  x: number;
+  z: number;
+  variants: string[];
+}
+
+export interface DelveModuleDef {
+  id: string;
+  interior: 'crypt' | 'cave' | 'mine';
+  layout: string;
+  length: number;
+  spawnSets: DelveSpawnSet[];
+  interactableSlots: DelveInteractableSlot[];
+  sideRoom?: { chance: number; moduleId: string };
+}
+
+export interface DelveDef {
+  id: string;
+  name: string;
+  theme: DelveTheme;
+  index: number;
+  minLevel: number;
+  suggestedPlayers: number;
+  doorPos: { x: number; z: number };
+  modules: string[];
+  moduleCount: [number, number];
+  finaleModuleId: string;
+  bosses: string[];
+  objective: DelveObjectiveKind;
+  tiers: DelveTierDef[];
+  baseRewards: DelveRewardTable;
+  boardNpcId: string;
+  // Companion auto-hired for solo runs (e.g. Acolyte Tessa). Omit for delves that
+  // ship without a companion. De-hardcodes the solo-spawn branch in `enterDelve`.
+  autoCompanionId?: string;
+  enterText: string;
+  leaveText: string;
+}
+
+export interface DelveObjectiveState {
+  kind: DelveObjectiveKind;
+  counts: number[];
+  complete: boolean;
+}
+
+export interface DelveCompanionState {
+  companionId: string;
+  entityId: number;
+}
+
+export interface DelveRun {
+  delveId: string;
+  slot: number;
+  partyKey: string | null;
+  seed: number;
+  tierId: string;
+  affixes: string[];
+  modules: string[];
+  moduleIndex: number;
+  origin: { x: number; z: number };
+  mobIds: number[];
+  objectIds: number[];
+  objective: DelveObjectiveState;
+  companion?: DelveCompanionState;
+  completed: boolean;
+  emptyFor: number;
+  deathsThisRun: Record<number, number>;
+  objectState: Record<number, DelveObjectState>;
+  raiseDeadChannel: DelveRaiseDeadChannel | null;
+  restlessPending: DelveRestlessPending[];
+  badAirTimer: number;
+  companionBarks: string[];
+  /** True when the current module exit portal is active (trash cleared + plate if any). */
+  exitPortalOpen: boolean;
+  /** §7.6, this run rolled Bountiful (ultra-rare): the reward chest is a purple
+   * Coffer that only yields to a Hard-tier + Premium-ante lockpick solve and
+   * guarantees a signature rare. Rolled once at run start (Heroic 5% / Normal 2%). */
+  bountiful: boolean;
+  /** Entity id of the reward chest spawned after the finale boss dies, or null if not yet spawned. */
+  rewardChestId: number | null;
+  /** Entity id of the surface-exit portal spawned after the chest is opened, or null if not yet opened. */
+  surfaceExitId: number | null;
+  /** Active lockpicking attempt on the finale chest (single interactor, v1), or null. In-memory only. */
+  lockpick: LockSession | null;
+}
+
+export interface DelveDailyState {
+  date: string;
+  firstClearXp: string[];
+  markClears: number;
+}
+
+export interface DelveCompanionDef {
+  id: string;
+  name: string;
+  role: 'healer' | 'tank' | 'scout' | 'dps';
+  mobTemplateId: string;
+}
+
+export interface DelveAffixDef {
+  id: string;
+  name: string;
+  themes: DelveTheme[];
+  blessing?: boolean;
+}
+
+export interface DelveObjectState {
+  kind: string;
+  triggered: boolean;
+  hp: number;
+  maxHp: number;
+  linkIds: number[];
+  open: boolean;
+  // Lockpick chest gating (kind === 'locked_chest'). attemptAvailable is granted
+  // when the chest spawns (boss defeated) and consumed on a SUCCESS or FAILED
+  // attempt, a FAILED chest can only be retried by re-clearing the delve.
+  attemptAvailable?: boolean;
+  looted?: boolean;
+  lootedTier?: LootTier;
+  /** Item slots waiting on the post-unlock loot screen. */
+  pendingLoot?: { itemId: string; count: number }[];
+  /** Entity id of the player who picked the lock; only they may collect the loot. */
+  lootOwnerId?: number;
+}
+
+export interface DelveRaiseDeadChannel {
+  graveId: number;
+  bossId: number;
+  mobId: string;
+  count: number;
+  remaining: number;
+}
+
+export interface DelveRestlessPending {
+  at: number;
+  x: number;
+  z: number;
+  mobId: string;
 }

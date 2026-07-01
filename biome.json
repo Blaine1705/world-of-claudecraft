@@ -3,7 +3,8 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": true,
+    "defaultBranch": "origin/main"
   },
   "files": {
     "includes": [
@@ -16,7 +17,11 @@
       "!src/ui/i18n.resolved.generated",
       "!src/admin/i18n.resolved.generated",
       "!src/ui/i18n.status.summary.json",
-      "!**/*.min.js"
+      "!tests/parity/golden",
+      "!**/*.svelte",
+      "!**/*.min.js",
+      "!docs/design/professions-system",
+      "!docs/design/professions-system.html"
     ]
   },
   "formatter": {
@@ -41,6 +46,28 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["index.html", "play.html", "guide.html"],
+      "formatter": {
+        "enabled": false
+      },
+      "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": ["src/styles/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          },
+          "style": {
+            "noDescendingSpecificity": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["src/sim/rng.ts"],
       "linter": {

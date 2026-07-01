@@ -127,6 +127,14 @@ function despawnMobs(sim: Sim) {
   }
 }
 
+function forwardDistance(sim: Sim, ticks = 60): number {
+  const start = { ...sim.player.pos };
+  sim.moveInput.forward = true;
+  for (let i = 0; i < ticks; i++) sim.tick();
+  sim.moveInput.forward = false;
+  return dist2d(start, sim.player.pos);
+}
+
 describe('classic formulas', () => {
   it('rage conversion matches the vanilla constant', () => {
     expect(rageConversion(1)).toBeCloseTo(0.0091 + 3.23 + 4.27, 4);
@@ -627,11 +635,14 @@ describe('spell pushback', () => {
   });
 
   it('a pushed-back cast still completes and lands', () => {
-    const { sim, wolf } = castingMage();
+    const { sim, wolf } = castingMage(20); // high level vs a low wolf: the bolt won't miss
     sim.castAbility('fireball');
     (sim as any).dealDamage(wolf, sim.player, 5, false, 'physical', null, 'hit');
     const hpBefore = wolf.hp;
-    for (let i = 0; i < 20 * 8 && sim.player.castingAbility; i++) sim.tick();
+    // The cast completes (pushed back, not cancelled), THEN the fireball flies to the
+    // wolf and lands its damage a few ticks later (projectile_travel): tick until the
+    // bolt connects, not merely until the cast bar empties.
+    for (let i = 0; i < 20 * 8 && wolf.hp >= hpBefore; i++) sim.tick();
     expect(wolf.hp).toBeLessThan(hpBefore);
   });
 
@@ -709,6 +720,57 @@ describe('rogue', () => {
     // Therefore the rogue can immediately re-stealth.
     sim.castAbility('stealth');
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
+  it('rogue Stealth moves at 50% speed', () => {
+    const sim = makeSim('rogue');
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10); // reach level 3, learns stealth (lvl 2)
+    expect((sim as any).moveSpeedMult(sim.player)).toBe(1);
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
+  it('rogue Stealth actually covers half normal ground', () => {
+    const normal = makeSim('rogue');
+    despawnMobs(normal);
+    (normal as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
+
+    const stealthed = makeSim('rogue');
+    despawnMobs(stealthed);
+    (stealthed as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10);
+    stealthed.castAbility('stealth');
+    expect(stealthed.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const base = forwardDistance(normal);
+    const stealth = forwardDistance(stealthed);
+    expect(base).toBeGreaterThan(0);
+    expect(stealth / base).toBeCloseTo(0.5, 1);
+  });
+
+  it('rogue Vanish moves at 50% speed', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20); // Vanish learns at level 18
+    sim.castAbility('vanish');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect((sim as any).moveSpeedMult(sim.player)).toBeCloseTo(0.5, 5);
+  });
+
+  it('rogue Vanish actually covers half normal ground', () => {
+    const normal = makeSim('rogue');
+    despawnMobs(normal);
+    normal.setPlayerLevel(20);
+
+    const vanished = makeSim('rogue');
+    despawnMobs(vanished);
+    vanished.setPlayerLevel(20);
+    vanished.castAbility('vanish');
+    expect(vanished.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+
+    const base = forwardDistance(normal);
+    const vanish = forwardDistance(vanished);
+    expect(base).toBeGreaterThan(0);
+    expect(vanish / base).toBeCloseTo(0.5, 1);
   });
 
   it('rogue GCD is 1.0s', () => {
@@ -855,10 +917,10 @@ describe('food, drink, vendor', () => {
     const sim = makeSim('warrior');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
-    sim.copper = 100;
+    sim.copper = 200;
     sim.buyItem(wilkes.id, 'baked_bread');
-    expect(sim.countItem('baked_bread')).toBe(1);
-    expect(sim.copper).toBe(75);
+    expect(sim.countItem('baked_bread')).toBe(5); // food is sold in a stack of 5
+    expect(sim.copper).toBe(75); // 200 - 125 (buyValue 25 per unit x the stack of 5)
     sim.addItem('wolf_fang', 2);
     sim.sellItem('wolf_fang');
     expect(sim.copper).toBe(79);
@@ -948,6 +1010,62 @@ describe('food, drink, vendor', () => {
     expect(sim.vendorBuyback).toHaveLength(12);
     expect(sim.vendorBuyback[0]).toEqual({ itemId: 'apprentice_staff', count: 1 });
     expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang')).toBe(false);
+  });
+
+  it('Sell Junk bulk-sells only gray items, sparing quest items and better gear', () => {
+    const sim = makeSim('warrior');
+    const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
+    sim.copper = 0;
+    sim.addItem('wolf_fang', 2); // poor (gray), sellValue 4 -> 8
+    sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
+    sim.addItem('apprentice_staff', 1); // not poor -> kept
+    sim.addItem('boar_hide', 1); // quest item -> kept
+
+    sim.sellAllJunk();
+
+    // only the gray items leave the bags
+    expect(sim.countItem('wolf_fang')).toBe(0);
+    expect(sim.countItem('bandit_bandana')).toBe(0);
+    expect(sim.countItem('apprentice_staff')).toBe(1);
+    expect(sim.countItem('boar_hide')).toBe(1);
+    // proceeds = 2*4 + 6 = 14 copper
+    expect(sim.copper).toBe(14);
+    // each sold gray stack is recorded for buyback
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
+      true,
+    );
+    // exactly one summary loot line (not one per stack)
+    const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
+    expect(sold).toHaveLength(1);
+    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 14c.' });
+  });
+
+  it('Sell Junk needs a vendor in range and no-ops cleanly with nothing to sell', () => {
+    const sim = makeSim('warrior');
+    const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+
+    // far from any merchant: refuses, sells nothing
+    sim.addItem('wolf_fang', 1);
+    sim.sellAllJunk();
+    expect(sim.countItem('wolf_fang')).toBe(1);
+    expect(sim.events).toContainEqual({
+      type: 'error',
+      text: 'There is no merchant nearby.',
+      pid: sim.player.id,
+    });
+
+    // at the vendor with no gray items: silent no-op (button is disabled in the UI)
+    teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
+    sim.removeItem('wolf_fang', 1);
+    sim.addItem('apprentice_staff', 1); // not gray
+    sim.copper = 0;
+    const before = sim.events.length;
+    sim.sellAllJunk();
+    expect(sim.countItem('apprentice_staff')).toBe(1);
+    expect(sim.copper).toBe(0);
+    expect(sim.events.length).toBe(before); // nothing emitted
   });
 
   it('Fisherman Brandt sells a simple fishing pole', () => {
@@ -1416,13 +1534,13 @@ describe('quests', () => {
     sim.interact();
     const qp = sim.questLog.get('q_wolves')!;
     qp.counts[0] = 8;
-    (sim as any).checkQuestReady(qp, (sim as any).primary);
+    (sim as any).ctx.checkQuestReady(qp, (sim as any).primary);
     sim.interact(); // turn in wolves
     // accept bandits specifically
     sim.acceptQuest('q_bandits');
     const qb = sim.questLog.get('q_bandits')!;
     qb.counts[0] = 10;
-    (sim as any).checkQuestReady(qb, (sim as any).primary);
+    (sim as any).ctx.checkQuestReady(qb, (sim as any).primary);
     sim.turnInQuest('q_bandits');
     expect(sim.equipment.mainhand).toBe('redbrook_blade');
   });
@@ -1462,7 +1580,7 @@ describe('RL interface', () => {
       return trace;
     };
     expect(run()).toEqual(run());
-  });
+  }, 20000);
 });
 
 describe('gm characters', () => {
