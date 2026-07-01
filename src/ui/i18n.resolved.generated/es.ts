@@ -308,7 +308,8 @@ export const es: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Rueda de gestos",
       "targetFriendly": "Objetivo amistoso más cercano",
-      "targetFriendlyNext": "Objetivo amistoso siguiente"
+      "targetFriendlyNext": "Objetivo amistoso siguiente",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clic izquierdo",

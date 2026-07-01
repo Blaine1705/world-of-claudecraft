@@ -308,7 +308,8 @@ export const en_XA: EnTranslations = {
     "keybinds": {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
-      "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]"
+      "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
+      "discord": "[Ðíšçóŕð]"
     },
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",

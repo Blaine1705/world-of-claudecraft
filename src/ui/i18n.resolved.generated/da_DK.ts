@@ -308,7 +308,8 @@ export const da_DK: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Følelseshjul",
       "targetFriendly": "Sigt mod nærmeste allierede",
-      "targetFriendlyNext": "Skift allieret mål"
+      "targetFriendlyNext": "Skift allieret mål",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Venstreklik",

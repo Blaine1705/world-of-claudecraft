@@ -308,7 +308,8 @@ export const sv_SE: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Gesthjul",
       "targetFriendly": "Måltavla närmaste vänlig",
-      "targetFriendlyNext": "Växla vänligt mål"
+      "targetFriendlyNext": "Växla vänligt mål",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Vänsterklick",

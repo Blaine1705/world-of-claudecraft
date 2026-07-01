@@ -1127,6 +1127,9 @@ async function startGame(
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
+          case 'discord':
+            toggleDiscordPanel();
+            break;
           case 'chat':
             openChat();
             break;
@@ -1242,6 +1245,9 @@ async function startGame(
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();
+        break;
+      case 'discord':
+        toggleDiscordPanel();
         break;
       case 'chat':
         openChat();
@@ -5344,15 +5350,9 @@ function toggleDiscordPanel(open?: boolean): void {
 onDiscordStatusChange(() => {
   if (discordPanelOpen) renderDiscordPanel();
 });
-// Open/close the Discord panel with the U key (ignored while typing).
-window.addEventListener('keydown', (e) => {
-  if (e.code !== 'KeyU' || e.metaKey || e.ctrlKey || e.altKey) return;
-  const tag = (document.activeElement?.tagName ?? '').toLowerCase();
-  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-  if (!api.token || !DISCORD_BUILD_ENABLED) return;
-  e.preventDefault();
-  toggleDiscordPanel();
-});
+// The Discord panel toggles via the rebindable `discord` keybind action (default
+// U), dispatched through onUiKey above like every other interface window; the
+// build/token guard lives in toggleDiscordPanel.
 // Light periodic refresh so the panel's online/presence stays current while logged in.
 setInterval(() => {
   if (DISCORD_BUILD_ENABLED && api.token) void refreshDiscordStatus();

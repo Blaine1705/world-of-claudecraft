@@ -308,7 +308,8 @@ export const tr_TR: EnTranslations = {
     "keybinds": {
       "emoteWheel": "İfade Çarkı",
       "targetFriendly": "En Yakın Dostu Hedefle",
-      "targetFriendlyNext": "Dost Hedefler Arasında Geç"
+      "targetFriendlyNext": "Dost Hedefler Arasında Geç",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Sol Tık",

@@ -308,7 +308,8 @@ export const pt_BR: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Roda de emotes",
       "targetFriendly": "Selecionar aliado mais próximo",
-      "targetFriendlyNext": "Alternar alvo aliado"
+      "targetFriendlyNext": "Alternar alvo aliado",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clique esquerdo",

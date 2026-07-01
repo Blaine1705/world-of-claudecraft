@@ -308,7 +308,8 @@ export const nl_NL: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Emotewiel",
       "targetFriendly": "Dichtstbijzijnde Bondgenoot Aanwijzen",
-      "targetFriendlyNext": "Door Bondgenoten Bladeren"
+      "targetFriendlyNext": "Door Bondgenoten Bladeren",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Linkermuisklik",

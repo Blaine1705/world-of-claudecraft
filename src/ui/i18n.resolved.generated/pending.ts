@@ -11,47 +11,65 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
   "es_ES": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
   "fr_FR": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
   "fr_CA": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
   "de_DE": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.keybinds.discord"
+  ],
+  "zh_TW": [
+    "hudChrome.keybinds.discord"
+  ],
+  "ko_KR": [
+    "hudChrome.keybinds.discord"
+  ],
+  "ja_JP": [
+    "hudChrome.keybinds.discord"
+  ],
   "pt_BR": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.keybinds.discord"
+  ],
   "nl_NL": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",
@@ -61,6 +79,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",
@@ -70,6 +89,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",
@@ -79,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",
@@ -88,6 +109,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",
@@ -97,6 +119,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",
@@ -106,6 +129,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.options.startAttackOnAbility",
     "hudChrome.party.promoteLeader",
     "hudChrome.plurals.playersMatching.few",

@@ -308,7 +308,8 @@ export const vi_VN: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Vòng Biểu Cảm",
       "targetFriendly": "Chọn Đồng Minh Gần Nhất",
-      "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh"
+      "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Nhấp Trái",
