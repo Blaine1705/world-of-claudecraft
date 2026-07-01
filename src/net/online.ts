@@ -1304,14 +1304,18 @@ export class ClientWorld implements IWorld {
         kind: a.kind,
         remaining: a.rem,
         duration: a.dur,
-        // The wire carries value only for negative-value buff_* stat-saps (sparse,
-        // server/game.ts), so the UI classifies them as debuffs identically to offline; a
-        // missing value (ordinary buffs, absorb, non-buff auras, an old server) decodes to 0
-        // as before. sourceId/school stay simplified (separate pre-existing wire reductions,
-        // not part of this change).
+        // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
+        // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
+        // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
+        // unchanged), a missing school falls back to the physical default, and imbue range /
+        // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
+        // pre-existing wire reduction, not read by the tooltip).
         value: a.value ?? 0,
+        value2: a.value2,
+        value3: a.value3,
+        tickInterval: a.tickInterval,
         sourceId: 0,
-        school: 'physical' as const,
+        school: a.school ?? 'physical',
         stacks: a.stacks,
         // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire sends it
         // only when defined (server/game.ts), so an ordinary aura or an old server decodes to
