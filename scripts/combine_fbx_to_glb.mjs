@@ -39,25 +39,35 @@
 //
 // World of ClaudeCraft assets were built with: --strip-root --rest-clip Idle
 //   --rest-t 1 --height <n> --meshopt --webp-size 1024  (game uses meshopt + webp).
-import { readFileSync, writeFileSync, readdirSync, statSync, rmSync, mkdirSync } from 'node:fs';
-import { basename, extname, join, dirname } from 'node:path';
-import { tmpdir } from 'node:os';
+
 import { execSync } from 'node:child_process';
-import puppeteer from 'puppeteer-core';
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { basename, dirname, extname, join } from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { prune, dedup, meshopt, textureCompress } from '@gltf-transform/functions';
+import { dedup, meshopt, prune, textureCompress } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 // ---- arg parsing -----------------------------------------------------------
 const argv = process.argv.slice(2);
 if (argv.length === 0 || argv.includes('-h') || argv.includes('--help')) {
-  console.log(readFileSync(new URL(import.meta.url)).toString().split('\n')
-    .filter((l) => l.startsWith('//')).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
+  console.log(
+    readFileSync(new URL(import.meta.url))
+      .toString()
+      .split('\n')
+      .filter((l) => l.startsWith('//'))
+      .map((l) => l.replace(/^\/\/ ?/, ''))
+      .join('\n'),
+  );
   process.exit(argv.length === 0 ? 1 : 0);
 }
-const opt = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : undefined; };
+const opt = (name) => {
+  const i = argv.indexOf(name);
+  return i >= 0 ? argv[i + 1] : undefined;
+};
 const flag = (name) => argv.includes(name);
 const clipNameFromFile = (p) => {
   const stem = basename(p, extname(p));
@@ -65,17 +75,29 @@ const clipNameFromFile = (p) => {
   return tok.charAt(0).toUpperCase() + tok.slice(1);
 };
 
-const VALUE_FLAGS = new Set(['--base', '--anim', '--tex', '--height', '--rest-clip', '--rest-t', '--min-dur', '--webp-size']);
+const VALUE_FLAGS = new Set([
+  '--base',
+  '--anim',
+  '--tex',
+  '--height',
+  '--rest-clip',
+  '--rest-t',
+  '--min-dur',
+  '--webp-size',
+]);
 const explicitBase = opt('--base');
 const animArgs = argv.map((a, i) => (a === '--anim' ? argv[i + 1] : null)).filter(Boolean);
 const positionals = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
-  if (a.startsWith('--')) { if (VALUE_FLAGS.has(a)) i++; continue; } // skip flag (+ its value)
+  if (a.startsWith('--')) {
+    if (VALUE_FLAGS.has(a)) i++;
+    continue;
+  } // skip flag (+ its value)
   positionals.push(a);
 }
 
-let fbxFiles = []; // { path, name }
+const fbxFiles = []; // { path, name }
 let texFile = opt('--tex') || null;
 let out;
 
@@ -91,16 +113,28 @@ if (explicitBase || animArgs.length) {
   // folder mode: <inputDir> <out.glb>
   const dir = positionals[0];
   out = positionals[1];
-  if (!dir || !out) { console.error('usage: combine_fbx_to_glb.mjs <inputDir> <out.glb>  (see --help)'); process.exit(1); }
-  if (!statSync(dir).isDirectory()) { console.error(`not a directory: ${dir}`); process.exit(1); }
+  if (!dir || !out) {
+    console.error('usage: combine_fbx_to_glb.mjs <inputDir> <out.glb>  (see --help)');
+    process.exit(1);
+  }
+  if (!statSync(dir).isDirectory()) {
+    console.error(`not a directory: ${dir}`);
+    process.exit(1);
+  }
   for (const f of readdirSync(dir).sort()) {
     const p = join(dir, f);
     if (/\.fbx$/i.test(f)) fbxFiles.push({ path: p, name: clipNameFromFile(p) });
     else if (!texFile && /\.(png|jpe?g)$/i.test(f) && !/^\./.test(f)) texFile = p;
   }
 }
-if (fbxFiles.length === 0) { console.error('no .fbx inputs found'); process.exit(1); }
-if (!out) { console.error('no output path given'); process.exit(1); }
+if (fbxFiles.length === 0) {
+  console.error('no .fbx inputs found');
+  process.exit(1);
+}
+if (!out) {
+  console.error('no output path given');
+  process.exit(1);
+}
 
 const combineOpts = {
   targetHeight: opt('--height') ? Number(opt('--height')) : null,
@@ -124,32 +158,52 @@ const BUNDLE = join(tmpdir(), 'combine_fbx_to_glb.bundle.js');
 execSync(`npx esbuild ${ENTRY} --bundle --format=iife --outfile=${BUNDLE}`, { stdio: 'inherit' });
 const html = `<!doctype html><html><head><meta charset="utf8"></head><body><script>${readFileSync(BUNDLE, 'utf8')}</script></body></html>`;
 const browser = await puppeteer.launch({
-  executablePath: BROWSER_PATH, headless: 'new',
-  args: ['--use-angle=swiftshader', '--use-gl=angle', '--ignore-gpu-blocklist', '--no-sandbox', '--enable-webgl'],
+  executablePath: BROWSER_PATH,
+  headless: 'new',
+  args: [
+    '--use-angle=swiftshader',
+    '--use-gl=angle',
+    '--ignore-gpu-blocklist',
+    '--no-sandbox',
+    '--enable-webgl',
+  ],
 });
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.error('PAGEERR', e.message));
-page.on('console', (m) => { if (m.type() === 'error') console.error('CONSOLE', m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') console.error('CONSOLE', m.text());
+});
 await page.setContent(html, { waitUntil: 'load' });
 await page.waitForFunction('window.__ready === true', { timeout: 20000 });
 
 const files = fbxFiles.map((f) => ({ name: f.name, b64: readFileSync(f.path).toString('base64') }));
 const externalTexB64 = texFile ? readFileSync(texFile).toString('base64') : null;
-const { b64, dbg } = await page.evaluate((f, o) => window.combine(f, o), files, { ...combineOpts, externalTexB64 });
+const { b64, dbg } = await page.evaluate((f, o) => window.combine(f, o), files, {
+  ...combineOpts,
+  externalTexB64,
+});
 await browser.close();
 console.log('merge:', JSON.stringify(dbg));
 
 // ---- post-process with gltf-transform --------------------------------------
 const tmpRaw = join(tmpdir(), `combine_fbx_to_glb.${basename(out)}.raw.glb`);
 writeFileSync(tmpRaw, Buffer.from(b64, 'base64'));
-await MeshoptDecoder.ready; await MeshoptEncoder.ready;
-const io = new NodeIO().registerExtensions(ALL_EXTENSIONS)
+await MeshoptDecoder.ready;
+await MeshoptEncoder.ready;
+const io = new NodeIO()
+  .registerExtensions(ALL_EXTENSIONS)
   .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
 const doc = await io.read(tmpRaw);
 const transforms = [prune(), dedup()];
 if (wantWebp) {
   const sharp = (await import('sharp')).default;
-  transforms.push(textureCompress({ encoder: sharp, targetFormat: 'webp', ...(webpSize ? { resize: [webpSize, webpSize] } : {}) }));
+  transforms.push(
+    textureCompress({
+      encoder: sharp,
+      targetFormat: 'webp',
+      ...(webpSize ? { resize: [webpSize, webpSize] } : {}),
+    }),
+  );
 }
 if (wantMeshopt) transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
 await doc.transform(...transforms);
