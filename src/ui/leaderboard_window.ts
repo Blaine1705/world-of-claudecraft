@@ -18,7 +18,12 @@
 // hud.update()'s per-frame path.
 
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
-import type { GuildLeaderboardPage, IWorld, LeaderboardPage } from '../world_api';
+import type {
+  DailyRewardStatus,
+  GuildLeaderboardPage,
+  IWorld,
+  LeaderboardPage,
+} from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -35,7 +40,7 @@ import { svgIcon } from './ui_icons';
 import { formatXp } from './xp_bar';
 
 /** Which high-score board the window is showing. */
-type LeaderboardBoard = 'players' | 'guilds';
+type LeaderboardBoard = 'players' | 'guilds' | 'daily';
 
 /**
  * Hud-supplied glue. The leaderboard window renders entirely from IWorld + these
@@ -62,16 +67,20 @@ export class LeaderboardWindow {
   private board: LeaderboardBoard = 'players';
   private playerPage = 0;
   private guildPage = 0;
+  private dailyPage = 0;
   private openerFocus: HTMLElement | null = null;
 
   constructor(private readonly deps: LeaderboardWindowDeps) {}
 
   private get page(): number {
-    return this.board === 'guilds' ? this.guildPage : this.playerPage;
+    if (this.board === 'guilds') return this.guildPage;
+    if (this.board === 'daily') return this.dailyPage;
+    return this.playerPage;
   }
 
   private set page(value: number) {
     if (this.board === 'guilds') this.guildPage = value;
+    else if (this.board === 'daily') this.dailyPage = value;
     else this.playerPage = value;
   }
 
@@ -92,6 +101,7 @@ export class LeaderboardWindow {
     this.board = 'players';
     this.playerPage = 0;
     this.guildPage = 0;
+    this.dailyPage = 0;
     this.deps.root().style.display = 'block';
     void this.render('open');
   }
@@ -127,6 +137,10 @@ export class LeaderboardWindow {
 
     if (this.board === 'guilds') {
       await this.renderGuildBoard(el, world, focus);
+      return;
+    }
+    if (this.board === 'daily') {
+      await this.renderDailyBoard(el, world, focus);
       return;
     }
 
@@ -219,6 +233,35 @@ export class LeaderboardWindow {
     this.wirePager(body as HTMLElement, focus);
   }
 
+  private async renderDailyBoard(
+    el: HTMLElement,
+    world: IWorld,
+    focus: FocusTarget,
+  ): Promise<void> {
+    let result: DailyRewardStatus | null = null;
+    try {
+      result = await world.dailyRewards();
+    } catch {
+      result = null;
+    }
+    if (el.style.display !== 'block') return;
+    const body = el.querySelector('.lb-body');
+    if (!body) return;
+    if (result === null) {
+      body.innerHTML = `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    if (result.leaderboard.length === 0) {
+      body.innerHTML = `<div class="lb-empty">${esc(t('hudChrome.dailyRewards.noLeaders'))}</div>`;
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    body.innerHTML =
+      this.dailyHeaderHtml() + result.leaderboard.map((r) => this.dailyRowHtml(r)).join('');
+    this.focusCloseAfterPage(focus);
+  }
+
   // ---- HTML builders (the localized DOM the pure view-model drives) ----------
 
   private titleHtml(realm: string): string {
@@ -236,7 +279,7 @@ export class LeaderboardWindow {
     return `<div class="lb-body" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
   }
 
-  // The Players / Guilds tab bar. A WAI-ARIA role=tablist of two tabs with a roving
+  // The Players / Guilds / Daily tab bar. A WAI-ARIA role=tablist with roving
   // tabindex (0 on the active tab, -1 on the rest) and aria-selected, controlling the
   // shared #lb-body-panel tabpanel, mirroring social_window/talents_window. The
   // roving Arrow/Home/End + Enter/Space handler is wired in wireTabs.
@@ -253,6 +296,7 @@ export class LeaderboardWindow {
       `<div class="lb-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
       tab('players', t('hudChrome.leaderboard.tabPlayers')) +
       tab('guilds', t('hudChrome.leaderboard.tabGuilds')) +
+      tab('daily', t('hudChrome.dailyRewards.leaderboard')) +
       `</div>`
     );
   }
@@ -319,6 +363,23 @@ export class LeaderboardWindow {
       `<span class="lb-members">${formatNumber(r.memberCount, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-vlvl">${r.topLevel}</span>` +
       `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`
+    );
+  }
+
+  private dailyHeaderHtml(): string {
+    return (
+      `<div class="lb-row lb-daily lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
+      `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
+      `<span class="lb-xp">${esc(t('hudChrome.dailyRewards.score'))}</span></div>`
+    );
+  }
+
+  private dailyRowHtml(r: DailyRewardStatus['leaderboard'][number]): string {
+    const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
+    return (
+      `<div class="lb-row lb-daily${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<span class="lb-name">${esc(r.name)}${you}</span>` +
+      `<span class="lb-xp">${formatNumber(r.points, { maximumFractionDigits: 0 })}</span></div>`
     );
   }
 
