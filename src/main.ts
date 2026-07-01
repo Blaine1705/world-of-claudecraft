@@ -1161,6 +1161,7 @@ async function startGame(
     onChat: () => openChat(),
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
+    onDiscord: () => toggleDiscordPanel(true),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onQuestLog: () => hud.toggleQuestLog(),
@@ -5270,6 +5271,19 @@ function updateDiscordCtaBanner(): void {
   }
 }
 
+// Show/hide the Discord entry in the mobile "More" tray. Mobile has no keyboard,
+// so the U-key panel toggle is unreachable there; this button is the touch path
+// into the same #discord-window (link / unlink / status). It is only meaningful
+// when Discord is available: the client build enables it, the server has it on,
+// and the player is logged in. Driven off the same status-change signal as the
+// panel, so it tracks login/logout and the server's enabled flag.
+function syncDiscordMobileEntry(): void {
+  const btn = document.getElementById('mobile-discord');
+  if (!btn) return;
+  const available = DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token;
+  btn.hidden = !available;
+}
+
 function wireDiscordCtaBanner(): void {
   document.getElementById('discord-cta-link')?.addEventListener('click', () => {
     startDiscordOAuth('link');
@@ -5342,6 +5356,7 @@ function toggleDiscordPanel(open?: boolean): void {
 }
 // Keep an open panel in sync as status/presence updates arrive.
 onDiscordStatusChange(() => {
+  syncDiscordMobileEntry();
   if (discordPanelOpen) renderDiscordPanel();
 });
 // Open/close the Discord panel with the U key (ignored while typing).
