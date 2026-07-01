@@ -239,6 +239,7 @@ import {
   publishCard,
 } from './player_card_share';
 import { chatPlayerContextActions } from './player_context_menu';
+import { PET_ACTION_ICONS } from './pet_action_icons';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
 import { encodeQuestLink, parseChatSegments } from './quest_link';
@@ -4099,14 +4100,14 @@ export class Hud {
     };
     addButton(
       commands,
-      'attack',
+      PET_ACTION_ICONS.attack,
       t('hud.pet.attack'),
       petTooltip(t('hud.pet.petAttackTitle'), t('hud.pet.petAttackDesc')),
       () => this.sim.petAttack(),
     );
     addButton(
       commands,
-      'growl',
+      PET_ACTION_ICONS.taunt,
       t('hud.pet.taunt'),
       petTooltip(t('hud.pet.petTauntTitle'), t('hud.pet.petTauntDesc')),
       () => this.sim.petTaunt(),
@@ -4126,7 +4127,7 @@ export class Hud {
     if (ownerClass === 'warlock') {
       addButton(
         commands,
-        'drain_life',
+        PET_ACTION_ICONS.healDemon,
         t('hud.pet.healDemon'),
         petTooltip(t('hud.pet.healDemon'), t('hud.pet.healDemonDesc')),
         () => {
@@ -4136,7 +4137,7 @@ export class Hud {
     } else {
       addButton(
         commands,
-        'rejuvenation',
+        PET_ACTION_ICONS.feed,
         t('hud.pet.healPet'),
         petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')),
         () => {
@@ -4178,9 +4179,9 @@ export class Hud {
       },
     ];
     const modeIcons: Record<PetMode, string> = {
-      passive: 'prowl',
-      defensive: 'defensive_stance',
-      aggressive: 'rapid_fire',
+      passive: PET_ACTION_ICONS.passive,
+      defensive: PET_ACTION_ICONS.defensive,
+      aggressive: PET_ACTION_ICONS.aggressive,
     };
     addButton(
       stances,
