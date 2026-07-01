@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "private": true,
   "license": "MIT",
   "author": "levy-street",
@@ -170,5 +170,8 @@
         "deb"
       ]
     }
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true
   }
 }

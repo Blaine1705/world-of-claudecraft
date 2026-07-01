@@ -23,6 +23,10 @@ private/*
 
 # test artifacts & screenshots
 tmp/
+# PR-assist screenshot tour output + its CI-only ephemerals
+pr-shots/
+pr.diff
+.devpid
 .codex-research/
 .codex/
 .playwright-mcp/

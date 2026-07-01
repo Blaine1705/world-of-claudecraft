@@ -9,132 +9,24 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
-  "es_ES": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
-  "fr_FR": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
-  "fr_CA": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
-  "de_DE": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
-  "zh_CN": [
-    "hudChrome.keybinds.discord"
-  ],
-  "zh_TW": [
-    "hudChrome.keybinds.discord"
-  ],
-  "ko_KR": [
-    "hudChrome.keybinds.discord"
-  ],
-  "ja_JP": [
-    "hudChrome.keybinds.discord"
-  ],
-  "pt_BR": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
-  ],
-  "ru_RU": [
-    "hudChrome.keybinds.discord"
-  ],
-  "nl_NL": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ],
-  "pl_PL": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ],
-  "id_ID": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ],
-  "tr_TR": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ],
-  "sv_SE": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ],
-  "vi_VN": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ],
-  "da_DK": [
-    "hudChrome.itemShare.linkHint",
-    "hudChrome.keybinds.discord",
-    "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader",
-    "hudChrome.plurals.playersMatching.few",
-    "hudChrome.plurals.playersMatching.many",
-    "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };
