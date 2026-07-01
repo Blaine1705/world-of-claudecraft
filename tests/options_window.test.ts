@@ -154,6 +154,22 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
   });
 });
 
+describe('options_window: viewport resync on open (PR #1118)', () => {
+  it('re-syncs the app viewport before the panel opens, not just on load/resize', () => {
+    // toggle() is the only entry point every sub-panel opens through, so pinning
+    // the call here (before the display flip) locks the actual bug fix, not just
+    // the pure syncAppViewport() unit covered by tests/app_viewport.test.ts.
+    const toggle = painter.slice(painter.indexOf('toggle(): void {'));
+    const toggleEnd = toggle.indexOf('\n  }\n');
+    const body = toggle.slice(0, toggleEnd);
+    const syncIdx = body.indexOf('syncAppViewport()');
+    const displayIdx = body.indexOf("this.deps.root().style.display = 'block'");
+    expect(syncIdx).toBeGreaterThan(-1);
+    expect(displayIdx).toBeGreaterThan(-1);
+    expect(syncIdx).toBeLessThan(displayIdx);
+  });
+});
+
 describe('options_window: stays a cold window', () => {
   it('exposes no per-frame refresh and is never wired into Hud.update', () => {
     // the painter is open-on-demand only: no refreshIfChanged/update method
