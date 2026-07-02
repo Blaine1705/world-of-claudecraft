@@ -2376,6 +2376,7 @@ export class Sim {
       applyKnockback: sim.applyKnockback.bind(sim),
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
+      friendliesInRadius: sim.friendliesInRadius.bind(sim),
       breakStealth: sim.breakStealth.bind(sim),
       applyTaunt: sim.applyTaunt.bind(sim),
       summonPet: sim.summonPet.bind(sim),
@@ -3730,6 +3731,14 @@ export class Sim {
     const out: Entity[] = [];
     this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
       if (e.id !== source.id && !e.dead && this.isHostileTo(source, e)) out.push(e);
+    });
+    return out;
+  }
+
+  private friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
+    const out: Entity[] = [];
+    this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
+      if (!e.dead && (e.id === source.id || this.isFriendlyTo(source, e))) out.push(e);
     });
     return out;
   }

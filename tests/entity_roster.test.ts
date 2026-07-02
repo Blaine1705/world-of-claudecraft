@@ -156,6 +156,7 @@ function makeCtx() {
     applyKnockback: vi.fn(() => 0),
     diminishedCrowdControlDuration: vi.fn(() => null),
     hostilesInRadius: vi.fn(() => []),
+    friendliesInRadius: vi.fn(() => []),
     breakStealth: vi.fn(),
     applyTaunt: vi.fn(),
     summonPet: vi.fn(),

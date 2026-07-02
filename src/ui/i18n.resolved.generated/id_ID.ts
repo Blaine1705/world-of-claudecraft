@@ -3775,6 +3775,7 @@ export const id_ID: EnTranslations = {
       "notEnoughMana": "Mana tidak cukup!",
       "notEnoughResource": "{resource} tidak cukup!",
       "notEnoughHealth": "Nyawa tidak cukup.",
+      "nothingToConsume": "Tidak ada yang bisa dikonsumsi.",
       "targetMustDodge": "Sasaranmu harus mengelak terlebih dahulu.",
       "requiresCombo": "Kemampuan itu membutuhkan poin kombo.",
       "requiresForm": "Kamu harus berada dalam Wujud {form}.",

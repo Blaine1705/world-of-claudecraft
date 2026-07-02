@@ -3775,6 +3775,7 @@ export const en: EnTranslations = {
       "notEnoughMana": "Not enough mana!",
       "notEnoughResource": "Not enough {resource}!",
       "notEnoughHealth": "Not enough health.",
+      "nothingToConsume": "Nothing to consume.",
       "targetMustDodge": "Your target must dodge first.",
       "requiresCombo": "That ability requires combo points.",
       "requiresForm": "You must be in {form} Form.",

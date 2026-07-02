@@ -173,6 +173,8 @@ export type AuraKind =
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
+  | 'form_moonkin'
+  | 'form_shadow'
   | 'stealth'
   | 'defensive_stance'
   | 'righteous_fury'
@@ -256,6 +258,7 @@ export interface Aura {
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
+  leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
 export type CrowdControlDrCategory =
@@ -1152,13 +1155,14 @@ export type AbilityEffect =
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | { type: 'buffTarget'; kind: AuraKind; value: number; duration: number } // fortitude/might/mark on a friendly target
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
-  | { type: 'dot'; total: number; duration: number; interval: number }
+  | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
       min: number;
@@ -1174,6 +1178,13 @@ export type AbilityEffect =
   // of their damage on the weapon roll, so a flat AP drain barely dents them.
   | { type: 'aoeAttackPower'; amount?: number; pct?: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  | {
+      type: 'consumeAura';
+      auraIds?: string[];
+      auraKind?: 'dot' | 'hot';
+      deal?: { min: number; max: number };
+      heal?: { min: number; max: number };
+    }
   | {
       type: 'selfBuff';
       kind: AuraKind;
