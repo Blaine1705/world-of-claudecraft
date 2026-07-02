@@ -53,14 +53,17 @@ export function shouldResetMusicForDungeonEntry(
 /** Pick the soundtrack layer from world position context. */
 export function musicZoneForLocation(
   zoneId: string,
-  biome: 'vale' | 'marsh' | 'peaks',
+  biome: 'vale' | 'marsh' | 'peaks' | 'dusk',
   inHub: boolean,
   inDungeon: boolean,
   dungeonId: string | null = null,
 ): MusicZone {
   if (inDungeon) return dungeonId ? dungeonMusicZoneForDungeon(dungeonId) : 'dungeon_hollow_crypt';
-  if (inHub) return TOWN_MUSIC[zoneId] ?? biome;
-  return ZONE_MUSIC[zoneId] ?? biome;
+  // The dusk realm has no dedicated theme yet; it borrows the peaks anthem
+  // until one is composed (see ZONE_MUSIC to route a bespoke layer).
+  const biomeLayer: MusicZone = biome === 'dusk' ? 'peaks' : biome;
+  if (inHub) return TOWN_MUSIC[zoneId] ?? biomeLayer;
+  return ZONE_MUSIC[zoneId] ?? biomeLayer;
 }
 
 type Inst =
