@@ -1117,7 +1117,9 @@ export const pt_BR: EnTranslations = {
         "marshName": "Pântano de Mirefen",
         "marshBlurb": "Brejos submersos e ruínas castigadas pela maré, lar de murlocs e coisas piores.",
         "peaksName": "Alturas de Thornpeak",
-        "peaksBlurb": "Cumes varridos pelo vento que sobem rumo aos perigos mais gélidos do reino."
+        "peaksBlurb": "Cumes varridos pelo vento que sobem rumo aos perigos mais gélidos do reino.",
+        "duskName": "The Veiled Hollow",
+        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true."
       },
       "group": {
         "heading": "Forme grupo para as partes difíceis",
@@ -1485,9 +1487,12 @@ export const pt_BR: EnTranslations = {
       "marshGreeter": "Guardião Fenwick, Fenbridge",
       "peaksGreeting": "Duzentos anos esta muralha resistiu. Ela não cairá sob minha vigilância, mas range.",
       "peaksGreeter": "Capitã Thessaly, Highwatch",
+      "duskGreeting": "Few of your kind have stood beneath these boughs. Walk gently, and be welcome.",
+      "duskGreeter": "Keeper Saelwyn, Eldergleam",
       "valePlaceNotes": "Eastbrook é sua primeira base de operações. Wolf Run e Boar Meadow são terreno de caça ameno; Mirror Lake é água tranquila para pescar; a Webwood e a Copper Dig escondem aranhas e escavadores gananciosos por minério; um Bandit Camp e a Fallen Chapel guardam trabalhos mais duros; Reliquary Hill desce até a Collapsed Reliquary, o primeiro delve do reino; e Brightwood Glade é um bosque calmo e ensolarado ao norte.",
       "marshPlaceNotes": "Fenbridge guarda a única estrada seca. Os Juncos do Espreitador e os Baixios de Deepfen fervilham de feras do pântano e murlocs; o Matagal da Viúva é tecido de teias; a Capela Afogada e os Montículos dos Trolls guardam perigos mais antigos; o Acampamento dos Chamadores de Sepulturas é o culto entrincheirado, e o Bastião Submerso é o coração instanciado do pântano.",
       "peaksPlaceNotes": "Highwatch defende a muralha. A Cumeeira do Espreitador e as Tocas de Deeprock pertencem a felinos da serra e kobolds; os Sopés dos Ogros e o Acampamento de Guerra de Drogmar a brutamontes de aluguel; Stormcrag crepita de elementais e o Glimmermere reluz abaixo dela; as Tendas do Culto do Verme e os Campos dos Revenantes cercam o terreno alto do culto, com o Santuário do Gravewyrm no seu topo.",
+      "duskPlaceNotes": "Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
       "gladeTitle": "Um canto tranquilo: Clareira de Brightwood",
       "gladeBody": "Nem toda história no Vale fala dos mortos. Ao norte, uma clareira ensolarada chamada Brightwood Glade mantém seu próprio ritmo mais gentil, só trilhas silenciosas e luz salpicada sob os galhos. É um contraponto suave à trilha que você segue, e vale ser vista quando a estrada lhe der espaço para vaguear."
     },
@@ -6736,6 +6741,36 @@ export const pt_BR: EnTranslations = {
           },
           "9": {
             "label": "Santuário do Gravewyrm"
+          }
+        }
+      },
+      "veiled_hollow": {
+        "name": "The Veiled Hollow",
+        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Duskfall Cave"
+          },
+          "2": {
+            "label": "Duskfall Overlook"
+          },
+          "3": {
+            "label": "Elder Grove"
+          },
+          "4": {
+            "label": "Starfall Basin"
+          },
+          "5": {
+            "label": "The Sunken Court"
+          },
+          "6": {
+            "label": "Crystalline Shallows"
+          },
+          "7": {
+            "label": "The Gleaming Deep"
           }
         }
       }

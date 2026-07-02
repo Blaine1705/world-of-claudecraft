@@ -1117,7 +1117,9 @@ export const zh_CN: EnTranslations = {
         "marshName": "泥沼湿地",
         "marshBlurb": "沉没的沼泽与遭潮水侵蚀的废墟,鱼人与更可怕之物的栖身之所。",
         "peaksName": "荆棘峰高地",
-        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。"
+        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。",
+        "duskName": "帷幕幽谷",
+        "duskBlurb": "群山之下封存的国度，如果关于入口的低语属实。"
       },
       "group": {
         "heading": "组队迎接硬仗",
@@ -1485,9 +1487,12 @@ export const zh_CN: EnTranslations = {
       "marshGreeter": "守望者芬威克，芬桥",
       "peaksGreeting": "这堵墙已守了两百年。在我当值时它绝不会破，但它在呻吟。",
       "peaksGreeter": "塞萨莉队长，高守哨站",
+      "duskGreeting": "你的同族鲜少踏足这片树荫。轻声慢行，欢迎你的到来。",
+      "duskGreeter": "守护者塞尔文，古辉镇",
       "valePlaceNotes": "Eastbrook 是你的第一个大本营。Wolf Run 与 Boar Meadow 是温和的狩猎场；Mirror Lake 是供垂钓的静水；the Webwood 与 the Copper Dig 藏着蜘蛛和贪婪掘矿的家伙；一处 Bandit Camp 与 the Fallen Chapel 里有更棘手的活儿；Reliquary Hill 向下通往 the Collapsed Reliquary，这是这片位面的首个探险地；而 Brightwood Glade 则是北方一片宁静、阳光普照的林地。",
       "marshPlaceNotes": "芬桥守着唯一一条干燥的道路。潜行者芦苇荡与深沼浅滩里满是沼泽野兽和鱼人；寡妇密林被蛛网织得密不透风；溺亡礼拜堂与巨魔土丘藏着更古老的危险；唤墓者营地是邪教的盘踞之处，沉没堡垒则是这片湿地的副本核心。",
       "peaksPlaceNotes": "高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和狗头人；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，饮月之池在它下方泛着微光；蜿龙教帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。",
+      "duskPlaceNotes": "古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。",
       "gladeTitle": "宁静一隅：明木林地",
       "gladeBody": "the Vale 里的故事并不全都关于亡者。北方有一片阳光照耀的林地，名为 Brightwood Glade，自有它更为温和的节奏：尽是安静的小径，以及枝叶下斑驳的光影。它是你所追寻的踪迹之外一段柔和的对照，若道路给你余裕闲逛，很值得去看一看。"
     },
@@ -6736,6 +6741,36 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
+          }
+        }
+      },
+      "veiled_hollow": {
+        "name": "帷幕幽谷",
+        "welcome": "空气中回荡着古老魔法的低鸣。到古辉镇的巨树下寻找守护者塞尔文吧。",
+        "pois": {
+          "0": {
+            "label": "古辉镇"
+          },
+          "1": {
+            "label": "暮落洞穴"
+          },
+          "2": {
+            "label": "暮落瞭望台"
+          },
+          "3": {
+            "label": "古木林地"
+          },
+          "4": {
+            "label": "星落盆地"
+          },
+          "5": {
+            "label": "沉没王庭"
+          },
+          "6": {
+            "label": "水晶浅滩"
+          },
+          "7": {
+            "label": "辉光深处"
           }
         }
       }

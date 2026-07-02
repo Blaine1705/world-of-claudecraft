@@ -1195,6 +1195,9 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // The zone's southern border ridge has NO road pass and is raised past the
+  // climbable slope: the zone is reachable only by portal (see world.ts).
+  sealedSouthBorder?: boolean;
 }
 
 export interface BuildingDef {

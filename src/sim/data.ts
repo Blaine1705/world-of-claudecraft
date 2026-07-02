@@ -33,6 +33,18 @@ import {
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
+  REALM_CAMPS,
+  REALM_ITEMS,
+  REALM_MOBS,
+  REALM_NPCS,
+  REALM_OBJECTS,
+  REALM_PROPS,
+  REALM_QUEST_ORDER,
+  REALM_QUESTS,
+  REALM_ROADS,
+  REALM_ZONE,
+} from './content/realm';
+import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
   TEMPLE_DUNGEON_MOBS,
@@ -137,6 +149,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
   DELVE_ITEMS,
+  REALM_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -151,14 +164,18 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
+  ...REALM_MOBS,
 };
 
+// Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
+// before camps, so existing entity ids stay stable (determinism).
 export const NPCS: Record<string, NpcDef> = {
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
+  ...REALM_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -166,6 +183,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  ...REALM_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -173,6 +191,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
+  ...REALM_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -186,6 +205,8 @@ export const CAMPS: CampDef[] = [
   ...TEMPLE_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
   { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
+  // Veiled Hollow camps stay LAST for the same draw-order reason.
+  ...REALM_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -193,15 +214,22 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE2_OBJECTS,
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
+  ...REALM_OBJECTS,
 ];
 
-export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
+export const ROADS: { x: number; z: number }[][] = [
+  ...ZONE1_ROADS,
+  ...ZONE2_ROADS,
+  ...ZONE3_ROADS,
+  ...REALM_ROADS,
+];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
   ZONE2_PROPS,
   ZONE3_PROPS,
   TEMPLE_PROPS,
+  REALM_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -258,7 +286,7 @@ export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 // graveyard, its lakes, and a biome palette the renderer keys off.
 // ---------------------------------------------------------------------------
 
-export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE];
+export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE, REALM_ZONE];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
 export const WORLD_MIN_X = -WORLD_SIZE / 2;

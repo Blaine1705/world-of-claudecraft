@@ -34,13 +34,24 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   dusk: { hill: 14, base: 2, hubHeight: 2.5 },
 };
 
-// Ridge walls between zone bands, each opened by a road pass.
-const ZONE_RIDGES: { z: number; passX: number }[] = [];
+// Ridge walls between zone bands, each opened by a road pass. A zone with
+// sealedSouthBorder instead gets a taller, narrower wall with NO pass, its
+// crest shifted into the sealed zone's own band so the southern neighbor's
+// border content keeps (nearly) its original ground. Sealed zones are entered
+// only through a portal (see portals content).
+const ZONE_RIDGES: { z: number; passX: number; sealed: boolean }[] = [];
 for (let i = 0; i + 1 < ZONES.length; i++) {
-  ZONE_RIDGES.push({ z: ZONES[i].zMax, passX: 0 });
+  const sealed = ZONES[i + 1].sealedSouthBorder === true;
+  ZONE_RIDGES.push({ z: ZONES[i].zMax + (sealed ? 15 : 0), passX: 0, sealed });
 }
 const RIDGE_HEIGHT = 22;
 const RIDGE_SIGMA = 18; // gaussian width of the wall
+// Sealed walls: tall and steep enough that the straight-approach gradient
+// beats PLAYER_MAX_CLIMB_SLOPE everywhere along the border, even against the
+// worst-case downhill assist from the underlying biome hills (guarded by
+// tests/veiled_hollow.test.ts).
+const SEALED_RIDGE_HEIGHT = 60;
+const SEALED_RIDGE_SIGMA = 12;
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
@@ -149,15 +160,22 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     }
   }
 
-  // Mountain ridge walls between zones, pierced by the road pass
+  // Mountain ridge walls between zones, pierced by the road pass (sealed
+  // walls have no pass and only ever grow past their base height, so no
+  // crest dip opens a climbable notch)
   for (const ridge of ZONE_RIDGES) {
+    const sigma = ridge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     const dz = Math.abs(z - ridge.z);
-    if (dz < RIDGE_SIGMA * 3) {
-      const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
-      const pass = smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
+    if (dz < sigma * 3) {
+      const profile = Math.exp(-(dz * dz) / (2 * sigma * sigma));
+      const pass = ridge.sealed
+        ? 1
+        : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
       // jagged crest so the wall reads as mountains, not a berm
-      const crest = 1 + (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.7;
-      h += RIDGE_HEIGHT * crest * profile * pass;
+      const crestNoise = (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.7;
+      const crest = 1 + (ridge.sealed ? Math.abs(crestNoise) : crestNoise);
+      const height = ridge.sealed ? SEALED_RIDGE_HEIGHT : RIDGE_HEIGHT;
+      h += height * crest * profile * pass;
     }
   }
 
@@ -238,6 +256,11 @@ export function generateDecorations(seed: number): Decoration[] {
       } else if (biome === 'marsh') {
         if (r > 0.34) continue;
         kind = r < 0.08 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
+      } else if (biome === 'dusk') {
+        // the hollow is a glade: sparse pines, more twisted elders and stone;
+        // the dense mushroom flora comes from ground dressing and realm props
+        if (r > 0.38) continue;
+        kind = r < 0.14 ? 'tree' : r < 0.28 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

@@ -1284,6 +1284,25 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Gravewyrm Sanctum"
     ],
     "welcome": "Captain Thessaly holds the wall at Highwatch — barely."
+  },
+  {
+    "id": "veiled_hollow",
+    "name": "The Veiled Hollow",
+    "min": 15,
+    "max": 20,
+    "biome": "dusk",
+    "hub": "Eldergleam",
+    "pois": [
+      "Eldergleam",
+      "Duskfall Cave",
+      "Duskfall Overlook",
+      "Elder Grove",
+      "Starfall Basin",
+      "The Sunken Court",
+      "Crystalline Shallows",
+      "The Gleaming Deep"
+    ],
+    "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam."
   }
 ];
 

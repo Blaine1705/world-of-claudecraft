@@ -147,6 +147,8 @@ export const guideStrings = {
       marshBlurb: 'Sunken fens and tide-worn ruins, home to murlocs and worse.',
       peaksName: 'Thornpeak Heights',
       peaksBlurb: "Wind-scoured ridges climbing toward the realm's coldest dangers.",
+      duskName: 'The Veiled Hollow',
+      duskBlurb: 'A realm sealed beneath the mountains, if the whispers of a way in are true.',
     },
 
     // Group content teaser.
@@ -617,6 +619,8 @@ export const guideStrings = {
     peaksGreeting:
       'Two hundred years this wall has held. It will not break on my watch, but it groans.',
     peaksGreeter: 'Captain Thessaly, Highwatch',
+    duskGreeting: 'Few of your kind have stood beneath these boughs. Walk gently, and be welcome.',
+    duskGreeter: 'Keeper Saelwyn, Eldergleam',
 
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
@@ -626,6 +630,8 @@ export const guideStrings = {
       "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
       "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+    duskPlaceNotes:
+      'Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.',
 
     // Brightwood Glade vignette, distilled spoiler-safe.
     gladeTitle: 'A quiet corner: Brightwood Glade',
