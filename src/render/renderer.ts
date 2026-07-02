@@ -57,6 +57,7 @@ import {
   type FoliagePerfStats,
   type FoliageView,
 } from './foliage';
+import { activeFormTint } from './form_tint';
 import {
   GFX,
   type GfxBucketBands,
@@ -4189,8 +4190,15 @@ export class Renderer {
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
+      const formTint = activeFormTint(e.auras);
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
+      active.setFormTint(formTint);
+      if (active !== v.visual) v.visual.setFormTint(null);
+      if (v.sheepVisual && v.sheepVisual !== active) v.sheepVisual.setFormTint(null);
+      if (v.bearVisual && v.bearVisual !== active) v.bearVisual.setFormTint(null);
+      if (v.catVisual && v.catVisual !== active) v.catVisual.setFormTint(null);
+      if (v.travelVisual && v.travelVisual !== active) v.travelVisual.setFormTint(null);
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
