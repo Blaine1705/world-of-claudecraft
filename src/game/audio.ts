@@ -34,7 +34,13 @@ export class GameAudio {
     }
   }
 
-  private noise(duration: number, filterFreq: number, gain: number, decay = 0.9, filterType: BiquadFilterType = 'lowpass'): void {
+  private noise(
+    duration: number,
+    filterFreq: number,
+    gain: number,
+    decay = 0.9,
+    filterType: BiquadFilterType = 'lowpass',
+  ): void {
     if (!this.ctx || !this.master || !this.noiseBuf) return;
     const t = this.ctx.currentTime;
     const src = this.ctx.createBufferSource();
@@ -50,7 +56,14 @@ export class GameAudio {
     src.start(t, Math.random() * 0.5, duration);
   }
 
-  private tone(freq: number, duration: number, gain: number, type: OscillatorType = 'sine', delay = 0, slideTo?: number): void {
+  private tone(
+    freq: number,
+    duration: number,
+    gain: number,
+    type: OscillatorType = 'sine',
+    delay = 0,
+    slideTo?: number,
+  ): void {
     if (!this.ctx || !this.master) return;
     const t = this.ctx.currentTime + delay;
     const osc = this.ctx.createOscillator();
@@ -114,6 +127,14 @@ export class GameAudio {
 
   questDone(): void {
     [523, 659, 784].forEach((f, i) => this.tone(f, 0.35, 0.16, 'triangle', i * 0.12));
+  }
+
+  // Abandoning a quest: the inverse of questAccept, a falling two-tone
+  // ("closing the book") so giving one up reads clearly against the rising
+  // accept and the questDone fanfare.
+  questAbandon(): void {
+    this.tone(440, 0.2, 0.13, 'triangle');
+    this.tone(311, 0.32, 0.13, 'triangle', 0.12);
   }
 
   coin(): void {
@@ -200,7 +221,10 @@ export class GameAudio {
     const base = [523, 587, 659, 784][Math.min(3, tier)];
     this.tone(base, 0.16, 0.2, 'square');
     this.tone(base * 1.5, 0.22, 0.16, 'triangle', 0.05);
-    if (tier >= 2) { this.tone(base * 2, 0.3, 0.14, 'triangle', 0.1); this.noise(0.35, 5200, 0.1, 0.7, 'highpass'); }
+    if (tier >= 2) {
+      this.tone(base * 2, 0.3, 0.14, 'triangle', 0.1);
+      this.noise(0.35, 5200, 0.1, 0.7, 'highpass');
+    }
   }
 
   // Your team scored a point — quick, satisfying blip (higher when it's yours).
