@@ -4960,6 +4960,150 @@ export const zh_TW: EnTranslations = {
         "name": "狂暴之怒",
         "description": "進入狂暴之怒，產生 20 點怒氣。（戰士天賦）"
       },
+      "holy_shock": {
+        "name": "神聖震擊",
+        "description": "以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）"
+      },
+      "holy_shield": {
+        "name": "神聖之盾",
+        "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
+      },
+      "repentance": {
+        "name": "懺悔",
+        "description": "使敵人進入冥想狀態，最多持續6秒。受到任何傷害都會打破效果。（懲戒專精招牌）"
+      },
+      "bestial_wrath": {
+        "name": "狂野怒火",
+        "description": "使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）"
+      },
+      "trueshot_aura": {
+        "name": "強擊光環",
+        "description": "鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）"
+      },
+      "wyvern_sting": {
+        "name": "翼龍釘刺",
+        "description": "從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）"
+      },
+      "arcane_power": {
+        "name": "祕法強化",
+        "description": "讓你充滿祕法能量，法術強度提高28點，持續12秒。（祕法專精招牌）"
+      },
+      "combustion": {
+        "name": "燃燒",
+        "description": "集中你的火焰魔法，使下一次攻擊造成致命一擊。（火焰專精招牌）"
+      },
+      "cone_of_cold": {
+        "name": "冰錐術",
+        "description": "以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）"
+      },
+      "cold_blood": {
+        "name": "冷血",
+        "description": "集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）"
+      },
+      "blade_flurry": {
+        "name": "劍刃亂舞",
+        "description": "釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）"
+      },
+      "hemorrhage": {
+        "name": "出血",
+        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）"
+      },
+      "power_infusion": {
+        "name": "能量灌注",
+        "description": "向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）"
+      },
+      "holy_nova": {
+        "name": "神聖新星",
+        "description": "引發神聖之光爆炸，為附近盟友恢復{damage}點生命值並傷害附近敵人。（神聖專精招牌）"
+      },
+      "shadowform": {
+        "name": "暗影形態",
+        "description": "進入暗影形態，強化暗影魔法直到你切換回來。再次施放可返回普通形態。（暗影專精招牌）"
+      },
+      "elemental_mastery": {
+        "name": "元素精通",
+        "description": "呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）"
+      },
+      "shamanistic_rage": {
+        "name": "薩滿之怒",
+        "description": "釋放薩滿之怒，恢復160點法力值。（增強專精招牌）"
+      },
+      "natures_swiftness": {
+        "name": "自然迅捷",
+        "description": "呼喚自然之力，使你的下一個法術變為瞬發。（恢復專精招牌）"
+      },
+      "siphon_life": {
+        "name": "生命虹吸",
+        "description": "虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）"
+      },
+      "fel_domination": {
+        "name": "惡魔支配",
+        "description": "支配魔能，使你的下一個法術變為瞬發。（惡魔學識專精招牌）"
+      },
+      "conflagrate": {
+        "name": "燃盡",
+        "description": "吞噬敵人身上的獻祭，將其點燃並造成{damage}點火焰傷害。（毀滅專精招牌）"
+      },
+      "moonkin_form": {
+        "name": "梟獸形態",
+        "description": "進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）"
+      },
+      "feral_charge": {
+        "name": "野性衝鋒",
+        "description": "衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）"
+      },
+      "swiftmend": {
+        "name": "迅癒",
+        "description": "吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）"
+      },
+      "storm_bolt": {
+        "name": "風暴之錘",
+        "description": "將武器擲向目標，造成 {damage}，並使其昏迷 3 秒。"
+      },
+      "piercing_howl": {
+        "name": "刺耳怒吼",
+        "description": "發出刺耳的吼聲，使 15 碼內所有敵人減速 50%，持續 8 秒。"
+      },
+      "die_by_sword": {
+        "name": "劍在人在",
+        "description": "防禦技能：受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時降低 20%。"
+      },
+      "recklessness": {
+        "name": "魯莽",
+        "description": "激怒：怒氣獲取提高 50%，爆擊機率提高 20%，持續 12 秒。"
+      },
+      "avatar": {
+        "name": "天神下凡",
+        "description": "變身為巨像，持續 20 秒，解除自身所有控制效果，造成的傷害提高 20%。"
+      },
+      "sanguine_aura": {
+        "name": "血色光環",
+        "description": "以敵人之血浸染你的武器：你和近戰盟友獲得 10% 攻擊速度和 10% 傷害加成，持續 20 秒。"
+      },
+      "victory_rush": {
+        "name": "乘勝追擊",
+        "description": "發動打擊，造成武器傷害加 {damage}，並為你恢復最大生命值的 20%。只能在擊殺敵人後 20 秒內使用。"
+      },
+      "bladestorm": {
+        "name": "劍刃風暴",
+        "description": "化身鋼鐵旋風，每秒對 8 碼內所有敵人造成 {damage}，持續 4 秒。"
+      },
+      "intimidating_shout": {
+        "name": "破膽怒吼",
+        "description": "發出駭人的怒吼，使 8 碼內最多 5 名敵人驚懼逃竄 8 秒。受到傷害可能打破該效果。"
+      },
+      "pummel": {
+        "name": "拳擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。成功打斷施法時產生 10 點怒氣。"
+      },
+      "heroic_leap": {
+        "name": "英勇飛躍",
+        "description": "躍向目標區域，對附近敵人造成 {damage} 點傷害。"
+      },
+      "rallying_cry": {
+        "name": "集結吶喊",
+        "description": "發出集結吶喊，使你和 40 碼內的隊伍成員獲得 20% 的額外最大生命值，持續 10 秒。"
+      },
       "summon_imp": {
         "name": "召喚小鬼",
         "description": "召喚一隻聽從術士命令的小鬼。小鬼會從遠處向你的敵人投擲火焰箭。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。"

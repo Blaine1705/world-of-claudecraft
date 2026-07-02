@@ -1749,6 +1749,42 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Подрезать сухожилия',
   'entities.abilities.hamstring.description':
     'Калечит врага, нанося 5 ед. урона и снижая его скорость передвижения на 50% на 15 сек.',
+  'entities.abilities.storm_bolt.name': 'Удар бури',
+  'entities.abilities.storm_bolt.description':
+    'Метает оружие в цель, нанося {damage} и оглушая ее на 3 сек.',
+  'entities.abilities.piercing_howl.name': 'Пронзительный вой',
+  'entities.abilities.piercing_howl.description':
+    'Пронзительный крик, замедляющий всех противников в радиусе 15 м на 50% на 8 сек.',
+  'entities.abilities.die_by_sword.name': 'Смерть от меча',
+  'entities.abilities.die_by_sword.description':
+    'Защитная способность: получаемый урон снижен на 10% на 8 сек, при здоровье ниже 30% - на 20%.',
+  'entities.abilities.recklessness.name': 'Безрассудство',
+  'entities.abilities.recklessness.description':
+    'Исступление: накопление ярости увеличено на 50%, а вероятность критического удара на 20% на 12 сек.',
+  'entities.abilities.avatar.name': 'Аватара',
+  'entities.abilities.avatar.description':
+    'Превращает вас в колосса на 20 сек, снимая все эффекты контроля и увеличивая наносимый урон на 20%.',
+  'entities.abilities.sanguine_aura.name': 'Кровавая аура',
+  'entities.abilities.sanguine_aura.description':
+    'Пропитывает оружие кровью врагов: вы и ваши союзники ближнего боя получаете 10% к скорости атаки и 10% к урону на 20 сек.',
+  'entities.abilities.victory_rush.name': 'Победный рывок',
+  'entities.abilities.victory_rush.description':
+    'Удар, наносящий урон оружием плюс {damage} и восполняющий 20% вашего максимального здоровья. Можно использовать только в течение 20 сек после убийства врага.',
+  'entities.abilities.bladestorm.name': 'Вихрь клинков',
+  'entities.abilities.bladestorm.description':
+    'Вы превращаетесь в стальной вихрь, каждую секунду нанося {damage} всем врагам в радиусе 8 м в течение 4 сек.',
+  'entities.abilities.intimidating_shout.name': 'Устрашающий крик',
+  'entities.abilities.intimidating_shout.description':
+    'Ужасающий крик, обращающий в паническое бегство до 5 врагов в радиусе 8 м на 8 сек. Урон может прервать эффект.',
+  'entities.abilities.pummel.name': 'Зуботычина',
+  'entities.abilities.pummel.description':
+    'Прерывает произнесение заклинания и блокирует эту школу магии на 4 сек. Дает 10 ед. ярости, если заклинание было прервано.',
+  'entities.abilities.heroic_leap.name': 'Героический прыжок',
+  'entities.abilities.heroic_leap.description':
+    'Прыжок в указанную область, наносящий {damage} урона ближайшим врагам.',
+  'entities.abilities.rallying_cry.name': 'Воодушевляющий крик',
+  'entities.abilities.rallying_cry.description':
+    'Воодушевляющий крик дает вам и членам группы в радиусе 40 м 20% дополнительного максимального здоровья на 10 сек.',
   'entities.abilities.bloodrage.name': 'Кровавая ярость',
   'entities.abilities.bloodrage.description': 'Дает {rage} ед. ярости ценой здоровья.',
   'entities.abilities.overpower.name': 'Превосходство',
@@ -5764,4 +5800,76 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.moongateCommunion.title': 'Единение у лунных врат',
   'hudChrome.calendar.events.moongateCommunion.note':
     'Паломники собираются у лунных врат храма под срединной луной.',
+  'entities.abilities.holy_shock.name': 'Шок небес',
+  'entities.abilities.holy_shock.description':
+    'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
+  'entities.abilities.holy_shield.name': 'Священный щит',
+  'entities.abilities.holy_shield.description':
+    'Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)',
+  'entities.abilities.repentance.name': 'Покаяние',
+  'entities.abilities.repentance.description':
+    'Погружает врага в созерцание на срок до 6 сек. Любой урон прерывает эффект. (знаковое умение Воздаяния)',
+  'entities.abilities.bestial_wrath.name': 'Звериный гнев',
+  'entities.abilities.bestial_wrath.description':
+    'Повергает вас в звериную ярость, повышая силу атаки на 55 на 15 сек. (знаковое умение Повелителя зверей)',
+  'entities.abilities.trueshot_aura.name': 'Аура меткого выстрела',
+  'entities.abilities.trueshot_aura.description':
+    'Воодушевляет ближайших союзников, повышая силу атаки на 35 на 5 мин. (знаковое умение Стрельбы)',
+  'entities.abilities.wyvern_sting.name': 'Укус виверны',
+  'entities.abilities.wyvern_sting.description':
+    'Поражает врага издалека и выводит его из строя на срок до 4 сек. Любой урон прерывает эффект. (знаковое умение Выживания)',
+  'entities.abilities.arcane_power.name': 'Мощь тайной магии',
+  'entities.abilities.arcane_power.description':
+    'Наполняет вас тайной магией, повышая силу заклинаний на 28 на 12 сек. (знаковое умение Тайной магии)',
+  'entities.abilities.combustion.name': 'Возгорание',
+  'entities.abilities.combustion.description':
+    'Сосредоточивает магию огня, чтобы следующая атака стала критической. (знаковое умение Огня)',
+  'entities.abilities.cone_of_cold.name': 'Конус холода',
+  'entities.abilities.cone_of_cold.description':
+    'Поражает ближайших врагов холодом, нанося {damage} ед. урона от магии льда. (знаковое умение Льда)',
+  'entities.abilities.cold_blood.name': 'Хладнокровие',
+  'entities.abilities.cold_blood.description':
+    'Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)',
+  'entities.abilities.blade_flurry.name': 'Шквал клинков',
+  'entities.abilities.blade_flurry.description':
+    'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
+  'entities.abilities.hemorrhage.name': 'Кровоизлияние',
+  'entities.abilities.hemorrhage.description':
+    'Бьет врага, нанося урон оружием плюс {damage}, и вызывает кровотечение на 12 сек. Дает 1 прием. (знаковое умение Скрытности)',
+  'entities.abilities.power_infusion.name': 'Придание сил',
+  'entities.abilities.power_infusion.description':
+    'Наполняет дружественную цель силой, повышая ее силу заклинаний на 28 на 15 сек. (знаковое умение Послушания)',
+  'entities.abilities.holy_nova.name': 'Кольцо света',
+  'entities.abilities.holy_nova.description':
+    'Вызывает взрыв Света, исцеляя ближайших союзников на {damage} и раня ближайших врагов. (знаковое умение Света)',
+  'entities.abilities.shadowform.name': 'Облик Тьмы',
+  'entities.abilities.shadowform.description':
+    'Вы принимаете Облик Тьмы, усиливая темную магию до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Тьмы)',
+  'entities.abilities.elemental_mastery.name': 'Покорение стихий',
+  'entities.abilities.elemental_mastery.description':
+    'Призывает покорение стихий, делая следующее заклинание мгновенным. (знаковое умение Стихий)',
+  'entities.abilities.shamanistic_rage.name': 'Шаманская ярость',
+  'entities.abilities.shamanistic_rage.description':
+    'Высвобождает шаманскую ярость и восстанавливает 160 маны. (знаковое умение Совершенствования)',
+  'entities.abilities.natures_swiftness.name': 'Природная стремительность',
+  'entities.abilities.natures_swiftness.description':
+    'Призывает природу, чтобы следующее заклинание стало мгновенным. (знаковое умение Исцеления)',
+  'entities.abilities.siphon_life.name': 'Вытягивание жизни',
+  'entities.abilities.siphon_life.description':
+    'Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)',
+  'entities.abilities.fel_domination.name': 'Господство Скверны',
+  'entities.abilities.fel_domination.description':
+    'Подчиняет энергии Скверны, делая следующее заклинание мгновенным. (знаковое умение Демонологии)',
+  'entities.abilities.conflagrate.name': 'Поджигание',
+  'entities.abilities.conflagrate.description':
+    'Поглощает ваше Жертвенное пламя на враге, поджигая его и нанося {damage} ед. урона от огня. (знаковое умение Разрушения)',
+  'entities.abilities.moonkin_form.name': 'Облик лунного совуха',
+  'entities.abilities.moonkin_form.description':
+    'Вы принимаете Облик лунного совуха, усиливая заклинания до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Баланса)',
+  'entities.abilities.feral_charge.name': 'Звериная атака',
+  'entities.abilities.feral_charge.description':
+    'Вы бросаетесь к врагу и обездвиживаете его на 1 сек. Дистанция 8-25 м. (знаковое умение Силы зверя)',
+  'entities.abilities.swiftmend.name': 'Быстрое восстановление',
+  'entities.abilities.swiftmend.description':
+    'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
 };

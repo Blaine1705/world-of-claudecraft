@@ -4960,6 +4960,150 @@ export const tr_TR: EnTranslations = {
         "name": "Cinnet Öfkesi",
         "description": "Bir cinnet öfkesine girerek 20 öfke üretir. (Savaşçı yeteneği)"
       },
+      "holy_shock": {
+        "name": "Kutsal Şok",
+        "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"
+      },
+      "holy_shield": {
+        "name": "Kutsal Kalkan",
+        "description": "Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)"
+      },
+      "repentance": {
+        "name": "Tövbe",
+        "description": "Düşmanı en fazla 6 sn boyunca meditasyon durumuna sokar. Herhangi bir hasar etkiyi bozar. (İntikam imzası)"
+      },
+      "bestial_wrath": {
+        "name": "Vahşi Gazap",
+        "description": "Seni vahşi bir öfkeye sokar, saldırı gücünü 15 sn boyunca 55 artırır. (Canavar Ustalığı imzası)"
+      },
+      "trueshot_aura": {
+        "name": "Keskin Nişan Aurası",
+        "description": "Yakındaki müttefiklere ilham verir, saldırı gücünü 5 dk boyunca 35 artırır. (Nişancılık imzası)"
+      },
+      "wyvern_sting": {
+        "name": "Viverna Sokması",
+        "description": "Düşmanı uzaktan sokar ve en fazla 4 sn boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. (Hayatta Kalma imzası)"
+      },
+      "arcane_power": {
+        "name": "Gizemli Güç",
+        "description": "Seni gizemli güçle doldurur, büyü gücünü 12 sn boyunca 28 artırır. (Gizem imzası)"
+      },
+      "combustion": {
+        "name": "Yakma",
+        "description": "Ateş büyünü odaklar, böylece sonraki saldırın kritik vuruş olur. (Ateş imzası)"
+      },
+      "cone_of_cold": {
+        "name": "Soğuk Konisi",
+        "description": "Yakındaki düşmanları buzla patlatır ve {damage} Buz hasarı verir. (Buz imzası)"
+      },
+      "cold_blood": {
+        "name": "Soğukkanlılık",
+        "description": "Öldürme niyetini odaklar, böylece sonraki saldırın kritik vuruş olur. (Suikast imzası)"
+      },
+      "blade_flurry": {
+        "name": "Bıçak Yağmuru",
+        "description": "Bir bıçak yağmuru salar, saldırı hızını 12 sn boyunca 20% artırır. (Çarpışma imzası)"
+      },
+      "hemorrhage": {
+        "name": "Kanama",
+        "description": "Düşmana silah hasarı artı {damage} vurur ve 12 sn boyunca kanama hasarı verir. 1 kombo puanı kazandırır. (İncelik imzası)"
+      },
+      "power_infusion": {
+        "name": "Güç Aşılaması",
+        "description": "Dost bir hedefe güç aşılar, büyü gücünü 15 sn boyunca 28 artırır. (Disiplin imzası)"
+      },
+      "holy_nova": {
+        "name": "Kutsal Nova",
+        "description": "Kutsal ışık patlaması yaratır, yakındaki müttefikleri {damage} kadar iyileştirir ve yakındaki düşmanlara hasar verir. (Kutsal imza)"
+      },
+      "shadowform": {
+        "name": "Gölge Formu",
+        "description": "Gölge formuna girer, geri dönene kadar gölge büyüsünü güçlendirirsin. Normal forma dönmek için tekrar kullan. (Gölge imzası)"
+      },
+      "elemental_mastery": {
+        "name": "Element Ustalığı",
+        "description": "Element ustalığını çağırır, sonraki büyünü anında yapar. (Element imzası)"
+      },
+      "shamanistic_rage": {
+        "name": "Şamanistik Öfke",
+        "description": "Şamanistik öfkeyi serbest bırakır, 160 mana yeniler. (Güçlendirme imzası)"
+      },
+      "natures_swiftness": {
+        "name": "Doğanın Çabukluğu",
+        "description": "Doğayı çağırarak sonraki büyünü anında yapar. (Restorasyon imzası)"
+      },
+      "siphon_life": {
+        "name": "Can Sömürüsü",
+        "description": "Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)"
+      },
+      "fel_domination": {
+        "name": "İblis Enerjisi Hakimiyeti",
+        "description": "İblis enerjilerine hükmeder, sonraki büyünü anında yapar. (Demonoloji imzası)"
+      },
+      "conflagrate": {
+        "name": "Tutuşturma",
+        "description": "Düşmandaki Yakma etkini tüketerek onu {damage} Ateş hasarıyla tutuşturur. (Yıkım imzası)"
+      },
+      "moonkin_form": {
+        "name": "Aykuşu Formu",
+        "description": "Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)"
+      },
+      "feral_charge": {
+        "name": "Yabani Hücum",
+        "description": "Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)"
+      },
+      "swiftmend": {
+        "name": "Hızlı İyileştirme",
+        "description": "Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)"
+      },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
+      "pummel": {
+        "name": "Pummel",
+        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+      },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies."
+      },
+      "rallying_cry": {
+        "name": "Rallying Cry",
+        "description": "Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec."
+      },
       "summon_imp": {
         "name": "İblisçik Çağırma",
         "description": "Karabüyücünün komutası altında bir İblisçik çağırır. İblisçik, düşmanlarına uzaktan Alev Okları fırlatır. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir."

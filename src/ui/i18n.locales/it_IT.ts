@@ -1675,6 +1675,42 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Taglio ai Tendini',
   'entities.abilities.hamstring.description':
     'Menoma il nemico per 5 danni, riducendo la sua velocità di movimento del 50% per 15 s.',
+  'entities.abilities.storm_bolt.name': 'Dardo della Tempesta',
+  'entities.abilities.storm_bolt.description':
+    'Scaglia la tua arma sul bersaglio, infliggendo {damage} e stordendolo per 3 sec.',
+  'entities.abilities.piercing_howl.name': 'Urlo Penetrante',
+  'entities.abilities.piercing_howl.description':
+    'Un urlo lacerante che rallenta del 50% tutti i nemici entro 15 metri per 8 sec.',
+  'entities.abilities.die_by_sword.name': 'Morire di Spada',
+  'entities.abilities.die_by_sword.description':
+    'Recupero difensivo: subisci il 10% di danni in meno per 8 sec, il 20% sotto il 30% di salute.',
+  'entities.abilities.recklessness.name': 'Temerarietà',
+  'entities.abilities.recklessness.description':
+    'Ira: la generazione di rabbia aumenta del 50% e la probabilità di colpo critico del 20% per 12 sec.',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Ti trasformi in un colosso per 20 sec, spezzando ogni controllo su di te e aumentando i danni inflitti del 20%.',
+  'entities.abilities.sanguine_aura.name': 'Aura Sanguigna',
+  'entities.abilities.sanguine_aura.description':
+    "Intridi la tua arma del sangue dei nemici: tu e i tuoi alleati in mischia guadagnate il 10% di velocità d'attacco e il 10% di danni per 20 sec.",
+  'entities.abilities.victory_rush.name': 'Slancio della Vittoria',
+  'entities.abilities.victory_rush.description':
+    "Colpisce infliggendo danni dell'arma più {damage} e ti cura del 20% della salute massima. Utilizzabile solo entro 20 sec dall'uccisione di un nemico.",
+  'entities.abilities.bladestorm.name': 'Tempesta di Lame',
+  'entities.abilities.bladestorm.description':
+    "Diventi un turbine d'acciaio che colpisce tutti i nemici entro 8 metri, infliggendo {damage} ogni secondo per 4 sec.",
+  'entities.abilities.intimidating_shout.name': 'Urlo Intimidatorio',
+  'entities.abilities.intimidating_shout.description':
+    "Un urlo terrificante che fa fuggire fino a 5 nemici entro 8 metri per 8 sec. I danni possono spezzare l'effetto.",
+  'entities.abilities.pummel.name': 'Tempestare',
+  'entities.abilities.pummel.description':
+    "Interrompe l'incantesimo e impedisce di lanciare incantesimi di quella scuola per 4 sec. Genera 10 rabbia quando taglia un lancio.",
+  'entities.abilities.heroic_leap.name': 'Balzo Eroico',
+  'entities.abilities.heroic_leap.description':
+    "Balza sull'area bersaglio, infliggendo {damage} danni ai nemici vicini.",
+  'entities.abilities.rallying_cry.name': 'Grido di Guerra',
+  'entities.abilities.rallying_cry.description':
+    'Lanci un grido di guerra che concede a te e ai membri del gruppo entro 40 metri il 20% di salute massima aggiuntiva per 20 sec.',
   'entities.abilities.bloodrage.name': 'Rabbia Sanguinaria',
   'entities.abilities.bloodrage.description': 'Genera {rage} rabbia al costo di salute.',
   'entities.abilities.overpower.name': 'Sopraffazione',
@@ -5226,4 +5262,76 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Ciò che hai compiuto nel buio',
   'entities.letters.letter_q_hollow.body':
     'Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric',
+  'entities.abilities.holy_shock.name': 'Shock Sacro',
+  'entities.abilities.holy_shock.description':
+    "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)",
+  'entities.abilities.holy_shield.name': 'Scudo Sacro',
+  'entities.abilities.holy_shield.description':
+    "Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)",
+  'entities.abilities.repentance.name': 'Pentimento',
+  'entities.abilities.repentance.description':
+    "Mette il nemico in stato di meditazione per un massimo di 6 s. Qualsiasi danno interrompe l’effetto. (firma Castigo)",
+  'entities.abilities.bestial_wrath.name': 'Ira Bestiale',
+  'entities.abilities.bestial_wrath.description':
+    "Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)",
+  'entities.abilities.trueshot_aura.name': 'Aura di Precisione',
+  'entities.abilities.trueshot_aura.description':
+    "Ispira gli alleati vicini, aumentando la potenza d’attacco di 35 per 5 min. (firma Precisione)",
+  'entities.abilities.wyvern_sting.name': 'Morso della Viverna',
+  'entities.abilities.wyvern_sting.description':
+    "Punzecchia il nemico a distanza, incapacitandolo per un massimo di 4 s. Qualsiasi danno interrompe l’effetto. (firma Sopravvivenza)",
+  'entities.abilities.arcane_power.name': 'Potere Arcano',
+  'entities.abilities.arcane_power.description':
+    "Ti riempie di potere Arcano, aumentando la potenza magica di 28 per 12 s. (firma Arcano)",
+  'entities.abilities.combustion.name': 'Combustione',
+  'entities.abilities.combustion.description':
+    "Concentra la tua magia del fuoco, così il tuo prossimo attacco è un colpo critico. (firma Fuoco)",
+  'entities.abilities.cone_of_cold.name': 'Cono di Freddo',
+  'entities.abilities.cone_of_cold.description':
+    "Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)",
+  'entities.abilities.cold_blood.name': 'Sangue Freddo',
+  'entities.abilities.cold_blood.description':
+    "Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)",
+  'entities.abilities.blade_flurry.name': 'Vortice di Lame',
+  'entities.abilities.blade_flurry.description':
+    "Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)",
+  'entities.abilities.hemorrhage.name': 'Emorragia',
+  'entities.abilities.hemorrhage.description':
+    "Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)",
+  'entities.abilities.power_infusion.name': 'Infusione di Potere',
+  'entities.abilities.power_infusion.description':
+    "Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)",
+  'entities.abilities.holy_nova.name': 'Nova Sacra',
+  'entities.abilities.holy_nova.description':
+    "Provoca un’esplosione di luce Sacra, curando gli alleati vicini di {damage} e danneggiando i nemici vicini. (firma Sacro)",
+  'entities.abilities.shadowform.name': "Forma d'Ombra",
+  'entities.abilities.shadowform.description':
+    "Assume Forma d’Ombra, potenziando la magia d’ombra finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Ombra)",
+  'entities.abilities.elemental_mastery.name': 'Maestria Elementale',
+  'entities.abilities.elemental_mastery.description':
+    "Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)",
+  'entities.abilities.shamanistic_rage.name': 'Rabbia Sciamanica',
+  'entities.abilities.shamanistic_rage.description':
+    "Libera rabbia sciamanica, ripristinando 160 mana. (firma Potenziamento)",
+  'entities.abilities.natures_swiftness.name': 'Rapidità della Natura',
+  'entities.abilities.natures_swiftness.description':
+    "Invoca la natura per rendere istantaneo il tuo prossimo incantesimo. (firma Guarigione)",
+  'entities.abilities.siphon_life.name': 'Risucchio Vitale',
+  'entities.abilities.siphon_life.description':
+    "Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)",
+  'entities.abilities.fel_domination.name': 'Dominazione Demoniaca',
+  'entities.abilities.fel_domination.description':
+    "Domina energie demoniache, rendendo istantaneo il tuo prossimo incantesimo. (firma Demonologia)",
+  'entities.abilities.conflagrate.name': 'Conflagrazione',
+  'entities.abilities.conflagrate.description':
+    "Consuma il tuo Immolazione sul nemico per incendiarlo, infliggendo {damage} danni da Fuoco. (firma Distruzione)",
+  'entities.abilities.moonkin_form.name': 'Forma di Lunagufo',
+  'entities.abilities.moonkin_form.description':
+    "Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)",
+  'entities.abilities.feral_charge.name': 'Carica Ferina',
+  'entities.abilities.feral_charge.description':
+    "Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)",
+  'entities.abilities.swiftmend.name': 'Rapidità di Guarigione',
+  'entities.abilities.swiftmend.description':
+    "Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)",
 };

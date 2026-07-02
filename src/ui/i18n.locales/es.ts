@@ -1696,6 +1696,42 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Seccionar',
   'entities.abilities.hamstring.description':
     'Mutila al enemigo por 5 de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
+  'entities.abilities.storm_bolt.name': 'Rayo de tormenta',
+  'entities.abilities.storm_bolt.description':
+    'Lanza tu arma al objetivo, inflige {damage} y lo aturde durante 3 s.',
+  'entities.abilities.piercing_howl.name': 'Aullido penetrante',
+  'entities.abilities.piercing_howl.description':
+    'Un grito desgarrador que ralentiza un 50% a todos los enemigos en un radio de 15 yardas durante 8 s.',
+  'entities.abilities.die_by_sword.name': 'Morir matando',
+  'entities.abilities.die_by_sword.description':
+    'Recurso defensivo: recibes un 10% menos de daño durante 8 s, y un 20% menos por debajo del 30% de salud.',
+  'entities.abilities.recklessness.name': 'Temeridad',
+  'entities.abilities.recklessness.description':
+    'Enfurecer: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s.',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Te transformas en un coloso durante 20 s, rompes cualquier control sobre ti y tu daño infligido aumenta un 20%.',
+  'entities.abilities.sanguine_aura.name': 'Aura sangrienta',
+  'entities.abilities.sanguine_aura.description':
+    'Imbuye tu arma con la sangre de tus enemigos: tú y tus aliados cuerpo a cuerpo ganáis un 10% de velocidad de ataque y un 10% de daño durante 20 s.',
+  'entities.abilities.victory_rush.name': 'Ímpetu victorioso',
+  'entities.abilities.victory_rush.description':
+    'Golpea e inflige daño de arma más {damage}, y te cura un 20% de tu salud máxima. Solo se puede usar en los 20 s posteriores a matar a un enemigo.',
+  'entities.abilities.bladestorm.name': 'Tormenta de espadas',
+  'entities.abilities.bladestorm.description':
+    'Te conviertes en un torbellino de acero que golpea a todos los enemigos en un radio de 8 yardas e inflige {damage} cada segundo durante 4 s.',
+  'entities.abilities.intimidating_shout.name': 'Grito intimidante',
+  'entities.abilities.intimidating_shout.description':
+    'Un grito aterrador que hace huir despavoridos hasta a 5 enemigos en un radio de 8 yardas durante 8 s. El daño puede romper el efecto.',
+  'entities.abilities.pummel.name': 'Contundir',
+  'entities.abilities.pummel.description':
+    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. Genera 10 de ira cuando corta un lanzamiento.',
+  'entities.abilities.heroic_leap.name': 'Salto heroico',
+  'entities.abilities.heroic_leap.description':
+    'Saltas a la zona objetivo e infliges {damage} de daño a los enemigos cercanos.',
+  'entities.abilities.rallying_cry.name': 'Grito de guerra',
+  'entities.abilities.rallying_cry.description':
+    'Profieres un grito de guerra que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s.',
   'entities.abilities.bloodrage.name': 'Ira sangrienta',
   'entities.abilities.bloodrage.description': 'Genera {rage} de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Abrumar',
@@ -5274,4 +5310,76 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Lo que hiciste en la oscuridad',
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
+  'entities.abilities.holy_shock.name': 'Choque Sagrado',
+  'entities.abilities.holy_shock.description':
+    "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)",
+  'entities.abilities.holy_shield.name': 'Escudo Sagrado',
+  'entities.abilities.holy_shield.description':
+    "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)",
+  'entities.abilities.repentance.name': 'Arrepentimiento',
+  'entities.abilities.repentance.description':
+    "Pone al enemigo en estado de meditación hasta 6 s. Cualquier daño rompe el efecto. (habilidad distintiva de Reprensión)",
+  'entities.abilities.bestial_wrath.name': 'Cólera de las bestias',
+  'entities.abilities.bestial_wrath.description':
+    "Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)",
+  'entities.abilities.trueshot_aura.name': 'Aura de disparo certero',
+  'entities.abilities.trueshot_aura.description':
+    "Inspira a los aliados cercanos, aumentando el poder de ataque en 35 durante 5 min. (habilidad distintiva de Puntería)",
+  'entities.abilities.wyvern_sting.name': 'Picadura de dracoleón',
+  'entities.abilities.wyvern_sting.description':
+    "Pica al enemigo a distancia y lo incapacita hasta 4 s. Cualquier daño rompe el efecto. (habilidad distintiva de Supervivencia)",
+  'entities.abilities.arcane_power.name': 'Poder Arcano',
+  'entities.abilities.arcane_power.description':
+    "Te llena de poder Arcano, aumentando el poder con hechizos en 28 durante 12 s. (habilidad distintiva de Arcano)",
+  'entities.abilities.combustion.name': 'Combustión',
+  'entities.abilities.combustion.description':
+    "Concentra tu magia de fuego para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Fuego)",
+  'entities.abilities.cone_of_cold.name': 'Cono de frío',
+  'entities.abilities.cone_of_cold.description':
+    "Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)",
+  'entities.abilities.cold_blood.name': 'Sangre fría',
+  'entities.abilities.cold_blood.description':
+    "Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)",
+  'entities.abilities.blade_flurry.name': 'Aluvión de acero',
+  'entities.abilities.blade_flurry.description':
+    "Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)",
+  'entities.abilities.hemorrhage.name': 'Hemorragia',
+  'entities.abilities.hemorrhage.description':
+    "Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)",
+  'entities.abilities.power_infusion.name': 'Infusión de poder',
+  'entities.abilities.power_infusion.description':
+    "Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)",
+  'entities.abilities.holy_nova.name': 'Nova Sagrada',
+  'entities.abilities.holy_nova.description':
+    "Provoca una explosión de luz Sagrada, sana a los aliados cercanos por {damage} y daña a los enemigos cercanos. (habilidad distintiva de Sagrado)",
+  'entities.abilities.shadowform.name': 'Forma de las Sombras',
+  'entities.abilities.shadowform.description':
+    "Adopta Forma de las Sombras, potenciando la magia de sombras hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Sombras)",
+  'entities.abilities.elemental_mastery.name': 'Maestría elemental',
+  'entities.abilities.elemental_mastery.description':
+    "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)",
+  'entities.abilities.shamanistic_rage.name': 'Ira del chamán',
+  'entities.abilities.shamanistic_rage.description':
+    "Libera ira chamánica y restaura 160 de maná. (habilidad distintiva de Mejora)",
+  'entities.abilities.natures_swiftness.name': 'Presteza de la Naturaleza',
+  'entities.abilities.natures_swiftness.description':
+    "Invoca a la naturaleza para hacer que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Restauración)",
+  'entities.abilities.siphon_life.name': 'Succionar vida',
+  'entities.abilities.siphon_life.description':
+    "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)",
+  'entities.abilities.fel_domination.name': 'Dominación vil',
+  'entities.abilities.fel_domination.description':
+    "Domina energías viles, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Demonología)",
+  'entities.abilities.conflagrate.name': 'Conflagrar',
+  'entities.abilities.conflagrate.description':
+    "Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)",
+  'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
+  'entities.abilities.moonkin_form.description':
+    "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)",
+  'entities.abilities.feral_charge.name': 'Carga feral',
+  'entities.abilities.feral_charge.description':
+    "Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)",
+  'entities.abilities.swiftmend.name': 'Alivio presto',
+  'entities.abilities.swiftmend.description':
+    "Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)",
 };

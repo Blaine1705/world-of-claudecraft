@@ -4960,6 +4960,150 @@ export const fr_CA: EnTranslations = {
         "name": "Rage berserker",
         "description": "Entre dans une rage berserker et génère 20 rage. (talent de guerrier)"
       },
+      "holy_shock": {
+        "name": "Horion sacré",
+        "description": "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)"
+      },
+      "holy_shield": {
+        "name": "Bouclier sacré",
+        "description": "Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)"
+      },
+      "repentance": {
+        "name": "Repentir",
+        "description": "Plonge l’ennemi dans un état de méditation pendant un maximum de 6 s. Tout dégât interrompt l’effet. (signature Vindicte)"
+      },
+      "bestial_wrath": {
+        "name": "Courroux bestial",
+        "description": "Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)"
+      },
+      "trueshot_aura": {
+        "name": "Aura de précision",
+        "description": "Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)"
+      },
+      "wyvern_sting": {
+        "name": "Piqûre de wyverne",
+        "description": "Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)"
+      },
+      "arcane_power": {
+        "name": "Pouvoir des Arcanes",
+        "description": "Vous emplit de puissance arcanique, augmentant la puissance des sorts de 28 pendant 12 s. (signature Arcane)"
+      },
+      "combustion": {
+        "name": "Combustion",
+        "description": "Concentre votre magie du feu afin que votre prochaine attaque soit un coup critique. (signature Feu)"
+      },
+      "cone_of_cold": {
+        "name": "Cône de froid",
+        "description": "Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)"
+      },
+      "cold_blood": {
+        "name": "Sang froid",
+        "description": "Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)"
+      },
+      "blade_flurry": {
+        "name": "Déluge de lames",
+        "description": "Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)"
+      },
+      "hemorrhage": {
+        "name": "Hémorragie",
+        "description": "Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)"
+      },
+      "power_infusion": {
+        "name": "Infusion de puissance",
+        "description": "Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)"
+      },
+      "holy_nova": {
+        "name": "Nova sacrée",
+        "description": "Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)"
+      },
+      "shadowform": {
+        "name": "Forme d'Ombre",
+        "description": "Adopte la Forme d’Ombre, renforçant la magie de l’ombre jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Ombre)"
+      },
+      "elemental_mastery": {
+        "name": "Maîtrise élémentaire",
+        "description": "Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)"
+      },
+      "shamanistic_rage": {
+        "name": "Rage chamanique",
+        "description": "Libère une rage chamanique et rend 160 points de mana. (signature Amélioration)"
+      },
+      "natures_swiftness": {
+        "name": "Rapidité de la nature",
+        "description": "Fait appel à la nature pour rendre votre prochain sort instantané. (signature Restauration)"
+      },
+      "siphon_life": {
+        "name": "Siphon de vie",
+        "description": "Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)"
+      },
+      "fel_domination": {
+        "name": "Domination corrompue",
+        "description": "Domine les énergies gangrenées, rendant votre prochain sort instantané. (signature Démonologie)"
+      },
+      "conflagrate": {
+        "name": "Conflagration",
+        "description": "Consume votre Immolation sur l’ennemi pour l’enflammer et lui infliger {damage} points de dégâts de Feu. (signature Destruction)"
+      },
+      "moonkin_form": {
+        "name": "Forme de sélénien",
+        "description": "Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)"
+      },
+      "feral_charge": {
+        "name": "Charge farouche",
+        "description": "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)"
+      },
+      "swiftmend": {
+        "name": "Prompte guérison",
+        "description": "Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)"
+      },
+      "storm_bolt": {
+        "name": "Projectile-tempête",
+        "description": "Lancez votre arme sur la cible, infligeant {damage} et l'étourdissant pendant 3 s."
+      },
+      "piercing_howl": {
+        "name": "Hurlement perçant",
+        "description": "Un cri perçant qui ralentit de 50% tous les ennemis dans un rayon de 15 mètres pendant 8 s."
+      },
+      "die_by_sword": {
+        "name": "Périr par l'épée",
+        "description": "Recours défensif : vous subissez 10% de dégâts en moins pendant 8 s, 20% en moins sous 30% de vie."
+      },
+      "recklessness": {
+        "name": "Témérité",
+        "description": "Enrage : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Vous vous transformez en colosse pendant 20 s, brisant tout contrôle et augmentant vos dégâts de 20%."
+      },
+      "sanguine_aura": {
+        "name": "Aura sanguine",
+        "description": "Imprégnez votre arme du sang de vos ennemis : vous et vos alliés de mêlée gagnez 10% de vitesse d'attaque et 10% de dégâts pendant 20 s."
+      },
+      "victory_rush": {
+        "name": "Ruée victorieuse",
+        "description": "Frappe infligeant les dégâts de l'arme plus {damage} et vous soignant de 20% de votre vie maximale. Utilisable seulement dans les 20 s suivant la mort d'un ennemi."
+      },
+      "bladestorm": {
+        "name": "Tempête de lames",
+        "description": "Devenez un tourbillon d'acier frappant tous les ennemis dans un rayon de 8 mètres, infligeant {damage} chaque seconde pendant 4 s."
+      },
+      "intimidating_shout": {
+        "name": "Cri intimidant",
+        "description": "Un cri terrifiant qui fait fuir jusqu'à 5 ennemis dans un rayon de 8 mètres pendant 8 s. Les dégâts peuvent briser l'effet."
+      },
+      "pummel": {
+        "name": "Volée de coups",
+        "description": "Interrompt l'incantation et empêche de lancer des sorts de cette école pendant 4 s. Génère 10 points de rage en coupant une incantation."
+      },
+      "heroic_leap": {
+        "name": "Bond héroïque",
+        "description": "Bondissez vers la zone ciblée, infligeant {damage} points de dégâts aux ennemis proches."
+      },
+      "rallying_cry": {
+        "name": "Cri de ralliement",
+        "description": "Pousse un cri de ralliement accordant à vous et aux membres du groupe dans un rayon de 40 mètres 20% de vie maximale supplémentaire pendant 10 s."
+      },
       "summon_imp": {
         "name": "Invoquer un diablotin",
         "description": "Invoque un Diablotin sous le commandement du démoniste. Le Diablotin lance des Éclairs de feu sur vos ennemis à distance. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."

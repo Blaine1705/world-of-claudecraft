@@ -4960,6 +4960,150 @@ export const sv_SE: EnTranslations = {
         "name": "Bärsärkaraseri",
         "description": "Gå in i ett bärsärkaraseri och generera 20 raseri. (Krigartalang)"
       },
+      "holy_shock": {
+        "name": "Helig chock",
+        "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"
+      },
+      "holy_shield": {
+        "name": "Helig sköld",
+        "description": "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)"
+      },
+      "repentance": {
+        "name": "Ånger",
+        "description": "Försätter fienden i meditation i upp till 6 sek. All skada bryter effekten. (Vedergällningssignatur)"
+      },
+      "bestial_wrath": {
+        "name": "Bestialisk vrede",
+        "description": "Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)"
+      },
+      "trueshot_aura": {
+        "name": "Träffsäkerhetsaura",
+        "description": "Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernsting",
+        "description": "Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)"
+      },
+      "arcane_power": {
+        "name": "Arkan kraft",
+        "description": "Fyller dig med arkan kraft och ökar besvärjelsekraft med 28 i 12 sek. (Arkan signatur)"
+      },
+      "combustion": {
+        "name": "Förbränning",
+        "description": "Fokuserar din eldmagi så att din nästa attack blir en kritisk träff. (Eldsignatur)"
+      },
+      "cone_of_cold": {
+        "name": "Köldkon",
+        "description": "Spränger närliggande fiender med frost för {damage} frostskada. (Frostsignatur)"
+      },
+      "cold_blood": {
+        "name": "Kallt blod",
+        "description": "Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)"
+      },
+      "blade_flurry": {
+        "name": "Klingflod",
+        "description": "Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)"
+      },
+      "hemorrhage": {
+        "name": "Blödning",
+        "description": "Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)"
+      },
+      "power_infusion": {
+        "name": "Kraftinfusion",
+        "description": "Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)"
+      },
+      "holy_nova": {
+        "name": "Helig nova",
+        "description": "Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)"
+      },
+      "shadowform": {
+        "name": "Skuggform",
+        "description": "Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementär mästerskap",
+        "description": "Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)"
+      },
+      "shamanistic_rage": {
+        "name": "Schamanistisk vrede",
+        "description": "Släpper lös schamanistisk vrede och återställer 160 mana. (Förstärkningssignatur)"
+      },
+      "natures_swiftness": {
+        "name": "Naturens snabbhet",
+        "description": "Åkallar naturen för att göra din nästa besvärjelse omedelbar. (Återställningssignatur)"
+      },
+      "siphon_life": {
+        "name": "Livssifon",
+        "description": "Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)"
+      },
+      "fel_domination": {
+        "name": "Demonisk dominans",
+        "description": "Behärskar demoniska energier och gör din nästa besvärjelse omedelbar. (Demonologisignatur)"
+      },
+      "conflagrate": {
+        "name": "Storbrand",
+        "description": "Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)"
+      },
+      "moonkin_form": {
+        "name": "Månugglaform",
+        "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
+      },
+      "feral_charge": {
+        "name": "Vild rusning",
+        "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
+      },
+      "swiftmend": {
+        "name": "Snabb läkning",
+        "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)"
+      },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
+      "pummel": {
+        "name": "Pummel",
+        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+      },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies."
+      },
+      "rallying_cry": {
+        "name": "Rallying Cry",
+        "description": "Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec."
+      },
       "summon_imp": {
         "name": "Frammana imp",
         "description": "Frammanar en imp under häxmästarens befäl. Impen slungar eldpilar mot dina fiender från avstånd. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."

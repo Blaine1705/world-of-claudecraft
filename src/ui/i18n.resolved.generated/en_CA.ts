@@ -4960,6 +4960,150 @@ export const en_CA: EnTranslations = {
         "name": "Seething Fury",
         "description": "Enter a seething fury, generating 20 rage. (Warrior talent)"
       },
+      "holy_shock": {
+        "name": "Holy Shock",
+        "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
+      },
+      "holy_shield": {
+        "name": "Holy Shield",
+        "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
+      },
+      "bestial_wrath": {
+        "name": "Bestial Wrath",
+        "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
+      },
+      "trueshot_aura": {
+        "name": "Trueshot Aura",
+        "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvern Sting",
+        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+      },
+      "arcane_power": {
+        "name": "Arcane Power",
+        "description": "Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)"
+      },
+      "combustion": {
+        "name": "Combustion",
+        "description": "Focuses your fire magic so your next attack is a critical strike. (Fire signature)"
+      },
+      "cone_of_cold": {
+        "name": "Cone of Cold",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
+      },
+      "cold_blood": {
+        "name": "Cold Blood",
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+      },
+      "blade_flurry": {
+        "name": "Blade Flurry",
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+      },
+      "hemorrhage": {
+        "name": "Hemorrhage",
+        "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
+      },
+      "power_infusion": {
+        "name": "Power Infusion",
+        "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
+      },
+      "holy_nova": {
+        "name": "Holy Nova",
+        "description": "Causes an explosion of Holy light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+      },
+      "shadowform": {
+        "name": "Shadowform",
+        "description": "Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+      },
+      "elemental_mastery": {
+        "name": "Elemental Mastery",
+        "description": "Calls on elemental mastery, making your next spell instant. (Elemental signature)"
+      },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
+      "siphon_life": {
+        "name": "Siphon Life",
+        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
+      },
+      "conflagrate": {
+        "name": "Conflagrate",
+        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+      },
+      "moonkin_form": {
+        "name": "Moonkin Form",
+        "description": "Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+      },
+      "feral_charge": {
+        "name": "Feral Charge",
+        "description": "Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)"
+      },
+      "swiftmend": {
+        "name": "Swiftmend",
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+      },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
+      "pummel": {
+        "name": "Pummel",
+        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+      },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies."
+      },
+      "rallying_cry": {
+        "name": "Rallying Cry",
+        "description": "Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec."
+      },
       "summon_imp": {
         "name": "Summon Emberkin",
         "description": "Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."

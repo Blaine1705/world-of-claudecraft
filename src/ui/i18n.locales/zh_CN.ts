@@ -1652,6 +1652,42 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': '断筋',
   'entities.abilities.hamstring.description':
     '重创敌人，造成 5 点伤害，并使其移动速度降低 50%，持续 15 秒。',
+  'entities.abilities.storm_bolt.name': '风暴之锤',
+  'entities.abilities.storm_bolt.description':
+    '将武器掷向目标，造成 {damage}，并使其昏迷 3 秒。',
+  'entities.abilities.piercing_howl.name': '刺耳怒吼',
+  'entities.abilities.piercing_howl.description':
+    '发出刺耳的吼声，使 15 码内所有敌人减速 50%，持续 8 秒。',
+  'entities.abilities.die_by_sword.name': '剑在人在',
+  'entities.abilities.die_by_sword.description':
+    '防御技能：受到的伤害降低 10%，持续 8 秒；生命值低于 30% 时降低 20%。',
+  'entities.abilities.recklessness.name': '鲁莽',
+  'entities.abilities.recklessness.description':
+    '激怒：怒气获取提高 50%，暴击几率提高 20%，持续 12 秒。',
+  'entities.abilities.avatar.name': '天神下凡',
+  'entities.abilities.avatar.description':
+    '变身为巨像，持续 20 秒，解除自身所有控制效果，造成的伤害提高 20%。',
+  'entities.abilities.sanguine_aura.name': '血色光环',
+  'entities.abilities.sanguine_aura.description':
+    '以敌人之血浸染你的武器：你和近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。',
+  'entities.abilities.victory_rush.name': '乘胜追击',
+  'entities.abilities.victory_rush.description':
+    '发动打击，造成武器伤害加 {damage}，并为你恢复最大生命值的 20%。只能在击杀敌人后 20 秒内使用。',
+  'entities.abilities.bladestorm.name': '剑刃风暴',
+  'entities.abilities.bladestorm.description':
+    '化身钢铁旋风，每秒对 8 码内所有敌人造成 {damage}，持续 4 秒。',
+  'entities.abilities.intimidating_shout.name': '破胆怒吼',
+  'entities.abilities.intimidating_shout.description':
+    '发出骇人的怒吼，使 8 码内最多 5 名敌人惊惧逃窜 8 秒。受到伤害可能打破该效果。',
+  'entities.abilities.pummel.name': '拳击',
+  'entities.abilities.pummel.description':
+    '打断施法，并使该系法术在 4 秒内无法施放。成功打断施法时产生 10 点怒气。',
+  'entities.abilities.heroic_leap.name': '英勇飞跃',
+  'entities.abilities.heroic_leap.description':
+    '跃向目标区域，对附近敌人造成 {damage} 点伤害。',
+  'entities.abilities.rallying_cry.name': '集结呐喊',
+  'entities.abilities.rallying_cry.description':
+    '发出集结呐喊，使你和 40 码内的小队成员获得 20% 的额外最大生命值，持续 10 秒。',
   'entities.abilities.bloodrage.name': '血性狂暴',
   'entities.abilities.bloodrage.description': '以生命值为代价产生 {rage} 点怒气。',
   'entities.abilities.overpower.name': '压制',
@@ -5343,4 +5379,76 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note': '哈尔文修士在图上做了标记：宜探坍塌圣物窖。',
   'hudChrome.calendar.events.moongateCommunion.title': '月门共祷',
   'hudChrome.calendar.events.moongateCommunion.note': '朝圣者在月中之月下聚于神庙月门。',
+  'entities.abilities.holy_shock.name': '神圣震击',
+  'entities.abilities.holy_shock.description':
+    '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
+  'entities.abilities.holy_shield.name': '神圣之盾',
+  'entities.abilities.holy_shield.description':
+    '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
+  'entities.abilities.repentance.name': '忏悔',
+  'entities.abilities.repentance.description':
+    '使敌人进入冥想状态，最多持续6秒。受到任何伤害都会打破效果。（惩戒专精招牌）',
+  'entities.abilities.bestial_wrath.name': '狂野怒火',
+  'entities.abilities.bestial_wrath.description':
+    '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
+  'entities.abilities.trueshot_aura.name': '强击光环',
+  'entities.abilities.trueshot_aura.description':
+    '鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）',
+  'entities.abilities.wyvern_sting.name': '翼龙钉刺',
+  'entities.abilities.wyvern_sting.description':
+    '从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）',
+  'entities.abilities.arcane_power.name': '奥术强化',
+  'entities.abilities.arcane_power.description':
+    '让你充满奥术能量，法术强度提高28点，持续12秒。（奥术专精招牌）',
+  'entities.abilities.combustion.name': '燃烧',
+  'entities.abilities.combustion.description':
+    '集中你的火焰魔法，使下一次攻击造成暴击。（火焰专精招牌）',
+  'entities.abilities.cone_of_cold.name': '冰锥术',
+  'entities.abilities.cone_of_cold.description':
+    '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）',
+  'entities.abilities.cold_blood.name': '冷血',
+  'entities.abilities.cold_blood.description':
+    '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）',
+  'entities.abilities.blade_flurry.name': '剑刃乱舞',
+  'entities.abilities.blade_flurry.description':
+    '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）',
+  'entities.abilities.hemorrhage.name': '出血',
+  'entities.abilities.hemorrhage.description':
+    '攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）',
+  'entities.abilities.power_infusion.name': '能量灌注',
+  'entities.abilities.power_infusion.description':
+    '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
+  'entities.abilities.holy_nova.name': '神圣新星',
+  'entities.abilities.holy_nova.description':
+    '引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）',
+  'entities.abilities.shadowform.name': '暗影形态',
+  'entities.abilities.shadowform.description':
+    '进入暗影形态，强化暗影魔法直到你切换回来。再次施放可返回普通形态。（暗影专精招牌）',
+  'entities.abilities.elemental_mastery.name': '元素掌握',
+  'entities.abilities.elemental_mastery.description':
+    '呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）',
+  'entities.abilities.shamanistic_rage.name': '萨满之怒',
+  'entities.abilities.shamanistic_rage.description':
+    "释放萨满之怒，恢复160点法力值。（增强专精招牌）",
+  'entities.abilities.natures_swiftness.name': '自然迅捷',
+  'entities.abilities.natures_swiftness.description':
+    '呼唤自然之力，使你的下一个法术变为瞬发。（恢复专精招牌）',
+  'entities.abilities.siphon_life.name': '生命虹吸',
+  'entities.abilities.siphon_life.description':
+    '虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）',
+  'entities.abilities.fel_domination.name': '恶魔支配',
+  'entities.abilities.fel_domination.description':
+    '支配邪能，使你的下一个法术变为瞬发。（恶魔学识专精招牌）',
+  'entities.abilities.conflagrate.name': "燃尽",
+  'entities.abilities.conflagrate.description':
+    '吞噬敌人身上的献祭，将其点燃并造成{damage}点火焰伤害。（毁灭专精招牌）',
+  'entities.abilities.moonkin_form.name': '枭兽形态',
+  'entities.abilities.moonkin_form.description':
+    '进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）',
+  'entities.abilities.feral_charge.name': '野性冲锋',
+  'entities.abilities.feral_charge.description':
+    '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
+  'entities.abilities.swiftmend.name': '迅捷治愈',
+  'entities.abilities.swiftmend.description':
+    '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
 };

@@ -4960,6 +4960,150 @@ export const de_DE: EnTranslations = {
         "name": "Berserkerwut",
         "description": "Ihr verfallt in Berserkerwut und erzeugt 20 Wut. (Krieger-Talent)"
       },
+      "holy_shock": {
+        "name": "Heiliger Schock",
+        "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"
+      },
+      "holy_shield": {
+        "name": "Heiliger Schild",
+        "description": "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)"
+      },
+      "repentance": {
+        "name": "Buße",
+        "description": "Versetzt den Gegner bis zu 6 Sek. lang in einen Zustand der Meditation. Jeder Schaden bricht den Effekt. (Vergeltungs-Signatur)"
+      },
+      "bestial_wrath": {
+        "name": "Zorn des Wildtiers",
+        "description": "Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)"
+      },
+      "trueshot_aura": {
+        "name": "Aura des Volltreffers",
+        "description": "Inspiriert nahe Verbündete und erhöht die Angriffskraft 5 Min. lang um 35. (Treffsicherheits-Signatur)"
+      },
+      "wyvern_sting": {
+        "name": "Stich des Flügeldrachen",
+        "description": "Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)"
+      },
+      "arcane_power": {
+        "name": "Arkane Macht",
+        "description": "Erfüllt Euch mit arkaner Macht und erhöht Eure Zaubermacht 12 Sek. lang um 28. (Arkan-Signatur)"
+      },
+      "combustion": {
+        "name": "Verbrennung",
+        "description": "Bündelt Eure Feuermagie, sodass Euer nächster Angriff ein kritischer Treffer ist. (Feuer-Signatur)"
+      },
+      "cone_of_cold": {
+        "name": "Kältekegel",
+        "description": "Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)"
+      },
+      "cold_blood": {
+        "name": "Kaltblütigkeit",
+        "description": "Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)"
+      },
+      "blade_flurry": {
+        "name": "Klingenwirbel",
+        "description": "Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)"
+      },
+      "hemorrhage": {
+        "name": "Blutsturz",
+        "description": "Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)"
+      },
+      "power_infusion": {
+        "name": "Machtinfusion",
+        "description": "Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)"
+      },
+      "holy_nova": {
+        "name": "Heilige Nova",
+        "description": "Verursacht eine Explosion Heiligen Lichts, heilt nahe Verbündete um {damage} und schädigt nahe Gegner. (Heilig-Signatur)"
+      },
+      "shadowform": {
+        "name": "Schattenform",
+        "description": "Nehmt Schattenform an und verstärkt Schattenmagie, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Schatten-Signatur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementarbeherrschung",
+        "description": "Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)"
+      },
+      "shamanistic_rage": {
+        "name": "Schamanistische Wut",
+        "description": "Entfesselt schamanistische Wut und stellt 160 Mana wieder her. (Verstärkungs-Signatur)"
+      },
+      "natures_swiftness": {
+        "name": "Schnelligkeit der Natur",
+        "description": "Ruft die Natur an, um Euren nächsten Zauber sofort wirkbar zu machen. (Wiederherstellungs-Signatur)"
+      },
+      "siphon_life": {
+        "name": "Lebensentzug",
+        "description": "Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)"
+      },
+      "fel_domination": {
+        "name": "Teufelsbeherrschung",
+        "description": "Beherrscht Teufelsenergien und macht Euren nächsten Zauber sofort wirkbar. (Dämonologie-Signatur)"
+      },
+      "conflagrate": {
+        "name": "Feuersbrunst",
+        "description": "Verbraucht Euer Feuerbrand auf dem Gegner, um ihn zu entzünden und {damage} Feuerschaden zu verursachen. (Zerstörungs-Signatur)"
+      },
+      "moonkin_form": {
+        "name": "Mondkingestalt",
+        "description": "Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)"
+      },
+      "feral_charge": {
+        "name": "Wilde Attacke",
+        "description": "Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)"
+      },
+      "swiftmend": {
+        "name": "Rasche Heilung",
+        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)"
+      },
+      "storm_bolt": {
+        "name": "Sturmblitz",
+        "description": "Schleudert Eure Waffe auf das Ziel, verursacht {damage} und betäubt es 3 Sek. lang."
+      },
+      "piercing_howl": {
+        "name": "Durchdringendes Heulen",
+        "description": "Ein durchdringender Schrei, der alle Gegner im Umkreis von 15 Metern 8 Sek. lang um 50% verlangsamt."
+      },
+      "die_by_sword": {
+        "name": "Tod durch das Schwert",
+        "description": "Defensive Abklingzeit: Ihr erleidet 8 Sek. lang 10% weniger Schaden, unter 30% Gesundheit 20% weniger."
+      },
+      "recklessness": {
+        "name": "Tollkühnheit",
+        "description": "Wutanfall: Eure Wuterzeugung steigt 12 Sek. lang um 50% und Eure kritische Trefferchance um 20%."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Verwandelt Euch 20 Sek. lang in einen Koloss, bricht jede Kontrolle über Euch und erhöht Euren verursachten Schaden um 20%."
+      },
+      "sanguine_aura": {
+        "name": "Blutaura",
+        "description": "Tränkt Eure Waffe im Blut Eurer Feinde: Ihr und Eure Nahkampfverbündeten erhaltet 20 Sek. lang 10% Angriffstempo und 10% Schaden."
+      },
+      "victory_rush": {
+        "name": "Siegesrausch",
+        "description": "Ein Schlag mit Waffenschaden plus {damage}, der Euch um 20% Eurer maximalen Gesundheit heilt. Nur innerhalb von 20 Sek. nach dem Töten eines Gegners einsetzbar."
+      },
+      "bladestorm": {
+        "name": "Klingensturm",
+        "description": "Werdet zu einem wirbelnden Sturm aus Stahl, der alle Gegner im Umkreis von 8 Metern jede Sekunde 4 Sek. lang mit {damage} trifft."
+      },
+      "intimidating_shout": {
+        "name": "Drohruf",
+        "description": "Ein furchterregender Schrei, der bis zu 5 Gegner im Umkreis von 8 Metern 8 Sek. lang in Panik fliehen lässt. Schaden kann den Effekt brechen."
+      },
+      "pummel": {
+        "name": "Zuschlagen",
+        "description": "Unterbricht das Zaubern und verhindert 4 Sek. lang Zauber dieser Schule. Erzeugt 10 Wut, wenn ein Zauber unterbrochen wird."
+      },
+      "heroic_leap": {
+        "name": "Heldenhafter Sprung",
+        "description": "Springt zum Zielgebiet und verursacht {damage} Schaden an nahen Gegnern."
+      },
+      "rallying_cry": {
+        "name": "Schlachtruf",
+        "description": "Stößt einen Schlachtruf aus, der Euch und Gruppenmitgliedern im Umkreis von 40 Metern 10 Sek. lang 20% zusätzliche maximale Gesundheit gewährt."
+      },
       "summon_imp": {
         "name": "Wichtel beschwören",
         "description": "Beschwört einen Wichtel unter dem Befehl des Hexenmeisters. Der Wichtel schleudert aus der Ferne Feuerblitze auf Eure Feinde. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."

@@ -1684,6 +1684,42 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Kniesehne',
   'entities.abilities.hamstring.description':
     'Verkrüppelt den Gegner für 5 Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
+  'entities.abilities.storm_bolt.name': 'Sturmblitz',
+  'entities.abilities.storm_bolt.description':
+    'Schleudert Eure Waffe auf das Ziel, verursacht {damage} und betäubt es 3 Sek. lang.',
+  'entities.abilities.piercing_howl.name': 'Durchdringendes Heulen',
+  'entities.abilities.piercing_howl.description':
+    'Ein durchdringender Schrei, der alle Gegner im Umkreis von 15 Metern 8 Sek. lang um 50% verlangsamt.',
+  'entities.abilities.die_by_sword.name': 'Tod durch das Schwert',
+  'entities.abilities.die_by_sword.description':
+    'Defensive Abklingzeit: Ihr erleidet 8 Sek. lang 10% weniger Schaden, unter 30% Gesundheit 20% weniger.',
+  'entities.abilities.recklessness.name': 'Tollkühnheit',
+  'entities.abilities.recklessness.description':
+    'Wutanfall: Eure Wuterzeugung steigt 12 Sek. lang um 50% und Eure kritische Trefferchance um 20%.',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Verwandelt Euch 20 Sek. lang in einen Koloss, bricht jede Kontrolle über Euch und erhöht Euren verursachten Schaden um 20%.',
+  'entities.abilities.sanguine_aura.name': 'Blutaura',
+  'entities.abilities.sanguine_aura.description':
+    'Tränkt Eure Waffe im Blut Eurer Feinde: Ihr und Eure Nahkampfverbündeten erhaltet 20 Sek. lang 10% Angriffstempo und 10% Schaden.',
+  'entities.abilities.victory_rush.name': 'Siegesrausch',
+  'entities.abilities.victory_rush.description':
+    'Ein Schlag mit Waffenschaden plus {damage}, der Euch um 20% Eurer maximalen Gesundheit heilt. Nur innerhalb von 20 Sek. nach dem Töten eines Gegners einsetzbar.',
+  'entities.abilities.bladestorm.name': 'Klingensturm',
+  'entities.abilities.bladestorm.description':
+    'Werdet zu einem wirbelnden Sturm aus Stahl, der alle Gegner im Umkreis von 8 Metern jede Sekunde 4 Sek. lang mit {damage} trifft.',
+  'entities.abilities.intimidating_shout.name': 'Drohruf',
+  'entities.abilities.intimidating_shout.description':
+    'Ein furchterregender Schrei, der bis zu 5 Gegner im Umkreis von 8 Metern 8 Sek. lang in Panik fliehen lässt. Schaden kann den Effekt brechen.',
+  'entities.abilities.pummel.name': 'Zuschlagen',
+  'entities.abilities.pummel.description':
+    'Unterbricht das Zaubern und verhindert 4 Sek. lang Zauber dieser Schule. Erzeugt 10 Wut, wenn ein Zauber unterbrochen wird.',
+  'entities.abilities.heroic_leap.name': 'Heldenhafter Sprung',
+  'entities.abilities.heroic_leap.description':
+    'Springt zum Zielgebiet und verursacht {damage} Schaden an nahen Gegnern.',
+  'entities.abilities.rallying_cry.name': 'Schlachtruf',
+  'entities.abilities.rallying_cry.description':
+    'Stößt einen Schlachtruf aus, der Euch und Gruppenmitgliedern im Umkreis von 40 Metern 10 Sek. lang 20% zusätzliche maximale Gesundheit gewährt.',
   'entities.abilities.bloodrage.name': 'Blutrausch',
   'entities.abilities.bloodrage.description': 'Erzeugt {rage} Wut auf Kosten von Gesundheit.',
   'entities.abilities.overpower.name': 'Überwältigen',
@@ -5259,4 +5295,76 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
   'entities.letters.letter_q_hollow.body':
     'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  'entities.abilities.holy_shock.name': 'Heiliger Schock',
+  'entities.abilities.holy_shock.description':
+    "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)",
+  'entities.abilities.holy_shield.name': 'Heiliger Schild',
+  'entities.abilities.holy_shield.description':
+    "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)",
+  'entities.abilities.repentance.name': 'Buße',
+  'entities.abilities.repentance.description':
+    "Versetzt den Gegner bis zu 6 Sek. lang in einen Zustand der Meditation. Jeder Schaden bricht den Effekt. (Vergeltungs-Signatur)",
+  'entities.abilities.bestial_wrath.name': 'Zorn des Wildtiers',
+  'entities.abilities.bestial_wrath.description':
+    "Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)",
+  'entities.abilities.trueshot_aura.name': 'Aura des Volltreffers',
+  'entities.abilities.trueshot_aura.description':
+    "Inspiriert nahe Verbündete und erhöht die Angriffskraft 5 Min. lang um 35. (Treffsicherheits-Signatur)",
+  'entities.abilities.wyvern_sting.name': 'Stich des Flügeldrachen',
+  'entities.abilities.wyvern_sting.description':
+    "Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)",
+  'entities.abilities.arcane_power.name': 'Arkane Macht',
+  'entities.abilities.arcane_power.description':
+    "Erfüllt Euch mit arkaner Macht und erhöht Eure Zaubermacht 12 Sek. lang um 28. (Arkan-Signatur)",
+  'entities.abilities.combustion.name': 'Verbrennung',
+  'entities.abilities.combustion.description':
+    "Bündelt Eure Feuermagie, sodass Euer nächster Angriff ein kritischer Treffer ist. (Feuer-Signatur)",
+  'entities.abilities.cone_of_cold.name': 'Kältekegel',
+  'entities.abilities.cone_of_cold.description':
+    "Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)",
+  'entities.abilities.cold_blood.name': 'Kaltblütigkeit',
+  'entities.abilities.cold_blood.description':
+    "Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)",
+  'entities.abilities.blade_flurry.name': 'Klingenwirbel',
+  'entities.abilities.blade_flurry.description':
+    "Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)",
+  'entities.abilities.hemorrhage.name': 'Blutsturz',
+  'entities.abilities.hemorrhage.description':
+    "Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)",
+  'entities.abilities.power_infusion.name': "Machtinfusion",
+  'entities.abilities.power_infusion.description':
+    "Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)",
+  'entities.abilities.holy_nova.name': 'Heilige Nova',
+  'entities.abilities.holy_nova.description':
+    "Verursacht eine Explosion Heiligen Lichts, heilt nahe Verbündete um {damage} und schädigt nahe Gegner. (Heilig-Signatur)",
+  'entities.abilities.shadowform.name': 'Schattenform',
+  'entities.abilities.shadowform.description':
+    "Nehmt Schattenform an und verstärkt Schattenmagie, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Schatten-Signatur)",
+  'entities.abilities.elemental_mastery.name': 'Elementarbeherrschung',
+  'entities.abilities.elemental_mastery.description':
+    "Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)",
+  'entities.abilities.shamanistic_rage.name': 'Schamanistische Wut',
+  'entities.abilities.shamanistic_rage.description':
+    "Entfesselt schamanistische Wut und stellt 160 Mana wieder her. (Verstärkungs-Signatur)",
+  'entities.abilities.natures_swiftness.name': 'Schnelligkeit der Natur',
+  'entities.abilities.natures_swiftness.description':
+    "Ruft die Natur an, um Euren nächsten Zauber sofort wirkbar zu machen. (Wiederherstellungs-Signatur)",
+  'entities.abilities.siphon_life.name': 'Lebensentzug',
+  'entities.abilities.siphon_life.description':
+    "Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)",
+  'entities.abilities.fel_domination.name': 'Teufelsbeherrschung',
+  'entities.abilities.fel_domination.description':
+    "Beherrscht Teufelsenergien und macht Euren nächsten Zauber sofort wirkbar. (Dämonologie-Signatur)",
+  'entities.abilities.conflagrate.name': 'Feuersbrunst',
+  'entities.abilities.conflagrate.description':
+    "Verbraucht Euer Feuerbrand auf dem Gegner, um ihn zu entzünden und {damage} Feuerschaden zu verursachen. (Zerstörungs-Signatur)",
+  'entities.abilities.moonkin_form.name': 'Mondkingestalt',
+  'entities.abilities.moonkin_form.description':
+    "Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)",
+  'entities.abilities.feral_charge.name': 'Wilde Attacke',
+  'entities.abilities.feral_charge.description':
+    "Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)",
+  'entities.abilities.swiftmend.name': 'Rasche Heilung',
+  'entities.abilities.swiftmend.description':
+    "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)",
 };

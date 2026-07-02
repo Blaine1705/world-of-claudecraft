@@ -1732,6 +1732,42 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'ハムストリング',
   'entities.abilities.hamstring.description':
     '敵を痛めつけて5ダメージを与え、15秒間、移動速度を50%低下させます。',
+  'entities.abilities.storm_bolt.name': 'ストームボルト',
+  'entities.abilities.storm_bolt.description':
+    '武器を投げつけて{damage}のダメージを与え、対象を3秒間スタンさせます。',
+  'entities.abilities.piercing_howl.name': 'ピアシングハウル',
+  'entities.abilities.piercing_howl.description':
+    '鋭い咆哮を上げ、15ヤード以内の敵全員を8秒間50%減速させます。',
+  'entities.abilities.die_by_sword.name': 'ダイ・バイ・ザ・ソード',
+  'entities.abilities.die_by_sword.description':
+    '防御用クールダウン：8秒間、受けるダメージが10%減少します。体力が30%未満の間は20%減少します。',
+  'entities.abilities.recklessness.name': 'レックレスネス',
+  'entities.abilities.recklessness.description':
+    '激怒：12秒間、怒りの生成が50%、クリティカル率が20%増加します。',
+  'entities.abilities.avatar.name': 'アヴァター',
+  'entities.abilities.avatar.description':
+    '20秒間巨像に変身し、自身へのすべての制御効果を解除し、与えるダメージが20%増加します。',
+  'entities.abilities.sanguine_aura.name': 'サングインオーラ',
+  'entities.abilities.sanguine_aura.description':
+    '敵の血で武器を染め上げます。自身と近接の味方の攻撃速度が10%、ダメージが10%増加します。20秒間持続します。',
+  'entities.abilities.victory_rush.name': 'ヴィクトリーラッシュ',
+  'entities.abilities.victory_rush.description':
+    '武器ダメージ+{damage}の一撃を放ち、最大体力の20%を回復します。敵を倒してから20秒以内のみ使用可能です。',
+  'entities.abilities.bladestorm.name': 'ブレードストーム',
+  'entities.abilities.bladestorm.description':
+    '鋼鉄の旋風と化し、4秒間、毎秒8ヤード以内のすべての敵に{damage}のダメージを与えます。',
+  'entities.abilities.intimidating_shout.name': '威嚇の雄叫び',
+  'entities.abilities.intimidating_shout.description':
+    '恐ろしい雄叫びを上げ、8ヤード以内の最大5体の敵を8秒間恐怖で逃げ惑わせます。ダメージで効果が解除されることがあります。',
+  'entities.abilities.pummel.name': 'パンメル',
+  'entities.abilities.pummel.description':
+    '詠唱を妨害し、その系統の呪文を4秒間詠唱不能にします。詠唱を止めると怒りを10生成します。',
+  'entities.abilities.heroic_leap.name': 'ヒロイックリープ',
+  'entities.abilities.heroic_leap.description':
+    '目標地点へ跳躍し、周囲の敵に{damage}のダメージを与えます。',
+  'entities.abilities.rallying_cry.name': 'ラリングクライ',
+  'entities.abilities.rallying_cry.description':
+    '鬨の声を上げ、自身と40ヤード以内のパーティメンバーの最大体力を10秒間20%増加させます。',
   'entities.abilities.bloodrage.name': 'ブラッドレイジ',
   'entities.abilities.bloodrage.description': '体力を代償に怒りを{rage}生成します。',
   'entities.abilities.overpower.name': 'オーバーパワー',
@@ -5652,4 +5688,76 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。',
   'hudChrome.calendar.events.moongateCommunion.title': '月門の集い',
   'hudChrome.calendar.events.moongateCommunion.note': '月半ばの月の下、巡礼者が神殿の月門に集う。',
+  'entities.abilities.holy_shock.name': 'ホーリーショック',
+  'entities.abilities.holy_shock.description':
+    '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
+  'entities.abilities.holy_shield.name': 'ホーリーシールド',
+  'entities.abilities.holy_shield.description':
+    '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+  'entities.abilities.repentance.name': '悔悟',
+  'entities.abilities.repentance.description':
+    '敵を最大6秒間瞑想状態にします。ダメージを受けると効果は解除されます。（リトリビューション特性のシグネチャ）',
+  'entities.abilities.bestial_wrath.name': '野獣の怒り',
+  'entities.abilities.bestial_wrath.description':
+    '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',
+  'entities.abilities.trueshot_aura.name': 'トゥルーショットオーラ',
+  'entities.abilities.trueshot_aura.description':
+    '近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）',
+  'entities.abilities.wyvern_sting.name': 'ワイバーンスティング',
+  'entities.abilities.wyvern_sting.description':
+    '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
+  'entities.abilities.arcane_power.name': 'アーケインパワー',
+  'entities.abilities.arcane_power.description':
+    '秘術の力に満たされ、12秒間呪文力が28上がります。（アーケイン特性のシグネチャ）',
+  'entities.abilities.combustion.name': 'コンバッション',
+  'entities.abilities.combustion.description':
+    '炎の魔法を集中し、次の攻撃をクリティカルにします。（ファイア特性のシグネチャ）',
+  'entities.abilities.cone_of_cold.name': 'コーンオブコールド',
+  'entities.abilities.cone_of_cold.description':
+    '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（フロスト特性のシグネチャ）',
+  'entities.abilities.cold_blood.name': 'コールドブラッド',
+  'entities.abilities.cold_blood.description':
+    '殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）',
+  'entities.abilities.blade_flurry.name': 'ブレードフラリー',
+  'entities.abilities.blade_flurry.description':
+    '刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）',
+  'entities.abilities.hemorrhage.name': 'ヘモリッジ',
+  'entities.abilities.hemorrhage.description':
+    '敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）',
+  'entities.abilities.power_infusion.name': 'パワーインフュージョン',
+  'entities.abilities.power_infusion.description':
+    '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',
+  'entities.abilities.holy_nova.name': 'ホーリーノヴァ',
+  'entities.abilities.holy_nova.description':
+    '聖なる光を爆発させ、近くの味方を{damage}回復し、近くの敵にダメージを与えます。（ホーリー特性のシグネチャ）',
+  'entities.abilities.shadowform.name': 'シャドウフォーム',
+  'entities.abilities.shadowform.description':
+    'シャドウフォームになり、戻るまで影の魔法を強化します。再び唱えると通常形態に戻ります。（シャドウ特性のシグネチャ）',
+  'entities.abilities.elemental_mastery.name': 'エレメンタルマスタリー',
+  'entities.abilities.elemental_mastery.description':
+    '元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）',
+  'entities.abilities.shamanistic_rage.name': 'シャーマニスティックレイジ',
+  'entities.abilities.shamanistic_rage.description':
+    'シャーマンの怒りを解放し、マナを160回復します。（エンハンスメント特性のシグネチャ）',
+  'entities.abilities.natures_swiftness.name': '自然の迅速さ',
+  'entities.abilities.natures_swiftness.description':
+    '自然に呼びかけ、次の呪文を即時発動にします。（レストレーション特性のシグネチャ）',
+  'entities.abilities.siphon_life.name': 'サイフォンライフ',
+  'entities.abilities.siphon_life.description':
+    '敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）',
+  'entities.abilities.fel_domination.name': 'フェルドミネーション',
+  'entities.abilities.fel_domination.description':
+    '邪悪な力を支配し、次の呪文を即時発動にします。（デモノロジー特性のシグネチャ）',
+  'entities.abilities.conflagrate.name': 'コンフラグレート',
+  'entities.abilities.conflagrate.description':
+    '敵にかかったイモレートを消費して燃え上がらせ、{damage}のファイアダメージを与えます。（デストラクション特性のシグネチャ）',
+  'entities.abilities.moonkin_form.name': 'ムーンキンフォーム',
+  'entities.abilities.moonkin_form.description':
+    'ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）',
+  'entities.abilities.feral_charge.name': 'フェラルチャージ',
+  'entities.abilities.feral_charge.description':
+    '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
+  'entities.abilities.swiftmend.name': 'スウィフトメンド',
+  'entities.abilities.swiftmend.description':
+    '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
 };
