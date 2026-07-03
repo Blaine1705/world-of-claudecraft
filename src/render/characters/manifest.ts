@@ -401,7 +401,13 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
   },
   player_priest: {
-    url: `${PLAYERS}/mage.glb`,
+    // The CLASSIC mage body (Brother Aldric's chapel model), not the v2
+    // mage.glb the mage/warlock wear: a different robe cut, and its
+    // accessories are plain (non-skinned) nodes, so show:[] really does strip
+    // the hat/cape/built-in props: a bare-headed devotee under the halo. Same
+    // palette-atlas UV layout as the v2 body, so the priest/mage skin atlases
+    // fit both models.
+    url: `${PLAYERS}/mage_classic.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: [],

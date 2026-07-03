@@ -7,10 +7,11 @@
 import * as THREE from 'three';
 
 // Bone-space (raw KayKit rig units): a HORIZONTAL ring floating above the
-// crown (angel style). A vertical disc behind the head fights the wide hat
-// brim from half the camera angles; hovering above it never clips.
+// crown (angel style). A vertical disc behind the head fights wide headgear
+// from half the camera angles; hovering above never clips. Tuned for the
+// bare-headed classic priest body (the only halo wearer).
 const HALO_RADIUS = 0.5;
-const HALO_UP_OFFSET = 1.3;
+const HALO_UP_OFFSET = 1.0;
 
 let haloTex: THREE.Texture | null = null;
 const haloMats = new Map<number, THREE.MeshBasicMaterial>();
