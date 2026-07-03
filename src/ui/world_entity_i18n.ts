@@ -81,6 +81,17 @@ const MOB_IDS = [
   'reliquary_saintless_effigy',
   'deacon_varric',
   'acolyte_tessa',
+  // the Veiled Hollow
+  'glimmerwisp',
+  'duskwisp',
+  'hollow_spirit',
+  'veiled_stag',
+  'gleamstag',
+  'sporeling_gatherer',
+  'corrupted_sporeling',
+  'treant_elder',
+  'ancient_guardian',
+  'waking_warden',
 ] as const;
 
 const NPC_IDS = [
@@ -106,6 +117,12 @@ const NPC_IDS = [
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
+  // Eldergleam, the Veiled Hollow
+  'keeper_saelwyn',
+  'loremother_bryn',
+  'provisioner_fenna',
+  'wardsmith_orun',
+  'archivist_tullo',
 ] as const;
 
 const QUEST_IDS = [
@@ -180,6 +197,21 @@ const QUEST_IDS = [
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
   'q_mogger',
+  // the Veiled Hollow
+  'q_veil_thinned',
+  'q_gleaming_antlers',
+  'q_wisp_lights',
+  'q_calming_the_deep',
+  'q_spore_hearts',
+  'q_monument_tour',
+  'q_grove_menace',
+  'q_shards_of_starfall',
+  'q_treant_accord',
+  'q_spore_tide',
+  'q_sunken_court',
+  'q_wardens_echoes',
+  'q_waking_warden',
+  'q_seal_restored',
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights', 'veiled_hollow'] as const;

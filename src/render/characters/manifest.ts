@@ -876,6 +876,12 @@ const MOB_KEYS: Record<string, string> = {
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
+  // the Veiled Hollow: stags use the real stag rig instead of the beast-family
+  // wolf; the court guardians borrow the golem rig as stone constructs
+  veiled_stag: 'mob_stag',
+  gleamstag: 'mob_stag',
+  ancient_guardian: 'skel_golem',
+  waking_warden: 'skel_golem',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
@@ -909,6 +915,12 @@ const NPC_KEYS: Record<string, string> = {
   provisioner_hale: 'npc_villager',
   quartermaster_bree: 'npc_villager',
   brother_halven: 'npc_reliquary_keeper',
+  // Eldergleam, the Veiled Hollow
+  keeper_saelwyn: 'npc_mage',
+  loremother_bryn: 'npc_villager_robed',
+  provisioner_fenna: 'npc_villager',
+  wardsmith_orun: 'npc_smith',
+  archivist_tullo: 'npc_villager_robed',
 };
 
 export function visualKeyFor(e: Entity): string {

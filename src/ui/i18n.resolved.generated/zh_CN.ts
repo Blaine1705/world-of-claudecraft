@@ -4924,6 +4924,66 @@ export const zh_CN: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "duskwisp_essence": {
+        "name": "暮光灵精华"
+      },
+      "spore_heart": {
+        "name": "孢子之心"
+      },
+      "gleaming_antler": {
+        "name": "辉光鹿角"
+      },
+      "wisp_mote": {
+        "name": "光尘"
+      },
+      "starfall_shard": {
+        "name": "星落碎片"
+      },
+      "elder_bark": {
+        "name": "长者树皮"
+      },
+      "hollow_sealstone": {
+        "name": "幽谷封印石"
+      },
+      "monument_overlook": {
+        "name": "风蚀石碑"
+      },
+      "monument_court": {
+        "name": "沉没石碑"
+      },
+      "monument_north": {
+        "name": "遗忘石碑"
+      },
+      "guardian_core": {
+        "name": "守卫核心"
+      },
+      "wardens_seal": {
+        "name": "守望者之印"
+      },
+      "gleamstag_charm": {
+        "name": "辉鹿护符"
+      },
+      "veilsteel_blade": {
+        "name": "帷钢之刃"
+      },
+      "duskfang_dirk": {
+        "name": "暮牙短剑"
+      },
+      "gleamwood_stave": {
+        "name": "辉木长杖"
+      },
+      "wardens_oathband": {
+        "name": "守望者誓言护手"
+      },
+      "wardplate_cuirass": {
+        "name": "守卫板甲胸铠"
+      },
+      "nightweave_tunic": {
+        "name": "夜织皮甲"
+      },
+      "veilcloth_robe": {
+        "name": "帷纱长袍"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -5598,6 +5658,36 @@ export const zh_CN: EnTranslations = {
       "acolyte_tessa": {
         "name": "侍僧泰莎"
       },
+      "glimmerwisp": {
+        "name": "微光灵"
+      },
+      "duskwisp": {
+        "name": "暮光灵"
+      },
+      "hollow_spirit": {
+        "name": "幽谷之灵"
+      },
+      "veiled_stag": {
+        "name": "帷纱雄鹿"
+      },
+      "gleamstag": {
+        "name": "辉光雄鹿"
+      },
+      "sporeling_gatherer": {
+        "name": "孢子人采集者"
+      },
+      "corrupted_sporeling": {
+        "name": "堕落的孢子人"
+      },
+      "treant_elder": {
+        "name": "树人长者"
+      },
+      "ancient_guardian": {
+        "name": "上古守卫"
+      },
+      "waking_warden": {
+        "name": "苏醒的守望者"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -5817,6 +5907,31 @@ export const zh_CN: EnTranslations = {
         "name": "哈尔文修士",
         "title": "圣物库守护人",
         "greeting": "下方的圣物库又移位了。"
+      },
+      "keeper_saelwyn": {
+        "name": "守护者塞尔文",
+        "title": "幽谷守护者",
+        "greeting": "你的同族鲜少踏足这片树荫，{className}。轻声慢行，欢迎你的到来。"
+      },
+      "loremother_bryn": {
+        "name": "传识之母布琳",
+        "title": "圣祠之声",
+        "greeting": "这山谷里的每一盏光都铭记着什么，{playerName}。帮我听听它们的低语。"
+      },
+      "provisioner_fenna": {
+        "name": "补给员芬娜",
+        "title": "古辉镇补给员",
+        "greeting": "面包还热着，泉水依然甘甜。幽谷有所馈赠，我也一样。"
+      },
+      "wardsmith_orun": {
+        "name": "结界铁匠欧伦",
+        "title": "古炉看守",
+        "greeting": "这些熔炉几百年前就冷了，{className}，但它们锻出的兵刃至今锋利。"
+      },
+      "archivist_tullo": {
+        "name": "档案员图洛",
+        "title": "读石者",
+        "greeting": "外面那些石碑已经许久不曾对人开口。也许它们正等着新的耳朵。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -6574,6 +6689,152 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败莫格"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "稀薄的帷幕",
+        "text": "洞穴竟为你敞开了。那么封印比我担心的还要脆弱，{playerName}。帷幕撕裂之处，光灵会变得阴冷黑暗。给我带来八份暮光灵的精华，我便能读出这道伤口有多深。",
+        "completion": "每一份都是冰冷的。幽谷也许只剩一个季节，裂缝就会变成裂谷。你我有得忙了。",
+        "objectives": {
+          "0": {
+            "label": "暮光灵精华"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "辉光鹿角",
+        "text": "帷纱雄鹿在吃草的地方洒下微光，它们蜕下的鹿角能把光留住许多年。从星落盆地的鹿群那里取来五支，我的灯笼整个冬天都不用点油。不必伤害雄鹿，但它们也不会轻易相让。",
+        "completion": "看它们把光留得多好！没有火焰，没有烟，只有光。幽谷自有馈赠。",
+        "objectives": {
+          "0": {
+            "label": "辉光鹿角"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "浅滩之光",
+        "text": "微光灵身上带着幽谷封印之时落下的古老星光。六粒光尘，圣祠的灯便能燃上一年。只取那些将熄的，幽谷的馈赠足够，无需贪求。",
+        "completion": "柔和得像最初的星辰。放在祭坛边吧，圣祠会完成剩下的事。",
+        "objectives": {
+          "0": {
+            "label": "光尘"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "安抚幽深",
+        "text": "辉光深处的孢子人本是温和的族群，直到裂缝触到了他们的蘑菇环。被侵蚀夺走的，再也不会归还。让堕落者安息吧，{playerName}：深处北面，十个。",
+        "completion": "你做了我不忍做的事。南边的采集者还在歌唱；因为你，他们能一直唱下去。",
+        "objectives": {
+          "0": {
+            "label": "堕落的孢子人：已安息"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "蘑菇环之心",
+        "text": "孢子人堕入黑暗后，心脏仍靠借来的阴影跳动。四颗这样的心，在圣祠净化后，能让我们弄清侵蚀如何蔓延。这活计残酷，{playerName}，却是修补之工。",
+        "completion": "好了。净化了，也安静了。每一颗都指向同一处：阴影来自沉没王庭。去告诉塞尔文。",
+        "objectives": {
+          "0": {
+            "label": "孢子之心"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "石碑的记忆",
+        "text": "封印之前的石碑还立着三座：一座在暮落瞭望台，一座在沉没王庭，还有一座失落在无人行走的东北角。替我读一读它们，{playerName}。我的膝盖两百年前就爬不动台阶了。",
+        "completion": "瞭望台、王庭、被遗忘的角落……封印之歌的三段歌词，自吟唱之日起第一次重聚。你让一个老读者非常快乐。",
+        "objectives": {
+          "0": {
+            "label": "已读瞭望台石碑"
+          },
+          "1": {
+            "label": "已读王庭石碑"
+          },
+          "2": {
+            "label": "已读遗忘石碑"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "林间之患",
+        "text": "入夜后暮光灵开始在我的摊位间游荡，{playerName}，它们的寒气碰什么坏什么。替我清一清：十只，哪里帷幕破了就去哪里。",
+        "completion": "夜市又能开张了。你有一位终身顾客，至少也有个折扣。",
+        "objectives": {
+          "0": {
+            "label": "已驱散暮光灵"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "星落碎片",
+        "text": "暮光灵飘过水晶原野时，古老星光的碎屑会像芒刺般附在它们身上。六枚碎片，{playerName}，我就能把封印的年代精确到吟唱的那个季节。",
+        "completion": "看这些纹理！秋天。幽谷是在秋天被封印的。两百年的争论，被六块小石头了结。",
+        "objectives": {
+          "0": {
+            "label": "星落碎片"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "树人之约",
+        "text": "树荫长者们的根被侵蚀啃噬，外层树皮纷纷剥落。四段树皮，我就能为整片林地熬制药膏。你去撬树皮时它们不会道谢，{playerName}，但它们会因此多站立一个世纪。",
+        "completion": "四段都厚实完好。药膏要熬一个星期，药效要过一百年才算完。树木衡量善意的方式不一样。",
+        "objectives": {
+          "0": {
+            "label": "长者树皮"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "抵御孢子之潮",
+        "text": "药膏守住了林地，但每到黄昏，侵蚀就把深处逼得更紧。还要让十二个堕落者安息，采集者们才能夺回北面的蘑菇环，{playerName}。",
+        "completion": "今夜北面的蘑菇环又在歌唱了。轻轻地，但在歌唱。",
+        "objectives": {
+          "0": {
+            "label": "堕落的孢子人：已安息"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "沉没王庭",
+        "text": "布琳读得没错：裂缝贯穿东边的古老王庭，而它的守卫醒得不对了。它们本是为守护封印而造；如今却会碾碎任何靠近的人。清除废墟中的八座。",
+        "completion": "八座守卫，归于沉寂。我还记得它们被立起来的时候，{playerName}。别这么惊讶；幽谷让它的守护者活得很久。",
+        "objectives": {
+          "0": {
+            "label": "上古守卫：已沉寂"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "守望者的回响",
+        "text": "主人虽已沉默，王庭的守卫仍在重复它最后的命令，像一道不肯消散的回声。封印一日不归位，它们就会不断苏醒，{playerName}。再平息十座，石匠们才能抵达封印石。",
+        "completion": "回声一次比一次微弱。很快王庭就只剩下风和常春藤，废墟本该如此。",
+        "objectives": {
+          "0": {
+            "label": "上古守卫：已沉寂"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "苏醒的守望者",
+        "text": "王庭安静了，它的主人却没有。持守封印的守望者在扭曲中苏醒，它不倒下，封印就无法修复。这一战不会轻松；能找到一个朋友就带上一个，{playerName}。能找到两个就带上两个。",
+        "completion": "它钟鸣般的嗓音沉寂了。我在这里都感觉到了，像有重担从整座山谷卸下。",
+        "objectives": {
+          "0": {
+            "label": "已击败苏醒的守望者"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "封印重铸",
+        "text": "带上守望者之印，去王庭中心的封印石那里，把它放回被击落的位置。那时幽谷便能开始愈合，而你，{playerName}，将完成你的同族从未做到的事。",
+        "completion": "我在这里感觉到它合拢了，温柔如暮色。幽谷会记得它的朋友，{playerName}。无论你走多远，大树下总会为你留一盏灯。",
+        "objectives": {
+          "0": {
+            "label": "封印已放回封印石"
           }
         }
       },
