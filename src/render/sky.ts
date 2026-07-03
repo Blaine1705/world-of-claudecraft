@@ -107,6 +107,16 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   dusk: 0,
 };
 
+// The shared dawn HDRI has red hills PHOTOGRAPHED into its horizon band. The
+// dusk realm masks them: low view angles resample the sky from just above
+// the photographed ridge line, so the ocean meets clean gradient sky.
+const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
+  vale: 0,
+  marsh: 0,
+  peaks: 0,
+  dusk: 1,
+};
+
 interface NetworkInformationLike {
   readonly effectiveType?: string;
   readonly saveData?: boolean;
@@ -254,12 +264,17 @@ const SKY_FRAG = /* glsl */ `
   uniform float uBackdropAmtB;
   uniform vec3 uTintA; // per-biome dome grade (white = untouched)
   uniform vec3 uTintB;
+  uniform float uLiftA; // 1 = mask the HDRI's photographed horizon hills
+  uniform float uLiftB;
   varying vec3 vDir;
 
-  vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec2 tune) {
+  vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec2 tune, float lift) {
+    // lift resamples low view angles from just above the photographed ridge
+    // line, dissolving the HDRI's baked-in horizon hills into clean sky
+    float y = mix(dir.y, 0.26, lift * smoothstep(0.24, -0.06, dir.y));
     vec2 uv = vec2(
       atan(dir.z, dir.x) * 0.15915494 + 0.5 + uOff,
-      asin(clamp(dir.y, -1.0, 1.0)) * 0.31830989 + 0.5);
+      asin(clamp(y, -1.0, 1.0)) * 0.31830989 + 0.5);
     return min(texture2D(map, uv).rgb * tune.x, vec3(tune.y));
   }
 
@@ -296,7 +311,7 @@ const SKY_FRAG = /* glsl */ `
 
   void main() {
     vec3 dir = normalize(vDir);
-    vec3 c = mix(sampleSky(uSkyA, dir, uOffA, uTuneA), sampleSky(uSkyB, dir, uOffB, uTuneB), uMix);
+    vec3 c = mix(sampleSky(uSkyA, dir, uOffA, uTuneA, uLiftA), sampleSky(uSkyB, dir, uOffB, uTuneB, uLiftB), uMix);
     vec3 backA = sampleBackdrop(uBackdropA, dir, uBackdropBiasA);
     vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
     vec3 backdrop = mix(backA, backB, uMix);
@@ -388,6 +403,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uBackdropAmtB: { value: BIOME_BACKDROP_STRENGTH[start.to] },
     uTintA: { value: tintVec(start.from) },
     uTintB: { value: tintVec(start.to) },
+    uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
+    uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -420,6 +437,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
         uniforms.uBackdropAmtB.value = BIOME_BACKDROP_STRENGTH[next.to];
         uniforms.uTintA.value.copy(tintVec(next.from));
         uniforms.uTintB.value.copy(tintVec(next.to));
+        uniforms.uLiftA.value = BIOME_HORIZON_LIFT[next.from];
+        uniforms.uLiftB.value = BIOME_HORIZON_LIFT[next.to];
         uniforms.uMix.value = next.t;
         cur = next;
         return;

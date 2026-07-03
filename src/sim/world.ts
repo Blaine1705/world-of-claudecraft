@@ -163,7 +163,17 @@ function applyHollowCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
-  return floor + (h - floor) * t;
+  let out = floor + (h - floor) * t;
+  // The northern lowlands: everything past the mainland's north coast rides
+  // low (dune country), so no bluff line interrupts the view over the open
+  // sea. The rims add AFTER this, so the causeway tip's gate cap at the band
+  // edge still rises as the one distant landmark.
+  if (z > 1245) {
+    const cap = 6.5;
+    const ease = smoothstep(1245, 1268, z); // mainland shore eases into it
+    if (out > cap) out = out + (cap + (out - cap) * 0.12 - out) * ease;
+  }
+  return out;
 }
 
 // The realm's open sea (used by swim fatigue and the rim suppression): far
