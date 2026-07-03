@@ -5198,7 +5198,8 @@ export class Hud {
       unitFrameView({
         present: true,
         hpFrac: p.hp / Math.max(1, p.maxHp),
-        hpText: `${p.hp} / ${p.maxHp}`,
+        hpText: `${p.hp}/${p.maxHp}`,
+        showAbsorbText: true,
         resourceKind: p.resourceType,
         resFrac: p.resource / Math.max(1, p.maxResource),
         resText: `${Math.round(p.resource)} / ${p.maxResource}`,
@@ -5295,7 +5296,8 @@ export class Hud {
           unitFrameView({
             present: true,
             hpFrac: target.hp / Math.max(1, target.maxHp),
-            hpText: target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
+            hpText: target.dead ? t('hud.core.dead') : `${target.hp}/${target.maxHp}`,
+            showAbsorbText: !target.dead,
             // The target's power bar (classic target frame): players and caster
             // mobs show their mana/rage/energy; a resource-less target (a plain
             // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass

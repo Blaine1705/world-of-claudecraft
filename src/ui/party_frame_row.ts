@@ -215,7 +215,9 @@ export function createPartyRow(
   hpBar.className = 'bar hp';
   const hpFill = doc.createElement('div');
   hpFill.className = 'bar-fill';
-  hpBar.append(hpFill);
+  const hpAbsorb = doc.createElement('div');
+  hpAbsorb.className = 'bar-absorb';
+  hpBar.append(hpFill, hpAbsorb);
 
   const resBar = doc.createElement('div');
   resBar.className = 'bar';
@@ -266,6 +268,7 @@ export function createPartyRow(
       // a clean number in the accessible name.
       level: leadNum,
       hpFill,
+      absorb: hpAbsorb,
       resource: { container: resBar, fill: resFill },
     },
     {
