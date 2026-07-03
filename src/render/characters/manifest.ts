@@ -89,10 +89,6 @@ export interface VisualDef {
   /** Glowing ring parented behind the head bone (the priest's Light halo).
    *  Value is the glow color; geometry/placement live in visual.ts. */
   halo?: number;
-  /** Floor-length robe skirt parented to the hips bone (robe_skirt.ts): turns
-   *  the shared short-tunic body into a full-length vestment. It wears the
-   *  class skin atlas like any body mesh. */
-  robeSkirt?: boolean;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -414,9 +410,6 @@ export const VISUALS: Record<string, VisualDef> = {
     // the white-linen look lives in the default atlas (SKINS index 0); no tint,
     // it would also warm the face
     halo: 0xffd766,
-    // full-length cassock over the shared short tunic: the priest's GARMENT
-    // silhouette reads different from the mage's at a glance
-    robeSkirt: true,
   },
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,

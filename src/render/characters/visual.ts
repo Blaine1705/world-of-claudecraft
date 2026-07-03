@@ -24,7 +24,6 @@ import {
 } from './assets';
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
-import { buildRobeSkirt } from './robe_skirt';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -134,12 +133,6 @@ export class CharacterVisual {
     // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
     // the held weapon model, so the visual is born holding the right weapon.
     this.model = assembleModel(this.def, weaponItemId);
-    // Robe skirt BEFORE applyMaterials: it is a body mesh and must wear the
-    // class atlas (and follow later skin swaps) like the authored garment.
-    if (this.def.robeSkirt) {
-      const hips = this.model.getObjectByName('hips');
-      hips?.add(buildRobeSkirt());
-    }
     applyMaterials(
       this.model,
       this.def,
