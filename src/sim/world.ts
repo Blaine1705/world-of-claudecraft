@@ -119,6 +119,11 @@ const HOLLOW_LAND_LOBES = [
   { x: 150, z: 1215, r: 62 }, // the northeast arm (the forgotten monument)
   { x: 120, z: 995, r: 72 }, // the Starfall headland and falls terrace
   { x: 130, z: 1082, r: 48 }, // the Sunken Court peninsula
+  // the Pale Causeway: a winding isthmus across the ocean toward the north
+  // band edge, where a future realm will one day connect
+  { x: 30, z: 1290, r: 42 },
+  { x: 48, z: 1355, r: 36 },
+  { x: 38, z: 1425, r: 44 },
 ] as const;
 const HOLLOW_BAYS = [
   { x: 182, z: 1038, r: 38 }, // the east bight, between headland and Court
@@ -201,7 +206,8 @@ function hollowShapingOffset(x: number, z: number, seed: number): number {
       const d = Math.hypot(x - keep.x, z - keep.z);
       if (d < keep.r) bite = Math.min(bite, 8 + (d / keep.r) * 14);
     }
-    dh += 34 * (1 - smoothstep(bite * 0.25, bite, dSide));
+    // gentler than the first cut: lower crowns rising over a longer run
+    dh += 24 * (1 - smoothstep(bite * 0.1, bite, dSide));
   }
   return dh;
 }
@@ -338,11 +344,18 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // by it. The NORTH rim is suppressed over the Hollow's open sea: looking
   // out from the shore reads as water meeting sky, and swim fatigue (not a
   // wall) turns swimmers back before the band edge.
-  const rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
+  let rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
   const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
   let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
-  if (rimN > 0 && inHollowOpenSea(x, z)) rimN = 0;
-  h += Math.max(rimX, rimS, rimN) * 40;
+  if (inHollowOpenSea(x, z)) {
+    // no ranges over the open sea: the flanks read as water to the map edge
+    // (swim fatigue, not a wall, turns swimmers back out there)
+    rimX = 0;
+    rimN = 0;
+  }
+  // inside the Hollow the remaining land rims stay softer than the world's
+  const rimScale = z > 960 && z <= WORLD_MAX_Z ? 0.6 : 1;
+  h += Math.max(rimX, rimS, rimN) * 40 * rimScale;
   return h;
 }
 

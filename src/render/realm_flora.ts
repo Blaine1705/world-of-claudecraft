@@ -976,6 +976,122 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     }
   }
 
+  // The ocean's atmosphere: low mist banks over the far water, soft light
+  // rays leaning from the sky, and a distant flock tracing slow circles.
+  // All render-only sprites and primitives; they gently veil what lies
+  // beyond the sea without walling it off.
+  const seaDrift: { mesh: THREE.Mesh; baseX: number; speed: number }[] = [];
+  const seaRays: { mat: THREE.MeshBasicMaterial; base: number; phase: number }[] = [];
+  let flock: THREE.InstancedMesh | null = null;
+  const FLOCK_SIZE = 11;
+  const FLOCK_CENTER = { x: -30, z: 1330, y: 24, r: 55 };
+  if (typeof document !== 'undefined') {
+    // mist banks: wide soft-alpha gradient planes riding just over the water
+    const mistCanvas = document.createElement('canvas');
+    mistCanvas.width = 128;
+    mistCanvas.height = 32;
+    const mctx = mistCanvas.getContext('2d');
+    if (mctx) {
+      const grad = mctx.createLinearGradient(0, 32, 0, 0);
+      grad.addColorStop(0, 'rgba(255,240,248,0)');
+      grad.addColorStop(0.45, 'rgba(255,240,248,0.55)');
+      grad.addColorStop(1, 'rgba(255,240,248,0)');
+      mctx.fillStyle = grad;
+      mctx.fillRect(0, 0, 128, 32);
+      // soften the ends so banks read as drifting patches, not strips
+      const side = mctx.createLinearGradient(0, 0, 128, 0);
+      side.addColorStop(0, 'rgba(0,0,0,1)');
+      side.addColorStop(0.2, 'rgba(0,0,0,0)');
+      side.addColorStop(0.8, 'rgba(0,0,0,0)');
+      side.addColorStop(1, 'rgba(0,0,0,1)');
+      mctx.globalCompositeOperation = 'destination-out';
+      mctx.fillStyle = side;
+      mctx.fillRect(0, 0, 128, 32);
+      const mistTex = new THREE.CanvasTexture(mistCanvas);
+      for (const [mx, mz, w, hgt, op] of [
+        [-90, 1315, 150, 9, 0.32],
+        [40, 1350, 190, 11, 0.36],
+        [130, 1310, 120, 8, 0.3],
+        [-30, 1408, 240, 14, 0.44],
+        [110, 1420, 170, 12, 0.4],
+      ] as const) {
+        const mist = new THREE.Mesh(
+          new THREE.PlaneGeometry(w, hgt),
+          new THREE.MeshBasicMaterial({
+            map: mistTex,
+            transparent: true,
+            opacity: op,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          }),
+        );
+        mist.position.set(mx, WATER_LEVEL + hgt * 0.35, mz);
+        seaDrift.push({ mesh: mist, baseX: mx, speed: 0.4 + (Math.abs(mx) % 7) * 0.09 });
+        group.add(mist);
+      }
+      // light rays: tall additive streaks leaning sunward over the water
+      const rayCanvas = document.createElement('canvas');
+      rayCanvas.width = 32;
+      rayCanvas.height = 128;
+      const rctx = rayCanvas.getContext('2d');
+      if (rctx) {
+        const rg = rctx.createLinearGradient(0, 0, 32, 0);
+        rg.addColorStop(0, 'rgba(255,220,235,0)');
+        rg.addColorStop(0.5, 'rgba(255,228,240,0.8)');
+        rg.addColorStop(1, 'rgba(255,220,235,0)');
+        rctx.fillStyle = rg;
+        rctx.fillRect(0, 0, 32, 128);
+        const fade = rctx.createLinearGradient(0, 0, 0, 128);
+        fade.addColorStop(0, 'rgba(0,0,0,0)');
+        fade.addColorStop(0.75, 'rgba(0,0,0,0)');
+        fade.addColorStop(1, 'rgba(0,0,0,1)');
+        rctx.globalCompositeOperation = 'destination-out';
+        rctx.fillStyle = fade;
+        rctx.fillRect(0, 0, 32, 128);
+        const rayTex = new THREE.CanvasTexture(rayCanvas);
+        for (const [rx, rz, hgt, op, phase] of [
+          [-120, 1340, 42, 0.1, 0],
+          [-45, 1385, 55, 0.13, 1.7],
+          [85, 1360, 48, 0.11, 3.1],
+          [150, 1395, 50, 0.12, 4.4],
+          [10, 1300, 38, 0.09, 5.6],
+        ] as const) {
+          const mat = new THREE.MeshBasicMaterial({
+            map: rayTex,
+            transparent: true,
+            opacity: op,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+          });
+          const ray = new THREE.Mesh(new THREE.PlaneGeometry(9, hgt), mat);
+          ray.position.set(rx, WATER_LEVEL + hgt * 0.42, rz);
+          ray.rotation.z = 0.24; // leaning with the anchored sun
+          seaRays.push({ mat, base: op, phase });
+          group.add(ray);
+        }
+      }
+      // the distant flock: simple chevron birds circling over the sound
+      const wing = new THREE.BufferGeometry();
+      wing.setAttribute(
+        'position',
+        new THREE.BufferAttribute(
+          new Float32Array([
+            -0.9, 0, 0, 0, 0.16, 0.22, 0, 0, 0.1, 0.9, 0, 0, 0, 0.16, 0.22, 0, 0, 0.1,
+          ]),
+          3,
+        ),
+      );
+      wing.computeVertexNormals();
+      flock = new THREE.InstancedMesh(
+        wing,
+        new THREE.MeshBasicMaterial({ color: 0x4a3f55, side: THREE.DoubleSide }),
+        FLOCK_SIZE,
+      );
+      group.add(flock);
+    }
+  }
+
   // The great tree of Eldergleam, rising over the town square. Position and
   // trunk radius come from REALM_PROPS.greatTrees: the same record the sim's
   // collision grid consumes, so the visual and the collider never drift.
@@ -1027,6 +1143,34 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         foam.rotation.z = time * (i === 0 ? 0.35 : -0.5);
         const churn = 1 + Math.sin(time * 2.1 + i * 1.9) * 0.08;
         foam.scale.setScalar(churn);
+      }
+      // mist banks drift, rays breathe, the flock wheels over the sound
+      for (const bank of seaDrift) {
+        bank.mesh.position.x = bank.baseX + Math.sin(time * 0.05 * bank.speed) * 22;
+      }
+      for (const ray of seaRays) {
+        ray.mat.opacity = ray.base * (0.7 + 0.3 * Math.sin(time * 0.4 + ray.phase));
+      }
+      if (flock) {
+        const m = new THREE.Matrix4();
+        const q = new THREE.Quaternion();
+        const up = new THREE.Vector3(0, 1, 0);
+        const v = new THREE.Vector3();
+        const sc = new THREE.Vector3();
+        for (let i = 0; i < FLOCK_SIZE; i++) {
+          const lag = i * 0.18;
+          const ang = time * 0.09 - lag;
+          const wob = Math.sin(time * 1.1 + i * 2.3);
+          v.set(
+            FLOCK_CENTER.x + Math.sin(ang) * (FLOCK_CENTER.r + (i % 3) * 4),
+            FLOCK_CENTER.y + Math.sin(time * 0.5 + i) * 2.2,
+            FLOCK_CENTER.z + Math.cos(ang) * (FLOCK_CENTER.r + (i % 3) * 4),
+          );
+          q.setFromAxisAngle(up, ang + Math.PI / 2);
+          sc.set(1.4, 1 + wob * 0.5, 1.4); // the wing flap
+          flock.setMatrixAt(i, m.compose(v, q, sc));
+        }
+        flock.instanceMatrix.needsUpdate = true;
       }
     },
   };
