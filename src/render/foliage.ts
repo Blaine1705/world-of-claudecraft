@@ -1100,9 +1100,11 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     return 'mushroom';
   }
   if (biome === 'dusk') {
-    // mushroom-lit glade floor: mostly mushrooms and ferns, few bushes
-    if (r < 0.18) return 'bush';
-    if (r < 0.52) return 'fern';
+    // mushroom-lit glade floor: mushrooms and ferns, with flowering bushes
+    // threaded through the meadows
+    if (r < 0.12) return 'bush';
+    if (r < 0.3) return 'bushFlowers';
+    if (r < 0.56) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';

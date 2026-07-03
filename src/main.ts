@@ -12,6 +12,7 @@ import {
 } from './game/browser_env';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
 import {
+  clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
   clickMoveStep,
   distance2d,
@@ -2059,6 +2060,7 @@ async function startGame(
     );
   }
 
+  let lastResolveMovePos: { x: number; z: number } | null = null;
   function resolveMove(
     mouselook: boolean,
     playerPos: { x: number; z: number },
@@ -2068,6 +2070,13 @@ async function startGame(
     attackMoveTick();
     const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
+    // A teleport (door, portal, spirit release) invalidates any pending
+    // click-to-move: the destination is across the transition, and chasing it
+    // walks the player straight back into the trigger.
+    if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
+      input.clearClickMove();
+    }
+    lastResolveMovePos = { x: playerPos.x, z: playerPos.z };
     if (input.clickMoveTarget) {
       const action = resolveClickMoveAction(mi, {
         mouselook,
