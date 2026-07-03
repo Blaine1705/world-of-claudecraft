@@ -94,12 +94,41 @@ const HOLLOW_SHAPING = [
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
 ] as const;
 
-function hollowShapingOffset(x: number, z: number): number {
+// Border pockets the mountain fringe must not swallow.
+const HOLLOW_FRINGE_CLEARINGS = [
+  { x: -140, z: 960, r: 34 }, // the Duskfall cave arrival and its road
+  { x: -145, z: 1100, r: 30 }, // the Gleamstag's hidden clearing
+  { x: 160, z: 1228, r: 26 }, // the forgotten monument
+] as const;
+
+function hollowShapingOffset(x: number, z: number, seed: number): number {
   if (z < 905 || z > 1260) return 0;
   let dh = 0;
   for (const f of HOLLOW_SHAPING) {
     const d = Math.hypot(x - f.x, z - f.z);
     if (d < f.r) dh += f.h * (1 - smoothstep(f.r * 0.35, f.r, d));
+  }
+  // An organic mountain fringe: noise modulates how deep the border hills
+  // bite into the band, so the walkable realm (and its map silhouette) is an
+  // irregular hollow instead of a rectangle. Heights stay gentle (max ~20
+  // over ~26yd, slope well under the climb gate) so nothing is walled off;
+  // the map painter's rock tint above h~26 does the visual work.
+  const dW = x + 180;
+  const dE = 180 - x;
+  const dN = 1260 - z;
+  const dSide = Math.min(dW, dE, dN);
+  if (dSide < 54) {
+    // coarse lobes (wavelength ~80yd) bite 8..48yd into the band; height 34
+    // crosses the map painter's rock tint so the silhouette reads as an
+    // irregular mountain bowl instead of a frame. Content pockets near the
+    // border (the cave arrival, the Gleamstag clearing, the forgotten
+    // monument) damp the fringe so nothing gets buried.
+    let bite = 8 + fbm2(x * 0.012 + 7, z * 0.012 - 3, seed + 47, 2) * 40;
+    for (const keep of HOLLOW_FRINGE_CLEARINGS) {
+      const d = Math.hypot(x - keep.x, z - keep.z);
+      if (d < keep.r) bite = Math.min(bite, 8 + (d / keep.r) * 14);
+    }
+    dh += 34 * (1 - smoothstep(bite * 0.25, bite, dSide));
   }
   return dh;
 }
@@ -235,7 +264,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const rim = Math.max(rimX, rimS, rimN);
   h += rim * 40;
   h += mirefenImpactCraterOffset(x, z);
-  h += hollowShapingOffset(x, z);
+  h += hollowShapingOffset(x, z, seed);
   return h;
 }
 

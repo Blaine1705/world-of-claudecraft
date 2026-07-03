@@ -188,11 +188,27 @@ function placeFlora(seed: number): Placements {
       const variant = hash2(gx, gz, seed + 241) < 0.5 ? 0 : 1;
       const area = areaAt(x, z, dRoad);
       const shroomTint = pickTint(MUSHROOM_AREA_TINTS[area], r);
+      // giants read washed-out under pale tints: deepen theirs toward the hue
+      const giantTint = (() => {
+        const col = new THREE.Color(shroomTint);
+        const hsl = { h: 0, s: 0, l: 0 };
+        col.getHSL(hsl);
+        col.setHSL(hsl.h, Math.min(1, hsl.s * 1.9 + 0.12), Math.max(0.42, hsl.l * 0.82));
+        return col.getHex();
+      })();
       const inShroomCountry = area === 'deep' || area === 'path';
       const inCrystalCountry = area === 'shallows' || area === 'court';
 
       const pushShroom = (scale: number) => {
-        out.mushrooms.push({ x, z, y, scale, rot, variant, tint: shroomTint });
+        out.mushrooms.push({
+          x,
+          z,
+          y,
+          scale,
+          rot,
+          variant,
+          tint: scale >= 3.2 ? giantTint : shroomTint,
+        });
         if (scale >= 3.2) {
           // a giant seeds a spore-ring of small ones around its foot
           const kids = 2 + Math.floor(hash2(gx, gz, seed + 251) * 3);
@@ -219,7 +235,7 @@ function placeFlora(seed: number): Placements {
       if (inShroomCountry) {
         if (r < 0.085)
           pushShroom(4 + r * 55); // giants, 4 to ~8.5
-        else if (r < 0.38) pushShroom(0.8 + (r - 0.085) * 2.6);
+        else if (r < 0.5) pushShroom(0.8 + (r - 0.085) * 2.6);
       } else if (inCrystalCountry) {
         const chance = area === 'court' ? 0.18 : 0.42;
         if (r < chance) {
@@ -233,12 +249,12 @@ function placeFlora(seed: number): Placements {
             tint: pickTint(CRYSTAL_AREA_TINTS[area], r * 3.7),
             lean: terrainGradient(x, z, seed),
           });
-        } else if (r > 0.94) {
+        } else if (r > 0.9) {
           pushShroom(0.7 + (1 - r) * 8);
         }
       } else {
         // the wider glade: a softer mix of everything
-        if (r < 0.07)
+        if (r < 0.095)
           pushShroom(0.8 + r * 36); // occasional big one
         else if (r > 0.982) {
           out.crystals.push({
@@ -257,9 +273,9 @@ function placeFlora(seed: number): Placements {
       // duskbell flowers: meadow drifts wherever the grass grows, thicker in
       // the glade and near the town's garden fringe
       const fr = hash2(gx, gz, seed + 301);
-      const flowerChance = area === 'glade' ? 0.5 : 0.3;
+      const flowerChance = area === 'glade' ? 0.32 : 0.2;
       if (fr < flowerChance) {
-        const patch = 2 + Math.floor(hash2(gx, gz, seed + 311) * 5);
+        const patch = 2 + Math.floor(hash2(gx, gz, seed + 311) * 3);
         for (let k = 0; k < patch; k++) {
           const fx = x + (hash2(gx + 7 * k, gz, seed + 321) - 0.5) * 5;
           const fz = z + (hash2(gx, gz + 7 * k, seed + 331) - 0.5) * 5;
@@ -280,8 +296,8 @@ function placeFlora(seed: number): Placements {
       // starbuds: a tiny understory flower that grows nearly everywhere,
       // half the size of a duskbell and twice as common
       const sr = hash2(gx, gz, seed + 531);
-      if (sr < 0.55) {
-        const patch = 2 + Math.floor(hash2(gx, gz, seed + 541) * 6);
+      if (sr < 0.32) {
+        const patch = 2 + Math.floor(hash2(gx, gz, seed + 541) * 3);
         for (let k = 0; k < patch; k++) {
           const fx = x + (hash2(gx + 11 * k, gz, seed + 551) - 0.5) * 6;
           const fz = z + (hash2(gx, gz + 11 * k, seed + 561) - 0.5) * 6;
@@ -438,17 +454,40 @@ function crystalCoreGeo(): THREE.BufferGeometry {
   return g;
 }
 
+// A ring of cupped petals around a bright center: the shape everyone reads
+// as "flower" even at four triangles a petal.
+function petalHead(
+  petals: number,
+  petalLen: number,
+  petalWide: number,
+  cup: number,
+): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < petals; k++) {
+    const ang = (k / petals) * Math.PI * 2;
+    const petal = new THREE.ConeGeometry(petalWide, petalLen, 3);
+    petal.applyMatrix4(new THREE.Matrix4().makeScale(1, 1, 0.35)); // flatten
+    petal.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2 - cup)); // lay out, cup up
+    petal.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, petalLen * 0.42));
+    petal.applyMatrix4(new THREE.Matrix4().makeRotationY(ang));
+    parts.push(petal.toNonIndexed());
+  }
+  const center = new THREE.IcosahedronGeometry(petalWide * 0.75, 0);
+  center.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.6, 1));
+  parts.push(center);
+  return mergeGeometries(parts);
+}
+
 function duskbellGeo(): THREE.BufferGeometry {
-  // a thin stem with a nodding bell head: reads as a flower at any distance
-  const stem = new THREE.CylinderGeometry(0.015, 0.025, 0.42, 4);
+  const stem = new THREE.CylinderGeometry(0.015, 0.025, 0.42, 4).toNonIndexed();
   stem.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.21, 0));
-  const bell = new THREE.ConeGeometry(0.09, 0.14, 6);
-  bell.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI * 0.82)); // nodding
-  bell.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.42, 0.05));
-  const leaf = new THREE.ConeGeometry(0.05, 0.16, 3);
+  const head = petalHead(5, 0.14, 0.05, 0.5);
+  head.applyMatrix4(new THREE.Matrix4().makeRotationZ(0.25)); // a gentle nod
+  head.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.44, 0));
+  const leaf = new THREE.ConeGeometry(0.05, 0.16, 3).toNonIndexed();
   leaf.applyMatrix4(new THREE.Matrix4().makeRotationZ(1.2));
   leaf.applyMatrix4(new THREE.Matrix4().makeTranslation(0.07, 0.12, 0));
-  return mergeGeometries([stem, bell, leaf]);
+  return mergeGeometries([stem, head, leaf]);
 }
 
 // Per-face brightness variance: converts to non-indexed and paints one flat
@@ -509,11 +548,9 @@ function addVertexMottle(
 }
 
 function starbudGeo(): THREE.BufferGeometry {
-  // polyhedron geometries are non-indexed; unify before merging
   const stem = new THREE.CylinderGeometry(0.01, 0.016, 0.2, 3).toNonIndexed();
   stem.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.1, 0));
-  const head = new THREE.IcosahedronGeometry(0.05, 0);
-  head.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.55, 1));
+  const head = petalHead(4, 0.07, 0.03, 0.35); // four tiny petals, up-facing
   head.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.21, 0));
   return mergeGeometries([stem, head]);
 }
@@ -545,25 +582,46 @@ function willowGeo(): { trunk: THREE.BufferGeometry; canopy: THREE.BufferGeometr
 }
 
 function blossomGeo(): { trunk: THREE.BufferGeometry; canopy: THREE.BufferGeometry } {
-  const trunk = new THREE.CylinderGeometry(0.14, 0.3, 2.1, 5);
-  trunk.applyMatrix4(new THREE.Matrix4().makeRotationZ(-0.18));
-  trunk.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 1.05, 0));
-  const branch = new THREE.CylinderGeometry(0.07, 0.12, 1.1, 4);
-  branch.applyMatrix4(new THREE.Matrix4().makeRotationZ(0.9));
-  branch.applyMatrix4(new THREE.Matrix4().makeTranslation(0.55, 2.0, 0.1));
-  const trunkAll = mergeGeometries([trunk, branch]);
-  const puff = (s: number, x: number, y: number, z: number): THREE.BufferGeometry => {
-    const g = new THREE.IcosahedronGeometry(s, 0);
+  // a real branch skeleton: a leaning trunk splitting into three boughs, each
+  // carrying blossom clusters at its tip, so the silhouette reads TREE
+  // (trunk, then branches, then clouds of bloom) instead of blob-on-a-stick
+  const wood: THREE.BufferGeometry[] = [];
+  const trunk = new THREE.CylinderGeometry(0.13, 0.3, 2.4, 5);
+  trunk.applyMatrix4(new THREE.Matrix4().makeRotationZ(-0.14));
+  trunk.applyMatrix4(new THREE.Matrix4().makeTranslation(0.05, 1.2, 0));
+  wood.push(trunk);
+  const boughSpecs = [
+    { yaw: 0.3, lean: 0.75, len: 1.5, tipY: 3.3 },
+    { yaw: 2.4, lean: 0.95, len: 1.3, tipY: 3.0 },
+    { yaw: 4.5, lean: 0.55, len: 1.2, tipY: 3.4 },
+  ];
+  const tips: { x: number; y: number; z: number }[] = [];
+  for (const bs of boughSpecs) {
+    const bough = new THREE.CylinderGeometry(0.05, 0.11, bs.len, 4);
+    bough.applyMatrix4(new THREE.Matrix4().makeTranslation(0, bs.len / 2, 0));
+    bough.applyMatrix4(new THREE.Matrix4().makeRotationZ(bs.lean));
+    bough.applyMatrix4(new THREE.Matrix4().makeRotationY(bs.yaw));
+    bough.applyMatrix4(new THREE.Matrix4().makeTranslation(0.05, 2.25, 0));
+    wood.push(bough);
+    const tx = 0.05 + Math.cos(bs.yaw) * Math.sin(bs.lean) * bs.len;
+    const tz = -Math.sin(bs.yaw) * Math.sin(bs.lean) * bs.len;
+    tips.push({ x: tx, y: bs.tipY - 0.4, z: tz });
+  }
+  const trunkAll = mergeGeometries(wood.map((g) => g.toNonIndexed()));
+  const puff = (s2: number, x: number, y: number, z: number): THREE.BufferGeometry => {
+    const g = new THREE.IcosahedronGeometry(s2, 0);
+    g.applyMatrix4(new THREE.Matrix4().makeScale(1.15, 0.85, 1.15)); // wind-spread
     g.applyMatrix4(new THREE.Matrix4().makeTranslation(x, y, z));
     return g;
   };
-  const canopy = mergeGeometries([
-    puff(0.85, -0.2, 2.55, 0),
-    puff(0.65, 0.9, 2.7, 0.2),
-    puff(0.55, 0.35, 3.15, -0.45),
-    puff(0.5, -0.65, 2.95, 0.35),
-    puff(0.45, 0.45, 2.4, 0.55),
-  ]);
+  const puffs: THREE.BufferGeometry[] = [];
+  tips.forEach((tip, i) => {
+    puffs.push(puff(0.55 + (i % 2) * 0.1, tip.x, tip.y, tip.z));
+    puffs.push(puff(0.4, tip.x * 1.25, tip.y + 0.32, tip.z * 1.25));
+    puffs.push(puff(0.3, tip.x * 0.8, tip.y - 0.28, tip.z * 0.8 + 0.15));
+  });
+  puffs.push(puff(0.45, 0.05, 3.5, 0)); // crown
+  const canopy = mergeGeometries(puffs);
   return { trunk: trunkAll, canopy };
 }
 
@@ -691,6 +749,46 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         castShadow: true,
         tinted: true,
       });
+    }
+  }
+
+  // giant caps get a dark radial gill skirt under the cap: the depth cue that
+  // sells scale up close (small mushrooms skip it, it would just be noise)
+  {
+    const giants = spots.mushrooms.filter((sp) => sp.scale >= 3.2);
+    if (giants.length > 0) {
+      const anyParts = loadedParts.get(MUSHROOM_URLS[0]);
+      const bbox = new THREE.Box3();
+      if (anyParts)
+        for (const part of anyParts)
+          bbox.union(
+            new THREE.Box3().setFromBufferAttribute(
+              part.geometry.getAttribute('position') as THREE.BufferAttribute,
+            ),
+          );
+      const capY = bbox.max.y * 0.55;
+      const capR = Math.max(bbox.max.x, -bbox.min.x) * 0.62;
+      const gillGeo = perFaceShade(
+        new THREE.CylinderGeometry(
+          capR,
+          capR * 0.35,
+          bbox.max.y * 0.14,
+          12,
+          1,
+          true,
+        ).toNonIndexed(),
+        0.3,
+        seed + 641,
+      );
+      gillGeo.applyMatrix4(new THREE.Matrix4().makeTranslation(0, capY, 0));
+      const gillMat = floraMat({
+        color: 0x5e4a66,
+        roughness: 0.9,
+        flatShading: true,
+        vertexColors: true,
+      });
+      (gillMat as THREE.MeshStandardMaterial).side = THREE.DoubleSide;
+      instance(gillGeo, gillMat, giants, { tinted: true });
     }
   }
 

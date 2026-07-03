@@ -66,6 +66,16 @@ export function paintTerrainRows(
         r = 38;
         g = 84;
         b = 138;
+      } else if (biome === 'dusk' && h > 26) {
+        // dusk crags stay dark violet so the organic mountain bowl reads
+        // against the pale map matte instead of blending into it
+        r = 60;
+        g = 50;
+        b = 72;
+      } else if (biome === 'dusk' && h > 11) {
+        r = 78;
+        g = 68;
+        b = 88;
       } else if (h > 26) {
         r = 168;
         g = 172;

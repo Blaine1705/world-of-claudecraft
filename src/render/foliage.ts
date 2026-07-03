@@ -141,6 +141,8 @@ const GRASS_TINT: Record<BiomeId, number> = {
   dusk: 0xccc3da,
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
+// Flowering-bush bloom colorways for the dusk realm (picked per instance).
+const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0xaebf8e,
   marsh: 0x8d9865,
@@ -1217,6 +1219,20 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
           if (kind === 'mushroom') {
             // mushrooms keep their painted cap colors — brightness jitter only
             im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'dusk') {
+            // the Hollow's flowering bushes bloom in several colors, not one
+            const tint =
+              DUSK_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * DUSK_BLOOM_TINTS.length)];
+            im.setColorAt(
+              i,
+              softTint(
+                s.x,
+                s.z,
+                tint,
+                c,
+                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
+              ),
+            );
           } else {
             im.setColorAt(
               i,
