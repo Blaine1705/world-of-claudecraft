@@ -71,6 +71,39 @@ export function crossesSealedBorder(z0: number, z1: number): boolean {
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
+// The Veiled Hollow's organic relief, layered over the base FBM hills the
+// same way the Mirefen crater is: gentle radial features that break the
+// band's uniformity into highlands, a meadow bowl, and the falls terrace
+// whose steep southern lip pours into Starfall Basin (the lake carve and the
+// terrace overlap; the height step between them IS the waterfall cliff,
+// dressed by render/realm_flora.ts).
+export const HOLLOW_FALLS = {
+  terrace: { x: 128, z: 1008, radius: 22, height: 9 },
+  // where the lip meets the basin: the render waterfall hangs here
+  lip: { x: 118, z: 995 },
+} as const;
+const HOLLOW_SHAPING = [
+  {
+    x: HOLLOW_FALLS.terrace.x,
+    z: HOLLOW_FALLS.terrace.z,
+    r: HOLLOW_FALLS.terrace.radius,
+    h: HOLLOW_FALLS.terrace.height,
+  },
+  { x: -135, z: 1090, r: 45, h: 7 }, // western highlands (the Mirrormere sits in them)
+  { x: 20, z: 1005, r: 35, h: -2.2 }, // soft meadow bowl south of the town road
+  { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
+] as const;
+
+function hollowShapingOffset(x: number, z: number): number {
+  if (z < 905 || z > 1260) return 0;
+  let dh = 0;
+  for (const f of HOLLOW_SHAPING) {
+    const d = Math.hypot(x - f.x, z - f.z);
+    if (d < f.r) dh += f.h * (1 - smoothstep(f.r * 0.35, f.r, d));
+  }
+  return dh;
+}
+
 export const MIREFEN_IMPACT_CRATER = {
   x: 149.5,
   z: 295,
@@ -202,6 +235,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const rim = Math.max(rimX, rimS, rimN);
   h += rim * 40;
   h += mirefenImpactCraterOffset(x, z);
+  h += hollowShapingOffset(x, z);
   return h;
 }
 

@@ -28,9 +28,18 @@ export const REALM_ZONE: ZoneDef = {
   sealedSouthBorder: true,
   hub: { x: -40, z: 1030, radius: 30, name: 'Eldergleam' },
   graveyard: { x: -60, z: 1004 },
+  // Overlapping carves make organic shorelines: inlets and coves instead of
+  // circular ponds. The tarn cuts into the western highlands; the falls pool
+  // terrace above Starfall is shaped in world.ts (VEILED_HOLLOW_SHAPING).
   lakes: [
     { x: 110, z: 985, radius: 22 }, // Starfall Basin
+    { x: 94, z: 1000, radius: 10 }, // ...its reedy northwest inlet
+    { x: 126, z: 972, radius: 9 }, // ...and the quiet southeast cove
     { x: 75, z: 1165, radius: 18 }, // the Crystalline Shallows
+    { x: 60, z: 1178, radius: 9 }, // ...shallow northern cove
+    { x: 92, z: 1154, radius: 8 }, // ...crystal-flanked eastern cove
+    { x: -120, z: 1105, radius: 12 }, // the Mirrormere, a highland tarn
+    { x: -15, z: 1062, radius: 7 }, // the meadow pond by the garden road
   ],
   pois: [
     { x: -40, z: 1030, label: 'Eldergleam' },

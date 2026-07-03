@@ -1078,7 +1078,7 @@ interface DressingSpot {
 
 const DRESS_STEP_HIGH = 12;
 const DRESS_STEP_LOW = 10;
-const DRESS_DENSITY: Record<BiomeId, number> = { vale: 0.26, marsh: 0.26, peaks: 0.15, dusk: 0.3 };
+const DRESS_DENSITY: Record<BiomeId, number> = { vale: 0.26, marsh: 0.26, peaks: 0.15, dusk: 0.24 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
 const DRESS_TINT_SOFTEN_LOW = 0.56;
@@ -1100,11 +1100,12 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     return 'mushroom';
   }
   if (biome === 'dusk') {
-    // mushroom-lit glade floor: mushrooms and ferns, with flowering bushes
-    // threaded through the meadows
+    // glade floor: ferns and flowering bushes carry the ground cover, with
+    // mushrooms as a sparser accent (the big glowing ones live in
+    // realm_flora, so the tiny dressing kind stays scattered and natural)
     if (r < 0.12) return 'bush';
-    if (r < 0.3) return 'bushFlowers';
-    if (r < 0.56) return 'fern';
+    if (r < 0.34) return 'bushFlowers';
+    if (r < 0.78) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';

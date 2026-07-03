@@ -24,7 +24,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { REALM_PROPS, REALM_ZONE } from '../sim/content/realm';
 import { hash2 } from '../sim/rng';
-import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
+import { HOLLOW_FALLS, roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
@@ -142,6 +142,7 @@ interface Placements {
   mushrooms: Spot[];
   crystals: Spot[];
   flowers: Spot[];
+  starbuds: Spot[];
   willows: Spot[];
   blossoms: Spot[];
   boulders: Spot[];
@@ -152,6 +153,7 @@ function placeFlora(seed: number): Placements {
     mushrooms: [],
     crystals: [],
     flowers: [],
+    starbuds: [],
     willows: [],
     blossoms: [],
     boulders: [],
@@ -193,7 +195,7 @@ function placeFlora(seed: number): Placements {
         out.mushrooms.push({ x, z, y, scale, rot, variant, tint: shroomTint });
         if (scale >= 3.2) {
           // a giant seeds a spore-ring of small ones around its foot
-          const kids = 3 + Math.floor(hash2(gx, gz, seed + 251) * 4);
+          const kids = 2 + Math.floor(hash2(gx, gz, seed + 251) * 3);
           for (let k = 0; k < kids; k++) {
             const ang = hash2(gx + k + 1, gz, seed + 261) * Math.PI * 2;
             const dist = 1.6 + hash2(gx, gz + k + 1, seed + 271) * (1.2 + scale * 0.35);
@@ -217,7 +219,7 @@ function placeFlora(seed: number): Placements {
       if (inShroomCountry) {
         if (r < 0.085)
           pushShroom(4 + r * 55); // giants, 4 to ~8.5
-        else if (r < 0.62) pushShroom(0.8 + (r - 0.085) * 2.6);
+        else if (r < 0.38) pushShroom(0.8 + (r - 0.085) * 2.6);
       } else if (inCrystalCountry) {
         const chance = area === 'court' ? 0.18 : 0.42;
         if (r < chance) {
@@ -231,13 +233,13 @@ function placeFlora(seed: number): Placements {
             tint: pickTint(CRYSTAL_AREA_TINTS[area], r * 3.7),
             lean: terrainGradient(x, z, seed),
           });
-        } else if (r > 0.9) {
+        } else if (r > 0.94) {
           pushShroom(0.7 + (1 - r) * 8);
         }
       } else {
         // the wider glade: a softer mix of everything
-        if (r < 0.1)
-          pushShroom(0.8 + r * 26); // occasional big one
+        if (r < 0.07)
+          pushShroom(0.8 + r * 36); // occasional big one
         else if (r > 0.982) {
           out.crystals.push({
             x,
@@ -269,7 +271,29 @@ function placeFlora(seed: number): Placements {
             y: fy,
             scale: 0.7 + hash2(gx + k, gz - k, seed + 341) * 0.7,
             rot: hash2(gx - k, gz - k, seed + 351) * Math.PI * 2,
-            variant: Math.floor(hash2(gx + k, gz + k, seed + 361) * 4),
+            variant: Math.floor(hash2(gx + k, gz + k, seed + 361) * 7),
+            tint: 0xffffff,
+          });
+        }
+      }
+
+      // starbuds: a tiny understory flower that grows nearly everywhere,
+      // half the size of a duskbell and twice as common
+      const sr = hash2(gx, gz, seed + 531);
+      if (sr < 0.55) {
+        const patch = 2 + Math.floor(hash2(gx, gz, seed + 541) * 6);
+        for (let k = 0; k < patch; k++) {
+          const fx = x + (hash2(gx + 11 * k, gz, seed + 551) - 0.5) * 6;
+          const fz = z + (hash2(gx, gz + 11 * k, seed + 561) - 0.5) * 6;
+          const fy = usable(fx, fz, 1.2, 2);
+          if (fy === null) continue;
+          out.starbuds.push({
+            x: fx,
+            z: fz,
+            y: fy,
+            scale: 0.5 + hash2(gx - k, gz + k, seed + 571) * 0.5,
+            rot: hash2(gx + k, gz - k, seed + 581) * Math.PI * 2,
+            variant: Math.floor(hash2(gx - k, gz - k, seed + 591) * 3),
             tint: 0xffffff,
           });
         }
@@ -427,6 +451,73 @@ function duskbellGeo(): THREE.BufferGeometry {
   return mergeGeometries([stem, bell, leaf]);
 }
 
+// Per-face brightness variance: converts to non-indexed and paints one flat
+// shade per triangle, the classic low-poly "confetti" detail. amp is the
+// +/- brightness range; hueShift nudges the red/blue balance per face for a
+// petal-like two-tone.
+function perFaceShade(
+  src: THREE.BufferGeometry,
+  amp: number,
+  seed: number,
+  hueShift = 0,
+): THREE.BufferGeometry {
+  const geo = src.toNonIndexed();
+  const pos = geo.getAttribute('position');
+  const colors = new Float32Array(pos.count * 3);
+  for (let f = 0; f < pos.count; f += 3) {
+    const r = hash2(
+      Math.round(pos.getX(f) * 53 + pos.getY(f) * 131),
+      Math.round(pos.getZ(f) * 71 + pos.getY(f) * 17),
+      seed,
+    );
+    const shade = 1 - amp + r * amp * 2;
+    const warm =
+      (hash2(Math.round(pos.getY(f) * 97), Math.round(pos.getX(f) * 43), seed + 1) - 0.5) *
+      hueShift;
+    for (let v = 0; v < 3; v++) {
+      colors[(f + v) * 3] = shade + warm;
+      colors[(f + v) * 3 + 1] = shade - Math.abs(warm) * 0.4;
+      colors[(f + v) * 3 + 2] = shade - warm;
+    }
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geo;
+}
+
+// Per-vertex mottling for indexed GLB geometry (mushroom caps): a soft
+// weathered blotching that multiplies the painted texture.
+function addVertexMottle(
+  src: THREE.BufferGeometry,
+  amp: number,
+  seed: number,
+): THREE.BufferGeometry {
+  const geo = src.clone();
+  const pos = geo.getAttribute('position');
+  const colors = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    const n =
+      hash2(Math.round(pos.getX(i) * 21), Math.round(pos.getZ(i) * 23 + pos.getY(i) * 9), seed) *
+        0.5 +
+      hash2(Math.round(pos.getX(i) * 7), Math.round(pos.getY(i) * 11), seed + 5) * 0.5;
+    const shade = 1 - amp + n * amp * 2;
+    colors[i * 3] = shade;
+    colors[i * 3 + 1] = shade;
+    colors[i * 3 + 2] = shade;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geo;
+}
+
+function starbudGeo(): THREE.BufferGeometry {
+  // polyhedron geometries are non-indexed; unify before merging
+  const stem = new THREE.CylinderGeometry(0.01, 0.016, 0.2, 3).toNonIndexed();
+  stem.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.1, 0));
+  const head = new THREE.IcosahedronGeometry(0.05, 0);
+  head.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.55, 1));
+  head.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.21, 0));
+  return mergeGeometries([stem, head]);
+}
+
 function willowGeo(): { trunk: THREE.BufferGeometry; canopy: THREE.BufferGeometry } {
   const trunk = new THREE.CylinderGeometry(0.22, 0.42, 3.2, 6);
   trunk.applyMatrix4(new THREE.Matrix4().makeRotationZ(0.12));
@@ -467,9 +558,11 @@ function blossomGeo(): { trunk: THREE.BufferGeometry; canopy: THREE.BufferGeomet
     return g;
   };
   const canopy = mergeGeometries([
-    puff(1.0, -0.15, 2.6, 0),
-    puff(0.75, 0.95, 2.75, 0.2),
-    puff(0.6, 0.35, 3.15, -0.45),
+    puff(0.85, -0.2, 2.55, 0),
+    puff(0.65, 0.9, 2.7, 0.2),
+    puff(0.55, 0.35, 3.15, -0.45),
+    puff(0.5, -0.65, 2.95, 0.35),
+    puff(0.45, 0.45, 2.4, 0.55),
   ]);
   return { trunk: trunkAll, canopy };
 }
@@ -485,8 +578,48 @@ const WILLOW_LEAF = 0x9fb8a8; // silver-sage, unlike any existing canopy
 const WILLOW_BARK = 0x8a7a90;
 const BLOSSOM_PINKS = [0xf2b8cc, 0xf8e0ea]; // cherry pink / near-white
 const BLOSSOM_BARK = 0x6e5a66;
-const FLOWER_TINTS = [0xf2a8c8, 0xe8e0f8, 0xa8d8e8, 0xd8b8f2]; // duskbell colorways
+const FLOWER_TINTS = [
+  0xf2a8c8, // rose
+  0xe8e0f8, // moon white
+  0xa8d8e8, // rainwater blue
+  0xd8b8f2, // lilac
+  0xf2e0a0, // butter
+  0xf2a88f, // coral
+  0x9a7fd8, // deep violet
+]; // duskbell colorways
+const STARBUD_TINTS = [0xf8f0ff, 0xf2d8a8, 0xf2b8c8]; // tiny understory flowers
 const BOULDER_MOSS = 0x9caa96;
+
+// One-off flora materials that need vertexColors: built directly (surfaceMat
+// caches and shares by key, so flipping vertexColors on a cached material
+// would leak into unrelated users).
+function floraMat(opts: {
+  color: number;
+  emissive?: number;
+  emissiveIntensity?: number;
+  roughness?: number;
+  metalness?: number;
+  flatShading?: boolean;
+  vertexColors?: boolean;
+}): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
+  return GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({
+        color: opts.color,
+        emissive: opts.emissive ?? 0x000000,
+        emissiveIntensity: opts.emissiveIntensity ?? 1,
+        roughness: opts.roughness ?? 0.85,
+        metalness: opts.metalness ?? 0,
+        flatShading: opts.flatShading ?? false,
+        vertexColors: opts.vertexColors ?? false,
+      })
+    : new THREE.MeshLambertMaterial({
+        color: opts.color,
+        emissive: opts.emissive ?? 0x000000,
+        emissiveIntensity: opts.emissiveIntensity ?? 1,
+        flatShading: opts.flatShading ?? false,
+        vertexColors: opts.vertexColors ?? false,
+      });
+}
 
 export function buildRealmFlora(seed: number): RealmFloraView {
   const group = new THREE.Group();
@@ -551,22 +684,28 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         mat.emissive = new THREE.Color(variant === 0 ? 0xff8fca : 0x8fe8d8);
         mat.emissiveIntensity = GFX.composer ? 0.28 : 0.18;
       }
+      // weathered mottling multiplies the painted texture
+      mat.vertexColors = true;
       pulsing.push({ mat, base: (mat as THREE.MeshStandardMaterial).emissiveIntensity ?? 0 });
-      instance(part.geometry, mat, list, { castShadow: true, tinted: true });
+      instance(addVertexMottle(part.geometry, 0.13, seed + 601), mat, list, {
+        castShadow: true,
+        tinted: true,
+      });
     }
   }
 
   // --- crystals: dim faceted shell for depth, bright core for the glow,
   // both rooted into the ground and leaned with the slope ---
-  const shellGeo = crystalShellGeo();
+  const shellGeo = perFaceShade(crystalShellGeo(), 0.28, seed + 611);
   const coreGeo = crystalCoreGeo();
-  const shellMat = surfaceMat({
+  const shellMat = floraMat({
     color: 0x8a76a8,
     emissive: 0x7a5fa0,
     emissiveIntensity: GFX.composer ? 0.3 : 0.2,
     roughness: 0.16,
     metalness: 0.18, // env glints off the facets
     flatShading: true,
+    vertexColors: true, // per-face depth variance
   }) as THREE.MeshStandardMaterial;
   const coreMat = surfaceMat({
     color: 0xd8c8f2,
@@ -600,6 +739,14 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       spots.flowers.filter((sp) => sp.variant === colorway),
     );
   }
+  const budGeo = starbudGeo();
+  for (let colorway = 0; colorway < STARBUD_TINTS.length; colorway++) {
+    instance(
+      budGeo,
+      surfaceMat({ color: STARBUD_TINTS[colorway], roughness: 0.85 }),
+      spots.starbuds.filter((sp) => sp.variant === colorway),
+    );
+  }
 
   // --- weeping willows on the lakeshores ---
   const willow = willowGeo();
@@ -607,8 +754,8 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     castShadow: true,
   });
   instance(
-    willow.canopy,
-    surfaceMat({ color: WILLOW_LEAF, roughness: 0.85, flatShading: true }),
+    perFaceShade(willow.canopy, 0.12, seed + 621),
+    floraMat({ color: WILLOW_LEAF, roughness: 0.85, flatShading: true, vertexColors: true }),
     spots.willows,
     { castShadow: true },
   );
@@ -618,10 +765,16 @@ export function buildRealmFlora(seed: number): RealmFloraView {
   instance(blossom.trunk, surfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }), spots.blossoms, {
     castShadow: true,
   });
+  const blossomShaded = perFaceShade(blossom.canopy, 0.15, seed + 631, 0.12);
   for (const variant of [0, 1]) {
     instance(
-      blossom.canopy,
-      surfaceMat({ color: BLOSSOM_PINKS[variant], roughness: 0.8, flatShading: true }),
+      blossomShaded,
+      floraMat({
+        color: BLOSSOM_PINKS[variant],
+        roughness: 0.8,
+        flatShading: true,
+        vertexColors: true,
+      }),
       spots.blossoms.filter((sp) => sp.variant === variant),
       { castShadow: true },
     );
@@ -634,6 +787,94 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       const mat = part.material.clone() as THREE.MeshStandardMaterial;
       if ('color' in mat) mat.color.multiply(new THREE.Color(BOULDER_MOSS));
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
+    }
+  }
+
+  // The Starfall falls: the terrace lip shaped in world.ts pours into the
+  // basin. A scrolling canvas-streak sheet reads as falling water in the
+  // game's low-poly style; two foam discs churn at the base; a translucent
+  // pool caps the terrace behind the lip. All render-only.
+  let fallsMap: THREE.CanvasTexture | null = null;
+  const foamDiscs: THREE.Mesh[] = [];
+  {
+    const lip = HOLLOW_FALLS.lip;
+    const t = HOLLOW_FALLS.terrace;
+    const dirX = (110 - t.x) / 29.2,
+      dirZ = (985 - t.z) / 29.2; // toward the lake
+    const topX = lip.x - dirX * 3,
+      topZ = lip.z - dirZ * 3;
+    const baseX = lip.x + dirX * 4,
+      baseZ = lip.z + dirZ * 4;
+    const topY = terrainHeight(topX, topZ, seed);
+    const baseY = Math.max(WATER_LEVEL - 0.5, terrainHeight(baseX, baseZ, seed));
+    const drop = Math.max(4, topY - baseY);
+    if (typeof document !== 'undefined') {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, 64, 128);
+        for (let i = 0; i < 26; i++) {
+          const sx = hash2(i, 3, seed) * 64;
+          const len = 24 + hash2(i, 7, seed) * 70;
+          const sy = hash2(i, 11, seed) * 128;
+          ctx.fillStyle = `rgba(255,255,255,${0.25 + hash2(i, 13, seed) * 0.45})`;
+          ctx.fillRect(sx, sy, 1.6 + hash2(i, 17, seed) * 2.2, len);
+        }
+        fallsMap = new THREE.CanvasTexture(canvas);
+        fallsMap.wrapS = THREE.RepeatWrapping;
+        fallsMap.wrapT = THREE.RepeatWrapping;
+        const sheet = new THREE.Mesh(
+          new THREE.PlaneGeometry(6.5, drop + 1.5, 1, 4),
+          new THREE.MeshBasicMaterial({
+            map: fallsMap,
+            transparent: true,
+            opacity: 0.85,
+            color: 0xcfe4f2,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+          }),
+        );
+        sheet.position.set(lip.x, (topY + baseY) / 2 + 0.4, lip.z);
+        sheet.rotation.y = Math.atan2(dirX, dirZ);
+        sheet.rotation.x = -0.08; // lean back into the cliff
+        group.add(sheet);
+        const foamMat = new THREE.MeshBasicMaterial({
+          color: 0xeaf4fa,
+          transparent: true,
+          opacity: 0.4,
+          depthWrite: false,
+        });
+        for (const [fs, fx, fz] of [
+          [2.6, baseX, baseZ],
+          [1.7, baseX + dirZ * 1.6, baseZ - dirX * 1.6],
+        ] as const) {
+          const foam = new THREE.Mesh(new THREE.CircleGeometry(fs, 10), foamMat);
+          foam.rotation.x = -Math.PI / 2;
+          foam.position.set(fx, WATER_LEVEL + 0.12, fz);
+          foamDiscs.push(foam);
+          group.add(foam);
+        }
+        // the terrace pool feeding the lip
+        const pool = new THREE.Mesh(
+          new THREE.CircleGeometry(5.5, 14),
+          new THREE.MeshBasicMaterial({
+            color: 0x9fc8e0,
+            transparent: true,
+            opacity: 0.55,
+            depthWrite: false,
+          }),
+        );
+        pool.rotation.x = -Math.PI / 2;
+        pool.position.set(topX - dirX * 4, topY + 0.15, topZ - dirZ * 4);
+        group.add(pool);
+        const fallsLight = new THREE.PointLight(0xbfe0f2, 5, 13, 2);
+        fallsLight.position.set(lip.x, baseY + 2.5, lip.z);
+        fallsLight.userData.baseIntensity = 5;
+        glowLights.push(fallsLight);
+        group.add(fallsLight);
+      }
     }
   }
 
@@ -681,6 +922,14 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       // one gentle shared breath across the glowing materials
       const breathe = 1 + Math.sin(time * 0.9) * 0.16;
       for (const entry of pulsing) entry.mat.emissiveIntensity = entry.base * breathe;
+      // the falls pour and the foam churns
+      if (fallsMap) fallsMap.offset.y = -((time * 0.55) % 1);
+      for (let i = 0; i < foamDiscs.length; i++) {
+        const foam = foamDiscs[i];
+        foam.rotation.z = time * (i === 0 ? 0.35 : -0.5);
+        const churn = 1 + Math.sin(time * 2.1 + i * 1.9) * 0.08;
+        foam.scale.setScalar(churn);
+      }
     },
   };
 }
