@@ -1254,6 +1254,9 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
+  // colliders here, rendered by render/realm_flora.ts from the same record.
+  greatTrees?: { x: number; z: number; r: number }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {

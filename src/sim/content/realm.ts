@@ -26,8 +26,8 @@ export const REALM_ZONE: ZoneDef = {
   levelRange: [15, 20],
   biome: 'dusk',
   sealedSouthBorder: true,
-  hub: { x: -40, z: 1030, radius: 22, name: 'Eldergleam' },
-  graveyard: { x: -52, z: 1014 },
+  hub: { x: -40, z: 1030, radius: 30, name: 'Eldergleam' },
+  graveyard: { x: -60, z: 1004 },
   lakes: [
     { x: 110, z: 985, radius: 22 }, // Starfall Basin
     { x: 75, z: 1165, radius: 18 }, // the Crystalline Shallows
@@ -328,8 +328,8 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'keeper_saelwyn',
     name: 'Keeper Saelwyn',
     title: 'Keeper of the Hollow',
-    pos: { x: -41, z: 1022 },
-    facing: 0.4,
+    pos: { x: -42, z: 1019 },
+    facing: 0.3,
     color: 0xd8c4f0,
     questIds: [
       'q_veil_thinned',
@@ -344,7 +344,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'loremother_bryn',
     name: 'Loremother Bryn',
     title: 'Voice of the Shrine',
-    pos: { x: -29, z: 1023 },
+    pos: { x: -20, z: 1015 },
     facing: -0.9,
     color: 0xc4b08a,
     questIds: ['q_spore_hearts', 'q_wisp_lights', 'q_treant_accord', 'q_spore_tide'],
@@ -354,7 +354,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'provisioner_fenna',
     name: 'Provisioner Fenna',
     title: 'Eldergleam Provisioner',
-    pos: { x: -45, z: 1031.5 },
+    pos: { x: -52, z: 1037.5 },
     facing: 1.6,
     color: 0x8fbf8a,
     questIds: ['q_gleaming_antlers', 'q_grove_menace'],
@@ -372,7 +372,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'wardsmith_orun',
     name: 'Wardsmith Orun',
     title: 'Keeper of the Old Forges',
-    pos: { x: -34, z: 1033.5 },
+    pos: { x: -28, z: 1039.5 },
     facing: -0.5,
     color: 0x9a86b8,
     questIds: [],
@@ -383,7 +383,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
     id: 'archivist_tullo',
     name: 'Archivist Tullo',
     title: 'Reader of Stones',
-    pos: { x: -36, z: 1026 },
+    pos: { x: -34, z: 1021 },
     facing: 2.6,
     color: 0xb8a8d8,
     questIds: ['q_monument_tour', 'q_shards_of_starfall', 'q_wardens_echoes'],
@@ -934,23 +934,26 @@ export const REALM_PROPS: ZonePropsDef = {
   ],
   // Eldergleam: the hub town under the great tree (the tree itself is placed
   // by render/realm_flora.ts; these are the built structures around it).
+  // The great tree's trunk is solid (colliders.ts); everything else rings it
+  // at a respectful distance so the square breathes.
+  greatTrees: [{ x: -40, z: 1026, r: 2.6 }],
   buildings: [
-    { kind: 'inn', x: -48, z: 1038, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: -30, z: 1040, w: 7, d: 6, rot: -0.4 },
-    { kind: 'house', x: -52, z: 1024, w: 6, d: 6, rot: 1.2 },
-    { kind: 'chapel', x: -28, z: 1020, w: 5, d: 7, rot: -1.9 }, // the shrine
+    { kind: 'inn', x: -58, z: 1046, w: 6, d: 7, rot: 0.7 },
+    { kind: 'house', x: -22, z: 1048, w: 7, d: 6, rot: -0.4 },
+    { kind: 'house', x: -62, z: 1016, w: 6, d: 6, rot: 1.2 },
+    { kind: 'chapel', x: -18, z: 1012, w: 5, d: 7, rot: -1.9 }, // the shrine
   ],
-  wells: [{ x: -38, z: 1036, r: 1.5 }],
+  wells: [{ x: -40, z: 1042, r: 1.5 }],
   stalls: [
-    { x: -45, z: 1030, rot: Math.PI / 2, r: 1.7 }, // Provisioner Fenna
-    { x: -34, z: 1032, rot: -0.5, r: 1.7 }, // Wardsmith Orun
+    { x: -52, z: 1036, rot: Math.PI / 2, r: 1.7 }, // Provisioner Fenna
+    { x: -28, z: 1038, rot: -0.5, r: 1.7 }, // Wardsmith Orun
   ],
   crates: [
-    [-44, 1028],
-    [-33, 1034],
+    [-51, 1033],
+    [-27, 1041],
   ],
   campfires: [
-    [-40, 1018], // town square gathering fire
+    [-40, 1008], // town square gathering fire, south of the tree
     [-70, 1005], // wayfarer camp on the Duskfall road
     [32, 958], // Grove Keeper camp
   ],
@@ -961,9 +964,9 @@ export const REALM_PROPS: ZonePropsDef = {
   ],
   fences: [
     // the magical garden ring on the town's north edge
-    { x1: -50, z1: 1044, x2: -42, z2: 1047 },
-    { x1: -42, z1: 1047, x2: -33, z2: 1046 },
-    { x1: -33, z1: 1046, x2: -27, z2: 1042 },
+    { x1: -52, z1: 1052, x2: -42, z2: 1056 },
+    { x1: -42, z1: 1056, x2: -30, z2: 1055 },
+    { x1: -30, z1: 1055, x2: -22, z2: 1050 },
   ],
   ruinRings: [
     // the Sunken Court: an overgrown temple complex
@@ -975,5 +978,5 @@ export const REALM_PROPS: ZonePropsDef = {
     // a lone forgotten monument in the far northeast (no POI: a secret)
     { x: 160, z: 1230, ringR: 4, columns: 3 },
   ],
-  graveyards: [{ x: -52, z: 1014 }],
+  graveyards: [{ x: -60, z: 1004 }],
 };

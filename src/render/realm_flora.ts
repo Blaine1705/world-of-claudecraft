@@ -22,7 +22,7 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { REALM_ZONE } from '../sim/content/realm';
+import { REALM_PROPS, REALM_ZONE } from '../sim/content/realm';
 import { hash2 } from '../sim/rng';
 import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -637,12 +637,14 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     }
   }
 
-  // The great tree of Eldergleam, rising over the town square.
-  if (greatTreeScene) {
-    const hub = REALM_ZONE.hub;
+  // The great tree of Eldergleam, rising over the town square. Position and
+  // trunk radius come from REALM_PROPS.greatTrees: the same record the sim's
+  // collision grid consumes, so the visual and the collider never drift.
+  const treeSpot = REALM_PROPS.greatTrees?.[0];
+  if (greatTreeScene && treeSpot) {
     const tree = greatTreeScene.clone(true);
-    const tx = hub.x,
-      tz = hub.z - 4;
+    const tx = treeSpot.x,
+      tz = treeSpot.z;
     tree.position.set(tx, terrainHeight(tx, tz, seed) - 0.2, tz);
     tree.scale.setScalar(6.5);
     tree.rotation.y = 0.8;

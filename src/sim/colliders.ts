@@ -106,6 +106,15 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, w.x, w.z, 3.7),
       camGhost: true,
     });
+  for (const t of PROPS.greatTrees ?? [])
+    out.push({
+      type: 'circle',
+      x: t.x,
+      z: t.z,
+      r: t.r,
+      cameraTopY: topY(seed, t.x, t.z, 7),
+      camGhost: true,
+    });
   for (const s of PROPS.stalls)
     out.push({
       type: 'circle',
