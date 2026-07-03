@@ -197,6 +197,16 @@ const FLOATING: ClipMap = {
   death: 'Death',
 };
 
+// 2023 enemy rig variant with a bite attack and no run clip (yeti)
+const ENEMY_BITE: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Bite_Front'],
+  hit: ['HitRecieve'],
+  death: 'Death',
+};
+
 const SPIDER: ClipMap = {
   idle: 'Spider_Idle',
   walk: 'Spider_Walk',
@@ -608,6 +618,34 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // the Veiled Hollow's spirits and wisps: the ghost rig, entity-tinted so
+  // the rose glimmerwisps, violet duskwisps, and teal hollow spirits read as
+  // one ethereal family unlike anything in the outer three zones
+  mob_ghost: {
+    url: `${CREATURES}/ghost.glb`,
+    height: 1.6,
+    hover: 0.4,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+  // spore-borne mushroom folk: the glub blob drifting just above the glade
+  mob_glub: {
+    url: `${CREATURES}/glubevolved.glb`,
+    height: 1.4,
+    hover: 0.15,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.45,
+  },
+  // mossy treant: the shaggy yeti under a bark-green entity wash
+  mob_treant: {
+    url: `${CREATURES}/yeti.glb`,
+    height: 2.6,
+    clips: ENEMY_BITE,
+    tint: 'entity',
+    tintStrength: 0.72, // the white pelt needs a heavy wash to read as moss
+  },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
     height: 2.1,
@@ -877,11 +915,19 @@ const MOB_KEYS: Record<string, string> = {
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
   // the Veiled Hollow: stags use the real stag rig instead of the beast-family
-  // wolf; the court guardians borrow the golem rig as stone constructs
+  // wolf; the court guardians borrow the golem rig as stone constructs; the
+  // spirits, mushroom folk, and treants get realm-only rigs (ghost, glub,
+  // yeti) that appear nowhere in the outer three zones
   veiled_stag: 'mob_stag',
   gleamstag: 'mob_stag',
   ancient_guardian: 'skel_golem',
   waking_warden: 'skel_golem',
+  glimmerwisp: 'mob_ghost',
+  duskwisp: 'mob_ghost',
+  hollow_spirit: 'mob_ghost',
+  sporeling_gatherer: 'mob_glub',
+  corrupted_sporeling: 'mob_glub',
+  treant_elder: 'mob_treant',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

@@ -266,7 +266,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
       { itemId: 'elder_bark', chance: 0.7, questId: 'q_treant_accord' },
     ],
     scale: 1.45,
-    color: 0x6b7a4e,
+    color: 0x4f7a38, // mossy bark green (drives the treant rig wash)
   },
   ancient_guardian: {
     id: 'ancient_guardian',
