@@ -205,8 +205,8 @@ describe('open-sea swim fatigue', () => {
     const p = sim.player;
     p.maxHp = 1000;
     p.hp = 1000;
-    // far out in the north sound: no land lobe reaches here
-    p.pos.x = 0;
+    // hugging the eastern map edge in open water: the fatigue band
+    p.pos.x = 160;
     p.pos.z = 1380;
     p.pos.y = -4.6; // treading at the surface
     p.prevPos = { ...p.pos };
@@ -215,7 +215,7 @@ describe('open-sea swim fatigue', () => {
     for (let t = 0; t < 20 * 8 && p.hp === 1000; t++) {
       const events = sim.tick();
       if (events.some((e) => e.type === 'log' && e.text.includes('open sea'))) warned = true;
-      p.pos.x = 0;
+      p.pos.x = 160;
       p.pos.z = 1380; // keep swimming in place against any drift
     }
     expect(warned).toBe(true);
@@ -229,5 +229,61 @@ describe('open-sea swim fatigue', () => {
     for (let t = 0; t < 20 * 3; t++) sim.tick();
     expect(p.fatigueTicks).toBe(0);
     expect(p.hp).toBeGreaterThanOrEqual(hpAfterSea);
+  });
+});
+
+describe('the Pale Causeway', () => {
+  it('is one continuous walkable landmass from the coast to the band edge', () => {
+    // the spine, coast root to northern head: dry land the whole way, and no
+    // step along it steeper than the climb gate
+    const spine = [
+      { x: 0, z: 1250 },
+      { x: 18, z: 1280 },
+      { x: 30, z: 1300 },
+      { x: 40, z: 1330 },
+      { x: 48, z: 1355 },
+      { x: 46, z: 1390 },
+      { x: 44, z: 1415 },
+    ];
+    for (let i = 0; i < spine.length - 1; i++) {
+      for (let t = 0; t <= 1; t += 0.1) {
+        const x = spine[i].x + (spine[i + 1].x - spine[i].x) * t;
+        const z = spine[i].z + (spine[i + 1].z - spine[i].z) * t;
+        expect(terrainHeight(x, z, SEED), `spine ${x},${z}`).toBeGreaterThan(WATER_LEVEL);
+      }
+      // sample the along-path gradient at footstep scale
+      const dx = spine[i + 1].x - spine[i].x;
+      const dz = spine[i + 1].z - spine[i].z;
+      const len = Math.hypot(dx, dz);
+      for (let d = 0; d < len - 0.5; d += 0.5) {
+        const x0 = spine[i].x + (dx * d) / len;
+        const z0 = spine[i].z + (dz * d) / len;
+        const x1 = spine[i].x + (dx * (d + 0.5)) / len;
+        const z1 = spine[i].z + (dz * (d + 0.5)) / len;
+        const rise = terrainHeight(x1, z1, SEED) - terrainHeight(x0, z0, SEED);
+        expect(
+          Math.abs(rise) / 0.5,
+          `spine slope at ${x0.toFixed(0)},${z0.toFixed(0)}`,
+        ).toBeLessThan(PLAYER_MAX_CLIMB_SLOPE);
+      }
+    }
+  });
+
+  it('leaves the interior sound fatigue-free (only the map edges drown)', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.player;
+    p.maxHp = 1000;
+    p.hp = 1000;
+    p.pos.x = -60;
+    p.pos.z = 1320; // mid-sound, far from every edge
+    p.pos.y = -5.2;
+    p.prevPos = { ...p.pos };
+    for (let t = 0; t < 20 * 6; t++) {
+      sim.tick();
+      p.pos.x = -60;
+      p.pos.z = 1320;
+    }
+    expect(p.fatigueTicks).toBe(0);
+    expect(p.hp).toBe(1000);
   });
 });

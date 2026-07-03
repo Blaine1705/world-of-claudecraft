@@ -119,16 +119,19 @@ const HOLLOW_LAND_LOBES = [
   { x: 150, z: 1215, r: 62 }, // the northeast arm (the forgotten monument)
   { x: 120, z: 995, r: 72 }, // the Starfall headland and falls terrace
   { x: 130, z: 1082, r: 48 }, // the Sunken Court peninsula
-  // the Pale Causeway: a winding isthmus across the ocean toward the north
-  // band edge, where a future realm will one day connect
-  { x: 30, z: 1290, r: 42 },
-  { x: 48, z: 1355, r: 36 },
-  { x: 38, z: 1425, r: 44 },
+  // the Pale Causeway: a winding isthmus rooted in the north coast and
+  // running across the ocean to the band edge, where a future realm will
+  // one day connect (adjacent lobes overlap deeply so the spine is one
+  // continuous, walkable landmass)
+  { x: 0, z: 1250, r: 48 }, // the root, fused with the mainland coast
+  { x: 30, z: 1300, r: 44 },
+  { x: 48, z: 1355, r: 40 },
+  { x: 44, z: 1420, r: 48 },
 ] as const;
 const HOLLOW_BAYS = [
   { x: 182, z: 1038, r: 38 }, // the east bight, between headland and Court
   { x: -178, z: 1062, r: 42 }, // the west inlet
-  { x: 30, z: 1262, r: 58 }, // the north sound
+  { x: -62, z: 1270, r: 50 }, // the north sound, west of the causeway root
   { x: -185, z: 1235, r: 46 }, // the northwest reach
 ] as const;
 const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
@@ -167,9 +170,10 @@ function applyHollowCoast(x: number, z: number, h: number): number {
 // enough offshore that no land lobe reaches, inside the coastal band.
 export function inHollowOpenSea(x: number, z: number): boolean {
   if (z < 960 || z > HOLLOW_ZMAX + 2 || x > 600) return false;
-  // beyond every land lobe's influence the landness floor is -0.06; anything
-  // under -0.02 is already past the last shallows
-  return hollowLandness(x, z) < -0.02;
+  // fatigue bites only near the map's border edges: the interior sound, the
+  // bays, and the causeway shores are free to swim
+  const dEdge = Math.min(x + 180, 180 - x, HOLLOW_ZMAX - z);
+  return dEdge < 48 && hollowLandness(x, z) < 0.02;
 }
 
 // Border pockets the mountain fringe must not swallow.
@@ -177,6 +181,8 @@ const HOLLOW_FRINGE_CLEARINGS = [
   { x: -140, z: 960, r: 34 }, // the Duskfall cave arrival and its road
   { x: -145, z: 1100, r: 30 }, // the Gleamstag's hidden clearing
   { x: 160, z: 1228, r: 26 }, // the forgotten monument
+  { x: 46, z: 1380, r: 40 }, // the Pale Causeway's upper spine
+  { x: 44, z: 1430, r: 42 }, // ...and its northern head
 ] as const;
 
 function hollowShapingOffset(x: number, z: number, seed: number): number {
@@ -353,8 +359,11 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     rimX = 0;
     rimN = 0;
   }
-  // inside the Hollow the remaining land rims stay softer than the world's
-  const rimScale = z > 960 && z <= WORLD_MAX_Z ? 0.6 : 1;
+  // inside the Hollow the remaining land rims stay softer than the world's,
+  // EXCEPT the final strip at the band's very edge (the causeway tip's cap):
+  // that stays full strength so the future gate is a real wall, not a stroll
+  const nearBandEnd = z > WORLD_MAX_Z - 14 && z <= WORLD_MAX_Z + 30;
+  const rimScale = z > 960 && z <= WORLD_MAX_Z && !nearBandEnd ? 0.6 : 1;
   h += Math.max(rimX, rimS, rimN) * 40 * rimScale;
   return h;
 }

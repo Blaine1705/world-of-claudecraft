@@ -28,6 +28,7 @@ import { HOLLOW_FALLS, roadDistance, terrainHeight, WATER_LEVEL } from '../sim/w
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+import { cloudTexture } from './textures';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
@@ -1070,6 +1071,38 @@ export function buildRealmFlora(seed: number): RealmFloraView {
           seaRays.push({ mat, base: op, phase });
           group.add(ray);
         }
+      }
+      // the horizon cloud bank: big painterly cumulus stacked low over the
+      // open sea, beyond the fog (fog: false, like the sky dome), so looking
+      // out from any shore reads as rose-and-violet clouds piling over the
+      // water instead of empty gradient
+      const cloudTex = cloudTexture(16, 0.62);
+      const CLOUD_TINTS = [0xf2c4d8, 0xd8b8e8, 0xf8dce4, 0xc4b0e0, 0xf2d8c8];
+      for (const [cx, cz, cy, w, hgt, tint, op] of [
+        [-150, 1560, 26, 210, 62, 0, 0.85],
+        [-60, 1620, 38, 300, 92, 1, 0.8],
+        [30, 1560, 22, 190, 56, 2, 0.9],
+        [120, 1600, 34, 260, 84, 3, 0.8],
+        [200, 1550, 24, 200, 64, 4, 0.85],
+        [-220, 1580, 30, 240, 76, 1, 0.75],
+        [90, 1530, 14, 150, 40, 2, 0.7],
+        [-10, 1540, 12, 140, 38, 4, 0.7],
+      ] as const) {
+        const cloud = new THREE.Mesh(
+          new THREE.PlaneGeometry(w, hgt),
+          new THREE.MeshBasicMaterial({
+            map: cloudTex,
+            transparent: true,
+            opacity: op,
+            color: CLOUD_TINTS[tint],
+            depthWrite: false,
+            fog: false,
+            side: THREE.DoubleSide,
+          }),
+        );
+        cloud.position.set(cx, cy, cz);
+        seaDrift.push({ mesh: cloud, baseX: cx, speed: 0.12 + (Math.abs(cx) % 5) * 0.05 });
+        group.add(cloud);
       }
       // the distant flock: simple chevron birds circling over the sound
       const wing = new THREE.BufferGeometry();
