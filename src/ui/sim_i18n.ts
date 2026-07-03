@@ -164,6 +164,8 @@ const baseEnTable = {
   'aura.offBalance': 'Off-Balance',
   'aura.numbingChill': 'Numbing Chill',
   'aura.demoralized': 'Demoralized',
+  'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
+  'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
 } as const;
 
 const petEnTable = {
@@ -219,6 +221,8 @@ export type SimMessageKey = keyof typeof enTable;
 // a missing locale OR a missing/renamed key (stronger than the server DICT).
 const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = {
   en: {
+    'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
+    'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
     'error.lineOfSight': 'Line of sight.',
     'error.specLevel': 'You may choose a specialization at level {level}.',
     'error.equipLevel': 'You must be level {level} to equip that.',
@@ -359,6 +363,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.demoralized': 'Demoralized',
   },
   es: {
+    'log.veilEnter': 'Un velo de crepúsculo se abre ante ti, y la Hondonada se despliega adelante.',
+    'log.veilLeave': 'El velo se cierra a tu espalda, y el aire de la montaña vuelve a morder.',
     'log.learnedAbility': 'Has aprendido una nueva habilidad: {name}.',
     'log.abilityRankUp': 'Tu {name} ha mejorado a Rango {rank}.',
     'log.stopFollowing': 'Dejas de seguir.',
@@ -500,6 +506,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': 'Poder del Oso',
   },
   es_ES: {
+    'log.veilEnter': 'Un velo de crepúsculo se abre ante ti, y la Hondonada se despliega adelante.',
+    'log.veilLeave': 'El velo se cierra a tu espalda, y el aire de la montaña vuelve a morder.',
     'log.learnedAbility': 'Has aprendido una nueva habilidad: {name}.',
     'log.abilityRankUp': 'Tu {name} ha mejorado a Rango {rank}.',
     'log.stopFollowing': 'Dejas de seguir.',
@@ -641,6 +649,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': 'Poder del Oso',
   },
   fr_FR: {
+    'log.veilEnter': "Un voile de crépuscule s'écarte, et la Combe s'ouvre devant vous.",
+    'log.veilLeave': "Le voile se referme derrière vous, et l'air des montagnes mord de nouveau.",
     'log.learnedAbility': 'Vous avez appris une nouvelle technique : {name}.',
     'log.abilityRankUp': 'Votre {name} est passé au rang {rank}.',
     'log.stopFollowing': 'Vous ne suivez plus.',
@@ -784,6 +794,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': "Puissance de l'Ours",
   },
   fr_CA: {
+    'log.veilEnter': "Un voile de crépuscule s'écarte, et la Combe s'ouvre devant vous.",
+    'log.veilLeave': "Le voile se referme derrière vous, et l'air des montagnes mord de nouveau.",
     'log.learnedAbility': 'Vous avez appris une nouvelle technique : {name}.',
     'log.abilityRankUp': 'Votre {name} est passé au rang {rank}.',
     'log.stopFollowing': 'Vous ne suivez plus.',
@@ -928,6 +940,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': "Puissance de l'Ours",
   },
   en_CA: {
+    'log.veilEnter': 'A veil of dusk parts before you, and the Hollow opens ahead.',
+    'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
     'log.abilityRankUp': 'Your {name} has improved to Rank {rank}.',
     'log.stopFollowing': 'You stop following.',
@@ -1068,6 +1082,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': 'Might of the Bear',
   },
   it_IT: {
+    'log.veilEnter': 'Un velo di crepuscolo si apre davanti a te, e la Conca si rivela più avanti.',
+    'log.veilLeave': "Il velo si richiude alle tue spalle, e l'aria di montagna torna a pungere.",
     'log.learnedAbility': 'Hai imparato una nuova abilità: {name}.',
     'log.abilityRankUp': 'La tua {name} è migliorata al Grado {rank}.',
     'log.stopFollowing': 'Smetti di seguire.',
@@ -1209,6 +1225,9 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': "Potenza dell'Orso",
   },
   de_DE: {
+    'log.veilEnter':
+      'Ein Schleier aus Dämmerung teilt sich vor dir, und die Senke öffnet sich dahinter.',
+    'log.veilLeave': 'Der Schleier schließt sich hinter dir, und die Bergluft beißt wieder.',
     'log.learnedAbility': 'Ihr habt eine neue Fähigkeit erlernt: {name}.',
     'log.abilityRankUp': 'Euer {name} wurde auf Rang {rank} verbessert.',
     'log.stopFollowing': 'Ihr folgt nicht mehr.',
@@ -1351,6 +1370,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': 'Macht des Bären',
   },
   zh_CN: {
+    'log.veilEnter': '暮色的帷幕在你面前分开，幽谷在前方展开。',
+    'log.veilLeave': '帷幕在你身后合拢，山间的寒风再次刺骨。',
     'log.learnedAbility': '你学会了新技能：{name}。',
     'log.abilityRankUp': '你的{name}已提升至等级 {rank}。',
     'log.stopFollowing': '你停止了跟随。',
@@ -1490,6 +1511,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': '巨熊之力',
   },
   zh_TW: {
+    'log.veilEnter': '暮色的帷幕在你面前分開，幽谷在前方展開。',
+    'log.veilLeave': '帷幕在你身後合攏，山間的寒風再次刺骨。',
     'log.learnedAbility': '你學會了新技能：{name}。',
     'log.abilityRankUp': '你的「{name}」已提升至第 {rank} 級。',
     'log.stopFollowing': '你停止了跟隨。',
@@ -1629,6 +1652,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': '巨熊之力',
   },
   ko_KR: {
+    'log.veilEnter': '황혼의 장막이 눈앞에서 갈라지고, 골짜기가 앞에 펼쳐진다.',
+    'log.veilLeave': '장막이 등 뒤에서 닫히고, 산바람이 다시 살을 엔다.',
     'log.learnedAbility': '새로운 기술을 배웠습니다: {name}.',
     'log.abilityRankUp': '{name}이(가) {rank}단계로 향상되었습니다.',
     'log.stopFollowing': '따라가기를 멈췄습니다.',
@@ -1770,6 +1795,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': '곰의 힘',
   },
   ja_JP: {
+    'log.veilEnter': '黄昏の帳が目の前で開き、幽谷が行く手に広がる。',
+    'log.veilLeave': '帳が背後で閉じ、山の空気が再び肌を刺す。',
     'log.learnedAbility': '新しいアビリティ「{name}」を習得しました。',
     'log.abilityRankUp': '「{name}」がランク{rank}に上昇しました。',
     'log.stopFollowing': '追従を解除しました。',
@@ -1914,6 +1941,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': '熊の力',
   },
   pt_BR: {
+    'log.veilEnter': 'Um veu de crepusculo se abre a sua frente, e o Vale Oculto surge adiante.',
+    'log.veilLeave': 'O veu se fecha as suas costas, e o ar da montanha volta a morder.',
     'log.learnedAbility': 'Você aprendeu uma nova habilidade: {name}.',
     'log.abilityRankUp': 'Sua habilidade {name} melhorou para o Grau {rank}.',
     'log.stopFollowing': 'Você parou de seguir.',
@@ -2054,6 +2083,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': 'Força do Urso',
   },
   ru_RU: {
+    'log.veilEnter': 'Сумеречная завеса расступается перед вами, и впереди открывается Лощина.',
+    'log.veilLeave': 'Завеса смыкается за спиной, и горный воздух снова обжигает холодом.',
     'log.learnedAbility': 'Вы изучили новое умение: {name}.',
     'log.abilityRankUp': 'Умение «{name}» повышено до ранга {rank}.',
     'log.stopFollowing': 'Вы перестаёте следовать.',

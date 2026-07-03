@@ -15,6 +15,7 @@ import type {
   MobTemplate,
   NpcDef,
   PlayerClass,
+  PortalDef,
   QuestDef,
   QuestState,
   ZoneDef,
@@ -38,6 +39,7 @@ import {
   REALM_MOBS,
   REALM_NPCS,
   REALM_OBJECTS,
+  REALM_PORTALS,
   REALM_PROPS,
   REALM_QUEST_ORDER,
   REALM_QUESTS,
@@ -223,6 +225,9 @@ export const ROADS: { x: number; z: number }[][] = [
   ...ZONE3_ROADS,
   ...REALM_ROADS,
 ];
+
+// Paired overworld portals (src/sim/portals.ts checks these each tick).
+export const PORTALS: PortalDef[] = [...REALM_PORTALS];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,

@@ -11,6 +11,7 @@ import type {
   ItemDef,
   MobTemplate,
   NpcDef,
+  PortalDef,
   QuestDef,
   ZoneDef,
   ZonePropsDef,
@@ -76,6 +77,21 @@ export const REALM_ROADS: { x: number; z: number }[][] = [
   ], // the Gleaming Deep -> Crystalline Shallows
 ];
 
+// The hidden way in. Side a is the concealed cave in the northwest Thornpeak
+// cliffs (no POI, no map marker: found by exploring); side b is the Duskfall
+// Cave on the realm's southern wall. Landings sit ~5yd outside the opposite
+// trigger so arrivals never bounce straight back.
+export const REALM_PORTALS: PortalDef[] = [
+  {
+    id: 'duskfall_passage',
+    a: { x: -140, z: 845, landing: { x: -140, z: 841, facing: Math.PI } },
+    b: { x: -140, z: 950, landing: { x: -140, z: 955, facing: 0 } },
+    radius: 2.0,
+    enterText: 'A veil of dusk parts before you, and the Hollow opens ahead.',
+    leaveText: 'The veil closes behind you, and the mountain air bites again.',
+  },
+];
+
 // Content tables land in later steps (creatures, town NPCs, quest chain,
 // items, props); registered empty now so the zone exists end to end.
 export const REALM_MOBS: Record<string, MobTemplate> = {};
@@ -92,4 +108,13 @@ export const REALM_OBJECTS: GroundObjectDef[] = [];
 
 export const REALM_ITEMS: Record<string, ItemDef> = {};
 
-export const REALM_PROPS: ZonePropsDef = emptyZoneProps();
+export const REALM_PROPS: ZonePropsDef = {
+  ...emptyZoneProps(),
+  // The two cave mouths of the Duskfall passage: the concealed entrance in
+  // the Thornpeak cliffs and its twin on the realm's southern wall. The mine
+  // arch faces its rot direction; the portal trigger sits just outside each.
+  mines: [
+    { x: -140, z: 847, rot: Math.PI }, // Thornpeak side, opening south
+    { x: -140, z: 948, rot: 0 }, // realm side, opening north
+  ],
+};
