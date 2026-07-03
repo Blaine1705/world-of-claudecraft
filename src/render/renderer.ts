@@ -81,6 +81,7 @@ import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
+import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
@@ -830,6 +831,7 @@ export class Renderer {
   private motes: MotesView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
+  private realmFlora: RealmFloraView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1229,6 +1231,14 @@ export class Renderer {
     // numPointLights -> materials never recompile for a light-count change).
     this.fireLights.push(this.impactSite.light);
     this.propsView = props;
+
+    // The Veiled Hollow's glowing mushrooms and crystals; their glow lights
+    // join the same rank-culled fire-light budget.
+    this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
+    setRenderCategory(this.realmFlora.group, 'props');
+    this.scene.add(this.realmFlora.group);
+    freezeStaticMatrices(this.realmFlora.group);
+    for (const light of this.realmFlora.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -4473,6 +4483,7 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
+    this.realmFlora.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);

@@ -117,4 +117,48 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: -140, z: 847, rot: Math.PI }, // Thornpeak side, opening south
     { x: -140, z: 948, rot: 0 }, // realm side, opening north
   ],
+  // Eldergleam: the hub town under the great tree (the tree itself is placed
+  // by render/realm_flora.ts; these are the built structures around it).
+  buildings: [
+    { kind: 'inn', x: -48, z: 1038, w: 6, d: 7, rot: 0.7 },
+    { kind: 'house', x: -30, z: 1040, w: 7, d: 6, rot: -0.4 },
+    { kind: 'house', x: -52, z: 1024, w: 6, d: 6, rot: 1.2 },
+    { kind: 'chapel', x: -28, z: 1020, w: 5, d: 7, rot: -1.9 }, // the shrine
+  ],
+  wells: [{ x: -38, z: 1036, r: 1.5 }],
+  stalls: [
+    { x: -45, z: 1030, rot: Math.PI / 2, r: 1.7 }, // Provisioner Fenna
+    { x: -34, z: 1032, rot: -0.5, r: 1.7 }, // Wardsmith Orun
+  ],
+  crates: [
+    [-44, 1028],
+    [-33, 1034],
+  ],
+  campfires: [
+    [-40, 1018], // town square gathering fire
+    [-70, 1005], // wayfarer camp on the Duskfall road
+    [32, 958], // Grove Keeper camp
+  ],
+  tents: [
+    { x: 27, z: 953, rot: 0.6, scale: 1 }, // Grove Keeper camp
+    { x: 35, z: 952, rot: -0.9, scale: 0.9 },
+    { x: 31, z: 962, rot: 2.4, scale: 1.05 },
+  ],
+  fences: [
+    // the magical garden ring on the town's north edge
+    { x1: -50, z1: 1044, x2: -42, z2: 1047 },
+    { x1: -42, z1: 1047, x2: -33, z2: 1046 },
+    { x1: -33, z1: 1046, x2: -27, z2: 1042 },
+  ],
+  ruinRings: [
+    // the Sunken Court: an overgrown temple complex
+    { x: 125, z: 1085, ringR: 9, columns: 7 },
+    { x: 138, z: 1072, ringR: 6, columns: 5 },
+    { x: 112, z: 1098, ringR: 5, columns: 4 },
+    // the Duskfall Overlook: a broken vantage ring at the first viewpoint
+    { x: -118, z: 988, ringR: 4, columns: 3 },
+    // a lone forgotten monument in the far northeast (no POI: a secret)
+    { x: 160, z: 1230, ringR: 4, columns: 3 },
+  ],
+  graveyards: [{ x: -52, z: 1014 }],
 };
