@@ -1042,6 +1042,11 @@ export class Renderer {
         const eq = this.skyView.envTexture(b);
         if (eq) this.envRTs.set(b, pmrem.fromEquirectangular(eq));
       }
+      // The dusk realm shares the peaks HDRI; alias its prefiltered RT
+      // rather than refiltering the same texture (the distinct dusk look
+      // rides the dome tint, fog, and light grade).
+      const peaksRT = this.envRTs.get('peaks');
+      if (peaksRT) this.envRTs.set('dusk', peaksRT);
       if (this.envRTs.size > 0) {
         this.envOutdoorIntensity = ENV_INTENSITY * IBL_RAW_SCALE;
         this.scene.environment = this.envRTs.get('vale')?.texture ?? null;
@@ -3514,9 +3519,24 @@ export class Renderer {
     vale: { color: 0xa6c6e0, near: 130, far: 470 },
     marsh: { color: 0xa3b294, near: 80, far: 330 },
     peaks: { color: 0xbdd3ec, near: 160, far: 560 },
-    dusk: { color: 0xbdd3ec, near: 160, far: 560 },
+    // permanent dusk: dense rose-mauve murk, the realm's signature
+    dusk: { color: 0xc9a3bd, near: 55, far: 250 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
+
+  // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
+  // The three original biomes keep the exact constants the lights were
+  // created with; the dusk realm warms the sun to late-evening orange and
+  // turns the sky bounce rose over violet ground.
+  private static BIOME_LIGHT: Record<
+    BiomeId,
+    { hemiSky: number; hemiGround: number; sun: number }
+  > = {
+    vale: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    peaks: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
+  };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
@@ -3694,6 +3714,12 @@ export class Renderer {
       fog.color.lerp(this.fogScratch.setHex(preset.color), k);
       fog.near += (preset.near - fog.near) * k;
       fog.far += (preset.far - fog.far) * k;
+      // ...and the light grade with it (the dusk realm's warm sun and rose
+      // sky bounce; a no-op elsewhere since the presets match the ctor hues)
+      const light = Renderer.BIOME_LIGHT[zoneBiomeAt(this.sim.player.pos.z)];
+      this.hemi.color.lerp(this.fogScratch.setHex(light.hemiSky), k);
+      this.hemi.groundColor.lerp(this.fogScratch.setHex(light.hemiGround), k);
+      this.sun.color.lerp(this.fogScratch.setHex(light.sun), k);
     }
   }
 

@@ -132,12 +132,13 @@ const BIOME_PALETTE: Record<
     dirt: 0x7d6a50,
     sand: 0xb0a486,
   },
+  // dusk: violet-cast glade greens with dusty rose soil
   dusk: {
-    grass: 0x687a55,
-    grassDark: 0x4d5c45,
-    grassYellow: 0x8d9168,
-    dirt: 0x7d6a50,
-    sand: 0xb0a486,
+    grass: 0x6d7566,
+    grassDark: 0x4c4e58,
+    grassYellow: 0x8c8078,
+    dirt: 0x6e5a68,
+    sand: 0xa593a2,
   },
 };
 
@@ -146,7 +147,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   vale: 0.55,
   marsh: 0.62,
   peaks: 0.45,
-  dusk: 0.55,
+  dusk: 0.52,
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));

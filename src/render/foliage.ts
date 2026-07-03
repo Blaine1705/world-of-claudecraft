@@ -114,38 +114,38 @@ const PINE_TINT: Record<BiomeId, number> = {
   vale: 0x9bb48d,
   marsh: 0x87966b,
   peaks: 0x6f8a7a,
-  dusk: 0x6f8a7a,
+  dusk: 0x7f93ab,
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
   marsh: 0x8d9865,
   peaks: 0x92a37f,
-  dusk: 0x92a37f,
+  dusk: 0x9c92b4,
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
   marsh: 0x565c4e,
   peaks: 0x878e99,
-  dusk: 0x878e99,
+  dusk: 0x8f88a6,
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
   marsh: 0xd2d8bc,
   peaks: 0xd9dde4,
-  dusk: 0xd9dde4,
+  dusk: 0xd0c8e0,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
   marsh: 0xbfc492,
   peaks: 0xc2cec8,
-  dusk: 0xc2cec8,
+  dusk: 0xccc3da,
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0xaebf8e,
   marsh: 0x8d9865,
   peaks: 0x93a78f,
-  dusk: 0x93a78f,
+  dusk: 0x9e94ba,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
@@ -965,11 +965,14 @@ function buildTrees(
   for (const bucket of buckets.values()) {
     const { items } = bucket;
     const pines = items.filter((d) => d.kind === 'tree');
-    const oaks = items.filter((d) => d.kind === 'tree2' && d.biome !== 'marsh');
-    const swamps = items.filter((d) => d.kind === 'tree2' && d.biome === 'marsh');
-    // marsh swamp trees split between twisted (mossy) and dead (bare) models
-    const twisteds = swamps.filter((d) => hashAt(d.x, d.z, 19) >= 0.35);
-    const deads = swamps.filter((d) => hashAt(d.x, d.z, 19) < 0.35);
+    const gnarled = (d: Decoration) => d.biome === 'marsh' || d.biome === 'dusk';
+    const oaks = items.filter((d) => d.kind === 'tree2' && !gnarled(d));
+    const swamps = items.filter((d) => d.kind === 'tree2' && gnarled(d));
+    // marsh swamp trees split between twisted (mossy) and dead (bare) models;
+    // the dusk realm's tree2 elders are all twisted, never dead: the Hollow
+    // is ancient, not rotting
+    const twisteds = swamps.filter((d) => d.biome === 'dusk' || hashAt(d.x, d.z, 19) >= 0.35);
+    const deads = swamps.filter((d) => d.biome !== 'dusk' && hashAt(d.x, d.z, 19) < 0.35);
     const rocks = items.filter((d) => d.kind === 'rock');
 
     let minX = Infinity,
@@ -1075,7 +1078,7 @@ interface DressingSpot {
 
 const DRESS_STEP_HIGH = 12;
 const DRESS_STEP_LOW = 10;
-const DRESS_DENSITY: Record<BiomeId, number> = { vale: 0.26, marsh: 0.26, peaks: 0.15, dusk: 0.15 };
+const DRESS_DENSITY: Record<BiomeId, number> = { vale: 0.26, marsh: 0.26, peaks: 0.15, dusk: 0.3 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
 const DRESS_TINT_SOFTEN_LOW = 0.56;
@@ -1094,6 +1097,12 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
   if (biome === 'marsh') {
     if (r < 0.3) return 'bush';
     if (r < 0.62) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'dusk') {
+    // mushroom-lit glade floor: mostly mushrooms and ferns, few bushes
+    if (r < 0.18) return 'bush';
+    if (r < 0.52) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';

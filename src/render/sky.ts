@@ -150,6 +150,16 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   dusk: 0.631,
 };
 
+// Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
+// tonemap, so channels above 1 are fine). White = untouched. The dusk realm
+// pushes the shared dawn HDRI into permanent rose-and-violet dusk.
+const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
+  vale: [1, 1, 1],
+  marsh: [1, 1, 1],
+  peaks: [1, 1, 1],
+  dusk: [1.22, 0.82, 1.12],
+};
+
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
 // 2K HDRs are ~17MB on disk; 1K is ~4MB. Pick the lighter set for phone /
@@ -230,6 +240,8 @@ const SKY_FRAG = /* glsl */ `
   uniform float uBackdropStrength;
   uniform float uBackdropBiasA;
   uniform float uBackdropBiasB;
+  uniform vec3 uTintA; // per-biome dome grade (white = untouched)
+  uniform vec3 uTintB;
   varying vec3 vDir;
 
   vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec2 tune) {
@@ -277,6 +289,7 @@ const SKY_FRAG = /* glsl */ `
     vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
     vec3 backdrop = mix(backA, backB, uMix);
     c = mix(c, backdrop, uBackdropStrength);
+    c *= mix(uTintA, uTintB, uMix); // biome grade before the warm sun glow
     float sunAmt = pow(max(dot(dir, uSunDir), 0.0), 8.0);
     c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3;                        // warm glow around the anchor sun
     float sunCore = pow(max(dot(dir, uSunDir), 0.0), 90.0);
@@ -341,6 +354,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   const backdropsReady = hasBackdropAssets();
   const tuneVec = (b: BiomeId): THREE.Vector2 =>
     new THREE.Vector2(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp);
+  const tintVec = (b: BiomeId): THREE.Vector3 => new THREE.Vector3(...BIOME_TINT[b]);
   const backdropTex = (b: BiomeId): THREE.Texture =>
     (backdropsReady ? backdropStore[b] : hdriStore[b]) as THREE.Texture;
   const start = biomeBlendAt(0);
@@ -358,6 +372,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uBackdropStrength: { value: backdropsReady ? 1 : 0 },
     uBackdropBiasA: { value: BACKDROP_Y_BIAS[start.from] },
     uBackdropBiasB: { value: BACKDROP_Y_BIAS[start.to] },
+    uTintA: { value: tintVec(start.from) },
+    uTintB: { value: tintVec(start.to) },
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -386,6 +402,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
         uniforms.uBackdropB.value = backdropTex(next.to);
         uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[next.from];
         uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[next.to];
+        uniforms.uTintA.value.copy(tintVec(next.from));
+        uniforms.uTintB.value.copy(tintVec(next.to));
         uniforms.uMix.value = next.t;
         cur = next;
         return;
