@@ -249,11 +249,8 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'startAttackOnAbilityUse',
       'walkByAutoloot',
       'groundReticle',
-<<<<<<< HEAD
-      'aurasOnPlayerFrame',
-=======
       'mouseoverCast',
->>>>>>> feature/mouseover-cast
+      'aurasOnPlayerFrame',
       'showItemLevel',
       'showSecondaryActionBar',
     ]);
