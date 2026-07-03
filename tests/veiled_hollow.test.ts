@@ -198,3 +198,36 @@ describe('the Hollow coastline keeps every fixed feature on dry land', () => {
     }
   });
 });
+
+describe('open-sea swim fatigue', () => {
+  it('warns, then deals rising damage far offshore, and relents ashore', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.player;
+    p.maxHp = 1000;
+    p.hp = 1000;
+    // far out in the north sound: no land lobe reaches here
+    p.pos.x = 0;
+    p.pos.z = 1380;
+    p.pos.y = -4.6; // treading at the surface
+    p.prevPos = { ...p.pos };
+    let warned = false;
+    // swim until the sea has bitten once (staying past that is lethal by design)
+    for (let t = 0; t < 20 * 8 && p.hp === 1000; t++) {
+      const events = sim.tick();
+      if (events.some((e) => e.type === 'log' && e.text.includes('open sea'))) warned = true;
+      p.pos.x = 0;
+      p.pos.z = 1380; // keep swimming in place against any drift
+    }
+    expect(warned).toBe(true);
+    expect(p.hp).toBeLessThan(1000);
+    const hpAfterSea = p.hp;
+    // back ashore: fatigue resets and the bleeding stops
+    p.pos.x = -40;
+    p.pos.z = 1030;
+    p.pos.y = 3;
+    p.prevPos = { ...p.pos };
+    for (let t = 0; t < 20 * 3; t++) sim.tick();
+    expect(p.fatigueTicks).toBe(0);
+    expect(p.hp).toBeGreaterThanOrEqual(hpAfterSea);
+  });
+});

@@ -1366,6 +1366,7 @@ export interface Entity {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
   hp: number;
   maxHp: number;
   resource: number;

@@ -22,7 +22,7 @@ export const REALM_ZONE: ZoneDef = {
   id: 'veiled_hollow',
   name: 'The Veiled Hollow',
   zMin: 900,
-  zMax: 1260,
+  zMax: 1440, // the northern 180yd is open ocean (see the coast in world.ts)
   levelRange: [15, 20],
   biome: 'dusk',
   sealedSouthBorder: true,

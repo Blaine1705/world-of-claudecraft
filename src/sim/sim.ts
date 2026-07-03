@@ -200,6 +200,7 @@ import * as tradeMod from './social/trade';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
+import { updateSwimFatigue } from './fatigue';
 import {
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
@@ -2440,6 +2441,7 @@ export class Sim {
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
         updatePortalTriggers(this.ctx, p);
+        updateSwimFatigue(this.ctx, p);
         this.updateCasting(p, meta);
         this.updatePlayerAutoAttack(p, meta);
         updateRegen(this.ctx, p, meta);

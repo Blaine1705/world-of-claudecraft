@@ -2,6 +2,7 @@
 /* eslint-disable */
 export const BASE_NEW = {
   da_DK: {
+    'log.seaFatigue': 'Det åbne hav tærer på dine kræfter. Svøm tilbage til kysten!',
     'log.veilEnter': 'Et slør af tusmørke deler sig foran dig, og Lavningen åbner sig forude.',
     'log.veilLeave': 'Sløret lukker sig bag dig, og bjergluften bider igen.',
     'aura.acidSpit': 'Syrespyt',
@@ -145,6 +146,7 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Du er nu i Forstyr Ikke-tilstand: {message}',
   },
   id_ID: {
+    'log.seaFatigue': 'Laut lepas menguras tenagamu. Berenanglah kembali ke pantai!',
     'log.veilEnter':
       'Tabir senja terbuka di hadapanmu, dan Lembah Tersembunyi terbentang di depan.',
     'log.veilLeave': 'Tabir menutup di belakangmu, dan udara pegunungan kembali menggigit.',
@@ -289,6 +291,7 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Kamu kini dalam mode Jangan Diganggu: {message}',
   },
   nl_NL: {
+    'log.seaFatigue': 'De open zee put je krachten uit. Zwem terug naar de kust!',
     'log.veilEnter': 'Een sluier van schemering wijkt voor je, en de Kom opent zich verderop.',
     'log.veilLeave': 'De sluier sluit zich achter je, en de berglucht bijt weer.',
     'aura.acidSpit': 'Zuurspuug',
@@ -432,6 +435,7 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Je bent nu in de modus Niet Storen: {message}',
   },
   pl_PL: {
+    'log.seaFatigue': 'Otwarte morze wysysa twoje siły. Płyń z powrotem do brzegu!',
     'log.veilEnter': 'Zasłona zmierzchu rozstępuje się, a przed tobą otwiera się Kotlina.',
     'log.veilLeave': 'Zasłona zamyka się za tobą, a górskie powietrze znów szczypie.',
     'aura.acidSpit': 'Plwocina kwasu',
@@ -575,6 +579,7 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Jesteś teraz w trybie Nie przeszkadzać: {message}',
   },
   sv_SE: {
+    'log.seaFatigue': 'Öppna havet tär på dina krafter. Simma tillbaka till stranden!',
     'log.veilEnter': 'En skymningsslöja delar sig framför dig, och Dälden öppnar sig där framme.',
     'log.veilLeave': 'Slöjan sluter sig bakom dig, och bergsluften biter igen.',
     'aura.acidSpit': 'Syraspott',
@@ -718,6 +723,7 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Du är nu i läget Stör ej: {message}',
   },
   tr_TR: {
+    'log.seaFatigue': 'Açık deniz gücünü tüketiyor. Kıyıya geri yüz!',
     'log.veilEnter': 'Alacakaranlık perdesi önünde aralanır ve Kuytu Vadi ileride açılır.',
     'log.veilLeave': 'Perde ardında kapanır ve dağ havası yeniden ısırır.',
     'aura.acidSpit': 'Asit Tükürüğü',
@@ -860,6 +866,7 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Artık Rahatsız Etmeyin modundasın: {message}',
   },
   vi_VN: {
+    'log.seaFatigue': 'Biển khơi đang rút cạn sức lực của bạn. Hãy bơi trở lại bờ!',
     'log.veilEnter': 'Bức màn hoàng hôn hé mở trước mặt bạn, và Thung Lũng Ẩn hiện ra phía trước.',
     'log.veilLeave': 'Bức màn khép lại sau lưng bạn, và khí núi lại buốt giá.',
     'aura.acidSpit': 'Phun Axit',

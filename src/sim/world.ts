@@ -104,6 +104,9 @@ const HOLLOW_SHAPING = [
 // Every fixed content point (camps, town, roads, ruins) sits on a lobe with
 // margin; tests/veiled_hollow.test.ts asserts it stays that way.
 // ---------------------------------------------------------------------------
+// Keep in sync with REALM_ZONE.zMax (content/realm.ts): the band's northern
+// stretch past the coast is open ocean.
+const HOLLOW_ZMAX = 1440;
 const HOLLOW_LAND_LOBES = [
   { x: 0, z: 1060, r: 155 }, // main body: town, meadow, court's west edge
   { x: -125, z: 1010, r: 85 }, // southwest: the Duskfall arrival and overlook
@@ -145,11 +148,23 @@ export function hollowLandness(x: number, z: number): number {
 function applyHollowCoast(x: number, z: number, h: number): number {
   // the sea starts north of the sealed range: the realm's south is mountain,
   // its other shores are coast (and the wall never wets)
-  if (z < 960 || z > 1262) return h;
-  const dSide = Math.min(x + 183, 183 - x, 1263 - z);
-  if (dSide < 10) return h;
-  const t = smoothstep(0.0, 0.14, hollowLandness(x, z));
-  return HOLLOW_SEA_FLOOR + (h - HOLLOW_SEA_FLOOR) * t;
+  if (z < 960 || z > HOLLOW_ZMAX + 2) return h;
+  const land = hollowLandness(x, z);
+  // a wide, gentle transition: a shallow near-shore shelf slopes into the
+  // deep, so beaches ease into the water instead of dropping off a cliff
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
+  return floor + (h - floor) * t;
+}
+
+// The realm's open sea (used by swim fatigue and the rim suppression): far
+// enough offshore that no land lobe reaches, inside the coastal band.
+export function inHollowOpenSea(x: number, z: number): boolean {
+  if (z < 960 || z > HOLLOW_ZMAX + 2 || x > 600) return false;
+  // beyond every land lobe's influence the landness floor is -0.06; anything
+  // under -0.02 is already past the last shallows
+  return hollowLandness(x, z) < -0.02;
 }
 
 // Border pockets the mountain fringe must not swallow.
@@ -160,7 +175,7 @@ const HOLLOW_FRINGE_CLEARINGS = [
 ] as const;
 
 function hollowShapingOffset(x: number, z: number, seed: number): number {
-  if (z < 905 || z > 1260) return 0;
+  if (z < 905 || z > HOLLOW_ZMAX) return 0;
   let dh = 0;
   for (const f of HOLLOW_SHAPING) {
     const d = Math.hypot(x - f.x, z - f.z);
@@ -173,7 +188,7 @@ function hollowShapingOffset(x: number, z: number, seed: number): number {
   // the map painter's rock tint above h~26 does the visual work.
   const dW = x + 180;
   const dE = 180 - x;
-  const dN = 1260 - z;
+  const dN = HOLLOW_ZMAX - z;
   const dSide = Math.min(dW, dE, dN);
   if (dSide < 54) {
     // coarse lobes (wavelength ~80yd) bite 8..48yd into the band; height 34
@@ -315,15 +330,19 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     }
   }
 
-  // Raise the world rim so the player naturally stays in bounds
-  const rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
-  const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
-  const rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
-  const rim = Math.max(rimX, rimS, rimN);
-  h += rim * 40;
   h += mirefenImpactCraterOffset(x, z);
   h += hollowShapingOffset(x, z, seed);
   h = applyHollowCoast(x, z, h);
+  // World rims AFTER the coast, so the border ranges rise out of the sea
+  // (mountains dipping into the ocean at the flanks) instead of being sunk
+  // by it. The NORTH rim is suppressed over the Hollow's open sea: looking
+  // out from the shore reads as water meeting sky, and swim fatigue (not a
+  // wall) turns swimmers back before the band edge.
+  const rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
+  const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
+  let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
+  if (rimN > 0 && inHollowOpenSea(x, z)) rimN = 0;
+  h += Math.max(rimX, rimS, rimN) * 40;
   return h;
 }
 

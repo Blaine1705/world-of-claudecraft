@@ -97,6 +97,16 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   dusk: 0,
 };
 
+// How strongly the painted horizon backdrop shows per biome. The dusk realm
+// drops it entirely: its border mountains are real geometry and its open sea
+// must meet clear sky at the horizon, not a painted mountain ring.
+const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
+  vale: 1,
+  marsh: 1,
+  peaks: 1,
+  dusk: 0,
+};
+
 interface NetworkInformationLike {
   readonly effectiveType?: string;
   readonly saveData?: boolean;
@@ -240,6 +250,8 @@ const SKY_FRAG = /* glsl */ `
   uniform float uBackdropStrength;
   uniform float uBackdropBiasA;
   uniform float uBackdropBiasB;
+  uniform float uBackdropAmtA; // per-biome backdrop visibility
+  uniform float uBackdropAmtB;
   uniform vec3 uTintA; // per-biome dome grade (white = untouched)
   uniform vec3 uTintB;
   varying vec3 vDir;
@@ -288,7 +300,7 @@ const SKY_FRAG = /* glsl */ `
     vec3 backA = sampleBackdrop(uBackdropA, dir, uBackdropBiasA);
     vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
     vec3 backdrop = mix(backA, backB, uMix);
-    c = mix(c, backdrop, uBackdropStrength);
+    c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     c *= mix(uTintA, uTintB, uMix); // biome grade before the warm sun glow
     float sunAmt = pow(max(dot(dir, uSunDir), 0.0), 8.0);
     c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3;                        // warm glow around the anchor sun
@@ -372,6 +384,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uBackdropStrength: { value: backdropsReady ? 1 : 0 },
     uBackdropBiasA: { value: BACKDROP_Y_BIAS[start.from] },
     uBackdropBiasB: { value: BACKDROP_Y_BIAS[start.to] },
+    uBackdropAmtA: { value: BIOME_BACKDROP_STRENGTH[start.from] },
+    uBackdropAmtB: { value: BIOME_BACKDROP_STRENGTH[start.to] },
     uTintA: { value: tintVec(start.from) },
     uTintB: { value: tintVec(start.to) },
   };
@@ -402,6 +416,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
         uniforms.uBackdropB.value = backdropTex(next.to);
         uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[next.from];
         uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[next.to];
+        uniforms.uBackdropAmtA.value = BIOME_BACKDROP_STRENGTH[next.from];
+        uniforms.uBackdropAmtB.value = BIOME_BACKDROP_STRENGTH[next.to];
         uniforms.uTintA.value.copy(tintVec(next.from));
         uniforms.uTintB.value.copy(tintVec(next.to));
         uniforms.uMix.value = next.t;
