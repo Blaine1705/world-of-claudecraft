@@ -401,19 +401,10 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
   },
   player_priest: {
-    // The CLASSIC mage body (Brother Aldric's chapel model), not the v2
-    // mage.glb the mage/warlock wear, so the priest's GARMENT reads different
-    // from the mage's: high closed collar, straight tunic with a hem trim,
-    // rolled cuffs. Its accessories are plain (non-skinned) nodes, so the
-    // show list works here: keep the pointy hat (silhouette parity with the
-    // other casters), strip the cape and the built-in staff/wand/spellbooks
-    // (the equipped weapon attaches at handslot.r like every class). Same
-    // palette-atlas UV layout as the v2 body, so the white priest atlas and
-    // the shared alt skins fit both models.
-    url: `${PLAYERS}/mage_classic.glb`,
+    url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    show: ['Mage_Hat'],
+    show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
     // the white-linen look lives in the default atlas (SKINS index 0); no tint,

@@ -10,8 +10,7 @@ import * as THREE from 'three';
 // crown (angel style). A vertical disc behind the head fights the wide hat
 // brim from half the camera angles; hovering above it never clips.
 const HALO_RADIUS = 0.5;
-// tuned to hover just over the classic priest hat's tip (the only halo wearer)
-const HALO_UP_OFFSET = 1.1;
+const HALO_UP_OFFSET = 1.3;
 
 let haloTex: THREE.Texture | null = null;
 const haloMats = new Map<number, THREE.MeshBasicMaterial>();
