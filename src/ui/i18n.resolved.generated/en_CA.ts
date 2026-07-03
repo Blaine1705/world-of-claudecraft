@@ -402,6 +402,7 @@ export const en_CA: EnTranslations = {
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",

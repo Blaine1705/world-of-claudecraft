@@ -372,7 +372,11 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
     boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
     boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
+<<<<<<< HEAD
     boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
+=======
+    boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
+>>>>>>> feature/mouseover-cast
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
     boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
   ];

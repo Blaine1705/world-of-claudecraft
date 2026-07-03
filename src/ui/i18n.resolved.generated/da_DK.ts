@@ -402,6 +402,7 @@ export const da_DK: EnTranslations = {
       "startAttackOnAbility": "Autoangreb ved brug af evne",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Jordsigte-retikel",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",

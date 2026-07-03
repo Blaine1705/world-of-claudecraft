@@ -402,6 +402,7 @@ export const vi_VN: EnTranslations = {
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",

@@ -402,6 +402,7 @@ export const pl_PL: EnTranslations = {
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Celownik naziemny",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",

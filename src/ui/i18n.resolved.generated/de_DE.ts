@@ -402,6 +402,7 @@ export const de_DE: EnTranslations = {
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Bodenziel-Fadenkreuz",
+      "mouseoverCast": "Mouseover-Zauber auf Gruppenfenster",
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",

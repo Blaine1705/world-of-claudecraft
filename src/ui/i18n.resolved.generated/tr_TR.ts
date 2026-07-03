@@ -402,6 +402,7 @@ export const tr_TR: EnTranslations = {
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Yer hedefleme halkası",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",

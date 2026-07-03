@@ -402,6 +402,7 @@ export const ja_JP: EnTranslations = {
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
+      "mouseoverCast": "マウスオーバー詠唱（パーティ枠）",
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",

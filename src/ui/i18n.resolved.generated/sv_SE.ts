@@ -402,6 +402,7 @@ export const sv_SE: EnTranslations = {
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Markriktmedel",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",

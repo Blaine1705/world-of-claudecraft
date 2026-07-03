@@ -402,6 +402,7 @@ export const fr_CA: EnTranslations = {
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Réticule de ciblage au sol",
+      "mouseoverCast": "Sort au survol des cadres de groupe",
       "showItemLevel": "Afficher le niveau d'objet",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",

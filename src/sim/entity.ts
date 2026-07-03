@@ -49,6 +49,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     stealthed: false,
     ccDr: new Map(),
     castingAbility: null,
+    castTargetId: null,
     castRemaining: 0,
     castTotal: 0,
     castAim: null,

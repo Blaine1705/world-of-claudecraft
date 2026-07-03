@@ -402,6 +402,7 @@ export const it_IT: EnTranslations = {
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Reticolo di puntamento a terra",
+      "mouseoverCast": "Lancio al passaggio sui riquadri del gruppo",
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",

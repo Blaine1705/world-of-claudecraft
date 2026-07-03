@@ -402,6 +402,7 @@ export const pt_BR: EnTranslations = {
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Retícula de mira no chão",
+      "mouseoverCast": "Lançar feitiços ao apontar o grupo",
       "showItemLevel": "Mostrar nível do item",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",

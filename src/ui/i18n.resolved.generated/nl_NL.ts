@@ -402,6 +402,7 @@ export const nl_NL: EnTranslations = {
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Grondrichtkruis",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
