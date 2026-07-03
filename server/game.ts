@@ -65,6 +65,7 @@ import {
   saveCharacterState,
   saveMailState,
   saveMarketState,
+  touchCharacterLogin,
   walletForAccount,
 } from './db';
 import { enqueueActivity } from './discord_activity';
@@ -569,6 +570,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     mhp: e.maxHp,
   };
   if (e.dead) out.dead = 1;
+  if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   // The target frame's resource bar: type + current/max, sent only for entities
@@ -1549,6 +1551,11 @@ export class GameServer {
     this.sessionsByCharacterId.set(characterId, session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
+    // Stamp this character's last world-entry time for the guild-roster "last
+    // seen" readout. Best-effort: a failed write must never block joining.
+    void touchCharacterLogin(characterId).catch((err) =>
+      console.error('failed to stamp character last_login:', err),
+    );
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;
@@ -2251,7 +2258,10 @@ export class GameServer {
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
       }
-      if (frame.facing !== null && !e.dead) {
+      // A released spirit turns with the camera like the living; only a corpse that
+      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
+      // this the server drops the ghost's mouselook facing and its run feels inverted.
+      if (frame.facing !== null && (!e.dead || e.ghost)) {
         e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -2477,6 +2487,12 @@ export class GameServer {
         break;
       case 'release':
         sim.releaseSpirit(pid);
+        break;
+      case 'resurrect_corpse':
+        sim.resurrectAtCorpse(pid);
+        break;
+      case 'resurrect_healer':
+        sim.resurrectAtSpiritHealer(pid);
         break;
       case 'challengeResponse':
         if (typeof msg.n === 'string' && typeof msg.r === 'string' && typeof msg.sig === 'string') {
@@ -3328,6 +3344,10 @@ export class GameServer {
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
+    // Where the player's corpse lies while their spirit is a ghost (null otherwise).
+    // Delta-guarded: ships on death-release and clears on resurrect. The client
+    // draws the corpse marker and gates the resurrect-at-corpse button on it.
+    maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
