@@ -27,6 +27,13 @@ function teleport(ctx: SimContext, p: Entity, to: PortalSide, text: string): voi
   p.facing = to.landing.facing;
   p.targetId = null;
   p.autoAttack = false;
+  // Land settled: no carried-over jump arc or fall distance from the far side
+  // (a future portal pair with an elevation delta would otherwise deal fall
+  // damage on arrival).
+  p.vy = 0;
+  p.jumping = false;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
   ctx.emit({ type: 'log', text, color: '#b9f', pid: p.id });
 }
 

@@ -1046,7 +1046,9 @@ export class Renderer {
       }
       // The dusk realm shares the peaks HDRI; alias its prefiltered RT
       // rather than refiltering the same texture (the distinct dusk look
-      // rides the dome tint, fog, and light grade).
+      // rides the dome tint, fog, and light grade). envRTs live for the
+      // whole session; if a teardown loop is ever added, dedupe by RT
+      // identity first or this alias double-disposes.
       const peaksRT = this.envRTs.get('peaks');
       if (peaksRT) this.envRTs.set('dusk', peaksRT);
       if (this.envRTs.size > 0) {

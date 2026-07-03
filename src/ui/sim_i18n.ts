@@ -1941,8 +1941,8 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.elixirBear': '熊の力',
   },
   pt_BR: {
-    'log.veilEnter': 'Um veu de crepusculo se abre a sua frente, e o Vale Oculto surge adiante.',
-    'log.veilLeave': 'O veu se fecha as suas costas, e o ar da montanha volta a morder.',
+    'log.veilEnter': 'Um véu de crepúsculo se abre à sua frente, e o Vale Oculto surge adiante.',
+    'log.veilLeave': 'O véu se fecha às suas costas, e o ar da montanha volta a morder.',
     'log.learnedAbility': 'Você aprendeu uma nova habilidade: {name}.',
     'log.abilityRankUp': 'Sua habilidade {name} melhorou para o Grau {rank}.',
     'log.stopFollowing': 'Você parou de seguir.',

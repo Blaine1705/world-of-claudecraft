@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { REALM_ZONE } from '../src/sim/content/realm';
 import { WORLD_MAX_Z, ZONES, zoneAt } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const SEED = 1337; // matches the fixed client seed in src/main.ts
@@ -84,5 +85,69 @@ describe('the sealed border wall', () => {
     const atSanctum = terrainHeight(0, 880, SEED);
     const nearby = terrainHeight(0, 860, SEED);
     expect(Math.abs(atSanctum - nearby)).toBeLessThan(12);
+  });
+});
+
+describe('the sealed border is a hard movement wall', () => {
+  // The climb gate projects rise along the movement direction, so a smooth
+  // gaussian wall alone is beatable by shallow diagonals (and airborne drift
+  // skips the gate entirely). crossesSealedBorder in resolveMovement is the
+  // real guarantee: drive the ACTUAL sim movement at exploit angles and with
+  // jump spam, and assert the crest is never crossed.
+  const CREST = 915; // ZONES[2].zMax + 15 (the sealed ridge shift)
+
+  function walker(seed: number, startX: number, yawOffNorth: number, jump: boolean): number {
+    const sim = new Sim({ seed, playerClass: 'warrior' });
+    const p = sim.player;
+    p.pos.x = startX;
+    p.pos.z = 890;
+    p.pos.y = terrainHeight(startX, 890, seed);
+    p.prevPos = { ...p.pos };
+    p.maxHp = 999999;
+    p.hp = 999999;
+    sim.moveInput.forward = true;
+    let maxZ = p.pos.z;
+    // 60 seconds of held movement, re-aiming across the wall each second and
+    // flipping the diagonal so the walker tacks along the face
+    for (let s = 0; s < 60; s++) {
+      const sign = s % 2 === 0 ? 1 : -1;
+      p.facing = sign * yawOffNorth; // 0 = +z north (into the realm)
+      for (let t = 0; t < 20; t++) {
+        if (jump) sim.moveInput.jump = true;
+        sim.tick();
+        if (p.pos.z > maxZ) maxZ = p.pos.z;
+      }
+      // clamp x back into the band so the tack never leaves the world
+      if (p.pos.x > 170) p.pos.x = 170;
+      if (p.pos.x < -170) p.pos.x = -170;
+    }
+    return maxZ;
+  }
+
+  // the easiest faces found by a greedy climber: mid-band and the Starfall
+  // carve near x=126 (full sims are slow; keep the matrix tight)
+  it('holds against shallow-diagonal walking at the exploit-prone faces', () => {
+    for (const x of [-40, 126]) {
+      for (const yaw of [1.1, 1.35]) {
+        expect(walker(SEED, x, yaw, false), `x=${x} yaw=${yaw}`).toBeLessThan(CREST);
+      }
+    }
+  }, 60000);
+
+  it('holds against jump spam into the face', () => {
+    for (const x of [-40, 126]) {
+      expect(walker(SEED, x, 1.2, true), `x=${x}`).toBeLessThan(CREST);
+    }
+  }, 60000);
+
+  it('still lets the portal deliver players across', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.player;
+    p.pos.x = -140;
+    p.pos.z = 844.5;
+    p.prevPos = { ...p.pos };
+    sim.tick();
+    expect(p.pos.z).toBeGreaterThan(CREST);
+    expect(zoneAt(p.pos.z).id).toBe('veiled_hollow');
   });
 });

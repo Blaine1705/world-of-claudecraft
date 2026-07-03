@@ -312,7 +312,7 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     enrage: { belowHpPct: 0.3, dmgMult: 1.35, hasteMult: 1.25 },
     loot: [
       { copper: 600, chance: 1 },
-      { itemId: 'wardens_seal', chance: 1 },
+      { itemId: 'wardens_seal', chance: 1, questId: 'q_waking_warden' },
     ],
     scale: 1.5,
     color: 0xb08fd8,
@@ -709,7 +709,7 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'ancient_guardian', center: { x: 138, z: 1070 }, radius: 10, count: 3 },
   { mobId: 'waking_warden', center: { x: 125, z: 1085 }, radius: 3, count: 1 },
   // the rare glowing stag, deep in the hidden western clearing (no POI)
-  { mobId: 'gleamstag', center: { x: -160, z: 1100 }, radius: 4, count: 1 },
+  { mobId: 'gleamstag', center: { x: -145, z: 1100 }, radius: 4, count: 1 },
 ];
 
 // ---------------------------------------------------------------------------
@@ -834,7 +834,6 @@ export const REALM_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     noVendorSell: true,
-    noDiscard: true,
   },
   gleamstag_charm: {
     id: 'gleamstag_charm',

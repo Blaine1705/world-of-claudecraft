@@ -20,7 +20,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
-import { generateDecorations, groundHeight } from './world';
+import { crossesSealedBorder, generateDecorations, groundHeight } from './world';
 
 // Static world collision. Prop placement comes from the per-zone content
 // modules (merged into PROPS by sim/data.ts): the renderer builds its meshes
@@ -431,9 +431,16 @@ export function resolveMovement(
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
     const nextX = fromX + dx * t;
-    const nextZ = fromZ + dz * t;
+    // A sealed zone border is a hard wall regardless of terrain slope (the
+    // climb gate projects rise along the movement direction, so a shallow
+    // diagonal would otherwise sneak over the crest). Clamp z at the crest
+    // and keep the x component, so pushing into the wall slides along it.
+    const nextZ = crossesSealedBorder(z, fromZ + dz * t) ? z : fromZ + dz * t;
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
     const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules);
+    // ...and a static-collider slide (a tree hugging the crest) must not
+    // shove the resolved position across it either
+    if (crossesSealedBorder(z, resolved.z)) break;
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {

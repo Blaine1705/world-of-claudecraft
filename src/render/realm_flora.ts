@@ -210,7 +210,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     mesh.instanceMatrix.needsUpdate = true;
     mesh.castShadow = false;
     mesh.receiveShadow = true;
-    mesh.frustumCulled = false; // spans the whole band; the band is one zone
+    // instanced bounding sphere covers every placement, so normal frustum
+    // culling drops the whole batch when the realm is off-screen
+    mesh.computeBoundingSphere();
     group.add(mesh);
   };
 

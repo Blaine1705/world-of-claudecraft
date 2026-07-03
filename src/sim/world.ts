@@ -47,11 +47,27 @@ for (let i = 0; i + 1 < ZONES.length; i++) {
 const RIDGE_HEIGHT = 22;
 const RIDGE_SIGMA = 18; // gaussian width of the wall
 // Sealed walls: tall and steep enough that the straight-approach gradient
-// beats PLAYER_MAX_CLIMB_SLOPE everywhere along the border, even against the
-// worst-case downhill assist from the underlying biome hills (guarded by
-// tests/veiled_hollow.test.ts).
+// beats PLAYER_MAX_CLIMB_SLOPE everywhere along the border. The slope gate
+// alone cannot seal a smooth wall (it projects rise along the movement
+// direction, so a shallow-enough diagonal always sneaks under it); the crest
+// line is therefore ALSO a hard movement wall in colliders.resolveMovement
+// via crossesSealedBorder below. The terrain steepness is the fiction; the
+// crossing check is the guarantee (guarded by tests/veiled_hollow.test.ts).
 const SEALED_RIDGE_HEIGHT = 60;
 const SEALED_RIDGE_SIGMA = 12;
+
+// Crest z of every sealed border: an uncrossable line for swept movement.
+// Portal teleports assign positions directly and are unaffected.
+export const SEALED_BORDER_ZS: readonly number[] = ZONE_RIDGES.filter((r) => r.sealed).map(
+  (r) => r.z,
+);
+
+export function crossesSealedBorder(z0: number, z1: number): boolean {
+  for (const zc of SEALED_BORDER_ZS) {
+    if ((z0 - zc) * (z1 - zc) < 0) return true;
+  }
+  return false;
+}
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
