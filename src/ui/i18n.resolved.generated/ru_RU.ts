@@ -5688,6 +5688,12 @@ export const ru_RU: EnTranslations = {
       "waking_warden": {
         "name": "Пробудившийся Смотритель"
       },
+      "old_marrowshell": {
+        "name": "Старый Костнопанцирь"
+      },
+      "aurelhorn": {
+        "name": "Аурелхорн, Первый в стаде"
+      },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
       },

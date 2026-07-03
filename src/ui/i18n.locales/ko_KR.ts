@@ -3002,6 +3002,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.treant_elder.name': '나무정령 원로',
   'entities.mobs.ancient_guardian.name': '고대 수호자',
   'entities.mobs.waking_warden.name': '깨어난 감시자',
+  'entities.mobs.old_marrowshell.name': '늙은 골수껍질',
+  'entities.mobs.aurelhorn.name': '아우렐혼, 무리의 첫째',
   'entities.npcs.keeper_saelwyn.name': '수호자 샐윈',
   'entities.npcs.keeper_saelwyn.title': '골짜기의 수호자',
   'entities.npcs.keeper_saelwyn.greeting': '그대의 동족이 이 가지 아래 선 일은 드물다, {className}. 조심스레 걸으라, 그리고 환영받으라.',

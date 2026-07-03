@@ -5688,6 +5688,12 @@ export const ja_JP: EnTranslations = {
       "waking_warden": {
         "name": "目覚めし監視者"
       },
+      "old_marrowshell": {
+        "name": "オールド・マロウシェル"
+      },
+      "aurelhorn": {
+        "name": "アウレルホーン、群れの長"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },

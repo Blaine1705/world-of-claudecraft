@@ -5688,6 +5688,12 @@ export const zh_TW: EnTranslations = {
       "waking_warden": {
         "name": "甦醒的守望者"
       },
+      "old_marrowshell": {
+        "name": "老甲髓"
+      },
+      "aurelhorn": {
+        "name": "金角，鹿群之首"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },

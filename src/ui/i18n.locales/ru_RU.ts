@@ -3038,6 +3038,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.treant_elder.name': 'Древень-старейшина',
   'entities.mobs.ancient_guardian.name': 'Древний страж',
   'entities.mobs.waking_warden.name': 'Пробудившийся Смотритель',
+  'entities.mobs.old_marrowshell.name': 'Старый Костнопанцирь',
+  'entities.mobs.aurelhorn.name': 'Аурелхорн, Первый в стаде',
   'entities.npcs.keeper_saelwyn.name': 'Хранительница Сэльвин',
   'entities.npcs.keeper_saelwyn.title': 'Хранительница Лощины',
   'entities.npcs.keeper_saelwyn.greeting': 'Немногие из вашего рода стояли под этими ветвями, {className}. Ступайте мягко, и добро пожаловать.',

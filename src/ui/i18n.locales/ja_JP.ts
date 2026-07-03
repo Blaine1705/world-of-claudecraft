@@ -3007,6 +3007,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.treant_elder.name': 'トレントの長老',
   'entities.mobs.ancient_guardian.name': '古代の守護者',
   'entities.mobs.waking_warden.name': '目覚めし監視者',
+  'entities.mobs.old_marrowshell.name': 'オールド・マロウシェル',
+  'entities.mobs.aurelhorn.name': 'アウレルホーン、群れの長',
   'entities.npcs.keeper_saelwyn.name': '守り手セルウィン',
   'entities.npcs.keeper_saelwyn.title': '幽谷の守り手',
   'entities.npcs.keeper_saelwyn.greeting': 'そなたの同族でこの枝の下に立った者は少ない、{className}よ。静かに歩み、歓迎を受けるがよい。',

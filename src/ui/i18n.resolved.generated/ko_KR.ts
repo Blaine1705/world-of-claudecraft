@@ -5688,6 +5688,12 @@ export const ko_KR: EnTranslations = {
       "waking_warden": {
         "name": "깨어난 감시자"
       },
+      "old_marrowshell": {
+        "name": "늙은 골수껍질"
+      },
+      "aurelhorn": {
+        "name": "아우렐혼, 무리의 첫째"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },

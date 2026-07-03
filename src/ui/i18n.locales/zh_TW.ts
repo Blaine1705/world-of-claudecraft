@@ -2874,6 +2874,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.treant_elder.name': '樹人長者',
   'entities.mobs.ancient_guardian.name': '上古守衛',
   'entities.mobs.waking_warden.name': '甦醒的守望者',
+  'entities.mobs.old_marrowshell.name': '老甲髓',
+  'entities.mobs.aurelhorn.name': '金角，鹿群之首',
   'entities.npcs.keeper_saelwyn.name': '守護者塞爾文',
   'entities.npcs.keeper_saelwyn.title': '幽谷守護者',
   'entities.npcs.keeper_saelwyn.greeting': '你的同族鮮少踏足這片樹蔭，{className}。輕聲慢行，歡迎你的到來。',

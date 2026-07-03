@@ -5688,6 +5688,12 @@ export const vi_VN: EnTranslations = {
       "waking_warden": {
         "name": "The Waking Warden"
       },
+      "old_marrowshell": {
+        "name": "Old Marrowshell"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, First of the Herd"
+      },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"
       },

@@ -8,13 +8,13 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 577,
-  "drawDigest": "b8b0af28",
+  "draws": 578,
+  "drawDigest": "a4fd8b08",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 454,
+      "nextId": 456,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 456,
-      "state": "ada05fcf",
-      "events": "64b02d05",
+      "nextId": 458,
+      "state": "9cd4f34b",
+      "events": "07d59c81",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,56 +39,56 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 456,
-      "state": "1aa473ab",
-      "events": "22fed9ea",
+      "nextId": 458,
+      "state": "a949fe7b",
+      "events": "aef16bfe",
       "rng": {
         "draws": 42,
-        "digest": "481bbab1"
+        "digest": "be3b4920"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 456,
-      "state": "5324184b",
-      "events": "e46c5c7e",
+      "nextId": 458,
+      "state": "aeb90d9b",
+      "events": "ec794c9a",
       "rng": {
-        "draws": 177,
-        "digest": "baa4e4c9"
+        "draws": 180,
+        "digest": "69ad16d0"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 456,
-      "state": "cc5062df",
-      "events": "18a13e6e",
+      "nextId": 458,
+      "state": "eb37e21b",
+      "events": "f67d7f72",
       "rng": {
-        "draws": 314,
-        "digest": "e6f94efc"
+        "draws": 316,
+        "digest": "d7496bf7"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 456,
-      "state": "97ab7e18",
-      "events": "bd975609",
+      "nextId": 458,
+      "state": "7d3db7b0",
+      "events": "30aa6d4b",
       "rng": {
-        "draws": 460,
-        "digest": "9b59a115"
+        "draws": 459,
+        "digest": "c97d980c"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 456,
-      "state": "27c83cb0",
+      "nextId": 458,
+      "state": "985309f8",
       "events": "741638a5",
       "rng": {
-        "draws": 577,
-        "digest": "b8b0af28"
+        "draws": 578,
+        "digest": "a4fd8b08"
       },
       "label": "final",
       "players": [
@@ -102,7 +102,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 454,
+          "entityId": 456,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -124,7 +124,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 455,
+          "entityId": 457,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -145,7 +145,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 106.1,
           "hp": 90,
-          "id": 454,
+          "id": 456,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -192,7 +192,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 455,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

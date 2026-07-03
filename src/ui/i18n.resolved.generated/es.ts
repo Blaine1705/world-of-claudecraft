@@ -5688,6 +5688,12 @@ export const es: EnTranslations = {
       "waking_warden": {
         "name": "The Waking Warden"
       },
+      "old_marrowshell": {
+        "name": "Old Marrowshell"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, First of the Herd"
+      },
       "ironvein_foreman": {
         "name": "Capataz Vena de Hierro"
       },

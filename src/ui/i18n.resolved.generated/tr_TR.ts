@@ -5688,6 +5688,12 @@ export const tr_TR: EnTranslations = {
       "waking_warden": {
         "name": "The Waking Warden"
       },
+      "old_marrowshell": {
+        "name": "Old Marrowshell"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, First of the Herd"
+      },
       "ironvein_foreman": {
         "name": "Demirdamar Ustabaşı"
       },

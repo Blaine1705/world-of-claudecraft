@@ -300,6 +300,72 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     scale: 1.2,
     color: 0x9a94a8,
   },
+  // --- wandering bosses: rare elites with their own silhouettes (the crab
+  // and bull rigs appear nowhere else in the game) ---
+  old_marrowshell: {
+    id: 'old_marrowshell',
+    name: 'Old Marrowshell',
+    minLevel: 17,
+    maxLevel: 17,
+    family: 'beast',
+    rare: true,
+    elite: true,
+    ccImmune: true,
+    canSwim: true,
+    respawnMult: 6,
+    hpBase: 340,
+    hpPerLevel: 54,
+    dmgBase: 16,
+    dmgPerLevel: 3.8,
+    attackSpeed: 2.0,
+    armorPerLevel: 34,
+    moveSpeed: 6.5,
+    aggroRadius: 9,
+    stoneskin: { amount: 110, every: 12, duration: 8, name: 'Ancient Carapace' },
+    venom: { chance: 0.3, perTick: 5, interval: 2, duration: 10, name: 'Coldwater Rot' },
+    loot: [
+      { copper: 700, chance: 1 },
+      { itemId: 'guardian_core', chance: 1 },
+      { itemId: 'duskfang_dirk', chance: 0.35 },
+    ],
+    scale: 1.5,
+    color: 0x8fb8d8,
+  },
+  aurelhorn: {
+    id: 'aurelhorn',
+    name: 'Aurelhorn, First of the Herd',
+    minLevel: 18,
+    maxLevel: 18,
+    family: 'beast',
+    rare: true,
+    elite: true,
+    ccImmune: true,
+    respawnMult: 6,
+    hpBase: 360,
+    hpPerLevel: 56,
+    dmgBase: 17,
+    dmgPerLevel: 3.8,
+    attackSpeed: 1.9,
+    armorPerLevel: 26,
+    moveSpeed: 9,
+    aggroRadius: 0, // the herd's warden strikes only when the herd is struck
+    aoePulse: {
+      min: 22,
+      max: 30,
+      radius: 8,
+      every: 9,
+      name: 'Trampling Charge',
+      school: 'physical',
+    },
+    enrage: { belowHpPct: 0.35, dmgMult: 1.4, hasteMult: 1.3 },
+    loot: [
+      { copper: 700, chance: 1 },
+      { itemId: 'gleaming_antler', chance: 1 },
+      { itemId: 'veilsteel_blade', chance: 0.35 },
+    ],
+    scale: 1.45,
+    color: 0xd8c49a,
+  },
   waking_warden: {
     id: 'waking_warden',
     name: 'The Waking Warden',
@@ -719,6 +785,9 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'waking_warden', center: { x: 125, z: 1085 }, radius: 3, count: 1 },
   // the rare glowing stag, deep in the hidden western clearing (no POI)
   { mobId: 'gleamstag', center: { x: -145, z: 1100 }, radius: 4, count: 1 },
+  // wandering bosses (rare elites, long respawns, appended last for rng order)
+  { mobId: 'old_marrowshell', center: { x: 94, z: 1152 }, radius: 5, count: 1 },
+  { mobId: 'aurelhorn', center: { x: 70, z: 995 }, radius: 6, count: 1 },
 ];
 
 // ---------------------------------------------------------------------------

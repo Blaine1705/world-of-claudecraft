@@ -92,6 +92,8 @@ const MOB_IDS = [
   'treant_elder',
   'ancient_guardian',
   'waking_warden',
+  'old_marrowshell',
+  'aurelhorn',
 ] as const;
 
 const NPC_IDS = [

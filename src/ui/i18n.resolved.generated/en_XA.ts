@@ -5688,6 +5688,12 @@ export const en_XA: EnTranslations = {
       "waking_warden": {
         "name": "[Ţĥé Ŵáķíñĝ Ŵáŕðéñ]"
       },
+      "old_marrowshell": {
+        "name": "[Óļð Ɱáŕŕóŵšĥéļļ]"
+      },
+      "aurelhorn": {
+        "name": "[Áúŕéļĥóŕñ, Ƒíŕšţ óƒ ţĥé Ĥéŕð]"
+      },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"
       },

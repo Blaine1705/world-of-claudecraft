@@ -638,6 +638,29 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.45,
   },
+  // the Hollow's wandering bosses: two more rigs no other zone uses
+  mob_crab: {
+    url: `${CREATURES}/crabenemy.glb`,
+    height: 1.7,
+    clips: ENEMY_BITE,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_bull: {
+    url: `${CREATURES}/bull.glb`,
+    height: 2.1,
+    // the bull rig has no plain Idle clip; grazing IS its idle
+    clips: {
+      idle: 'Eating',
+      walk: 'Walk',
+      run: 'Gallop',
+      attack: ['Attack_Headbutt', 'Attack_Kick'],
+      hit: ['Idle_HitReact_Left', 'Idle_HitReact_Right'],
+      death: 'Death',
+    },
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
   // mossy treant: the shaggy yeti under a bark-green entity wash
   mob_treant: {
     url: `${CREATURES}/yeti.glb`,
@@ -928,6 +951,8 @@ const MOB_KEYS: Record<string, string> = {
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
   treant_elder: 'mob_treant',
+  old_marrowshell: 'mob_crab',
+  aurelhorn: 'mob_bull',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
