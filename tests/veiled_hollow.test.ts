@@ -4,11 +4,18 @@
 // from EVERY x, in BOTH directions, with no road pass through it.
 
 import { describe, expect, it } from 'vitest';
-import { REALM_ZONE } from '../src/sim/content/realm';
+import {
+  REALM_CAMPS,
+  REALM_NPCS,
+  REALM_PORTALS,
+  REALM_PROPS,
+  REALM_ROADS,
+  REALM_ZONE,
+} from '../src/sim/content/realm';
 import { WORLD_MAX_Z, ZONES, zoneAt } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
-import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { hollowLandness, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const SEED = 1337; // matches the fixed client seed in src/main.ts
 
@@ -149,5 +156,45 @@ describe('the sealed border is a hard movement wall', () => {
     sim.tick();
     expect(p.pos.z).toBeGreaterThan(CREST);
     expect(zoneAt(p.pos.z).id).toBe('veiled_hollow');
+  });
+});
+
+describe('the Hollow coastline keeps every fixed feature on dry land', () => {
+  function assertOnLand(label: string, x: number, z: number) {
+    // the coast only exists north of the sealed range (z >= 960); south of it
+    // (and outside the band) only the dry-ground check applies
+    if (z >= 960 && z <= 1262) {
+      expect(hollowLandness(x, z), `${label} at ${x},${z} landness`).toBeGreaterThan(0.14);
+    }
+    expect(terrainHeight(x, z, SEED), `${label} at ${x},${z} height`).toBeGreaterThan(WATER_LEVEL);
+  }
+
+  it('camps, town, roads, ruins, portals, and POIs stay above the sea', () => {
+    for (const c of REALM_CAMPS) assertOnLand(`camp ${c.mobId}`, c.center.x, c.center.z);
+    for (const n of Object.values(REALM_NPCS)) assertOnLand(`npc ${n.id}`, n.pos.x, n.pos.z);
+    for (const poi of REALM_ZONE.pois) {
+      // POIs may label water features (the lakes); they just must not drift
+      // out past the coast into the open sea
+      expect(hollowLandness(poi.x, poi.z), `poi ${poi.label} landness`).toBeGreaterThan(0.14);
+    }
+    for (const b of REALM_PROPS.buildings) assertOnLand('building', b.x, b.z);
+    for (const ring of REALM_PROPS.ruinRings) assertOnLand('ruin ring', ring.x, ring.z);
+    for (const t of REALM_PROPS.tents) assertOnLand('tent', t.x, t.z);
+    for (const m of REALM_PROPS.mines) assertOnLand('cave mouth', m.x, m.z);
+    for (const portal of REALM_PORTALS) {
+      assertOnLand('portal b', portal.b.x, portal.b.z);
+      assertOnLand('portal b landing', portal.b.landing.x, portal.b.landing.z);
+    }
+    const g = REALM_ZONE.graveyard;
+    assertOnLand('graveyard', g.x, g.z);
+    for (const road of REALM_ROADS) {
+      for (let i = 0; i < road.length - 1; i++) {
+        for (let t = 0; t <= 1; t += 0.1) {
+          const x = road[i].x + (road[i + 1].x - road[i].x) * t;
+          const z = road[i].z + (road[i + 1].z - road[i].z) * t;
+          assertOnLand('road', x, z);
+        }
+      }
+    }
   });
 });

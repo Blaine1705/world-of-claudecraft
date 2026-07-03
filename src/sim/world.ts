@@ -94,6 +94,64 @@ const HOLLOW_SHAPING = [
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
 ] as const;
 
+// ---------------------------------------------------------------------------
+// The Hollow's coastline. The realm is an organic landmass in a dusk sea:
+// a union of soft land lobes (peninsulas for the cave arrival, the western
+// highlands, the Gleaming Deep, the northeast monument arm, the Starfall
+// headland) minus carved bays. Terrain outside the coast sinks to a seabed,
+// and the full-band water plane plus the map painter's blue do the rest, so
+// the world map reads like a real continent silhouette instead of a square.
+// Every fixed content point (camps, town, roads, ruins) sits on a lobe with
+// margin; tests/veiled_hollow.test.ts asserts it stays that way.
+// ---------------------------------------------------------------------------
+const HOLLOW_LAND_LOBES = [
+  { x: 0, z: 1060, r: 155 }, // main body: town, meadow, court's west edge
+  { x: -125, z: 1010, r: 85 }, // southwest: the Duskfall arrival and overlook
+  { x: -140, z: 925, r: 55 }, // the sealed range's western shoulder
+  { x: 10, z: 935, r: 90 }, // the sealed range's center and Elder Grove
+  { x: 140, z: 925, r: 60 }, // the sealed range's eastern shoulder
+  { x: -125, z: 1150, r: 75 }, // western highlands and the Mirrormere
+  { x: -55, z: 1200, r: 75 }, // the Gleaming Deep's north rings
+  { x: 95, z: 1150, r: 75 }, // the Crystalline Shallows
+  { x: 150, z: 1215, r: 62 }, // the northeast arm (the forgotten monument)
+  { x: 120, z: 995, r: 72 }, // the Starfall headland and falls terrace
+  { x: 130, z: 1082, r: 48 }, // the Sunken Court peninsula
+] as const;
+const HOLLOW_BAYS = [
+  { x: 182, z: 1038, r: 38 }, // the east bight, between headland and Court
+  { x: -178, z: 1062, r: 42 }, // the west inlet
+  { x: 30, z: 1262, r: 58 }, // the north sound
+  { x: -185, z: 1235, r: 46 }, // the northwest reach
+] as const;
+const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
+
+// >0 on land, <0 at sea; the coast is the soft zero crossing.
+export function hollowLandness(x: number, z: number): number {
+  let land = 0;
+  for (const b of HOLLOW_LAND_LOBES) {
+    const d2 = ((x - b.x) / b.r) ** 2 + ((z - b.z) / b.r) ** 2;
+    if (d2 < 1) land += (1 - d2) ** 2;
+  }
+  for (const b of HOLLOW_BAYS) {
+    const d2 = ((x - b.x) / b.r) ** 2 + ((z - b.z) / b.r) ** 2;
+    if (d2 < 1) land -= 1.4 * (1 - d2) ** 2;
+  }
+  return land - 0.06;
+}
+
+// Sink everything beyond the coast to the seabed. The outer 10yd of the band
+// keeps the containment rim (it rises from the water as border cliffs), and
+// the sealed border band is fully inside land lobes so the wall never wets.
+function applyHollowCoast(x: number, z: number, h: number): number {
+  // the sea starts north of the sealed range: the realm's south is mountain,
+  // its other shores are coast (and the wall never wets)
+  if (z < 960 || z > 1262) return h;
+  const dSide = Math.min(x + 183, 183 - x, 1263 - z);
+  if (dSide < 10) return h;
+  const t = smoothstep(0.0, 0.14, hollowLandness(x, z));
+  return HOLLOW_SEA_FLOOR + (h - HOLLOW_SEA_FLOOR) * t;
+}
+
 // Border pockets the mountain fringe must not swallow.
 const HOLLOW_FRINGE_CLEARINGS = [
   { x: -140, z: 960, r: 34 }, // the Duskfall cave arrival and its road
@@ -265,6 +323,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h += rim * 40;
   h += mirefenImpactCraterOffset(x, z);
   h += hollowShapingOffset(x, z, seed);
+  h = applyHollowCoast(x, z, h);
   return h;
 }
 

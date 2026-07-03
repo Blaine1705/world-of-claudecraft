@@ -9,8 +9,8 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 721,
-  "drawDigest": "82194059",
+  "draws": 719,
+  "drawDigest": "d6dc685e",
   "frames": [
     {
       "tick": 0,
@@ -66,8 +66,8 @@
       "state": "c3f539a3",
       "events": "128faa39",
       "rng": {
-        "draws": 277,
-        "digest": "d09c690e"
+        "draws": 278,
+        "digest": "830c1bb1"
       }
     },
     {
@@ -88,8 +88,8 @@
       "state": "518c5e8d",
       "events": "741638a5",
       "rng": {
-        "draws": 626,
-        "digest": "6de5d4a2"
+        "draws": 627,
+        "digest": "203889f4"
       }
     },
     {
@@ -99,8 +99,8 @@
       "state": "73926cee",
       "events": "fe8ecf44",
       "rng": {
-        "draws": 721,
-        "digest": "82194059"
+        "draws": 719,
+        "digest": "d6dc685e"
       },
       "label": "final",
       "players": [

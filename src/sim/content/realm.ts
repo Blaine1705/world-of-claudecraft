@@ -770,9 +770,9 @@ export const REALM_QUEST_ORDER: string[] = [
 // ---------------------------------------------------------------------------
 
 export const REALM_CAMPS: CampDef[] = [
-  { mobId: 'glimmerwisp', center: { x: 85, z: 1000 }, radius: 16, count: 4 },
+  { mobId: 'glimmerwisp', center: { x: 76, z: 1014 }, radius: 12, count: 4 },
   { mobId: 'glimmerwisp', center: { x: 60, z: 1150 }, radius: 14, count: 4 },
-  { mobId: 'duskwisp', center: { x: 140, z: 1110 }, radius: 12, count: 4 },
+  { mobId: 'duskwisp', center: { x: 126, z: 1120 }, radius: 12, count: 4 },
   { mobId: 'duskwisp', center: { x: -30, z: 1200 }, radius: 14, count: 4 },
   { mobId: 'hollow_spirit', center: { x: -75, z: 1170 }, radius: 18, count: 5 },
   { mobId: 'veiled_stag', center: { x: 92, z: 962 }, radius: 18, count: 6 },
@@ -786,7 +786,7 @@ export const REALM_CAMPS: CampDef[] = [
   // the rare glowing stag, deep in the hidden western clearing (no POI)
   { mobId: 'gleamstag', center: { x: -145, z: 1100 }, radius: 4, count: 1 },
   // wandering bosses (rare elites, long respawns, appended last for rng order)
-  { mobId: 'old_marrowshell', center: { x: 94, z: 1152 }, radius: 5, count: 1 },
+  { mobId: 'old_marrowshell', center: { x: 103, z: 1144 }, radius: 5, count: 1 },
   { mobId: 'aurelhorn', center: { x: 70, z: 995 }, radius: 6, count: 1 },
 ];
 
