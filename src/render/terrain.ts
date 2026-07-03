@@ -173,6 +173,8 @@ const rockC = new THREE.Color(0x7a7a72);
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
+const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
+const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(0xedf3fa);
 const lowSunC = new THREE.Color(0xe7d9a5);
 const lowShadeC = new THREE.Color(0x60745b);
@@ -286,6 +288,14 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     const t = Math.min(1, (slope - rockStart) * 2);
     cTmp.lerp(rockC, t);
     lerpSplat(w, 2, t);
+    // dusk sea cliffs read as dark weathered stone with pale strata bands, so
+    // the coast walls look like rugged wave-cut rock instead of smooth clay
+    if (biome === 'dusk') {
+      const nearSea = clamp01((16 - h) / 12);
+      const band = (Math.sin(h * 1.7 + x * 0.06 + z * 0.045) + 1) / 2;
+      cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
+      cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
+    }
   }
   // high ground (ridges, peaks) goes rocky then snowy
   let snow = 0;

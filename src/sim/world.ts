@@ -9,7 +9,7 @@ import {
   WORLD_MIN_Z,
   ZONES,
 } from './data';
-import { fbm2, hash2 } from './rng';
+import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId } from './types';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -172,6 +172,28 @@ function applyHollowCoast(x: number, z: number, h: number): number {
     const cap = 6.5;
     const ease = smoothstep(1245, 1268, z); // mainland shore eases into it
     if (out > cap) out = out + (cap + (out - cap) * 0.12 - out) * ease;
+  }
+  // Wave-cut ledges: coastal rock above the beach line breaks into stepped
+  // terraces with noise-jittered edges, so bluffs meet the sea as rigid
+  // cliff faces instead of smooth mounds. Confined to the shore band (the
+  // interior fades out by landness) south of the northern lowlands; beaches
+  // and the water itself sit below the height gate and stay gentle.
+  if (z < 1245) {
+    const coastW = smoothstep(0.02, 0.1, land) * (1 - smoothstep(0.3, 0.48, land));
+    if (coastW > 0) {
+      const lift = smoothstep(WATER_LEVEL + 1.5, WATER_LEVEL + 6, out);
+      const fade = 1 - smoothstep(WATER_LEVEL + 20, WATER_LEVEL + 28, out);
+      const w = 0.62 * coastW * lift * fade;
+      if (w > 0) {
+        const step = 4.2;
+        const jit = (noise2(x * 0.13, z * 0.13, 77) - 0.5) * 2.2;
+        const hh = out + jit;
+        const base = Math.floor(hh / step) * step;
+        const frac = (hh - base) / step;
+        const ledge = base + step * Math.min(1, Math.max(0, (frac - 0.3) / 0.4));
+        out = out + (ledge - out) * w;
+      }
+    }
   }
   return out;
 }

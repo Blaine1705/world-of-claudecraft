@@ -24,7 +24,13 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { REALM_PROPS, REALM_ZONE } from '../sim/content/realm';
 import { hash2 } from '../sim/rng';
-import { HOLLOW_FALLS, roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
+import {
+  HOLLOW_FALLS,
+  hollowLandness,
+  roadDistance,
+  terrainHeight,
+  WATER_LEVEL,
+} from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
@@ -32,6 +38,14 @@ import { cloudTexture } from './textures';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
+// The rugged coast reuses the bundled rock kit: two broad fallen-boulder
+// shapes and two tall shards for offshore stacks and crest teeth.
+const SEA_ROCK_URLS = [
+  '/models/props/rock_large_d.glb',
+  '/models/props/rock_large_f.glb',
+  '/models/props/rock_tall_a.glb',
+  '/models/props/rock_tall_h.glb',
+];
 // The great tree of Eldergleam: one hand-placed giant of the twisted elder
 // model the realm's forests already use, kept with its own materials (the
 // loader cache is immutable, so the scene is cloned before use).
@@ -51,7 +65,7 @@ interface ModelPart {
   material: THREE.Material;
 }
 const loadedParts = new Map<string, ModelPart[]>();
-for (const url of [...MUSHROOM_URLS, BOULDER_URL]) {
+for (const url of new Set([...MUSHROOM_URLS, BOULDER_URL, ...SEA_ROCK_URLS])) {
   registerPreload(
     loadGltf(url).then((gltf) => {
       gltf.scene.updateMatrixWorld(true);
@@ -147,6 +161,8 @@ interface Placements {
   willows: Spot[];
   blossoms: Spot[];
   boulders: Spot[];
+  seaRocks: Spot[];
+  seaStacks: Spot[];
 }
 
 function placeFlora(seed: number): Placements {
@@ -158,6 +174,8 @@ function placeFlora(seed: number): Placements {
     willows: [],
     blossoms: [],
     boulders: [],
+    seaRocks: [],
+    seaStacks: [],
   };
   const hub = REALM_ZONE.hub;
 
@@ -412,6 +430,93 @@ function placeFlora(seed: number): Placements {
     }
   }
 
+  // --- the rugged coast: where cliffs meet the open sea, fallen boulders
+  // pile half-sunk at the waterline, stacks stand just offshore, and crest
+  // teeth break the smooth silhouette. Beaches (gentle gradient) stay clean.
+  for (let gx = -176; gx <= 176; gx += 5) {
+    for (let gz = 948; gz <= 1436; gz += 5) {
+      const x = gx + (hash2(gx, gz, seed + 1601) - 0.5) * 4;
+      const z = gz + (hash2(gx, gz, seed + 1611) - 0.5) * 4;
+      if (hollowLandness(x, z) > 0.3) continue; // the open-coast ring only
+      const h = terrainHeight(x, z, seed);
+      if (h > WATER_LEVEL + 1.4 || h < WATER_LEVEL - 2.2) continue; // waterline
+      const g = terrainGradient(x, z, seed);
+      const mag = Math.hypot(g.gx, g.gz);
+      if (mag < 0.5) continue; // cliffy shores only
+      const pick = hash2(gx, gz, seed + 1621);
+      if (pick > 0.62) continue;
+      const dirX = g.gx / mag,
+        dirZ = g.gz / mag; // uphill, into the face
+      const n = 1 + Math.floor(hash2(gx, gz, seed + 1631) * 2.4);
+      for (let k = 0; k < n && out.seaRocks.length < 520; k++) {
+        const bx = x + (hash2(gx + k, gz, seed + 1641) - 0.5) * 4.5;
+        const bz = z + (hash2(gx, gz + k, seed + 1651) - 0.5) * 4.5;
+        const by = terrainHeight(bx, bz, seed);
+        if (by > WATER_LEVEL + 1.6) continue;
+        const variant = Math.floor(hash2(gx - k, gz + k, seed + 1681) * SEA_ROCK_URLS.length);
+        // broad slabs run big, shards stay lean; lift each so its crown
+        // clears the surface instead of drowning the whole rock
+        const scale =
+          variant < 2
+            ? 2.2 + hash2(gx + 3 * k, gz, seed + 1661) * 2.6
+            : 0.9 + hash2(gx + 3 * k, gz, seed + 1661) * 1.7;
+        out.seaRocks.push({
+          x: bx,
+          z: bz,
+          y: Math.max(
+            Math.max(by, WATER_LEVEL - 1.3),
+            WATER_LEVEL + 0.6 - SEA_ROCK_MODEL_H[variant] * scale,
+          ),
+          scale,
+          rot: hash2(gx, gz + 3 * k, seed + 1671) * Math.PI * 2,
+          variant,
+          tint: SEA_ROCK_TINTS[
+            Math.floor(hash2(gx + k, gz - k, seed + 1691) * SEA_ROCK_TINTS.length)
+          ],
+          lean: g,
+        });
+      }
+      // an offshore stack with surf at its foot, open sea only
+      if (pick < 0.09 && out.seaStacks.length < 44 && hollowLandness(x, z) < 0.08) {
+        out.seaStacks.push({
+          x: x - dirX * (4 + hash2(gx, gz, seed + 1701) * 6),
+          z: z - dirZ * (4 + hash2(gz, gx, seed + 1711) * 6),
+          y: WATER_LEVEL - 1.6,
+          scale: 2.2 + hash2(gx, gz, seed + 1721) * 2.2,
+          rot: hash2(gz, gx, seed + 1731) * Math.PI * 2,
+          variant: 2 + Math.floor(hash2(gx + 1, gz, seed + 1741) * 2), // tall shards
+          tint: SEA_ROCK_TINTS[Math.floor(hash2(gx, gz + 1, seed + 1746) * SEA_ROCK_TINTS.length)],
+        });
+      }
+      // a crest tooth up the face, breaking the smooth edge line
+      if (pick < 0.3 && out.seaRocks.length < 520) {
+        let cx = x,
+          cz = z,
+          cy = h;
+        for (let stp = 0; stp < 5 && cy < WATER_LEVEL + 7; stp++) {
+          cx += dirX * 3;
+          cz += dirZ * 3;
+          cy = terrainHeight(cx, cz, seed);
+        }
+        if (cy > WATER_LEVEL + 4) {
+          out.seaRocks.push({
+            x: cx,
+            z: cz,
+            y: cy - 0.4,
+            // tall shards only: a 0.5-unit slab vanishes atop a 20yd face
+            scale: 1.2 + hash2(gz, gx, seed + 1751) * 1.5,
+            rot: hash2(gx * 2, gz, seed + 1761) * Math.PI * 2,
+            variant: 2 + Math.floor(hash2(gx, gz * 2, seed + 1771) * 2),
+            tint: SEA_ROCK_TINTS[
+              Math.floor(hash2(gz, gx * 2, seed + 1781) * SEA_ROCK_TINTS.length)
+            ],
+            lean: terrainGradient(cx, cz, seed),
+          });
+        }
+      }
+    }
+  }
+
   return out;
 }
 
@@ -648,6 +753,12 @@ const FLOWER_TINTS = [
 ]; // duskbell colorways
 const STARBUD_TINTS = [0xf8f0ff, 0xf2d8a8, 0xf2b8c8]; // tiny understory flowers
 const BOULDER_MOSS = 0x9caa96;
+const SEA_STONE = 0x6f6570; // dusk basalt multiply over the painted rock kit
+const SEA_ROCK_TINTS = [0xfff2ea, 0xd8d2dc, 0xb4aab4, 0xe8d8c8]; // weathering
+// Approximate unscaled heights of the kit (the large rocks are broad low
+// slabs, the tall ones are shards): sizing and surf placement key off these
+// so every waterline rock actually breaks the surface.
+const SEA_ROCK_MODEL_H = [0.52, 0.52, 3.4, 3.8];
 
 // One-off flora materials that need vertexColors: built directly (surfaceMat
 // caches and shares by key, so flipping vertexColors on a cached material
@@ -886,6 +997,57 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       const mat = part.material.clone() as THREE.MeshStandardMaterial;
       if ('color' in mat) mat.color.multiply(new THREE.Color(BOULDER_MOSS));
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
+    }
+  }
+
+  // --- the rugged coast: dark weathered rocks at the cliff bases, offshore
+  // stacks, and a foam ring of breaking surf at each stack's foot ---
+  const seaFoam: { mesh: THREE.Mesh; phase: number }[] = [];
+  {
+    for (let variant = 0; variant < SEA_ROCK_URLS.length; variant++) {
+      const parts = loadedParts.get(SEA_ROCK_URLS[variant]);
+      if (!parts) continue;
+      const rocks = spots.seaRocks.filter((sp) => sp.variant === variant);
+      const stacks = spots.seaStacks.filter((sp) => sp.variant === variant);
+      for (const part of parts) {
+        const mat = part.material.clone() as THREE.MeshStandardMaterial;
+        if ('color' in mat) mat.color.multiply(new THREE.Color(SEA_STONE));
+        if ('roughness' in mat) mat.roughness = 0.95;
+        instance(part.geometry, mat, rocks, {
+          sink: 0.18,
+          castShadow: true,
+          tinted: true,
+          leanInto: true,
+        });
+        instance(part.geometry, mat, stacks, { castShadow: true, tinted: true });
+      }
+    }
+    const surf: Spot[] = [
+      ...spots.seaStacks,
+      ...spots.seaRocks
+        .filter(
+          (sp) =>
+            sp.y < WATER_LEVEL + 0.2 &&
+            sp.y + SEA_ROCK_MODEL_H[sp.variant] * sp.scale > WATER_LEVEL + 0.5 &&
+            sp.scale > 2.6 &&
+            hollowLandness(sp.x, sp.z) < 0.08,
+        )
+        .slice(0, 30),
+    ];
+    if (surf.length > 0) {
+      const foamMat = new THREE.MeshBasicMaterial({
+        color: 0xeef6f8,
+        transparent: true,
+        opacity: 0.32,
+        depthWrite: false,
+      });
+      for (const st of surf) {
+        const foam = new THREE.Mesh(new THREE.CircleGeometry(st.scale * 1.05, 12), foamMat);
+        foam.rotation.x = -Math.PI / 2;
+        foam.position.set(st.x, WATER_LEVEL + 0.1, st.z);
+        seaFoam.push({ mesh: foam, phase: st.x * 0.7 + st.z * 0.31 });
+        group.add(foam);
+      }
     }
   }
 
@@ -1176,6 +1338,10 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         foam.rotation.z = time * (i === 0 ? 0.35 : -0.5);
         const churn = 1 + Math.sin(time * 2.1 + i * 1.9) * 0.08;
         foam.scale.setScalar(churn);
+      }
+      // the surf rings around stacks and shore rocks swell and relax
+      for (const f of seaFoam) {
+        f.mesh.scale.setScalar(1 + Math.sin(time * 1.4 + f.phase) * 0.12);
       }
       // mist banks drift, rays breathe, the flock wheels over the sound
       for (const bank of seaDrift) {
