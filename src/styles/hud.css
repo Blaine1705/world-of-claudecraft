@@ -882,11 +882,13 @@
     max-width: 320px;
     pointer-events: auto;
   }
-  /* Debuffs sit in their own row beneath the buff row (classic layout). */
+  /* Debuffs sit in their own row well beneath the buff row (classic layout),
+     level with the minimap's lower edge (the mail badge), so a wrapping wall of
+     raid buffs and their duration labels never crowds the debuff row. */
   #debuff-bar {
     position: absolute;
     right: 196px;
-    top: 50px;
+    top: 172px;
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: wrap;
