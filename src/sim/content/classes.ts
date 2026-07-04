@@ -2269,6 +2269,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
+    projectileFx: 'lightning', // a jagged electric bolt instead of the default glowing bolt
     effects: [{ type: 'directDamage', min: 15, max: 17 }],
     ranks: [
       {
