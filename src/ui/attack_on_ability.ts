@@ -35,6 +35,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
+  chainHeal: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',

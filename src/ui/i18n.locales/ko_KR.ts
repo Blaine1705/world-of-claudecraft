@@ -1977,6 +1977,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghost_wolf.name': '늑대 정령',
   'entities.abilities.ghost_wolf.description':
     '늑대 정령으로 변신하여 10분 동안 이동 속도가 40%만큼 증가합니다.',
+  'entities.abilities.chain_heal.name': '연쇄 치유',
+  'entities.abilities.chain_heal.description':
+    '대상을 {damage}만큼 치유한 후 주변 아군 최대 2명에게 연쇄됩니다. 연쇄될 때마다 치유량이 절반으로 줄어듭니다.',
   'entities.abilities.stormstrike.name': '폭풍의 일격',
   'entities.abilities.stormstrike.description':
     '무기에 폭풍의 힘을 흘려 넣어 즉시 무기 피해에 {damage}를 더한 피해를 입힙니다.',

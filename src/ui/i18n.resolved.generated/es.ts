@@ -4376,6 +4376,10 @@ export const es: EnTranslations = {
         "name": "Terremoto",
         "description": "Sacude el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza."
       },
+      "chain_heal": {
+        "name": "Sanación en cadena",
+        "description": "Sana al objetivo por {damage} y salta hasta a 2 aliados cercanos, sanando cada salto la mitad que el anterior."
+      },
       "heroic_strike": {
         "name": "Golpe heroico",
         "description": "Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe."

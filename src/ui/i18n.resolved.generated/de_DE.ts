@@ -4376,6 +4376,10 @@ export const de_DE: EnTranslations = {
         "name": "Erdbeben",
         "description": "Lässt den Zielbereich erbeben, trifft Gegner und verursacht {damage} Naturschaden."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Heldenhafter Stoß",
         "description": "Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst."

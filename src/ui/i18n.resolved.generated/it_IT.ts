@@ -4376,6 +4376,10 @@ export const it_IT: EnTranslations = {
         "name": "Terremoto",
         "description": "Scuote la zona bersaglio, colpendo i nemici per {damage} danni della Natura."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Colpo Eroico",
         "description": "Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo."

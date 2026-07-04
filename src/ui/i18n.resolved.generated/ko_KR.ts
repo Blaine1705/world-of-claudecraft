@@ -4376,6 +4376,10 @@ export const ko_KR: EnTranslations = {
         "name": "지진",
         "description": "지정한 지역을 뒤흔들어 적을 강타하고 {damage}의 자연 피해를 입힙니다."
       },
+      "chain_heal": {
+        "name": "연쇄 치유",
+        "description": "대상을 {damage}만큼 치유한 후 주변 아군 최대 2명에게 연쇄됩니다. 연쇄될 때마다 치유량이 절반으로 줄어듭니다."
+      },
       "heroic_strike": {
         "name": "영웅의 일격",
         "description": "강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다."

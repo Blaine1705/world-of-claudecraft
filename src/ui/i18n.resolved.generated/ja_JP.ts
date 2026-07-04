@@ -4376,6 +4376,10 @@ export const ja_JP: EnTranslations = {
         "name": "地震",
         "description": "対象地点を揺るがし、敵に{damage}の自然ダメージを与えます。"
       },
+      "chain_heal": {
+        "name": "チェインヒール",
+        "description": "対象を {damage} 回復し、さらに近くの味方最大2体へ連鎖します。連鎖するたびに回復量は半分になります。"
+      },
       "heroic_strike": {
         "name": "英雄の一撃",
         "description": "強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。"

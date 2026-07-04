@@ -1893,6 +1893,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為你的武器附上刺骨寒霜：每次揮擊額外造成 8 點傷害，持續 5 分鐘。',
   'entities.abilities.ghost_wolf.name': '幽魂之狼',
   'entities.abilities.ghost_wolf.description': '變成幽魂之狼，使移動速度提高 40%，持續 10 分鐘。',
+  'entities.abilities.chain_heal.name': '治療鏈',
+  'entities.abilities.chain_heal.description':
+    '治療目標 {damage}，隨後躍向至多 2 名附近的盟友，每次跳躍的治療量減半。',
   'entities.abilities.stormstrike.name': '風暴打擊',
   'entities.abilities.stormstrike.description':
     '將風暴導入武器，立即攻擊並造成武器傷害加 {damage}。',

@@ -4376,6 +4376,10 @@ export const pt_BR: EnTranslations = {
         "name": "Terremoto",
         "description": "Sacode a área-alvo, atingindo os inimigos e causando {damage} de dano de Natureza."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Golpe Heroico",
         "description": "Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe."

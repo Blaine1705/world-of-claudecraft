@@ -4376,6 +4376,10 @@ export const zh_TW: EnTranslations = {
         "name": "地震",
         "description": "撼動目標區域，重擊敵人，造成 {damage} 點自然傷害。"
       },
+      "chain_heal": {
+        "name": "治療鏈",
+        "description": "治療目標 {damage}，隨後躍向至多 2 名附近的盟友，每次跳躍的治療量減半。"
+      },
       "heroic_strike": {
         "name": "英勇打擊",
         "description": "一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。"

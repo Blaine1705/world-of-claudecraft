@@ -771,6 +771,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Shadewolf"
       },
       {
+        "id": "chain_heal",
+        "name": "Chain Heal"
+      },
+      {
         "id": "stormstrike",
         "name": "Ancestral Strike"
       },

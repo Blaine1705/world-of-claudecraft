@@ -4376,6 +4376,10 @@ export const nl_NL: EnTranslations = {
         "name": "Aardbeving",
         "description": "Laat het doelgebied beven, treft vijanden voor {damage} Natuurschade."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Heroïsche Slag",
         "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."

@@ -1965,6 +1965,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghost_wolf.name': 'Lobo fantasmal',
   'entities.abilities.ghost_wolf.description':
     'Te transforma en lobo fantasmal y aumenta tu velocidad de movimiento un 40% durante 10 min.',
+  'entities.abilities.chain_heal.name': 'Sanación en cadena',
+  'entities.abilities.chain_heal.description':
+    'Sana al objetivo por {damage} y salta hasta a 2 aliados cercanos, sanando cada salto la mitad que el anterior.',
   'entities.abilities.stormstrike.name': 'Golpe de tormenta',
   'entities.abilities.stormstrike.description':
     'Canaliza la tormenta a través de tu arma y golpea al instante por daño de arma más {damage}.',

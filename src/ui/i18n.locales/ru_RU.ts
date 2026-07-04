@@ -2012,6 +2012,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghost_wolf.name': 'Призрачный волк',
   'entities.abilities.ghost_wolf.description':
     'Превращает вас в призрачного волка, повышая скорость передвижения на 40% на 10 мин.',
+  'entities.abilities.chain_heal.name': 'Цепное исцеление',
+  'entities.abilities.chain_heal.description':
+    'Исцеляет цель на {damage}, затем перескакивает не более чем на 2 ближайших союзников, исцеляя каждым скачком вдвое меньше предыдущего.',
   'entities.abilities.stormstrike.name': 'Удар бури',
   'entities.abilities.stormstrike.description':
     'Направляет бурю через ваше оружие и мгновенно наносит урон оружием плюс {damage}.',
