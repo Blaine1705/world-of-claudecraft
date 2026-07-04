@@ -10,9 +10,7 @@ import type { PlayerClass } from '../src/sim/types';
 const ALL_CLASSES = Object.keys(CLASSES) as PlayerClass[];
 
 function count(sim: Sim, itemId: string): number {
-  return sim.inventory
-    .filter((s) => s.itemId === itemId)
-    .reduce((total, s) => total + s.count, 0);
+  return sim.inventory.filter((s) => s.itemId === itemId).reduce((total, s) => total + s.count, 0);
 }
 
 describe('starter rations', () => {
