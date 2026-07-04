@@ -2550,7 +2550,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'chainHeal', min: 96, max: 110, jumps: 2, jumpRange: 12, falloff: 0.5 }],
+    effects: [{ type: 'chainHeal', min: 96, max: 110, jumps: 2, jumpRange: 18, falloff: 0.5 }],
     description:
       'Heals the target for $d, then arcs to up to 2 nearby allies, each arc healing half the previous amount.',
   },
