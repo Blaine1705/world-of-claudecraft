@@ -146,7 +146,8 @@ describe("locale-aware formatting is centralized", () => {
   it("constructs no ad-hoc Intl.NumberFormat/DateTimeFormat outside the helper modules", () => {
     const offenders: string[] = [];
     for (const f of files) {
-      const rel = path.relative(ROOT, f);
+      // Normalize to forward slashes so the allowlist also matches on Windows.
+      const rel = path.relative(ROOT, f).replaceAll('\\', '/');
       if (INTL_ALLOW.includes(rel)) continue;
       const src = readFileSync(f, "utf8");
       const m = src.match(/new Intl\.(NumberFormat|DateTimeFormat)\(/);
