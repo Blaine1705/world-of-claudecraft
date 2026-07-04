@@ -412,105 +412,63 @@ export class Vfx {
     this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
   }
 
-  // Chain Heal's signature bolt: a THICK green lightning arc that crackles from the
-  // source ally to the target, WoW-style (a jagged zigzag centerline, not a smooth
-  // wave), drawn with a bright hot core plus side/top strands so it reads as a fat
-  // beam with real thickness. Each hop of the chain emits one; the per-target heal
-  // glow (healGlow, on the heal2 event) lands the burst at each ally, so this method
-  // only draws the connecting bolt.
+  // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
+  // from the source ally to the target, denser and softer than a nuke beam so it
+  // reads as flowing healing water rather than crackling lightning. Each hop of the
+  // chain emits one; the per-target heal glow (healGlow, on the heal2 event) lands
+  // the burst at each ally, so this method only draws the connecting cord.
   chainHealArc(sourceId: number, targetId: number): void {
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
-    // Hot near-white core, vivid mid green, deeper outer glow: the three-band
-    // build that makes a bolt read as thick and bright rather than a flat line.
-    const core = new THREE.Color(0xe6ffc4).multiplyScalar(hdr(2.9));
-    const mid = new THREE.Color(0x8ef05a).multiplyScalar(hdr(2.1));
-    const soft = new THREE.Color(0x57c634).multiplyScalar(hdr(1.5));
+    const core = new THREE.Color(0xbaf7a0).multiplyScalar(hdr(2.4));
+    const soft = new THREE.Color(0x86e86a).multiplyScalar(hdr(1.7));
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     const dz = to.z - from.z;
     const len = Math.hypot(dx, dz);
     if (len <= 0.001 && Math.abs(dy) <= 0.001) return;
-    // Horizontal unit perpendicular (xz plane) drives both the lateral zigzag and
-    // the beam's sideways thickness; vertical thickness is a plain up-offset.
-    const inv = 1 / Math.max(len, 0.001);
-    const px = -dz * inv;
-    const pz = dx * inv;
-    // A gentle vertical bow plus a jagged lateral zigzag (two harmonics at random
-    // per-cast phase), both tapered to zero at the two anchored ends so the bolt
-    // stays pinned to each ally. jagAmp/lift grow with distance so a long jump
-    // whips more.
-    const lift = Math.min(1.1, 0.35 + len * 0.08);
-    const jagAmp = Math.min(0.95, 0.35 + len * 0.06);
-    const phase = Math.random() * Math.PI * 2;
-    const phase2 = Math.random() * Math.PI * 2;
-    // Beam half-thickness: the "considerable grosor" the strands are offset by.
-    const half = Math.min(0.55, 0.36 + len * 0.012);
-    const steps = Math.min(38, Math.max(16, Math.ceil(len / 0.6)));
+    // Arc height scales with distance so a long jump bows more; capped so a short
+    // hop still curves. The lift peaks at the midpoint (sin(pi*f)).
+    const lift = Math.min(1.6, 0.5 + len * 0.12);
+    const steps = Math.min(34, Math.max(12, Math.ceil(len / 0.8)));
     for (let i = 0; i <= steps; i++) {
       const f = i / steps;
-      const taper = Math.sin(f * Math.PI); // 0 at both ends, 1 mid-span
-      const lateral =
-        (Math.sin(f * Math.PI * 3 + phase) * 0.6 + Math.sin(f * Math.PI * 8 + phase2) * 0.4) *
-        jagAmp *
-        taper;
-      const cx = from.x + dx * f + px * lateral;
-      const cy = from.y + dy * f + taper * lift;
-      const cz = from.z + dz * f + pz * lateral;
-      // Cross-section: a hot core strand down the middle, two mid-green strands
-      // offset along the perpendicular, and a soft outer strand lifted above, so
-      // the bolt has body from every viewing angle. Near-zero velocity: a bolt
-      // crackles in place, then fades, it does not drift.
-      this.spawn(cx, cy, cz, 0, 0.12, 0, core, 0.5, 0.4 + Math.random() * 0.14, -0.2, SPR.glowCore);
+      const arc = Math.sin(f * Math.PI) * lift;
+      const jitterX = (Math.random() - 0.5) * 0.1;
+      const jitterZ = (Math.random() - 0.5) * 0.1;
+      // Alternate a bright core sprite and a soft glow so the cord has depth.
+      const bright = i % 2 === 0;
       this.spawn(
-        cx + px * half,
-        cy + 0.04,
-        cz + pz * half,
+        from.x + dx * f + jitterX,
+        from.y + dy * f + arc + (Math.random() - 0.5) * 0.08,
+        from.z + dz * f + jitterZ,
         0,
-        0.12,
+        0.4,
         0,
-        mid,
-        0.62,
-        0.38,
-        -0.2,
-        SPR.glowSoft,
+        bright ? core : soft,
+        bright ? 0.42 : 0.55,
+        0.5 + Math.random() * 0.18,
+        -0.4,
+        bright ? SPR.glowCore : SPR.glowSoft,
       );
-      this.spawn(
-        cx - px * half,
-        cy - 0.04,
-        cz - pz * half,
-        0,
-        0.12,
-        0,
-        mid,
-        0.62,
-        0.38,
-        -0.2,
-        SPR.glowSoft,
-      );
-      this.spawn(cx, cy + half, cz, 0, 0.12, 0, soft, 0.78, 0.34, -0.2, SPR.glowSoft);
     }
-    // A few crackle sparks hugging the bolt for the electric shimmer.
-    const sparks = this.scaledCount(10);
-    for (let i = 0; i < sparks; i++) {
+    // A few rising sparkles along the cord for the living-water feel.
+    const sparkles = this.scaledCount(8);
+    for (let i = 0; i < sparkles; i++) {
       const f = Math.random();
-      const taper = Math.sin(f * Math.PI);
-      const lateral =
-        (Math.sin(f * Math.PI * 3 + phase) * 0.6 + Math.sin(f * Math.PI * 8 + phase2) * 0.4) *
-        jagAmp *
-        taper;
+      const arc = Math.sin(f * Math.PI) * lift;
       this.spawn(
-        from.x + dx * f + px * lateral + (Math.random() - 0.5) * 0.25,
-        from.y + dy * f + taper * lift + 0.1,
-        from.z + dz * f + pz * lateral + (Math.random() - 0.5) * 0.25,
+        from.x + dx * f + (Math.random() - 0.5) * 0.3,
+        from.y + dy * f + arc + 0.1,
+        from.z + dz * f + (Math.random() - 0.5) * 0.3,
         0,
-        0.9 + Math.random() * 0.7,
+        1.3 + Math.random() * 0.8,
         0,
         core,
-        0.3,
-        0.4 + Math.random() * 0.24,
-        -1.0,
+        0.28,
+        0.55 + Math.random() * 0.3,
+        -1.4,
         SPR.sparkle,
       );
     }
