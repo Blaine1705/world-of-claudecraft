@@ -956,22 +956,22 @@
     border-color: var(--color-debuff);
     border-width: 2px;
   }
-  .buff.debuff[data-school='fire'] {
+  .buff.debuff[data-school="fire"] {
     border-color: var(--color-debuff-fire);
   }
-  .buff.debuff[data-school='frost'] {
+  .buff.debuff[data-school="frost"] {
     border-color: var(--color-debuff-frost);
   }
-  .buff.debuff[data-school='arcane'] {
+  .buff.debuff[data-school="arcane"] {
     border-color: var(--color-debuff-arcane);
   }
-  .buff.debuff[data-school='shadow'] {
+  .buff.debuff[data-school="shadow"] {
     border-color: var(--color-debuff-shadow);
   }
-  .buff.debuff[data-school='nature'] {
+  .buff.debuff[data-school="nature"] {
     border-color: var(--color-debuff-nature);
   }
-  .buff.debuff[data-school='holy'] {
+  .buff.debuff[data-school="holy"] {
     border-color: var(--color-debuff-holy);
   }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
