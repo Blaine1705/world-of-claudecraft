@@ -673,8 +673,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       }
     ],
     "model": "player_priest",
-    "tint": "#f0e9d6",
-    "still": "/guide-stills/player_priest__f0e9d6.webp"
+    "still": "/guide-stills/player_priest.webp"
   },
   {
     "id": "shaman",
@@ -1820,8 +1819,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "url": "models/weapons/staff.glb",
         "bone": "handslot.r"
       }
-    ],
-    "tintStrength": 0.5
+    ]
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
