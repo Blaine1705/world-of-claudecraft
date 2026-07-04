@@ -94,7 +94,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 1,
     maxLevel: 2,
     family: 'beast',
-    hpBase: 28,
+    hpBase: 40,
     hpPerLevel: 14,
     dmgBase: 3,
     dmgPerLevel: 1.6,
