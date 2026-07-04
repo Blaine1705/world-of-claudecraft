@@ -474,6 +474,99 @@ export class Vfx {
     }
   }
 
+  // A jagged electric lightning strike from caster to target: a thin, bright
+  // blue-white bolt whose centerline zig-zags erratically (a bounded random walk,
+  // pinned at both ends), with a couple of short forks, a target impact flash, and
+  // a caster muzzle spark. Very short-lived so it reads as a single quick flash.
+  // Original procedural effect (no external assets).
+  lightningStrike(sourceId: number, targetId: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const coreC = new THREE.Color(0xeaf6ff).multiplyScalar(hdr(3.2)); // hot white-blue
+    const boltC = new THREE.Color(0x66b8ff).multiplyScalar(hdr(2.5)); // electric blue
+    const glowC = new THREE.Color(0x2f7bff).multiplyScalar(hdr(1.6)); // deep blue halo
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dz = to.z - from.z;
+    const len = Math.hypot(dx, dz);
+    if (len <= 0.001 && Math.abs(dy) <= 0.001) return;
+    const inv = 1 / Math.max(len, 0.001);
+    const px = -dz * inv; // horizontal perpendicular
+    const pz = dx * inv;
+    const steps = Math.min(56, Math.max(22, Math.ceil(len / 0.35)));
+    const jag = Math.min(1.0, 0.35 + len * 0.07);
+    // Bounded random walk for the jagged offset: each step kicks hard then pulls
+    // only partway back toward the line, so the bolt wanders into sharp angular
+    // kinks (a lightning zig-zag) while staying anchored near the straight path.
+    let lat = 0;
+    let vert = 0;
+    const pts: number[][] = [];
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const taper = Math.sin(f * Math.PI); // pinned to 0 at caster and target
+      lat = lat * 0.62 + (Math.random() - 0.5) * jag;
+      vert = vert * 0.62 + (Math.random() - 0.5) * jag * 0.8;
+      const cx = from.x + dx * f + px * lat * taper;
+      const cy = from.y + dy * f + vert * taper;
+      const cz = from.z + dz * f + pz * lat * taper;
+      pts.push([cx, cy, cz]);
+      // A bright hot core down the middle with a broad blue halo behind it, sized
+      // so the jagged bolt reads boldly even without the composer bloom.
+      this.spawn(cx, cy, cz, 0, 0.03, 0, coreC, 0.34, 0.2 + Math.random() * 0.06, 0, SPR.glowCore);
+      this.spawn(cx, cy, cz, 0, 0.03, 0, boltC, 0.5, 0.22, 0, SPR.glowCore);
+      this.spawn(cx, cy, cz, 0, 0.03, 0, glowC, 0.72, 0.24, 0, SPR.glowSoft);
+    }
+    // A couple of short branching forks off random midpoints.
+    const forks = this.scaledCount(2);
+    for (let k = 0; k < forks; k++) {
+      const bi = 3 + Math.floor(Math.random() * Math.max(1, pts.length - 6));
+      const base = pts[bi];
+      let fx = 0;
+      let fz = 0;
+      const flen = 3 + Math.floor(Math.random() * 4);
+      for (let j = 0; j < flen; j++) {
+        fx += (Math.random() - 0.5) * 0.6;
+        fz += (Math.random() - 0.5) * 0.6;
+        this.spawn(
+          base[0] + fx,
+          base[1] + (Math.random() - 0.5) * 0.3,
+          base[2] + fz,
+          0,
+          0.04,
+          0,
+          boltC,
+          0.34,
+          0.16 + Math.random() * 0.05,
+          0,
+          SPR.glowCore,
+        );
+      }
+    }
+    // Impact flash + spark shower at the target.
+    this.spawn(to.x, to.y, to.z, 0, 0.15, 0, coreC, 1.1, 0.16, 0, SPR.flash);
+    const sparks = this.scaledCount(14);
+    for (let i = 0; i < sparks; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 3 + Math.random() * 5;
+      this.spawn(
+        to.x,
+        to.y,
+        to.z,
+        Math.sin(a) * sp,
+        1 + Math.random() * 2,
+        Math.cos(a) * sp,
+        i % 2 === 0 ? coreC : boltC,
+        0.3,
+        0.22 + Math.random() * 0.14,
+        5,
+        i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    // Muzzle spark at the caster's hand.
+    this.spawn(from.x, from.y, from.z, 0, 0.1, 0, boltC, 0.7, 0.14, 0, SPR.flash);
+  }
+
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
     const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';

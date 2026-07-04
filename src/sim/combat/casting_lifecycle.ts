@@ -734,7 +734,9 @@ function applyAbility(
       sourceId: p.id,
       targetId: target.id,
       school: ability.school,
-      fx: 'projectile',
+      // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
+      // jagged electric strike); the projectile MECHANIC below is unchanged.
+      fx: ability.projectileFx ?? 'projectile',
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
     // target (projectile_travel), not this tick. A target that dies before impact
