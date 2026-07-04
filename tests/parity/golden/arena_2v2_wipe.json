@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 403,
-      "state": "0f0cb46d",
+      "state": "7637f339",
       "events": "329c7e41",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 403,
-      "state": "7cc3b2e7",
+      "state": "69da240b",
       "events": "277176cf",
       "rng": {
         "draws": 54,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 403,
-      "state": "e06cefb5",
+      "state": "ec42a661",
       "events": "b079be27",
       "rng": {
         "draws": 152,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 403,
-      "state": "e4b88421",
+      "state": "53114f5d",
       "events": "e5fdcbcf",
       "rng": {
         "draws": 276,
@@ -73,7 +73,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 403,
-      "state": "c0223f3d",
+      "state": "9a111b09",
       "events": "14539d29",
       "rng": {
         "draws": 280,
@@ -103,6 +103,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -132,6 +138,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -161,6 +177,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -190,6 +212,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -399,7 +431,7 @@
       "tick": 102,
       "time": 5.1,
       "nextId": 403,
-      "state": "c5cc5571",
+      "state": "b685e121",
       "events": "892381e5",
       "rng": {
         "draws": 281,
@@ -429,6 +461,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -458,6 +496,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -489,6 +537,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -518,6 +572,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -727,7 +791,7 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 403,
-      "state": "d786d60f",
+      "state": "2770973b",
       "events": "95f53912",
       "rng": {
         "draws": 284,
@@ -758,6 +822,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -788,6 +858,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -820,6 +900,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -852,6 +938,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1061,7 +1157,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 403,
-      "state": "5e721b59",
+      "state": "c7a9f6ed",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -1072,7 +1168,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 403,
-      "state": "6c2f0a43",
+      "state": "a342acdf",
       "events": "741638a5",
       "rng": {
         "draws": 548,
@@ -1083,7 +1179,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 403,
-      "state": "633bc0bd",
+      "state": "18278d31",
       "events": "741638a5",
       "rng": {
         "draws": 712,
@@ -1094,7 +1190,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 403,
-      "state": "058cb83b",
+      "state": "122eea77",
       "events": "741638a5",
       "rng": {
         "draws": 902,
@@ -1105,7 +1201,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 403,
-      "state": "b6a034b1",
+      "state": "bd1c25c5",
       "events": "16b96263",
       "rng": {
         "draws": 1011,
@@ -1116,7 +1212,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 403,
-      "state": "cd603755",
+      "state": "4c0792c9",
       "events": "741638a5",
       "rng": {
         "draws": 1088,
@@ -1147,6 +1243,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1177,6 +1279,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1209,6 +1321,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1241,6 +1359,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1455,7 +1583,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 403,
-      "state": "cd603755",
+      "state": "4c0792c9",
       "events": "741638a5",
       "rng": {
         "draws": 1088,
@@ -1486,6 +1614,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1516,6 +1650,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1548,6 +1692,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1580,6 +1730,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},

@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "832800b2",
+      "state": "cad8a816",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -46,6 +46,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -112,7 +118,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "787ef23b",
+      "state": "31cdd82f",
       "events": "4d2796c2",
       "rng": {
         "draws": 1,
@@ -143,6 +149,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {
@@ -209,7 +221,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 409,
-      "state": "db508adc",
+      "state": "b0a7606a",
       "events": "62ff2cae",
       "rng": {
         "draws": 1,
@@ -240,6 +252,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {
@@ -307,7 +325,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 409,
-      "state": "db508adc",
+      "state": "b0a7606a",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -338,6 +356,12 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {

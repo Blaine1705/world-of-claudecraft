@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "0b22594f",
+      "state": "e170e76d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,6 +47,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -111,7 +117,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "8a15a494",
+      "state": "5f4a7562",
       "events": "dbf89253",
       "rng": {
         "draws": 4,
@@ -122,7 +128,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "0a9364b5",
+      "state": "eaf35e35",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -133,7 +139,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 409,
-      "state": "7dc391b3",
+      "state": "19b0ae47",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -144,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "b11ce3a2",
+      "state": "39e6995c",
       "events": "795498b6",
       "rng": {
         "draws": 4,
@@ -155,7 +161,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "b5fb3c31",
+      "state": "97cecd59",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -166,7 +172,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 409,
-      "state": "bf78e8f6",
+      "state": "ab687ec8",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -177,7 +183,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 409,
-      "state": "6adb1863",
+      "state": "3eb8e7f7",
       "events": "dddd1680",
       "rng": {
         "draws": 6,
@@ -188,7 +194,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "c83f0b5d",
+      "state": "e5e50efd",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -199,7 +205,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "c83f0b5d",
+      "state": "e5e50efd",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -232,6 +238,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {
@@ -379,7 +391,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 409,
-      "state": "659eae06",
+      "state": "975c8718",
       "events": "c5e87eac",
       "rng": {
         "draws": 8,
@@ -412,6 +424,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {
@@ -573,7 +591,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 409,
-      "state": "ffaa6cc4",
+      "state": "87a94092",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -584,7 +602,7 @@
       "tick": 49,
       "time": 2.45,
       "nextId": 409,
-      "state": "757468ba",
+      "state": "c3137ff4",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -617,6 +635,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {
@@ -722,7 +746,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "b4537e4d",
+      "state": "2e2d796d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -733,7 +757,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 409,
-      "state": "22483246",
+      "state": "32293858",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -766,6 +790,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {
@@ -872,7 +902,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 409,
-      "state": "22483246",
+      "state": "32293858",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -905,6 +935,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "talents": {

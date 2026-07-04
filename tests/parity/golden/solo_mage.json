@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "0d92d345",
+      "state": "9c7f8cf4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -46,6 +46,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -111,7 +121,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 401,
-      "state": "0df02025",
+      "state": "7c3d72be",
       "events": "9a0a9e86",
       "rng": {
         "draws": 3,
@@ -122,7 +132,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 401,
-      "state": "ab27890a",
+      "state": "de857a53",
       "events": "e710d6ab",
       "rng": {
         "draws": 3,
@@ -133,7 +143,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 401,
-      "state": "2f8ee986",
+      "state": "a2f2a467",
       "events": "0d9e8614",
       "rng": {
         "draws": 73,
@@ -144,7 +154,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 401,
-      "state": "6e3ebf9e",
+      "state": "b62d8edf",
       "events": "0d9e8614",
       "rng": {
         "draws": 162,
@@ -155,7 +165,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 401,
-      "state": "1176e75a",
+      "state": "be600d83",
       "events": "1aaa0bb3",
       "rng": {
         "draws": 254,
@@ -166,7 +176,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 401,
-      "state": "bf1271ab",
+      "state": "da6ad2e4",
       "events": "0d9e8614",
       "rng": {
         "draws": 367,
@@ -177,7 +187,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 401,
-      "state": "ff3a2947",
+      "state": "6a962aa8",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -208,6 +218,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "talents": {

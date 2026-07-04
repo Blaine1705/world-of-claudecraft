@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "0b22594f",
+      "state": "e170e76d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,6 +47,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -111,7 +117,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "70d4d96a",
+      "state": "97603242",
       "events": "8c467819",
       "rng": {
         "draws": 0,
@@ -142,6 +148,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "questLog": [
@@ -219,7 +231,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 408,
-      "state": "3b653265",
+      "state": "123aaddd",
       "events": "8e1af75c",
       "rng": {
         "draws": 40,
@@ -254,6 +266,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "questLog": [
@@ -332,7 +350,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 408,
-      "state": "cc64a4ba",
+      "state": "a9196010",
       "events": "2a1aa60b",
       "rng": {
         "draws": 40,
@@ -370,6 +388,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
           "questsDone": [
@@ -440,7 +464,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 408,
-      "state": "395d9a32",
+      "state": "4955f148",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -478,6 +502,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
           "questsDone": [

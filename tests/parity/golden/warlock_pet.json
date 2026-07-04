@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "e184f74d",
+      "state": "496323fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,6 +47,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -112,7 +122,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 400,
-      "state": "84c0ba0d",
+      "state": "1eb17034",
       "events": "f2eda24a",
       "rng": {
         "draws": 0,
@@ -123,7 +133,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 400,
-      "state": "64749eef",
+      "state": "238b0ad6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -134,7 +144,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "8e1db478",
+      "state": "fe9f6ecf",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -145,7 +155,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 400,
-      "state": "cb6a45f5",
+      "state": "d7f8cf3c",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -156,7 +166,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 401,
-      "state": "5f15af49",
+      "state": "091a0dd8",
       "events": "141bf491",
       "rng": {
         "draws": 271,
@@ -167,7 +177,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 402,
-      "state": "491b296e",
+      "state": "00fe9d3d",
       "events": "f69aba8d",
       "rng": {
         "draws": 366,
@@ -178,7 +188,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 402,
-      "state": "477a32ff",
+      "state": "0b38fd86",
       "events": "f530c648",
       "rng": {
         "draws": 495,
@@ -189,7 +199,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 402,
-      "state": "860f2015",
+      "state": "daeb6fdc",
       "events": "30b8dfd6",
       "rng": {
         "draws": 636,
@@ -200,7 +210,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 402,
-      "state": "0bab29f7",
+      "state": "41f0b21e",
       "events": "9fbf0852",
       "rng": {
         "draws": 774,
@@ -211,7 +221,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 402,
-      "state": "bec33730",
+      "state": "7f949287",
       "events": "fec89ca2",
       "rng": {
         "draws": 943,
@@ -222,7 +232,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 402,
-      "state": "ce9cead9",
+      "state": "dd6be088",
       "events": "9fbf0852",
       "rng": {
         "draws": 1021,
@@ -233,7 +243,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 402,
-      "state": "6cdb3742",
+      "state": "15456f59",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -266,6 +276,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "talents": {
@@ -446,7 +466,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 402,
-      "state": "24047c71",
+      "state": "6482b480",
       "events": "ee4bfd35",
       "rng": {
         "draws": 1050,
@@ -479,6 +499,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "talents": {

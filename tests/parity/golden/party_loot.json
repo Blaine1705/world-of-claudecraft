@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 402,
-      "state": "7a6f0654",
+      "state": "ac77d233",
       "events": "0002a44f",
       "rng": {
         "draws": 2,
@@ -59,6 +59,10 @@
           },
           "gatheringProficiency": {},
           "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
             {
               "count": 1,
               "itemId": "greyjaw_hide_boots"
@@ -93,6 +97,16 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},

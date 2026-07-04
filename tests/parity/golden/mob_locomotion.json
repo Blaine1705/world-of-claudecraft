@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "f2a94dda",
+      "state": "43d3a77e",
       "events": "bee71169",
       "rng": {
         "draws": 4,
@@ -64,6 +64,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -174,7 +180,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "0ae97abc",
+      "state": "f94f631c",
       "events": "c6d48f06",
       "rng": {
         "draws": 8,
@@ -206,6 +212,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -371,7 +383,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 403,
-      "state": "4db8a367",
+      "state": "2e6f0645",
       "events": "62abcd57",
       "rng": {
         "draws": 13,
@@ -403,6 +415,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -624,7 +642,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "6d57d40b",
+      "state": "0e56dfd1",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -656,6 +674,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -925,7 +949,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 405,
-      "state": "1f61f425",
+      "state": "194be20f",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -957,6 +981,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1268,7 +1298,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "7a6427d1",
+      "state": "cf5cb493",
       "events": "5cca3644",
       "rng": {
         "draws": 16,
@@ -1300,6 +1330,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -1656,7 +1692,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "dabc4a24",
+      "state": "6d5e80a4",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1688,6 +1724,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -2045,7 +2087,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "dabc4a24",
+      "state": "6d5e80a4",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2077,6 +2119,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},

@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 403,
-      "state": "fd198e19",
+      "state": "47e3b5e5",
       "events": "655eff33",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 403,
-      "state": "0b1589db",
+      "state": "51c9e0cf",
       "events": "277176cf",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 403,
-      "state": "8f5f6d01",
+      "state": "a007d70d",
       "events": "b079be27",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 403,
-      "state": "ed66a61b",
+      "state": "409c140f",
       "events": "e5fdcbcf",
       "rng": {
         "draws": 230,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 403,
-      "state": "50acf965",
+      "state": "8c2db7c3",
       "events": "666b6891",
       "rng": {
         "draws": 384,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 403,
-      "state": "1697b1e5",
+      "state": "07e50843",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 403,
-      "state": "03f6f926",
+      "state": "3aee6798",
       "events": "df4ead10",
       "rng": {
         "draws": 608,
@@ -135,6 +135,12 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -178,6 +184,16 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -226,6 +242,12 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -269,6 +291,16 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},

@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "0b22594f",
+      "state": "e170e76d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
           "talents": {
             "choices": {},
@@ -112,7 +118,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 401,
-      "state": "f6420788",
+      "state": "1191eb08",
       "events": "aaca4d31",
       "rng": {
         "draws": 6,
@@ -123,7 +129,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 401,
-      "state": "257eb005",
+      "state": "ea03da9b",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -134,7 +140,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 401,
-      "state": "0000dc3f",
+      "state": "0c140cd9",
       "events": "9c283f9c",
       "rng": {
         "draws": 98,
@@ -145,7 +151,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 401,
-      "state": "f8185598",
+      "state": "171bc818",
       "events": "efbffe3f",
       "rng": {
         "draws": 154,
@@ -180,6 +186,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "talents": {
@@ -308,7 +320,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 401,
-      "state": "2b4d27b8",
+      "state": "8c852e38",
       "events": "741638a5",
       "rng": {
         "draws": 172,
@@ -343,6 +355,12 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "talents": {
