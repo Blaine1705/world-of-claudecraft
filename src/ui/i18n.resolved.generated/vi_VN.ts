@@ -4472,6 +4472,10 @@ export const vi_VN: EnTranslations = {
         "name": "Động Đất",
         "description": "Làm rung chuyển khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Đòn Cướp Phá",
         "description": "Một đòn đánh mạnh tăng sát thương cận chiến thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn."

@@ -4472,6 +4472,10 @@ export const pl_PL: EnTranslations = {
         "name": "Trzęsienie ziemi",
         "description": "Wstrząsa wybranym obszarem, smagając wrogów i zadając {damage} obrażeń od sił natury."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Cios łupieżcy",
         "description": "Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu."

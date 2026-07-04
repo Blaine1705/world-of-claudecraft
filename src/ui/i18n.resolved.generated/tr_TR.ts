@@ -4472,6 +4472,10 @@ export const tr_TR: EnTranslations = {
         "name": "Deprem",
         "description": "Hedef alanı sarsar ve düşmanlara {damage} Doğa hasarı verir."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Yağmacı Darbesi",
         "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."

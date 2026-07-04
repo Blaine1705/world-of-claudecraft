@@ -4472,6 +4472,10 @@ export const sv_SE: EnTranslations = {
         "name": "Jordbävning",
         "description": "Skakar målområdet och slår fiender för {damage} Naturskada."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Plundrarhugg",
         "description": "Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg."

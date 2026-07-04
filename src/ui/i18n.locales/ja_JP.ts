@@ -2011,6 +2011,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghost_wolf.name': 'シェイドウルフ',
   'entities.abilities.ghost_wolf.description':
     'シェイドウルフに変身し、10分間、移動速度が40%増加します。',
+  'entities.abilities.chain_heal.name': 'チェインヒール',
+  'entities.abilities.chain_heal.description':
+    '対象を {damage} 回復し、さらに近くの味方最大2体へ連鎖します。連鎖するたびに回復量は半分になります。',
   'entities.abilities.stormstrike.name': '祖霊の一撃',
   'entities.abilities.stormstrike.description':
     '武器に嵐を流し込み、即座に武器ダメージに {damage} を加えたダメージを与えます。',

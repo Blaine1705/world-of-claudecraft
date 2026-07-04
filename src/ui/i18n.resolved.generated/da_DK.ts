@@ -4472,6 +4472,10 @@ export const da_DK: EnTranslations = {
         "name": "Jordskælv",
         "description": "Ryster målområdet og rammer fjender for {damage} Naturskade."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Plyndrerslag",
         "description": "Et stærkt angreb, der øger nærkampsskaden med {damage}. Aktiveres ved dit næste hug."

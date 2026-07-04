@@ -244,6 +244,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_shock',
       'frostbrand_weapon',
       'ghost_wolf',
+      'chain_heal',
       'stormstrike',
       'earthquake',
     ],
@@ -2516,6 +2517,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.4, duration: 3600 }],
     description:
       'Turns you into a Shadewolf, increasing movement speed by 40%. Cast again to return to normal form.',
+  },
+  chain_heal: {
+    id: 'chain_heal',
+    name: 'Chain Heal',
+    class: 'shaman',
+    learnLevel: 18,
+    cost: 110,
+    castTime: 2.5,
+    cooldown: 0,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'chainHeal', min: 96, max: 110, jumps: 2, jumpRange: 18, falloff: 0.5 }],
+    description:
+      'Heals the target for $d, then arcs to up to 2 nearby allies, each arc healing half the previous amount.',
   },
   stormstrike: {
     id: 'stormstrike',

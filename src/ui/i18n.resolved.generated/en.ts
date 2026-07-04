@@ -4472,6 +4472,10 @@ export const en: EnTranslations = {
         "name": "Earthquake",
         "description": "Shakes the target area, battering enemies for {damage} Nature damage."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Reaver Strike",
         "description": "A strong attack that increases melee damage by {damage}. Activates on your next swing."

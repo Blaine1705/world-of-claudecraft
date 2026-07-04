@@ -2410,6 +2410,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // shaman
   frost_shock: r('frost', 'ice', ['snowflake'], ['motion']),
   ghost_wolf: r('nature', 'leafGreen', ['paw'], ['glow']),
+  // the healing arc: a green heart with the chain lightning zigzag through it
+  chain_heal: r('nature', 'leafGreen', ['heart', { p: 'lightning', s: 0.7 }], ['arcs', 'sparkle']),
   stormstrike: r('storm', 'sky', ['sword', { p: 'lightning', ...BR }]),
   // warlock
   fear: r('shadow', 'shadowPurple', ['roar'], ['glow']),

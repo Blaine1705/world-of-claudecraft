@@ -12415,6 +12415,7 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
     (eff) =>
       eff.type === 'directDamage' ||
       eff.type === 'heal' ||
+      eff.type === 'chainHeal' ||
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
@@ -12426,6 +12427,7 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
     switch (primary.type) {
       case 'directDamage':
       case 'heal':
+      case 'chainHeal':
       case 'aoeDamage':
       case 'aoeRoot':
       case 'drainTick':

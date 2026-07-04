@@ -603,6 +603,11 @@ const classAbilityNamesEn = {
         'Shakes the target area, battering enemies for {damage} Nature damage.',
       ],
       [
+        'chain_heal',
+        'Chain Heal',
+        'Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount.',
+      ],
+      [
         'heroic_strike',
         'Reaver Strike',
         'A strong attack that increases melee damage by {damage}. Activates on your next swing.',

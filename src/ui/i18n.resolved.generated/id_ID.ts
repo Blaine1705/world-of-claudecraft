@@ -4472,6 +4472,10 @@ export const id_ID: EnTranslations = {
         "name": "Gempa Bumi",
         "description": "Mengguncang area sasaran, menghantam musuh sebesar {damage} kerusakan Alam."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Serangan Perampas",
         "description": "Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya."

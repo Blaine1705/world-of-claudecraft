@@ -11,22 +11,58 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [],
   "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "fr_FR": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "fr_CA": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "de_DE": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "pl_PL": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "id_ID": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "tr_TR": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "sv_SE": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "vi_VN": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ],
+  "da_DK": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name"
+  ]
 };

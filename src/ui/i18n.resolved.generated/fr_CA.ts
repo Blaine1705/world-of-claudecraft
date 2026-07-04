@@ -4472,6 +4472,10 @@ export const fr_CA: EnTranslations = {
         "name": "Tremblement de terre",
         "description": "Fait trembler la zone visée, frappant les ennemis pour {damage} points de dégâts de Nature."
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "Frappe du pillard",
         "description": "Une attaque puissante qui augmente les dégâts de mêlée de {damage}. S'active lors de votre prochaine frappe."

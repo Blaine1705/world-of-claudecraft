@@ -1102,6 +1102,17 @@ export type AbilityEffect =
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
+  // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps` nearby
+  // allies (the most injured within `jumpRange` yards of the previous target, never
+  // repeating one), each hop healing `falloff` of the previous hop's amount.
+  | {
+      type: 'chainHeal';
+      min: number;
+      max: number;
+      jumps: number;
+      jumpRange: number;
+      falloff: number;
+    }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
@@ -1870,7 +1881,7 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
-      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup';
+      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'chainHeal';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
