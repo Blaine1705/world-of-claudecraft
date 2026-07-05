@@ -5172,6 +5172,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Necesito ayuda',
   'hudChrome.discord.relay.help.hint': 'Pide ayuda a la comunidad',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
+  'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'La marca de tu marca',
   'errors.api.desktopCodeInvalid':
     'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',
   'desktop.crash.body': 'La vista del juego dejó de funcionar. ¿Recargarla?',

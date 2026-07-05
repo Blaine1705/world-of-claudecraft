@@ -246,6 +246,12 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // off by default: the classic "target of target" mini-frame. When on, and you have
+  // a target, a small unit frame under the target frame shows who YOUR target is
+  // targeting (a mob's aggro target, a player's selected target). Purely a display
+  // preference read by the HUD's target-frame update; the id it reads already rides
+  // the wire, and the frame hides itself when the target-of-target is unknown.
+  showTargetOfTarget: { def: false },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and
