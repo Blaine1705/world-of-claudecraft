@@ -4,7 +4,6 @@
 import * as THREE from 'three';
 import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
-import { cloudTexture } from './textures';
 
 export interface AmberFeaturesView {
   group: THREE.Group;
@@ -91,51 +90,6 @@ export function buildAmberFeatures(seed: number): AmberFeaturesView {
     }
   }
 
-  // --- the horizon cloud bank: two staggered rings of big gold-lit cumulus
-  // standing between the camera and the day sky's photographed hills, so the
-  // Amberfall's horizon is cloud on cloud, never a mountain photo ---
-  const bankClouds: { mesh: THREE.Mesh; baseX: number; speed: number }[] = [];
-  {
-    const tex = cloudTexture(16, 0.62);
-    const CENTER = { x: 0, z: 2840 };
-    // three tiers, reference-style: bright gold-cream masses low over the
-    // glow, deeper amber-brown shapes above them (the dark sunset masses),
-    // and a high scattered tier catching the last light
-    const TIERS = [
-      { radius: 380, count: 14, color: 0xffe8c0, y: 22, yj: 22, wMin: 200, wMax: 340, op: 0.95 },
-      { radius: 450, count: 11, color: 0xc9925c, y: 52, yj: 30, wMin: 240, wMax: 380, op: 0.85 },
-      { radius: 520, count: 8, color: 0xffd8a0, y: 95, yj: 40, wMin: 200, wMax: 320, op: 0.7 },
-    ];
-    TIERS.forEach((tier, ring) => {
-      for (let k = 0; k < tier.count; k++) {
-        const ang = ((k + ring * 0.37) / tier.count) * Math.PI * 2;
-        const mat = new THREE.MeshBasicMaterial({
-          map: tex,
-          color: tier.color,
-          transparent: true,
-          opacity: tier.op,
-          depthWrite: false,
-          fog: false,
-        });
-        const w = tier.wMin + hash2(k, ring, 5011) * (tier.wMax - tier.wMin);
-        const cloud = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.4), mat);
-        cloud.position.set(
-          CENTER.x + Math.sin(ang) * tier.radius,
-          tier.y + hash2(ring, k, 5021) * tier.yj,
-          CENTER.z + Math.cos(ang) * tier.radius,
-        );
-        cloud.rotation.y = ang + Math.PI; // face the realm
-        cloud.renderOrder = 1;
-        bankClouds.push({
-          mesh: cloud,
-          baseX: cloud.position.x,
-          speed: 0.6 + hash2(k, ring, 5031),
-        });
-        group.add(cloud);
-      }
-    });
-  }
-
   return {
     group,
     update(time: number): void {
@@ -144,10 +98,6 @@ export function buildAmberFeatures(seed: number): AmberFeaturesView {
       for (const r of rays) {
         r.mat.opacity = 0.24 * (0.55 + 0.45 * Math.sin(time * 0.13 + r.phase));
         if (r.mat.map) r.mat.map.offset.x = (time * 0.004 + r.phase) % 1;
-      }
-      // the bank drifts almost imperceptibly
-      for (const c of bankClouds) {
-        c.mesh.position.x = c.baseX + Math.sin(time * 0.014 * c.speed) * 14;
       }
     },
   };
