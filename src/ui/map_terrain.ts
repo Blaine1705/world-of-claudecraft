@@ -67,14 +67,19 @@ export function paintTerrainRows(
         r = 74 + 76 * sandT;
         g = 110 + 10 * sandT;
         b = 52 + 32 * sandT;
-        const scorch = Math.max(0, Math.min(1, (z - 1880) / 100));
-        r = r * (1 - scorch * 0.35);
+        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x + 10) - 26) / 26));
+        const valley = passT * Math.max(0, Math.min(1, (z - 1930) / 80));
+        const scorch = Math.max(0, Math.min(1, (z - 1880) / 100)) * (1 - valley);
+        r = r * (1 - scorch * 0.35) - 60 * valley * (sandT > 0 ? 1 : 0);
         g = g * (1 - scorch * 0.45);
-        b = b * (1 - scorch * 0.4);
+        b = b * (1 - scorch * 0.4) - 25 * valley;
       } else if (biome === 'frost') {
-        r = 214;
-        g = 224;
-        b = 236;
+        // the Snowline corridor greens the map too, fading under the snow
+        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x + 10) - 26) / 26));
+        const snowline = Math.max(Math.min(1, Math.max(0, (z - 2055) / 85)), 1 - passT);
+        r = 74 + 140 * snowline;
+        g = 110 + 114 * snowline;
+        b = 52 + 184 * snowline;
       } // snowbound
       if (h < WATER_LEVEL) {
         r = 38;

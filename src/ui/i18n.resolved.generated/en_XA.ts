@@ -5698,6 +5698,21 @@ export const en_XA: EnTranslations = {
       "aurelhorn": {
         "name": "[Áúŕéļĥóŕñ, Ƒíŕšţ óƒ ţĥé Ĥéŕð]"
       },
+      "snowdrift_wolf": {
+        "name": "[Šñóŵðŕíƒţ Ŵóļƒ]"
+      },
+      "ice_wisp": {
+        "name": "[Íçé Ŵíšþ]"
+      },
+      "rime_elemental": {
+        "name": "[Ŕíɱé Éļéɱéñţáļ]"
+      },
+      "fen_sprite": {
+        "name": "[Ƒéñ Šþŕíţé]"
+      },
+      "frostmane_yeti": {
+        "name": "[Ƒŕóšţɱáñé Ýéţí]"
+      },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"
       },
@@ -7077,7 +7092,7 @@ export const en_XA: EnTranslations = {
             "label": "[Íçéɱáñţļé]"
           },
           "1": {
-            "label": "[Ĥéáŕţƒŕóšţ Çáʋéŕñ]"
+            "label": "[Ţĥé Šñóŵļíñé]"
           },
           "2": {
             "label": "[Ĝļáçíéŕ Ţáŕñ]"

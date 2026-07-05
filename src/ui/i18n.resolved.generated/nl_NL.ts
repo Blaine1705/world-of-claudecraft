@@ -5698,6 +5698,21 @@ export const nl_NL: EnTranslations = {
       "aurelhorn": {
         "name": "Aurelhorn, First of the Herd"
       },
+      "snowdrift_wolf": {
+        "name": "Snowdrift Wolf"
+      },
+      "ice_wisp": {
+        "name": "Ice Wisp"
+      },
+      "rime_elemental": {
+        "name": "Rime Elemental"
+      },
+      "fen_sprite": {
+        "name": "Fen Sprite"
+      },
+      "frostmane_yeti": {
+        "name": "Frostmane Yeti"
+      },
       "ironvein_foreman": {
         "name": "IJzerader-Voorman"
       },
@@ -7077,7 +7092,7 @@ export const nl_NL: EnTranslations = {
             "label": "Icemantle"
           },
           "1": {
-            "label": "Heartfrost Cavern"
+            "label": "The Snowline"
           },
           "2": {
             "label": "Glacier Tarn"

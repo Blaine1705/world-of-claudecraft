@@ -74,6 +74,12 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: -90, z: 1830 },
     { x: -90, z: 1890 },
   ], // Cinder Dunes -> Bloodglass Fields
+  [
+    { x: 20, z: 1800 },
+    { x: -8, z: 1900 },
+    { x: -10, z: 1975 },
+    { x: -10, z: 2042 },
+  ], // the dune fork -> the Snowline pass, west of the Drakemaw
 ];
 
 // Content fill (creatures, folk, quests) lands in a follow-up pass; the

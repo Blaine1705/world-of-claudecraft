@@ -5698,6 +5698,21 @@ export const ru_RU: EnTranslations = {
       "aurelhorn": {
         "name": "Аурелхорн, Первый в стаде"
       },
+      "snowdrift_wolf": {
+        "name": "Сугробный волк"
+      },
+      "ice_wisp": {
+        "name": "Ледяной огонёк"
+      },
+      "rime_elemental": {
+        "name": "Инеевый элементаль"
+      },
+      "fen_sprite": {
+        "name": "Топяной дух"
+      },
+      "frostmane_yeti": {
+        "name": "Морозогривый йети"
+      },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
       },
@@ -7077,7 +7092,7 @@ export const ru_RU: EnTranslations = {
             "label": "Ледяная Мантия"
           },
           "1": {
-            "label": "Пещера Стылого Сердца"
+            "label": "Снеговая Тропа"
           },
           "2": {
             "label": "Ледниковое озеро"

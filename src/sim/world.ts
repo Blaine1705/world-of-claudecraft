@@ -190,6 +190,7 @@ const EMBER_LAND_LOBES = [
   { x: 45, z: 1790, r: 55 }, // the dune saddle carrying the Trollmoot fork
   { x: -20, z: 1780, r: 85 }, // the Cinder Dunes' heart
   { x: 60, z: 1880, r: 80 }, // approach to the Drakemaw
+  { x: 0, z: 1858, r: 45 }, // the saddle carrying the Snowline road
   { x: -70, z: 1870, r: 75 }, // the Bloodglass shelf
   { x: 0, z: 1975, r: 95 }, // the Drakemaw belt
   { x: 130, z: 1950, r: 60 }, // eastern volcanic spur
@@ -221,6 +222,7 @@ const FROST_LAND_LOBES = [
   { x: 120, z: 2075, r: 60 }, // eastern wall footing
   { x: 0, z: 2100, r: 85 }, // the rim benches
   { x: -40, z: 2230, r: 90 }, // the Icemantle massif
+  { x: -30, z: 2158, r: 45 }, // the town shelf under Icemantle itself
   { x: 80, z: 2200, r: 75 }, // Glacier Tarn's shoulder
   { x: 30, z: 2270, r: 65 }, // the inner valley joining the tarn to the Steps
   { x: 20, z: 2350, r: 95 }, // the Aurora Steps
@@ -302,9 +304,6 @@ function applyEmberCoast(x: number, z: number, h: number): number {
   // at matching height and the land rises gradually into the gatewood.
   const capEase = 1 - smoothstep(1442, 1495, z);
   if (capEase > 0 && out > 6.5) out = out + (6.5 + (out - 6.5) * 0.12 - out) * capEase;
-  // hold the last stretch before the Drakemaw wall at full base height
-  const rimHold = smoothstep(1990, 2020, z);
-  if (rimHold > 0) out = out + (h - out) * rimHold;
   return out;
 }
 
@@ -316,9 +315,13 @@ function applyFrostCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
-  const out = floor + (h - floor) * t;
-  const wallHold = 1 - smoothstep(2085, 2110, z);
-  return out + (h - out) * wallHold;
+  let out = floor + (h - floor) * t;
+  // The Snowline pass: a flat valley floor through the border mountains, the
+  // Wyrmgate recipe again (hold a low cap over the corridor, easing off as
+  // the road climbs into the benches).
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 10))) * (1 - smoothstep(2090, 2150, z));
+  if (passT > 0 && out > 7) out = out + (7 + (out - 7) * 0.15 - out) * passT;
+  return out;
 }
 
 // The Drakemaw's volcano cones: raised shields with crater dips. The caldera
@@ -584,7 +587,11 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       // never gated: the Drakemaw range runs down into the sea at its flanks.
       let seaGate = 1;
       if (!ridge.sealed && ridge.z >= HOLLOW_ZMAX) {
-        seaGate = smoothstep(0.005, 0.06, Math.max(hollowLandness(x, z), emberLandness(x, z)));
+        seaGate = smoothstep(
+          0.005,
+          0.06,
+          Math.max(hollowLandness(x, z), emberLandness(x, z), frostLandness(x, z)),
+        );
       }
       h += height * crest * profile * pass * seaGate;
     }

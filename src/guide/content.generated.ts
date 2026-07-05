@@ -1330,7 +1330,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "hub": "Icemantle",
     "pois": [
       "Icemantle",
-      "Heartfrost Cavern",
+      "The Snowline",
       "Glacier Tarn",
       "The Aurora Steps",
       "The Shiverfen",

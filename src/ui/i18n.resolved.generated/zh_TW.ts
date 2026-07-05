@@ -5698,6 +5698,21 @@ export const zh_TW: EnTranslations = {
       "aurelhorn": {
         "name": "金角，鹿群之首"
       },
+      "snowdrift_wolf": {
+        "name": "雪堆狼"
+      },
+      "ice_wisp": {
+        "name": "寒冰微光"
+      },
+      "rime_elemental": {
+        "name": "霜凝元素"
+      },
+      "fen_sprite": {
+        "name": "沼澤小妖"
+      },
+      "frostmane_yeti": {
+        "name": "霜鬃雪人"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -7077,7 +7092,7 @@ export const zh_TW: EnTranslations = {
             "label": "冰幔鎮"
           },
           "1": {
-            "label": "霜心洞窟"
+            "label": "雪線隘口"
           },
           "2": {
             "label": "冰川湖"

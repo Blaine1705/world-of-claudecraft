@@ -547,6 +547,14 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x5a4030,
     tintStrength: 0.5,
   },
+  // the same rig worn honestly: an ice-white yeti for the Frostveil
+  mob_yeti: {
+    url: `${CREATURES}/yetialt.glb`,
+    height: 2.5,
+    clips: BIPED14,
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
   mob_spider: {
     url: `${CREATURES}/spider.glb`,
     height: 1.4,
@@ -948,6 +956,8 @@ const MOB_KEYS: Record<string, string> = {
   glimmerwisp: 'mob_ghost',
   duskwisp: 'mob_ghost',
   hollow_spirit: 'mob_ghost',
+  ice_wisp: 'mob_ghost',
+  frostmane_yeti: 'mob_yeti',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
   treant_elder: 'mob_treant',

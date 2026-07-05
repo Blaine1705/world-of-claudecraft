@@ -94,6 +94,11 @@ const MOB_IDS = [
   'waking_warden',
   'old_marrowshell',
   'aurelhorn',
+  'snowdrift_wolf',
+  'ice_wisp',
+  'rime_elemental',
+  'fen_sprite',
+  'frostmane_yeti',
 ] as const;
 
 const NPC_IDS = [

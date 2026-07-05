@@ -5698,6 +5698,21 @@ export const ja_JP: EnTranslations = {
       "aurelhorn": {
         "name": "アウレルホーン、群れの長"
       },
+      "snowdrift_wolf": {
+        "name": "スノードリフトウルフ"
+      },
+      "ice_wisp": {
+        "name": "アイスウィスプ"
+      },
+      "rime_elemental": {
+        "name": "霧氷の精霊"
+      },
+      "fen_sprite": {
+        "name": "フェンスプライト"
+      },
+      "frostmane_yeti": {
+        "name": "フロストメイン・イエティ"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -7077,7 +7092,7 @@ export const ja_JP: EnTranslations = {
             "label": "アイスマントル"
           },
           "1": {
-            "label": "ハートフロスト洞窟"
+            "label": "スノーライン峠"
           },
           "2": {
             "label": "氷河の湖"

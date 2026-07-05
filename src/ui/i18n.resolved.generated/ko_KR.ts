@@ -5698,6 +5698,21 @@ export const ko_KR: EnTranslations = {
       "aurelhorn": {
         "name": "아우렐혼, 무리의 첫째"
       },
+      "snowdrift_wolf": {
+        "name": "눈더미 늑대"
+      },
+      "ice_wisp": {
+        "name": "얼음 위습"
+      },
+      "rime_elemental": {
+        "name": "서리 정령"
+      },
+      "fen_sprite": {
+        "name": "늪 요정"
+      },
+      "frostmane_yeti": {
+        "name": "서리갈기 예티"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -7077,7 +7092,7 @@ export const ko_KR: EnTranslations = {
             "label": "아이스맨틀"
           },
           "1": {
-            "label": "서리심장 동굴"
+            "label": "설선 고개"
           },
           "2": {
             "label": "빙하 호수"
