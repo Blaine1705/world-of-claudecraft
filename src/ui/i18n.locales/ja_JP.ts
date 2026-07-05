@@ -3020,7 +3020,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.amberfall.name': 'アンバーフォール',
   'entities.zones.amberfall.welcome': 'ここではどの葉も金と紅に燃え、決して散らない。ランタンミアの灯りが君を迎えている。',
   'entities.zones.amberfall.pois.0.label': 'ランタンミア',
-  'entities.zones.amberfall.pois.1.label': 'ウェストウェイ',
+  'entities.zones.amberfall.pois.1.label': 'ゴールドメルト峠',
   'entities.zones.amberfall.pois.2.label': '黄金の果樹園',
   'entities.zones.amberfall.pois.3.label': 'ハーベスト谷',
   'entities.zones.amberfall.pois.4.label': '大いなる湖',

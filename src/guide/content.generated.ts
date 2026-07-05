@@ -1347,7 +1347,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "hub": "Lanternmere",
     "pois": [
       "Lanternmere",
-      "The Rootway",
+      "The Goldmelt",
       "The Gilded Orchard",
       "Harvest Hollow",
       "The Great Mere",

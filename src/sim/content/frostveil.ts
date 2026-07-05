@@ -74,6 +74,11 @@ export const FROSTVEIL_ROADS: { x: number; z: number }[][] = [
     { x: 70, z: 2390 },
     { x: 90, z: 2430 },
   ], // the Aurora Steps -> the Howling Terraces
+  [
+    { x: 30, z: 2340 },
+    { x: 18, z: 2450 },
+    { x: 10, z: 2558 },
+  ], // the Aurora Steps -> the Goldmelt pass
 ];
 
 // No portals: the Reach is walked into over the Snowline pass.

@@ -7118,7 +7118,7 @@ export const tr_TR: EnTranslations = {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Westway"
+            "label": "The Goldmelt"
           },
           "2": {
             "label": "The Gilded Orchard"

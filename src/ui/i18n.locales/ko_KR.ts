@@ -3015,7 +3015,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.amberfall.name': '호박빛 가을터',
   'entities.zones.amberfall.welcome': '이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다. 랜턴미어의 등불이 너를 위해 켜져 있다.',
   'entities.zones.amberfall.pois.0.label': '랜턴미어',
-  'entities.zones.amberfall.pois.1.label': '서쪽 길',
+  'entities.zones.amberfall.pois.1.label': '금빛눈녹이 고개',
   'entities.zones.amberfall.pois.2.label': '금빛 과수원',
   'entities.zones.amberfall.pois.3.label': '수확 골짜기',
   'entities.zones.amberfall.pois.4.label': '큰 호수',

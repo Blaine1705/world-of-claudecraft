@@ -61,11 +61,6 @@ export const REALM_ZONE: ZoneDef = {
 // the grove, the basin, the ruins, and the mushroom forest.
 export const REALM_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 126, z: 1088 },
-    { x: 150, z: 1080 },
-    { x: 175, z: 1078 },
-  ], // the Sunken Court -> the Westway crossing
-  [
     { x: -140, z: 955 },
     { x: -125, z: 980 },
     { x: -95, z: 1005 },

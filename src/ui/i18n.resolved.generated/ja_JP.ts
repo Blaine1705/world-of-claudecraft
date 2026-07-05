@@ -7118,7 +7118,7 @@ export const ja_JP: EnTranslations = {
             "label": "ランタンミア"
           },
           "1": {
-            "label": "ウェストウェイ"
+            "label": "ゴールドメルト峠"
           },
           "2": {
             "label": "黄金の果樹園"

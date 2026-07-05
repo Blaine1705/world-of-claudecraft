@@ -238,6 +238,7 @@ const FROST_LAND_LOBES = [
   { x: -100, z: 2320, r: 70 }, // the Shiverfen shelf
   { x: 120, z: 2390, r: 65 }, // the Howling Terraces
   { x: 0, z: 2470, r: 80 }, // the north crown
+  { x: 10, z: 2545, r: 50 }, // the Goldmelt corridor's south footing
 ] as const;
 const FROST_BAYS = [
   { x: 165, z: 2260, r: 55 }, // the east sound
@@ -256,7 +257,8 @@ export function frostLandness(x: number, z: number): number {
 // ---------------------------------------------------------------------------
 const AMBER_ZMAX = 3120; // keep in sync with AMBERFALL_ZONE.zMax
 const AMBER_LAND_LOBES = [
-  { x: -60, z: 2620, r: 70 }, // the Rootway arrival shelf
+  { x: 10, z: 2590, r: 60 }, // the Goldmelt pass mouth
+  { x: -60, z: 2620, r: 70 }, // the arrival shelf west of the pass
   { x: 20, z: 2650, r: 80 }, // the south weald
   { x: 100, z: 2690, r: 65 }, // Harvest Hollow's shelf
   { x: 55, z: 2725, r: 50 }, // the harvest road's field saddle
@@ -285,9 +287,11 @@ function applyAmberCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
-  const out = floor + (h - floor) * t;
-  const wallHold = 1 - smoothstep(2605, 2630, z);
-  return out + (h - out) * wallHold;
+  let out = floor + (h - floor) * t;
+  // the Goldmelt: a flat pass floor across the border, the Wyrmgate recipe
+  const passT = (1 - smoothstep(26, 52, Math.abs(x - 10))) * (1 - smoothstep(2610, 2660, z));
+  if (passT > 0 && out > 7) out = out + (7 + (out - 7) * 0.15 - out) * passT;
+  return out;
 }
 
 // Sink everything beyond the coast to the seabed. The outer 10yd of the band
@@ -313,11 +317,6 @@ function applyHollowCoast(x: number, z: number, h: number): number {
     const ease = smoothstep(1245, 1268, z); // mainland shore eases into it
     if (out > cap) out = out + (cap + (out - cap) * 0.12 - out) * ease;
   }
-  // The Westway: the crossing into the Amberfall is an open, flat meadow
-  // corridor (no cave, no wall), the Wyrmgate recipe turned sideways: cap
-  // the west-edge heights across the corridor band so the walk stays level.
-  const westGate = smoothstep(138, 158, x) * (1 - smoothstep(18, 42, Math.abs(z - 1078)));
-  if (westGate > 0 && out > 5) out = out + (5 + (out - 5) * 0.15 - out) * westGate;
   // Wave-cut ledges: coastal rock above the beach line breaks into stepped
   // terraces with noise-jittered edges, so bluffs meet the sea as rigid
   // cliff faces instead of smooth mounds. Confined to the shore band (the
@@ -652,7 +651,12 @@ export function terrainHeight(x: number, z: number, seed: number): number {
         seaGate = smoothstep(
           0.005,
           0.06,
-          Math.max(hollowLandness(x, z), emberLandness(x, z), frostLandness(x, z)),
+          Math.max(
+            hollowLandness(x, z),
+            emberLandness(x, z),
+            frostLandness(x, z),
+            amberLandness(x, z),
+          ),
         );
       }
       h += height * crest * profile * pass * seaGate;
@@ -674,13 +678,6 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // out from the shore reads as water meeting sky, and swim fatigue (not a
   // wall) turns swimmers back before the band edge.
   let rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
-  // the Westway crossing stays open: no border range over the corridor,
-  // EXCEPT the last strip past the trigger picket, a steep backstop so no
-  // one wanders off the world's edge behind the crossing
-  if (x > 0 && z > 900) {
-    const backstop = smoothstep(178, 181, x);
-    rimX *= Math.max(smoothstep(18, 42, Math.abs(z - 1078)), backstop);
-  }
   const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
   let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
   if (inHollowOpenSea(x, z)) {

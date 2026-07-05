@@ -7118,7 +7118,7 @@ export const da_DK: EnTranslations = {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Westway"
+            "label": "The Goldmelt"
           },
           "2": {
             "label": "The Gilded Orchard"

@@ -7118,7 +7118,7 @@ export const ru_RU: EnTranslations = {
             "label": "Лантанмир"
           },
           "1": {
-            "label": "Западный Путь"
+            "label": "Золотая Проталина"
           },
           "2": {
             "label": "Золочёный сад"

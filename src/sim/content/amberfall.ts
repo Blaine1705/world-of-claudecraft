@@ -2,8 +2,8 @@
 // Hollow's western cliffs: fire-colored forests under a honey-gold sky,
 // harvest meadows, and the Great Mere at its heart, ringed by the lantern
 // town of Lanternmere. Walked into through the Rootway, a tunnel behind the
-// Hollow's Mirrorshallow meadow: the Westway, an open flat crossing;
-// the southern border is sealed. Terrain shape: AMBER_* tables in world.ts.
+// Frostveil's north benches over the Goldmelt pass, snow melting into
+// gold underfoot (southPassX). Terrain shape: AMBER_* tables in world.ts.
 
 import type {
   CampDef,
@@ -25,7 +25,7 @@ export const AMBERFALL_ZONE: ZoneDef = {
   zMax: 3120,
   levelRange: [18, 20],
   biome: 'amber',
-  sealedSouthBorder: true,
+  southPassX: 10, // the Goldmelt: where the snow road melts into autumn
   hub: { x: 0, z: 2812, radius: 24, name: 'Lanternmere' },
   graveyard: { x: 24, z: 2790 },
   lakes: [
@@ -37,7 +37,7 @@ export const AMBERFALL_ZONE: ZoneDef = {
   ],
   pois: [
     { x: 0, z: 2812, label: 'Lanternmere' },
-    { x: -60, z: 2612, label: 'The Westway' },
+    { x: 10, z: 2588, label: 'The Goldmelt' },
     { x: -72, z: 2732, label: 'The Gilded Orchard' },
     { x: 70, z: 2700, label: 'Harvest Hollow' },
     { x: 0, z: 2872, label: 'The Great Mere' },
@@ -50,11 +50,11 @@ export const AMBERFALL_ZONE: ZoneDef = {
 
 export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
   [
-    { x: -60, z: 2616 },
-    { x: -40, z: 2700 },
+    { x: 10, z: 2558 },
+    { x: 0, z: 2620 },
     { x: -14, z: 2770 },
     { x: 0, z: 2812 },
-  ], // the Rootway -> Lanternmere
+  ], // the Goldmelt pass -> Lanternmere
   [
     { x: -12, z: 2790 },
     { x: -50, z: 2760 },
@@ -80,16 +80,9 @@ export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
 // The Westway: an open meadow crossing at the world's western edge; walking
 // west past the Mirrorshallow carries you straight into the Amberfall (a
 // wide unmarked trigger, no cave and no wall, like walking into a new land).
-// A picket of triggers spans the corridor's full width so no walking line
-// slips between them (one circle could be walked around).
-export const AMBERFALL_PORTALS: PortalDef[] = [1062, 1070, 1078, 1086, 1094].map((z, i) => ({
-  id: `westway_crossing_${i}`,
-  a: { x: 176, z, landing: { x: 170, z: 1078, facing: 2.4 } },
-  b: { x: -60, z: 2608, landing: { x: -60, z: 2615, facing: 0 } },
-  radius: 4.5,
-  enterText: 'The dusk thins around you, and gold light floods the meadow ahead.',
-  leaveText: 'The gold fades at your back, and dusk settles over the Mirrorshallow.',
-}));
+// No portals: the Amberfall is walked into over the Goldmelt pass, where
+// the Frostveil's snow road melts mile by mile into autumn gold.
+export const AMBERFALL_PORTALS: PortalDef[] = [];
 
 // Creatures and quests follow in the content pass.
 export const AMBERFALL_MOBS: Record<string, MobTemplate> = {};
@@ -120,6 +113,6 @@ export const AMBERFALL_PROPS: ZonePropsDef = {
   ],
   campfires: [
     [0, 2808],
-    [-58, 2618],
+    [8, 2585],
   ],
 };

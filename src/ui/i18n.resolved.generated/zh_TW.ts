@@ -7118,7 +7118,7 @@ export const zh_TW: EnTranslations = {
             "label": "燈湖鎮"
           },
           "1": {
-            "label": "西行道"
+            "label": "融金隘口"
           },
           "2": {
             "label": "鎏金果園"

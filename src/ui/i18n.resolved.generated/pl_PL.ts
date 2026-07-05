@@ -7118,7 +7118,7 @@ export const pl_PL: EnTranslations = {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Westway"
+            "label": "The Goldmelt"
           },
           "2": {
             "label": "The Gilded Orchard"

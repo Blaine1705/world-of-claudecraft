@@ -3051,7 +3051,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.amberfall.name': 'Янтарная Падь',
   'entities.zones.amberfall.welcome': 'Каждый лист здесь горит золотом и багрянцем, но ни один не падает. Фонари Лантанмира зажжены для тебя.',
   'entities.zones.amberfall.pois.0.label': 'Лантанмир',
-  'entities.zones.amberfall.pois.1.label': 'Западный Путь',
+  'entities.zones.amberfall.pois.1.label': 'Золотая Проталина',
   'entities.zones.amberfall.pois.2.label': 'Золочёный сад',
   'entities.zones.amberfall.pois.3.label': 'Жатвенная лощина',
   'entities.zones.amberfall.pois.4.label': 'Великое озеро',
