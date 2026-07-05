@@ -36,39 +36,40 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   vale: { gain: 0.6, clamp: 2.6 },
   marsh: { gain: 0.6, clamp: 2.2 },
   peaks: { gain: 0.48, clamp: 1.7 },
-  dusk: { gain: 0.48, clamp: 1.7 },
-  // dimmed and reined in: a storm-dark red dusk, not a bright dawn
-  ember: { gain: 0.34, clamp: 1.45 },
-  // dimmed well below the vale's day: a deep blue twilight the aurora can
-  // actually glow against
-  frost: { gain: 0.3, clamp: 1.4 },
-  amber: { gain: 0.5, clamp: 1.9 },
-  fen: { gain: 0.62, clamp: 2.6 },
+  // the five realm skies are project-generated with their moods baked in
+  // (storm-dark ember, dim frost twilight), so their gains sit close to the
+  // vale's day instead of re-dimming an already-graded image
+  dusk: { gain: 0.55, clamp: 2.2 },
+  ember: { gain: 0.5, clamp: 2.0 },
+  frost: { gain: 0.5, clamp: 2.0 },
+  amber: { gain: 0.55, clamp: 2.2 },
+  fen: { gain: 0.6, clamp: 2.6 },
 };
 
-// The dusk biome reuses the peaks dawn HDRI (already pink at the horizon); the
-// loader caches one parse per URL, so this costs no extra download or memory.
-// Its distinct look comes from the per-biome dome tint, fog, and light grade.
+// The three southern zones keep their Poly Haven photographs; the five realm
+// biomes each get a project-generated sky (skies_in/ sources, converted by
+// the local RGBE pipeline with the sun's HDR energy re-injected). All five
+// have clean ocean horizons: no baked land, so no lift and no tint hacks.
 const BIOME_HDRI_2K: Record<BiomeId, string> = {
   vale: '/env/vale_day_2k.hdr',
   marsh: '/env/marsh_overcast_2k.hdr',
   peaks: '/env/peaks_dawn_2k.hdr',
-  dusk: '/env/peaks_dawn_2k.hdr',
-  ember: '/env/peaks_dawn_2k.hdr',
-  frost: '/env/vale_day_2k.hdr',
-  amber: '/env/peaks_dawn_2k.hdr',
-  fen: '/env/vale_day_2k.hdr',
+  dusk: '/env/hollow_dusk_2k.hdr',
+  ember: '/env/ember_storm_2k.hdr',
+  frost: '/env/frost_twilight_2k.hdr',
+  amber: '/env/amber_sunset_2k.hdr',
+  fen: '/env/fen_day_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
   vale: '/env/vale_day_1k.hdr',
   marsh: '/env/marsh_overcast_1k.hdr',
   peaks: '/env/peaks_dawn_1k.hdr',
-  dusk: '/env/peaks_dawn_1k.hdr',
-  ember: '/env/peaks_dawn_1k.hdr',
-  frost: '/env/vale_day_1k.hdr',
-  amber: '/env/peaks_dawn_1k.hdr',
-  fen: '/env/vale_day_1k.hdr',
+  dusk: '/env/hollow_dusk_1k.hdr',
+  ember: '/env/ember_storm_1k.hdr',
+  frost: '/env/frost_twilight_1k.hdr',
+  amber: '/env/amber_sunset_1k.hdr',
+  fen: '/env/fen_day_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -140,23 +141,18 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   fen: 0,
 };
 
-// The shared dawn HDRI has red hills PHOTOGRAPHED into its horizon band. The
-// dusk realm masks them: low view angles resample the sky from just above
-// the photographed ridge line, so the ocean meets clean gradient sky.
+// Lift masks a horizon band PHOTOGRAPHED into an HDRI (the dawn sky's red
+// hills) by resampling low view angles from just above the ridge line. The
+// realm skies are generated with clean ocean horizons, so nothing lifts:
+// lift also smears bold clouds into vertical streaks near the ground.
 const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   vale: 0,
   marsh: 0,
   peaks: 0,
-  dusk: 1,
-  ember: 1,
-  // frost keeps its real horizon: the lift smeared the day sky's cloud band
-  // into vertical streaks near the ground, and at the dim frost grade the
-  // HDRI's own horizon reads as distant dark ranges instead
+  dusk: 0,
+  ember: 0,
   frost: 0,
-  // amber lifts like the Hollow: the dawn sky's baked hills vanish and the
-  // sea meets clean golden sky (its wispy clouds never showed the smear the
-  // day sky's bold cumulus did); fen keeps its day sky unstretched
-  amber: 1,
+  amber: 0,
   fen: 0,
 };
 
@@ -204,33 +200,35 @@ function shouldUseLiteBackdrop(): boolean {
 
 const BIOME_BACKDROP = shouldUseLiteBackdrop() ? BIOME_BACKDROP_4K : BIOME_BACKDROP_8K;
 
-// Measured brightest-texel u (sun azimuth in equirect space) per HDRI — see
-// tmp/analyze_hdr.mjs. Used to rotate each map so its sun matches SUN_ANCHOR.
+// Measured brightest-texel u (sun azimuth in equirect space) per HDRI, used
+// to rotate each map so its sun matches SUN_ANCHOR. Poly Haven values via
+// tmp/analyze_hdr.mjs; realm-sky values printed by the conversion pipeline
+// (the injected sun spot, identical at both tiers).
 const HDRI_SUN_U: Record<BiomeId, number> = {
   vale: 0.595,
   marsh: 0.657,
   peaks: 0.631,
-  dusk: 0.631,
-  ember: 0.631,
-  frost: 0.595,
-  amber: 0.631,
-  fen: 0.595,
+  dusk: 0.745,
+  ember: 0.385,
+  frost: 0.5,
+  amber: 0.501,
+  fen: 0.497,
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
-// tonemap, so channels above 1 are fine). White = untouched. The dusk realm
-// pushes the shared dawn HDRI into permanent rose-and-violet dusk.
+// tonemap, so channels above 1 are fine). White = untouched. Every realm sky
+// now carries its own baked color (rose dusk, red storm, blue twilight,
+// sunset gold, day blue), so the heavy grades that faked those moods over
+// shared photographs are retired.
 const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   vale: [1, 1, 1],
   marsh: [1, 1, 1],
   peaks: [1, 1, 1],
-  dusk: [1.22, 0.82, 1.12],
-  ember: [1.45, 0.55, 0.38],
-  frost: [0.5, 0.66, 1.05],
-  // deep sunset gold over the dawn sky's waterline sun glow
-  amber: [1.5, 1.12, 0.5],
-  // bright, airy, faintly cool: a clear wetland morning
-  fen: [0.98, 1.04, 1.1],
+  dusk: [1, 1, 1],
+  ember: [1, 1, 1],
+  frost: [1, 1, 1],
+  amber: [1, 1, 1],
+  fen: [1, 1, 1],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

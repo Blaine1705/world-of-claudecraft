@@ -1048,17 +1048,23 @@ export class Renderer {
     // the environment intensity is rescaled to match the shipped look.
     if (!LOW_GFX) {
       const pmrem = new THREE.PMREMGenerator(this.webgl);
-      for (const b of ['vale', 'marsh', 'peaks'] as BiomeId[]) {
+      // every biome has its own HDRI now (three Poly Haven photographs plus
+      // the five project-generated realm skies), so each gets its own
+      // prefiltered RT; envRTs live for the whole session
+      const biomes: BiomeId[] = [
+        'vale',
+        'marsh',
+        'peaks',
+        'dusk',
+        'ember',
+        'frost',
+        'amber',
+        'fen',
+      ];
+      for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
         if (eq) this.envRTs.set(b, pmrem.fromEquirectangular(eq));
       }
-      // The dusk realm shares the peaks HDRI; alias its prefiltered RT
-      // rather than refiltering the same texture (the distinct dusk look
-      // rides the dome tint, fog, and light grade). envRTs live for the
-      // whole session; if a teardown loop is ever added, dedupe by RT
-      // identity first or this alias double-disposes.
-      const peaksRT = this.envRTs.get('peaks');
-      if (peaksRT) this.envRTs.set('dusk', peaksRT);
       if (this.envRTs.size > 0) {
         this.envOutdoorIntensity = ENV_INTENSITY * IBL_RAW_SCALE;
         this.scene.environment = this.envRTs.get('vale')?.texture ?? null;
