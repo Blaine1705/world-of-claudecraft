@@ -135,7 +135,7 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   ember: 0,
   frost: 0,
   amber: 0,
-  fen: 0,
+  fen: 1,
 };
 
 // The shared dawn HDRI has red hills PHOTOGRAPHED into its horizon band. The
