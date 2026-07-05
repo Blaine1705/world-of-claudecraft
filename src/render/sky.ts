@@ -135,7 +135,9 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   ember: 0,
   frost: 0,
   amber: 0,
-  fen: 1,
+  // no backdrop: it hid the day sky's low cloud bank; the fen keeps the
+  // whole cloudscape (the lift alone was the streak culprit, and it is off)
+  fen: 0,
 };
 
 // The shared dawn HDRI has red hills PHOTOGRAPHED into its horizon band. The
