@@ -5729,6 +5729,33 @@ export const ru_RU: EnTranslations = {
       "dune_troll": {
         "name": "Дюнный тролль"
       },
+      "gilded_stag": {
+        "name": "Золочёный олень"
+      },
+      "gloam_fox": {
+        "name": "Сумеречный лис"
+      },
+      "orchard_treant": {
+        "name": "Садовый древень"
+      },
+      "harvest_sprite": {
+        "name": "Жатвенный дух"
+      },
+      "mere_lurker": {
+        "name": "Озёрный скрытень"
+      },
+      "bogtoad": {
+        "name": "Топяная жаба"
+      },
+      "drowsy_croaker": {
+        "name": "Дремотный Квакун"
+      },
+      "lily_wisp": {
+        "name": "Кувшинковый огонёк"
+      },
+      "willow_sprite": {
+        "name": "Ивовый дух"
+      },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
       },

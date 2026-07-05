@@ -5729,6 +5729,33 @@ export const ko_KR: EnTranslations = {
       "dune_troll": {
         "name": "모래언덕 트롤"
       },
+      "gilded_stag": {
+        "name": "금빛 수사슴"
+      },
+      "gloam_fox": {
+        "name": "어스름여우"
+      },
+      "orchard_treant": {
+        "name": "과수원 나무정령"
+      },
+      "harvest_sprite": {
+        "name": "수확 요정"
+      },
+      "mere_lurker": {
+        "name": "호수 잠복자"
+      },
+      "bogtoad": {
+        "name": "늪두꺼비"
+      },
+      "drowsy_croaker": {
+        "name": "졸음 개구리왕"
+      },
+      "lily_wisp": {
+        "name": "수련 위습"
+      },
+      "willow_sprite": {
+        "name": "버들 요정"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },

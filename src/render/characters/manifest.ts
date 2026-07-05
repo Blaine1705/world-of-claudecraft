@@ -951,6 +951,10 @@ const MOB_KEYS: Record<string, string> = {
   // yeti) that appear nowhere in the outer three zones
   veiled_stag: 'mob_stag',
   gleamstag: 'mob_stag',
+  gilded_stag: 'mob_stag',
+  gloam_fox: 'mob_fox',
+  orchard_treant: 'mob_treant',
+  lily_wisp: 'mob_ghost',
   ancient_guardian: 'skel_golem',
   waking_warden: 'skel_golem',
   glimmerwisp: 'mob_ghost',

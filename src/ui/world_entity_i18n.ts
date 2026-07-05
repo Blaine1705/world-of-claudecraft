@@ -103,6 +103,15 @@ const MOB_IDS = [
   'ashbone_raider',
   'ashbone_warcaller',
   'dune_troll',
+  'gilded_stag',
+  'gloam_fox',
+  'orchard_treant',
+  'harvest_sprite',
+  'mere_lurker',
+  'bogtoad',
+  'drowsy_croaker',
+  'lily_wisp',
+  'willow_sprite',
 ] as const;
 
 const NPC_IDS = [

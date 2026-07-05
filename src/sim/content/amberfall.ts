@@ -92,13 +92,113 @@ export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
 // the Frostveil's snow road melts mile by mile into autumn gold.
 export const AMBERFALL_PORTALS: PortalDef[] = [];
 
-// Creatures and quests follow in the content pass.
-export const AMBERFALL_MOBS: Record<string, MobTemplate> = {};
+// Quests and folk follow in a later pass.
+export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
+  gilded_stag: {
+    id: 'gilded_stag',
+    name: 'Gilded Stag',
+    minLevel: 18,
+    maxLevel: 19,
+    family: 'beast',
+    hpBase: 54,
+    hpPerLevel: 18,
+    dmgBase: 10,
+    dmgPerLevel: 2.2,
+    attackSpeed: 2.0,
+    armorPerLevel: 12,
+    moveSpeed: 9,
+    aggroRadius: 0, // grazes the gold meadows, fights only if pressed
+    loot: [],
+    scale: 1.15,
+    color: 0xd8a848,
+  },
+  gloam_fox: {
+    id: 'gloam_fox',
+    name: 'Gloam Fox',
+    minLevel: 18,
+    maxLevel: 18,
+    family: 'beast',
+    hpBase: 44,
+    hpPerLevel: 16,
+    dmgBase: 9,
+    dmgPerLevel: 2.0,
+    attackSpeed: 1.8,
+    armorPerLevel: 10,
+    moveSpeed: 9.5,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xd87838,
+  },
+  orchard_treant: {
+    id: 'orchard_treant',
+    name: 'Orchard Treant',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'ogre',
+    hpBase: 110,
+    hpPerLevel: 28,
+    dmgBase: 14,
+    dmgPerLevel: 2.6,
+    attackSpeed: 2.6,
+    armorPerLevel: 16,
+    moveSpeed: 6.5,
+    aggroRadius: 0, // ancient and calm, until an axe is raised
+    elite: true,
+    loot: [],
+    scale: 1.4,
+    color: 0xc89838,
+  },
+  harvest_sprite: {
+    id: 'harvest_sprite',
+    name: 'Harvest Sprite',
+    minLevel: 18,
+    maxLevel: 19,
+    family: 'kobold',
+    hpBase: 48,
+    hpPerLevel: 17,
+    dmgBase: 10,
+    dmgPerLevel: 2.1,
+    attackSpeed: 1.9,
+    armorPerLevel: 11,
+    moveSpeed: 8.5,
+    aggroRadius: 11, // orchard thieves, and territorial about it
+    loot: [],
+    scale: 0.85,
+    color: 0xe8c878,
+  },
+  mere_lurker: {
+    id: 'mere_lurker',
+    name: 'Mere Lurker',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'murloc',
+    hpBase: 58,
+    hpPerLevel: 20,
+    dmgBase: 12,
+    dmgPerLevel: 2.4,
+    attackSpeed: 2.0,
+    armorPerLevel: 13,
+    moveSpeed: 8,
+    aggroRadius: 13,
+    loot: [],
+    scale: 1.1,
+    color: 0xa8b048,
+  },
+};
 export const AMBERFALL_NPCS: Record<string, NpcDef> = {};
 export const AMBERFALL_QUESTS: Record<string, QuestDef> = {};
 export const AMBERFALL_QUEST_ORDER: string[] = [];
 export const AMBERFALL_ITEMS: Record<string, ItemDef> = {};
-export const AMBERFALL_CAMPS: CampDef[] = [];
+export const AMBERFALL_CAMPS: CampDef[] = [
+  { mobId: 'gilded_stag', center: { x: 60, z: 2716 }, radius: 12, count: 3 },
+  { mobId: 'gilded_stag', center: { x: -60, z: 2760 }, radius: 11, count: 2 },
+  { mobId: 'gloam_fox', center: { x: 30, z: 2770 }, radius: 10, count: 2 },
+  { mobId: 'harvest_sprite', center: { x: -76, z: 2724 }, radius: 10, count: 3 },
+  { mobId: 'orchard_treant', center: { x: -66, z: 2942 }, radius: 9, count: 2 },
+  { mobId: 'mere_lurker', center: { x: 48, z: 2898 }, radius: 8, count: 2 },
+  { mobId: 'mere_lurker', center: { x: 90, z: 2976 }, radius: 8, count: 2 },
+];
 export const AMBERFALL_OBJECTS: GroundObjectDef[] = [];
 
 export const AMBERFALL_PROPS: ZonePropsDef = {

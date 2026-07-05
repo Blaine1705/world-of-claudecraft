@@ -42,19 +42,19 @@ export const WILLOWFEN_ZONE: ZoneDef = {
   graveyard: { x: 14, z: 3278 },
   lakes: [
     ...MOAT,
-    // the Lilymoors: a lake-maze whose overlapping carves leave islets
-    { x: -80, z: 3230, radius: 15 },
-    { x: -102, z: 3248, radius: 13 },
-    { x: -84, z: 3268, radius: 12 }, // ...the three ring an islet
-    { x: -60, z: 3252, radius: 10 },
+    // the Lilymoors: three pools ringing a real dry islet at (-87,3247)
+    { x: -76, z: 3226, radius: 13 },
+    { x: -108, z: 3244, radius: 11 },
+    { x: -82, z: 3270, radius: 11 },
+    { x: -56, z: 3250, radius: 9 },
     // Bogshine Pools: scattered bright bog eyes
     { x: 70, z: 3220, radius: 12 },
     { x: 92, z: 3238, radius: 9 },
     { x: 58, z: 3244, radius: 8 },
-    // the Drowsy Flats: broad shallow sheets with an islet ring
-    { x: 30, z: 3420, radius: 16 },
-    { x: 54, z: 3436, radius: 13 },
-    { x: 34, z: 3452, radius: 12 },
+    // the Drowsy Flats: three sheets ringing the Croaker's islet at (38,3436)
+    { x: 24, z: 3414, radius: 13 },
+    { x: 58, z: 3440, radius: 12 },
+    { x: 28, z: 3456, radius: 11 },
     { x: -66, z: 3400, radius: 14 }, // Willowweep's pool
     { x: -84, z: 3418, radius: 10 },
   ],
@@ -106,13 +106,94 @@ export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
 // No portals: walked into over the Amberfen Steps.
 export const WILLOWFEN_PORTALS: PortalDef[] = [];
 
-// Creatures and quests follow in the content pass.
-export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {};
+// Quests and folk follow in a later pass.
+export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
+  bogtoad: {
+    id: 'bogtoad',
+    name: 'Bogtoad',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'murloc',
+    hpBase: 56,
+    hpPerLevel: 20,
+    dmgBase: 11,
+    dmgPerLevel: 2.3,
+    attackSpeed: 2.0,
+    armorPerLevel: 12,
+    moveSpeed: 8,
+    aggroRadius: 12,
+    loot: [],
+    scale: 1,
+    color: 0x7aa848,
+  },
+  drowsy_croaker: {
+    id: 'drowsy_croaker',
+    name: 'The Drowsy Croaker',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'murloc',
+    hpBase: 140,
+    hpPerLevel: 34,
+    dmgBase: 16,
+    dmgPerLevel: 3.0,
+    attackSpeed: 2.4,
+    armorPerLevel: 17,
+    moveSpeed: 7.5,
+    aggroRadius: 14,
+    elite: true,
+    loot: [],
+    scale: 1.65,
+    color: 0x5a9858,
+  },
+  lily_wisp: {
+    id: 'lily_wisp',
+    name: 'Lily Wisp',
+    minLevel: 19,
+    maxLevel: 19,
+    family: 'elemental',
+    hpBase: 44,
+    hpPerLevel: 16,
+    dmgBase: 8,
+    dmgPerLevel: 2.0,
+    attackSpeed: 2.0,
+    armorPerLevel: 10,
+    moveSpeed: 7.5,
+    aggroRadius: 0, // pale lights adrift over the pools
+    loot: [],
+    scale: 0.7,
+    color: 0xd0f2c8,
+  },
+  willow_sprite: {
+    id: 'willow_sprite',
+    name: 'Willow Sprite',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'kobold',
+    hpBase: 50,
+    hpPerLevel: 18,
+    dmgBase: 10,
+    dmgPerLevel: 2.2,
+    attackSpeed: 1.9,
+    armorPerLevel: 11,
+    moveSpeed: 8.5,
+    aggroRadius: 10,
+    loot: [],
+    scale: 0.9,
+    color: 0xc8e0b8,
+  },
+};
 export const WILLOWFEN_NPCS: Record<string, NpcDef> = {};
 export const WILLOWFEN_QUESTS: Record<string, QuestDef> = {};
 export const WILLOWFEN_QUEST_ORDER: string[] = [];
 export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {};
-export const WILLOWFEN_CAMPS: CampDef[] = [];
+export const WILLOWFEN_CAMPS: CampDef[] = [
+  { mobId: 'bogtoad', center: { x: -70, z: 3210 }, radius: 10, count: 3 },
+  { mobId: 'bogtoad', center: { x: 76, z: 3256 }, radius: 10, count: 3 },
+  { mobId: 'lily_wisp', center: { x: -66, z: 3380 }, radius: 12, count: 4 },
+  { mobId: 'willow_sprite', center: { x: -36, z: 3316 }, radius: 10, count: 3 },
+  { mobId: 'willow_sprite', center: { x: 44, z: 3320 }, radius: 10, count: 2 },
+  { mobId: 'drowsy_croaker', center: { x: 38, z: 3436 }, radius: 5, count: 1 },
+];
 export const WILLOWFEN_OBJECTS: GroundObjectDef[] = [];
 
 export const WILLOWFEN_PROPS: ZonePropsDef = {

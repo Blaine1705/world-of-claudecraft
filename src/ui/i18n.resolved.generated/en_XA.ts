@@ -5729,6 +5729,33 @@ export const en_XA: EnTranslations = {
       "dune_troll": {
         "name": "[Ðúñé Ţŕóļļ]"
       },
+      "gilded_stag": {
+        "name": "[Ĝíļðéð Šţáĝ]"
+      },
+      "gloam_fox": {
+        "name": "[Ĝļóáɱ Ƒóẋ]"
+      },
+      "orchard_treant": {
+        "name": "[Óŕçĥáŕð Ţŕéáñţ]"
+      },
+      "harvest_sprite": {
+        "name": "[Ĥáŕʋéšţ Šþŕíţé]"
+      },
+      "mere_lurker": {
+        "name": "[Ɱéŕé Ļúŕķéŕ]"
+      },
+      "bogtoad": {
+        "name": "[Ɓóĝţóáð]"
+      },
+      "drowsy_croaker": {
+        "name": "[Ţĥé Ðŕóŵšý Çŕóáķéŕ]"
+      },
+      "lily_wisp": {
+        "name": "[Ļíļý Ŵíšþ]"
+      },
+      "willow_sprite": {
+        "name": "[Ŵíļļóŵ Šþŕíţé]"
+      },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"
       },

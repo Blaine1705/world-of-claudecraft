@@ -5729,6 +5729,33 @@ export const ja_JP: EnTranslations = {
       "dune_troll": {
         "name": "デューントロール"
       },
+      "gilded_stag": {
+        "name": "黄金の牡鹿"
+      },
+      "gloam_fox": {
+        "name": "グロームフォックス"
+      },
+      "orchard_treant": {
+        "name": "果樹園のトレント"
+      },
+      "harvest_sprite": {
+        "name": "ハーベストスプライト"
+      },
+      "mere_lurker": {
+        "name": "湖の潜み手"
+      },
+      "bogtoad": {
+        "name": "ボグトード"
+      },
+      "drowsy_croaker": {
+        "name": "まどろみのクローカー"
+      },
+      "lily_wisp": {
+        "name": "リリーウィスプ"
+      },
+      "willow_sprite": {
+        "name": "ウィロースプライト"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },

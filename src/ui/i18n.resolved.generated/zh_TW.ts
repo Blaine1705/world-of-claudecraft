@@ -5729,6 +5729,33 @@ export const zh_TW: EnTranslations = {
       "dune_troll": {
         "name": "沙丘巨魔"
       },
+      "gilded_stag": {
+        "name": "鎏金雄鹿"
+      },
+      "gloam_fox": {
+        "name": "暮光狐"
+      },
+      "orchard_treant": {
+        "name": "果園樹人"
+      },
+      "harvest_sprite": {
+        "name": "豐收小妖"
+      },
+      "mere_lurker": {
+        "name": "湖澤潛伏者"
+      },
+      "bogtoad": {
+        "name": "沼蟾"
+      },
+      "drowsy_croaker": {
+        "name": "瞌睡蛙王"
+      },
+      "lily_wisp": {
+        "name": "睡蓮微光"
+      },
+      "willow_sprite": {
+        "name": "柳樹小妖"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },

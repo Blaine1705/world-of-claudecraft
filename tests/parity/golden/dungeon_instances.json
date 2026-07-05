@@ -10,13 +10,13 @@
     "updateDoorTriggers exit portal -> leaveDungeon (~14620)",
     "updateInstances empty-reset -> freeInstance despawn + partyKey null (~14841/14816)"
   ],
-  "draws": 49,
-  "drawDigest": "b9651bcb",
+  "draws": 51,
+  "drawDigest": "99ffafd4",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 489,
+      "nextId": 521,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,12 +30,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 505,
-      "state": "a76aae92",
-      "events": "ff30bf4a",
+      "nextId": 537,
+      "state": "3a6110ce",
+      "events": "ed688bad",
       "rng": {
         "draws": 35,
-        "digest": "50202579"
+        "digest": "03600db6"
       },
       "label": "entered",
       "players": [
@@ -48,7 +48,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 489,
+          "entityId": 521,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -67,7 +67,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 490,
+          "entityId": 522,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -88,7 +88,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 99.1,
           "hp": 50000,
-          "id": 489,
+          "id": 521,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -136,7 +136,7 @@
           "fallStartY": -1.613579,
           "fiveSecondRule": 99.1,
           "hp": 50000,
-          "id": 490,
+          "id": 522,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -175,7 +175,7 @@
           }
         },
         {
-          "aggroTargetId": 489,
+          "aggroTargetId": 521,
           "aiState": "chase",
           "combatTimer": 99.1,
           "critChance": 0.05,
@@ -185,7 +185,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 491,
+          "id": 523,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -214,7 +214,7 @@
           "templateId": "crypt_shambler",
           "threat": [
             [
-              489,
+              521,
               1
             ]
           ],
@@ -225,7 +225,7 @@
           }
         },
         {
-          "aggroTargetId": 489,
+          "aggroTargetId": 521,
           "aiState": "chase",
           "combatTimer": 99.1,
           "critChance": 0.05,
@@ -235,7 +235,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 492,
+          "id": 524,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -264,7 +264,7 @@
           "templateId": "crypt_shambler",
           "threat": [
             [
-              489,
+              521,
               1
             ]
           ],
@@ -280,97 +280,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.045944,
-          "fiveSecondRule": 99,
-          "hostile": true,
-          "hp": 391,
-          "id": 493,
-          "kind": "mob",
-          "level": 7,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 391,
-          "moveSpeed": 6.5,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 891.196878,
-            "z": -1211.886003
-          },
-          "potionCooldownUntil": -1,
-          "spawnPos": {
-            "x": 891,
-            "z": -1212
-          },
-          "stats": {
-            "armor": 108
-          },
-          "templateId": "crypt_shambler",
-          "wanderTarget": {
-            "x": 894.916194,
-            "z": -1209.732433
-          },
-          "wanderTimer": 29.95,
-          "weapon": {
-            "max": 38,
-            "min": 24,
-            "speed": 2.4
-          }
-        },
-        {
-          "aiState": "idle",
-          "combatTimer": 99.1,
-          "critChance": 0.05,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.05,
-          "facing": 1.006912,
-          "fiveSecondRule": 99,
-          "hostile": true,
-          "hp": 391,
-          "id": 494,
-          "kind": "mob",
-          "level": 8,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 391,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 895.20707,
-            "z": -1210.869054
-          },
-          "potionCooldownUntil": -1,
-          "spawnPos": {
-            "x": 895,
-            "z": -1211
-          },
-          "stats": {
-            "armor": 98
-          },
-          "templateId": "hollow_acolyte",
-          "wanderTarget": {
-            "x": 901.186472,
-            "z": -1207.087838
-          },
-          "wanderTimer": 29.95,
-          "weapon": {
-            "max": 45,
-            "min": 29,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "combatTimer": 99.1,
-          "critChance": 0.05,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.05,
-          "facing": 1.523268,
+          "facing": 0.715303,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 495,
+          "id": 525,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -380,21 +294,21 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 909.227243,
-            "z": -1195.989191
+            "x": 891.149205,
+            "z": -1211.828261
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 909,
-            "z": -1196
+            "x": 891,
+            "z": -1212
           },
           "stats": {
             "armor": 126
           },
           "templateId": "crypt_shambler",
           "wanderTarget": {
-            "x": 912.022117,
-            "z": -1195.856256
+            "x": 892.71494,
+            "z": -1210.026063
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -409,11 +323,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.008915,
+          "facing": 2.300238,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 496,
+          "id": 526,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -423,21 +337,21 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 904.77814,
-            "z": -1195.103938
+            "x": 895.182659,
+            "z": -1211.163281
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 905,
-            "z": -1195
+            "x": 895,
+            "z": -1211
           },
           "stats": {
             "armor": 98
           },
           "templateId": "hollow_acolyte",
           "wanderTarget": {
-            "x": 901.945838,
-            "z": -1196.430828
+            "x": 901.508296,
+            "z": -1216.817847
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -452,11 +366,97 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 2.792541,
+          "facing": 0.580839,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 437,
+          "id": 527,
+          "kind": "mob",
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 437,
+          "moveSpeed": 6.5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 909.124835,
+            "z": -1195.809809
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 909,
+            "z": -1196
+          },
+          "stats": {
+            "armor": 126
+          },
+          "templateId": "crypt_shambler",
+          "wanderTarget": {
+            "x": 911.999846,
+            "z": -1191.429629
+          },
+          "wanderTimer": 29.95,
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2.4
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.616793,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 391,
+          "id": 528,
+          "kind": "mob",
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 391,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 904.877245,
+            "z": -1195.212029
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 905,
+            "z": -1195
+          },
+          "stats": {
+            "armor": 98
+          },
+          "templateId": "hollow_acolyte",
+          "wanderTarget": {
+            "x": 902.860603,
+            "z": -1198.695289
+          },
+          "wanderTimer": 29.95,
+          "weapon": {
+            "max": 45,
+            "min": 29,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.726015,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 460,
-          "id": 497,
+          "id": 529,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -466,8 +466,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 895.095762,
-            "z": -1182.263115
+            "x": 894.886959,
+            "z": -1182.256167
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -479,8 +479,8 @@
           },
           "templateId": "bonechill_widow",
           "wanderTarget": {
-            "x": 897.531063,
-            "z": -1188.954352
+            "x": 893.208558,
+            "z": -1186.059661
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -495,11 +495,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 3.029745,
+          "facing": -1.200857,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 498,
+          "id": 530,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -509,8 +509,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 899.031252,
-            "z": -1180.27825
+            "x": 898.738942,
+            "z": -1179.898763
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -522,8 +522,8 @@
           },
           "templateId": "bonechill_widow",
           "wanderTarget": {
-            "x": 899.801647,
-            "z": -1187.1374
+            "x": 895.331481,
+            "z": -1178.577371
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -538,11 +538,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 2.421862,
+          "facing": -2.85981,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 499,
+          "id": 531,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -552,8 +552,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 896.1615,
-            "z": -1168.184236
+            "x": 895.931873,
+            "z": -1168.235338
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -565,8 +565,8 @@
           },
           "templateId": "sexton_marrow",
           "wanderTarget": {
-            "x": 901.676358,
-            "z": -1174.475495
+            "x": 894.562179,
+            "z": -1172.966817
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -581,11 +581,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.638323,
+          "facing": 1.04825,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 500,
+          "id": 532,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -595,8 +595,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 900.854017,
-            "z": -1166.803241
+            "x": 901.212305,
+            "z": -1166.877723
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -608,8 +608,8 @@
           },
           "templateId": "hollow_acolyte",
           "wanderTarget": {
-            "x": 897.869031,
-            "z": -1162.780029
+            "x": 906.608523,
+            "z": -1163.769785
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -624,11 +624,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.059384,
+          "facing": 0.236332,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 501,
+          "id": 533,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -638,8 +638,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 899.786347,
-            "z": -1151.880095
+            "x": 900.057364,
+            "z": -1151.76181
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -651,8 +651,8 @@
           },
           "templateId": "morthen",
           "wanderTarget": {
-            "x": 894.912423,
-            "z": -1149.144781
+            "x": 901.787557,
+            "z": -1144.577606
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -667,22 +667,22 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.93381,
+          "facing": -0.361197,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 437,
-          "id": 502,
+          "hp": 391,
+          "id": 534,
           "kind": "mob",
-          "level": 8,
+          "level": 7,
           "lootFfaTimer": "Infinity",
-          "maxHp": 437,
+          "maxHp": 391,
           "moveSpeed": 6.5,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 895.953069,
-            "z": -1154.222607
+            "x": 895.919603,
+            "z": -1153.78718
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -690,17 +690,17 @@
             "z": -1154
           },
           "stats": {
-            "armor": 126
+            "armor": 108
           },
           "templateId": "crypt_shambler",
           "wanderTarget": {
-            "x": 894.317642,
-            "z": -1161.979872
+            "x": 895.290816,
+            "z": -1152.12271
           },
           "wanderTimer": 29.95,
           "weapon": {
-            "max": 42,
-            "min": 27,
+            "max": 38,
+            "min": 24,
             "speed": 2.4
           }
         },
@@ -710,11 +710,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.746893,
+          "facing": 2.545943,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 503,
+          "id": 535,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -724,8 +724,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 903.776018,
-            "z": -1154.039855
+            "x": 904.127638,
+            "z": -1154.188321
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -737,8 +737,8 @@
           },
           "templateId": "crypt_shambler",
           "wanderTarget": {
-            "x": 895.945716,
-            "z": -1155.433178
+            "x": 905.303012,
+            "z": -1155.922501
           },
           "wanderTimer": 29.95,
           "weapon": {
@@ -756,7 +756,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 504,
+          "id": 536,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -788,12 +788,12 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 505,
-      "state": "72898df8",
-      "events": "d966fd2d",
+      "nextId": 537,
+      "state": "074c57ba",
+      "events": "9678aba3",
       "rng": {
         "draws": 49,
-        "digest": "b9651bcb"
+        "digest": "2a875865"
       },
       "label": "left",
       "players": [
@@ -809,7 +809,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 489,
+          "entityId": 521,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -828,7 +828,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 490,
+          "entityId": 522,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -850,7 +850,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.484002,
           "fiveSecondRule": 99.2,
-          "id": 489,
+          "id": 521,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -898,7 +898,7 @@
           "fallStartY": 42.122741,
           "fiveSecondRule": 99.2,
           "hp": 50000,
-          "id": 490,
+          "id": 522,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -946,7 +946,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 491,
+          "id": 523,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -968,7 +968,7 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "wanderTimer": 7.994353,
+          "wanderTimer": 5.289227,
           "weapon": {
             "max": 42,
             "min": 27,
@@ -985,7 +985,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 492,
+          "id": 524,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1007,7 +1007,7 @@
             "armor": 108
           },
           "templateId": "crypt_shambler",
-          "wanderTimer": 3.808901,
+          "wanderTimer": 7.973578,
           "weapon": {
             "max": 38,
             "min": 24,
@@ -1020,97 +1020,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.045944,
-          "fiveSecondRule": 99,
-          "hostile": true,
-          "hp": 391,
-          "id": 493,
-          "kind": "mob",
-          "level": 7,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 391,
-          "moveSpeed": 6.5,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 891.393756,
-            "z": -1211.772006
-          },
-          "potionCooldownUntil": -1,
-          "spawnPos": {
-            "x": 891,
-            "z": -1212
-          },
-          "stats": {
-            "armor": 108
-          },
-          "templateId": "crypt_shambler",
-          "wanderTarget": {
-            "x": 894.916194,
-            "z": -1209.732433
-          },
-          "wanderTimer": 29.85,
-          "weapon": {
-            "max": 38,
-            "min": 24,
-            "speed": 2.4
-          }
-        },
-        {
-          "aiState": "idle",
-          "combatTimer": 99.2,
-          "critChance": 0.05,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.05,
-          "facing": 1.006912,
-          "fiveSecondRule": 99,
-          "hostile": true,
-          "hp": 391,
-          "id": 494,
-          "kind": "mob",
-          "level": 8,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 391,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 895.414141,
-            "z": -1210.738108
-          },
-          "potionCooldownUntil": -1,
-          "spawnPos": {
-            "x": 895,
-            "z": -1211
-          },
-          "stats": {
-            "armor": 98
-          },
-          "templateId": "hollow_acolyte",
-          "wanderTarget": {
-            "x": 901.186472,
-            "z": -1207.087838
-          },
-          "wanderTimer": 29.85,
-          "weapon": {
-            "max": 45,
-            "min": 29,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "combatTimer": 99.2,
-          "critChance": 0.05,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.05,
-          "facing": 1.523268,
+          "facing": 0.715303,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 495,
+          "id": 525,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1120,21 +1034,21 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 909.454486,
-            "z": -1195.978383
+            "x": 891.29841,
+            "z": -1211.656523
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 909,
-            "z": -1196
+            "x": 891,
+            "z": -1212
           },
           "stats": {
             "armor": 126
           },
           "templateId": "crypt_shambler",
           "wanderTarget": {
-            "x": 912.022117,
-            "z": -1195.856256
+            "x": 892.71494,
+            "z": -1210.026063
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1149,11 +1063,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.008915,
+          "facing": 2.300238,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 496,
+          "id": 526,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1163,21 +1077,21 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 904.55628,
-            "z": -1195.207876
+            "x": 895.365318,
+            "z": -1211.326562
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 905,
-            "z": -1195
+            "x": 895,
+            "z": -1211
           },
           "stats": {
             "armor": 98
           },
           "templateId": "hollow_acolyte",
           "wanderTarget": {
-            "x": 901.945838,
-            "z": -1196.430828
+            "x": 901.508296,
+            "z": -1216.817847
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1192,11 +1106,97 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 2.792541,
+          "facing": 0.580839,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 437,
+          "id": 527,
+          "kind": "mob",
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 437,
+          "moveSpeed": 6.5,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 909.24967,
+            "z": -1195.619619
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 909,
+            "z": -1196
+          },
+          "stats": {
+            "armor": 126
+          },
+          "templateId": "crypt_shambler",
+          "wanderTarget": {
+            "x": 911.999846,
+            "z": -1191.429629
+          },
+          "wanderTimer": 29.85,
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2.4
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.2,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.616793,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 391,
+          "id": 528,
+          "kind": "mob",
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 391,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 904.754491,
+            "z": -1195.424058
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 905,
+            "z": -1195
+          },
+          "stats": {
+            "armor": 98
+          },
+          "templateId": "hollow_acolyte",
+          "wanderTarget": {
+            "x": 902.860603,
+            "z": -1198.695289
+          },
+          "wanderTimer": 29.85,
+          "weapon": {
+            "max": 45,
+            "min": 29,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99.2,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -2.726015,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 460,
-          "id": 497,
+          "id": 529,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -1206,8 +1206,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 895.191524,
-            "z": -1182.526231
+            "x": 894.773918,
+            "z": -1182.512335
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1219,8 +1219,8 @@
           },
           "templateId": "bonechill_widow",
           "wanderTarget": {
-            "x": 897.531063,
-            "z": -1188.954352
+            "x": 893.208558,
+            "z": -1186.059661
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1235,11 +1235,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 3.029745,
+          "facing": -1.200857,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 498,
+          "id": 530,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1249,8 +1249,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 899.062504,
-            "z": -1180.556501
+            "x": 898.477884,
+            "z": -1179.797527
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1262,8 +1262,8 @@
           },
           "templateId": "bonechill_widow",
           "wanderTarget": {
-            "x": 899.801647,
-            "z": -1187.1374
+            "x": 895.331481,
+            "z": -1178.577371
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1278,11 +1278,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 2.421862,
+          "facing": -2.85981,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 499,
+          "id": 531,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -1292,8 +1292,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 896.322999,
-            "z": -1168.368472
+            "x": 895.863747,
+            "z": -1168.470675
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1305,8 +1305,8 @@
           },
           "templateId": "sexton_marrow",
           "wanderTarget": {
-            "x": 901.676358,
-            "z": -1174.475495
+            "x": 894.562179,
+            "z": -1172.966817
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1321,11 +1321,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.638323,
+          "facing": 1.04825,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 500,
+          "id": 532,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1335,8 +1335,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 900.708034,
-            "z": -1166.606483
+            "x": 901.42461,
+            "z": -1166.755447
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1348,8 +1348,8 @@
           },
           "templateId": "hollow_acolyte",
           "wanderTarget": {
-            "x": 897.869031,
-            "z": -1162.780029
+            "x": 906.608523,
+            "z": -1163.769785
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1364,11 +1364,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.059384,
+          "facing": 0.236332,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 501,
+          "id": 533,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -1378,8 +1378,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 899.572693,
-            "z": -1151.76019
+            "x": 900.114728,
+            "z": -1151.52362
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1391,8 +1391,8 @@
           },
           "templateId": "morthen",
           "wanderTarget": {
-            "x": 894.912423,
-            "z": -1149.144781
+            "x": 901.787557,
+            "z": -1144.577606
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1407,22 +1407,22 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.93381,
+          "facing": -0.361197,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 437,
-          "id": 502,
+          "hp": 391,
+          "id": 534,
           "kind": "mob",
-          "level": 8,
+          "level": 7,
           "lootFfaTimer": "Infinity",
-          "maxHp": 437,
+          "maxHp": 391,
           "moveSpeed": 6.5,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 895.906138,
-            "z": -1154.445213
+            "x": 895.839206,
+            "z": -1153.574359
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1430,17 +1430,17 @@
             "z": -1154
           },
           "stats": {
-            "armor": 126
+            "armor": 108
           },
           "templateId": "crypt_shambler",
           "wanderTarget": {
-            "x": 894.317642,
-            "z": -1161.979872
+            "x": 895.290816,
+            "z": -1152.12271
           },
           "wanderTimer": 29.85,
           "weapon": {
-            "max": 42,
-            "min": 27,
+            "max": 38,
+            "min": 24,
             "speed": 2.4
           }
         },
@@ -1450,11 +1450,11 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.746893,
+          "facing": 2.545943,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 503,
+          "id": 535,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1464,8 +1464,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 903.552037,
-            "z": -1154.079711
+            "x": 904.255276,
+            "z": -1154.376642
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1477,8 +1477,8 @@
           },
           "templateId": "crypt_shambler",
           "wanderTarget": {
-            "x": 895.945716,
-            "z": -1155.433178
+            "x": 905.303012,
+            "z": -1155.922501
           },
           "wanderTimer": 29.85,
           "weapon": {
@@ -1496,7 +1496,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 504,
+          "id": 536,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1528,56 +1528,56 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 505,
-      "state": "88cabd99",
-      "events": "cc210b6b",
+      "nextId": 537,
+      "state": "92bfc521",
+      "events": "805af00d",
       "rng": {
         "draws": 49,
-        "digest": "b9651bcb"
+        "digest": "2a875865"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 505,
-      "state": "34c16c7c",
+      "nextId": 537,
+      "state": "575e9683",
       "events": "741638a5",
       "rng": {
         "draws": 49,
-        "digest": "b9651bcb"
+        "digest": "2a875865"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 505,
-      "state": "0d6dea82",
+      "nextId": 537,
+      "state": "9f6d1aca",
       "events": "741638a5",
       "rng": {
         "draws": 49,
-        "digest": "b9651bcb"
+        "digest": "2a875865"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 505,
-      "state": "0cb691b6",
+      "nextId": 537,
+      "state": "317ee670",
       "events": "741638a5",
       "rng": {
-        "draws": 49,
-        "digest": "b9651bcb"
+        "draws": 51,
+        "digest": "99ffafd4"
       }
     },
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 505,
-      "state": "6aeee85e",
+      "nextId": 537,
+      "state": "92a08bd8",
       "events": "741638a5",
       "rng": {
-        "draws": 49,
-        "digest": "b9651bcb"
+        "draws": 51,
+        "digest": "99ffafd4"
       },
       "label": "reset",
       "players": [
@@ -1593,7 +1593,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 489,
+          "entityId": 521,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1615,7 +1615,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 490,
+          "entityId": 522,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1637,7 +1637,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 489,
+          "id": 521,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1685,7 +1685,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 490,
+          "id": 522,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1729,12 +1729,12 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 505,
-      "state": "6aeee85e",
+      "nextId": 537,
+      "state": "92a08bd8",
       "events": "741638a5",
       "rng": {
-        "draws": 49,
-        "digest": "b9651bcb"
+        "draws": 51,
+        "digest": "99ffafd4"
       },
       "label": "final",
       "players": [
@@ -1750,7 +1750,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 489,
+          "entityId": 521,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1772,7 +1772,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 490,
+          "entityId": 522,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1794,7 +1794,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 489,
+          "id": 521,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1842,7 +1842,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 490,
+          "id": 522,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
