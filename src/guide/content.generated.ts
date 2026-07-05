@@ -1337,6 +1337,24 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Howling Terraces"
     ],
     "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake."
+  },
+  {
+    "id": "amberfall",
+    "name": "The Amberfall",
+    "min": 18,
+    "max": 20,
+    "biome": "amber",
+    "hub": "Lanternmere",
+    "pois": [
+      "Lanternmere",
+      "The Rootway",
+      "The Gilded Orchard",
+      "Harvest Hollow",
+      "The Great Mere",
+      "Cindermaple Rise",
+      "The Leaning Monolith"
+    ],
+    "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you."
   }
 ];
 

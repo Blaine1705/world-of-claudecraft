@@ -1123,7 +1123,9 @@ export const de_DE: EnTranslations = {
         "emberName": "The Drakelands",
         "emberBlurb": "Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.",
         "frostName": "The Frostveil Reach",
-        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights."
+        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights.",
+        "amberName": "The Amberfall",
+        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere."
       },
       "group": {
         "heading": "Schließt euch für die harten Stellen zusammen",
@@ -7105,6 +7107,33 @@ export const de_DE: EnTranslations = {
           },
           "5": {
             "label": "The Howling Terraces"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "The Amberfall",
+        "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "The Rootway"
+          },
+          "2": {
+            "label": "The Gilded Orchard"
+          },
+          "3": {
+            "label": "Harvest Hollow"
+          },
+          "4": {
+            "label": "The Great Mere"
+          },
+          "5": {
+            "label": "Cindermaple Rise"
+          },
+          "6": {
+            "label": "The Leaning Monolith"
           }
         }
       }

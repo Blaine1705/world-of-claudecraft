@@ -34,6 +34,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   dusk: { hill: 14, base: 2, hubHeight: 2.5 },
   ember: { hill: 16, base: 2.5, hubHeight: 2.5 },
   frost: { hill: 26, base: 6, hubHeight: 3 },
+  // the Amberfall: rolling autumn weald around the Great Mere
+  amber: { hill: 15, base: 2, hubHeight: 2.5 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with
@@ -133,9 +135,16 @@ const HOLLOW_LAND_LOBES = [
   { x: 30, z: 1300, r: 44 },
   { x: 48, z: 1355, r: 40 },
   { x: 44, z: 1420, r: 48 },
+  // the western edge arm: a low coastal ridge along the map border that
+  // encloses the old open water as the Mirrorshallow lake (the Rootway's
+  // tunnel mouth sits in its cliffs)
+  { x: 184, z: 1000, r: 50 },
+  { x: 186, z: 1075, r: 52 },
+  { x: 184, z: 1150, r: 50 },
 ] as const;
 const HOLLOW_BAYS = [
-  { x: 182, z: 1038, r: 38 }, // the east bight, between headland and Court
+  // (the old bight at {182,1038} became the Mirrorshallow: see the edge arm
+  // lobes below, which enclose that water as a lake)
   { x: -178, z: 1062, r: 42 }, // the west inlet
   { x: -62, z: 1270, r: 50 }, // the north sound, west of the causeway root
   { x: -185, z: 1235, r: 46 }, // the northwest reach
@@ -238,6 +247,47 @@ const FROST_BAYS = [
 
 export function frostLandness(x: number, z: number): number {
   return metaballLandness(FROST_LAND_LOBES, FROST_BAYS, x, z);
+}
+
+// ---------------------------------------------------------------------------
+// The Amberfall: an autumn weald around the Great Mere, its south fringe
+// carrying the sealed wall's footing, meadow shelves east and west, and a
+// north crown meeting the world's end sea.
+// ---------------------------------------------------------------------------
+const AMBER_ZMAX = 3120; // keep in sync with AMBERFALL_ZONE.zMax
+const AMBER_LAND_LOBES = [
+  { x: -60, z: 2620, r: 70 }, // the Rootway arrival shelf
+  { x: 20, z: 2650, r: 80 }, // the south weald
+  { x: 100, z: 2690, r: 65 }, // Harvest Hollow's shelf
+  { x: 55, z: 2725, r: 50 }, // the harvest road's field saddle
+  { x: -90, z: 2750, r: 75 }, // the Gilded Orchard
+  { x: -40, z: 2690, r: 55 }, // the Rootway road's meadow saddle
+  { x: 0, z: 2780, r: 90 }, // Lanternmere's shore
+  { x: 0, z: 2870, r: 95 }, // the Great Mere basin
+  { x: -80, z: 2950, r: 70 }, // Cindermaple Rise
+  { x: 95, z: 2960, r: 70 }, // the Monolith heath
+  { x: 0, z: 3040, r: 85 }, // the north crown
+] as const;
+const AMBER_BAYS = [
+  { x: 170, z: 2820, r: 55 }, // the east sound
+  { x: -170, z: 2860, r: 55 }, // the west reach
+  { x: 40, z: 3115, r: 45 }, // the north cove
+] as const;
+
+export function amberLandness(x: number, z: number): number {
+  return metaballLandness(AMBER_LAND_LOBES, AMBER_BAYS, x, z);
+}
+
+// Same coast recipe; holds the sealed wall's footing at the south fringe.
+function applyAmberCoast(x: number, z: number, h: number): number {
+  if (z <= FROST_ZMAX || z > AMBER_ZMAX + 2) return h;
+  const land = amberLandness(x, z);
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
+  const out = floor + (h - floor) * t;
+  const wallHold = 1 - smoothstep(2605, 2630, z);
+  return out + (h - out) * wallHold;
 }
 
 // Sink everything beyond the coast to the seabed. The outer 10yd of the band
@@ -401,6 +451,8 @@ function applyFrostTerraces(x: number, z: number, h: number): number {
 // is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
   if (z < 960 || x > 600) return false;
+  // the Mirrorshallow: enclosed lake water, never open sea
+  if (Math.hypot(x - 152, z - 1112) < 42) return false;
   if (z <= HOLLOW_ZMAX + 2) {
     const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && hollowLandness(x, z) < 0.02;
@@ -410,8 +462,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     return dEdge < 48 && emberLandness(x, z) < 0.02;
   }
   if (z <= FROST_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, FROST_ZMAX - z);
+    const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && frostLandness(x, z) < 0.02;
+  }
+  if (z <= AMBER_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, AMBER_ZMAX - z);
+    return dEdge < 48 && amberLandness(x, z) < 0.02;
   }
   return false;
 }
@@ -423,6 +479,7 @@ const HOLLOW_FRINGE_CLEARINGS = [
   { x: 160, z: 1228, r: 26 }, // the forgotten monument
   { x: 46, z: 1380, r: 40 }, // the Pale Causeway's upper spine
   { x: 44, z: 1430, r: 42 }, // ...and its northern head
+  { x: 172, z: 1085, r: 42 }, // the Mirrorshallow shore and the Rootway mouth
 ] as const;
 
 function hollowShapingOffset(x: number, z: number, seed: number): number {
@@ -603,6 +660,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyHollowCoast(x, z, h);
   h = applyEmberCoast(x, z, h);
   h = applyFrostCoast(x, z, h);
+  h = applyAmberCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   // World rims AFTER the coast, so the border ranges rise out of the sea
@@ -710,6 +768,10 @@ export function generateDecorations(seed: number): Decoration[] {
         // hardy pines and broken stone on the snow benches
         if (r > 0.36) continue;
         kind = r < 0.18 ? 'tree' : r < 0.23 ? 'tree2' : 'rock';
+      } else if (biome === 'amber') {
+        // a dense fire-colored weald, broadleaf-heavy
+        if (r > 0.5) continue;
+        kind = r < 0.12 ? 'tree' : r < 0.42 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

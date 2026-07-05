@@ -1507,6 +1507,7 @@ export class Renderer {
     const biome = zoneBiomeAt(z);
     if (biome === 'vale') return 'grass';
     if (biome === 'marsh' || biome === 'ember') return 'dirt'; // ember: sandy waste
+    if (biome === 'amber') return 'grass';
     return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
   }
 
@@ -3550,6 +3551,8 @@ export class Renderer {
     ember: { color: 0xd8a488, near: 70, far: 300 },
     // the Frostveil: dense icy mist, visibility closes right in
     frost: { color: 0xc6d8e8, near: 34, far: 180 },
+    // the Amberfall: warm golden haze under an endless afternoon
+    amber: { color: 0xdec18e, near: 65, far: 270 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3567,6 +3570,7 @@ export class Renderer {
     dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
     ember: { hemiSky: 0xffd2b0, hemiGround: 0x6a4438, sun: 0xffb070 },
     frost: { hemiSky: 0xcfe2ff, hemiGround: 0x8a94a8, sun: 0xeaf2ff },
+    amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {

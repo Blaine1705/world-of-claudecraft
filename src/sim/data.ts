@@ -26,6 +26,19 @@ export type { FishingEntry } from './content/items';
 export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
+  AMBERFALL_CAMPS,
+  AMBERFALL_ITEMS,
+  AMBERFALL_MOBS,
+  AMBERFALL_NPCS,
+  AMBERFALL_OBJECTS,
+  AMBERFALL_PORTALS,
+  AMBERFALL_PROPS,
+  AMBERFALL_QUEST_ORDER,
+  AMBERFALL_QUESTS,
+  AMBERFALL_ROADS,
+  AMBERFALL_ZONE,
+} from './content/amberfall';
+import {
   BROTHER_HALVEN,
   COLLAPSED_RELIQUARY_DELVE,
   COLLAPSED_RELIQUARY_MODULES,
@@ -179,6 +192,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   REALM_ITEMS,
   DRAKELANDS_ITEMS,
   FROSTVEIL_ITEMS,
+  AMBERFALL_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -196,6 +210,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...FROSTVEIL_MOBS,
+  ...AMBERFALL_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -209,6 +224,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...REALM_NPCS,
   ...DRAKELANDS_NPCS,
   ...FROSTVEIL_NPCS,
+  ...AMBERFALL_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -219,6 +235,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...REALM_QUESTS,
   ...DRAKELANDS_QUESTS,
   ...FROSTVEIL_QUESTS,
+  ...AMBERFALL_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -229,6 +246,7 @@ export const QUEST_ORDER: string[] = [
   ...REALM_QUEST_ORDER,
   ...DRAKELANDS_QUEST_ORDER,
   ...FROSTVEIL_QUEST_ORDER,
+  ...AMBERFALL_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -247,6 +265,7 @@ export const CAMPS: CampDef[] = [
   ...REALM_CAMPS,
   ...DRAKELANDS_CAMPS,
   ...FROSTVEIL_CAMPS,
+  ...AMBERFALL_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -257,6 +276,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...REALM_OBJECTS,
   ...DRAKELANDS_OBJECTS,
   ...FROSTVEIL_OBJECTS,
+  ...AMBERFALL_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -266,10 +286,11 @@ export const ROADS: { x: number; z: number }[][] = [
   ...REALM_ROADS,
   ...DRAKELANDS_ROADS,
   ...FROSTVEIL_ROADS,
+  ...AMBERFALL_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
-export const PORTALS: PortalDef[] = [...REALM_PORTALS, ...FROSTVEIL_PORTALS];
+export const PORTALS: PortalDef[] = [...REALM_PORTALS, ...FROSTVEIL_PORTALS, ...AMBERFALL_PORTALS];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
@@ -279,6 +300,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   REALM_PROPS,
   DRAKELANDS_PROPS,
   FROSTVEIL_PROPS,
+  AMBERFALL_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -343,6 +365,7 @@ export const ZONES: ZoneDef[] = [
   REALM_ZONE,
   DRAKELANDS_ZONE,
   FROSTVEIL_ZONE,
+  AMBERFALL_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]

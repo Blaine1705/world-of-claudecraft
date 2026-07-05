@@ -154,6 +154,9 @@ export const guideStrings = {
         'Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.',
       frostName: 'The Frostveil Reach',
       frostBlurb: 'A snowbound height beyond every map, glimpsed only in the dancing lights.',
+      amberName: 'The Amberfall',
+      amberBlurb:
+        'Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.',
     },
 
     // Group content teaser.

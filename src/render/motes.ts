@@ -27,6 +27,7 @@ const MOTE_TINT: Record<BiomeId, number> = {
   dusk: 0xf2b8e0,
   ember: 0xffa868,
   frost: 0xcfe8ff,
+  amber: 0xffd98a, // drifting golden leaves
 };
 
 const RADIUS = 26; // motes live within this ring of the player

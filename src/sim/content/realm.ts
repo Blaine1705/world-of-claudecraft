@@ -40,6 +40,8 @@ export const REALM_ZONE: ZoneDef = {
     { x: 92, z: 1154, radius: 8 }, // ...crystal-flanked eastern cove
     { x: -120, z: 1105, radius: 12 }, // the Mirrormere, a highland tarn
     { x: -15, z: 1062, radius: 7 }, // the meadow pond by the garden road
+    { x: 152, z: 1108, radius: 16 }, // the Mirrorshallow, under the western cliffs
+    { x: 146, z: 1130, radius: 9 }, // ...its reeded southern finger
   ],
   pois: [
     { x: -40, z: 1030, label: 'Eldergleam' },

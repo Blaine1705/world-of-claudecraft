@@ -80,7 +80,11 @@ export function paintTerrainRows(
         r = 74 + 140 * snowline;
         g = 110 + 114 * snowline;
         b = 52 + 184 * snowline;
-      } // snowbound
+      } else if (biome === 'amber') {
+        r = 168;
+        g = 130;
+        b = 58;
+      } // snowbound; amber: autumn gold
       if (h < WATER_LEVEL) {
         r = 38;
         g = 84;
@@ -105,6 +109,10 @@ export function paintTerrainRows(
         r = 188;
         g = 199;
         b = 214;
+      } else if (biome === 'amber' && h > 20) {
+        r = 128;
+        g = 92;
+        b = 58;
       } else if (biome === 'frost' && h > 6) {
         // mid benches: slightly shaded snow, never the mossy green
         r = 202;

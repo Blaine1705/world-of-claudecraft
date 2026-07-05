@@ -381,7 +381,7 @@ class Sfx {
    *  These are continuous background beds, kept well under the foreground
    *  footstep/jump/combat one-shots so movement always reads clearly over them. */
   ambience(
-    biome: 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost',
+    biome: 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost' | 'amber',
     inDungeon: boolean,
     precip: 'snow' | 'rain' | null,
     nearWater: boolean,
@@ -393,7 +393,15 @@ class Sfx {
     // sheltered valley, no open-ridge wind.
     // ...and the ember wastes a faint dry-air version of the same bed
     const marshBed =
-      biome === 'marsh' ? 0.13 : biome === 'dusk' ? 0.07 : biome === 'ember' ? 0.05 : 0;
+      biome === 'marsh'
+        ? 0.13
+        : biome === 'dusk'
+          ? 0.07
+          : biome === 'ember'
+            ? 0.05
+            : biome === 'amber'
+              ? 0.09
+              : 0;
     this.ambient('amb_wind_marsh', !inDungeon ? marshBed : 0);
     // the Frostveil shares the peaks' ridge wind, a touch stronger in the mist
     const peaksBed = biome === 'peaks' ? 0.18 : biome === 'frost' ? 0.2 : 0;

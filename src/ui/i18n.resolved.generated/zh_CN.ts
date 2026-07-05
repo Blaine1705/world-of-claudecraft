@@ -1123,7 +1123,9 @@ export const zh_CN: EnTranslations = {
         "emberName": "龙裔荒原",
         "emberBlurb": "越过苍白堤道，绿意让位于灰烬，古老的存在统治着荒漠。",
         "frostName": "霜幕之境",
-        "frostBlurb": "一处任何地图都未曾标出的雪封高地，只在舞动的极光中若隐若现。"
+        "frostBlurb": "一处任何地图都未曾标出的雪封高地，只在舞动的极光中若隐若现。",
+        "amberName": "琥珀秋境",
+        "amberBlurb": "西边峭壁之后，是一场永不落幕的秋天，金色湖面上灯火点点。"
       },
       "group": {
         "heading": "组队迎接硬仗",
@@ -7105,6 +7107,33 @@ export const zh_CN: EnTranslations = {
           },
           "5": {
             "label": "呼啸台地"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "琥珀秋境",
+        "welcome": "这里每一片叶子都燃烧着金红，却从不飘落。灯湖镇的灯笼已为你点亮。",
+        "pois": {
+          "0": {
+            "label": "灯湖镇"
+          },
+          "1": {
+            "label": "根之道"
+          },
+          "2": {
+            "label": "鎏金果园"
+          },
+          "3": {
+            "label": "丰收谷"
+          },
+          "4": {
+            "label": "大湖"
+          },
+          "5": {
+            "label": "烬枫坡"
+          },
+          "6": {
+            "label": "斜碑"
           }
         }
       }

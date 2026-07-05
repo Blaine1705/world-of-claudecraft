@@ -154,6 +154,13 @@ const BIOME_PALETTE: Record<
     dirt: 0x9fb0c0,
     sand: 0xdfe8f2,
   },
+  amber: {
+    grass: 0xc9a44e,
+    grassDark: 0xa88438,
+    grassYellow: 0xe0c060,
+    dirt: 0x8a6a42,
+    sand: 0xd8bc84,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -164,6 +171,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   dusk: 0.52,
   ember: 0.5,
   frost: 0.5,
+  amber: 0.52,
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
