@@ -1254,6 +1254,7 @@ export class Renderer {
     for (const light of this.emberFeatures.glowLights) this.fireLights.push(light);
     this.frostSky = buildFrostSky(this.sim.cfg.seed);
     this.scene.add(this.frostSky.group);
+    for (const light of this.frostSky.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each

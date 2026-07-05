@@ -197,27 +197,42 @@ export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [];
 
 export const FROSTVEIL_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Icemantle: a snowbound waystation around the hub plateau
+  // Icemantle: a snug village ringing its firelit market plaza (the well
+  // and the great fire at the centre, stalls and crates crowding in, homes
+  // and the lodge shouldering close against the cold)
   buildings: [
-    { kind: 'inn', x: -42, z: 2154, w: 6, d: 7, rot: 0.9 },
+    { kind: 'inn', x: -42, z: 2154, w: 6, d: 7, rot: 0.9 }, // the Hearth-Lodge
     { kind: 'house', x: -20, z: 2150, w: 6, d: 6, rot: -0.5 },
     { kind: 'house', x: -40, z: 2172, w: 6, d: 6, rot: 2.2 },
     { kind: 'chapel', x: -18, z: 2170, w: 5, d: 7, rot: -2.0 },
+    { kind: 'house', x: -30, z: 2144, w: 5, d: 5, rot: 0.1 }, // the fisher's hut
+    { kind: 'house', x: -44, z: 2163, w: 5, d: 5, rot: 1.4 },
+    { kind: 'inn', x: -22, z: 2178, w: 5, d: 6, rot: -2.6 }, // the trade hall
   ],
   wells: [{ x: -30, z: 2162, r: 1.5 }],
   stalls: [
     { x: -24, z: 2156, rot: 0.6, r: 1.6 },
     { x: -36, z: 2166, rot: -1.2, r: 1.6 },
+    { x: -34, z: 2154, rot: 2.1, r: 1.6 },
+    { x: -25, z: 2168, rot: -0.4, r: 1.6 },
+  ],
+  crates: [
+    [-27, 2158],
+    [-33, 2165],
+    [-23, 2162],
+    [-38, 2158],
   ],
   fences: [
     { x1: -46, z1: 2146, x2: -38, z2: 2142 },
     { x1: -16, z1: 2158, x2: -14, z2: 2166 },
+    { x1: -44, z1: 2178, x2: -36, z2: 2180 },
   ],
   tents: [
     { x: -12, z: 2100, rot: 0.4, scale: 1 }, // the Snowline waycamp
   ],
   campfires: [
     [-30, 2160],
+    [-28, 2164], // the plaza's great fire is really two, for a wider glow
     [-11, 2098],
   ],
 };
