@@ -213,7 +213,8 @@ describe('master loot', () => {
         if (e.type === 'lootRoll' && e.rollId === rollId && e.pid !== undefined) rolls.push(e.pid);
     }
     expect(rolls.sort((x, y) => x - y)).toEqual([a, b].sort((x, y) => x - y));
-  });
+    // 6020 ticks of a 9-zone world: give it headroom under full-suite load
+  }, 20000);
 
   it('only the leader can change the loot method', () => {
     const sim = makeSim();

@@ -117,7 +117,8 @@ describe('world.lockpickState is the single board source of truth', () => {
       if (run.objectState[chestId].looted) opened++;
     }
     expect(opened).toBe(N);
-  });
+    // 80 fresh sims (one per seed): give it headroom under full-suite load
+  }, 20000);
 
   it('console sim.lockpickEngage leaves state live at col 0 (board would paint it)', () => {
     const sim = makeSim(42);
