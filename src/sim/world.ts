@@ -397,15 +397,15 @@ export const EMBER_VOLCANOES = [
 // Open lava pools out in the wastes (shaped as shallow flat-floored basins;
 // the render lava surface sits just above each floor).
 export const EMBER_LAVA_POOLS = [
-  { x: 30, z: 1940, r: 14, floor: 2.2 }, // inside the Drakemaw crater
-  { x: 96, z: 1832, r: 12, floor: 2.2 },
-  { x: -58, z: 1948, r: 11, floor: 2.2 },
+  { x: 30, z: 1940, r: 14, floor: 12 }, // the vent inside the Drakemaw crater
+  { x: 86, z: 1840, r: 11, floor: -0.5 },
+  { x: -58, z: 1948, r: 11, floor: 0 },
   // crater pools high in the two smaller cones
-  { x: -90, z: 1902, r: 7, floor: 13 },
-  { x: 140, z: 1990, r: 6, floor: 11 },
+  { x: -90, z: 1902, r: 7, floor: 11.5 },
+  { x: 140, z: 1990, r: 6, floor: 9.5 },
   // the Moltenmaw: an open lava-lake field east of the caldera
-  { x: 58, z: 1962, r: 16, floor: 3.2 },
-  { x: 78, z: 1946, r: 10, floor: 3.2 },
+  { x: 58, z: 1962, r: 16, floor: -1.2 },
+  { x: 78, z: 1946, r: 10, floor: -1.2 },
 ] as const;
 
 function emberShapingOffset(x: number, z: number, seed: number): number {
@@ -425,16 +425,24 @@ function emberShapingOffset(x: number, z: number, seed: number): number {
   return dh;
 }
 
-// Flat-floored lava basins, carved after the cones so each pool floor is
-// level (the same move the zone lakes make, at a higher floor).
+// Real craters, carved after the cones: a raised rock lip rings each pool
+// and the floor sinks genuinely below the surrounding ground, so the melt
+// sits down INSIDE its bowl the way lake water does (the floors stay above
+// WATER_LEVEL so the zone water plane never floods a vent).
 function applyEmberLavaBasins(x: number, z: number, h: number): number {
   if (z < HOLLOW_ZMAX || z > DRAKE_ZMAX) return h;
   let out = h;
   for (const pool of EMBER_LAVA_POOLS) {
     const d = Math.hypot(x - pool.x, z - pool.z);
-    if (d < pool.r * 1.7) {
-      const blend = smoothstep(pool.r * 0.6, pool.r * 1.7, d);
-      out = out * blend + pool.floor * (1 - blend);
+    if (d < pool.r * 2.2) {
+      // the lip: rises from the bowl edge, falls away outward
+      const lip =
+        2.4 *
+        smoothstep(pool.r * 0.7, pool.r * 1.05, d) *
+        (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d));
+      // the bowl: flat melt floor inside, blending up to the lip
+      const blend = smoothstep(pool.r * 0.55, pool.r * 1.05, d);
+      out = out * blend + pool.floor * (1 - blend) + lip;
     }
   }
   return out;
