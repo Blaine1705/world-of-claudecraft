@@ -100,6 +100,8 @@ const HOLLOW_SHAPING = [
   { x: -135, z: 1090, r: 45, h: 7 }, // western highlands (the Mirrormere sits in them)
   { x: 20, z: 1005, r: 35, h: -2.2 }, // soft meadow bowl south of the town road
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
+  // the Tablecrag's bulk (its flat crown is leveled after the rims, below)
+  { x: -170, z: 1195, r: 46, h: 12 },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -136,18 +138,20 @@ const HOLLOW_LAND_LOBES = [
   { x: 48, z: 1355, r: 40 },
   { x: 44, z: 1420, r: 48 },
   // the western edge arm: a low coastal ridge along the map border that
-  // encloses the old open water as the Mirrorshallow lake (the Rootway's
-  // tunnel mouth sits in its cliffs)
+  // encloses the old open water as the Mirrorshallow lake
   { x: 184, z: 1000, r: 50 },
   { x: 186, z: 1075, r: 52 },
   { x: 184, z: 1150, r: 50 },
+  // the eastern highland shoulder: the old bay is filled and the Tablecrag
+  // (a flat-topped mesa, see HOLLOW_SHAPING) rises over the Deep's flank
+  { x: -178, z: 1190, r: 60 },
+  { x: -180, z: 1255, r: 48 },
 ] as const;
 const HOLLOW_BAYS = [
   // (the old bight at {182,1038} became the Mirrorshallow: see the edge arm
   // lobes below, which enclose that water as a lake)
   { x: -178, z: 1062, r: 42 }, // the west inlet
   { x: -62, z: 1270, r: 50 }, // the north sound, west of the causeway root
-  { x: -185, z: 1235, r: 46 }, // the northwest reach
 ] as const;
 const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
 
@@ -691,6 +695,13 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // cap is now the Wyrmgate ridge with a real pass through it)
   const rimScale = z > 960 && z <= WORLD_MAX_Z ? 0.6 : 1;
   h += Math.max(rimX, rimS, rimN) * 40 * rimScale;
+  // the Tablecrag's crown: a level table cut into the eastern border range
+  // (flattened AFTER the rims so the top is a true plateau, not rim noise)
+  const dMesa = Math.hypot(x + 168, z - 1195);
+  if (dMesa < 30) {
+    const t = smoothstep(14, 30, dMesa);
+    h = h * t + 34 * (1 - t);
+  }
   return h;
 }
 
