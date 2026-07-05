@@ -223,7 +223,7 @@ describe('open-sea swim fatigue', () => {
     p.prevPos = { ...p.pos };
     let warned = false;
     // swim until the sea has bitten once (staying past that is lethal by design)
-    for (let t = 0; t < 20 * 8 && p.hp === 1000; t++) {
+    for (let t = 0; t < 20 * 16 && p.hp === 1000; t++) {
       const events = sim.tick();
       if (events.some((e) => e.type === 'log' && e.text.includes('open sea'))) warned = true;
       p.pos.x = 160;

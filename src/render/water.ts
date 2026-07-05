@@ -3,7 +3,7 @@ import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE, ZONES } from '../sim/data';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { GFX, sharedUniforms, SUN_DIR } from './gfx';
+import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { waterNormalish, waterNormalMaps } from './textures';
 
 // Water for the whole zone strip.
@@ -24,11 +24,13 @@ const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing — enough for the foam ban
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
-  registerPreload(loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
-    tex.anisotropy = 4;
-    WATER_TEX[key] = tex;
-    return tex;
-  }));
+  registerPreload(
+    loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
+      tex.anisotropy = 4;
+      WATER_TEX[key] = tex;
+      return tex;
+    }),
+  );
 }
 if (GFX.standardMaterials) {
   kickWaterTex('n1', 'water_1_normal.jpg');
@@ -150,10 +152,30 @@ function buildShaderWater(seed: number): WaterView {
   });
 
   const meshes: THREE.Mesh[] = [];
+  // The apron: one huge deep-sea sheet running far past every map edge, so
+  // looking off the world's side reads as open ocean to the fog line, never
+  // a water plane ending in mid-air. It sits a hair below the zone planes
+  // (no z-fight) and carries a constant deep shore attribute.
+  {
+    const span = WORLD_MAX_Z - WORLD_MIN_Z + 2400;
+    const geo = new THREE.PlaneGeometry(3000, span, 1, 1).rotateX(-Math.PI / 2);
+    geo.translate(0, 0, (WORLD_MIN_Z + WORLD_MAX_Z) / 2);
+    const pos = geo.attributes.position as THREE.BufferAttribute;
+    const deep = new Float32Array(pos.count).fill(8);
+    geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(deep, 1));
+    geo.computeBoundingSphere();
+    const apron = new THREE.Mesh(geo, material);
+    apron.position.y = WATER_LEVEL - 0.06;
+    meshes.push(apron);
+  }
   for (const zone of ZONES) {
     const depth = zone.zMax - zone.zMin;
-    const geo = new THREE.PlaneGeometry(WORLD_SIZE, depth, SEGMENTS_PER_ZONE, SEGMENTS_PER_ZONE)
-      .rotateX(-Math.PI / 2);
+    const geo = new THREE.PlaneGeometry(
+      WORLD_SIZE,
+      depth,
+      SEGMENTS_PER_ZONE,
+      SEGMENTS_PER_ZONE,
+    ).rotateX(-Math.PI / 2);
     geo.translate(0, 0, (zone.zMin + zone.zMax) / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
@@ -172,19 +194,23 @@ function buildShaderWater(seed: number): WaterView {
 
 function buildPhongWater(): WaterView {
   const tex = waterNormalish();
-  tex.repeat.set(30, 30);
   const [norm] = waterNormalMaps();
-  norm.repeat.set(26, 78);
   const mat = new THREE.MeshPhongMaterial({
-    color: 0x2a6a96, transparent: true, opacity: 0.8, shininess: 140,
-    specular: 0xd8ecff, map: tex, normalMap: norm,
+    color: 0x2a6a96,
+    transparent: true,
+    opacity: 0.8,
+    shininess: 140,
+    specular: 0xd8ecff,
+    map: tex,
+    normalMap: norm,
     normalScale: new THREE.Vector2(0.8, 0.8),
   });
-  const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(WORLD_SIZE, worldDepth).rotateX(-Math.PI / 2),
-    mat,
-  );
+  // low tier gets the same to-the-horizon apron by simply oversizing the
+  // one plane (the tiled texture keeps its density via the repeat bump)
+  const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z + 2400;
+  tex.repeat.set(240, 240);
+  norm.repeat.set(210, 620);
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, worldDepth).rotateX(-Math.PI / 2), mat);
   mesh.position.set(0, WATER_LEVEL, (WORLD_MIN_Z + WORLD_MAX_Z) / 2);
   return {
     meshes: [mesh],
@@ -198,5 +224,7 @@ function buildPhongWater(): WaterView {
 }
 
 export function buildWater(seed: number): WaterView {
-  return GFX.standardMaterials && hasWaterShaderAssets() ? buildShaderWater(seed) : buildPhongWater();
+  return GFX.standardMaterials && hasWaterShaderAssets()
+    ? buildShaderWater(seed)
+    : buildPhongWater();
 }
