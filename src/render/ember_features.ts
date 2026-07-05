@@ -45,14 +45,15 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       depthWrite: false,
     });
     pulsingLava.push(lavaMat);
-    const lava = new THREE.Mesh(new THREE.CircleGeometry(pool.r * 0.92, 22), lavaMat);
+    const lava = new THREE.Mesh(new THREE.CircleGeometry(pool.r * 0.98, 22), lavaMat);
     lava.rotation.x = -Math.PI / 2;
-    // riding well above the shaped floor: the render terrain LOD undershoots
-    // small basins, so a surface at floor height would sink under the mesh
-    lava.position.set(pool.x, pool.floor + 1.5, pool.z);
+    // seated into the bowl like water in its basin: just above the shaped
+    // floor, so the disc edge tucks under the rising basin walls instead of
+    // hovering over the outer skirt (0.9 still clears the LOD undershoot)
+    lava.position.set(pool.x, pool.floor + 0.9, pool.z);
     group.add(lava);
     const light = new THREE.PointLight(0xff5a18, 8, pool.r * 3.4, 2);
-    light.position.set(pool.x, pool.floor + 3.2, pool.z);
+    light.position.set(pool.x, pool.floor + 2.6, pool.z);
     light.userData.baseIntensity = 8;
     glowLights.push(light);
     group.add(light);
