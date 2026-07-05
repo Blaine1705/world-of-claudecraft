@@ -1119,7 +1119,11 @@ export const en: EnTranslations = {
         "peaksName": "Thornpeak Heights",
         "peaksBlurb": "Wind-scoured ridges climbing toward the realm's coldest dangers.",
         "duskName": "The Veiled Hollow",
-        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true."
+        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true.",
+        "emberName": "The Drakelands",
+        "emberBlurb": "Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.",
+        "frostName": "The Frostveil Reach",
+        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights."
       },
       "group": {
         "heading": "Group up for the hard parts",

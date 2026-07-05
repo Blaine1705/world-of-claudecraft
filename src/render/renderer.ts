@@ -48,6 +48,7 @@ import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
+import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
@@ -57,6 +58,7 @@ import {
   type FoliagePerfStats,
   type FoliageView,
 } from './foliage';
+import { buildFrostSky, type FrostSkyView } from './frost_sky';
 import {
   GFX,
   type GfxBucketBands,
@@ -832,6 +834,8 @@ export class Renderer {
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView;
+  private emberFeatures: EmberFeaturesView;
+  private frostSky: FrostSkyView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1241,6 +1245,15 @@ export class Renderer {
     this.scene.add(this.realmFlora.group);
     freezeStaticMatrices(this.realmFlora.group);
     for (const light of this.realmFlora.glowLights) this.fireLights.push(light);
+
+    // The Drakelands' lava pools and bloodglass, and the Frostveil's aurora.
+    this.emberFeatures = buildEmberFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.emberFeatures.group, 'props');
+    this.scene.add(this.emberFeatures.group);
+    freezeStaticMatrices(this.emberFeatures.group);
+    for (const light of this.emberFeatures.glowLights) this.fireLights.push(light);
+    this.frostSky = buildFrostSky();
+    this.scene.add(this.frostSky.group);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -4492,6 +4505,8 @@ export class Renderer {
     this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.realmFlora.update(this.time);
+    this.emberFeatures.update(this.time);
+    this.frostSky.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);

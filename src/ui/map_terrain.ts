@@ -61,7 +61,21 @@ export function paintTerrainRows(
         r = 96;
         g = 84;
         b = 104;
-      } // mauve glade
+      } else if (biome === 'ember') {
+        // green gatewood in the south drying to sand, scorched near the belt
+        const sandT = Math.max(0, Math.min(1, (z - 1545) / 145));
+        r = 74 + 76 * sandT;
+        g = 110 + 10 * sandT;
+        b = 52 + 32 * sandT;
+        const scorch = Math.max(0, Math.min(1, (z - 1880) / 100));
+        r = r * (1 - scorch * 0.35);
+        g = g * (1 - scorch * 0.45);
+        b = b * (1 - scorch * 0.4);
+      } else if (biome === 'frost') {
+        r = 214;
+        g = 224;
+        b = 236;
+      } // snowbound
       if (h < WATER_LEVEL) {
         r = 38;
         g = 84;
@@ -76,6 +90,21 @@ export function paintTerrainRows(
         r = 78;
         g = 68;
         b = 88;
+      } else if (biome === 'ember' && h > 20) {
+        // the Drakemaw's volcanic crags read dark, not alpine
+        r = 84;
+        g = 58;
+        b = 52;
+      } else if (biome === 'frost' && h > 22) {
+        // frost crags stay pale so the terraces read as snow benches
+        r = 188;
+        g = 199;
+        b = 214;
+      } else if (biome === 'frost' && h > 6) {
+        // mid benches: slightly shaded snow, never the mossy green
+        r = 202;
+        g = 212;
+        b = 226;
       } else if (h > 26) {
         r = 168;
         g = 172;

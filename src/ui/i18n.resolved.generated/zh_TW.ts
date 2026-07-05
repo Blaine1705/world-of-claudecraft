@@ -1119,7 +1119,11 @@ export const zh_TW: EnTranslations = {
         "peaksName": "棘峰高地",
         "peaksBlurb": "風蝕的山脊一路攀向這片國度最寒冷的危境。",
         "duskName": "帷幕幽谷",
-        "duskBlurb": "群山之下封存的國度，如果關於入口的低語屬實。"
+        "duskBlurb": "群山之下封存的國度，如果關於入口的低語屬實。",
+        "emberName": "龍裔荒原",
+        "emberBlurb": "越過蒼白堤道，綠意讓位於灰燼，古老的存在統治著荒漠。",
+        "frostName": "霜幕之境",
+        "frostBlurb": "一處任何地圖都未曾標出的雪封高地，只在舞動的極光中若隱若現。"
       },
       "group": {
         "heading": "在艱難之處組隊同行",

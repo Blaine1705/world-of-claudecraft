@@ -38,7 +38,9 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   peaks: { gain: 0.48, clamp: 1.7 },
   dusk: { gain: 0.48, clamp: 1.7 },
   ember: { gain: 0.48, clamp: 1.7 },
-  frost: { gain: 0.6, clamp: 2.6 },
+  // dimmed well below the vale's day: a deep blue twilight the aurora can
+  // actually glow against
+  frost: { gain: 0.3, clamp: 1.4 },
 };
 
 // The dusk biome reuses the peaks dawn HDRI (already pink at the horizon); the
@@ -197,7 +199,7 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   peaks: [1, 1, 1],
   dusk: [1.22, 0.82, 1.12],
   ember: [1.28, 0.88, 0.72],
-  frost: [0.82, 0.94, 1.18],
+  frost: [0.5, 0.66, 1.05],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

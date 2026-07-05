@@ -1303,6 +1303,40 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Gleaming Deep"
     ],
     "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam."
+  },
+  {
+    "id": "drakelands",
+    "name": "The Drakelands",
+    "min": 16,
+    "max": 20,
+    "biome": "ember",
+    "hub": "Wyrmwatch",
+    "pois": [
+      "Wyrmwatch",
+      "The Gatewood",
+      "Cinder Dunes",
+      "Trollmoot",
+      "Bloodglass Fields",
+      "Drakemaw Caldera"
+    ],
+    "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes."
+  },
+  {
+    "id": "frostveil",
+    "name": "The Frostveil Reach",
+    "min": 17,
+    "max": 20,
+    "biome": "frost",
+    "hub": "Icemantle",
+    "pois": [
+      "Icemantle",
+      "Heartfrost Cavern",
+      "Glacier Tarn",
+      "The Aurora Steps",
+      "The Shiverfen",
+      "The Howling Terraces"
+    ],
+    "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake."
   }
 ];
 

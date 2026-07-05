@@ -1119,7 +1119,11 @@ export const ko_KR: EnTranslations = {
         "peaksName": "가시봉우리 고원",
         "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선.",
         "duskName": "장막의 골짜기",
-        "duskBlurb": "산맥 아래 봉인된 세계. 들어가는 길이 있다는 소문이 사실이라면."
+        "duskBlurb": "산맥 아래 봉인된 세계. 들어가는 길이 있다는 소문이 사실이라면.",
+        "emberName": "드레이크랜드",
+        "emberBlurb": "창백한 둑길을 건너면 초록은 재에 자리를 내주고, 오래된 존재가 황무지를 다스린다.",
+        "frostName": "서리장막 봉우리",
+        "frostBlurb": "어떤 지도에도 없는 눈 덮인 고지. 춤추는 오로라 속에서만 언뜻 보인다."
       },
       "group": {
         "heading": "어려운 구간은 함께",

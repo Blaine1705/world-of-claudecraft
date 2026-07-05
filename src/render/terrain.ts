@@ -189,6 +189,9 @@ const rockC = new THREE.Color(0x7a7a72);
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
+const emberForestC = new THREE.Color(0x729a4e); // the Drakelands' green gatewood
+const emberScorchC = new THREE.Color(0x6a4a40); // volcanic ground near the Drakemaw
+const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
 const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
 const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(0xedf3fa);
@@ -272,6 +275,19 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   cTmp.copy(grassC).lerp(grassDarkC, v);
   const v2 = (Math.sin(x * 0.043 + 5) * Math.cos(z * 0.05 + 2) + 1) / 2;
   cTmp.lerp(grassYellowC, v2 * 0.35);
+  if (biome === 'ember') {
+    // the gatewood is green at the Wyrmgate and dries into sand northward;
+    // the volcanic belt then darkens toward scorched basalt
+    const forest = 1 - clamp01((z - 1545) / 145);
+    if (forest > 0) cTmp.lerp(emberForestC, forest * 0.85);
+    const sandT = clamp01((z - 1545) / 145);
+    lerpSplat(w, 3, sandT * 0.75);
+    const scorch = clamp01((z - 1880) / 100);
+    if (scorch > 0) {
+      cTmp.lerp(emberScorchC, scorch * 0.55);
+      lerpSplat(w, 2, scorch * 0.5);
+    }
+  }
   // the marsh reads muddier: patches of wet dirt across the lowland
   if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
   // shoreline sand — color and splat weight share one feathered falloff so
@@ -313,11 +329,25 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
       cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
     }
   }
-  // high ground (ridges, peaks) goes rocky then snowy
+  // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
+  // rock reads as dark basalt instead, and its peaks never take snow)
   let snow = 0;
+  if (biome === 'ember') {
+    const t2 = Math.max(
+      slope > rockStart ? Math.min(1, (slope - rockStart) * 2) : 0,
+      clamp01((h - 18) / 8) * 0.75,
+    );
+    if (t2 > 0) cTmp.lerp(emberBasaltC, t2 * 0.85);
+  }
+  if (biome === 'frost') {
+    // the Reach is snowbound from the shore up, not just on its crowns
+    const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3);
+    cTmp.lerp(snowCapC, 0.8 * blanket);
+    snow = Math.max(snow, 0.85 * blanket);
+  }
   if (h > 22) {
-    cTmp.lerp(rockC, clamp01((h - 22) / 10) * 0.7);
-    snow = clamp01((h - 34) / 14) * 0.85;
+    cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, clamp01((h - 22) / 10) * 0.7);
+    snow = biome === 'ember' ? 0 : clamp01((h - 34) / 14) * 0.85;
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }

@@ -116,7 +116,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   peaks: 0x6f8a7a,
   dusk: 0x7f93ab,
   ember: 0x93a06b,
-  frost: 0x6f8a92,
+  frost: 0xc2d4da, // frosted boughs: reads as snow-dusted pines
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,

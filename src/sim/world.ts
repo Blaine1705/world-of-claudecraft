@@ -334,9 +334,9 @@ export const EMBER_VOLCANOES = [
 // Open lava pools out in the wastes (shaped as shallow flat-floored basins;
 // the render lava surface sits just above each floor).
 export const EMBER_LAVA_POOLS = [
-  { x: 30, z: 1940, r: 13 }, // inside the Drakemaw crater
-  { x: 96, z: 1832, r: 9 },
-  { x: -58, z: 1948, r: 8 },
+  { x: 30, z: 1940, r: 14 }, // inside the Drakemaw crater
+  { x: 96, z: 1832, r: 12 },
+  { x: -58, z: 1948, r: 11 },
 ] as const;
 export const EMBER_LAVA_FLOOR = 2.2;
 
