@@ -1454,6 +1454,10 @@ async function startGame(
       hud.setDailyRewardsChestButtonVisible(settings.set('showDailyRewardsChest', !!value));
       return;
     }
+    if (key === 'showTargetOfTarget') {
+      hud.setShowTargetOfTarget(settings.set('showTargetOfTarget', !!value));
+      return;
+    }
     if (key === 'browserEffects') {
       applyBrowserEffects(settings.set('browserEffects', value as number));
       return;
