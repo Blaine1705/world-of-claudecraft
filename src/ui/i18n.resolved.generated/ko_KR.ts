@@ -5756,6 +5756,18 @@ export const ko_KR: EnTranslations = {
       "willow_sprite": {
         "name": "버들 요정"
       },
+      "moonfleece_grazer": {
+        "name": "달양털 짐승"
+      },
+      "gloam_strider": {
+        "name": "어스름 질주자"
+      },
+      "nightkin_stargazer": {
+        "name": "밤일족 별지기"
+      },
+      "barrow_king": {
+        "name": "봉분의 왕"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -7199,6 +7211,30 @@ export const ko_KR: EnTranslations = {
           },
           "5": {
             "label": "나른한 여울"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "밤꽃 평원",
+        "welcome": "밤의 문 너머까지 태양은 따라오지 않는다. 꽃빛을 따라 문레스트로 가라. 가는 길에 별하늘을 올려다보는 것도 잊지 말고.",
+        "pois": {
+          "0": {
+            "label": "문레스트"
+          },
+          "1": {
+            "label": "밤의 문"
+          },
+          "2": {
+            "label": "달우물"
+          },
+          "3": {
+            "label": "어스름 꽃벌판"
+          },
+          "4": {
+            "label": "불침번 선돌"
+          },
+          "5": {
+            "label": "잠들지 않는 봉분"
           }
         }
       }

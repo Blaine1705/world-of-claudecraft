@@ -72,6 +72,19 @@ import {
 } from './content/frostveil';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
+  NIGHTBLOOM_CAMPS,
+  NIGHTBLOOM_ITEMS,
+  NIGHTBLOOM_MOBS,
+  NIGHTBLOOM_NPCS,
+  NIGHTBLOOM_OBJECTS,
+  NIGHTBLOOM_PORTALS,
+  NIGHTBLOOM_PROPS,
+  NIGHTBLOOM_QUEST_ORDER,
+  NIGHTBLOOM_QUESTS,
+  NIGHTBLOOM_ROADS,
+  NIGHTBLOOM_ZONE,
+} from './content/nightbloom';
+import {
   REALM_CAMPS,
   REALM_ITEMS,
   REALM_MOBS,
@@ -207,6 +220,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FROSTVEIL_ITEMS,
   AMBERFALL_ITEMS,
   WILLOWFEN_ITEMS,
+  NIGHTBLOOM_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -226,6 +240,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
   ...WILLOWFEN_MOBS,
+  ...NIGHTBLOOM_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -241,6 +256,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...FROSTVEIL_NPCS,
   ...AMBERFALL_NPCS,
   ...WILLOWFEN_NPCS,
+  ...NIGHTBLOOM_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -253,6 +269,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...FROSTVEIL_QUESTS,
   ...AMBERFALL_QUESTS,
   ...WILLOWFEN_QUESTS,
+  ...NIGHTBLOOM_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -265,6 +282,7 @@ export const QUEST_ORDER: string[] = [
   ...FROSTVEIL_QUEST_ORDER,
   ...AMBERFALL_QUEST_ORDER,
   ...WILLOWFEN_QUEST_ORDER,
+  ...NIGHTBLOOM_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -285,6 +303,7 @@ export const CAMPS: CampDef[] = [
   ...FROSTVEIL_CAMPS,
   ...AMBERFALL_CAMPS,
   ...WILLOWFEN_CAMPS,
+  ...NIGHTBLOOM_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -297,6 +316,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...FROSTVEIL_OBJECTS,
   ...AMBERFALL_OBJECTS,
   ...WILLOWFEN_OBJECTS,
+  ...NIGHTBLOOM_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -308,6 +328,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...FROSTVEIL_ROADS,
   ...AMBERFALL_ROADS,
   ...WILLOWFEN_ROADS,
+  ...NIGHTBLOOM_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -316,6 +337,7 @@ export const PORTALS: PortalDef[] = [
   ...FROSTVEIL_PORTALS,
   ...AMBERFALL_PORTALS,
   ...WILLOWFEN_PORTALS,
+  ...NIGHTBLOOM_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -328,6 +350,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   FROSTVEIL_PROPS,
   AMBERFALL_PROPS,
   WILLOWFEN_PROPS,
+  NIGHTBLOOM_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -394,6 +417,7 @@ export const ZONES: ZoneDef[] = [
   FROSTVEIL_ZONE,
   AMBERFALL_ZONE,
   WILLOWFEN_ZONE,
+  NIGHTBLOOM_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]

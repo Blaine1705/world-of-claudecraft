@@ -33,6 +33,8 @@ describe('Veiled Hollow zone registration', () => {
     expect(ZONES[6].zMin).toBe(ZONES[5].zMax);
     expect(ZONES[7].id).toBe('willowfen');
     expect(ZONES[7].zMin).toBe(ZONES[6].zMax);
+    expect(ZONES[8].id).toBe('nightbloom');
+    expect(ZONES[8].zMin).toBe(ZONES[7].zMax);
     expect(WORLD_MAX_Z).toBe(ZONES[ZONES.length - 1].zMax);
     expect(zoneAt(1000).id).toBe('veiled_hollow');
     expect(zoneAt(899).id).toBe('thornpeak_heights');

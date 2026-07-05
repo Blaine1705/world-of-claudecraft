@@ -5756,6 +5756,18 @@ export const pt_BR: EnTranslations = {
       "willow_sprite": {
         "name": "Willow Sprite"
       },
+      "moonfleece_grazer": {
+        "name": "Moonfleece Grazer"
+      },
+      "gloam_strider": {
+        "name": "Gloam Strider"
+      },
+      "nightkin_stargazer": {
+        "name": "Nightkin Stargazer"
+      },
+      "barrow_king": {
+        "name": "The Barrow King"
+      },
       "ironvein_foreman": {
         "name": "Capataz Veio de Ferro"
       },
@@ -7199,6 +7211,30 @@ export const pt_BR: EnTranslations = {
           },
           "5": {
             "label": "The Drowsy Flats"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "The Nightbloom",
+        "welcome": "The sun does not follow you past the Nightgate. Walk the flower-light to Moonrest and look up as you go.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "The Nightgate"
+          },
+          "2": {
+            "label": "The Moonwell"
+          },
+          "3": {
+            "label": "Gloamfield"
+          },
+          "4": {
+            "label": "The Standing Vigil"
+          },
+          "5": {
+            "label": "The Sleepless Barrow"
           }
         }
       }

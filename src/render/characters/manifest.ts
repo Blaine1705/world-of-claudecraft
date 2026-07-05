@@ -215,6 +215,15 @@ const SPIDER: ClipMap = {
   death: 'Spider_Death', // no hit-react in asset
 };
 
+// Velociraptor rig (velociraptor.glb) — like the spider, no hit-react clips
+const RAPTOR: ClipMap = {
+  idle: 'Velociraptor_Idle',
+  walk: 'Velociraptor_Walk',
+  run: 'Velociraptor_Run',
+  attack: ['Velociraptor_Attack'],
+  death: 'Velociraptor_Death',
+};
+
 // Chicken-cow rig (chicken_cow.glb, procedurally authored — see
 // scripts/gen_chicken_cow.mjs). Node-transform animations, no hit-react.
 const CHICKEN_COW: ClipMap = {
@@ -626,6 +635,31 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // the Nightbloom's realm-only rigs, all first appearances: the moonfleece
+  // herds (alpaca), the gloam striders (velociraptor), and the hovering
+  // masked nightkin (tribal, a flying rig: they drift rather than walk)
+  mob_alpaca: {
+    url: `${CREATURES}/alpaca.glb`,
+    height: 1.7,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_raptor: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 1.6,
+    clips: RAPTOR,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_nightkin: {
+    url: `${CREATURES}/tribal.glb`,
+    height: 1.9,
+    hover: 0.3,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
   // the Veiled Hollow's spirits and wisps: the ghost rig, entity-tinted so
   // the rose glimmerwisps, violet duskwisps, and teal hollow spirits read as
   // one ethereal family unlike anything in the outer three zones
@@ -967,6 +1001,12 @@ const MOB_KEYS: Record<string, string> = {
   treant_elder: 'mob_treant',
   old_marrowshell: 'mob_crab',
   aurelhorn: 'mob_bull',
+  // the Nightbloom: silver herds, night-running raptors, hovering star folk;
+  // the Barrow King borrows the armored skeleton the other revenants wear
+  moonfleece_grazer: 'mob_alpaca',
+  gloam_strider: 'mob_raptor',
+  nightkin_stargazer: 'mob_nightkin',
+  barrow_king: 'skel_warrior',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

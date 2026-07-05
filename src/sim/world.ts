@@ -307,6 +307,7 @@ const FEN_LAND_LOBES = [
   { x: 0, z: 3530, r: 85 }, // the north fen
   { x: -110, z: 3330, r: 60 },
   { x: 110, z: 3380, r: 60 },
+  { x: -30, z: 3600, r: 55 }, // the Nightgate's southern footing
 ] as const;
 const FEN_BAYS = [
   { x: 170, z: 3300, r: 55 }, // the east sound
@@ -329,6 +330,52 @@ function applyFenCoast(x: number, z: number, h: number): number {
   let out = floor + (h - floor) * t;
   // the Amberfen Steps: flat pass floor across the border
   const passT = (1 - smoothstep(26, 52, Math.abs(x + 20))) * (1 - smoothstep(3170, 3220, z));
+  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  // ...and the Nightgate's south ramp, meeting the night realm's pass cap
+  const passN = (1 - smoothstep(26, 52, Math.abs(x + 30))) * smoothstep(3560, 3605, z);
+  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// The Nightbloom: moonlit downs under permanent night, the world's current
+// northern end. Gentle coasts like the fen's; the north shore looks out over
+// open starlit sea.
+// ---------------------------------------------------------------------------
+const NIGHT_ZMAX = 4200; // keep in sync with NIGHTBLOOM_ZONE.zMax
+const NIGHT_LAND_LOBES = [
+  { x: -30, z: 3680, r: 60 }, // the Nightgate's shelf
+  { x: 20, z: 3760, r: 90 }, // the realm's heart: Moonrest and the Moonwell
+  { x: -80, z: 3860, r: 80 }, // Gloamfield's flower downs
+  { x: 80, z: 3930, r: 70 }, // the Standing Vigil's rise
+  { x: 0, z: 4040, r: 85 }, // the barrow downs
+  { x: -5, z: 3900, r: 80 }, // the midrealm saddle: bridges heart to barrow
+  { x: -12, z: 3828, r: 42 }, // the saddle's south seam, under the barrow road
+  { x: 0, z: 3968, r: 45 }, // ...and its north seam at the barrow's foot
+  { x: 35, z: 3865, r: 55 }, // the Vigil road's shoulder
+  { x: -120, z: 3950, r: 55 }, // the west arm
+  { x: 130, z: 3760, r: 50 }, // the east arm
+] as const;
+const NIGHT_BAYS = [
+  { x: 170, z: 3900, r: 55 }, // the east sound
+  { x: -170, z: 3760, r: 55 }, // the west reach
+  { x: -60, z: 4150, r: 50 }, // the north bight, open to the starlit sea
+] as const;
+
+export function nightLandness(x: number, z: number): number {
+  return metaballLandness(NIGHT_LAND_LOBES, NIGHT_BAYS, x, z);
+}
+
+// Gentle everywhere, the fen's recipe: soft downs easing into a dark sea.
+function applyNightCoast(x: number, z: number, h: number): number {
+  if (z <= FEN_ZMAX || z > NIGHT_ZMAX + 2) return h;
+  const land = nightLandness(x, z);
+  const t = smoothstep(0.02, 0.32, land);
+  const shelf = smoothstep(-0.5, 0.06, land);
+  const floor = WATER_LEVEL - 3.6 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.6)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the Nightgate: flat pass floor across the border
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 30))) * (1 - smoothstep(3690, 3740, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
   return out;
 }
@@ -543,8 +590,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     return dEdge < 48 && amberLandness(x, z) < 0.02;
   }
   if (z <= FEN_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, FEN_ZMAX - z);
+    const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && fenLandness(x, z) < 0.02;
+  }
+  if (z <= NIGHT_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, NIGHT_ZMAX - z);
+    return dEdge < 48 && nightLandness(x, z) < 0.02;
   }
   return false;
 }
@@ -730,6 +781,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
             frostLandness(x, z),
             amberLandness(x, z),
             fenLandness(x, z),
+            nightLandness(x, z),
           ),
         );
       }
@@ -745,6 +797,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyFrostCoast(x, z, h);
   h = applyAmberCoast(x, z, h);
   h = applyFenCoast(x, z, h);
+  h = applyNightCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   // World rims AFTER the coast, so the border ranges rise out of the sea
@@ -872,6 +925,10 @@ export function generateDecorations(seed: number): Decoration[] {
         // open and soft: scattered broadleafs, very little stone
         if (r > 0.3) continue;
         kind = r < 0.06 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
+      } else if (biome === 'night') {
+        // open moon meadows: sparse silvered groves, standing stones between
+        if (r > 0.28) continue;
+        kind = r < 0.08 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

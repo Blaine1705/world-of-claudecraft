@@ -24,6 +24,7 @@ const ZONE_ALIASES: Record<string, string> = {
   frostveil: 'frost',
   amberfall: 'amber',
   willowfen: 'fen',
+  nightbloom: 'night',
 };
 
 export function installDevTeleports(

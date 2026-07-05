@@ -81,6 +81,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
@@ -840,6 +841,7 @@ export class Renderer {
   private frostSky: FrostSkyView;
   private fenFeatures: FenFeaturesView;
   private amberFeatures: AmberFeaturesView;
+  private nightFeatures: NightFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1273,6 +1275,11 @@ export class Renderer {
     setRenderCategory(this.amberFeatures.group, 'props');
     this.scene.add(this.amberFeatures.group);
     freezeStaticMatrices(this.amberFeatures.group);
+    this.nightFeatures = buildNightFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.nightFeatures.group, 'props');
+    this.scene.add(this.nightFeatures.group);
+    freezeStaticMatrices(this.nightFeatures.group);
+    for (const light of this.nightFeatures.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -4540,6 +4547,7 @@ export class Renderer {
     this.frostSky.update(this.time);
     this.fenFeatures.update(this.time);
     this.amberFeatures.update(this.time);
+    this.nightFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);

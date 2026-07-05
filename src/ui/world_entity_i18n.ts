@@ -112,6 +112,10 @@ const MOB_IDS = [
   'drowsy_croaker',
   'lily_wisp',
   'willow_sprite',
+  'moonfleece_grazer',
+  'gloam_strider',
+  'nightkin_stargazer',
+  'barrow_king',
 ] as const;
 
 const NPC_IDS = [
@@ -243,6 +247,7 @@ const ZONE_IDS = [
   'frostveil',
   'amberfall',
   'willowfen',
+  'nightbloom',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

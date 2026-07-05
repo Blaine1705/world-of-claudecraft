@@ -5756,6 +5756,18 @@ export const zh_CN: EnTranslations = {
       "willow_sprite": {
         "name": "柳树小妖"
       },
+      "moonfleece_grazer": {
+        "name": "月绒兽"
+      },
+      "gloam_strider": {
+        "name": "幽暝疾行者"
+      },
+      "nightkin_stargazer": {
+        "name": "夜裔观星者"
+      },
+      "barrow_king": {
+        "name": "古冢之王"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -7199,6 +7211,30 @@ export const zh_CN: EnTranslations = {
           },
           "5": {
             "label": "沉眠浅滩"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "夜绽花野",
+        "welcome": "越过夜门，太阳便不再跟随。沿着花光走向月栖镇，路上别忘了抬头看看星空。",
+        "pois": {
+          "0": {
+            "label": "月栖镇"
+          },
+          "1": {
+            "label": "夜门"
+          },
+          "2": {
+            "label": "月井"
+          },
+          "3": {
+            "label": "暮光花田"
+          },
+          "4": {
+            "label": "守望石阵"
+          },
+          "5": {
+            "label": "不眠古冢"
           }
         }
       }

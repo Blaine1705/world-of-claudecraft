@@ -1372,6 +1372,23 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Drowsy Flats"
     ],
     "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile."
+  },
+  {
+    "id": "nightbloom",
+    "name": "The Nightbloom",
+    "min": 20,
+    "max": 20,
+    "biome": "night",
+    "hub": "Moonrest",
+    "pois": [
+      "Moonrest",
+      "The Nightgate",
+      "The Moonwell",
+      "Gloamfield",
+      "The Standing Vigil",
+      "The Sleepless Barrow"
+    ],
+    "welcome": "The sun does not follow you past the Nightgate. Walk the flower-light to Moonrest and look up as you go."
   }
 ];
 

@@ -5756,6 +5756,18 @@ export const ja_JP: EnTranslations = {
       "willow_sprite": {
         "name": "ウィロースプライト"
       },
+      "moonfleece_grazer": {
+        "name": "ムーンフリース"
+      },
+      "gloam_strider": {
+        "name": "グロームストライダー"
+      },
+      "nightkin_stargazer": {
+        "name": "ナイトキンの星読み"
+      },
+      "barrow_king": {
+        "name": "塚の王"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -7199,6 +7211,30 @@ export const ja_JP: EnTranslations = {
           },
           "5": {
             "label": "まどろみの浅瀬"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "ナイトブルーム",
+        "welcome": "夜門の先まで太陽はついてこない。花明かりをたどってムーンレストへ。道中はぜひ星空を見上げるといい。",
+        "pois": {
+          "0": {
+            "label": "ムーンレスト"
+          },
+          "1": {
+            "label": "夜の門"
+          },
+          "2": {
+            "label": "月の井戸"
+          },
+          "3": {
+            "label": "宵闇の花野"
+          },
+          "4": {
+            "label": "見張りの石環"
+          },
+          "5": {
+            "label": "不眠の塚"
           }
         }
       }
