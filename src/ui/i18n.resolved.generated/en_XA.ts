@@ -7118,7 +7118,7 @@ export const en_XA: EnTranslations = {
             "label": "[Ļáñţéŕñɱéŕé]"
           },
           "1": {
-            "label": "[Ţĥé Ŕóóţŵáý]"
+            "label": "[Ţĥé Ŵéšţŵáý]"
           },
           "2": {
             "label": "[Ţĥé Ĝíļðéð Óŕçĥáŕð]"

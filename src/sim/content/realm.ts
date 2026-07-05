@@ -40,8 +40,8 @@ export const REALM_ZONE: ZoneDef = {
     { x: 92, z: 1154, radius: 8 }, // ...crystal-flanked eastern cove
     { x: -120, z: 1105, radius: 12 }, // the Mirrormere, a highland tarn
     { x: -15, z: 1062, radius: 7 }, // the meadow pond by the garden road
-    { x: 152, z: 1108, radius: 16 }, // the Mirrorshallow, under the western cliffs
-    { x: 146, z: 1130, radius: 9 }, // ...its reeded southern finger
+    { x: 148, z: 1124, radius: 13 }, // the Mirrorshallow, beside the Westway meadow
+    { x: 142, z: 1142, radius: 8 }, // ...its reeded southern finger
   ],
   pois: [
     { x: -40, z: 1030, label: 'Eldergleam' },
@@ -60,6 +60,11 @@ export const REALM_ZONE: ZoneDef = {
 // Winding valley paths: the cave descent into Eldergleam, then spokes out to
 // the grove, the basin, the ruins, and the mushroom forest.
 export const REALM_ROADS: { x: number; z: number }[][] = [
+  [
+    { x: 126, z: 1088 },
+    { x: 150, z: 1080 },
+    { x: 175, z: 1078 },
+  ], // the Sunken Court -> the Westway crossing
   [
     { x: -140, z: 955 },
     { x: -125, z: 980 },

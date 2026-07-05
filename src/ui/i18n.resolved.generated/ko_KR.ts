@@ -7118,7 +7118,7 @@ export const ko_KR: EnTranslations = {
             "label": "랜턴미어"
           },
           "1": {
-            "label": "뿌리길"
+            "label": "서쪽 길"
           },
           "2": {
             "label": "금빛 과수원"

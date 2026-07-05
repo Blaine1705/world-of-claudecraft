@@ -313,6 +313,11 @@ function applyHollowCoast(x: number, z: number, h: number): number {
     const ease = smoothstep(1245, 1268, z); // mainland shore eases into it
     if (out > cap) out = out + (cap + (out - cap) * 0.12 - out) * ease;
   }
+  // The Westway: the crossing into the Amberfall is an open, flat meadow
+  // corridor (no cave, no wall), the Wyrmgate recipe turned sideways: cap
+  // the west-edge heights across the corridor band so the walk stays level.
+  const westGate = smoothstep(138, 158, x) * (1 - smoothstep(18, 42, Math.abs(z - 1078)));
+  if (westGate > 0 && out > 5) out = out + (5 + (out - 5) * 0.15 - out) * westGate;
   // Wave-cut ledges: coastal rock above the beach line breaks into stepped
   // terraces with noise-jittered edges, so bluffs meet the sea as rigid
   // cliff faces instead of smooth mounds. Confined to the shore band (the
@@ -479,7 +484,7 @@ const HOLLOW_FRINGE_CLEARINGS = [
   { x: 160, z: 1228, r: 26 }, // the forgotten monument
   { x: 46, z: 1380, r: 40 }, // the Pale Causeway's upper spine
   { x: 44, z: 1430, r: 42 }, // ...and its northern head
-  { x: 172, z: 1085, r: 42 }, // the Mirrorshallow shore and the Rootway mouth
+  { x: 168, z: 1078, r: 46 }, // the Westway corridor and the Mirrorshallow shore
 ] as const;
 
 function hollowShapingOffset(x: number, z: number, seed: number): number {
@@ -669,6 +674,8 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // out from the shore reads as water meeting sky, and swim fatigue (not a
   // wall) turns swimmers back before the band edge.
   let rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
+  // the Westway crossing stays open: no border range over the corridor
+  if (x > 0 && z > 900) rimX *= smoothstep(18, 42, Math.abs(z - 1078));
   const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
   let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
   if (inHollowOpenSea(x, z)) {

@@ -7118,7 +7118,7 @@ export const fr_FR: EnTranslations = {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Rootway"
+            "label": "The Westway"
           },
           "2": {
             "label": "The Gilded Orchard"

@@ -2887,7 +2887,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.amberfall.name': '琥珀秋境',
   'entities.zones.amberfall.welcome': '這裡每一片葉子都燃燒著金紅，卻從不飄落。燈湖鎮的燈籠已為你點亮。',
   'entities.zones.amberfall.pois.0.label': '燈湖鎮',
-  'entities.zones.amberfall.pois.1.label': '根之道',
+  'entities.zones.amberfall.pois.1.label': '西行道',
   'entities.zones.amberfall.pois.2.label': '鎏金果園',
   'entities.zones.amberfall.pois.3.label': '豐收谷',
   'entities.zones.amberfall.pois.4.label': '大湖',

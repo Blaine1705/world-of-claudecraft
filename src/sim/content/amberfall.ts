@@ -2,7 +2,7 @@
 // Hollow's western cliffs: fire-colored forests under a honey-gold sky,
 // harvest meadows, and the Great Mere at its heart, ringed by the lantern
 // town of Lanternmere. Walked into through the Rootway, a tunnel behind the
-// Hollow's new Mirrorshallow lake (a paired portal, the Duskfall recipe);
+// Hollow's Mirrorshallow meadow: the Westway, an open flat crossing;
 // the southern border is sealed. Terrain shape: AMBER_* tables in world.ts.
 
 import type {
@@ -37,7 +37,7 @@ export const AMBERFALL_ZONE: ZoneDef = {
   ],
   pois: [
     { x: 0, z: 2812, label: 'Lanternmere' },
-    { x: -60, z: 2612, label: 'The Rootway' },
+    { x: -60, z: 2612, label: 'The Westway' },
     { x: -72, z: 2732, label: 'The Gilded Orchard' },
     { x: 70, z: 2700, label: 'Harvest Hollow' },
     { x: 0, z: 2872, label: 'The Great Mere' },
@@ -77,16 +77,17 @@ export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
   ], // Lanternmere -> the Leaning Monolith, east of the Mere
 ];
 
-// The Rootway: a tunnel through the western cliffs, from the shore of the
-// Hollow's Mirrorshallow lake into the Amberfall's south weald.
+// The Westway: an open meadow crossing at the world's western edge; walking
+// west past the Mirrorshallow carries you straight into the Amberfall (a
+// wide unmarked trigger, no cave and no wall, like walking into a new land).
 export const AMBERFALL_PORTALS: PortalDef[] = [
   {
-    id: 'rootway_passage',
-    a: { x: 168, z: 1088, landing: { x: 163, z: 1086, facing: 2.4 } },
+    id: 'westway_crossing',
+    a: { x: 177, z: 1078, landing: { x: 171, z: 1078, facing: 2.4 } },
     b: { x: -60, z: 2608, landing: { x: -60, z: 2615, facing: 0 } },
-    radius: 2.0,
-    enterText: 'Roots close overhead, then part: gold light, and leaves that never fall.',
-    leaveText: 'The tunnel narrows, and dusk settles back over the Mirrorshallow.',
+    radius: 4.0,
+    enterText: 'The dusk thins around you, and gold light floods the meadow ahead.',
+    leaveText: 'The gold fades at your back, and dusk settles over the Mirrorshallow.',
   },
 ];
 
@@ -120,10 +121,5 @@ export const AMBERFALL_PROPS: ZonePropsDef = {
   campfires: [
     [0, 2808],
     [-58, 2618],
-  ],
-  // both Rootway mouths
-  mines: [
-    { x: 170, z: 1089, rot: 2.4 }, // Hollow side, set into the lake cliffs
-    { x: -60, z: 2605, rot: 0 }, // Amberfall side, opening north
   ],
 };
