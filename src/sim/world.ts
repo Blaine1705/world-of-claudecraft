@@ -102,6 +102,8 @@ const HOLLOW_SHAPING = [
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
   // the Tablecrag's bulk (its flat crown is leveled after the rims, below)
   { x: -170, z: 1195, r: 46, h: 12 },
+  // ...and its southern sister over the old inlet
+  { x: -168, z: 1075, r: 38, h: 10 },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -146,11 +148,11 @@ const HOLLOW_LAND_LOBES = [
   // (a flat-topped mesa, see HOLLOW_SHAPING) rises over the Deep's flank
   { x: -178, z: 1190, r: 60 },
   { x: -180, z: 1255, r: 48 },
+  { x: -176, z: 1080, r: 55 }, // ...and its southern reach over the old inlet
 ] as const;
 const HOLLOW_BAYS = [
   // (the old bight at {182,1038} became the Mirrorshallow: see the edge arm
   // lobes below, which enclose that water as a lake)
-  { x: -178, z: 1062, r: 42 }, // the west inlet
   { x: -62, z: 1270, r: 50 }, // the north sound, west of the causeway root
 ] as const;
 const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
@@ -701,6 +703,11 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   if (dMesa < 30) {
     const t = smoothstep(14, 30, dMesa);
     h = h * t + 34 * (1 - t);
+  }
+  const dMesaS = Math.hypot(x + 166, z - 1072);
+  if (dMesaS < 26) {
+    const t = smoothstep(11, 26, dMesaS);
+    h = h * t + 30 * (1 - t);
   }
   return h;
 }

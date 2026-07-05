@@ -111,8 +111,17 @@ export const AMBERFALL_PROPS: ZonePropsDef = {
     { x1: -18, z1: 2798, x2: -8, z2: 2794 },
     { x1: 8, z1: 2828, x2: 18, z2: 2830 },
   ],
+  // the Goldmelt shrine: column rings flanking the pass, statue-lined, so
+  // the crossing reads as a gilded threshold between snow and autumn
+  ruinRings: [
+    { x: 22, z: 2592, ringR: 7, columns: 6 },
+    { x: -4, z: 2578, ringR: 5, columns: 5 },
+    { x: 10, z: 2612, ringR: 4, columns: 4 },
+  ],
   campfires: [
     [0, 2808],
     [8, 2585],
+    [22, 2592],
+    [-4, 2578],
   ],
 };
