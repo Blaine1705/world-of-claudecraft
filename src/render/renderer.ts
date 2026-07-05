@@ -3574,6 +3574,8 @@ export class Renderer {
     amber: { color: 0xdec18e, near: 65, far: 270 },
     // the Willowfen: clear airy morning, the lightest fog in the world
     fen: { color: 0xcfe2dc, near: 95, far: 340 },
+    // the Nightbloom: deep indigo dark, near-clear so the glow flora carries
+    night: { color: 0x141c30, near: 80, far: 300 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3593,6 +3595,9 @@ export class Renderer {
     frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
     fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
+    // the Nightbloom: the "sun" is the moon, a cold silver key over deep
+    // blue ground bounce (the fireflies and blooms supply the warm accents)
+    night: { hemiSky: 0x8094c0, hemiGround: 0x222c44, sun: 0xbcccee },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {

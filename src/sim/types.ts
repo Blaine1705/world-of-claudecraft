@@ -1180,7 +1180,16 @@ export interface DungeonDef {
   leaveText: string;
 }
 
-export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost' | 'amber' | 'fen';
+export type BiomeId =
+  | 'vale'
+  | 'marsh'
+  | 'peaks'
+  | 'dusk'
+  | 'ember'
+  | 'frost'
+  | 'amber'
+  | 'fen'
+  | 'night';
 
 export interface ZoneDef {
   id: string;

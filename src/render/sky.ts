@@ -44,6 +44,10 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   frost: { gain: 0.5, clamp: 2.0 },
   amber: { gain: 0.55, clamp: 2.2 },
   fen: { gain: 0.6, clamp: 2.6 },
+  // the shipped Poly Haven night HDRI is far darker than any day sky
+  // (mean radiance ~0.07): the big gain lifts the milky way into view and
+  // the low clamp keeps the horizon lights from blooming the dark out
+  night: { gain: 5.0, clamp: 1.6 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -59,6 +63,7 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   frost: '/env/frost_twilight_2k.hdr',
   amber: '/env/amber_sunset_2k.hdr',
   fen: '/env/fen_day_2k.hdr',
+  night: '/env/night_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -70,6 +75,7 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   frost: '/env/frost_twilight_1k.hdr',
   amber: '/env/amber_sunset_1k.hdr',
   fen: '/env/fen_day_1k.hdr',
+  night: '/env/night_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -101,6 +107,7 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   frost: '/env/vale_backdrop.webp',
   amber: '/env/peaks_backdrop.webp',
   fen: '/env/vale_backdrop.webp',
+  night: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
 };
 
 const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
@@ -112,6 +119,7 @@ const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   frost: '/env/vale_backdrop_4k.webp',
   amber: '/env/peaks_backdrop_4k.webp',
   fen: '/env/vale_backdrop_4k.webp',
+  night: '/env/vale_backdrop_4k.webp',
 };
 
 const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
@@ -123,6 +131,7 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   frost: 0,
   amber: 0,
   fen: 0,
+  night: 0,
 };
 
 // How strongly the painted horizon backdrop shows per biome. The dusk realm
@@ -139,6 +148,7 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   // no backdrop: it hid the day sky's low cloud bank; the fen keeps the
   // whole cloudscape (the lift alone was the streak culprit, and it is off)
   fen: 0,
+  night: 0,
 };
 
 // Lift masks a horizon band PHOTOGRAPHED into an HDRI (the dawn sky's red
@@ -154,6 +164,9 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   frost: 0,
   amber: 0,
   fen: 0,
+  // the night photo has bush silhouettes at its horizon; at night they read
+  // as a distant dark treeline over the sea, so no lift (stars would smear)
+  night: 0,
 };
 
 interface NetworkInformationLike {
@@ -213,6 +226,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   frost: 0.5,
   amber: 0.501,
   fen: 0.497,
+  night: 0.342, // the moonrise glow on the night photo's horizon
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -229,6 +243,8 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   frost: [1, 1, 1],
   amber: [1, 1, 1],
   fen: [1, 1, 1],
+  // cool the warm sodium glow the night photo carries toward moonlight
+  night: [0.85, 0.95, 1.25],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

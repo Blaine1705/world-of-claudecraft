@@ -38,6 +38,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   amber: { hill: 15, base: 2, hubHeight: 2.5 },
   // the Willowfen: low, wet, and gentle
   fen: { hill: 8, base: -0.3, hubHeight: 2 },
+  // the Nightbloom: soft moonlit downs, a touch more rolling than the fen
+  night: { hill: 12, base: 1, hubHeight: 2.5 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with

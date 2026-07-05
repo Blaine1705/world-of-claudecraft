@@ -119,6 +119,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   frost: 0x7e99a2, // frosted but dark: pines hold their shape at distance
   amber: 0xb89a52, // autumn-burnished pines
   fen: 0x8fae7e,
+  night: 0x506878, // moonlit blue-green, dark at distance
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -129,6 +130,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   frost: 0x84989e,
   amber: 0xd8852f, // fire-orange canopy
   fen: 0x9dc47e, // lush wetland green
+  night: 0x5a7086, // silvered indigo canopy under the stars
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -139,6 +141,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   frost: 0x9aa8b8,
   amber: 0x9a8a70,
   fen: 0x7e8a76,
+  night: 0x6e7890,
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -149,6 +152,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   frost: 0xe4e9f0,
   amber: 0xd8c0a0,
   fen: 0xc8cfae,
+  night: 0xb8c0d8,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -159,6 +163,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   frost: 0xdde8f2,
   amber: 0xe8cf8a,
   fen: 0xcfe4b0,
+  night: 0xaebed2, // silver-blue moon grass
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
@@ -167,6 +172,9 @@ const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
 const FEN_BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xffffff, 0xa8d8f2, 0xf2a88f];
 // the Amberfall blooms white: snow-white to warm cream against the gold
 const AMBER_BLOOM_TINTS = [0xffffff, 0xfaf6ec, 0xf4eedd];
+// the Nightbloom's namesake flowers: pale luminous petals that read as
+// glowing under the moon (ice-blue, star-white, violet, mint)
+const NIGHT_BLOOM_TINTS = [0x9fdcff, 0xffffff, 0xc8a8ff, 0xa0ffd8];
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0xaebf8e,
   marsh: 0x8d9865,
@@ -176,6 +184,7 @@ const DRESS_TINT: Record<BiomeId, number> = {
   frost: 0xc8d8e0,
   amber: 0xd8a860,
   fen: 0xa8c48e,
+  night: 0x8a98b8,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
@@ -1117,6 +1126,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   frost: 0.08,
   amber: 0.34,
   fen: 0.38,
+  night: 0.32,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -1160,6 +1170,14 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     if (r < 0.1) return 'bush';
     if (r < 0.52) return 'bushFlowers';
     if (r < 0.86) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'night') {
+    // the realm's namesake: luminous bloom hedges dominate the moon meadows,
+    // mushrooms fill the dark corners
+    if (r < 0.08) return 'bush';
+    if (r < 0.56) return 'bushFlowers';
+    if (r < 0.76) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';
@@ -1277,6 +1295,12 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
             im.setColorAt(i, c.set(tint));
           } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'fen') {
             const tint = FEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * FEN_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'night') {
+            // the nightblooms take their tint raw: pale petals must pop
+            // against the dark ground, not soften toward it
+            const tint =
+              NIGHT_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * NIGHT_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
           } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'dusk') {
             // the Hollow's flowering bushes bloom in several colors, not one
