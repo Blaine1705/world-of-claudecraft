@@ -10,13 +10,13 @@
     "companionUpgrade rank bump + refreshDelveDaily day rollover"
   ],
   "draws": 3,
-  "drawDigest": "830829fd",
+  "drawDigest": "100254a2",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 475,
-      "state": "f759d933",
+      "nextId": 490,
+      "state": "280b47d3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -34,7 +34,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 474,
+          "entityId": 489,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -56,7 +56,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 474,
+          "id": 489,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -99,23 +99,23 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 496,
-      "state": "0ca3f1a7",
-      "events": "19f561d2",
+      "nextId": 507,
+      "state": "6a3344b3",
+      "events": "6bc5b6fd",
       "rng": {
         "draws": 1,
-        "digest": "bbdfb877"
+        "digest": "4c70ba91"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 496,
-      "state": "a05f9505",
+      "nextId": 507,
+      "state": "6697ed49",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "830829fd"
+        "digest": "100254a2"
       },
       "label": "advanced-to-finale",
       "players": [
@@ -129,7 +129,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 474,
+          "entityId": 489,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -151,7 +151,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 474,
+          "id": 489,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -193,12 +193,12 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 496,
-      "state": "6f025b0d",
-      "events": "f0692101",
+      "nextId": 507,
+      "state": "96e2e989",
+      "events": "58d4c851",
       "rng": {
         "draws": 3,
-        "digest": "830829fd"
+        "digest": "100254a2"
       },
       "label": "shop-daily",
       "players": [
@@ -218,7 +218,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 474,
+          "entityId": 489,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -241,7 +241,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 338,
-          "id": 474,
+          "id": 489,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -283,12 +283,12 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 496,
-      "state": "1bdf656f",
+      "nextId": 507,
+      "state": "a81fe7b3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "830829fd"
+        "digest": "100254a2"
       },
       "label": "final",
       "players": [
@@ -308,7 +308,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 474,
+          "entityId": 489,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -331,7 +331,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 338,
-          "id": 474,
+          "id": 489,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

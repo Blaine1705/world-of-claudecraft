@@ -84,16 +84,111 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
 
 // Content fill (creatures, folk, quests) lands in a follow-up pass; the
 // skeleton ships the zone, its shape, and the walk-in entrance first.
-export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {};
+export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
+  emberwing_drake: {
+    id: 'emberwing_drake',
+    name: 'Emberwing Drake',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'dragonkin',
+    hpBase: 130,
+    hpPerLevel: 32,
+    dmgBase: 16,
+    dmgPerLevel: 3.0,
+    attackSpeed: 2.2,
+    armorPerLevel: 16,
+    moveSpeed: 9,
+    aggroRadius: 18,
+    elite: true,
+    loot: [],
+    scale: 1.4,
+    color: 0xd84028,
+  },
+  ashbone_raider: {
+    id: 'ashbone_raider',
+    name: 'Ashbone Raider',
+    minLevel: 17,
+    maxLevel: 18,
+    family: 'undead',
+    hpBase: 50,
+    hpPerLevel: 18,
+    dmgBase: 10,
+    dmgPerLevel: 2.2,
+    attackSpeed: 1.9,
+    armorPerLevel: 12,
+    moveSpeed: 8,
+    aggroRadius: 13,
+    loot: [],
+    scale: 1,
+    color: 0xe8dcc8,
+  },
+  ashbone_warcaller: {
+    id: 'ashbone_warcaller',
+    name: 'Ashbone Warcaller',
+    minLevel: 18,
+    maxLevel: 19,
+    family: 'undead',
+    hpBase: 62,
+    hpPerLevel: 20,
+    dmgBase: 12,
+    dmgPerLevel: 2.4,
+    attackSpeed: 2.1,
+    armorPerLevel: 13,
+    moveSpeed: 8,
+    aggroRadius: 13,
+    loot: [],
+    scale: 1.1,
+    color: 0xd8c8a8,
+  },
+  dune_troll: {
+    id: 'dune_troll',
+    name: 'Dune Troll',
+    minLevel: 17,
+    maxLevel: 19,
+    family: 'troll',
+    hpBase: 66,
+    hpPerLevel: 22,
+    dmgBase: 12,
+    dmgPerLevel: 2.5,
+    attackSpeed: 2.3,
+    armorPerLevel: 14,
+    moveSpeed: 8.5,
+    aggroRadius: 14,
+    loot: [],
+    scale: 1.15,
+    color: 0xb07040,
+  },
+};
 export const DRAKELANDS_NPCS: Record<string, NpcDef> = {};
 export const DRAKELANDS_QUESTS: Record<string, QuestDef> = {};
 export const DRAKELANDS_QUEST_ORDER: string[] = [];
 export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {};
-export const DRAKELANDS_CAMPS: CampDef[] = [];
+export const DRAKELANDS_CAMPS: CampDef[] = [
+  { mobId: 'dune_troll', center: { x: 100, z: 1760 }, radius: 10, count: 3 },
+  { mobId: 'dune_troll', center: { x: 116, z: 1744 }, radius: 8, count: 2 },
+  { mobId: 'ashbone_raider', center: { x: -4, z: 1706 }, radius: 10, count: 3 },
+  { mobId: 'ashbone_raider', center: { x: -64, z: 1804 }, radius: 10, count: 3 },
+  { mobId: 'ashbone_warcaller', center: { x: 88, z: 1726 }, radius: 8, count: 2 },
+  { mobId: 'emberwing_drake', center: { x: 48, z: 1912 }, radius: 8, count: 1 },
+  { mobId: 'emberwing_drake', center: { x: -76, z: 1888 }, radius: 8, count: 1 },
+];
 export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [];
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
+  // fallen keeps of the old drake-cult: castle ruins across the wastes
+  ruinRings: [
+    { x: -30, z: 1734, ringR: 10, columns: 8 }, // the Cinder Bastion
+    { x: -22, z: 1744, ringR: 6, columns: 5 },
+    { x: 62, z: 1652, ringR: 8, columns: 6 }, // the Last Keep, forest's edge
+    { x: 108, z: 1778, ringR: 7, columns: 6 }, // the Trollmoot henge
+    { x: -92, z: 1876, ringR: 6, columns: 5 }, // Bloodglass watch
+  ],
+  graveyards: [
+    { x: -6, z: 1712 },
+    { x: -60, z: 1796 },
+    { x: 92, z: 1732 },
+  ],
   // a first waypost so Wyrmwatch reads as a camp, not bare ground
   tents: [
     { x: 36, z: 1514, rot: 0.8, scale: 1 },

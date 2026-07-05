@@ -5715,6 +5715,18 @@ export const ru_RU: EnTranslations = {
       "frostmane_yeti": {
         "name": "Морозогривый йети"
       },
+      "emberwing_drake": {
+        "name": "Углекрылый дрейк"
+      },
+      "ashbone_raider": {
+        "name": "Пеплокостный налётчик"
+      },
+      "ashbone_warcaller": {
+        "name": "Пеплокостный горлопан"
+      },
+      "dune_troll": {
+        "name": "Дюнный тролль"
+      },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
       },

@@ -5715,6 +5715,18 @@ export const ko_KR: EnTranslations = {
       "frostmane_yeti": {
         "name": "서리갈기 예티"
       },
+      "emberwing_drake": {
+        "name": "잿불날개 드레이크"
+      },
+      "ashbone_raider": {
+        "name": "잿빛뼈 약탈자"
+      },
+      "ashbone_warcaller": {
+        "name": "잿빛뼈 전쟁소집꾼"
+      },
+      "dune_troll": {
+        "name": "모래언덕 트롤"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },

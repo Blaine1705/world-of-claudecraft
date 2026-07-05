@@ -5715,6 +5715,18 @@ export const da_DK: EnTranslations = {
       "frostmane_yeti": {
         "name": "Frostmane Yeti"
       },
+      "emberwing_drake": {
+        "name": "Emberwing Drake"
+      },
+      "ashbone_raider": {
+        "name": "Ashbone Raider"
+      },
+      "ashbone_warcaller": {
+        "name": "Ashbone Warcaller"
+      },
+      "dune_troll": {
+        "name": "Dune Troll"
+      },
       "ironvein_foreman": {
         "name": "Jernåre-Formand"
       },

@@ -99,6 +99,10 @@ const MOB_IDS = [
   'rime_elemental',
   'fen_sprite',
   'frostmane_yeti',
+  'emberwing_drake',
+  'ashbone_raider',
+  'ashbone_warcaller',
+  'dune_troll',
 ] as const;
 
 const NPC_IDS = [

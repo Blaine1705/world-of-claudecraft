@@ -397,11 +397,16 @@ export const EMBER_VOLCANOES = [
 // Open lava pools out in the wastes (shaped as shallow flat-floored basins;
 // the render lava surface sits just above each floor).
 export const EMBER_LAVA_POOLS = [
-  { x: 30, z: 1940, r: 14 }, // inside the Drakemaw crater
-  { x: 96, z: 1832, r: 12 },
-  { x: -58, z: 1948, r: 11 },
+  { x: 30, z: 1940, r: 14, floor: 2.2 }, // inside the Drakemaw crater
+  { x: 96, z: 1832, r: 12, floor: 2.2 },
+  { x: -58, z: 1948, r: 11, floor: 2.2 },
+  // crater pools high in the two smaller cones
+  { x: -90, z: 1902, r: 7, floor: 13 },
+  { x: 140, z: 1990, r: 6, floor: 11 },
+  // the Moltenmaw: an open lava-lake field east of the caldera
+  { x: 58, z: 1962, r: 16, floor: 3.2 },
+  { x: 78, z: 1946, r: 10, floor: 3.2 },
 ] as const;
-export const EMBER_LAVA_FLOOR = 2.2;
 
 function emberShapingOffset(x: number, z: number, seed: number): number {
   if (z < HOLLOW_ZMAX - 10 || z > DRAKE_ZMAX + 40) return 0;
@@ -429,7 +434,7 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
     const d = Math.hypot(x - pool.x, z - pool.z);
     if (d < pool.r * 1.7) {
       const blend = smoothstep(pool.r * 0.6, pool.r * 1.7, d);
-      out = out * blend + EMBER_LAVA_FLOOR * (1 - blend);
+      out = out * blend + pool.floor * (1 - blend);
     }
   }
   return out;
@@ -789,7 +794,7 @@ export function generateDecorations(seed: number): Decoration[] {
         // northward, scorched rock takes over
         const t = Math.max(0, Math.min(1, (gz - 1560) / 170));
         const treeGate = 0.36 * (1 - t) + 0.05 * t;
-        if (r > treeGate + 0.12) continue;
+        if (r > treeGate + 0.12 + t * 0.1) continue; // rockier as the waste opens
         kind = r < treeGate * 0.55 ? 'tree' : r < treeGate ? 'tree2' : 'rock';
       } else if (biome === 'frost') {
         // hardy pines and broken stone on the snow benches

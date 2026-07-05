@@ -5715,6 +5715,18 @@ export const en_XA: EnTranslations = {
       "frostmane_yeti": {
         "name": "[Ƒŕóšţɱáñé Ýéţí]"
       },
+      "emberwing_drake": {
+        "name": "[Éɱƀéŕŵíñĝ Ðŕáķé]"
+      },
+      "ashbone_raider": {
+        "name": "[Ášĥƀóñé Ŕáíðéŕ]"
+      },
+      "ashbone_warcaller": {
+        "name": "[Ášĥƀóñé Ŵáŕçáļļéŕ]"
+      },
+      "dune_troll": {
+        "name": "[Ðúñé Ţŕóļļ]"
+      },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"
       },

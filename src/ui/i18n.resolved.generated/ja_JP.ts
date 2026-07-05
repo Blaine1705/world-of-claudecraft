@@ -5715,6 +5715,18 @@ export const ja_JP: EnTranslations = {
       "frostmane_yeti": {
         "name": "フロストメイン・イエティ"
       },
+      "emberwing_drake": {
+        "name": "エンバーウィング・ドレイク"
+      },
+      "ashbone_raider": {
+        "name": "アッシュボーンの略奪者"
+      },
+      "ashbone_warcaller": {
+        "name": "アッシュボーンの戦呼び"
+      },
+      "dune_troll": {
+        "name": "デューントロール"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },

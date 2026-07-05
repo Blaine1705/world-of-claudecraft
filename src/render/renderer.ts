@@ -3548,7 +3548,7 @@ export class Renderer {
     // permanent dusk: dense rose-mauve murk, the realm's signature
     dusk: { color: 0xc9a3bd, near: 55, far: 250 },
     // scorched haze south, thicker toward the volcanic north (looks pass)
-    ember: { color: 0xd8a488, near: 70, far: 300 },
+    ember: { color: 0x9a5844, near: 55, far: 240 },
     // the Frostveil: dense icy mist, visibility closes right in
     frost: { color: 0xc6d8e8, near: 34, far: 180 },
     // the Amberfall: warm golden haze under an endless afternoon
@@ -3568,7 +3568,7 @@ export class Renderer {
     marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
     peaks: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
     dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
-    ember: { hemiSky: 0xffd2b0, hemiGround: 0x6a4438, sun: 0xffb070 },
+    ember: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
     frost: { hemiSky: 0xcfe2ff, hemiGround: 0x8a94a8, sun: 0xeaf2ff },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
   };

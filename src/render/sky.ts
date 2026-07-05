@@ -37,7 +37,8 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   marsh: { gain: 0.6, clamp: 2.2 },
   peaks: { gain: 0.48, clamp: 1.7 },
   dusk: { gain: 0.48, clamp: 1.7 },
-  ember: { gain: 0.48, clamp: 1.7 },
+  // dimmed and reined in: a storm-dark red dusk, not a bright dawn
+  ember: { gain: 0.34, clamp: 1.45 },
   // dimmed well below the vale's day: a deep blue twilight the aurora can
   // actually glow against
   frost: { gain: 0.3, clamp: 1.4 },
@@ -207,7 +208,7 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   marsh: [1, 1, 1],
   peaks: [1, 1, 1],
   dusk: [1.22, 0.82, 1.12],
-  ember: [1.28, 0.88, 0.72],
+  ember: [1.45, 0.55, 0.38],
   frost: [0.5, 0.66, 1.05],
   // honey-gold eternal afternoon
   amber: [1.32, 1.04, 0.62],

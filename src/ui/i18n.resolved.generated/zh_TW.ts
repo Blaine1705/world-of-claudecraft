@@ -5715,6 +5715,18 @@ export const zh_TW: EnTranslations = {
       "frostmane_yeti": {
         "name": "霜鬃雪人"
       },
+      "emberwing_drake": {
+        "name": "燼翼幼龍"
+      },
+      "ashbone_raider": {
+        "name": "灰骨掠奪者"
+      },
+      "ashbone_warcaller": {
+        "name": "灰骨戰吼者"
+      },
+      "dune_troll": {
+        "name": "沙丘巨魔"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
