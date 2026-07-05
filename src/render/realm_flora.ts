@@ -1249,6 +1249,15 @@ export function buildRealmFlora(seed: number): RealmFloraView {
         [-220, 1580, 30, 240, 76, 1, 0.75],
         [90, 1530, 14, 150, 40, 2, 0.7],
         [-10, 1540, 12, 140, 38, 4, 0.7],
+        // ...and an overhead deck across the realm itself, so the dusk sky
+        // is a proper cloudscape everywhere, not just at the north horizon
+        [-90, 1000, 88, 240, 70, 0, 0.6],
+        [70, 1060, 104, 300, 88, 3, 0.55],
+        [-30, 1160, 96, 260, 76, 1, 0.6],
+        [130, 1220, 110, 280, 82, 4, 0.5],
+        [-140, 1280, 92, 230, 68, 2, 0.55],
+        [40, 1340, 100, 260, 76, 0, 0.5],
+        [-60, 950, 112, 280, 82, 3, 0.5],
       ] as const) {
         const cloud = new THREE.Mesh(
           new THREE.PlaneGeometry(w, hgt),

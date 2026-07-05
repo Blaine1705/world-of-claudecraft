@@ -182,21 +182,26 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
   const stormClouds: THREE.Mesh[] = [];
   {
     const tex = cloudTexture(16, 0.62);
-    for (let k = 0; k < 8; k++) {
+    // fourteen masses covering the whole band: lighter smoke-brown over the
+    // gatewood south, near-black over the volcanic north
+    for (let k = 0; k < 14; k++) {
+      const z = 1480 + hash2(k, 11, seed + 791) * 540;
+      const northT = Math.max(0, Math.min(1, (z - 1560) / 320));
+      const shade = Math.round(0x40 + (1 - northT) * 0x2a);
       const mat = new THREE.MeshBasicMaterial({
         map: tex,
-        color: 0x40201c,
+        color: (shade << 16) | (Math.round(shade * 0.55) << 8) | Math.round(shade * 0.5),
         transparent: true,
-        opacity: 0.62,
+        opacity: 0.5 + northT * 0.18,
         depthWrite: false,
         fog: false,
       });
-      const w = 120 + hash2(k, 3, seed + 761) * 120;
+      const w = 120 + hash2(k, 3, seed + 761) * 140;
       const cloud = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.42), mat);
       cloud.position.set(
-        -140 + hash2(k, 5, seed + 771) * 280,
-        95 + hash2(k, 7, seed + 781) * 45,
-        1640 + hash2(k, 11, seed + 791) * 400,
+        -150 + hash2(k, 5, seed + 771) * 300,
+        92 + hash2(k, 7, seed + 781) * 48,
+        z,
       );
       cloud.rotation.x = -Math.PI / 2 + 0.9;
       cloud.renderOrder = 2;
