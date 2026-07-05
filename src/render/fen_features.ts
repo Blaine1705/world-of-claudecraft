@@ -169,10 +169,10 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     bloomGeo.scale(1, 0.7, 1);
     const geo = bloomGeo.toNonIndexed();
     const spots: { x: number; z: number; y: number; s: number; rot: number; tint: number }[] = [];
-    for (let gx = -160; gx <= 160; gx += 14) {
-      for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 14) {
+    for (let gx = -160; gx <= 160; gx += 11) {
+      for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 11) {
         const r = hash2(gx, gz, seed + 2301);
-        if (r > 0.3) continue;
+        if (r > 0.42) continue;
         const x = gx + (hash2(gx, gz, seed + 2311) - 0.5) * 10;
         const z = gz + (hash2(gz, gx, seed + 2321) - 0.5) * 10;
         const y = terrainHeight(x, z, seed);

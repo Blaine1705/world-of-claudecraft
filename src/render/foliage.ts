@@ -163,6 +163,10 @@ const GRASS_TINT: Record<BiomeId, number> = {
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
 const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
+// the fen blooms brighter: rose, butter, white, sky, coral
+const FEN_BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xffffff, 0xa8d8f2, 0xf2a88f];
+// the Amberfall blooms white: snow-white to warm cream against the gold
+const AMBER_BLOOM_TINTS = [0xffffff, 0xfaf6ec, 0xf4eedd];
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0xaebf8e,
   marsh: 0x8d9865,
@@ -1111,8 +1115,8 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   dusk: 0.24,
   ember: 0.18,
   frost: 0.08,
-  amber: 0.26,
-  fen: 0.3,
+  amber: 0.34,
+  fen: 0.38,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -1141,6 +1145,21 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     if (r < 0.12) return 'bush';
     if (r < 0.34) return 'bushFlowers';
     if (r < 0.78) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'fen') {
+    // the fen floor blooms: flowering hedges everywhere, mushrooms thick in
+    // the damp, plain bushes almost absent
+    if (r < 0.08) return 'bush';
+    if (r < 0.48) return 'bushFlowers';
+    if (r < 0.72) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'amber') {
+    // the gold meadows flower white: bloom hedges lead, ferns fill
+    if (r < 0.1) return 'bush';
+    if (r < 0.52) return 'bushFlowers';
+    if (r < 0.86) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';
@@ -1252,6 +1271,13 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
           if (kind === 'mushroom') {
             // mushrooms keep their painted cap colors — brightness jitter only
             im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'amber') {
+            const tint =
+              AMBER_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * AMBER_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'fen') {
+            const tint = FEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * FEN_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
           } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'dusk') {
             // the Hollow's flowering bushes bloom in several colors, not one
             const tint =
