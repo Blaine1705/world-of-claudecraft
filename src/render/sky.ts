@@ -42,7 +42,7 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   // dimmed well below the vale's day: a deep blue twilight the aurora can
   // actually glow against
   frost: { gain: 0.3, clamp: 1.4 },
-  amber: { gain: 0.5, clamp: 1.8 },
+  amber: { gain: 0.5, clamp: 1.9 },
   fen: { gain: 0.62, clamp: 2.6 },
 };
 
@@ -153,9 +153,10 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   // into vertical streaks near the ground, and at the dim frost grade the
   // HDRI's own horizon reads as distant dark ranges instead
   frost: 0,
-  // amber and fen keep every day-sky cloud unstretched (the lift smears the
-  // cloud band into vertical streaks near the ground)
-  amber: 0,
+  // amber lifts like the Hollow: the dawn sky's baked hills vanish and the
+  // sea meets clean golden sky (its wispy clouds never showed the smear the
+  // day sky's bold cumulus did); fen keeps its day sky unstretched
+  amber: 1,
   fen: 0,
 };
 
@@ -226,8 +227,8 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   dusk: [1.22, 0.82, 1.12],
   ember: [1.45, 0.55, 0.38],
   frost: [0.5, 0.66, 1.05],
-  // honey-gold eternal afternoon
-  amber: [1.32, 1.04, 0.62],
+  // deep sunset gold over the dawn sky's waterline sun glow
+  amber: [1.5, 1.12, 0.5],
   // bright, airy, faintly cool: a clear wetland morning
   fen: [0.98, 1.04, 1.1],
 };

@@ -208,6 +208,8 @@ const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
 const emberForestC = new THREE.Color(0x729a4e); // the Drakelands' green gatewood
 const emberScorchC = new THREE.Color(0x6a4a40); // volcanic ground near the Drakemaw
 const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
+const cobbleC = new THREE.Color(0x8f8c86); // the Amberfall's laid stone
+const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
 const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
 const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(0xedf3fa);
@@ -325,19 +327,38 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
     if (dHub < 14) {
       const hubT = clamp01((14 - dHub) / 3);
-      cTmp.lerp(dirtDarkC, 0.7 * hubT);
-      lerpSplat(w, 1, 0.75 * hubT);
+      if (zn.biome === 'amber') {
+        // Lanternmere's plaza is paved like its roads
+        const cell =
+          (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+        cTmp.lerp(cobbleC, 0.85 * hubT);
+        cTmp.lerp(cobbleDarkC, cell * 0.45 * hubT);
+        lerpSplat(w, 2, 0.75 * hubT);
+      } else {
+        cTmp.lerp(dirtDarkC, 0.7 * hubT);
+        lerpSplat(w, 1, 0.75 * hubT);
+      }
       break;
     }
   }
   const rd = roadDistance(x, z);
+  // the Amberfall paves its ways: cobblestone, cell-jittered so the vertex
+  // grid reads as laid stones rather than one grey ribbon (rock splat)
+  const cobbles = biome === 'amber';
   if (rd < 2.0) {
-    cTmp.lerp(dirtC, 0.85);
-    lerpSplat(w, 1, 0.85);
+    if (cobbles) {
+      const cell = (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+      cTmp.lerp(cobbleC, 0.9);
+      cTmp.lerp(cobbleDarkC, cell * 0.5);
+      lerpSplat(w, 2, 0.85);
+    } else {
+      cTmp.lerp(dirtC, 0.85);
+      lerpSplat(w, 1, 0.85);
+    }
   } else if (rd < 3.4) {
     const t = 0.85 * (1 - (rd - 2.0) / 1.4);
-    cTmp.lerp(dirtC, t);
-    lerpSplat(w, 1, t);
+    cTmp.lerp(cobbles ? cobbleC : dirtC, t);
+    lerpSplat(w, cobbles ? 2 : 1, t);
   }
   const rockStart = ROCK_SLOPE_START[biome];
   if (slope > rockStart) {

@@ -84,25 +84,31 @@ export function buildAmberFeatures(seed: number): AmberFeaturesView {
   {
     const tex = cloudTexture(16, 0.62);
     const CENTER = { x: 0, z: 2840 };
-    for (let ring = 0; ring < 2; ring++) {
-      const radius = 400 + ring * 90;
-      const count = 12;
-      for (let k = 0; k < count; k++) {
-        const ang = ((k + ring * 0.5) / count) * Math.PI * 2;
+    // three tiers, reference-style: bright gold-cream masses low over the
+    // glow, deeper amber-brown shapes above them (the dark sunset masses),
+    // and a high scattered tier catching the last light
+    const TIERS = [
+      { radius: 380, count: 14, color: 0xffe8c0, y: 22, yj: 22, wMin: 200, wMax: 340, op: 0.95 },
+      { radius: 450, count: 11, color: 0xc9925c, y: 52, yj: 30, wMin: 240, wMax: 380, op: 0.85 },
+      { radius: 520, count: 8, color: 0xffd8a0, y: 95, yj: 40, wMin: 200, wMax: 320, op: 0.7 },
+    ];
+    TIERS.forEach((tier, ring) => {
+      for (let k = 0; k < tier.count; k++) {
+        const ang = ((k + ring * 0.37) / tier.count) * Math.PI * 2;
         const mat = new THREE.MeshBasicMaterial({
           map: tex,
-          color: ring === 0 ? 0xffe4b8 : 0xffd8a0, // golden-lit, warmer behind
+          color: tier.color,
           transparent: true,
-          opacity: 0.94,
+          opacity: tier.op,
           depthWrite: false,
           fog: false,
         });
-        const w = 220 + hash2(k, ring, 5011) * 140;
+        const w = tier.wMin + hash2(k, ring, 5011) * (tier.wMax - tier.wMin);
         const cloud = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.4), mat);
         cloud.position.set(
-          CENTER.x + Math.sin(ang) * radius,
-          26 + hash2(ring, k, 5021) * 34 + ring * 14,
-          CENTER.z + Math.cos(ang) * radius,
+          CENTER.x + Math.sin(ang) * tier.radius,
+          tier.y + hash2(ring, k, 5021) * tier.yj,
+          CENTER.z + Math.cos(ang) * tier.radius,
         );
         cloud.rotation.y = ang + Math.PI; // face the realm
         cloud.renderOrder = 1;
@@ -113,7 +119,7 @@ export function buildAmberFeatures(seed: number): AmberFeaturesView {
         });
         group.add(cloud);
       }
-    }
+    });
   }
 
   return {
