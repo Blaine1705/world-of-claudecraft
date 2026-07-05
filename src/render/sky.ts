@@ -153,8 +153,10 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   // into vertical streaks near the ground, and at the dim frost grade the
   // HDRI's own horizon reads as distant dark ranges instead
   frost: 0,
-  amber: 1,
-  fen: 1,
+  // amber and fen keep every day-sky cloud unstretched (the lift smears the
+  // cloud band into vertical streaks near the ground)
+  amber: 0,
+  fen: 0,
 };
 
 interface NetworkInformationLike {

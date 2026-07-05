@@ -33,6 +33,7 @@ import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { SpatialAudioSink, Surface } from './audio_sink';
@@ -838,6 +839,7 @@ export class Renderer {
   private emberFeatures: EmberFeaturesView;
   private frostSky: FrostSkyView;
   private fenFeatures: FenFeaturesView;
+  private amberFeatures: AmberFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1261,6 +1263,10 @@ export class Renderer {
     setRenderCategory(this.fenFeatures.group, 'props');
     this.scene.add(this.fenFeatures.group);
     freezeStaticMatrices(this.fenFeatures.group);
+    this.amberFeatures = buildAmberFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.amberFeatures.group, 'props');
+    this.scene.add(this.amberFeatures.group);
+    freezeStaticMatrices(this.amberFeatures.group);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -4522,6 +4528,7 @@ export class Renderer {
     this.emberFeatures.update(this.time);
     this.frostSky.update(this.time);
     this.fenFeatures.update(this.time);
+    this.amberFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);
