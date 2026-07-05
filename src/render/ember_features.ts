@@ -8,7 +8,6 @@ import { hash2 } from '../sim/rng';
 import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
 import { GFX } from './gfx';
 import { cloudTexture } from './textures';
-import { makeLavaMaterial } from './water';
 
 export interface EmberFeaturesView {
   group: THREE.Group;
@@ -33,40 +32,24 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
   const glowLights: THREE.PointLight[] = [];
   const pulsingLava: THREE.MeshBasicMaterial[] = [];
 
-  // --- lava surfaces: the WATER shader in molten colors (same live waves,
-  // glints, and shore band; the foam seam reads as white-hot crust where the
-  // lava meets rock). Each pool is a shore-attributed circle riding above
-  // its own basin floor; low tiers fall back to the flat crust-texture disc.
-  const lavaShader = makeLavaMaterial();
-  const lavaTex = lavaShader ? null : lavaTexture();
+  // --- lava surfaces: unlit molten discs with a dark-crust texture (bright
+  // cracks between cooled plates, like a real lava lake), each riding above
+  // its own basin floor; the point light carries the glow onto the rocks ---
+  const lavaTex = lavaTexture();
   for (const pool of EMBER_LAVA_POOLS) {
-    const surfaceY = pool.floor + 1.5;
-    let lava: THREE.Mesh;
-    if (lavaShader) {
-      const geo = new THREE.CircleGeometry(pool.r * 1.04, 28).rotateX(-Math.PI / 2);
-      geo.translate(pool.x, 0, pool.z);
-      const pos = geo.attributes.position as THREE.BufferAttribute;
-      const shoreDepth = new Float32Array(pos.count);
-      for (let i = 0; i < pos.count; i++) {
-        shoreDepth[i] = surfaceY - terrainHeight(pos.getX(i), pos.getZ(i), seed);
-      }
-      geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
-      geo.computeBoundingSphere();
-      lava = new THREE.Mesh(geo, lavaShader);
-      lava.position.y = surfaceY;
-    } else {
-      const lavaMat = new THREE.MeshBasicMaterial({
-        color: 0xffb060,
-        map: lavaTex ?? undefined,
-        transparent: true,
-        opacity: 0.98,
-        depthWrite: false,
-      });
-      pulsingLava.push(lavaMat);
-      lava = new THREE.Mesh(new THREE.CircleGeometry(pool.r * 0.92, 22), lavaMat);
-      lava.rotation.x = -Math.PI / 2;
-      lava.position.set(pool.x, surfaceY, pool.z);
-    }
+    const lavaMat = new THREE.MeshBasicMaterial({
+      color: 0xffb060,
+      map: lavaTex ?? undefined,
+      transparent: true,
+      opacity: 0.98,
+      depthWrite: false,
+    });
+    pulsingLava.push(lavaMat);
+    const lava = new THREE.Mesh(new THREE.CircleGeometry(pool.r * 0.92, 22), lavaMat);
+    lava.rotation.x = -Math.PI / 2;
+    // riding well above the shaped floor: the render terrain LOD undershoots
+    // small basins, so a surface at floor height would sink under the mesh
+    lava.position.set(pool.x, pool.floor + 1.5, pool.z);
     group.add(lava);
     const light = new THREE.PointLight(0xff5a18, 8, pool.r * 3.4, 2);
     light.position.set(pool.x, pool.floor + 3.2, pool.z);

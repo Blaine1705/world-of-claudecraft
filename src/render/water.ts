@@ -3,7 +3,7 @@ import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE, ZONES } from '../sim/data';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { GFX, SUN_DIR, sharedUniforms } from './gfx';
+import { GFX, sharedUniforms, SUN_DIR } from './gfx';
 import { waterNormalish, waterNormalMaps } from './textures';
 
 // Water for the whole zone strip.
@@ -24,13 +24,11 @@ const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing — enough for the foam ban
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
-  registerPreload(
-    loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
-      tex.anisotropy = 4;
-      WATER_TEX[key] = tex;
-      return tex;
-    }),
-  );
+  registerPreload(loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
+    tex.anisotropy = 4;
+    WATER_TEX[key] = tex;
+    return tex;
+  }));
 }
 if (GFX.standardMaterials) {
   kickWaterTex('n1', 'water_1_normal.jpg');
@@ -154,12 +152,8 @@ function buildShaderWater(seed: number): WaterView {
   const meshes: THREE.Mesh[] = [];
   for (const zone of ZONES) {
     const depth = zone.zMax - zone.zMin;
-    const geo = new THREE.PlaneGeometry(
-      WORLD_SIZE,
-      depth,
-      SEGMENTS_PER_ZONE,
-      SEGMENTS_PER_ZONE,
-    ).rotateX(-Math.PI / 2);
+    const geo = new THREE.PlaneGeometry(WORLD_SIZE, depth, SEGMENTS_PER_ZONE, SEGMENTS_PER_ZONE)
+      .rotateX(-Math.PI / 2);
     geo.translate(0, 0, (zone.zMin + zone.zMax) / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
@@ -182,13 +176,8 @@ function buildPhongWater(): WaterView {
   const [norm] = waterNormalMaps();
   norm.repeat.set(26, 78);
   const mat = new THREE.MeshPhongMaterial({
-    color: 0x2a6a96,
-    transparent: true,
-    opacity: 0.8,
-    shininess: 140,
-    specular: 0xd8ecff,
-    map: tex,
-    normalMap: norm,
+    color: 0x2a6a96, transparent: true, opacity: 0.8, shininess: 140,
+    specular: 0xd8ecff, map: tex, normalMap: norm,
     normalScale: new THREE.Vector2(0.8, 0.8),
   });
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
@@ -208,36 +197,6 @@ function buildPhongWater(): WaterView {
   };
 }
 
-// The lava pools reuse the water surface wholesale (same waves, glints,
-// shore band) with molten uniforms: the shore foam reads as the white-hot
-// seam where lava meets rock, and the fresnel reflection picks up the ember
-// realm's red fog. Null on tiers without the shader assets (callers keep
-// their flat-disc fallback).
-export function makeLavaMaterial(): THREE.ShaderMaterial | null {
-  if (!GFX.standardMaterials || !hasWaterShaderAssets()) return null;
-  return new THREE.ShaderMaterial({
-    uniforms: {
-      ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
-      uNorm1: { value: WATER_TEX.n1 },
-      uNorm2: { value: WATER_TEX.n2 },
-      uNorm3: { value: WATER_TEX.broad },
-      uSunDir: { value: SUN_DIR.clone() },
-      uSunColor: { value: new THREE.Color(0xffc060) },
-      uSkyColor: { value: new THREE.Color(0x8a2810) },
-      uDeep: { value: new THREE.Color(0xc03c0c) },
-      uShallow: { value: new THREE.Color(0xff8a20) },
-      uTime: sharedUniforms.uTime,
-    },
-    vertexShader: WATER_VERT,
-    fragmentShader: WATER_FRAG,
-    transparent: true,
-    depthWrite: false,
-    fog: true,
-  });
-}
-
 export function buildWater(seed: number): WaterView {
-  return GFX.standardMaterials && hasWaterShaderAssets()
-    ? buildShaderWater(seed)
-    : buildPhongWater();
+  return GFX.standardMaterials && hasWaterShaderAssets() ? buildShaderWater(seed) : buildPhongWater();
 }
