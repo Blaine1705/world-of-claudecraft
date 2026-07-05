@@ -20,13 +20,20 @@ import { hollowLandness, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 const SEED = 1337; // matches the fixed client seed in src/main.ts
 
 describe('Veiled Hollow zone registration', () => {
-  it('is the last zone band and extends the world', () => {
-    const last = ZONES[ZONES.length - 1];
-    expect(last.id).toBe('veiled_hollow');
-    expect(last.zMin).toBe(900);
-    expect(WORLD_MAX_Z).toBe(last.zMax);
+  it('sits fourth in the band order, tiled against Thornpeak', () => {
+    // Once the world's last band, now the gateway to the northern realms:
+    // the Drakelands tile against its north edge, the Frostveil past them.
+    expect(ZONES[3].id).toBe('veiled_hollow');
+    expect(ZONES[3].zMin).toBe(900);
+    expect(ZONES[4].id).toBe('drakelands');
+    expect(ZONES[4].zMin).toBe(ZONES[3].zMax);
+    expect(ZONES[5].id).toBe('frostveil');
+    expect(ZONES[5].zMin).toBe(ZONES[4].zMax);
+    expect(WORLD_MAX_Z).toBe(ZONES[5].zMax);
     expect(zoneAt(1000).id).toBe('veiled_hollow');
     expect(zoneAt(899).id).toBe('thornpeak_heights');
+    expect(zoneAt(1500).id).toBe('drakelands');
+    expect(zoneAt(2100).id).toBe('frostveil');
   });
 
   it('declares its southern border sealed', () => {

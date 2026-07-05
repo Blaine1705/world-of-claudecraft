@@ -216,7 +216,14 @@ const QUEST_IDS = [
   'q_seal_restored',
 ] as const;
 
-const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights', 'veiled_hollow'] as const;
+const ZONE_IDS = [
+  'eastbrook_vale',
+  'mirefen_marsh',
+  'thornpeak_heights',
+  'veiled_hollow',
+  'drakelands',
+  'frostveil',
+] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',
   'sunken_bastion',

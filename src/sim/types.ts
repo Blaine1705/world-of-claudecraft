@@ -1180,7 +1180,7 @@ export interface DungeonDef {
   leaveText: string;
 }
 
-export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'dusk';
+export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost';
 
 export interface ZoneDef {
   id: string;
@@ -1198,6 +1198,10 @@ export interface ZoneDef {
   // The zone's southern border ridge has NO road pass and is raised past the
   // climbable slope: the zone is reachable only by portal (see world.ts).
   sealedSouthBorder?: boolean;
+  // Where the road pass through the zone's SOUTHERN border ridge sits (x).
+  // Defaults to 0 (the original zones' central road); the Drakelands set it
+  // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
+  southPassX?: number;
 }
 
 // One end of a paired overworld portal. Walking within the pair's trigger

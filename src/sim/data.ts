@@ -31,7 +31,32 @@ import {
   COLLAPSED_RELIQUARY_MODULES,
   DELVE_MOBS,
 } from './content/delves';
+import {
+  DRAKELANDS_CAMPS,
+  DRAKELANDS_ITEMS,
+  DRAKELANDS_MOBS,
+  DRAKELANDS_NPCS,
+  DRAKELANDS_OBJECTS,
+  DRAKELANDS_PROPS,
+  DRAKELANDS_QUEST_ORDER,
+  DRAKELANDS_QUESTS,
+  DRAKELANDS_ROADS,
+  DRAKELANDS_ZONE,
+} from './content/drakelands';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import {
+  FROSTVEIL_CAMPS,
+  FROSTVEIL_ITEMS,
+  FROSTVEIL_MOBS,
+  FROSTVEIL_NPCS,
+  FROSTVEIL_OBJECTS,
+  FROSTVEIL_PORTALS,
+  FROSTVEIL_PROPS,
+  FROSTVEIL_QUEST_ORDER,
+  FROSTVEIL_QUESTS,
+  FROSTVEIL_ROADS,
+  FROSTVEIL_ZONE,
+} from './content/frostveil';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
   REALM_CAMPS,
@@ -152,6 +177,8 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   TEMPLE_ITEMS,
   DELVE_ITEMS,
   REALM_ITEMS,
+  DRAKELANDS_ITEMS,
+  FROSTVEIL_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -167,6 +194,8 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
   ...REALM_MOBS,
+  ...DRAKELANDS_MOBS,
+  ...FROSTVEIL_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -178,6 +207,8 @@ export const NPCS: Record<string, NpcDef> = {
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
   ...REALM_NPCS,
+  ...DRAKELANDS_NPCS,
+  ...FROSTVEIL_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -186,6 +217,8 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
   ...REALM_QUESTS,
+  ...DRAKELANDS_QUESTS,
+  ...FROSTVEIL_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -194,6 +227,8 @@ export const QUEST_ORDER: string[] = [
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
   ...REALM_QUEST_ORDER,
+  ...DRAKELANDS_QUEST_ORDER,
+  ...FROSTVEIL_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -207,8 +242,11 @@ export const CAMPS: CampDef[] = [
   ...TEMPLE_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
   { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
-  // Veiled Hollow camps stay LAST for the same draw-order reason.
+  // Veiled Hollow camps stay LAST for the same draw-order reason; the two
+  // northern realms append after it in registration order.
   ...REALM_CAMPS,
+  ...DRAKELANDS_CAMPS,
+  ...FROSTVEIL_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -217,6 +255,8 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
   ...REALM_OBJECTS,
+  ...DRAKELANDS_OBJECTS,
+  ...FROSTVEIL_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -224,10 +264,12 @@ export const ROADS: { x: number; z: number }[][] = [
   ...ZONE2_ROADS,
   ...ZONE3_ROADS,
   ...REALM_ROADS,
+  ...DRAKELANDS_ROADS,
+  ...FROSTVEIL_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
-export const PORTALS: PortalDef[] = [...REALM_PORTALS];
+export const PORTALS: PortalDef[] = [...REALM_PORTALS, ...FROSTVEIL_PORTALS];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
@@ -235,6 +277,8 @@ export const PROPS: ZonePropsDef = mergeProps([
   ZONE3_PROPS,
   TEMPLE_PROPS,
   REALM_PROPS,
+  DRAKELANDS_PROPS,
+  FROSTVEIL_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -292,7 +336,14 @@ export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 // graveyard, its lakes, and a biome palette the renderer keys off.
 // ---------------------------------------------------------------------------
 
-export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE, REALM_ZONE];
+export const ZONES: ZoneDef[] = [
+  ZONE1_ZONE,
+  ZONE2_ZONE,
+  ZONE3_ZONE,
+  REALM_ZONE,
+  DRAKELANDS_ZONE,
+  FROSTVEIL_ZONE,
+];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
 export const WORLD_MIN_X = -WORLD_SIZE / 2;

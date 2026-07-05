@@ -25,6 +25,8 @@ const MOTE_TINT: Record<BiomeId, number> = {
   marsh: 0xb8d28a,
   peaks: 0xdce8f2,
   dusk: 0xf2b8e0,
+  ember: 0xffa868,
+  frost: 0xcfe8ff,
 };
 
 const RADIUS = 26; // motes live within this ring of the player

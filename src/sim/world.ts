@@ -32,6 +32,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   peaks: { hill: 34, base: 7, hubHeight: 9 },
   // The Veiled Hollow: a sheltered valley, gentler than the peaks that hide it.
   dusk: { hill: 14, base: 2, hubHeight: 2.5 },
+  ember: { hill: 16, base: 2.5, hubHeight: 2.5 },
+  frost: { hill: 26, base: 6, hubHeight: 3 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with
@@ -42,7 +44,11 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
 const ZONE_RIDGES: { z: number; passX: number; sealed: boolean }[] = [];
 for (let i = 0; i + 1 < ZONES.length; i++) {
   const sealed = ZONES[i + 1].sealedSouthBorder === true;
-  ZONE_RIDGES.push({ z: ZONES[i].zMax + (sealed ? 15 : 0), passX: 0, sealed });
+  ZONE_RIDGES.push({
+    z: ZONES[i].zMax + (sealed ? 15 : 0),
+    passX: ZONES[i + 1].southPassX ?? 0,
+    sealed,
+  });
 }
 const RIDGE_HEIGHT = 22;
 const RIDGE_SIGMA = 18; // gaussian width of the wall
@@ -136,18 +142,100 @@ const HOLLOW_BAYS = [
 ] as const;
 const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
 
-// >0 on land, <0 at sea; the coast is the soft zero crossing.
-export function hollowLandness(x: number, z: number): number {
+// >0 on land, <0 at sea; the coast is the soft zero crossing. One metaball
+// evaluator shared by every northern realm's coastline (same math the Hollow
+// shipped with, extracted verbatim when the Drakelands and the Frostveil
+// added their own lobe tables).
+type CoastBlob = { readonly x: number; readonly z: number; readonly r: number };
+function metaballLandness(
+  lobes: readonly CoastBlob[],
+  bays: readonly CoastBlob[],
+  x: number,
+  z: number,
+): number {
   let land = 0;
-  for (const b of HOLLOW_LAND_LOBES) {
+  for (const b of lobes) {
     const d2 = ((x - b.x) / b.r) ** 2 + ((z - b.z) / b.r) ** 2;
     if (d2 < 1) land += (1 - d2) ** 2;
   }
-  for (const b of HOLLOW_BAYS) {
+  for (const b of bays) {
     const d2 = ((x - b.x) / b.r) ** 2 + ((z - b.z) / b.r) ** 2;
     if (d2 < 1) land -= 1.4 * (1 - d2) ** 2;
   }
   return land - 0.06;
+}
+
+export function hollowLandness(x: number, z: number): number {
+  return metaballLandness(HOLLOW_LAND_LOBES, HOLLOW_BAYS, x, z);
+}
+
+// ---------------------------------------------------------------------------
+// The Drakelands' landmass: a gatewood shore fused to the causeway landing,
+// widening into the desert body, then a broad volcanic belt spanning the far
+// north (the Drakemaw range doubles as the sealed wall's footing where it
+// meets land; over the flanks the range simply runs into the sea).
+// ---------------------------------------------------------------------------
+const DRAKE_ZMAX = 2040; // keep in sync with DRAKELANDS_ZONE.zMax
+const EMBER_LAND_LOBES = [
+  { x: 44, z: 1445, r: 40 }, // the causeway landing, fused across the border
+  { x: 44, z: 1478, r: 52 }, // the Wyrmgate shore and Wyrmwatch
+  { x: 0, z: 1520, r: 70 }, // the Gatewood
+  { x: 90, z: 1540, r: 55 }, // eastern gatewood shore
+  { x: 95, z: 1615, r: 55 }, // the Last Spring headland
+  { x: -70, z: 1560, r: 60 }, // western gatewood shore
+  { x: 20, z: 1650, r: 90 }, // the drying midlands
+  { x: -80, z: 1700, r: 65 }, // Mirage Hollow's dune shelf
+  { x: 110, z: 1690, r: 70 }, // eastern dunes
+  { x: 105, z: 1770, r: 60 }, // Trollmoot's rise
+  { x: 45, z: 1790, r: 55 }, // the dune saddle carrying the Trollmoot fork
+  { x: -20, z: 1780, r: 85 }, // the Cinder Dunes' heart
+  { x: 60, z: 1880, r: 80 }, // approach to the Drakemaw
+  { x: -70, z: 1870, r: 75 }, // the Bloodglass shelf
+  { x: 0, z: 1975, r: 95 }, // the Drakemaw belt
+  { x: 130, z: 1950, r: 60 }, // eastern volcanic spur
+  { x: -140, z: 1960, r: 55 }, // western volcanic spur
+  { x: 90, z: 2020, r: 70 }, // the rim belt, wide under the sealed range
+  { x: -90, z: 2020, r: 70 },
+  { x: 0, z: 2030, r: 80 },
+] as const;
+const EMBER_BAYS = [
+  { x: -165, z: 1600, r: 50 }, // the west bight
+  { x: 175, z: 1800, r: 55 }, // the east reach
+  { x: -155, z: 1850, r: 40 }, // a western cove under the spur
+] as const;
+
+export function emberLandness(x: number, z: number): number {
+  return metaballLandness(EMBER_LAND_LOBES, EMBER_BAYS, x, z);
+}
+
+// ---------------------------------------------------------------------------
+// The Frostveil Reach: a snowbound island massif. Its south rim carries the
+// sealed wall's footing (the Heartfrost side), the body climbs in terraced
+// benches (frost shaping below), and the north coast meets the world's edge
+// sea like the Hollow's does.
+// ---------------------------------------------------------------------------
+const FROST_ZMAX = 2560; // keep in sync with FROSTVEIL_ZONE.zMax
+const FROST_LAND_LOBES = [
+  { x: 0, z: 2060, r: 95 }, // the south rim: Heartfrost Cavern's shelf
+  { x: -120, z: 2075, r: 60 }, // western wall footing
+  { x: 120, z: 2075, r: 60 }, // eastern wall footing
+  { x: 0, z: 2100, r: 85 }, // the rim benches
+  { x: -40, z: 2230, r: 90 }, // the Icemantle massif
+  { x: 80, z: 2200, r: 75 }, // Glacier Tarn's shoulder
+  { x: 30, z: 2270, r: 65 }, // the inner valley joining the tarn to the Steps
+  { x: 20, z: 2350, r: 95 }, // the Aurora Steps
+  { x: -100, z: 2320, r: 70 }, // the Shiverfen shelf
+  { x: 120, z: 2390, r: 65 }, // the Howling Terraces
+  { x: 0, z: 2470, r: 80 }, // the north crown
+] as const;
+const FROST_BAYS = [
+  { x: 165, z: 2260, r: 55 }, // the east sound
+  { x: -165, z: 2180, r: 50 }, // the west inlet
+  { x: 60, z: 2545, r: 50 }, // the north cove
+] as const;
+
+export function frostLandness(x: number, z: number): number {
+  return metaballLandness(FROST_LAND_LOBES, FROST_BAYS, x, z);
 }
 
 // Sink everything beyond the coast to the seabed. The outer 10yd of the band
@@ -198,14 +286,131 @@ function applyHollowCoast(x: number, z: number, h: number): number {
   return out;
 }
 
-// The realm's open sea (used by swim fatigue and the rim suppression): far
-// enough offshore that no land lobe reaches, inside the coastal band.
+// The Drakelands' coast, same recipe as the Hollow's. It fades OUT toward
+// the volcanic rim belt (z past ~2010) so the Drakemaw range keeps its
+// footing all the way across the band: over the flanks the sealed range
+// simply runs down into the sea instead of being sunk by the coast.
+function applyEmberCoast(x: number, z: number, h: number): number {
+  if (z < HOLLOW_ZMAX - 2 || z > DRAKE_ZMAX) return h;
+  const land = emberLandness(x, z);
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
+  let out = floor + (h - floor) * t;
+  // Continue the Hollow's northern-lowlands cap across the border (same
+  // formula, easing off northward), so the Wyrmgate shore meets the causeway
+  // at matching height and the land rises gradually into the gatewood.
+  const capEase = 1 - smoothstep(1442, 1495, z);
+  if (capEase > 0 && out > 6.5) out = out + (6.5 + (out - 6.5) * 0.12 - out) * capEase;
+  // hold the last stretch before the Drakemaw wall at full base height
+  const rimHold = smoothstep(1990, 2020, z);
+  if (rimHold > 0) out = out + (h - out) * rimHold;
+  return out;
+}
+
+// The Frostveil's coast. Fades IN north of the sealed wall's footing for the
+// same reason (the wall crest sits at the band's south fringe).
+function applyFrostCoast(x: number, z: number, h: number): number {
+  if (z <= DRAKE_ZMAX || z > FROST_ZMAX + 2) return h;
+  const land = frostLandness(x, z);
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
+  const out = floor + (h - floor) * t;
+  const wallHold = 1 - smoothstep(2085, 2110, z);
+  return out + (h - out) * wallHold;
+}
+
+// The Drakemaw's volcano cones: raised shields with crater dips. The caldera
+// floors sit well above the sea so they stay dry; the render layer pours the
+// lava (ember features module).
+export const EMBER_VOLCANOES = [
+  { x: 30, z: 1940, r: 62, h: 27, craterR: 16, craterD: 13 }, // Drakemaw Caldera
+  { x: -90, z: 1902, r: 40, h: 20, craterR: 8, craterD: 8 },
+  { x: 140, z: 1990, r: 36, h: 18, craterR: 7, craterD: 7 },
+  { x: -42, z: 2012, r: 30, h: 14, craterR: 0, craterD: 0 },
+] as const;
+
+// Open lava pools out in the wastes (shaped as shallow flat-floored basins;
+// the render lava surface sits just above each floor).
+export const EMBER_LAVA_POOLS = [
+  { x: 30, z: 1940, r: 13 }, // inside the Drakemaw crater
+  { x: 96, z: 1832, r: 9 },
+  { x: -58, z: 1948, r: 8 },
+] as const;
+export const EMBER_LAVA_FLOOR = 2.2;
+
+function emberShapingOffset(x: number, z: number, seed: number): number {
+  if (z < HOLLOW_ZMAX - 10 || z > DRAKE_ZMAX + 40) return 0;
+  let dh = 0;
+  for (const v of EMBER_VOLCANOES) {
+    const d = Math.hypot(x - v.x, z - v.z);
+    if (d < v.r) {
+      dh += v.h * (1 - smoothstep(v.r * 0.22, v.r, d));
+      if (v.craterR > 0 && d < v.craterR * 1.5)
+        dh -= v.craterD * (1 - smoothstep(v.craterR * 0.55, v.craterR * 1.5, d));
+    }
+  }
+  // long low dune ridges across the open waste (stretched noise, north only)
+  const duneT = smoothstep(1620, 1760, z) * (1 - smoothstep(1930, 1990, z));
+  if (duneT > 0) dh += (fbm2(x * 0.018, z * 0.085, seed + 41, 2) - 0.5) * 5 * duneT;
+  return dh;
+}
+
+// Flat-floored lava basins, carved after the cones so each pool floor is
+// level (the same move the zone lakes make, at a higher floor).
+function applyEmberLavaBasins(x: number, z: number, h: number): number {
+  if (z < HOLLOW_ZMAX || z > DRAKE_ZMAX) return h;
+  let out = h;
+  for (const pool of EMBER_LAVA_POOLS) {
+    const d = Math.hypot(x - pool.x, z - pool.z);
+    if (d < pool.r * 1.7) {
+      const blend = smoothstep(pool.r * 0.6, pool.r * 1.7, d);
+      out = out * blend + EMBER_LAVA_FLOOR * (1 - blend);
+    }
+  }
+  return out;
+}
+
+// The Frostveil's terraced benches: the whole massif steps into flats,
+// ramps, and short steep risers (multi-level mountain ground). Suppressed
+// near roads so every marked route stays climbable, and below the shore
+// line so beaches ease into the sea.
+function applyFrostTerraces(x: number, z: number, h: number): number {
+  if (z <= DRAKE_ZMAX + 20 || z > FROST_ZMAX) return h;
+  if (h < WATER_LEVEL + 2) return h;
+  const road = roadDistance(x, z);
+  if (road < 5) return h;
+  const step = 6.5;
+  const jit = (noise2(x * 0.045, z * 0.045, 88) - 0.5) * 3.4;
+  const hh = h + jit;
+  const base = Math.floor(hh / step) * step;
+  const frac = (hh - base) / step;
+  const ledge = base + step * Math.min(1, Math.max(0, (frac - 0.26) / 0.42));
+  const w = 0.55 * smoothstep(WATER_LEVEL + 2, WATER_LEVEL + 5.5, h) * smoothstep(5, 12, road);
+  return h + (ledge - h) * w;
+}
+
+// The northern realms' open sea (swim fatigue + rim suppression): far enough
+// offshore that no land lobe reaches, near a true map border edge. The
+// Hollow's north edge stopped being a border when the Drakelands landed
+// beyond it, so only the x flanks bite there now; the Frostveil's far north
+// is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
-  if (z < 960 || z > HOLLOW_ZMAX + 2 || x > 600) return false;
-  // fatigue bites only near the map's border edges: the interior sound, the
-  // bays, and the causeway shores are free to swim
-  const dEdge = Math.min(x + 180, 180 - x, HOLLOW_ZMAX - z);
-  return dEdge < 48 && hollowLandness(x, z) < 0.02;
+  if (z < 960 || x > 600) return false;
+  if (z <= HOLLOW_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x);
+    return dEdge < 48 && hollowLandness(x, z) < 0.02;
+  }
+  if (z <= DRAKE_ZMAX) {
+    const dEdge = Math.min(x + 180, 180 - x);
+    return dEdge < 48 && emberLandness(x, z) < 0.02;
+  }
+  if (z <= FROST_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, FROST_ZMAX - z);
+    return dEdge < 48 && frostLandness(x, z) < 0.02;
+  }
+  return false;
 }
 
 // Border pockets the mountain fringe must not swallow.
@@ -231,7 +436,10 @@ function hollowShapingOffset(x: number, z: number, seed: number): number {
   // the map painter's rock tint above h~26 does the visual work.
   const dW = x + 180;
   const dE = 180 - x;
-  const dN = HOLLOW_ZMAX - z;
+  // The Wyrmgate: the north fringe opens over the causeway head so the road
+  // can walk out of the band into the Drakelands (the old sealed gate cap).
+  const passOpen = 1 - smoothstep(12, 40, Math.abs(x - 44));
+  const dN = HOLLOW_ZMAX - z + passOpen * 80;
   const dSide = Math.min(dW, dE, dN);
   if (dSide < 54) {
     // coarse lobes (wavelength ~80yd) bite 8..48yd into the band; height 34
@@ -370,13 +578,26 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       const crestNoise = (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.7;
       const crest = 1 + (ridge.sealed ? Math.abs(crestNoise) : crestNoise);
       const height = ridge.sealed ? SEALED_RIDGE_HEIGHT : RIDGE_HEIGHT;
-      h += height * crest * profile * pass;
+      // The Hollow/Drakelands boundary ridge rises only where there is land
+      // to carry it (the Wyrmgate mountains around the causeway head); over
+      // the open sea the two realms' waters simply meet. Sealed walls are
+      // never gated: the Drakemaw range runs down into the sea at its flanks.
+      let seaGate = 1;
+      if (!ridge.sealed && ridge.z >= HOLLOW_ZMAX) {
+        seaGate = smoothstep(0.005, 0.06, Math.max(hollowLandness(x, z), emberLandness(x, z)));
+      }
+      h += height * crest * profile * pass * seaGate;
     }
   }
 
   h += mirefenImpactCraterOffset(x, z);
   h += hollowShapingOffset(x, z, seed);
+  h += emberShapingOffset(x, z, seed);
   h = applyHollowCoast(x, z, h);
+  h = applyEmberCoast(x, z, h);
+  h = applyFrostCoast(x, z, h);
+  h = applyEmberLavaBasins(x, z, h);
+  h = applyFrostTerraces(x, z, h);
   // World rims AFTER the coast, so the border ranges rise out of the sea
   // (mountains dipping into the ocean at the flanks) instead of being sunk
   // by it. The NORTH rim is suppressed over the Hollow's open sea: looking
@@ -391,11 +612,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     rimX = 0;
     rimN = 0;
   }
-  // inside the Hollow the remaining land rims stay softer than the world's,
-  // EXCEPT the final strip at the band's very edge (the causeway tip's cap):
-  // that stays full strength so the future gate is a real wall, not a stroll
-  const nearBandEnd = z > WORLD_MAX_Z - 14 && z <= WORLD_MAX_Z + 30;
-  const rimScale = z > 960 && z <= WORLD_MAX_Z && !nearBandEnd ? 0.6 : 1;
+  // inside the northern realms the remaining land rims stay softer than the
+  // world's (their coasts and ranges do the framing; the old causeway gate
+  // cap is now the Wyrmgate ridge with a real pass through it)
+  const rimScale = z > 960 && z <= WORLD_MAX_Z ? 0.6 : 1;
   h += Math.max(rimX, rimS, rimN) * 40 * rimScale;
   return h;
 }
@@ -472,6 +692,17 @@ export function generateDecorations(seed: number): Decoration[] {
         // the dense mushroom flora comes from ground dressing and realm props
         if (r > 0.38) continue;
         kind = r < 0.14 ? 'tree' : r < 0.28 ? 'tree2' : 'rock';
+      } else if (biome === 'ember') {
+        // the gatewood thins mile by mile into open waste: trees fade out
+        // northward, scorched rock takes over
+        const t = Math.max(0, Math.min(1, (gz - 1560) / 170));
+        const treeGate = 0.36 * (1 - t) + 0.05 * t;
+        if (r > treeGate + 0.12) continue;
+        kind = r < treeGate * 0.55 ? 'tree' : r < treeGate ? 'tree2' : 'rock';
+      } else if (biome === 'frost') {
+        // hardy pines and broken stone on the snow benches
+        if (r > 0.36) continue;
+        kind = r < 0.18 ? 'tree' : r < 0.23 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
