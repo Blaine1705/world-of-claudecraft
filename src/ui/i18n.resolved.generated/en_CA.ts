@@ -283,6 +283,7 @@ export const en_CA: EnTranslations = {
       "playerLabel": "Your Hero",
       "targetLabel": "Your Mark",
       "targetAnnounce": "Mark {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Your Band",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
@@ -411,7 +412,8 @@ export const en_CA: EnTranslations = {
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Show Secondary Action Bar"
+      "showSecondaryActionBar": "Show Secondary Action Bar",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Controller",

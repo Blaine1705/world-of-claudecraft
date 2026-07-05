@@ -283,6 +283,7 @@ export const ru_RU: EnTranslations = {
       "playerLabel": "Ваш персонаж",
       "targetLabel": "Ваша цель",
       "targetAnnounce": "Цель: {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Ваша группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
@@ -411,7 +412,8 @@ export const ru_RU: EnTranslations = {
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
-      "showSecondaryActionBar": "Показывать вторичную панель действий"
+      "showSecondaryActionBar": "Показывать вторичную панель действий",
+      "showTargetOfTarget": "Показывать цель цели"
     },
     "controller": {
       "title": "Геймпад",

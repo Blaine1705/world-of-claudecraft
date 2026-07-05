@@ -283,6 +283,7 @@ export const zh_CN: EnTranslations = {
       "playerLabel": "你的角色",
       "targetLabel": "你的目标",
       "targetAnnounce": "目标：{name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "你的队伍",
       "partyGroup": "小队 {n}",
       "durationUnitSeconds": "秒",
@@ -411,7 +412,8 @@ export const zh_CN: EnTranslations = {
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
-      "showSecondaryActionBar": "显示副动作条"
+      "showSecondaryActionBar": "显示副动作条",
+      "showTargetOfTarget": "显示目标的目标"
     },
     "controller": {
       "title": "手柄",

@@ -283,6 +283,7 @@ export const it_IT: EnTranslations = {
       "playerLabel": "Il tuo personaggio",
       "targetLabel": "Il tuo bersaglio",
       "targetAnnounce": "Bersaglio: {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Il tuo gruppo",
       "partyGroup": "Gruppo {n}",
       "durationUnitSeconds": "s",
@@ -411,7 +412,8 @@ export const it_IT: EnTranslations = {
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
-      "showSecondaryActionBar": "Mostra la barra delle azioni secondaria"
+      "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Controller",

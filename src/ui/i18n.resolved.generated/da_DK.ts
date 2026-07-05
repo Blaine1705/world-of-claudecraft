@@ -283,6 +283,7 @@ export const da_DK: EnTranslations = {
       "playerLabel": "Din helt",
       "targetLabel": "Dit mål",
       "targetAnnounce": "Markér {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Dit følge",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
@@ -411,7 +412,8 @@ export const da_DK: EnTranslations = {
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Vis sekundær handlingslinje"
+      "showSecondaryActionBar": "Vis sekundær handlingslinje",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Controller",

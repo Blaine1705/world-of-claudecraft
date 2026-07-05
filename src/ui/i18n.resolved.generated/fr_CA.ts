@@ -283,6 +283,7 @@ export const fr_CA: EnTranslations = {
       "playerLabel": "Votre personnage",
       "targetLabel": "Votre cible",
       "targetAnnounce": "Cible : {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Votre groupe",
       "partyGroup": "Groupe {n}",
       "durationUnitSeconds": "s",
@@ -411,7 +412,8 @@ export const fr_CA: EnTranslations = {
       "showItemLevel": "Afficher le niveau d'objet",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Afficher la barre d'action secondaire"
+      "showSecondaryActionBar": "Afficher la barre d'action secondaire",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Manette",

@@ -283,6 +283,7 @@ export const en_XA: EnTranslations = {
       "playerLabel": "[Ýóúŕ Ĥéŕó]",
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
       "targetAnnounce": "[Ɱáŕķ {name}]",
+      "targetOfTargetLabel": "[Ɱáŕķ'š Ɱáŕķ]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
       "partyGroup": "[Ĝŕóúþ {n}]",
       "durationUnitSeconds": "[š]",
@@ -411,7 +412,8 @@ export const en_XA: EnTranslations = {
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
-      "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]"
+      "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
+      "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]"
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
