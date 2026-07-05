@@ -80,16 +80,16 @@ export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
 // The Westway: an open meadow crossing at the world's western edge; walking
 // west past the Mirrorshallow carries you straight into the Amberfall (a
 // wide unmarked trigger, no cave and no wall, like walking into a new land).
-export const AMBERFALL_PORTALS: PortalDef[] = [
-  {
-    id: 'westway_crossing',
-    a: { x: 177, z: 1078, landing: { x: 171, z: 1078, facing: 2.4 } },
-    b: { x: -60, z: 2608, landing: { x: -60, z: 2615, facing: 0 } },
-    radius: 4.0,
-    enterText: 'The dusk thins around you, and gold light floods the meadow ahead.',
-    leaveText: 'The gold fades at your back, and dusk settles over the Mirrorshallow.',
-  },
-];
+// A picket of triggers spans the corridor's full width so no walking line
+// slips between them (one circle could be walked around).
+export const AMBERFALL_PORTALS: PortalDef[] = [1062, 1070, 1078, 1086, 1094].map((z, i) => ({
+  id: `westway_crossing_${i}`,
+  a: { x: 176, z, landing: { x: 170, z: 1078, facing: 2.4 } },
+  b: { x: -60, z: 2608, landing: { x: -60, z: 2615, facing: 0 } },
+  radius: 4.5,
+  enterText: 'The dusk thins around you, and gold light floods the meadow ahead.',
+  leaveText: 'The gold fades at your back, and dusk settles over the Mirrorshallow.',
+}));
 
 // Creatures and quests follow in the content pass.
 export const AMBERFALL_MOBS: Record<string, MobTemplate> = {};

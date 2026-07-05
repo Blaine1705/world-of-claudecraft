@@ -674,8 +674,13 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // out from the shore reads as water meeting sky, and swim fatigue (not a
   // wall) turns swimmers back before the band edge.
   let rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
-  // the Westway crossing stays open: no border range over the corridor
-  if (x > 0 && z > 900) rimX *= smoothstep(18, 42, Math.abs(z - 1078));
+  // the Westway crossing stays open: no border range over the corridor,
+  // EXCEPT the last strip past the trigger picket, a steep backstop so no
+  // one wanders off the world's edge behind the crossing
+  if (x > 0 && z > 900) {
+    const backstop = smoothstep(178, 181, x);
+    rimX *= Math.max(smoothstep(18, 42, Math.abs(z - 1078)), backstop);
+  }
   const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
   let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
   if (inHollowOpenSea(x, z)) {
