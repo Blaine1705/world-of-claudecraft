@@ -22,6 +22,7 @@ import {
 } from './game/click_move';
 import { getClientSeed } from './game/client_seed';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
+import { installDevTeleports } from './game/dev_shortcuts';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { Input } from './game/input';
@@ -88,7 +89,7 @@ import { navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS } from './sim/data';
+import { ITEMS, ZONES } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -2490,6 +2491,21 @@ async function startGame(
             hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
           flushLockpickEvents: () => hud.flushLockpickEvents(),
         };
+        // Console realm teleports (go.vale() ... go.fen()): offline dev only,
+        // never online (server-authoritative movement) and never production.
+        if (import.meta.env.DEV && offlineSim && !online) {
+          installDevTeleports(
+            ZONES.map((zn) => ({ id: zn.id, town: zn.hub.name, x: zn.hub.x, z: zn.hub.z })),
+            (x, z) => {
+              const me = offlineSim.entities.get(offlineSim.playerId);
+              if (!me) return;
+              me.pos.x = x;
+              me.pos.z = z;
+              me.prevPos = { ...me.pos };
+              me.hp = me.maxHp;
+            },
+          );
+        }
       }, LOADING_FADE_MS);
     }),
   );
