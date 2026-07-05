@@ -1252,7 +1252,7 @@ export class Renderer {
     this.scene.add(this.emberFeatures.group);
     freezeStaticMatrices(this.emberFeatures.group);
     for (const light of this.emberFeatures.glowLights) this.fireLights.push(light);
-    this.frostSky = buildFrostSky();
+    this.frostSky = buildFrostSky(this.sim.cfg.seed);
     this.scene.add(this.frostSky.group);
 
     // selection ring — a classic target reticle: a base ring plus four
@@ -3550,7 +3550,7 @@ export class Renderer {
     // scorched haze south, thicker toward the volcanic north (looks pass)
     ember: { color: 0x9a5844, near: 55, far: 240 },
     // the Frostveil: dense icy mist, visibility closes right in
-    frost: { color: 0xc6d8e8, near: 34, far: 180 },
+    frost: { color: 0xa9bed2, near: 38, far: 190 },
     // the Amberfall: warm golden haze under an endless afternoon
     amber: { color: 0xdec18e, near: 65, far: 270 },
   };
@@ -3569,7 +3569,7 @@ export class Renderer {
     peaks: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
     dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
     ember: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
-    frost: { hemiSky: 0xcfe2ff, hemiGround: 0x8a94a8, sun: 0xeaf2ff },
+    frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
   };
 

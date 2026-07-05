@@ -116,7 +116,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   peaks: 0x6f8a7a,
   dusk: 0x7f93ab,
   ember: 0x93a06b,
-  frost: 0xc2d4da, // frosted boughs: reads as snow-dusted pines
+  frost: 0x7e99a2, // frosted but dark: pines hold their shape at distance
   amber: 0xb89a52, // autumn-burnished pines
 };
 const OAK_TINT: Record<BiomeId, number> = {
@@ -125,7 +125,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   peaks: 0x92a37f,
   dusk: 0x9c92b4,
   ember: 0xa8a060,
-  frost: 0x9fb0b8,
+  frost: 0x84989e,
   amber: 0xd8852f, // fire-orange canopy
 };
 const ROCK_TINT: Record<BiomeId, number> = {

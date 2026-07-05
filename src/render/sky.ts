@@ -140,7 +140,10 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   peaks: 0,
   dusk: 1,
   ember: 1,
-  frost: 1,
+  // frost keeps its real horizon: the lift smeared the day sky's cloud band
+  // into vertical streaks near the ground, and at the dim frost grade the
+  // HDRI's own horizon reads as distant dark ranges instead
+  frost: 0,
   amber: 1,
 };
 
