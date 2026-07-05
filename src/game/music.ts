@@ -53,7 +53,7 @@ export function shouldResetMusicForDungeonEntry(
 /** Pick the soundtrack layer from world position context. */
 export function musicZoneForLocation(
   zoneId: string,
-  biome: 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost' | 'amber',
+  biome: 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost' | 'amber' | 'fen',
   inHub: boolean,
   inDungeon: boolean,
   dungeonId: string | null = null,
@@ -64,7 +64,9 @@ export function musicZoneForLocation(
   const biomeLayer: MusicZone =
     biome === 'dusk' || biome === 'ember' || biome === 'frost' || biome === 'amber'
       ? 'peaks'
-      : biome;
+      : biome === 'fen'
+        ? 'marsh'
+        : biome;
   if (inHub) return TOWN_MUSIC[zoneId] ?? biomeLayer;
   return ZONE_MUSIC[zoneId] ?? biomeLayer;
 }

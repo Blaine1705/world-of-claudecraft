@@ -43,6 +43,7 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   // actually glow against
   frost: { gain: 0.3, clamp: 1.4 },
   amber: { gain: 0.5, clamp: 1.8 },
+  fen: { gain: 0.62, clamp: 2.6 },
 };
 
 // The dusk biome reuses the peaks dawn HDRI (already pink at the horizon); the
@@ -56,6 +57,7 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   ember: '/env/peaks_dawn_2k.hdr',
   frost: '/env/vale_day_2k.hdr',
   amber: '/env/peaks_dawn_2k.hdr',
+  fen: '/env/vale_day_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -66,6 +68,7 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   ember: '/env/peaks_dawn_1k.hdr',
   frost: '/env/vale_day_1k.hdr',
   amber: '/env/peaks_dawn_1k.hdr',
+  fen: '/env/vale_day_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -96,6 +99,7 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   ember: '/env/peaks_backdrop.webp',
   frost: '/env/vale_backdrop.webp',
   amber: '/env/peaks_backdrop.webp',
+  fen: '/env/vale_backdrop.webp',
 };
 
 const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
@@ -106,6 +110,7 @@ const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   ember: '/env/peaks_backdrop_4k.webp',
   frost: '/env/vale_backdrop_4k.webp',
   amber: '/env/peaks_backdrop_4k.webp',
+  fen: '/env/vale_backdrop_4k.webp',
 };
 
 const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
@@ -116,6 +121,7 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   ember: 0,
   frost: 0,
   amber: 0,
+  fen: 0,
 };
 
 // How strongly the painted horizon backdrop shows per biome. The dusk realm
@@ -129,6 +135,7 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   ember: 0,
   frost: 0,
   amber: 0,
+  fen: 0,
 };
 
 // The shared dawn HDRI has red hills PHOTOGRAPHED into its horizon band. The
@@ -145,6 +152,7 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   // HDRI's own horizon reads as distant dark ranges instead
   frost: 0,
   amber: 1,
+  fen: 1,
 };
 
 interface NetworkInformationLike {
@@ -201,6 +209,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   ember: 0.631,
   frost: 0.595,
   amber: 0.631,
+  fen: 0.595,
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -215,6 +224,8 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   frost: [0.5, 0.66, 1.05],
   // honey-gold eternal afternoon
   amber: [1.32, 1.04, 0.62],
+  // bright, airy, faintly cool: a clear wetland morning
+  fen: [0.98, 1.04, 1.1],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

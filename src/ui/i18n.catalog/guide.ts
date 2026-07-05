@@ -157,6 +157,9 @@ export const guideStrings = {
       amberName: 'The Amberfall',
       amberBlurb:
         'Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.',
+      fenName: 'The Willowfen',
+      fenBlurb:
+        'Past the autumn crown, a bright fen of willows and still water, and a town behind a moat.',
     },
 
     // Group content teaser.

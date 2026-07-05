@@ -233,6 +233,7 @@ const ZONE_IDS = [
   'drakelands',
   'frostveil',
   'amberfall',
+  'willowfen',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

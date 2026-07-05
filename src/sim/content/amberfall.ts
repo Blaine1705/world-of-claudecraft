@@ -75,6 +75,14 @@ export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
     { x: 58, z: 2910 },
     { x: 88, z: 2966 },
   ], // Lanternmere -> the Leaning Monolith, east of the Mere
+  [
+    { x: -14, z: 2830 },
+    { x: -44, z: 2848 },
+    { x: -52, z: 2920 },
+    { x: -24, z: 2990 },
+    { x: -20, z: 3040 },
+    { x: -20, z: 3122 },
+  ], // Lanternmere -> west around the Mere -> the Amberfen Steps
 ];
 
 // The Westway: an open meadow crossing at the world's western edge; walking

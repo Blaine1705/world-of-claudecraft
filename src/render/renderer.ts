@@ -51,6 +51,7 @@ import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
+import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -836,6 +837,7 @@ export class Renderer {
   private realmFlora: RealmFloraView;
   private emberFeatures: EmberFeaturesView;
   private frostSky: FrostSkyView;
+  private fenFeatures: FenFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1255,6 +1257,10 @@ export class Renderer {
     this.frostSky = buildFrostSky(this.sim.cfg.seed);
     this.scene.add(this.frostSky.group);
     for (const light of this.frostSky.glowLights) this.fireLights.push(light);
+    this.fenFeatures = buildFenFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.fenFeatures.group, 'props');
+    this.scene.add(this.fenFeatures.group);
+    freezeStaticMatrices(this.fenFeatures.group);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -1508,7 +1514,7 @@ export class Renderer {
     const biome = zoneBiomeAt(z);
     if (biome === 'vale') return 'grass';
     if (biome === 'marsh' || biome === 'ember') return 'dirt'; // ember: sandy waste
-    if (biome === 'amber') return 'grass';
+    if (biome === 'amber' || biome === 'fen') return 'grass';
     return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
   }
 
@@ -3554,6 +3560,8 @@ export class Renderer {
     frost: { color: 0xa9bed2, near: 38, far: 190 },
     // the Amberfall: warm golden haze under an endless afternoon
     amber: { color: 0xdec18e, near: 65, far: 270 },
+    // the Willowfen: clear airy morning, the lightest fog in the world
+    fen: { color: 0xcfe2dc, near: 95, far: 340 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3572,6 +3580,7 @@ export class Renderer {
     ember: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
     frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
+    fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
@@ -4512,6 +4521,7 @@ export class Renderer {
     this.realmFlora.update(this.time);
     this.emberFeatures.update(this.time);
     this.frostSky.update(this.time);
+    this.fenFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);

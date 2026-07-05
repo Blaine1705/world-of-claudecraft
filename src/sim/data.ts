@@ -98,6 +98,19 @@ import {
 } from './content/temple';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import {
+  WILLOWFEN_CAMPS,
+  WILLOWFEN_ITEMS,
+  WILLOWFEN_MOBS,
+  WILLOWFEN_NPCS,
+  WILLOWFEN_OBJECTS,
+  WILLOWFEN_PORTALS,
+  WILLOWFEN_PROPS,
+  WILLOWFEN_QUEST_ORDER,
+  WILLOWFEN_QUESTS,
+  WILLOWFEN_ROADS,
+  WILLOWFEN_ZONE,
+} from './content/willowfen';
+import {
   GRAVEYARD_POS,
   LAKE,
   TOWN_RADIUS,
@@ -193,6 +206,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DRAKELANDS_ITEMS,
   FROSTVEIL_ITEMS,
   AMBERFALL_ITEMS,
+  WILLOWFEN_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -211,6 +225,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...DRAKELANDS_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
+  ...WILLOWFEN_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -225,6 +240,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...DRAKELANDS_NPCS,
   ...FROSTVEIL_NPCS,
   ...AMBERFALL_NPCS,
+  ...WILLOWFEN_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -236,6 +252,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...DRAKELANDS_QUESTS,
   ...FROSTVEIL_QUESTS,
   ...AMBERFALL_QUESTS,
+  ...WILLOWFEN_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -247,6 +264,7 @@ export const QUEST_ORDER: string[] = [
   ...DRAKELANDS_QUEST_ORDER,
   ...FROSTVEIL_QUEST_ORDER,
   ...AMBERFALL_QUEST_ORDER,
+  ...WILLOWFEN_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -266,6 +284,7 @@ export const CAMPS: CampDef[] = [
   ...DRAKELANDS_CAMPS,
   ...FROSTVEIL_CAMPS,
   ...AMBERFALL_CAMPS,
+  ...WILLOWFEN_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -277,6 +296,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...DRAKELANDS_OBJECTS,
   ...FROSTVEIL_OBJECTS,
   ...AMBERFALL_OBJECTS,
+  ...WILLOWFEN_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -287,10 +307,16 @@ export const ROADS: { x: number; z: number }[][] = [
   ...DRAKELANDS_ROADS,
   ...FROSTVEIL_ROADS,
   ...AMBERFALL_ROADS,
+  ...WILLOWFEN_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
-export const PORTALS: PortalDef[] = [...REALM_PORTALS, ...FROSTVEIL_PORTALS, ...AMBERFALL_PORTALS];
+export const PORTALS: PortalDef[] = [
+  ...REALM_PORTALS,
+  ...FROSTVEIL_PORTALS,
+  ...AMBERFALL_PORTALS,
+  ...WILLOWFEN_PORTALS,
+];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
@@ -301,6 +327,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   DRAKELANDS_PROPS,
   FROSTVEIL_PROPS,
   AMBERFALL_PROPS,
+  WILLOWFEN_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -366,6 +393,7 @@ export const ZONES: ZoneDef[] = [
   DRAKELANDS_ZONE,
   FROSTVEIL_ZONE,
   AMBERFALL_ZONE,
+  WILLOWFEN_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]

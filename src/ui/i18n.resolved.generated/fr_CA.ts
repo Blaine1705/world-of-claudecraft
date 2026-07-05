@@ -1125,7 +1125,9 @@ export const fr_CA: EnTranslations = {
         "frostName": "The Frostveil Reach",
         "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights.",
         "amberName": "The Amberfall",
-        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere."
+        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.",
+        "fenName": "The Willowfen",
+        "fenBlurb": "Past the autumn crown, a bright fen of willows and still water, and a town behind a moat."
       },
       "group": {
         "heading": "Formez un groupe pour les passages difficiles",
@@ -7146,6 +7148,30 @@ export const fr_CA: EnTranslations = {
           },
           "6": {
             "label": "The Leaning Monolith"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "The Willowfen",
+        "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "The Amberfen Steps"
+          },
+          "2": {
+            "label": "The Lilymoors"
+          },
+          "3": {
+            "label": "Bogshine Pools"
+          },
+          "4": {
+            "label": "Willowweep"
+          },
+          "5": {
+            "label": "The Drowsy Flats"
           }
         }
       }

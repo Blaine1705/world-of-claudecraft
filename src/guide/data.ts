@@ -84,4 +84,11 @@ export const ZONE_TEASERS: ZoneTeaser[] = [
     min: 18,
     max: 20,
   },
+  {
+    id: 'fen',
+    nameKey: 'guide.home.world.fenName',
+    blurbKey: 'guide.home.world.fenBlurb',
+    min: 19,
+    max: 20,
+  },
 ];

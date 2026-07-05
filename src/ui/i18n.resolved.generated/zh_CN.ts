@@ -1125,7 +1125,9 @@ export const zh_CN: EnTranslations = {
         "frostName": "霜幕之境",
         "frostBlurb": "一处任何地图都未曾标出的雪封高地，只在舞动的极光中若隐若现。",
         "amberName": "琥珀秋境",
-        "amberBlurb": "西边峭壁之后，是一场永不落幕的秋天，金色湖面上灯火点点。"
+        "amberBlurb": "西边峭壁之后，是一场永不落幕的秋天，金色湖面上灯火点点。",
+        "fenName": "柳泽沼地",
+        "fenBlurb": "越过秋色之冠，是一片垂柳与静水的明亮沼泽，还有一座护城河环绕的小镇。"
       },
       "group": {
         "heading": "组队迎接硬仗",
@@ -7146,6 +7148,30 @@ export const zh_CN: EnTranslations = {
           },
           "6": {
             "label": "斜碑"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "柳泽沼地",
+        "welcome": "沼泽里蜻蜓与蜜蜂嗡嗡作响。跨过桥进入桥湖镇，歇歇脚吧。",
+        "pois": {
+          "0": {
+            "label": "桥湖镇"
+          },
+          "1": {
+            "label": "琥珀沼石阶"
+          },
+          "2": {
+            "label": "睡莲泽"
+          },
+          "3": {
+            "label": "泽光池"
+          },
+          "4": {
+            "label": "垂柳湾"
+          },
+          "5": {
+            "label": "沉眠浅滩"
           }
         }
       }

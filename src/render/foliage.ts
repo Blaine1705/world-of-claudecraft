@@ -118,6 +118,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   ember: 0x93a06b,
   frost: 0x7e99a2, // frosted but dark: pines hold their shape at distance
   amber: 0xb89a52, // autumn-burnished pines
+  fen: 0x8fae7e,
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -127,6 +128,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   ember: 0xa8a060,
   frost: 0x84989e,
   amber: 0xd8852f, // fire-orange canopy
+  fen: 0x9dc47e, // lush wetland green
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -136,6 +138,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   ember: 0x9a7a62,
   frost: 0x9aa8b8,
   amber: 0x9a8a70,
+  fen: 0x7e8a76,
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -145,6 +148,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   ember: 0xe0cfa8,
   frost: 0xe4e9f0,
   amber: 0xd8c0a0,
+  fen: 0xc8cfae,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -154,6 +158,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   ember: 0xd8c890,
   frost: 0xdde8f2,
   amber: 0xe8cf8a,
+  fen: 0xcfe4b0,
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
@@ -166,6 +171,7 @@ const DRESS_TINT: Record<BiomeId, number> = {
   ember: 0xb8a878,
   frost: 0xc8d8e0,
   amber: 0xd8a860,
+  fen: 0xa8c48e,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
@@ -1106,6 +1112,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   ember: 0.18,
   frost: 0.08,
   amber: 0.26,
+  fen: 0.3,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;

@@ -1355,6 +1355,23 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Leaning Monolith"
     ],
     "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you."
+  },
+  {
+    "id": "willowfen",
+    "name": "The Willowfen",
+    "min": 19,
+    "max": 20,
+    "biome": "fen",
+    "hub": "Bridgemere",
+    "pois": [
+      "Bridgemere",
+      "The Amberfen Steps",
+      "The Lilymoors",
+      "Bogshine Pools",
+      "Willowweep",
+      "The Drowsy Flats"
+    ],
+    "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile."
   }
 ];
 

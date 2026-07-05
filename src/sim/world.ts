@@ -36,6 +36,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   frost: { hill: 26, base: 6, hubHeight: 3 },
   // the Amberfall: rolling autumn weald around the Great Mere
   amber: { hill: 15, base: 2, hubHeight: 2.5 },
+  // the Willowfen: low, wet, and gentle
+  fen: { hill: 8, base: -0.3, hubHeight: 2 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with
@@ -275,6 +277,7 @@ const AMBER_LAND_LOBES = [
   { x: -80, z: 2950, r: 70 }, // Cindermaple Rise
   { x: 95, z: 2960, r: 70 }, // the Monolith heath
   { x: 0, z: 3040, r: 85 }, // the north crown
+  { x: -20, z: 3095, r: 55 }, // the Amberfen Steps' northern footing
 ] as const;
 const AMBER_BAYS = [
   { x: 170, z: 2820, r: 55 }, // the east sound
@@ -284,6 +287,48 @@ const AMBER_BAYS = [
 
 export function amberLandness(x: number, z: number): number {
   return metaballLandness(AMBER_LAND_LOBES, AMBER_BAYS, x, z);
+}
+
+// ---------------------------------------------------------------------------
+// The Willowfen: a low green wetland platter, widest of the north realms,
+// its coasts gentle everywhere (no cliffs in a fen).
+// ---------------------------------------------------------------------------
+const FEN_ZMAX = 3640; // keep in sync with WILLOWFEN_ZONE.zMax
+const FEN_LAND_LOBES = [
+  { x: -20, z: 3150, r: 65 }, // the Amberfen Steps' shelf
+  { x: 30, z: 3200, r: 80 }, // the eastern fen
+  { x: -70, z: 3240, r: 85 }, // the Lilymoors' platter
+  { x: 0, z: 3300, r: 90 }, // Bridgemere's wetland heart
+  { x: 90, z: 3260, r: 65 }, // Bogshine's shelf
+  { x: -60, z: 3400, r: 85 }, // Willowweep
+  { x: 40, z: 3430, r: 80 }, // the Drowsy Flats
+  { x: 0, z: 3530, r: 85 }, // the north fen
+  { x: -110, z: 3330, r: 60 },
+  { x: 110, z: 3380, r: 60 },
+] as const;
+const FEN_BAYS = [
+  { x: 170, z: 3300, r: 55 }, // the east sound
+  { x: -170, z: 3450, r: 55 }, // the west reach
+  { x: 30, z: 3635, r: 50 }, // the north cove
+] as const;
+
+export function fenLandness(x: number, z: number): number {
+  return metaballLandness(FEN_LAND_LOBES, FEN_BAYS, x, z);
+}
+
+// Gentle everywhere: the fen's shelf is wider and its floor shallower than
+// the other realms' (bog country, not sea cliffs).
+function applyFenCoast(x: number, z: number, h: number): number {
+  if (z <= AMBER_ZMAX || z > FEN_ZMAX + 2) return h;
+  const land = fenLandness(x, z);
+  const t = smoothstep(0.02, 0.34, land);
+  const shelf = smoothstep(-0.5, 0.06, land);
+  const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the Amberfen Steps: flat pass floor across the border
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 20))) * (1 - smoothstep(3170, 3220, z));
+  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  return out;
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
@@ -297,6 +342,9 @@ function applyAmberCoast(x: number, z: number, h: number): number {
   // the Goldmelt: a flat pass floor across the border, the Wyrmgate recipe
   const passT = (1 - smoothstep(26, 52, Math.abs(x - 10))) * (1 - smoothstep(2610, 2660, z));
   if (passT > 0 && out > 7) out = out + (7 + (out - 7) * 0.15 - out) * passT;
+  // ...and the Amberfen Steps' south ramp, meeting the fen's pass cap
+  const passN = (1 - smoothstep(26, 52, Math.abs(x + 20))) * smoothstep(3060, 3105, z);
+  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
   return out;
 }
 
@@ -489,8 +537,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     return dEdge < 48 && frostLandness(x, z) < 0.02;
   }
   if (z <= AMBER_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, AMBER_ZMAX - z);
+    const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && amberLandness(x, z) < 0.02;
+  }
+  if (z <= FEN_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, FEN_ZMAX - z);
+    return dEdge < 48 && fenLandness(x, z) < 0.02;
   }
   return false;
 }
@@ -675,6 +727,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
             emberLandness(x, z),
             frostLandness(x, z),
             amberLandness(x, z),
+            fenLandness(x, z),
           ),
         );
       }
@@ -689,6 +742,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyEmberCoast(x, z, h);
   h = applyFrostCoast(x, z, h);
   h = applyAmberCoast(x, z, h);
+  h = applyFenCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   // World rims AFTER the coast, so the border ranges rise out of the sea
@@ -812,6 +866,10 @@ export function generateDecorations(seed: number): Decoration[] {
         // a dense fire-colored weald, broadleaf-heavy
         if (r > 0.5) continue;
         kind = r < 0.12 ? 'tree' : r < 0.42 ? 'tree2' : 'rock';
+      } else if (biome === 'fen') {
+        // open and soft: scattered broadleafs, very little stone
+        if (r > 0.3) continue;
+        kind = r < 0.06 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
