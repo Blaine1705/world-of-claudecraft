@@ -45,9 +45,9 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   amber: { gain: 0.55, clamp: 2.2 },
   fen: { gain: 0.6, clamp: 2.6 },
   // the shipped Poly Haven night HDRI is far darker than any day sky
-  // (mean radiance ~0.07): the big gain lifts the milky way into view and
-  // the low clamp keeps the horizon lights from blooming the dark out
-  night: { gain: 5.0, clamp: 1.6 },
+  // (mean radiance ~0.07): the gain lifts the milky way into view and the
+  // tight clamp keeps the horizon lights from blooming the dark out
+  night: { gain: 2.4, clamp: 0.9 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm

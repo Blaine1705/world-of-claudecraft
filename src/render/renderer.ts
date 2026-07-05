@@ -1062,6 +1062,7 @@ export class Renderer {
         'frost',
         'amber',
         'fen',
+        'night',
       ];
       for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
@@ -3602,9 +3603,11 @@ export class Renderer {
     frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
     fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
-    // the Nightbloom: the "sun" is the moon, a cold silver key over deep
-    // blue ground bounce (the fireflies and blooms supply the warm accents)
-    night: { hemiSky: 0x8094c0, hemiGround: 0x222c44, sun: 0xbcccee },
+    // the Nightbloom: the "sun" is the moon. The light rig has no per-biome
+    // intensity knob, so the darkness lives in the color luminance: these
+    // sit at roughly a third of the day values, moon-blue, and the glow
+    // flora and fireflies carry the accents against the dark
+    night: { hemiSky: 0x38445e, hemiGround: 0x0e1220, sun: 0x505f7e },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
