@@ -290,6 +290,7 @@ export const es: EnTranslations = {
       "playerLabel": "Tu personaje",
       "targetLabel": "Tu objetivo",
       "targetAnnounce": "Objetivo: {name}",
+      "targetOfTargetLabel": "La marca de tu marca",
       "partyLabel": "Tu grupo",
       "partyGroup": "Grupo {n}",
       "durationUnitSeconds": "s",
@@ -418,7 +419,8 @@ export const es: EnTranslations = {
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
-      "showDailyRewardsChest": "Mostrar cofre de recompensas diarias"
+      "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
+      "showTargetOfTarget": "Mostrar objetivo del objetivo"
     },
     "controller": {
       "title": "Mando",

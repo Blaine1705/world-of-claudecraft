@@ -290,6 +290,7 @@ export const pl_PL: EnTranslations = {
       "playerLabel": "Twój bohater",
       "targetLabel": "Twój cel",
       "targetAnnounce": "Oznacz {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Twoja drużyna",
       "partyGroup": "Grupa {n}",
       "durationUnitSeconds": "s",
@@ -418,7 +419,8 @@ export const pl_PL: EnTranslations = {
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
-      "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród"
+      "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Kontroler",

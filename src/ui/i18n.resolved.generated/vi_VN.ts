@@ -290,6 +290,7 @@ export const vi_VN: EnTranslations = {
       "playerLabel": "Anh Hùng Của Bạn",
       "targetLabel": "Mục Tiêu Của Bạn",
       "targetAnnounce": "Đánh Dấu {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Đội Của Bạn",
       "partyGroup": "Nhóm {n}",
       "durationUnitSeconds": "s",
@@ -418,7 +419,8 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
-      "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày"
+      "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Tay Cầm",

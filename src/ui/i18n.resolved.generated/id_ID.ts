@@ -290,6 +290,7 @@ export const id_ID: EnTranslations = {
       "playerLabel": "Pahlawan Anda",
       "targetLabel": "Sasaran Anda",
       "targetAnnounce": "Tandai {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Kelompok Anda",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "d",
@@ -418,7 +419,8 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
-      "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian"
+      "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Kontroler",

@@ -290,6 +290,7 @@ export const fr_FR: EnTranslations = {
       "playerLabel": "Votre personnage",
       "targetLabel": "Votre cible",
       "targetAnnounce": "Cible : {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Votre groupe",
       "partyGroup": "Groupe {n}",
       "durationUnitSeconds": "s",
@@ -418,7 +419,8 @@ export const fr_FR: EnTranslations = {
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
-      "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes"
+      "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Manette",

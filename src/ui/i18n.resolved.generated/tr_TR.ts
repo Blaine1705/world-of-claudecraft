@@ -290,6 +290,7 @@ export const tr_TR: EnTranslations = {
       "playerLabel": "Kahramanın",
       "targetLabel": "Hedefin",
       "targetAnnounce": "{name} hedefini işaretle",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Takımın",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "sn",
@@ -418,7 +419,8 @@ export const tr_TR: EnTranslations = {
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
-      "showDailyRewardsChest": "Günlük Ödül Sandığını Göster"
+      "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
+      "showTargetOfTarget": "Show Target of Target"
     },
     "controller": {
       "title": "Oyun Kolu",

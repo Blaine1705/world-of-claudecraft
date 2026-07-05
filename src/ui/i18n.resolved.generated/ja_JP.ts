@@ -290,6 +290,7 @@ export const ja_JP: EnTranslations = {
       "playerLabel": "あなたのキャラクター",
       "targetLabel": "あなたのターゲット",
       "targetAnnounce": "ターゲット：{name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "あなたのパーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
@@ -418,7 +419,8 @@ export const ja_JP: EnTranslations = {
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
-      "showDailyRewardsChest": "デイリー報酬の宝箱を表示"
+      "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
+      "showTargetOfTarget": "ターゲットのターゲットを表示"
     },
     "controller": {
       "title": "コントローラー",

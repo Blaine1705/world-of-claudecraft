@@ -290,6 +290,7 @@ export const ko_KR: EnTranslations = {
       "playerLabel": "내 캐릭터",
       "targetLabel": "내 대상",
       "targetAnnounce": "대상: {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "내 파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
@@ -418,7 +419,8 @@ export const ko_KR: EnTranslations = {
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
-      "showDailyRewardsChest": "일일 보상 보물상자 표시"
+      "showDailyRewardsChest": "일일 보상 보물상자 표시",
+      "showTargetOfTarget": "대상의 대상 표시"
     },
     "controller": {
       "title": "컨트롤러",

@@ -11,22 +11,68 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [],
   "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "fr_FR": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "fr_CA": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "de_DE": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "zh_CN": [
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "zh_TW": [
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "ko_KR": [
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "ja_JP": [
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "pt_BR": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "ru_RU": [
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "nl_NL": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "pl_PL": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "id_ID": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "tr_TR": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "sv_SE": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "vi_VN": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
+  "da_DK": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ]
 };
