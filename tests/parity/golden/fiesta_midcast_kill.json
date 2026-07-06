@@ -10,8 +10,8 @@
     "fiesta lifesteal augment arm (~5499)",
     "multi-player fiesta meta"
   ],
-  "draws": 524,
-  "drawDigest": "1731ce7a",
+  "draws": 523,
+  "drawDigest": "1bff173c",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 404,
-      "state": "729d0404",
+      "state": "f2ccb9ec",
       "events": "a1a98eff",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 404,
-      "state": "c43eb324",
+      "state": "2f5619be",
       "events": "6e60008d",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 404,
-      "state": "30d5f65a",
+      "state": "085cd71c",
       "events": "9b3dbf7d",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "1dcaf0c6",
+      "state": "43d53f96",
       "events": "e324e10d",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "e016d355",
+      "state": "fdd2cdc7",
       "events": "eac8ab97",
       "rng": {
         "draws": 300,
@@ -85,7 +85,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -137,7 +136,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -191,7 +189,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -243,7 +240,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -378,7 +374,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.15,
+          "spellHaste": 0.1,
           "spellPower": 45,
           "stats": {
             "agi": 12,
@@ -402,8 +398,7 @@
           "castTotal": 2.5,
           "castingAbility": "fireball",
           "comboUntil": -1,
-          "critChance": 0.2045,
-          "critDmgBonus": 0.2,
+          "critChance": 0.1545,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.1345,
           "facing": 3.141593,
@@ -451,7 +446,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 151,
+          "attackPower": 131,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.121,
@@ -459,12 +454,12 @@
           "dodgeChance": 0.101,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 864,
+          "hp": 848,
           "id": 403,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 864,
+          "maxHp": 848,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -475,7 +470,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 207,
+          "rangedPower": 180,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -505,7 +500,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "1794e011",
+      "state": "cfc966c3",
       "events": "abc18e50",
       "rng": {
         "draws": 300,
@@ -515,7 +510,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -567,7 +561,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -621,7 +614,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -673,7 +665,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -808,7 +799,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.15,
+          "spellHaste": 0.1,
           "spellPower": 45,
           "stats": {
             "agi": 12,
@@ -830,8 +821,7 @@
           "attackPower": 125,
           "castTotal": 2.5,
           "comboUntil": -1,
-          "critChance": 0.2045,
-          "critDmgBonus": 0.2,
+          "critChance": 0.1545,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.1345,
           "facing": 3.141593,
@@ -879,7 +869,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 151,
+          "attackPower": 131,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.121,
@@ -887,12 +877,12 @@
           "dodgeChance": 0.101,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 864,
+          "hp": 848,
           "id": 403,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 864,
+          "maxHp": 848,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -903,7 +893,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 207,
+          "rangedPower": 180,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -933,7 +923,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "7c03caf7",
+      "state": "49a392c5",
       "events": "d24eb35d",
       "rng": {
         "draws": 300,
@@ -943,7 +933,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -996,7 +985,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1050,7 +1038,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1103,7 +1090,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1238,7 +1224,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.15,
+          "spellHaste": 0.1,
           "spellPower": 45,
           "stats": {
             "agi": 12,
@@ -1260,8 +1246,7 @@
           "attackPower": 125,
           "castTotal": 2,
           "comboUntil": -1,
-          "critChance": 0.2045,
-          "critDmgBonus": 0.2,
+          "critChance": 0.1545,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.1345,
@@ -1309,7 +1294,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 151,
+          "attackPower": 131,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.121,
@@ -1317,12 +1302,12 @@
           "dodgeChance": 0.101,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 864,
+          "hp": 848,
           "id": 403,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 864,
+          "maxHp": 848,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -1333,7 +1318,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 207,
+          "rangedPower": 180,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -1363,7 +1348,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 404,
-      "state": "dc9fa547",
+      "state": "f6ed4859",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1374,17 +1359,16 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 404,
-      "state": "853e6fd1",
+      "state": "1b59e269",
       "events": "741638a5",
       "rng": {
-        "draws": 524,
-        "digest": "1731ce7a"
+        "draws": 523,
+        "digest": "1bff173c"
       },
       "label": "final",
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1437,7 +1421,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1491,7 +1474,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1544,7 +1526,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1680,7 +1661,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.15,
+          "spellHaste": 0.1,
           "spellPower": 45,
           "stats": {
             "agi": 12,
@@ -1703,8 +1684,7 @@
           "castTotal": 2,
           "combatTimer": 2.05,
           "comboUntil": -1,
-          "critChance": 0.2045,
-          "critDmgBonus": 0.2,
+          "critChance": 0.1545,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.1345,
@@ -1752,7 +1732,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 151,
+          "attackPower": 131,
           "combatTimer": 101.05,
           "comboUntil": -1,
           "critChance": 0.121,
@@ -1760,12 +1740,12 @@
           "dodgeChance": 0.101,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "hp": 864,
+          "hp": 848,
           "id": 403,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 864,
+          "maxHp": 848,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -1776,7 +1756,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 207,
+          "rangedPower": 180,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {

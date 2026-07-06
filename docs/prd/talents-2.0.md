@@ -230,6 +230,29 @@ Reasons:
 So the whole player-facing model is: pick a spec at 10 (signature ability +
 mastery), pick 1 of 3 at levels 5/8/11/14/17/20. Nothing else.
 
+### All-27 extension (owner: 2026-07-07)
+
+Owner extended impactful masteries to every spec. The prior PR B pass already
+covered 10 specs; this follow-up updates the remaining 13. Warrior arms,
+warrior fury, warrior protection, and shaman elemental were already strong
+and remain unchanged.
+
+| Spec | New mastery fields |
+|---|---|
+| paladin/protection | global: threatPct 0.5; stats: armorPct 0.2 |
+| paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2 |
+| hunter/marksmanship | global: meleeDmgPct 0.2; stats: crit 0.03 |
+| hunter/survival | global: meleeDmgPct 0.15; stats: agiPct 0.15 |
+| mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| rogue/assassination | global: dotDmgPct 0.2; stats: crit 0.03 |
+| rogue/subtlety | global: critDmgPct 0.4; stats: agiPct 0.1 |
+| priest/holy | global: healPct 0.2 |
+| priest/shadow | global: dotDmgPct 0.15, spellDmgPct 0.1 |
+| shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1 |
+| druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
+| warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
+
 ### Spec signature fairness (audit + fix)
 
 Audit method: a signature is REAL only if its ability id is absent from

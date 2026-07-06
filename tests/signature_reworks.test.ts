@@ -155,8 +155,8 @@ describe('spell haste plumbing', () => {
   it('a spec mastery with spellHastePct folds into the caster spell-haste stat', () => {
     const sim = makeSim('mage', 'arcane');
     const p = sim.entities.get(sim.playerId) as Entity;
-    // Aetheric Flux mastery grants +15% spell haste.
-    expect(p.spellHaste).toBeCloseTo(0.15);
+    // Aetheric Flux mastery grants +10% spell haste (all-27 identity pass values).
+    expect(p.spellHaste).toBeCloseTo(0.1);
   });
 
   it('Arcane Power keeps its 0.1 haste value under an Arcane spell-damage mastery (no round-to-0)', () => {
