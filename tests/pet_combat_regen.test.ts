@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { dist2d } from '../src/sim/types';
 
@@ -23,11 +24,18 @@ function summonInfernal(sim: Sim, p: any) {
 }
 
 function firstWildMob(sim: Sim) {
-  let best: any = null, bd = Infinity;
+  let best: any = null,
+    bd = Infinity;
   for (const e of sim.entities.values()) {
-    if (e.kind !== 'mob' || e.dead || (e as any).ownerId !== null) continue;
+    if (e.kind !== 'mob' || e.dead || (e as any).ownerId !== null || !e.hostile) continue;
+    // it must also fight back: a passive-aggro template never targets the
+    // pet, and the owner-combat link keys off the mob's target
+    if ((MOBS[e.templateId]?.aggroRadius ?? 0) <= 0) continue;
     const d = dist2d(sim.player.pos, e.pos);
-    if (d < bd) { bd = d; best = e; }
+    if (d < bd) {
+      bd = d;
+      best = e;
+    }
   }
   if (!best) throw new Error('no wild mob');
   return best;
@@ -55,7 +63,10 @@ describe('pet-held combat does not block owner health regen', () => {
     p.combatTimer = 99;
     const hpStart = p.hp;
 
-    for (let i = 0; i < 200; i++) { place(); sim.tick(); }
+    for (let i = 0; i < 200; i++) {
+      place();
+      sim.tick();
+    }
 
     expect(pet.aggroTargetId).toBe(mob.id); // pet still "has" the target
     expect(p.hp).toBeGreaterThan(hpStart); // but the owner regenerates
@@ -68,19 +79,30 @@ describe('pet-held combat does not block owner health regen', () => {
 
     // Park a high-HP target in melee range of the pet so it keeps swinging:
     // the pet's combatTimer stays low, so the owner stays in combat.
-    mob.hp = 1_000_000; mob.maxHp = 1_000_000;
+    mob.hp = 1_000_000;
+    mob.maxHp = 1_000_000;
     pet.petMode = 'aggressive';
     const place = () => {
       pet.pos = { x: p.pos.x + 1, y: p.pos.y, z: p.pos.z };
       mob.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z };
     };
 
-    p.hp = Math.floor(p.maxHp * 0.4);
     p.inCombat = false;
     p.combatTimer = 99;
+    // let the aggressive pet actually acquire the target and start trading
+    // blows before sampling the baseline (the warm-up takes a few seconds,
+    // and the owner legitimately regens until the first blows land)
+    for (let i = 0; i < 20 * 8 && pet.combatTimer >= 5; i++) {
+      place();
+      sim.tick();
+    }
+    p.hp = Math.floor(p.maxHp * 0.4);
     const hpStart = p.hp;
 
-    for (let i = 0; i < 200; i++) { place(); sim.tick(); }
+    for (let i = 0; i < 200; i++) {
+      place();
+      sim.tick();
+    }
 
     expect(pet.combatTimer).toBeLessThan(5); // pet is genuinely fighting
     expect(p.hp).toBe(hpStart); // owner remains in combat, no health regen

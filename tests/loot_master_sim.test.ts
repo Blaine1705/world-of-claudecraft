@@ -196,7 +196,7 @@ describe('master loot', () => {
         if (e.type === 'lootRoll' && e.rollId === rollId) convertedEarly = true;
     }
     expect(convertedEarly).toBe(false);
-  });
+  }, 20000);
 
   it('converts an uncurated drop to a need/greed roll for all candidates at the 5-min timeout', () => {
     const sim = makeSim();
