@@ -89,6 +89,11 @@ export function paintTerrainRows(
         r = 118;
         g = 106;
         b = 168;
+      } else if (biome === 'haunt') {
+        // the haunted wood reads near-black forest
+        r = 48;
+        g = 56;
+        b = 44;
       } // snowbound; amber: autumn gold; night: moonlit blue
       if (h < WATER_LEVEL) {
         r = 38;
@@ -123,6 +128,11 @@ export function paintTerrainRows(
         r = 154;
         g = 140;
         b = 190;
+      } else if (biome === 'haunt' && h > 20) {
+        // wet grey crags looming out of the murk
+        r = 82;
+        g = 86;
+        b = 78;
       } else if (biome === 'frost' && h > 6) {
         // mid benches: slightly shaded snow, never the mossy green
         r = 202;

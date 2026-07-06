@@ -79,6 +79,12 @@ export const NIGHTBLOOM_ROADS: { x: number; z: number }[][] = [
     { x: -2, z: 3950 },
     { x: 0, z: 4016 },
   ], // Moonrest -> the Sleepless Barrow
+  [
+    { x: 0, z: 4016 },
+    { x: 4, z: 4080 },
+    { x: 16, z: 4130 },
+    { x: 30, z: 4192 },
+  ], // the Barrow -> the Crowgate, west around the Barrowmere
 ];
 
 // No portals: walked into over the Nightgate.

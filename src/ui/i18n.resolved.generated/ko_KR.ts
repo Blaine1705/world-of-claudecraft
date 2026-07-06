@@ -5768,6 +5768,18 @@ export const ko_KR: EnTranslations = {
       "barrow_king": {
         "name": "봉분의 왕"
       },
+      "widowsilk_spinner": {
+        "name": "과부비단 거미"
+      },
+      "wood_wraith": {
+        "name": "숲 망령"
+      },
+      "gravenbark_shambler": {
+        "name": "무덤껍질 괴목"
+      },
+      "pale_huntsman": {
+        "name": "창백한 사냥꾼"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -7235,6 +7247,30 @@ export const ko_KR: EnTranslations = {
           },
           "5": {
             "label": "잠들지 않는 봉분"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "망령숲",
+        "welcome": "나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 갈로미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.",
+        "pois": {
+          "0": {
+            "label": "갈로미어"
+          },
+          "1": {
+            "label": "까마귀 문"
+          },
+          "2": {
+            "label": "과부의 덤불"
+          },
+          "3": {
+            "label": "교수대 공터"
+          },
+          "4": {
+            "label": "애도석 예배당"
+          },
+          "5": {
+            "label": "사냥꾼의 공터"
           }
         }
       }

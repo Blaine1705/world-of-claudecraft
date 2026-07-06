@@ -5768,6 +5768,18 @@ export const zh_CN: EnTranslations = {
       "barrow_king": {
         "name": "古冢之王"
       },
+      "widowsilk_spinner": {
+        "name": "寡妇丝纺蛛"
+      },
+      "wood_wraith": {
+        "name": "林中怨灵"
+      },
+      "gravenbark_shambler": {
+        "name": "墓皮树怪"
+      },
+      "pale_huntsman": {
+        "name": "苍白猎手"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -7235,6 +7247,30 @@ export const zh_CN: EnTranslations = {
           },
           "5": {
             "label": "不眠古冢"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "怨灵林",
+        "welcome": "树冠像棺盖一样在路上合拢。跟紧绞湖镇的灯火，若林中有声音喊你的名字，千万别回应。",
+        "pois": {
+          "0": {
+            "label": "绞湖镇"
+          },
+          "1": {
+            "label": "鸦门"
+          },
+          "2": {
+            "label": "寡妇棘丛"
+          },
+          "3": {
+            "label": "吊影林地"
+          },
+          "4": {
+            "label": "哀石礼拜堂"
+          },
+          "5": {
+            "label": "猎手林隙"
           }
         }
       }

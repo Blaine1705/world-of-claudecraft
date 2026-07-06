@@ -178,6 +178,14 @@ const BIOME_PALETTE: Record<
     dirt: 0x8a5cb8,
     sand: 0xd8a8f0,
   },
+  // haunt: dead mossy floor, cold wet earth, everything a shade too dark
+  haunt: {
+    grass: 0x46543e,
+    grassDark: 0x2e382c,
+    grassYellow: 0x5a6644,
+    dirt: 0x453c34,
+    sand: 0x6b6754,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -191,6 +199,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   amber: 0.52,
   fen: 0.6,
   night: 0.55,
+  haunt: 0.58,
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));

@@ -71,6 +71,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
@@ -842,6 +843,7 @@ export class Renderer {
   private fenFeatures: FenFeaturesView;
   private amberFeatures: AmberFeaturesView;
   private nightFeatures: NightFeaturesView;
+  private hauntFeatures: HauntFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1063,6 +1065,7 @@ export class Renderer {
         'amber',
         'fen',
         'night',
+        'haunt',
       ];
       for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
@@ -1281,6 +1284,10 @@ export class Renderer {
     this.scene.add(this.nightFeatures.group);
     freezeStaticMatrices(this.nightFeatures.group);
     for (const light of this.nightFeatures.glowLights) this.fireLights.push(light);
+    this.hauntFeatures = buildHauntFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.hauntFeatures.group, 'props');
+    this.scene.add(this.hauntFeatures.group);
+    for (const light of this.hauntFeatures.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -3584,6 +3591,8 @@ export class Renderer {
     fen: { color: 0xcfe2dc, near: 95, far: 340 },
     // the Nightbloom: a soft lavender dream-haze over the violet downs
     night: { color: 0xbfb0e8, near: 90, far: 330 },
+    // the Wraithwood: dense dead-grey murk, sightlines close right in
+    haunt: { color: 0x59615a, near: 34, far: 175 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3606,6 +3615,9 @@ export class Renderer {
     // the Nightbloom: dreamlight. A rose-white sun over lavender sky bounce
     // and deep violet ground, bright as day but nothing like it
     night: { hemiSky: 0xd8ccff, hemiGround: 0x564a80, sun: 0xffe6f0 },
+    // the Wraithwood: sickly grey light strangled by the canopy (the rig has
+    // no intensity knob, so the gloom lives in the color luminance)
+    haunt: { hemiSky: 0x6d766c, hemiGround: 0x151a15, sun: 0x8f9a86 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
@@ -4549,6 +4561,7 @@ export class Renderer {
     this.fenFeatures.update(this.time);
     this.amberFeatures.update(this.time);
     this.nightFeatures.update(this.time);
+    this.hauntFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);
@@ -4925,8 +4938,8 @@ export class Renderer {
           ? null
           : biome === 'peaks' || biome === 'frost'
             ? 'snow'
-            : biome === 'marsh'
-              ? 'rain'
+            : biome === 'marsh' || biome === 'haunt'
+              ? 'rain' // the haunted wood drips under a permanent drizzle
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.

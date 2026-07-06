@@ -40,6 +40,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   fen: { hill: 8, base: -0.3, hubHeight: 2 },
   // the Nightbloom: soft moonlit downs, a touch more rolling than the fen
   night: { hill: 12, base: 1, hubHeight: 2.5 },
+  // the Wraithwood: low haunted forest floor under the giant canopies
+  haunt: { hill: 13, base: 1.5, hubHeight: 2.5 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with
@@ -355,6 +357,8 @@ const NIGHT_LAND_LOBES = [
   { x: 35, z: 3865, r: 55 }, // the Vigil road's shoulder
   { x: -120, z: 3950, r: 55 }, // the west arm
   { x: 130, z: 3760, r: 50 }, // the east arm
+  { x: 30, z: 4160, r: 48 }, // the Crowgate's southern footing
+  { x: 10, z: 4100, r: 50 }, // the dream road's shoulder past the Barrowmere
 ] as const;
 const NIGHT_BAYS = [
   { x: 170, z: 3900, r: 55 }, // the east sound
@@ -376,6 +380,50 @@ function applyNightCoast(x: number, z: number, h: number): number {
   let out = floor + (h - floor) * t;
   // the Nightgate: flat pass floor across the border
   const passT = (1 - smoothstep(26, 52, Math.abs(x + 30))) * (1 - smoothstep(3690, 3740, z));
+  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  // ...and the Crowgate's south ramp, meeting the haunted wood's pass cap
+  const passN = (1 - smoothstep(26, 52, Math.abs(x - 30))) * smoothstep(4120, 4165, z);
+  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// The Wraithwood: the haunted forest at the world's current northern end.
+// A broad wooded platter whose shores sink into a drowned grey sea.
+// ---------------------------------------------------------------------------
+const WOOD_ZMAX = 4760; // keep in sync with WRAITHWOOD_ZONE.zMax
+const WOOD_LAND_LOBES = [
+  { x: 30, z: 4240, r: 55 }, // the Crowgate's shelf
+  { x: 0, z: 4360, r: 90 }, // the realm's heart: Gallowmere under the eaves
+  { x: -80, z: 4430, r: 80 }, // Widow's Thicket
+  { x: 80, z: 4470, r: 75 }, // the Hanging Glade
+  { x: -60, z: 4560, r: 70 }, // the Mournstone rise
+  { x: 10, z: 4630, r: 80 }, // the Huntsman's clearing
+  { x: -10, z: 4480, r: 70 }, // the midwood saddle: bridges hamlet to chapel
+  { x: 14, z: 4540, r: 50 }, // the clearing road's shoulder
+  { x: -130, z: 4500, r: 55 }, // the west arm
+  { x: 130, z: 4380, r: 50 }, // the east arm
+] as const;
+const WOOD_BAYS = [
+  { x: 170, z: 4460, r: 55 }, // the east sound
+  { x: -170, z: 4340, r: 55 }, // the west reach
+  { x: 40, z: 4740, r: 50 }, // the north bight, open to the grey sea
+] as const;
+
+export function woodLandness(x: number, z: number): number {
+  return metaballLandness(WOOD_LAND_LOBES, WOOD_BAYS, x, z);
+}
+
+// Gentle shores under the murk, the fen recipe again.
+function applyWoodCoast(x: number, z: number, h: number): number {
+  if (z <= NIGHT_ZMAX || z > WOOD_ZMAX + 2) return h;
+  const land = woodLandness(x, z);
+  const t = smoothstep(0.02, 0.32, land);
+  const shelf = smoothstep(-0.5, 0.06, land);
+  const floor = WATER_LEVEL - 3.6 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.6)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the Crowgate: flat pass floor across the border
+  const passT = (1 - smoothstep(26, 52, Math.abs(x - 30))) * (1 - smoothstep(4250, 4300, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
   return out;
 }
@@ -594,8 +642,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     return dEdge < 48 && fenLandness(x, z) < 0.02;
   }
   if (z <= NIGHT_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, NIGHT_ZMAX - z);
+    const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && nightLandness(x, z) < 0.02;
+  }
+  if (z <= WOOD_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, WOOD_ZMAX - z);
+    return dEdge < 48 && woodLandness(x, z) < 0.02;
   }
   return false;
 }
@@ -782,6 +834,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
             amberLandness(x, z),
             fenLandness(x, z),
             nightLandness(x, z),
+            woodLandness(x, z),
           ),
         );
       }
@@ -798,6 +851,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyAmberCoast(x, z, h);
   h = applyFenCoast(x, z, h);
   h = applyNightCoast(x, z, h);
+  h = applyWoodCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   // World rims AFTER the coast, so the border ranges rise out of the sea
@@ -929,6 +983,10 @@ export function generateDecorations(seed: number): Decoration[] {
         // open moon meadows: sparse silvered groves, standing stones between
         if (r > 0.28) continue;
         kind = r < 0.08 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
+      } else if (biome === 'haunt') {
+        // the densest forest in the world: the canopy is the realm
+        if (r > 0.62) continue;
+        kind = r < 0.3 ? 'tree' : r < 0.54 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

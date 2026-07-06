@@ -27,7 +27,17 @@ export interface SpatialAudioSink {
   ): void;
   /** Per-frame ambience state around the player; the engine cross-fades loops. */
   ambience(
-    biome: 'vale' | 'marsh' | 'peaks' | 'dusk' | 'ember' | 'frost' | 'amber' | 'fen' | 'night',
+    biome:
+      | 'vale'
+      | 'marsh'
+      | 'peaks'
+      | 'dusk'
+      | 'ember'
+      | 'frost'
+      | 'amber'
+      | 'fen'
+      | 'night'
+      | 'haunt',
     inDungeon: boolean,
     precip: 'snow' | 'rain' | null,
     nearWater: boolean,

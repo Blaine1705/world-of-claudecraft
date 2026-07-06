@@ -46,6 +46,9 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   fen: { gain: 0.6, clamp: 2.6 },
   // the Nightbloom's dream sky is project-generated like its siblings
   night: { gain: 0.55, clamp: 2.2 },
+  // the Wraithwood borrows the marsh overcast, graded down to a dead grey
+  // gloom until its own generated sky lands (skies_in/wraithwood.png)
+  haunt: { gain: 0.38, clamp: 1.4 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -62,6 +65,7 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   amber: '/env/amber_sunset_2k.hdr',
   fen: '/env/fen_day_2k.hdr',
   night: '/env/nightbloom_dream_2k.hdr',
+  haunt: '/env/marsh_overcast_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -74,6 +78,7 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   amber: '/env/amber_sunset_1k.hdr',
   fen: '/env/fen_day_1k.hdr',
   night: '/env/nightbloom_dream_1k.hdr',
+  haunt: '/env/marsh_overcast_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -106,6 +111,7 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   amber: '/env/peaks_backdrop.webp',
   fen: '/env/vale_backdrop.webp',
   night: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
+  haunt: '/env/marsh_backdrop.webp', // never shown: backdrop strength 0
 };
 
 const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
@@ -118,6 +124,7 @@ const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   amber: '/env/peaks_backdrop_4k.webp',
   fen: '/env/vale_backdrop_4k.webp',
   night: '/env/vale_backdrop_4k.webp',
+  haunt: '/env/marsh_backdrop_4k.webp',
 };
 
 const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
@@ -130,6 +137,7 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   amber: 0,
   fen: 0,
   night: 0,
+  haunt: 0,
 };
 
 // How strongly the painted horizon backdrop shows per biome. The dusk realm
@@ -147,6 +155,7 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   // whole cloudscape (the lift alone was the streak culprit, and it is off)
   fen: 0,
   night: 0,
+  haunt: 0,
 };
 
 // Lift masks a horizon band PHOTOGRAPHED into an HDRI (the dawn sky's red
@@ -163,6 +172,7 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   amber: 0,
   fen: 0,
   night: 0,
+  haunt: 0,
 };
 
 interface NetworkInformationLike {
@@ -223,6 +233,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   amber: 0.501,
   fen: 0.497,
   night: 0.324, // the dream sky's low sun over its glowing sea
+  haunt: 0.657, // the marsh overcast's measured sun, shared while borrowed
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -240,6 +251,9 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   amber: [1, 1, 1],
   fen: [1, 1, 1],
   night: [1, 1, 1],
+  // dead grey-green murk over the haunted wood (placeholder grade until the
+  // realm's own sky arrives)
+  haunt: [0.62, 0.66, 0.6],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

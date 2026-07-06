@@ -30,6 +30,7 @@ const MOTE_TINT: Record<BiomeId, number> = {
   amber: 0xffd98a, // drifting golden leaves
   fen: 0xeaffd0, // drifting pollen and midge-glow
   night: 0xf2dcff, // dream sparkles: pale rose-white drift
+  haunt: 0xc2d4b4, // drifting grave-pale spores
 };
 
 const RADIUS = 26; // motes live within this ring of the player

@@ -5768,6 +5768,18 @@ export const ja_JP: EnTranslations = {
       "barrow_king": {
         "name": "塚の王"
       },
+      "widowsilk_spinner": {
+        "name": "ウィドウシルク・スピナー"
+      },
+      "wood_wraith": {
+        "name": "ウッドレイス"
+      },
+      "gravenbark_shambler": {
+        "name": "グレイヴンバーク"
+      },
+      "pale_huntsman": {
+        "name": "蒼白の狩人"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -7235,6 +7247,30 @@ export const ja_JP: EnTranslations = {
           },
           "5": {
             "label": "不眠の塚"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "レイスウッド",
+        "welcome": "梢が棺の蓋のように道の上で閉じていく。ガロウミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。",
+        "pois": {
+          "0": {
+            "label": "ガロウミア"
+          },
+          "1": {
+            "label": "鴉の門"
+          },
+          "2": {
+            "label": "寡婦の茨"
+          },
+          "3": {
+            "label": "吊るしの林間地"
+          },
+          "4": {
+            "label": "哀石の礼拝堂"
+          },
+          "5": {
+            "label": "狩人の広場"
           }
         }
       }

@@ -1007,6 +1007,12 @@ const MOB_KEYS: Record<string, string> = {
   gloam_strider: 'mob_raptor',
   nightkin_stargazer: 'mob_nightkin',
   barrow_king: 'skel_warrior',
+  // the Wraithwood: drifting wraiths on the ghost rig, walking haunted
+  // trees on the treant's, and the hooded Huntsman on the crypt rogue's
+  // (the widowsilk spinners take the spider family default)
+  wood_wraith: 'mob_ghost',
+  gravenbark_shambler: 'mob_treant',
+  pale_huntsman: 'skel_rogue',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

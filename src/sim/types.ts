@@ -1189,7 +1189,8 @@ export type BiomeId =
   | 'frost'
   | 'amber'
   | 'fen'
-  | 'night';
+  | 'night'
+  | 'haunt';
 
 export interface ZoneDef {
   id: string;

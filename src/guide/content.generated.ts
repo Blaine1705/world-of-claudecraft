@@ -1389,6 +1389,23 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Sleepless Barrow"
     ],
     "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky."
+  },
+  {
+    "id": "wraithwood",
+    "name": "The Wraithwood",
+    "min": 20,
+    "max": 20,
+    "biome": "haunt",
+    "hub": "Gallowmere",
+    "pois": [
+      "Gallowmere",
+      "The Crowgate",
+      "Widow's Thicket",
+      "The Hanging Glade",
+      "The Mournstone Chapel",
+      "The Huntsman's Clearing"
+    ],
+    "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name."
   }
 ];
 
