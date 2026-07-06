@@ -3592,7 +3592,7 @@ export class Renderer {
     // the Nightbloom: a soft lavender dream-haze over the violet downs
     night: { color: 0xbfb0e8, near: 90, far: 330 },
     // the Wraithwood: dense dead-grey murk, sightlines close right in
-    haunt: { color: 0x59615a, near: 34, far: 175 },
+    haunt: { color: 0x454c46, near: 30, far: 150 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3617,7 +3617,7 @@ export class Renderer {
     night: { hemiSky: 0xd8ccff, hemiGround: 0x564a80, sun: 0xffe6f0 },
     // the Wraithwood: sickly grey light strangled by the canopy (the rig has
     // no intensity knob, so the gloom lives in the color luminance)
-    haunt: { hemiSky: 0x6d766c, hemiGround: 0x151a15, sun: 0x8f9a86 },
+    haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {

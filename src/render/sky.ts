@@ -48,7 +48,7 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   night: { gain: 0.55, clamp: 2.2 },
   // the Wraithwood borrows the marsh overcast, graded down to a dead grey
   // gloom until its own generated sky lands (skies_in/wraithwood.png)
-  haunt: { gain: 0.38, clamp: 1.4 },
+  haunt: { gain: 0.3, clamp: 1.1 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -253,7 +253,7 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   night: [1, 1, 1],
   // dead grey-green murk over the haunted wood (placeholder grade until the
   // realm's own sky arrives)
-  haunt: [0.62, 0.66, 0.6],
+  haunt: [0.5, 0.55, 0.5],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
