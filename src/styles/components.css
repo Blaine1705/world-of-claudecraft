@@ -1919,11 +1919,6 @@
     border-color: var(--border);
     color: var(--color-text-muted);
   }
-  .tal-row-lock {
-    flex: 0 0 auto;
-    font-size: 10.5px;
-    color: var(--color-text-muted);
-  }
   .tal-row-opts {
     flex: 1;
     min-width: 0;

@@ -6,7 +6,6 @@
 // (repainted on open/tab-switch/pick, never per frame). Owns no state.
 
 import { esc } from './esc';
-import { t } from './i18n';
 import { talentEffectIconRef, talentIconDataUrl } from './talent_icons';
 import type { TalentRowsVM } from './talent_rows_view';
 
@@ -42,15 +41,12 @@ export function paintTalentRowsTab(
         );
       })
       .join('');
-    const lock = row.unlocked
-      ? ''
-      : `<span class="tal-row-lock">${esc(
-          t('hudChrome.itemTooltip.requiresLevel', { level: row.level }),
-        )}</span>`;
+    // The level badge on the left already says when the row unlocks; a locked
+    // row just dims (no redundant "requires level" text, owner call).
     parts.push(
       `<div class="tal-row${row.unlocked ? '' : ' locked'}">` +
         `<span class="tal-row-lv${row.unlocked ? '' : ' locked'}">${row.level}</span>` +
-        `<div class="tal-row-opts">${opts}</div>${lock}` +
+        `<div class="tal-row-opts">${opts}</div>` +
         `</div>`,
     );
   }
