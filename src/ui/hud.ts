@@ -7184,7 +7184,7 @@ export class Hud {
         // Chain Heal uses a custom one-shot healing cast clip (cast_chain_heal)
         // instead of the earthy nature cast loop its school would otherwise pick.
         if (ent && ev.ability === 'chain_heal') {
-          this.combat('cast_chain_heal', ent.pos.x, ent.pos.y, ent.pos.z, 0.6);
+          this.combat('cast_chain_heal', ent.pos.x, ent.pos.y, ent.pos.z, 0.45);
           return;
         }
         const key = castKeyForAbility(ev.ability);
