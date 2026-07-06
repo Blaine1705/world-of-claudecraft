@@ -194,7 +194,13 @@ export type AuraKind =
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
   | 'buff_scale'
-  | 'buff_jump';
+  | 'buff_jump'
+  // Choice-row talent primitives. `buff_dmg_done` value = additive fraction of
+  // extra outgoing damage (0.2 = +20%), summed across auras in dealDamage;
+  // `buff_crit` value = additive crit chance folded by recalcPlayerStats. Worn
+  // by talent cooldowns (Recklessness / Avatar / Bloodbath / Sanguine Aura).
+  | 'buff_dmg_done'
+  | 'buff_crit';
 
 export interface Aura {
   id: string; // ability id that applied it

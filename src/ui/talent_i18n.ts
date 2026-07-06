@@ -47,7 +47,10 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
-type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted'>;
+// Globals with no auto-generated tooltip label: critVsRooted (situational spell
+// crit) and the choice-row rage-generation multipliers, whose row options carry
+// hand-authored descriptions instead of the generated "Increases X by Y%" form.
+type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted' | 'autoRagePct' | 'abilityRagePct'>;
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
@@ -7081,7 +7084,7 @@ function effectDescription(
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
-    if (key === 'critVsRooted') continue;
+    if (key === 'critVsRooted' || key === 'autoRagePct' || key === 'abilityRagePct') continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
   }
 

@@ -70,6 +70,13 @@ import {
   rollSkinRank,
 } from './content/skins';
 import {
+  computeModifiersWithRows,
+  emptyRowPicks,
+  type RowPicks,
+  rowTreeFor,
+  sanitizeRowPicks,
+} from './content/talent_rows';
+import {
   cloneAllocation,
   computeTalentModifiers,
   emptyAllocation,
@@ -198,6 +205,7 @@ import {
 import {
   applyTalentAllocation,
   deleteTalentLoadout,
+  pickChoiceRowTalent,
   respecTalents,
   saveTalentLoadout,
   setTalentSpec,
@@ -754,6 +762,10 @@ export interface PlayerMeta {
   // change (recomputeTalents), never walked on the combat or stat hot path.
   talents: TalentAllocation;
   talentMods: TalentModifiers;
+  // Choice-row talents (the Pandaria-style row system, content/talent_rows.ts):
+  // the picked option id per row (null = unpicked), folded into `talentMods` by
+  // the recompute alongside the point tree. Persisted in CharacterState.
+  rowPicks: RowPicks;
   // 2v2 Fiesta (session-only, never persisted). `fiestaAugments` is the ordered
   // list of augment ids picked this bout; `fiestaMods` is talentMods with those
   // augments folded in (the effective modifier the stat/ability hot paths use
@@ -859,6 +871,10 @@ export interface CharacterState {
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
+  // Choice-row picks (option id per row, null = unpicked). Additive field: old
+  // saves without it load as all-unpicked; sanitized against the current tree
+  // and level on load like `talents` is repaired.
+  rowPicks?: (string | null)[];
   loadouts?: SavedLoadout[];
   activeLoadout?: number;
   raidLockouts?: Record<string, number>;
@@ -1411,6 +1427,7 @@ export class Sim {
       arena2v2Losses: savedArena2v2.losses,
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
+      rowPicks: emptyRowPicks(),
       fiestaAugments: [],
       fiestaMods: null,
       fiestaSpecial: {},
@@ -1501,6 +1518,9 @@ export class Sim {
           },
           talentPointsAtLevel(player.level),
         );
+      // Choice-row picks are revalidated the same way: unknown option ids and
+      // rows above the character's level are dropped before the bake below.
+      if (s.rowPicks) meta.rowPicks = sanitizeRowPicks(rowTreeFor(cls), s.rowPicks, player.level);
       if (s.loadouts)
         meta.loadouts = s.loadouts.map((l) => ({
           name: l.name,
@@ -1535,9 +1555,10 @@ export class Sim {
       }
     }
 
-    // Resolve the flat talent struct once, before the stat pass + ability
-    // resolver below consume it (they only ever read these flat numbers).
-    meta.talentMods = computeTalentModifiers(cls, meta.talents);
+    // Resolve the flat talent struct once (point tree + choice-row picks),
+    // before the stat pass + ability resolver below consume it (they only ever
+    // read these flat numbers).
+    meta.talentMods = computeModifiersWithRows(cls, meta.talents, meta.rowPicks);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
     if (savedState) {
@@ -1740,6 +1761,9 @@ export class Sim {
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
       talents: cloneAllocation(restore ? restore.talents : meta.talents),
+      // Row picks are untouched by the Fiesta standardization (only talentMods is
+      // rebuilt for the bout), so the live array is always the real build.
+      rowPicks: [...meta.rowPicks],
       loadouts: meta.loadouts.map((l) => ({
         name: l.name,
         alloc: cloneAllocation(l.alloc),
@@ -2068,6 +2092,9 @@ export class Sim {
   }
   get talents(): TalentAllocation {
     return this.primary.talents;
+  }
+  get rowPicks(): RowPicks {
+    return this.primary.rowPicks;
   }
   get talentSpec(): string | null {
     return this.primary.talentMods.spec;
@@ -2678,6 +2705,13 @@ export class Sim {
   // Free respec (out of combat): wipe all talent points. Spec is retained.
   respec(pid?: number): boolean {
     return respecTalents(this.ctx, pid);
+  }
+
+  // Pick (or clear, optionId null) a choice-row talent (the Pandaria-style row
+  // system, content/talent_rows.ts). Validated server-side: row unlocked by
+  // level, option belongs to the row, not in combat/arena.
+  pickRowTalent(rowIndex: number, optionId: string | null, pid?: number): boolean {
+    return pickChoiceRowTalent(this.ctx, rowIndex, optionId, pid);
   }
 
   // Save the current build (talents + spec + the given action-bar slot map) as a
@@ -5927,8 +5961,7 @@ export class Sim {
                 hp: e.hp,
                 mhp: e.maxHp,
                 absorb: e.auras.reduce(
-                  (sum, aura) =>
-                    sum + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
+                  (sum, aura) => sum + (aura.kind === 'absorb' ? Math.max(0, aura.value) : 0),
                   0,
                 ),
                 res: Math.round(e.resource),

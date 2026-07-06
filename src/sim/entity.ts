@@ -213,6 +213,7 @@ export function recalcPlayerStats(
   // Buff auras
   let bonusAp = setEff.ap;
   let bonusDodge = 0;
+  let bonusCrit = 0;
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
@@ -246,6 +247,10 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    // Choice-row talent cooldowns (e.g. Recklessness): additive crit chance
+    // while the buff rides; expiry re-runs this recalc via the buff* statsDirty
+    // pass in combat/auras.ts, so the bonus falls off with the aura.
+    else if (a.kind === 'buff_crit') bonusCrit += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
@@ -327,8 +332,8 @@ export function recalcPlayerStats(
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
-  // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
+  // Crit: ~1% per 20 agi at low level (+ buff_crit auras summed above)
+  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit + bonusCrit;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.

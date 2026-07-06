@@ -138,6 +138,17 @@ export function dealDamage(
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
 
+  // Damage-done buffs (choice-row talent cooldowns: Avatar / Bloodbath / Sanguine
+  // Aura): an additive amp on the source's outgoing damage, summed across auras.
+  // Self-damage is untouched, mirroring the hex rule above. No existing content
+  // applies this kind, so the multiplier is 1 (a no-op) everywhere until a talent
+  // wears it.
+  if (source && source.id !== target.id && amount > 0) {
+    let dmgAmp = 0;
+    for (const a of source.auras) if (a.kind === 'buff_dmg_done') dmgAmp += a.value;
+    if (dmgAmp > 0) amount = Math.round(amount * (1 + dmgAmp));
+  }
+
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.
@@ -334,9 +345,12 @@ export function dealDamage(
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
+      // Auto-attack rage, scaled by the choice-row talent multiplier (Anger
+      // Management's autoRagePct; 0 for everyone else, leaving the classic mint).
+      const autoMult = 1 + (meta ? ctx.playerMods(meta).global.autoRagePct : 0);
       source.resource = Math.min(
         source.maxResource,
-        source.resource + rageFromDealing(amount, source.level),
+        source.resource + rageFromDealing(amount, source.level) * autoMult,
       );
     }
   }

@@ -734,7 +734,14 @@ export function runEffects(
         break;
       }
       case 'gainResource': {
-        p.resource = Math.min(p.maxResource, p.resource + eff.amount);
+        // Ability-granted rage is scaled by the choice-row talent multiplier
+        // (Anger Management's abilityRagePct). Non-rage resources (energy from
+        // Adrenaline Rush, etc.) are deliberately untouched.
+        const gainAmt =
+          p.resourceType === 'rage'
+            ? eff.amount * (1 + ctx.playerMods(meta).global.abilityRagePct)
+            : eff.amount;
+        p.resource = Math.min(p.maxResource, p.resource + gainAmt);
         break;
       }
       case 'selfDamagePctMax': {
@@ -759,7 +766,11 @@ export function runEffects(
         p.chargeTargetId = target.id;
         p.chargeTimeLeft = CHARGE_MAX_DURATION;
         p.chargePath = ctx.findChargePath(p, target);
-        if (p.resourceType === 'rage') p.resource = Math.min(p.maxResource, p.resource + 9);
+        // Charge's rage burst, scaled like gainResource by abilityRagePct.
+        if (p.resourceType === 'rage') {
+          const chargeRage = 9 * (1 + ctx.playerMods(meta).global.abilityRagePct);
+          p.resource = Math.min(p.maxResource, p.resource + chargeRage);
+        }
         ctx.enterCombat(p, target);
         break;
       }

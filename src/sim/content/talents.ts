@@ -76,6 +76,12 @@ export interface GlobalModEffect {
   healPct?: number; // healing done
   threatPct?: number; // bonus threat (tank role)
   critVsRooted?: number; // additive spell crit chance against rooted targets
+  // Rage-generation multipliers (warrior choice rows, e.g. Anger Management).
+  // `autoRagePct` scales the rage minted by auto-attack damage dealt;
+  // `abilityRagePct` scales ability-granted rage (gainResource, Charge's burst).
+  // Rage from TAKING damage is deliberately unscaled by either.
+  autoRagePct?: number;
+  abilityRagePct?: number;
 }
 
 export interface TalentEffect {
@@ -524,7 +530,15 @@ function zeroStats(): Required<StatModEffect> {
   };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
-  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0, critVsRooted: 0 };
+  return {
+    meleeDmgPct: 0,
+    spellDmgPct: 0,
+    healPct: 0,
+    threatPct: 0,
+    critVsRooted: 0,
+    autoRagePct: 0,
+    abilityRagePct: 0,
+  };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
   return {
@@ -585,6 +599,8 @@ export function accumulate(
     g.healPct += (e.healPct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
+    g.autoRagePct += (e.autoRagePct ?? 0) * mult;
+    g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

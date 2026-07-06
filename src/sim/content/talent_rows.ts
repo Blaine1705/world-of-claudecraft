@@ -15,7 +15,16 @@
 // talents.ts.
 // ---------------------------------------------------------------------------
 
-import { accumulate, emptyModifiers, type TalentEffect, type TalentModifiers } from './talents';
+import type { PlayerClass } from '../types';
+import {
+  accumulate,
+  computeTalentModifiers,
+  emptyModifiers,
+  type TalentAllocation,
+  type TalentEffect,
+  type TalentModifiers,
+} from './talents';
+import { WARRIOR_ROWS } from './warrior_rows';
 
 /** The character level at which each row (tier) unlocks. One row per level. */
 export const ROW_LEVELS = [5, 8, 11, 14, 17, 20] as const;
@@ -82,11 +91,9 @@ export function rowsUnlockedAt(level: number): number {
   return n;
 }
 
-/** Fold a player's picks into the flat `TalentModifiers` the hot paths read,
- *  reusing the shared effect engine. Unpicked rows and unknown ids contribute
- *  nothing; deterministic (a pure function of tree + picks). */
-export function computeRowModifiers(tree: RowTree, picks: RowPicks): TalentModifiers {
-  const mods = emptyModifiers();
+/** Fold a player's picks into an EXISTING modifier struct (the shared effect
+ *  engine's accumulate). Unpicked rows and unknown ids contribute nothing. */
+export function accumulateRowPicks(mods: TalentModifiers, tree: RowTree, picks: RowPicks): void {
   picks.forEach((pick, i) => {
     if (!pick) return;
     const row = tree[i];
@@ -94,5 +101,65 @@ export function computeRowModifiers(tree: RowTree, picks: RowPicks): TalentModif
     const opt = row.options.find((o) => o.id === pick);
     if (opt) accumulate(mods, opt.effect, 1);
   });
+}
+
+/** Fold a player's picks into fresh flat `TalentModifiers`. Deterministic (a
+ *  pure function of tree + picks). */
+export function computeRowModifiers(tree: RowTree, picks: RowPicks): TalentModifiers {
+  const mods = emptyModifiers();
+  accumulateRowPicks(mods, tree, picks);
   return mods;
+}
+
+/** Drop picks a character is not entitled to: unknown option ids (stale saves,
+ *  renamed content, tampering) and rows above the character's level. Returns a
+ *  fresh ROW_COUNT-length array; a null/missing tree clears everything. */
+export function sanitizeRowPicks(
+  tree: RowTree | null,
+  picks: readonly (string | null)[] | undefined,
+  level: number,
+): RowPicks {
+  const clean = emptyRowPicks();
+  if (!tree || !picks) return clean;
+  for (let i = 0; i < ROW_COUNT; i++) {
+    const pick = picks[i];
+    const row = tree[i];
+    if (!pick || !row || level < row.level) continue;
+    if (row.options.some((o) => o.id === pick)) clean[i] = pick;
+  }
+  return clean;
+}
+
+/** The full bake used everywhere a player's REAL build is resolved: the point
+ *  tree's modifiers plus the choice-row picks folded on top, into one flat
+ *  struct. (Fiesta's standardized bouts deliberately skip the row fold.) */
+export function computeModifiersWithRows(
+  cls: PlayerClass,
+  alloc: TalentAllocation,
+  picks: RowPicks,
+): TalentModifiers {
+  const mods = computeTalentModifiers(cls, alloc);
+  const tree = rowTreeFor(cls);
+  if (tree) accumulateRowPicks(mods, tree, picks);
+  return mods;
+}
+
+// ---------------------------------------------------------------------------
+// Registry. Like TALENTS in talents.ts: per-class authored row content, validated
+// at import so a malformed tree fails loudly at boot rather than in play.
+// ---------------------------------------------------------------------------
+
+export const ROW_TREES: Partial<Record<PlayerClass, RowTree>> = {
+  warrior: WARRIOR_ROWS,
+};
+
+export function rowTreeFor(cls: PlayerClass): RowTree | null {
+  return ROW_TREES[cls] ?? null;
+}
+
+for (const [cls, tree] of Object.entries(ROW_TREES)) {
+  const errs = validateRowTree(tree);
+  if (errs.length > 0) {
+    throw new Error(`Invalid choice-row tree for ${cls}: ${errs.join('; ')}`);
+  }
 }
