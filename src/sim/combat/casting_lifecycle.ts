@@ -306,6 +306,22 @@ export function castAbility(
       ctx.error(p.id, 'Line of sight.');
       return;
     }
+  } else if (ability.requiresTarget && ability.targetType === 'any') {
+    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+      ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
+      return;
+    }
+    const d = dist2d(p.pos, target.pos);
+    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    if (d > maxRange) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
   } else if (ability.requiresTarget) {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
@@ -691,6 +707,22 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       ctx.error(p.id, 'Line of sight.');
       return;
     }
+  } else if (ability.requiresTarget && ability.targetType === 'any') {
+    target = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
+    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+      ctx.error(p.id, 'You have no target.');
+      return;
+    }
+    const d = dist2d(p.pos, target.pos);
+    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    if (d > maxRange + 2) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
   } else if (ability.requiresTarget) {
     target = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
@@ -716,7 +748,10 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
 
   // helpful spells never miss
-  if (ability.targetType === 'friendly') {
+  if (
+    ability.targetType === 'friendly' ||
+    (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
+  ) {
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);

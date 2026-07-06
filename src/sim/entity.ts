@@ -359,7 +359,7 @@ export function recalcPlayerStats(
   // Haste from item-set bonuses (the only haste-gear source). ONE aggregated
   // stat drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  e.meleeHaste = setEff.haste;
+  e.meleeHaste = setEff.haste + (mods?.global.meleeHastePct ?? 0);
   e.rangedHaste = setEff.haste;
   // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
   // caster spec can shorten every cast; the cast-time tooltips read the same total.

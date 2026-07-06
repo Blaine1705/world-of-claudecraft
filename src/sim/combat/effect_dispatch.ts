@@ -31,7 +31,7 @@ import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
-import { isRooted } from './cc';
+import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
@@ -154,7 +154,8 @@ export function runEffects(
       }
       case 'directDamage': {
         if (!target) break;
-        const rooted = isRooted(target);
+        if (!ctx.isHostileTo(p, target)) break;
+        const rooted = isRootedOrChilled(target);
         const critChance =
           isSpell && rooted
             ? ctx.spellCrit(p) + ctx.playerMods(meta).global.critVsRooted
@@ -253,6 +254,7 @@ export function runEffects(
         break;
       case 'heal': {
         const healTarget = target ?? p;
+        if (healTarget !== p && ctx.isHostileTo(p, healTarget)) break;
         // Heals scale with Spell Power at the direct cast-time coefficient, the
         // healing mirror of the direct-nuke rider (applyHeal fires the crit).
         const healAmount =

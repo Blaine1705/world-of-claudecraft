@@ -163,7 +163,31 @@ export function dealDamage(
 
   const sourcePlayer = ctx.pvpController(source);
 
-  // duels end at 1 hp — nobody dies
+  if (target.kind === 'player' && amount > 0) {
+    const meta = ctx.players.get(target.id);
+    const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
+    const pet = share > 0 ? ctx.petOf(target.id) : null;
+    if (pet && !pet.dead) {
+      const redirected = Math.min(amount, Math.round(amount * share));
+      if (redirected > 0) {
+        amount -= redirected;
+        ctx.dealDamage(
+          source,
+          pet,
+          redirected,
+          crit,
+          school,
+          ability,
+          kind,
+          noRage,
+          threatOpts,
+          direct,
+        );
+      }
+    }
+  }
+
+  // duels end at 1 hp, nobody dies
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
     duel &&

@@ -3667,9 +3667,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'holy',
     requiresTarget: true,
-    targetType: 'friendly',
-    effects: [{ type: 'heal', min: 40, max: 50 }],
-    description: 'Shocks a friendly target with Holy energy, healing them for $d. (Holy signature)',
+    targetType: 'any',
+    effects: [
+      { type: 'heal', min: 40, max: 50 },
+      { type: 'directDamage', min: 40, max: 50 },
+    ],
+    description:
+      'Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)',
   },
   holy_shield: {
     id: 'holy_shield',
@@ -3853,7 +3857,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'buff_spellhaste', value: 0.2, duration: 15 }],
     description:
-      'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
+      'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
   },
   holy_nova: {
     id: 'holy_nova',
@@ -4005,6 +4009,9 @@ function scaleEffect(
   eff: AbilityEffect,
   dmgMult: number,
   healMult: number,
+  dotMult: number,
+  hotMult: number,
+  absorbMult: number,
   flat: number,
 ): AbilityEffect {
   switch (eff.type) {
@@ -4019,7 +4026,7 @@ function scaleEffect(
         max: Math.round(eff.max * dmgMult + flat),
       };
     case 'dot':
-      return { ...eff, total: Math.round(eff.total * dmgMult + flat) };
+      return { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
     case 'aoeDamage':
       return {
         ...eff,
@@ -4052,9 +4059,9 @@ function scaleEffect(
         max: Math.round(eff.max * healMult + flat),
       };
     case 'hot':
-      return { ...eff, total: Math.round(eff.total * healMult + flat) };
+      return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
     case 'absorb':
-      return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
+      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
     // A buff value below 1 is a RATE (haste/spell-damage/crit fraction, e.g. 0.2), not a
     // magnitude: scaling it by a global damage mult and rounding would floor it to 0 (this
     // silently zeroed Arcane Power's haste for an Arcane mage). Only integer magnitudes
@@ -4086,14 +4093,26 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
+  const dotMult = 1 + mods.global.dotDmgPct;
+  const hotMult = 1 + mods.global.hotHealPct;
+  const absorbMult = 1 + mods.global.absorbPct;
   const flat = am?.flatDmg ?? 0;
   if (am?.addEffects.length) {
     // Append copies before the scaling pass so added effects inherit the same
     // global and per-ability damage/heal modifiers as native effects.
     entry.effects = [...entry.effects, ...am.addEffects.map((e) => ({ ...e }))];
   }
-  if (dmgMult !== 1 || healMult !== 1 || flat !== 0) {
-    entry.effects = entry.effects.map((e) => scaleEffect(e, dmgMult, healMult, flat));
+  if (
+    dmgMult !== 1 ||
+    healMult !== 1 ||
+    dotMult !== 1 ||
+    hotMult !== 1 ||
+    absorbMult !== 1 ||
+    flat !== 0
+  ) {
+    entry.effects = entry.effects.map((e) =>
+      scaleEffect(e, dmgMult, healMult, dotMult, hotMult, absorbMult, flat),
+    );
   }
   if (am) {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));

@@ -74,6 +74,12 @@ export interface GlobalModEffect {
   meleeDmgPct?: number; // physical ability damage
   spellDmgPct?: number; // magic ability damage
   healPct?: number; // healing done
+  dotDmgPct?: number; // damage-over-time effects
+  hotHealPct?: number; // heal-over-time effects
+  absorbPct?: number; // absorb shield strength
+  meleeHastePct?: number; // passive melee attack haste
+  petDmgPct?: number; // owner's passive pet damage
+  petDmgSharePct?: number; // incoming damage redirected to a living pet
   threatPct?: number; // bonus threat (tank role)
   // Extra critical-strike damage (0.5 = +50%). Added to the base crit multiplier for BOTH
   // spell (base 1.5) and physical (base 2.0) crits: a spec mastery so a Fire mage's crits
@@ -535,6 +541,12 @@ function zeroGlobal(): Required<GlobalModEffect> {
     meleeDmgPct: 0,
     spellDmgPct: 0,
     healPct: 0,
+    dotDmgPct: 0,
+    hotHealPct: 0,
+    absorbPct: 0,
+    meleeHastePct: 0,
+    petDmgPct: 0,
+    petDmgSharePct: 0,
     threatPct: 0,
     critDmgPct: 0,
     spellHastePct: 0,
@@ -594,6 +606,12 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.meleeDmgPct += (e.meleeDmgPct ?? 0) * mult;
     g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
     g.healPct += (e.healPct ?? 0) * mult;
+    g.dotDmgPct += (e.dotDmgPct ?? 0) * mult;
+    g.hotHealPct += (e.hotHealPct ?? 0) * mult;
+    g.absorbPct += (e.absorbPct ?? 0) * mult;
+    g.meleeHastePct += (e.meleeHastePct ?? 0) * mult;
+    g.petDmgPct += (e.petDmgPct ?? 0) * mult;
+    g.petDmgSharePct += (e.petDmgSharePct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
     g.critDmgPct += (e.critDmgPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
@@ -666,7 +684,11 @@ export function defaultBuild(cls: PlayerClass, points: number): TalentAllocation
   return alloc;
 }
 
-export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation): TalentModifiers {
+export function computeTalentModifiers(
+  cls: PlayerClass,
+  alloc: TalentAllocation,
+  level = MAX_LEVEL,
+): TalentModifiers {
   const mods = emptyModifiers();
   const ct = talentsFor(cls);
   if (!ct) return mods;
@@ -677,7 +699,7 @@ export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation
     mods.spec = spec.id;
     mods.role = spec.role;
     mods.grants.push({ ability: spec.signature, rank: 1 }); // signature ability
-    accumulate(mods, spec.mastery.effect, 1); // Mastery passive
+    accumulate(mods, spec.mastery.effect, Math.min(1, level / 20)); // Mastery passive
   }
 
   for (const id in alloc.ranks) {
