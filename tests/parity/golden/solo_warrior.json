@@ -126,30 +126,30 @@
       "tick": 20,
       "time": 1,
       "nextId": 401,
-      "state": "2986e11e",
-      "events": "aaca4d31",
+      "state": "59dd78d4",
+      "events": "7083c59e",
       "rng": {
-        "draws": 6,
-        "digest": "93f0e12e"
+        "draws": 7,
+        "digest": "101398c0"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 401,
-      "state": "1c8b5137",
+      "state": "da286ea9",
       "events": "741638a5",
       "rng": {
-        "draws": 6,
-        "digest": "93f0e12e"
+        "draws": 7,
+        "digest": "101398c0"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 401,
-      "state": "116e2e31",
-      "events": "9c283f9c",
+      "state": "e544357a",
+      "events": "512cd4ad",
       "rng": {
         "draws": 98,
         "digest": "92f0a886"
@@ -159,7 +159,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 401,
-      "state": "b54b1eae",
+      "state": "83eada45",
       "events": "efbffe3f",
       "rng": {
         "draws": 154,
@@ -181,8 +181,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7074,
-            "damageTaken": 11,
+            "damageDealt": 7073,
+            "damageTaken": 4,
             "kills": 1
           },
           "craftSkills": {},
@@ -228,7 +228,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49989,
+          "hp": 49996,
           "id": 399,
           "inCombat": true,
           "kind": "player",
@@ -336,7 +336,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 401,
-      "state": "7c33750e",
+      "state": "ceaa5165",
       "events": "741638a5",
       "rng": {
         "draws": 172,
@@ -358,8 +358,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7074,
-            "damageTaken": 11,
+            "damageDealt": 7073,
+            "damageTaken": 4,
             "kills": 1
           },
           "craftSkills": {},
@@ -406,7 +406,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 49989,
+          "hp": 49996,
           "id": 399,
           "inCombat": true,
           "kind": "player",
