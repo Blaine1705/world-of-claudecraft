@@ -610,21 +610,26 @@ export function inGardenMaze(x: number, z: number): boolean {
   );
 }
 
-// The hedge heightfield: distance to the nearest wall-cell rectangle among
-// the 3x3 neighborhood, eased over the skirt, so walls are sheer (well past
-// the climb gate) but corners and junctions stay smoothly rounded.
-function gardenMazeOffset(x: number, z: number): number {
-  if (x < MAZE_X0 - 4 || x > MAZE_X0 + MAZE_COLS * MAZE_CELL + 4) return 0;
-  if (z < MAZE_Z0 - 4 || z > MAZE_Z1 + 4) return 0;
+// How deep a point sits inside hedge: 0 in corridors and outside the maze,
+// growing toward a wall cell's core. Measured as the distance to the
+// nearest OPEN ground (a corridor cell in the 3x3 neighborhood, or the lawn
+// beyond the maze rect), so the wall's rising skirt lives entirely INSIDE
+// the wall cells: corridors keep their full 9yd width wall-face to
+// wall-face, and continuous wall runs have no seams.
+function gardenMazeWallDepth(x: number, z: number): number {
+  const inX = Math.min(x - MAZE_X0, MAZE_X0 + MAZE_COLS * MAZE_CELL - x);
+  const inZ = Math.min(z - MAZE_Z0, MAZE_Z1 - z);
+  const inRect = Math.min(inX, inZ); // depth inside the maze rect
+  if (inRect <= 0) return 0; // the world outside the maze is open ground
+  let best = inRect;
   const ci = Math.floor((x - MAZE_X0) / MAZE_CELL);
   const ri = Math.floor((MAZE_Z1 - z) / MAZE_CELL);
-  let best = Infinity;
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
       const r = ri + dr;
       const c = ci + dc;
       if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) continue;
-      if (GARDEN_MAZE[r].charCodeAt(c) !== 35) continue; // '#'
+      if (GARDEN_MAZE[r].charCodeAt(c) !== 46) continue; // '.' open cells only
       const x0 = MAZE_X0 + c * MAZE_CELL;
       const x1 = x0 + MAZE_CELL;
       const zTop = MAZE_Z1 - r * MAZE_CELL;
@@ -635,8 +640,45 @@ function gardenMazeOffset(x: number, z: number): number {
       if (d < best) best = d;
     }
   }
-  if (best === Infinity) return 0;
-  return MAZE_WALL_H * (1 - smoothstep(0, MAZE_SKIRT, best));
+  return best;
+}
+
+// A hedge deep enough to block: movement treats it as a hard wall (see
+// colliders.resolveMovement); the slope gate alone is not enough, a shallow
+// diagonal walk sneaks over any gradient. Knee height, just inside the face.
+const MAZE_WALL_SOLID = 0.5;
+export function inGardenMazeWall(x: number, z: number): boolean {
+  return gardenMazeWallDepth(x, z) > MAZE_WALL_SOLID;
+}
+
+// Does the segment pass through hedge? The endpoint test alone is not
+// enough: a mover stalled at a wall face keeps its interpolated target
+// advancing, and the moment the target lands on open ground beyond the
+// wall an endpoint-only check would teleport it across. Sampled finer than
+// the wall's solid core so no step can straddle it.
+export function crossesGardenHedge(
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+): boolean {
+  // fast reject: segment nowhere near the maze
+  const w = MAZE_COLS * MAZE_CELL;
+  if (Math.max(fromZ, toZ) < MAZE_Z0 || Math.min(fromZ, toZ) > MAZE_Z1) return false;
+  if (Math.max(fromX, toX) < MAZE_X0 || Math.min(fromX, toX) > MAZE_X0 + w) return false;
+  const len = Math.hypot(toX - fromX, toZ - fromZ);
+  const steps = Math.max(1, Math.ceil(len / 0.3));
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    if (inGardenMazeWall(fromX + (toX - fromX) * t, fromZ + (toZ - fromZ) * t)) return true;
+  }
+  return false;
+}
+
+// The hedge heightfield: sheer faces (well past the climb gate) whose skirt
+// eats into the wall cells, not the corridors.
+function gardenMazeOffset(x: number, z: number): number {
+  return MAZE_WALL_H * smoothstep(0, MAZE_SKIRT, gardenMazeWallDepth(x, z));
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.

@@ -5,6 +5,7 @@
 // Fountain Court.
 
 import { describe, expect, it } from 'vitest';
+import { resolveMovement } from '../src/sim/colliders';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_PROPS,
@@ -15,6 +16,7 @@ import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import {
   GARDEN_MAZE_GRID,
   inGardenMaze,
+  inGardenMazeWall,
   MAZE_CELL,
   MAZE_COLS,
   MAZE_ROWS,
@@ -165,6 +167,28 @@ describe('the Great Maze', () => {
     }
   });
 
+  it('keeps corridors flat across their full width', () => {
+    // The wall skirt must live inside the wall cells: at a corridor cell's
+    // edges (1yd off the wall face) the hedge offset stays out of the way,
+    // so the walkable lane is the whole 9yd cell, not a narrow center strip.
+    for (let r = 0; r < MAZE_ROWS; r++) {
+      for (let c = 0; c < MAZE_COLS; c++) {
+        if (GARDEN_MAZE_GRID[r][c] !== '.') continue;
+        const center = cellCenter(c, r);
+        const hCenter = terrainHeight(center.x, center.z, SEED);
+        for (const [ox, oz] of [
+          [MAZE_CELL / 2 - 1, 0],
+          [-(MAZE_CELL / 2 - 1), 0],
+          [0, MAZE_CELL / 2 - 1],
+          [0, -(MAZE_CELL / 2 - 1)],
+        ]) {
+          const h = terrainHeight(center.x + ox, center.z + oz, SEED);
+          expect(Math.abs(h - hCenter), `corridor ${c},${r} edge ${ox},${oz}`).toBeLessThan(2);
+        }
+      }
+    }
+  });
+
   it('keeps corridor centers flat enough to walk', () => {
     // Along every open cell center, the local slope to its open neighbors
     // stays under the climb gate, so the labyrinth is fully traversable.
@@ -188,5 +212,61 @@ describe('the Great Maze', () => {
         }
       }
     }
+  });
+});
+
+describe('the hedge walls are hard colliders', () => {
+  // Find an interior wall cell with open corridor on both its east and west
+  // sides, and prove movement cannot cross it, straight or diagonal. The
+  // slope gate is not what stops it (a shallow diagonal defeats slope);
+  // resolveMovement's hedge wall check is.
+  function findCrossableWall(): { c: number; r: number } {
+    for (let r = 1; r < MAZE_ROWS - 1; r++) {
+      for (let c = 1; c < MAZE_COLS - 1; c++) {
+        if (GARDEN_MAZE_GRID[r][c] !== '#') continue;
+        if (GARDEN_MAZE_GRID[r][c - 1] === '.' && GARDEN_MAZE_GRID[r][c + 1] === '.') {
+          return { c, r };
+        }
+      }
+    }
+    throw new Error('no wall with corridors on both sides');
+  }
+
+  it('blocks walking straight through a hedge', () => {
+    const wall = findCrossableWall();
+    const from = cellCenter(wall.c - 1, wall.r);
+    const to = cellCenter(wall.c + 1, wall.r);
+    const end = resolveMovement(SEED, from.x, from.z, to.x, to.z, 0.5);
+    // never inside the hedge, and never on the far side
+    expect(inGardenMazeWall(end.x, end.z)).toBe(false);
+    const wallWest = MAZE_X0 + wall.c * MAZE_CELL;
+    expect(end.x).toBeLessThan(wallWest + 1);
+  });
+
+  it('blocks the diagonal cheese over a hedge', () => {
+    const wall = findCrossableWall();
+    const from = cellCenter(wall.c - 1, wall.r);
+    // a long shallow diagonal aimed across the wall
+    const to = { x: from.x + MAZE_CELL * 2, z: from.z + 3 };
+    let x = from.x;
+    let z = from.z;
+    // push repeatedly, as a player holding a diagonal key would
+    for (let i = 0; i < 40; i++) {
+      const step = resolveMovement(SEED, x, z, to.x, to.z, 0.5);
+      x = step.x;
+      z = step.z;
+    }
+    expect(inGardenMazeWall(x, z)).toBe(false);
+    const wallWest = MAZE_X0 + wall.c * MAZE_CELL;
+    expect(x, 'slid along the hedge, never across it').toBeLessThan(wallWest + 1);
+  });
+
+  it('lets movement flow freely along a corridor', () => {
+    // control: the same mover walks the entrance corridor unimpeded
+    const entranceCol = GARDEN_MAZE_GRID[MAZE_ROWS - 1].indexOf('.');
+    const from = cellCenter(entranceCol, MAZE_ROWS - 1);
+    const to = cellCenter(entranceCol, MAZE_ROWS - 3);
+    const end = resolveMovement(SEED, from.x, from.z, to.x, to.z, 0.5);
+    expect(Math.hypot(end.x - to.x, end.z - to.z)).toBeLessThan(1);
   });
 });
