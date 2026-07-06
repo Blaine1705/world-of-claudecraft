@@ -415,6 +415,9 @@ export const fr_CA: EnTranslations = {
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Manette",
       "enable": "Activer la manette",

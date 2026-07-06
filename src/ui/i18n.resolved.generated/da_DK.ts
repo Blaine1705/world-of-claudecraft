@@ -415,6 +415,9 @@ export const da_DK: EnTranslations = {
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Controller",
       "enable": "Aktivér controller",

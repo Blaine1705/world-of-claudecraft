@@ -414,6 +414,12 @@ export const hudChromeStrings = {
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
   },
+  // Choice-row talents (the Pandaria-style rows tab in the talents window).
+  // The row OPTION names/descriptions are sim content (English source, localized
+  // with the talent-copy batch); only the chrome lives here.
+  talentRows: {
+    tab: 'Choices',
+  },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
   // formatNumber. The button names themselves (A / LB / D-pad, etc.) stay as

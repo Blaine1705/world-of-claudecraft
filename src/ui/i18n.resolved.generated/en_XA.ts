@@ -415,6 +415,9 @@ export const en_XA: EnTranslations = {
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]"
     },
+    "talentRows": {
+      "tab": "[Çĥóíçéš]"
+    },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
       "enable": "[Éñáƀļé Çóñţŕóļļéŕ]",

@@ -415,6 +415,9 @@ export const id_ID: EnTranslations = {
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Kontroler",
       "enable": "Aktifkan Kontroler",

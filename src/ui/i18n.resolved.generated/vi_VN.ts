@@ -415,6 +415,9 @@ export const vi_VN: EnTranslations = {
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Tay Cầm",
       "enable": "Bật Tay Cầm",

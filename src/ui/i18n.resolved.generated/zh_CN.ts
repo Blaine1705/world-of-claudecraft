@@ -415,6 +415,9 @@ export const zh_CN: EnTranslations = {
       "showSecondaryActionBar": "显示副动作条",
       "showTargetOfTarget": "显示目标的目标"
     },
+    "talentRows": {
+      "tab": "选择"
+    },
     "controller": {
       "title": "手柄",
       "enable": "启用手柄",

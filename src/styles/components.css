@@ -1875,6 +1875,89 @@
     position: relative;
     margin: 6px auto;
   }
+  /* Choice-row talents tab (talent_rows_tab.ts): one block per tier, a level
+     badge plus three option cards; picked = gold, locked rows dim + disable. */
+  .tal-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 8px 0 4px;
+  }
+  .tal-row-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .tal-row-lv {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-size: 12px;
+  }
+  .tal-row-lv.locked {
+    border-color: var(--border);
+    color: var(--color-text-muted);
+  }
+  .tal-row-lock {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .tal-row-opts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .tal-row.locked .tal-row-opts {
+    opacity: 0.45;
+  }
+  .tal-row-opt {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+    padding: 8px 9px;
+    font: inherit;
+    color: var(--color-text-light);
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .tal-row-opt b {
+    font-size: 12.5px;
+  }
+  .tal-row-opt span {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    line-height: 1.3;
+  }
+  .tal-row-opt:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+  }
+  .tal-row-opt:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .tal-row-opt.picked {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+  }
+  .tal-row-opt.picked b {
+    color: var(--gold);
+  }
+  .tal-row-opt:disabled {
+    cursor: default;
+  }
+  @media (max-width: 640px) {
+    .tal-row-opts {
+      grid-template-columns: 1fr;
+    }
+  }
   .tal-arrows {
     position: absolute;
     left: 0;

@@ -415,6 +415,9 @@ export const nl_NL: EnTranslations = {
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Controller",
       "enable": "Controller inschakelen",

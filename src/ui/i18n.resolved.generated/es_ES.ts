@@ -415,6 +415,9 @@ export const es_ES: EnTranslations = {
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
       "showTargetOfTarget": "Mostrar objetivo del objetivo"
     },
+    "talentRows": {
+      "tab": "Elecciones"
+    },
     "controller": {
       "title": "Mando",
       "enable": "Activar mando",

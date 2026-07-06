@@ -415,6 +415,9 @@ export const ja_JP: EnTranslations = {
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showTargetOfTarget": "ターゲットのターゲットを表示"
     },
+    "talentRows": {
+      "tab": "選択"
+    },
     "controller": {
       "title": "コントローラー",
       "enable": "コントローラーを有効化",

@@ -415,6 +415,9 @@ export const ru_RU: EnTranslations = {
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showTargetOfTarget": "Показывать цель цели"
     },
+    "talentRows": {
+      "tab": "Выбор"
+    },
     "controller": {
       "title": "Геймпад",
       "enable": "Включить геймпад",

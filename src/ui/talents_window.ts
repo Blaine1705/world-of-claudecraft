@@ -19,6 +19,7 @@
 // properties via TAL_COLOR; the tree geometry comes from the core's named layout
 // constants. No em dashes anywhere (the mastery / choice separator is ASCII " - ").
 
+import { type RowPicks, rowTreeFor } from '../sim/content/talent_rows';
 import {
   cloneAllocation,
   exportBuild,
@@ -40,6 +41,8 @@ import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';
 import { roleLabel, tTalent } from './talent_i18n';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
+import { paintTalentRowsTab } from './talent_rows_tab';
+import { buildTalentRowsView } from './talent_rows_view';
 import { buildTalentsView, type TalentsView, type TalentTreeVM } from './talents_view';
 import { svgIcon } from './ui_icons';
 
@@ -66,6 +69,11 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   currentAllocation(): TalentAllocation;
   activeLoadout(): number;
   loadouts(): readonly SavedLoadout[];
+  // Choice-row talents (the Pandaria-style rows tab): live picks + level reads,
+  // and the server-validated pick command (IWorld.pickRowTalent).
+  rowPicks(): RowPicks;
+  playerLevel(): number;
+  pickRow(rowIndex: number, optionId: string | null): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
   // Loadout commit surface (server-authoritative IWorld; the only commit path).
@@ -126,7 +134,7 @@ function signatureName(abilityId: string): string {
 }
 
 export class TalentsWindow {
-  private tab: 'class' | 'spec' = 'class';
+  private tab: 'class' | 'spec' | 'rows' = 'class';
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
 
@@ -182,6 +190,13 @@ export class TalentsWindow {
     }
     const total = this.deps.totalPoints();
     const view = buildTalentsView(stage, cls, total);
+    // The choice-row tab renders only for classes with authored row content.
+    const rowTree = rowTreeFor(cls);
+    const rowsVm = buildTalentRowsView(rowTree, this.deps.rowPicks(), this.deps.playerLevel());
+    if (!rowTree && this.tab === 'rows') this.tab = 'class';
+    const rowsTab = rowTree
+      ? `<div class="tal-tab${this.tab === 'rows' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'rows' ? '0' : '-1'}" aria-selected="${this.tab === 'rows'}" aria-controls="tal-body" data-tab="rows"><span class="tal-tab-label">${t('hudChrome.talentRows.tab')}</span><span class="tt-pts">${rowsVm.pickedCount}</span></div>`
+      : '';
 
     el.innerHTML =
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
@@ -190,11 +205,12 @@ export class TalentsWindow {
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
       `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
       `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +
+      rowsTab +
       `</div><div id="tal-body" role="tabpanel"></div>` +
       this.footerHtml(view);
 
     const switchTab = (tab: HTMLElement): void => {
-      this.tab = tab.dataset.tab as 'class' | 'spec';
+      this.tab = tab.dataset.tab as 'class' | 'spec' | 'rows';
       this.render();
     };
     // WAI-ARIA tabs: roving arrow navigation (Left/Right/Home/End) plus Enter/Space.
@@ -226,6 +242,18 @@ export class TalentsWindow {
       tree.className = 'tal-tree';
       body.appendChild(tree);
       this.paintTree(tree, view.classTree, stage);
+    } else if (this.tab === 'rows') {
+      paintTalentRowsTab(body, rowsVm, {
+        pickRow: (rowIndex, optionId) => this.deps.pickRow(rowIndex, optionId),
+        // Repaint now (offline Sim applies instantly), then once more shortly
+        // after so the ONLINE mirror's authoritative tal snapshot lands too.
+        rerender: () => {
+          this.render();
+          window.setTimeout(() => {
+            if (this.deps.root().style.display === 'block' && this.tab === 'rows') this.render();
+          }, 300);
+        },
+      });
     } else {
       this.paintSpecTab(body, view, stage);
     }

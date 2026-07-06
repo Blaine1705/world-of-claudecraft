@@ -415,6 +415,9 @@ export const ko_KR: EnTranslations = {
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showTargetOfTarget": "대상의 대상 표시"
     },
+    "talentRows": {
+      "tab": "선택"
+    },
     "controller": {
       "title": "컨트롤러",
       "enable": "컨트롤러 사용",

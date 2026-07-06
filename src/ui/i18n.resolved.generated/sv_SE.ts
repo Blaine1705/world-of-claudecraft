@@ -415,6 +415,9 @@ export const sv_SE: EnTranslations = {
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Handkontroll",
       "enable": "Aktivera handkontroll",

@@ -415,6 +415,9 @@ export const en_CA: EnTranslations = {
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Controller",
       "enable": "Enable Controller",

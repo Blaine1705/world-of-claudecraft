@@ -415,6 +415,9 @@ export const tr_TR: EnTranslations = {
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
       "showTargetOfTarget": "Show Target of Target"
     },
+    "talentRows": {
+      "tab": "Choices"
+    },
     "controller": {
       "title": "Oyun Kolu",
       "enable": "Oyun Kolunu Etkinleştir",
