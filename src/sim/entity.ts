@@ -64,8 +64,6 @@ function baseEntity(id: number, pos: Vec3): Entity {
     setProcs: [],
     procReadyAt: undefined as unknown as Record<string, number>,
     critChance: 0.05,
-    critRating: 0,
-    hasteRating: 0,
     critDmgBonus: 0,
     dodgeChance: 0.05,
     parryChance: 0,
@@ -362,21 +360,14 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
-    // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
-    // integer-rounding talent value multiplier; converted to a fraction here.
-    else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;
-    else if (a.kind === 'buff_int_pct') intPct += a.value / 100;
-    else if (a.kind === 'buff_sta_pct') staPct += a.value / 100;
-    else if (a.kind === 'buff_armor_pct') buffArmorPct += a.value / 100;
-    else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
-    // Avatar: the colossus transform grows the body by the fixed scale (its
-    // aura value carries the damage amp, consumed in dealDamage).
-    else if (a.kind === 'buff_avatar') scaleMul *= AVATAR_SCALE;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
     // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
     // the form aura's value, so the bonus lives and dies with the one toggle.
-    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') bonusSp += a.value;
+    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') {
+      bonusSp += a.value;
+      if (a.kind === 'form_moonkin') moonkinForm = true;
+    }
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
@@ -420,9 +411,6 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
-  // Protection's Vanguard: bonus armor from Strength, added (on the fully-summed
-  // Strength) before the armor multiplier so armorPct amplifies it too.
-  if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
   // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
   // separate buff_spelldmg aura the form applies).
   if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
@@ -516,23 +504,13 @@ export function recalcPlayerStats(
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  // hasteFrac folds set-bonus + rating haste (#1471); bonusHaste adds Fury Enrage's
-  // +25%; and a spec mastery's passive haste (#1543) adds on its own channel.
-  e.meleeHaste = hasteFrac + bonusHaste + (mods?.global.meleeHastePct ?? 0);
-  e.rangedHaste = hasteFrac + bonusHaste;
+  e.meleeHaste = setEff.haste;
+  e.rangedHaste = setEff.haste;
   // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
   // caster spec can shorten every cast; the cast-time tooltips read the same total.
-  e.spellHaste = hasteFrac + bonusHaste + (mods?.global.spellHastePct ?? 0);
-  e.setProcs = setEff.procs;
-  if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
-  // Crit: ~1% per 20 agi at low level (+ buff_crit auras summed above, + crit rating)
-  e.critChance =
-    0.05 +
-    s.agi * 0.0005 +
-    (mods?.stats.crit ?? 0) +
-    setEff.crit +
-    bonusCrit +
-    critFractionFromRating(e.critRating);
+  e.spellHaste = setEff.haste + (mods?.global.spellHastePct ?? 0);
+  // Crit: ~1% per 20 agi at low level
+  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
   // Extra crit damage from a spec mastery (e.g. Fire mage: spell crits deal double).
   e.critDmgBonus = mods?.global.critDmgPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;

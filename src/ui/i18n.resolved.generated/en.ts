@@ -6243,15 +6243,15 @@ export const en: EnTranslations = {
       },
       "holy_shield": {
         "name": "Holy Shield",
-        "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
+        "description": "Hurls a holy shield at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
       },
       "bestial_wrath": {
         "name": "Bestial Wrath",
-        "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
+        "description": "Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)"
       },
       "trueshot_aura": {
         "name": "Trueshot Aura",
-        "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
+        "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
         "name": "Wyvern Sting",
@@ -6279,7 +6279,7 @@ export const en: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Hemorrhage",
-        "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
       },
       "power_infusion": {
         "name": "Power Infusion",
@@ -6291,7 +6291,7 @@ export const en: EnTranslations = {
       },
       "shadowform": {
         "name": "Shadowform",
-        "description": "Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
       },
       "elemental_mastery": {
         "name": "Elemental Mastery",

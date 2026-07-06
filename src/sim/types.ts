@@ -190,6 +190,7 @@ export type AuraKind =
   | 'buff_ap'
   | 'buff_ap_pct'
   | 'pet_damage_pct'
+  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -216,6 +217,11 @@ export type AuraKind =
   | 'form_travel'
   | 'form_moonkin'
   | 'form_shadow'
+  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
+  // its damage/haste bonuses ride separate buff auras).
+  | 'form_metamorph'
+  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
+  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   // Arms restructure (owner 2026-07-08). `overpower_charge`: Redhand stacks it
@@ -1598,56 +1604,9 @@ export type AbilityEffect =
     }
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
-  // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13): place a
-  // per-caster mark on the friendly target (or self) for `duration` sec. The
-  // small initial heal is authored as a sibling `heal` effect on the same
-  // ability (so $d shows it); this effect owns only the mark. The Arcane-damage
-  // conversion is handled by combat/chronomancy.ts, not by a stored field.
-  | { type: 'temporalEcho'; duration: number }
-  // Chronomancy Cascada temporal (docs/prd/mage-chronomancy.md Phase 4): the group
-  // version of Temporal Echo. Centered on the friendly target (which must be the
-  // caster or a living group/raid member and is ALWAYS included), it marks up to
-  // `maxTargets` allies (the target plus the nearest others within `radius`) with a
-  // GROUP echo for `duration` sec and gives each a small initial `heal`. Selection,
-  // the individual-echo overlap rule, and the reduced group conversion all live in
-  // combat/chronomancy.ts.
-  | {
-      type: 'massTemporalEcho';
-      duration: number;
-      radius: number;
-      maxTargets: number;
-      heal: { min: number; max: number };
-    }
-  // Chronomancy combat resurrection (Temporal Reversal): rewind a DEAD group/raid
-  // member back to life at their corpse with `hpFrac` of their pools, no sickness.
-  | { type: 'resurrectAlly'; hpFrac: number }
-  // Chronomancer offensive cooldown (Perfect Moment): slam the caster to full
-  // Arcane Charges and open the no-consume window (combat/chronomancy.ts).
-  | { type: 'perfectMoment' }
-  // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
-  // the caster. Restores `fraction` of the REAL damage each living group/raid member
-  // within `radius` took in the last `windowSec` seconds, capped per target at
-  // `maxHpFraction` of their max HP and never above their missing health. No crit,
-  // no Echo, normal heal threat. See combat/rewind.ts.
-  | {
-      type: 'rewind';
-      fraction: number;
-      maxHpFraction: number;
-      windowSec: number;
-      radius: number;
-    }
-  // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
-  // nearby allies, each hop healing `falloff` of the previous hop's amount. The
-  // arc reach is given as `jumpRange` on some variants and `radius` on others.
-  | {
-      type: 'chainHeal';
-      min: number;
-      max: number;
-      jumps: number;
-      falloff: number;
-      jumpRange?: number;
-      radius?: number;
-    }
+  // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
+  // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
+  | { type: 'chainHeal'; min: number; max: number; jumps: number; falloff: number; radius: number }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
@@ -1792,21 +1751,7 @@ export type AbilityEffect =
   // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
   // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
   | { type: 'feralCharge' }
-  // Sunder Armor: stacking PERCENT armor debuff (2% per stack via effectiveArmor) +
-  // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
-  // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
-  // `armor` is retained for the threat value; the reduction percent is a fixed constant.
-  | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
-  | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
-  // Iron Resolve: a damage-absorb shield (the priest-style 'absorb' aura kind)
-  // sized from the resource ACTUALLY spent by the cast (`mult` damage soaked
-  // per point). Pairs with AbilityDef.spendsAllResource, which snapshots the
-  // spend-all bill into the resolved cost the effect reads.
-  | { type: 'absorbSpentResource'; mult: number; duration: number }
-  // Defiant Bellow: taunt every hostile mob within radius through the shared
-  // applyTaunt entry (threat to top + forced attack), the aoe fan-out of the
-  // single-target 'taunt' effect. Draws no rng.
-  | { type: 'aoeTaunt'; radius: number }
+  | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
@@ -2306,8 +2251,6 @@ export interface Entity {
   setProcs: SetProc[];
   procReadyAt: Record<string, number>;
   critChance: number; // 0..1
-  critRating: number; // accumulated crit rating from gear + set bonuses
-  hasteRating: number; // accumulated haste rating from gear + set bonuses
   // Extra critical-strike damage from a spec mastery (0 = none). Added to the base crit
   // multiplier at the crit site: spell crits deal 1.5 + this, physical crits 2 + this.
   critDmgBonus: number;

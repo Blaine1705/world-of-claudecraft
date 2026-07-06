@@ -417,11 +417,8 @@ export function meleeSwing(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
   );
-  const crit =
-    ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance) ||
-    opts.forceCrit === true;
+  const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
   if (crit) dmg *= 2 + attacker.critDmgBonus;
-  if (opts.damageMult !== undefined) dmg *= opts.damageMult;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   if (blockChance > 0 && roll < missChance + dodgeChance + blockChance) {
     dmg = Math.max(1, dmg - target.blockValue);

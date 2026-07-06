@@ -1358,17 +1358,17 @@ const classAbilityNamesEn = {
       [
         'holy_shield',
         'Holy Shield',
-        'Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)',
+        'Hurls a holy shield at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
       ],
       [
         'bestial_wrath',
         'Bestial Wrath',
-        'Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)',
+        'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
       ],
       [
         'trueshot_aura',
         'Trueshot Aura',
-        'Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)',
+        'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
       ],
       [
         'wyvern_sting',
@@ -1403,7 +1403,7 @@ const classAbilityNamesEn = {
       [
         'hemorrhage',
         'Hemorrhage',
-        'Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)',
+        'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
       ],
       [
         'power_infusion',
@@ -1418,7 +1418,7 @@ const classAbilityNamesEn = {
       [
         'shadowform',
         'Shadowform',
-        'Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+        'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
