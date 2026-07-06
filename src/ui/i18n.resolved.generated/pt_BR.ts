@@ -851,6 +851,7 @@ export const pt_BR: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Físico",
         "fire": "Fogo",
@@ -4428,7 +4429,7 @@ export const pt_BR: EnTranslations = {
       },
       "bloodrage": {
         "name": "Raiva Sangrenta",
-        "description": "Gera 10 de raiva ao custo de vida."
+        "description": "Gera {rage} de raiva ao custo de vida."
       },
       "overpower": {
         "name": "Sobrepujar",

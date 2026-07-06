@@ -1696,7 +1696,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Mutila al enemigo por 5 de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
   'entities.abilities.bloodrage.name': 'Ira sangrienta',
-  'entities.abilities.bloodrage.description': 'Genera 10 de ira a costa de salud.',
+  'entities.abilities.bloodrage.description': 'Genera {rage} de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Abrumar',
   'entities.abilities.overpower.description':
     'Ataque instantáneo que inflige daño de arma +5. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
@@ -4995,6 +4995,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta la probabilidad de golpe crítico y el daño infligido un {pct}%',
   'hudChrome.auraEffect.dieBySword':
     'Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)',
+  'hudChrome.auraEffect.sanguine':
+    'Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%',
   'hudChrome.auraEffect.school.physical': 'Físico',
   'hudChrome.auraEffect.school.fire': 'Fuego',
   'hudChrome.auraEffect.school.frost': 'Escarcha',

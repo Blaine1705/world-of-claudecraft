@@ -851,6 +851,7 @@ export const tr_TR: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Fiziksel",
         "fire": "Ateş",
@@ -4428,7 +4429,7 @@ export const tr_TR: EnTranslations = {
       },
       "bloodrage": {
         "name": "Kan Öfkesi",
-        "description": "Can pahasına 10 öfke üretir."
+        "description": "Can pahasına {rage} öfke üretir."
       },
       "overpower": {
         "name": "Alt Etme",

@@ -958,6 +958,7 @@ export const hudChromeStrings = {
     avatar: 'Colossus: damage dealt increased by {pct}%',
     bloodbath: 'Increases critical strike chance and damage dealt by {pct}%',
     dieBySword: 'Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)',
+    sanguine: 'Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%',
     // Localized damage-school names spliced into {school} above.
     school: {
       physical: 'Physical',

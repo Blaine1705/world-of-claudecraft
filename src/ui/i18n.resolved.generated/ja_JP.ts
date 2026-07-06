@@ -851,6 +851,7 @@ export const ja_JP: EnTranslations = {
       "avatar": "巨像：与えるダメージが{pct}%増加",
       "bloodbath": "クリティカル率と与えるダメージが{pct}%増加",
       "dieBySword": "受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）",
+      "sanguine": "攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加",
       "school": {
         "physical": "物理",
         "fire": "火",
@@ -4428,7 +4429,7 @@ export const ja_JP: EnTranslations = {
       },
       "bloodrage": {
         "name": "ブラッドレイジ",
-        "description": "体力を代償に怒りを10生成します。"
+        "description": "体力を代償に怒りを{rage}生成します。"
       },
       "overpower": {
         "name": "オーバーパワー",

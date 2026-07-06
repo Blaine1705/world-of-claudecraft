@@ -1697,7 +1697,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     "Mutile l'ennemi pour 5 points de dégâts et réduit sa vitesse de déplacement de 50% pendant 15 s.",
   'entities.abilities.bloodrage.name': 'Rage sanguinaire',
-  'entities.abilities.bloodrage.description': 'Génère 10 rage au prix de vos points de vie.',
+  'entities.abilities.bloodrage.description': 'Génère {rage} rage au prix de vos points de vie.',
   'entities.abilities.overpower.name': 'Fulmination',
   'entities.abilities.overpower.description':
     "Attaque instantanée infligeant les dégâts de l'arme +5. Utilisable seulement après une esquive de la cible. Ne peut pas être esquivée.",

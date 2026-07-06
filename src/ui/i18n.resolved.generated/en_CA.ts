@@ -851,6 +851,7 @@ export const en_CA: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Physical",
         "fire": "Fire",
@@ -4428,7 +4429,7 @@ export const en_CA: EnTranslations = {
       },
       "bloodrage": {
         "name": "Blood Toll",
-        "description": "Generates 10 rage at the cost of health."
+        "description": "Generates {rage} rage at the cost of health."
       },
       "overpower": {
         "name": "Redhand",

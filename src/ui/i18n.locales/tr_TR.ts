@@ -465,7 +465,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Hedefi kör eder, 8 saniye boyunca şaşkın şaşkın dolaşmasına neden olur. Herhangi bir hasar etkiyi bozar.',
   'entities.abilities.blind.name': 'Kör Etme',
-  'entities.abilities.bloodrage.description': 'Can pahasına 10 öfke üretir.',
+  'entities.abilities.bloodrage.description': 'Can pahasına {rage} öfke üretir.',
   'entities.abilities.bloodrage.name': 'Kan Öfkesi',
   'entities.abilities.bloodthirst.description':
     'Bir kan çılgınlığıyla anında {damage} hasar veren bir saldırı yap. (Hiddet imzası)',

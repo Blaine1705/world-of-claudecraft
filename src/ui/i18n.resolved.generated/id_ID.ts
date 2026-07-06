@@ -851,6 +851,7 @@ export const id_ID: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Fisik",
         "fire": "Api",
@@ -4428,7 +4429,7 @@ export const id_ID: EnTranslations = {
       },
       "bloodrage": {
         "name": "Amukan Darah",
-        "description": "Menghasilkan 10 amarah dengan mengorbankan nyawa."
+        "description": "Menghasilkan {rage} amarah dengan mengorbankan nyawa."
       },
       "overpower": {
         "name": "Hempasan",

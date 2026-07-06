@@ -459,7 +459,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Forblænder målet, så det vandrer forvirret omkring i 8 sek. Enhver skade bryder effekten.',
   'entities.abilities.blind.name': 'Forblænding',
-  'entities.abilities.bloodrage.description': 'Genererer 10 raseri på bekostning af helbred.',
+  'entities.abilities.bloodrage.description':
+    'Genererer {rage} raseri på bekostning af helbred.',
   'entities.abilities.bloodrage.name': 'Blodraseri',
   'entities.abilities.bloodthirst.description':
     'Angrib øjeblikkeligt i et blodraseri for {damage}. (Furie-signatur)',

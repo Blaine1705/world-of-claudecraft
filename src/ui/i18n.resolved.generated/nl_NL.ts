@@ -851,6 +851,7 @@ export const nl_NL: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Fysiek",
         "fire": "Vuur",
@@ -4428,7 +4429,7 @@ export const nl_NL: EnTranslations = {
       },
       "bloodrage": {
         "name": "Bloedwoede",
-        "description": "Genereert 10 woede ten koste van levenskracht."
+        "description": "Genereert {rage} woede ten koste van levenskracht."
       },
       "overpower": {
         "name": "Overmeesteren",

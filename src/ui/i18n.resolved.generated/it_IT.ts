@@ -851,6 +851,7 @@ export const it_IT: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Fisico",
         "fire": "Fuoco",
@@ -4428,7 +4429,7 @@ export const it_IT: EnTranslations = {
       },
       "bloodrage": {
         "name": "Rabbia Sanguinaria",
-        "description": "Genera 10 rabbia al costo di salute."
+        "description": "Genera {rage} rabbia al costo di salute."
       },
       "overpower": {
         "name": "Sopraffazione",

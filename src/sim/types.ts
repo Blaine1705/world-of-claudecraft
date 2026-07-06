@@ -218,7 +218,12 @@ export type AuraKind =
   // Avatar's transform, ONE aura carrying both halves (two selfBuffs would
   // overwrite each other, applyAura replaces by id): value = the damage-done
   // amp; the colossus body scale is the fixed AVATAR_SCALE in recalc.
-  | 'buff_avatar';
+  | 'buff_avatar'
+  // Sanguine Aura's war-leader buff, ONE aura for both halves so the buff
+  // frame shows one icon with one two-part tooltip: value = the swing-interval
+  // multiplier (< 1 = faster, read by swingIntervalMult), value2 = the
+  // damage-done fraction (read by the dealDamage amp loop).
+  | 'sanguine';
 
 export interface Aura {
   id: string; // ability id that applied it

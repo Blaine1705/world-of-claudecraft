@@ -851,6 +851,7 @@ export const zh_TW: EnTranslations = {
       "avatar": "巨像：造成的傷害提高 {pct}%",
       "bloodbath": "爆擊機率和造成的傷害提高 {pct}%",
       "dieBySword": "受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）",
+      "sanguine": "攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%",
       "school": {
         "physical": "物理",
         "fire": "火焰",
@@ -4428,7 +4429,7 @@ export const zh_TW: EnTranslations = {
       },
       "bloodrage": {
         "name": "血性狂暴",
-        "description": "以生命值為代價產生 10 點怒氣。"
+        "description": "以生命值為代價產生 {rage} 點怒氣。"
       },
       "overpower": {
         "name": "壓制",

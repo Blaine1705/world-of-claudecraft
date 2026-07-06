@@ -4260,11 +4260,20 @@ function renderClassDetails(panelId: string, className: PlayerClass): void {
         }
       }
       const abilityName = tEntity({ kind: 'ability', id: a.id, field: 'name' });
+      // {rage}: base (rank 1) gainResource total, mirroring the in-game tooltip
+      // splice (Blood Toll's "Generates {rage} rage ...").
+      const rageGained = a.effects.reduce(
+        (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
+        0,
+      );
       const resolvedDesc = tEntity({
         kind: 'ability',
         id: a.id,
         field: 'description',
-        values: { damage: dmgText },
+        values: {
+          damage: dmgText,
+          rage: rageGained > 0 ? formatClassDetailNumber(rageGained) : '',
+        },
       });
 
       return `

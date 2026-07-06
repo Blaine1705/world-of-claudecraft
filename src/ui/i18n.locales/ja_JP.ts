@@ -1732,7 +1732,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     '敵を痛めつけて5ダメージを与え、15秒間、移動速度を50%低下させます。',
   'entities.abilities.bloodrage.name': 'ブラッドレイジ',
-  'entities.abilities.bloodrage.description': '体力を代償に怒りを10生成します。',
+  'entities.abilities.bloodrage.description': '体力を代償に怒りを{rage}生成します。',
   'entities.abilities.overpower.name': 'オーバーパワー',
   'entities.abilities.overpower.description':
     '武器ダメージ +5 の即時攻撃です。対象が回避した後にのみ使用できます。回避されません。',
@@ -4950,6 +4950,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.avatar': '巨像：与えるダメージが{pct}%増加',
   'hudChrome.auraEffect.bloodbath': 'クリティカル率と与えるダメージが{pct}%増加',
   'hudChrome.auraEffect.dieBySword': '受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）',
+  'hudChrome.auraEffect.sanguine': '攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火',
   'hudChrome.auraEffect.school.frost': '氷',

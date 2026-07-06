@@ -1684,7 +1684,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Verkrüppelt den Gegner für 5 Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
   'entities.abilities.bloodrage.name': 'Blutrausch',
-  'entities.abilities.bloodrage.description': 'Erzeugt 10 Wut auf Kosten von Gesundheit.',
+  'entities.abilities.bloodrage.description': 'Erzeugt {rage} Wut auf Kosten von Gesundheit.',
   'entities.abilities.overpower.name': 'Überwältigen',
   'entities.abilities.overpower.description':
     'Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',

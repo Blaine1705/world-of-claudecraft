@@ -851,6 +851,7 @@ export const fr_FR: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Physique",
         "fire": "Feu",
@@ -4428,7 +4429,7 @@ export const fr_FR: EnTranslations = {
       },
       "bloodrage": {
         "name": "Rage sanguinaire",
-        "description": "Génère 10 rage au prix de vos points de vie."
+        "description": "Génère {rage} rage au prix de vos points de vie."
       },
       "overpower": {
         "name": "Fulmination",

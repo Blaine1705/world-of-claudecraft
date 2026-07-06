@@ -463,7 +463,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Làm mù mục tiêu, khiến nó lảo đảo mất phương hướng trong 8 giây. Bất kỳ sát thương nào cũng phá vỡ hiệu ứng.',
   'entities.abilities.blind.name': 'Làm Mù',
-  'entities.abilities.bloodrage.description': 'Tạo 10 nộ khí bằng cái giá sinh lực.',
+  'entities.abilities.bloodrage.description': 'Tạo {rage} nộ khí bằng cái giá sinh lực.',
   'entities.abilities.bloodrage.name': 'Cuồng Huyết',
   'entities.abilities.bloodthirst.description':
     'Tấn công tức thời trong cơn cuồng huyết gây {damage}. (Tuyệt chiêu Cuồng Nộ)',

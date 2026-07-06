@@ -264,16 +264,24 @@ describe('Avatar', () => {
 });
 
 describe('Sanguine Aura', () => {
-  it('buffs the caster (a melee class) with attack speed and damage', () => {
+  it('buffs the caster (a melee class) with ONE composite aura: speed and damage', () => {
     const sim = warriorAtCap(52);
     sim.pickRowTalent(5, 'war_row_sanguine_aura');
     const p = sim.player;
     sim.castAbility('sanguine_aura');
-    const haste = p.auras.find((a: any) => a.kind === 'attackspeed');
-    const amp = p.auras.find((a: any) => a.kind === 'buff_dmg_done');
-    expect(haste?.value).toBeCloseTo(1 / 1.1);
-    expect(amp?.value).toBeCloseTo(0.1);
-    expect(haste?.remaining).toBeCloseTo(20, 0);
+    // One aura carries both halves (a haste+damage pair rendered as two
+    // same-named icons read as a missing effect in playtest).
+    const auras = p.auras.filter((a: any) => a.kind === 'sanguine');
+    expect(auras).toHaveLength(1);
+    expect(auras[0].value).toBeCloseTo(1 / 1.1);
+    expect(auras[0].value2).toBeCloseTo(0.1);
+    expect(auras[0].remaining).toBeCloseTo(20, 0);
+    // Both halves act: swings 10% faster, damage dealt +10%.
+    expect((sim as any).swingIntervalMult(p)).toBeCloseTo(1 / 1.1);
+    const mob = mobsNear(sim, 1)[0];
+    const hp0 = mob.hp;
+    (sim as any).dealDamage(p, mob, 20, false, 'physical', null, 'hit', true);
+    expect(hp0 - mob.hp).toBe(Math.round(20 * 1.1));
     // The melee filter: warriors in, pure casters out (class-level v1).
     expect(MELEE_CLASSES.has('warrior')).toBe(true);
     expect(MELEE_CLASSES.has('mage')).toBe(false);

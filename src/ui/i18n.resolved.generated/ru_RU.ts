@@ -851,6 +851,7 @@ export const ru_RU: EnTranslations = {
       "avatar": "Колосс: наносимый урон увеличен на {pct}%",
       "bloodbath": "Вероятность критического удара и наносимый урон увеличены на {pct}%",
       "dieBySword": "Получаемый урон снижен на {pct}% ({lowPct}% при здоровье ниже {hpPct}%)",
+      "sanguine": "Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%",
       "school": {
         "physical": "Физическая",
         "fire": "Огонь",
@@ -4428,7 +4429,7 @@ export const ru_RU: EnTranslations = {
       },
       "bloodrage": {
         "name": "Кровавая ярость",
-        "description": "Дает 10 ед. ярости ценой здоровья."
+        "description": "Дает {rage} ед. ярости ценой здоровья."
       },
       "overpower": {
         "name": "Превосходство",

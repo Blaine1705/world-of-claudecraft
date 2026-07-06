@@ -851,6 +851,7 @@ export const ko_KR: EnTranslations = {
       "avatar": "거인: 입히는 피해가 {pct}% 증가합니다",
       "bloodbath": "치명타 확률과 입히는 피해가 {pct}% 증가합니다",
       "dieBySword": "받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)",
+      "sanguine": "공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다",
       "school": {
         "physical": "물리",
         "fire": "화염",
@@ -4428,7 +4429,7 @@ export const ko_KR: EnTranslations = {
       },
       "bloodrage": {
         "name": "피의 분노",
-        "description": "생명력을 희생하여 분노 10을 생성합니다."
+        "description": "생명력을 희생하여 분노 {rage}을(를) 생성합니다."
       },
       "overpower": {
         "name": "제압",

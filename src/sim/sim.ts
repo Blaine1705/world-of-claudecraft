@@ -78,7 +78,6 @@ import {
 } from './content/talent_rows';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   emptyAllocation,
   emptyModifiers,
   type Role,
@@ -3033,7 +3032,9 @@ export class Sim {
   swingIntervalMult(e: Entity): number {
     let m = 1;
     for (const a of e.auras) {
-      if (a.kind === 'attackspeed') m *= a.value;
+      // 'sanguine' carries its swing multiplier in value (the damage half
+      // rides value2, read in dealDamage).
+      if (a.kind === 'attackspeed' || a.kind === 'sanguine') m *= a.value;
       if (a.kind === 'buff_haste') m /= a.value;
     }
     // Enrage frenzy: an enraged mob swings faster (mirrors the inline dmgMult

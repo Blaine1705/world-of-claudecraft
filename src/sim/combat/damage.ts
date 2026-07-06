@@ -157,6 +157,8 @@ export function dealDamage(
     for (const a of source.auras) {
       if (a.kind === 'buff_dmg_done' || a.kind === 'bloodbath' || a.kind === 'buff_avatar')
         dmgAmp += a.value;
+      // Sanguine Aura's damage half rides value2 (value is its swing mult).
+      if (a.kind === 'sanguine') dmgAmp += a.value2 ?? 0;
     }
     if (dmgAmp > 0) amount = Math.round(amount * (1 + dmgAmp));
   }

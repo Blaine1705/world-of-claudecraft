@@ -851,6 +851,7 @@ export const pl_PL: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Fizyczne",
         "fire": "Ogień",
@@ -4428,7 +4429,7 @@ export const pl_PL: EnTranslations = {
       },
       "bloodrage": {
         "name": "Krwawa furia",
-        "description": "Generuje 10 wściekłości kosztem zdrowia."
+        "description": "Generuje {rage} wściekłości kosztem zdrowia."
       },
       "overpower": {
         "name": "Przewaga",

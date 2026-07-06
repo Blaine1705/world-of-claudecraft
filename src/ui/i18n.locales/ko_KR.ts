@@ -1718,7 +1718,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     '적에게 5의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.bloodrage.name': '피의 분노',
-  'entities.abilities.bloodrage.description': '생명력을 희생하여 분노 10을 생성합니다.',
+  'entities.abilities.bloodrage.description': '생명력을 희생하여 분노 {rage}을(를) 생성합니다.',
   'entities.abilities.overpower.name': '제압',
   'entities.abilities.overpower.description':
     '무기 피해 +5를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다.',
@@ -4958,6 +4958,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bloodbath': '치명타 확률과 입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.dieBySword':
     '받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)',
+  'hudChrome.auraEffect.sanguine': '공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다',
   'hudChrome.auraEffect.school.physical': '물리',
   'hudChrome.auraEffect.school.fire': '화염',
   'hudChrome.auraEffect.school.frost': '냉기',

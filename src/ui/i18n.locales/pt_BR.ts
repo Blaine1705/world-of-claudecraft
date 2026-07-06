@@ -1677,7 +1677,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Mutila o inimigo, causando 5 de dano e reduzindo sua velocidade de movimento em 50% por 15 s.',
   'entities.abilities.bloodrage.name': 'Raiva Sangrenta',
-  'entities.abilities.bloodrage.description': 'Gera 10 de raiva ao custo de vida.',
+  'entities.abilities.bloodrage.description': 'Gera {rage} de raiva ao custo de vida.',
   'entities.abilities.overpower.name': 'Sobrepujar',
   'entities.abilities.overpower.description':
     'Ataque instantâneo com dano de arma +5. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado.',

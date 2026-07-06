@@ -851,6 +851,7 @@ export const es: EnTranslations = {
       "avatar": "Coloso: daño infligido aumentado un {pct}%",
       "bloodbath": "Aumenta la probabilidad de golpe crítico y el daño infligido un {pct}%",
       "dieBySword": "Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)",
+      "sanguine": "Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%",
       "school": {
         "physical": "Físico",
         "fire": "Fuego",
@@ -4428,7 +4429,7 @@ export const es: EnTranslations = {
       },
       "bloodrage": {
         "name": "Ira sangrienta",
-        "description": "Genera 10 de ira a costa de salud."
+        "description": "Genera {rage} de ira a costa de salud."
       },
       "overpower": {
         "name": "Abrumar",

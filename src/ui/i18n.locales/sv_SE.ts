@@ -460,7 +460,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Förblindar målet och får det att vandra desorienterat i 8 sek. All skada bryter effekten.',
   'entities.abilities.blind.name': 'Förblinda',
-  'entities.abilities.bloodrage.description': 'Genererar 10 raseri på bekostnad av hälsa.',
+  'entities.abilities.bloodrage.description': 'Genererar {rage} raseri på bekostnad av hälsa.',
   'entities.abilities.bloodrage.name': 'Blodsraseri',
   'entities.abilities.bloodthirst.description':
     'Attackera omedelbart i ett blodsraseri för {damage}. (Fury-signatur)',

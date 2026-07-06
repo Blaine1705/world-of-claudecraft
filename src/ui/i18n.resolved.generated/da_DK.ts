@@ -851,6 +851,7 @@ export const da_DK: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Fysisk",
         "fire": "Ild",
@@ -4428,7 +4429,7 @@ export const da_DK: EnTranslations = {
       },
       "bloodrage": {
         "name": "Blodraseri",
-        "description": "Genererer 10 raseri på bekostning af helbred."
+        "description": "Genererer {rage} raseri på bekostning af helbred."
       },
       "overpower": {
         "name": "Overmande",

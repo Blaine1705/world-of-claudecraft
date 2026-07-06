@@ -639,7 +639,7 @@ const classAbilityNamesEn = {
         'Hobbling Cut',
         'Maims the enemy for 5 damage, slowing its movement by 50% for 15 sec.',
       ],
-      ['bloodrage', 'Blood Toll', 'Generates 10 rage at the cost of health.'],
+      ['bloodrage', 'Blood Toll', 'Generates {rage} rage at the cost of health.'],
       [
         'overpower',
         'Redhand',
@@ -1224,7 +1224,7 @@ export const classAbilityNames = {
           'Seccionar',
           'Mutila al enemigo por 5 de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
         ],
-        ['bloodrage', 'Ira sangrienta', 'Genera 10 de ira a costa de salud.'],
+        ['bloodrage', 'Ira sangrienta', 'Genera {rage} de ira a costa de salud.'],
         [
           'overpower',
           'Abrumar',
@@ -1863,7 +1863,7 @@ export const classAbilityNames = {
           'Brise-genou',
           "Mutile l'ennemi pour 5 points de dégâts et réduit sa vitesse de déplacement de 50% pendant 15 s.",
         ],
-        ['bloodrage', 'Rage sanguinaire', 'Génère 10 rage au prix de vos points de vie.'],
+        ['bloodrage', 'Rage sanguinaire', 'Génère {rage} rage au prix de vos points de vie.'],
         [
           'overpower',
           'Fulmination',
@@ -2545,7 +2545,7 @@ export const classAbilityNames = {
           'Taglio ai Tendini',
           'Menoma il nemico per 5 danni, riducendo la sua velocità di movimento del 50% per 15 s.',
         ],
-        ['bloodrage', 'Rabbia Sanguinaria', 'Genera 10 rabbia al costo di salute.'],
+        ['bloodrage', 'Rabbia Sanguinaria', 'Genera {rage} rabbia al costo di salute.'],
         [
           'overpower',
           'Sopraffazione',
@@ -3159,7 +3159,7 @@ export const classAbilityNames = {
           'Kniesehne',
           'Verkrüppelt den Gegner für 5 Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
         ],
-        ['bloodrage', 'Blutrausch', 'Erzeugt 10 Wut auf Kosten von Gesundheit.'],
+        ['bloodrage', 'Blutrausch', 'Erzeugt {rage} Wut auf Kosten von Gesundheit.'],
         [
           'overpower',
           'Überwältigen',
@@ -3765,7 +3765,7 @@ export const classAbilityNames = {
           '轰击附近敌人，造成 {damage} 点伤害，并使其攻击速度降低 10%，持续 10 秒。',
         ],
         ['hamstring', '断筋', '重创敌人，造成 5 点伤害，并使其移动速度降低 50%，持续 15 秒。'],
-        ['bloodrage', '血性狂暴', '以生命值为代价产生 10 点怒气。'],
+        ['bloodrage', '血性狂暴', '以生命值为代价产生 {rage} 点怒气。'],
         ['overpower', '压制', '立即攻击，造成武器伤害 +5。只能在目标躲闪后使用。无法被躲闪。'],
         [
           'execute',
@@ -4087,7 +4087,7 @@ export const classAbilityNames = {
           '轟擊附近敵人，造成 {damage} 點傷害，並使其攻擊速度降低 10%，持續 10 秒。',
         ],
         ['hamstring', '斷筋', '重創敵人，造成 5 點傷害，並使其移動速度降低 50%，持續 15 秒。'],
-        ['bloodrage', '血性狂暴', '以生命值為代價產生 10 點怒氣。'],
+        ['bloodrage', '血性狂暴', '以生命值為代價產生 {rage} 點怒氣。'],
         ['overpower', '壓制', '立即攻擊，造成武器傷害 +5。只能在目標閃躲後使用。無法被閃躲。'],
         [
           'execute',
@@ -4417,7 +4417,7 @@ export const classAbilityNames = {
           '무력화',
           '적에게 5의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다.',
         ],
-        ['bloodrage', '피의 분노', '생명력을 희생하여 분노 10을 생성합니다.'],
+        ['bloodrage', '피의 분노', '생명력을 희생하여 분노 {rage}을(를) 생성합니다.'],
         [
           'overpower',
           '제압',
@@ -4927,7 +4927,7 @@ export const classAbilityNames = {
           'ハムストリング',
           '敵を痛めつけて5ダメージを与え、15秒間、移動速度を50%低下させます。',
         ],
-        ['bloodrage', 'ブラッドレイジ', '体力を代償に怒りを10生成します。'],
+        ['bloodrage', 'ブラッドレイジ', '体力を代償に怒りを{rage}生成します。'],
         [
           'overpower',
           'オーバーパワー',
@@ -5481,7 +5481,7 @@ export const classAbilityNames = {
           'Cortar Tendão',
           'Mutila o inimigo, causando 5 de dano e reduzindo sua velocidade de movimento em 50% por 15 s.',
         ],
-        ['bloodrage', 'Raiva Sangrenta', 'Gera 10 de raiva ao custo de vida.'],
+        ['bloodrage', 'Raiva Sangrenta', 'Gera {rage} de raiva ao custo de vida.'],
         [
           'overpower',
           'Sobrepujar',
@@ -6079,7 +6079,7 @@ export const classAbilityNames = {
           'Подрезать сухожилия',
           'Калечит врага, нанося 5 ед. урона и снижая его скорость передвижения на 50% на 15 сек.',
         ],
-        ['bloodrage', 'Кровавая ярость', 'Дает 10 ед. ярости ценой здоровья.'],
+        ['bloodrage', 'Кровавая ярость', 'Дает {rage} ед. ярости ценой здоровья.'],
         [
           'overpower',
           'Превосходство',

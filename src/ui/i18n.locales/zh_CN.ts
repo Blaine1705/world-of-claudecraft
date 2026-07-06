@@ -1652,7 +1652,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     '重创敌人，造成 5 点伤害，并使其移动速度降低 50%，持续 15 秒。',
   'entities.abilities.bloodrage.name': '血性狂暴',
-  'entities.abilities.bloodrage.description': '以生命值为代价产生 10 点怒气。',
+  'entities.abilities.bloodrage.description': '以生命值为代价产生 {rage} 点怒气。',
   'entities.abilities.overpower.name': '压制',
   'entities.abilities.overpower.description':
     '立即攻击，造成武器伤害 +5。只能在目标躲闪后使用。无法被躲闪。',
@@ -4700,6 +4700,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.avatar': '巨像：造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.bloodbath': '暴击几率和造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.dieBySword': '受到的伤害降低 {pct}%（生命值低于 {hpPct}% 时为 {lowPct}%）',
+  'hudChrome.auraEffect.sanguine': '攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火焰',
   'hudChrome.auraEffect.school.frost': '冰霜',

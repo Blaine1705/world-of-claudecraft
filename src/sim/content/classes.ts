@@ -602,7 +602,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfDamagePctMax', pct: 0.08 },
       { type: 'gainResource', amount: 10 },
     ],
-    description: 'Generates 10 rage at the cost of health.',
+    // {rage} is spliced from the RESOLVED gainResource total, so the Blood
+    // Offering talent's upgraded amount (30) shows in the tooltip automatically.
+    description: 'Generates {rage} rage at the cost of health.',
   },
   overpower: {
     id: 'overpower',

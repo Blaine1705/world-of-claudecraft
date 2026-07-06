@@ -1749,7 +1749,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Калечит врага, нанося 5 ед. урона и снижая его скорость передвижения на 50% на 15 сек.',
   'entities.abilities.bloodrage.name': 'Кровавая ярость',
-  'entities.abilities.bloodrage.description': 'Дает 10 ед. ярости ценой здоровья.',
+  'entities.abilities.bloodrage.description': 'Дает {rage} ед. ярости ценой здоровья.',
   'entities.abilities.overpower.name': 'Превосходство',
   'entities.abilities.overpower.description':
     'Мгновенная атака, наносящая урон оружием +5. Можно использовать только после уклонения цели. От нее нельзя уклониться.',
@@ -5053,6 +5053,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вероятность критического удара и наносимый урон увеличены на {pct}%',
   'hudChrome.auraEffect.dieBySword':
     'Получаемый урон снижен на {pct}% ({lowPct}% при здоровье ниже {hpPct}%)',
+  'hudChrome.auraEffect.sanguine':
+    'Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%',
   'hudChrome.auraEffect.school.physical': 'Физическая',
   'hudChrome.auraEffect.school.fire': 'Огонь',
   'hudChrome.auraEffect.school.frost': 'Лёд',

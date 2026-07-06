@@ -1675,7 +1675,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.description':
     'Menoma il nemico per 5 danni, riducendo la sua velocità di movimento del 50% per 15 s.',
   'entities.abilities.bloodrage.name': 'Rabbia Sanguinaria',
-  'entities.abilities.bloodrage.description': 'Genera 10 rabbia al costo di salute.',
+  'entities.abilities.bloodrage.description': 'Genera {rage} rabbia al costo di salute.',
   'entities.abilities.overpower.name': 'Sopraffazione',
   'entities.abilities.overpower.description':
     "Attacco istantaneo per danni dell'arma +5. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",

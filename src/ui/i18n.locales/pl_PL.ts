@@ -460,7 +460,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Oślepia cel, sprawiając, że błądzi zdezorientowany przez 8 sek. Jakiekolwiek obrażenia przerywają efekt.',
   'entities.abilities.blind.name': 'Oślepienie',
-  'entities.abilities.bloodrage.description': 'Generuje 10 wściekłości kosztem zdrowia.',
+  'entities.abilities.bloodrage.description': 'Generuje {rage} wściekłości kosztem zdrowia.',
   'entities.abilities.bloodrage.name': 'Krwawa furia',
   'entities.abilities.bloodthirst.description':
     'Natychmiast atakuj w krwawym szale, zadając {damage}. (Sygnatura furii)',

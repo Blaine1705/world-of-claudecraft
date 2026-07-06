@@ -467,7 +467,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Verblindt het doelwit, waardoor het 8 sec gedesoriënteerd ronddwaalt. Elke schade verbreekt het effect.',
   'entities.abilities.blind.name': 'Verblinden',
-  'entities.abilities.bloodrage.description': 'Genereert 10 woede ten koste van levenskracht.',
+  'entities.abilities.bloodrage.description':
+    'Genereert {rage} woede ten koste van levenskracht.',
   'entities.abilities.bloodrage.name': 'Bloedwoede',
   'entities.abilities.bloodthirst.description':
     'Val onmiddellijk aan in een bloedrazernij voor {damage}. (Razernij-kenmerk)',

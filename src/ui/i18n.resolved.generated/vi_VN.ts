@@ -851,6 +851,7 @@ export const vi_VN: EnTranslations = {
       "avatar": "Colossus: damage dealt increased by {pct}%",
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "school": {
         "physical": "Vật lý",
         "fire": "Lửa",
@@ -4428,7 +4429,7 @@ export const vi_VN: EnTranslations = {
       },
       "bloodrage": {
         "name": "Cuồng Huyết",
-        "description": "Tạo 10 nộ khí bằng cái giá sinh lực."
+        "description": "Tạo {rage} nộ khí bằng cái giá sinh lực."
       },
       "overpower": {
         "name": "Áp Đảo",

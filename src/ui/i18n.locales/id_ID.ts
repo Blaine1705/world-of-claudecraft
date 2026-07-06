@@ -474,7 +474,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.description':
     'Membutakan target, membuatnya mengembara linglung selama 8 detik. Kerusakan apa pun mematahkan efeknya.',
   'entities.abilities.blind.name': 'Membutakan',
-  'entities.abilities.bloodrage.description': 'Menghasilkan 10 amarah dengan mengorbankan nyawa.',
+  'entities.abilities.bloodrage.description':
+    'Menghasilkan {rage} amarah dengan mengorbankan nyawa.',
   'entities.abilities.bloodrage.name': 'Amukan Darah',
   'entities.abilities.bloodthirst.description':
     'Seketika menyerang dalam amukan darah untuk {damage}. (Penanda Fury)',

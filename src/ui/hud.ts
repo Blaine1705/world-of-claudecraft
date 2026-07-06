@@ -3982,13 +3982,27 @@ export class Hud {
         t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(res.cooldown) }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText))}</div>`;
+    // `{rage}` splices the RESOLVED gainResource total, so a talent that raises
+    // the granted amount (Blood Offering on Blood Toll) shows in the tooltip.
+    const rageGained = res.effects.reduce(
+      (sum, eff) => sum + (eff.type === 'gainResource' ? eff.amount : 0),
+      0,
+    );
+    const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText, rageText))}</div>`;
     // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
     // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
     for (const eff of res.effects) {
       if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
         html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value });
+      } else if (eff.type === 'partyMeleeBuff') {
+        // Sanguine Aura: surface the same composite line the buff icon shows.
+        html += this.auraEffectTooltipHtml({
+          kind: 'sanguine',
+          value: eff.attackSpeedMult,
+          value2: eff.dmgPct,
+        });
       }
     }
     const requirements = abilityRequirementLines(a);
@@ -12142,12 +12156,12 @@ function abilityDisplayName(def: AbilityDef): string {
   return tEntity({ kind: 'ability', id: def.id, field: 'name' });
 }
 
-function abilityDisplayDescription(def: AbilityDef, damageText: string): string {
+function abilityDisplayDescription(def: AbilityDef, damageText: string, rageText = ''): string {
   return tEntity({
     kind: 'ability',
     id: def.id,
     field: 'description',
-    values: { damage: damageText },
+    values: { damage: damageText, rage: rageText },
   });
 }
 

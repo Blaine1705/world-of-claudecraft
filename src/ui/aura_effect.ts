@@ -26,6 +26,8 @@
 //     at per-stack pct * stacks), so it is shown as-is.
 //   - die_by_sword: the cuts are the fixed DIE_BY_SWORD_* constants dealDamage
 //     applies (the aura's own value is informational only).
+//   - sanguine: value is the swing-interval multiplier (< 1 = faster; shown as
+//     the attacks-per-second gain, 1/value - 1) and value2 the damage fraction.
 import {
   type AuraKind,
   DIE_BY_SWORD_CUT,
@@ -229,6 +231,16 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
           pct: pctFromFrac(1 - DIE_BY_SWORD_CUT),
           lowPct: pctFromFrac(1 - DIE_BY_SWORD_LOW_CUT),
           hpPct: pctFromFrac(DIE_BY_SWORD_LOW_HP),
+        },
+      };
+    case 'sanguine':
+      // The haste half is shown as the attacks-per-second gain (1/mult - 1),
+      // so the designed 10% (mult 1/1.1) reads exactly 10%, not 9%.
+      return {
+        key: `${KEY}.sanguine`,
+        nums: {
+          hastePct: a.value > 0 ? Math.abs(round((1 / a.value - 1) * 100)) : 0,
+          dmgPct: pctFromFrac(a.value2 ?? 0),
         },
       };
 

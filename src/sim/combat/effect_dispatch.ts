@@ -730,23 +730,17 @@ export function runEffects(
           const mE = ctx.entities.get(pid);
           if (!mMeta || !mE || mE.dead) continue;
           if (!MELEE_CLASSES.has(mMeta.cls)) continue;
+          // ONE composite aura (kind 'sanguine') instead of a haste+damage
+          // pair: the buff frame shows a single icon whose tooltip lists both
+          // halves (two same-named icons read as a missing effect in playtest).
           ctx.applyAura(mE, {
-            id: `${ability.id}_haste`,
+            id: ability.id,
             name: ability.name,
-            kind: 'attackspeed',
+            kind: 'sanguine',
             remaining: eff.duration,
             duration: eff.duration,
             value: eff.attackSpeedMult,
-            sourceId: p.id,
-            school: ability.school,
-          });
-          ctx.applyAura(mE, {
-            id: `${ability.id}_dmg`,
-            name: ability.name,
-            kind: 'buff_dmg_done',
-            remaining: eff.duration,
-            duration: eff.duration,
-            value: eff.dmgPct,
+            value2: eff.dmgPct,
             sourceId: p.id,
             school: ability.school,
           });

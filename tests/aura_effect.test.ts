@@ -182,4 +182,16 @@ describe('auraEffectDescriptor', () => {
       nums: { pct: 10, lowPct: 20, hpPct: 30 },
     });
   });
+
+  it('describes Sanguine Aura with both halves, haste as the true rate gain', () => {
+    // Swing-interval mult 1/1.1 = 10% more attacks per second: the tooltip
+    // must read the designed 10%, not the 9% a naive (1 - mult) would give.
+    expect(desc({ kind: 'sanguine', value: 1 / 1.1, value2: 0.1 })).toEqual({
+      key: 'hudChrome.auraEffect.sanguine',
+      nums: { hastePct: 10, dmgPct: 10 },
+    });
+    // The online mirror omits an undefined value2; the damage half reads 0
+    // rather than crashing.
+    expect(desc({ kind: 'sanguine', value: 1 / 1.1 })?.nums?.dmgPct).toBe(0);
+  });
 });

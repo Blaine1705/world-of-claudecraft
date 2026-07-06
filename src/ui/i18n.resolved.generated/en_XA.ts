@@ -851,6 +851,7 @@ export const en_XA: EnTranslations = {
       "avatar": "[Çóļóššúš: ðáɱáĝé ðéáļţ íñçŕéášéð ƀý {pct}%]",
       "bloodbath": "[Íñçŕéášéš çŕíţíçáļ šţŕíķé çĥáñçé áñð ðáɱáĝé ðéáļţ ƀý {pct}%]",
       "dieBySword": "[Ŕéðúçéš ðáɱáĝé ţáķéñ ƀý {pct}% ({lowPct}% ŵĥíļé ƀéļóŵ {hpPct}% ĥéáļţĥ)]",
+      "sanguine": "[Íñçŕéášéš áţţáçķ šþééð ƀý {hastePct}% áñð ðáɱáĝé ðéáļţ ƀý {dmgPct}%]",
       "school": {
         "physical": "[Þĥýšíçáļ]",
         "fire": "[Ƒíŕé]",
@@ -4428,7 +4429,7 @@ export const en_XA: EnTranslations = {
       },
       "bloodrage": {
         "name": "[Ɓļóóð Ţóļļ]",
-        "description": "[Ĝéñéŕáţéš 10 ŕáĝé áţ ţĥé çóšţ óƒ ĥéáļţĥ.]"
+        "description": "[Ĝéñéŕáţéš {rage} ŕáĝé áţ ţĥé çóšţ óƒ ĥéáļţĥ.]"
       },
       "overpower": {
         "name": "[Ŕéðĥáñð]",
