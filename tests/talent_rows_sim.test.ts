@@ -51,13 +51,32 @@ function metaOf(sim: Sim) {
 }
 
 describe('warrior row content', () => {
-  it('is a valid registered tree with exactly the Phase 2 options live', () => {
+  it('is a valid registered tree with exactly the lit options live', () => {
     expect(validateRowTree(WARRIOR_ROWS)).toEqual([]);
     const live = WARRIOR_ROWS.flatMap((r) => r.options)
       .filter((o) => Object.keys(o.effect).length > 0)
       .map((o) => o.id)
       .sort();
-    expect(live).toEqual([ANGER, CRUSH]);
+    // Phase 2 lit the first two; phase 3 lit twelve more. Still pending their
+    // own slices: double_charge (charge system + wire), victory_rush (proc
+    // window + wire), lingering_dread (needs the warrior fear-shout decision),
+    // bladestorm (caster-centered channel + VFX).
+    expect(live).toEqual([
+      ANGER,
+      'war_row_avatar',
+      'war_row_battle_rhythm',
+      'war_row_blood_offering',
+      'war_row_bloodbath',
+      'war_row_colossal_might',
+      CRUSH,
+      'war_row_die_by_the_sword',
+      'war_row_piercing_howl',
+      'war_row_pursuit',
+      'war_row_recklessness',
+      'war_row_sanguine_aura',
+      'war_row_second_wind',
+      'war_row_storm_bolt',
+    ]);
   });
 });
 

@@ -31,7 +31,14 @@
 import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import {
+  type Aura,
+  type AuraKind,
+  CAST_COMPLETE_EPS,
+  DT,
+  type Entity,
+  SECOND_WIND_THRESHOLD,
+} from '../types';
 import { tickThornsCooldown } from './thorns_charge';
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
@@ -76,6 +83,17 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
   if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
+  }
+  // Second Wind (warrior choice row): IN-combat recovery while badly hurt, a
+  // separate arm from the out-of-combat regen above (which gates on !inCombat).
+  // 3%/sec folded into this 2-second cadence; 0 for everyone without the talent.
+  const swPct = ctx.playerMods(_meta).global.secondWindPctPerSec;
+  if (swPct > 0 && p.hp > 0 && p.hp < p.maxHp * SECOND_WIND_THRESHOLD) {
+    const heal = Math.min(Math.round(p.maxHp * swPct * 2), p.maxHp - p.hp);
+    if (heal > 0) {
+      p.hp += heal;
+      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+    }
   }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {
@@ -190,9 +208,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
-      // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
-      // mark stats dirty on expiry or the AP cut would persist after the fade.
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'debuff_ap')
+      // debuff_ap and bloodbath are the non-buff* kinds recalcPlayerStats folds,
+      // so they must mark stats dirty on expiry or their stat contribution
+      // (the AP cut, Bloodbath's crit) would persist after the fade.
+      if (
+        a.kind.startsWith('buff') ||
+        a.kind.startsWith('form') ||
+        a.kind === 'debuff_ap' ||
+        a.kind === 'bloodbath'
+      )
         statsDirty = true;
     }
   }

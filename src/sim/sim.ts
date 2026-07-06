@@ -766,6 +766,10 @@ export interface PlayerMeta {
   // the picked option id per row (null = unpicked), folded into `talentMods` by
   // the recompute alongside the point tree. Persisted in CharacterState.
   rowPicks: RowPicks;
+  // Battle Rhythm's rolling cast counter (wraps 1-2-0; the cast that lands the
+  // wrap to 0 is the empowered third). Gameplay state advanced in runEffects;
+  // session-scoped (a relog restarts the rhythm), so it is not persisted.
+  abilityRhythm: number;
   // 2v2 Fiesta (session-only, never persisted). `fiestaAugments` is the ordered
   // list of augment ids picked this bout; `fiestaMods` is talentMods with those
   // augments folded in (the effective modifier the stat/ability hot paths use
@@ -1428,6 +1432,7 @@ export class Sim {
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
       rowPicks: emptyRowPicks(),
+      abilityRhythm: 0,
       fiestaAugments: [],
       fiestaMods: null,
       fiestaSpecial: {},

@@ -32,6 +32,9 @@ import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
+  DIE_BY_SWORD_CUT,
+  DIE_BY_SWORD_LOW_CUT,
+  DIE_BY_SWORD_LOW_HP,
   dist2d,
   FISHING_CAST_ID,
   isConsuming,
@@ -42,10 +45,17 @@ import {
   PARTY_XP_RANGE,
   rageFromDealing,
   rageFromTaking,
+  rageGenAuraMult,
   virtualLevel,
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
+
+// Choice-row on-kill talent tuning (owner design draft: Pursuit +30% speed for
+// 6s; Bloodbath +5% crit and damage per stack, 8s, capped at 5 stacks).
+const PURSUIT_SPEED_DURATION = 6;
+const BLOODBATH_DURATION = 8;
+const BLOODBATH_MAX_STACKS = 5;
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -139,14 +149,27 @@ export function dealDamage(
   }
 
   // Damage-done buffs (choice-row talent cooldowns: Avatar / Bloodbath / Sanguine
-  // Aura): an additive amp on the source's outgoing damage, summed across auras.
-  // Self-damage is untouched, mirroring the hex rule above. No existing content
-  // applies this kind, so the multiplier is 1 (a no-op) everywhere until a talent
-  // wears it.
+  // Aura / Battle Rhythm's blink): an additive amp on the source's outgoing
+  // damage, summed across auras (a bloodbath aura's value already carries its
+  // stack total). Self-damage is untouched, mirroring the hex rule above.
   if (source && source.id !== target.id && amount > 0) {
     let dmgAmp = 0;
-    for (const a of source.auras) if (a.kind === 'buff_dmg_done') dmgAmp += a.value;
+    for (const a of source.auras) {
+      if (a.kind === 'buff_dmg_done' || a.kind === 'bloodbath' || a.kind === 'buff_avatar')
+        dmgAmp += a.value;
+    }
     if (dmgAmp > 0) amount = Math.round(amount * (1 + dmgAmp));
+  }
+
+  // Die by the Sword (choice-row defensive cooldown): the wearer takes 10% less
+  // damage, doubled to a 20% cut while below 30% health. A single self aura,
+  // never stacked, checked target-side beside the Defensive Stance cut above.
+  if (source && source.id !== target.id && amount > 0) {
+    if (target.auras.some((a) => a.kind === 'die_by_sword')) {
+      const cut =
+        target.hp < target.maxHp * DIE_BY_SWORD_LOW_HP ? DIE_BY_SWORD_LOW_CUT : DIE_BY_SWORD_CUT;
+      amount = Math.round(amount * cut);
+    }
   }
 
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
@@ -346,8 +369,10 @@ export function dealDamage(
     if (meta) meta.counters.damageDealt += amount;
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
       // Auto-attack rage, scaled by the choice-row talent multiplier (Anger
-      // Management's autoRagePct; 0 for everyone else, leaving the classic mint).
-      const autoMult = 1 + (meta ? ctx.playerMods(meta).global.autoRagePct : 0);
+      // Management's autoRagePct) and the aura-driven bonus (Recklessness).
+      // Both are exactly 1 for everyone else, leaving the classic mint.
+      const autoMult =
+        (1 + (meta ? ctx.playerMods(meta).global.autoRagePct : 0)) * rageGenAuraMult(source);
       source.resource = Math.min(
         source.maxResource,
         source.resource + rageFromDealing(amount, source.level) * autoMult,
@@ -358,9 +383,11 @@ export function dealDamage(
     const meta = ctx.players.get(target.id);
     if (meta) meta.counters.damageTaken += amount;
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
+      // Rage from taking damage honors the aura-driven bonus only (Recklessness
+      // enrages ALL rage generation); the talent-static globals do not apply here.
       target.resource = Math.min(
         target.maxResource,
-        target.resource + rageFromTaking(amount, source.level),
+        target.resource + rageFromTaking(amount, source.level) * rageGenAuraMult(target),
       );
     }
     if (isConsuming(target)) {
@@ -622,6 +649,50 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
 
       meta.counters.kills++;
       if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
+      // Choice-row on-kill talents for the credited player (draws no rng):
+      // Pursuit's speed burst and Bloodbath's stacking crit + damage buff.
+      if (!creditEntity.dead) {
+        const killMods = ctx.playerMods(meta).global;
+        if (killMods.onKillSpeedPct > 0) {
+          ctx.applyAura(creditEntity, {
+            id: 'pursuit',
+            name: 'Pursuit',
+            kind: 'buff_speed',
+            value: 1 + killMods.onKillSpeedPct,
+            remaining: PURSUIT_SPEED_DURATION,
+            duration: PURSUIT_SPEED_DURATION,
+            sourceId: creditEntity.id,
+            school: 'physical',
+          });
+        }
+        if (killMods.bloodbathPct > 0) {
+          const existing = creditEntity.auras.find((a) => a.kind === 'bloodbath');
+          if (existing) {
+            existing.stacks = Math.min(BLOODBATH_MAX_STACKS, (existing.stacks ?? 1) + 1);
+            existing.value = killMods.bloodbathPct * existing.stacks;
+            existing.remaining = BLOODBATH_DURATION;
+            existing.duration = BLOODBATH_DURATION;
+          } else {
+            ctx.applyAura(creditEntity, {
+              id: 'bloodbath',
+              name: 'Bloodbath',
+              kind: 'bloodbath',
+              value: killMods.bloodbathPct,
+              remaining: BLOODBATH_DURATION,
+              duration: BLOODBATH_DURATION,
+              sourceId: creditEntity.id,
+              school: 'physical',
+              stacks: 1,
+            });
+          }
+          // handleDeath sits outside runEffects, so nothing recalcs for us: fold
+          // the new crit into the derived stats here (the expiry pass already
+          // re-runs recalc when the aura fades, bloodbath being a buff* kind...
+          // it is NOT: 'bloodbath' does not start with 'buff', so the expiry
+          // pass must know it. See the expiry arm in combat/auras.ts.
+          recalcPlayerStats(creditEntity, meta.cls, meta.equipment, ctx.playerMods(meta));
+        }
+      }
       // combo points are character-bound: unspent points survive the kill and
       // carry to the next target (they fade on their own via updateComboExpiry)
       for (const member of eligible) {

@@ -29,7 +29,8 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_pursuit',
         name: 'Pursuit',
         description: 'Each enemy you kill grants 30% movement speed for 6 sec.',
-        effect: {}, // PHASE 3: on-kill hook (build plan T1b)
+        // LIVE: the on-kill hook in combat/damage.ts handleDeath reads this global.
+        effect: { global: { onKillSpeedPct: 0.3 } },
       },
       {
         id: 'war_row_crushing_charge',
@@ -58,14 +59,16 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_second_wind',
         name: 'Second Wind',
         description: 'Below 35% health, you regenerate 3% of your health per second.',
-        effect: {}, // PHASE 3: in-combat conditional regen (build plan T2a)
+        // LIVE: the in-combat regen arm in combat/auras.ts updateRegen reads this.
+        effect: { global: { secondWindPctPerSec: 0.03 } },
       },
       {
         id: 'war_row_die_by_the_sword',
         name: 'Die by the Sword',
         description:
           'Defensive cooldown: reduces damage taken by 10%, doubled to 20% while below 30% health.',
-        effect: {}, // PHASE 3: granted ability + damage-taken arm (build plan T2b)
+        // LIVE: grants the defensive cooldown; the cut lives in dealDamage.
+        effect: { grant: { ability: 'die_by_sword' } },
       },
       {
         id: 'war_row_victory_rush',
@@ -83,13 +86,15 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_piercing_howl',
         name: 'Piercing Howl',
         description: 'A shout that slows enemies within 15 yards by 50% for 15 sec.',
-        effect: {}, // PHASE 3: aoeSlow effect + granted ability (build plan T3a)
+        // LIVE: grants the AoE-slow shout (the aoeSlow effect in effect_dispatch).
+        effect: { grant: { ability: 'piercing_howl' } },
       },
       {
         id: 'war_row_storm_bolt',
         name: 'Storm Bolt',
         description: 'Hurl your weapon to stun a target.',
-        effect: {}, // PHASE 3: granted ability (pure data + ability i18n batch, T3b)
+        // LIVE: grants the thrown stun (directDamage + stun, projectile).
+        effect: { grant: { ability: 'storm_bolt' } },
       },
       {
         id: 'war_row_lingering_dread',
@@ -114,14 +119,16 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_blood_offering',
         name: 'Blood Offering',
         description: 'Sacrifice 5% of your maximum health to instantly gain 30 rage.',
-        effect: {}, // PHASE 3: granted ability (bloodrage twin + ability i18n, T4b)
+        // LIVE: grants the health-for-rage cooldown (selfDamagePctMax + gainResource).
+        effect: { grant: { ability: 'blood_offering' } },
       },
       {
         id: 'war_row_battle_rhythm',
         name: 'Battle Rhythm',
         description:
           'Every third ability you use generates 20% more rage and deals 5% more damage.',
-        effect: {}, // PHASE 3: rolling cast counter (build plan T4c)
+        // LIVE: flags the rolling counter in runEffects (every 3rd cast empowered).
+        effect: { global: { battleRhythm: 1 } },
       },
     ],
   },
@@ -134,21 +141,24 @@ export const WARRIOR_ROWS: RowTree = [
         name: 'Recklessness',
         description:
           'Enrage: increase all your rage generation by 50% and gain 20% additional critical strike chance for 12 sec.',
-        effect: {}, // PHASE 3: granted ability wearing buff_crit + a rage-gen aura (T5a)
+        // LIVE: grants the enrage (one buff_reckless aura: +20% crit, +50% rage gen).
+        effect: { grant: { ability: 'recklessness' } },
       },
       {
         id: 'war_row_avatar',
         name: 'Avatar',
         description:
           'Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%.',
-        effect: {}, // PHASE 3: control-break + transform (build plan T5b)
+        // LIVE: grants the transform (breakControl + damage amp + colossus scale).
+        effect: { grant: { ability: 'avatar' } },
       },
       {
         id: 'war_row_bloodbath',
         name: 'Bloodbath',
         description:
           'Each enemy you kill grants 5% critical strike and 5% damage dealt for 8 sec, stacking up to 25%.',
-        effect: {}, // PHASE 3: on-kill stacking buff (build plan T5c)
+        // LIVE: the on-kill hook in handleDeath stacks the bloodbath aura from this.
+        effect: { global: { bloodbathPct: 0.05 } },
       },
     ],
   },
@@ -160,7 +170,8 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_colossal_might',
         name: 'Colossal Might',
         description: 'Rage you spend reduces the cooldown of your major offensive abilities.',
-        effect: {}, // PHASE 3: cooldown reduction on rage spend (build plan T6a)
+        // LIVE: spendAbilityCost shaves the big offensive cooldowns per rage spent.
+        effect: { global: { cdrPerRage: 0.1 } },
       },
       {
         id: 'war_row_bladestorm',
@@ -173,7 +184,8 @@ export const WARRIOR_ROWS: RowTree = [
         name: 'Sanguine Aura',
         description:
           'Imbue your weapon with the blood of your foes. You and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
-        effect: {}, // PHASE 3: party-scoped melee-filtered buff (build plan T6c)
+        // LIVE: grants the war-leader shout (partyMeleeBuff, MELEE_CLASSES filter).
+        effect: { grant: { ability: 'sanguine_aura' } },
       },
     ],
   },

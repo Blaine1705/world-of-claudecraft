@@ -504,7 +504,17 @@ function formShiftKind(p: Entity, ability: AbilityDef): 'off' | 'cross' | null {
   return null;
 }
 
-function spendAbilityCost(p: Entity, res: ResolvedAbility): void {
+// Colossal Might (warrior choice-row capstone): the "big offensive abilities"
+// whose remaining cooldowns rage spending shaves. A named set so tuning the
+// roster is one edit; bladestorm is listed ahead of its implementation slice.
+const COLOSSAL_MIGHT_ABILITIES = ['recklessness', 'avatar', 'storm_bolt', 'bladestorm'] as const;
+
+function spendAbilityCost(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  res: ResolvedAbility,
+): void {
   if (isToggleBuff(res.def) && p.auras.some((a) => a.id === res.def.id)) return;
   const shift = formShiftKind(p, res.def);
   if (shift === 'off') return;
@@ -513,6 +523,19 @@ function spendAbilityCost(p: Entity, res: ResolvedAbility): void {
     return;
   }
   spendResource(p, res.cost);
+  // Colossal Might: each point of rage actually spent shaves cdrPerRage seconds
+  // off the tracked offensive cooldowns (deleting one that reaches zero, like
+  // the updateTimers decrement does). 0 for everyone without the capstone.
+  const cdr = ctx.playerMods(meta).global.cdrPerRage;
+  if (cdr > 0 && res.cost > 0 && p.resourceType === 'rage') {
+    for (const id of COLOSSAL_MIGHT_ABILITIES) {
+      const rem = p.cooldowns.get(id);
+      if (rem === undefined) continue;
+      const next = rem - res.cost * cdr;
+      if (next <= 0) p.cooldowns.delete(id);
+      else p.cooldowns.set(id, next);
+    }
+  }
 }
 
 function armAbilityCooldown(
@@ -712,7 +735,7 @@ function applyAbility(
 
   // helpful spells never miss
   if (ability.targetType === 'friendly') {
-    spendAbilityCost(p, res);
+    spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);
     return;
@@ -727,7 +750,7 @@ function applyAbility(
   const firesProjectile = ability.school !== 'physical' || ability.projectile === true;
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
-    spendAbilityCost(p, res);
+    spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.emit({
       type: 'spellfx',
@@ -764,7 +787,7 @@ function applyAbility(
     return;
   }
 
-  spendAbilityCost(p, res);
+  spendAbilityCost(ctx, p, meta, res);
   armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
   ctx.runEffects(p, meta, target, res);
 }

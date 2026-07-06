@@ -30,7 +30,13 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
-import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
+import {
+  armorReduction,
+  FISHING_CAST_ID,
+  MELEE_CLASSES,
+  meleeMissChance,
+  rageGenAuraMult,
+} from '../types';
 import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -60,6 +66,33 @@ export function runEffects(
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
   const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
+
+  // Battle Rhythm (warrior choice row): every third ability is empowered. The
+  // counter advances once per cast; on the third, two one-tick micro-auras ride
+  // this cast's effects through the EXISTING generic reads (buff_dmg_done's amp
+  // in dealDamage, buff_rage_gen in rageGenAuraMult), then expire on the next
+  // aura tick, so nothing here special-cases individual effect types. The brief
+  // buff-bar blink doubles as the "third hit ready" feedback. No rng drawn.
+  if (ctx.playerMods(meta).global.battleRhythm > 0) {
+    meta.abilityRhythm = (meta.abilityRhythm + 1) % 3;
+    if (meta.abilityRhythm === 0) {
+      const blink = { remaining: 0.11, duration: 0.11, sourceId: p.id, school: ability.school };
+      ctx.applyAura(p, {
+        id: 'battle_rhythm',
+        name: 'Battle Rhythm',
+        kind: 'buff_dmg_done',
+        value: 0.05,
+        ...blink,
+      });
+      ctx.applyAura(p, {
+        id: 'battle_rhythm_rage',
+        name: 'Battle Rhythm',
+        kind: 'buff_rage_gen',
+        value: 0.2,
+        ...blink,
+      });
+    }
+  }
 
   for (const eff of res.effects) {
     switch (eff.type) {
@@ -641,6 +674,81 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeSlow': {
+        // Piercing Howl: the aoeAttackPower loop shape with a `slow` aura (the
+        // same kind hamstring applies, so movement math needs no new read).
+        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+          if (m.dead) continue;
+          ctx.applyAura(m, {
+            id: `${ability.id}_slow`,
+            name: ability.name,
+            kind: 'slow',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.mult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+          ctx.enterCombat(p, m);
+          if (m.kind === 'mob' && m.hostile)
+            addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
+        }
+        break;
+      }
+      case 'breakControl': {
+        // Avatar: strip every control aura off the caster (the shared predicate
+        // covers stun/root/incapacitate/polymorph; silence/disarm/slow join it
+        // per the "breaks ALL control" design). Emits the aura-lost events so
+        // client buff bars clear (the cleanseFriendlyNpcAuras precedent).
+        for (let i = p.auras.length - 1; i >= 0; i--) {
+          const a = p.auras[i];
+          if (
+            ctx.isControlAura(a.kind) ||
+            a.kind === 'silence' ||
+            a.kind === 'disarm' ||
+            a.kind === 'slow'
+          ) {
+            p.auras.splice(i, 1);
+            ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+          }
+        }
+        break;
+      }
+      case 'partyMeleeBuff': {
+        // Sanguine Aura: the caster plus every MELEE party member (class-level
+        // filter, MELEE_CLASSES) gains an attack-speed multiplier and a
+        // damage-done amp. Solo casters just buff themselves; members are
+        // buffed regardless of distance (a war-leader shout, not an aura zone).
+        const party = ctx.partyOf(p.id);
+        const memberIds = party ? party.members : [p.id];
+        for (const pid of memberIds) {
+          const mMeta = ctx.players.get(pid);
+          const mE = ctx.entities.get(pid);
+          if (!mMeta || !mE || mE.dead) continue;
+          if (!MELEE_CLASSES.has(mMeta.cls)) continue;
+          ctx.applyAura(mE, {
+            id: `${ability.id}_haste`,
+            name: ability.name,
+            kind: 'attackspeed',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.attackSpeedMult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+          ctx.applyAura(mE, {
+            id: `${ability.id}_dmg`,
+            name: ability.name,
+            kind: 'buff_dmg_done',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.dmgPct,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           type: 'spellfx',
@@ -735,11 +843,12 @@ export function runEffects(
       }
       case 'gainResource': {
         // Ability-granted rage is scaled by the choice-row talent multiplier
-        // (Anger Management's abilityRagePct). Non-rage resources (energy from
+        // (Anger Management's abilityRagePct) and the aura-driven bonus
+        // (Recklessness / Battle Rhythm). Non-rage resources (energy from
         // Adrenaline Rush, etc.) are deliberately untouched.
         const gainAmt =
           p.resourceType === 'rage'
-            ? eff.amount * (1 + ctx.playerMods(meta).global.abilityRagePct)
+            ? eff.amount * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p)
             : eff.amount;
         p.resource = Math.min(p.maxResource, p.resource + gainAmt);
         break;
@@ -766,9 +875,11 @@ export function runEffects(
         p.chargeTargetId = target.id;
         p.chargeTimeLeft = CHARGE_MAX_DURATION;
         p.chargePath = ctx.findChargePath(p, target);
-        // Charge's rage burst, scaled like gainResource by abilityRagePct.
+        // Charge's rage burst, scaled like gainResource by abilityRagePct and
+        // the aura-driven bonus (Recklessness / Battle Rhythm).
         if (p.resourceType === 'rage') {
-          const chargeRage = 9 * (1 + ctx.playerMods(meta).global.abilityRagePct);
+          const chargeRage =
+            9 * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p);
           p.resource = Math.min(p.maxResource, p.resource + chargeRage);
         }
         ctx.enterCombat(p, target);

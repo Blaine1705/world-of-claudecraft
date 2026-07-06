@@ -82,6 +82,18 @@ export interface GlobalModEffect {
   // Rage from TAKING damage is deliberately unscaled by either.
   autoRagePct?: number;
   abilityRagePct?: number;
+  // Warrior choice-row passives, read by their runtime hooks (all 0 = off):
+  // Pursuit's on-kill speed burst (+fraction, handleDeath), Second Wind's
+  // in-combat regen below 35% health (fraction of max HP per second,
+  // updateRegen), Battle Rhythm's every-3rd-cast empower (a 0/1 flag,
+  // runEffects), Bloodbath's per-stack on-kill crit+damage fraction
+  // (handleDeath), and Colossal Might's cooldown seconds shaved per rage spent
+  // (spendAbilityCost).
+  onKillSpeedPct?: number;
+  secondWindPctPerSec?: number;
+  battleRhythm?: number;
+  bloodbathPct?: number;
+  cdrPerRage?: number;
 }
 
 export interface TalentEffect {
@@ -538,6 +550,11 @@ function zeroGlobal(): Required<GlobalModEffect> {
     critVsRooted: 0,
     autoRagePct: 0,
     abilityRagePct: 0,
+    onKillSpeedPct: 0,
+    secondWindPctPerSec: 0,
+    battleRhythm: 0,
+    bloodbathPct: 0,
+    cdrPerRage: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -601,6 +618,11 @@ export function accumulate(
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
     g.autoRagePct += (e.autoRagePct ?? 0) * mult;
     g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
+    g.onKillSpeedPct += (e.onKillSpeedPct ?? 0) * mult;
+    g.secondWindPctPerSec += (e.secondWindPctPerSec ?? 0) * mult;
+    g.battleRhythm += (e.battleRhythm ?? 0) * mult;
+    g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
+    g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

@@ -198,9 +198,27 @@ export type AuraKind =
   // Choice-row talent primitives. `buff_dmg_done` value = additive fraction of
   // extra outgoing damage (0.2 = +20%), summed across auras in dealDamage;
   // `buff_crit` value = additive crit chance folded by recalcPlayerStats. Worn
-  // by talent cooldowns (Recklessness / Avatar / Bloodbath / Sanguine Aura).
+  // by talent cooldowns (Avatar / Battle Rhythm's empowered-cast blink).
   | 'buff_dmg_done'
-  | 'buff_crit';
+  | 'buff_crit'
+  // `buff_rage_gen` value = additive fraction of extra rage generation while
+  // worn (Battle Rhythm's empowered cast), summed by rageGenAuraMult below.
+  | 'buff_rage_gen'
+  // Recklessness: one aura carrying both halves of the enrage. value = the
+  // additive crit chance (0.20); the rage-generation bonus is the fixed
+  // RECKLESSNESS_RAGE_GEN read by rageGenAuraMult.
+  | 'buff_reckless'
+  // Bloodbath: the on-kill stacking buff. value = per-stack fraction times the
+  // current stacks (crit AND damage-dealt share the same number); `stacks`
+  // carries the count for the buff-icon badge.
+  | 'bloodbath'
+  // Die by the Sword: while worn, incoming damage is cut 10% (20% below 30%
+  // health); the cut itself lives in dealDamage, keyed off the kind alone.
+  | 'die_by_sword'
+  // Avatar's transform, ONE aura carrying both halves (two selfBuffs would
+  // overwrite each other, applyAura replaces by id): value = the damage-done
+  // amp; the colossus body scale is the fixed AVATAR_SCALE in recalc.
+  | 'buff_avatar';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -1146,6 +1164,14 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
+  // Piercing Howl: slow every hostile within radius (no target needed).
+  | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
+  // Avatar: strip every control aura (stun/root/incapacitate/polymorph via the
+  // shared isControlAura predicate, plus silence/disarm/slow) off the caster.
+  | { type: 'breakControl' }
+  // Sanguine Aura: buff the caster and every MELEE party member (MELEE_CLASSES)
+  // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
+  | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
   | { type: 'charge' }
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
@@ -2258,6 +2284,42 @@ export function rageFromDealing(damage: number, level: number): number {
 export function rageFromTaking(damage: number, attackerLevel: number): number {
   return damage / (Math.max(1, attackerLevel) * 1.5);
 }
+
+// Choice-row warrior talents: aura-driven rage-generation multiplier, applied
+// at every rage mint site (auto-attack dealing, taking, gainResource, Charge's
+// burst) on top of the talent-static autoRagePct/abilityRagePct globals. A
+// Recklessness enrage adds the fixed bonus; Battle Rhythm's empowered-cast
+// blink adds its buff_rage_gen value. 1 (a no-op) with no such aura worn.
+export const RECKLESSNESS_RAGE_GEN = 0.5;
+export function rageGenAuraMult(e: Entity): number {
+  let mult = 1;
+  for (const a of e.auras) {
+    if (a.kind === 'buff_rage_gen') mult += a.value;
+    else if (a.kind === 'buff_reckless') mult += RECKLESSNESS_RAGE_GEN;
+  }
+  return mult;
+}
+
+// Sanguine Aura's melee filter: the classes whose party members receive the
+// attack-speed + damage buff. Class-level v1 (spec-aware filtering can refine
+// it later); deliberately excludes the pure casters so the buff never replaces
+// a universal haste. Owner-tunable.
+export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
+  'warrior',
+  'paladin',
+  'rogue',
+  'shaman',
+  'druid',
+]);
+
+// Die by the Sword: the damage-taken multiplier tiers (10% cut, doubled below
+// the low-health threshold) and Second Wind's activation threshold.
+export const DIE_BY_SWORD_CUT = 0.9;
+export const DIE_BY_SWORD_LOW_CUT = 0.8;
+export const DIE_BY_SWORD_LOW_HP = 0.3;
+export const SECOND_WIND_THRESHOLD = 0.35;
+// Avatar's colossus body-size multiplier while the buff_avatar aura is worn.
+export const AVATAR_SCALE = 1.15;
 
 // Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
 // tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant

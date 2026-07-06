@@ -2,7 +2,7 @@ import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
-import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
+import { AVATAR_SCALE, EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
@@ -247,11 +247,17 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
-    // Choice-row talent cooldowns (e.g. Recklessness): additive crit chance
-    // while the buff rides; expiry re-runs this recalc via the buff* statsDirty
-    // pass in combat/auras.ts, so the bonus falls off with the aura.
-    else if (a.kind === 'buff_crit') bonusCrit += a.value;
+    // Choice-row talent buffs: additive crit chance while worn. buff_crit is the
+    // generic kind; buff_reckless carries Recklessness' +20% crit half (its rage
+    // half lives in rageGenAuraMult); a bloodbath aura's value is its per-stack
+    // crit times the current stacks. Expiry re-runs this recalc via the
+    // statsDirty pass in combat/auras.ts, so each bonus falls off with its aura.
+    else if (a.kind === 'buff_crit' || a.kind === 'buff_reckless' || a.kind === 'bloodbath')
+      bonusCrit += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
+    // Avatar: the colossus transform grows the body by the fixed scale (its
+    // aura value carries the damage amp, consumed in dealDamage).
+    else if (a.kind === 'buff_avatar') scaleMul *= AVATAR_SCALE;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
   }
