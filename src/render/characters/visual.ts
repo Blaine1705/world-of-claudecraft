@@ -38,6 +38,8 @@ const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
+const SHADOWFORM_OPACITY = 0.9;
+const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -89,6 +91,7 @@ export class CharacterVisual {
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
+  private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -105,6 +108,7 @@ export class CharacterVisual {
   private shadowOn = true;
   private far = false;
   private soulRend = false;
+  private shadowform = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -399,6 +403,12 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  setShadowform(on: boolean): void {
+    if (on === this.shadowform) return;
+    this.shadowform = on;
+    this.applyVisualMaterials();
+  }
+
   private applyVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
@@ -521,6 +531,7 @@ export class CharacterVisual {
 
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
     if (this.soulRend) return this.soulRendMaterial(material);
+    if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
     return material;
   }
@@ -554,6 +565,27 @@ export class CharacterVisual {
       withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.35);
     }
     this.soulRendMaterials.set(material, marked);
+    return marked;
+  }
+
+  private shadowformMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.shadowformMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    marked.transparent = true;
+    marked.opacity = SHADOWFORM_OPACITY;
+    marked.depthWrite = true;
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.copy(SHADOWFORM_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x2a0a4a);
+      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.4);
+    }
+    this.shadowformMaterials.set(material, marked);
     return marked;
   }
 

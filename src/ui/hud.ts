@@ -7321,6 +7321,9 @@ export class Hud {
           break;
         }
         case 'learnAbility':
+          // A newly granted ability (level-up or spec signature) must appear in
+          // an open spellbook right away, not on the next manual reopen.
+          if (this.spellbookWindow.isOpen) this.spellbookWindow.render();
           break; // logged by sim
         case 'comboPoint':
           break;

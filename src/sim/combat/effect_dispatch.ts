@@ -95,6 +95,17 @@ export function runEffects(
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
+  // Casting a healing spell drops a Shadow priest out of Shadowform: the form
+  // amplifies Shadow damage but forbids healing (classic Shadowform rule).
+  if (res.effects.some((e) => e.type === 'heal' || e.type === 'hot' || e.type === 'aoeHeal')) {
+    const sf = p.auras.findIndex((a) => a.kind === 'form_shadow');
+    if (sf >= 0) {
+      const lost = p.auras[sf];
+      p.auras.splice(sf, 1);
+      ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
+      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+    }
+  }
   const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
 
   for (const eff of res.effects) {
@@ -131,7 +142,7 @@ export function runEffects(
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
-        if (crit) dmg *= isSpell ? 1.5 : 2;
+        if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -160,7 +171,7 @@ export function runEffects(
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
-        if (crit) dmg *= 2;
+        if (crit) dmg *= 2 + p.critDmgBonus;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -295,7 +306,7 @@ export function runEffects(
           ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
           directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
-        if (crit) dmg *= 1.5;
+        if (crit) dmg *= 1.5 + p.critDmgBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         noteSpellHit(ctx, p, crit);
         break;
@@ -739,7 +750,7 @@ export function runEffects(
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
-          if (crit) dmg *= isSpell ? 1.5 : 2;
+          if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(
