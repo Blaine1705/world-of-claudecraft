@@ -22,6 +22,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { computeTalentModifiers } from '../content/talents';
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -704,6 +705,10 @@ export function grantXp(
     meta.xp -= xpForLevel(p.level);
     p.level++;
     meta.counters.levelUps++;
+    // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
+    // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
+    // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
+    meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
