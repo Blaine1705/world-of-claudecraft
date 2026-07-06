@@ -853,6 +853,7 @@ export const ru_RU: EnTranslations = {
       "dieBySword": "Получаемый урон снижен на {pct}% ({lowPct}% при здоровье ниже {hpPct}%)",
       "sanguine": "Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%",
       "battleTrance": "Следующий Удар героя или Мощный удар не расходует ярость",
+      "victoryRush": "Победный рывок готов",
       "school": {
         "physical": "Физическая",
         "fire": "Огонь",

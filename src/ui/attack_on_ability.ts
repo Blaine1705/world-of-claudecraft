@@ -49,6 +49,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   // Choice-row talents: an AoE slow is a non-breaking snare; the Avatar
   // control-break and the Sanguine party buff are pure utility.
   aoeSlow: 'other',
+  // Fear BREAKS on damage: an auto swing would shatter it (see 'breakCC').
+  aoeFear: 'breakCC',
   breakControl: 'other',
   partyMeleeBuff: 'other',
   selfBuff: 'other',
@@ -56,6 +58,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherStun: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
+  selfHealPctMax: 'other',
   charge: 'other',
   sunder: 'other',
   taunt: 'other',

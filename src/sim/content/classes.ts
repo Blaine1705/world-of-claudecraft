@@ -71,6 +71,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'cleave',
       'defensive_stance',
       'demoralizing_shout',
+      'intimidating_shout',
       'sunder_armor',
       'taunt',
     ],
@@ -3652,6 +3653,65 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Hurl your weapon at the target for {damage}, stunning it for 3 sec.',
   },
+  intimidating_shout: {
+    id: 'intimidating_shout',
+    name: 'Intimidating Shout',
+    class: 'warrior',
+    learnLevel: 14,
+    cost: 15,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    // Classic-era shape (25 rage / 3 min / 5 targets / 8 yd / 8 sec) scaled to
+    // the 1-20 band: cost and cooldown tuned down, the fear itself unchanged.
+    effects: [{ type: 'aoeFear', duration: 8, radius: 8, maxTargets: 5 }],
+    description:
+      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
+  },
+  bladestorm: {
+    id: 'bladestorm',
+    name: 'Bladestorm',
+    class: 'warrior',
+    learnLevel: 20,
+    cost: 25,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    // A self-centered position channel: each tick pulses the aoeDamage at the
+    // caster's LIVE position (no ground-aim reticle), so the storm moves with
+    // you for its full duration.
+    targetMode: 'position',
+    selfCentered: true,
+    channel: { duration: 4, ticks: 4 },
+    effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 8 }],
+    description:
+      'Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec.',
+  },
+  victory_rush: {
+    id: 'victory_rush',
+    name: 'Victory Rush',
+    class: 'warrior',
+    learnLevel: 8,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    // Usable only inside the on-kill window aura handleDeath opens; the cast
+    // consumes it (runEffects), so one kill funds one strike.
+    requiresAuraKind: 'victory_rush',
+    effects: [
+      { type: 'weaponStrike', bonus: 10 },
+      { type: 'selfHealPctMax', pct: 0.2 },
+    ],
+    description:
+      'Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
+  },
   piercing_howl: {
     id: 'piercing_howl',
     name: 'Piercing Howl',
@@ -3753,6 +3813,7 @@ export interface KnownAbility {
   threatFlat: number;
   threatMult: number;
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  charges?: number; // talent-granted stored uses (Double Charge); undefined = 1
 }
 
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
@@ -3848,6 +3909,9 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
+    // Stored uses (Double Charge): base 1; the combat gate + recharge live in
+    // casting_lifecycle / updateTimers, keyed off this resolved max.
+    if (am.bonusCharges) entry.charges = 1 + am.bonusCharges;
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
     if (am.buffPct) {

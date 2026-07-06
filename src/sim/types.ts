@@ -227,7 +227,10 @@ export type AuraKind =
   // Battle Trance (warrior baseline proc): the next Reaver Strike or Brute
   // Swing costs no rage. An ability-scoped sibling of next_cast_free, armed by
   // connected auto-attack swings and consumed by combat/empower_next.ts.
-  | 'battle_trance';
+  | 'battle_trance'
+  // Victory Rush's on-kill window: worn for VICTORY_RUSH_WINDOW seconds after
+  // a credited kill; the granted strike requires it and consumes it on cast.
+  | 'victory_rush';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -243,6 +246,9 @@ export interface Aura {
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
+  // Lingering Dread: a break-on-damage aura with a threshold soaks this much
+  // damage before breaking (undefined = classic break on ANY damage).
+  breakThreshold?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
@@ -1173,8 +1179,12 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
+  | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
   // Piercing Howl: slow every hostile within radius (no target needed).
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
+  // Intimidating Shout: fear up to maxTargets hostiles within radius (the
+  // same fear_incap aura + flee movement the warlock Fear uses, DR shared).
+  | { type: 'aoeFear'; duration: number; radius: number; maxTargets: number }
   // Avatar: strip every control aura (stun/root/incapacitate/polymorph via the
   // shared isControlAura predicate, plus silence/disarm/slow) off the caster.
   | { type: 'breakControl' }
@@ -1237,6 +1247,10 @@ export interface AbilityDef {
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
   targetMode?: 'position';
+  // A `targetMode: 'position'` channel that follows the CASTER instead of a
+  // fixed aimed point (Bladestorm): each tick recenters on the live position
+  // and the client never opens the ground-aim reticle for it.
+  selfCentered?: boolean;
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
   offGcd?: boolean;
   awardsCombo?: number; // rogue builders
@@ -1254,6 +1268,9 @@ export interface AbilityDef {
   exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
+  // Usable only while the caster wears an aura of this kind (Victory Rush's
+  // on-kill window); runEffects consumes the enabling aura on a successful cast.
+  requiresAuraKind?: AuraKind;
   learnLevel: number;
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)
@@ -1536,6 +1553,12 @@ export interface Entity {
   channelTickEvery: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
+  // Charge-limited abilities (Double Charge): per-ability spent count plus the
+  // full recharge duration. While spent > 0 the ability's cooldowns entry is
+  // the RECHARGE timer; expiry refunds one charge and re-arms (updateTimers).
+  // Created lazily on first charged cast (undefined = no charge bookkeeping),
+  // so entities without the talent serialize/trace exactly as before.
+  charges?: Map<string, { spent: number; cdMax: number }>;
   queuedOnSwing: string | null; // heroic strike
   queuedOnSwingFree?: boolean; // next_cast_free consumed at queue time
   fiveSecondRule: number; // time since last mana spend
@@ -2334,6 +2357,8 @@ export const AVATAR_SCALE = 1.15;
 // seconds. No stacking: a re-proc refreshes the one aura (applyAura by id).
 export const BATTLE_TRANCE_CHANCE = 0.2;
 export const BATTLE_TRANCE_DURATION = 10;
+// Victory Rush (choice row): how long the on-kill window stays open.
+export const VICTORY_RUSH_WINDOW = 20;
 
 // Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
 // tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant

@@ -4998,6 +4998,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine':
     'Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': 'Tu próximo Golpe heroico o Embate no cuesta ira',
+  'hudChrome.auraEffect.victoryRush': 'Victory Rush está listo',
   'hudChrome.auraEffect.school.physical': 'Físico',
   'hudChrome.auraEffect.school.fire': 'Fuego',
   'hudChrome.auraEffect.school.frost': 'Escarcha',

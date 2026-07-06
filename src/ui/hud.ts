@@ -4422,7 +4422,9 @@ export class Hud {
       // so the client-side slot remap never desyncs slot semantics
       const resolved = this.abilityForSlot(barSlot);
       if (resolved) {
-        if (resolved.def.targetMode === 'position') {
+        // A self-centered channel (Bladestorm) casts at the caster's own feet:
+        // no ground-aim reticle, straight to the normal cast path.
+        if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
           if (this.groundReticleEnabled()) {
             this.beginGroundAim(action.id, barSlot);
           } else {

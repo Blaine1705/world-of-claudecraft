@@ -239,7 +239,11 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
-  if ((p.cooldowns.has(ability.id) || sharedCooldown) && !togglingOff) {
+  // Charge-limited abilities (Double Charge): a running cooldown is only the
+  // RECHARGE timer; the cast is blocked only once every stored use is spent.
+  const maxCharges = res.charges ?? 1;
+  const chargeAvailable = maxCharges > 1 && (p.charges?.get(ability.id)?.spent ?? 0) < maxCharges;
+  if ((sharedCooldown || (p.cooldowns.has(ability.id) && !chargeAvailable)) && !togglingOff) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }
@@ -261,6 +265,13 @@ export function castAbility(
   ctx.stopFollow(p);
   if (ability.requiresDodgeProc && ctx.time > p.overpowerUntil) {
     ctx.error(p.id, 'Your target must dodge first.');
+    return;
+  }
+  // Kill-window abilities (Victory Rush): usable only while the enabling aura
+  // is worn; runEffects consumes it on a successful cast. Reuses the existing
+  // not-ready error literal so no new client matcher is needed.
+  if (ability.requiresAuraKind && !p.auras.some((a) => a.kind === ability.requiresAuraKind)) {
+    ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target
@@ -449,7 +460,7 @@ export function castAbility(
 
   if (ability.channel) {
     spendResource(p, res.cost);
-    armAbilityCooldown(p, ability.id, res.cooldown);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1);
     p.castingAbility = ability.id;
     p.castTargetId = null; // channels are hostile-path; never carry an override
     p.castTotal = ability.channel.duration;
@@ -543,10 +554,23 @@ function armAbilityCooldown(
   abilityId: string,
   cooldown: number,
   togglingOff = false,
+  maxCharges = 1,
 ): void {
   if (cooldown <= 0 || togglingOff) return;
   if (isShamanShock(abilityId)) {
     for (const id of SHAMAN_SHOCK_COOLDOWN_IDS) p.cooldowns.set(id, cooldown);
+    return;
+  }
+  // Charge-limited (Double Charge): spend one stored use; the cooldowns entry
+  // is the recharge timer and only starts when it is not already running
+  // (recharges are sequential). updateTimers refunds on expiry.
+  if (maxCharges > 1) {
+    if (!p.charges) p.charges = new Map();
+    const cs = p.charges.get(abilityId) ?? { spent: 0, cdMax: cooldown };
+    cs.spent = Math.min(maxCharges, cs.spent + 1);
+    cs.cdMax = cooldown;
+    p.charges.set(abilityId, cs);
+    if (!p.cooldowns.has(abilityId)) p.cooldowns.set(abilityId, cooldown);
     return;
   }
   p.cooldowns.set(abilityId, cooldown);
@@ -557,7 +581,9 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
   if (res.def.targetMode === 'position') {
-    const center = p.castAim ?? p.pos;
+    // A self-centered channel (Bladestorm) follows the caster tick by tick;
+    // aimed channels keep the point captured at cast start.
+    const center = res.def.selfCentered ? p.pos : (p.castAim ?? p.pos);
     const isSpell = res.def.school !== 'physical';
     const radius = res.effects.find((eff) => eff.type === 'aoeDamage')?.radius;
     ctx.emit({
@@ -693,7 +719,7 @@ function applyAbility(
       return;
     }
     spendResource(p, billableCost());
-    armAbilityCooldown(p, ability.id, res.cooldown);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1);
     ctx.revivePet(p.id);
     return;
   }
@@ -737,7 +763,7 @@ function applyAbility(
   // helpful spells never miss
   if (ability.targetType === 'friendly') {
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
     ctx.runEffects(p, meta, target, res);
     return;
   }
@@ -752,7 +778,7 @@ function applyAbility(
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -789,6 +815,6 @@ function applyAbility(
   }
 
   spendAbilityCost(ctx, p, meta, res);
-  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
   ctx.runEffects(p, meta, target, res);
 }

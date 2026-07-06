@@ -853,6 +853,7 @@ export const en_XA: EnTranslations = {
       "dieBySword": "[Ŕéðúçéš ðáɱáĝé ţáķéñ ƀý {pct}% ({lowPct}% ŵĥíļé ƀéļóŵ {hpPct}% ĥéáļţĥ)]",
       "sanguine": "[Íñçŕéášéš áţţáçķ šþééð ƀý {hastePct}% áñð ðáɱáĝé ðéáļţ ƀý {dmgPct}%]",
       "battleTrance": "[Ýóúŕ ñéẋţ Ŕéáʋéŕ Šţŕíķé óŕ Ɓŕúţé Šŵíñĝ çóšţš ñó Ŕáĝé]",
+      "victoryRush": "[Ʋíçţóŕý Ŕúšĥ íš ŕéáðý]",
       "school": {
         "physical": "[Þĥýšíçáļ]",
         "fire": "[Ƒíŕé]",

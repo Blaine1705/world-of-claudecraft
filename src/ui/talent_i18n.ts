@@ -60,6 +60,7 @@ type DisplayGlobalKey = Exclude<
   | 'battleRhythm'
   | 'bloodbathPct'
   | 'cdrPerRage'
+  | 'fearBreakPct'
 >;
 
 export interface TalentLocaleText {
@@ -7102,7 +7103,8 @@ function effectDescription(
       key === 'secondWindPctPerSec' ||
       key === 'battleRhythm' ||
       key === 'bloodbathPct' ||
-      key === 'cdrPerRage'
+      key === 'cdrPerRage' ||
+      key === 'fearBreakPct'
     )
       continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));

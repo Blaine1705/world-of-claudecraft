@@ -853,6 +853,7 @@ export const fr_FR: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "victoryRush": "Victory Rush is ready",
       "school": {
         "physical": "Physique",
         "fire": "Feu",

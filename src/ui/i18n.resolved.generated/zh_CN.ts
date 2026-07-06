@@ -853,6 +853,7 @@ export const zh_CN: EnTranslations = {
       "dieBySword": "受到的伤害降低 {pct}%（生命值低于 {hpPct}% 时为 {lowPct}%）",
       "sanguine": "攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%",
       "battleTrance": "你的下一次英勇打击或猛击不消耗怒气",
+      "victoryRush": "乘胜追击已就绪",
       "school": {
         "physical": "物理",
         "fire": "火焰",

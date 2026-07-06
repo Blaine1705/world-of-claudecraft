@@ -46,6 +46,7 @@ import {
   rageFromDealing,
   rageFromTaking,
   rageGenAuraMult,
+  VICTORY_RUSH_WINDOW,
   virtualLevel,
   xpForLevel,
 } from '../types';
@@ -317,11 +318,17 @@ export function dealDamage(
       target.damageIdleDespawnTimer = DAMAGE_IDLE_DESPAWN_SECONDS;
     }
     for (let i = target.auras.length - 1; i >= 0; i--) {
-      if (target.auras[i].breaksOnDamage) {
+      const breakable = target.auras[i];
+      if (breakable.breaksOnDamage) {
+        // Lingering Dread: a thresholded fear soaks damage before breaking.
+        if (breakable.breakThreshold !== undefined && breakable.breakThreshold > amount) {
+          breakable.breakThreshold -= amount;
+          continue;
+        }
         ctx.emit({
           type: 'aura',
           targetId: target.id,
-          name: target.auras[i].name,
+          name: breakable.name,
           gained: false,
         });
         target.auras.splice(i, 1);
@@ -693,6 +700,21 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
           // it is NOT: 'bloodbath' does not start with 'buff', so the expiry
           // pass must know it. See the expiry arm in combat/auras.ts.
           recalcPlayerStats(creditEntity, meta.cls, meta.equipment, ctx.playerMods(meta));
+        }
+        // Victory Rush (choice row): a credited kill opens the window in which
+        // the granted strike is usable. A normal self aura (rides the aura
+        // wire and the buff frame; the strike requires and consumes it).
+        if (ctx.playerMods(meta).grants.some((g) => g.ability === 'victory_rush')) {
+          ctx.applyAura(creditEntity, {
+            id: 'victory_rush',
+            name: 'Victory Rush',
+            kind: 'victory_rush',
+            value: 0,
+            remaining: VICTORY_RUSH_WINDOW,
+            duration: VICTORY_RUSH_WINDOW,
+            sourceId: creditEntity.id,
+            school: 'physical',
+          });
         }
       }
       // combo points are character-bound: unspent points survive the kill and

@@ -247,6 +247,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       // The warrior free-strike proc: the summary is the covered abilities,
       // not a number (their names are baked per locale in the catalog value).
       return { key: `${KEY}.battleTrance` };
+    case 'victory_rush':
+      // The on-kill window: the summary is the readiness, not a number.
+      return { key: `${KEY}.victoryRush` };
 
     default:
       return null;

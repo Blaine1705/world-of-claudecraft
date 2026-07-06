@@ -962,6 +962,7 @@ export const hudChromeStrings = {
     // The two ability names are the locale's own (Reaver Strike / Brute Swing
     // here; each fill uses its locale's translated names).
     battleTrance: 'Your next Reaver Strike or Brute Swing costs no Rage',
+    victoryRush: 'Victory Rush is ready',
     // Localized damage-school names spliced into {school} above.
     school: {
       physical: 'Physical',

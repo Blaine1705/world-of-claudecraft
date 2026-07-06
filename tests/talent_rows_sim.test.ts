@@ -57,25 +57,27 @@ describe('warrior row content', () => {
       .filter((o) => Object.keys(o.effect).length > 0)
       .map((o) => o.id)
       .sort();
-    // Phase 2 lit the first two; phase 3 lit twelve more. Still pending their
-    // own slices: double_charge (charge system + wire), victory_rush (proc
-    // window + wire), lingering_dread (needs the warrior fear-shout decision),
-    // bladestorm (caster-centered channel + VFX).
+    // All 18 warrior options are LIVE (phase 3 complete). A future empty-effect
+    // placeholder must be added here deliberately, never by omission.
     expect(live).toEqual([
       ANGER,
       'war_row_avatar',
       'war_row_battle_rhythm',
+      'war_row_bladestorm',
       'war_row_blood_offering',
       'war_row_bloodbath',
       'war_row_colossal_might',
       CRUSH,
       'war_row_die_by_the_sword',
+      'war_row_double_charge',
+      'war_row_lingering_dread',
       'war_row_piercing_howl',
       'war_row_pursuit',
       'war_row_recklessness',
       'war_row_sanguine_aura',
       'war_row_second_wind',
       'war_row_storm_bolt',
+      'war_row_victory_rush',
     ]);
   });
 });

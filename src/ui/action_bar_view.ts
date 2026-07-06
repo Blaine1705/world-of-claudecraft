@@ -66,10 +66,12 @@ const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
 
 /** The ability fields the core reads. A structural subset of ResolvedAbility that
- *  both worlds expose (def + the talent-resolved cost). */
+ *  both worlds expose (def + the talent-resolved cost and stored uses). */
 export interface ActionBarAbility {
   def: AbilityDef;
   cost: number;
+  /** Talent-resolved stored uses (Double Charge); undefined = 1. */
+  charges?: number;
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -130,6 +132,9 @@ export interface ActionBarPlayerInput {
    *  Trance / next_cast_free) that drives the slot glow and usable state.
    *  Both worlds expose the live aura list. */
   auras: readonly { kind: string }[];
+  /** Charge-limited abilities' spent counts (Double Charge); the recharge
+   *  timer itself rides `cooldowns`. Optional: absent when nothing is spent. */
+  charges?: { get(id: string): { spent: number } | undefined };
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -347,18 +352,41 @@ export function createActionBarView(
               )
             : 0;
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
-        slot.count = '';
+        // Charge-limited (Double Charge): the running cooldown is only the
+        // RECHARGE timer; the badge shows the stored uses left and the slot
+        // stays usable while any remain.
+        const maxCharges = ability.charges ?? 1;
+        const chargesLeft =
+          maxCharges > 1 ? maxCharges - (player.charges?.get(def.id)?.spent ?? 0) : cd > 0 ? 0 : 1;
+        slot.count = maxCharges > 1 ? deps.formatCount(chargesLeft) : '';
         // A free-cost proc (Battle Trance / next_cast_free) covers the cost:
         // the slot is usable at any resource and glows (the sim predicate is
         // imported so bar and combat can never disagree on the proc's scope).
         const freeByProc = ability.cost > 0 && freeCostAuraActive(player.auras, def.id);
-        slot.usable = !(player.resource < ability.cost) || freeByProc;
+        // A kill-window ability (Victory Rush): usable only while its enabling
+        // aura is worn, and it glows while the window is open.
+        let windowOpen = true;
+        let windowGlow = false;
+        if (def.requiresAuraKind) {
+          windowOpen = false;
+          for (const a of player.auras) {
+            if (a.kind === def.requiresAuraKind) {
+              windowOpen = true;
+              break;
+            }
+          }
+          windowGlow = windowOpen;
+        }
+        slot.usable =
+          (!(player.resource < ability.cost) || freeByProc) &&
+          windowOpen &&
+          !(maxCharges > 1 && chargesLeft <= 0);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
           tgtDist > (def.range > 0 ? def.range : MELEE_RANGE);
         slot.queued = player.queuedOnSwing === def.id;
-        slot.procGlow = freeByProc;
+        slot.procGlow = freeByProc || windowGlow;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),

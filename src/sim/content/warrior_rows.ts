@@ -3,13 +3,12 @@
 // talent_rows.ts). Six tiers at levels 5/8/11/14/17/20, pick one of three.
 // Pure data; English text is the content source, localized at the client.
 //
-// PHASING: an option whose mechanic the engine cannot express yet carries
-// `effect: {}` and a PHASE 3 marker; it folds to nothing if picked (there is no
-// player-facing picker until the UI phase, so nothing half-built is reachable).
-// tests/talent_rows.test.ts pins exactly which options are LIVE, so a marker
-// cannot be forgotten silently. The design source of truth (numbers approved by
-// the owner) is the bilingual calculator mockup + docs/design/
-// warrior-talents-build-plan.md.
+// PHASING: all 18 options are LIVE. If a future option's mechanic is not built
+// yet, give it `effect: {}`: it folds to nothing, the Choices tab renders it
+// disabled with a "Coming soon" badge, and tests/talent_rows_sim.test.ts pins
+// exactly which options are live so a marker cannot be forgotten silently.
+// The design source of truth (numbers approved by the owner) is the bilingual
+// calculator mockup + docs/design/warrior-talents-build-plan.md.
 // ---------------------------------------------------------------------------
 
 import type { RowTree } from './talent_rows';
@@ -23,7 +22,9 @@ export const WARRIOR_ROWS: RowTree = [
         id: 'war_row_double_charge',
         name: 'Double Charge',
         description: 'Your Charge stores 2 uses, so you can charge twice in a row.',
-        effect: {}, // PHASE 3: ability-charge system (build plan T1a)
+        // LIVE: the ability-charge system (casting_lifecycle + updateTimers)
+        // keyed off the resolved bonusCharges.
+        effect: { ability: [{ ability: 'charge', bonusCharges: 1 }] },
       },
       {
         id: 'war_row_pursuit',
@@ -74,8 +75,11 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_victory_rush',
         name: 'Victory Rush',
-        description: 'A strike that heals you, ready after a kill.',
-        effect: {}, // PHASE 3: kill proc window + self-heal strike (build plan T2c)
+        description:
+          'Grants Victory Rush: after killing an enemy, your next strike heals you for 20% of your maximum health.',
+        // LIVE: grants the strike; the on-kill window aura is applied by
+        // handleDeath and required + consumed by the cast.
+        effect: { grant: { ability: 'victory_rush' } },
       },
     ],
   },
@@ -100,8 +104,11 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_lingering_dread',
         name: 'Lingering Dread',
-        description: 'Your feared enemies must take far more damage before the fear breaks.',
-        effect: {}, // PHASE 3: fear break-threshold mechanic (build plan T3c)
+        description:
+          'Enemies feared by your Intimidating Shout can endure 20% of their health in damage before the fear breaks.',
+        // LIVE: arms the breakThreshold on the aoeFear apply (the threshold
+        // arm in combat/damage.ts soaks damage before the classic snap).
+        effect: { global: { fearBreakPct: 0.2 } },
       },
     ],
   },
@@ -188,8 +195,11 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_bladestorm',
         name: 'Bladestorm',
-        description: 'Become a whirling storm of steel, striking everything around you.',
-        effect: {}, // PHASE 3: caster-centered channel (build plan T6b)
+        description:
+          'Become a whirling storm of steel, striking all enemies within 8 yards every second for 4 sec.',
+        // LIVE: grants the self-centered position channel (the storm follows
+        // the caster tick by tick).
+        effect: { grant: { ability: 'bladestorm' } },
       },
       {
         id: 'war_row_sanguine_aura',

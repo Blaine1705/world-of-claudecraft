@@ -1840,6 +1840,7 @@ const ALL_DELTA_KEYS = [
   'bags',
   'buyback',
   'cds',
+  'chg',
   'corpse',
   'cosmetics',
   'dclears',
@@ -1880,6 +1881,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bags: 'bags',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
+  chg: 'charges',
   cosmetics: 'accountCosmetics',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
@@ -1996,6 +1998,7 @@ function dirtyEveryDeltaField(): {
 
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
+  p.charges = new Map([['charge', { spent: 1, cdMax: 15 }]]);
   p.stats = { ...p.stats, str: 12345 };
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
@@ -2048,6 +2051,7 @@ describe('full self-state snapshot delta fixture', () => {
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
+    expect(client.player.charges?.get('charge')?.spent).toBe(1); // chg -> e.charges
     expect(client.player.stats).toMatchObject({ str: 12345 }); // stats (inline s.X ?? e.X)
     expect(client.player.weapon).toMatchObject({ min: 999 }); // weapon (inline s.X ?? e.X)
     expect(client.player.resource).toBe(42); // res -> resource
@@ -2145,9 +2149,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 30 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(30);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(30);
+  it('ALL_DELTA_KEYS contains exactly 31 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(31);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(31);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2159,7 +2163,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(30);
+    expect(scraped.size).toBe(31);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

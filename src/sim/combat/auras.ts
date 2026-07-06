@@ -119,8 +119,17 @@ export function updateTimers(p: Entity): void {
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
     const nv = v - DT;
-    if (nv <= 0) p.cooldowns.delete(k);
-    else p.cooldowns.set(k, nv);
+    if (nv <= 0) {
+      p.cooldowns.delete(k);
+      // Charge-limited abilities (Double Charge): an expired timer is one
+      // RECHARGE completing; refund the use and re-arm while more are spent.
+      const cs = p.charges?.get(k);
+      if (cs) {
+        cs.spent -= 1;
+        if (cs.spent > 0) p.cooldowns.set(k, cs.cdMax);
+        else p.charges?.delete(k);
+      }
+    } else p.cooldowns.set(k, nv);
   }
 }
 

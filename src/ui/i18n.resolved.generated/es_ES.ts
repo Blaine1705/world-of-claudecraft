@@ -853,6 +853,7 @@ export const es_ES: EnTranslations = {
       "dieBySword": "Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)",
       "sanguine": "Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%",
       "battleTrance": "Tu próximo Golpe heroico o Embate no cuesta ira",
+      "victoryRush": "Victory Rush está listo",
       "school": {
         "physical": "Daño físico",
         "fire": "Ígneo",

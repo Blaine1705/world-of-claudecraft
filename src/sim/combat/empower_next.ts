@@ -1,7 +1,7 @@
 import type { SimContext } from '../sim_context';
 import type { AuraKind, Entity } from '../types';
 
-function consumeAuraKind(ctx: SimContext, e: Entity, kind: AuraKind): boolean {
+export function consumeAuraKind(ctx: SimContext, e: Entity, kind: AuraKind): boolean {
   const idx = e.auras.findIndex((a) => a.kind === kind);
   if (idx < 0) return false;
   const [aura] = e.auras.splice(idx, 1);

@@ -4702,6 +4702,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dieBySword': '受到的伤害降低 {pct}%（生命值低于 {hpPct}% 时为 {lowPct}%）',
   'hudChrome.auraEffect.sanguine': '攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': '你的下一次英勇打击或猛击不消耗怒气',
+  'hudChrome.auraEffect.victoryRush': '乘胜追击已就绪',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火焰',
   'hudChrome.auraEffect.school.frost': '冰霜',

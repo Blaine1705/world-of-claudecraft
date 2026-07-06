@@ -1526,6 +1526,13 @@ export class ClientWorld implements IWorld {
         e.cooldowns.clear();
         for (const k in s.cds) e.cooldowns.set(k, Number(s.cds[k]));
       }
+      if (s.chg !== undefined) {
+        // Charge-limited stored-use counts (Double Charge). cdMax is a
+        // server-side recharge detail; the mirror only displays spent counts.
+        if (!e.charges) e.charges = new Map();
+        e.charges.clear();
+        for (const k in s.chg) e.charges.set(k, { spent: Number(s.chg[k]), cdMax: 0 });
+      }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;

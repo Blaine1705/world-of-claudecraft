@@ -44,21 +44,23 @@ describe('buildTalentRowsView', () => {
     expect(vm.rows[5].options.every((o) => !o.picked)).toBe(true);
   });
 
-  it('flags exactly the unimplemented (empty-effect) options as pending', () => {
+  it('flags empty-effect options as pending (none left in the live warrior tree)', () => {
+    // Every warrior option is live now: nothing renders the Coming-soon badge.
     const vm = buildTalentRowsView(WARRIOR_ROWS, emptyRowPicks(), 20);
-    const pending = vm.rows
-      .flatMap((r) => r.options)
-      .filter((o) => o.pending)
-      .map((o) => o.id)
-      .sort();
-    // The four phase 3 slices still to land; the painter renders these
-    // disabled with a "Coming soon" badge. Shrinks as each slice ships.
-    expect(pending).toEqual([
-      'war_row_bladestorm',
-      'war_row_double_charge',
-      'war_row_lingering_dread',
-      'war_row_victory_rush',
-    ]);
+    expect(vm.rows.flatMap((r) => r.options).filter((o) => o.pending)).toEqual([]);
+    // The mechanism itself stays pinned via a synthetic placeholder row.
+    const synthetic = [
+      {
+        level: 5,
+        options: [
+          { id: 'a', name: 'A', description: 'x', effect: {} },
+          { id: 'b', name: 'B', description: 'x', effect: { global: { threatPct: 0.1 } } },
+          { id: 'c', name: 'C', description: 'x', effect: { grant: { ability: 'slam' } } },
+        ],
+      },
+    ];
+    const svm = buildTalentRowsView(synthetic as never, emptyRowPicks(), 5);
+    expect(svm.rows[0].options.map((o) => o.pending)).toEqual([true, false, false]);
   });
 
   it('is deterministic: same inputs give the same model', () => {

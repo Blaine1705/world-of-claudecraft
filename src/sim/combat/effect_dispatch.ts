@@ -39,7 +39,7 @@ import {
   rageGenAuraMult,
 } from '../types';
 import { isRooted } from './cc';
-import { consumeNextAttackCrit } from './empower_next';
+import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
@@ -97,6 +97,10 @@ export function runEffects(
       });
     }
   }
+
+  // A kill-window ability (Victory Rush) consumes its enabling aura on cast;
+  // castAbility already gated on it being worn.
+  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
 
   for (const eff of res.effects) {
     switch (eff.type) {
@@ -699,6 +703,40 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeFear': {
+        // Intimidating Shout: fear up to maxTargets hostiles around the caster.
+        // Applies the SAME fear_incap aura + flee movement the warlock Fear
+        // uses (updateFearMovement keys on that id), with the shared fear DR.
+        // Lingering Dread arms a break threshold: the fear soaks a fraction of
+        // the victim's max health in damage before the breaksOnDamage pass
+        // snaps it (see the threshold arm in combat/damage.ts).
+        const fearBreakPct = ctx.playerMods(meta).global.fearBreakPct;
+        let feared = 0;
+        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+          if (m.dead || feared >= eff.maxTargets) continue;
+          const remaining = ctx.diminishedCrowdControlDuration(p, m, 'fear', eff.duration);
+          if (remaining === null) continue;
+          feared++;
+          ctx.applyAura(m, {
+            id: 'fear_incap',
+            name: ability.name,
+            kind: 'incapacitate',
+            remaining,
+            duration: remaining,
+            value: ctx.rng.range(-Math.PI, Math.PI),
+            sourceId: p.id,
+            school: ability.school,
+            breaksOnDamage: true,
+            ...(fearBreakPct > 0
+              ? { breakThreshold: Math.max(1, Math.round(m.maxHp * fearBreakPct)) }
+              : {}),
+          });
+          ctx.enterCombat(p, m);
+          if (m.kind === 'mob' && m.hostile)
+            addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
+        }
+        break;
+      }
       case 'breakControl': {
         // Avatar: strip every control aura off the caster (the shared predicate
         // covers stun/root/incapacitate/polymorph; silence/disarm/slow join it
@@ -864,6 +902,12 @@ export function runEffects(
           ability: ability.name,
           kind: 'hit',
         });
+        break;
+      }
+      case 'selfHealPctMax': {
+        // Victory Rush's rider: a flat fraction of max health, through the
+        // shared heal path (threat/heal-absorb/crit handled there).
+        ctx.applyHeal(p, p, Math.round(p.maxHp * eff.pct), ability.name);
         break;
       }
       case 'charge': {

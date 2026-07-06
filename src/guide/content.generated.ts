@@ -193,6 +193,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Direhowl"
       },
       {
+        "id": "intimidating_shout",
+        "name": "Intimidating Shout"
+      },
+      {
         "id": "sunder_armor",
         "name": "Armor Shear"
       },

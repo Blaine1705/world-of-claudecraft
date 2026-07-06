@@ -3367,6 +3367,13 @@ export class GameServer {
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
+    // Charge-limited ability stored-use counts (Double Charge): {abilityId:
+    // spent}. The recharge timer itself rides `cds`; the client derives the
+    // max from its own talent rebake. Empty for everyone untalented.
+    maybe(
+      'chg',
+      p.charges ? Object.fromEntries([...p.charges.entries()].map(([k, v]) => [k, v.spent])) : {},
+    );
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
     maybe('party', this.partyWire(anchorSession.pid));

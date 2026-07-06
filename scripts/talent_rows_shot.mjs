@@ -139,10 +139,10 @@ const locked = await page.evaluate(() => ({
   pending: document.querySelectorAll('.tal-row-opt.pending .tal-soon').length,
 }));
 check(locked.lockedRows === 4, `4 locked rows at level 8 (got ${locked.lockedRows})`);
-// 12 options in the 4 locked rows + the 2 not-implemented ("Coming soon")
-// options in the unlocked tiers (Double Charge, Victory Rush).
-check(locked.disabled === 14, `14 disabled options at level 8 (got ${locked.disabled})`);
-check(locked.pending === 4, `4 Coming-soon badges (got ${locked.pending})`);
+// 12 options in the 4 locked rows; every warrior option is live now, so no
+// Coming-soon badge disables anything in the unlocked tiers.
+check(locked.disabled === 12, `12 disabled options at level 8 (got ${locked.disabled})`);
+check(locked.pending === 0, `0 Coming-soon badges (got ${locked.pending})`);
 await page.screenshot({ path: 'tmp/rows_locked.png' });
 
 await browser.close();

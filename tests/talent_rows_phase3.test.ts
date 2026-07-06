@@ -3,6 +3,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { updateRegen } from '../src/sim/combat/auras';
+import { MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -287,6 +288,155 @@ describe('Sanguine Aura', () => {
     expect(MELEE_CLASSES.has('mage')).toBe(false);
     expect(MELEE_CLASSES.has('priest')).toBe(false);
     expect(MELEE_CLASSES.has('warlock')).toBe(false);
+  });
+});
+
+describe('Victory Rush', () => {
+  it('a kill opens the 20s window; the strike heals 20% max and consumes it', () => {
+    const sim = warriorAtCap(54);
+    sim.pickRowTalent(1, 'war_row_victory_rush');
+    expect(metaOf(sim).known.some((k: any) => k.def.id === 'victory_rush')).toBe(true);
+    const p = sim.player;
+    const first = mobsNear(sim, 1)[0];
+    // The exact-heal assertion needs a target WITHOUT the innate spiked-hide
+    // reflect (its bounce-back damage would offset the healed hp).
+    const second = [...sim.entities.values()]
+      .filter((e: any) => e.kind === 'mob' && !e.dead && e !== first && !MOBS[e.templateId]?.thorns)
+      .sort(
+        (a: any, b: any) => dist2d(a.pos, sim.player.pos) - dist2d(b.pos, sim.player.pos),
+      )[0] as any;
+    // Not usable before a kill (the gate errors, nothing happens).
+    standOff(sim, first, 2);
+    sim.targetEntity(first.id);
+    const hpBefore = first.hp;
+    sim.castAbility('victory_rush');
+    expect(first.hp).toBe(hpBefore);
+    // A credited kill opens the window as a normal buff.
+    killMob(sim, first);
+    const win = p.auras.find((a: any) => a.kind === 'victory_rush');
+    expect(win?.remaining).toBeCloseTo(20, 0);
+    // The strike lands, heals 20% of max health, and consumes the window.
+    standOff(sim, second, 2);
+    sim.targetEntity(second.id);
+    p.gcdRemaining = 0;
+    p.critChance = 0; // no heal crit: pin the exact 20%
+    p.hp = Math.floor(p.maxHp * 0.5);
+    const hp0 = p.hp;
+    sim.castAbility('victory_rush');
+    expect(p.hp).toBe(hp0 + Math.round(p.maxHp * 0.2));
+    expect(p.auras.some((a: any) => a.kind === 'victory_rush')).toBe(false);
+  });
+});
+
+describe('Double Charge', () => {
+  it('stores two uses of Charge; the recharge refunds them one at a time', () => {
+    const sim = warriorAtCap(55);
+    sim.pickRowTalent(0, 'war_row_double_charge');
+    const p = sim.player;
+    const mob = mobsNear(sim, 1)[0];
+    mob.hp = 1_000_000;
+    mob.maxHp = 1_000_000;
+    // First charge: spends a use and starts the recharge timer.
+    standOff(sim, mob, 12);
+    sim.targetEntity(mob.id);
+    sim.castAbility('charge');
+    expect(p.charges?.get('charge')?.spent).toBe(1);
+    expect(p.cooldowns.get('charge')).toBe(15);
+    // Second charge while the first still recharges: allowed, both spent.
+    standOff(sim, mob, 12);
+    p.chargeTargetId = null; // cut the first dash so the test stays positional
+    sim.castAbility('charge');
+    expect(p.charges?.get('charge')?.spent).toBe(2);
+    // Third is blocked: every stored use is spent.
+    standOff(sim, mob, 12);
+    p.chargeTargetId = null;
+    const cdBefore = p.cooldowns.get('charge');
+    sim.castAbility('charge');
+    expect(p.cooldowns.get('charge')).toBe(cdBefore); // nothing re-armed
+    expect(p.charges?.get('charge')?.spent).toBe(2);
+    // One full recharge refunds ONE use and re-arms for the second.
+    for (let i = 0; i < 20 * 15 + 1; i++) sim.tick();
+    expect(p.charges?.get('charge')?.spent).toBe(1);
+    expect(p.cooldowns.has('charge')).toBe(true);
+    // The second recharge clears the bookkeeping entirely.
+    for (let i = 0; i < 20 * 15 + 1; i++) sim.tick();
+    expect(p.charges?.get('charge')).toBeUndefined();
+    expect(p.cooldowns.has('charge')).toBe(false);
+  });
+
+  it('baseline Charge (no talent) keeps the classic single cooldown', () => {
+    const sim = warriorAtCap(55);
+    const mob = mobsNear(sim, 1)[0];
+    standOff(sim, mob, 12);
+    sim.targetEntity(mob.id);
+    sim.castAbility('charge');
+    expect(sim.player.charges).toBeUndefined();
+    expect(sim.player.cooldowns.get('charge')).toBe(15);
+  });
+});
+
+describe('Bladestorm', () => {
+  it('channels a self-centered storm that pulses damage around the caster', () => {
+    const sim = warriorAtCap(56);
+    sim.pickRowTalent(5, 'war_row_bladestorm');
+    expect(metaOf(sim).known.some((k: any) => k.def.id === 'bladestorm')).toBe(true);
+    const p = sim.player;
+    const mob = mobsNear(sim, 1)[0];
+    mob.hp = 1_000_000;
+    mob.maxHp = 1_000_000;
+    standOff(sim, mob, 4); // inside the 8yd storm
+    p.resource = 50;
+    const hp0 = mob.hp;
+    sim.castAbility('bladestorm');
+    expect(p.channeling).toBe(true);
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(p.channeling).toBe(false);
+    // Four ticks of 16-22 (armor-mitigated) landed: well over one tick's worth.
+    const dealt = hp0 - mob.hp;
+    expect(dealt).toBeGreaterThan(30);
+    expect(p.cooldowns.get('bladestorm')).toBeGreaterThan(0);
+  });
+});
+
+describe('Intimidating Shout + Lingering Dread', () => {
+  it('the base shout fears nearby enemies and any damage breaks it', () => {
+    const sim = warriorAtCap(57);
+    const p = sim.player;
+    const mob = mobsNear(sim, 1)[0];
+    mob.hp = 1_000_000;
+    mob.maxHp = 1_000_000;
+    standOff(sim, mob, 4);
+    p.resource = 50;
+    sim.castAbility('intimidating_shout');
+    const fear = mob.auras.find((a: any) => a.id === 'fear_incap');
+    expect(fear).toBeTruthy();
+    expect(fear.breaksOnDamage).toBe(true);
+    expect(fear.breakThreshold).toBeUndefined();
+    // Classic: ANY damage snaps the fear.
+    (sim as any).dealDamage(p, mob, 5, false, 'physical', null, 'hit', true);
+    expect(mob.auras.some((a: any) => a.id === 'fear_incap')).toBe(false);
+  });
+
+  it('Lingering Dread soaks 20% of max health in damage before the fear breaks', () => {
+    const sim = warriorAtCap(58);
+    sim.pickRowTalent(2, 'war_row_lingering_dread');
+    const p = sim.player;
+    const mob = mobsNear(sim, 1)[0];
+    mob.hp = 1_000_000;
+    mob.maxHp = 1_000_000;
+    standOff(sim, mob, 4);
+    p.resource = 50;
+    sim.castAbility('intimidating_shout');
+    const fear = mob.auras.find((a: any) => a.id === 'fear_incap');
+    const threshold = Math.round(mob.maxHp * 0.2);
+    expect(fear?.breakThreshold).toBe(threshold);
+    // Damage below the threshold soaks; the fear holds.
+    (sim as any).dealDamage(p, mob, 1000, false, 'physical', null, 'hit', true);
+    expect(mob.auras.some((a: any) => a.id === 'fear_incap')).toBe(true);
+    expect(fear?.breakThreshold).toBe(threshold - 1000);
+    // Enough damage to cross the remaining threshold snaps it.
+    (sim as any).dealDamage(p, mob, threshold, false, 'physical', null, 'hit', true);
+    expect(mob.auras.some((a: any) => a.id === 'fear_incap')).toBe(false);
   });
 });
 

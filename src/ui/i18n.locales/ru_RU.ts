@@ -5056,6 +5056,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine':
     'Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': 'Следующий Удар героя или Мощный удар не расходует ярость',
+  'hudChrome.auraEffect.victoryRush': 'Победный рывок готов',
   'hudChrome.auraEffect.school.physical': 'Физическая',
   'hudChrome.auraEffect.school.fire': 'Огонь',
   'hudChrome.auraEffect.school.frost': 'Лёд',

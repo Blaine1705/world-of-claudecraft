@@ -65,6 +65,7 @@ export interface AbilityModEffect {
   castPct?: number; // -0.50 = half cast time
   buffPct?: number; // +0.20 = +20% to this ability's selfBuff/buffTarget value (e.g. Improved Devotion Aura)
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
+  bonusCharges?: number; // +N stored uses (Double Charge); base is 1
   addEffects?: AbilityEffect[];
 }
 
@@ -94,6 +95,9 @@ export interface GlobalModEffect {
   battleRhythm?: number;
   bloodbathPct?: number;
   cdrPerRage?: number;
+  // Lingering Dread: fraction of the target's max health a fear the player
+  // applies can soak before breaking (0 = classic break on any damage).
+  fearBreakPct?: number;
 }
 
 export interface TalentEffect {
@@ -178,6 +182,7 @@ export interface ResolvedAbilityMod {
   castPct: number;
   buffPct: number;
   castWhileMoving: boolean;
+  bonusCharges: number;
   addEffects: AbilityEffect[];
 }
 
@@ -555,6 +560,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
     battleRhythm: 0,
     bloodbathPct: 0,
     cdrPerRage: 0,
+    fearBreakPct: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -566,6 +572,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
+    bonusCharges: 0,
     addEffects: [],
   };
 }
@@ -623,6 +630,7 @@ export function accumulate(
     g.battleRhythm += (e.battleRhythm ?? 0) * mult;
     g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
     g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
+    g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];
@@ -637,6 +645,7 @@ export function accumulate(
     cur.castPct += (am.castPct ?? 0) * mult;
     cur.buffPct += (am.buffPct ?? 0) * mult;
     if (am.castWhileMoving) cur.castWhileMoving = true;
+    cur.bonusCharges += (am.bonusCharges ?? 0) * mult;
     // Added effects are rank-1 semantics, not multiplied by talent rank.
     if (am.addEffects) cur.addEffects.push(...am.addEffects);
   }

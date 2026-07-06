@@ -4952,6 +4952,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dieBySword': '受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）',
   'hudChrome.auraEffect.sanguine': '攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加',
   'hudChrome.auraEffect.battleTrance': '次の英雄の一撃またはスラムの怒りコストがゼロになる',
+  'hudChrome.auraEffect.victoryRush': 'ビクトリーラッシュが使用可能',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火',
   'hudChrome.auraEffect.school.frost': '氷',

@@ -853,6 +853,7 @@ export const ja_JP: EnTranslations = {
       "dieBySword": "受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）",
       "sanguine": "攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加",
       "battleTrance": "次の英雄の一撃またはスラムの怒りコストがゼロになる",
+      "victoryRush": "ビクトリーラッシュが使用可能",
       "school": {
         "physical": "物理",
         "fire": "火",

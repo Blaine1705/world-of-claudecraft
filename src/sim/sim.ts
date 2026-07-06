@@ -647,6 +647,7 @@ export interface ResolvedAbility {
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  charges?: number; // talent-granted stored uses (Double Charge); undefined = 1
 }
 
 export interface RewardCounters {

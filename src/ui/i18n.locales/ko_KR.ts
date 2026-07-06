@@ -4960,6 +4960,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)',
   'hudChrome.auraEffect.sanguine': '공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다',
   'hudChrome.auraEffect.battleTrance': '다음 영웅의 일격 또는 격돌에 분노가 소모되지 않습니다',
+  'hudChrome.auraEffect.victoryRush': '연전연승을 사용할 수 있습니다',
   'hudChrome.auraEffect.school.physical': '물리',
   'hudChrome.auraEffect.school.fire': '화염',
   'hudChrome.auraEffect.school.frost': '냉기',
