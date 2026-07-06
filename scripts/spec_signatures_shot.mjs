@@ -119,7 +119,7 @@ const results = [];
     return me.auras.some((a) => a.kind === 'form_moonkin');
   });
   await zoomIn(page, 7);
-  await sleep(3500); // let the star-mote aura accumulate particles
+  await sleep(900);
   await page.screenshot({ path: `${OUT}/moonkin-form-visual.png` });
   results.push(`moonkin-form-visual.png (inForm=${cast})`);
   await page.close();
@@ -141,28 +141,9 @@ const results = [];
     };
   });
   await zoomIn(page, 8);
-  await sleep(3500); // let the fire aura accumulate particles
+  await sleep(900);
   await page.screenshot({ path: `${OUT}/metamorphosis-visual.png` });
   results.push(`metamorphosis-visual.png (inForm=${cast.inForm}, scale=${cast.scale})`);
-  await page.close();
-}
-
-// Scene 5: Shadowform visual (Vesper Form: gloom tint + shadow wisp aura).
-{
-  const page = await enterGame('priest', 'Gloamys');
-  const cast = await page.evaluate(() => {
-    const sim = window.__game.sim;
-    sim.setSpec('shadow');
-    const me = sim.player;
-    me.resource = me.maxResource;
-    me.gcdRemaining = 0;
-    sim.castAbility('shadowform');
-    return me.auras.some((a) => a.kind === 'form_shadow');
-  });
-  await zoomIn(page, 7);
-  await sleep(3500); // let the continuous wisp aura accumulate particles
-  await page.screenshot({ path: `${OUT}/shadowform-visual.png` });
-  results.push(`shadowform-visual.png (inForm=${cast})`);
   await page.close();
 }
 
