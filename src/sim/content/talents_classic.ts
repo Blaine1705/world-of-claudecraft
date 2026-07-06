@@ -42,8 +42,8 @@ const PALADIN_SPECS: SpecDef[] = [
     'A devoted healer who turns the Light into steady single-target recovery.',
     'holy_shock',
     'Kindled Faith',
-    'Increases all healing done by 25%.',
-    { global: { healPct: 0.25 } },
+    'Your healing spells critically heal for double.',
+    { global: { critDmgPct: 0.5 } },
   ),
   spec(
     'protection',
@@ -520,8 +520,8 @@ const HUNTER_SPECS: SpecDef[] = [
     'A wild commander who fights beside a durable companion.',
     'bestial_wrath',
     'Packbond',
-    'Increases your attack power by 15% and maximum health by 10%.',
-    { stats: { apPct: 0.15, maxHpPct: 0.1 } },
+    'Your pet deals 35% more damage. Increases maximum health by 8%.',
+    { global: { petDmgPct: 0.35 }, stats: { maxHpPct: 0.08 } },
   ),
   spec(
     'marksmanship',
@@ -1023,8 +1023,8 @@ const MAGE_SPECS: SpecDef[] = [
     'A volatile caster built around fast, high-damage Fire spells.',
     'combustion',
     'Afterflame',
-    'Increases your spell damage by 10% and the damage of your critical strikes by 50%.',
-    { global: { spellDmgPct: 0.1, critDmgPct: 0.5 } },
+    'Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
+    { global: { critDmgPct: 0.5 }, stats: { crit: 0.02 } },
   ),
   spec(
     'frost',
@@ -1035,8 +1035,8 @@ const MAGE_SPECS: SpecDef[] = [
     'A controlling caster who trades peak burst for survival and slows.',
     'icy_veins',
     'Brittlebreak',
-    'Increases your spell damage by 25% and your armor by 10%.',
-    { global: { spellDmgPct: 0.25 }, stats: { armorPct: 0.1 } },
+    'Increases critical strike chance against rooted or chilled targets by 10%. Increases armor by 10%.',
+    { global: { critVsRooted: 0.1 }, stats: { armorPct: 0.1 } },
   ),
 ];
 
@@ -1090,8 +1090,8 @@ const ROGUE_SPECS: SpecDef[] = [
     'A sustained fighter focused on direct weapon strikes.',
     'blade_flurry',
     "Scrapper's Edge",
-    'Increases your melee ability damage by 15% and critical strike chance by 5%.',
-    { global: { meleeDmgPct: 0.15 }, stats: { crit: 0.05 } },
+    'Increases attack speed by 10% and reduces melee ability damage by 10%.',
+    { global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 } },
   ),
   spec(
     'subtlety',
@@ -1564,8 +1564,8 @@ const PRIEST_SPECS: SpecDef[] = [
     'A mitigator who shields allies and heals through controlled efficiency.',
     'power_infusion',
     'Fixed Purpose',
-    'Increases your healing done by 15% and maximum health by 10%.',
-    { global: { healPct: 0.15 }, stats: { maxHpPct: 0.1 } },
+    'Your shields absorb 30% more. Increases maximum health by 8%.',
+    { global: { absorbPct: 0.3 }, stats: { maxHpPct: 0.08 } },
   ),
   spec(
     'holy',
@@ -2080,8 +2080,13 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A healer using ancestral waves and efficient nature magic.',
     'chain_heal',
     'Cleansing Tides',
-    'Increases healing done by 25%.',
-    { global: { healPct: 0.25 } },
+    'Your healing spells cost 20% less mana.',
+    {
+      ability: [
+        { ability: 'chain_heal', costPct: -0.2 },
+        { ability: 'healing_wave', costPct: -0.2 },
+      ],
+    },
   ),
 ];
 
@@ -2110,8 +2115,8 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A curse-weaver using damage over time and drains.',
     'siphon_life',
     'Creeping Rot',
-    'Increases your spell damage by 20%.',
-    { global: { spellDmgPct: 0.2 } },
+    'Your damage-over-time effects deal 20% more damage.',
+    { global: { dotDmgPct: 0.2 } },
   ),
   spec(
     'demonology',
@@ -2122,8 +2127,8 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A durable warlock who survives through demonic resilience.',
     'metamorphosis',
     'Fiendlore',
-    'Increases your spell damage by 15% and Stamina by 10%.',
-    { global: { spellDmgPct: 0.15 }, stats: { staPct: 0.1 } },
+    '20% of damage you take is redirected to your demon. Increases Stamina by 10%.',
+    { global: { petDmgSharePct: 0.2 }, stats: { staPct: 0.1 } },
   ),
   spec(
     'destruction',
@@ -2624,8 +2629,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A healer using heal-over-time effects and efficient nature magic.',
     'swiftmend',
     "Grove's Gift",
-    'Increases healing done by 25%.',
-    { global: { healPct: 0.25 } },
+    'Your heal-over-time effects heal 25% more.',
+    { global: { hotHealPct: 0.25 } },
   ),
 ];
 

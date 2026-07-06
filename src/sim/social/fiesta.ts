@@ -223,10 +223,7 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   if (meta.fiestaRestore) return;
   meta.fiestaRestore = { level: e.level, xp: meta.xp, talents: cloneAllocation(meta.talents) };
   e.level = FIESTA_STANDARD_LEVEL;
-  meta.talents = defaultBuild(meta.cls, FIESTA_STANDARD_LEVEL);
-  // Deliberately the PLAIN bake (no player choice-row PICKS): a standardized bout
-  // excludes them so every fighter enters equal. The picks themselves are untouched
-  // and return with fiestaRestoreChar below.
+  meta.talents = defaultBuild(meta.cls, talentPointsAtLevel(FIESTA_STANDARD_LEVEL));
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly
@@ -240,9 +237,7 @@ export function fiestaRestoreChar(meta: PlayerMeta, e: Entity): void {
   e.level = snap.level;
   meta.xp = snap.xp;
   meta.talents = snap.talents;
-  // The REAL build returns here, so the bake must include the choice-row picks
-  // (they were excluded by the standardized bout above, not cleared).
-  meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks, e.level);
+  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.fiestaRestore = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
   meta.wireRev++; // real talents restored, refresh the wire promptly

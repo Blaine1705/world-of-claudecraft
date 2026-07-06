@@ -600,17 +600,6 @@ export function castAbility(
       ctx.error(p.id, 'Line of sight.');
       return;
     }
-    // Group/raid-only friendly target (Cascada temporal): the target must be the
-    // caster or a member of the caster's party/raid, never an external friendly or
-    // NPC. Refuse before any cost/cooldown is paid, so an out-of-group target never
-    // silently burns the cast on an empty selection.
-    if (ability.partyOnlyTarget && target.id !== p.id) {
-      const party = ctx.partyOf(p.id);
-      if (!party || !party.members.includes(target.id)) {
-        ctx.error(p.id, 'That ally is not in your group.');
-        return;
-      }
-    }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
     if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
@@ -1338,7 +1327,7 @@ function applyAbility(
       return;
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
+    target = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
     if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
       ctx.error(p.id, 'You have no target.');
       return;
@@ -1401,15 +1390,8 @@ function applyAbility(
     ability.targetType === 'friendly' ||
     (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
   ) {
-    spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(
-      p,
-      ability.id,
-      res.cooldown,
-      togglingOff,
-      res.charges ?? 1,
-      res.bonusCharges ?? 0,
-    );
+    spendAbilityCost(p, res);
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')

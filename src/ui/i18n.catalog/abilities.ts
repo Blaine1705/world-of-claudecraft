@@ -1358,7 +1358,7 @@ const classAbilityNamesEn = {
       [
         'holy_shock',
         'Holy Shock',
-        'Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)',
+        'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
       ],
       [
         'holy_shield',
@@ -1413,7 +1413,7 @@ const classAbilityNamesEn = {
       [
         'power_infusion',
         'Fervor',
-        'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
+        'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
       ],
       [
         'holy_nova',

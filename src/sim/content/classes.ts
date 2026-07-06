@@ -4879,9 +4879,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'holy',
     requiresTarget: true,
-    targetType: 'friendly',
-    effects: [{ type: 'heal', min: 40, max: 50 }],
-    description: 'Shocks a friendly target with Holy energy, healing them for $d. (Holy signature)',
+    targetType: 'any',
+    effects: [
+      { type: 'heal', min: 40, max: 50 },
+      { type: 'directDamage', min: 40, max: 50 },
+    ],
+    description:
+      'Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)',
   },
   holy_shield: {
     id: 'holy_shield',
@@ -5065,7 +5069,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'buff_spellhaste', value: 0.2, duration: 15 }],
     description:
-      'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
+      'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
   },
   holy_nova: {
     id: 'holy_nova',
@@ -5297,26 +5301,8 @@ function scaleEffect(
       };
     case 'hot':
       return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
-    case 'consumeAura':
-      // `flat` is added once, to the PRIMARY magnitude only: deal when present,
-      // else heal (a dual deal+heal def must not double-apply a flat talent mod).
-      return {
-        ...eff,
-        deal: eff.deal
-          ? {
-              min: Math.round(eff.deal.min * dmgMult + flat),
-              max: Math.round(eff.deal.max * dmgMult + flat),
-            }
-          : undefined,
-        heal: eff.heal
-          ? {
-              min: Math.round(eff.heal.min * healMult + (eff.deal ? 0 : flat)),
-              max: Math.round(eff.heal.max * healMult + (eff.deal ? 0 : flat)),
-            }
-          : undefined,
-      };
     case 'absorb':
-      return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
+      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
     // A buff value below 1 is a RATE (haste/spell-damage/crit fraction, e.g. 0.2), not a
     // magnitude: scaling it by a global damage mult and rounding would floor it to 0 (this
     // silently zeroed Arcane Power's haste for an Arcane mage). Only integer magnitudes

@@ -237,7 +237,7 @@ describe('precomputed modifiers', () => {
       10,
       computeTalentModifiers('priest', alloc({ spec: 'discipline' }), 10),
     ).find((k) => k.def.id === 'power_word_shield')!;
-    expect(effOf(shield).amount).toBe(59); // 48 * (1 + 15% mastery + 8% talent)
+    expect(effOf(shield).amount).toBe(67); // 48 * 1.30 mastery * 1.08 talent
 
     const fort = abilitiesKnownAt(
       'priest',

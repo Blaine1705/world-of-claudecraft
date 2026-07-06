@@ -61,6 +61,7 @@ import type { Entity } from '../types';
 // known-ability resolver that consume it.
 function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   const e = ctx.entities.get(meta.entityId);
+  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e?.level ?? 20);
   if (e) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
   // Announce newly granted abilities (spec signature, active nodes): emits `learnAbility`
   // (the HUD places it on the bar + spellbook) and a "You have learned" log. This is a

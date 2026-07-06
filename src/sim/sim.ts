@@ -1970,19 +1970,9 @@ export class Sim {
       }
     }
 
-    // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
-    // saved-state and brand-new-character arms: a first-ever join can already have
-    // earned account bonuses. Values are host-trusted but clamped to the registry
-    // ceiling anyway; the breakdown rows are cloned at this write boundary.
-    if (opts?.bankBonus) {
-      meta.bank.bonusSlots = clampBonusSlots(opts.bankBonus.bonusSlots);
-      meta.bankBonusSources = opts.bankBonus.sources.map((s) => ({ ...s }));
-    }
-
-    // Resolve the flat talent struct once (point tree + choice-row picks),
-    // before the stat pass + ability resolver below consume it (they only ever
-    // read these flat numbers). The level scales spec-mastery magnitudes.
-    meta.talentMods = computeModifiersWithRows(cls, meta.talents, meta.rowPicks, player.level);
+    // Resolve the flat talent struct once, before the stat pass + ability
+    // resolver below consume it (they only ever read these flat numbers).
+    meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     if (savedState) {
@@ -3819,6 +3809,8 @@ export class Sim {
     for (const a of e.auras) {
       if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
     }
+    const ownerMeta = this.players.get(e.ownerId);
+    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
     return mult;
   }
 

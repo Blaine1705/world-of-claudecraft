@@ -1820,45 +1820,7 @@ export interface AbilityDef {
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
   requiresTarget: boolean;
-  // Passive ability (Measured Fury): known and shown in the spellbook, but never
-  // castable and never auto-placed on the action bar. Its benefit is folded
-  // wherever the flat known list is read (e.g. the cost choke point in
-  // resolvedAbility); castAbility refuses it silently.
-  passive?: boolean;
-  // Spec-gated base kit: when set, only players whose CHOSEN spec id is in the
-  // list keep this ability in their known list (abilitiesKnownAt). A player who
-  // has not committed to a spec keeps the full kit, and talent/row GRANTS are
-  // never filtered (the tree they come from is already spec-scoped).
-  specs?: readonly string[];
-  // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
-  // spec id is in the list DROPS this ability from their known list, even though
-  // it is otherwise ungated. Used to swap one ability for a spec-exclusive
-  // replacement (heroic_strike excludeSpecs ['prot'], since prot uses revenge).
-  // A no-spec player and any non-listed spec keep it. Grants are never filtered.
-  excludeSpecs?: readonly string[];
-  // When set alongside excludeSpecs, the exclusion only kicks in at this player
-  // level: below it the listed specs still know the ability. Models a kit
-  // hand-off (Redhand serves committed Fury as its rage spender until Red
-  // Harvest arrives, then retires). Without it exclusion applies at any level.
-  excludeSpecsAtLevel?: number;
-  // friendly = self or allied player; 'any' = either (defaults to enemy)
-  // An INSTANT that may be pressed in the middle of another cast without
-  // touching it (Fire Blast, Combustion; casting_lifecycle's through-cast
-  // path, the same door Blink While Casting opens by talent).
-  usableWhileCasting?: boolean;
-  // An escape/immunity press (Ice Block) that ignores control: it can be cast while
-  // stunned, polymorphed, incapacitated, silenced, or locked out, so it always frees
-  // the caster. The CC cast gate in casting_lifecycle skips those checks for it.
-  usableWhileControlled?: boolean;
-  targetType?: 'enemy' | 'friendly' | 'any';
-  // Restrict a friendly-target ability to the caster or a member of the caster's
-  // group/raid (never an external friendly player, pet, or friendly NPC). Cascada
-  // temporal uses this so the cast is refused (no cost/cooldown) on an out-of-group
-  // target rather than resolving to an empty selection. Checked in casting_lifecycle.
-  partyOnlyTarget?: boolean;
-  // Combat resurrection (Temporal Reversal): the target must be a DEAD group/raid
-  // member (not the living-friendly self-cast path). Resolved in casting_lifecycle.
-  targetsDead?: boolean;
+  targetType?: 'enemy' | 'friendly' | 'any'; // friendly = self or allied player (defaults to enemy)
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
