@@ -151,4 +151,21 @@ describe('spec masteries', () => {
     expect(warlock.player.hp).toBe(920);
     expect(demon.hp).toBe(980);
   });
+
+  it('mastery strength ramps on the live level-up path (min(1, level/20) re-bake)', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(10);
+    sim.setSpec('restoration');
+    const at10 = metaOf(sim, sim.player).talentMods.global.hotHealPct;
+    expect(at10).toBeCloseTo(0.25 * (10 / 20), 10);
+
+    // Ding through grantXp (the live level-up path), NOT setPlayerLevel/setSpec:
+    // the ding itself must re-bake talentMods at the new level.
+    const grant = (sim as unknown as { grantXp(amount: number): void }).grantXp.bind(sim);
+    for (let i = 0; i < 200 && sim.player.level < 20; i++) grant(5000);
+    expect(sim.player.level).toBe(20);
+    const at20 = metaOf(sim, sim.player).talentMods.global.hotHealPct;
+    expect(at20).toBeCloseTo(0.25, 10);
+    expect(at20).toBeGreaterThan(at10);
+  });
 });

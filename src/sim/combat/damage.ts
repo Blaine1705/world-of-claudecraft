@@ -22,8 +22,8 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { computeModifiersWithRows } from '../content/talent_rows';
-import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
+import { computeTalentModifiers } from '../content/talents';
+import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
@@ -1142,9 +1142,8 @@ export function grantXp(
     // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
     // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
     // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
-    // computeModifiersWithRows also folds the choice-row picks, so those bonuses survive.
-    meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks, p.level);
-    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+    meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
+    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
     ctx.emit({ type: 'levelup', level: p.level, pid: p.id });

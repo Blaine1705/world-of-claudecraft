@@ -129,15 +129,9 @@ function talentMods(
   level: number,
 ): TalentModifiers | undefined {
   try {
-    // The REAL build: the level-scaled point tree (mastery level-scaling matches
-    // the live sim, so a sub-20 character's sheet does not report full-strength
-    // mastery stats) plus the choice-row picks folded on top, matching the in-game
-    // bake (addPlayer/recomputeTalents). Picks come straight from persisted state,
-    // so they get the same sanitize (unknown ids and above-level rows dropped).
-    const mods = computeTalentModifiers(cls, normalizeAllocation(state), level);
-    const tree = rowTreeFor(cls);
-    if (tree) accumulateRowPicks(mods, tree, sanitizeRowPicks(tree, state.rowPicks, level));
-    return mods;
+    // Pass the character's level so mastery level-scaling matches the live sim
+    // (a sub-20 character's sheet must not report full-strength mastery stats).
+    return computeTalentModifiers(cls, normalizeAllocation(state), level);
   } catch {
     return undefined; // never let a malformed allocation break a public read
   }
@@ -206,7 +200,6 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
       level,
       state.equipment ?? {},
       talentMods(cls, state, level),
-      state.equipmentInstance ?? {},
     );
     sheet.stats = { ...derived.stats };
     sheet.vitals = {
