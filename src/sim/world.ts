@@ -45,6 +45,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   // the Palmreach: low tropical relief, the coasts flattened to beach by
   // the jungle coast applier
   jungle: { hill: 11, base: 1.2, hubHeight: 2 },
+  // the Evergarden: groomed parkland, gentle as a lawn
+  garden: { hill: 9, base: 1.8, hubHeight: 2 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with
@@ -475,6 +477,10 @@ const REACH_LAND_LOBES = [
   { x: -6, z: 4925, r: 45 }, // the Palmstrand road's shoulder
   { x: 150, z: 4880, r: 42 }, // the offshore islet
   { x: 118, z: 4886, r: 38 }, // ...and its sandbar back to the strand
+  { x: 78, z: 5205, r: 45 }, // the gate road's saddle over the cape's neck
+  { x: 66, z: 5245, r: 38 }, // ...and its rise to the gate footing
+  { x: 50, z: 5280, r: 45 }, // the Garden Gate road's northern footing
+  { x: 50, z: 5316, r: 42 }, // ...carried right up to the border
 ] as const;
 const REACH_BAYS = [
   { x: -170, z: 5010, r: 50 }, // the west reach
@@ -502,7 +508,135 @@ function applyReachCoast(x: number, z: number, h: number): number {
   // the Tanglemouth: flat pass floor across the border
   const passT = (1 - smoothstep(26, 52, Math.abs(x + 60))) * (1 - smoothstep(4810, 4860, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  // ...and the Garden Gate's south ramp, meeting the garden's pass cap
+  const passN = (1 - smoothstep(26, 52, Math.abs(x - 50))) * smoothstep(5240, 5285, z);
+  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
   return out;
+}
+
+// ---------------------------------------------------------------------------
+// The Evergarden: the formal garden at the world's current northern end. The
+// lawns are one broad organic landmass; its signature is the Great Maze, a
+// true hedge labyrinth grown from the heightfield itself (walls are terrain,
+// so sim collision, the renderer, and the map all read the same hedges).
+// ---------------------------------------------------------------------------
+const GARDEN_ZMAX = 5880; // keep in sync with EVERGARDEN_ZONE.zMax
+const GARDEN_LAND_LOBES = [
+  { x: 50, z: 5330, r: 42 }, // the Garden Gate's border footing
+  { x: 50, z: 5360, r: 55 }, // the Garden Gate's approach lawn
+  { x: 18, z: 5385, r: 45 }, // the gate road's lawn, bridging to the hub
+  { x: -40, z: 5430, r: 70 }, // Hedgewick and the gate lawns
+  { x: 0, z: 5500, r: 80 }, // the Statuary Walk
+  { x: 80, z: 5470, r: 55 }, // the Petal Pond's basin
+  { x: -70, z: 5490, r: 40 }, // the rose road's shoulder
+  { x: -90, z: 5530, r: 60 }, // the Rose Wilds
+  { x: 0, z: 5636, r: 95 }, // the Great Maze's terrace...
+  { x: -55, z: 5580, r: 60 }, // ...and its four corners, kept well ashore
+  { x: 55, z: 5580, r: 60 },
+  { x: -55, z: 5695, r: 60 },
+  { x: 55, z: 5695, r: 60 },
+  { x: -20, z: 5790, r: 65 }, // the north lawn and the Lily Basin
+  { x: 60, z: 5760, r: 55 }, // the east walk's long lawn
+  { x: 88, z: 5515, r: 40 }, // the east walk's south shoulder
+  { x: 100, z: 5580, r: 55 }, // the east walk's shoulder
+  { x: 98, z: 5630, r: 40 }, // the east walk's midpoint lawn
+  { x: 100, z: 5680, r: 50 }, // the eastern border beds
+  { x: -110, z: 5650, r: 55 }, // the western wilds
+  { x: 30, z: 5850, r: 50 }, // the far hedgerow under the north rim
+] as const;
+const GARDEN_BAYS = [
+  { x: -170, z: 5560, r: 50 }, // the west water
+  { x: 175, z: 5480, r: 45 }, // the east water
+  { x: 150, z: 5845, r: 45 }, // the northeast bight
+] as const;
+
+export function gardenLandness(x: number, z: number): number {
+  return metaballLandness(GARDEN_LAND_LOBES, GARDEN_BAYS, x, z);
+}
+
+// The garden coast: the fen recipe over lawn instead of reeds.
+function applyGardenCoast(x: number, z: number, h: number): number {
+  if (z <= REACH_ZMAX || z > GARDEN_ZMAX + 2) return h;
+  const land = gardenLandness(x, z);
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = WATER_LEVEL - 3.2 + (WATER_LEVEL - 0.9 - (WATER_LEVEL - 3.2)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the Garden Gate: flat pass floor across the border
+  const passT = (1 - smoothstep(26, 52, Math.abs(x - 50))) * (1 - smoothstep(5370, 5420, z));
+  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  return out;
+}
+
+// The Great Maze. '#' cells are hedge walls raised straight out of the
+// heightfield; '.' cells are gravel corridors. Row 0 is the NORTH row (the
+// map's top), the entrance is the gap in the south row, and the open 3x3
+// court at the center is the Fountain Court. Solvability (entrance to
+// court) is asserted by tests/evergarden.test.ts, so an edit here that
+// bricks the maze fails CI instead of stranding players.
+const GARDEN_MAZE = [
+  '###############',
+  '#.....#.......#',
+  '#.###.#####.###',
+  '#.#.#.....#...#',
+  '#.#.#####.#.#.#',
+  '#.#.#.....#.#.#',
+  '#.#.#.#####.#.#',
+  '#.#.......#.#.#',
+  '#.#.##....###.#',
+  '#.#.#.........#',
+  '#.###.#######.#',
+  '#.#...#.....#.#',
+  '#.#.#####.#.#.#',
+  '#.#.....#.#.#.#',
+  '#.#####.#.###.#',
+  '#.......#.....#',
+  '#######.#######',
+] as const;
+export const GARDEN_MAZE_GRID: readonly string[] = GARDEN_MAZE;
+export const MAZE_CELL = 9; // yd per maze cell
+export const MAZE_COLS = 15;
+export const MAZE_ROWS = 17;
+export const MAZE_X0 = -(MAZE_COLS * MAZE_CELL) / 2; // west edge, x -67.5
+export const MAZE_Z1 = 5713; // north edge (row 0); south edge z 5560
+export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
+const MAZE_WALL_H = 12;
+const MAZE_SKIRT = 2.6; // yd of wall flank; the corridor keeps a flat center
+
+/** Inside the maze footprint (small margin), where dressing must not spawn. */
+export function inGardenMaze(x: number, z: number): boolean {
+  return (
+    x > MAZE_X0 - 3 && x < MAZE_X0 + MAZE_COLS * MAZE_CELL + 3 && z > MAZE_Z0 - 3 && z < MAZE_Z1 + 3
+  );
+}
+
+// The hedge heightfield: distance to the nearest wall-cell rectangle among
+// the 3x3 neighborhood, eased over the skirt, so walls are sheer (well past
+// the climb gate) but corners and junctions stay smoothly rounded.
+function gardenMazeOffset(x: number, z: number): number {
+  if (x < MAZE_X0 - 4 || x > MAZE_X0 + MAZE_COLS * MAZE_CELL + 4) return 0;
+  if (z < MAZE_Z0 - 4 || z > MAZE_Z1 + 4) return 0;
+  const ci = Math.floor((x - MAZE_X0) / MAZE_CELL);
+  const ri = Math.floor((MAZE_Z1 - z) / MAZE_CELL);
+  let best = Infinity;
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      const r = ri + dr;
+      const c = ci + dc;
+      if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) continue;
+      if (GARDEN_MAZE[r].charCodeAt(c) !== 35) continue; // '#'
+      const x0 = MAZE_X0 + c * MAZE_CELL;
+      const x1 = x0 + MAZE_CELL;
+      const zTop = MAZE_Z1 - r * MAZE_CELL;
+      const zBot = zTop - MAZE_CELL;
+      const ddx = x < x0 ? x0 - x : x > x1 ? x - x1 : 0;
+      const ddz = z < zBot ? zBot - z : z > zTop ? z - zTop : 0;
+      const d = Math.sqrt(ddx * ddx + ddz * ddz);
+      if (d < best) best = d;
+    }
+  }
+  if (best === Infinity) return 0;
+  return MAZE_WALL_H * (1 - smoothstep(0, MAZE_SKIRT, best));
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
@@ -727,8 +861,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     return dEdge < 48 && woodLandness(x, z) < 0.02;
   }
   if (z <= REACH_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, REACH_ZMAX - z);
+    const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && reachLandness(x, z) < 0.02;
+  }
+  if (z <= GARDEN_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, GARDEN_ZMAX - z);
+    return dEdge < 48 && gardenLandness(x, z) < 0.02;
   }
   return false;
 }
@@ -922,6 +1060,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
             nightLandness(x, z),
             woodLandness(x, z),
             reachLandness(x, z),
+            gardenLandness(x, z),
           ),
         );
       }
@@ -940,8 +1079,13 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyNightCoast(x, z, h);
   h = applyWoodCoast(x, z, h);
   h = applyReachCoast(x, z, h);
+  h = applyGardenCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
+  // The Great Maze rises out of the finished lawn: walls are pure additive
+  // hedge over whatever the garden terrain does beneath them, so corridors
+  // follow the ground and the walls stay a constant unclimbable height.
+  h += gardenMazeOffset(x, z);
   // World rims AFTER the coast, so the border ranges rise out of the sea
   // (mountains dipping into the ocean at the flanks) instead of being sunk
   // by it. The NORTH rim is suppressed over the Hollow's open sea: looking
@@ -1179,6 +1323,12 @@ export function generateDecorations(seed: number): Decoration[] {
         if (terrainHeight(gx, gz, seed) < 3) continue;
         if (r > 0.58) continue;
         kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
+      } else if (biome === 'garden') {
+        // open parkland: sparse specimen trees on the lawns, and the maze
+        // keeps its corridors clear (the hedges are terrain, not dressing)
+        if (inGardenMaze(gx, gz)) continue;
+        if (r > 0.3) continue;
+        kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

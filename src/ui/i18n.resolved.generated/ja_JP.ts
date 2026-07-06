@@ -5792,6 +5792,18 @@ export const ja_JP: EnTranslations = {
       "idol_guardian": {
         "name": "神像の守護者"
       },
+      "topiary_stag": {
+        "name": "トピアリーの雄鹿"
+      },
+      "topiary_wolf": {
+        "name": "トピアリーの狼"
+      },
+      "hedge_gnome": {
+        "name": "生け垣ノーム"
+      },
+      "the_topiary_bull": {
+        "name": "トピアリーの雄牛"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -7310,6 +7322,33 @@ export const ja_JP: EnTranslations = {
           },
           "6": {
             "label": "沈んだ神像"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "エバーガーデン",
+        "welcome": "生け垣は今も刈り込まれているのに、庭師の姿は百年も見られていない。迷路には気をつけろ。迷路もお前を見ている。",
+        "pois": {
+          "0": {
+            "label": "ヘッジウィック"
+          },
+          "1": {
+            "label": "ガーデンゲート"
+          },
+          "2": {
+            "label": "彫像の並木道"
+          },
+          "3": {
+            "label": "野バラの茂み"
+          },
+          "4": {
+            "label": "花びらの池"
+          },
+          "5": {
+            "label": "大迷路"
+          },
+          "6": {
+            "label": "噴水の中庭"
           }
         }
       }

@@ -61,6 +61,7 @@ import {
   type FoliageView,
 } from './foliage';
 import { buildFrostSky, type FrostSkyView } from './frost_sky';
+import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import {
   GFX,
   type GfxBucketBands,
@@ -846,6 +847,7 @@ export class Renderer {
   private nightFeatures: NightFeaturesView;
   private hauntFeatures: HauntFeaturesView;
   private jungleFeatures: JungleFeaturesView;
+  private gardenFeatures: GardenFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1069,6 +1071,7 @@ export class Renderer {
         'night',
         'haunt',
         'jungle',
+        'garden',
       ];
       for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
@@ -1295,6 +1298,10 @@ export class Renderer {
     setRenderCategory(this.jungleFeatures.group, 'props');
     this.scene.add(this.jungleFeatures.group);
     freezeStaticMatrices(this.jungleFeatures.group);
+    this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.gardenFeatures.group, 'props');
+    this.scene.add(this.gardenFeatures.group);
+    freezeStaticMatrices(this.gardenFeatures.group);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -3602,6 +3609,8 @@ export class Renderer {
     haunt: { color: 0x454c46, near: 30, far: 150 },
     // the Palmreach: bright humid haze, the clearest air in the world
     jungle: { color: 0xd6efe2, near: 115, far: 400 },
+    // the Evergarden: crystal parkland air with the faintest green cast
+    garden: { color: 0xdcefdc, near: 120, far: 420 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3629,6 +3638,8 @@ export class Renderer {
     haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
     // the Palmreach: hard tropical daylight over deep green bounce
     jungle: { hemiSky: 0xeafcff, hemiGround: 0x3a6a42, sun: 0xfff4d8 },
+    // the Evergarden: soft perfect afternoon over clipped lawns
+    garden: { hemiSky: 0xe8f8ff, hemiGround: 0x4a7a44, sun: 0xfff2d0 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
@@ -4574,6 +4585,7 @@ export class Renderer {
     this.nightFeatures.update(this.time);
     this.hauntFeatures.update(this.time);
     this.jungleFeatures.update(this.time);
+    this.gardenFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);

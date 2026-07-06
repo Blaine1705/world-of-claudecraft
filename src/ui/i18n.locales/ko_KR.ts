@@ -2983,7 +2983,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.8.label': '망령 들판',
   'entities.zones.thornpeak_heights.pois.9.label': '무덤고룡 성소',
   'entities.zones.veiled_hollow.name': '장막의 골짜기',
-  'entities.zones.veiled_hollow.welcome': '대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.',
+  'entities.zones.veiled_hollow.welcome':
+    '대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.',
   'entities.zones.veiled_hollow.pois.0.label': '엘더글림',
   'entities.zones.veiled_hollow.pois.1.label': '황혼 동굴',
   'entities.zones.veiled_hollow.pois.2.label': '황혼 전망대',
@@ -2993,11 +2994,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': '수정 여울',
   'entities.zones.veiled_hollow.pois.7.label': '빛나는 심처',
   'guide.home.world.emberName': '드레이크랜드',
-  'guide.home.world.emberBlurb': '창백한 둑길을 건너면 초록은 재에 자리를 내주고, 오래된 존재가 황무지를 다스린다.',
+  'guide.home.world.emberBlurb':
+    '창백한 둑길을 건너면 초록은 재에 자리를 내주고, 오래된 존재가 황무지를 다스린다.',
   'guide.home.world.frostName': '서리장막 봉우리',
-  'guide.home.world.frostBlurb': '어떤 지도에도 없는 눈 덮인 고지. 춤추는 오로라 속에서만 언뜻 보인다.',
+  'guide.home.world.frostBlurb':
+    '어떤 지도에도 없는 눈 덮인 고지. 춤추는 오로라 속에서만 언뜻 보인다.',
   'entities.zones.drakelands.name': '드레이크랜드',
-  'entities.zones.drakelands.welcome': '뜨거운 바람이 황무지에서 불어온다. 용들이 드레이크모 위를 맴돌고, 모래 언덕에는 트롤의 모닥불이 타오른다.',
+  'entities.zones.drakelands.welcome':
+    '뜨거운 바람이 황무지에서 불어온다. 용들이 드레이크모 위를 맴돌고, 모래 언덕에는 트롤의 모닥불이 타오른다.',
   'entities.zones.drakelands.pois.0.label': '와이름 감시탑',
   'entities.zones.drakelands.pois.1.label': '관문숲',
   'entities.zones.drakelands.pois.2.label': '잿빛 사구',
@@ -3005,7 +3009,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.drakelands.pois.4.label': '핏빛유리 벌판',
   'entities.zones.drakelands.pois.5.label': '드레이크모 화산구',
   'entities.zones.frostveil.name': '서리장막 봉우리',
-  'entities.zones.frostveil.welcome': '눈이 모든 소리를 삼킨다. 춤추는 오로라 아래, 추위 그 자체가 깨어 있는 듯하다.',
+  'entities.zones.frostveil.welcome':
+    '눈이 모든 소리를 삼킨다. 춤추는 오로라 아래, 추위 그 자체가 깨어 있는 듯하다.',
   'entities.zones.frostveil.pois.0.label': '아이스맨틀',
   'entities.zones.frostveil.pois.1.label': '설선 고개',
   'entities.zones.frostveil.pois.2.label': '빙하 호수',
@@ -3013,7 +3018,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.frostveil.pois.4.label': '떨림늪',
   'entities.zones.frostveil.pois.5.label': '울부짖는 단구',
   'entities.zones.amberfall.name': '호박빛 가을터',
-  'entities.zones.amberfall.welcome': '이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다. 랜턴미어의 등불이 너를 위해 켜져 있다.',
+  'entities.zones.amberfall.welcome':
+    '이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다. 랜턴미어의 등불이 너를 위해 켜져 있다.',
   'entities.zones.amberfall.pois.0.label': '랜턴미어',
   'entities.zones.amberfall.pois.1.label': '금빛눈녹이 고개',
   'entities.zones.amberfall.pois.2.label': '금빛 과수원',
@@ -3022,7 +3028,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.amberfall.pois.5.label': '잿단풍 언덕',
   'entities.zones.amberfall.pois.6.label': '기운 비석',
   'entities.zones.willowfen.name': '버들늪',
-  'entities.zones.willowfen.welcome': '늪에는 잠자리와 벌의 날갯소리가 가득하다. 다리를 건너 브리지미어에 들어가 잠시 쉬어 가라.',
+  'entities.zones.willowfen.welcome':
+    '늪에는 잠자리와 벌의 날갯소리가 가득하다. 다리를 건너 브리지미어에 들어가 잠시 쉬어 가라.',
   'entities.zones.willowfen.pois.0.label': '브리지미어',
   'entities.zones.willowfen.pois.1.label': '호박늪 돌계단',
   'entities.zones.willowfen.pois.2.label': '수련 습지',
@@ -3030,9 +3037,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.pois.4.label': '수양버들 만',
   'entities.zones.willowfen.pois.5.label': '나른한 여울',
   'guide.home.world.fenName': '버들늪',
-  'guide.home.world.fenBlurb': '가을의 왕관 너머, 버드나무와 고요한 물의 밝은 늪과 해자 뒤의 마을이 있다.',
+  'guide.home.world.fenBlurb':
+    '가을의 왕관 너머, 버드나무와 고요한 물의 밝은 늪과 해자 뒤의 마을이 있다.',
   'guide.home.world.amberName': '호박빛 가을터',
-  'guide.home.world.amberBlurb': '서쪽 절벽 너머에는 끝나지 않는 가을이 있고, 금빛 호수 위에 등불이 떠 있다.',
+  'guide.home.world.amberBlurb':
+    '서쪽 절벽 너머에는 끝나지 않는 가을이 있고, 금빛 호수 위에 등불이 떠 있다.',
   'entities.mobs.snowdrift_wolf.name': '눈더미 늑대',
   'entities.mobs.ice_wisp.name': '얼음 위습',
   'entities.mobs.rime_elemental.name': '서리 정령',
@@ -3052,7 +3061,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': '수련 위습',
   'entities.mobs.willow_sprite.name': '버들 요정',
   'entities.zones.nightbloom.name': '밤꽃 평원',
-  'entities.zones.nightbloom.welcome': '밤의 문 너머에서는 공기마저 꿈을 꾼다. 꽃빛을 따라 문레스트로 가라. 하늘에 걸린 잠든 세계도 놓치지 말고.',
+  'entities.zones.nightbloom.welcome':
+    '밤의 문 너머에서는 공기마저 꿈을 꾼다. 꽃빛을 따라 문레스트로 가라. 하늘에 걸린 잠든 세계도 놓치지 말고.',
   'entities.zones.nightbloom.pois.0.label': '문레스트',
   'entities.zones.nightbloom.pois.1.label': '밤의 문',
   'entities.zones.nightbloom.pois.2.label': '달우물',
@@ -3064,7 +3074,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nightkin_stargazer.name': '밤일족 별지기',
   'entities.mobs.barrow_king.name': '봉분의 왕',
   'entities.zones.wraithwood.name': '망령숲',
-  'entities.zones.wraithwood.welcome': '나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 갈로미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.',
+  'entities.zones.wraithwood.welcome':
+    '나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 갈로미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.',
   'entities.zones.wraithwood.pois.0.label': '갈로미어',
   'entities.zones.wraithwood.pois.1.label': '까마귀 문',
   'entities.zones.wraithwood.pois.2.label': '과부의 덤불',
@@ -3076,7 +3087,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravenbark_shambler.name': '무덤껍질 괴목',
   'entities.mobs.pale_huntsman.name': '창백한 사냥꾼',
   'entities.zones.palmreach.name': '야자 해안',
-  'entities.zones.palmreach.welcome': '따뜻한 모래, 요란한 새소리, 지평선을 삼키는 정글. 드리프트헤이븐이 해변에 불을 피워 두고 너를 기다린다.',
+  'entities.zones.palmreach.welcome':
+    '따뜻한 모래, 요란한 새소리, 지평선을 삼키는 정글. 드리프트헤이븐이 해변에 불을 피워 두고 너를 기다린다.',
   'entities.zones.palmreach.pois.0.label': '드리프트헤이븐',
   'entities.zones.palmreach.pois.1.label': '덩굴 어귀',
   'entities.zones.palmreach.pois.2.label': '야자 백사장',
@@ -3088,6 +3100,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thicket_boar.name': '덤불 멧돼지',
   'entities.mobs.canopy_weaver.name': '수관 거미',
   'entities.mobs.idol_guardian.name': '신상 수호자',
+  'entities.zones.evergarden.name': '상록 정원',
+  'entities.zones.evergarden.welcome':
+    '산울타리는 여전히 다듬어지고 있지만, 정원사를 본 사람은 백 년 동안 없었다. 미로를 조심하라. 미로도 너를 지켜보고 있다.',
+  'entities.zones.evergarden.pois.0.label': '헤지윅',
+  'entities.zones.evergarden.pois.1.label': '정원 문',
+  'entities.zones.evergarden.pois.2.label': '조각상 산책로',
+  'entities.zones.evergarden.pois.3.label': '들장미 수풀',
+  'entities.zones.evergarden.pois.4.label': '꽃잎 연못',
+  'entities.zones.evergarden.pois.5.label': '대미로',
+  'entities.zones.evergarden.pois.6.label': '분수 안뜰',
+  'entities.mobs.topiary_stag.name': '토피어리 수사슴',
+  'entities.mobs.topiary_wolf.name': '토피어리 늑대',
+  'entities.mobs.hedge_gnome.name': '산울타리 노움',
+  'entities.mobs.the_topiary_bull.name': '토피어리 황소',
   'entities.mobs.glimmerwisp.name': '미광 위습',
   'entities.mobs.duskwisp.name': '황혼 위습',
   'entities.mobs.hollow_spirit.name': '골짜기 정령',
@@ -3102,76 +3128,109 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.aurelhorn.name': '아우렐혼, 무리의 첫째',
   'entities.npcs.keeper_saelwyn.name': '수호자 샐윈',
   'entities.npcs.keeper_saelwyn.title': '골짜기의 수호자',
-  'entities.npcs.keeper_saelwyn.greeting': '그대의 동족이 이 가지 아래 선 일은 드물다, {className}. 조심스레 걸으라, 그리고 환영받으라.',
+  'entities.npcs.keeper_saelwyn.greeting':
+    '그대의 동족이 이 가지 아래 선 일은 드물다, {className}. 조심스레 걸으라, 그리고 환영받으라.',
   'entities.npcs.loremother_bryn.name': '로어마더 브린',
   'entities.npcs.loremother_bryn.title': '성소의 목소리',
-  'entities.npcs.loremother_bryn.greeting': '이 골짜기의 빛은 저마다 무언가를 기억하고 있다네, {playerName}. 함께 귀 기울여 주게.',
+  'entities.npcs.loremother_bryn.greeting':
+    '이 골짜기의 빛은 저마다 무언가를 기억하고 있다네, {playerName}. 함께 귀 기울여 주게.',
   'entities.npcs.provisioner_fenna.name': '보급상 펜나',
   'entities.npcs.provisioner_fenna.title': '엘더글림 보급상',
-  'entities.npcs.provisioner_fenna.greeting': '빵은 아직 따끈하고 물은 여전히 달아요. 골짜기가 베풀고, 저도 베풀지요.',
+  'entities.npcs.provisioner_fenna.greeting':
+    '빵은 아직 따끈하고 물은 여전히 달아요. 골짜기가 베풀고, 저도 베풀지요.',
   'entities.npcs.wardsmith_orun.name': '수호기술자 오룬',
   'entities.npcs.wardsmith_orun.title': '옛 대장간의 관리인',
-  'entities.npcs.wardsmith_orun.greeting': '이 화로들은 수백 년 전에 식었지만, {className}, 여기서 벼려진 날은 아직도 서슬이 퍼렇다네.',
+  'entities.npcs.wardsmith_orun.greeting':
+    '이 화로들은 수백 년 전에 식었지만, {className}, 여기서 벼려진 날은 아직도 서슬이 퍼렇다네.',
   'entities.npcs.archivist_tullo.name': '기록관 툴로',
   'entities.npcs.archivist_tullo.title': '돌을 읽는 자',
-  'entities.npcs.archivist_tullo.greeting': '바깥의 비석들은 한 시대가 지나도록 누구에게도 말을 걸지 않았지. 새 귀를 기다렸는지도 모르네.',
+  'entities.npcs.archivist_tullo.greeting':
+    '바깥의 비석들은 한 시대가 지나도록 누구에게도 말을 걸지 않았지. 새 귀를 기다렸는지도 모르네.',
   'entities.quests.q_veil_thinned.title': '얇아진 장막',
-  'entities.quests.q_veil_thinned.text': '동굴이 그대에게 열렸군. 그렇다면 봉인은 내 걱정보다 약해져 있다는 뜻이야, {playerName}. 장막이 찢긴 곳에서 위습들은 어둡고 차갑게 변한다네. 황혼 위습의 정수 여덟 개를 가져오면 상처가 얼마나 깊은지 읽어 보겠네.',
-  'entities.quests.q_veil_thinned.completion': '하나같이 차갑군. 찢긴 자리가 균열이 되기까지 골짜기에 남은 시간은 한 계절 남짓일 게야. 그대와 내가 할 일이 생겼네.',
+  'entities.quests.q_veil_thinned.text':
+    '동굴이 그대에게 열렸군. 그렇다면 봉인은 내 걱정보다 약해져 있다는 뜻이야, {playerName}. 장막이 찢긴 곳에서 위습들은 어둡고 차갑게 변한다네. 황혼 위습의 정수 여덟 개를 가져오면 상처가 얼마나 깊은지 읽어 보겠네.',
+  'entities.quests.q_veil_thinned.completion':
+    '하나같이 차갑군. 찢긴 자리가 균열이 되기까지 골짜기에 남은 시간은 한 계절 남짓일 게야. 그대와 내가 할 일이 생겼네.',
   'entities.quests.q_veil_thinned.objectives.0.label': '황혼 위습의 정수',
   'entities.quests.q_gleaming_antlers.title': '빛나는 가지뿔',
-  'entities.quests.q_gleaming_antlers.text': '장막 수사슴은 풀을 뜯는 자리마다 빛을 흘리고, 떨어진 가지뿔은 그 빛을 몇 해나 간직하지요. 별내림 분지의 무리에게서 다섯 개만 구해 오면 제 등불은 기름 없이 겨울을 나요. 사슴을 해칠 필요는 없지만, 순순히 내주지도 않을 거예요.',
-  'entities.quests.q_gleaming_antlers.completion': '빛을 이렇게나 담고 있다니! 불꽃도 연기도 없이, 오직 빛뿐. 골짜기는 베푸는군요.',
+  'entities.quests.q_gleaming_antlers.text':
+    '장막 수사슴은 풀을 뜯는 자리마다 빛을 흘리고, 떨어진 가지뿔은 그 빛을 몇 해나 간직하지요. 별내림 분지의 무리에게서 다섯 개만 구해 오면 제 등불은 기름 없이 겨울을 나요. 사슴을 해칠 필요는 없지만, 순순히 내주지도 않을 거예요.',
+  'entities.quests.q_gleaming_antlers.completion':
+    '빛을 이렇게나 담고 있다니! 불꽃도 연기도 없이, 오직 빛뿐. 골짜기는 베푸는군요.',
   'entities.quests.q_gleaming_antlers.objectives.0.label': '빛나는 가지뿔',
   'entities.quests.q_wisp_lights.title': '여울의 불빛',
-  'entities.quests.q_wisp_lights.text': '미광 위습들은 골짜기가 봉인되던 날 떨어진 옛 별빛의 티끌을 지니고 다니지. 여섯 톨이면 성소의 등불이 일 년을 버틴다네. 스러져 가는 것들에게서만 취하게. 골짜기는 욕심부리지 않아도 넉넉히 베푸니.',
-  'entities.quests.q_wisp_lights.completion': '첫 별들처럼 은은하군. 제단 곁에 두게. 나머지는 성소가 알아서 할 걸세.',
+  'entities.quests.q_wisp_lights.text':
+    '미광 위습들은 골짜기가 봉인되던 날 떨어진 옛 별빛의 티끌을 지니고 다니지. 여섯 톨이면 성소의 등불이 일 년을 버틴다네. 스러져 가는 것들에게서만 취하게. 골짜기는 욕심부리지 않아도 넉넉히 베푸니.',
+  'entities.quests.q_wisp_lights.completion':
+    '첫 별들처럼 은은하군. 제단 곁에 두게. 나머지는 성소가 알아서 할 걸세.',
   'entities.quests.q_wisp_lights.objectives.0.label': '별빛 티끌',
   'entities.quests.q_calming_the_deep.title': '깊은 숲 달래기',
-  'entities.quests.q_calming_the_deep.text': '빛나는 심처의 포자꾼들은 찢긴 자리가 그들의 고리에 닿기 전까진 온순한 이들이었다네. 타락이 앗아간 것은 돌아오지 않아. 타락한 이들에게 안식을 주게, {playerName}. 심처 북쪽에서 열이라네.',
-  'entities.quests.q_calming_the_deep.completion': '내가 차마 못 할 일을 해 주었군. 남쪽 고리의 채집꾼들은 아직 노래하고 있네. 그대 덕에 계속 노래할 걸세.',
+  'entities.quests.q_calming_the_deep.text':
+    '빛나는 심처의 포자꾼들은 찢긴 자리가 그들의 고리에 닿기 전까진 온순한 이들이었다네. 타락이 앗아간 것은 돌아오지 않아. 타락한 이들에게 안식을 주게, {playerName}. 심처 북쪽에서 열이라네.',
+  'entities.quests.q_calming_the_deep.completion':
+    '내가 차마 못 할 일을 해 주었군. 남쪽 고리의 채집꾼들은 아직 노래하고 있네. 그대 덕에 계속 노래할 걸세.',
   'entities.quests.q_calming_the_deep.objectives.0.label': '타락한 포자꾼에게 안식을 주었다',
   'entities.quests.q_spore_hearts.title': '고리의 심장',
-  'entities.quests.q_spore_hearts.text': '어둠에 떨어진 포자꾼의 심장은 빌려 온 그림자로 계속 뛴다네. 그 심장 넷을 성소에서 정화하면 타락이 어떻게 번지는지 배울 수 있을 게야. 궂은일이지만, {playerName}, 고치는 일이기도 하지.',
-  'entities.quests.q_spore_hearts.completion': '되었네. 정화되어 고요해졌어. 하나같이 같은 표식이 보이는군. 그림자는 가라앉은 궁정에서 흘러나오고 있네. 샐윈에게 전하게.',
+  'entities.quests.q_spore_hearts.text':
+    '어둠에 떨어진 포자꾼의 심장은 빌려 온 그림자로 계속 뛴다네. 그 심장 넷을 성소에서 정화하면 타락이 어떻게 번지는지 배울 수 있을 게야. 궂은일이지만, {playerName}, 고치는 일이기도 하지.',
+  'entities.quests.q_spore_hearts.completion':
+    '되었네. 정화되어 고요해졌어. 하나같이 같은 표식이 보이는군. 그림자는 가라앉은 궁정에서 흘러나오고 있네. 샐윈에게 전하게.',
   'entities.quests.q_spore_hearts.objectives.0.label': '포자 심장',
   'entities.quests.q_monument_tour.title': '돌이 기억하는 것',
-  'entities.quests.q_monument_tour.text': '봉인 이전의 비석이 아직 셋 서 있네. 하나는 황혼 전망대, 하나는 가라앉은 궁정, 하나는 아무도 걷지 않는 북동쪽 끝에 잊혀 있지. 대신 읽어 주게, {playerName}. 내 무릎은 이백 년 전에 계단을 포기했다네.',
-  'entities.quests.q_monument_tour.completion': '전망대, 궁정, 잊힌 구석이라… 봉인가의 세 절이 불린 그날 이후 처음으로 한자리에 모였군. 늙은 독서가를 참으로 기쁘게 해 주었네.',
+  'entities.quests.q_monument_tour.text':
+    '봉인 이전의 비석이 아직 셋 서 있네. 하나는 황혼 전망대, 하나는 가라앉은 궁정, 하나는 아무도 걷지 않는 북동쪽 끝에 잊혀 있지. 대신 읽어 주게, {playerName}. 내 무릎은 이백 년 전에 계단을 포기했다네.',
+  'entities.quests.q_monument_tour.completion':
+    '전망대, 궁정, 잊힌 구석이라… 봉인가의 세 절이 불린 그날 이후 처음으로 한자리에 모였군. 늙은 독서가를 참으로 기쁘게 해 주었네.',
   'entities.quests.q_monument_tour.objectives.0.label': '전망대 비석을 읽었다',
   'entities.quests.q_monument_tour.objectives.1.label': '궁정 비석을 읽었다',
   'entities.quests.q_monument_tour.objectives.2.label': '잊힌 비석을 읽었다',
   'entities.quests.q_grove_menace.title': '숲의 골칫거리',
-  'entities.quests.q_grove_menace.text': '해가 지면 황혼 위습들이 제 좌판 사이로 흘러들어요, {playerName}. 그 냉기는 닿는 족족 상하게 하죠. 좀 솎아 주세요. 장막이 찢긴 곳이라면 어디든, 열 마리요.',
-  'entities.quests.q_grove_menace.completion': '이제 밤장을 다시 열 수 있겠어요. 평생 단골이 생긴 셈 치세요. 적어도 할인은 해 드릴게요.',
+  'entities.quests.q_grove_menace.text':
+    '해가 지면 황혼 위습들이 제 좌판 사이로 흘러들어요, {playerName}. 그 냉기는 닿는 족족 상하게 하죠. 좀 솎아 주세요. 장막이 찢긴 곳이라면 어디든, 열 마리요.',
+  'entities.quests.q_grove_menace.completion':
+    '이제 밤장을 다시 열 수 있겠어요. 평생 단골이 생긴 셈 치세요. 적어도 할인은 해 드릴게요.',
   'entities.quests.q_grove_menace.objectives.0.label': '황혼 위습을 흩어 놓았다',
   'entities.quests.q_shards_of_starfall.title': '별내림의 파편',
-  'entities.quests.q_shards_of_starfall.text': '황혼 위습이 수정 들판 위를 지나면 옛 별빛 조각이 가시처럼 들러붙지. 파편 여섯이면, {playerName}, 봉인이 불린 계절까지 짚어낼 수 있다네.',
-  'entities.quests.q_shards_of_starfall.completion': '이 결을 보게! 가을일세. 골짜기는 가을에 봉인되었어. 이백 년 묵은 논쟁이 작은 돌 여섯으로 끝났군.',
+  'entities.quests.q_shards_of_starfall.text':
+    '황혼 위습이 수정 들판 위를 지나면 옛 별빛 조각이 가시처럼 들러붙지. 파편 여섯이면, {playerName}, 봉인이 불린 계절까지 짚어낼 수 있다네.',
+  'entities.quests.q_shards_of_starfall.completion':
+    '이 결을 보게! 가을일세. 골짜기는 가을에 봉인되었어. 이백 년 묵은 논쟁이 작은 돌 여섯으로 끝났군.',
   'entities.quests.q_shards_of_starfall.objectives.0.label': '별내림 파편',
   'entities.quests.q_treant_accord.title': '나무정령과의 언약',
-  'entities.quests.q_treant_accord.text': '숲의 원로들은 타락이 뿌리를 갉을수록 겉껍질을 벗어 던진다네. 네 장이면 숲 전체에 바를 연고를 달일 수 있어. 껍질을 떼는 동안 고맙단 말은 못 듣겠지만, {playerName}, 그 덕에 그들은 한 세기를 더 서 있을 걸세.',
-  'entities.quests.q_treant_accord.completion': '넷 다 두껍고 성하군. 연고는 달이는 데 일주일, 다 듣는 데 백 년이 걸리지. 나무는 친절을 재는 잣대가 다르다네.',
+  'entities.quests.q_treant_accord.text':
+    '숲의 원로들은 타락이 뿌리를 갉을수록 겉껍질을 벗어 던진다네. 네 장이면 숲 전체에 바를 연고를 달일 수 있어. 껍질을 떼는 동안 고맙단 말은 못 듣겠지만, {playerName}, 그 덕에 그들은 한 세기를 더 서 있을 걸세.',
+  'entities.quests.q_treant_accord.completion':
+    '넷 다 두껍고 성하군. 연고는 달이는 데 일주일, 다 듣는 데 백 년이 걸리지. 나무는 친절을 재는 잣대가 다르다네.',
   'entities.quests.q_treant_accord.objectives.0.label': '원로의 나무껍질',
   'entities.quests.q_spore_tide.title': '포자의 물결에 맞서',
-  'entities.quests.q_spore_tide.text': '연고가 숲은 지키고 있지만, 타락은 황혼마다 심처를 더 세게 밀어붙인다네. 채집꾼들이 북쪽 고리를 되찾으려면 타락한 이들 열둘에게 더 안식을 주어야 해, {playerName}.',
-  'entities.quests.q_spore_tide.completion': '오늘 밤 북쪽 고리가 다시 노래하고 있네. 나직하게, 그러나 분명하게.',
+  'entities.quests.q_spore_tide.text':
+    '연고가 숲은 지키고 있지만, 타락은 황혼마다 심처를 더 세게 밀어붙인다네. 채집꾼들이 북쪽 고리를 되찾으려면 타락한 이들 열둘에게 더 안식을 주어야 해, {playerName}.',
+  'entities.quests.q_spore_tide.completion':
+    '오늘 밤 북쪽 고리가 다시 노래하고 있네. 나직하게, 그러나 분명하게.',
   'entities.quests.q_spore_tide.objectives.0.label': '타락한 포자꾼에게 안식을 주었다',
   'entities.quests.q_sunken_court.title': '가라앉은 궁정',
-  'entities.quests.q_sunken_court.text': '브린이 옳게 읽었네. 찢긴 자리는 동쪽의 옛 궁정을 관통하고, 그곳의 수호자들은 잘못 깨어났어. 봉인을 지키라고 세운 것들이 이제는 다가서는 자를 짓뭉개려 든다네. 폐허에서 여덟을 쓰러뜨리게.',
-  'entities.quests.q_sunken_court.completion': '수호자 여덟이 잠잠해졌군. 나는 저들이 세워지던 때를 기억한다네, {playerName}. 놀랄 것 없어. 골짜기는 제 수호자들을 오래 살게 하지.',
+  'entities.quests.q_sunken_court.text':
+    '브린이 옳게 읽었네. 찢긴 자리는 동쪽의 옛 궁정을 관통하고, 그곳의 수호자들은 잘못 깨어났어. 봉인을 지키라고 세운 것들이 이제는 다가서는 자를 짓뭉개려 든다네. 폐허에서 여덟을 쓰러뜨리게.',
+  'entities.quests.q_sunken_court.completion':
+    '수호자 여덟이 잠잠해졌군. 나는 저들이 세워지던 때를 기억한다네, {playerName}. 놀랄 것 없어. 골짜기는 제 수호자들을 오래 살게 하지.',
   'entities.quests.q_sunken_court.objectives.0.label': '고대 수호자를 잠재웠다',
   'entities.quests.q_wardens_echoes.title': '감시자의 메아리',
-  'entities.quests.q_wardens_echoes.text': '주인이 침묵했는데도 궁정의 수호자들은 사그라들지 않는 메아리처럼 마지막 명령을 되풀이하고 있네. 봉인이 제자리로 돌아갈 때까지 저들은 계속 깨어날 걸세, {playerName}. 석공들이 봉인석에 닿도록 열을 더 잠재워 주게.',
-  'entities.quests.q_wardens_echoes.completion': '메아리는 되풀이될수록 옅어지는군. 머잖아 궁정에는 바람과 담쟁이만 남을 걸세. 폐허란 본래 그래야 하는 법이지.',
+  'entities.quests.q_wardens_echoes.text':
+    '주인이 침묵했는데도 궁정의 수호자들은 사그라들지 않는 메아리처럼 마지막 명령을 되풀이하고 있네. 봉인이 제자리로 돌아갈 때까지 저들은 계속 깨어날 걸세, {playerName}. 석공들이 봉인석에 닿도록 열을 더 잠재워 주게.',
+  'entities.quests.q_wardens_echoes.completion':
+    '메아리는 되풀이될수록 옅어지는군. 머잖아 궁정에는 바람과 담쟁이만 남을 걸세. 폐허란 본래 그래야 하는 법이지.',
   'entities.quests.q_wardens_echoes.objectives.0.label': '고대 수호자를 잠재웠다',
   'entities.quests.q_waking_warden.title': '깨어난 감시자',
-  'entities.quests.q_waking_warden.text': '궁정은 조용해졌지만 그 주인은 아니라네. 봉인을 지키던 감시자가 뒤틀린 채 깨어났고, 저것이 서 있는 한 봉인은 기울 수 없어. 쉽게 쓰러지지 않을 걸세. 친구를 하나 구할 수 있다면 데려가게, {playerName}. 둘을 구할 수 있다면 둘을 데려가게.',
-  'entities.quests.q_waking_warden.completion': '그 종소리 같던 목소리가 침묵했네. 여기서도 느꼈다네. 골짜기 전체에서 무거운 짐이 내려앉는 듯했지.',
+  'entities.quests.q_waking_warden.text':
+    '궁정은 조용해졌지만 그 주인은 아니라네. 봉인을 지키던 감시자가 뒤틀린 채 깨어났고, 저것이 서 있는 한 봉인은 기울 수 없어. 쉽게 쓰러지지 않을 걸세. 친구를 하나 구할 수 있다면 데려가게, {playerName}. 둘을 구할 수 있다면 둘을 데려가게.',
+  'entities.quests.q_waking_warden.completion':
+    '그 종소리 같던 목소리가 침묵했네. 여기서도 느꼈다네. 골짜기 전체에서 무거운 짐이 내려앉는 듯했지.',
   'entities.quests.q_waking_warden.objectives.0.label': '깨어난 감시자를 물리쳤다',
   'entities.quests.q_seal_restored.title': '봉인의 복원',
-  'entities.quests.q_seal_restored.text': '감시자의 인장을 궁정 한가운데의 봉인석으로 가져가, 떨어져 나온 자리에 도로 끼우게. 그러면 골짜기는 아물기 시작할 것이고, 그대는, {playerName}, 그대의 동족 누구도 해내지 못한 일을 이루는 걸세.',
-  'entities.quests.q_seal_restored.completion': '여기서도 닫히는 것이 느껴졌네. 황혼처럼 부드럽게. 골짜기는 벗을 기억한다네, {playerName}. 아무리 멀리 떠나도 큰 나무 아래에는 언제나 그대를 위한 불빛이 있을 걸세.',
+  'entities.quests.q_seal_restored.text':
+    '감시자의 인장을 궁정 한가운데의 봉인석으로 가져가, 떨어져 나온 자리에 도로 끼우게. 그러면 골짜기는 아물기 시작할 것이고, 그대는, {playerName}, 그대의 동족 누구도 해내지 못한 일을 이루는 걸세.',
+  'entities.quests.q_seal_restored.completion':
+    '여기서도 닫히는 것이 느껴졌네. 황혼처럼 부드럽게. 골짜기는 벗을 기억한다네, {playerName}. 아무리 멀리 떠나도 큰 나무 아래에는 언제나 그대를 위한 불빛이 있을 걸세.',
   'entities.quests.q_seal_restored.objectives.0.label': '봉인을 봉인석에 되돌려 놓았다',
   'entities.dungeons.hollow_crypt.name': '텅 빈 묘실',
   'entities.dungeons.hollow_crypt.enterText': '텅 빈 묘실로 내려갑니다...',
@@ -4737,9 +4796,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 성벽이 이백 년을 버텨 왔소. 내가 지키는 한 무너지지 않겠지만, 신음하고 있긴 하지.',
   'guide.worldPage.peaksPlaceNotes':
     '하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 코볼트의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나며, 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.',
-  'guide.worldPage.duskGreeting': '그대의 동족이 이 가지 아래 선 일은 드물다. 조심스레 걸으라, 그리고 환영받으라.',
+  'guide.worldPage.duskGreeting':
+    '그대의 동족이 이 가지 아래 선 일은 드물다. 조심스레 걸으라, 그리고 환영받으라.',
   'guide.worldPage.duskGreeter': '수호자 샐윈, 엘더글림',
-  'guide.worldPage.duskPlaceNotes': '엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
+  'guide.worldPage.duskPlaceNotes':
+    '엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.',
   'guide.worldPage.valeGreeter': '레드브룩 원수, 이스트브룩',
   'guide.worldPage.valeGreeting': '칼을 가까이 두시오. 골짜기는 예전 같지 않으니.',
   'guide.worldPage.valePlaceNotes':

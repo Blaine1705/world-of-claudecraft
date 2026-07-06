@@ -2988,7 +2988,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.8.label': '亡霊の野',
   'entities.zones.thornpeak_heights.pois.9.label': '墓ワームの聖所',
   'entities.zones.veiled_hollow.name': 'ヴェールの幽谷',
-  'entities.zones.veiled_hollow.welcome': '大気は古の魔力に満ちて震えている。エルダーグリームの大樹の下で、守り手セルウィンを訪ねよ。',
+  'entities.zones.veiled_hollow.welcome':
+    '大気は古の魔力に満ちて震えている。エルダーグリームの大樹の下で、守り手セルウィンを訪ねよ。',
   'entities.zones.veiled_hollow.pois.0.label': 'エルダーグリーム',
   'entities.zones.veiled_hollow.pois.1.label': 'ダスクフォール洞窟',
   'entities.zones.veiled_hollow.pois.2.label': 'ダスクフォールの見晴らし台',
@@ -2998,11 +2999,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.veiled_hollow.pois.6.label': '水晶の浅瀬',
   'entities.zones.veiled_hollow.pois.7.label': '輝きの深み',
   'guide.home.world.emberName': 'ドレイクランド',
-  'guide.home.world.emberBlurb': 'ペイル・コーズウェイを越えると緑は燃え殻に変わり、荒野には古きものが君臨する。',
+  'guide.home.world.emberBlurb':
+    'ペイル・コーズウェイを越えると緑は燃え殻に変わり、荒野には古きものが君臨する。',
   'guide.home.world.frostName': 'フロストヴェイルの果て',
-  'guide.home.world.frostBlurb': 'どの地図にも載らない雪の高地。揺らめくオーロラの中にだけ垣間見える。',
+  'guide.home.world.frostBlurb':
+    'どの地図にも載らない雪の高地。揺らめくオーロラの中にだけ垣間見える。',
   'entities.zones.drakelands.name': 'ドレイクランド',
-  'entities.zones.drakelands.welcome': '熱風が荒野から吹きつける。ドラゴンはドレイクモウの上空を旋回し、砂丘にはトロールの焚き火が燃えている。',
+  'entities.zones.drakelands.welcome':
+    '熱風が荒野から吹きつける。ドラゴンはドレイクモウの上空を旋回し、砂丘にはトロールの焚き火が燃えている。',
   'entities.zones.drakelands.pois.0.label': 'ワームウォッチ',
   'entities.zones.drakelands.pois.1.label': 'ゲートウッドの森',
   'entities.zones.drakelands.pois.2.label': 'シンダー砂丘',
@@ -3010,7 +3014,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.drakelands.pois.4.label': 'ブラッドグラスの平原',
   'entities.zones.drakelands.pois.5.label': 'ドレイクモウ火口',
   'entities.zones.frostveil.name': 'フロストヴェイルの果て',
-  'entities.zones.frostveil.welcome': '雪がすべての音を呑み込む。揺らめくオーロラの下で、寒さそのものが目覚めているかのようだ。',
+  'entities.zones.frostveil.welcome':
+    '雪がすべての音を呑み込む。揺らめくオーロラの下で、寒さそのものが目覚めているかのようだ。',
   'entities.zones.frostveil.pois.0.label': 'アイスマントル',
   'entities.zones.frostveil.pois.1.label': 'スノーライン峠',
   'entities.zones.frostveil.pois.2.label': '氷河の湖',
@@ -3018,7 +3023,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.frostveil.pois.4.label': 'シヴァーフェン湿地',
   'entities.zones.frostveil.pois.5.label': '咆哮のテラス',
   'entities.zones.amberfall.name': 'アンバーフォール',
-  'entities.zones.amberfall.welcome': 'ここではどの葉も金と紅に燃え、決して散らない。ランタンミアの灯りが君を迎えている。',
+  'entities.zones.amberfall.welcome':
+    'ここではどの葉も金と紅に燃え、決して散らない。ランタンミアの灯りが君を迎えている。',
   'entities.zones.amberfall.pois.0.label': 'ランタンミア',
   'entities.zones.amberfall.pois.1.label': 'ゴールドメルト峠',
   'entities.zones.amberfall.pois.2.label': '黄金の果樹園',
@@ -3027,7 +3033,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.amberfall.pois.5.label': 'シンダーメイプルの丘',
   'entities.zones.amberfall.pois.6.label': '傾いた石碑',
   'entities.zones.willowfen.name': 'ウィローフェン',
-  'entities.zones.willowfen.welcome': '湿原にはトンボと蜂の羽音が満ちている。橋を渡ってブリッジミアに入り、しばし足を休めるといい。',
+  'entities.zones.willowfen.welcome':
+    '湿原にはトンボと蜂の羽音が満ちている。橋を渡ってブリッジミアに入り、しばし足を休めるといい。',
   'entities.zones.willowfen.pois.0.label': 'ブリッジミア',
   'entities.zones.willowfen.pois.1.label': 'アンバーフェンの石段',
   'entities.zones.willowfen.pois.2.label': 'リリームーア',
@@ -3035,9 +3042,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.willowfen.pois.4.label': 'ウィローウィープ',
   'entities.zones.willowfen.pois.5.label': 'まどろみの浅瀬',
   'guide.home.world.fenName': 'ウィローフェン',
-  'guide.home.world.fenBlurb': '秋の冠を越えた先には、柳と静かな水の明るい湿原と、堀に守られた町がある。',
+  'guide.home.world.fenBlurb':
+    '秋の冠を越えた先には、柳と静かな水の明るい湿原と、堀に守られた町がある。',
   'guide.home.world.amberName': 'アンバーフォール',
-  'guide.home.world.amberBlurb': '西の断崖の向こうには終わらない秋があり、金色の湖にランタンが灯る。',
+  'guide.home.world.amberBlurb':
+    '西の断崖の向こうには終わらない秋があり、金色の湖にランタンが灯る。',
   'entities.mobs.snowdrift_wolf.name': 'スノードリフトウルフ',
   'entities.mobs.ice_wisp.name': 'アイスウィスプ',
   'entities.mobs.rime_elemental.name': '霧氷の精霊',
@@ -3057,7 +3066,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': 'リリーウィスプ',
   'entities.mobs.willow_sprite.name': 'ウィロースプライト',
   'entities.zones.nightbloom.name': 'ナイトブルーム',
-  'entities.zones.nightbloom.welcome': '夜門の先では、大気までもが夢を見ている。花明かりをたどってムーンレストへ。空に浮かぶ眠れる世界もお見逃しなく。',
+  'entities.zones.nightbloom.welcome':
+    '夜門の先では、大気までもが夢を見ている。花明かりをたどってムーンレストへ。空に浮かぶ眠れる世界もお見逃しなく。',
   'entities.zones.nightbloom.pois.0.label': 'ムーンレスト',
   'entities.zones.nightbloom.pois.1.label': '夜の門',
   'entities.zones.nightbloom.pois.2.label': '月の井戸',
@@ -3069,7 +3079,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nightkin_stargazer.name': 'ナイトキンの星読み',
   'entities.mobs.barrow_king.name': '塚の王',
   'entities.zones.wraithwood.name': 'レイスウッド',
-  'entities.zones.wraithwood.welcome': '梢が棺の蓋のように道の上で閉じていく。ガロウミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。',
+  'entities.zones.wraithwood.welcome':
+    '梢が棺の蓋のように道の上で閉じていく。ガロウミアの灯りから離れるな。森が名前を呼んでも、決して答えるな。',
   'entities.zones.wraithwood.pois.0.label': 'ガロウミア',
   'entities.zones.wraithwood.pois.1.label': '鴉の門',
   'entities.zones.wraithwood.pois.2.label': '寡婦の茨',
@@ -3081,7 +3092,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravenbark_shambler.name': 'グレイヴンバーク',
   'entities.mobs.pale_huntsman.name': '蒼白の狩人',
   'entities.zones.palmreach.name': 'パームリーチ',
-  'entities.zones.palmreach.welcome': '暖かい砂浜、騒がしい鳥の声、そして地平線を呑み込むジャングル。ドリフトヘイヴンは浜辺に火を焚いて待っている。',
+  'entities.zones.palmreach.welcome':
+    '暖かい砂浜、騒がしい鳥の声、そして地平線を呑み込むジャングル。ドリフトヘイヴンは浜辺に火を焚いて待っている。',
   'entities.zones.palmreach.pois.0.label': 'ドリフトヘイヴン',
   'entities.zones.palmreach.pois.1.label': '絡み口',
   'entities.zones.palmreach.pois.2.label': 'パームストランド',
@@ -3093,6 +3105,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thicket_boar.name': '茂みの猪',
   'entities.mobs.canopy_weaver.name': 'キャノピーウィーバー',
   'entities.mobs.idol_guardian.name': '神像の守護者',
+  'entities.zones.evergarden.name': 'エバーガーデン',
+  'entities.zones.evergarden.welcome':
+    '生け垣は今も刈り込まれているのに、庭師の姿は百年も見られていない。迷路には気をつけろ。迷路もお前を見ている。',
+  'entities.zones.evergarden.pois.0.label': 'ヘッジウィック',
+  'entities.zones.evergarden.pois.1.label': 'ガーデンゲート',
+  'entities.zones.evergarden.pois.2.label': '彫像の並木道',
+  'entities.zones.evergarden.pois.3.label': '野バラの茂み',
+  'entities.zones.evergarden.pois.4.label': '花びらの池',
+  'entities.zones.evergarden.pois.5.label': '大迷路',
+  'entities.zones.evergarden.pois.6.label': '噴水の中庭',
+  'entities.mobs.topiary_stag.name': 'トピアリーの雄鹿',
+  'entities.mobs.topiary_wolf.name': 'トピアリーの狼',
+  'entities.mobs.hedge_gnome.name': '生け垣ノーム',
+  'entities.mobs.the_topiary_bull.name': 'トピアリーの雄牛',
   'entities.mobs.glimmerwisp.name': 'グリマーウィスプ',
   'entities.mobs.duskwisp.name': 'ダスクウィスプ',
   'entities.mobs.hollow_spirit.name': '幽谷の精霊',
@@ -3107,76 +3133,108 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.aurelhorn.name': 'アウレルホーン、群れの長',
   'entities.npcs.keeper_saelwyn.name': '守り手セルウィン',
   'entities.npcs.keeper_saelwyn.title': '幽谷の守り手',
-  'entities.npcs.keeper_saelwyn.greeting': 'そなたの同族でこの枝の下に立った者は少ない、{className}よ。静かに歩み、歓迎を受けるがよい。',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'そなたの同族でこの枝の下に立った者は少ない、{className}よ。静かに歩み、歓迎を受けるがよい。',
   'entities.npcs.loremother_bryn.name': 'ロアマザー・ブリン',
   'entities.npcs.loremother_bryn.title': '聖堂の声',
-  'entities.npcs.loremother_bryn.greeting': 'この谷の光はどれも何かを覚えている、{playerName}。共に耳を澄ませておくれ。',
+  'entities.npcs.loremother_bryn.greeting':
+    'この谷の光はどれも何かを覚えている、{playerName}。共に耳を澄ませておくれ。',
   'entities.npcs.provisioner_fenna.name': '補給係フェンナ',
   'entities.npcs.provisioner_fenna.title': 'エルダーグリームの補給係',
-  'entities.npcs.provisioner_fenna.greeting': 'パンはまだ温かく、水はまだ甘い。幽谷は与えてくれる。わたしもね。',
+  'entities.npcs.provisioner_fenna.greeting':
+    'パンはまだ温かく、水はまだ甘い。幽谷は与えてくれる。わたしもね。',
   'entities.npcs.wardsmith_orun.name': 'ワードスミス・オルン',
   'entities.npcs.wardsmith_orun.title': '古き炉の番人',
-  'entities.npcs.wardsmith_orun.greeting': 'この炉が冷えたのは何世紀も前だ、{className}。だが打たれた刃は今も切れる。',
+  'entities.npcs.wardsmith_orun.greeting':
+    'この炉が冷えたのは何世紀も前だ、{className}。だが打たれた刃は今も切れる。',
   'entities.npcs.archivist_tullo.name': 'アーキビスト・トゥッロ',
   'entities.npcs.archivist_tullo.title': '石を読む者',
-  'entities.npcs.archivist_tullo.greeting': '外の石碑はもう長いこと誰にも語りかけていない。新しい耳を待っていたのかもしれん。',
+  'entities.npcs.archivist_tullo.greeting':
+    '外の石碑はもう長いこと誰にも語りかけていない。新しい耳を待っていたのかもしれん。',
   'entities.quests.q_veil_thinned.title': '薄れゆく帳',
-  'entities.quests.q_veil_thinned.text': '洞窟がそなたに開いたか。ならば封印は思ったより弱っている、{playerName}。帳が裂ける場所で、ウィスプは冷たく暗く変わる。ダスクウィスプの精髄を八つ持ってきておくれ。傷の深さを読み取ろう。',
-  'entities.quests.q_veil_thinned.completion': 'どれも冷え切っている。裂け目が亀裂になるまで、幽谷に残された時はひと季節ほどだろう。そなたとわたしの仕事が始まる。',
+  'entities.quests.q_veil_thinned.text':
+    '洞窟がそなたに開いたか。ならば封印は思ったより弱っている、{playerName}。帳が裂ける場所で、ウィスプは冷たく暗く変わる。ダスクウィスプの精髄を八つ持ってきておくれ。傷の深さを読み取ろう。',
+  'entities.quests.q_veil_thinned.completion':
+    'どれも冷え切っている。裂け目が亀裂になるまで、幽谷に残された時はひと季節ほどだろう。そなたとわたしの仕事が始まる。',
   'entities.quests.q_veil_thinned.objectives.0.label': 'ダスクウィスプの精髄',
   'entities.quests.q_gleaming_antlers.title': '輝く鹿角',
-  'entities.quests.q_gleaming_antlers.text': 'ヴェールの牡鹿は草を食む場所に光を落とし、抜け落ちた角は何年もその光を保つ。星降りの盆地の群れから五本。それでわたしのランタンは油なしで冬を越せる。牡鹿を傷つける必要はないが、簡単には譲ってくれないよ。',
-  'entities.quests.q_gleaming_antlers.completion': '見ておくれ、光をこんなに抱えて！炎も煙もなく、ただ光だけ。幽谷は与えてくれる。',
+  'entities.quests.q_gleaming_antlers.text':
+    'ヴェールの牡鹿は草を食む場所に光を落とし、抜け落ちた角は何年もその光を保つ。星降りの盆地の群れから五本。それでわたしのランタンは油なしで冬を越せる。牡鹿を傷つける必要はないが、簡単には譲ってくれないよ。',
+  'entities.quests.q_gleaming_antlers.completion':
+    '見ておくれ、光をこんなに抱えて！炎も煙もなく、ただ光だけ。幽谷は与えてくれる。',
   'entities.quests.q_gleaming_antlers.objectives.0.label': '輝く鹿角',
   'entities.quests.q_wisp_lights.title': '浅瀬の灯',
-  'entities.quests.q_wisp_lights.text': 'グリマーウィスプは、幽谷が封じられた時に降った古い星明かりの粒を運んでいる。六粒あれば聖堂の灯は一年もつ。消えかけたものからだけ取りなさい。幽谷は貪らずとも足りるだけ与えてくれる。',
-  'entities.quests.q_wisp_lights.completion': '最初の星々のように柔らかい。祭壇のそばに置いておくれ。あとは聖堂がやってくれる。',
+  'entities.quests.q_wisp_lights.text':
+    'グリマーウィスプは、幽谷が封じられた時に降った古い星明かりの粒を運んでいる。六粒あれば聖堂の灯は一年もつ。消えかけたものからだけ取りなさい。幽谷は貪らずとも足りるだけ与えてくれる。',
+  'entities.quests.q_wisp_lights.completion':
+    '最初の星々のように柔らかい。祭壇のそばに置いておくれ。あとは聖堂がやってくれる。',
   'entities.quests.q_wisp_lights.objectives.0.label': '星明かりの粒',
   'entities.quests.q_calming_the_deep.title': '深みを鎮めて',
-  'entities.quests.q_calming_the_deep.text': '輝きの深みのスポアリングは、裂け目が輪に触れるまでは穏やかな民だった。穢れが奪ったものは還らない。堕ちた者たちに安らぎを、{playerName}。深みの北で、十体。',
-  'entities.quests.q_calming_the_deep.completion': 'わたしにはできなかったことをしてくれた。南の輪では採集者たちがまだ歌っている。そなたのおかげで、歌い続けられる。',
+  'entities.quests.q_calming_the_deep.text':
+    '輝きの深みのスポアリングは、裂け目が輪に触れるまでは穏やかな民だった。穢れが奪ったものは還らない。堕ちた者たちに安らぎを、{playerName}。深みの北で、十体。',
+  'entities.quests.q_calming_the_deep.completion':
+    'わたしにはできなかったことをしてくれた。南の輪では採集者たちがまだ歌っている。そなたのおかげで、歌い続けられる。',
   'entities.quests.q_calming_the_deep.objectives.0.label': '堕落したスポアリングを鎮めた',
   'entities.quests.q_spore_hearts.title': '輪の心臓',
-  'entities.quests.q_spore_hearts.text': '闇に堕ちたスポアリングの心臓は、借り物の影で脈打ち続ける。その心臓を四つ、聖堂で清めれば、穢れの広がり方が分かるはずだ。むごい仕事だが、{playerName}、これは癒やしの仕事でもある。',
-  'entities.quests.q_spore_hearts.completion': 'これで清められ、静かになった。どの心臓にも同じ印がある。影は沈んだ宮廷から流れている。セルウィンに伝えておくれ。',
+  'entities.quests.q_spore_hearts.text':
+    '闇に堕ちたスポアリングの心臓は、借り物の影で脈打ち続ける。その心臓を四つ、聖堂で清めれば、穢れの広がり方が分かるはずだ。むごい仕事だが、{playerName}、これは癒やしの仕事でもある。',
+  'entities.quests.q_spore_hearts.completion':
+    'これで清められ、静かになった。どの心臓にも同じ印がある。影は沈んだ宮廷から流れている。セルウィンに伝えておくれ。',
   'entities.quests.q_spore_hearts.objectives.0.label': '胞子の心臓',
   'entities.quests.q_monument_tour.title': '石が覚えていること',
-  'entities.quests.q_monument_tour.text': '封印より前の石碑が三つ残っている。ひとつはダスクフォールの見晴らし台、ひとつは沈んだ宮廷、もうひとつは誰も歩かぬ北東の果てだ。読んできておくれ、{playerName}。わたしの膝は二世紀前に階段を諦めた。',
-  'entities.quests.q_monument_tour.completion': '見晴らし台、宮廷、忘れられた片隅……封印の歌の三つの節が、歌われた日以来はじめて揃った。老いた読み手を心から喜ばせてくれたね。',
+  'entities.quests.q_monument_tour.text':
+    '封印より前の石碑が三つ残っている。ひとつはダスクフォールの見晴らし台、ひとつは沈んだ宮廷、もうひとつは誰も歩かぬ北東の果てだ。読んできておくれ、{playerName}。わたしの膝は二世紀前に階段を諦めた。',
+  'entities.quests.q_monument_tour.completion':
+    '見晴らし台、宮廷、忘れられた片隅……封印の歌の三つの節が、歌われた日以来はじめて揃った。老いた読み手を心から喜ばせてくれたね。',
   'entities.quests.q_monument_tour.objectives.0.label': '見晴らし台の石碑を読んだ',
   'entities.quests.q_monument_tour.objectives.1.label': '宮廷の石碑を読んだ',
   'entities.quests.q_monument_tour.objectives.2.label': '忘れられた石碑を読んだ',
   'entities.quests.q_grove_menace.title': '木立の脅威',
-  'entities.quests.q_grove_menace.text': '日が落ちるとダスクウィスプが屋台の間に漂い込んでくるんだ、{playerName}。あの冷気は触れたものを片端から駄目にする。間引いておくれ。帳の裂けた場所で、十体。',
-  'entities.quests.q_grove_menace.completion': 'これで夜市を開けられる。生涯のお得意さんができたよ。少なくとも割引はしよう。',
+  'entities.quests.q_grove_menace.text':
+    '日が落ちるとダスクウィスプが屋台の間に漂い込んでくるんだ、{playerName}。あの冷気は触れたものを片端から駄目にする。間引いておくれ。帳の裂けた場所で、十体。',
+  'entities.quests.q_grove_menace.completion':
+    'これで夜市を開けられる。生涯のお得意さんができたよ。少なくとも割引はしよう。',
   'entities.quests.q_grove_menace.objectives.0.label': 'ダスクウィスプを散らした',
   'entities.quests.q_shards_of_starfall.title': '星降りの欠片',
-  'entities.quests.q_shards_of_starfall.text': 'ダスクウィスプが水晶の野を渡ると、古い星明かりの欠片が棘のように張り付く。欠片が六つあれば、{playerName}、封印が歌われた季節まで特定できる。',
-  'entities.quests.q_shards_of_starfall.completion': 'この縞模様を見よ！秋だ。幽谷は秋に封じられたのだ。二百年の論争が、六つの小石で決着した。',
+  'entities.quests.q_shards_of_starfall.text':
+    'ダスクウィスプが水晶の野を渡ると、古い星明かりの欠片が棘のように張り付く。欠片が六つあれば、{playerName}、封印が歌われた季節まで特定できる。',
+  'entities.quests.q_shards_of_starfall.completion':
+    'この縞模様を見よ！秋だ。幽谷は秋に封じられたのだ。二百年の論争が、六つの小石で決着した。',
   'entities.quests.q_shards_of_starfall.objectives.0.label': '星降りの欠片',
   'entities.quests.q_treant_accord.title': 'トレントとの約定',
-  'entities.quests.q_treant_accord.text': '木立の長老たちは、根を穢れに齧られて外皮を落としている。樹皮が四片あれば、木立全体の軟膏を煎じられる。剥がす間は感謝されないだろうが、{playerName}、そのぶん彼らは百年長く立っていられる。',
-  'entities.quests.q_treant_accord.completion': '四片とも厚く、健やかだ。軟膏は煎じるのに一週間、効き終わるのに百年かかる。木々は優しさの尺度が違うのだよ。',
+  'entities.quests.q_treant_accord.text':
+    '木立の長老たちは、根を穢れに齧られて外皮を落としている。樹皮が四片あれば、木立全体の軟膏を煎じられる。剥がす間は感謝されないだろうが、{playerName}、そのぶん彼らは百年長く立っていられる。',
+  'entities.quests.q_treant_accord.completion':
+    '四片とも厚く、健やかだ。軟膏は煎じるのに一週間、効き終わるのに百年かかる。木々は優しさの尺度が違うのだよ。',
   'entities.quests.q_treant_accord.objectives.0.label': '長老の樹皮',
   'entities.quests.q_spore_tide.title': '胞子の潮に抗して',
-  'entities.quests.q_spore_tide.text': '軟膏は木立を守っているが、穢れは夕暮れごとに深みへ強く押し寄せる。採集者たちが北の輪を取り戻すには、あと十二の堕ちた者に安らぎを、{playerName}。',
+  'entities.quests.q_spore_tide.text':
+    '軟膏は木立を守っているが、穢れは夕暮れごとに深みへ強く押し寄せる。採集者たちが北の輪を取り戻すには、あと十二の堕ちた者に安らぎを、{playerName}。',
   'entities.quests.q_spore_tide.completion': '今夜、北の輪がまた歌っている。小さく、けれど確かに。',
   'entities.quests.q_spore_tide.objectives.0.label': '堕落したスポアリングを鎮めた',
   'entities.quests.q_sunken_court.title': '沈んだ宮廷',
-  'entities.quests.q_sunken_court.text': 'ブリンの読みは正しかった。裂け目は東の古い宮廷を貫き、その守護者たちは狂って目覚めた。封印を守るために造られたものが、今は近づく者を砕こうとする。廃墟から八体を除いておくれ。',
-  'entities.quests.q_sunken_court.completion': '八体の守護者が、静まった。あれらが建てられた時をわたしは覚えているよ、{playerName}。驚くことはない。幽谷は守り手を長く生かすのだ。',
+  'entities.quests.q_sunken_court.text':
+    'ブリンの読みは正しかった。裂け目は東の古い宮廷を貫き、その守護者たちは狂って目覚めた。封印を守るために造られたものが、今は近づく者を砕こうとする。廃墟から八体を除いておくれ。',
+  'entities.quests.q_sunken_court.completion':
+    '八体の守護者が、静まった。あれらが建てられた時をわたしは覚えているよ、{playerName}。驚くことはない。幽谷は守り手を長く生かすのだ。',
   'entities.quests.q_sunken_court.objectives.0.label': '古代の守護者を静めた',
   'entities.quests.q_wardens_echoes.title': '監視者の残響',
-  'entities.quests.q_wardens_echoes.text': '主が黙しても、宮廷の守護者たちは最後の命令を、消えない残響のように繰り返している。封印が戻るまで、彼らは目覚め続ける、{playerName}。石工たちが封印石に届くよう、さらに十体を静めておくれ。',
-  'entities.quests.q_wardens_echoes.completion': '残響は繰り返すたびに薄れていく。じきに宮廷には風と蔦だけが残る。廃墟とはそうあるべきものだ。',
+  'entities.quests.q_wardens_echoes.text':
+    '主が黙しても、宮廷の守護者たちは最後の命令を、消えない残響のように繰り返している。封印が戻るまで、彼らは目覚め続ける、{playerName}。石工たちが封印石に届くよう、さらに十体を静めておくれ。',
+  'entities.quests.q_wardens_echoes.completion':
+    '残響は繰り返すたびに薄れていく。じきに宮廷には風と蔦だけが残る。廃墟とはそうあるべきものだ。',
   'entities.quests.q_wardens_echoes.objectives.0.label': '古代の守護者を静めた',
   'entities.quests.q_waking_warden.title': '目覚めし監視者',
-  'entities.quests.q_waking_warden.text': '宮廷は静かになったが、その主は違う。封印を守る監視者が歪んで目覚めた。あれが立っている限り、封印は繕えない。容易には倒れぬぞ。友を一人見つけられるなら連れて行け、{playerName}。二人見つかるなら二人だ。',
-  'entities.quests.q_waking_warden.completion': 'あの鐘のような声が沈黙した。ここからでも感じたよ。谷全体から重石が取り除かれたようだった。',
+  'entities.quests.q_waking_warden.text':
+    '宮廷は静かになったが、その主は違う。封印を守る監視者が歪んで目覚めた。あれが立っている限り、封印は繕えない。容易には倒れぬぞ。友を一人見つけられるなら連れて行け、{playerName}。二人見つかるなら二人だ。',
+  'entities.quests.q_waking_warden.completion':
+    'あの鐘のような声が沈黙した。ここからでも感じたよ。谷全体から重石が取り除かれたようだった。',
   'entities.quests.q_waking_warden.objectives.0.label': '目覚めし監視者を打ち倒した',
   'entities.quests.q_seal_restored.title': '封印の修復',
-  'entities.quests.q_seal_restored.text': '監視者の印章を宮廷の中心の封印石へ運び、打ち落とされた場所へ戻しておくれ。そうすれば幽谷は癒え始める。そしてそなたは、{playerName}、そなたの同族の誰も成しえなかったことを成すのだ。',
-  'entities.quests.q_seal_restored.completion': 'ここから閉じるのを感じたよ。黄昏のように穏やかに。幽谷は友を忘れない、{playerName}。どれほど遠くへ旅しても、大樹の下にはいつでもそなたの灯りがある。',
+  'entities.quests.q_seal_restored.text':
+    '監視者の印章を宮廷の中心の封印石へ運び、打ち落とされた場所へ戻しておくれ。そうすれば幽谷は癒え始める。そしてそなたは、{playerName}、そなたの同族の誰も成しえなかったことを成すのだ。',
+  'entities.quests.q_seal_restored.completion':
+    'ここから閉じるのを感じたよ。黄昏のように穏やかに。幽谷は友を忘れない、{playerName}。どれほど遠くへ旅しても、大樹の下にはいつでもそなたの灯りがある。',
   'entities.quests.q_seal_restored.objectives.0.label': '封印を封印石に戻した',
   'entities.dungeons.hollow_crypt.name': '虚ろの墓所',
   'entities.dungeons.hollow_crypt.enterText': '虚ろの墓所へ降りていきます...',
@@ -4729,9 +4787,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'この壁は二百年立ち続けてきた。私が守る限り崩れはしないが、軋んでいる。',
   'guide.worldPage.peaksPlaceNotes':
     'ハイウォッチは壁を守っています。ストーカー尾根とディープロックの巣穴は尾根猫とコボルドのもの、オーガの丘陵とドログマーの戦営は雇われの荒くれ者のもの。ストームクラグはエレメンタルで弾け、その下にはグリマーミアが輝きます。ワームカルトのテントとレヴェナントの野原がカルトの高所を囲み、その頂には墓守竜の聖域があります。',
-  'guide.worldPage.duskGreeting': 'そなたの同族でこの枝の下に立った者は少ない。静かに歩み、歓迎を受けるがよい。',
+  'guide.worldPage.duskGreeting':
+    'そなたの同族でこの枝の下に立った者は少ない。静かに歩み、歓迎を受けるがよい。',
   'guide.worldPage.duskGreeter': '守り手セルウィン、エルダーグリーム',
-  'guide.worldPage.duskPlaceNotes': 'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
+  'guide.worldPage.duskPlaceNotes':
+    'エルダーグリームは大樹の下に集う。ダスクフォール洞窟とその見晴らし台が入り口であり、谷を初めて望む場所でもある。長老樹の森と星降りの盆地は静かな南を守り、沈んだ宮廷は東で草に覆われた遺跡を抱え、輝きの深みと水晶の浅瀬は北で淡く光る。',
   'guide.worldPage.valeGreeter': 'レッドブルック元帥、イーストブルック',
   'guide.worldPage.valeGreeting': '刃を手放すな。渓谷はかつての姿ではない。',
   'guide.worldPage.valePlaceNotes':

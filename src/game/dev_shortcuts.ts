@@ -27,6 +27,7 @@ const ZONE_ALIASES: Record<string, string> = {
   nightbloom: 'night',
   wraithwood: 'wood',
   palmreach: 'palm',
+  evergarden: 'garden',
 };
 
 export function installDevTeleports(

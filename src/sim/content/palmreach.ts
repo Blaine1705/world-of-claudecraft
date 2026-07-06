@@ -79,6 +79,12 @@ export const PALMREACH_ROADS: { x: number; z: number }[][] = [
     { x: 122, z: 5078 },
     { x: 104, z: 5132 },
   ], // Drifthaven -> east around the Lagoon -> the Sunken Idol
+  [
+    { x: 104, z: 5132 },
+    { x: 86, z: 5202 },
+    { x: 64, z: 5256 },
+    { x: 50, z: 5310 },
+  ], // the Sunken Idol -> up the north cape -> the Garden Gate
 ] as { x: number; z: number }[][];
 
 // No portals: walked into through the Tanglemouth.

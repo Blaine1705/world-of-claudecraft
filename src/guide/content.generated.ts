@@ -1424,6 +1424,24 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Sunken Idol"
     ],
     "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you."
+  },
+  {
+    "id": "evergarden",
+    "name": "The Evergarden",
+    "min": 20,
+    "max": 20,
+    "biome": "garden",
+    "hub": "Hedgewick",
+    "pois": [
+      "Hedgewick",
+      "The Garden Gate",
+      "The Statuary Walk",
+      "The Rose Wilds",
+      "The Petal Pond",
+      "The Great Maze",
+      "The Fountain Court"
+    ],
+    "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back."
   }
 ];
 

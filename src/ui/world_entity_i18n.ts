@@ -124,6 +124,10 @@ const MOB_IDS = [
   'thicket_boar',
   'canopy_weaver',
   'idol_guardian',
+  'topiary_stag',
+  'topiary_wolf',
+  'hedge_gnome',
+  'the_topiary_bull',
 ] as const;
 
 const NPC_IDS = [
@@ -258,6 +262,7 @@ const ZONE_IDS = [
   'nightbloom',
   'wraithwood',
   'palmreach',
+  'evergarden',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

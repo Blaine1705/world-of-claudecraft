@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { inGardenMaze, roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -194,6 +194,14 @@ const BIOME_PALETTE: Record<
     dirt: 0x8a6e4a,
     sand: 0xf2e2b4,
   },
+  // garden: mown lawn over warm gravel, tidy even where it has run wild
+  garden: {
+    grass: 0x58a04e,
+    grassDark: 0x3f7e3c,
+    grassYellow: 0x86b85c,
+    dirt: 0x8a7a5a,
+    sand: 0xd8cca8,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -209,6 +217,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   night: 0.55,
   haunt: 0.58,
   jungle: 0.6,
+  garden: 0.6,
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
@@ -240,6 +249,7 @@ const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
 const cobbleC = new THREE.Color(0x8f8c86); // the Amberfall's laid stone
 const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
 const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
+const hedgeC = new THREE.Color(0x2e5c30); // the Great Maze's clipped hedge walls
 const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(0xedf3fa);
 const lowSunC = new THREE.Color(0xe7d9a5);
@@ -394,6 +404,12 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     const t = Math.min(1, (slope - rockStart) * 2);
     cTmp.lerp(rockC, t);
     lerpSplat(w, 2, t);
+    // the Great Maze's walls are hedges, not cliffs: inside the maze the
+    // steep faces take clipped evergreen instead of rock
+    if (biome === 'garden' && inGardenMaze(x, z)) {
+      cTmp.lerp(hedgeC, t);
+      lerpSplat(w, 0, t * 0.7); // lean back toward the grass splat
+    }
     // dusk sea cliffs read as dark weathered stone with pale strata bands, so
     // the coast walls look like rugged wave-cut rock instead of smooth clay
     if (biome === 'dusk') {

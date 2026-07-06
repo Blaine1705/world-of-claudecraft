@@ -5792,6 +5792,18 @@ export const ko_KR: EnTranslations = {
       "idol_guardian": {
         "name": "신상 수호자"
       },
+      "topiary_stag": {
+        "name": "토피어리 수사슴"
+      },
+      "topiary_wolf": {
+        "name": "토피어리 늑대"
+      },
+      "hedge_gnome": {
+        "name": "산울타리 노움"
+      },
+      "the_topiary_bull": {
+        "name": "토피어리 황소"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -7310,6 +7322,33 @@ export const ko_KR: EnTranslations = {
           },
           "6": {
             "label": "가라앉은 신상"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "상록 정원",
+        "welcome": "산울타리는 여전히 다듬어지고 있지만, 정원사를 본 사람은 백 년 동안 없었다. 미로를 조심하라. 미로도 너를 지켜보고 있다.",
+        "pois": {
+          "0": {
+            "label": "헤지윅"
+          },
+          "1": {
+            "label": "정원 문"
+          },
+          "2": {
+            "label": "조각상 산책로"
+          },
+          "3": {
+            "label": "들장미 수풀"
+          },
+          "4": {
+            "label": "꽃잎 연못"
+          },
+          "5": {
+            "label": "대미로"
+          },
+          "6": {
+            "label": "분수 안뜰"
           }
         }
       }

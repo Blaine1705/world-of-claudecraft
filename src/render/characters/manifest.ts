@@ -1018,6 +1018,8 @@ const MOB_KEYS: Record<string, string> = {
   tide_scuttler: 'mob_crab',
   thicket_boar: 'mob_boar',
   idol_guardian: 'skel_golem',
+  topiary_stag: 'mob_stag',
+  the_topiary_bull: 'mob_bull',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

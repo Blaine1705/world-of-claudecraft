@@ -5792,6 +5792,18 @@ export const zh_TW: EnTranslations = {
       "idol_guardian": {
         "name": "神像守衛"
       },
+      "topiary_stag": {
+        "name": "綠雕雄鹿"
+      },
+      "topiary_wolf": {
+        "name": "綠雕之狼"
+      },
+      "hedge_gnome": {
+        "name": "樹籬地精"
+      },
+      "the_topiary_bull": {
+        "name": "綠雕公牛"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -7310,6 +7322,33 @@ export const zh_TW: EnTranslations = {
           },
           "6": {
             "label": "沉沒神像"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "常青園",
+        "welcome": "樹籬仍有人在修剪，可百年來無人見過園丁。當心迷宮：它也在留意你。",
+        "pois": {
+          "0": {
+            "label": "籬苑鎮"
+          },
+          "1": {
+            "label": "花園之門"
+          },
+          "2": {
+            "label": "雕像步道"
+          },
+          "3": {
+            "label": "野薔薇叢"
+          },
+          "4": {
+            "label": "花瓣池"
+          },
+          "5": {
+            "label": "大迷宮"
+          },
+          "6": {
+            "label": "噴泉庭院"
           }
         }
       }

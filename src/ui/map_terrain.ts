@@ -44,6 +44,7 @@ const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = 
   night: 0.2,
   haunt: 0.55, // the canopy is the realm
   jungle: 0.6, // wall-to-wall green
+  garden: 0.34,
 };
 
 const CONTOUR_STEP = 6; // height units between contour lines
@@ -186,6 +187,11 @@ export function paintTerrainRows(
         r = 48;
         g = 56;
         b = 44;
+      } else if (biome === 'garden') {
+        // mown parkland green
+        r = 82;
+        g = 148;
+        b = 72;
       }
 
       // -- high ground overrides (crag/snow tints per biome, as before) --
@@ -222,6 +228,11 @@ export function paintTerrainRows(
         r = 96;
         g = 104;
         b = 84;
+      } else if (biome === 'garden' && h > 9) {
+        // the hedge walls: the Great Maze draws itself onto the map
+        r = 40;
+        g = 84;
+        b = 42;
       } else if (biome === 'frost' && h > 6) {
         r = 202;
         g = 212;
@@ -344,8 +355,9 @@ export function paintTerrainRows(
 
       // -- mountain glyphs: the hand-drawn caret marks every fantasy map
       // ranges its highlands with, inked with a lit northwest face (and a
-      // snow-white one on frozen ground) --
-      if (h > 14) {
+      // snow-white one on frozen ground). The garden's hedge walls live in
+      // the same height band and are hedges, not peaks: no carets there --
+      if (h > 14 && !(biome === 'garden' && h <= 26)) {
         const gx = Math.floor(x / 7);
         const gz = Math.floor(z / 7);
         if (hash2(gx, gz, seed + 431) < 0.85) {
