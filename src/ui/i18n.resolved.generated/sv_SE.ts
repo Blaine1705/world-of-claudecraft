@@ -6233,6 +6233,10 @@ export const sv_SE: EnTranslations = {
         "name": "Korsfararslag",
         "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
       "metamorphosis": {
         "name": "Metamorfos",
         "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"

@@ -284,6 +284,14 @@ function petDamageMult(pet: Entity): number {
   return mult;
 }
 
+// Pet attack/cast speed multiplier from pet_spellhaste auras (Metamorphosis: +20% cast
+// speed on the demon). value is a fraction (0.2 = +20%); the swing interval divides by it.
+function petHasteMult(pet: Entity): number {
+  let bonus = 0;
+  for (const a of pet.auras) if (a.kind === 'pet_spellhaste') bonus += a.value;
+  return 1 + Math.max(0, bonus);
+}
+
 /** A ranged demon pet (imp) hurls a spell-school bolt: a telegraphed
  *  projectile that bypasses armor, mirroring the player caster path. Damage
  *  comes from the mob's weapon range + AP, exactly like its melee siblings. */

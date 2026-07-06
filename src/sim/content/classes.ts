@@ -3525,9 +3525,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'heal', min: 120, max: 145 }],
+    effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.6, radius: 12 }],
     description:
-      'Heals a friendly target for a large amount. (Will chain to nearby allies in a future update.)',
+      'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)',
   },
   healing_wave: {
     id: 'healing_wave',
@@ -4859,11 +4859,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     effects: [
-      { type: 'selfBuff', kind: 'buff_armor', value: 300, duration: 20 },
-      { type: 'selfBuff', kind: 'buff_ap', value: 70, duration: 20 },
+      { type: 'selfBuff', kind: 'form_metamorph', value: 1, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_spelldmg', value: 0.2, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.2, duration: 20 },
+      { type: 'petBuff', kind: 'pet_damage_pct', value: 50, duration: 20 },
+      { type: 'petBuff', kind: 'pet_spellhaste', value: 0.2, duration: 20 },
     ],
     description:
-      'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
+      'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
   },
   holy_shock: {
     id: 'holy_shock',
@@ -5134,7 +5137,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 55,
     castTime: 0,
-    cooldown: 10,
+    cooldown: 6,
     range: 30,
     school: 'fire',
     requiresTarget: true,
@@ -5153,25 +5156,26 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'form_moonkin', value: 15, duration: 3600 }],
+    effects: [{ type: 'selfBuff', kind: 'form_moonkin', value: 0, duration: 3600 }],
     description:
-      'Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
+      'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
   },
   feral_charge: {
     id: 'feral_charge',
-    name: 'Feral Charge',
+    name: 'Feral Instinct',
     class: 'druid',
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 15,
-    range: 25,
-    minRange: 8,
+    cooldown: 90,
+    range: 0,
     school: 'physical',
-    requiresTarget: true,
+    requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'charge' }, { type: 'root', duration: 1 }],
-    description: 'Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)',
+    usableInForm: true,
+    effects: [{ type: 'feralCharge' }],
+    description:
+      'Unleash your feral instincts. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bear Form, instantly generates 50 Rage. (Feral signature)',
   },
   swiftmend: {
     id: 'swiftmend',
@@ -5180,7 +5184,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 55,
     castTime: 0,
-    cooldown: 15,
+    cooldown: 8,
     range: 30,
     school: 'nature',
     requiresTarget: true,
@@ -5313,29 +5317,20 @@ function scaleEffect(
           : undefined,
       };
     case 'absorb':
-      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
+      return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
     // A buff value below 1 is a RATE (haste/spell-damage/crit fraction, e.g. 0.2), not a
     // magnitude: scaling it by a global damage mult and rounding would floor it to 0 (this
     // silently zeroed Arcane Power's haste for an Arcane mage). Only integer magnitudes
     // (armor, attack power, thorns damage) scale; rates pass through untouched. Intentional
     // buff scaling still rides the per-ability buffPct in applyTalentMods.
+    case 'buffTarget':
+      return Math.abs(eff.value) < 1
+        ? eff
+        : { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'selfBuff':
-      // MULTIPLIER-shaped buff values (haste 1.2 = +20% swing speed, fiesta
-      // scale/jump, mortal_wound's 0.5 heal cut) must never take damage
-      // scaling: rounding a multiplier destroys it (round(1.2 * 1.1) = 1 =
-      // zero haste; round(0.5 * 1.1) = 1 = ALL healing suppressed). Only
-      // additive buff values (AP, armor, spellpower) scale.
-      if (
-        eff.kind === 'buff_haste' ||
-        eff.kind === 'buff_spellhaste' ||
-        eff.kind === 'buff_scale' ||
-        eff.kind === 'buff_jump' ||
-        eff.kind === 'mortal_wound' ||
-        eff.kind === 'vuln_source'
-      ) {
-        return eff;
-      }
-      return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
+      return Math.abs(eff.value) < 1
+        ? eff
+        : { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'lifeTap':
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
     case 'gainResource':
@@ -5395,11 +5390,9 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        e.type === 'selfBuff' || e.type === 'buffTarget'
-          ? { ...e, value: scaleBuffValue(e.kind, e.value, mul) }
-          : e.type === 'finisherHaste'
-            ? { ...e, mult: 1 + (e.mult - 1) * mul }
-            : e,
+        (e.type === 'selfBuff' || e.type === 'buffTarget') && Math.abs(e.value) >= 1
+          ? { ...e, value: Math.round(e.value * mul) }
+          : e,
       );
     }
   }

@@ -133,7 +133,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "f16c6f5e",
+      "state": "2c6b5f2c",
       "events": "d85bae6f",
       "rng": {
         "draws": 0,
@@ -205,7 +205,7 @@
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0895,
-          "critDmgPhysBonus": 0.25,
+          "critDmgBonus": 0.25,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -254,9 +254,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "6d4a276a",
-      "events": "91f5b638",
+      "nextId": 401,
+      "state": "e467b21f",
+      "events": "40479820",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -324,7 +324,7 @@
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0695,
-          "critDmgPhysBonus": 0.25,
+          "critDmgBonus": 0.25,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -373,9 +373,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "3115b42d",
-      "events": "e641cf31",
+      "nextId": 401,
+      "state": "3275ea48",
+      "events": "a7d95be1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -461,7 +461,7 @@
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0995,
-          "critDmgPhysBonus": 0.25,
+          "critDmgBonus": 0.25,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -510,9 +510,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "2f6db990",
-      "events": "a75c7e72",
+      "nextId": 401,
+      "state": "cab61c49",
+      "events": "980c682a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -598,7 +598,7 @@
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0695,
-          "critDmgPhysBonus": 0.25,
+          "critDmgBonus": 0.25,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -648,7 +648,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "6d482d79",
+      "state": "fd8d2b47",
       "events": "6e54fd06",
       "rng": {
         "draws": 0,
@@ -781,8 +781,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "4103aa22",
+      "nextId": 401,
+      "state": "fd8d2b47",
       "events": "741638a5",
       "rng": {
         "draws": 0,

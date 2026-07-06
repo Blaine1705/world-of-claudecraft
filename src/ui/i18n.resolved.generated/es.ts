@@ -6233,6 +6233,10 @@ export const es: EnTranslations = {
         "name": "Golpe de cruzado",
         "description": "Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)"
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
       "metamorphosis": {
         "name": "Metamorfosis",
         "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"

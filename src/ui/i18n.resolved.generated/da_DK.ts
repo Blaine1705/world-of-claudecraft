@@ -6233,6 +6233,10 @@ export const da_DK: EnTranslations = {
         "name": "Korsfarerslag",
         "description": "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)"
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
       "metamorphosis": {
         "name": "Metamorfose",
         "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"

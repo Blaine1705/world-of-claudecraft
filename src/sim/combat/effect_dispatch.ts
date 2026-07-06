@@ -130,6 +130,33 @@ function friendliesInRadius(ctx: SimContext, source: Entity, radius: number): En
   return out;
 }
 
+// The nearest friendly to `from` (a Chain Heal jump origin) within `radius` that the
+// caster hasn't already healed this cast. Deterministic: distance ties resolve by the
+// entity iteration order (insertion order), and no rng is drawn.
+function nearestUnhealedFriendly(
+  ctx: SimContext,
+  source: Entity,
+  from: Entity,
+  radius: number,
+  healed: Set<number>,
+): Entity | null {
+  let best: Entity | null = null;
+  let bestD = radius * radius;
+  for (const e of ctx.entities.values()) {
+    if (e.dead || healed.has(e.id)) continue;
+    if (e.hp >= e.maxHp) continue; // Chain Heal jumps only to injured allies
+    if (e.id !== source.id && !ctx.isFriendlyTo(source, e)) continue;
+    const dx = e.pos.x - from.pos.x;
+    const dz = e.pos.z - from.pos.z;
+    const d = dx * dx + dz * dz;
+    if (d <= bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  return best;
+}
+
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -542,65 +569,19 @@ export function runEffects(
         break;
       }
       case 'chainHeal': {
-        // Chain Heal: heal the target, then arc hop by hop to nearby allies. The
-        // hop choice is DETERMINISTIC (most injured by hp fraction, then nearest,
-        // then lowest id), so the only rng draws are the one base roll plus each
-        // applyHeal's crit, and the same world state always builds the same chain.
-        // Selection and the per-hop spellfx arc adopted from Blaine1705's #1434.
-        const first = target ?? p;
-        const baseAmount =
-          ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
-        const chain: Entity[] = [first];
-        while (chain.length <= eff.jumps) {
-          const from = chain[chain.length - 1];
-          let best: Entity | null = null;
-          let bestFrac = Infinity;
-          let bestD2 = Infinity;
-          // The main grid holds every entity (players AND player-owned pets AND
-          // mobs); isFriendlyTo filters to healable allies, so one scan suffices.
-          // The pick is a deterministic min (hp fraction, then distance, then id),
-          // so it is independent of grid iteration order (no rng here).
-          // Arc reach: content uses either jumpRange (warrior overhaul) or radius
-          // (PTR); read whichever is set.
-          ctx.grid.forEachInRadius(
-            from.pos.x,
-            from.pos.z,
-            eff.jumpRange ?? eff.radius ?? 0,
-            (e, d2) => {
-              if (e.dead || chain.includes(e)) return;
-              // Allies only: players and player-owned pets (what a friendly-target
-              // heal may hit), never a hostile or an NPC bystander.
-              if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
-              // hp/maxHp are integers, so equal fractions compute the identical float:
-              // an EXACT ladder (frac, then distance, then id) is transitive and thus
-              // order-independent, no epsilon window needed.
-              const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-              const better =
-                best === null ||
-                frac < bestFrac ||
-                (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
-              if (better) {
-                best = e;
-                bestFrac = frac;
-                bestD2 = d2;
-              }
-            },
-          );
-          if (best === null) break;
-          chain.push(best);
-        }
-        for (let i = 0; i < chain.length; i++) {
-          // The green healing arc: caster to the first target, then previous hop to
-          // the next (a dedicated fx so it reads as a healing cord, not a nuke beam).
-          ctx.emit({
-            type: 'spellfx',
-            sourceId: i === 0 ? p.id : chain[i - 1].id,
-            targetId: chain[i].id,
-            school: ability.school,
-            fx: 'chainHeal',
-          });
-          const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
-          ctx.applyHeal(p, chain[i], hopAmount, ability.name);
+        // Heal the primary target, then bounce to the nearest not-yet-healed ally, up to
+        // `jumps` extra targets, each jump healing `falloff`x the previous. The +SpellPower
+        // rider is rolled once (from the full cast) and rides the falloff like the base.
+        const primary = target ?? p;
+        let amount = ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
+        const healed = new Set<number>();
+        let cur: Entity | null = primary;
+        for (let j = 0; j <= eff.jumps && cur; j++) {
+          ctx.applyHeal(p, cur, Math.round(amount), ability.name);
+          healed.add(cur.id);
+          if (j === eff.jumps) break;
+          cur = nearestUnhealedFriendly(ctx, p, cur, eff.radius, healed);
+          amount *= eff.falloff;
         }
         break;
       }
@@ -2034,65 +2015,17 @@ export function runEffects(
           p.auras.splice(i, 1);
           ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
         }
-        // Overpower charge (Arms): Redhand STACKS its empower up to 2 rather than
-        // refreshing to a single stack, so a second Redhand grows the buff.
-        if (eff.kind === 'overpower_charge') {
-          const existing = p.auras.find((a) => a.kind === 'overpower_charge');
-          if (existing) {
-            existing.stacks = Math.min(2, (existing.stacks ?? 1) + 1);
-            existing.remaining = eff.duration;
-            existing.duration = eff.duration;
-            break;
-          }
-        }
         // An ability can grant SEVERAL self-buffs at once (Arcane Power: spell damage AND
         // haste; Metamorphosis: damage AND haste). applyAura dedups by (id, sourceId), so
         // every companion buff needs a distinct id or the last would evict the rest. The
-        // PRIMARY self-buff (the first kind on the DEF) keeps the ability id (so its
+        // PRIMARY self-buff (the first kind on the DEF) keeps the bare ability id (so its
         // icon/name resolve and the form/aspect toggle-off still finds it by id); companions
         // get a kind-suffixed id. Compare by KIND, not object identity: applyTalentMods may
         // have replaced the resolved effect objects, so a reference check would misfire.
-        // A selfBuff may also carry its own buff identity (eff.auraId/eff.auraName: aoe_echo /
-        // Bladed Gyre arms 'Bladed Echo' under id 'bladed_echo'), which takes precedence for
-        // the primary so the HUD names the rider apart from the granting ability.
         const firstSelfBuffKind = ability.effects.find((e) => e.type === 'selfBuff')?.kind;
         const isPrimarySelfBuff = eff.kind === firstSelfBuffKind;
         ctx.applyAura(p, {
-          id: isPrimarySelfBuff ? (eff.auraId ?? ability.id) : `${ability.id}_${eff.kind}`,
-          name: isPrimarySelfBuff ? (eff.auraName ?? ability.name) : ability.name,
-          kind: eff.kind,
-          remaining: eff.duration,
-          duration: eff.duration,
-          value: eff.value,
-          // Overpower charge opens at one stack; a second Redhand grows it above.
-          stacks: eff.kind === 'overpower_charge' ? 1 : undefined,
-          sourceId: p.id,
-          school: ability.school,
-          // charge-limited thorns (Lightning Shield): cap reflects and gate them
-          // behind an internal cooldown. Absent on a plain always-on thorns coat.
-          // aoe_echo counts its remaining casts through the same charges field.
-          charges: eff.charges,
-          icdMax: eff.internalCooldown,
-        });
-        recalcPlayerStats(
-          p,
-          meta.cls,
-          meta.equipment,
-          ctx.playerMods(meta),
-          meta.equipmentInstance,
-        );
-        break;
-      }
-      case 'petBuff': {
-        const pet = ctx.petOf(p.id);
-        if (!pet) break;
-        // Same multi-buff rule as selfBuff: Metamorphosis buffs the demon's damage AND its
-        // cast speed, so the companion pet-buff needs its own id to survive apply. Match by
-        // kind (applyTalentMods may have replaced the resolved effect objects).
-        const firstPetBuffKind = ability.effects.find((e) => e.type === 'petBuff')?.kind;
-        const isPrimaryPetBuff = eff.kind === firstPetBuffKind;
-        ctx.applyAura(pet, {
-          id: isPrimaryPetBuff ? `${ability.id}_pet` : `${ability.id}_pet_${eff.kind}`,
+          id: isPrimarySelfBuff ? ability.id : `${ability.id}_${eff.kind}`,
           name: ability.name,
           kind: eff.kind,
           remaining: eff.duration,
@@ -2121,8 +2054,13 @@ export function runEffects(
       case 'petBuff': {
         const pet = ctx.petOf(p.id);
         if (!pet) break;
+        // Same multi-buff rule as selfBuff: Metamorphosis buffs the demon's damage AND its
+        // cast speed, so the companion pet-buff needs its own id to survive apply. Match by
+        // kind (applyTalentMods may have replaced the resolved effect objects).
+        const firstPetBuffKind = ability.effects.find((e) => e.type === 'petBuff')?.kind;
+        const isPrimaryPetBuff = eff.kind === firstPetBuffKind;
         ctx.applyAura(pet, {
-          id: `${ability.id}_pet`,
+          id: isPrimaryPetBuff ? `${ability.id}_pet` : `${ability.id}_pet_${eff.kind}`,
           name: ability.name,
           kind: eff.kind,
           remaining: eff.duration,

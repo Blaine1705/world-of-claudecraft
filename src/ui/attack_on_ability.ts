@@ -49,13 +49,6 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
-  // Chronomancy Temporal Echo: places a friendly mark (its Arcane-damage-to-heal
-  // conversion is separate); the ability itself deals no damage and breaks no CC.
-  temporalEcho: 'other',
-  massTemporalEcho: 'other',
-  resurrectAlly: 'other',
-  perfectMoment: 'other',
-  rewind: 'other',
   chainHeal: 'other',
   feralCharge: 'other',
   hot: 'other',

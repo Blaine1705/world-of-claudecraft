@@ -6233,9 +6233,13 @@ export const en: EnTranslations = {
         "name": "Crusader Strike",
         "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
       "metamorphosis": {
         "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
       },
       "holy_shock": {
         "name": "Holy Shock",
@@ -6307,11 +6311,11 @@ export const en: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Moonkin Form",
-        "description": "Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
       },
       "feral_charge": {
-        "name": "Feral Charge",
-        "description": "Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)"
+        "name": "Feral Instinct",
+        "description": "Unleash your feral instincts. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bear Form, instantly generates 50 Rage. (Feral signature)"
       },
       "swiftmend": {
         "name": "Swiftmend",

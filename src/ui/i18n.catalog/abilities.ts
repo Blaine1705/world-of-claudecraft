@@ -1346,9 +1346,14 @@ const classAbilityNamesEn = {
         'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
       ],
       [
+        'chain_heal',
+        'Chain Heal',
+        'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)',
+      ],
+      [
         'metamorphosis',
         'Metamorphosis',
-        'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
+        'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
       ],
       [
         'holy_shock',
@@ -1438,12 +1443,12 @@ const classAbilityNamesEn = {
       [
         'moonkin_form',
         'Moonkin Form',
-        'Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
+        'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
       ],
       [
         'feral_charge',
-        'Feral Charge',
-        'Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)',
+        'Feral Instinct',
+        'Unleash your feral instincts. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bear Form, instantly generates 50 Rage. (Feral signature)',
       ],
       [
         'swiftmend',

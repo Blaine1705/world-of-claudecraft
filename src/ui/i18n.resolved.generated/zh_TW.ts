@@ -6233,6 +6233,10 @@ export const zh_TW: EnTranslations = {
         "name": "十字軍聖擊",
         "description": "打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）"
       },
+      "chain_heal": {
+        "name": "治療鏈",
+        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低40%。（恢復專精招牌）"
+      },
       "metamorphosis": {
         "name": "惡魔變形",
         "description": "化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）"

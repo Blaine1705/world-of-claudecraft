@@ -6233,6 +6233,10 @@ export const en_CA: EnTranslations = {
         "name": "Crusader Strike",
         "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
       "metamorphosis": {
         "name": "Metamorphosis",
         "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
