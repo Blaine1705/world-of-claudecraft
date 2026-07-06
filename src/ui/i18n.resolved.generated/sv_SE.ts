@@ -852,6 +852,7 @@ export const sv_SE: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fysisk",
         "fire": "Eld",
@@ -4433,7 +4434,7 @@ export const sv_SE: EnTranslations = {
       },
       "overpower": {
         "name": "Övermanna",
-        "description": "Omedelbart anfall för vapenskada +5. Endast användbart efter att målet väjt undan. Kan inte väjas undan."
+        "description": "Omedelbar attack för vapenskada plus {damage} som genererar {rage} raseri. Kan inte undvikas."
       },
       "execute": {
         "name": "Avrätta",

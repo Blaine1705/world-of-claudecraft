@@ -852,6 +852,7 @@ export const pt_BR: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Físico",
         "fire": "Fogo",
@@ -4433,7 +4434,7 @@ export const pt_BR: EnTranslations = {
       },
       "overpower": {
         "name": "Sobrepujar",
-        "description": "Ataque instantâneo com dano de arma +5. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado."
+        "description": "Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva. Não pode ser esquivado."
       },
       "execute": {
         "name": "Executar",

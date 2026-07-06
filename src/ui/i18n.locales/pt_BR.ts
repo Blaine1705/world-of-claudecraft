@@ -1680,7 +1680,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Gera {rage} de raiva ao custo de vida.',
   'entities.abilities.overpower.name': 'Sobrepujar',
   'entities.abilities.overpower.description':
-    'Ataque instantâneo com dano de arma +5. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado.',
+    'Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva. Não pode ser esquivado.',
   'entities.abilities.execute.name': 'Executar',
   'entities.abilities.execute.description':
     'Tenta finalizar um inimigo ferido, causando {damage} de dano. Só pode ser usado em inimigos com menos de 20% de vida.',

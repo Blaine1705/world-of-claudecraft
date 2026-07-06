@@ -690,7 +690,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
   'entities.abilities.mortal_strike.name': 'Dödligt hugg',
   'entities.abilities.overpower.description':
-    'Omedelbart anfall för vapenskada +5. Endast användbart efter att målet väjt undan. Kan inte väjas undan.',
+    'Omedelbar attack för vapenskada plus {damage} som genererar {rage} raseri. Kan inte undvikas.',
   'entities.abilities.overpower.name': 'Övermanna',
   'entities.abilities.polymorph.description':
     'Förvandlar fienden till ett får i upp till 15 sek. Fåret vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider.',

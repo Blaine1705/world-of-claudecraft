@@ -643,7 +643,7 @@ const classAbilityNamesEn = {
       [
         'overpower',
         'Redhand',
-        'Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged.',
+        'Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged.',
       ],
       [
         'execute',
@@ -1228,7 +1228,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Abrumar',
-          'Ataque instantáneo que inflige daño de arma +5. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
+          'Ataque instantáneo que inflige daño de arma más {damage} y genera {rage} de ira. No puede esquivarse.',
         ],
         [
           'execute',
@@ -1867,7 +1867,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Fulmination',
-          "Attaque instantanée infligeant les dégâts de l'arme +5. Utilisable seulement après une esquive de la cible. Ne peut pas être esquivée.",
+          "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage. Ne peut pas être esquivée.",
         ],
         [
           'execute',
@@ -2549,7 +2549,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Sopraffazione',
-          "Attacco istantaneo per danni dell'arma +5. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",
+          "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia. Non può essere schivato.",
         ],
         [
           'execute',
@@ -3163,7 +3163,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Überwältigen',
-          'Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
+          'Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt. Kann nicht ausgewichen werden.',
         ],
         [
           'execute',
@@ -3766,7 +3766,11 @@ export const classAbilityNames = {
         ],
         ['hamstring', '断筋', '重创敌人，造成 5 点伤害，并使其移动速度降低 50%，持续 15 秒。'],
         ['bloodrage', '血性狂暴', '以生命值为代价产生 {rage} 点怒气。'],
-        ['overpower', '压制', '立即攻击，造成武器伤害 +5。只能在目标躲闪后使用。无法被躲闪。'],
+        [
+          'overpower',
+          '压制',
+          '立即攻击，造成武器伤害加 {damage}，并产生 {rage} 点怒气。无法被躲闪。',
+        ],
         [
           'execute',
           '斩杀',
@@ -4088,7 +4092,11 @@ export const classAbilityNames = {
         ],
         ['hamstring', '斷筋', '重創敵人，造成 5 點傷害，並使其移動速度降低 50%，持續 15 秒。'],
         ['bloodrage', '血性狂暴', '以生命值為代價產生 {rage} 點怒氣。'],
-        ['overpower', '壓制', '立即攻擊，造成武器傷害 +5。只能在目標閃躲後使用。無法被閃躲。'],
+        [
+          'overpower',
+          '壓制',
+          '立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣。無法被閃躲。',
+        ],
         [
           'execute',
           '斬殺',
@@ -4421,7 +4429,7 @@ export const classAbilityNames = {
         [
           'overpower',
           '제압',
-          '무기 피해 +5를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다.',
+          '무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성합니다. 회피할 수 없습니다.',
         ],
         [
           'execute',
@@ -4931,7 +4939,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'オーバーパワー',
-          '武器ダメージ +5 の即時攻撃です。対象が回避した後にのみ使用できます。回避されません。',
+          '武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成します。回避されません。',
         ],
         [
           'execute',
@@ -5485,7 +5493,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Sobrepujar',
-          'Ataque instantâneo com dano de arma +5. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado.',
+          'Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva. Não pode ser esquivado.',
         ],
         [
           'execute',
@@ -6083,7 +6091,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Превосходство',
-          'Мгновенная атака, наносящая урон оружием +5. Можно использовать только после уклонения цели. От нее нельзя уклониться.',
+          'Мгновенная атака, наносящая урон оружием плюс {damage} и дающая {rage} ед. ярости. От нее нельзя уклониться.',
         ],
         [
           'execute',

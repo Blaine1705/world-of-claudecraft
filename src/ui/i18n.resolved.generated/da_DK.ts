@@ -852,6 +852,7 @@ export const da_DK: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fysisk",
         "fire": "Ild",
@@ -4433,7 +4434,7 @@ export const da_DK: EnTranslations = {
       },
       "overpower": {
         "name": "Overmande",
-        "description": "Øjeblikkeligt angreb for våbenskade +5. Kan kun bruges efter målet undviger. Kan ikke undviges."
+        "description": "Øjeblikkeligt angreb for våbenskade plus {damage}, der genererer {rage} raseri. Kan ikke undviges."
       },
       "execute": {
         "name": "Henrettelse",

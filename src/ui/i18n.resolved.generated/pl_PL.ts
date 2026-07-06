@@ -852,6 +852,7 @@ export const pl_PL: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fizyczne",
         "fire": "Ogień",
@@ -4433,7 +4434,7 @@ export const pl_PL: EnTranslations = {
       },
       "overpower": {
         "name": "Przewaga",
-        "description": "Natychmiastowy atak za obrażenia broni +5. Użyteczne tylko po uniku celu. Nie można uniknąć."
+        "description": "Natychmiastowy atak zadający obrażenia broni plus {damage}, generujący {rage} wściekłości. Nie można go uniknąć."
       },
       "execute": {
         "name": "Egzekucja",

@@ -1678,7 +1678,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Genera {rage} rabbia al costo di salute.',
   'entities.abilities.overpower.name': 'Sopraffazione',
   'entities.abilities.overpower.description':
-    "Attacco istantaneo per danni dell'arma +5. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",
+    "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia. Non può essere schivato.",
   'entities.abilities.execute.name': 'Esecuzione',
   'entities.abilities.execute.description':
     'Tenta di finire un nemico ferito, infliggendo {damage} danni. Utilizzabile solo sui nemici sotto il 20% di salute.',

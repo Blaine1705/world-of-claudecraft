@@ -25,7 +25,7 @@ import {
 } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
-function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
+function makeSim(cls: 'warrior' | 'mage' | 'rogue' | 'hunter' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
 }
 
@@ -596,21 +596,23 @@ describe('combat', () => {
     expect(wolf.auras.some((a: any) => a.kind === 'polymorph')).toBe(false);
   });
 
-  it('overpower requires a dodge proc', () => {
-    const sim = makeSim('warrior');
+  // The dodge-proc gate now lives on the hunter's Counterfang (warrior Redhand
+  // was reworked into the free rage builder, tests/battle_trance.test.ts).
+  it('mongoose_bite requires a dodge proc', () => {
+    const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
     facePlayerAt(sim, wolf);
     sim.player.resource = 50;
-    sim.castAbility('overpower');
+    sim.castAbility('mongoose_bite');
     let _events = sim.tick();
     // without a dodge proc it errors
     expect(sim.counters.damageDealt).toBe(0);
     // simulate a dodge proc
     sim.player.overpowerUntil = sim.time + 5;
-    sim.castAbility('overpower');
+    sim.castAbility('mongoose_bite');
     _events = sim.tick();
     expect(sim.counters.damageDealt).toBeGreaterThan(0);
   });

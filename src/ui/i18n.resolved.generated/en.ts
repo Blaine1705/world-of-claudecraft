@@ -852,6 +852,7 @@ export const en: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Physical",
         "fire": "Fire",
@@ -4433,7 +4434,7 @@ export const en: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged."
+        "description": "Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged."
       },
       "execute": {
         "name": "Early Grave",

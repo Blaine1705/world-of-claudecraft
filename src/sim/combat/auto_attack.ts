@@ -35,6 +35,8 @@ import { addThreat } from '../threat';
 import {
   angleTo,
   armorReduction,
+  BATTLE_TRANCE_CHANCE,
+  BATTLE_TRANCE_DURATION,
   DT,
   dist2d,
   type Entity,
@@ -151,7 +153,23 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     p.queuedOnSwing = null;
     delete p.queuedOnSwingFree;
   }
-  meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
+  const connected = meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
+  // Battle Trance (warrior baseline): every CONNECTED auto swing has a chance
+  // to make the next Reaver Strike or Brute Swing free (empower_next.ts owns
+  // the consumption scope). Rolled AFTER the swing so the white-hit table's
+  // own rng draws keep their positions; only warriors draw here.
+  if (connected && meta.cls === 'warrior' && ctx.rng.chance(BATTLE_TRANCE_CHANCE)) {
+    ctx.applyAura(p, {
+      id: 'battle_trance',
+      name: 'Battle Trance',
+      kind: 'battle_trance',
+      remaining: BATTLE_TRANCE_DURATION,
+      duration: BATTLE_TRANCE_DURATION,
+      value: 0,
+      sourceId: p.id,
+      school: 'physical',
+    });
+  }
   // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
   // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
   p.swingTimer = baseSwingSpeed(p) * ctx.swingIntervalMult(p);

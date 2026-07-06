@@ -24,6 +24,7 @@
 // the offline Sim and the online ClientWorld mirror expose (player.cooldowns is a
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
+import { freeCostAuraActive } from '../sim/combat/empower_next';
 import {
   type AbilityDef,
   dist2d,
@@ -125,6 +126,10 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
+  /** The player's worn auras (kind only): the free-cost proc read (Battle
+   *  Trance / next_cast_free) that drives the slot glow and usable state.
+   *  Both worlds expose the live aura list. */
+  auras: readonly { kind: string }[];
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -156,6 +161,10 @@ export interface ActionBarSlotState {
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
+  /** A free-cost proc (Battle Trance) covers this ability right now: the
+   *  painter renders the classic gold proc glow. Actionable info, so it is
+   *  NEVER shed by a graphics tier. */
+  procGlow: boolean;
   ariaLabel: string;
   keybindLabel: string;
 }
@@ -186,6 +195,7 @@ function makeSlotState(): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    procGlow: false,
     ariaLabel: '',
     keybindLabel: '',
   };
@@ -250,6 +260,7 @@ export function createActionBarView(
           slot.usable = true;
           slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
           slot.queued = player.autoAttack;
+          slot.procGlow = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
@@ -274,6 +285,7 @@ export function createActionBarView(
           slot.usable = true;
           slot.outOfRange = false;
           slot.queued = false;
+          slot.procGlow = false;
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
           slot.keybindLabel = sd.keybindLabel();
           continue;
@@ -304,6 +316,7 @@ export function createActionBarView(
           slot.usable = !(count <= 0 || player.dead);
           slot.outOfRange = false;
           slot.queued = false;
+          slot.procGlow = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.itemName(item),
@@ -335,12 +348,17 @@ export function createActionBarView(
             : 0;
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
-        slot.usable = !(player.resource < ability.cost);
+        // A free-cost proc (Battle Trance / next_cast_free) covers the cost:
+        // the slot is usable at any resource and glows (the sim predicate is
+        // imported so bar and combat can never disagree on the proc's scope).
+        const freeByProc = ability.cost > 0 && freeCostAuraActive(player.auras, def.id);
+        slot.usable = !(player.resource < ability.cost) || freeByProc;
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
           tgtDist > (def.range > 0 ? def.range : MELEE_RANGE);
         slot.queued = player.queuedOnSwing === def.id;
+        slot.procGlow = freeByProc;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),

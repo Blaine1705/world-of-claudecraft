@@ -611,24 +611,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redhand',
     class: 'warrior',
     learnLevel: 10,
-    cost: 5,
+    cost: 0,
     castTime: 0,
     cooldown: 5,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    requiresDodgeProc: true,
-    effects: [{ type: 'weaponStrike', bonus: 5, cannotBeDodged: true }],
+    // Reworked by owner decision into the kit's active rage BUILDER: no cost,
+    // generates 10 rage, and the classic dodge-proc gate is gone (too RNG).
+    // The requiresDodgeProc machinery itself stays (hunter mongoose_bite).
+    effects: [
+      { type: 'weaponStrike', bonus: 5, cannotBeDodged: true },
+      { type: 'gainResource', amount: 10 },
+    ],
     ranks: [
       {
         rank: 2,
         level: 16,
-        cost: 5,
-        effects: [{ type: 'weaponStrike', bonus: 15, cannotBeDodged: true }],
+        cost: 0,
+        effects: [
+          { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
+          { type: 'gainResource', amount: 10 },
+        ],
       },
     ],
     description:
-      'Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged.',
+      'Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged.',
   },
   execute: {
     id: 'execute',

@@ -852,6 +852,7 @@ export const es_ES: EnTranslations = {
       "bloodbath": "Aumenta la probabilidad de golpe crítico y el daño infligido un {pct}%",
       "dieBySword": "Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)",
       "sanguine": "Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%",
+      "battleTrance": "Tu próximo Golpe heroico o Embate no cuesta ira",
       "school": {
         "physical": "Daño físico",
         "fire": "Ígneo",
@@ -4433,7 +4434,7 @@ export const es_ES: EnTranslations = {
       },
       "overpower": {
         "name": "Abrumar",
-        "description": "Ataque instantáneo que inflige daño de arma +5. Solo se puede usar después de que el objetivo esquive. No puede esquivarse."
+        "description": "Ataque instantáneo que inflige daño de arma más {damage} y genera {rage} de ira. No puede esquivarse."
       },
       "execute": {
         "name": "Ejecutar",

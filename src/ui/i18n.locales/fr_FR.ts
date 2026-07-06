@@ -1700,7 +1700,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Génère {rage} rage au prix de vos points de vie.',
   'entities.abilities.overpower.name': 'Fulmination',
   'entities.abilities.overpower.description':
-    "Attaque instantanée infligeant les dégâts de l'arme +5. Utilisable seulement après une esquive de la cible. Ne peut pas être esquivée.",
+    "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage. Ne peut pas être esquivée.",
   'entities.abilities.execute.name': 'Exécution',
   'entities.abilities.execute.description':
     "Tente d'achever un ennemi blessé et inflige {damage} points de dégâts. Utilisable seulement sur les ennemis sous 20% de points de vie.",

@@ -852,6 +852,7 @@ export const it_IT: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fisico",
         "fire": "Fuoco",
@@ -4433,7 +4434,7 @@ export const it_IT: EnTranslations = {
       },
       "overpower": {
         "name": "Sopraffazione",
-        "description": "Attacco istantaneo per danni dell'arma +5. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato."
+        "description": "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia. Non può essere schivato."
       },
       "execute": {
         "name": "Esecuzione",

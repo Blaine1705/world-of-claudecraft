@@ -704,7 +704,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)',
   'entities.abilities.mortal_strike.name': 'Dodelijke Slag',
   'entities.abilities.overpower.description':
-    'Ogenblikkelijke aanval voor wapenschade +5. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken.',
+    'Directe aanval voor wapenschade plus {damage} die {rage} woede genereert. Kan niet ontweken worden.',
   'entities.abilities.overpower.name': 'Overmeesteren',
   'entities.abilities.polymorph.description':
     'Verandert de vijand in een schaap gedurende maximaal 15 sec. Het schaap dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',

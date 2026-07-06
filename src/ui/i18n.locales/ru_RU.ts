@@ -1752,7 +1752,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Дает {rage} ед. ярости ценой здоровья.',
   'entities.abilities.overpower.name': 'Превосходство',
   'entities.abilities.overpower.description':
-    'Мгновенная атака, наносящая урон оружием +5. Можно использовать только после уклонения цели. От нее нельзя уклониться.',
+    'Мгновенная атака, наносящая урон оружием плюс {damage} и дающая {rage} ед. ярости. От нее нельзя уклониться.',
   'entities.abilities.execute.name': 'Казнь',
   'entities.abilities.execute.description':
     'Попытка добить раненого врага, нанося {damage} ед. урона. Можно использовать только против врагов с менее чем 20% здоровья.',
@@ -5055,6 +5055,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Получаемый урон снижен на {pct}% ({lowPct}% при здоровье ниже {hpPct}%)',
   'hudChrome.auraEffect.sanguine':
     'Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%',
+  'hudChrome.auraEffect.battleTrance': 'Следующий Удар героя или Мощный удар не расходует ярость',
   'hudChrome.auraEffect.school.physical': 'Физическая',
   'hudChrome.auraEffect.school.fire': 'Огонь',
   'hudChrome.auraEffect.school.frost': 'Лёд',

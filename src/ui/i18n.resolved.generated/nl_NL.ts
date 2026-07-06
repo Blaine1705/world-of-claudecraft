@@ -852,6 +852,7 @@ export const nl_NL: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fysiek",
         "fire": "Vuur",
@@ -4433,7 +4434,7 @@ export const nl_NL: EnTranslations = {
       },
       "overpower": {
         "name": "Overmeesteren",
-        "description": "Ogenblikkelijke aanval voor wapenschade +5. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken."
+        "description": "Directe aanval voor wapenschade plus {damage} die {rage} woede genereert. Kan niet ontweken worden."
       },
       "execute": {
         "name": "Terechtstelling",

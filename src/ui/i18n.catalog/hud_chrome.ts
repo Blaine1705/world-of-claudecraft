@@ -959,6 +959,9 @@ export const hudChromeStrings = {
     bloodbath: 'Increases critical strike chance and damage dealt by {pct}%',
     dieBySword: 'Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)',
     sanguine: 'Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%',
+    // The two ability names are the locale's own (Reaver Strike / Brute Swing
+    // here; each fill uses its locale's translated names).
+    battleTrance: 'Your next Reaver Strike or Brute Swing costs no Rage',
     // Localized damage-school names spliced into {school} above.
     school: {
       physical: 'Physical',

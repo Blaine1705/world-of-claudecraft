@@ -694,7 +694,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)',
   'entities.abilities.mortal_strike.name': 'Śmiertelne uderzenie',
   'entities.abilities.overpower.description':
-    'Natychmiastowy atak za obrażenia broni +5. Użyteczne tylko po uniku celu. Nie można uniknąć.',
+    'Natychmiastowy atak zadający obrażenia broni plus {damage}, generujący {rage} wściekłości. Nie można go uniknąć.',
   'entities.abilities.overpower.name': 'Przewaga',
   'entities.abilities.polymorph.description':
     'Przemienia wroga w owcę na nawet 15 sek. Owca błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy.',

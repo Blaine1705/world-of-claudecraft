@@ -852,6 +852,7 @@ export const tr_TR: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fiziksel",
         "fire": "Ateş",
@@ -4433,7 +4434,7 @@ export const tr_TR: EnTranslations = {
       },
       "overpower": {
         "name": "Alt Etme",
-        "description": "Silah hasarı +5 veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz."
+        "description": "Silah hasarına {damage} ekleyen anında saldırı, {rage} öfke üretir. Kaçınılamaz."
       },
       "execute": {
         "name": "İnfaz",

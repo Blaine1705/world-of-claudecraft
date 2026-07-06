@@ -714,7 +714,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)',
   'entities.abilities.mortal_strike.name': 'Serangan Maut',
   'entities.abilities.overpower.description':
-    'Serangan seketika sebesar kerusakan senjata +5. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan.',
+    'Serangan instan dengan kerusakan senjata plus {damage} yang menghasilkan {rage} amarah. Tidak dapat dihindari.',
   'entities.abilities.overpower.name': 'Hempasan',
   'entities.abilities.polymorph.description':
     'Mengubah musuh menjadi domba hingga 15 detik. Domba itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid.',

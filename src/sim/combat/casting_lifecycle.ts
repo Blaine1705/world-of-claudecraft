@@ -49,10 +49,10 @@ import {
 } from '../types';
 import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
+  consumeFreeCostFor,
   consumeNextAttackCrit,
-  consumeNextCastFree,
   consumeNextCastInstant,
-  hasNextCastFree,
+  hasFreeCostFor,
 } from './empower_next';
 import { isSpellResisted } from './spell_resist';
 
@@ -245,7 +245,7 @@ export function castAbility(
   }
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -421,7 +421,7 @@ export function castAbility(
   if (ability.onNextSwing) {
     const toggledOff = p.queuedOnSwing === ability.id;
     p.queuedOnSwing = toggledOff ? null : ability.id;
-    if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p)) {
+    if (!toggledOff && canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
       p.queuedOnSwingFree = true;
     } else {
       delete p.queuedOnSwingFree;
@@ -444,7 +444,7 @@ export function castAbility(
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
+    if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) res = { ...res, cost: 0 };
   }
 
   if (ability.channel) {
@@ -657,7 +657,7 @@ function applyAbility(
   // early-return utility branches below bill directly, so they must go through
   // this too or a free conjure/revive would keep the charge alive.
   const billableCost = (): number =>
-    res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p) ? 0 : res.cost;
+    res.cost > 0 && !togglingOff && consumeFreeCostFor(ctx, p, ability.id) ? 0 : res.cost;
   if (ability.id === 'conjure_water') {
     // higher ranks conjure better water (falls back if the item isn't defined)
     const tiered = `conjured_water${res.rank}`;
@@ -726,12 +726,13 @@ function applyAbility(
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }
-  if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
+  if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id))
+    res = { ...res, cost: 0 };
 
   // helpful spells never miss
   if (ability.targetType === 'friendly') {

@@ -1657,7 +1657,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': '以生命值為代價產生 {rage} 點怒氣。',
   'entities.abilities.overpower.name': '壓制',
   'entities.abilities.overpower.description':
-    '立即攻擊，造成武器傷害 +5。只能在目標閃躲後使用。無法被閃躲。',
+    '立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣。無法被閃躲。',
   'entities.abilities.execute.name': '斬殺',
   'entities.abilities.execute.description':
     '嘗試終結受傷的敵人，造成 {damage} 點傷害。只能對生命值低於 20% 的敵人使用。',
@@ -4702,6 +4702,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bloodbath': '爆擊機率和造成的傷害提高 {pct}%',
   'hudChrome.auraEffect.dieBySword': '受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）',
   'hudChrome.auraEffect.sanguine': '攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%',
+  'hudChrome.auraEffect.battleTrance': '你的下一次英勇打擊或猛擊不消耗怒氣',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火焰',
   'hudChrome.auraEffect.school.frost': '冰霜',

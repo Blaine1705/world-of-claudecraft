@@ -852,6 +852,7 @@ export const id_ID: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Fisik",
         "fire": "Api",
@@ -4433,7 +4434,7 @@ export const id_ID: EnTranslations = {
       },
       "overpower": {
         "name": "Hempasan",
-        "description": "Serangan seketika sebesar kerusakan senjata +5. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
+        "description": "Serangan instan dengan kerusakan senjata plus {damage} yang menghasilkan {rage} amarah. Tidak dapat dihindari."
       },
       "execute": {
         "name": "Eksekusi",

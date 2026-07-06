@@ -1735,7 +1735,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': '体力を代償に怒りを{rage}生成します。',
   'entities.abilities.overpower.name': 'オーバーパワー',
   'entities.abilities.overpower.description':
-    '武器ダメージ +5 の即時攻撃です。対象が回避した後にのみ使用できます。回避されません。',
+    '武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成します。回避されません。',
   'entities.abilities.execute.name': 'エグゼキュート',
   'entities.abilities.execute.description':
     '傷ついた敵をとどめようとして {damage} のダメージを与えます。体力が20%未満の敵にのみ使用できます。',
@@ -4951,6 +4951,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bloodbath': 'クリティカル率と与えるダメージが{pct}%増加',
   'hudChrome.auraEffect.dieBySword': '受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）',
   'hudChrome.auraEffect.sanguine': '攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加',
+  'hudChrome.auraEffect.battleTrance': '次の英雄の一撃またはスラムの怒りコストがゼロになる',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火',
   'hudChrome.auraEffect.school.frost': '氷',

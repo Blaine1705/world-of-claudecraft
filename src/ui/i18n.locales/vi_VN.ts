@@ -697,7 +697,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)',
   'entities.abilities.mortal_strike.name': 'Đòn Trí Mạng',
   'entities.abilities.overpower.description':
-    'Đòn tấn công tức thời gây sát thương vũ khí +5. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né.',
+    'Đòn tấn công tức thời gây sát thương vũ khí cộng {damage}, tạo {rage} nộ khí. Không thể né tránh.',
   'entities.abilities.overpower.name': 'Áp Đảo',
   'entities.abilities.polymorph.description':
     'Biến kẻ địch thành một con cừu trong tối đa 15 giây. Con cừu đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình.',

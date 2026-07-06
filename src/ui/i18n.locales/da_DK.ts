@@ -689,7 +689,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)',
   'entities.abilities.mortal_strike.name': 'Dødbringende Slag',
   'entities.abilities.overpower.description':
-    'Øjeblikkeligt angreb for våbenskade +5. Kan kun bruges efter målet undviger. Kan ikke undviges.',
+    'Øjeblikkeligt angreb for våbenskade plus {damage}, der genererer {rage} raseri. Kan ikke undviges.',
   'entities.abilities.overpower.name': 'Overmande',
   'entities.abilities.polymorph.description':
     'Forvandler fjenden til et får i op til 15 sek. Fåret vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider.',

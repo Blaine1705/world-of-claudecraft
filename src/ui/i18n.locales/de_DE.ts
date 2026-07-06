@@ -1687,7 +1687,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Erzeugt {rage} Wut auf Kosten von Gesundheit.',
   'entities.abilities.overpower.name': 'Überwältigen',
   'entities.abilities.overpower.description':
-    'Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
+    'Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt. Kann nicht ausgewichen werden.',
   'entities.abilities.execute.name': 'Hinrichten',
   'entities.abilities.execute.description':
     'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',

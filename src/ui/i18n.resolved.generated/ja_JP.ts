@@ -852,6 +852,7 @@ export const ja_JP: EnTranslations = {
       "bloodbath": "クリティカル率と与えるダメージが{pct}%増加",
       "dieBySword": "受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）",
       "sanguine": "攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加",
+      "battleTrance": "次の英雄の一撃またはスラムの怒りコストがゼロになる",
       "school": {
         "physical": "物理",
         "fire": "火",
@@ -4433,7 +4434,7 @@ export const ja_JP: EnTranslations = {
       },
       "overpower": {
         "name": "オーバーパワー",
-        "description": "武器ダメージ +5 の即時攻撃です。対象が回避した後にのみ使用できます。回避されません。"
+        "description": "武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成します。回避されません。"
       },
       "execute": {
         "name": "エグゼキュート",

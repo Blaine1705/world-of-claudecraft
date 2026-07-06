@@ -852,6 +852,7 @@ export const de_DE: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Physisch",
         "fire": "Feuer",
@@ -4433,7 +4434,7 @@ export const de_DE: EnTranslations = {
       },
       "overpower": {
         "name": "Überwältigen",
-        "description": "Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden."
+        "description": "Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt. Kann nicht ausgewichen werden."
       },
       "execute": {
         "name": "Hinrichten",

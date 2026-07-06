@@ -852,6 +852,7 @@ export const ko_KR: EnTranslations = {
       "bloodbath": "치명타 확률과 입히는 피해가 {pct}% 증가합니다",
       "dieBySword": "받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)",
       "sanguine": "공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다",
+      "battleTrance": "다음 영웅의 일격 또는 격돌에 분노가 소모되지 않습니다",
       "school": {
         "physical": "물리",
         "fire": "화염",
@@ -4433,7 +4434,7 @@ export const ko_KR: EnTranslations = {
       },
       "overpower": {
         "name": "제압",
-        "description": "무기 피해 +5를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다."
+        "description": "무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성합니다. 회피할 수 없습니다."
       },
       "execute": {
         "name": "마무리 일격",

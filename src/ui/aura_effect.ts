@@ -243,6 +243,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
           dmgPct: pctFromFrac(a.value2 ?? 0),
         },
       };
+    case 'battle_trance':
+      // The warrior free-strike proc: the summary is the covered abilities,
+      // not a number (their names are baked per locale in the catalog value).
+      return { key: `${KEY}.battleTrance` };
 
     default:
       return null;

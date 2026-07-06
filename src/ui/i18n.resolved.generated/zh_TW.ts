@@ -852,6 +852,7 @@ export const zh_TW: EnTranslations = {
       "bloodbath": "爆擊機率和造成的傷害提高 {pct}%",
       "dieBySword": "受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）",
       "sanguine": "攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%",
+      "battleTrance": "你的下一次英勇打擊或猛擊不消耗怒氣",
       "school": {
         "physical": "物理",
         "fire": "火焰",
@@ -4433,7 +4434,7 @@ export const zh_TW: EnTranslations = {
       },
       "overpower": {
         "name": "壓制",
-        "description": "立即攻擊，造成武器傷害 +5。只能在目標閃躲後使用。無法被閃躲。"
+        "description": "立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣。無法被閃躲。"
       },
       "execute": {
         "name": "斬殺",

@@ -223,7 +223,11 @@ export type AuraKind =
   // frame shows one icon with one two-part tooltip: value = the swing-interval
   // multiplier (< 1 = faster, read by swingIntervalMult), value2 = the
   // damage-done fraction (read by the dealDamage amp loop).
-  | 'sanguine';
+  | 'sanguine'
+  // Battle Trance (warrior baseline proc): the next Reaver Strike or Brute
+  // Swing costs no rage. An ability-scoped sibling of next_cast_free, armed by
+  // connected auto-attack swings and consumed by combat/empower_next.ts.
+  | 'battle_trance';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -2325,6 +2329,11 @@ export const DIE_BY_SWORD_LOW_HP = 0.3;
 export const SECOND_WIND_THRESHOLD = 0.35;
 // Avatar's colossus body-size multiplier while the buff_avatar aura is worn.
 export const AVATAR_SCALE = 1.15;
+// Battle Trance (warrior baseline): a connected auto-attack swing has this
+// chance to make the next Reaver Strike or Brute Swing free, for this many
+// seconds. No stacking: a re-proc refreshes the one aura (applyAura by id).
+export const BATTLE_TRANCE_CHANCE = 0.2;
+export const BATTLE_TRANCE_DURATION = 10;
 
 // Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
 // tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant

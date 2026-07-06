@@ -852,6 +852,7 @@ export const vi_VN: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
       "school": {
         "physical": "Vật lý",
         "fire": "Lửa",
@@ -4433,7 +4434,7 @@ export const vi_VN: EnTranslations = {
       },
       "overpower": {
         "name": "Áp Đảo",
-        "description": "Đòn tấn công tức thời gây sát thương vũ khí +5. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né."
+        "description": "Đòn tấn công tức thời gây sát thương vũ khí cộng {damage}, tạo {rage} nộ khí. Không thể né tránh."
       },
       "execute": {
         "name": "Hành Quyết",

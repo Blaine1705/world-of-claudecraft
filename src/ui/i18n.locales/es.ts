@@ -1699,7 +1699,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Genera {rage} de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Abrumar',
   'entities.abilities.overpower.description':
-    'Ataque instantáneo que inflige daño de arma +5. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
+    'Ataque instantáneo que inflige daño de arma más {damage} y genera {rage} de ira. No puede esquivarse.',
   'entities.abilities.execute.name': 'Ejecutar',
   'entities.abilities.execute.description':
     'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',
@@ -4997,6 +4997,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)',
   'hudChrome.auraEffect.sanguine':
     'Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%',
+  'hudChrome.auraEffect.battleTrance': 'Tu próximo Golpe heroico o Embate no cuesta ira',
   'hudChrome.auraEffect.school.physical': 'Físico',
   'hudChrome.auraEffect.school.fire': 'Fuego',
   'hudChrome.auraEffect.school.frost': 'Escarcha',

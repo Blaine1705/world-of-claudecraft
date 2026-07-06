@@ -694,7 +694,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
   'entities.abilities.mortal_strike.name': 'Ölümcül Darbe',
   'entities.abilities.overpower.description':
-    'Silah hasarı +5 veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz.',
+    'Silah hasarına {damage} ekleyen anında saldırı, {rage} öfke üretir. Kaçınılamaz.',
   'entities.abilities.overpower.name': 'Alt Etme',
   'entities.abilities.polymorph.description':
     'Düşmanı 15 saniyeye kadar bir koyuna dönüştürür. Koyun başıboş dolaşır ve hızla iyileşir. Herhangi bir hasar etkiyi bozar. Yalnızca canavarlar ve insansılar.',
