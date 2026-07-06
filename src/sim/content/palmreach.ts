@@ -75,9 +75,9 @@ export const PALMREACH_ROADS: { x: number; z: number }[][] = [
   [
     { x: 60, z: 4880 },
     { x: 84, z: 4950 },
-    { x: 112, z: 4990 },
-    { x: 114, z: 5080 },
-    { x: 102, z: 5130 },
+    { x: 118, z: 4988 },
+    { x: 122, z: 5078 },
+    { x: 104, z: 5132 },
   ], // Drifthaven -> east around the Lagoon -> the Sunken Idol
 ] as { x: number; z: number }[][];
 

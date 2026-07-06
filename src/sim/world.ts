@@ -137,6 +137,7 @@ const HOLLOW_LAND_LOBES = [
   { x: -125, z: 1150, r: 75 }, // western highlands and the Mirrormere
   { x: -55, z: 1200, r: 75 }, // the Gleaming Deep's north rings
   { x: 95, z: 1150, r: 75 }, // the Crystalline Shallows
+  { x: 20, z: 1172, r: 38 }, // the Deep road's shoulder (organic-warp dip)
   { x: 150, z: 1215, r: 62 }, // the northeast arm (the forgotten monument)
   { x: 120, z: 995, r: 72 }, // the Starfall headland and falls terrace
   { x: 130, z: 1082, r: 48 }, // the Sunken Court peninsula
@@ -177,15 +178,24 @@ function metaballLandness(
   x: number,
   z: number,
 ): number {
+  // Organic coastlines: the raw metaball union reads as connecting circles,
+  // so the sample position is domain-warped by fixed-seed fbm (bending the
+  // blobs into peninsulas and coves) and the result gets a higher-frequency
+  // raggedness term (small capes and inlets). The seeds are CONSTANTS, not
+  // the world seed: landness must stay a pure fn of (x, z) because content
+  // tables, tests, and the sim's open-sea check were all placed against it.
+  const wx = x + (fbm2(x * 0.015, z * 0.015, 9101, 3) - 0.5) * 46;
+  const wz = z + (fbm2(x * 0.015 + 73, z * 0.015 - 41, 9103, 3) - 0.5) * 46;
   let land = 0;
   for (const b of lobes) {
-    const d2 = ((x - b.x) / b.r) ** 2 + ((z - b.z) / b.r) ** 2;
+    const d2 = ((wx - b.x) / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
     if (d2 < 1) land += (1 - d2) ** 2;
   }
   for (const b of bays) {
-    const d2 = ((x - b.x) / b.r) ** 2 + ((z - b.z) / b.r) ** 2;
+    const d2 = ((wx - b.x) / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
     if (d2 < 1) land -= 1.4 * (1 - d2) ** 2;
   }
+  land += (fbm2(x * 0.05, z * 0.05, 9107, 2) - 0.5) * 0.2;
   return land - 0.06;
 }
 
@@ -313,6 +323,8 @@ const FEN_LAND_LOBES = [
   { x: -110, z: 3330, r: 60 },
   { x: 110, z: 3380, r: 60 },
   { x: -30, z: 3600, r: 55 }, // the Nightgate's southern footing
+  { x: -42, z: 3478, r: 40 }, // the north track's shoulder (organic-warp dip)
+  { x: -30, z: 3634, r: 38 }, // the border footing right under the Nightgate
 ] as const;
 const FEN_BAYS = [
   { x: 170, z: 3300, r: 55 }, // the east sound
@@ -451,6 +463,7 @@ const REACH_LAND_LOBES = [
   { x: 60, z: 4890, r: 70 }, // Drifthaven's strand
   { x: 95, z: 4955, r: 60 }, // the lagoon's northern arm...
   { x: 125, z: 5050, r: 55 }, // ...curling east around the water
+  { x: 118, z: 5008, r: 40 }, // the idol road's shoulder on the lagoon's rim
   { x: 100, z: 5140, r: 60 }, // the Sunken Idol's headland
   { x: -40, z: 5140, r: 80 }, // the Vinefall
   { x: 20, z: 5230, r: 70 }, // the north cape
@@ -840,7 +853,12 @@ function baseHeight(x: number, z: number, seed: number): number {
   // ...except the carved lake basins
   for (const zone of ZONES) {
     for (const lake of zone.lakes) {
-      const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2);
+      // organic shores: the carve distance wobbles with fixed-seed noise so
+      // lakes read as real waterbodies instead of stamped discs. Northern
+      // realms only (z > 900): the three original zones keep their exact
+      // shorelines, and with them every seed-pinned fixture placed on them.
+      const wob = lake.z > 900 ? (noise2(x * 0.12, z * 0.12, 9109) - 0.5) * lake.radius * 0.45 : 0;
+      const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2) + wob;
       if (dLake < lake.radius * 1.6) {
         const lakeBlend = smoothstep(lake.radius * 0.55, lake.radius * 1.6, dLake);
         h = h * lakeBlend + (WATER_LEVEL - 4) * (1 - lakeBlend);
