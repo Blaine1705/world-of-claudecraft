@@ -53,6 +53,10 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   aoeFear: 'breakCC',
   breakControl: 'other',
   partyMeleeBuff: 'other',
+  // PR #1348 base-kit rescues: the leap's relocation is utility (its
+  // aoeDamage rider classifies the ability); the rallying AP buff likewise.
+  repositionToAim: 'other',
+  aoeAllyAttackPower: 'other',
   selfBuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',

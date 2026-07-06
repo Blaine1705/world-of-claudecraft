@@ -18,6 +18,7 @@
 import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -33,16 +34,25 @@ import type { AbilityDef, Entity } from '../types';
 import {
   armorReduction,
   DT,
+  dist2d,
   FISHING_CAST_ID,
   MELEE_CLASSES,
   meleeMissChance,
   rageGenAuraMult,
 } from '../types';
+import { groundHeight, WATER_LEVEL } from '../world';
 import { isRooted } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
+// repositionToAim sweep tuning (harvested from PR #1348): the leap walks the
+// straight line in small steps, stopping at the last legal point before a
+// collider, an unclimbable rise, or deep water, so it can never tunnel
+// through a wall or land somewhere movement could not reach.
+const TELEPORT_SWEEP_STEP = 0.5;
+const TELEPORT_MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+const TELEPORT_MIN_GROUND = WATER_LEVEL - PLAYER_SWIM_DEPTH;
 
 function isStealthToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -50,6 +60,64 @@ function isStealthToggle(ability: AbilityDef): boolean {
 
 function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
+}
+
+function removeRootAuras(ctx: SimContext, p: Entity): void {
+  for (let i = p.auras.length - 1; i >= 0; i--) {
+    const aura = p.auras[i];
+    if (aura.kind !== 'root') continue;
+    p.auras.splice(i, 1);
+    ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  }
+}
+
+// Swept relocation (Heroic Leap): step toward the destination, resolving each
+// step against the colliders and bailing at cliffs/deep water, then land at
+// the last safe point. Adapted from PR #1348's sweptReposition onto our
+// point-resolution seam (resolveMovePoint).
+function sweptReposition(ctx: SimContext, p: Entity, destX: number, destZ: number): void {
+  const fromX = p.pos.x;
+  const fromZ = p.pos.z;
+  const dx = destX - fromX;
+  const dz = destZ - fromZ;
+  const distance = Math.hypot(dx, dz);
+  let safeX = fromX;
+  let safeZ = fromZ;
+  let prevGround = groundHeight(fromX, fromZ, ctx.cfg.seed);
+  if (distance > 1e-6) {
+    const steps = Math.max(1, Math.ceil(distance / TELEPORT_SWEEP_STEP));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const nextX = fromX + dx * t;
+      const nextZ = fromZ + dz * t;
+      const step = Math.hypot(nextX - safeX, nextZ - safeZ);
+      const nextGround = groundHeight(nextX, nextZ, ctx.cfg.seed);
+      if (nextGround < TELEPORT_MIN_GROUND) break;
+      if (
+        nextGround > prevGround &&
+        step > 1e-6 &&
+        (nextGround - prevGround) / step > TELEPORT_MAX_CLIMB_SLOPE
+      ) {
+        break;
+      }
+      const resolved = ctx.resolveMovePoint(nextX, nextZ, PLAYER_BODY_RADIUS, p);
+      const moved = Math.hypot(resolved.x - safeX, resolved.z - safeZ);
+      const blocked =
+        Math.hypot(resolved.x - nextX, resolved.z - nextZ) > PLAYER_BODY_RADIUS * 0.25;
+      if (blocked || moved < step * 0.5) break;
+      safeX = resolved.x;
+      safeZ = resolved.z;
+      prevGround = groundHeight(safeX, safeZ, ctx.cfg.seed);
+    }
+  }
+  p.pos.x = safeX;
+  p.pos.z = safeZ;
+  p.pos.y = groundHeight(safeX, safeZ, ctx.cfg.seed);
+  p.vy = 0;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
+  p.chargeTargetId = null;
+  p.chargePath = [];
 }
 
 export function runEffects(
@@ -751,6 +819,38 @@ export function runEffects(
           ctx.enterCombat(p, m);
           if (m.kind === 'mob' && m.hostile)
             addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
+        }
+        break;
+      }
+      case 'repositionToAim': {
+        // Heroic Leap: relocate to the (server-clamped) aimed point through
+        // the swept resolver; any aoeDamage on the same ability then blasts
+        // castAim, which is exactly where the caster just landed.
+        if (eff.breakRoots) removeRootAuras(ctx, p);
+        const aim = p.castAim ?? p.pos;
+        sweptReposition(ctx, p, aim.x, aim.z);
+        break;
+      }
+      case 'aoeAllyAttackPower': {
+        // Rallying Cry: an attack-power buff on the caster and every party
+        // member within radius (partyMeleeBuff's loop shape, buff_ap aura, no
+        // class filter). Solo casters just buff themselves.
+        const cryParty = ctx.partyOf(p.id);
+        const cryIds = cryParty ? cryParty.members : [p.id];
+        for (const pid of cryIds) {
+          const mE = ctx.entities.get(pid);
+          if (!mE || mE.dead) continue;
+          if (pid !== p.id && dist2d(mE.pos, p.pos) > eff.radius) continue;
+          ctx.applyAura(mE, {
+            id: `${ability.id}_ap`,
+            name: ability.name,
+            kind: 'buff_ap',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.amount,
+            sourceId: p.id,
+            school: ability.school,
+          });
         }
         break;
       }

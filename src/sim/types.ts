@@ -1189,6 +1189,12 @@ export type AbilityEffect =
   // Intimidating Shout: fear up to maxTargets hostiles within radius (the
   // same fear_incap aura + flee movement the warlock Fear uses, DR shared).
   | { type: 'aoeFear'; duration: number; radius: number; maxTargets: number }
+  // Heroic Leap: relocate the caster to the aimed point via a collision- and
+  // cliff-checked sweep (harvested from PR #1348's movement primitive).
+  | { type: 'repositionToAim'; breakRoots?: boolean }
+  // Rallying Cry: an attack-power BUFF on the caster and party members within
+  // radius (the friendly mirror of aoeAttackPower; PR #1348 harvest).
+  | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
   // Avatar: strip every control aura (stun/root/incapacitate/polymorph via the
   // shared isControlAura predicate, plus silence/disarm/slow) off the caster.
   | { type: 'breakControl' }

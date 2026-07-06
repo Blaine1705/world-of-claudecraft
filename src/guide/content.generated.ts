@@ -173,6 +173,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Redhand"
       },
       {
+        "id": "pummel",
+        "name": "Pummel"
+      },
+      {
         "id": "execute",
         "name": "Early Grave"
       },
@@ -181,8 +185,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Brute Swing"
       },
       {
+        "id": "heroic_leap",
+        "name": "Heroic Leap"
+      },
+      {
         "id": "cleave",
         "name": "Reaping Arc"
+      },
+      {
+        "id": "rallying_cry",
+        "name": "Rallying Cry"
       },
       {
         "id": "defensive_stance",
