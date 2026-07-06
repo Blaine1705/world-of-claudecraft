@@ -57,7 +57,13 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents);
   const e = ctx.entities.get(meta.entityId);
   if (e) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
-  ctx.refreshKnownAbilities(meta, false);
+  // Announce newly granted abilities (spec signature, active nodes): emits `learnAbility`
+  // (the HUD places it on the bar + spellbook) and a "You have learned" log. This is a
+  // LIVE-action path only (apply/spec-pick/respec/loadout-switch); character LOAD resolves
+  // known abilities via its own silent path (refreshKnownAbilities(meta, false) in the
+  // addPlayer/restore block), so this never spams on login. refreshKnownAbilities only
+  // fires for abilities genuinely new since the last known-set.
+  ctx.refreshKnownAbilities(meta, true);
 }
 
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
