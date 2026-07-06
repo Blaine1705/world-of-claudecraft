@@ -4514,11 +4514,6 @@ export class Renderer {
       let hasTravelForm = false;
       let hasStealth = false;
       let hasShadowform = false;
-      let hasMoonkin = false;
-      let hasMetamorph = false;
-      let hasStasis = false;
-      let hasFrostNovaRoot = false;
-      let mageBarrierState: MageBarrierState | null = null;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -4527,11 +4522,6 @@ export class Renderer {
         if (a.kind === 'form_travel') hasTravelForm = true;
         if (a.kind === 'stealth') hasStealth = true;
         if (a.kind === 'form_shadow') hasShadowform = true;
-        if (a.kind === 'form_moonkin') hasMoonkin = true;
-        if (a.kind === 'form_metamorph') hasMetamorph = true;
-        if (a.kind === 'stasis') hasStasis = true;
-        if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
-        mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
       }
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
@@ -4806,20 +4796,8 @@ export class Renderer {
       const formTint = activeFormTint(e.auras);
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
-      // Data-driven form tint (shadow, moonkin) on the active rig; cleared on any
-      // inactive alternate rig so a stale tint never lingers through a form swap.
-      active.setFormTint(formTint);
-      if (active !== v.visual) v.visual.setFormTint(null);
-      if (v.sheepVisual && v.sheepVisual !== active) v.sheepVisual.setFormTint(null);
-      if (v.bearVisual && v.bearVisual !== active) v.bearVisual.setFormTint(null);
-      if (v.catVisual && v.catVisual !== active) v.catVisual.setFormTint(null);
-      if (v.travelVisual && v.travelVisual !== active) v.travelVisual.setFormTint(null);
-      // Metamorphosis has no tint-table entry, so it keeps its dedicated fel-demon
-      // material (it also grows the body via Entity.scale in the sim). Shadowform and
-      // Moonkin toggles ride alongside; the tint above wins for those two forms.
+      // Shadowform tints the base priest rig shadow-purple (no rig swap).
       active.setShadowform(hasShadowform);
-      active.setMoonkin(hasMoonkin);
-      active.setMetamorph(hasMetamorph);
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);

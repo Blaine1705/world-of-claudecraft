@@ -182,7 +182,7 @@ export function runEffects(
       const lost = p.auras[sf];
       p.auras.splice(sf, 1);
       ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
-      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+      recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
     }
   }
   const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
@@ -336,7 +336,7 @@ export function runEffects(
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
-        if (crit) dmg *= isSpell ? 1.5 : 2;
+        if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
@@ -375,12 +375,7 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        // Emboldened: the roll is still drawn; only the outcome is overridden.
-        const crit =
-          ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
-          sureCrit ||
-          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target ?? null);
-        if (sureCrit) sureCritRolled = true;
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
         if (crit) dmg *= 2 + p.critDmgBonus;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -705,10 +700,7 @@ export function runEffects(
           baseDmg * (eff.dmgMult ?? 1) +
           (eff.flat ?? 0) +
           directHitBonus(p.spellPower, ability, res.castTime);
-        // Emboldened: the roll is still drawn; only the outcome is overridden.
-        const crit =
-          ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
-        if (sureCrit) sureCritRolled = true;
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
         if (crit) dmg *= 1.5 + p.critDmgBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         noteSpellHit(ctx, p, crit);
@@ -1958,7 +1950,7 @@ export function runEffects(
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
-          if (crit) dmg *= isSpell ? 1.5 : 2;
+          if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(

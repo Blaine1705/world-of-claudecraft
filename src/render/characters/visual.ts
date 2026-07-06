@@ -55,14 +55,6 @@ const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
 const SHADOWFORM_OPACITY = 0.9;
 const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
-// Moonkin Form: a brighter, more luminous violet than the ghost run (owner's brief: a
-// purplish tint like ghost form but a bit brighter).
-const MOONKIN_OPACITY = 0.72;
-const MOONKIN_TINT = new THREE.Color(0x9d6bff);
-// Metamorphosis: a monstrous demon shell, deep fel-purple body with a hot glow
-// (the fire aura around it comes from vfx.formAura, not the material). Kept
-// dark enough that the body still shades and the flames read against it.
-const METAMORPH_TINT = new THREE.Color(0x4f2170);
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -120,10 +112,7 @@ export class CharacterVisual {
   private weaponAuraOn = false;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
-  private formTintMaterials = new Map<string, Map<THREE.Material, THREE.Material>>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
-  private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
-  private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -142,11 +131,7 @@ export class CharacterVisual {
   private shadowOn = true;
   private far = false;
   private soulRend = false;
-  private formTint: FormTint | null = null;
-  private formTintSig = '';
   private shadowform = false;
-  private moonkin = false;
-  private metamorph = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -521,29 +506,9 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  setFormTint(tint: FormTint | null): void {
-    const sig = tint ? `${tint.color}:${tint.opacity}` : '';
-    if (sig === this.formTintSig) return;
-    this.formTint = tint;
-    this.formTintSig = sig;
-    this.applyVisualMaterials();
-  }
-
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
-    this.applyVisualMaterials();
-  }
-
-  setMoonkin(on: boolean): void {
-    if (on === this.moonkin) return;
-    this.moonkin = on;
-    this.applyVisualMaterials();
-  }
-
-  setMetamorph(on: boolean): void {
-    if (on === this.metamorph) return;
-    this.metamorph = on;
     this.applyVisualMaterials();
   }
 
@@ -724,6 +689,7 @@ export class CharacterVisual {
     // data-driven form tint (shadow, moonkin) takes precedence over the dedicated
     // shapeshift materials, which cover forms not in the tint table (metamorph).
     if (this.soulRend) return this.soulRendMaterial(material);
+    if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
     if (this.formTint) return this.formTintMaterial(material, this.formTint);
     if (this.metamorph) return this.metamorphMaterial(material);
@@ -764,29 +730,6 @@ export class CharacterVisual {
     return marked;
   }
 
-  private formTintMaterial(material: THREE.Material, tint: FormTint): THREE.Material {
-    let byMaterial = this.formTintMaterials.get(this.formTintSig);
-    if (!byMaterial) {
-      byMaterial = new Map<THREE.Material, THREE.Material>();
-      this.formTintMaterials.set(this.formTintSig, byMaterial);
-    }
-    const cached = byMaterial.get(material);
-    if (cached) return cached;
-    const tinted = material.clone();
-    const withColor = tinted as THREE.Material & {
-      color?: THREE.Color;
-      opacity: number;
-    };
-    if (withColor.color) withColor.color.multiply(new THREE.Color(tint.color));
-    if (tint.opacity < 1) {
-      tinted.transparent = true;
-      withColor.opacity *= tint.opacity;
-      tinted.depthWrite = false;
-    }
-    byMaterial.set(material, tinted);
-    return tinted;
-  }
-
   private shadowformMaterial(material: THREE.Material): THREE.Material {
     const cached = this.shadowformMaterials.get(material);
     if (cached) return cached;
@@ -805,48 +748,6 @@ export class CharacterVisual {
       withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.4);
     }
     this.shadowformMaterials.set(material, marked);
-    return marked;
-  }
-
-  private moonkinMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.moonkinMaterials.get(material);
-    if (cached) return cached;
-    const marked = material.clone();
-    marked.transparent = true;
-    marked.opacity = MOONKIN_OPACITY;
-    marked.depthWrite = true;
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(MOONKIN_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x6a3fd0);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.55);
-    }
-    this.moonkinMaterials.set(material, marked);
-    return marked;
-  }
-
-  private metamorphMaterial(material: THREE.Material): THREE.Material {
-    const cached = this.metamorphMaterials.get(material);
-    if (cached) return cached;
-    const marked = material.clone();
-    const withColor = marked as THREE.Material & {
-      color?: THREE.Color;
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-    };
-    if (withColor.color) withColor.color.copy(METAMORPH_TINT);
-    if (withColor.emissive) {
-      withColor.emissive.setHex(0x7a1abf);
-      // Set, don't floor: the source materials ship emissiveIntensity 1 (with a
-      // black emissive color), so a Math.max floor keeps full-strength glow and
-      // the body renders as flat neon, drowning the fire aura and all shading.
-      withColor.emissiveIntensity = 0.35;
-    }
-    this.metamorphMaterials.set(material, marked);
     return marked;
   }
 
