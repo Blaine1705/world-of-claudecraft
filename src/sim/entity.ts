@@ -166,6 +166,10 @@ function manaFromIntellect(int: number): number {
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
 }
 
+function pctValue(value: number): number {
+  return value > 1 ? value / 100 : value;
+}
+
 // Recompute all derived stats for the player from class, level, gear, buffs, and
 // precomputed talent modifiers. `mods` is the flat struct resolved at
 // allocation/respec time (computeTalentModifiers) — this never walks the tree.
@@ -219,12 +223,14 @@ export function recalcPlayerStats(
   s.spi += setEff.spi;
   // Buff auras
   let bonusAp = setEff.ap;
+  let bonusApPct = 0;
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
+    else if (a.kind === 'buff_ap_pct') bonusApPct += pctValue(a.value);
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
     // effectiveAttackPower; players bake it here, so without this arm the debuff
     // was a no-op versus enemy players (PvP).
@@ -328,11 +334,14 @@ export function recalcPlayerStats(
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
-  e.attackPower = Math.max(0, Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0))));
+  e.attackPower = Math.max(
+    0,
+    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + bonusApPct)),
+  );
   // Hunters: ranged AP = 2/agi (classic-era value)
   e.rangedPower =
     cls === 'hunter'
-      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + bonusApPct)))
       : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.

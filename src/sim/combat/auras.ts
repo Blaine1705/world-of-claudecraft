@@ -47,6 +47,7 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'polymorph',
   'attackspeed',
   'sunder',
+  'bleed_vuln',
   'spellvuln',
   'vulnerability',
   'tongues',
@@ -56,6 +57,10 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
 
 export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
+}
+
+function pctValue(value: number): number {
+  return value > 1 ? value / 100 : value;
 }
 
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
@@ -143,6 +148,14 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
         if (a.kind === 'dot') {
+          let tickDamage = a.value;
+          if (a.school === 'physical') {
+            let bleedAmp = 0;
+            for (const targetAura of e.auras) {
+              if (targetAura.kind === 'bleed_vuln') bleedAmp += pctValue(targetAura.value);
+            }
+            if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
+          }
           ctx.emit({
             type: 'spellfx',
             sourceId: a.sourceId,
@@ -153,7 +166,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           ctx.dealDamage(
             ctx.entities.get(a.sourceId) ?? null,
             e,
-            a.value,
+            tickDamage,
             false,
             a.school,
             a.name,
@@ -167,7 +180,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
-              const healed = Math.min(Math.round(a.value * a.leechPct), src.maxHp - src.hp);
+              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
               if (healed > 0) {
                 src.hp += healed;
                 ctx.emit({

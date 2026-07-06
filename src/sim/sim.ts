@@ -2997,6 +2997,15 @@ export class Sim {
     return Math.max(0, attackPower);
   }
 
+  private petDamageMult(e: Entity): number {
+    if (e.ownerId === null) return 1;
+    let mult = 1;
+    for (const a of e.auras) {
+      if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+    }
+    return mult;
+  }
+
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
   // these thin delegates for the applyAura/aura-expiry callers (this.applyNonPlayerStatAura)
   // and respawnMob's ctx.clearNonPlayerStatAuras.
@@ -4312,6 +4321,7 @@ export class Sim {
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
+    dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
     const dealt = Math.max(1, Math.round(dmg));
@@ -4374,7 +4384,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         const dmg = Math.round(
-          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1),
+          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
+            this.petDamageMult(pet),
         );
         this.dealDamage(pet, target, Math.max(1, dmg), false, spell.school, spell.name, 'hit');
       }

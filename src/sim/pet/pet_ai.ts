@@ -211,6 +211,15 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   ctx.moveToward(pet, aim, speed);
 }
 
+function petDamageMult(pet: Entity): number {
+  if (pet.ownerId === null) return 1;
+  let mult = 1;
+  for (const a of pet.auras) {
+    if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+  }
+  return mult;
+}
+
 /** A ranged demon pet (imp) hurls a spell-school bolt: a telegraphed
  *  projectile that bypasses armor, mirroring the player caster path. Damage
  *  comes from the mob's weapon range + AP, exactly like its melee siblings. */
@@ -235,6 +244,7 @@ export function petRangedAttack(
       ctx.rng.range(src.weapon.min, src.weapon.max) +
       (ctx.effectiveAttackPower(src) / 14) * src.weapon.speed;
     if (crit) dmg *= 2;
+    dmg *= petDamageMult(src);
     ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
   });
 }

@@ -50,6 +50,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   aoeAllyAttackPower: 'other',
   aoeAllyHaste: 'other',
   selfBuff: 'other',
+  petBuff: 'other',
+  applyDebuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
   gainResource: 'other',
