@@ -46,9 +46,9 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   fen: { gain: 0.6, clamp: 2.6 },
   // the Nightbloom's dream sky is project-generated like its siblings
   night: { gain: 0.55, clamp: 2.2 },
-  // the Wraithwood borrows the marsh overcast, graded down to a dead grey
-  // gloom until its own generated sky lands (skies_in/wraithwood.png)
-  haunt: { gain: 0.3, clamp: 1.1 },
+  // the Wraithwood's storm gloom is project-generated with the darkness
+  // baked in; the clamp still reins in the dying sun's water lane
+  haunt: { gain: 0.6, clamp: 1.8 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -65,7 +65,7 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   amber: '/env/amber_sunset_2k.hdr',
   fen: '/env/fen_day_2k.hdr',
   night: '/env/nightbloom_dream_2k.hdr',
-  haunt: '/env/marsh_overcast_2k.hdr',
+  haunt: '/env/wraithwood_gloom_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -78,7 +78,7 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   amber: '/env/amber_sunset_1k.hdr',
   fen: '/env/fen_day_1k.hdr',
   night: '/env/nightbloom_dream_1k.hdr',
-  haunt: '/env/marsh_overcast_1k.hdr',
+  haunt: '/env/wraithwood_gloom_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -233,7 +233,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   amber: 0.501,
   fen: 0.497,
   night: 0.324, // the dream sky's low sun over its glowing sea
-  haunt: 0.657, // the marsh overcast's measured sun, shared while borrowed
+  haunt: 0.282, // the storm sky's dying sun on the horizon
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -251,9 +251,7 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   amber: [1, 1, 1],
   fen: [1, 1, 1],
   night: [1, 1, 1],
-  // dead grey-green murk over the haunted wood (placeholder grade until the
-  // realm's own sky arrives)
-  haunt: [0.5, 0.55, 0.5],
+  haunt: [1, 1, 1],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
