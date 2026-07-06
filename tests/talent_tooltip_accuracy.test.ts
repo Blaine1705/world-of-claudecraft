@@ -26,6 +26,8 @@ const PCT_FIELDS = new Set([
   'spellDmgPct',
   'healPct',
   'threatPct',
+  'critDmgPct',
+  'spellHastePct',
   'dmgPct',
   'costPct',
   'cooldownPct',

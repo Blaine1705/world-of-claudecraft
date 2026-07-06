@@ -45,6 +45,7 @@ const baseEnTable = {
   'error.potionNotReady': 'That potion is not ready yet.',
   'error.fullHealth': 'You are already at full health.',
   'error.nothingRestore': 'Nothing to restore.',
+  'error.nothingConsume': 'Nothing to consume.',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',

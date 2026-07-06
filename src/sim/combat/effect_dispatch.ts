@@ -81,6 +81,33 @@ function friendliesInRadius(ctx: SimContext, source: Entity, radius: number): En
   return out;
 }
 
+// The nearest friendly to `from` (a Chain Heal jump origin) within `radius` that the
+// caster hasn't already healed this cast. Deterministic: distance ties resolve by the
+// entity iteration order (insertion order), and no rng is drawn.
+function nearestUnhealedFriendly(
+  ctx: SimContext,
+  source: Entity,
+  from: Entity,
+  radius: number,
+  healed: Set<number>,
+): Entity | null {
+  let best: Entity | null = null;
+  let bestD = radius * radius;
+  for (const e of ctx.entities.values()) {
+    if (e.dead || healed.has(e.id)) continue;
+    if (e.hp >= e.maxHp) continue; // Chain Heal jumps only to injured allies
+    if (e.id !== source.id && !ctx.isFriendlyTo(source, e)) continue;
+    const dx = e.pos.x - from.pos.x;
+    const dz = e.pos.z - from.pos.z;
+    const d = dx * dx + dz * dz;
+    if (d <= bestD) {
+      bestD = d;
+      best = e;
+    }
+  }
+  return best;
+}
+
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -231,6 +258,42 @@ export function runEffects(
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
         ctx.applyHeal(p, healTarget, healAmount, ability.name);
+        break;
+      }
+      case 'chainHeal': {
+        // Heal the primary target, then bounce to the nearest not-yet-healed ally, up to
+        // `jumps` extra targets, each jump healing `falloff`x the previous. The +SpellPower
+        // rider is rolled once (from the full cast) and rides the falloff like the base.
+        const primary = target ?? p;
+        let amount = ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
+        const healed = new Set<number>();
+        let cur: Entity | null = primary;
+        for (let j = 0; j <= eff.jumps && cur; j++) {
+          ctx.applyHeal(p, cur, Math.round(amount), ability.name);
+          healed.add(cur.id);
+          if (j === eff.jumps) break;
+          cur = nearestUnhealedFriendly(ctx, p, cur, eff.radius, healed);
+          amount *= eff.falloff;
+        }
+        break;
+      }
+      case 'feralCharge': {
+        // Druid Feral signature (Feral Instinct): a form-gated resource burst. Cat Form
+        // (Energy) gains a regeneration buff; Bear Form (Rage) gets an instant Rage jolt.
+        if (p.auras.some((a) => a.kind === 'form_cat')) {
+          ctx.applyAura(p, {
+            id: 'feral_instinct_energy',
+            name: ability.name,
+            kind: 'buff_energyregen',
+            remaining: 10,
+            duration: 10,
+            value: 1,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        } else if (p.auras.some((a) => a.kind === 'form_bear') && p.resourceType === 'rage') {
+          p.resource = Math.min(p.maxResource, p.resource + 50);
+        }
         break;
       }
       case 'hot': {
@@ -824,8 +887,17 @@ export function runEffects(
           p.auras.splice(i, 1);
           ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
         }
+        // An ability can grant SEVERAL self-buffs at once (Arcane Power: spell damage AND
+        // haste; Metamorphosis: damage AND haste). applyAura dedups by (id, sourceId), so
+        // every companion buff needs a distinct id or the last would evict the rest. The
+        // PRIMARY self-buff (the first kind on the DEF) keeps the bare ability id (so its
+        // icon/name resolve and the form/aspect toggle-off still finds it by id); companions
+        // get a kind-suffixed id. Compare by KIND, not object identity: applyTalentMods may
+        // have replaced the resolved effect objects, so a reference check would misfire.
+        const firstSelfBuffKind = ability.effects.find((e) => e.type === 'selfBuff')?.kind;
+        const isPrimarySelfBuff = eff.kind === firstSelfBuffKind;
         ctx.applyAura(p, {
-          id: ability.id,
+          id: isPrimarySelfBuff ? ability.id : `${ability.id}_${eff.kind}`,
           name: ability.name,
           kind: eff.kind,
           remaining: eff.duration,
@@ -844,8 +916,13 @@ export function runEffects(
       case 'petBuff': {
         const pet = ctx.petOf(p.id);
         if (!pet) break;
+        // Same multi-buff rule as selfBuff: Metamorphosis buffs the demon's damage AND its
+        // cast speed, so the companion pet-buff needs its own id to survive apply. Match by
+        // kind (applyTalentMods may have replaced the resolved effect objects).
+        const firstPetBuffKind = ability.effects.find((e) => e.type === 'petBuff')?.kind;
+        const isPrimaryPetBuff = eff.kind === firstPetBuffKind;
         ctx.applyAura(pet, {
-          id: `${ability.id}_pet`,
+          id: isPrimaryPetBuff ? `${ability.id}_pet` : `${ability.id}_pet_${eff.kind}`,
           name: ability.name,
           kind: eff.kind,
           remaining: eff.duration,

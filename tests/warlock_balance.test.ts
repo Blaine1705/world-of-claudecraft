@@ -52,9 +52,11 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(shadowBolt?.effects).toEqual([{ type: 'directDamage', min: 68, max: 84 }]);
   });
 
-  it('keeps affliction and destruction low-level talent amplification in line with other casters', () => {
-    expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBe(0.04);
-    expect(spec('destruction').mastery.effect.global?.spellDmgPct).toBe(0.03);
+  it('keeps affliction and destruction talent amplification in line with the other caster masteries', () => {
+    // Masteries were made impactful across all specs (owner pass): affliction leans on raw
+    // spell damage, destruction pairs damage with a big crit-damage bonus (asserted separately).
+    expect(spec('affliction').mastery.effect.global?.spellDmgPct).toBe(0.2);
+    expect(spec('destruction').mastery.effect.global?.spellDmgPct).toBe(0.1);
 
     const afflictionPact = node('wlk_dark_pact').choices?.find(
       (choice) => choice.id === 'wlk_pact_affliction',
