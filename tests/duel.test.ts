@@ -163,12 +163,18 @@ describe('duel: PvP combat affordances', () => {
     expect(warlock.hp).toBeLessThan(hpBeforeTap);
     expect(warlock.resource).toBeGreaterThan(manaBeforeTap);
 
-    warlock.gcdRemaining = 0;
-    warlock.resource = warlock.maxResource;
-    sim.castAbility('curse_of_agony', a);
     // The curse is a projectile now: it applies when the bolt reaches the warrior
-    // (projectile_travel), a few ticks after the cast, so let it land.
-    for (let i = 0; i < 20 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
+    // (projectile_travel), a few ticks after the cast, so let each land. A bolt
+    // can also MISS on the spell hit table (the roll rides the shared rng
+    // stream, which world-gen shifts), so retry the cast rather than pin a
+    // stream position.
+    for (let attempt = 0; attempt < 8; attempt++) {
+      warlock.gcdRemaining = 0;
+      warlock.resource = warlock.maxResource;
+      sim.castAbility('curse_of_agony', a);
+      for (let i = 0; i < 20 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
+      if (warrior.auras.some((aura) => aura.id === 'curse_of_agony')) break;
+    }
     expect(warrior.auras.some((aura) => aura.id === 'curse_of_agony')).toBe(true);
 
     warlock.gcdRemaining = 0;
