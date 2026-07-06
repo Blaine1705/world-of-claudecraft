@@ -7,14 +7,14 @@
 // The colours sample the SAME `terrainHeight`/`roadDistance` the renderer and
 // sim use, so the map always matches the real world, do not diverge them.
 //
-// The style is a shaded-relief atlas plate: two-axis hillshade lit from the
-// northwest, topographic contour lines, an inked coastline over depth-graded
-// water with shallow foam, wet and dry sand shoreline bands, hypsometric
-// tinting (lush lowlands drying toward pale highlands), fbm vegetation
-// mottling, rock exposure on steep slopes, per-biome forest stippling, and
-// worn dirt tracks with wobbling width, a packed center strip, and inked
-// edges, so both the minimap and the map window read like real land rather
-// than flat color bands.
+// The style is a hand-drawn fantasy atlas plate: the landmass sits on the
+// sea like a carved slab (an inked cliff edge on its shadow side and a cast
+// shadow in the water), mountains are drawn caret glyphs with lit faces and
+// snow caps, forests are clumped painted crowns, and beneath those the
+// relief work remains: two-axis hillshade lit from the northwest, contour
+// lines, depth-graded water with shallow foam, wet and dry sand shorelines,
+// hypsometric tinting, fbm vegetation mottling, rock exposure on steep
+// slopes, and worn dirt tracks with wobbling width and inked edges.
 import { ZONES } from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
@@ -111,6 +111,18 @@ export function paintTerrainRows(
           r += (150 - r) * foam * 0.6;
           g += (188 - g) * foam * 0.6;
           b += (198 - b) * foam * 0.6;
+        }
+        // the land slab's cast shadow on the sea (light from screen
+        // top-left; screen right/down = world -x/-z, so the caster sits at
+        // world +x,+z)
+        if (terrainHeight(x + 2.4, z + 2.4, seed) >= WATER_LEVEL) {
+          r *= 0.66;
+          g *= 0.66;
+          b *= 0.7;
+        } else if (terrainHeight(x + 4.8, z + 4.8, seed) >= WATER_LEVEL) {
+          r *= 0.84;
+          g *= 0.84;
+          b *= 0.87;
         }
         if (left >= WATER_LEVEL || up >= WATER_LEVEL) {
           // the ink line where the sea meets the land
@@ -255,6 +267,20 @@ export function paintTerrainRows(
         b += (rb - b) * rockT * 0.85;
       }
 
+      // -- the carved slab edge: the coast facing away from the light is
+      // cut as a dark cliff band, the lit coast gets a bright rim --
+      if (shore < 4) {
+        if (terrainHeight(x - 2.2, z - 2.2, seed) < WATER_LEVEL) {
+          r *= 0.5;
+          g *= 0.5;
+          b *= 0.52;
+        } else if (terrainHeight(x + 2.2, z + 2.2, seed) < WATER_LEVEL) {
+          r = Math.min(255, r * 1.22 + 14);
+          g = Math.min(255, g * 1.22 + 14);
+          b = Math.min(255, b * 1.18 + 10);
+        }
+      }
+
       // -- the shoreline: a wet dark line at the waterline, dry pale sand above --
       if (shore < 1.6) {
         const t = 1 - shore / 1.6;
@@ -270,26 +296,83 @@ export function paintTerrainRows(
         }
       }
 
-      // -- forest stipple: hash-celled tree dots below the crag line, kept
-      // off exposed rock --
+      // -- forests: clumped painted crowns (round blobs with a lit rim on
+      // the northwest, the hand-drawn-map read), kept off exposed rock --
       const density = FOREST_STIPPLE[biome] ?? 0.3;
       if (h < 22 && shore > 1.2 && rockT < 0.4) {
-        const cell = hash2(Math.round(x * 0.8), Math.round(z * 0.8), seed + 271);
+        const cx = Math.floor(x / 2.4);
+        const cz = Math.floor(z / 2.4);
+        const cell = hash2(cx, cz, seed + 271);
         if (cell < density) {
-          const dot = 0.72 + cell * 0.3; // deeper cells read as darker crowns
-          r *= dot;
-          g *= dot * 1.04; // crowns keep a green cast
-          b *= dot;
+          const jx = (hash2(cx, cz, seed + 277) - 0.5) * 0.5;
+          const jz = (hash2(cz, cx, seed + 283) - 0.5) * 0.5;
+          const u = x / 2.4 - cx - 0.5 + jx;
+          const v = z / 2.4 - cz - 0.5 + jz;
+          const rad = 0.3 + cell * 0.45;
+          const d = Math.sqrt(u * u + v * v);
+          if (d < rad) {
+            const crown = 0.62 + cell * 0.25;
+            r *= crown;
+            g *= crown * 1.1; // crowns keep a green cast
+            b *= crown;
+            // the lit rim toward the light (world +x,+z)
+            if (u > rad * 0.25 && v > rad * 0.25) {
+              r *= 1.3;
+              g *= 1.3;
+              b *= 1.25;
+            }
+          }
         }
       }
 
-      // -- topographic contour lines (skip the beach so the coast stays sand) --
-      if (shore > 1.6) {
+      // -- topographic contour lines (skip the beach so the coast stays
+      // sand, and the high ground where the mountain glyphs take over) --
+      if (shore > 1.6 && h <= 14) {
         const f = ((h % CONTOUR_STEP) + CONTOUR_STEP) % CONTOUR_STEP;
         if (f < CONTOUR_WIDTH) {
           r *= 0.78;
           g *= 0.78;
           b *= 0.78;
+        }
+      }
+
+      // -- mountain glyphs: the hand-drawn caret marks every fantasy map
+      // ranges its highlands with, inked with a lit northwest face (and a
+      // snow-white one on frozen ground) --
+      if (h > 14) {
+        const gx = Math.floor(x / 7);
+        const gz = Math.floor(z / 7);
+        if (hash2(gx, gz, seed + 431) < 0.85) {
+          const jx = (hash2(gx, gz, seed + 433) - 0.5) * 0.24;
+          const jz = (hash2(gz, gx, seed + 437) - 0.5) * 0.24;
+          const u = x / 7 - gx - 0.5 + jx;
+          const v = z / 7 - gz - 0.5 + jz;
+          // the caret: apex up-screen (v positive is screen-up in world +z)
+          const ridge = 0.2 - 1.3 * Math.abs(u);
+          const strokeW = Math.max(0.06, (yardsPerPx / 7) * 1.2);
+          if (Math.abs(u) < 0.34 && v > -0.26 && v < ridge + strokeW) {
+            const snowy = biome === 'frost' || biome === 'peaks' || h > 26;
+            if (v > ridge - strokeW) {
+              // the inked ridge line
+              r *= 0.4;
+              g *= 0.4;
+              b *= 0.42;
+            } else if (u < 0) {
+              // the shadowed southeast face
+              r *= 0.62;
+              g *= 0.62;
+              b *= 0.64;
+            } else if (snowy) {
+              // the lit face carries the snow
+              r = r * 0.3 + 205 * 0.7;
+              g = g * 0.3 + 212 * 0.7;
+              b = b * 0.3 + 222 * 0.7;
+            } else {
+              r *= 1.28;
+              g *= 1.24;
+              b *= 1.18;
+            }
+          }
         }
       }
 
