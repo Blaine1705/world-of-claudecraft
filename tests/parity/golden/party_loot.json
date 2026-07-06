@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 402,
-      "state": "ac77d233",
+      "state": "1f006c11",
       "events": "0002a44f",
       "rng": {
         "draws": 2,
@@ -69,6 +69,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -108,6 +116,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

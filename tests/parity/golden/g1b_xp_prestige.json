@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "e170e76d",
+      "state": "0949a805",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,6 +55,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -118,7 +126,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 400,
-      "state": "21f51a45",
+      "state": "6f4dfecd",
       "events": "795498b6",
       "rng": {
         "draws": 0,
@@ -129,7 +137,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 400,
-      "state": "573250fd",
+      "state": "7ae06a15",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -140,7 +148,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "652e1dc3",
+      "state": "08ae742f",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -151,7 +159,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "652e1dc3",
+      "state": "08ae742f",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -190,6 +198,14 @@
           ],
           "mailWelcomed": true,
           "restedXp": 0.125,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -253,7 +269,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "5c4ae01e",
+      "state": "1432c702",
       "events": "4fe1145b",
       "rng": {
         "draws": 75,
@@ -295,6 +311,14 @@
           "lifetimeXp": 160,
           "mailWelcomed": true,
           "restedXp": 920,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -359,7 +383,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "97ea7635",
+      "state": "a32d9fd7",
       "events": "9c31fa87",
       "rng": {
         "draws": 75,
@@ -402,6 +426,14 @@
           "lifetimeXp": 610,
           "mailWelcomed": true,
           "restedXp": 920,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -466,7 +498,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "bb37ec91",
+      "state": "dca7c733",
       "events": "4a654dfd",
       "rng": {
         "draws": 75,
@@ -509,6 +541,14 @@
           "lifetimeXp": 190400,
           "mailWelcomed": true,
           "restedXp": 920,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -573,7 +613,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "f25c40de",
+      "state": "48199690",
       "events": "5eced1e6",
       "rng": {
         "draws": 75,
@@ -617,6 +657,14 @@
           "mailWelcomed": true,
           "prestigeRank": 1,
           "restedXp": 920,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -680,7 +728,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "f25c40de",
+      "state": "48199690",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -724,6 +772,14 @@
           "mailWelcomed": true,
           "prestigeRank": 1,
           "restedXp": 920,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -787,7 +843,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "f25c40de",
+      "state": "48199690",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -831,6 +887,14 @@
           "mailWelcomed": true,
           "prestigeRank": 1,
           "restedXp": 920,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

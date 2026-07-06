@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 415,
-      "state": "a9d32703",
+      "state": "a26e5f61",
       "events": "754520e5",
       "rng": {
         "draws": 35,
@@ -68,6 +68,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -107,6 +115,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -841,7 +857,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 415,
-      "state": "75e7df10",
+      "state": "31d2d2a2",
       "events": "6ae4bb61",
       "rng": {
         "draws": 49,
@@ -881,6 +897,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -920,6 +944,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1633,7 +1665,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 415,
-      "state": "c6e0aab7",
+      "state": "3f3bc4ff",
       "events": "6a220e01",
       "rng": {
         "draws": 49,
@@ -1644,7 +1676,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 415,
-      "state": "82bdc299",
+      "state": "70209759",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1655,7 +1687,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 415,
-      "state": "bcbb4bcf",
+      "state": "347c2fb7",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1666,7 +1698,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 415,
-      "state": "f882d509",
+      "state": "2d853cc9",
       "events": "fae5dbae",
       "rng": {
         "draws": 49,
@@ -1677,7 +1709,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 415,
-      "state": "06abb9c9",
+      "state": "6cd9e989",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1717,6 +1749,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1759,6 +1799,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1872,7 +1920,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 415,
-      "state": "06abb9c9",
+      "state": "6cd9e989",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1912,6 +1960,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1954,6 +2010,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

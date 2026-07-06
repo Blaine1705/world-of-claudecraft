@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 403,
-      "state": "47e3b5e5",
+      "state": "3960db7b",
       "events": "655eff33",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 403,
-      "state": "51c9e0cf",
+      "state": "d3c678cd",
       "events": "277176cf",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 403,
-      "state": "a007d70d",
+      "state": "0ceef6a3",
       "events": "b079be27",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 403,
-      "state": "409c140f",
+      "state": "7e0a790d",
       "events": "e5fdcbcf",
       "rng": {
         "draws": 230,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 403,
-      "state": "8c2db7c3",
+      "state": "f6bad119",
       "events": "666b6891",
       "rng": {
         "draws": 384,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 403,
-      "state": "07e50843",
+      "state": "72207999",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 403,
-      "state": "3aee6798",
+      "state": "a9c478d2",
       "events": "df4ead10",
       "rng": {
         "draws": 608,
@@ -142,6 +142,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {
@@ -195,6 +203,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {
@@ -249,6 +265,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {
@@ -302,6 +326,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {

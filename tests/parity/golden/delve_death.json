@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "cad8a816",
+      "state": "2678fbd8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,6 +53,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -118,7 +126,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "31cdd82f",
+      "state": "0024fd2b",
       "events": "4d2796c2",
       "rng": {
         "draws": 1,
@@ -157,6 +165,14 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -221,7 +237,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 409,
-      "state": "b0a7606a",
+      "state": "c36d303c",
       "events": "62ff2cae",
       "rng": {
         "draws": 1,
@@ -260,6 +276,14 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -325,7 +349,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 409,
-      "state": "b0a7606a",
+      "state": "c36d303c",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -364,6 +388,14 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

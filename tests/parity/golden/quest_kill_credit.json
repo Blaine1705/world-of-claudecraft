@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "e170e76d",
+      "state": "0949a805",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,6 +54,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -117,7 +125,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "97603242",
+      "state": "dcce7984",
       "events": "8c467819",
       "rng": {
         "draws": 0,
@@ -167,6 +175,14 @@
                 "state": "active"
               }
             ]
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},
@@ -231,7 +247,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 408,
-      "state": "123aaddd",
+      "state": "e5b31335",
       "events": "8e1af75c",
       "rng": {
         "draws": 40,
@@ -285,6 +301,14 @@
                 "state": "ready"
               }
             ]
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},
@@ -350,7 +374,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 408,
-      "state": "a9196010",
+      "state": "c3856b04",
       "events": "2a1aa60b",
       "rng": {
         "draws": 40,
@@ -398,6 +422,14 @@
           "mailWelcomed": true,
           "questsDone": [
             "q_wolves"
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},
@@ -464,7 +496,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 408,
-      "state": "4955f148",
+      "state": "1b72bd4c",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -512,6 +544,14 @@
           "mailWelcomed": true,
           "questsDone": [
             "q_wolves"
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},

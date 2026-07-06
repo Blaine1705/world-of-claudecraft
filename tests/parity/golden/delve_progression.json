@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "e170e76d",
+      "state": "0949a805",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,6 +54,14 @@
             }
           ],
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -117,7 +125,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 421,
-      "state": "269d2b1d",
+      "state": "a18e6ff5",
       "events": "776625f2",
       "rng": {
         "draws": 1,
@@ -128,7 +136,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 421,
-      "state": "dd334c7f",
+      "state": "c9b64dfb",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -167,6 +175,14 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -228,7 +244,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 421,
-      "state": "f6d4c3b9",
+      "state": "bf9cccd1",
       "events": "02dc9841",
       "rng": {
         "draws": 3,
@@ -274,6 +290,14 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -335,7 +359,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 421,
-      "state": "125708cb",
+      "state": "6fd26fa7",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -381,6 +405,14 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
