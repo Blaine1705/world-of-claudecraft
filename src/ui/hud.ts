@@ -225,6 +225,7 @@ import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
+import { onMapArtReady } from './map_art';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
@@ -1074,6 +1075,18 @@ export class Hud {
       minZ: WORLD_MIN_Z,
       maxZ: WORLD_MAX_Z,
     });
+    // hand-painted plates land in the world strip too, each over its own band
+    {
+      const stripH = this.minimapBg.height;
+      const spanZ = WORLD_MAX_Z - WORLD_MIN_Z;
+      for (const zn of ZONES) {
+        onMapArtReady(zn.id, (img) => {
+          const top = ((WORLD_MAX_Z - zn.zMax) / spanZ) * stripH;
+          const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
+          require2dContext(this.minimapBg).drawImage(img, 0, top, this.minimapBg.width, rows);
+        });
+      }
+    }
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     mm.addEventListener('click', () => this.toggleMap());
@@ -5656,11 +5669,22 @@ export class Hud {
   // a prewarm hasn't already produced it. The synchronous path is the fallback
   // for "opened the map the instant we entered a zone"; normally the idle
   // prewarm has it ready and this is a Map hit.
+  // Composite a hand-painted plate (public/map_art/<zoneId>.*) over a zone's
+  // procedural background canvas once it loads; the caches hold the canvas by
+  // reference, so the next blit picks the art up without invalidation.
+  private compositeMapArt(zoneId: string, canvas: HTMLCanvasElement): void {
+    onMapArtReady(zoneId, (img) => {
+      const ctx = require2dContext(canvas);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    });
+  }
+
   private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
     const cached = this.mapBgCache.get(zone.id);
     if (cached) return cached;
     const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
     this.mapBgCache.set(zone.id, bg);
+    this.compositeMapArt(zone.id, bg);
     // a redundant in-flight prewarm for this same zone can be dropped now
     if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
     return bg;
@@ -5751,6 +5775,7 @@ export class Hud {
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
       this.mapBgCache.set(job.zoneId, job.canvas);
+      this.compositeMapArt(job.zoneId, job.canvas);
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
