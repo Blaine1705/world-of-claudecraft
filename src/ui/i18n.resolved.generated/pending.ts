@@ -47,6 +47,10 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
+  "cs_CZ": [
+    "hudChrome.options.showTargetOfTarget",
+    "hudChrome.unitFrame.targetOfTargetLabel"
+  ],
   "nl_NL": [
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"

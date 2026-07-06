@@ -110,6 +110,7 @@ const LANGUAGE_ENDONYMS: Record<SupportedLanguage, string> = {
   ja_JP: '日本語',
   pt_BR: 'Português (Brasil)',
   ru_RU: 'Русский',
+  cs_CZ: 'Čeština',
   nl_NL: 'Nederlands',
   pl_PL: 'Polski',
   id_ID: 'Bahasa Indonesia',
@@ -160,6 +161,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   talents: 'game.talents.title',
   leaderboard: 'game.leaderboard.title',
   calendar: 'hudChrome.calendar.keybindLabel',
+  crafting: 'hudChrome.crafting.title',
 };
 
 /**
