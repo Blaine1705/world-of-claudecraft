@@ -1373,6 +1373,7 @@ export interface ZonePropsDef {
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
+  marshReeds: [number, number][];
   crates: [number, number][];
   campfires: [number, number][];
   mudHuts: [number, number][];
@@ -1398,6 +1399,7 @@ export function emptyZoneProps(): ZonePropsDef {
     ruinRings: [],
     fences: [],
     graveyards: [],
+    marshReeds: [],
   };
 }
 
