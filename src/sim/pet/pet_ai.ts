@@ -275,23 +275,13 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
   ctx.moveToward(pet, aim, speed);
 }
 
-function petDamageMult(ctx: SimContext, pet: Entity): number {
+function petDamageMult(pet: Entity): number {
   if (pet.ownerId === null) return 1;
   let mult = 1;
   for (const a of pet.auras) {
-    if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
+    if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
   }
-  const ownerMeta = ctx.players.get(pet.ownerId);
-  if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
   return mult;
-}
-
-// Pet attack/cast speed multiplier from pet_spellhaste auras (Metamorphosis: +20% cast
-// speed on the demon). value is a fraction (0.2 = +20%); the swing interval divides by it.
-function petHasteMult(pet: Entity): number {
-  let bonus = 0;
-  for (const a of pet.auras) if (a.kind === 'pet_spellhaste') bonus += a.value;
-  return 1 + Math.max(0, bonus);
 }
 
 /** A ranged demon pet (imp) hurls a spell-school bolt: a telegraphed
@@ -328,7 +318,7 @@ export function petRangedAttack(
       ctx.rng.range(src.weapon.min, src.weapon.max) +
       (ctx.effectiveAttackPower(src) / 14) * src.weapon.speed;
     if (crit) dmg *= 2;
-    dmg *= petDamageMult(ctx, src);
+    dmg *= petDamageMult(src);
     ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
   });
 }

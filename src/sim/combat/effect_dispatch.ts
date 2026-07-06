@@ -1483,17 +1483,31 @@ export function runEffects(
       case 'aoeAllyAttackPower': {
         // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
         // nearby allies (Trueshot Aura), riding the PR3a friendlies seam.
+        const kind = eff.apPct !== undefined ? 'buff_ap_pct' : 'buff_ap';
+        const value = eff.apPct ?? eff.amount ?? 0;
+        const party = ctx.partyOf(p.id);
         for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          if (m.id !== p.id && !party?.members.includes(m.id)) continue;
           ctx.applyAura(m, {
             id: `${ability.id}_ap`,
             name: ability.name,
-            kind: 'buff_ap',
+            kind,
             remaining: eff.duration,
             duration: eff.duration,
-            value: eff.amount,
+            value,
             sourceId: p.id,
             school: ability.school,
           });
+          if (m.kind === 'player') {
+            const targetMeta = ctx.players.get(m.id);
+            if (targetMeta)
+              recalcPlayerStats(
+                m,
+                targetMeta.cls,
+                targetMeta.equipment,
+                ctx.playerMods(targetMeta),
+              );
+          }
         }
         break;
       }
@@ -2087,6 +2101,36 @@ export function runEffects(
         const isPrimaryPetBuff = eff.kind === firstPetBuffKind;
         ctx.applyAura(pet, {
           id: isPrimaryPetBuff ? `${ability.id}_pet` : `${ability.id}_pet_${eff.kind}`,
+          name: ability.name,
+          kind: eff.kind,
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.value,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
+      case 'applyDebuff': {
+        if (!target || target.dead) break;
+        ctx.applyAura(target, {
+          id: `${ability.id}_${eff.kind}`,
+          name: ability.name,
+          kind: eff.kind,
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.value,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        ctx.enterCombat(p, target);
+        break;
+      }
+      case 'petBuff': {
+        const pet = ctx.petOf(p.id);
+        if (!pet) break;
+        ctx.applyAura(pet, {
+          id: `${ability.id}_pet`,
           name: ability.name,
           kind: eff.kind,
           remaining: eff.duration,

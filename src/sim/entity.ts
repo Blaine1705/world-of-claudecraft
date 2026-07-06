@@ -217,7 +217,7 @@ function manaFromIntellect(int: number): number {
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
 }
 
-export function pctValue(value: number): number {
+function pctValue(value: number): number {
   return value > 1 ? value / 100 : value;
 }
 
@@ -294,6 +294,7 @@ export function recalcPlayerStats(
   bonusSp += setEff.sp; // caster set 2-piece spell power (mirrors setEff.ap for melee)
   // Buff auras
   let bonusAp = setEff.ap;
+  let bonusApPct = 0;
   let bonusDodge = 0;
   let bonusCrit = 0;
   let bonusHaste = 0; // Fury Enrage folds +25% haste here (real haste: swings + casts)
@@ -312,6 +313,7 @@ export function recalcPlayerStats(
   let maxHpPctAura = 0; // Rallying Cry: summed buff_maxhp_pct fractions
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
+    else if (a.kind === 'buff_ap_pct') bonusApPct += pctValue(a.value);
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
     // effectiveAttackPower; players bake it here, so without this arm the debuff
     // was a no-op versus enemy players (PvP).
@@ -497,15 +499,14 @@ export function recalcPlayerStats(
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
-  // buffApPct (Battle Shout / Blessing of Might) folds into the same AP multiplier.
   e.attackPower = Math.max(
     0,
-    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)),
+    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + bonusApPct)),
   );
   // Hunters: ranged AP = 2/agi (classic-era value)
   e.rangedPower =
     cls === 'hunter'
-      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)))
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + bonusApPct)))
       : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.

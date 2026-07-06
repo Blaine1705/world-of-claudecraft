@@ -4909,9 +4909,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 55, duration: 15 }],
+    effects: [
+      { type: 'selfBuff', kind: 'buff_ap_pct', value: 20, duration: 15 },
+      { type: 'petBuff', kind: 'pet_damage_pct', value: 100, duration: 15 },
+    ],
     description:
-      'Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)',
+      'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
   },
   trueshot_aura: {
     id: 'trueshot_aura',
@@ -4924,9 +4927,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'aoeAllyAttackPower', amount: 35, duration: 300, radius: 30 }],
+    effects: [{ type: 'aoeAllyAttackPower', apPct: 10, duration: 1800, radius: 30 }],
     description:
-      'Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)',
+      'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
   },
   wyvern_sting: {
     id: 'wyvern_sting',
@@ -5040,9 +5043,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'weaponStrike', bonus: 16 },
       { type: 'dot', total: 36, duration: 12, interval: 3 },
+      { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
     ],
     description:
-      'Strikes the enemy for weapon damage plus $d and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)',
+      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
   },
   power_infusion: {
     id: 'power_infusion',

@@ -12,51 +12,15 @@ const OUT = 'docs/screenshots/signatures';
 fs.mkdirSync(OUT, { recursive: true });
 
 const SPECS = {
-  warrior: [
-    ['arms', 'mortal_strike'],
-    ['fury', 'bloodthirst'],
-    ['prot', 'shield_slam'],
-  ],
-  paladin: [
-    ['holy', 'holy_shock'],
-    ['protection', 'holy_shield'],
-    ['retribution', 'crusader_strike'],
-  ],
-  hunter: [
-    ['beast_mastery', 'bestial_wrath'],
-    ['marksmanship', 'trueshot_aura'],
-    ['survival', 'wyvern_sting'],
-  ],
-  rogue: [
-    ['assassination', 'cold_blood'],
-    ['combat', 'blade_flurry'],
-    ['subtlety', 'hemorrhage'],
-  ],
-  priest: [
-    ['discipline', 'power_infusion'],
-    ['holy', 'holy_nova'],
-    ['shadow', 'shadowform'],
-  ],
-  shaman: [
-    ['elemental', 'elemental_mastery'],
-    ['enhancement', 'stormstrike'],
-    ['restoration', 'chain_heal'],
-  ],
-  mage: [
-    ['arcane', 'arcane_power'],
-    ['fire', 'combustion'],
-    ['frost', 'icy_veins'],
-  ],
-  warlock: [
-    ['affliction', 'siphon_life'],
-    ['demonology', 'metamorphosis'],
-    ['destruction', 'conflagrate'],
-  ],
-  druid: [
-    ['balance', 'moonkin_form'],
-    ['feral', 'feral_charge'],
-    ['restoration', 'swiftmend'],
-  ],
+  warrior: [['arms', 'mortal_strike'], ['fury', 'bloodthirst'], ['prot', 'shield_slam']],
+  paladin: [['holy', 'holy_shock'], ['protection', 'holy_shield'], ['retribution', 'crusader_strike']],
+  hunter: [['beast_mastery', 'bestial_wrath'], ['marksmanship', 'trueshot_aura'], ['survival', 'wyvern_sting']],
+  rogue: [['assassination', 'cold_blood'], ['combat', 'blade_flurry'], ['subtlety', 'hemorrhage']],
+  priest: [['discipline', 'power_infusion'], ['holy', 'holy_nova'], ['shadow', 'shadowform']],
+  shaman: [['elemental', 'elemental_mastery'], ['enhancement', 'stormstrike'], ['restoration', 'chain_heal']],
+  mage: [['arcane', 'arcane_power'], ['fire', 'combustion'], ['frost', 'icy_veins']],
+  warlock: [['affliction', 'siphon_life'], ['demonology', 'metamorphosis'], ['destruction', 'conflagrate']],
+  druid: [['balance', 'moonkin_form'], ['feral', 'feral_charge'], ['restoration', 'swiftmend']],
 };
 
 const browser = await puppeteer.launch({
@@ -95,9 +59,7 @@ for (const [cls, specs] of Object.entries(SPECS)) {
         if (!sim.resolvedAbility(sig)) return false;
         // Spawn a pinned dummy in front by cloning the nearest mob template we can find,
         // else target the nearest existing hostile mob.
-        const target = [...sim.entities.values()].find(
-          (e) => e.kind === 'mob' && !e.dead && e.hostile,
-        );
+        let target = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead && e.hostile);
         if (target) {
           // move the player next to it so melee/ranged both land
           p.pos = { x: target.pos.x, y: target.pos.y, z: target.pos.z - 8 };

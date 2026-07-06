@@ -190,7 +190,6 @@ export type AuraKind =
   | 'buff_ap'
   | 'buff_ap_pct'
   | 'pet_damage_pct'
-  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -1715,7 +1714,13 @@ export type AbilityEffect =
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
-  | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
+  | {
+      type: 'aoeAllyAttackPower';
+      amount?: number;
+      apPct?: number;
+      duration: number;
+      radius: number;
+    }
   | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   | {

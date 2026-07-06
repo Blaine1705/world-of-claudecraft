@@ -50,8 +50,6 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'attackspeed',
   'sunder',
   'bleed_vuln',
-  'corrode',
-  'faerie_fire',
   'spellvuln',
   'vulnerability',
   'tongues',
@@ -67,7 +65,7 @@ function pctValue(value: number): number {
   return value > 1 ? value / 100 : value;
 }
 
-export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   // Lifesap: living sap restores a flat amount of WHATEVER the current resource
   // is, every classic tick, in combat and across form shifts. Hard control
@@ -219,7 +217,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
-              const healed = Math.min(Math.round(a.value * a.leechPct), src.maxHp - src.hp);
+              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
               if (healed > 0) {
                 src.hp += healed;
                 ctx.emit({
