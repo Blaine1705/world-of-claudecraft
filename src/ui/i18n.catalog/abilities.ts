@@ -1352,7 +1352,7 @@ const classAbilityNamesEn = {
       ],
       [
         'metamorphosis',
-        'Metamorphosis',
+        'Fiendshape',
         'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
       ],
       [
@@ -1362,17 +1362,17 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_shield',
-        'Holy Shield',
-        'Hurls a holy shield at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+        'Radiant Aegis',
+        'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
       ],
       [
         'bestial_wrath',
-        'Bestial Wrath',
+        'Wild Fury',
         'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
       ],
       [
         'trueshot_aura',
-        'Trueshot Aura',
+        'Coldsight Aura',
         'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
       ],
       [
@@ -1382,12 +1382,12 @@ const classAbilityNamesEn = {
       ],
       [
         'arcane_power',
-        'Arcane Power',
+        'Aether Surge',
         'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
       ],
       [
         'combustion',
-        'Combustion',
+        'Flashfire',
         'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
       ],
       [
@@ -1397,42 +1397,42 @@ const classAbilityNamesEn = {
       ],
       [
         'cold_blood',
-        'Cold Blood',
+        "Killer's Calm",
         'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
       ],
       [
         'blade_flurry',
-        'Blade Flurry',
+        'Knifestorm',
         'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
       ],
       [
         'hemorrhage',
-        'Hemorrhage',
+        'Deep Cut',
         'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
       ],
       [
         'power_infusion',
-        'Power Infusion',
+        'Fervor',
         'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
       ],
       [
         'holy_nova',
         'Holy Nova',
-        'Causes an explosion of Holy light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
+        'Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
       ],
       [
         'shadowform',
-        'Shadowform',
+        'Vesper Form',
         'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
-        'Elemental Mastery',
-        'Calls on elemental mastery, making your next spell instant. (Elemental signature)',
+        'Stormsurge',
+        'Calls on the storm, making your next spell instant. (Elemental signature)',
       ],
       [
         'siphon_life',
-        'Siphon Life',
+        'Life Leech',
         'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
       ],
       [
@@ -1442,13 +1442,13 @@ const classAbilityNamesEn = {
       ],
       [
         'moonkin_form',
-        'Moonkin Form',
+        'Owl Form',
         'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
       ],
       [
         'feral_charge',
-        'Feral Instinct',
-        'Unleash your feral instincts. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bear Form, instantly generates 50 Rage. (Feral signature)',
+        'Primal Surge',
+        'Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
       ],
       [
         'swiftmend',
@@ -3253,7 +3253,7 @@ export const classAbilityNames = {
         ],
         [
           'combustion',
-          'Combustion',
+          'Flashfire',
           'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
         ],
         [

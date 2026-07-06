@@ -4849,7 +4849,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   metamorphosis: {
     id: 'metamorphosis',
-    name: 'Metamorphosis',
+    name: 'Fiendshape',
     class: 'warlock',
     learnLevel: 10,
     cost: 75,
@@ -4885,7 +4885,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   holy_shield: {
     id: 'holy_shield',
-    name: 'Holy Shield',
+    name: 'Radiant Aegis',
     class: 'paladin',
     learnLevel: 10,
     cost: 30,
@@ -4899,11 +4899,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'aoeDamage', min: 60, max: 75, radius: 10 },
     ],
     description:
-      'Hurls a holy shield at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+      'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
   },
   bestial_wrath: {
     id: 'bestial_wrath',
-    name: 'Bestial Wrath',
+    name: 'Wild Fury',
     class: 'hunter',
     learnLevel: 10,
     cost: 40,
@@ -4921,7 +4921,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   trueshot_aura: {
     id: 'trueshot_aura',
-    name: 'Trueshot Aura',
+    name: 'Coldsight Aura',
     class: 'hunter',
     learnLevel: 10,
     cost: 40,
@@ -4953,7 +4953,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   arcane_power: {
     id: 'arcane_power',
-    name: 'Arcane Power',
+    name: 'Aether Surge',
     class: 'mage',
     learnLevel: 10,
     cost: 0,
@@ -4971,7 +4971,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   combustion: {
     id: 'combustion',
-    name: 'Combustion',
+    name: 'Flashfire',
     class: 'mage',
     learnLevel: 10,
     cost: 0,
@@ -5003,7 +5003,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   cold_blood: {
     id: 'cold_blood',
-    name: 'Cold Blood',
+    name: "Killer's Calm",
     class: 'rogue',
     learnLevel: 10,
     cost: 0,
@@ -5018,7 +5018,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blade_flurry: {
     id: 'blade_flurry',
-    name: 'Blade Flurry',
+    name: 'Knifestorm',
     class: 'rogue',
     learnLevel: 10,
     cost: 25,
@@ -5033,7 +5033,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hemorrhage: {
     id: 'hemorrhage',
-    name: 'Hemorrhage',
+    name: 'Deep Cut',
     class: 'rogue',
     learnLevel: 10,
     cost: 35,
@@ -5053,7 +5053,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   power_infusion: {
     id: 'power_infusion',
-    name: 'Power Infusion',
+    name: 'Fervor',
     class: 'priest',
     learnLevel: 10,
     cost: 55,
@@ -5083,11 +5083,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
     ],
     description:
-      'Causes an explosion of Holy light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
+      'Causes an explosion of holy radiance, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
   },
   shadowform: {
     id: 'shadowform',
-    name: 'Shadowform',
+    name: 'Vesper Form',
     class: 'priest',
     learnLevel: 10,
     cost: 60,
@@ -5102,7 +5102,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   elemental_mastery: {
     id: 'elemental_mastery',
-    name: 'Elemental Mastery',
+    name: 'Stormsurge',
     class: 'shaman',
     learnLevel: 10,
     cost: 45,
@@ -5112,12 +5112,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
-    description:
-      'Calls on elemental mastery, making your next spell instant. (Elemental signature)',
+    description: 'Calls on the storm, making your next spell instant. (Elemental signature)',
   },
   siphon_life: {
     id: 'siphon_life',
-    name: 'Siphon Life',
+    name: 'Life Leech',
     class: 'warlock',
     learnLevel: 10,
     cost: 45,
@@ -5147,7 +5146,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   moonkin_form: {
     id: 'moonkin_form',
-    name: 'Moonkin Form',
+    name: 'Owl Form',
     class: 'druid',
     learnLevel: 10,
     cost: 55,
@@ -5162,7 +5161,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   feral_charge: {
     id: 'feral_charge',
-    name: 'Feral Instinct',
+    name: 'Primal Surge',
     class: 'druid',
     learnLevel: 10,
     cost: 0,
@@ -5175,7 +5174,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableInForm: true,
     effects: [{ type: 'feralCharge' }],
     description:
-      'Unleash your feral instincts. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bear Form, instantly generates 50 Rage. (Feral signature)',
+      'Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
   },
   swiftmend: {
     id: 'swiftmend',
