@@ -85,10 +85,10 @@ export function paintTerrainRows(
         g = 130;
         b = 58;
       } else if (biome === 'night') {
-        // moonlit silver-blue downs
-        r = 62;
-        g = 78;
-        b = 96;
+        // dream-violet downs
+        r = 118;
+        g = 106;
+        b = 168;
       } // snowbound; amber: autumn gold; night: moonlit blue
       if (h < WATER_LEVEL) {
         r = 38;
@@ -119,10 +119,10 @@ export function paintTerrainRows(
         g = 92;
         b = 58;
       } else if (biome === 'night' && h > 20) {
-        // night crags: pale moonstruck rock against the dark downs
-        r = 108;
-        g = 118;
-        b = 138;
+        // dream crags: pale amethyst rock over the violet downs
+        r = 154;
+        g = 140;
+        b = 190;
       } else if (biome === 'frost' && h > 6) {
         // mid benches: slightly shaded snow, never the mossy green
         r = 202;

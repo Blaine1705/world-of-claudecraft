@@ -1,11 +1,12 @@
-// The Nightbloom (level 20). North past the Willowfen's bright morning the
-// road climbs the Nightgate and the sun simply does not follow: a realm of
-// permanent starry midnight where the namesake flowers open only under the
-// moon. Silver-blue downs, firefly meadows, the lantern village of Moonrest,
-// the round Moonwell tarn, the Standing Vigil stone circle where the hovering
-// nightkin keep their watch, and the Sleepless Barrow in the far north.
-// Terrain: the NIGHT_* tables in world.ts; the glowing flora, moonbeams, and
-// standing stones live in render/night_features.ts.
+// The Nightbloom (level 20). North past the Willowfen the road climbs the
+// Nightgate into a realm that is dreaming: violet downs under a luminous
+// lavender sky where a sleeping world hangs among the clouds, and the
+// namesake flowers glow in the dream-light. The lantern village of Moonrest,
+// the round Moonwell tarn, Gloamfield's flower downs, the Standing Vigil
+// stone circle where the hovering nightkin keep their watch, and the
+// Sleepless Barrow in the far north. Terrain: the NIGHT_* tables in
+// world.ts; the glowing flora, dreambeams, and standing stones live in
+// render/night_features.ts.
 
 import type {
   CampDef,
@@ -46,7 +47,7 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
     { x: 0, z: 4030, label: 'The Sleepless Barrow' },
   ],
   welcome:
-    'The sun does not follow you past the Nightgate. Walk the flower-light to Moonrest and look up as you go.',
+    'Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.',
 };
 
 export const NIGHTBLOOM_ROADS: { x: number; z: number }[][] = [

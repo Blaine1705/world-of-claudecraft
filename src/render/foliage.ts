@@ -119,7 +119,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   frost: 0x7e99a2, // frosted but dark: pines hold their shape at distance
   amber: 0xb89a52, // autumn-burnished pines
   fen: 0x8fae7e,
-  night: 0x506878, // moonlit blue-green, dark at distance
+  night: 0x8040e0, // dream-violet boughs (saturated: soften + green albedo wash it out)
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -130,7 +130,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   frost: 0x84989e,
   amber: 0xd8852f, // fire-orange canopy
   fen: 0x9dc47e, // lush wetland green
-  night: 0x5a7086, // silvered indigo canopy under the stars
+  night: 0xb03cf0, // vivid orchid canopy (soften + green albedo wash it out)
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -141,7 +141,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   frost: 0x9aa8b8,
   amber: 0x9a8a70,
   fen: 0x7e8a76,
-  night: 0x6e7890,
+  night: 0xa094c8,
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -152,7 +152,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   frost: 0xe4e9f0,
   amber: 0xd8c0a0,
   fen: 0xc8cfae,
-  night: 0xb8c0d8,
+  night: 0xe0d4ec,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -163,7 +163,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   frost: 0xdde8f2,
   amber: 0xe8cf8a,
   fen: 0xcfe4b0,
-  night: 0xaebed2, // silver-blue moon grass
+  night: 0xe598ff, // orchid dream grass (green blade albedo mutes it)
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
@@ -184,10 +184,16 @@ const DRESS_TINT: Record<BiomeId, number> = {
   frost: 0xc8d8e0,
   amber: 0xd8a860,
   fen: 0xa8c48e,
-  night: 0x8a98b8,
+  night: 0xc078f2,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
+// The night realm's exception: soften(violet) x green albedo can only land
+// on green, so its canopies take the orchid tint nearly raw and multiply
+// down to dark dream-plum instead
+const LEAF_TINT_SOFTEN_NIGHT = 0.15;
+const leafSoften = (biome: BiomeId): number =>
+  biome === 'night' ? LEAF_TINT_SOFTEN_NIGHT : LEAF_TINT_SOFTEN;
 const BARK_TINT_SOFTEN = 0.85;
 const ROCK_TINT_SOFTEN = 0.45;
 const DRESS_TINT_SOFTEN = 0.65;
@@ -815,7 +821,7 @@ function placeSpecies(
               d.z,
               tintHex,
               c,
-              spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : LEAF_TINT_SOFTEN,
+              spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
             ),
           );
         });
@@ -841,7 +847,7 @@ function placeSpecies(
           group.handles[i].parts.push({ mesh: im, index: i, visibleMatrix, hiddenMatrix });
           if (part.isLeaf) {
             const hex = typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
-            im.setColorAt(i, softTint(d.x, d.z, hex, c, LEAF_TINT_SOFTEN));
+            im.setColorAt(i, softTint(d.x, d.z, hex, c, leafSoften(d.biome)));
           } else {
             im.setColorAt(i, softTint(d.x, d.z, TRUNK_TINT[d.biome], c, BARK_TINT_SOFTEN, 0.5));
           }

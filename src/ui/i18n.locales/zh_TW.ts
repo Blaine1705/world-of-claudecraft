@@ -2924,7 +2924,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': '睡蓮微光',
   'entities.mobs.willow_sprite.name': '柳樹小妖',
   'entities.zones.nightbloom.name': '夜綻花野',
-  'entities.zones.nightbloom.welcome': '越過夜門，太陽便不再跟隨。沿著花光走向月棲鎮，路上別忘了抬頭看看星空。',
+  'entities.zones.nightbloom.welcome': '越過夜門，連空氣都在做夢。沿著花光走向月棲鎮，別忘了看看懸在天上沉睡的世界。',
   'entities.zones.nightbloom.pois.0.label': '月棲鎮',
   'entities.zones.nightbloom.pois.1.label': '夜門',
   'entities.zones.nightbloom.pois.2.label': '月井',

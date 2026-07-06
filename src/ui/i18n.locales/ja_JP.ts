@@ -3057,7 +3057,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': 'リリーウィスプ',
   'entities.mobs.willow_sprite.name': 'ウィロースプライト',
   'entities.zones.nightbloom.name': 'ナイトブルーム',
-  'entities.zones.nightbloom.welcome': '夜門の先まで太陽はついてこない。花明かりをたどってムーンレストへ。道中はぜひ星空を見上げるといい。',
+  'entities.zones.nightbloom.welcome': '夜門の先では、大気までもが夢を見ている。花明かりをたどってムーンレストへ。空に浮かぶ眠れる世界もお見逃しなく。',
   'entities.zones.nightbloom.pois.0.label': 'ムーンレスト',
   'entities.zones.nightbloom.pois.1.label': '夜の門',
   'entities.zones.nightbloom.pois.2.label': '月の井戸',

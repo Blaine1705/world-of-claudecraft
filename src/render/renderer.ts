@@ -3582,8 +3582,8 @@ export class Renderer {
     amber: { color: 0xdec18e, near: 65, far: 270 },
     // the Willowfen: clear airy morning, the lightest fog in the world
     fen: { color: 0xcfe2dc, near: 95, far: 340 },
-    // the Nightbloom: deep indigo dark, near-clear so the glow flora carries
-    night: { color: 0x141c30, near: 80, far: 300 },
+    // the Nightbloom: a soft lavender dream-haze over the violet downs
+    night: { color: 0xbfb0e8, near: 90, far: 330 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3603,11 +3603,9 @@ export class Renderer {
     frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
     fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
-    // the Nightbloom: the "sun" is the moon. The light rig has no per-biome
-    // intensity knob, so the darkness lives in the color luminance: these
-    // sit at roughly a third of the day values, moon-blue, and the glow
-    // flora and fireflies carry the accents against the dark
-    night: { hemiSky: 0x38445e, hemiGround: 0x0e1220, sun: 0x505f7e },
+    // the Nightbloom: dreamlight. A rose-white sun over lavender sky bounce
+    // and deep violet ground, bright as day but nothing like it
+    night: { hemiSky: 0xd8ccff, hemiGround: 0x564a80, sun: 0xffe6f0 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {

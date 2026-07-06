@@ -7216,7 +7216,7 @@ export const zh_TW: EnTranslations = {
       },
       "nightbloom": {
         "name": "夜綻花野",
-        "welcome": "越過夜門，太陽便不再跟隨。沿著花光走向月棲鎮，路上別忘了抬頭看看星空。",
+        "welcome": "越過夜門，連空氣都在做夢。沿著花光走向月棲鎮，別忘了看看懸在天上沉睡的世界。",
         "pois": {
           "0": {
             "label": "月棲鎮"

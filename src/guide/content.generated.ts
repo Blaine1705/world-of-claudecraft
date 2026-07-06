@@ -1388,7 +1388,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Standing Vigil",
       "The Sleepless Barrow"
     ],
-    "welcome": "The sun does not follow you past the Nightgate. Walk the flower-light to Moonrest and look up as you go."
+    "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky."
   }
 ];
 

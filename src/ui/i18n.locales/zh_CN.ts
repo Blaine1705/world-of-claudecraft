@@ -2922,7 +2922,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': '睡莲微光',
   'entities.mobs.willow_sprite.name': '柳树小妖',
   'entities.zones.nightbloom.name': '夜绽花野',
-  'entities.zones.nightbloom.welcome': '越过夜门，太阳便不再跟随。沿着花光走向月栖镇，路上别忘了抬头看看星空。',
+  'entities.zones.nightbloom.welcome': '越过夜门，连空气都在做梦。沿着花光走向月栖镇，别忘了看看悬在天上沉睡的世界。',
   'entities.zones.nightbloom.pois.0.label': '月栖镇',
   'entities.zones.nightbloom.pois.1.label': '夜门',
   'entities.zones.nightbloom.pois.2.label': '月井',

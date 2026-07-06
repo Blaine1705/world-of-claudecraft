@@ -44,10 +44,8 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   frost: { gain: 0.5, clamp: 2.0 },
   amber: { gain: 0.55, clamp: 2.2 },
   fen: { gain: 0.6, clamp: 2.6 },
-  // the shipped Poly Haven night HDRI is far darker than any day sky
-  // (mean radiance ~0.07): the gain lifts the milky way into view and the
-  // tight clamp keeps the horizon lights from blooming the dark out
-  night: { gain: 2.4, clamp: 0.9 },
+  // the Nightbloom's dream sky is project-generated like its siblings
+  night: { gain: 0.55, clamp: 2.2 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -63,7 +61,7 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   frost: '/env/frost_twilight_2k.hdr',
   amber: '/env/amber_sunset_2k.hdr',
   fen: '/env/fen_day_2k.hdr',
-  night: '/env/night_2k.hdr',
+  night: '/env/nightbloom_dream_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -75,7 +73,7 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   frost: '/env/frost_twilight_1k.hdr',
   amber: '/env/amber_sunset_1k.hdr',
   fen: '/env/fen_day_1k.hdr',
-  night: '/env/night_1k.hdr',
+  night: '/env/nightbloom_dream_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -164,8 +162,6 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   frost: 0,
   amber: 0,
   fen: 0,
-  // the night photo has bush silhouettes at its horizon; at night they read
-  // as a distant dark treeline over the sea, so no lift (stars would smear)
   night: 0,
 };
 
@@ -226,7 +222,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   frost: 0.5,
   amber: 0.501,
   fen: 0.497,
-  night: 0.342, // the moonrise glow on the night photo's horizon
+  night: 0.324, // the dream sky's low sun over its glowing sea
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -243,8 +239,7 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   frost: [1, 1, 1],
   amber: [1, 1, 1],
   fen: [1, 1, 1],
-  // cool the warm sodium glow the night photo carries toward moonlight
-  night: [0.85, 0.95, 1.25],
+  night: [1, 1, 1],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

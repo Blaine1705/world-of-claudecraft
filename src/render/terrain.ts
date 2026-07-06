@@ -168,13 +168,15 @@ const BIOME_PALETTE: Record<
     dirt: 0x6e6448,
     sand: 0xb8bc8e,
   },
-  // night: moonlit silver-blue meadow greens over cool indigo soil
+  // night: the Nightbloom dreams in violet. The splat textures are
+  // green-authored, so these run hot and saturated or the meadow reads
+  // green anyway (the amber realm's fire-orange needed the same push)
   night: {
-    grass: 0x4e6472,
-    grassDark: 0x36485a,
-    grassYellow: 0x64788a,
-    dirt: 0x46485e,
-    sand: 0x8892a8,
+    grass: 0xc06cf2,
+    grassDark: 0x8f4ecc,
+    grassYellow: 0xe08cf8,
+    dirt: 0x8a5cb8,
+    sand: 0xd8a8f0,
   },
 };
 

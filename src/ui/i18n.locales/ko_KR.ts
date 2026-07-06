@@ -3052,7 +3052,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': '수련 위습',
   'entities.mobs.willow_sprite.name': '버들 요정',
   'entities.zones.nightbloom.name': '밤꽃 평원',
-  'entities.zones.nightbloom.welcome': '밤의 문 너머까지 태양은 따라오지 않는다. 꽃빛을 따라 문레스트로 가라. 가는 길에 별하늘을 올려다보는 것도 잊지 말고.',
+  'entities.zones.nightbloom.welcome': '밤의 문 너머에서는 공기마저 꿈을 꾼다. 꽃빛을 따라 문레스트로 가라. 하늘에 걸린 잠든 세계도 놓치지 말고.',
   'entities.zones.nightbloom.pois.0.label': '문레스트',
   'entities.zones.nightbloom.pois.1.label': '밤의 문',
   'entities.zones.nightbloom.pois.2.label': '달우물',

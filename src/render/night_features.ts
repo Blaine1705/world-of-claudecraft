@@ -1,7 +1,6 @@
-// The Nightbloom's dressing, render-only: moonbeams falling through the
-// starlight, fields of emissive lumen blossoms that carry the realm's name,
-// glow lights at the two stone rings, and cool lantern posts around
-// Moonrest. Same contract as the sibling realm modules: build once,
+// The Nightbloom's dressing, render-only: dreambeams falling through the
+// lavender sky, fields of emissive lumen blossoms that carry the realm's
+// name, and glow lights at the two stone rings and the Moonwell. Same contract as the sibling realm modules: build once,
 // update(time) animates gently, glowLights join the renderer's rank-culled
 // fireLights budget.
 import * as THREE from 'three';
@@ -19,9 +18,9 @@ export interface NightFeaturesView {
 const NIGHT_ZMIN = 3640;
 const NIGHT_ZMAX = 4200;
 
-// Moonbeam fans: the aurora/sunbeam texture anatomy, silvered. Each plane's
-// bright top edge is the "cloud line" the moon breaks through; the columns
-// fall as pale shafts over the meadows and the Moonwell.
+// Dreambeam fans: the aurora/sunbeam texture anatomy in pale violet. Each
+// plane's bright top edge is the cloud line the dream-light breaks through;
+// the columns fall as soft shafts over the meadows and the Moonwell.
 const BEAMS = [
   { x: 60, z: 3762, rot: 0.3, w: 60, h: 105, phase: 0 }, // over the Moonwell
   { x: -70, z: 3868, rot: -0.4, w: 70, h: 110, phase: 1.9 }, // Gloamfield
@@ -80,13 +79,13 @@ export function buildNightFeatures(seed: number): NightFeaturesView {
   const beams: { mat: THREE.MeshBasicMaterial; phase: number }[] = [];
   const pulsing: { mat: THREE.MeshStandardMaterial | null; phase: number }[] = [];
 
-  // --- moonbeams: additive silver shafts, one moon ---
+  // --- dreambeams: additive violet shafts, one light ---
   const tex = beamTexture();
   if (tex) {
     for (const b of BEAMS) {
       const mat = new THREE.MeshBasicMaterial({
         map: tex,
-        color: 0xbcd6ff,
+        color: 0xe4d2ff,
         transparent: true,
         opacity: 0.16,
         blending: THREE.AdditiveBlending,
@@ -176,11 +175,11 @@ export function buildNightFeatures(seed: number): NightFeaturesView {
     });
   }
 
-  // --- glow at the stone rings and the town: cool moon-fire ---
+  // --- glow at the stone rings and the tarn: soft dream-fire ---
   const GLOWS = [
-    { x: 88, z: 3918, c: 0x9fc8ff, i: 1.6 }, // the Standing Vigil
-    { x: 0, z: 4030, c: 0x8fb0e8, i: 1.4 }, // the Sleepless Barrow
-    { x: 70, z: 3760, c: 0xb8e0ff, i: 1.2 }, // the Moonwell's water glow
+    { x: 88, z: 3918, c: 0xc8b4ff, i: 1.6 }, // the Standing Vigil
+    { x: 0, z: 4030, c: 0xb0a0e8, i: 1.4 }, // the Sleepless Barrow
+    { x: 70, z: 3760, c: 0xffc8ec, i: 1.2 }, // the Moonwell's water glow
   ];
   for (const g of GLOWS) {
     const y = Math.max(terrainHeight(g.x, g.z, seed), WATER_LEVEL) + 3;
@@ -194,7 +193,7 @@ export function buildNightFeatures(seed: number): NightFeaturesView {
     group,
     glowLights,
     update(time: number): void {
-      // moonbeams breathe slowly out of phase, columns drifting like the
+      // dreambeams breathe slowly out of phase, columns drifting like the
       // aurora's; the blossom field pulses almost imperceptibly
       for (const b of beams) {
         b.mat.opacity = 0.18 * (0.55 + 0.45 * Math.sin(time * 0.11 + b.phase));

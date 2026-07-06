@@ -3088,7 +3088,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.lily_wisp.name': 'Кувшинковый огонёк',
   'entities.mobs.willow_sprite.name': 'Ивовый дух',
   'entities.zones.nightbloom.name': 'Ночецветье',
-  'entities.zones.nightbloom.welcome': 'За Ночные Врата солнце за тобой не пойдёт. Иди по цветочному свету к Лунному Приюту и не забывай смотреть вверх.',
+  'entities.zones.nightbloom.welcome': 'За Ночными Вратами грезит сам воздух. Иди по цветочному свету к Лунному Приюту и не пропусти спящий мир, что висит в небе.',
   'entities.zones.nightbloom.pois.0.label': 'Лунный Приют',
   'entities.zones.nightbloom.pois.1.label': 'Ночные Врата',
   'entities.zones.nightbloom.pois.2.label': 'Лунный Колодец',
