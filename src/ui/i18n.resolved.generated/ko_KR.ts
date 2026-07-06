@@ -845,6 +845,7 @@ export const ko_KR: EnTranslations = {
       "scale": "크기가 {pct}% 증가합니다",
       "jump": "도약 높이가 {pct}% 증가합니다",
       "dmgDone": "입히는 피해가 {pct}% 증가합니다",
+      "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
       "crit": "치명타 확률이 {pct}% 증가합니다",
       "rageGen": "분노 생성량이 {pct}% 증가합니다",
       "reckless": "치명타 확률이 {pct}%, 분노 생성량이 {ragePct}% 증가합니다",
@@ -4411,7 +4412,7 @@ export const ko_KR: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "사기의 외침",
-        "description": "무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 30만큼 감소시킵니다."
+        "description": "무시무시한 고함을 질러 주위 모든 적이 입히는 피해를 20초 동안 20% 감소시킵니다."
       },
       "charge": {
         "name": "돌진",

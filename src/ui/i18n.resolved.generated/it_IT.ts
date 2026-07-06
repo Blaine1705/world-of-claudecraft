@@ -845,6 +845,7 @@ export const it_IT: EnTranslations = {
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const it_IT: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Urlo Demoralizzante",
-        "description": "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di 30 per 30 sec."
+        "description": "Lancia un urlo spaventoso, riducendo del 20% i danni inflitti da tutti i nemici vicini per 20 sec."
       },
       "charge": {
         "name": "Carica",

@@ -845,6 +845,7 @@ export const da_DK: EnTranslations = {
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const da_DK: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Demoraliserende Råb",
-        "description": "Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med 30 i 30 sek."
+        "description": "Udstøder et frygtindgydende råb, der reducerer skaden fra alle nærliggende fjender med 20% i 20 sek."
       },
       "charge": {
         "name": "Storm",

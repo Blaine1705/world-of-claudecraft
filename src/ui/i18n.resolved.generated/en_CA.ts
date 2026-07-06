@@ -845,6 +845,7 @@ export const en_CA: EnTranslations = {
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const en_CA: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Lets out a fearsome shout, reducing the attack power of all nearby enemies by 30 for 30 sec."
+        "description": "Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by 20% for 20 sec."
       },
       "charge": {
         "name": "Onrush",

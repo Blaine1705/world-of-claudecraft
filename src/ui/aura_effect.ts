@@ -210,7 +210,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
 
     // Warrior choice-row auras (see the value semantics in the header).
     case 'buff_dmg_done':
-      return { key: `${KEY}.dmgDone`, nums: { pct: pctFromFrac(a.value) } };
+      // Negative value = a demoralize (Direhowl's pct form): the victim DEALS
+      // less damage. pctFromFrac already abs()es the number.
+      return {
+        key: a.value < 0 ? `${KEY}.dmgDoneReduce` : `${KEY}.dmgDone`,
+        nums: { pct: pctFromFrac(a.value) },
+      };
     case 'buff_crit':
       return { key: `${KEY}.crit`, nums: { pct: pctFromFrac(a.value) } };
     case 'buff_rage_gen':

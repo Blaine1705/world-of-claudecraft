@@ -666,16 +666,33 @@ export function runEffects(
       case 'aoeAttackPower': {
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
-          ctx.applyAura(m, {
-            id: `${ability.id}_ap`,
-            name: ability.name,
-            kind: 'debuff_ap',
-            remaining: eff.duration,
-            duration: eff.duration,
-            value: eff.amount,
-            sourceId: p.id,
-            school: ability.school,
-          });
+          // pct form (Direhowl rework): a NEGATIVE buff_dmg_done aura cuts a
+          // fraction of ALL damage the victim deals (the dealDamage amp fold
+          // handles the negative side); the legacy amount form stays the flat
+          // debuff_ap drain (demoralizing roar).
+          if (eff.pct !== undefined) {
+            ctx.applyAura(m, {
+              id: `${ability.id}_ap`,
+              name: ability.name,
+              kind: 'buff_dmg_done',
+              remaining: eff.duration,
+              duration: eff.duration,
+              value: -eff.pct,
+              sourceId: p.id,
+              school: ability.school,
+            });
+          } else {
+            ctx.applyAura(m, {
+              id: `${ability.id}_ap`,
+              name: ability.name,
+              kind: 'debuff_ap',
+              remaining: eff.duration,
+              duration: eff.duration,
+              value: eff.amount ?? 0,
+              sourceId: p.id,
+              school: ability.school,
+            });
+          }
           ctx.enterCombat(p, m);
           if (m.kind === 'mob' && m.hostile)
             addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));

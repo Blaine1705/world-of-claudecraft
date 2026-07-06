@@ -1639,7 +1639,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': '使你的耐力提高 6，持续 2 分钟。',
   'entities.abilities.demoralizing_shout.name': '挫志怒吼',
   'entities.abilities.demoralizing_shout.description':
-    '发出可怕的怒吼，使附近所有敌人的攻击强度降低 30，持续 30 秒。',
+    '发出可怕的怒吼，使附近所有敌人造成的伤害降低 20%，持续 20 秒。',
   'entities.abilities.charge.name': '冲锋',
   'entities.abilities.charge.description':
     '向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。',
@@ -4694,6 +4694,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.scale': '体型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳跃高度提高 {pct}%',
   'hudChrome.auraEffect.dmgDone': '造成的伤害提高 {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
   'hudChrome.auraEffect.crit': '暴击几率提高 {pct}%',
   'hudChrome.auraEffect.rageGen': '怒气获取提高 {pct}%',
   'hudChrome.auraEffect.reckless': '暴击几率提高 {pct}%，怒气获取提高 {ragePct}%',

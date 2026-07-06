@@ -1718,7 +1718,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': '2分間、スタミナが6増加します。',
   'entities.abilities.demoralizing_shout.name': 'デモラライジングシャウト',
   'entities.abilities.demoralizing_shout.description':
-    '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を30低下させます。',
+    '恐ろしい雄叫びを上げ、20秒間、周囲の敵すべてが与えるダメージを20%減少させます。',
   'entities.abilities.charge.name': 'チャージ',
   'entities.abilities.charge.description':
     '敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。',
@@ -4944,6 +4944,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.scale': 'サイズが{pct}%増加',
   'hudChrome.auraEffect.jump': 'ジャンプの高さが{pct}%増加',
   'hudChrome.auraEffect.dmgDone': '与えるダメージが{pct}%増加',
+  'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージが{pct}%減少',
   'hudChrome.auraEffect.crit': 'クリティカル率が{pct}%増加',
   'hudChrome.auraEffect.rageGen': '怒りの獲得量が{pct}%増加',
   'hudChrome.auraEffect.reckless': 'クリティカル率が{pct}%、怒りの獲得量が{ragePct}%増加',

@@ -952,6 +952,7 @@ export const hudChromeStrings = {
     // Warrior choice-row auras (aura_effect.ts arms of the same names). All
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',
+    dmgDoneReduce: 'Reduces damage dealt by {pct}%',
     crit: 'Increases critical strike chance by {pct}%',
     rageGen: 'Increases Rage generation by {pct}%',
     reckless: 'Increases critical strike chance by {pct}% and Rage generation by {ragePct}%',

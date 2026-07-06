@@ -518,7 +518,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Demoraliserer nærliggende fjender og sænker deres angrebsstyrke med 20 i 20 sek. Kun i Bjørneform.',
   'entities.abilities.demoralizing_roar.name': 'Demoraliserende Brøl',
   'entities.abilities.demoralizing_shout.description':
-    'Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med 30 i 30 sek.',
+    'Udstøder et frygtindgydende råb, der reducerer skaden fra alle nærliggende fjender med 20% i 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Demoraliserende Råb',
   'entities.abilities.devotion_aura.description': 'Øger din rustning med 40 i 30 min.',
   'entities.abilities.devotion_aura.name': 'Hengivenhedens Aura',

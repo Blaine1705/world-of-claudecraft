@@ -845,6 +845,7 @@ export const pt_BR: EnTranslations = {
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const pt_BR: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Grito Desmoralizante",
-        "description": "Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em 30 por 30 s."
+        "description": "Solta um grito assustador, reduzindo em 20% o dano causado por todos os inimigos próximos por 20 seg."
       },
       "charge": {
         "name": "Investida",

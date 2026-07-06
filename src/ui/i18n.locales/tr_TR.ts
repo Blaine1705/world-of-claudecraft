@@ -523,7 +523,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yakındaki düşmanların moralini bozarak saldırı güçlerini 20 saniye boyunca 20 azaltır. Yalnızca Ayı Formu.',
   'entities.abilities.demoralizing_roar.name': 'Moral Bozucu Kükreme',
   'entities.abilities.demoralizing_shout.description':
-    'Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca 30 azaltır.',
+    'Korkunç bir nara atarak yakındaki tüm düşmanların verdiği hasarı 20 saniye boyunca %20 azaltır.',
   'entities.abilities.demoralizing_shout.name': 'Moral Bozucu Nara',
   'entities.abilities.devotion_aura.description': 'Zırhını 30 dakika boyunca 40 artırır.',
   'entities.abilities.devotion_aura.name': 'Bağlılık Aurası',

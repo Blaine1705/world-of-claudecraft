@@ -845,6 +845,7 @@ export const zh_TW: EnTranslations = {
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
       "dmgDone": "造成的傷害提高 {pct}%",
+      "dmgDoneReduce": "造成的傷害降低 {pct}%",
       "crit": "爆擊機率提高 {pct}%",
       "rageGen": "怒氣獲取提高 {pct}%",
       "reckless": "爆擊機率提高 {pct}%，怒氣獲取提高 {ragePct}%",
@@ -4411,7 +4412,7 @@ export const zh_TW: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "挫志怒吼",
-        "description": "發出可怕的怒吼，使附近所有敵人的攻擊強度降低 30，持續 30 秒。"
+        "description": "發出可怕的怒吼，使附近所有敵人造成的傷害降低 20%，持續 20 秒。"
       },
       "charge": {
         "name": "衝鋒",

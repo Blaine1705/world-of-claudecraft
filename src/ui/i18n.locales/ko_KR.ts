@@ -1704,7 +1704,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': '2분 동안 체력이 6만큼 증가합니다.',
   'entities.abilities.demoralizing_shout.name': '사기의 외침',
   'entities.abilities.demoralizing_shout.description':
-    '무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 30만큼 감소시킵니다.',
+    '무시무시한 고함을 질러 주위 모든 적이 입히는 피해를 20초 동안 20% 감소시킵니다.',
   'entities.abilities.charge.name': '돌진',
   'entities.abilities.charge.description':
     '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd.',
@@ -4951,6 +4951,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.scale': '크기가 {pct}% 증가합니다',
   'hudChrome.auraEffect.jump': '도약 높이가 {pct}% 증가합니다',
   'hudChrome.auraEffect.dmgDone': '입히는 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
   'hudChrome.auraEffect.crit': '치명타 확률이 {pct}% 증가합니다',
   'hudChrome.auraEffect.rageGen': '분노 생성량이 {pct}% 증가합니다',
   'hudChrome.auraEffect.reckless': '치명타 확률이 {pct}%, 분노 생성량이 {ragePct}% 증가합니다',

@@ -845,6 +845,7 @@ export const ja_JP: EnTranslations = {
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",
       "dmgDone": "与えるダメージが{pct}%増加",
+      "dmgDoneReduce": "与えるダメージが{pct}%減少",
       "crit": "クリティカル率が{pct}%増加",
       "rageGen": "怒りの獲得量が{pct}%増加",
       "reckless": "クリティカル率が{pct}%、怒りの獲得量が{ragePct}%増加",
@@ -4411,7 +4412,7 @@ export const ja_JP: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "デモラライジングシャウト",
-        "description": "恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を30低下させます。"
+        "description": "恐ろしい雄叫びを上げ、20秒間、周囲の敵すべてが与えるダメージを20%減少させます。"
       },
       "charge": {
         "name": "チャージ",

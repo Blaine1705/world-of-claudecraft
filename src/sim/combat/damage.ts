@@ -22,7 +22,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
+import { ABILITIES, DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { tunedXpAmount } from '../game_config';
@@ -64,10 +64,12 @@ const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 
-// A handful of casts ignore classic-era spell pushback (e.g. ghost_wolf). Sole user is
-// the dealDamage pushback branch, so the predicate lives here with it.
+// A handful of casts ignore classic-era spell pushback: ghost_wolf, plus any
+// def flagged `uninterruptible` (Bladestorm: the channel must run its full
+// listed duration even while being hit). Sole user is the dealDamage pushback
+// branch, so the predicate lives here with it.
 function ignoresDamagePushback(abilityId: string): boolean {
-  return abilityId === 'ghost_wolf';
+  return abilityId === 'ghost_wolf' || ABILITIES[abilityId]?.uninterruptible === true;
 }
 
 export function dealDamage(
@@ -149,10 +151,13 @@ export function dealDamage(
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
 
-  // Damage-done buffs (choice-row talent cooldowns: Avatar / Bloodbath / Sanguine
-  // Aura / Battle Rhythm's blink): an additive amp on the source's outgoing
-  // damage, summed across auras (a bloodbath aura's value already carries its
-  // stack total). Self-damage is untouched, mirroring the hex rule above.
+  // Damage-done buffs AND debuffs: an additive amp on the source's outgoing
+  // damage, summed across auras. Positive values are the choice-row cooldowns
+  // (Avatar / Bloodbath / Sanguine Aura / Battle Rhythm's blink; a bloodbath
+  // aura's value already carries its stack total); a NEGATIVE buff_dmg_done is
+  // a demoralize (Direhowl's pct form) cutting what the victim deals. The sum
+  // is floored at a zero multiplier so stacked demoralizes can never heal.
+  // Self-damage is untouched, mirroring the hex rule above.
   if (source && source.id !== target.id && amount > 0) {
     let dmgAmp = 0;
     for (const a of source.auras) {
@@ -161,7 +166,7 @@ export function dealDamage(
       // Sanguine Aura's damage half rides value2 (value is its swing mult).
       if (a.kind === 'sanguine') dmgAmp += a.value2 ?? 0;
     }
-    if (dmgAmp > 0) amount = Math.round(amount * (1 + dmgAmp));
+    if (dmgAmp !== 0) amount = Math.round(amount * Math.max(0, 1 + dmgAmp));
   }
 
   // Die by the Sword (choice-row defensive cooldown): the wearer takes 10% less

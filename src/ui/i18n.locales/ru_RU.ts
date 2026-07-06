@@ -1735,7 +1735,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': 'Повышает вашу выносливость на 6 на 2 мин.',
   'entities.abilities.demoralizing_shout.name': 'Деморализующий крик',
   'entities.abilities.demoralizing_shout.description':
-    'Издает устрашающий крик, снижая силу атаки всех противников поблизости на 30 на 30 сек.',
+    'Издает устрашающий крик, снижая урон, наносимый всеми противниками поблизости, на 20% на 20 сек.',
   'entities.abilities.charge.name': 'Рывок',
   'entities.abilities.charge.description':
     'Вы бросаетесь к врагу, накапливаете 9 ярости и оглушаете его на 1 сек. Дальность 8-25 м.',
@@ -5044,6 +5044,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.scale': 'Размер увеличен на {pct}%',
   'hudChrome.auraEffect.jump': 'Высота прыжка увеличена на {pct}%',
   'hudChrome.auraEffect.dmgDone': 'Наносимый урон увеличен на {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Наносимый урон снижен на {pct}%',
   'hudChrome.auraEffect.crit': 'Вероятность критического удара увеличена на {pct}%',
   'hudChrome.auraEffect.rageGen': 'Накопление ярости увеличено на {pct}%',
   'hudChrome.auraEffect.reckless':

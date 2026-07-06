@@ -1661,7 +1661,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': 'Aumenta la tua Tempra di 6 per 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Urlo Demoralizzante',
   'entities.abilities.demoralizing_shout.description':
-    "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di 30 per 30 sec.",
+    'Lancia un urlo spaventoso, riducendo del 20% i danni inflitti da tutti i nemici vicini per 20 sec.',
   'entities.abilities.charge.name': 'Carica',
   'entities.abilities.charge.description':
     'Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m.',

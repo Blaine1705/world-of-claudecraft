@@ -144,6 +144,11 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.dmgDone',
       nums: { pct: 10 },
     });
+    // Negative = a demoralize (Direhowl's pct form): the reduce wording.
+    expect(desc({ kind: 'buff_dmg_done', value: -0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.dmgDoneReduce',
+      nums: { pct: 20 },
+    });
     expect(desc({ kind: 'buff_crit', value: 0.2 })).toEqual({
       key: 'hudChrome.auraEffect.crit',
       nums: { pct: 20 },

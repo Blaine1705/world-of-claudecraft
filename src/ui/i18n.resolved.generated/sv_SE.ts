@@ -845,6 +845,7 @@ export const sv_SE: EnTranslations = {
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const sv_SE: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Demoraliserande rop",
-        "description": "Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med 30 i 30 sek."
+        "description": "Utstöter ett fruktansvärt rop som minskar skadan från alla närliggande fiender med 20% i 20 sek."
       },
       "charge": {
         "name": "Storma",

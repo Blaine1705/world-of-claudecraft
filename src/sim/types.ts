@@ -1163,7 +1163,11 @@ export type AbilityEffect =
       interval: number;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
-  | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
+  // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
+  // (debuff_ap); `pct` = a percentage cut to ALL damage the victims deal (a
+  // negative buff_dmg_done aura), the owner's Direhowl rework: mobs carry most
+  // of their damage on the weapon roll, so a flat AP drain barely dents them.
+  | { type: 'aoeAttackPower'; amount?: number; pct?: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   | {
       type: 'selfBuff';

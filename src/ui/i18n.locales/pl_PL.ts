@@ -519,7 +519,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Demoralizuje pobliskich wrogów, zmniejszając ich moc ataku o 20 na 20 sek. Tylko w postaci niedźwiedzia.',
   'entities.abilities.demoralizing_roar.name': 'Demoralizujący ryk',
   'entities.abilities.demoralizing_shout.description':
-    'Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o 30 na 30 sek.',
+    'Wydaje przerażający okrzyk, zmniejszający obrażenia zadawane przez wszystkich pobliskich wrogów o 20% na 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Demoralizujący okrzyk',
   'entities.abilities.devotion_aura.description': 'Zwiększa twój pancerz o 40 na 30 min.',
   'entities.abilities.devotion_aura.name': 'Aura oddania',

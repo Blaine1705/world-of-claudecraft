@@ -617,7 +617,7 @@ const classAbilityNamesEn = {
       [
         'demoralizing_shout',
         'Direhowl',
-        'Lets out a fearsome shout, reducing the attack power of all nearby enemies by 30 for 30 sec.',
+        'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by 20% for 20 sec.',
       ],
       [
         'charge',
@@ -1202,7 +1202,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'Grito desmoralizador',
-          'Lanza un grito aterrador y reduce el poder de ataque de todos los enemigos cercanos en 30 durante 30 s.',
+          'Lanza un grito aterrador y reduce un 20% el daño que infligen todos los enemigos cercanos durante 20 s.',
         ],
         [
           'charge',
@@ -1841,7 +1841,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'Cri démoralisant',
-          "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de 30 pendant 30 s.",
+          'Pousse un cri terrifiant qui réduit de 20% les dégâts infligés par tous les ennemis proches pendant 20 s.',
         ],
         [
           'charge',
@@ -2527,7 +2527,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'Urlo Demoralizzante',
-          "Lancia un urlo spaventoso, riducendo la potenza d'attacco di tutti i nemici vicini di 30 per 30 sec.",
+          'Lancia un urlo spaventoso, riducendo del 20% i danni inflitti da tutti i nemici vicini per 20 sec.',
         ],
         [
           'charge',
@@ -3137,7 +3137,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'Demoralisierender Ruf',
-          'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um 30.',
+          'Stößt einen furchterregenden Ruf aus und verringert den von allen nahen Gegnern verursachten Schaden 20 Sek. lang um 20%.',
         ],
         [
           'charge',
@@ -3755,7 +3755,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           '挫志怒吼',
-          '发出可怕的怒吼，使附近所有敌人的攻击强度降低 30，持续 30 秒。',
+          '发出可怕的怒吼，使附近所有敌人造成的伤害降低 20%，持续 20 秒。',
         ],
         ['charge', '冲锋', '向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。'],
         ['rend', '撕裂', '撕裂目标，使其在 9 秒内流血并受到 {damage} 点伤害。'],
@@ -4081,7 +4081,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           '挫志怒吼',
-          '發出可怕的怒吼，使附近所有敵人的攻擊強度降低 30，持續 30 秒。',
+          '發出可怕的怒吼，使附近所有敵人造成的傷害降低 20%，持續 20 秒。',
         ],
         ['charge', '衝鋒', '向一名敵人衝鋒，產生 9 點怒氣並使其昏迷 1 秒。8-25 碼距離。'],
         ['rend', '撕裂', '撕裂目標，使其在 9 秒內流血並受到 {damage} 點傷害。'],
@@ -4407,7 +4407,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           '사기의 외침',
-          '무시무시한 고함을 질러 주위 모든 적의 전투력을 30만큼 30초 동안 감소시킵니다.',
+          '무시무시한 고함을 질러 주위 모든 적이 입히는 피해를 20초 동안 20% 감소시킵니다.',
         ],
         [
           'charge',
@@ -4921,7 +4921,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'デモラライジングシャウト',
-          '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を30減少させます。',
+          '恐ろしい雄叫びを上げ、20秒間、周囲の敵すべてが与えるダメージを20%減少させます。',
         ],
         ['charge', 'チャージ', '敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。'],
         ['rend', 'レンド', '対象を負傷させ、9秒間で {damage} の出血ダメージを与えます。'],
@@ -5471,7 +5471,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'Grito Desmoralizante',
-          'Solta um grito assustador, reduzindo o poder de ataque de todos os inimigos próximos em 30 por 30 seg.',
+          'Solta um grito assustador, reduzindo em 20% o dano causado por todos os inimigos próximos por 20 seg.',
         ],
         [
           'charge',
@@ -6065,7 +6065,7 @@ export const classAbilityNames = {
         [
           'demoralizing_shout',
           'Деморализующий крик',
-          'Издает устрашающий крик, снижая силу атаки всех противников поблизости на 30 на 30 сек.',
+          'Издает устрашающий крик, снижая урон, наносимый всеми противниками поблизости, на 20% на 20 сек.',
         ],
         [
           'charge',

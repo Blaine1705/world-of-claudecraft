@@ -396,6 +396,24 @@ describe('Bladestorm', () => {
     expect(dealt).toBeGreaterThan(30);
     expect(p.cooldowns.get('bladestorm')).toBeGreaterThan(0);
   });
+
+  it('the channel ignores pushback: incoming hits never shorten the 4 seconds', () => {
+    const sim = warriorAtCap(59);
+    sim.pickRowTalent(5, 'war_row_bladestorm');
+    const p = sim.player;
+    const mob = mobsNear(sim, 1)[0];
+    standOff(sim, mob, 4);
+    p.resource = 50;
+    sim.castAbility('bladestorm');
+    expect(p.channeling).toBe(true);
+    const remaining0 = p.castRemaining;
+    // A landed enemy hit mid-channel: the channel pushback rule would shave
+    // castTotal * 25%, but Bladestorm is uninterruptible (owner ruling: the
+    // storm runs its full listed duration no matter what).
+    (sim as any).dealDamage(mob, p, 30, false, 'physical', null, 'hit', true);
+    expect(p.castRemaining).toBe(remaining0);
+    expect(p.channeling).toBe(true);
+  });
 });
 
 describe('Intimidating Shout + Lingering Dread', () => {

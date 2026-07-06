@@ -1683,7 +1683,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': 'Augmente votre Endurance de 6 pendant 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Cri démoralisant',
   'entities.abilities.demoralizing_shout.description':
-    "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de 30 pendant 30 s.",
+    'Pousse un cri terrifiant qui réduit de 20% les dégâts infligés par tous les ennemis proches pendant 20 s.',
   'entities.abilities.charge.name': 'Charge',
   'entities.abilities.charge.description':
     "Charge un ennemi, génère 9 rage et l'étourdit pendant 1 s. Portée de 8-25 m.",

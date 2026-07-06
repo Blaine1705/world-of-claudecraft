@@ -535,7 +535,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melemahkan semangat musuh di sekitar, mengurangi kekuatan serang mereka sebesar 20 selama 20 detik. Hanya dalam Wujud Beruang.',
   'entities.abilities.demoralizing_roar.name': 'Auman Pelemah Semangat',
   'entities.abilities.demoralizing_shout.description':
-    'Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar 30 selama 30 detik.',
+    'Mengeluarkan teriakan menakutkan yang mengurangi kerusakan dari semua musuh di dekatnya sebesar 20% selama 20 detik.',
   'entities.abilities.demoralizing_shout.name': 'Pekik Pelemah Semangat',
   'entities.abilities.devotion_aura.description':
     'Meningkatkan zirahmu sebesar 40 selama 30 menit.',

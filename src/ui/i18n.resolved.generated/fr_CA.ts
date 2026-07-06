@@ -845,6 +845,7 @@ export const fr_CA: EnTranslations = {
       "scale": "Gabarit augmentée de {pct}%",
       "jump": "Saut augmentée de {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const fr_CA: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Cri démoralisant",
-        "description": "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de 30 pendant 30 s."
+        "description": "Pousse un cri terrifiant qui réduit de 20% les dégâts infligés par tous les ennemis proches pendant 20 s."
       },
       "charge": {
         "name": "Charge",

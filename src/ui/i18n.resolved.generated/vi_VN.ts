@@ -845,6 +845,7 @@ export const vi_VN: EnTranslations = {
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const vi_VN: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Hô Áp Chế",
-        "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi 30 trong 30 giây."
+        "description": "Hét lên một tiếng kinh hoàng, giảm 20% sát thương gây ra bởi mọi kẻ địch gần đó trong 20 giây."
       },
       "charge": {
         "name": "Xung Phong",

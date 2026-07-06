@@ -461,21 +461,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 14,
     cost: 10,
     castTime: 0,
-    cooldown: 0,
+    // Owner rework: a real defensive cooldown instead of a spammable flat AP
+    // drain (which barely dented mobs, whose damage rides the weapon roll):
+    // 45s cd, every nearby enemy deals 20% less damage for 20s (pct form).
+    cooldown: 45,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'aoeAttackPower', amount: 30, duration: 30, radius: 10 }],
-    ranks: [
-      {
-        rank: 2,
-        level: 20,
-        cost: 10,
-        effects: [{ type: 'aoeAttackPower', amount: 45, duration: 30, radius: 10 }],
-      },
-    ],
+    effects: [{ type: 'aoeAttackPower', pct: 0.2, duration: 20, radius: 10 }],
     description:
-      'Lets out a fearsome shout, reducing the attack power of all nearby enemies by 30 for 30 sec.',
+      'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by 20% for 20 sec.',
   },
   charge: {
     id: 'charge',
@@ -3683,9 +3678,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     // A self-centered position channel: each tick pulses the aoeDamage at the
     // caster's LIVE position (no ground-aim reticle), so the storm moves with
-    // you for its full duration.
+    // you for its full duration. Owner ruling: the channel runs its FULL 4s
+    // no matter what, so it ignores pushback (uninterruptible) and survives
+    // the caster's own movement (you spin while running, like WoW).
     targetMode: 'position',
     selfCentered: true,
+    uninterruptible: true,
+    castWhileMoving: true,
     channel: { duration: 4, ticks: 4 },
     effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 8 }],
     description:

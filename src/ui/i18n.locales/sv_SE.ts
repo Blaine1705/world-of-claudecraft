@@ -518,7 +518,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Demoraliserar närliggande fiender och sänker deras anfallskraft med 20 i 20 sek. Endast i björnform.',
   'entities.abilities.demoralizing_roar.name': 'Demoraliserande vrål',
   'entities.abilities.demoralizing_shout.description':
-    'Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med 30 i 30 sek.',
+    'Utstöter ett fruktansvärt rop som minskar skadan från alla närliggande fiender med 20% i 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Demoraliserande rop',
   'entities.abilities.devotion_aura.description': 'Ökar din rustning med 40 i 30 min.',
   'entities.abilities.devotion_aura.name': 'Hängivenhetsaura',

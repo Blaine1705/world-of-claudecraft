@@ -845,6 +845,7 @@ export const de_DE: EnTranslations = {
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const de_DE: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Demoralisierender Ruf",
-        "description": "Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um 30."
+        "description": "Stößt einen furchterregenden Ruf aus und verringert den von allen nahen Gegnern verursachten Schaden 20 Sek. lang um 20%."
       },
       "charge": {
         "name": "Sturmangriff",

@@ -36,6 +36,10 @@ const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
+// Bladestorm whirl: how fast the body spins on itself (radians/sec, ~1.75
+// turns/sec reads like the classic warrior whirl) and the swing-loop speed.
+const SPIN_RATE = 11;
+const SPIN_ATTACK_TIMESCALE = 1.6;
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
@@ -102,6 +106,7 @@ export class CharacterVisual {
   private hitCooldown = 0;
   private pendingDt = 0;
   private swimPitch = 0;
+  private spinAngle = 0;
 
   private shadowOn = true;
   private far = false;
@@ -243,8 +248,20 @@ export class CharacterVisual {
             this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
           this.current.timeScale = timeScale;
         }
+        // the whirl swings faster than a normal one-shot attack
+        if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
       }
     }
+
+    // Bladestorm whirl: spin the body on itself while the channel runs. The
+    // yaw rides poseWrap (relative to the renderer-driven facing), and snaps
+    // back to 0 the moment the channel ends so facing is authoritative again.
+    if (s.spinning && !s.dead) {
+      this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
+    } else {
+      this.spinAngle = 0;
+    }
+    this.poseWrap.rotation.y = this.spinAngle;
 
     // swim pose: Lie_Idle (when the rig has it) + pitch and surface bob
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
@@ -574,6 +591,10 @@ export class CharacterVisual {
         return this.action(c.run) ?? this.action(c.walk);
       case 'cast':
         return this.action(c.cast) ?? this.action(c.idle);
+      case 'spin':
+        // loop the first attack swing while the body whirls (Bladestorm);
+        // rigs without an attack clip just spin on their idle
+        return this.action(this.def.clips.attack[0]) ?? this.action(c.idle);
       case 'swim':
         return this.action(c.swim) ?? this.action(c.idle);
       case 'sit':
@@ -586,7 +607,7 @@ export class CharacterVisual {
   }
 
   private shouldInterruptEmote(s: AnimState): boolean {
-    return s.moving || s.airborne || s.swimming || s.casting || s.sitting || s.dead;
+    return s.moving || s.airborne || s.swimming || s.casting || !!s.spinning || s.sitting || s.dead;
   }
 
   private fadeTo(next: THREE.AnimationAction | null, fade: number, oneShot: boolean): void {

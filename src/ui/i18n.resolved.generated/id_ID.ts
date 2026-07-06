@@ -845,6 +845,7 @@ export const id_ID: EnTranslations = {
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const id_ID: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Pekik Pelemah Semangat",
-        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar 30 selama 30 detik."
+        "description": "Mengeluarkan teriakan menakutkan yang mengurangi kerusakan dari semua musuh di dekatnya sebesar 20% selama 20 detik."
       },
       "charge": {
         "name": "Terjangan",

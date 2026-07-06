@@ -845,6 +845,7 @@ export const pl_PL: EnTranslations = {
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const pl_PL: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Demoralizujący okrzyk",
-        "description": "Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o 30 na 30 sek."
+        "description": "Wydaje przerażający okrzyk, zmniejszający obrażenia zadawane przez wszystkich pobliskich wrogów o 20% na 20 sek."
       },
       "charge": {
         "name": "Szarża",

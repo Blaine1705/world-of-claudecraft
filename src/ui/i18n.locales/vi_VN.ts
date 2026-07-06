@@ -522,7 +522,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Áp chế kẻ địch xung quanh, giảm sức tấn công của chúng đi 20 trong 20 giây. Chỉ dùng được ở Hình Gấu.',
   'entities.abilities.demoralizing_roar.name': 'Gầm Áp Chế',
   'entities.abilities.demoralizing_shout.description':
-    'Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi 30 trong 30 giây.',
+    'Hét lên một tiếng kinh hoàng, giảm 20% sát thương gây ra bởi mọi kẻ địch gần đó trong 20 giây.',
   'entities.abilities.demoralizing_shout.name': 'Hô Áp Chế',
   'entities.abilities.devotion_aura.description': 'Tăng giáp của bạn thêm 40 trong 30 phút.',
   'entities.abilities.devotion_aura.name': 'Hào Quang Tận Tụy',

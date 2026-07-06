@@ -1670,7 +1670,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': 'Erhöht eure Ausdauer 2 Min. lang um 6.',
   'entities.abilities.demoralizing_shout.name': 'Demoralisierender Ruf',
   'entities.abilities.demoralizing_shout.description':
-    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um 30.',
+    'Stößt einen furchterregenden Ruf aus und verringert den von allen nahen Gegnern verursachten Schaden 20 Sek. lang um 20%.',
   'entities.abilities.charge.name': 'Sturmangriff',
   'entities.abilities.charge.description':
     'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',

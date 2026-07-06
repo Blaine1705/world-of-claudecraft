@@ -528,7 +528,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Demoraliseert nabije vijanden en verlaagt hun aanvalskracht met 20 gedurende 20 sec. Alleen in Berengedaante.',
   'entities.abilities.demoralizing_roar.name': 'Demoraliserend Gebrul',
   'entities.abilities.demoralizing_shout.description':
-    'Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met 30 verlaagt gedurende 30 sec.',
+    'Slaakt een angstaanjagende kreet die de schade van alle nabije vijanden 20 sec. lang met 20% vermindert.',
   'entities.abilities.demoralizing_shout.name': 'Demoraliserende Kreet',
   'entities.abilities.devotion_aura.description': 'Verhoogt je pantser met 40 gedurende 30 min.',
   'entities.abilities.devotion_aura.name': 'Aura van Toewijding',

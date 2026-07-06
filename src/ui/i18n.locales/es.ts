@@ -1682,7 +1682,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en 6 durante 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Grito desmoralizador',
   'entities.abilities.demoralizing_shout.description':
-    'Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en 30 durante 30 s.',
+    'Lanza un grito aterrador y reduce un 20% el daño que infligen todos los enemigos cercanos durante 20 s.',
   'entities.abilities.charge.name': 'Cargar',
   'entities.abilities.charge.description':
     'Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m.',
@@ -4986,6 +4986,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',
   'hudChrome.auraEffect.jump': 'Altura de salto aumentada un {pct}%',
   'hudChrome.auraEffect.dmgDone': 'Aumenta el daño infligido un {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Reduce el daño infligido un {pct}%',
   'hudChrome.auraEffect.crit': 'Aumenta la probabilidad de golpe crítico un {pct}%',
   'hudChrome.auraEffect.rageGen': 'Aumenta la generación de ira un {pct}%',
   'hudChrome.auraEffect.reckless':

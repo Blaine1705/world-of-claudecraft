@@ -845,6 +845,7 @@ export const nl_NL: EnTranslations = {
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "crit": "Increases critical strike chance by {pct}%",
       "rageGen": "Increases Rage generation by {pct}%",
       "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
@@ -4411,7 +4412,7 @@ export const nl_NL: EnTranslations = {
       },
       "demoralizing_shout": {
         "name": "Demoraliserende Kreet",
-        "description": "Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met 30 verlaagt gedurende 30 sec."
+        "description": "Slaakt een angstaanjagende kreet die de schade van alle nabije vijanden 20 sec. lang met 20% vermindert."
       },
       "charge": {
         "name": "Stormloop",

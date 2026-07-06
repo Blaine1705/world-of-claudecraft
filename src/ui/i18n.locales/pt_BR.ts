@@ -1663,7 +1663,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.commanding_shout.description': 'Aumenta seu Vigor em 6 por 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Grito Desmoralizante',
   'entities.abilities.demoralizing_shout.description':
-    'Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em 30 por 30 s.',
+    'Solta um grito assustador, reduzindo em 20% o dano causado por todos os inimigos próximos por 20 seg.',
   'entities.abilities.charge.name': 'Investida',
   'entities.abilities.charge.description':
     'Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8-25 m.',
