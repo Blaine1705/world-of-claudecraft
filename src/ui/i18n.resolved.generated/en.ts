@@ -6243,7 +6243,7 @@ export const en: EnTranslations = {
       },
       "holy_shock": {
         "name": "Holy Shock",
-        "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
+        "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
       },
       "holy_shield": {
         "name": "Radiant Aegis",
@@ -6287,7 +6287,7 @@ export const en: EnTranslations = {
       },
       "power_infusion": {
         "name": "Fervor",
-        "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
+        "description": "Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)"
       },
       "holy_nova": {
         "name": "Holy Nova",

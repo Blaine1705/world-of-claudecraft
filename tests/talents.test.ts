@@ -253,7 +253,8 @@ describe('precomputed modifiers', () => {
       20,
       computeTalentModifiers('paladin', alloc({ spec: 'retribution' }), 20),
     ).find((k) => k.def.id === 'seal_of_righteousness')!;
-    expect(effOf(seal)).toMatchObject({ bonus: 15, judgeMin: 42, judgeMax: 62 }); // 2 talent ranks (Ret mastery is melee + crit damage, no spell scaling)
+    expect(effOf(seal)).toMatchObject({ bonus: 18, judgeMin: 48, judgeMax: 70 });
+    // 2 talent ranks plus 20% retribution spell mastery.
   });
 });
 

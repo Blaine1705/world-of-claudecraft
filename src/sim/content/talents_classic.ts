@@ -54,7 +54,7 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'holy_shield',
     'Oathward',
-    'Increases threat by 50% and armor by 20%.',
+    'Increases all threat you generate by 50% and your armor by 20%.',
     { global: { threatPct: 0.5 }, stats: { armorPct: 0.2 } },
   ),
   spec(
@@ -66,8 +66,8 @@ const PALADIN_SPECS: SpecDef[] = [
     'A holy warrior who judges enemies with weapon strikes and radiant burst.',
     'crusader_strike',
     'Blood Debt',
-    'Increases your melee ability damage by 15% and the damage of your critical strikes by 25%.',
-    { global: { meleeDmgPct: 0.15, critDmgPct: 0.25 } },
+    'Increases your Holy and physical ability damage by 20%.',
+    { global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 } },
   ),
 ];
 
@@ -532,8 +532,8 @@ const HUNTER_SPECS: SpecDef[] = [
     'A precise archer built around ranged burst and efficient shots.',
     'trueshot_aura',
     'Iron Aim',
-    'Increases your attack power by 15% and the damage of your critical strikes by 25%.',
-    { stats: { apPct: 0.15 }, global: { critDmgPct: 0.25 } },
+    'Increases your ranged ability damage by 20% and critical strike chance by 3%.',
+    { global: { meleeDmgPct: 0.2 }, stats: { crit: 0.03 } },
   ),
   spec(
     'survival',
@@ -544,8 +544,8 @@ const HUNTER_SPECS: SpecDef[] = [
     'A skirmisher who controls distance and survives close pressure.',
     'wyvern_sting',
     'Quickblood',
-    'Increases Agility by 10%, dodge by 2%, and melee ability damage by 10%.',
-    { stats: { agiPct: 0.1, dodge: 0.02 }, global: { meleeDmgPct: 0.1 } },
+    'Increases your Agility by 15% and physical ability damage by 15%.',
+    { global: { meleeDmgPct: 0.15 }, stats: { agiPct: 0.15 } },
   ),
 ];
 
@@ -1011,8 +1011,8 @@ const MAGE_SPECS: SpecDef[] = [
     'A precision caster using mana efficiency and focused arcane barrages.',
     'arcane_power',
     'Aetheric Flux',
-    'Increases your spell damage by 15% and your spell haste by 15%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.15 } },
+    'Increases your spell damage by 15% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
   ),
   spec(
     'fire',
@@ -1078,8 +1078,8 @@ const ROGUE_SPECS: SpecDef[] = [
     'A burst specialist using critical strikes and finishers.',
     'cold_blood',
     'Redhanded',
-    'Increases your critical strike chance by 8% and the damage of your critical strikes by 20%.',
-    { stats: { crit: 0.08 }, global: { critDmgPct: 0.2 } },
+    'Increases your bleed damage by 20% and critical strike chance by 3%.',
+    { global: { dotDmgPct: 0.2 }, stats: { crit: 0.03 } },
   ),
   spec(
     'combat',
@@ -1102,8 +1102,8 @@ const ROGUE_SPECS: SpecDef[] = [
     'A stealth attacker built around openers, control, and avoidance.',
     'hemorrhage',
     'False Face',
-    'Increases your critical strike chance by 3% and the damage of your critical strikes by 40%.',
-    { stats: { crit: 0.03 }, global: { critDmgPct: 0.4 } },
+    'Increases the damage of your critical strikes by 40% and your Agility by 10%.',
+    { global: { critDmgPct: 0.4 }, stats: { agiPct: 0.1 } },
   ),
 ];
 
@@ -1576,8 +1576,8 @@ const PRIEST_SPECS: SpecDef[] = [
     'A direct healer with strong throughput and restorative prayers.',
     'holy_nova',
     'Grave Mercy',
-    'Increases all healing done by 25%.',
-    { global: { healPct: 0.25 } },
+    'Increases all healing you do by 20%.',
+    { global: { healPct: 0.2 } },
   ),
   spec(
     'shadow',
@@ -1588,8 +1588,8 @@ const PRIEST_SPECS: SpecDef[] = [
     'A damage caster built around Shadow damage over time and mind spells.',
     'shadowform',
     'Gloamveil',
-    'Increases your spell damage by 20% and your armor by 10%.',
-    { global: { spellDmgPct: 0.2 }, stats: { armorPct: 0.1 } },
+    'Increases your damage-over-time damage by 15% and your spell damage by 10%.',
+    { global: { dotDmgPct: 0.15, spellDmgPct: 0.1 } },
   ),
 ];
 
@@ -2068,8 +2068,8 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A weapon fighter who channels the storm through melee swings.',
     'stormstrike',
     'Skyrend',
-    'Increases your melee ability damage by 15% and critical strike chance by 5%.',
-    { global: { meleeDmgPct: 0.15 }, stats: { crit: 0.05 } },
+    'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
+    { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
   ),
   spec(
     'restoration',
@@ -2139,8 +2139,9 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A burst caster using Gloom Bolt, fire, and Duskfire.',
     'conflagrate',
     'Desolation',
-    'Increases your spell damage by 10% and the damage of your critical strikes by 50%.',
-    { global: { spellDmgPct: 0.1, critDmgPct: 0.5 } },
+    'Your Fire spell critical strikes deal double damage, and ' +
+      'your critical strike chance is increased by 2%.',
+    { global: { critDmgPct: 0.5 }, stats: { crit: 0.02 } },
   ),
 ];
 
@@ -2605,8 +2606,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A caster who uses lunar and nature magic from range.',
     'moonkin_form',
     'Moonrage',
-    'Increases your spell damage by 20% and the damage of your critical strikes by 25%.',
-    { global: { spellDmgPct: 0.2, critDmgPct: 0.25 } },
+    'Increases your spell damage by 15% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
   ),
   spec(
     'feral',
@@ -2617,8 +2618,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A shapeshifter who tanks in bear form and fights up close.',
     'feral_charge',
     'Primal Heart',
-    'Increases your melee ability damage by 15%, critical strike chance by 5%, and threat generated by 20%.',
-    { global: { threatPct: 0.2, meleeDmgPct: 0.15 }, stats: { crit: 0.05 } },
+    'Increases your physical ability damage by 15%, your bleed damage by 15%, and threat by 20%.',
+    { global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 } },
   ),
   spec(
     'restoration',

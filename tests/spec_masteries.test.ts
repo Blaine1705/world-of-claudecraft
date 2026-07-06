@@ -78,6 +78,54 @@ describe('spec masteries', () => {
     });
   });
 
+  it('authors the all-27 extension mastery effects exactly', () => {
+    expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
+      global: { threatPct: 0.5 },
+      stats: { armorPct: 0.2 },
+    });
+    expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
+      global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
+    });
+    expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
+      global: { meleeDmgPct: 0.2 },
+      stats: { crit: 0.03 },
+    });
+    expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
+      global: { meleeDmgPct: 0.15 },
+      stats: { agiPct: 0.15 },
+    });
+    expect(TALENTS.mage?.specs.find((s) => s.id === 'arcane')?.mastery.effect).toEqual({
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+    });
+    expect(TALENTS.rogue?.specs.find((s) => s.id === 'assassination')?.mastery.effect).toEqual({
+      global: { dotDmgPct: 0.2 },
+      stats: { crit: 0.03 },
+    });
+    expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
+      global: { critDmgPct: 0.4 },
+      stats: { agiPct: 0.1 },
+    });
+    expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
+      global: { healPct: 0.2 },
+    });
+    expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
+      global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
+    });
+    expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
+      global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
+    });
+    expect(TALENTS.druid?.specs.find((s) => s.id === 'balance')?.mastery.effect).toEqual({
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+    });
+    expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
+      global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+    });
+    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
+      global: { critDmgPct: 0.5 },
+      stats: { crit: 0.02 },
+    });
+  });
+
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
     expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(102);

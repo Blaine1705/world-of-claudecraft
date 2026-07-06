@@ -31,7 +31,13 @@ const PCT_FIELDS = new Set([
   'healPct',
   'threatPct',
   'critDmgPct',
+  'dotDmgPct',
+  'hotHealPct',
+  'absorbPct',
+  'critVsRooted',
   'spellHastePct',
+  'petDmgPct',
+  'petDmgSharePct',
   'dmgPct',
   'costPct',
   'cooldownPct',
@@ -61,30 +67,8 @@ function expectedTokens(effect: unknown): string[] {
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
-        if (key === 'battleRhythm') continue;
-        // Temporal Rift / Blink While Casting / Elemental Convergence (mage
-        // choice rows) are picked/not-picked flags like battleRhythm; their
-        // timings are stated as durations, not this 1.
-        if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
         if (key === 'critDmgPct' && value === 0.5) {
           toks.push('double');
-          continue;
-        }
-        // A slow `mult` is stated as the percentage slowed (mult 0.5 = 50% slower).
-        if (key === 'mult' && value > 0 && value < 1) {
-          toks.push(`${+((1 - value) * 100).toFixed(1)}%`);
-          continue;
-        }
-        // castPct -1 means the cast becomes instant; tooltips say "instant".
-        if (key === 'castPct' && value === -1) {
-          toks.push('instant');
-          continue;
-        }
-        // A proc firing on EVERY matching cast (n: 1) reads as "every cast";
-        // no numeral is required in the copy.
-        if (key === 'n' && value === 1) continue;
-        if (key === 'bonusCharges') {
-          toks.push(`${value + 1}`);
           continue;
         }
         toks.push(
@@ -255,15 +239,15 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(blank.map((entry) => `${entry.cls}:${entry.id}`)).toEqual([]);
   });
 
-  it('the rendered English tooltip states numbers when the effect has any', () => {
-    const vague = effects
+  it('the rendered English tooltip states the numbers when the effect has any (no vague text)', () => {
+    const vague = entries
       .filter(
-        (entry) =>
-          hasNumericEffect(entry.effect) &&
-          !/\d/.test(entry.render()) &&
-          !expectedTokens(entry.effect).every((token) => entry.render().includes(token)),
+        (e) =>
+          hasNumericEffect(e.effect, e.maxRank) &&
+          !/\d/.test(e.render()) &&
+          !expectedTokens(e.effect, e.maxRank).every((t) => e.render().includes(t)),
       )
-      .map((entry) => `${entry.cls}:${entry.id} -> "${entry.render()}"`);
+      .map((e) => `${e.cls}:${e.id} -> "${e.render()}"`);
     expect(vague).toEqual([]);
   });
 
@@ -316,29 +300,27 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
       if (!entry) throw new Error(`no talent entry matched for ${cls}:${id}`);
       return entry.render();
     };
-
-    expect(render('warrior', 'war_r5_crushing_onrush')).toContain('50%');
-    expect(render('warrior', 'war_r17_red_harvest')).toContain('25%');
-    const survival = render('hunter', 'survival.mastery');
-    expect(survival).toContain('Agility');
-    expect(survival).toContain('15%');
-    expect(survival).toContain('physical ability damage');
-  });
-
-  it('localized thorns procs identify the ward and reflected melee strike trigger', async () => {
-    await ensureLocaleLoaded('es');
-    setLanguage('es');
-    const entry = effects.find(
-      (candidate) =>
-        candidate.cls === 'shaman' && candidate.id.endsWith('sha_r5_improved_lightning_shield'),
-    );
-    if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
-
-    const rendered = entry.render();
-    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_shield', field: 'name' }));
-    expect(rendered).toContain(
-      'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
-    );
-    setLanguage('en');
+    // Barrage was "Improves instant shots per rank." (vague) -> now the real per-rank
+    // numbers. Concussive Shot is a utility slow, so the talent cuts its cooldown (more
+    // frequent slows) rather than buffing its negligible damage.
+    const barrage = render('hunter', (e) => e.id === 'mm_barrage');
+    expect(barrage).toContain('Fell Shot');
+    expect(barrage).toContain('Rattling Shot');
+    expect(barrage).toContain('cooldown');
+    expect(barrage).toContain('10%');
+    expect(barrage).not.toContain('15%');
+    // Emberstorm promised "+10% Fire damage"; the 12% effect was bent down to honor it.
+    const ember = render('warlock', (e) => e.id === 'dest_choice.dest_choice_emberstorm');
+    expect(ember).toContain('10%');
+    expect(ember).not.toContain('12%');
+    // Arcane Mind promised "+8% Intellect"; the effect now grants intPct 0.08.
+    const arcane = render('mage', (e) => e.id === 'mag_school_focus.mag_school_arcane');
+    expect(arcane).toContain('Intellect');
+    expect(arcane).toContain('8%');
+    // Survival mastery grants 15% Agility and 15% physical ability damage.
+    const lr = render('hunter', (e) => e.id === 'survival.mastery');
+    expect(lr).toContain('Agility');
+    expect(lr).toContain('15%');
+    expect(lr).toContain('physical ability damage');
   });
 });

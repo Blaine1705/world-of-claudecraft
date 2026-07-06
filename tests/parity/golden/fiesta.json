@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 404,
-      "state": "539f8b2e",
+      "state": "f2ccb9ec",
       "events": "d1d54493",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 404,
-      "state": "0b2e96ce",
+      "state": "2f5619be",
       "events": "6e60008d",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 404,
-      "state": "d5f56114",
+      "state": "085cd71c",
       "events": "9b3dbf7d",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "a6bbbae0",
+      "state": "43d53f96",
       "events": "e324e10d",
       "rng": {
         "draws": 231,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 404,
-      "state": "e712c39c",
+      "state": "8e8a6c5e",
       "events": "5461e684",
       "rng": {
         "draws": 385,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 404,
-      "state": "dc217f56",
+      "state": "e36abb92",
       "events": "741638a5",
       "rng": {
         "draws": 537,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 404,
-      "state": "7d72f3ad",
+      "state": "aaadb4df",
       "events": "e6734fa8",
       "rng": {
         "draws": 606,
@@ -106,7 +106,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -176,7 +175,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -245,7 +243,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -314,7 +311,6 @@
         },
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -463,7 +459,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.15,
+          "spellHaste": 0.1,
           "spellPower": 45,
           "stats": {
             "agi": 12,
@@ -485,8 +481,7 @@
           "attackPower": 125,
           "combatTimer": 99.05,
           "comboUntil": -1,
-          "critChance": 0.2045,
-          "critDmgBonus": 0.2,
+          "critChance": 0.1545,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.1345,
           "facing": 3.141593,
@@ -533,7 +528,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 151,
+          "attackPower": 131,
           "combatTimer": 102.1,
           "comboUntil": -1,
           "critChance": 0.121,
@@ -541,12 +536,12 @@
           "dodgeChance": 0.101,
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
-          "hp": 864,
+          "hp": 848,
           "id": 403,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 864,
+          "maxHp": 848,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -557,7 +552,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 207,
+          "rangedPower": 180,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {

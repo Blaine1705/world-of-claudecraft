@@ -253,65 +253,6 @@ and remain unchanged.
 | druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
 | warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
 
-### Mastery rating readiness (owner directive 2026-07-07)
-
-Every spec's mastery must be improvable by a FUTURE mastery stat (an item
-rating like haste/crit rating; NOT implemented yet). The model, WoW-style:
-each spec has exactly ONE designated scalable mastery axis; the rating
-multiplies that axis's magnitude (the shipped value is the base at zero
-rating); any other component of the mastery (armor, max health, the static
-secondary) does NOT scale. The rating lands in a later itemization PR; this
-section fixes the per-spec axis NOW so no mastery ships in a shape the
-rating cannot scale. Owner exemplars: combat scales its 10% attack speed,
-frost scales its 25% Frost spell damage, fire scales how much harder its
-crits land.
-
-Frost was reshaped for this (2026-07-07): its mastery is now "+25% Frost
-spell damage" via ability-scoped mods on the frost kit (frostbolt,
-frost_nova; ability-scoped so the mage's fire/arcane baseline spells stay
-untouched) plus the static +10% armor. The crit-vs-rooted-or-chilled
-identity moves to a Shatter-style row option in the flip content (the P4
-machinery stays).
-
-The designated scalable axis per spec (base value = shipped magnitude):
-
-| Spec | Scalable axis | Base |
-|---|---|---|
-| warrior/arms | melee ability damage (meleeDmgPct) | 15% |
-| warrior/fury | crit chance (crit) | 10% |
-| warrior/prot | threat (threatPct) | 50% |
-| paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
-| paladin/protection | threat (threatPct) | 50% |
-| paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
-| hunter/beast_mastery | pet damage (petDmgPct) | 35% |
-| hunter/marksmanship | physical ability damage (meleeDmgPct) | 20% |
-| hunter/survival | physical ability damage (meleeDmgPct) | 15% |
-| mage/arcane | spell damage (spellDmgPct) | 15% |
-| mage/fire | spell crit damage (critDmgPct) | +50% (2x) |
-| mage/frost | Frost spell damage (frost-kit ability dmgPct) | 25% |
-| rogue/assassination | bleed damage (dotDmgPct) | 20% |
-| rogue/combat | attack speed (meleeHastePct) | 10% |
-| rogue/subtlety | crit damage (critDmgPct) | +40% |
-| priest/discipline | shield absorb (absorbPct) | 30% |
-| priest/holy | healing done (healPct) | 20% |
-| priest/shadow | damage-over-time damage (dotDmgPct) | 15% |
-| shaman/elemental | spell damage (spellDmgPct) | 15% |
-| shaman/enhancement | attack speed (meleeHastePct) | 10% |
-| shaman/restoration | heal mana efficiency (heal-kit costPct) | -20% |
-| warlock/affliction | damage-over-time damage (dotDmgPct) | 20% |
-| warlock/demonology | damage redirected to demon (petDmgSharePct) | 20% |
-| warlock/destruction | spell crit damage (critDmgPct) | +50% (2x) |
-| druid/balance | spell damage (spellDmgPct) | 15% |
-| druid/feral | melee ability damage (meleeDmgPct) | 15% |
-| druid/restoration | heal-over-time healing (hotHealPct) | 25% |
-
-Implementation note for the future rating PR: the axis is a CONVENTION over
-the existing mastery effect data (scale the named field, or the named
-per-ability set for frost and resto shaman), applied where masteries
-accumulate (the same level-scaling multiplier site in content/talents.ts).
-No new SpecDef field ships until that PR needs one; do not pre-add
-scaffolding.
-
 ### Spec signature fairness (audit + fix)
 
 Audit method: a signature is REAL only if its ability id is absent from
