@@ -10,14 +10,14 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 239,
-  "drawDigest": "e2b5c6bc",
+  "draws": 252,
+  "drawDigest": "015b4fc4",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 572,
-      "state": "f954afa3",
+      "nextId": 590,
+      "state": "c4bfbb59",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,7 +35,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 571,
+          "entityId": 589,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -57,7 +57,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 571,
+          "id": 589,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -100,45 +100,45 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 573,
-      "state": "fd6a39ff",
-      "events": "65ee0c07",
+      "nextId": 591,
+      "state": "fb8a17ff",
+      "events": "de3ab4f0",
       "rng": {
         "draws": 6,
-        "digest": "51b9c90d"
+        "digest": "1c4d25cc"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 573,
-      "state": "ad12a45e",
+      "nextId": 591,
+      "state": "9656050e",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "51b9c90d"
+        "digest": "1c4d25cc"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 573,
-      "state": "1037a590",
-      "events": "30f141e6",
+      "nextId": 591,
+      "state": "d788ccc6",
+      "events": "02807649",
       "rng": {
-        "draws": 131,
-        "digest": "0d19744a"
+        "draws": 138,
+        "digest": "a7aceaaf"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 573,
-      "state": "59d85529",
-      "events": "fb1f631b",
+      "nextId": 591,
+      "state": "99cece9f",
+      "events": "ab1fd70d",
       "rng": {
-        "draws": 210,
-        "digest": "d388e1a3"
+        "draws": 220,
+        "digest": "b820be2c"
       },
       "label": "kill",
       "players": [
@@ -151,12 +151,12 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 7071,
-            "damageTaken": 8,
+            "damageTaken": 6,
             "kills": 1
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 571,
+          "entityId": 589,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -178,8 +178,8 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49992,
-          "id": 571,
+          "hp": 49994,
+          "id": 589,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -213,7 +213,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 572,
+          "targetId": 590,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -232,7 +232,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 572,
+          "id": 590,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -242,11 +242,11 @@
           },
           "level": 2,
           "loot": {
-            "copper": 7
+            "copper": 8
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            571
+            589
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -270,8 +270,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 571,
-          "targetId": 571,
+          "tappedById": 589,
+          "targetId": 589,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -284,12 +284,12 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 573,
-      "state": "02f69093",
+      "nextId": 591,
+      "state": "231d2a6d",
       "events": "741638a5",
       "rng": {
-        "draws": 239,
-        "digest": "e2b5c6bc"
+        "draws": 252,
+        "digest": "015b4fc4"
       },
       "label": "final",
       "players": [
@@ -302,12 +302,12 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 7071,
-            "damageTaken": 8,
+            "damageTaken": 6,
             "kills": 1
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 571,
+          "entityId": 589,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -330,8 +330,8 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 49992,
-          "id": 571,
+          "hp": 49994,
+          "id": 589,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -365,7 +365,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 572,
+          "targetId": 590,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -384,7 +384,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 572,
+          "id": 590,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -394,11 +394,11 @@
           },
           "level": 2,
           "loot": {
-            "copper": 7
+            "copper": 8
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            571
+            589
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -422,8 +422,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 571,
-          "targetId": 571,
+          "tappedById": 589,
+          "targetId": 589,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
