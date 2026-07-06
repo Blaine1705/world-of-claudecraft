@@ -32,6 +32,7 @@ import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
   armorReduction,
+  DT,
   FISHING_CAST_ID,
   MELEE_CLASSES,
   meleeMissChance,
@@ -76,7 +77,10 @@ export function runEffects(
   if (ctx.playerMods(meta).global.battleRhythm > 0) {
     meta.abilityRhythm = (meta.abilityRhythm + 1) % 3;
     if (meta.abilityRhythm === 0) {
-      const blink = { remaining: 0.11, duration: 0.11, sourceId: p.id, school: ability.school };
+      // remaining = exactly one tick (DT): the cast's own effects run
+      // synchronously below, then the next decay pass removes the blink, so it
+      // cannot bleed onto a followup off-GCD cast or auto swing (review note).
+      const blink = { remaining: DT, duration: DT, sourceId: p.id, school: ability.school };
       ctx.applyAura(p, {
         id: 'battle_rhythm',
         name: 'Battle Rhythm',

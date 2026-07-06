@@ -65,7 +65,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
 }
 
-export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
+export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   if (p.resourceType === 'mana') {
     if (p.fiveSecondRule >= 5) {
@@ -87,7 +87,7 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
   // Second Wind (warrior choice row): IN-combat recovery while badly hurt, a
   // separate arm from the out-of-combat regen above (which gates on !inCombat).
   // 3%/sec folded into this 2-second cadence; 0 for everyone without the talent.
-  const swPct = ctx.playerMods(_meta).global.secondWindPctPerSec;
+  const swPct = ctx.playerMods(meta).global.secondWindPctPerSec;
   if (swPct > 0 && p.hp > 0 && p.hp < p.maxHp * SECOND_WIND_THRESHOLD) {
     const heal = Math.min(Math.round(p.maxHp * swPct * 2), p.maxHp - p.hp);
     if (heal > 0) {

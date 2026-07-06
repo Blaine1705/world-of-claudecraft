@@ -198,6 +198,13 @@ describe('Battle Rhythm', () => {
     const before = p.resource;
     sim.castAbility('charge'); // cast 3: empowered (+20% on its 9 rage)
     expect(p.resource).toBeCloseTo(Math.min(100, before + 9 * 1.2));
+    // The damage half rides the same cast as a one-tick buff_dmg_done blink
+    // (present right after the cast, gone on the next decay pass).
+    expect(p.auras.some((a: any) => a.id === 'battle_rhythm' && a.kind === 'buff_dmg_done')).toBe(
+      true,
+    );
+    sim.tick();
+    expect(p.auras.some((a: any) => a.id === 'battle_rhythm')).toBe(false);
   });
 });
 
