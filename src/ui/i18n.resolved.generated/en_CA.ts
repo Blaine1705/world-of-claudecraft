@@ -5040,6 +5040,94 @@ export const en_CA: EnTranslations = {
         "name": "Seething Fury",
         "description": "Enter a seething fury, generating 20 rage. (Warrior talent)"
       },
+      "crusader_strike": {
+        "name": "Crusader Strike",
+        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+      },
+      "metamorphosis": {
+        "name": "Metamorphosis",
+        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+      },
+      "holy_shock": {
+        "name": "Holy Shock",
+        "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
+      },
+      "holy_shield": {
+        "name": "Holy Shield",
+        "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
+      },
+      "bestial_wrath": {
+        "name": "Bestial Wrath",
+        "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
+      },
+      "trueshot_aura": {
+        "name": "Trueshot Aura",
+        "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvern Sting",
+        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+      },
+      "arcane_power": {
+        "name": "Arcane Power",
+        "description": "Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)"
+      },
+      "combustion": {
+        "name": "Combustion",
+        "description": "Increases spell critical chance by 50% for 15 sec. (Fire signature)"
+      },
+      "icy_veins": {
+        "name": "Icy Veins",
+        "description": "Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)"
+      },
+      "cold_blood": {
+        "name": "Cold Blood",
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+      },
+      "blade_flurry": {
+        "name": "Blade Flurry",
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+      },
+      "hemorrhage": {
+        "name": "Hemorrhage",
+        "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
+      },
+      "power_infusion": {
+        "name": "Power Infusion",
+        "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
+      },
+      "holy_nova": {
+        "name": "Holy Nova",
+        "description": "Causes an explosion of Holy light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+      },
+      "shadowform": {
+        "name": "Shadowform",
+        "description": "Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+      },
+      "elemental_mastery": {
+        "name": "Elemental Mastery",
+        "description": "Calls on elemental mastery, making your next spell instant. (Elemental signature)"
+      },
+      "siphon_life": {
+        "name": "Siphon Life",
+        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+      },
+      "conflagrate": {
+        "name": "Conflagrate",
+        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+      },
+      "moonkin_form": {
+        "name": "Moonkin Form",
+        "description": "Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+      },
+      "feral_charge": {
+        "name": "Feral Charge",
+        "description": "Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)"
+      },
+      "swiftmend": {
+        "name": "Swiftmend",
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+      },
       "summon_imp": {
         "name": "Summon Emberkin",
         "description": "Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time."

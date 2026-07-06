@@ -34,6 +34,7 @@ import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
 import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
@@ -43,6 +44,41 @@ function isStealthToggle(ability: AbilityDef): boolean {
 
 function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
+}
+
+function consumeMatchingAura(
+  ctx: SimContext,
+  caster: Entity,
+  target: Entity | null,
+  eff: Extract<ResolvedAbility['effects'][number], { type: 'consumeAura' }>,
+): number {
+  if (!target) return -1;
+  return target.auras.findIndex((a) => {
+    // Only dot/hot auras are consumable, even by id: a raw splice skips the
+    // stat-aura teardown expiry performs, so consuming a stat-carrying aura
+    // (buff_*/form_*) would leak its contribution permanently.
+    if (a.kind !== 'dot' && a.kind !== 'hot') return false;
+    const matchesId = eff.auraIds?.includes(a.id);
+    const matchesKind = eff.auraKind !== undefined && a.kind === eff.auraKind;
+    if (!matchesId && !matchesKind) return false;
+    if (target !== caster && ctx.isHostileTo(caster, target) && a.kind === 'dot') {
+      return a.sourceId === caster.id;
+    }
+    return true;
+  });
+}
+
+function friendliesInRadius(ctx: SimContext, source: Entity, radius: number): Entity[] {
+  const out: Entity[] = [];
+  const r2 = radius * radius;
+  for (const e of ctx.entities.values()) {
+    if (e.dead) continue;
+    const dx = e.pos.x - source.pos.x;
+    const dz = e.pos.z - source.pos.z;
+    if (dx * dx + dz * dz > r2) continue;
+    if (e.id === source.id || ctx.isFriendlyTo(source, e)) out.push(e);
+  }
+  return out;
 }
 
 export function runEffects(
@@ -96,6 +132,7 @@ export function runEffects(
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
         if (crit) dmg *= isSpell ? 1.5 : 2;
+        if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -108,6 +145,7 @@ export function runEffects(
           false,
           threatOpts,
         );
+        if (isSpell) noteSpellHit(ctx, p, crit);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -259,6 +297,7 @@ export function runEffects(
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
+        noteSpellHit(ctx, p, crit);
         break;
       }
       case 'interrupt': {
@@ -358,6 +397,7 @@ export function runEffects(
           tickTimer: eff.interval,
           sourceId: p.id,
           school: ability.school,
+          leechPct: eff.leechPct,
         });
         ctx.enterCombat(p, target);
         break;
@@ -491,6 +531,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, aoeCenter, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -506,6 +547,22 @@ export function runEffects(
             false,
             threatOpts,
           );
+        }
+        break;
+      }
+      case 'aoeHeal': {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'nova',
+        });
+        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime);
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          if (!ctx.hasLineOfSight(p, m)) continue;
+          const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
+          ctx.applyHeal(p, m, healAmount, ability.name);
         }
         break;
       }
@@ -586,6 +643,38 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyAttackPower': {
+        // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
+        // nearby allies (Trueshot Aura), riding the PR3a friendlies seam.
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: `${ability.id}_ap`,
+            name: ability.name,
+            kind: 'buff_ap',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.amount,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'aoeAllyHaste': {
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: ability.id,
+            name: ability.name,
+            kind: 'buff_haste',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.mult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           type: 'spellfx',
@@ -617,10 +706,55 @@ export function runEffects(
         }
         break;
       }
+      case 'consumeAura': {
+        if (!target || target.dead) {
+          ctx.error(p.id, 'Nothing to consume.');
+          break;
+        }
+        const auraIdx = consumeMatchingAura(ctx, p, target, eff);
+        if (auraIdx < 0) {
+          ctx.error(p.id, 'Nothing to consume.');
+          break;
+        }
+        const consumed = target.auras[auraIdx];
+        target.auras.splice(auraIdx, 1);
+        ctx.emit({ type: 'aura', targetId: target.id, name: consumed.name, gained: false });
+        if (eff.deal) {
+          let dmg =
+            ctx.rng.range(eff.deal.min, eff.deal.max) +
+            directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
+          const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          if (crit) dmg *= isSpell ? 1.5 : 2;
+          if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+          if (isSpell) noteSpellHit(ctx, p, crit);
+          ctx.dealDamage(
+            p,
+            target,
+            Math.round(dmg),
+            crit,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+          );
+        }
+        if (eff.heal) {
+          const healAmount =
+            ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
+          ctx.applyHeal(p, target, healAmount, ability.name);
+        }
+        break;
+      }
       case 'selfBuff': {
         // forms, stances and stealth are toggles: casting again cancels
         const isFormKind =
-          eff.kind === 'form_bear' || eff.kind === 'form_cat' || eff.kind === 'form_travel';
+          eff.kind === 'form_bear' ||
+          eff.kind === 'form_cat' ||
+          eff.kind === 'form_travel' ||
+          eff.kind === 'form_moonkin' ||
+          eff.kind === 'form_shadow';
         const isToggle =
           isFormKind ||
           eff.kind === 'defensive_stance' ||
@@ -641,7 +775,11 @@ export function runEffects(
           for (let i = p.auras.length - 1; i >= 0; i--) {
             const a = p.auras[i];
             if (
-              (a.kind === 'form_bear' || a.kind === 'form_cat' || a.kind === 'form_travel') &&
+              (a.kind === 'form_bear' ||
+                a.kind === 'form_cat' ||
+                a.kind === 'form_travel' ||
+                a.kind === 'form_moonkin' ||
+                a.kind === 'form_shadow') &&
               a.kind !== eff.kind
             ) {
               p.auras.splice(i, 1);

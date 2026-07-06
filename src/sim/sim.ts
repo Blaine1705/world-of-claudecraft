@@ -51,6 +51,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
@@ -3429,7 +3430,9 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
+      const isSpell = effect.school !== 'physical';
+      const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
+      const dmg = Math.round(isSpell ? rawDmg * spellDamageMultFromAuras(source) : rawDmg);
       this.dealDamage(
         source,
         target,
@@ -3529,7 +3532,7 @@ export class Sim {
   }
 
   private spellCrit(p: Entity): number {
-    return 0.05 + p.stats.int * 0.0008;
+    return 0.05 + p.stats.int * 0.0008 + spellCritBonusFromAuras(p);
   }
 
   // Heal core, heal multipliers, heal-absorb soak, crit-vuln bonus, and the
@@ -3737,6 +3740,14 @@ export class Sim {
     const out: Entity[] = [];
     this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
       if (e.id !== source.id && !e.dead && this.isHostileTo(source, e)) out.push(e);
+    });
+    return out;
+  }
+
+  private friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
+    const out: Entity[] = [];
+    this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
+      if (!e.dead && (e.id === source.id || this.isFriendlyTo(source, e))) out.push(e);
     });
     return out;
   }

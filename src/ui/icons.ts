@@ -2384,6 +2384,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
   scorch: r('fire', 'ember', ['flame'], ['motion']),
   ice_barrier: r('frost', 'ice', ['shield'], ['glow']),
+  crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),
   ambush: r('shadow', 'steel', ['dagger'], ['motion']),
@@ -2421,6 +2422,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   summon_felguard: r('shadow', 'steel', ['axe', { p: 'helm', ...TL }], ['glow']),
   summon_infernal: r('fire', 'ember', ['meteor'], ['glow']),
   summon_doomguard: r('shadow', 'shadowPurple', ['wing', { p: 'skull', ...BR }], ['glow']),
+  metamorphosis: r('shadow', 'ember', ['wing', { p: 'chestplate', ...BR }], ['glow']),
   // druid
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
@@ -2435,6 +2437,26 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
+  holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
+  holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
+  bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
+  trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
+  wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
+  arcane_power: r('arcane', 'arcanePink', ['sigil_rune'], ['glow']),
+  combustion: r('fire', 'ember', ['flame'], ['sparkle']),
+  icy_veins: r('frost', 'ice', ['snowflake'], ['glow']),
+  cold_blood: r('frost', 'steel', ['dagger'], ['glow']),
+  blade_flurry: r('fury', 'steel', ['sword', { p: 'sword', ...BR }], ['motion']),
+  hemorrhage: r('blood', 'blood', ['dagger', { p: 'droplet', ...BR }], ['drips']),
+  power_infusion: r('holy', 'arcanePink', ['sunburst'], ['sparkle']),
+  holy_nova: r('holy', 'holyGold', ['sunburst'], ['arcs']),
+  shadowform: r('shadow', 'shadowPurple', ['eye'], ['glow']),
+  elemental_mastery: r('storm', 'sky', ['lightning', { p: 'sigil_rune', ...BR }], ['glow']),
+  siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
+  conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
+  moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
+  feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
+  swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
