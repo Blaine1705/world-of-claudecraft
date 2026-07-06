@@ -16,12 +16,16 @@ export function spellDamageMultFromAuras(p: Entity): number {
   return 1 + bonus;
 }
 
-export function spellHasteMultFromAuras(p: Entity): number {
-  let bonus = 0;
+// The total spell-haste multiplier for a caster: the resolved Entity.spellHaste stat
+// (item-set bonuses + spec-mastery passive haste) PLUS any live buff_spellhaste auras
+// (Arcane Power, Icy Veins, Power Infusion). This is the single source of truth casts and
+// the cast-time tooltips both read, so a shown cast time never disagrees with reality.
+export function spellHasteMult(p: Entity): number {
+  let bonus = p.spellHaste;
   for (const aura of p.auras) {
     if (aura.kind === 'buff_spellhaste') bonus += aura.value;
   }
-  return 1 + bonus;
+  return 1 + Math.max(0, bonus);
 }
 
 export function hasCastShield(p: Entity): boolean {

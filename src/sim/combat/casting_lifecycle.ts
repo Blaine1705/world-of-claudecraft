@@ -58,7 +58,7 @@ import {
   hasCastShield,
   noteSpellHit,
   spellDamageMultFromAuras,
-  spellHasteMultFromAuras,
+  spellHasteMult,
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 
@@ -458,7 +458,7 @@ export function castAbility(
     spendResource(p, res.cost);
     armAbilityCooldown(p, ability.id, res.cooldown);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
-    const channelDuration = ability.channel.duration / spellHasteMultFromAuras(p);
+    const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
     p.castTotal = channelDuration;
     p.castRemaining = channelDuration;
@@ -481,7 +481,7 @@ export function castAbility(
     // so meleeHaste always equals spellHaste and the classic melee-haste scaling
     // falls out identically. If the haste channels ever split, give physical casts
     // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
-    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMultFromAuras(p);
+    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMult(p);
     p.castingAbility = ability.id;
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;

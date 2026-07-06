@@ -75,6 +75,13 @@ export interface GlobalModEffect {
   spellDmgPct?: number; // magic ability damage
   healPct?: number; // healing done
   threatPct?: number; // bonus threat (tank role)
+  // Extra critical-strike damage (0.5 = +50%). Added to the base crit multiplier for BOTH
+  // spell (base 1.5) and physical (base 2.0) crits: a spec mastery so a Fire mage's crits
+  // hit harder. Baked onto Entity.critDmgBonus in recalcPlayerStats.
+  critDmgPct?: number;
+  // Passive spell haste from a spec mastery (0.1 = +10%). Folds into Entity.spellHaste, so
+  // it shortens every cast and the cast-time tooltips reflect it live.
+  spellHastePct?: number;
   critVsRooted?: number; // additive spell crit chance against rooted targets
 }
 
@@ -524,7 +531,15 @@ function zeroStats(): Required<StatModEffect> {
   };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
-  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0, critVsRooted: 0 };
+  return {
+    meleeDmgPct: 0,
+    spellDmgPct: 0,
+    healPct: 0,
+    threatPct: 0,
+    critDmgPct: 0,
+    spellHastePct: 0,
+    critVsRooted: 0,
+  };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
   return {
@@ -580,6 +595,8 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
     g.healPct += (e.healPct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
+    g.critDmgPct += (e.critDmgPct ?? 0) * mult;
+    g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {

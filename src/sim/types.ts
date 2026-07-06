@@ -152,6 +152,7 @@ export type AuraKind =
   | 'buff_ap'
   | 'buff_ap_pct'
   | 'pet_damage_pct'
+  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -178,6 +179,11 @@ export type AuraKind =
   | 'form_travel'
   | 'form_moonkin'
   | 'form_shadow'
+  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
+  // its damage/haste bonuses ride separate buff auras).
+  | 'form_metamorph'
+  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
+  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   | 'righteous_fury'
@@ -1142,6 +1148,9 @@ export type AbilityEffect =
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
+  // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
+  // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
+  | { type: 'chainHeal'; min: number; max: number; jumps: number; falloff: number; radius: number }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
@@ -1202,6 +1211,9 @@ export type AbilityEffect =
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
+  // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
+  // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
+  | { type: 'feralCharge' }
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
@@ -1538,6 +1550,9 @@ export interface Entity {
   rangedHaste: number;
   spellHaste: number;
   critChance: number; // 0..1
+  // Extra critical-strike damage from a spec mastery (0 = none). Added to the base crit
+  // multiplier at the crit site: spell crits deal 1.5 + this, physical crits 2 + this.
+  critDmgBonus: number;
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)

@@ -38,6 +38,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     rangedHaste: 0,
     spellHaste: 0,
     critChance: 0.05,
+    critDmgBonus: 0,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
     knockbackResistance: 0,
@@ -227,6 +228,7 @@ export function recalcPlayerStats(
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
+  let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
@@ -260,11 +262,16 @@ export function recalcPlayerStats(
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
+    // Metamorphosis: a temporary demon transform that also makes the caster larger.
+    else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
     // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
     // the form aura's value, so the bonus lives and dies with the one toggle.
-    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') bonusSp += a.value;
+    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') {
+      bonusSp += a.value;
+      if (a.kind === 'form_moonkin') moonkinForm = true;
+    }
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
@@ -298,6 +305,9 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
+  // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
+  // separate buff_spelldmg aura the form applies).
+  if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
@@ -351,9 +361,13 @@ export function recalcPlayerStats(
   // AND shorter spell casts/channels.
   e.meleeHaste = setEff.haste;
   e.rangedHaste = setEff.haste;
-  e.spellHaste = setEff.haste;
+  // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
+  // caster spec can shorten every cast; the cast-time tooltips read the same total.
+  e.spellHaste = setEff.haste + (mods?.global.spellHastePct ?? 0);
   // Crit: ~1% per 20 agi at low level
   e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
+  // Extra crit damage from a spec mastery (e.g. Fire mage: spell crits deal double).
+  e.critDmgBonus = mods?.global.critDmgPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
