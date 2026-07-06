@@ -6233,10 +6233,6 @@ export const vi_VN: EnTranslations = {
         "name": "Đòn Thập Tự",
         "description": "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)"
       },
-      "chain_heal": {
-        "name": "Hồi Máu Liên Hoàn",
-        "description": "Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)"
-      },
       "metamorphosis": {
         "name": "Biến Hình",
         "description": "Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)"

@@ -6233,10 +6233,6 @@ export const fr_CA: EnTranslations = {
         "name": "Frappe du croisé",
         "description": "Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)"
       },
-      "chain_heal": {
-        "name": "Salve de guérison",
-        "description": "Rend une grande quantité de points de vie à une cible alliée, puis rebondit sur un maximum de 2 autres alliés proches, avec des soins réduits de 50 % à chaque rebond. (signature Restauration)"
-      },
       "metamorphosis": {
         "name": "Métamorphose",
         "description": "Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)"

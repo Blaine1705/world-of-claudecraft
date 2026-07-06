@@ -2537,54 +2537,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
   scorch: r('fire', 'ember', ['flame'], ['motion']),
   ice_barrier: r('frost', 'ice', ['shield'], ['glow']),
-  // The mage redesign's new kit (owner playtest 2026-07): every ability gets an
-  // explicit recipe (the ability_icons guard forbids the procedural fallback),
-  // each visually distinct from its neighbours.
-  ice_floes: r('frost', 'ice', ['boot', { p: 'snowflake', ...TR }], ['motion']),
-  greater_invisibility: r('arcane', 'pink', ['eye', { p: 'moon', ...TR }], ['motion']),
-  rings_of_frost: r('frost', 'ice', ['sigil_rune', { p: 'snowflake', ...TR }]),
-  cold_snap: r('frost', 'ice', ['sunburst', { p: 'snowflake', ...BIG }], ['glow']),
-  mass_barrier: r('arcane', 'arcanePink', ['shield', { p: 'sunburst', ...TR }], ['glow']),
-  overload: r('arcane', 'pink', ['bolt', { p: 'sunburst', ...TR }], ['glow']),
-  // Power Echo: the doubled cast, two bolts chasing each other.
-  power_echo: r('fire', 'ember', ['bolt', { p: 'bolt', ...BR }], ['motion']),
-  rune_of_power: r('arcane', 'arcanePink', ['sigil_rune', { p: 'sunburst', ...TL }], ['glow']),
-  blazing_barrier: r('fire', 'ember', ['shield', { p: 'flame', ...TR }], ['glow']),
-  ignition: r('fire', 'ember', ['flame', { p: 'droplet', ...BR }], ['drips']),
-  hot_streak: r('fire', 'gold', ['flame', { p: 'sunburst', ...TR }], ['sparkle']),
-  summon_water_elemental: r('frost', 'ice', ['droplet', { p: 'snowflake', ...TR }], ['glow']),
-  // Chronomancy (procedural placeholders until painted art lands).
-  temporal_mend: r('arcane', 'arcanePink', ['heart', { p: 'moon', ...TR }], ['glow']),
-  temporal_barrier: r('arcane', 'arcanePink', ['shield', { p: 'moon', ...TR }], ['glow']),
-  // Phase 2: the Arcane-damage-to-healing mark (heart + a radiating echo).
-  temporal_echo: r('arcane', 'arcanePink', ['heart', { p: 'sunburst', ...TR }], ['sparkle']),
-  // Chronomancy later phases (procedural fallbacks; the painted desktop-sheet
-  // icons ride ABILITY_IMAGE_IDS): the stacking nuke, the group echo, the combat
-  // res, the raid rewind, and the group lust. Distinct shape combos per the
-  // no-identical-icons guard.
-  arcane_surge: r('arcane', 'arcanePink', [{ p: 'sunburst', ...BIG }, 'bolt'], ['glow']),
-  temporal_cascade: r(
-    'arcane',
-    'arcanePink',
-    [
-      { p: 'heart', s: 0.8 },
-      { p: 'moon', ...BR },
-    ],
-    ['arcs'],
-  ),
-  temporal_reversal: r('arcane', 'arcanePink', ['cross', { p: 'moon', ...TR }], ['glow']),
-  temporal_rewind: r('arcane', 'arcanePink', [{ p: 'moon', s: 1.1 }], ['arcs', 'glow']),
-  temporal_acceleration: r('arcane', 'arcanePink', ['boot', { p: 'moon', ...TR }], ['motion']),
-  // Perfect Moment: the loaded-bird offensive window (gem = the held charges).
-  perfect_moment: r(
-    'arcane',
-    'arcanePink',
-    [
-      { p: 'gem', s: 1.05 },
-      { p: 'moon', ...TR },
-    ],
-    ['glow'],
-  ),
   crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),
@@ -2693,10 +2645,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
-  // spec signature spells (Talents 2.0 PR3b): one per spec, grant-only
   holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
   holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
-  repentance: r('holy', 'silverWhite', ['hand'], ['glow']),
   bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
   trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
   wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
@@ -2710,10 +2660,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   holy_nova: r('holy', 'holyGold', ['sunburst'], ['arcs']),
   shadowform: r('shadow', 'shadowPurple', ['eye'], ['glow']),
   elemental_mastery: r('storm', 'sky', ['lightning', { p: 'sigil_rune', ...BR }], ['glow']),
-  shamanistic_rage: r('storm', 'blood', ['fist'], ['glow']),
-  natures_swiftness: r('nature', 'leafGreen', ['leaf'], ['sparkle']),
   siphon_life: r('shadow', 'venom', ['heart'], ['drips']),
-  fel_domination: r('shadow', 'ember', ['imp_head'], ['glow']),
   conflagrate: r('fire', 'ember', ['flame', { p: 'skull', ...BR }], ['crack']),
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),

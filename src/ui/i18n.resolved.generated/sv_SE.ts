@@ -6233,10 +6233,6 @@ export const sv_SE: EnTranslations = {
         "name": "Korsfararslag",
         "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
-      "chain_heal": {
-        "name": "Kedjeläkning",
-        "description": "Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)"
-      },
       "metamorphosis": {
         "name": "Metamorfos",
         "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"

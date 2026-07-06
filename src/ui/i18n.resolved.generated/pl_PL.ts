@@ -6233,10 +6233,6 @@ export const pl_PL: EnTranslations = {
         "name": "Cios krzyżowca",
         "description": "Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)"
       },
-      "chain_heal": {
-        "name": "Leczenie Łańcuchowe",
-        "description": "Leczy sojusznika za dużą wartość, a następnie przeskakuje do maksymalnie 2 pobliskich sojuszników, lecząc o 50% mniej przy każdym skoku. (Sztandarowa zdolność Odnowy)"
-      },
       "metamorphosis": {
         "name": "Metamorfoza",
         "description": "Przyjmujesz demoniczną moc, zwiększając pancerz i siłę ataku na 20 s. (talent czarnoksiężnika)"

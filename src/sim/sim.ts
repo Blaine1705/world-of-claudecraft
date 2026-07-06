@@ -62,8 +62,6 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { rewindHealAmount } from './combat/rewind';
-import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 import { ensureWarriorStance } from './combat/warrior_stances';
@@ -4146,28 +4144,9 @@ export class Sim {
     let zoneStruck = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      zoneStruck++;
       const isSpell = effect.school !== 'physical';
       const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
       const dmg = Math.round(isSpell ? rawDmg * spellDamageMultFromAuras(source) : rawDmg);
-      // Blizzard: the zone snares everyone it strikes, pulse by pulse.
-      if (effect.slowMult && effect.slowDuration && !target.dead) {
-        this.applyAura(target, {
-          id: 'blizzard_slow',
-          name: effect.ability,
-          kind: 'slow',
-          value: effect.slowMult,
-          remaining: effect.slowDuration,
-          duration: effect.slowDuration,
-          sourceId: source.id,
-          school: effect.school as Aura['school'],
-        });
-      }
-      // Meteor (fire mage): each struck enemy is also Ignited for a fraction
-      // of THIS resolved pulse damage (applyIgnite copies it, no re-roll).
-      if (effect.igniteFrac && dmg > 0 && !target.dead) {
-        applyIgnite(this.ctx, source, target, Math.round(dmg * effect.igniteFrac));
-      }
       this.dealDamage(
         source,
         target,

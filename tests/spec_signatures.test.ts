@@ -93,17 +93,4 @@ describe('Phase 1: spec signatures', () => {
       expect(!!sim.resolvedAbility('chain_heal'), `${s.name} chain_heal`).toBe(isResto);
     }
   });
-
-  it('picking a spec announces the signature (learnAbility event + log) so it lands on the bar', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', autoEquip: true });
-    sim.setPlayerLevel(20);
-    sim.setSpec('fury'); // grants bloodthirst
-    const evs = sim.tick();
-    const learned = evs.filter((e) => e.type === 'learnAbility').map((e) => (e as any).abilityId);
-    const said = evs.some(
-      (e) => e.type === 'log' && /have learned/i.test((e as { text: string }).text),
-    );
-    expect(learned, 'a learnAbility event for the signature').toContain('bloodthirst');
-    expect(said, 'a "You have learned" log').toBe(true);
-  });
 });

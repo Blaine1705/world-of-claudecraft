@@ -6233,10 +6233,6 @@ export const da_DK: EnTranslations = {
         "name": "Korsfarerslag",
         "description": "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)"
       },
-      "chain_heal": {
-        "name": "Kædeheling",
-        "description": "Helbreder et venligt mål for en stor mængde og springer derefter til op til 2 yderligere allierede i nærheden. Helbredelsen mindskes med 50% for hvert spring. (Genoprettelsessignatur)"
-      },
       "metamorphosis": {
         "name": "Metamorfose",
         "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"

@@ -1341,44 +1341,34 @@ const classAbilityNamesEn = {
         'Enter a seething fury, generating 20 rage. (Warrior talent)',
       ],
       [
-        'holy_shock',
-        'Holy Shock',
-        'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
-      ],
-      [
         'crusader_strike',
         'Crusader Strike',
         'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
       ],
       [
         'metamorphosis',
-        'Dread Aspect',
-        'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
+        'Metamorphosis',
+        'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
       ],
       [
-        'aura_surge',
-        'Radiant Swell',
-        'Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)',
+        'holy_shock',
+        'Holy Shock',
+        'Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)',
       ],
       [
         'holy_shield',
-        'Hallowed Wall',
-        'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
-      ],
-      [
-        'repentance',
-        'Repentance',
-        'Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)',
+        'Holy Shield',
+        'Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)',
       ],
       [
         'bestial_wrath',
-        'Howling Rage',
-        'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
+        'Bestial Wrath',
+        'Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)',
       ],
       [
         'trueshot_aura',
-        'Sureflight Aura',
-        'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
+        'Trueshot Aura',
+        'Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)',
       ],
       [
         'wyvern_sting',
@@ -1387,13 +1377,13 @@ const classAbilityNamesEn = {
       ],
       [
         'arcane_power',
-        'Aether Surge',
+        'Arcane Power',
         'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
       ],
       [
         'combustion',
         'Combustion',
-        'Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)',
+        'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
       ],
       [
         'icy_veins',
@@ -1402,58 +1392,43 @@ const classAbilityNamesEn = {
       ],
       [
         'cold_blood',
-        "Killer's Calm",
+        'Cold Blood',
         'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
       ],
       [
         'blade_flurry',
-        'Mirrored Blades',
+        'Blade Flurry',
         'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
       ],
       [
         'hemorrhage',
-        'Red Ribbon',
-        'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+        'Hemorrhage',
+        'Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)',
       ],
       [
         'power_infusion',
-        'Anointing',
-        'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
+        'Power Infusion',
+        'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
       ],
       [
         'holy_nova',
         'Holy Nova',
-        'Causes an explosion of Mending Light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
+        'Causes an explosion of Holy light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
       ],
       [
         'shadowform',
-        'Gloamveil',
-        'Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+        'Shadowform',
+        'Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
-        'Primal Mastery',
-        'Calls on primal mastery, making your next spell instant. (Elemental signature)',
-      ],
-      [
-        'shamanistic_rage',
-        'Shamanistic Rage',
-        'Releases shamanistic rage, restoring 160 mana. (Enhancement signature)',
-      ],
-      [
-        'natures_swiftness',
-        "Nature's Swiftness",
-        'Calls on nature to make your next spell instant. (Restoration signature)',
+        'Elemental Mastery',
+        'Calls on elemental mastery, making your next spell instant. (Elemental signature)',
       ],
       [
         'siphon_life',
-        'Veinleech',
+        'Siphon Life',
         'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
-      ],
-      [
-        'fel_domination',
-        'Fel Domination',
-        'Dominates fel energies, making your next spell instant. (Demonology signature)',
       ],
       [
         'conflagrate',
@@ -1462,53 +1437,18 @@ const classAbilityNamesEn = {
       ],
       [
         'moonkin_form',
-        'Moonwing Form',
-        'Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
+        'Moonkin Form',
+        'Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
       ],
       [
         'feral_charge',
-        'Primal Surge',
-        'Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
+        'Feral Charge',
+        'Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)',
       ],
       [
         'swiftmend',
         'Swiftmend',
         'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)',
-      ],
-      [
-        'storm_bolt',
-        'Storm Bolt',
-        'Hurl your weapon at the target for {damage}, stunning it for 3 sec.',
-      ],
-      [
-        'piercing_howl',
-        'Piercing Howl',
-        'A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.',
-      ],
-      [
-        'die_by_sword',
-        'Die by the Sword',
-        'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
-      ],
-      [
-        'recklessness',
-        'Recklessness',
-        'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
-      ],
-      [
-        'sanguine_aura',
-        'Sanguine Aura',
-        'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
-      ],
-      [
-        'victory_rush',
-        'Victory Rush',
-        'Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
-      ],
-      [
-        'intimidating_shout',
-        'Intimidating Shout',
-        'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
       ],
       [
         'summon_imp',
@@ -2478,11 +2418,6 @@ export const classAbilityNames = {
           'Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)',
         ],
         [
-          'repentance',
-          'Arrepentimiento',
-          'Pone al enemigo en estado de meditación hasta 6 s. Cualquier daño rompe el efecto. (habilidad distintiva de Reprensión)',
-        ],
-        [
           'bestial_wrath',
           'Cólera de las bestias',
           'Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)',
@@ -2505,12 +2440,7 @@ export const classAbilityNames = {
         [
           'combustion',
           'Combustión',
-          'Combustiona: durante 10 s tus hechizos de Fuego siempre golpean de crítico. Estos críticos garantizados no generan Buena Racha. (habilidad distintiva de Fuego)',
-        ],
-        [
-          'cone_of_cold',
-          'Cono de frío',
-          'Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)',
+          'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
         ],
         [
           'icy_veins',
@@ -2553,24 +2483,9 @@ export const classAbilityNames = {
           'Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)',
         ],
         [
-          'shamanistic_rage',
-          'Ira del chamán',
-          'Libera ira chamánica y restaura 160 de maná. (habilidad distintiva de Mejora)',
-        ],
-        [
-          'natures_swiftness',
-          'Presteza de la Naturaleza',
-          'Invoca a la naturaleza para hacer que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Restauración)',
-        ],
-        [
           'siphon_life',
           'Succionar vida',
           'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
-        ],
-        [
-          'fel_domination',
-          'Dominación vil',
-          'Domina energías viles, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Demonología)',
         ],
         [
           'conflagrate',
@@ -2591,66 +2506,6 @@ export const classAbilityNames = {
           'swiftmend',
           'Alivio presto',
           'Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)',
-        ],
-        [
-          'storm_bolt',
-          'Rayo de tormenta',
-          'Lanza tu arma al objetivo, inflige {damage} y lo aturde durante 3 s.',
-        ],
-        [
-          'piercing_howl',
-          'Aullido penetrante',
-          'Un grito desgarrador que ralentiza un 50% a todos los enemigos en un radio de 15 yardas durante 8 s.',
-        ],
-        [
-          'die_by_sword',
-          'Morir matando',
-          'Cooldown defensivo: durante 8 sec recibes un 30% menos de daño y esquivas muchos más ataques.',
-        ],
-        [
-          'recklessness',
-          'Temeridad',
-          'Enfurecer: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s.',
-        ],
-        [
-          'avatar',
-          'Avatar',
-          'Te transformas en un coloso durante 20 s, rompes cualquier control sobre ti y tu daño infligido aumenta un 20%.',
-        ],
-        [
-          'sanguine_aura',
-          'Aura sangrienta',
-          'Imbuye tu arma con la sangre de tus enemigos: tú y tus aliados cuerpo a cuerpo ganáis un 10% de velocidad de ataque y un 10% de daño durante 20 s.',
-        ],
-        [
-          'victory_rush',
-          'Ímpetu victorioso',
-          'Golpea e inflige daño de arma más {damage}, y te cura un 20% de tu salud máxima. Solo se puede usar en los 20 s posteriores a matar a un enemigo.',
-        ],
-        [
-          'bladestorm',
-          'Tormenta de espadas',
-          'Te conviertes en un torbellino de acero que golpea a todos los enemigos en un radio de 8 yardas e inflige {damage} cada segundo durante 4 s.',
-        ],
-        [
-          'intimidating_shout',
-          'Grito intimidante',
-          'Un grito aterrador que hace huir despavoridos hasta a 5 enemigos en un radio de 8 yardas durante 8 s. El daño puede romper el efecto.',
-        ],
-        [
-          'pummel',
-          'Contundir',
-          'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. Genera 10 de ira cuando corta un lanzamiento.',
-        ],
-        [
-          'heroic_leap',
-          'Salto heroico',
-          'Saltas a la zona objetivo e infliges {damage} de daño a los enemigos cercanos.',
-        ],
-        [
-          'rallying_cry',
-          'Grito de guerra',
-          'Profieres un grito de guerra que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s.',
         ],
         [
           'summon_imp',
@@ -3372,11 +3227,6 @@ export const classAbilityNames = {
           'Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)',
         ],
         [
-          'repentance',
-          'Repentir',
-          'Plonge l’ennemi dans un état de méditation pendant un maximum de 6 s. Tout dégât interrompt l’effet. (signature Vindicte)',
-        ],
-        [
           'bestial_wrath',
           'Courroux bestial',
           'Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)',
@@ -3398,13 +3248,8 @@ export const classAbilityNames = {
         ],
         [
           'combustion',
-          'Flashfire',
+          'Combustion',
           'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
-        ],
-        [
-          'cone_of_cold',
-          'Cône de froid',
-          'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)',
         ],
         [
           'icy_veins',
@@ -3447,24 +3292,9 @@ export const classAbilityNames = {
           'Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)',
         ],
         [
-          'shamanistic_rage',
-          'Rage chamanique',
-          'Libère une rage chamanique et rend 160 points de mana. (signature Amélioration)',
-        ],
-        [
-          'natures_swiftness',
-          'Rapidité de la nature',
-          'Fait appel à la nature pour rendre votre prochain sort instantané. (signature Restauration)',
-        ],
-        [
           'siphon_life',
           'Siphon de vie',
           'Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)',
-        ],
-        [
-          'fel_domination',
-          'Domination corrompue',
-          'Domine les énergies gangrenées, rendant votre prochain sort instantané. (signature Démonologie)',
         ],
         [
           'conflagrate',
@@ -3485,66 +3315,6 @@ export const classAbilityNames = {
           'swiftmend',
           'Prompte guérison',
           'Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)',
-        ],
-        [
-          'storm_bolt',
-          'Projectile-tempête',
-          "Lancez votre arme sur la cible, infligeant {damage} et l'étourdissant pendant 3 s.",
-        ],
-        [
-          'piercing_howl',
-          'Hurlement perçant',
-          'Un cri perçant qui ralentit de 50% tous les ennemis dans un rayon de 15 mètres pendant 8 s.',
-        ],
-        [
-          'die_by_sword',
-          "Périr par l'épée",
-          "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques.",
-        ],
-        [
-          'recklessness',
-          'Témérité',
-          'Enrage : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s.',
-        ],
-        [
-          'avatar',
-          'Avatar',
-          'Vous vous transformez en colosse pendant 20 s, brisant tout contrôle et augmentant vos dégâts de 20%.',
-        ],
-        [
-          'sanguine_aura',
-          'Aura sanguine',
-          "Imprégnez votre arme du sang de vos ennemis : vous et vos alliés de mêlée gagnez 10% de vitesse d'attaque et 10% de dégâts pendant 20 s.",
-        ],
-        [
-          'victory_rush',
-          'Ruée victorieuse',
-          "Frappe infligeant les dégâts de l'arme plus {damage} et vous soignant de 20% de votre vie maximale. Utilisable seulement dans les 20 s suivant la mort d'un ennemi.",
-        ],
-        [
-          'bladestorm',
-          'Tempête de lames',
-          "Devenez un tourbillon d'acier frappant tous les ennemis dans un rayon de 8 mètres, infligeant {damage} chaque seconde pendant 4 s.",
-        ],
-        [
-          'intimidating_shout',
-          'Cri intimidant',
-          "Un cri terrifiant qui fait fuir jusqu'à 5 ennemis dans un rayon de 8 mètres pendant 8 s. Les dégâts peuvent briser l'effet.",
-        ],
-        [
-          'pummel',
-          'Volée de coups',
-          "Interrompt l'incantation et empêche de lancer des sorts de cette école pendant 4 s. Génère 10 points de rage en coupant une incantation.",
-        ],
-        [
-          'heroic_leap',
-          'Bond héroïque',
-          'Bondissez vers la zone ciblée, infligeant {damage} points de dégâts aux ennemis proches.',
-        ],
-        [
-          'rallying_cry',
-          'Cri de ralliement',
-          'Pousse un cri de ralliement accordant à vous et aux membres du groupe dans un rayon de 40 mètres 20% de vie maximale supplémentaire pendant 10 s.',
         ],
         [
           'summon_imp',
@@ -4189,11 +3959,6 @@ export const classAbilityNames = {
           'Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)',
         ],
         [
-          'repentance',
-          'Pentimento',
-          'Mette il nemico in stato di meditazione per un massimo di 6 s. Qualsiasi danno interrompe l’effetto. (firma Castigo)',
-        ],
-        [
           'bestial_wrath',
           'Ira Bestiale',
           'Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)',
@@ -4217,11 +3982,6 @@ export const classAbilityNames = {
           'combustion',
           'Combustione',
           'Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)',
-        ],
-        [
-          'cone_of_cold',
-          'Cono di Freddo',
-          'Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)',
         ],
         [
           'icy_veins',
@@ -4264,24 +4024,9 @@ export const classAbilityNames = {
           'Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)',
         ],
         [
-          'shamanistic_rage',
-          'Rabbia Sciamanica',
-          'Libera rabbia sciamanica, ripristinando 160 mana. (firma Potenziamento)',
-        ],
-        [
-          'natures_swiftness',
-          'Rapidità della Natura',
-          'Invoca la natura per rendere istantaneo il tuo prossimo incantesimo. (firma Guarigione)',
-        ],
-        [
           'siphon_life',
           'Risucchio Vitale',
           'Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)',
-        ],
-        [
-          'fel_domination',
-          'Dominazione Demoniaca',
-          'Domina energie demoniache, rendendo istantaneo il tuo prossimo incantesimo. (firma Demonologia)',
         ],
         [
           'conflagrate',
@@ -4302,66 +4047,6 @@ export const classAbilityNames = {
           'swiftmend',
           'Rapidità di Guarigione',
           'Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)',
-        ],
-        [
-          'storm_bolt',
-          'Dardo della Tempesta',
-          'Scaglia la tua arma sul bersaglio, infliggendo {damage} e stordendolo per 3 sec.',
-        ],
-        [
-          'piercing_howl',
-          'Urlo Penetrante',
-          'Un urlo lacerante che rallenta del 50% tutti i nemici entro 15 metri per 8 sec.',
-        ],
-        [
-          'die_by_sword',
-          'Morire di Spada',
-          'Recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi.',
-        ],
-        [
-          'recklessness',
-          'Temerarietà',
-          'Ira: la generazione di rabbia aumenta del 50% e la probabilità di colpo critico del 20% per 12 sec.',
-        ],
-        [
-          'avatar',
-          'Avatar',
-          'Ti trasformi in un colosso per 20 sec, spezzando ogni controllo su di te e aumentando i danni inflitti del 20%.',
-        ],
-        [
-          'sanguine_aura',
-          'Aura Sanguigna',
-          "Intridi la tua arma del sangue dei nemici: tu e i tuoi alleati in mischia guadagnate il 10% di velocità d'attacco e il 10% di danni per 20 sec.",
-        ],
-        [
-          'victory_rush',
-          'Slancio della Vittoria',
-          "Colpisce infliggendo danni dell'arma più {damage} e ti cura del 20% della salute massima. Utilizzabile solo entro 20 sec dall'uccisione di un nemico.",
-        ],
-        [
-          'bladestorm',
-          'Tempesta di Lame',
-          "Diventi un turbine d'acciaio che colpisce tutti i nemici entro 8 metri, infliggendo {damage} ogni secondo per 4 sec.",
-        ],
-        [
-          'intimidating_shout',
-          'Urlo Intimidatorio',
-          "Un urlo terrificante che fa fuggire fino a 5 nemici entro 8 metri per 8 sec. I danni possono spezzare l'effetto.",
-        ],
-        [
-          'pummel',
-          'Tempestare',
-          "Interrompe l'incantesimo e impedisce di lanciare incantesimi di quella scuola per 4 sec. Genera 10 rabbia quando taglia un lancio.",
-        ],
-        [
-          'heroic_leap',
-          'Balzo Eroico',
-          "Balza sull'area bersaglio, infliggendo {damage} danni ai nemici vicini.",
-        ],
-        [
-          'rallying_cry',
-          'Grido di Guerra',
-          'Lanci un grido di guerra che concede a te e ai membri del gruppo entro 40 metri il 20% di salute massima aggiuntiva per 10 sec.',
         ],
         [
           'summon_imp',
@@ -5012,11 +4697,6 @@ export const classAbilityNames = {
           'Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)',
         ],
         [
-          'repentance',
-          'Buße',
-          'Versetzt den Gegner bis zu 6 Sek. lang in einen Zustand der Meditation. Jeder Schaden bricht den Effekt. (Vergeltungs-Signatur)',
-        ],
-        [
           'bestial_wrath',
           'Zorn des Wildtiers',
           'Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)',
@@ -5040,11 +4720,6 @@ export const classAbilityNames = {
           'combustion',
           'Verbrennung',
           'Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)',
-        ],
-        [
-          'cone_of_cold',
-          'Kältekegel',
-          'Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)',
         ],
         [
           'icy_veins',
@@ -5087,24 +4762,9 @@ export const classAbilityNames = {
           'Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)',
         ],
         [
-          'shamanistic_rage',
-          'Schamanistische Wut',
-          'Entfesselt schamanistische Wut und stellt 160 Mana wieder her. (Verstärkungs-Signatur)',
-        ],
-        [
-          'natures_swiftness',
-          'Schnelligkeit der Natur',
-          'Ruft die Natur an, um Euren nächsten Zauber sofort wirkbar zu machen. (Wiederherstellungs-Signatur)',
-        ],
-        [
           'siphon_life',
           'Lebensentzug',
           'Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)',
-        ],
-        [
-          'fel_domination',
-          'Teufelsbeherrschung',
-          'Beherrscht Teufelsenergien und macht Euren nächsten Zauber sofort wirkbar. (Dämonologie-Signatur)',
         ],
         [
           'conflagrate',
@@ -5125,66 +4785,6 @@ export const classAbilityNames = {
           'swiftmend',
           'Rasche Heilung',
           'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)',
-        ],
-        [
-          'storm_bolt',
-          'Sturmblitz',
-          'Schleudert Eure Waffe auf das Ziel, verursacht {damage} und betäubt es 3 Sek. lang.',
-        ],
-        [
-          'piercing_howl',
-          'Durchdringendes Heulen',
-          'Ein durchdringender Schrei, der alle Gegner im Umkreis von 15 Metern 8 Sek. lang um 50% verlangsamt.',
-        ],
-        [
-          'die_by_sword',
-          'Tod durch das Schwert',
-          'Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus.',
-        ],
-        [
-          'recklessness',
-          'Tollkühnheit',
-          'Wutanfall: Eure Wuterzeugung steigt 12 Sek. lang um 50% und Eure kritische Trefferchance um 20%.',
-        ],
-        [
-          'avatar',
-          'Avatar',
-          'Verwandelt Euch 20 Sek. lang in einen Koloss, bricht jede Kontrolle über Euch und erhöht Euren verursachten Schaden um 20%.',
-        ],
-        [
-          'sanguine_aura',
-          'Blutaura',
-          'Tränkt Eure Waffe im Blut Eurer Feinde: Ihr und Eure Nahkampfverbündeten erhaltet 20 Sek. lang 10% Angriffstempo und 10% Schaden.',
-        ],
-        [
-          'victory_rush',
-          'Siegesrausch',
-          'Ein Schlag mit Waffenschaden plus {damage}, der Euch um 20% Eurer maximalen Gesundheit heilt. Nur innerhalb von 20 Sek. nach dem Töten eines Gegners einsetzbar.',
-        ],
-        [
-          'bladestorm',
-          'Klingensturm',
-          'Werdet zu einem wirbelnden Sturm aus Stahl, der alle Gegner im Umkreis von 8 Metern jede Sekunde 4 Sek. lang mit {damage} trifft.',
-        ],
-        [
-          'intimidating_shout',
-          'Drohruf',
-          'Ein furchterregender Schrei, der bis zu 5 Gegner im Umkreis von 8 Metern 8 Sek. lang in Panik fliehen lässt. Schaden kann den Effekt brechen.',
-        ],
-        [
-          'pummel',
-          'Zuschlagen',
-          'Unterbricht das Zaubern und verhindert 4 Sek. lang Zauber dieser Schule. Erzeugt 10 Wut, wenn ein Zauber unterbrochen wird.',
-        ],
-        [
-          'heroic_leap',
-          'Heldenhafter Sprung',
-          'Springt zum Zielgebiet und verursacht {damage} Schaden an nahen Gegnern.',
-        ],
-        [
-          'rallying_cry',
-          'Schlachtruf',
-          'Stößt einen Schlachtruf aus, der Euch und Gruppenmitgliedern im Umkreis von 40 Metern 10 Sek. lang 20% zusätzliche maximale Gesundheit gewährt.',
         ],
         [
           'summon_imp',
@@ -5549,11 +5149,6 @@ export const classAbilityNames = {
           '以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）',
         ],
         [
-          'repentance',
-          '忏悔',
-          '使敌人进入冥想状态，最多持续6秒。受到任何伤害都会打破效果。（惩戒专精招牌）',
-        ],
-        [
           'bestial_wrath',
           '狂野怒火',
           '使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）',
@@ -5579,7 +5174,6 @@ export const classAbilityNames = {
           '冰冷血脉',
           '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
         ],
-        ['cone_of_cold', '冰锥术', '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）'],
         ['cold_blood', '冷血', '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）'],
         ['blade_flurry', '剑刃乱舞', '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）'],
         [
@@ -5607,18 +5201,11 @@ export const classAbilityNames = {
           '元素掌握',
           '呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）',
         ],
-        ['shamanistic_rage', '萨满之怒', '释放萨满之怒，恢复160点法力值。（增强专精招牌）'],
-        [
-          'natures_swiftness',
-          '自然迅捷',
-          '呼唤自然之力，使你的下一个法术变为瞬发。（恢复专精招牌）',
-        ],
         [
           'siphon_life',
           '生命虹吸',
           '虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）',
         ],
-        ['fel_domination', '恶魔支配', '支配邪能，使你的下一个法术变为瞬发。（恶魔学识专精招牌）'],
         [
           'conflagrate',
           '燃尽',
@@ -5634,40 +5221,6 @@ export const classAbilityNames = {
           'swiftmend',
           '迅捷治愈',
           '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
-        ],
-        ['storm_bolt', '风暴之锤', '将武器掷向目标，造成 {damage}，并使其昏迷 3 秒。'],
-        ['piercing_howl', '刺耳怒吼', '发出刺耳的吼声，使 15 码内所有敌人减速 50%，持续 8 秒。'],
-        [
-          'die_by_sword',
-          '剑在人在',
-          '防御性冷却：持续 8 秒，你受到的伤害降低 30%，并能躲闪更多攻击。',
-        ],
-        ['recklessness', '鲁莽', '激怒：怒气获取提高 50%，暴击几率提高 20%，持续 12 秒。'],
-        [
-          'sanguine_aura',
-          '血色光环',
-          '以敌人之血浸染你的武器：你和近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。',
-        ],
-        [
-          'victory_rush',
-          '乘胜追击',
-          '发动打击，造成武器伤害加 {damage}，并为你恢复最大生命值的 20%。只能在击杀敌人后 20 秒内使用。',
-        ],
-        [
-          'intimidating_shout',
-          '破胆怒吼',
-          '发出骇人的怒吼，使 8 码内最多 5 名敌人惊惧逃窜 8 秒。受到伤害可能打破该效果。',
-        ],
-        [
-          'pummel',
-          '拳击',
-          '打断施法，并使该系法术在 4 秒内无法施放。成功打断施法时产生 10 点怒气。',
-        ],
-        ['heroic_leap', '英勇飞跃', '跃向目标区域，对附近敌人造成 {damage} 点伤害。'],
-        [
-          'rallying_cry',
-          '集结呐喊',
-          '发出集结呐喊，使你和 40 码内的小队成员获得 20% 的额外最大生命值，持续 10 秒。',
         ],
         [
           'summon_imp',
@@ -6032,11 +5585,6 @@ export const classAbilityNames = {
           '以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）',
         ],
         [
-          'repentance',
-          '懺悔',
-          '使敵人進入冥想狀態，最多持續6秒。受到任何傷害都會打破效果。（懲戒專精招牌）',
-        ],
-        [
           'bestial_wrath',
           '狂野怒火',
           '使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）',
@@ -6062,7 +5610,6 @@ export const classAbilityNames = {
           '冰冷血脈',
           '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
         ],
-        ['cone_of_cold', '冰錐術', '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）'],
         ['cold_blood', '冷血', '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）'],
         ['blade_flurry', '劍刃亂舞', '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）'],
         [
@@ -6090,18 +5637,11 @@ export const classAbilityNames = {
           '元素精通',
           '呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）',
         ],
-        ['shamanistic_rage', '薩滿之怒', '釋放薩滿之怒，恢復160點法力值。（增強專精招牌）'],
-        [
-          'natures_swiftness',
-          '自然迅捷',
-          '呼喚自然之力，使你的下一個法術變為瞬發。（恢復專精招牌）',
-        ],
         [
           'siphon_life',
           '生命虹吸',
           '虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）',
         ],
-        ['fel_domination', '惡魔支配', '支配魔能，使你的下一個法術變為瞬發。（惡魔學識專精招牌）'],
         [
           'conflagrate',
           '燃盡',
@@ -6117,40 +5657,6 @@ export const classAbilityNames = {
           'swiftmend',
           '迅癒',
           '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
-        ],
-        ['storm_bolt', '風暴之錘', '將武器擲向目標，造成 {damage}，並使其昏迷 3 秒。'],
-        ['piercing_howl', '刺耳怒吼', '發出刺耳的吼聲，使 15 碼內所有敵人減速 50%，持續 8 秒。'],
-        [
-          'die_by_sword',
-          '劍在人在',
-          '防禦性冷卻：持續 8 秒，你受到的傷害降低 30%，並能閃躲更多攻擊。',
-        ],
-        ['recklessness', '魯莽', '激怒：怒氣獲取提高 50%，爆擊機率提高 20%，持續 12 秒。'],
-        [
-          'sanguine_aura',
-          '血色光環',
-          '以敵人之血浸染你的武器：你和近戰盟友獲得 10% 攻擊速度和 10% 傷害加成，持續 20 秒。',
-        ],
-        [
-          'victory_rush',
-          '乘勝追擊',
-          '發動打擊，造成武器傷害加 {damage}，並為你恢復最大生命值的 20%。只能在擊殺敵人後 20 秒內使用。',
-        ],
-        [
-          'intimidating_shout',
-          '破膽怒吼',
-          '發出駭人的怒吼，使 8 碼內最多 5 名敵人驚懼逃竄 8 秒。受到傷害可能打破該效果。',
-        ],
-        [
-          'pummel',
-          '拳擊',
-          '打斷施法，並使該系法術在 4 秒內無法施放。成功打斷施法時產生 10 點怒氣。',
-        ],
-        ['heroic_leap', '英勇飛躍', '躍向目標區域，對附近敵人造成 {damage} 點傷害。'],
-        [
-          'rallying_cry',
-          '集結吶喊',
-          '發出集結吶喊，使你和 40 碼內的隊伍成員獲得 20% 的額外最大生命值，持續 10 秒。',
         ],
         [
           'summon_imp',
@@ -6719,11 +6225,6 @@ export const classAbilityNames = {
           '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
         ],
         [
-          'repentance',
-          '참회',
-          '적을 최대 6초 동안 명상 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. (징벌 전문화 상징)',
-        ],
-        [
           'bestial_wrath',
           '야수의 격노',
           '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
@@ -6744,11 +6245,6 @@ export const classAbilityNames = {
           '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
         ],
         ['combustion', '발화', '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)'],
-        [
-          'cone_of_cold',
-          '냉기 돌풍',
-          '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)',
-        ],
         [
           'icy_veins',
           '얼음 핏줄',
@@ -6790,24 +6286,9 @@ export const classAbilityNames = {
           '정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)',
         ],
         [
-          'shamanistic_rage',
-          '주술의 분노',
-          '주술의 분노를 방출하여 마나 160를 회복합니다. (고양 전문화 상징)',
-        ],
-        [
-          'natures_swiftness',
-          '자연의 신속함',
-          '자연을 불러 다음 주문을 즉시 시전하게 합니다. (복원 전문화 상징)',
-        ],
-        [
           'siphon_life',
           '생명력 착취',
           '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
-        ],
-        [
-          'fel_domination',
-          '악마 지배',
-          '지옥의 기운을 지배하여 다음 주문을 즉시 시전하게 합니다. (악마 전문화 상징)',
         ],
         [
           'conflagrate',
@@ -6828,56 +6309,6 @@ export const classAbilityNames = {
           'swiftmend',
           '신속한 치유',
           '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
-        ],
-        [
-          'storm_bolt',
-          '폭풍망치',
-          '무기를 던져 대상에게 {damage}의 피해를 입히고 3초 동안 기절시킵니다.',
-        ],
-        [
-          'piercing_howl',
-          '날카로운 고함',
-          '날카로운 고함을 질러 15미터 내 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다.',
-        ],
-        [
-          'die_by_sword',
-          '투사의 혼',
-          '방어 재사용 대기시간: 8초 동안 받는 피해가 30% 감소하고 훨씬 더 많은 공격을 회피합니다.',
-        ],
-        [
-          'recklessness',
-          '무모한 희생',
-          '격노: 12초 동안 분노 생성량이 50%, 치명타 확률이 20% 증가합니다.',
-        ],
-        [
-          'sanguine_aura',
-          '핏빛 오라',
-          '적의 피로 무기를 물들입니다. 자신과 근접 아군의 공격 속도가 10%, 피해가 10% 증가합니다. 20초 동안 지속됩니다.',
-        ],
-        [
-          'victory_rush',
-          '연전연승',
-          '무기 피해에 {damage}를 더한 피해를 입히고 최대 생명력의 20%를 회복합니다. 적 처치 후 20초 이내에만 사용할 수 있습니다.',
-        ],
-        [
-          'intimidating_shout',
-          '위협의 외침',
-          '공포스러운 외침으로 8미터 내 최대 5명의 적을 8초 동안 공포에 질려 도망치게 합니다. 피해를 입으면 효과가 풀릴 수 있습니다.',
-        ],
-        [
-          'pummel',
-          '자루 공격',
-          '시전을 방해하고 해당 계열 주문을 4초 동안 시전할 수 없게 합니다. 시전을 끊으면 분노 10을 생성합니다.',
-        ],
-        [
-          'heroic_leap',
-          '영웅의 도약',
-          '목표 지점으로 도약하여 주위 적에게 {damage}의 피해를 입힙니다.',
-        ],
-        [
-          'rallying_cry',
-          '재집결의 함성',
-          '재집결의 함성을 질러 자신과 40미터 내 파티원의 최대 생명력을 10초 동안 20% 증가시킵니다.',
         ],
         [
           'summon_imp',
@@ -7478,11 +6909,6 @@ export const classAbilityNames = {
           '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
         ],
         [
-          'repentance',
-          '悔悟',
-          '敵を最大6秒間瞑想状態にします。ダメージを受けると効果は解除されます。（リトリビューション特性のシグネチャ）',
-        ],
-        [
           'bestial_wrath',
           '野獣の怒り',
           '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',
@@ -7506,11 +6932,6 @@ export const classAbilityNames = {
           'combustion',
           'コンバッション',
           '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
-        ],
-        [
-          'cone_of_cold',
-          'コーンオブコールド',
-          '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（フロスト特性のシグネチャ）',
         ],
         [
           'icy_veins',
@@ -7553,24 +6974,9 @@ export const classAbilityNames = {
           '元素の熟達を呼び、次の呪文を即時発動にします。（エレメンタル特性のシグネチャ）',
         ],
         [
-          'shamanistic_rage',
-          'シャーマニスティックレイジ',
-          'シャーマンの怒りを解放し、マナを160回復します。（エンハンスメント特性のシグネチャ）',
-        ],
-        [
-          'natures_swiftness',
-          '自然の迅速さ',
-          '自然に呼びかけ、次の呪文を即時発動にします。（レストレーション特性のシグネチャ）',
-        ],
-        [
           'siphon_life',
           'サイフォンライフ',
           '敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）',
-        ],
-        [
-          'fel_domination',
-          'フェルドミネーション',
-          '邪悪な力を支配し、次の呪文を即時発動にします。（デモノロジー特性のシグネチャ）',
         ],
         [
           'conflagrate',
@@ -7591,56 +6997,6 @@ export const classAbilityNames = {
           'swiftmend',
           'スウィフトメンド',
           '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
-        ],
-        [
-          'storm_bolt',
-          'ストームボルト',
-          '武器を投げつけて{damage}のダメージを与え、対象を3秒間スタンさせます。',
-        ],
-        [
-          'piercing_howl',
-          'ピアシングハウル',
-          '鋭い咆哮を上げ、15ヤード以内の敵全員を8秒間50%減速させます。',
-        ],
-        [
-          'die_by_sword',
-          'ダイ・バイ・ザ・ソード',
-          '防御用クールダウン：8秒間、受けるダメージが30%減少し、はるかに多くの攻撃を回避します。',
-        ],
-        [
-          'recklessness',
-          'レックレスネス',
-          '激怒：12秒間、怒りの生成が50%、クリティカル率が20%増加します。',
-        ],
-        [
-          'sanguine_aura',
-          'サングインオーラ',
-          '敵の血で武器を染め上げます。自身と近接の味方の攻撃速度が10%、ダメージが10%増加します。20秒間持続します。',
-        ],
-        [
-          'victory_rush',
-          'ヴィクトリーラッシュ',
-          '武器ダメージ+{damage}の一撃を放ち、最大体力の20%を回復します。敵を倒してから20秒以内のみ使用可能です。',
-        ],
-        [
-          'intimidating_shout',
-          '威嚇の雄叫び',
-          '恐ろしい雄叫びを上げ、8ヤード以内の最大5体の敵を8秒間恐怖で逃げ惑わせます。ダメージで効果が解除されることがあります。',
-        ],
-        [
-          'pummel',
-          'パンメル',
-          '詠唱を妨害し、その系統の呪文を4秒間詠唱不能にします。詠唱を止めると怒りを10生成します。',
-        ],
-        [
-          'heroic_leap',
-          'ヒロイックリープ',
-          '目標地点へ跳躍し、周囲の敵に{damage}のダメージを与えます。',
-        ],
-        [
-          'rallying_cry',
-          'ラリングクライ',
-          '鬨の声を上げ、自身と40ヤード以内のパーティメンバーの最大体力を10秒間20%増加させます。',
         ],
         [
           'summon_imp',
@@ -8267,11 +7623,6 @@ export const classAbilityNames = {
           'Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)',
         ],
         [
-          'repentance',
-          'Arrependimento',
-          'Coloca o inimigo em estado de meditação por até 6 s. Qualquer dano quebra o efeito. (assinatura Retribuição)',
-        ],
-        [
           'bestial_wrath',
           'Ira Bestial',
           'Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)',
@@ -8295,11 +7646,6 @@ export const classAbilityNames = {
           'combustion',
           'Combustão',
           'Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)',
-        ],
-        [
-          'cone_of_cold',
-          'Cone de Frio',
-          'Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (assinatura Gelo)',
         ],
         [
           'icy_veins',
@@ -8342,24 +7688,9 @@ export const classAbilityNames = {
           'Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)',
         ],
         [
-          'shamanistic_rage',
-          'Raiva Xamânica',
-          'Libera raiva xamânica, restaurando 160 de mana. (assinatura Aperfeiçoamento)',
-        ],
-        [
-          'natures_swiftness',
-          'Rapidez da Natureza',
-          'Invoca a natureza para tornar seu próximo feitiço instantâneo. (assinatura Restauração)',
-        ],
-        [
           'siphon_life',
           'Sifão de Vida',
           'Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)',
-        ],
-        [
-          'fel_domination',
-          'Dominação Vil',
-          'Domina energias vis, tornando seu próximo feitiço instantâneo. (assinatura Demonologia)',
         ],
         [
           'conflagrate',
@@ -8380,66 +7711,6 @@ export const classAbilityNames = {
           'swiftmend',
           'Recuperação Rápida',
           'Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)',
-        ],
-        [
-          'storm_bolt',
-          'Raio Tempestuoso',
-          'Arremessa sua arma no alvo, causando {damage} e atordoando-o por 3 seg.',
-        ],
-        [
-          'piercing_howl',
-          'Uivo Penetrante',
-          'Um grito penetrante que reduz em 50% a velocidade de todos os inimigos num raio de 15 metros por 8 seg.',
-        ],
-        [
-          'die_by_sword',
-          'Morrer pela Espada',
-          'Recurso defensivo: por 8 seg você sofre 30% menos dano e esquiva de muito mais ataques.',
-        ],
-        [
-          'recklessness',
-          'Imprudência',
-          'Fúria: sua geração de raiva aumenta em 50% e sua chance de acerto crítico em 20% por 12 seg.',
-        ],
-        [
-          'avatar',
-          'Avatar',
-          'Transforma-se num colosso por 20 seg, quebrando qualquer controle sobre você e aumentando o dano causado em 20%.',
-        ],
-        [
-          'sanguine_aura',
-          'Aura Sanguínea',
-          'Embebe sua arma no sangue dos inimigos: você e seus aliados corpo a corpo ganham 10% de velocidade de ataque e 10% de dano por 20 seg.',
-        ],
-        [
-          'victory_rush',
-          'Ímpeto da Vitória',
-          'Golpeia causando dano da arma mais {damage} e cura 20% da sua vida máxima. Utilizável apenas em até 20 seg após matar um inimigo.',
-        ],
-        [
-          'bladestorm',
-          'Tempestade de Lâminas',
-          'Torna-se um redemoinho de aço, golpeando todos os inimigos num raio de 8 metros com {damage} por segundo durante 4 seg.',
-        ],
-        [
-          'intimidating_shout',
-          'Grito Intimidador',
-          'Um grito aterrorizante que faz até 5 inimigos num raio de 8 metros fugirem apavorados por 8 seg. Dano pode quebrar o efeito.',
-        ],
-        [
-          'pummel',
-          'Esmurrar',
-          'Interrompe a conjuração e impede conjurar feitiços daquela escola por 4 seg. Gera 10 de raiva ao cortar uma conjuração.',
-        ],
-        [
-          'heroic_leap',
-          'Salto Heroico',
-          'Salta para a área alvo, causando {damage} de dano aos inimigos próximos.',
-        ],
-        [
-          'rallying_cry',
-          'Grito de Guerra',
-          'Solta um grito de guerra que concede a você e aos membros do grupo num raio de 40 metros 20% de vida máxima adicional por 10 seg.',
         ],
         [
           'summon_imp',
@@ -9112,11 +8383,6 @@ export const classAbilityNames = {
           'Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)',
         ],
         [
-          'repentance',
-          'Покаяние',
-          'Погружает врага в созерцание на срок до 6 сек. Любой урон прерывает эффект. (знаковое умение Воздаяния)',
-        ],
-        [
           'bestial_wrath',
           'Звериный гнев',
           'Повергает вас в звериную ярость, повышая силу атаки на 55 на 15 сек. (знаковое умение Повелителя зверей)',
@@ -9140,11 +8406,6 @@ export const classAbilityNames = {
           'combustion',
           'Возгорание',
           'Повышает шанс критического эффекта заклинаний на 50% на 15 сек. (знаковое умение Огня)',
-        ],
-        [
-          'cone_of_cold',
-          'Конус холода',
-          'Поражает ближайших врагов холодом, нанося {damage} ед. урона от магии льда. (знаковое умение Льда)',
         ],
         [
           'icy_veins',
@@ -9187,24 +8448,9 @@ export const classAbilityNames = {
           'Призывает покорение стихий, делая следующее заклинание мгновенным. (знаковое умение Стихий)',
         ],
         [
-          'shamanistic_rage',
-          'Шаманская ярость',
-          'Высвобождает шаманскую ярость и восстанавливает 160 маны. (знаковое умение Совершенствования)',
-        ],
-        [
-          'natures_swiftness',
-          'Природная стремительность',
-          'Призывает природу, чтобы следующее заклинание стало мгновенным. (знаковое умение Исцеления)',
-        ],
-        [
           'siphon_life',
           'Вытягивание жизни',
           'Вытягивает жизнь из врага, нанося {damage} ед. урона от темной магии за 30 сек. и исцеляя вас на величину нанесенного урона. (знаковое умение Колдовства)',
-        ],
-        [
-          'fel_domination',
-          'Господство Скверны',
-          'Подчиняет энергии Скверны, делая следующее заклинание мгновенным. (знаковое умение Демонологии)',
         ],
         [
           'conflagrate',
@@ -9225,52 +8471,6 @@ export const classAbilityNames = {
           'swiftmend',
           'Быстрое восстановление',
           'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
-        ],
-        ['storm_bolt', 'Удар бури', 'Метает оружие в цель, нанося {damage} и оглушая ее на 3 сек.'],
-        [
-          'piercing_howl',
-          'Пронзительный вой',
-          'Пронзительный крик, замедляющий всех противников в радиусе 15 м на 50% на 8 сек.',
-        ],
-        [
-          'die_by_sword',
-          'Смерть от меча',
-          'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
-        ],
-        [
-          'recklessness',
-          'Безрассудство',
-          'Исступление: накопление ярости увеличено на 50%, а вероятность критического удара на 20% на 12 сек.',
-        ],
-        [
-          'sanguine_aura',
-          'Кровавая аура',
-          'Пропитывает оружие кровью врагов: вы и ваши союзники ближнего боя получаете 10% к скорости атаки и 10% к урону на 20 сек.',
-        ],
-        [
-          'victory_rush',
-          'Победный рывок',
-          'Удар, наносящий урон оружием плюс {damage} и восполняющий 20% вашего максимального здоровья. Можно использовать только в течение 20 сек после убийства врага.',
-        ],
-        [
-          'intimidating_shout',
-          'Устрашающий крик',
-          'Ужасающий крик, обращающий в паническое бегство до 5 врагов в радиусе 8 м на 8 сек. Урон может прервать эффект.',
-        ],
-        [
-          'pummel',
-          'Зуботычина',
-          'Прерывает произнесение заклинания и блокирует эту школу магии на 4 сек. Дает 10 ед. ярости, если заклинание было прервано.',
-        ],
-        [
-          'heroic_leap',
-          'Героический прыжок',
-          'Прыжок в указанную область, наносящий {damage} урона ближайшим врагам.',
-        ],
-        [
-          'rallying_cry',
-          'Воодушевляющий крик',
-          'Воодушевляющий крик дает вам и членам группы в радиусе 40 м 20% дополнительного максимального здоровья на 10 сек.',
         ],
         [
           'summon_imp',

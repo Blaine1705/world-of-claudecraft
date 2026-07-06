@@ -219,7 +219,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
-              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
+              const healed = Math.min(Math.round(a.value * a.leechPct), src.maxHp - src.hp);
               if (healed > 0) {
                 src.hp += healed;
                 ctx.emit({

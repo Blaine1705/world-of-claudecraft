@@ -198,21 +198,9 @@ export type AuraKind =
   | 'buff_speed'
   | 'buff_haste'
   | 'buff_spellpower'
-  // Rallying Cry: value = fraction added to maximum health while worn (the
-  // recalc keeps the hp fraction, so current health scales with it).
-  | 'buff_maxhp_pct'
   | 'buff_spellcrit'
   | 'buff_spelldmg'
   | 'buff_spellhaste'
-  // Shared exhaustion marker (Bloodlust / Temporal Acceleration): a pure debuff with
-  // no stat effect. While it rides, a target cannot benefit from another group haste
-  // burst (aoeAllyHaste with exhaust), so the effects can never be chained.
-  | 'sated'
-  // Cauterize lockout (fire mage, combat/fire_mage.ts): a pure debuff marking that
-  // the lethal save already fired. While worn, Cauterize cannot save again. It
-  // SURVIVES death (resurrection.ts aurasSurvivingDeath) and pauses while dead, so
-  // dying, reviving, and dying again inside the window never double-saves.
-  | 'cauterize_fatigue'
   | 'cast_shield'
   | 'hot'
   | 'absorb'
@@ -229,11 +217,6 @@ export type AuraKind =
   | 'form_travel'
   | 'form_moonkin'
   | 'form_shadow'
-  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
-  // its damage/haste bonuses ride separate buff auras).
-  | 'form_metamorph'
-  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
-  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   // Arms restructure (owner 2026-07-08). `overpower_charge`: Redhand stacks it
@@ -459,22 +442,7 @@ export interface Aura {
   charges?: number;
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
-  // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
-  // ids may consume this aura; undefined means any eligible cast.
-  empowerAbilities?: string[];
-  // extendDot bookkeeping: seconds already added to this DoT application, so
-  // the per-application maxBonus cap holds across channel ticks.
-  extendedBy?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
-  // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
-  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
-  // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
-  // echoConvertRate stores the single-target coefficient the mark converts at
-  // (0.35 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
-  // combat/chronomancy.ts during Arcane-damage conversion (server-authoritative and
-  // offline), so they never need to ride the wire.
-  echoGroup?: boolean;
-  echoConvertRate?: number;
 }
 
 export type CrowdControlDrCategory =
@@ -1711,49 +1679,13 @@ export type AbilityEffect =
       auraName: string;
     }
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
-  // `auraId` overrides the applied dot aura's id (default: the ability id) so a
-  // rider bleed does not collide with another same-id aura the same cast applies
-  // (Maiming Strike's Deep Wounds bleed vs its mortal_wound debuff).
-  | {
-      type: 'dot';
-      total: number;
-      duration: number;
-      interval: number;
-      leechPct?: number;
-      auraId?: string;
-    }
+  | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
-  // `frontal` restricts the blast to enemies within the melee facing arc
-  // (MELEE_ARC, the castAbility facing gate); `stunSec` is a paired stun rider
-  // applied to each enemy actually hit (Faultline). Neither draws extra rng.
-  | {
-      type: 'aoeDamage';
-      min: number;
-      max: number;
-      radius: number;
-      // The blast can critically strike: ONE crit decision per CAST (a single
-      // rng draw once at least one target is struck; fireGuaranteedCrit
-      // overrides the outcome), applied to every struck enemy together, and
-      // fed to noteSpellHit exactly once, so an AoE builder (Flamestrike)
-      // counts a whole cast as a single crit toward Hot Streak (owner rule).
-      // Absent: the classic never-crits AoE path, zero extra rng.
-      canCrit?: boolean;
-      frontal?: boolean;
-      stunSec?: number;
-      // Classic AoE soft target cap (Revenge): once more than `softCap` targets
-      // are struck, each rolled hit is scaled by softCap/targets so the TOTAL
-      // damage caps at softCap x per-target. Scales the already-rolled amount, so
-      // it draws no extra rng.
-      softCap?: number;
-      // Rage-generating AoE (Bladed Gyre): after the blast, the caster gains
-      // `base + perTarget * min(targetsHit, capTargets)` rage (e.g. 5 + 1 per
-      // enemy struck, capped at +5). Deterministic state change, no extra rng.
-      rageOnHit?: { base: number; perTarget: number; capTargets: number };
-    }
+  | { type: 'aoeDamage'; min: number; max: number; radius: number }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
@@ -1781,89 +1713,11 @@ export type AbilityEffect =
       orbCdr?: boolean;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
-  // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
-  // (debuff_ap); `pct` = a percentage cut to ALL damage the victims deal (a
-  // negative buff_dmg_done aura), the owner's Direhowl rework: mobs carry most
-  // of their damage on the weapon roll, so a flat AP drain barely dents them.
-  | { type: 'aoeAttackPower'; amount?: number; pct?: number; duration: number; radius: number }
+  | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
-  | {
-      type: 'aoeAllyAttackPower';
-      amount?: number;
-      apPct?: number;
-      duration: number;
-      radius: number;
-    }
-  // Group haste buff. Base form (Red Banner): buff_haste (attack speed) to every
-  // friendly in radius. `spell` also grants buff_spellhaste (full haste: casts and
-  // channels too). `exhaust` applies the shared `sated` debuff and refuses the buff
-  // on already-sated targets, so Bloodlust / Temporal Acceleration cannot be chained.
-  // `groupOnly` restricts it to the caster's living group/raid (never external
-  // friendlies), so a shared-exhaustion burst never sates a passing stranger.
-  | {
-      type: 'aoeAllyHaste';
-      mult: number;
-      duration: number;
-      radius: number;
-      spell?: boolean;
-      exhaust?: boolean;
-      groupOnly?: boolean;
-    }
-  | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
-  | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
-  | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
-  | {
-      type: 'aoeRoot';
-      duration: number;
-      radius: number;
-      min: number;
-      max: number;
-      // Optional persistent annular trap. `duration` remains the root duration;
-      // the nested duration is how long the ring can catch new enemies.
-      ring?: { duration: number; innerRadius: number };
-    }
-  | {
-      type: 'empoweredCone';
-      angle: number;
-      slowMult?: number;
-      slowDuration?: number;
-      fx?: 'frostCone' | 'fireCone';
-      guaranteedCritLevel?: number;
-      hotStreakOnce?: boolean;
-      stages: readonly {
-        range: number;
-        min: number;
-        max: number;
-        angle?: number;
-        rootDuration?: number;
-        incapacitateDuration?: number;
-      }[];
-    }
-  // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
-  // caster that pulses frost damage + a snare every `interval` for `duration`
-  // seconds and feeds Fingers of Frost (frost mage spec kit).
-  | {
-      type: 'frozenOrb';
-      min: number;
-      max: number;
-      radius: number;
-      duration: number;
-      interval: number;
-    }
-  // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
-  // match ball toward the caster's castAim (power = ground speed yd/s, loft =
-  // initial vertical speed); sportDash is a targetless directional lunge along
-  // the aim direction (catchBall lets a keeper's Dive catch a crossing ball);
-  // sportShove bumps the target back via the knockback walker. ballPass rolls a
-  // firm auto-paced ground pass to the caster's targeted teammate (else the best
-  // teammate toward the aim), leading their run. All no-damage.
-  | { type: 'ballKick'; power: number; loft: number }
-  | { type: 'ballPass'; power: number; loft: number }
-  // ballShoot fires the ball at the enemy goal; power (ground speed) and loft
-  // both scale with the caster's charge, so a max-power shot sails OVER the bar.
-  | { type: 'ballShoot'; power: number; loft: number }
-  | { type: 'sportDash'; distance: number; catchBall?: boolean }
-  | { type: 'sportShove'; distance: number }
+  | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
+  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
+  | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   | {
       type: 'consumeAura';
       auraIds?: string[];

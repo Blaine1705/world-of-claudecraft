@@ -15017,9 +15017,19 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}`
       : '';
   };
-  // The pickers live in ability_damage.ts so the consistency guard test shares
-  // them; this function only formats the picked effect.
-  const primary = abilityPrimaryEffect(res);
+  const primary = effects.find(
+    (eff) =>
+      eff.type === 'directDamage' ||
+      eff.type === 'heal' ||
+      eff.type === 'weaponDamage' ||
+      eff.type === 'weaponStrike' ||
+      eff.type === 'aoeDamage' ||
+      eff.type === 'aoeHeal' ||
+      eff.type === 'aoeRoot' ||
+      eff.type === 'consumeAura' ||
+      eff.type === 'finisherDamage' ||
+      eff.type === 'drainTick',
+  );
   if (primary) {
     switch (primary.type) {
       case 'directDamage':
@@ -15031,12 +15041,6 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'groundAoE':
       case 'drainTick':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
-      case 'repositionToAim':
-        // Heroic Leap: the touchdown blast lives in landingAoe (guaranteed
-        // present here, since the picker only selects repositionToAim with one).
-        return primary.landingAoe
-          ? abilityAmountRange(primary.landingAoe.min, primary.landingAoe.max)
-          : '';
       case 'consumeAura':
         if (primary.deal) {
           return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);

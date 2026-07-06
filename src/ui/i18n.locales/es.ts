@@ -3254,9 +3254,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Revivir mascota',
   'entities.abilities.revive_pet.description':
     'Revive a tu mascota muerta y la devuelve a tu lado.',
-  'entities.abilities.aura_surge.name': 'Oleada Radiante',
-  'entities.abilities.aura_surge.description':
-    'Sobrecarga tu aura y te endurece con 160 de armadura durante 10 s. (talento de Paladín)',
   'entities.abilities.holy_shock.name': 'Choque Sagrado',
   'entities.abilities.holy_shock.description':
     'Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)',
@@ -3277,7 +3274,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
   'entities.abilities.combustion.name': 'Combustión',
   'entities.abilities.combustion.description':
-    'Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos acumulan Buena Racha como cualquier otro. (habilidad distintiva de Fuego)',
+    'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
   'entities.abilities.icy_veins.name': 'Venas heladas',
   'entities.abilities.icy_veins.description':
     'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
@@ -3323,159 +3320,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': 'Metamorfosis',
   'entities.abilities.metamorphosis.description':
     'Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)',
-  'entities.abilities.aspect_of_the_wild.name': 'Atuendo Colmillo Salvaje',
-  'entities.abilities.aspect_of_the_wild.description':
-    'Inspira a cercanos aliados con fuerza salvaje, aumentando poder de ataque durante 5 min. (talento de cazador)',
-  'entities.abilities.avatar.name': 'Coloso',
-  'entities.abilities.avatar.description':
-    'Te transforma en un coloso y aumenta poder de ataque durante 20 s. (talento de guerrero)',
-  'entities.abilities.avenging_wrath.name': 'Ala de Venganza',
-  'entities.abilities.avenging_wrath.description':
-    'Invoca poder vengador y aumenta poder de ataque y poder con hechizos durante 20 s. (talento de paladín)',
-  'entities.abilities.berserk.name': 'Bruma Roja',
-  'entities.abilities.berserk.description':
-    'Aumenta poder de ataque durante 15 s. (talento de druida)',
-  'entities.abilities.bladestorm.name': 'Ciclón de Acero',
-  'entities.abilities.bladestorm.description':
-    'Te convierte en una tormenta de acero que golpea a cercanos enemigos cada segundo por {damage}. (talento de guerrero)',
-  'entities.abilities.blink.name': 'Paso Fugaz',
-  'entities.abilities.blink.description':
-    'Te teletransporta 15 m hacia delante y rompe raíces. (talento de mago)',
-  'entities.abilities.bloodlust.name': 'Tambores de Guerra',
-  'entities.abilities.bloodlust.description':
-    'Lleva a cercanos aliados al frenesí y aumenta su velocidad de ataque durante 15 s. (talento de chamán)',
-  'entities.abilities.chain_lightning.name': 'Relámpago Bifurcado',
-  'entities.abilities.chain_lightning.description':
-    'Lanza relámpagos al área objetivo e inflige {damage} de daño a cercanos enemigos. (talento de chamán)',
-  'entities.abilities.chaos_bolt.name': 'Descarga de Ruina',
-  'entities.abilities.chaos_bolt.description':
-    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de brujo)',
-  'entities.abilities.cloak_of_shadows.name': 'Capa Sombría',
-  'entities.abilities.cloak_of_shadows.description':
-    'Te envuelve en sombras y absorbe daño durante 5 s. (talento de pícaro)',
-  'entities.abilities.cone_of_cold.name': 'Barrido de Escarcha',
-  'entities.abilities.cone_of_cold.description':
-    'Golpea a cercanos enemigos con escarcha e inflige {damage} de daño de Escarcha. (talento de mago)',
-  'entities.abilities.counter_shot.name': 'Disparo Silenciador',
-  'entities.abilities.counter_shot.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de cazador)',
-  'entities.abilities.counterspell.name': 'Rompehechizos',
-  'entities.abilities.counterspell.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 6 s. (talento de mago)',
-  'entities.abilities.curse_of_exhaustion.name': 'Maleficio Plomizo',
-  'entities.abilities.curse_of_exhaustion.description':
-    'Maldice a objetivo y reduce su velocidad de movimiento un 30% durante 12 s. (talento de brujo)',
-  'entities.abilities.death_coil.name': 'Espiral de Tumba',
-  'entities.abilities.death_coil.description':
-    'Golpea a objetivo por {damage} de daño de Sombras y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talento de brujo)',
-  'entities.abilities.deep_freeze.name': 'Escarcha Muerta',
-  'entities.abilities.deep_freeze.description':
-    'Congela profundamente a objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (talento de mago)',
-  'entities.abilities.desperate_prayer.name': 'Última Plegaria',
-  'entities.abilities.desperate_prayer.description':
-    'Te sana al instante por {damage}. (talento de sacerdote)',
-  'entities.abilities.deterrence.name': 'Guardia de Zarzas',
-  'entities.abilities.deterrence.description':
-    'Aumenta tu probabilidad de esquivar un 50% durante 10 s. (talento de cazador)',
-  'entities.abilities.divine_shield.name': 'Resguardo de Luz',
-  'entities.abilities.divine_shield.description':
-    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talento de paladín)',
-  'entities.abilities.earthbind.name': 'Tierra Prensora',
-  'entities.abilities.earthbind.description':
-    'Ata a la tierra a cercanos enemigos y los inmoviliza durante 2 s. (talento de chamán)',
-  'entities.abilities.evocation.name': 'Pozo de Éter',
-  'entities.abilities.evocation.description':
-    'Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)',
-  'entities.abilities.frenzied_regeneration.name': 'Remiendo Salvaje',
-  'entities.abilities.frenzied_regeneration.description':
-    'Regenera salud durante 10 s. Solo en Forma de oso. (talento de druida)',
-  'entities.abilities.frost_trap.name': 'Trampa de Cencellada',
-  'entities.abilities.frost_trap.description':
-    'Congela a los enemigos en el área objetivo durante 3 s. (talento de cazador)',
-  'entities.abilities.ghostly_strike.name': 'Golpe Espectral',
-  'entities.abilities.ghostly_strike.description':
-    'Golpea a objetivo por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talento de pícaro)',
-  'entities.abilities.hammer_of_wrath.name': 'Martillo Tañoso',
-  'entities.abilities.hammer_of_wrath.description':
-    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sagrado. Solo se usa por debajo del 20% de salud. (talento de paladín)',
-  'entities.abilities.healing_stream.name': 'Manantial',
-  'entities.abilities.healing_stream.description':
-    'Restaura a objetivo amistoso durante 12 s. (talento de chamán)',
-  'entities.abilities.heroic_leap.name': 'Salto de Guerra',
-  'entities.abilities.heroic_leap.description':
-    'Saltas al área objetivo e infliges {damage} de daño Físico a cercanos enemigos. (talento de guerrero)',
-  'entities.abilities.holy_wrath.name': 'Ira del Santo',
-  'entities.abilities.holy_wrath.description':
-    'Desata poder sagrado e inflige {damage} de daño a cercanos enemigos. (talento de paladín)',
-  'entities.abilities.howl_of_terror.name': 'Aullido Pavoroso',
-  'entities.abilities.howl_of_terror.description':
-    'Aterroriza a cercanos enemigos hasta 3 s. El daño puede romper el efecto. (talento de brujo)',
-  'entities.abilities.ice_block.name': 'Ataúd Helado',
-  'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)',
-  'entities.abilities.inner_focus.name': 'Mente Serena',
-  'entities.abilities.inner_focus.description':
-    'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento de sacerdote)',
-  'entities.abilities.innervate.name': 'Savia Vital',
-  'entities.abilities.innervate.description':
-    'La savia viva brota en ti durante 10 s, restaurando 20 de tu recurso actual en oleadas: maná, ira o energía; cambiar de forma no la interrumpe. (talento de Druida)',
-  'entities.abilities.kick.name': 'Patada',
-  'entities.abilities.kick.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de pícaro)',
-  'entities.abilities.last_stand.name': 'Undécima Hora',
-  'entities.abilities.last_stand.description':
-    'Aumenta temporalmente Aguante durante 15 s, aumentando la salud máxima. (talento de guerrero)',
-  'entities.abilities.mend_pet.name': 'Remendar',
-  'entities.abilities.mend_pet.description':
-    'Sana a objetivo amistoso por {damage} durante 15 s. (talento de cazador)',
-  'entities.abilities.meteor.name': 'Piedra Celeste',
-  'entities.abilities.meteor.description':
-    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (talento de mago)',
-  'entities.abilities.mind_sear.name': 'Ardeideas',
-  'entities.abilities.mind_sear.description':
-    'Canaliza energía de Sombras en el área objetivo e inflige {damage} cada segundo a cercanos enemigos. (talento de sacerdote)',
-  'entities.abilities.multi_shot.name': 'Disparo Dividido',
-  'entities.abilities.multi_shot.description':
-    'Dispara varios proyectiles e inflige {damage} a cercanos enemigos. (talento de cazador)',
-  'entities.abilities.prayer_of_healing.name': 'Coro Sanador',
-  'entities.abilities.prayer_of_healing.description':
-    'Sana a cercanos aliados por {damage}. (talento de sacerdote)',
-  'entities.abilities.preparation.name': 'Contingencia',
-  'entities.abilities.preparation.description':
-    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talento de pícaro)',
-  'entities.abilities.presence_of_mind.name': 'Mente Veloz',
-  'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento de mago)',
-  'entities.abilities.psychic_scream.name': 'Alarido Psíquico',
-  'entities.abilities.psychic_scream.description':
-    'Aterroriza a cercanos enemigos hasta 4 s. El daño puede romper el efecto. (talento de sacerdote)',
-  'entities.abilities.pummel.name': 'Zurrar',
-  'entities.abilities.pummel.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de guerrero)',
-  'entities.abilities.rallying_cry.name': 'Arenga',
-  'entities.abilities.rallying_cry.description':
-    'Lanza un grito de reunión y aumenta poder de ataque de cercanos aliados durante 10 s. (talento de guerrero)',
-  'entities.abilities.rebuke.name': 'Reprensión',
-  'entities.abilities.rebuke.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de paladín)',
-  'entities.abilities.shadowstep.name': 'Paso Sombrío',
-  'entities.abilities.shadowstep.description':
-    'Das un paso entre las sombras hacia tu objetivo. (talento de pícaro)',
-  'entities.abilities.shield_wall.name': 'Baluarte',
-  'entities.abilities.shield_wall.description':
-    'Alzas un muro de escudo y aumentas mucho la armadura durante 10 s. (talento de guerrero)',
-  'entities.abilities.silence.name': 'Silencio',
-  'entities.abilities.silence.description':
-    'Silencia a objetivo durante 4 s. (talento de sacerdote)',
-  'entities.abilities.skull_bash.name': 'Cabezazo',
-  'entities.abilities.skull_bash.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de druida)',
-  'entities.abilities.spell_lock.name': 'Orden de Mordaza',
-  'entities.abilities.spell_lock.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 5 s. (talento de brujo)',
-  'entities.abilities.tranquility.name': 'Canto del Claro',
-  'entities.abilities.tranquility.description':
-    'Canaliza energía restauradora y sana a cercanos aliados cada segundo. (talento de druida)',
   'entities.items.worn_sword.name': 'Espada corta corroída',
   'entities.items.gnarled_staff.name': 'Bastón de Roble Pantanoso',
   'entities.items.rusty_dagger.name': 'Daga oxidada',

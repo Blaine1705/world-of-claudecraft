@@ -6233,10 +6233,6 @@ export const nl_NL: EnTranslations = {
         "name": "Kruisvaardersslag",
         "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
       },
-      "chain_heal": {
-        "name": "Kettinggenezing",
-        "description": "Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 andere bondgenoten in de buurt. Elke sprong geneest 50% minder. (Herstelkenmerk)"
-      },
       "metamorphosis": {
         "name": "Metamorfose",
         "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"

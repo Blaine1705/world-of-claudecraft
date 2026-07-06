@@ -39,13 +39,10 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
-  chainDamage: 'damage',
   aoeHeal: 'other',
-  chainHeal: 'other',
   groundAoE: 'damage',
   frozenOrb: 'damage',
   aoeRoot: 'damage',
-  empoweredCone: 'damage',
   consumeAura: 'other',
   drainTick: 'damage',
   judgement: 'damage',
@@ -71,18 +68,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   stun: 'other',
   aoeAttackSpeed: 'other',
   aoeAttackPower: 'other',
-  // Choice-row talents: an AoE slow is a non-breaking snare; the party buff is
-  // pure utility. (aoeFear/breakControl/repositionToAim are classified above.)
-  aoeSlow: 'other',
-  partyMeleeBuff: 'other',
   aoeAllyAttackPower: 'other',
-  aoeAllyMaxHp: 'other',
   aoeAllyHaste: 'other',
-  aoeAllyDamage: 'other',
-  // Fury support cooldowns: the group guaranteed-crit buff and the self
-  // HoT are both pure utility, never an attack.
-  aoeAllySureCrit: 'other',
-  selfHotPctMax: 'other',
   selfBuff: 'other',
   petBuff: 'other',
   applyDebuff: 'other',

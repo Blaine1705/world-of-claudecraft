@@ -6233,10 +6233,6 @@ export const id_ID: EnTranslations = {
         "name": "Serangan Tentara Salib",
         "description": "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)"
       },
-      "chain_heal": {
-        "name": "Penyembuhan Berantai",
-        "description": "Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)"
-      },
       "metamorphosis": {
         "name": "Metamorfosis",
         "description": "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)"

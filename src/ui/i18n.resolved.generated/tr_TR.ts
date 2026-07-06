@@ -6233,10 +6233,6 @@ export const tr_TR: EnTranslations = {
         "name": "Haçlı Darbesi",
         "description": "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)"
       },
-      "chain_heal": {
-        "name": "Zincirleme İyileştirme",
-        "description": "Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)"
-      },
       "metamorphosis": {
         "name": "Metamorfoz",
         "description": "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)"

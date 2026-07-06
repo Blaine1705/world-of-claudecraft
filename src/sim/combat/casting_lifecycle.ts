@@ -67,19 +67,11 @@ import {
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
-import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
-import {
-  applyBrainFreezeOverride,
-  brainFreezeBypassesCooldown,
-  frostMageChannelPulse,
-  frostMageChannelStart,
-} from './frost_mage';
-import { empoweredCastProgress, empoweredStageForProgress } from './glacial_front';
 import {
   hasCastShield,
   noteSpellHit,
   spellDamageMultFromAuras,
-  spellHasteMult,
+  spellHasteMultFromAuras,
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
@@ -99,7 +91,15 @@ const COLOSSAL_MIGHT_COOLDOWNS = new Set([
 ]);
 
 function isFormToggle(ability: AbilityDef): boolean {
-  return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
+  return ability.effects.some(
+    (e) =>
+      e.type === 'selfBuff' &&
+      (e.kind === 'form_bear' ||
+        e.kind === 'form_cat' ||
+        e.kind === 'form_travel' ||
+        e.kind === 'form_moonkin' ||
+        e.kind === 'form_shadow'),
+  );
 }
 
 // Forms, stances and stealth are toggles: re-casting cancels the aura, and
@@ -109,7 +109,11 @@ function isToggleBuff(ability: AbilityDef): boolean {
   return ability.effects.some(
     (e) =>
       e.type === 'selfBuff' &&
-      (isFormAuraKind(e.kind) ||
+      (e.kind === 'form_bear' ||
+        e.kind === 'form_cat' ||
+        e.kind === 'form_travel' ||
+        e.kind === 'form_moonkin' ||
+        e.kind === 'form_shadow' ||
         e.kind === 'defensive_stance' ||
         e.kind === 'stealth' ||
         e.kind === 'stasis'),
@@ -810,7 +814,7 @@ export function castAbility(
     // (combat/chronomancy.ts); inert for every other channel.
     aetherDartsChannelStart(p, ability.id);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
-    const channelDuration = ability.channel.duration / spellHasteMult(p);
+    const channelDuration = ability.channel.duration / spellHasteMultFromAuras(p);
     p.castingAbility = ability.id;
     p.castTotal = channelDuration;
     p.castRemaining = channelDuration;
@@ -847,10 +851,7 @@ export function castAbility(
     // so meleeHaste always equals spellHaste and the classic melee-haste scaling
     // falls out identically. If the haste channels ever split, give physical casts
     // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
-    // Aether Surge speeds up with held Arcane Charges and while Aether Rush is armed
-    // (combat/chronomancy.ts); 1x for every other cast, so nothing else is touched.
-    const surgeCastMult = ability.id === ARCANE_SURGE_ID ? aetherSurgeCastMult(p) : 1;
-    const stretchedCastTime = (castTime * tonguesMult(p) * surgeCastMult) / spellHasteMult(p);
+    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMultFromAuras(p);
     p.castingAbility = ability.id;
     // The resolved target (incl. the mouseover-resolved friendly) was captured
     // into p.castTargetId above; the finish path re-validates it.
@@ -1215,11 +1216,11 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     for (const eff of res.effects) {
       if (eff.type === 'directDamage') {
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
-        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
+        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
         dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
-        noteSpellHit(ctx, src, crit, res.def.id);
+        noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');

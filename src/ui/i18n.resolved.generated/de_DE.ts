@@ -6233,10 +6233,6 @@ export const de_DE: EnTranslations = {
         "name": "Kreuzfahrerstoß",
         "description": "Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)"
       },
-      "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heilt ein verbündetes Ziel um einen großen Betrag und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Die Heilung verringert sich mit jedem Sprung um 50%. (Wiederherstellungs-Signatur)"
-      },
       "metamorphosis": {
         "name": "Metamorphose",
         "description": "Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)"

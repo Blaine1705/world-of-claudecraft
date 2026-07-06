@@ -6233,10 +6233,6 @@ export const ko_KR: EnTranslations = {
         "name": "성전사의 일격",
         "description": "대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)"
       },
-      "chain_heal": {
-        "name": "연쇄 치유",
-        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
-      },
       "metamorphosis": {
         "name": "악마 변신",
         "description": "악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)"

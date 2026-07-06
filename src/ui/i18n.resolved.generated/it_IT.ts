@@ -6233,10 +6233,6 @@ export const it_IT: EnTranslations = {
         "name": "Assalto del Crociato",
         "description": "Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)"
       },
-      "chain_heal": {
-        "name": "Guarigione a Catena",
-        "description": "Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)"
-      },
       "metamorphosis": {
         "name": "Metamorfosi",
         "description": "Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)"

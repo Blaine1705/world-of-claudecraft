@@ -122,11 +122,11 @@ const MAGE_SPECS: SpecDef[] = [
     'Chronomancy',
     'healer',
     '*',
-    'A temporal healer who repairs, prevents and rewinds harm with time-bending Arcane magic.',
-    'temporal_mend',
-    'Chronoweave',
-    'Increases all healing you do by 15%, your maximum mana by 5%, and your mana regeneration by 20%.',
-    { global: { healPct: 0.15, manaPct: 0.05, manaRegenPct: 0.2 } },
+    'A precision caster using mana efficiency and focused arcane barrages.',
+    'arcane_power',
+    'Aetheric Flux',
+    'Increases spell damage by 8% and Intellect by 4.',
+    { global: { spellDmgPct: 0.08 }, stats: { int: 4 } },
   ),
   spec(
     'fire',
@@ -135,16 +135,10 @@ const MAGE_SPECS: SpecDef[] = [
     'dps',
     'x',
     'A volatile caster built around fast, high-damage Fire spells.',
-    // Signature swapped to the Hot Streak spender (owner leveling pass 2026-07-14):
-    // Combustion moved into the spec kit at level 12, and a signature grant would
-    // bypass that learnLevel gate (grants always do).
-    'pyroblast',
-    'Ignition',
-    'Your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
-    // The burn fraction is the scalable mastery axis (runtime: fire_mage's
-    // igniteOnCrit copies the resolved crit damage); crit chance is the static
-    // secondary.
-    { global: { ignitionPct: 0.4 }, stats: { crit: 0.02 } },
+    'combustion',
+    'Afterflame',
+    'Increases critical strike chance by 2%. Increases spell damage by 8%.',
+    { global: { spellDmgPct: 0.08 }, stats: { crit: 0.02 } },
   ),
   spec(
     'frost',
@@ -153,9 +147,7 @@ const MAGE_SPECS: SpecDef[] = [
     'dps',
     '#',
     'A controlling caster who trades peak burst for survival and slows.',
-    // Signature swapped to the proc spender (owner leveling pass 2026-07-14):
-    // Icy Veins moved into the spec kit at level 12 (see combustion above).
-    'ice_lance',
+    'icy_veins',
     'Brittlebreak',
     'Increases your Frost spell damage by 25%. Increases armor by 10%.',
     // The scalable mastery axis is the Frost-kit damage (ability-scoped so the

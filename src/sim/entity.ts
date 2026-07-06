@@ -374,10 +374,7 @@ export function recalcPlayerStats(
     else if (a.kind === 'form_cat') catForm = true;
     // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
     // the form aura's value, so the bonus lives and dies with the one toggle.
-    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') {
-      bonusSp += a.value;
-      if (a.kind === 'form_moonkin') moonkinForm = true;
-    }
+    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') bonusSp += a.value;
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
