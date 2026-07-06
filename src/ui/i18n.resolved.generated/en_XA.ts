@@ -855,6 +855,7 @@ export const en_XA: EnTranslations = {
       "sanguine": "[Íñçŕéášéš áţţáçķ šþééð ƀý {hastePct}% áñð ðáɱáĝé ðéáļţ ƀý {dmgPct}%]",
       "battleTrance": "[Ýóúŕ ñéẋţ Ŕéáʋéŕ Šţŕíķé óŕ Ɓŕúţé Šŵíñĝ çóšţš ñó Ŕáĝé]",
       "victoryRush": "[Ʋíçţóŕý Ŕúšĥ íš ŕéáðý]",
+      "maxHpPct": "[Íñçŕéášéš ɱáẋíɱúɱ ĥéáļţĥ ƀý {pct}%]",
       "school": {
         "physical": "[Þĥýšíçáļ]",
         "fire": "[Ƒíŕé]",

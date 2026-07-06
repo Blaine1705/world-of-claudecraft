@@ -4705,6 +4705,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine': '攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': '你的下一次英勇打擊或猛擊不消耗怒氣',
   'hudChrome.auraEffect.victoryRush': '乘勝追擊已就緒',
+  'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
   'hudChrome.auraEffect.school.physical': '物理',
   'hudChrome.auraEffect.school.fire': '火焰',
   'hudChrome.auraEffect.school.frost': '冰霜',

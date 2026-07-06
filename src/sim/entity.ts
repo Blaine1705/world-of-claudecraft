@@ -217,6 +217,7 @@ export function recalcPlayerStats(
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
+  let maxHpPctAura = 0; // Rallying Cry: summed buff_maxhp_pct fractions
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
@@ -235,6 +236,7 @@ export function recalcPlayerStats(
       s.int += a.value;
       s.spi += a.value;
     } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
+    else if (a.kind === 'buff_maxhp_pct') maxHpPctAura += a.value;
     else if (a.kind === 'buff_allstats_pct') {
       // Percentage drain on the whole stat block (Resurrection Sickness: value
       // -0.75 leaves stats at 25%). Applied to the base + gear total gathered so
@@ -349,6 +351,9 @@ export function recalcPlayerStats(
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);
   if (bearForm) e.maxHp = Math.round(e.maxHp * 1.15);
   if (mods?.stats.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + mods.stats.maxHpPct));
+  // Rallying Cry: a temporary maximum-health fraction. The hpFrac restore
+  // below scales CURRENT health with it (gain on apply, drop on expiry).
+  if (maxHpPctAura !== 0) e.maxHp = Math.max(1, Math.round(e.maxHp * (1 + maxHpPctAura)));
   // Fiesta "Colossus"-style buffs: growing bigger also makes you tankier.
   if (scaleMul > 1) e.maxHp = Math.round(e.maxHp * scaleMul);
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));

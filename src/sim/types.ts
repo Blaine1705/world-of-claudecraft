@@ -157,6 +157,9 @@ export type AuraKind =
   | 'buff_speed'
   | 'buff_haste'
   | 'buff_spellpower'
+  // Rallying Cry: value = fraction added to maximum health while worn (the
+  // recalc keeps the hp fraction, so current health scales with it).
+  | 'buff_maxhp_pct'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -1126,7 +1129,9 @@ export type AbilityEffect =
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
-  | { type: 'interrupt'; lockout: number }
+  // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
+  // incentive design), scaled like ability-granted rage; never on a whiff.
+  | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps` nearby
   // allies (the most injured within `jumpRange` yards of the previous target, never
@@ -1192,9 +1197,13 @@ export type AbilityEffect =
   // Heroic Leap: relocate the caster to the aimed point via a collision- and
   // cliff-checked sweep (harvested from PR #1348's movement primitive).
   | { type: 'repositionToAim'; breakRoots?: boolean }
-  // Rallying Cry: an attack-power BUFF on the caster and party members within
-  // radius (the friendly mirror of aoeAttackPower; PR #1348 harvest).
+  // An attack-power BUFF on the caster and party members within radius (the
+  // friendly mirror of aoeAttackPower; PR #1348 harvest, Trueshot Aura).
   | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
+  // Rallying Cry (owner rework): the caster and party members within radius
+  // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
+  // hp FRACTION, so current health rises and falls with the buff, WoW-style).
+  | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
   // Avatar: strip every control aura (stun/root/incapacitate/polymorph via the
   // shared isControlAura predicate, plus silence/disarm/slow) off the caster.
   | { type: 'breakControl' }

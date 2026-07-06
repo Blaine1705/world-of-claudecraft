@@ -855,6 +855,7 @@ export const ko_KR: EnTranslations = {
       "sanguine": "공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다",
       "battleTrance": "다음 영웅의 일격 또는 격돌에 분노가 소모되지 않습니다",
       "victoryRush": "연전연승을 사용할 수 있습니다",
+      "maxHpPct": "최대 생명력이 {pct}% 증가합니다",
       "school": {
         "physical": "물리",
         "fire": "화염",

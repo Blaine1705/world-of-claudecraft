@@ -445,6 +445,17 @@ export function runEffects(
         const school = interruptedDef.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
+        // Pummel (owner design): stopping a cast PAYS rage instead of costing
+        // it, scaled like every ability-granted rage (Anger Management +
+        // Recklessness / Battle Rhythm). Minted only when a cast was actually
+        // cut (this branch), never on a whiffed press.
+        if (eff.rageOnInterrupt && p.resourceType === 'rage') {
+          const interruptGain =
+            eff.rageOnInterrupt *
+            (1 + ctx.playerMods(meta).global.abilityRagePct) *
+            rageGenAuraMult(p);
+          p.resource = Math.min(p.maxResource, p.resource + interruptGain);
+        }
         if (remaining === null) break;
         ctx.applyAura(target, {
           id: `${ability.id}_lockout`,
@@ -832,9 +843,9 @@ export function runEffects(
         break;
       }
       case 'aoeAllyAttackPower': {
-        // Rallying Cry: an attack-power buff on the caster and every party
-        // member within radius (partyMeleeBuff's loop shape, buff_ap aura, no
-        // class filter). Solo casters just buff themselves.
+        // An attack-power buff on the caster and every party member within
+        // radius (partyMeleeBuff's loop shape, buff_ap aura, no class filter).
+        // Solo casters just buff themselves.
         const cryParty = ctx.partyOf(p.id);
         const cryIds = cryParty ? cryParty.members : [p.id];
         for (const pid of cryIds) {
@@ -848,6 +859,30 @@ export function runEffects(
             remaining: eff.duration,
             duration: eff.duration,
             value: eff.amount,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'aoeAllyMaxHp': {
+        // Rallying Cry (owner rework): a temporary maximum-health fraction on
+        // the caster and party members within radius. buff_maxhp_pct folds in
+        // recalcPlayerStats, whose hp-fraction restore raises current health
+        // with the buff and drops it back (never overflowing) on expiry.
+        const rallyParty = ctx.partyOf(p.id);
+        const rallyIds = rallyParty ? rallyParty.members : [p.id];
+        for (const pid of rallyIds) {
+          const mE = ctx.entities.get(pid);
+          if (!mE || mE.dead) continue;
+          if (pid !== p.id && dist2d(mE.pos, p.pos) > eff.radius) continue;
+          ctx.applyAura(mE, {
+            id: `${ability.id}_hp`,
+            name: ability.name,
+            kind: 'buff_maxhp_pct',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.pct,
             sourceId: p.id,
             school: ability.school,
           });

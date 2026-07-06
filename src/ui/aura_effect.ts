@@ -255,6 +255,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     case 'victory_rush':
       // The on-kill window: the summary is the readiness, not a number.
       return { key: `${KEY}.victoryRush` };
+    case 'buff_maxhp_pct':
+      // Rallying Cry: value is the temporary max-health fraction.
+      return { key: `${KEY}.maxHpPct`, nums: { pct: pctFromFrac(a.value) } };
 
     default:
       return null;

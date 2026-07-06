@@ -855,6 +855,7 @@ export const es: EnTranslations = {
       "sanguine": "Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%",
       "battleTrance": "Tu próximo Golpe heroico o Embate no cuesta ira",
       "victoryRush": "Victory Rush está listo",
+      "maxHpPct": "Aumenta la salud máxima un {pct}%",
       "school": {
         "physical": "Físico",
         "fire": "Fuego",

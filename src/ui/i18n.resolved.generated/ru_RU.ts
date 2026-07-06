@@ -855,6 +855,7 @@ export const ru_RU: EnTranslations = {
       "sanguine": "Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%",
       "battleTrance": "Следующий Удар героя или Мощный удар не расходует ярость",
       "victoryRush": "Победный рывок готов",
+      "maxHpPct": "Максимальный запас здоровья увеличен на {pct}%",
       "school": {
         "physical": "Физическая",
         "fire": "Огонь",

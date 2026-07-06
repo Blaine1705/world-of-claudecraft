@@ -855,6 +855,7 @@ export const zh_CN: EnTranslations = {
       "sanguine": "攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%",
       "battleTrance": "你的下一次英勇打击或猛击不消耗怒气",
       "victoryRush": "乘胜追击已就绪",
+      "maxHpPct": "最大生命值提高 {pct}%",
       "school": {
         "physical": "物理",
         "fire": "火焰",

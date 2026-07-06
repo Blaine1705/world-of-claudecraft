@@ -57,6 +57,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   // aoeDamage rider classifies the ability); the rallying AP buff likewise.
   repositionToAim: 'other',
   aoeAllyAttackPower: 'other',
+  aoeAllyMaxHp: 'other',
   selfBuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',

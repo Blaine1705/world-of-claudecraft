@@ -55,7 +55,7 @@ describe('base kit membership', () => {
 });
 
 describe('Pummel', () => {
-  it('interrupts a casting enemy and locks the school for 4 sec', () => {
+  it('costs nothing, interrupts, locks the school 4s, and PAYS 10 rage for the cut', () => {
     const sim = warriorAtCap(71);
     const p = sim.player;
     const mob = nearestMob(sim);
@@ -67,12 +67,25 @@ describe('Pummel', () => {
     mob.castingAbility = 'fireball';
     mob.castRemaining = 1.2;
     mob.castTotal = 2;
-    p.resource = 50;
+    p.resource = 0; // free: castable at empty rage
     sim.castAbility('pummel');
     expect(mob.castingAbility).toBeNull();
     const lockout = mob.auras.find((a: any) => a.kind === 'lockout');
     expect(lockout).toBeTruthy();
     expect(lockout.remaining).toBeCloseTo(4, 0);
+    // The owner's incentive: stopping a cast GENERATES 10 rage.
+    expect(p.resource).toBeCloseTo(10);
+  });
+
+  it('pays no rage on a whiff (the target was not casting)', () => {
+    const sim = warriorAtCap(71);
+    const p = sim.player;
+    const mob = nearestMob(sim);
+    standOff(sim, mob, 2);
+    sim.targetEntity(mob.id);
+    p.resource = 0;
+    sim.castAbility('pummel');
+    expect(p.resource).toBe(0);
   });
 });
 
@@ -110,21 +123,38 @@ describe('Heroic Leap', () => {
 });
 
 describe('Rallying Cry', () => {
-  it('buffs the caster (+45 attack power for 10s) when solo', () => {
+  it('grants 20% temporary maximum health, raising current health with it', () => {
     const sim = warriorAtCap(74);
     const p = sim.player;
-    const ap0 = p.attackPower;
-    p.resource = 50;
+    const max0 = p.maxHp;
+    p.hp = Math.floor(p.maxHp * 0.5); // half health going in
+    const hp0 = p.hp;
     sim.castAbility('rallying_cry');
-    const aura = p.auras.find((a: any) => a.id === 'rallying_cry_ap');
-    expect(aura?.kind).toBe('buff_ap');
-    expect(aura?.value).toBe(45);
+    const aura = p.auras.find((a: any) => a.id === 'rallying_cry_hp');
+    expect(aura?.kind).toBe('buff_maxhp_pct');
+    expect(aura?.value).toBeCloseTo(0.2);
     expect(aura?.remaining).toBeCloseTo(10, 0);
-    expect(p.attackPower).toBe(ap0 + 45);
+    // Max rose 20% and CURRENT health rose proportionally (the hp-fraction
+    // restore): the horn grants real temporary health, WoW-style.
+    expect(p.maxHp).toBe(Math.round(max0 * 1.2));
+    expect(p.hp).toBeGreaterThan(hp0);
     expect(p.cooldowns.get('rallying_cry')).toBe(180);
   });
 
-  it('reaches party members in range and skips those beyond 30 yards', () => {
+  it('drops the temporary health on expiry without overflowing', () => {
+    const sim = warriorAtCap(74);
+    const p = sim.player;
+    const max0 = p.maxHp;
+    sim.castAbility('rallying_cry');
+    expect(p.maxHp).toBe(Math.round(max0 * 1.2));
+    for (let i = 0; i < 20 * 11 && p.auras.some((a: any) => a.id === 'rallying_cry_hp'); i++)
+      sim.tick();
+    expect(p.auras.some((a: any) => a.id === 'rallying_cry_hp')).toBe(false);
+    expect(p.maxHp).toBe(max0);
+    expect(p.hp).toBeLessThanOrEqual(p.maxHp);
+  });
+
+  it('reaches party members in range and skips those beyond 40 yards', () => {
     const sim = new Sim({ seed: 74, playerClass: 'warrior', noPlayer: true });
     const casterId = sim.addPlayer('warrior', 'Caster');
     const nearId = sim.addPlayer('warrior', 'Near');
@@ -141,8 +171,8 @@ describe('Rallying Cry', () => {
     far.pos = { x: caster.pos.x + 60, y: caster.pos.y, z: caster.pos.z };
     caster.resource = 50;
     sim.castAbility('rallying_cry', casterId);
-    expect(near.auras.some((a: any) => a.id === 'rallying_cry_ap')).toBe(true);
-    expect(far.auras.some((a: any) => a.id === 'rallying_cry_ap')).toBe(false);
+    expect(near.auras.some((a: any) => a.id === 'rallying_cry_hp')).toBe(true);
+    expect(far.auras.some((a: any) => a.id === 'rallying_cry_hp')).toBe(false);
   });
 });
 

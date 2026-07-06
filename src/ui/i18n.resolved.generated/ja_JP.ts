@@ -855,6 +855,7 @@ export const ja_JP: EnTranslations = {
       "sanguine": "攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加",
       "battleTrance": "次の英雄の一撃またはスラムの怒りコストがゼロになる",
       "victoryRush": "ビクトリーラッシュが使用可能",
+      "maxHpPct": "最大体力が{pct}%増加",
       "school": {
         "physical": "物理",
         "fire": "火",

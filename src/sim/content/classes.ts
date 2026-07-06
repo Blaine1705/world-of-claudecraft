@@ -3638,16 +3638,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Pummel',
     class: 'warrior',
     learnLevel: 12,
-    cost: 10,
+    // Owner design: free, and stopping a cast GENERATES 10 rage (the reward
+    // makes the interrupt a play, not a tax).
+    cost: 0,
     castTime: 0,
     cooldown: 10,
     range: 0,
     school: 'physical',
     requiresTarget: true,
     offGcd: true,
-    effects: [{ type: 'interrupt', lockout: 4 }],
+    effects: [{ type: 'interrupt', lockout: 4, rageOnInterrupt: 10 }],
     description:
-      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec.',
+      'Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast.',
   },
   heroic_leap: {
     id: 'heroic_leap',
@@ -3675,9 +3677,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'aoeAllyAttackPower', amount: 45, duration: 10, radius: 30 }],
+    // Owner rework: the WoW-style defensive raid horn (+20% temporary maximum
+    // health), 40yd (the classic raid-buff reach).
+    effects: [{ type: 'aoeAllyMaxHp', pct: 0.2, duration: 10, radius: 40 }],
     description:
-      'Lets loose a rallying cry, increasing the attack power of you and nearby party members by 45 for 10 sec.',
+      'Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec.',
   },
   // ------ Choice-row talents (warrior_rows.ts grants; numbers are the owner's
   // design draft, tune VALUE not SHAPE) ------
