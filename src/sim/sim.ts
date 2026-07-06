@@ -4524,14 +4524,6 @@ export class Sim {
     return out;
   }
 
-  private friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[] {
-    const out: Entity[] = [];
-    this.grid.forEachInRadius(pos.x, pos.z, radius, (e) => {
-      if (!e.dead && (e.id === source.id || this.isFriendlyTo(source, e))) out.push(e);
-    });
-    return out;
-  }
-
   private breakStealth(e: Entity): void {
     const idx = e.auras.findIndex((a) => a.kind === 'stealth');
     if (idx < 0) return;
