@@ -550,7 +550,11 @@ export function emptyModifiers(): TalentModifiers {
   };
 }
 
-function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
+export function accumulate(
+  mods: TalentModifiers,
+  eff: TalentEffect | undefined,
+  mult: number,
+): void {
   if (!eff) return;
   if (eff.stats) {
     const s = mods.stats,
