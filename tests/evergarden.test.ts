@@ -126,6 +126,47 @@ describe('the Great Maze', () => {
     expect(reached).toBe(true);
   });
 
+  it('keeps wall runs seamless: full height across shared edges, tall corners', () => {
+    // Two failure shapes this pins down: a dip along the shared edge of two
+    // adjacent wall cells (a visible seam splitting one hedge run into
+    // slabs), and a taper-to-ground at a run's corner where it meets a
+    // junction (a see-through notch). Both read as walls "not seamed".
+    for (let r = 0; r < MAZE_ROWS; r++) {
+      for (let c = 0; c < MAZE_COLS; c++) {
+        if (GARDEN_MAZE_GRID[r][c] !== '#') continue;
+        const center = cellCenter(c, r);
+        const hWall = terrainHeight(center.x, center.z, SEED);
+        // shared edge midpoints with east/south wall neighbors
+        for (const [dc, dr] of [
+          [1, 0],
+          [0, 1],
+        ]) {
+          const oc = c + dc;
+          const or = r + dr;
+          if (oc >= MAZE_COLS || or >= MAZE_ROWS) continue;
+          if (GARDEN_MAZE_GRID[or][oc] !== '#') continue;
+          const other = cellCenter(oc, or);
+          const mid = { x: (center.x + other.x) / 2, z: (center.z + other.z) / 2 };
+          const hMid = terrainHeight(mid.x, mid.z, SEED);
+          expect(hWall - hMid, `seam dip between ${c},${r} and ${oc},${or}`).toBeLessThan(1.5);
+        }
+        // corners: a yard inside each cell corner the hedge is already tall
+        for (const [sx, sz] of [
+          [1, 1],
+          [1, -1],
+          [-1, 1],
+          [-1, -1],
+        ]) {
+          const px = center.x + sx * (MAZE_CELL / 2 - 1);
+          const pz = center.z + sz * (MAZE_CELL / 2 - 1);
+          const lawn = terrainHeight(center.x, center.z, SEED) - 12; // approx local ground
+          const h = terrainHeight(px, pz, SEED);
+          expect(h - lawn, `low corner in wall ${c},${r}`).toBeGreaterThan(5);
+        }
+      }
+    }
+  });
+
   it('raises hedge walls the climb gate cannot beat', () => {
     // Every wall cell adjacent to a corridor must present a slope steeper
     // than the player's climb limit on the straight approach from the
