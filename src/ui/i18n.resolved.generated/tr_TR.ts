@@ -986,6 +986,7 @@ export const tr_TR: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Yönetici",
+        "coredevs": "Core Dev",
         "devs": "Geliştirici",
         "mods": "Moderatör",
         "artists": "Sanatçı"

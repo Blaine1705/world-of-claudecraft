@@ -9,73 +9,95 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
+  "es": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "es_ES": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
   "fr_FR": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "fr_CA": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "de_DE": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "zh_CN": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "zh_TW": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ko_KR": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ja_JP": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "pt_BR": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ru_RU": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "cs_CZ": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "nl_NL": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "pl_PL": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "id_ID": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "tr_TR": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "sv_SE": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "vi_VN": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "da_DK": [
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.options.showTargetOfTarget",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ]
