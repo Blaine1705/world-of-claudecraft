@@ -1887,14 +1887,19 @@
   .tal-rows {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    /* Fill the tall body and DISTRIBUTE the six bands across it (owner call:
+       no dead black space under the level-20 row); gap is the minimum spacing
+       when the viewport is short. */
+    justify-content: space-between;
+    min-height: min(48vh, 520px);
+    gap: 8px;
     margin: 8px 0 4px;
   }
   .tal-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 5px 8px;
+    gap: 12px;
+    padding: 9px 12px;
     background: rgba(0, 0, 0, 0.18);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -1903,12 +1908,12 @@
     display: inline-grid;
     place-items: center;
     flex: 0 0 auto;
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 1px solid var(--gold-dim);
     color: var(--gold);
-    font-size: 12px;
+    font-size: 13px;
   }
   .tal-row-lv.locked {
     border-color: var(--border);
@@ -1924,7 +1929,7 @@
     min-width: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 12px;
   }
   .tal-row.locked .tal-row-opts {
     opacity: 0.45;
@@ -1932,10 +1937,10 @@
   .tal-row-opt {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     min-width: 0;
     text-align: left;
-    padding: 4px 8px;
+    padding: 8px 12px;
     font: inherit;
     color: var(--color-text-light);
     background: var(--panel-bg);
@@ -1944,13 +1949,13 @@
     cursor: pointer;
   }
   .tal-row-opt img {
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
     flex: 0 0 auto;
-    border-radius: 5px;
+    border-radius: 6px;
   }
   .tal-row-opt b {
-    font-size: 12px;
+    font-size: 13.5px;
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
