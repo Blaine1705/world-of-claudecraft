@@ -277,6 +277,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'applyTalents',
   'respec',
   'setSpec',
+  'pickRowTalent',
   'saveLoadout',
   'switchLoadout',
   'deleteLoadout',
@@ -2819,6 +2820,17 @@ export class GameServer {
       case 'setSpec':
         sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid);
         break;
+      // Choice-row talents: the pick is re-validated inside the Sim (level gate,
+      // row membership, out-of-combat lock). Fields type-checked + length-capped.
+      case 'pickRowTalent': {
+        const row = typeof msg.row === 'number' ? msg.row | 0 : -1;
+        const option =
+          typeof msg.option === 'string' && msg.option.length <= 64 ? msg.option : null;
+        if (row >= 0 && (option !== null || msg.option === null)) {
+          sim.pickRowTalent(row, option, pid);
+        }
+        break;
+      }
       case 'saveLoadout': {
         const alloc = talentAllocationFromWire(msg.alloc) ?? undefined;
         if (typeof msg.name === 'string')
@@ -3420,6 +3432,7 @@ export class GameServer {
         role: meta.talentMods.role,
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
+        rowPicks: meta.rowPicks,
       });
     }
     return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;

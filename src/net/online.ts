@@ -9,9 +9,9 @@ import {
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
+import { computeModifiersWithRows, emptyRowPicks, type RowPicks } from '../sim/content/talent_rows';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   emptyAllocation,
   pointsSpent,
   type Role,
@@ -888,6 +888,9 @@ export class ClientWorld implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
+  // Choice-row picks, mirrored from the snapshot self (`tal.rowPicks`). Display
+  // only; picks are server-validated (pickRowTalent just sends the command).
+  rowPicks: RowPicks = emptyRowPicks();
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
@@ -1592,13 +1595,17 @@ export class ClientWorld implements IWorld {
         this.talentRole = s.tal.role ?? null;
         this.loadouts = s.tal.loadouts ?? [];
         this.activeLoadout = typeof s.tal.activeLoadout === 'number' ? s.tal.activeLoadout : -1;
+        this.rowPicks = Array.isArray(s.tal.rowPicks) ? s.tal.rowPicks : emptyRowPicks();
       }
       if (!this.talents) this.talents = emptyAllocation();
+      if (!this.rowPicks) this.rowPicks = emptyRowPicks();
       const talents = this.talents;
+      // Point tree + choice-row picks, the same bake the server runs, so
+      // row-granted abilities and tweaks display identically online.
       this.known = abilitiesKnownAt(
         this.cfg.playerClass,
         e.level,
-        computeTalentModifiers(this.cfg.playerClass, talents),
+        computeModifiersWithRows(this.cfg.playerClass, talents, this.rowPicks),
       );
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
@@ -2401,6 +2408,11 @@ export class ClientWorld implements IWorld {
   setSpec(specId: string | null): void {
     this.cmd({ cmd: 'setSpec', spec: specId });
   }
+  pickRowTalent(rowIndex: number, optionId: string | null): void {
+    // Pure send: the server validates and the next snapshot's `tal.rowPicks`
+    // mirrors the authoritative result (no optimistic local mutation).
+    this.cmd({ cmd: 'pickRowTalent', row: rowIndex, option: optionId });
+  }
   saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void {
     this.cmd({ cmd: 'saveLoadout', name, bar, alloc });
     if (alloc) {
@@ -2421,7 +2433,11 @@ export class ClientWorld implements IWorld {
       this.known = abilitiesKnownAt(
         this.cfg.playerClass,
         this.player.level,
-        computeTalentModifiers(this.cfg.playerClass, this.talents),
+        computeModifiersWithRows(
+          this.cfg.playerClass,
+          this.talents,
+          this.rowPicks ?? emptyRowPicks(),
+        ),
       );
     }
   }
@@ -2442,7 +2458,11 @@ export class ClientWorld implements IWorld {
         this.known = abilitiesKnownAt(
           this.cfg.playerClass,
           this.player.level,
-          computeTalentModifiers(this.cfg.playerClass, this.talents),
+          computeModifiersWithRows(
+            this.cfg.playerClass,
+            this.talents,
+            this.rowPicks ?? emptyRowPicks(),
+          ),
         );
       }
     } else if (this.activeLoadout > index) this.activeLoadout -= 1;

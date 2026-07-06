@@ -264,6 +264,7 @@ export const COMMAND_NAMES = [
   'applyTalents',
   'respec',
   'setSpec',
+  'pickRowTalent',
   'saveLoadout',
   'switchLoadout',
   'deleteLoadout',

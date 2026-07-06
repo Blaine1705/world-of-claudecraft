@@ -244,10 +244,12 @@ export const IWORLD_MEMBERS = [
   { name: 'talentRole', kind: 'data' },
   { name: 'loadouts', kind: 'data' },
   { name: 'activeLoadout', kind: 'data' },
+  { name: 'rowPicks', kind: 'data' },
   { name: 'talentPoints', kind: 'method' }, // read-returning (6/6)
   { name: 'applyTalents', kind: 'method' },
   { name: 'respec', kind: 'method' },
   { name: 'setSpec', kind: 'method' },
+  { name: 'pickRowTalent', kind: 'method' },
   { name: 'saveLoadout', kind: 'method' },
   { name: 'switchLoadout', kind: 'method' },
   { name: 'deleteLoadout', kind: 'method' },
@@ -352,9 +354,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(167);
-    expect(DATA_MEMBERS.length).toBe(42);
-    expect(METHOD_MEMBERS.length).toBe(125);
+    expect(IWORLD_MEMBERS.length).toBe(169);
+    expect(DATA_MEMBERS.length).toBe(43);
+    expect(METHOD_MEMBERS.length).toBe(126);
   });
 
   it('has no duplicate member names', () => {
@@ -478,6 +480,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyPromote',
       'petAttack',
       'petTaunt',
+      'pickRowTalent',
       'pickUpObject',
       'playEmote',
       'player',
@@ -498,6 +501,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'rowPicks',
       'saveLoadout',
       'searchCharacters',
       'sellAllJunk',
@@ -572,6 +576,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questsDone',
       'realm',
       'restedXp',
+      'rowPicks',
       'socialInfo',
       'talentRole',
       'talentSpec',
@@ -671,6 +676,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyPromote',
       'petAttack',
       'petTaunt',
+      'pickRowTalent',
       'pickUpObject',
       'playEmote',
       'prestige',
@@ -884,10 +890,12 @@ const FACET_TALENTS = [
   'talentRole',
   'loadouts',
   'activeLoadout',
+  'rowPicks',
   'talentPoints',
   'applyTalents',
   'respec',
   'setSpec',
+  'pickRowTalent',
   'saveLoadout',
   'switchLoadout',
   'deleteLoadout',
@@ -1092,8 +1100,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 22 fa
 
   it('the union of the 22 facets equals the pinned 167-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(167);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(167);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(169);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(169);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
