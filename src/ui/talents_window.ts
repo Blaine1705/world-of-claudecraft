@@ -244,6 +244,7 @@ export class TalentsWindow {
       this.paintTree(tree, view.classTree, stage);
     } else if (this.tab === 'rows') {
       paintTalentRowsTab(body, rowsVm, {
+        attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
         pickRow: (rowIndex, optionId) => this.deps.pickRow(rowIndex, optionId),
         // Repaint now (offline Sim applies instantly), then once more shortly
         // after so the ONLINE mirror's authoritative tal snapshot lands too.

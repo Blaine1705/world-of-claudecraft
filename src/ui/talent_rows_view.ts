@@ -6,6 +6,7 @@
 // Sim and the online ClientWorld), so a Vitest drives it directly.
 
 import type { RowPicks, RowTree } from '../sim/content/talent_rows';
+import type { TalentEffect } from '../sim/content/talents';
 
 export interface RowOptionVM {
   id: string;
@@ -14,6 +15,8 @@ export interface RowOptionVM {
   name: string;
   description: string;
   picked: boolean;
+  /** The option's effect, passed through for the effect-derived icon. */
+  effect: TalentEffect;
 }
 
 export interface RowVM {
@@ -53,6 +56,7 @@ export function buildTalentRowsView(
         name: o.name,
         description: o.description,
         picked: unlocked && pick === o.id,
+        effect: o.effect,
       })),
     };
   });

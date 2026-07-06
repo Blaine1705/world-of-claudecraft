@@ -1,11 +1,13 @@
-// Thin painter for the choice-row talents tab (talent_rows_view.ts core). A
-// cold window body (repainted on open/tab-switch/pick, never per frame), so it
-// builds DOM directly like its sibling talents_window sections; option
-// name/description are sim content (English source) interpolated through esc().
-// Chrome strings are t() keys. Owns no state; everything arrives via deps.
+// Thin painter for the choice-row talents tab (talent_rows_view.ts core), in the
+// classic MoP band layout: each tier is ONE compact horizontal band (level badge
+// plus three icon+name pills), so all six tiers fit without scrolling; the
+// option description lives in the shared hover tooltip (and in the button's
+// accessible name, so keyboard/AT users lose nothing). A cold window body
+// (repainted on open/tab-switch/pick, never per frame). Owns no state.
 
 import { esc } from './esc';
 import { t } from './i18n';
+import { talentEffectIconRef, talentIconDataUrl } from './talent_icons';
 import type { TalentRowsVM } from './talent_rows_view';
 
 export interface TalentRowsTabDeps {
@@ -14,6 +16,8 @@ export interface TalentRowsTabDeps {
   /** Repaint the window after a pick (and once more shortly after, so the
    *  online mirror's authoritative snapshot lands in the repaint). */
   rerender(): void;
+  /** The shared HUD hover tooltip (PainterHostPresentation). */
+  attachTooltip(el: HTMLElement, html: () => string): void;
 }
 
 export function paintTalentRowsTab(
@@ -25,33 +29,43 @@ export function paintTalentRowsTab(
   wrap.className = 'tal-rows';
   const parts: string[] = [];
   for (const row of vm.rows) {
-    const lockBadge = row.unlocked
-      ? `<span class="tal-row-lv">${row.level}</span>`
-      : `<span class="tal-row-lv locked">${row.level}</span><span class="tal-row-lock">${esc(
-          t('hudChrome.itemTooltip.requiresLevel', { level: row.level }),
-        )}</span>`;
     const opts = row.options
-      .map(
-        (o) =>
+      .map((o) => {
+        const icon = talentIconDataUrl(talentEffectIconRef(o.effect, 'choice'));
+        return (
           `<button type="button" class="tal-row-opt${o.picked ? ' picked' : ''}"` +
           ` data-row="${row.index}" data-opt="${esc(o.id)}"` +
-          ` aria-pressed="${o.picked}" ${row.unlocked ? '' : 'disabled'}>` +
-          `<b>${esc(o.name)}</b><span>${esc(o.description)}</span>` +
-          `</button>`,
-      )
+          ` aria-pressed="${o.picked}" aria-label="${esc(`${o.name}. ${o.description}`)}"` +
+          ` ${row.unlocked ? '' : 'disabled'}>` +
+          `<img src="${icon}" alt="" draggable="false"><b>${esc(o.name)}</b>` +
+          `</button>`
+        );
+      })
       .join('');
+    const lock = row.unlocked
+      ? ''
+      : `<span class="tal-row-lock">${esc(
+          t('hudChrome.itemTooltip.requiresLevel', { level: row.level }),
+        )}</span>`;
     parts.push(
       `<div class="tal-row${row.unlocked ? '' : ' locked'}">` +
-        `<div class="tal-row-head">${lockBadge}</div>` +
-        `<div class="tal-row-opts">${opts}</div>` +
+        `<span class="tal-row-lv${row.unlocked ? '' : ' locked'}">${row.level}</span>` +
+        `<div class="tal-row-opts">${opts}</div>${lock}` +
         `</div>`,
     );
   }
   wrap.innerHTML = parts.join('');
   wrap.querySelectorAll<HTMLButtonElement>('.tal-row-opt').forEach((btn) => {
+    const rowIndex = Number(btn.dataset.row);
+    const optId = btn.dataset.opt ?? null;
+    const opt = vm.rows[rowIndex]?.options.find((o) => o.id === optId);
+    if (opt) {
+      deps.attachTooltip(
+        btn,
+        () => `<b>${esc(opt.name)}</b><br><span>${esc(opt.description)}</span>`,
+      );
+    }
     btn.addEventListener('click', () => {
-      const rowIndex = Number(btn.dataset.row);
-      const optId = btn.dataset.opt ?? null;
       const wasPicked = btn.getAttribute('aria-pressed') === 'true';
       // Click a picked option to clear it; click another to swap (free respec).
       deps.pickRow(rowIndex, wasPicked ? null : optId);

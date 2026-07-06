@@ -1875,25 +1875,31 @@
     position: relative;
     margin: 6px auto;
   }
-  /* Choice-row talents tab (talent_rows_tab.ts): one block per tier, a level
-     badge plus three option cards; picked = gold, locked rows dim + disable. */
+  /* Choice-row talents tab (talent_rows_tab.ts), MoP band layout: each tier is
+     one compact horizontal band (level badge + three icon-and-name pills), so
+     all six tiers fit without scrolling; descriptions live in the hover
+     tooltip. Picked = gold; locked rows dim + disable. */
   .tal-rows {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     margin: 8px 0 4px;
   }
-  .tal-row-head {
+  .tal-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 10px;
+    padding: 5px 8px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--border);
+    border-radius: 6px;
   }
   .tal-row-lv {
     display: inline-grid;
     place-items: center;
-    width: 24px;
-    height: 24px;
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: 1px solid var(--gold-dim);
     color: var(--gold);
@@ -1904,10 +1910,13 @@
     color: var(--color-text-muted);
   }
   .tal-row-lock {
-    font-size: 11px;
+    flex: 0 0 auto;
+    font-size: 10.5px;
     color: var(--color-text-muted);
   }
   .tal-row-opts {
+    flex: 1;
+    min-width: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
@@ -1917,10 +1926,11 @@
   }
   .tal-row-opt {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
     text-align: left;
-    padding: 8px 9px;
+    padding: 4px 8px;
     font: inherit;
     color: var(--color-text-light);
     background: var(--panel-bg);
@@ -1928,13 +1938,18 @@
     border-radius: 6px;
     cursor: pointer;
   }
-  .tal-row-opt b {
-    font-size: 12.5px;
+  .tal-row-opt img {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    border-radius: 5px;
   }
-  .tal-row-opt span {
-    font-size: 11px;
-    color: var(--color-text-muted);
-    line-height: 1.3;
+  .tal-row-opt b {
+    font-size: 12px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .tal-row-opt:hover:not(:disabled) {
     border-color: var(--gold-dim);
@@ -1954,8 +1969,12 @@
     cursor: default;
   }
   @media (max-width: 640px) {
+    .tal-row {
+      flex-wrap: wrap;
+    }
     .tal-row-opts {
       grid-template-columns: 1fr;
+      flex-basis: 100%;
     }
   }
   .tal-arrows {
