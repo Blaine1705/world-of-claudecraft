@@ -1,15 +1,16 @@
 // The Wraithwood's dressing, render-only: the giant overgrown trees the
-// realm is named for (drawn from the same WRAITHWOOD_PROPS.greatTrees
-// records that give the sim its solid trunk colliders), curtains of hanging
-// moss under their canopies, a low ground mist that never lifts, and
-// ghost-lights drifting between the trunks. Same contract as the sibling
+// realm is named for (the Eldergleam's twisted-elder model, cloned dark at
+// the same WRAITHWOOD_PROPS.greatTrees spots that give the sim its solid
+// trunk colliders), a low ground mist that never lifts, and ghost-lights
+// drifting between the trunks. Same contract as the sibling
 // realm modules: build once, update(time) animates gently, glowLights join
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
 import { WRAITHWOOD_PROPS } from '../sim/content/wraithwood';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
-import { GFX } from './gfx';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 
 export interface HauntFeaturesView {
   group: THREE.Group;
@@ -19,6 +20,17 @@ export interface HauntFeaturesView {
 
 const WOOD_ZMIN = 4200;
 const WOOD_ZMAX = 4760;
+
+// The giant trees are the Eldergleam's twisted-elder model (realm_flora
+// already preloads the same URL, so the loader cache makes this free),
+// cloned per greatTrees record and darkened into haunted silhouettes.
+const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
+let greatTreeScene: THREE.Group | null = null;
+registerPreload(
+  loadGltf(GREAT_TREE_URL).then((gltf) => {
+    greatTreeScene = gltf.scene;
+  }),
+);
 
 // Ground-mist banks: wide soft sheets pooled in the realm's low spots.
 const MISTS = [
@@ -69,74 +81,50 @@ function glowTexture(): THREE.CanvasTexture | null {
   return new THREE.CanvasTexture(canvas);
 }
 
-function mat(color: number, rough = 0.9): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({ color, roughness: rough, flatShading: true })
-    : new THREE.MeshLambertMaterial({ color, flatShading: true });
-}
-
 export function buildHauntFeatures(seed: number): HauntFeaturesView {
   const group = new THREE.Group();
   group.name = 'haunt-features';
   const glowLights: THREE.PointLight[] = [];
 
-  // --- the giant trees: colossal trunks under one shared broken ceiling ---
-  // Each greatTrees record grows a tapered trunk, a few root buttresses, and
-  // a wide stack of dark canopy domes; neighboring canopies overlap so the
-  // wood reads as closed cover with murk beneath.
+  // --- the giant trees: the Eldergleam's twisted elder, grown grim ---
+  // One clone per greatTrees record (the same spots the sim's trunk
+  // colliders use), scaled from the record's radius the way the Hollow's
+  // centerpiece is (r 2.6 = scale 6.5), turned and sized with a little
+  // hash jitter, and darkened toward dead grey-green. Materials are cloned
+  // once per source material (the loader cache is immutable) and shared
+  // across every tree here.
   {
-    const trunkMat = mat(0x3e362e, 0.95);
-    const canopyMat = mat(0x38412f, 0.9);
-    const mossMat = mat(0x55624a, 0.9);
-    for (const t of WRAITHWOOD_PROPS.greatTrees ?? []) {
-      const y = terrainHeight(t.x, t.z, seed);
-      if (y < WATER_LEVEL) continue;
-      const h = 17 + hash2(t.x, t.z, seed + 4101) * 7; // trunk height
-      const tree = new THREE.Group();
-      tree.position.set(t.x, y - 0.6, t.z);
-      const trunk = new THREE.Mesh(
-        new THREE.CylinderGeometry(t.r * 0.62, t.r * 1.15, h, 9),
-        trunkMat,
-      );
-      trunk.position.y = h / 2;
-      trunk.castShadow = true;
-      trunk.receiveShadow = true;
-      tree.add(trunk);
-      // root buttresses: leaning cones ringing the base
-      for (let i = 0; i < 5; i++) {
-        const ang = (i / 5) * Math.PI * 2 + hash2(t.x + i, t.z, seed + 4111) * 0.6;
-        const root = new THREE.Mesh(new THREE.ConeGeometry(t.r * 0.42, 4.6, 5), trunkMat);
-        root.position.set(Math.sin(ang) * t.r * 1.1, 1.7, Math.cos(ang) * t.r * 1.1);
-        root.rotation.z = Math.sin(ang) * 0.5;
-        root.rotation.x = Math.cos(ang) * -0.5;
-        root.receiveShadow = true;
-        tree.add(root);
+    const darkened = new Map<string, THREE.Material>();
+    const darken = (source: THREE.Material): THREE.Material => {
+      let m = darkened.get(source.uuid);
+      if (!m) {
+        m = source.clone();
+        const c = (m as THREE.MeshStandardMaterial).color;
+        if (c) c.multiply(new THREE.Color(0.42, 0.48, 0.42));
+        darkened.set(source.uuid, m);
       }
-      // the canopy: overlapping squashed domes, huge and low-slung
-      const domes = 3 + Math.floor(hash2(t.z, t.x, seed + 4121) * 2);
-      for (let i = 0; i < domes; i++) {
-        const ang = hash2(i, t.x + t.z, seed + 4131) * Math.PI * 2;
-        const spread = i === 0 ? 0 : 4 + hash2(t.x, i, seed + 4141) * 5;
-        const cr = 9 + hash2(i + 1, t.z, seed + 4151) * 6;
-        const dome = new THREE.Mesh(new THREE.SphereGeometry(cr, 8, 6), canopyMat);
-        dome.scale.set(1, 0.42, 1);
-        dome.position.set(Math.sin(ang) * spread, h - 1 + i * 1.6, Math.cos(ang) * spread);
-        dome.castShadow = true;
-        tree.add(dome);
-        // hanging moss: sparse strands trailing from each dome's rim
-        for (let k = 0; k < 6; k++) {
-          const mang = (k / 6) * Math.PI * 2 + hash2(k, i + t.x, seed + 4161);
-          const len = 3 + ((k * 7 + i * 3) % 5) * 0.9;
-          const strand = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.045, len, 3), mossMat);
-          strand.position.set(
-            dome.position.x + Math.sin(mang) * cr * 0.85,
-            dome.position.y - len / 2,
-            dome.position.z + Math.cos(mang) * cr * 0.85,
-          );
-          tree.add(strand);
-        }
+      return m;
+    };
+    if (greatTreeScene) {
+      for (const t of WRAITHWOOD_PROPS.greatTrees ?? []) {
+        const y = terrainHeight(t.x, t.z, seed);
+        if (y < WATER_LEVEL) continue;
+        const tree = greatTreeScene.clone(true);
+        tree.position.set(t.x, y - 0.2, t.z);
+        tree.scale.setScalar(t.r * (2.4 + hash2(t.x, t.z, seed + 4101) * 0.5));
+        tree.rotation.y = hash2(t.z, t.x, seed + 4111) * Math.PI * 2;
+        tree.traverse((obj) => {
+          const mesh = obj as THREE.Mesh;
+          if (mesh.isMesh) {
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.material = Array.isArray(mesh.material)
+              ? mesh.material.map(darken)
+              : darken(mesh.material);
+          }
+        });
+        group.add(tree);
       }
-      group.add(tree);
     }
   }
 
