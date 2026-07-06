@@ -43,6 +43,7 @@ const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = 
   fen: 0.24,
   night: 0.2,
   haunt: 0.55, // the canopy is the realm
+  jungle: 0.6, // wall-to-wall green
 };
 
 const CONTOUR_STEP = 6; // height units between contour lines
@@ -216,6 +217,11 @@ export function paintTerrainRows(
         r = 82;
         g = 86;
         b = 78;
+      } else if (biome === 'jungle' && h > 20) {
+        // vine-hung volcanic stone
+        r = 96;
+        g = 104;
+        b = 84;
       } else if (biome === 'frost' && h > 6) {
         r = 202;
         g = 212;

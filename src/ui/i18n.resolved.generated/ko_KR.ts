@@ -5780,6 +5780,18 @@ export const ko_KR: EnTranslations = {
       "pale_huntsman": {
         "name": "창백한 사냥꾼"
       },
+      "tide_scuttler": {
+        "name": "조수 게"
+      },
+      "thicket_boar": {
+        "name": "덤불 멧돼지"
+      },
+      "canopy_weaver": {
+        "name": "수관 거미"
+      },
+      "idol_guardian": {
+        "name": "신상 수호자"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -7271,6 +7283,33 @@ export const ko_KR: EnTranslations = {
           },
           "5": {
             "label": "사냥꾼의 공터"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "야자 해안",
+        "welcome": "따뜻한 모래, 요란한 새소리, 지평선을 삼키는 정글. 드리프트헤이븐이 해변에 불을 피워 두고 너를 기다린다.",
+        "pois": {
+          "0": {
+            "label": "드리프트헤이븐"
+          },
+          "1": {
+            "label": "덩굴 어귀"
+          },
+          "2": {
+            "label": "야자 백사장"
+          },
+          "3": {
+            "label": "에메랄드 밀림"
+          },
+          "4": {
+            "label": "덩굴폭포 숲"
+          },
+          "5": {
+            "label": "사파이어 석호"
+          },
+          "6": {
+            "label": "가라앉은 신상"
           }
         }
       }

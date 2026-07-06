@@ -5780,6 +5780,18 @@ export const zh_CN: EnTranslations = {
       "pale_huntsman": {
         "name": "苍白猎手"
       },
+      "tide_scuttler": {
+        "name": "潮汐蟹"
+      },
+      "thicket_boar": {
+        "name": "灌丛野猪"
+      },
+      "canopy_weaver": {
+        "name": "树冠织网蛛"
+      },
+      "idol_guardian": {
+        "name": "神像守卫"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -7271,6 +7283,33 @@ export const zh_CN: EnTranslations = {
           },
           "5": {
             "label": "猎手林隙"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "棕榈湾",
+        "welcome": "温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。漂流港在海滩上为你留着一堆篝火。",
+        "pois": {
+          "0": {
+            "label": "漂流港"
+          },
+          "1": {
+            "label": "缠木隘口"
+          },
+          "2": {
+            "label": "棕榈长滩"
+          },
+          "3": {
+            "label": "翠绿丛林"
+          },
+          "4": {
+            "label": "垂藤林"
+          },
+          "5": {
+            "label": "蓝宝石潟湖"
+          },
+          "6": {
+            "label": "沉没神像"
           }
         }
       }

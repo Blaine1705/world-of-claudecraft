@@ -186,6 +186,14 @@ const BIOME_PALETTE: Record<
     dirt: 0x453c34,
     sand: 0x6b6754,
   },
+  // jungle: saturated tropical green over bright coral sand
+  jungle: {
+    grass: 0x3f9448,
+    grassDark: 0x2c7038,
+    grassYellow: 0x74b04e,
+    dirt: 0x8a6e4a,
+    sand: 0xf2e2b4,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -200,6 +208,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   fen: 0.6,
   night: 0.55,
   haunt: 0.58,
+  jungle: 0.6,
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));

@@ -1013,6 +1013,11 @@ const MOB_KEYS: Record<string, string> = {
   wood_wraith: 'mob_ghost',
   gravenbark_shambler: 'mob_treant',
   pale_huntsman: 'skel_rogue',
+  // the Palmreach: coral crabs, jungle boars, and the carved-stone guardian
+  // (the canopy weavers take the spider family default)
+  tide_scuttler: 'mob_crab',
+  thicket_boar: 'mob_boar',
+  idol_guardian: 'skel_golem',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

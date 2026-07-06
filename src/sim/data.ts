@@ -85,6 +85,19 @@ import {
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
 import {
+  PALMREACH_CAMPS,
+  PALMREACH_ITEMS,
+  PALMREACH_MOBS,
+  PALMREACH_NPCS,
+  PALMREACH_OBJECTS,
+  PALMREACH_PORTALS,
+  PALMREACH_PROPS,
+  PALMREACH_QUEST_ORDER,
+  PALMREACH_QUESTS,
+  PALMREACH_ROADS,
+  PALMREACH_ZONE,
+} from './content/palmreach';
+import {
   REALM_CAMPS,
   REALM_ITEMS,
   REALM_MOBS,
@@ -235,6 +248,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WILLOWFEN_ITEMS,
   NIGHTBLOOM_ITEMS,
   WRAITHWOOD_ITEMS,
+  PALMREACH_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -256,6 +270,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...WILLOWFEN_MOBS,
   ...NIGHTBLOOM_MOBS,
   ...WRAITHWOOD_MOBS,
+  ...PALMREACH_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -273,6 +288,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...WILLOWFEN_NPCS,
   ...NIGHTBLOOM_NPCS,
   ...WRAITHWOOD_NPCS,
+  ...PALMREACH_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -287,6 +303,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...WILLOWFEN_QUESTS,
   ...NIGHTBLOOM_QUESTS,
   ...WRAITHWOOD_QUESTS,
+  ...PALMREACH_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -301,6 +318,7 @@ export const QUEST_ORDER: string[] = [
   ...WILLOWFEN_QUEST_ORDER,
   ...NIGHTBLOOM_QUEST_ORDER,
   ...WRAITHWOOD_QUEST_ORDER,
+  ...PALMREACH_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -323,6 +341,7 @@ export const CAMPS: CampDef[] = [
   ...WILLOWFEN_CAMPS,
   ...NIGHTBLOOM_CAMPS,
   ...WRAITHWOOD_CAMPS,
+  ...PALMREACH_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -337,6 +356,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...WILLOWFEN_OBJECTS,
   ...NIGHTBLOOM_OBJECTS,
   ...WRAITHWOOD_OBJECTS,
+  ...PALMREACH_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -350,6 +370,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...WILLOWFEN_ROADS,
   ...NIGHTBLOOM_ROADS,
   ...WRAITHWOOD_ROADS,
+  ...PALMREACH_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -360,6 +381,7 @@ export const PORTALS: PortalDef[] = [
   ...WILLOWFEN_PORTALS,
   ...NIGHTBLOOM_PORTALS,
   ...WRAITHWOOD_PORTALS,
+  ...PALMREACH_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -374,6 +396,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   WILLOWFEN_PROPS,
   NIGHTBLOOM_PROPS,
   WRAITHWOOD_PROPS,
+  PALMREACH_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -442,6 +465,7 @@ export const ZONES: ZoneDef[] = [
   WILLOWFEN_ZONE,
   NIGHTBLOOM_ZONE,
   WRAITHWOOD_ZONE,
+  PALMREACH_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]

@@ -120,6 +120,10 @@ const MOB_IDS = [
   'wood_wraith',
   'gravenbark_shambler',
   'pale_huntsman',
+  'tide_scuttler',
+  'thicket_boar',
+  'canopy_weaver',
+  'idol_guardian',
 ] as const;
 
 const NPC_IDS = [
@@ -253,6 +257,7 @@ const ZONE_IDS = [
   'willowfen',
   'nightbloom',
   'wraithwood',
+  'palmreach',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

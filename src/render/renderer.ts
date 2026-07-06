@@ -74,6 +74,7 @@ import {
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
+import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMotes, type MotesView } from './motes';
 import { COMBO_PIP_MAX } from './nameplate_combo';
@@ -844,6 +845,7 @@ export class Renderer {
   private amberFeatures: AmberFeaturesView;
   private nightFeatures: NightFeaturesView;
   private hauntFeatures: HauntFeaturesView;
+  private jungleFeatures: JungleFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1066,6 +1068,7 @@ export class Renderer {
         'fen',
         'night',
         'haunt',
+        'jungle',
       ];
       for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
@@ -1288,6 +1291,10 @@ export class Renderer {
     setRenderCategory(this.hauntFeatures.group, 'props');
     this.scene.add(this.hauntFeatures.group);
     for (const light of this.hauntFeatures.glowLights) this.fireLights.push(light);
+    this.jungleFeatures = buildJungleFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.jungleFeatures.group, 'props');
+    this.scene.add(this.jungleFeatures.group);
+    freezeStaticMatrices(this.jungleFeatures.group);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -3593,6 +3600,8 @@ export class Renderer {
     night: { color: 0xbfb0e8, near: 90, far: 330 },
     // the Wraithwood: dense dead-grey murk, sightlines close right in
     haunt: { color: 0x454c46, near: 30, far: 150 },
+    // the Palmreach: bright humid haze, the clearest air in the world
+    jungle: { color: 0xd6efe2, near: 115, far: 400 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3618,6 +3627,8 @@ export class Renderer {
     // the Wraithwood: sickly grey light strangled by the canopy (the rig has
     // no intensity knob, so the gloom lives in the color luminance)
     haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
+    // the Palmreach: hard tropical daylight over deep green bounce
+    jungle: { hemiSky: 0xeafcff, hemiGround: 0x3a6a42, sun: 0xfff4d8 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
@@ -4562,6 +4573,7 @@ export class Renderer {
     this.amberFeatures.update(this.time);
     this.nightFeatures.update(this.time);
     this.hauntFeatures.update(this.time);
+    this.jungleFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);

@@ -391,14 +391,15 @@ class Sfx {
       | 'amber'
       | 'fen'
       | 'night'
-      | 'haunt',
+      | 'haunt'
+      | 'jungle',
     inDungeon: boolean,
     precip: 'snow' | 'rain' | null,
     nearWater: boolean,
   ): void {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
     this.ambient('amb_wind_vale', !inDungeon && biome === 'vale' ? 0.12 : 0);
-    this.ambient('amb_birds', !inDungeon && biome === 'vale' ? 0.1 : 0);
+    this.ambient('amb_birds', !inDungeon && (biome === 'vale' || biome === 'jungle') ? 0.14 : 0);
     // The dusk realm shares the marsh's low still-air bed, kept quieter: a
     // sheltered valley, no open-ridge wind.
     // ...and the ember wastes a faint dry-air version of the same bed
@@ -417,7 +418,9 @@ class Sfx {
                   ? 0.06 // hushed still night air
                   : biome === 'haunt'
                     ? 0.14 // the wood breathes: thick still air
-                    : 0;
+                    : biome === 'jungle'
+                      ? 0.1 // humid insect drone
+                      : 0;
     this.ambient('amb_wind_marsh', !inDungeon ? marshBed : 0);
     // the Frostveil shares the peaks' ridge wind, a touch stronger in the mist
     const peaksBed = biome === 'peaks' ? 0.18 : biome === 'frost' ? 0.2 : 0;

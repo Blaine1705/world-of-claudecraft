@@ -42,6 +42,9 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   night: { hill: 12, base: 1, hubHeight: 2.5 },
   // the Wraithwood: low haunted forest floor under the giant canopies
   haunt: { hill: 13, base: 1.5, hubHeight: 2.5 },
+  // the Palmreach: low tropical relief, the coasts flattened to beach by
+  // the jungle coast applier
+  jungle: { hill: 11, base: 1.2, hubHeight: 2 },
 };
 
 // Ridge walls between zone bands, each opened by a road pass. A zone with
@@ -403,6 +406,9 @@ const WOOD_LAND_LOBES = [
   { x: 14, z: 4540, r: 50 }, // the clearing road's shoulder
   { x: -130, z: 4500, r: 55 }, // the west arm
   { x: 130, z: 4380, r: 50 }, // the east arm
+  { x: -60, z: 4710, r: 48 }, // the Tanglemouth's southern footing
+  { x: -52, z: 4645, r: 45 }, // the west track's shoulder toward the pass
+  { x: -60, z: 4740, r: 42 }, // the border footing right under the pass
 ] as const;
 const WOOD_BAYS = [
   { x: 170, z: 4460, r: 55 }, // the east sound
@@ -424,6 +430,64 @@ function applyWoodCoast(x: number, z: number, h: number): number {
   let out = floor + (h - floor) * t;
   // the Crowgate: flat pass floor across the border
   const passT = (1 - smoothstep(26, 52, Math.abs(x - 30))) * (1 - smoothstep(4250, 4300, z));
+  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  // ...and the Tanglemouth's south ramp, meeting the jungle's pass cap
+  const passN = (1 - smoothstep(26, 52, Math.abs(x + 60))) * smoothstep(4680, 4725, z);
+  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// The Palmreach: the tropical realm at the world's current northern end.
+// Its signature is the coast: every shore is flattened into a wide, gently
+// sloped beach shelf, so the land meets a turquoise sea over sand instead of
+// bluffs. The eastern arm cups the Sapphire Lagoon.
+// ---------------------------------------------------------------------------
+const REACH_ZMAX = 5320; // keep in sync with PALMREACH_ZONE.zMax
+const REACH_LAND_LOBES = [
+  { x: -60, z: 4800, r: 55 }, // the Tanglemouth's shelf
+  { x: -100, z: 4950, r: 75 }, // the Palmstrand's long beach arm
+  { x: 0, z: 5000, r: 95 }, // the Emerald Tangle: the realm's green heart
+  { x: 60, z: 4890, r: 70 }, // Drifthaven's strand
+  { x: 95, z: 4955, r: 60 }, // the lagoon's northern arm...
+  { x: 125, z: 5050, r: 55 }, // ...curling east around the water
+  { x: 100, z: 5140, r: 60 }, // the Sunken Idol's headland
+  { x: -40, z: 5140, r: 80 }, // the Vinefall
+  { x: 20, z: 5230, r: 70 }, // the north cape
+  { x: -120, z: 5080, r: 55 }, // the west arm
+  { x: -40, z: 5060, r: 55 }, // the Tangle's western shoulder
+  { x: 30, z: 5120, r: 50 }, // ...and its northeastern one
+  { x: 20, z: 4860, r: 55 }, // the shore road's back-beach
+  { x: -24, z: 4830, r: 45 }, // ...its western reach out of the pass
+  { x: -6, z: 4925, r: 45 }, // the Palmstrand road's shoulder
+  { x: 150, z: 4880, r: 42 }, // the offshore islet
+  { x: 118, z: 4886, r: 38 }, // ...and its sandbar back to the strand
+] as const;
+const REACH_BAYS = [
+  { x: -170, z: 5010, r: 50 }, // the west reach
+  { x: 178, z: 5000, r: 45 }, // the east sound
+  { x: -30, z: 5312, r: 50 }, // the north bight, open to the warm sea
+] as const;
+
+export function reachLandness(x: number, z: number): number {
+  return metaballLandness(REACH_LAND_LOBES, REACH_BAYS, x, z);
+}
+
+// The tropical coast: the fen recipe, then every low shore flattened into a
+// broad sand shelf (the beach cap) so the strand runs wide and walkable.
+function applyReachCoast(x: number, z: number, h: number): number {
+  if (z <= WOOD_ZMAX || z > REACH_ZMAX + 2) return h;
+  const land = reachLandness(x, z);
+  const t = smoothstep(0.02, 0.32, land);
+  const shelf = smoothstep(-0.5, 0.06, land);
+  const floor = WATER_LEVEL - 3.2 + (WATER_LEVEL - 0.8 - (WATER_LEVEL - 3.2)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the beach cap: the coastal band is pressed flat and low, a long sandy
+  // apron instead of the other realms' bluff shores
+  const beachT = 1 - smoothstep(0.05, 0.3, land);
+  if (beachT > 0 && out > 1.4) out = out + (1.4 + (out - 1.4) * 0.2 - out) * beachT;
+  // the Tanglemouth: flat pass floor across the border
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 60))) * (1 - smoothstep(4810, 4860, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
   return out;
 }
@@ -646,8 +710,12 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     return dEdge < 48 && nightLandness(x, z) < 0.02;
   }
   if (z <= WOOD_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, WOOD_ZMAX - z);
+    const dEdge = Math.min(x + 180, 180 - x);
     return dEdge < 48 && woodLandness(x, z) < 0.02;
+  }
+  if (z <= REACH_ZMAX + 2) {
+    const dEdge = Math.min(x + 180, 180 - x, REACH_ZMAX - z);
+    return dEdge < 48 && reachLandness(x, z) < 0.02;
   }
   return false;
 }
@@ -835,6 +903,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
             fenLandness(x, z),
             nightLandness(x, z),
             woodLandness(x, z),
+            reachLandness(x, z),
           ),
         );
       }
@@ -852,6 +921,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyFenCoast(x, z, h);
   h = applyNightCoast(x, z, h);
   h = applyWoodCoast(x, z, h);
+  h = applyReachCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   // World rims AFTER the coast, so the border ranges rise out of the sea
@@ -987,6 +1057,12 @@ export function generateDecorations(seed: number): Decoration[] {
         // the densest forest in the world: the canopy is the realm
         if (r > 0.62) continue;
         kind = r < 0.3 ? 'tree' : r < 0.54 ? 'tree2' : 'rock';
+      } else if (biome === 'jungle') {
+        // wall-to-wall broadleaf inland; the palms on the beaches are the
+        // render module's (this grid skips the low sand shelf below)
+        if (terrainHeight(gx, gz, seed) < 3) continue;
+        if (r > 0.58) continue;
+        kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

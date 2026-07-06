@@ -79,6 +79,13 @@ export const WRAITHWOOD_ROADS: { x: number; z: number }[][] = [
     { x: 14, z: 4530 },
     { x: 18, z: 4600 },
   ], // Gallowmere -> the Huntsman's Clearing
+  [
+    { x: 0, z: 4370 },
+    { x: -28, z: 4460 },
+    { x: -36, z: 4560 },
+    { x: -48, z: 4660 },
+    { x: -60, z: 4752 },
+  ], // Gallowmere -> east of the chapel tarn -> the Tanglemouth
 ];
 
 // No portals: walked into under the Crowgate.

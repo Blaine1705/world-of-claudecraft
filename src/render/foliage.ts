@@ -121,6 +121,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   fen: 0x8fae7e,
   night: 0x8040e0, // dream-violet boughs (saturated: soften + green albedo wash it out)
   haunt: 0x36443a, // dead dark needles
+  jungle: 0x3f9450, // deep tropical green
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -133,6 +134,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   fen: 0x9dc47e, // lush wetland green
   night: 0xb03cf0, // vivid orchid canopy (soften + green albedo wash it out)
   haunt: 0x424c38, // gnarled grey-green canopy
+  jungle: 0x46b04e, // lush broadleaf canopy
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -145,6 +147,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   fen: 0x7e8a76,
   night: 0xa094c8,
   haunt: 0x565a50,
+  jungle: 0x7e8a6a,
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -157,6 +160,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   fen: 0xc8cfae,
   night: 0xe0d4ec,
   haunt: 0x9a948a, // grey weathered bark
+  jungle: 0xd8c4a0,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -169,6 +173,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   fen: 0xcfe4b0,
   night: 0xe598ff, // orchid dream grass (green blade albedo mutes it)
   haunt: 0x99a382, // sickly pale grass
+  jungle: 0xc4ec96, // bright wet tropical grass
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
@@ -191,6 +196,7 @@ const DRESS_TINT: Record<BiomeId, number> = {
   fen: 0xa8c48e,
   night: 0xc078f2,
   haunt: 0x707a5e,
+  jungle: 0x6cc064,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
@@ -1140,6 +1146,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   fen: 0.38,
   night: 0.32,
   haunt: 0.3,
+  jungle: 0.5,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -1197,6 +1204,14 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     // nothing flowers here: brambles, ferns, and mushrooms in the leaf rot
     if (r < 0.24) return 'bush';
     if (r < 0.6) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'jungle') {
+    // the understory is the realm: ferns wall the paths, blooms burst
+    // through, mushrooms keep to the deep shade
+    if (r < 0.16) return 'bush';
+    if (r < 0.38) return 'bushFlowers';
+    if (r < 0.88) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';

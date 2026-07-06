@@ -1406,6 +1406,24 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Huntsman's Clearing"
     ],
     "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name."
+  },
+  {
+    "id": "palmreach",
+    "name": "The Palmreach",
+    "min": 20,
+    "max": 20,
+    "biome": "jungle",
+    "hub": "Drifthaven",
+    "pois": [
+      "Drifthaven",
+      "The Tanglemouth",
+      "The Palmstrand",
+      "The Emerald Tangle",
+      "The Vinefall",
+      "The Sapphire Lagoon",
+      "The Sunken Idol"
+    ],
+    "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you."
   }
 ];
 

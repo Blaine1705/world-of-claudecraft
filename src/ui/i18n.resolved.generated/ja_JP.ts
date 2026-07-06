@@ -5780,6 +5780,18 @@ export const ja_JP: EnTranslations = {
       "pale_huntsman": {
         "name": "蒼白の狩人"
       },
+      "tide_scuttler": {
+        "name": "タイドスカトラー"
+      },
+      "thicket_boar": {
+        "name": "茂みの猪"
+      },
+      "canopy_weaver": {
+        "name": "キャノピーウィーバー"
+      },
+      "idol_guardian": {
+        "name": "神像の守護者"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -7271,6 +7283,33 @@ export const ja_JP: EnTranslations = {
           },
           "5": {
             "label": "狩人の広場"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "パームリーチ",
+        "welcome": "暖かい砂浜、騒がしい鳥の声、そして地平線を呑み込むジャングル。ドリフトヘイヴンは浜辺に火を焚いて待っている。",
+        "pois": {
+          "0": {
+            "label": "ドリフトヘイヴン"
+          },
+          "1": {
+            "label": "絡み口"
+          },
+          "2": {
+            "label": "パームストランド"
+          },
+          "3": {
+            "label": "エメラルドの密林"
+          },
+          "4": {
+            "label": "蔓垂の森"
+          },
+          "5": {
+            "label": "サファイアの潟"
+          },
+          "6": {
+            "label": "沈んだ神像"
           }
         }
       }

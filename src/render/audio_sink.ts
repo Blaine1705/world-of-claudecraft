@@ -37,7 +37,8 @@ export interface SpatialAudioSink {
       | 'amber'
       | 'fen'
       | 'night'
-      | 'haunt',
+      | 'haunt'
+      | 'jungle',
     inDungeon: boolean,
     precip: 'snow' | 'rain' | null,
     nearWater: boolean,
