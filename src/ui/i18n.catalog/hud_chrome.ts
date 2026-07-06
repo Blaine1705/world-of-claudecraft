@@ -416,9 +416,11 @@ export const hudChromeStrings = {
   },
   // Choice-row talents (the Pandaria-style rows tab in the talents window).
   // The row OPTION names/descriptions are sim content (English source, localized
-  // with the talent-copy batch); only the chrome lives here.
+  // with the talent-copy batch); only the chrome lives here. defaultLoadout is
+  // the loadout dropdown button's label while no saved build is active.
   talentRows: {
     tab: 'Choices',
+    defaultLoadout: 'Default Loadout',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through

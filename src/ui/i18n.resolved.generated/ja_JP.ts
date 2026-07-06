@@ -416,7 +416,8 @@ export const ja_JP: EnTranslations = {
       "showTargetOfTarget": "ターゲットのターゲットを表示"
     },
     "talentRows": {
-      "tab": "選択"
+      "tab": "選択",
+      "defaultLoadout": "デフォルト構成"
     },
     "controller": {
       "title": "コントローラー",

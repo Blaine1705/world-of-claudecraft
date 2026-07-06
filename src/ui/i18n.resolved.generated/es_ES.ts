@@ -416,7 +416,8 @@ export const es_ES: EnTranslations = {
       "showTargetOfTarget": "Mostrar objetivo del objetivo"
     },
     "talentRows": {
-      "tab": "Elecciones"
+      "tab": "Elecciones",
+      "defaultLoadout": "Configuración predeterminada"
     },
     "controller": {
       "title": "Mando",

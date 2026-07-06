@@ -416,7 +416,8 @@ export const en_XA: EnTranslations = {
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]"
     },
     "talentRows": {
-      "tab": "[Çĥóíçéš]"
+      "tab": "[Çĥóíçéš]",
+      "defaultLoadout": "[Ðéƒáúļţ Ļóáðóúţ]"
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",

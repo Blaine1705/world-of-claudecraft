@@ -416,7 +416,8 @@ export const zh_CN: EnTranslations = {
       "showTargetOfTarget": "显示目标的目标"
     },
     "talentRows": {
-      "tab": "选择"
+      "tab": "选择",
+      "defaultLoadout": "默认配置"
     },
     "controller": {
       "title": "手柄",

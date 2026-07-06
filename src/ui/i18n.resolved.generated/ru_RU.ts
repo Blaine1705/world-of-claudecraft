@@ -416,7 +416,8 @@ export const ru_RU: EnTranslations = {
       "showTargetOfTarget": "Показывать цель цели"
     },
     "talentRows": {
-      "tab": "Выбор"
+      "tab": "Выбор",
+      "defaultLoadout": "Набор по умолчанию"
     },
     "controller": {
       "title": "Геймпад",

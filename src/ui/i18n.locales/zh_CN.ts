@@ -327,6 +327,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showTargetOfTarget': '显示目标的目标',
   'hudChrome.talentRows.tab': '选择',
+  'hudChrome.talentRows.defaultLoadout': '默认配置',
   'hudChrome.options.itemLevelLine': '物品等级 {level}',
   'hudChrome.options.itemScoreLine': '评分 {score}',
   'hudChrome.landing.highContrast': '高对比度',

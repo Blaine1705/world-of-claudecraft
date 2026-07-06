@@ -5174,6 +5174,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
   'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',
   'hudChrome.talentRows.tab': 'Elecciones',
+  'hudChrome.talentRows.defaultLoadout': 'Configuración predeterminada',
   'hudChrome.unitFrame.targetOfTargetLabel': 'La marca de tu marca',
   'errors.api.desktopCodeInvalid':
     'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',

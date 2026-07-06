@@ -416,7 +416,8 @@ export const vi_VN: EnTranslations = {
       "showTargetOfTarget": "Show Target of Target"
     },
     "talentRows": {
-      "tab": "Choices"
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout"
     },
     "controller": {
       "title": "Tay Cầm",

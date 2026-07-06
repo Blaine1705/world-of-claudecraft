@@ -344,6 +344,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
   'hudChrome.talentRows.tab': '선택',
+  'hudChrome.talentRows.defaultLoadout': '기본 구성',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
   'hudChrome.options.itemScoreLine': '점수 {score}',
   'hudChrome.landing.highContrast': '고대비',

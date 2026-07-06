@@ -328,6 +328,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showTargetOfTarget': '顯示目標的目標',
   'hudChrome.talentRows.tab': '選擇',
+  'hudChrome.talentRows.defaultLoadout': '預設配置',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',

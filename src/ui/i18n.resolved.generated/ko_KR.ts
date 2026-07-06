@@ -416,7 +416,8 @@ export const ko_KR: EnTranslations = {
       "showTargetOfTarget": "대상의 대상 표시"
     },
     "talentRows": {
-      "tab": "선택"
+      "tab": "선택",
+      "defaultLoadout": "기본 구성"
     },
     "controller": {
       "title": "컨트롤러",

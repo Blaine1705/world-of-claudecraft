@@ -416,7 +416,8 @@ export const pl_PL: EnTranslations = {
       "showTargetOfTarget": "Show Target of Target"
     },
     "talentRows": {
-      "tab": "Choices"
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout"
     },
     "controller": {
       "title": "Kontroler",
