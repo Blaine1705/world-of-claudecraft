@@ -9,11 +9,14 @@
 //
 // The style is a shaded-relief atlas plate: two-axis hillshade lit from the
 // northwest, topographic contour lines, an inked coastline over depth-graded
-// water, a sand shoreline band, per-biome forest stippling, and outlined
-// roads, so both the minimap and the map window read like a real map rather
+// water with shallow foam, wet and dry sand shoreline bands, hypsometric
+// tinting (lush lowlands drying toward pale highlands), fbm vegetation
+// mottling, rock exposure on steep slopes, per-biome forest stippling, and
+// worn dirt tracks with wobbling width, a packed center strip, and inked
+// edges, so both the minimap and the map window read like real land rather
 // than flat color bands.
 import { ZONES } from '../sim/data';
-import { hash2 } from '../sim/rng';
+import { fbm2, hash2 } from '../sim/rng';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 
 export interface MapRegion {
@@ -102,6 +105,13 @@ export function paintTerrainRows(
         r += chop;
         g += chop;
         b += chop;
+        // breaking foam on the shallowest fringe, just off the sand
+        const foam = 1 - Math.min(1, (WATER_LEVEL - h) / 0.4);
+        if (foam > 0) {
+          r += (150 - r) * foam * 0.6;
+          g += (188 - g) * foam * 0.6;
+          b += (198 - b) * foam * 0.6;
+        }
         if (left >= WATER_LEVEL || up >= WATER_LEVEL) {
           // the ink line where the sea meets the land
           r *= 0.45;
@@ -213,18 +223,57 @@ export function paintTerrainRows(
         b = 62;
       }
 
-      // -- the sand shoreline band right above the waterline --
       const shore = h - WATER_LEVEL;
-      if (shore < 1.6) {
-        const t = 1 - shore / 1.6;
-        r += (172 - r) * t * 0.75;
-        g += (156 - g) * t * 0.75;
-        b += (118 - b) * t * 0.75;
+      const yardsPerPx = spanX / W;
+      // slope in height-per-yard, resolution-independent, from the same
+      // neighbours the hillshade uses
+      const slope = Math.max(Math.abs(h - left), Math.abs(h - up)) / Math.max(yardsPerPx, 0.001);
+
+      // -- hypsometric tint: valleys lush, high ground dry and pale --
+      const lift = Math.max(0, Math.min(1, (h - 2) / 26));
+      r += (30 - r * 0.06) * lift * 0.5;
+      g += (16 - g * 0.05) * lift * 0.4;
+      b *= 1 - lift * 0.08;
+
+      // -- vegetation mottle: broad moisture patches + fine ground texture,
+      // the thing that stops real land ever being one flat color --
+      const veg = fbm2(x * 0.045, z * 0.045, seed + 601, 2) - 0.5;
+      const grain = fbm2(x * 0.3, z * 0.3, seed + 613, 2) - 0.5;
+      const mottle = 1 + veg * 0.16 + grain * 0.1;
+      r *= mottle;
+      g *= 1 + veg * 0.2 + grain * 0.1; // moisture reads mostly in the greens
+      b *= mottle;
+
+      // -- rock exposure: steep faces shed their vegetation --
+      const rockT = Math.max(0, Math.min(1, (slope - 0.55) / 0.6));
+      if (rockT > 0) {
+        const rr = 122 + grain * 40;
+        const rg = 116 + grain * 40;
+        const rb = 106 + grain * 36;
+        r += (rr - r) * rockT * 0.85;
+        g += (rg - g) * rockT * 0.85;
+        b += (rb - b) * rockT * 0.85;
       }
 
-      // -- forest stipple: hash-celled tree dots below the crag line --
+      // -- the shoreline: a wet dark line at the waterline, dry pale sand above --
+      if (shore < 1.6) {
+        const t = 1 - shore / 1.6;
+        if (shore < 0.5) {
+          const wet = 1 - shore / 0.5;
+          r += (128 - r) * wet * 0.8;
+          g += (114 - g) * wet * 0.8;
+          b += (88 - b) * wet * 0.8;
+        } else {
+          r += (176 - r) * t * 0.7;
+          g += (160 - g) * t * 0.7;
+          b += (122 - b) * t * 0.7;
+        }
+      }
+
+      // -- forest stipple: hash-celled tree dots below the crag line, kept
+      // off exposed rock --
       const density = FOREST_STIPPLE[biome] ?? 0.3;
-      if (h < 22 && shore > 1.2) {
+      if (h < 22 && shore > 1.2 && rockT < 0.4) {
         const cell = hash2(Math.round(x * 0.8), Math.round(z * 0.8), seed + 271);
         if (cell < density) {
           const dot = 0.72 + cell * 0.3; // deeper cells read as darker crowns
@@ -268,16 +317,25 @@ export function paintTerrainRows(
         b = 40;
       } else {
         const road = roadDistance(x, z);
-        if (road < 2.2) {
-          // the worn track itself
-          r = 164;
-          g = 136;
-          b = 94;
-        } else if (road < 3.2) {
-          // its inked edge
-          r *= 0.72;
-          g *= 0.72;
-          b *= 0.72;
+        if (road < 4.2) {
+          // a worn dirt track, not a painted band: the width wobbles like a
+          // real path, the middle is packed pale by feet and wheels, and the
+          // verge is inked so it reads against every ground color
+          const wobble = (fbm2(x * 0.3, z * 0.3, seed + 911, 2) - 0.5) * 0.9;
+          const core = 2.0 + wobble;
+          if (road < core * 0.45) {
+            r = 178;
+            g = 152;
+            b = 110;
+          } else if (road < core) {
+            r = 156;
+            g = 128;
+            b = 88;
+          } else if (road < core + 1.0) {
+            r *= 0.7;
+            g *= 0.7;
+            b *= 0.7;
+          }
         }
       }
 
