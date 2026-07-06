@@ -417,7 +417,8 @@ export const ja_JP: EnTranslations = {
     },
     "talentRows": {
       "tab": "選択",
-      "defaultLoadout": "デフォルト構成"
+      "defaultLoadout": "デフォルト構成",
+      "comingSoon": "近日実装"
     },
     "controller": {
       "title": "コントローラー",
@@ -843,6 +844,13 @@ export const ja_JP: EnTranslations = {
       "righteousFury": "正義の怒り: 神聖ダメージによる脅威度が大幅に上昇",
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",
+      "dmgDone": "与えるダメージが{pct}%増加",
+      "crit": "クリティカル率が{pct}%増加",
+      "rageGen": "怒りの獲得量が{pct}%増加",
+      "reckless": "クリティカル率が{pct}%、怒りの獲得量が{ragePct}%増加",
+      "avatar": "巨像：与えるダメージが{pct}%増加",
+      "bloodbath": "クリティカル率と与えるダメージが{pct}%増加",
+      "dieBySword": "受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）",
       "school": {
         "physical": "物理",
         "fire": "火",

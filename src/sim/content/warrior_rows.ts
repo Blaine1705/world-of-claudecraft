@@ -58,9 +58,10 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_second_wind',
         name: 'Second Wind',
-        description: 'Below 35% health, you regenerate 3% of your health per second.',
+        description: 'Below 35% health, you regenerate 1.5% of your health per second.',
         // LIVE: the in-combat regen arm in combat/auras.ts updateRegen reads this.
-        effect: { global: { secondWindPctPerSec: 0.03 } },
+        // Nerfed 3% to 1.5%/sec after the owner's playtest ("muy broken").
+        effect: { global: { secondWindPctPerSec: 0.015 } },
       },
       {
         id: 'war_row_die_by_the_sword',
@@ -85,7 +86,7 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_piercing_howl',
         name: 'Piercing Howl',
-        description: 'A shout that slows enemies within 15 yards by 50% for 15 sec.',
+        description: 'A shout that slows enemies within 15 yards by 50% for 8 sec.',
         // LIVE: grants the AoE-slow shout (the aoeSlow effect in effect_dispatch).
         effect: { grant: { ability: 'piercing_howl' } },
       },
@@ -118,9 +119,20 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_blood_offering',
         name: 'Blood Offering',
-        description: 'Sacrifice 5% of your maximum health to instantly gain 30 rage.',
-        // LIVE: grants the health-for-rage cooldown (selfDamagePctMax + gainResource).
-        effect: { grant: { ability: 'blood_offering' } },
+        description:
+          'Empowers Blood Toll: it grants 30 rage (up from 10) and recharges twice as fast.',
+        // LIVE: upgrades the BASE health-for-rage ability instead of granting a
+        // duplicate (owner call: "que mejore la ira sangrienta existente").
+        // Blood Toll base: 8% max hp, 10 rage, 60s cd; talented: 30 rage, 30s.
+        effect: {
+          ability: [
+            {
+              ability: 'bloodrage',
+              cooldownPct: -0.5,
+              addEffects: [{ type: 'gainResource', amount: 20 }],
+            },
+          ],
+        },
       },
       {
         id: 'war_row_battle_rhythm',

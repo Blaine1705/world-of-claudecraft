@@ -354,6 +354,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
   'hudChrome.talentRows.tab': 'Выбор',
   'hudChrome.talentRows.defaultLoadout': 'Набор по умолчанию',
+  'hudChrome.talentRows.comingSoon': 'Скоро',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
   'hudChrome.options.itemScoreLine': 'Оценка {score}',
   'hudChrome.landing.highContrast': 'Высокая контрастность',
@@ -5042,6 +5043,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Праведная ярость: значительно повышенная угроза от урона Святой школы',
   'hudChrome.auraEffect.scale': 'Размер увеличен на {pct}%',
   'hudChrome.auraEffect.jump': 'Высота прыжка увеличена на {pct}%',
+  'hudChrome.auraEffect.dmgDone': 'Наносимый урон увеличен на {pct}%',
+  'hudChrome.auraEffect.crit': 'Вероятность критического удара увеличена на {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Накопление ярости увеличено на {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Вероятность критического удара увеличена на {pct}%, накопление ярости на {ragePct}%',
+  'hudChrome.auraEffect.avatar': 'Колосс: наносимый урон увеличен на {pct}%',
+  'hudChrome.auraEffect.bloodbath':
+    'Вероятность критического удара и наносимый урон увеличены на {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Получаемый урон снижен на {pct}% ({lowPct}% при здоровье ниже {hpPct}%)',
   'hudChrome.auraEffect.school.physical': 'Физическая',
   'hudChrome.auraEffect.school.fire': 'Огонь',
   'hudChrome.auraEffect.school.frost': 'Лёд',

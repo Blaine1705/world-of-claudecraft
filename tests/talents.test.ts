@@ -521,12 +521,15 @@ describe('Sim integration — active talents & ability modifiers', () => {
     ).find((k) => k.def.id === 'taunt')!;
     expect(taunt.cooldown).toBeCloseTo(10 * 0.8); // Improved Taunt -20% -> 8s
 
+    // Slam is instant by owner decision (MoP-era Brute Swing), so Improved
+    // Brute Swing's castPct has nothing left to reduce: 0 stays 0 (the castPct
+    // fold itself is covered by the caster-class talents, e.g. mage fireball).
     const slam = abilitiesKnownAt(
       'warrior',
       20,
       computeTalentModifiers('warrior', alloc({ spec: 'arms', ranks: { arms_imp_slam: 2 } })),
     ).find((k) => k.def.id === 'slam')!;
-    expect(slam.castTime).toBeCloseTo(1.5 * 0.5); // Improved Slam r2 -50% -> 0.75s
+    expect(slam.castTime).toBe(0);
   });
 
   it('a choice node applies only the chosen option ability mod', () => {

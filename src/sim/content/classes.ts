@@ -650,7 +650,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'warrior',
     learnLevel: 16,
     cost: 15,
-    castTime: 1.5,
+    // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
+    // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
+    castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
@@ -3640,24 +3642,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Hurl your weapon at the target for {damage}, stunning it for 3 sec.',
   },
-  blood_offering: {
-    id: 'blood_offering',
-    name: 'Blood Offering',
-    class: 'warrior',
-    learnLevel: 14,
-    cost: 0,
-    castTime: 0,
-    cooldown: 30,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    offGcd: true,
-    effects: [
-      { type: 'selfDamagePctMax', pct: 0.05 },
-      { type: 'gainResource', amount: 30 },
-    ],
-    description: 'Sacrifice 5% of your maximum health to instantly gain 30 rage.',
-  },
   piercing_howl: {
     id: 'piercing_howl',
     name: 'Piercing Howl',
@@ -3669,8 +3653,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'aoeSlow', mult: 0.5, duration: 15, radius: 15 }],
-    description: 'A piercing shout that slows all enemies within 15 yards by 50% for 15 sec.',
+    // Slow shortened 15s to 8s after the owner's playtest (a near-permanent
+    // AoE snare on a no-cooldown shout was too strong).
+    effects: [{ type: 'aoeSlow', mult: 0.5, duration: 8, radius: 15 }],
+    description: 'A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.',
   },
   die_by_sword: {
     id: 'die_by_sword',

@@ -65,15 +65,29 @@ describe('Storm Bolt', () => {
 });
 
 describe('Blood Offering', () => {
-  it('trades 5% max health for 30 rage', () => {
-    const sim = warriorAtCap(42);
-    sim.pickRowTalent(3, 'war_row_blood_offering');
-    const p = sim.player;
-    p.hp = p.maxHp;
-    p.resource = 0;
-    sim.castAbility('blood_offering');
-    expect(p.hp).toBe(p.maxHp - Math.round(p.maxHp * 0.05));
-    expect(p.resource).toBeCloseTo(30);
+  it('empowers the base Blood Toll: 30 rage and half its cooldown', () => {
+    const run = (pick: boolean) => {
+      const sim = warriorAtCap(42);
+      if (pick) sim.pickRowTalent(3, 'war_row_blood_offering');
+      const p = sim.player;
+      p.hp = p.maxHp;
+      p.resource = 0;
+      sim.castAbility('bloodrage');
+      return {
+        hpLost: p.maxHp - p.hp,
+        maxHp: p.maxHp,
+        rage: p.resource,
+        cd: p.cooldowns.get('bloodrage'),
+      };
+    };
+    const base = run(false);
+    expect(base.rage).toBeCloseTo(10);
+    expect(base.cd).toBe(60);
+    const talented = run(true);
+    // Same health price (8% max), triple the rage, twice the availability.
+    expect(talented.hpLost).toBe(Math.round(talented.maxHp * 0.08));
+    expect(talented.rage).toBeCloseTo(30);
+    expect(talented.cd).toBe(30);
   });
 });
 
@@ -132,7 +146,7 @@ describe('Pursuit', () => {
 });
 
 describe('Second Wind', () => {
-  it('regenerates 3%/sec below the threshold and nothing above it', () => {
+  it('regenerates 1.5%/sec below the threshold and nothing above it', () => {
     const sim = warriorAtCap(46);
     sim.pickRowTalent(1, 'war_row_second_wind');
     while ((sim as any).tickCount % 40 !== 0) sim.tick();
@@ -141,8 +155,9 @@ describe('Second Wind', () => {
     p.inCombat = true;
     p.hp = Math.floor(p.maxHp * 0.3);
     const low = p.hp;
+    // The regen arm runs on a 2s cadence, so one pass heals 2 * 1.5% = 3%.
     updateRegen((sim as any).ctx, p, meta);
-    expect(p.hp).toBe(low + Math.round(p.maxHp * 0.06));
+    expect(p.hp).toBe(low + Math.round(p.maxHp * 0.03));
     p.hp = Math.floor(p.maxHp * (SECOND_WIND_THRESHOLD + 0.1));
     const high = p.hp;
     updateRegen((sim as any).ctx, p, meta);
@@ -170,7 +185,7 @@ describe('Die by the Sword', () => {
 });
 
 describe('Piercing Howl', () => {
-  it('slows every hostile within 15 yards by 50% for 15s', () => {
+  it('slows every hostile within 15 yards by 50% for 8s', () => {
     const sim = warriorAtCap(48);
     sim.pickRowTalent(2, 'war_row_piercing_howl');
     const mob = mobsNear(sim, 1)[0];
@@ -179,7 +194,7 @@ describe('Piercing Howl', () => {
     sim.castAbility('piercing_howl');
     const slow = mob.auras.find((a: any) => a.kind === 'slow');
     expect(slow?.value).toBe(0.5);
-    expect(slow?.remaining).toBeCloseTo(15, 0);
+    expect(slow?.remaining).toBeCloseTo(8, 0);
   });
 });
 

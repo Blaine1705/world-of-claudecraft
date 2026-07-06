@@ -417,7 +417,8 @@ export const de_DE: EnTranslations = {
     },
     "talentRows": {
       "tab": "Choices",
-      "defaultLoadout": "Default Loadout"
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
     },
     "controller": {
       "title": "Controller",
@@ -843,6 +844,13 @@ export const de_DE: EnTranslations = {
       "righteousFury": "Rechtschaffener Zorn: stark erhöhte Bedrohung durch Heiligschaden",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "school": {
         "physical": "Physisch",
         "fire": "Feuer",

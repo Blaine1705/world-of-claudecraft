@@ -6,6 +6,7 @@
 // (repainted on open/tab-switch/pick, never per frame). Owns no state.
 
 import { esc } from './esc';
+import { t } from './i18n';
 import { talentEffectIconRef, talentIconDataUrl } from './talent_icons';
 import type { TalentRowsVM } from './talent_rows_view';
 
@@ -26,17 +27,21 @@ export function paintTalentRowsTab(
 ): void {
   const wrap = document.createElement('div');
   wrap.className = 'tal-rows';
+  const soon = t('hudChrome.talentRows.comingSoon');
   const parts: string[] = [];
   for (const row of vm.rows) {
     const opts = row.options
       .map((o) => {
         const icon = talentIconDataUrl(talentEffectIconRef(o.effect, 'choice'));
+        const aria = `${o.name}. ${o.description}${o.pending ? ` (${soon})` : ''}`;
         return (
-          `<button type="button" class="tal-row-opt${o.picked ? ' picked' : ''}"` +
+          `<button type="button" class="tal-row-opt${o.picked ? ' picked' : ''}` +
+          `${o.pending ? ' pending' : ''}"` +
           ` data-row="${row.index}" data-opt="${esc(o.id)}"` +
-          ` aria-pressed="${o.picked}" aria-label="${esc(`${o.name}. ${o.description}`)}"` +
-          ` ${row.unlocked ? '' : 'disabled'}>` +
+          ` aria-pressed="${o.picked}" aria-label="${esc(aria)}"` +
+          ` ${row.unlocked && !o.pending ? '' : 'disabled'}>` +
           `<img src="${icon}" alt="" draggable="false"><b>${esc(o.name)}</b>` +
+          (o.pending ? `<i class="tal-soon">${esc(soon)}</i>` : '') +
           `</button>`
         );
       })
@@ -58,7 +63,9 @@ export function paintTalentRowsTab(
     if (opt) {
       deps.attachTooltip(
         btn,
-        () => `<b>${esc(opt.name)}</b><br><span>${esc(opt.description)}</span>`,
+        () =>
+          `<b>${esc(opt.name)}</b><br><span>${esc(opt.description)}</span>` +
+          (opt.pending ? `<br><i>${esc(soon)}</i>` : ''),
       );
     }
     btn.addEventListener('click', () => {

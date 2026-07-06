@@ -1973,6 +1973,26 @@
   .tal-row-opt:disabled {
     cursor: default;
   }
+  /* An option whose mechanic is not implemented yet: dimmed, with a small
+     "Coming soon" badge instead of a pickable pill. */
+  .tal-row-opt.pending {
+    opacity: 0.55;
+  }
+  .tal-row-opt.pending img {
+    filter: grayscale(0.8);
+  }
+  .tal-soon {
+    margin-left: auto;
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
   @media (max-width: 640px) {
     .tal-row {
       flex-wrap: wrap;

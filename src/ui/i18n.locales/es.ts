@@ -4985,6 +4985,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.righteousFury': 'Furia recta: amenaza de daño Sagrado muy aumentada',
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',
   'hudChrome.auraEffect.jump': 'Altura de salto aumentada un {pct}%',
+  'hudChrome.auraEffect.dmgDone': 'Aumenta el daño infligido un {pct}%',
+  'hudChrome.auraEffect.crit': 'Aumenta la probabilidad de golpe crítico un {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Aumenta la generación de ira un {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Aumenta la probabilidad de golpe crítico un {pct}% y la generación de ira un {ragePct}%',
+  'hudChrome.auraEffect.avatar': 'Coloso: daño infligido aumentado un {pct}%',
+  'hudChrome.auraEffect.bloodbath':
+    'Aumenta la probabilidad de golpe crítico y el daño infligido un {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)',
   'hudChrome.auraEffect.school.physical': 'Físico',
   'hudChrome.auraEffect.school.fire': 'Fuego',
   'hudChrome.auraEffect.school.frost': 'Escarcha',
@@ -5175,6 +5185,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',
   'hudChrome.talentRows.tab': 'Elecciones',
   'hudChrome.talentRows.defaultLoadout': 'Configuración predeterminada',
+  'hudChrome.talentRows.comingSoon': 'Próximamente',
   'hudChrome.unitFrame.targetOfTargetLabel': 'La marca de tu marca',
   'errors.api.desktopCodeInvalid':
     'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',

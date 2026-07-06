@@ -16,7 +16,23 @@
 //   - tongues: value multiplies casting time (m = max(m, value)); > 1 = slower casts.
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
-import type { AuraKind } from '../sim/types';
+//   - buff_dmg_done/buff_crit/buff_rage_gen: value is a 0..1 fraction added to
+//     damage dealt / crit chance / rage generation (percent).
+//   - buff_reckless: value is the crit fraction; the rage-gen half is the fixed
+//     RECKLESSNESS_RAGE_GEN bonus rageGenAuraMult applies.
+//   - buff_avatar: value is the damage-dealt fraction (the colossus body scale
+//     is the cosmetic AVATAR_SCALE, not shown).
+//   - bloodbath: value is the TOTAL crit+damage fraction (handleDeath keeps it
+//     at per-stack pct * stacks), so it is shown as-is.
+//   - die_by_sword: the cuts are the fixed DIE_BY_SWORD_* constants dealDamage
+//     applies (the aura's own value is informational only).
+import {
+  type AuraKind,
+  DIE_BY_SWORD_CUT,
+  DIE_BY_SWORD_LOW_CUT,
+  DIE_BY_SWORD_LOW_HP,
+  RECKLESSNESS_RAGE_GEN,
+} from '../sim/types';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -189,6 +205,32 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.scale`, nums: { pct: pctFromMult(a.value) } };
     case 'buff_jump':
       return { key: `${KEY}.jump`, nums: { pct: pctFromMult(a.value) } };
+
+    // Warrior choice-row auras (see the value semantics in the header).
+    case 'buff_dmg_done':
+      return { key: `${KEY}.dmgDone`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_crit':
+      return { key: `${KEY}.crit`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_rage_gen':
+      return { key: `${KEY}.rageGen`, nums: { pct: pctFromFrac(a.value) } };
+    case 'buff_reckless':
+      return {
+        key: `${KEY}.reckless`,
+        nums: { pct: pctFromFrac(a.value), ragePct: pctFromFrac(RECKLESSNESS_RAGE_GEN) },
+      };
+    case 'buff_avatar':
+      return { key: `${KEY}.avatar`, nums: { pct: pctFromFrac(a.value) } };
+    case 'bloodbath':
+      return { key: `${KEY}.bloodbath`, nums: { pct: pctFromFrac(a.value) } };
+    case 'die_by_sword':
+      return {
+        key: `${KEY}.dieBySword`,
+        nums: {
+          pct: pctFromFrac(1 - DIE_BY_SWORD_CUT),
+          lowPct: pctFromFrac(1 - DIE_BY_SWORD_LOW_CUT),
+          hpPct: pctFromFrac(DIE_BY_SWORD_LOW_HP),
+        },
+      };
 
     default:
       return null;

@@ -417,7 +417,8 @@ export const it_IT: EnTranslations = {
     },
     "talentRows": {
       "tab": "Choices",
-      "defaultLoadout": "Default Loadout"
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
     },
     "controller": {
       "title": "Controller",
@@ -843,6 +844,13 @@ export const it_IT: EnTranslations = {
       "righteousFury": "Furia Virtuosa: minaccia da danni Sacri molto aumentata",
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "school": {
         "physical": "Fisico",
         "fire": "Fuoco",

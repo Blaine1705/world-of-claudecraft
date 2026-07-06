@@ -417,7 +417,8 @@ export const es_ES: EnTranslations = {
     },
     "talentRows": {
       "tab": "Elecciones",
-      "defaultLoadout": "Configuración predeterminada"
+      "defaultLoadout": "Configuración predeterminada",
+      "comingSoon": "Próximamente"
     },
     "controller": {
       "title": "Mando",
@@ -843,6 +844,13 @@ export const es_ES: EnTranslations = {
       "righteousFury": "Furia recta, amenaza de daño Sagrado muy aumentada",
       "scale": "Talla aumentado un {pct}%",
       "jump": "Salto aumentada un {pct}%",
+      "dmgDone": "Aumenta el daño infligido un {pct}%",
+      "crit": "Aumenta la probabilidad de golpe crítico un {pct}%",
+      "rageGen": "Aumenta la generación de ira un {pct}%",
+      "reckless": "Aumenta la probabilidad de golpe crítico un {pct}% y la generación de ira un {ragePct}%",
+      "avatar": "Coloso: daño infligido aumentado un {pct}%",
+      "bloodbath": "Aumenta la probabilidad de golpe crítico y el daño infligido un {pct}%",
+      "dieBySword": "Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)",
       "school": {
         "physical": "Daño físico",
         "fire": "Ígneo",

@@ -417,7 +417,8 @@ export const en_CA: EnTranslations = {
     },
     "talentRows": {
       "tab": "Choices",
-      "defaultLoadout": "Default Loadout"
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
     },
     "controller": {
       "title": "Controller",
@@ -843,6 +844,13 @@ export const en_CA: EnTranslations = {
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "school": {
         "physical": "Physical",
         "fire": "Fire",

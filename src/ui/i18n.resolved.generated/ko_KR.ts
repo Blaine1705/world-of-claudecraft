@@ -417,7 +417,8 @@ export const ko_KR: EnTranslations = {
     },
     "talentRows": {
       "tab": "선택",
-      "defaultLoadout": "기본 구성"
+      "defaultLoadout": "기본 구성",
+      "comingSoon": "출시 예정"
     },
     "controller": {
       "title": "컨트롤러",
@@ -843,6 +844,13 @@ export const ko_KR: EnTranslations = {
       "righteousFury": "정의의 격노: 신성 피해로 인한 위협 수준이 크게 증가합니다",
       "scale": "크기가 {pct}% 증가합니다",
       "jump": "도약 높이가 {pct}% 증가합니다",
+      "dmgDone": "입히는 피해가 {pct}% 증가합니다",
+      "crit": "치명타 확률이 {pct}% 증가합니다",
+      "rageGen": "분노 생성량이 {pct}% 증가합니다",
+      "reckless": "치명타 확률이 {pct}%, 분노 생성량이 {ragePct}% 증가합니다",
+      "avatar": "거인: 입히는 피해가 {pct}% 증가합니다",
+      "bloodbath": "치명타 확률과 입히는 피해가 {pct}% 증가합니다",
+      "dieBySword": "받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)",
       "school": {
         "physical": "물리",
         "fire": "화염",

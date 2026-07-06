@@ -136,4 +136,50 @@ describe('auraEffectDescriptor', () => {
     const input: AuraEffectInput = { kind: 'dot', value: 12, tickInterval: 2, school: 'nature' };
     expect(desc(input)).toEqual(desc(input));
   });
+
+  // The warrior choice-row auras: every kind a picked talent can wear has a
+  // one-line summary (an empty hover tooltip was a real playtest complaint).
+  it('describes the damage/crit/rage-gen fraction buffs as percents', () => {
+    expect(desc({ kind: 'buff_dmg_done', value: 0.1 })).toEqual({
+      key: 'hudChrome.auraEffect.dmgDone',
+      nums: { pct: 10 },
+    });
+    expect(desc({ kind: 'buff_crit', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.crit',
+      nums: { pct: 20 },
+    });
+    expect(desc({ kind: 'buff_rage_gen', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.rageGen',
+      nums: { pct: 20 },
+    });
+  });
+
+  it('describes Recklessness with its crit value and the fixed rage-gen bonus', () => {
+    expect(desc({ kind: 'buff_reckless', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.reckless',
+      nums: { pct: 20, ragePct: 50 },
+    });
+  });
+
+  it('describes Avatar by its damage amp (the body scale is cosmetic)', () => {
+    expect(desc({ kind: 'buff_avatar', value: 0.2 })).toEqual({
+      key: 'hudChrome.auraEffect.avatar',
+      nums: { pct: 20 },
+    });
+  });
+
+  it('describes Bloodbath with the already-stacked total fraction', () => {
+    // handleDeath keeps value = per-stack pct * stacks, so 3 stacks read 15%.
+    expect(desc({ kind: 'bloodbath', value: 0.15, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.bloodbath',
+      nums: { pct: 15 },
+    });
+  });
+
+  it('describes Die by the Sword from the fixed damage-cut constants', () => {
+    expect(desc({ kind: 'die_by_sword', value: 0.1 })).toEqual({
+      key: 'hudChrome.auraEffect.dieBySword',
+      nums: { pct: 10, lowPct: 20, hpPct: 30 },
+    });
+  });
 });

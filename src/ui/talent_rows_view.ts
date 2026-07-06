@@ -15,6 +15,11 @@ export interface RowOptionVM {
   name: string;
   description: string;
   picked: boolean;
+  /** True when the option's mechanic is not built yet (an empty effect folds
+   *  to nothing): the painter disables the pill and badges it "Coming soon"
+   *  so nobody picks a no-op talent. Self-healing: the badge disappears the
+   *  moment the option's slice lands a real effect. */
+  pending: boolean;
   /** The option's effect, passed through for the effect-derived icon. */
   effect: TalentEffect;
 }
@@ -56,6 +61,7 @@ export function buildTalentRowsView(
         name: o.name,
         description: o.description,
         picked: unlocked && pick === o.id,
+        pending: Object.keys(o.effect).length === 0,
         effect: o.effect,
       })),
     };

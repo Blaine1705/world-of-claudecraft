@@ -417,7 +417,8 @@ export const fr_CA: EnTranslations = {
     },
     "talentRows": {
       "tab": "Choices",
-      "defaultLoadout": "Default Loadout"
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
     },
     "controller": {
       "title": "Manette",
@@ -843,6 +844,13 @@ export const fr_CA: EnTranslations = {
       "righteousFury": "Fureur vertueuse, menace des dégâts Sacré fortement accrue",
       "scale": "Gabarit augmentée de {pct}%",
       "jump": "Saut augmentée de {pct}%",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "school": {
         "physical": "physique",
         "fire": "feu",

@@ -136,9 +136,13 @@ await sleep(300);
 const locked = await page.evaluate(() => ({
   lockedRows: document.querySelectorAll('.tal-row.locked').length,
   disabled: document.querySelectorAll('.tal-row-opt:disabled').length,
+  pending: document.querySelectorAll('.tal-row-opt.pending .tal-soon').length,
 }));
 check(locked.lockedRows === 4, `4 locked rows at level 8 (got ${locked.lockedRows})`);
-check(locked.disabled === 12, `12 disabled options at level 8 (got ${locked.disabled})`);
+// 12 options in the 4 locked rows + the 2 not-implemented ("Coming soon")
+// options in the unlocked tiers (Double Charge, Victory Rush).
+check(locked.disabled === 14, `14 disabled options at level 8 (got ${locked.disabled})`);
+check(locked.pending === 4, `4 Coming-soon badges (got ${locked.pending})`);
 await page.screenshot({ path: 'tmp/rows_locked.png' });
 
 await browser.close();

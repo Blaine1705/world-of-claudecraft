@@ -417,7 +417,8 @@ export const tr_TR: EnTranslations = {
     },
     "talentRows": {
       "tab": "Choices",
-      "defaultLoadout": "Default Loadout"
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
     },
     "controller": {
       "title": "Oyun Kolu",
@@ -843,6 +844,13 @@ export const tr_TR: EnTranslations = {
       "righteousFury": "Furia recta: amenaza de daño Sagrado muy aumentada",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "school": {
         "physical": "Fiziksel",
         "fire": "Ateş",

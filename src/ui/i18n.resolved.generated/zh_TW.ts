@@ -417,7 +417,8 @@ export const zh_TW: EnTranslations = {
     },
     "talentRows": {
       "tab": "選擇",
-      "defaultLoadout": "預設配置"
+      "defaultLoadout": "預設配置",
+      "comingSoon": "即將推出"
     },
     "controller": {
       "title": "手把",
@@ -843,6 +844,13 @@ export const zh_TW: EnTranslations = {
       "righteousFury": "正義之怒：神聖傷害產生的威脅值大幅提高",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
+      "dmgDone": "造成的傷害提高 {pct}%",
+      "crit": "爆擊機率提高 {pct}%",
+      "rageGen": "怒氣獲取提高 {pct}%",
+      "reckless": "爆擊機率提高 {pct}%，怒氣獲取提高 {ragePct}%",
+      "avatar": "巨像：造成的傷害提高 {pct}%",
+      "bloodbath": "爆擊機率和造成的傷害提高 {pct}%",
+      "dieBySword": "受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）",
       "school": {
         "physical": "物理",
         "fire": "火焰",

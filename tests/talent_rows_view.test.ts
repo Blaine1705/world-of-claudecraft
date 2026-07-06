@@ -44,6 +44,23 @@ describe('buildTalentRowsView', () => {
     expect(vm.rows[5].options.every((o) => !o.picked)).toBe(true);
   });
 
+  it('flags exactly the unimplemented (empty-effect) options as pending', () => {
+    const vm = buildTalentRowsView(WARRIOR_ROWS, emptyRowPicks(), 20);
+    const pending = vm.rows
+      .flatMap((r) => r.options)
+      .filter((o) => o.pending)
+      .map((o) => o.id)
+      .sort();
+    // The four phase 3 slices still to land; the painter renders these
+    // disabled with a "Coming soon" badge. Shrinks as each slice ships.
+    expect(pending).toEqual([
+      'war_row_bladestorm',
+      'war_row_double_charge',
+      'war_row_lingering_dread',
+      'war_row_victory_rush',
+    ]);
+  });
+
   it('is deterministic: same inputs give the same model', () => {
     const picks = emptyRowPicks();
     picks[0] = 'war_row_pursuit';
