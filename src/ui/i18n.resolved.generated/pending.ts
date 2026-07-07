@@ -11,38 +11,55 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "es_ES": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_FR": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_CA": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "de_DE": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "zh_TW": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "ko_KR": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "ja_JP": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
   "pt_BR": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
   "cs_CZ": [
     "entities.abilities.arcane_power.description",
     "entities.abilities.arcane_power.name",
@@ -89,34 +106,52 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.trueshot_aura.description",
     "entities.abilities.trueshot_aura.name",
     "entities.abilities.wyvern_sting.description",
-    "entities.abilities.wyvern_sting.name"
+    "entities.abilities.wyvern_sting.name",
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.hotbarPage",
+    "hudChrome.mobile.hotbarPageAria",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "nl_NL": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "pl_PL": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "id_ID": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "tr_TR": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "sv_SE": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "vi_VN": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "da_DK": [
     "entities.abilities.chain_heal.description",
-    "entities.abilities.chain_heal.name"
+    "entities.abilities.chain_heal.name",
+    "hudChrome.discord.roleTag.coredevs"
   ]
 };
