@@ -23,7 +23,8 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { ITEMS, MOBS, QUESTS } from './data';
+import { bagCapacity, fitsAll } from './bags';
+import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import {
   activateNythraxisRelic,
   interactObjectForQuests,
@@ -37,8 +38,16 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import {
+  effectiveFocusComponents,
+  HARVEST_COMPONENT_ITEMS,
+  harvestTierQuantity,
+  isHarvestableCorpse,
+  resolveCorpseFocusHarvest,
+  resolveCorpseHarvest,
+} from './professions/gathering';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from './types';
+import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
 import { markWorldBossLooted } from './world_boss';
 
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
@@ -79,6 +88,13 @@ export function lootCorpse(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot loot; the same rejection the
+  // item family uses (src/sim/items.ts). The walk-by autoLootForParty path never
+  // reaches this: it silently drops a dead trigger before delegating here.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot) return;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
@@ -124,12 +140,15 @@ export function lootCorpse(
     if (s.count > 0) bagsFull = true;
   }
   if (bagsFull && !quiet) ctx.error(meta.entityId, 'Your bags are full.');
-  // World-boss daily lockout is consumed by LOOTING, not by the kill: taking any
-  // personal slot from the boss's corpse burns today's roll (rollWorldBossLoot
-  // checks eligibility when the next boss dies). A contributor who never reaches
-  // the corpse keeps their daily and can try again at the next spawn.
+  // The world-boss loot lockout is consumed by LOOTING, not by the kill: taking any
+  // personal slot from the boss's corpse starts the lockout (rollWorldBossLoot checks
+  // eligibility when the next boss dies). A contributor who never reaches the corpse
+  // holds no lockout and can loot again at the next spawn.
   if (tookPersonal && MOBS[mob.templateId]?.worldBoss) {
-    markWorldBossLooted(meta, mob.templateId, ctx.utcDay);
+    // The world-boss loot lockout IS a raid lockout: this one write both gates re-loot
+    // (isWorldBossLootEligible) and renders the countdown in the raid-lockout timer, and
+    // it resets on the same boundary as the dungeon raids (ctx.raidResetMs).
+    markWorldBossLooted(meta, mob.templateId, ctx.raidResetMs(ctx.lockoutNowMs()));
   }
   pruneCorpseLoot(ctx, mob);
   if (p.targetId === mobId) p.targetId = null;
@@ -168,10 +187,89 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
   lootCorpse(ctx, mobId, meta.entityId, false, true);
 }
 
+/**
+ * Profession harvest: single-use, first-come salvage of a dead mob's corpse
+ * (skinning/salvage components), independent of the loot table above. Whoever's
+ * command reaches here first while the corpse is unclaimed wins; every later
+ * attempt against the same corpse (same tick or later) is denied. See
+ * professions/gathering.ts for the race-freedom argument.
+ *
+ * `components` (#1142) is the player's per-corpse focus pick: which tagged
+ * component(s) to extract. Omitted, empty, or covering every tagged component
+ * all spread the harvest across every tag (the #1141 behavior); picking fewer
+ * concentrates the effort for a higher tier per component, per
+ * resolveCorpseFocusHarvest in professions/gathering.ts.
+ */
+export function harvestCorpse(
+  ctx: SimContext,
+  mobId: number,
+  components?: string[],
+  pid?: number,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot harvest; the same rejection
+  // the loot/pickup commands above use.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
+  const mob = ctx.entities.get(mobId);
+  if (!mob || mob.kind !== 'mob' || !mob.dead) return;
+  const componentTags = MOBS[mob.templateId]?.componentTags;
+  if (!isHarvestableCorpse(componentTags)) {
+    ctx.error(meta.entityId, 'That corpse has nothing to harvest.');
+    return;
+  }
+  if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
+    ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
+  const claim = resolveCorpseHarvest(mob.harvestClaimedBy, meta.entityId);
+  if (!claim.success) {
+    ctx.error(meta.entityId, 'This corpse has already been harvested.');
+    return;
+  }
+  // Capacity gate BEFORE consuming the single-use claim: addItem is never
+  // capacity-capped (the command boundary owns the pre-check, like
+  // lootCorpse/pickUpObject in this file), and a full-bags refusal must leave
+  // the corpse unclaimed for the next harvester. The gate runs on the
+  // deterministic pre-roll focus set so a refused command draws NO rng, and it
+  // reserves the MAXIMUM the tier roll can add per component
+  // (harvestTierQuantity of the top tier, fit cumulatively): a gate on less
+  // could pass on a nearly-full stack and let the uncapped addItem spill past
+  // capacity.
+  const maxTierQty = harvestTierQuantity('legendary');
+  const wanted: InvSlot[] = [];
+  for (const component of effectiveFocusComponents(componentTags ?? [], components ?? [])) {
+    const wantedItemId = HARVEST_COMPONENT_ITEMS[component];
+    if (!wantedItemId) continue;
+    const existing = wanted.find((w) => w.itemId === wantedItemId);
+    if (existing) existing.count += maxTierQty;
+    else wanted.push({ itemId: wantedItemId, count: maxTierQty });
+  }
+  if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
+    ctx.error(meta.entityId, 'Your bags are full.');
+    return;
+  }
+  mob.harvestClaimedBy = claim.claimedBy;
+  const yields = resolveCorpseFocusHarvest(componentTags ?? [], components ?? [], ctx.rng);
+  for (const y of yields) {
+    const itemId = HARVEST_COMPONENT_ITEMS[y.component];
+    if (itemId) ctx.addItem(itemId, harvestTierQuantity(y.tier), meta.entityId);
+  }
+}
+
 export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot pick up world objects.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return;
   if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
@@ -217,6 +315,30 @@ export function interact(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
+  if (p.dead) {
+    // A dead player or released spirit cannot interact with the world: no
+    // looting, object pickup, mailbox, or quest talk. The one exception is the
+    // Spirit Healer (talking to the angel is how a ghost reaches the healer
+    // resurrection), so route a nearby angel through the normal quest-NPC talk
+    // and refuse everything else. A ghost still re-enters its instance via the
+    // proximity door trigger (updateDoorTriggers), which never comes through here.
+    let bestHealer: Entity | null = null;
+    let bestHealerD2 = INTERACT_RANGE * INTERACT_RANGE;
+    ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+      if (e.kind === 'npc' && e.templateId === SPIRIT_HEALER_NPC_ID && d2 < bestHealerD2) {
+        bestHealer = e;
+        bestHealerD2 = d2;
+      }
+    });
+    // re-read through a wider type: TS cannot see the closure assignment above
+    const healer = bestHealer as Entity | null;
+    if (healer) {
+      ctx.talkToNpc(healer.id, p.id);
+      return;
+    }
+    ctx.error(r.meta.entityId, "You can't do that while dead.");
+    return;
+  }
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {

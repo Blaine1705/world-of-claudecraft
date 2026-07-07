@@ -15,7 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
-import { ABILITIES } from '../data';
+import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
@@ -883,15 +883,11 @@ export function runEffects(
         break;
       }
       case 'aoeAllyAttackPower': {
-        // An attack-power buff on the caster and every party member within
-        // radius (partyMeleeBuff's loop shape, buff_ap aura, no class filter).
-        // Solo casters just buff themselves.
-        const cryParty = ctx.partyOf(p.id);
-        const cryIds = cryParty ? cryParty.members : [p.id];
-        for (const pid of cryIds) {
-          const mE = ctx.entities.get(pid);
-          if (!mE || mE.dead) continue;
-          if (pid !== p.id && dist2d(mE.pos, p.pos) > eff.radius) continue;
+        // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
+        // nearby allies (Trueshot Aura), riding the PR3a friendlies seam. No
+        // party requirement: friendliesInRadius includes the caster and every
+        // friendly entity within radius.
+        for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
           ctx.applyAura(mE, {
             id: `${ability.id}_ap`,
             name: ability.name,
@@ -1211,7 +1207,10 @@ export function runEffects(
       case 'dismissPet': {
         const pet = ctx.petOf(p.id);
         if (!pet) {
-          ctx.error(p.id, 'You have no pet.');
+          ctx.error(
+            p.id,
+            isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+          );
           break;
         }
         ctx.error(p.id, 'Permanent pets can only be abandoned from the pet frame.');

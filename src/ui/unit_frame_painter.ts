@@ -136,11 +136,7 @@ export class UnitFramePainter {
   private paintAbsorb(view: UnitFrameView): void {
     const absorb = this.el.absorb;
     if (!absorb) return;
-    this.writers.setStyleProp(
-      absorb,
-      ABSORB_START_PROP,
-      `${view.absorbStartFrac * 100}%`,
-    );
+    this.writers.setStyleProp(absorb, ABSORB_START_PROP, `${view.absorbStartFrac * 100}%`);
     this.writers.setTransform(absorb, this.barScaleX(view.absorbSizeFrac));
     this.writers.toggleClass(absorb, OVERSHIELD_CLASS, view.absorbOvershield);
   }

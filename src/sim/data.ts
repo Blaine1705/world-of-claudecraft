@@ -10,6 +10,7 @@ import type {
   DelveDef,
   DelveModuleDef,
   DungeonDef,
+  GatherNodeDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -27,11 +28,15 @@ export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
   BROTHER_HALVEN,
+  BROTHER_HALVEN_MARSH,
   COLLAPSED_RELIQUARY_DELVE,
   COLLAPSED_RELIQUARY_MODULES,
   DELVE_MOBS,
+  DROWNED_LITANY_DELVE,
+  DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
   OVERWORLD_GRAVEYARDS,
@@ -39,6 +44,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { COMMON_RECIPES as COMMON_RECIPES_CONTENT } from './content/recipes';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -121,6 +127,7 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
 
 export type { ClassDef } from './content/classes';
 export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
+export { GATHER_NODE_TYPES } from './content/gather_nodes';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
   BiomeId,
@@ -128,6 +135,8 @@ export type {
   DelveDef,
   DungeonDef,
   DungeonSpawn,
+  GatherNodeDef,
+  GatherNodeType,
   GroundObjectDef,
   NpcDef,
   ZoneDef,
@@ -166,6 +175,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
+  brother_halven_marsh: BROTHER_HALVEN_MARSH,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -209,6 +219,10 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
 ];
+
+export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
+
+export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT];
 
 export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
 
@@ -461,10 +475,12 @@ export function delveAt(x: number): DelveDef | null {
 
 export const DELVES: Record<string, DelveDef> = {
   [COLLAPSED_RELIQUARY_DELVE.id]: COLLAPSED_RELIQUARY_DELVE,
+  [DROWNED_LITANY_DELVE.id]: DROWNED_LITANY_DELVE,
 };
 export const DELVE_LIST: DelveDef[] = Object.values(DELVES).sort((a, b) => a.index - b.index);
 export const DELVE_MODULES: Record<string, DelveModuleDef> = {
   ...COLLAPSED_RELIQUARY_MODULES,
+  ...DROWNED_LITANY_MODULES,
 };
 
 function delveModuleFootprint(moduleId: string): number {

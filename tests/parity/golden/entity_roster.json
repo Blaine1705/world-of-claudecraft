@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
-      "state": "0949a805",
+      "nextId": 401,
+      "state": "7dfedf0b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,6 +26,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -41,7 +42,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -54,19 +55,11 @@
             }
           ],
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -81,7 +74,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -124,9 +117,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 402,
-      "state": "d185c977",
-      "events": "9f2a44d9",
+      "nextId": 403,
+      "state": "c3cc977b",
+      "events": "7c091790",
       "rng": {
         "draws": 4,
         "digest": "7ba9533d"
@@ -135,8 +128,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 402,
-      "state": "4437c3a5",
+      "nextId": 403,
+      "state": "7e107015",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -146,8 +139,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 402,
-      "state": "447cf2c9",
+      "nextId": 403,
+      "state": "5a32a361",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -157,6 +150,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -172,7 +166,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -186,19 +180,11 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -213,7 +199,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 50000,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -256,8 +242,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 402,
-      "state": "19b455de",
+      "nextId": 403,
+      "state": "a74f6672",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -267,6 +253,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -282,7 +269,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -296,19 +283,11 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -330,7 +309,7 @@
           "fiveSecondRule": 99.25,
           "ghost": true,
           "hp": 432,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -373,9 +352,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 402,
-      "state": "ce42e507",
-      "events": "4b40b072",
+      "nextId": 403,
+      "state": "e9229a86",
+      "events": "f9ac9126",
       "rng": {
         "draws": 4,
         "digest": "7ba9533d"
@@ -384,6 +363,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -399,7 +379,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -413,19 +393,11 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -440,7 +412,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 399,
+              "sourceId": 400,
               "value": -0.75
             }
           ],
@@ -452,7 +424,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 44,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -495,8 +467,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 402,
-      "state": "63435a8e",
+      "nextId": 403,
+      "state": "f5a2ed95",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -506,8 +478,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 402,
-      "state": "66f4d18a",
+      "nextId": 403,
+      "state": "a7a38c9d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -517,6 +489,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -532,7 +505,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -546,19 +519,11 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -573,7 +538,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 399,
+              "sourceId": 400,
               "value": -0.75
             }
           ],
@@ -585,7 +550,7 @@
           "fallStartY": 1.511848,
           "fiveSecondRule": 99.35,
           "hp": 44,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

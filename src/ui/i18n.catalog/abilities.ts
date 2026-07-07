@@ -1150,7 +1150,7 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_shield',
-        'Holy Shield',
+        'Hallowed Wall',
         'Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)',
       ],
       [
@@ -1160,12 +1160,12 @@ const classAbilityNamesEn = {
       ],
       [
         'bestial_wrath',
-        'Bestial Wrath',
+        'Howling Rage',
         'Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)',
       ],
       [
         'trueshot_aura',
-        'Trueshot Aura',
+        'Sureflight Aura',
         'Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)',
       ],
       [
@@ -1175,12 +1175,12 @@ const classAbilityNamesEn = {
       ],
       [
         'arcane_power',
-        'Arcane Power',
-        'Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)',
+        'Aether Surge',
+        'Fills you with aether surge, increasing spell power by 28 for 12 sec. (Arcane signature)',
       ],
       [
         'combustion',
-        'Combustion',
+        'Flashfire',
         'Focuses your fire magic so your next attack is a critical strike. (Fire signature)',
       ],
       [
@@ -1190,38 +1190,38 @@ const classAbilityNamesEn = {
       ],
       [
         'cold_blood',
-        'Cold Blood',
+        "Killer's Calm",
         'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
       ],
       [
         'blade_flurry',
-        'Blade Flurry',
+        'Mirrored Blades',
         'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
       ],
       [
         'hemorrhage',
-        'Hemorrhage',
+        'Red Ribbon',
         'Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)',
       ],
       [
         'power_infusion',
-        'Power Infusion',
+        'Anointing',
         'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
       ],
       [
         'holy_nova',
         'Holy Nova',
-        'Causes an explosion of Holy light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
+        'Causes an explosion of Mending Light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
       ],
       [
         'shadowform',
-        'Shadowform',
-        'Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+        'Gloamveil',
+        'Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
-        'Elemental Mastery',
-        'Calls on elemental mastery, making your next spell instant. (Elemental signature)',
+        'Primal Mastery',
+        'Calls on primal mastery, making your next spell instant. (Elemental signature)',
       ],
       [
         'shamanistic_rage',
@@ -1235,7 +1235,7 @@ const classAbilityNamesEn = {
       ],
       [
         'siphon_life',
-        'Siphon Life',
+        'Veinleech',
         'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
       ],
       [
@@ -1250,13 +1250,13 @@ const classAbilityNamesEn = {
       ],
       [
         'moonkin_form',
-        'Moonkin Form',
-        'Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
+        'Moonwing Form',
+        'Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
       ],
       [
         'feral_charge',
         'Feral Charge',
-        'Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)',
+        'Charge an enemy and root it for 1 sec. 8-25 yard range. (Feral signature)',
       ],
       [
         'swiftmend',

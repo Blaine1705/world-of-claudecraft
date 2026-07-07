@@ -157,8 +157,7 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
 export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
   if (!d.present) return HIDDEN;
   const absorb = d.absorb ? absorbBarView(d.absorb) : NO_ABSORB;
-  const hpText =
-    d.showAbsorbText && absorb.total > 0 ? `${d.hpText} (${absorb.total})` : d.hpText;
+  const hpText = d.showAbsorbText && absorb.total > 0 ? `${d.hpText} (${absorb.total})` : d.hpText;
   return {
     present: true,
     hpFrac: d.hpFrac,

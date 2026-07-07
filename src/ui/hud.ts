@@ -1,4 +1,5 @@
 import { audio } from '../game/audio';
+import type { GamepadKind } from '../game/gamepad_map';
 import type { Keybinds } from '../game/keybinds';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -90,10 +91,12 @@ import {
   isQuestTurnInNpc,
   MAX_LEVEL,
   MILESTONES,
+  type RiteIntensity,
   type SimEvent,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
+import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type DailyRewardStatus,
   type DelveRunInfo,
@@ -161,10 +164,15 @@ import {
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
+import { corpseHarvestView } from './corpse_harvest_view';
+import { renderCorpseHarvestPicker } from './corpse_harvest_window';
+import { buildCraftingView } from './crafting_view';
+import { renderCraftingWindow } from './crafting_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { DelveMapPainter } from './delve_map_painter';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
 import { markDialogRoot } from './dialog_root';
+import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { emoteIconUrl } from './emote_icons';
@@ -299,6 +307,7 @@ import { QuestLogWindow } from './questlog_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { restView } from './rest_indicator';
+import { RiteWindow } from './rite_window';
 import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
@@ -381,6 +390,9 @@ export interface GamepadBindingsHooks {
   entries(): { button: number; action: string }[];
   bind(button: number, action: string): void;
   reset(): void;
+  // Detected brand of the connected pad, so the panel labels each button with the
+  // glyph printed on that controller ('generic' combined labels when none/unknown).
+  kind(): GamepadKind;
 }
 
 export interface ReportHooks {
@@ -438,10 +450,15 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
   dead: false,
   outOfRange: false,
 };
-const trackMetaPixel = (eventName: string, data?: Record<string, unknown>): void => {
+const trackMetaPixel = (
+  eventName: string,
+  data?: Record<string, unknown>,
+  options?: Record<string, unknown>,
+): void => {
   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
-  fbq('trackCustom', eventName, data ?? {});
+  if (options) fbq('trackCustom', eventName, data ?? {}, options);
+  else fbq('trackCustom', eventName, data ?? {});
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
@@ -813,6 +830,13 @@ export class Hud {
   // shown, and drives both the log filter and the send channel.
   private chatTabs: ChatOpenTab[] = [];
   private activeChatTab: ChatTabId = 'all';
+  // Bind the tab-strip wheel-to-horizontal-scroll listener exactly once (renderChatTabs
+  // rebuilds the strip's children but the bar element itself persists).
+  private chatTabsWheelBound = false;
+  // The control that opened the shared #ctx-menu (the chat "+" button), so the
+  // outside-click closer can defer to that opener's own toggle click. Cleared on
+  // every close path (closeContextMenu + item activation).
+  private ctxMenuOpener: HTMLElement | null = null;
   private errorEl = $('#error-msg');
   private bannerEl = $('#banner');
   // The WoW-style quest-progress flash (quest_progress_banner.ts): yellow
@@ -1014,6 +1038,13 @@ export class Hud {
     onAction: (action) => this.submitLockpickAction(action),
     onAbort: () => this.submitLockpickAbort(),
     onClose: () => this.closeLockpick(),
+  });
+  // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
+  // cue (approaching the risen reliquary), closed once playback starts.
+  private riteTrap: FocusTrapHandle | null = null;
+  private readonly riteWindow = new RiteWindow({
+    onChoose: (intensity) => this.submitRiteChoose(intensity),
+    onClose: () => this.closeRitePanel(),
   });
   private openGossipNpcId: number | null = null;
   private openQuestDetailId: string | null = null;
@@ -1274,6 +1305,20 @@ export class Hud {
       document.getElementById('mobile-controls')?.classList.remove('expanded');
       document.getElementById('mobile-more')?.classList.remove('active');
     });
+    // Dismiss the shared #ctx-menu (right-click menus and the chat "+" channel
+    // picker) on any pointerdown outside it. A pointerdown inside the menu is left
+    // to the item's own click; a pointerdown on the opener is left to that opener's
+    // toggle (so a second click on + closes rather than reopens). Escape still
+    // closes it through the unified closeAll dispatcher.
+    document.addEventListener('pointerdown', (ev) => {
+      const menu = $('#ctx-menu');
+      if (menu.style.display !== 'block') return;
+      const target = ev.target as Node | null;
+      if (!target) return;
+      if (menu.contains(target)) return;
+      if (this.ctxMenuOpener?.contains(target)) return;
+      this.closeContextMenu();
+    });
     // classic-style minimap clock: real local time under the minimap; click it to
     // flip between 12-hour (AM/PM) and 24-hour display. Real-time clocks are a
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
@@ -1298,9 +1343,9 @@ export class Hud {
     } else if (dailyRewardsButton) {
       this.dailyRewardsButtonEl = dailyRewardsButton;
       dailyRewardsButton.innerHTML =
-        `<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">` +
-        `<span class="daily-rewards-label" data-i18n="hudChrome.dailyRewards.title">${t('hudChrome.dailyRewards.title')}</span>`;
+        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
       dailyRewardsButton.classList.remove('spin-ready');
+      this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1408,7 +1453,7 @@ export class Hud {
     // Quests toggle, per-quest track buttons, zoom, and close included). Stop
     // propagation (but NOT the default, so the button's native activation still
     // fires) when a panel button has focus, mirroring the quest-tracker guard above.
-    for (const panelId of ['#delve-board', '#lockpick-panel', '#map-window']) {
+    for (const panelId of ['#delve-board', '#lockpick-panel', '#delve-rite-panel', '#map-window']) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
         if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
@@ -1936,6 +1981,9 @@ export class Hud {
       case 'vendor-window':
         this.closeVendor();
         break;
+      case 'crafting-window':
+        this.closeCrafting();
+        break;
       case 'loot-window':
         this.closeLoot();
         break;
@@ -2047,7 +2095,10 @@ export class Hud {
     grip.setAttribute('aria-hidden', 'true');
     frame.appendChild(grip);
 
-    tabs.style.touchAction = 'none';
+    // touch-action lives in CSS now: `none` on desktop so a touch-drag on the empty
+    // strip moves the chat box (the move gesture is desktop-only, see
+    // onChatBoxMoveStart), and `pan-x` on mobile so overflowed tabs can be swiped
+    // (hud.mobile.css). An inline style here would override those rules.
     tabs.setAttribute('aria-label', t('hudChrome.chatWindow.move'));
     tabs.addEventListener('pointerdown', (ev) => this.onChatBoxMoveStart(ev, wrap, tabs));
     grip.addEventListener('pointerdown', (ev) => this.onChatBoxResizeStart(ev, wrap, frame));
@@ -2321,6 +2372,22 @@ export class Hud {
 
   private renderChatTabs(): void {
     const bar = $('#chatlog-tabs');
+    // Overflowed tabs scroll horizontally (see #chatlog-tabs in hud.css); translate
+    // a vertical wheel into that scroll (bound once, the bar element persists across
+    // these innerHTML rebuilds) so a mouse without a horizontal wheel can still reach
+    // them. A no-op until the strip actually overflows.
+    if (!this.chatTabsWheelBound) {
+      this.chatTabsWheelBound = true;
+      bar.addEventListener(
+        'wheel',
+        (ev) => {
+          if (ev.deltaY === 0 || bar.scrollWidth <= bar.clientWidth) return;
+          ev.preventDefault();
+          bar.scrollLeft += ev.deltaY;
+        },
+        { passive: false },
+      );
+    }
     bar.innerHTML = '';
     bar.setAttribute('role', 'tablist');
     const makeTab = (id: ChatTabId, label: string): HTMLButtonElement => {
@@ -2355,8 +2422,14 @@ export class Hud {
     add.setAttribute('aria-label', t('hud.core.chatChannels.add'));
     add.title = t('hud.core.chatChannels.add');
     add.addEventListener('click', () => {
+      // Toggle: a second click on + closes the picker it opened.
+      const menu = $('#ctx-menu');
+      if (menu.style.display === 'block' && this.ctxMenuOpener === add) {
+        this.closeContextMenu();
+        return;
+      }
       const r = add.getBoundingClientRect();
-      this.openChatChannelMenu(r.left, r.bottom);
+      this.openChatChannelMenu(r.left, r.bottom, add);
     });
     bar.append(add);
     this.updateActiveTabStyles();
@@ -2431,8 +2504,9 @@ export class Hud {
   // toggle off; the rest add a tab. Whisper is offered alongside the channels as
   // a filter-only tab that gathers every whisper in one place. Reuses the shared
   // #ctx-menu, so it inherits its outside-click / Escape close behaviour.
-  private openChatChannelMenu(x: number, y: number): void {
+  private openChatChannelMenu(x: number, y: number, opener: HTMLElement | null = null): void {
     const el = $('#ctx-menu');
+    this.ctxMenuOpener = opener;
     let html = `<div class="ctx-title">${esc(t('hud.core.chatChannels.addTitle'))}</div>`;
     // A trailing check mark flags already-open tabs, exactly as the channel list
     // did before this whisper tab was added. Built from its char code so no literal
@@ -3375,6 +3449,10 @@ export class Hud {
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
+    showChestButton: () => this.showDailyRewardsChestButton(),
+    setShowChestButton: (show) => this.setDailyRewardsChestButtonPreference(show),
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
@@ -3390,7 +3468,8 @@ export class Hud {
     ...this.windowFocus('#spellbook'),
     hideTooltip: () => this.hideTooltip(),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
-    abilitySummary: (known) => describeAbilitySummary(known, this.sim.player.resourceType),
+    abilitySummary: (known) =>
+      describeAbilitySummary(known, this.sim.player.resourceType, this.sim.player.spellHaste),
     abilityTooltip: (known) => this.abilityTooltip(known),
     barAbilityIds: () =>
       this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
@@ -3973,7 +4052,7 @@ export class Hud {
     const rangeLine = abilityRangeLine(a);
     if (rangeLine) costLine.push(rangeLine);
     if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
-    const castLine = [abilityCastLine(res)];
+    const castLine = [abilityCastLine(res, this.sim.player.spellHaste)];
     // Use the RESOLVED cooldown (res.cooldown), not res.def.cooldown, so talents that
     // reduce cooldown (Improved Mortal Strike, Barrage, Improved Fire Blast, ...) show
     // their effect in the tooltip.
@@ -5204,10 +5283,41 @@ export class Hud {
     );
   }
 
+  private showDailyRewardsChestButton(): boolean {
+    return this.optionsHooks?.settings.get('showDailyRewardsChest') ?? true;
+  }
+
+  private applyDailyRewardsChestButtonVisibility(show = this.showDailyRewardsChestButton()): void {
+    const button = this.dailyRewardsButtonEl;
+    if (!button) return;
+    const visible = this.dailyRewardsEnabled() && show;
+    button.toggleAttribute('hidden', !visible);
+    if (!visible) button.classList.remove('spin-ready');
+  }
+
+  private setDailyRewardsChestButtonPreference(show: boolean): void {
+    if (this.optionsHooks) {
+      this.optionsHooks.onSettingChange('showDailyRewardsChest', show);
+      return;
+    }
+    this.setDailyRewardsChestButtonVisible(show);
+  }
+
+  setDailyRewardsChestButtonVisible(show: boolean): void {
+    this.applyDailyRewardsChestButtonVisibility(show);
+    if (show) this.refreshDailyRewardsLauncher(true);
+  }
+
   private applyDailyRewardsLauncherStatus(status: DailyRewardStatus): void {
     if (!this.dailyRewardsEnabled()) return;
     const button = this.dailyRewardsButtonEl;
     if (!button) return;
+    if (!this.showDailyRewardsChestButton()) {
+      button.hidden = true;
+      button.classList.remove('spin-ready');
+      return;
+    }
+    button.hidden = false;
     button.classList.toggle('spin-ready', !status.eligibility.eligible || !status.spin.claimed);
   }
 
@@ -5215,6 +5325,8 @@ export class Hud {
     if (!this.dailyRewardsEnabled()) return;
     const button = this.dailyRewardsButtonEl;
     if (!button) return;
+    this.applyDailyRewardsChestButtonVisibility();
+    if (!this.showDailyRewardsChestButton()) return;
     const now = performance.now();
     if (!force && now - this.lastDailyRewardsLauncherRefreshAt < 60_000) return;
     this.lastDailyRewardsLauncherRefreshAt = now;
@@ -5832,7 +5944,16 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      raidName: (id) => dungeonDisplayName(id),
+      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
+      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
+      // the prefix convention in one place: it returns the boss mob id (localize as a mob
+      // name) or null for an ordinary dungeon/raid id.
+      raidName: (id) => {
+        const bossId = worldBossIdFromLockout(id);
+        return bossId !== null
+          ? tEntity({ kind: 'mob', id: bossId, field: 'name' })
+          : dungeonDisplayName(id);
+      },
       duration: (ms) => this.formatLockoutDuration(ms),
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
@@ -5976,7 +6097,9 @@ export class Hud {
       return;
     }
     const delveName = delveDisplayName(delve.id);
-    const canEnter = this.sim.player.level >= delve.minLevel;
+    const partySize = this.sim.partyInfo?.members.length ?? 1;
+    const partyTooLarge = partySize > delve.maxPlayers;
+    const canEnter = this.sim.player.level >= delve.minLevel && !partyTooLarge;
     const tierNormal = t('delveUi.board.tier.normal');
     const tierHeroic = t('delveUi.board.tier.heroic');
     const marks = formatNumber(this.sim.delveMarks, { maximumFractionDigits: 0 });
@@ -5987,28 +6110,26 @@ export class Hud {
     if (tab === 'shop') {
       body = this.delveShopBodyHtml(delve.id);
     } else {
-      const tessaRank = this.sim.companionUpgrades.companion_tessa ?? 1;
-      const tessaRankLabel = t('delveUi.board.companion.rank', {
-        rank: formatNumber(tessaRank, { maximumFractionDigits: 0 }),
+      const companionId = delve.autoCompanionId ?? 'companion_tessa';
+      const companionRank = this.sim.companionUpgrades[companionId] ?? 1;
+      const companionRankLabel = t('delveUi.board.companion.rank', {
+        rank: formatNumber(companionRank, { maximumFractionDigits: 0 }),
       });
-      // Companion rank-up: max rank is the highest cost tier; the next rank's
-      // Marks cost is shown on the button so the upgrade path is visible, and the
-      // button only enables when the player can afford it (the buy is re-checked
-      // sim-side regardless). Mirrors the Marks-shop affordability gating.
       const companionMaxRank = Math.max(...Object.keys(COMPANION_UPGRADE_COSTS).map(Number));
-      const nextRank = tessaRank + 1;
+      const nextRank = companionRank + 1;
       const nextCost = COMPANION_UPGRADE_COSTS[nextRank];
-      const tessaName = t('delveUi.board.companion.tessa');
+      const companionNameKey = companionId === 'companion_edda' ? 'edda' : 'tessa';
+      const companionName = t(`delveUi.board.companion.${companionNameKey}` as TranslationKey);
       let companionAction: string;
-      if (tessaRank >= companionMaxRank || !nextCost) {
+      if (companionRank >= companionMaxRank || !nextCost) {
         companionAction = `<div class="delve-companion-max quest-muted">${esc(t('delveUi.board.companion.maxRank'))}</div>`;
       } else {
         const costMarks = formatNumber(nextCost.marks, { maximumFractionDigits: 0 });
         const nextRankLabel = formatNumber(nextRank, { maximumFractionDigits: 0 });
         const affordable = this.sim.delveMarks >= nextCost.marks;
         companionAction =
-          `<button type="button" class="btn delve-companion-upgrade" data-companion-upgrade` +
-          ` aria-label="${esc(t('delveUi.board.companion.upgradeAria', { name: tessaName, rank: nextRankLabel, marks: costMarks }))}"` +
+          `<button type="button" class="btn delve-companion-upgrade" data-companion-upgrade="${esc(companionId)}"` +
+          ` aria-label="${esc(t('delveUi.board.companion.upgradeAria', { name: companionName, rank: nextRankLabel, marks: costMarks }))}"` +
           `${affordable ? '' : ' disabled'}>${esc(t('delveUi.board.companion.upgrade', { rank: nextRankLabel, marks: costMarks }))}</button>`;
       }
       const tierRow = ['normal', 'heroic']
@@ -6019,10 +6140,10 @@ export class Hud {
         })
         .join('');
       body =
-        `<div class="delve-board-greeting">${esc(t('delveUi.npc.halven.greeting', { playerName: this.sim.player.name }))}</div>` +
+        `<div class="delve-board-greeting">${esc(t(delve.id === 'drowned_litany' ? 'delveUi.npc.halvenMarsh.greeting' : 'delveUi.npc.halven.greeting', { playerName: this.sim.player.name }))}</div>` +
         `<div class="delve-tier-row">${tierRow}</div>` +
         `<div class="delve-companion-row"><div class="delve-companion-label">${esc(t('delveUi.board.companion.pick'))}</div>` +
-        `<div class="delve-companion-name">${esc(tessaName)} <span class="quest-muted">(${esc(tessaRankLabel)})</span></div>` +
+        `<div class="delve-companion-name">${esc(companionName)} <span class="quest-muted">(${esc(companionRankLabel)})</span></div>` +
         `<div class="delve-companion-boon quest-muted">${esc(t('delveUi.board.companion.boon'))}</div>` +
         `${companionAction}</div>` +
         `<button type="button" class="btn delve-enter-btn" data-delve-enter aria-label="${esc(t('delveUi.board.enterAria', { delve: delveName, tier: this.selectedDelveTier === 'heroic' ? tierHeroic : tierNormal }))}"${canEnter ? '' : ' disabled'}>${esc(t('delveUi.board.enter'))}</button>`;
@@ -6031,7 +6152,8 @@ export class Hud {
       `<div class="panel-title"><span>${esc(t('delveUi.board.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="delve-board-name">${esc(delveName)}</div>` +
       `<div class="delve-board-meta">${esc(t('delveUi.board.marks', { count: marks }))}</div>` +
-      `<div class="delve-board-req${canEnter ? '' : ' req-unmet'}">${esc(t('delveUi.board.minLevel', { level: formatNumber(delve.minLevel, { maximumFractionDigits: 0 }) }))}</div>` +
+      `<div class="delve-board-req${this.sim.player.level >= delve.minLevel ? '' : ' req-unmet'}">${esc(t('delveUi.board.minLevel', { level: formatNumber(delve.minLevel, { maximumFractionDigits: 0 }) }))}</div>` +
+      `<div class="delve-board-req${partyTooLarge ? ' req-unmet' : ''}">${esc(t('delveUi.board.partyTooLarge', { max: formatNumber(delve.maxPlayers, { maximumFractionDigits: 0 }) }))}</div>` +
       `<div class="delve-tabs" role="tablist" aria-label="${esc(t('delveUi.board.title'))}">${tabBtn('delve', t('delveUi.board.tabDelve'))}${tabBtn('shop', t('delveUi.board.tabShop'))}</div>` +
       `<div class="delve-board-body" role="tabpanel">${body}</div>`;
     el.querySelectorAll('[data-board-tab]').forEach((btn) => {
@@ -6051,8 +6173,11 @@ export class Hud {
           this.renderDelveBoard(true);
         });
       });
-      el.querySelector('[data-companion-upgrade]')?.addEventListener('click', () => {
-        this.sim.companionUpgrade('companion_tessa');
+      el.querySelector('[data-companion-upgrade]')?.addEventListener('click', (ev) => {
+        const btn = ev.currentTarget as HTMLElement;
+        const id = btn.dataset.companionUpgrade;
+        if (!id) return;
+        this.sim.companionUpgrade(id);
         this.renderDelveBoard(true);
       });
       el.querySelector('[data-delve-enter]')?.addEventListener('click', () => {
@@ -6294,6 +6419,31 @@ export class Hud {
     this.lockpickTrap = null;
   }
 
+  // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
+  // with the risen reliquary (delveRiteChoosePrompt) and closes once the chosen
+  // sequence starts playing (the first delveRitePulse) or on dismiss.
+  private openRitePanel(): void {
+    const el = $('#delve-rite-panel');
+    if (el.style.display !== 'block')
+      this.riteTrap = this.focusManager.open({ root: () => $('#delve-rite-panel') });
+    el.style.display = 'block';
+    this.riteWindow.render();
+    this.riteTrap?.focusFirst('.lp-ante-btn');
+  }
+
+  private submitRiteChoose(intensity: RiteIntensity): void {
+    this.sim.delveRiteChoose(intensity);
+    this.closeRitePanel();
+  }
+
+  private closeRitePanel(restoreFocus = true): void {
+    const el = $('#delve-rite-panel');
+    if (el.style.display === 'none') return;
+    el.style.display = 'none';
+    this.riteTrap?.release(restoreFocus);
+    this.riteTrap = null;
+  }
+
   private delveObjectiveLine(run: DelveRunInfo): string {
     const isFinale = run.moduleIndex >= run.moduleCount - 1;
     if (!isFinale) return t('delveUi.objective.clear_room');
@@ -6318,8 +6468,17 @@ export class Hud {
       this.lastDelveTrackerSig = '';
       if (el.innerHTML !== '') el.innerHTML = '';
       el.style.display = 'none';
+      // The run ended (walk-out, death release, completion teardown) while the
+      // difficulty popup could still be up; do not leave it floating over the
+      // outdoor world.
+      this.closeRitePanel(false);
       return;
     }
+    // State-driven close: the popup is only valid while the rite awaits a
+    // choice. The first pulse event also closes it, but that event is
+    // interest-scoped to the apse, so a party member elsewhere in the delve
+    // relies on this wire-state check instead.
+    if (run.rite && run.rite.phase !== 'choose') this.closeRitePanel(false);
     const sig = JSON.stringify([
       run.delveId,
       run.tierId,
@@ -6330,6 +6489,7 @@ export class Hud {
       run.affixes,
       run.completed,
       run.exitPortalOpen,
+      run.rite,
       this.sim.delveMarks,
     ]);
     if (sig === this.lastDelveTrackerSig) return;
@@ -6359,6 +6519,23 @@ export class Hud {
       affixHtml += '</div>';
     }
     const marks = formatNumber(this.sim.delveMarks, { maximumFractionDigits: 0 });
+    // Drowned Reliquary Rite: a phase-by-phase guidance line so the player
+    // always knows the next step (approach, watch, repeat with F, claim).
+    let riteHint = '';
+    if (run.rite) {
+      const riteText =
+        run.rite.phase === 'choose'
+          ? t('delveUi.tracker.riteChoose')
+          : run.rite.phase === 'playback'
+            ? t('delveUi.tracker.ritePlayback')
+            : run.rite.phase === 'input'
+              ? t('delveUi.tracker.riteInput', {
+                  current: formatNumber(run.rite.current, { maximumFractionDigits: 0 }),
+                  total: formatNumber(run.rite.total, { maximumFractionDigits: 0 }),
+                })
+              : t('delveUi.tracker.riteOpen');
+      riteHint = `<div class="dt-obj dt-hint">-> ${esc(riteText)}</div>`;
+    }
     let exitHint = '';
     if (run.moduleIndex < run.moduleCount - 1) {
       if (run.exitPortalOpen) {
@@ -6372,6 +6549,7 @@ export class Hud {
       `<div class="dt-title">${esc(delveName)} <span class="dt-tier">${esc(tierLabel)}</span>${complete}</div>` +
       `<div class="dt-obj">- ${esc(moduleLine)}${modName ? `: ${esc(modName)}` : ''}</div>` +
       `<div class="dt-obj${run.objective.complete ? ' done' : ''}">- ${esc(t('delveUi.tracker.objective'))}: ${esc(objectiveLine)}</div>` +
+      riteHint +
       exitHint +
       `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
       affixHtml;
@@ -7276,7 +7454,14 @@ export class Hud {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
-          if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });
+          if (ev.level === 5) {
+            const characterId = (this.sim as unknown as { characterId?: number }).characterId;
+            trackMetaPixel(
+              'ReachedLevel5',
+              { level: ev.level },
+              characterId ? { eventID: `lvl5_${characterId}` } : undefined,
+            );
+          }
           // First talent point (and spec) unlock — nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showBanner(t('game.talents.unlockBanner'));
@@ -7324,6 +7509,25 @@ export class Hud {
             audio.coin();
           else audio.lootItem();
           if ($('#bags').style.display !== 'none') this.renderBags();
+          break;
+        }
+        case 'craftResult': {
+          if (ev.ok && ev.itemId) {
+            const item = ITEMS[ev.itemId];
+            const name = item ? itemDisplayName(item) : ev.itemId;
+            this.log(t('hudChrome.crafting.craftedToast', { name }), '#7fdc4f');
+            audio.lootItem();
+          } else if (!ev.ok) {
+            this.log(
+              t(
+                ev.reason === 'unknown_recipe'
+                  ? 'hudChrome.crafting.unknownRecipe'
+                  : 'hudChrome.crafting.insufficientMaterials',
+              ),
+              '#ff6b6b',
+            );
+          }
+          if ($('#crafting-window').style.display === 'block') this.renderCrafting();
           break;
         }
         case 'lootRoll': {
@@ -7851,6 +8055,13 @@ export class Hud {
           this.combatLog(t('sim.lockpick.lockYields', { tier }), '#ffdd88');
           break;
         }
+        case 'delveRiteChoosePrompt':
+          this.openRitePanel();
+          break;
+        case 'delveRitePulse':
+          // The chosen sequence is playing; the difficulty popup is no longer needed.
+          this.closeRitePanel(false);
+          break;
         case 'delveChestLoot':
           this.openDelveLoot(ev.chestId, ev.items);
           break;
@@ -7863,15 +8074,30 @@ export class Hud {
         case 'companionBark': {
           // Acolyte Tessa's voice line: overhead bubble over her (when on-screen),
           // plus an attributed combat-log line so it is never missed off-screen.
-          const KNOWN_BARKS = ['combat_start', 'low_hp', 'trap_spotted', 'boss_pull', 'completion'];
+          const KNOWN_BARKS = [
+            'run_start',
+            'combat_start',
+            'low_hp',
+            'trap_spotted',
+            'boss_pull',
+            'ally_revive',
+            'completion',
+          ];
           if (!KNOWN_BARKS.includes(ev.barkId)) break;
-          const line = t(`delveUi.companion.tessa.${ev.barkId}` as TranslationKey, {
+          // The event carries the speaker: companionState can be momentarily
+          // null online (event/snapshot ordering), which used to fall back to
+          // Tessa's name and lines during an Edda run.
+          const companionKey = ev.companionId === 'companion_edda' ? 'edda' : 'tessa';
+          const line = t(`delveUi.companion.${companionKey}.${ev.barkId}` as TranslationKey, {
             playerName: this.sim.player.name,
           });
           const companion = this.sim.companionState;
           if (companion) this.renderer.showChatBubble(companion.entityId, line, false);
           this.combatLog(
-            t('delveUi.companion.barkLine', { name: t('delveUi.board.companion.tessa'), line }),
+            t('delveUi.companion.barkLine', {
+              name: t(`delveUi.board.companion.${companionKey}` as TranslationKey),
+              line,
+            }),
             '#c9a6e0',
           );
           break;
@@ -8953,7 +9179,11 @@ export class Hud {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
     if (Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId)) {
-      html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(t('delveUi.board.openDelve'))}</button>`;
+      const delveForNpc = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
+      const openLabel = delveForNpc
+        ? delveDisplayName(delveForNpc.id)
+        : t('delveUi.board.openDelve');
+      html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(openLabel)}</button>`;
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
@@ -9445,17 +9675,20 @@ export class Hud {
 
   openLoot(mobId: number, screenX: number, screenY: number): void {
     const mob = this.sim.entities.get(mobId);
-    if (!mob?.loot) return;
-    const visibleItems = mob.loot.items.filter(
-      (s) => !s.personalFor || s.personalFor.includes(this.sim.playerId),
-    );
-    if (mob.loot.copper <= 0 && visibleItems.length === 0) return;
+    if (!mob) return;
+    const componentTags = MOBS[mob.templateId]?.componentTags;
+    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
+    const visibleItems = mob.loot
+      ? mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId))
+      : [];
+    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
+    if (!hasLoot && !harvestable) return;
     this.closeOtherWindows('#loot-window');
     this.openLootMobId = mobId;
     this.openLootChestId = null;
     const el = $('#loot-window');
     let html = `<div class="panel-title"><span>${esc(entityDisplayName(mob))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
-    if (mob.loot.copper > 0) {
+    if (mob.loot && mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
     }
     for (const s of visibleItems) {
@@ -9467,14 +9700,24 @@ export class Hud {
       const itemId = (row as HTMLElement).dataset.item ?? '';
       this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
     });
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = t('itemUi.loot.takeAll');
-    btn.addEventListener('click', () => {
-      this.sim.lootCorpse(mobId);
-      this.closeLoot();
-    });
-    el.appendChild(btn);
+    if (hasLoot) {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.textContent = t('itemUi.loot.takeAll');
+      btn.addEventListener('click', () => {
+        this.sim.lootCorpse(mobId);
+        this.closeLoot();
+      });
+      el.appendChild(btn);
+    }
+    if (harvestable && componentTags) {
+      renderCorpseHarvestPicker(el, corpseHarvestView(componentTags, new Set()), {
+        onHarvest: (chosen) => {
+          this.sim.harvestCorpse(mobId, chosen);
+          this.closeLoot();
+        },
+      });
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
     this.placePopupAt(el, screenX - 115, screenY - 30, 260, 280, 10, 10);
     el.style.transform = 'none'; // loot pops at the cursor, not the centred slot
@@ -9566,6 +9809,47 @@ export class Hud {
 
   get vendorOpen(): boolean {
     return this.openVendorNpcId !== null;
+  }
+
+  // -------------------------------------------------------------------------
+  // Crafting (#1127): a minimal common-tier crafting window. Anywhere,
+  // anytime (no vendor/NPC gate): lists every known recipe with a Craft
+  // button enabled only when the player holds every required reagent.
+  // -------------------------------------------------------------------------
+
+  toggleCrafting(): void {
+    if ($('#crafting-window').style.display === 'block') {
+      this.closeCrafting();
+      return;
+    }
+    this.openCrafting();
+  }
+
+  openCrafting(): void {
+    this.closeOtherWindows('#crafting-window');
+    this.renderCrafting();
+  }
+
+  private renderCrafting(): void {
+    renderCraftingWindow(
+      $('#crafting-window'),
+      buildCraftingView(this.sim.recipeList, this.sim.inventory, ITEMS),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onCraft: (recipeId) => {
+          this.sim.craftItem(recipeId);
+          this.renderCrafting();
+          if ($('#bags').style.display !== 'none') this.renderBags();
+        },
+        onClose: () => this.closeCrafting(),
+      },
+    );
+  }
+
+  closeCrafting(): void {
+    $('#crafting-window').style.display = 'none';
+    this.hideTooltip();
   }
 
   // -------------------------------------------------------------------------
@@ -11309,22 +11593,6 @@ export class Hud {
     const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
-    const roleTagLabel = (key: string | undefined): string => {
-      switch (key) {
-        case 'levyst':
-          return t('hudChrome.discord.roleTag.levyst');
-        case 'admin':
-          return t('hudChrome.discord.roleTag.admin');
-        case 'devs':
-          return t('hudChrome.discord.roleTag.devs');
-        case 'mods':
-          return t('hudChrome.discord.roleTag.mods');
-        case 'artists':
-          return t('hudChrome.discord.roleTag.artists');
-        default:
-          return '';
-      }
-    };
     const parts: string[] = [];
     const nameInner = target.discordAvatar
       ? `<img src="${esc(target.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">${esc(target.discordName ?? '')}`
@@ -11332,7 +11600,7 @@ export class Hud {
     if (target.discordName || target.discordAvatar) {
       parts.push(`<span class="uf-dc-name">${nameInner}</span>`);
     }
-    const roleLabel = roleTagLabel(target.discordRole);
+    const roleLabel = discordRoleTagLabel(target.discordRole);
     if (roleLabel) {
       parts.push(
         `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? '#888'}">${esc(roleLabel)}</span>`,
@@ -11388,23 +11656,7 @@ export class Hud {
       memberDays !== null
         ? `<div class="inspect-holder-sub">${esc(t('hudChrome.discord.memberSince'))}: ${esc(t('hudChrome.discord.memberSinceDays', { days: formatNumber(memberDays, { maximumFractionDigits: 0 }) }))}</div>`
         : '';
-    const discordRoleLabel = (key: string | undefined): string => {
-      switch (key) {
-        case 'levyst':
-          return t('hudChrome.discord.roleTag.levyst');
-        case 'admin':
-          return t('hudChrome.discord.roleTag.admin');
-        case 'devs':
-          return t('hudChrome.discord.roleTag.devs');
-        case 'mods':
-          return t('hudChrome.discord.roleTag.mods');
-        case 'artists':
-          return t('hudChrome.discord.roleTag.artists');
-        default:
-          return '';
-      }
-    };
-    const roleLabel = discordRoleLabel(e.discordRole);
+    const roleLabel = discordRoleTagLabel(e.discordRole);
     const roleHtml = roleLabel
       ? `<div class="inspect-holder-sub inspect-discord-role">${esc(roleLabel)}</div>`
       : '';
@@ -11714,7 +11966,7 @@ export class Hud {
       const activate = () => {
         const act = item.dataset.act;
         if (!act) return;
-        el.style.display = 'none';
+        this.closeContextMenu();
         onActivate(act);
       };
       item.addEventListener('click', activate);
@@ -11859,6 +12111,7 @@ export class Hud {
 
   closeContextMenu(): void {
     $('#ctx-menu').style.display = 'none';
+    this.ctxMenuOpener = null;
   }
 
   // -------------------------------------------------------------------------
@@ -12100,6 +12353,12 @@ export class Hud {
     this.optionsWindow.onPerfOverlayMoved(x, y);
   }
 
+  /** Called by main.ts when a pad connects/disconnects: re-label the Controller
+   *  panel with the newly detected brand's glyphs if that panel is open. */
+  refreshControllerLabels(): void {
+    this.optionsWindow.refreshControllerLabels();
+  }
+
   // -------------------------------------------------------------------------
 
   // Historical name retained for the existing call sites. Opening a window no
@@ -12128,6 +12387,10 @@ export class Hud {
       this.hideEmoteWheel();
       return true;
     }
+    if ($('#delve-rite-panel').style.display === 'block') {
+      this.closeRitePanel();
+      return true;
+    }
     const top = this.topmostOpenWindow();
     if (!top) return false;
     this.closeManagedWindow(top);
@@ -12135,7 +12398,11 @@ export class Hud {
   }
 }
 
-function describeAbilitySummary(known: ResolvedAbility, resourceType: ResourceType | null): string {
+function describeAbilitySummary(
+  known: ResolvedAbility,
+  resourceType: ResourceType | null,
+  spellHaste = 0,
+): string {
   const parts: string[] = [];
   if (known.cost > 0) {
     parts.push(
@@ -12145,7 +12412,7 @@ function describeAbilitySummary(known: ResolvedAbility, resourceType: ResourceTy
       }),
     );
   }
-  parts.push(abilityCastLine(known));
+  parts.push(abilityCastLine(known, spellHaste));
   // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
   if (known.cooldown > 0) {
     parts.push(
@@ -12326,14 +12593,18 @@ function abilityRangeLine(def: AbilityDef): string | null {
   return t('abilityUi.tooltip.range', { range: formatAbilityNumber(def.range) });
 }
 
-function abilityCastLine(known: ResolvedAbility): string {
+// `spellHaste` (the live character's set-bonus spell haste, a fraction) shortens
+// the shown cast / channel time exactly as the sim does, so a hasted caster's
+// tooltips reflect the real, faster cast.
+function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
+  const h = 1 + Math.max(0, spellHaste);
   if (known.def.channel) {
     return t('abilityUi.tooltip.channeledSeconds', {
-      seconds: formatAbilityNumber(known.def.channel.duration),
+      seconds: formatAbilityNumber(known.def.channel.duration / h),
     });
   }
   if (known.castTime > 0) {
-    return t('abilityUi.tooltip.castSeconds', { seconds: formatAbilityNumber(known.castTime) });
+    return t('abilityUi.tooltip.castSeconds', { seconds: formatAbilityNumber(known.castTime / h) });
   }
   return t('abilityUi.tooltip.instant');
 }

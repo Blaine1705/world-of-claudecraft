@@ -51,6 +51,8 @@ export const hudChromeStrings = {
     error: 'Could not load daily rewards.',
     intro:
       'Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.',
+    disclaimer:
+      'WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.',
     prize: 'Prize Pool',
     reset: 'Reset',
     endsIn: 'Ends in {time}',
@@ -72,6 +74,13 @@ export const hudChromeStrings = {
     tasks: 'Tasks',
     taskMultiplier: 'x{multiplier} multiplier',
     pointsGained: '{points} daily rewards points gained.',
+    showChestButton: 'Show Chest',
+    hideChestButton: 'Hide Chest',
+    hideChestConfirmTitle: 'Hide Daily Rewards Chest?',
+    hideChestConfirmBody:
+      'This removes the chest shortcut from your HUD. Rewards, eligibility, and this panel stay available; you can bring the shortcut back from Options.',
+    hideChestConfirmOk: 'Hide Chest',
+    hideChestConfirmCancel: 'Cancel',
     leaderboard: 'Daily Leaderboard',
     totalPlayer: '{count} player today',
     totalPlayers: '{count} players today',
@@ -413,6 +422,7 @@ export const hudChromeStrings = {
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
+    showDailyRewardsChest: 'Show Daily Rewards Chest',
   },
   // Choice-row talents (the Pandaria-style rows tab in the talents window).
   // The row OPTION names/descriptions are sim content (English source, localized
@@ -818,6 +828,27 @@ export const hudChromeStrings = {
     summaryMaster: 'Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.',
     summaryGroup: 'Loot Settings: Group Loot.',
   },
+  // Per-corpse focus picker (#1142): the checkbox list of tagged components on a
+  // harvestable corpse, shown alongside loot. Concentrating on fewer checked
+  // components yields a higher tier per component than spreading across all of
+  // them (professions/gathering.ts resolveCorpseFocusHarvest).
+  corpseHarvest: {
+    title: 'Harvest',
+    harvestButton: 'Harvest',
+    concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    alreadyHarvested: 'This corpse has already been harvested.',
+    componentAria: 'Harvest {component}',
+    components: {
+      hide: 'Hide',
+      fang: 'Fang',
+      silk: 'Silk',
+      venomSac: 'Venom Sac',
+      gills: 'Gills',
+      claw: 'Claw',
+      horn: 'Horn',
+      tusk: 'Tusk',
+    },
+  },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
   // hud_chrome domain so an English-only PR compiles; the new-leader announcement
@@ -1131,6 +1162,7 @@ export const hudChromeStrings = {
     roleTag: {
       levyst: 'Levy St',
       admin: 'Admin',
+      coredevs: 'Core Dev',
       devs: 'Dev',
       mods: 'Mod',
       artists: 'Artist',
@@ -1180,6 +1212,20 @@ export const hudChromeStrings = {
       event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
+  },
+  // Crafting window (#1127): the minimal common-tier crafting action, one row
+  // per known recipe, a Craft button enabled only when every reagent is held.
+  crafting: {
+    title: 'Crafting',
+    close: 'Close crafting',
+    craft: 'Craft',
+    reagentsNeeded: 'Requires:',
+    reagentLine: '{name} x{have}/{required}',
+    empty: 'No recipes known yet.',
+    resultAria: 'Craft {name}',
+    craftedToast: 'Crafted: {name}',
+    insufficientMaterials: 'You do not have the materials for that.',
+    unknownRecipe: 'That recipe does not exist.',
   },
   // Developer badge: a cosmetic honor for contributors by landed-commit count
   // (the ladder lives in src/sim/dev_tier.ts; the data is sourced from a verified
@@ -1337,5 +1383,13 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+  },
+  // Gathering proficiency section on the character sheet (#1124). Profession
+  // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
+  gathering: {
+    title: 'Gathering',
+    mining: 'Mining',
+    logging: 'Logging',
+    herbalism: 'Herbalism',
   },
 };

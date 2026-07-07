@@ -24,6 +24,7 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
@@ -38,9 +39,11 @@ import {
   MELEE_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  SISTER_NHALIA_BOSS_ID,
+  TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
-import { groundHeight, waterLevel } from '../world';
+import { groundHeight, waterLevelAt } from '../world';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
 import { emitMobYell } from './yells';
@@ -86,6 +89,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   mob.combatTimer += DT;
 
   if (mob.templateId.startsWith('vision_')) {
+    mob.hostile = false;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    return;
+  }
+
+  // Tolling Bell projectiles (The Drowned Litany finale) are moved exclusively
+  // by the boss driver: no aggro, no wander, no evade-home, and the hostility
+  // safety net below must not re-hostile them.
+  if (mob.templateId === TOLLING_BELL_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -261,6 +276,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         mob.leashAnchor = null;
         break;
       }
+      // Anti-kite snare fires while chasing a fleeing target (the kite case).
+      pulseAntiKiteSnare(ctx, mob);
+      pulseLoudYell(ctx, mob);
       const d = dist2d(mob.pos, target.pos);
       if (spell && d <= spell.range) {
         mob.aiState = 'attack';
@@ -287,6 +305,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         break;
       }
       if (ctx.maybeFlee(mob, target)) break;
+      // Anti-kite snare also fires in melee (slows ranged players around the boss).
+      pulseAntiKiteSnare(ctx, mob);
+      pulseLoudYell(ctx, mob);
       const d = dist2d(mob.pos, target.pos);
       const spell = MOBS[mob.templateId]?.petSpell;
       if (spell) {
@@ -385,6 +406,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             mob.castingAbility = null;
             mob.castTotal = 0;
             mob.castRemaining = 0;
+            mob.castTargetId = null;
             const school = (bigCast.school ?? 'nature') as Aura['school'];
             ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
             ctx.emit({
@@ -408,6 +430,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             mob.castingAbility = bigCast.castId;
             mob.castTotal = bigCast.castTime;
             mob.castRemaining = bigCast.castTime;
+            mob.castTargetId = null;
             mob.channeling = false;
             if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
           }
@@ -552,6 +575,57 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 }
 
+// Howling Gale: the anti-kite snare pulse. A boss whose template declares `aoeSlow`
+// slams every player within `radius` with a movement slow on a fixed cadence. This is
+// the ONE boss pulse that also fires mid-chase (the callers below invoke it from both
+// the chase and attack states): the aoePulse/stomp/bigCast mechanics all gate on the
+// boss being in melee range, which is exactly what lets a ranged kiter hold a
+// sub-run-speed boss out of melee forever so none of them ever land. The snare closes
+// that gap (moveSpeedMult already honors the `slow` aura), then the melee-gated pulses
+// come online once the boss reaches the now-slowed target. Deals no damage and draws
+// no rng, so it is inert for every template without the field and cannot perturb the
+// parity gate. Called once per tick from whichever engaged state the mob is in, so the
+// cadence timer advances exactly once per tick.
+function pulseAntiKiteSnare(ctx: SimContext, mob: Entity): void {
+  const aoeSlow = MOBS[mob.templateId]?.aoeSlow;
+  if (!aoeSlow) return;
+  mob.aoeSlowTimer -= DT;
+  if (mob.aoeSlowTimer > 0) return;
+  mob.aoeSlowTimer = aoeSlow.every;
+  const school = (aoeSlow.school ?? 'nature') as Aura['school'];
+  ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+  for (const meta of ctx.players.values()) {
+    const pe = ctx.entities.get(meta.entityId);
+    if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > aoeSlow.radius) continue;
+    ctx.applyAura(pe, {
+      id: 'aoe_slow',
+      name: aoeSlow.name,
+      kind: 'slow',
+      remaining: aoeSlow.duration,
+      duration: aoeSlow.duration,
+      value: aoeSlow.mult,
+      sourceId: mob.id,
+      school,
+    });
+  }
+}
+
+// Loud boss battle cry: a mob with `battleYells` bellows the next line in its list
+// every `every`s while engaged (from the chase and attack states, like the snare),
+// broadcast at the wide battleYells.range so a "loud" boss is heard across the zone.
+// Cycles the lines in order (loudYellIndex), so it draws no rng and stays parity-inert
+// for every template without the field.
+function pulseLoudYell(ctx: SimContext, mob: Entity): void {
+  const loud = MOBS[mob.templateId]?.battleYells;
+  if (!loud || loud.lines.length === 0) return;
+  mob.loudYellTimer -= DT;
+  if (mob.loudYellTimer > 0) return;
+  mob.loudYellTimer = loud.every;
+  const line = loud.lines[mob.loudYellIndex % loud.lines.length];
+  mob.loudYellIndex = (mob.loudYellIndex + 1) % loud.lines.length;
+  emitMobYell(ctx, mob, line, loud.range);
+}
+
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
 export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
@@ -572,6 +646,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;
+  mob.loudYellTimer = MOBS[mob.templateId]?.battleYells?.every ?? 0;
+  mob.loudYellIndex = 0;
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
@@ -585,10 +662,12 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
     mob.castingAbility = null;
     mob.castTotal = 0;
     mob.castRemaining = 0;
+    mob.castTargetId = null;
   }
   mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to
@@ -617,7 +696,7 @@ export function blockedTowardSpawn(ctx: SimContext, e: Entity, dest: Vec3): bool
   const nz = e.pos.z + Math.cos(facing) * step;
   if (
     !ctx.mobCanSwim(MOBS[e.templateId]) &&
-    groundHeight(nx, nz, ctx.cfg.seed) < waterLevel() - SWIM_DEPTH
+    groundHeight(nx, nz, ctx.cfg.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
   )
     return true;
   const resolved = ctx.resolveMovePoint(nx, nz, BODY_RADIUS, e);

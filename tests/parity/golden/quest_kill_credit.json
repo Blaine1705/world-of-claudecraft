@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
-      "state": "0949a805",
+      "nextId": 401,
+      "state": "7dfedf0b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,6 +26,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -41,7 +42,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -54,19 +55,11 @@
             }
           ],
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -81,7 +74,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -124,9 +117,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
-      "state": "dcce7984",
-      "events": "8c467819",
+      "nextId": 401,
+      "state": "c0c2372a",
+      "events": "00bafcff",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -135,6 +128,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -150,7 +144,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -164,6 +158,7 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -176,19 +171,10 @@
               }
             ]
           ],
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -203,7 +189,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -246,9 +232,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 408,
-      "state": "e5b31335",
-      "events": "8e1af75c",
+      "nextId": 409,
+      "state": "0bdbd8b9",
+      "events": "d894ee18",
       "rng": {
         "draws": 40,
         "digest": "0e96c13c"
@@ -257,6 +243,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -276,7 +263,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -290,6 +277,7 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -302,19 +290,10 @@
               }
             ]
           ],
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -329,7 +308,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 399,
+          "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -373,9 +352,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 408,
-      "state": "c3856b04",
-      "events": "2a1aa60b",
+      "nextId": 409,
+      "state": "26db3dc0",
+      "events": "272aafab",
       "rng": {
         "draws": 40,
         "digest": "0e96c13c"
@@ -384,6 +363,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -406,7 +386,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -420,22 +400,14 @@
           ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
-          ],
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
           ],
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 250
         }
       ],
@@ -451,7 +423,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 399,
+          "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -495,8 +467,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 408,
-      "state": "1b72bd4c",
+      "nextId": 409,
+      "state": "bd08b448",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -506,6 +478,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -528,7 +501,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -542,22 +515,14 @@
           ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
-          ],
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
           ],
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 250
         }
       ],
@@ -573,7 +538,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 399,
+          "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 10,

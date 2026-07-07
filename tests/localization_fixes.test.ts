@@ -3,8 +3,10 @@ import * as path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
+import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -62,6 +64,7 @@ const locales: Record<string, any> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -542,6 +545,58 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     expect(localizeSimAuraName('not-an-aura')).toBeNull();
     setLanguage('en');
   });
+
+  it('every delve mob aura-emitting proc name resolves through the aura matcher', () => {
+    // These five template fields all push a named, player-visible aura (a channel
+    // line, a player debuff, or a target-frame buff). A name with no matcher row
+    // renders raw English in every non-English locale: the exact Litany Pulse /
+    // Web Snare / Silt Hide / Frenzy drift class, which occurred four ways in one
+    // delve. Scan the content records so a rename on either side reddens this.
+    setLanguage('zh_CN');
+    const names: string[] = [];
+    for (const tmpl of Object.values(DELVE_MOBS)) {
+      for (const proc of [
+        tmpl.mendAlly,
+        tmpl.chillOnHit,
+        tmpl.stoneskin,
+        tmpl.wardAllies,
+        tmpl.frenzyOnHit,
+      ]) {
+        if (proc?.name) names.push(proc.name);
+      }
+    }
+    // Pin the scan itself: if a field is renamed in the template type, the scan
+    // silently goes blind without these.
+    expect(names).toContain('Litany Pulse');
+    expect(names).toContain('Web Snare');
+    expect(names).toContain('Silt Hide');
+    expect(names).toContain('Feeding Frenzy');
+    for (const name of names) {
+      expect(localizeSimAuraName(name), `no aura matcher row for '${name}'`).not.toBeNull();
+    }
+    // De-aliasing: Silt Hide and Silt Ward are distinct auras with distinct keys.
+    expect(localizeSimAuraName('Silt Hide')).not.toBe(localizeSimAuraName('Silt Ward'));
+    setLanguage('en');
+  });
+
+  it('helper-returned pet error strings resolve through the matcher (the S3 scanner cannot see them)', () => {
+    // noPetError (src/sim/pet/pet_commands.ts) builds its string inside a ternary,
+    // and the delve arm 'Pets are not allowed inside the delves.' is a literal in
+    // the HELPER, never a direct ctx.error(...) argument. The S3 emit scanner only
+    // enumerates literals at the emit call site, so it is structurally blind to
+    // these: pin them here explicitly so a future delve pet-error added the same
+    // way still needs a matcher row.
+    setLanguage('es');
+    for (const emitted of [
+      'You have no pet.',
+      'You have no living pet.',
+      'You have no living demon.',
+      'Pets are not allowed inside the delves.',
+    ]) {
+      expect(localizeSimText(emitted), `no sim matcher row for '${emitted}'`).not.toBe(emitted);
+    }
+    setLanguage('en');
+  });
 });
 
 // --- S2: sim_i18n DICT parity (typed, but assert at runtime too) ---
@@ -820,6 +875,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
+    // DL1: Drowned Litany boss/rite/rooms emit surfaces.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_boss.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rite.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rooms.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).
     // The "Discarded"/"Equipped"/"Unequipped"/"You sit down to eat|drink"/"You quaff"/
@@ -837,6 +896,16 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the "<name> awakens!" summon log; the boss yells are variable-routed chat, not
     // scanned). Literals are byte-identical after the move so their matchers are unchanged.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/nythraxis.ts'), 'utf8'),
+    // H1 (#1141): the interaction command bodies (corpse harvest + loot/pickup). The two
+    // corpse-harvest deny strings ("That corpse has nothing to harvest." / "This corpse
+    // has already been harvested.") have their ONLY emitter occurrences here; the file's
+    // OTHER emits (too-far, bags-full, dead, no-permission) are byte-identical to
+    // literals in already-scanned files, so only a rewording of THIS file's sites was
+    // invisible to the guard before this entry.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8'),
+    // #1121: per-player node harvest command denials (dead gate, unknown node,
+    // range, respawn timer, bag-full pre-check).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

@@ -1603,14 +1603,30 @@
   }
   #chatlog-tabs {
     display: flex;
-    flex-wrap: wrap;
+    /* Stay a single clean row as tabs are added: never wrap the "+" to its own
+       line. When the tabs outgrow the strip they scroll horizontally instead
+       (the scrollbar is hidden for the classic look; wheel-to-horizontal is
+       wired in renderChatTabs, and the "+" stays pinned via position: sticky). */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    /* Desktop: the empty strip is a chat-box move handle (a touch-drag moves the
+       box), so suppress the browser's own touch gesture here. Mobile has no move
+       gesture and overrides this to pan-x so overflowed tabs stay swipeable. */
+    touch-action: none;
     gap: 2px;
     margin-left: 6px;
     margin-bottom: -1px;
     position: relative;
     z-index: 2;
   }
+  #chatlog-tabs::-webkit-scrollbar {
+    display: none;
+  }
   .chat-tab {
+    /* keep each tab its natural width and let the strip scroll, never squish */
+    flex: 0 0 auto;
     height: 22px;
     padding: 0 12px;
     border: 1px solid #3a321d;
@@ -1628,8 +1644,12 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
-  /* "add channel" (+) tab: square, icon-only, slightly de-emphasised */
+  /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
+     the right edge so it stays inline and reachable even when the tabs scroll. */
   .chat-tab-add {
+    flex: 0 0 auto;
+    position: sticky;
+    right: 0;
     padding: 0;
     width: 26px;
     font-size: 15px;
@@ -1855,12 +1875,23 @@
     border-radius: 4px;
   }
 
-  /* ---------- quest tracker ---------- */
-  #quest-tracker {
+  /* ---------- right tracker stack (quest tracker + delve tracker) ----------
+     One absolutely-positioned flex column so the delve tracker always stacks
+     BELOW the quest tracker's actual rendered height instead of a hardcoded
+     top offset that could collide with a long quest list. */
+  #right-tracker-stack {
     position: absolute;
     right: 14px;
     top: 262px;
     width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    pointer-events: none;
+  }
+  /* ---------- quest tracker ---------- */
+  #quest-tracker {
+    width: 100%;
     font-size: 12px;
     color: var(--color-text-overlay);
     text-shadow: 1px 1px 2px #000;
@@ -1943,6 +1974,9 @@
     font-size: 11px;
     font-family: var(--ui-font);
     vertical-align: text-bottom;
+    /* dark digit on a gold fill: the tracker's inherited black text-shadow
+       only blurs it, so drop it inside the badge */
+    text-shadow: none;
   }
   #quest-tracker .qt-obj {
     color: var(--color-text-overlay);
@@ -1957,10 +1991,7 @@
 
   /* ---------- delve tracker ---------- */
   #delve-tracker {
-    position: absolute;
-    right: 14px;
-    top: 380px;
-    width: 240px;
+    width: 100%;
     font-size: 12px;
     color: var(--gold);
     text-shadow: 1px 1px 2px #000;
@@ -2338,7 +2369,7 @@
     border-radius: 8px;
     margin-bottom: 14px;
     background: transparent;
-    border: 2px solid transparent;
+    border: 0;
     box-shadow: none;
     color: #f6c15b;
     overflow: visible;
@@ -2347,12 +2378,8 @@
       filter 0.16s;
   }
   #daily-rewards-button.spin-ready {
-    border-color: var(--gold);
-    box-shadow: 0 0 5px #ffd10066;
+    box-shadow: none;
     color: #fff;
-    animation: tal-pulse 1.6s ease-in-out infinite;
-    animation-duration: calc(1.6s * var(--motion-scale, 1));
-    animation-play-state: var(--fx-ambient-anim, running);
   }
   #daily-rewards-button.spin-ready .daily-rewards-icon {
     animation: daily-rewards-icon-pulse 1.6s ease-in-out infinite;
@@ -2360,66 +2387,39 @@
     animation-play-state: var(--fx-ambient-anim, running);
   }
   #daily-rewards-button::before {
-    content: none;
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe08a99 0%, #ffd10066 34%, #ffd10000 72%);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85);
+    pointer-events: none;
+    z-index: 0;
   }
   #daily-rewards-button::after {
     content: none;
   }
+  #daily-rewards-button.spin-ready::before {
+    animation: daily-rewards-glow-pulse 1.6s ease-in-out infinite;
+    animation-duration: calc(1.6s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
   #daily-rewards-button .daily-rewards-icon {
     position: relative;
     z-index: 1;
-    width: 58px;
-    height: 58px;
+    width: 64px;
+    height: 64px;
     display: block;
     object-fit: contain;
     pointer-events: none;
     filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 4px #ffd56d55);
   }
-  #daily-rewards-button .daily-rewards-label {
-    position: absolute;
-    right: calc(100% - 6px);
-    top: 0;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    max-width: 0;
-    padding: 0;
-    overflow: hidden;
-    opacity: 0;
-    white-space: nowrap;
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    line-height: 1;
-    color: var(--color-text-muted);
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    border: 2px solid #4a3d1d;
-    border-right: none;
-    border-radius: 5px 0 0 5px;
-    box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
-    pointer-events: none;
-    z-index: -1;
-    transition:
-      max-width 0.2s ease,
-      opacity 0.15s ease,
-      padding 0.2s ease,
-      border-color 0.12s ease,
-      color 0.12s ease;
-  }
-  #daily-rewards-button:hover .daily-rewards-label,
-  #daily-rewards-button:focus-visible .daily-rewards-label {
-    max-width: 220px;
-    opacity: 1;
-    padding: 0 18px 0 12px;
-  }
   #daily-rewards-button:hover,
-  #daily-rewards-button:focus-visible,
-  #daily-rewards-button:hover .daily-rewards-label,
-  #daily-rewards-button:focus-visible .daily-rewards-label {
+  #daily-rewards-button:focus-visible {
     border-color: #ffe08a;
     outline: none;
     color: #fff;
@@ -2441,6 +2441,17 @@
     50% {
       filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 14px #ffe08acc) brightness(1.16)
         saturate(1.12);
+    }
+  }
+  @keyframes daily-rewards-glow-pulse {
+    0%,
+    100% {
+      opacity: 0.34;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+    50% {
+      opacity: 0.82;
+      transform: translate(-50%, -50%) scale(1.18);
     }
   }
   /* the lockout panel rows inside the shared tooltip box */
@@ -4206,10 +4217,13 @@
 
   /* ---------- Ravenpost envelope indicator ---------- */
   /* Sits on the minimap disc rim (the raid-lockout button pattern): an envelope
-     glyph with an unread count, visible only while letters wait. */
+     glyph with an unread count, visible only while letters wait. Anchored to the
+     bottom-RIGHT corner because the raid-lockout badge owns bottom-left; each rim
+     satellite must claim its own corner or they stack (guarded by
+     tests/minimap_rim_badges.test.ts). */
   #mail-indicator {
     position: absolute;
-    left: 4px;
+    right: 4px;
     bottom: 4px;
     z-index: 3;
     display: inline-flex;

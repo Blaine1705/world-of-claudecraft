@@ -43,7 +43,7 @@ export const ko_KR: EnTranslations = {
       "subtitle": "누적 경험치",
       "rank": "순위",
       "name": "이름",
-      "realmCol": "렐름",
+      "realmCol": "월드",
       "level": "레벨",
       "vlevel": "가상",
       "lifetimeXp": "누적 경험치",
@@ -52,7 +52,7 @@ export const ko_KR: EnTranslations = {
       "loading": "순위 불러오는 중...",
       "unranked": "순위 없음",
       "you": "나",
-      "globalSubtitle": "모든 서버의 최고 영웅",
+      "globalSubtitle": "모든 월드의 최고 영웅",
       "retry": "순위표를 불러오지 못했습니다. 다시 시도하세요."
     },
     "milestone": {
@@ -188,6 +188,7 @@ export const ko_KR: EnTranslations = {
       "loading": "일일 보상 불러오는 중...",
       "error": "일일 보상을 불러올 수 없습니다.",
       "intro": "인증된 지갑에 충분한 WOC를 보유하여 일일 보상을 잠금 해제하세요. 하루 한 번의 스핀과 교체되는 과제로 포인트를 획득한 뒤, 일일 순위표를 올라 상금 풀의 일부를 차지하세요.",
+      "disclaimer": "WOC 가격은 빠르게 변동될 수 있습니다. 일반적인 가격 변동으로 보상이 잠기지 않도록 $20 USD 최소 기준보다 더 많이 보유하는 것을 권장합니다. 이는 금융 조언이 아닙니다.",
       "prize": "상금 풀",
       "reset": "초기화",
       "endsIn": "{time} 후 종료",
@@ -209,6 +210,12 @@ export const ko_KR: EnTranslations = {
       "tasks": "과제",
       "taskMultiplier": "{multiplier}배 배율",
       "pointsGained": "{points} 일일 보상 포인트를 획득했습니다.",
+      "showChestButton": "보물상자 표시",
+      "hideChestButton": "보물상자 숨기기",
+      "hideChestConfirmTitle": "일일 보상 보물상자를 숨기시겠습니까?",
+      "hideChestConfirmBody": "HUD에서 보물상자 바로가기가 제거됩니다. 보상, 자격, 이 패널은 계속 이용할 수 있습니다. 바로가기는 옵션에서 다시 표시할 수 있습니다.",
+      "hideChestConfirmOk": "보물상자 숨기기",
+      "hideChestConfirmCancel": "취소",
       "leaderboard": "일일 순위표",
       "totalPlayer": "오늘 플레이어 {count}명",
       "totalPlayers": "오늘 플레이어 {count}명",
@@ -413,7 +420,8 @@ export const ko_KR: EnTranslations = {
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
-      "showTargetOfTarget": "대상의 대상 표시"
+      "showTargetOfTarget": "대상의 대상 표시",
+      "showDailyRewardsChest": "일일 보상 보물상자 표시"
     },
     "talentRows": {
       "tab": "선택",
@@ -560,7 +568,7 @@ export const ko_KR: EnTranslations = {
       "defaultBuildName": "빌드 {n}"
     },
     "tips": {
-      "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 서버 전역의 플레이어와 대화할 수 있습니다."
+      "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -615,7 +623,7 @@ export const ko_KR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "버그 신고",
-      "realm": "서버",
+      "realm": "월드",
       "character": "캐릭터",
       "position": "좌표",
       "unknown": "알 수 없음",
@@ -736,6 +744,23 @@ export const ko_KR: EnTranslations = {
       "summaryMaster": "전리품 설정: 분배 담당, 분배 담당자 {name}, 품질 기준 {threshold}.",
       "summaryGroup": "전리품 설정: 파티 분배."
     },
+    "corpseHarvest": {
+      "title": "채집",
+      "harvestButton": "채집",
+      "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
+      "componentAria": "{component} 채집",
+      "components": {
+        "hide": "가죽",
+        "fang": "송곳니",
+        "silk": "비단실",
+        "venomSac": "독주머니",
+        "gills": "아가미",
+        "claw": "발톱",
+        "horn": "뿔",
+        "tusk": "엄니"
+      }
+    },
     "party": {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
@@ -835,13 +860,13 @@ export const ko_KR: EnTranslations = {
       "disarm": "무장 해제: 무기 공격을 사용할 수 없습니다",
       "lockout": "주문 계열이 봉인되었습니다",
       "imbue": "무기에 추가 효과가 부여되었습니다",
-      "imbueRange": "무기 부여: 심판 시 {min}에서 {max}의 추가 피해",
+      "imbueRange": "무기 부여: 선고 시 {min}에서 {max}의 추가 피해",
       "stealth": "은폐 상태, 이동 속도가 {pct}% 감소합니다",
-      "formBear": "곰 변신: 생명력과 방어도 증가",
+      "formBear": "큰곰 변신: 생명력과 방어도 증가",
       "formCat": "표범 변신: 근접 피해와 기력",
-      "formTravel": "여행 변신: 이동 속도가 {pct}% 증가합니다",
+      "formTravel": "쾌속 형태: 이동 속도가 {pct}% 증가합니다",
       "defensiveStance": "방어 태세: 받는 피해 감소, 위협 수준 증가",
-      "righteousFury": "정의의 격노: 신성 피해로 인한 위협 수준이 크게 증가합니다",
+      "righteousFury": "불타는 맹세: 신성 피해로 인한 위협 수준이 크게 증가합니다",
       "scale": "크기가 {pct}% 증가합니다",
       "jump": "도약 높이가 {pct}% 증가합니다",
       "dmgDone": "입히는 피해가 {pct}% 증가합니다",
@@ -979,6 +1004,7 @@ export const ko_KR: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "관리자",
+        "coredevs": "Core Dev",
         "devs": "개발자",
         "mods": "운영자",
         "artists": "아티스트"
@@ -1044,6 +1070,18 @@ export const ko_KR: EnTranslations = {
         }
       }
     },
+    "crafting": {
+      "title": "제작",
+      "close": "제작 닫기",
+      "craft": "제작",
+      "reagentsNeeded": "필요 재료:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "알려진 제작법이 없습니다.",
+      "resultAria": "{name} 제작",
+      "craftedToast": "제작 완료:{name}",
+      "insufficientMaterials": "재료가 부족합니다.",
+      "unknownRecipe": "해당 제작법이 존재하지 않습니다."
+    },
     "devBadge": {
       "title": "개발자",
       "tiers": {
@@ -1078,18 +1116,18 @@ export const ko_KR: EnTranslations = {
       "close": "우편함 닫기",
       "tabInbox": "받은 편지함",
       "tabInboxWithCount": "받은 편지함 ({count})",
-      "tabSend": "Send",
+      "tabSend": "보내기",
       "empty": "우편함이 비어 있습니다.",
       "truncated": "전체 {total}통 중 최신 {shown}통을 표시합니다.",
       "attachmentsBadge": "소포 첨부됨",
       "unreadBadge": "읽지 않음",
-      "back": "Back",
+      "back": "뒤로 가기",
       "take": "첨부물 받기",
       "delete": "편지 삭제",
       "deleteAria": "편지 {subject} 삭제",
       "openAria": "{name}이(가) 보낸 편지 {subject} 읽기",
       "noSubject": "(제목 없음)",
-      "toLabel": "To",
+      "toLabel": "받는 사람",
       "toPlaceholder": "캐릭터 이름",
       "subjectLabel": "제목",
       "bodyLabel": "내용",
@@ -1181,6 +1219,101 @@ export const ko_KR: EnTranslations = {
     "social": {
       "lastSeen": "마지막 접속: {when}",
       "lastSeenNever": "없음"
+    },
+    "gathering": {
+      "title": "채집",
+      "mining": "채광",
+      "logging": "벌목",
+      "herbalism": "약초학"
+    }
+  },
+  "apiError": {
+    "validation": {
+      "failed": "일부 항목이 올바르지 않습니다. 양식을 확인하고 다시 시도하세요."
+    },
+    "json": {
+      "malformed": "요청을 읽을 수 없습니다. 다시 시도해 주세요."
+    },
+    "body": {
+      "too_large": "요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.",
+      "unsupported_media_type": "지원되지 않는 요청 형식입니다."
+    },
+    "db": {
+      "conflict": "변경 사항이 다른 업데이트와 충돌했습니다. 다시 시도해 주세요."
+    },
+    "rate_limit": {
+      "exceeded": "요청이 너무 많습니다. {seconds} 후에 다시 시도하세요."
+    },
+    "internal": {
+      "error": "서버 측에서 문제가 발생했습니다. 다시 시도해 주세요."
+    },
+    "auth": {
+      "token_missing": "이 작업을 하려면 로그인해야 합니다.",
+      "token_invalid": "세션이 만료되었습니다. 다시 로그인해 주세요.",
+      "forbidden": "이 작업을 수행할 권한이 없습니다.",
+      "invalid_credentials": "사용자 이름 또는 비밀번호가 올바르지 않습니다.",
+      "required": "인증되지 않았습니다.",
+      "web_login_only": "로그인은 게임 클라이언트에서만 허용됩니다.",
+      "too_many_attempts": "시도가 너무 많습니다. 1분 후 다시 시도하세요.",
+      "too_many_failed_attempts": "시도 횟수가 너무 많습니다. 몇 분 후에 다시 시도하십시오.",
+      "current_password_incorrect": "현재 비밀번호가 올바르지 않습니다.",
+      "password_incorrect": "비밀번호가 올바르지 않습니다.",
+      "verification_failed": "확인에 실패했습니다. 다시 시도해 주세요."
+    },
+    "account": {
+      "username_invalid": "사용자 이름은 3-24자이며 글자, 숫자 또는 밑줄을 사용해야 합니다.",
+      "username_not_allowed": "이 사용자 이름은 사용할 수 없습니다.",
+      "username_taken": "이미 사용 중인 사용자 이름입니다.",
+      "username_mismatch": "해당 사용자 이름이 계정과 일치하지 않습니다.",
+      "password_too_short": "비밀번호는 최소 6자여야 합니다.",
+      "password_too_long": "새 비밀번호는 128자 이하여야 합니다.",
+      "characters_online": "비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.",
+      "deactivated": "이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.",
+      "not_found": "계정을 찾을 수 없습니다."
+    },
+    "character": {
+      "name_invalid": "캐릭터 이름이 올바르지 않습니다. 2-16자의 글자를 사용하세요.",
+      "name_not_allowed": "이 캐릭터 이름은 사용할 수 없습니다.",
+      "invalid_class": "유효하지 않은 직업입니다.",
+      "limit_reached": "캐릭터 한도에 도달했습니다.",
+      "name_taken": "이미 사용 중인 이름입니다.",
+      "not_found": "캐릭터를 찾을 수 없습니다.",
+      "online": "캐릭터가 현재 접속 중입니다.",
+      "rename_not_permitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
+      "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
+      "already_in_world": "캐릭터가 이미 세계에 있습니다.",
+      "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
+      "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다."
+    },
+    "moderation": {
+      "suspended_until": "이 계정은 {date}까지 정지되었습니다.",
+      "suspended": "이 계정은 정지되었습니다.",
+      "banned": "이 계정은 이용 정지되었습니다.",
+      "force_rename": "운영자가 당신의 캐릭터 중 하나의 이름 변경을 요구했습니다."
+    },
+    "email": {
+      "invalid": "유효한 이메일 주소를 입력하세요.",
+      "unchanged": "이미 사용 중인 이메일 주소입니다."
+    },
+    "two_factor": {
+      "code_invalid": "코드가 올바르지 않습니다. 다시 시도하세요.",
+      "setup_required": "먼저 2단계 인증 설정을 시작하세요.",
+      "already_enabled": "2단계 인증이 이미 활성화되어 있습니다.",
+      "not_enabled": "2단계 인증이 활성화되어 있지 않습니다."
+    },
+    "origin": {
+      "cross_site": "보안상의 이유로 요청이 차단되었습니다."
+    },
+    "discord": {
+      "not_configured": "현재 Discord 연동을 사용할 수 없습니다.",
+      "expired": "이 Discord 로그인이 만료되었습니다. Discord로 다시 로그인해 주세요.",
+      "already_linked": "이 Discord 계정은 이미 다른 계정에 연결되어 있습니다.",
+      "password_required": "Discord 계정 연결을 해제하기 전에 비밀번호를 설정하세요.",
+      "unknown_swag": "해당 보상은 사용할 수 없습니다.",
+      "link_required": "먼저 Discord 계정을 연결하세요.",
+      "swag_claimed": "이미 이 보상을 받았습니다.",
+      "swag_tier": "이 보상을 받으려면 더 높은 등급에 도달하세요.",
+      "swag_points": "포인트가 부족합니다."
     }
   },
   "guide": {
@@ -1208,6 +1341,7 @@ export const ko_KR: EnTranslations = {
       "delves": "탐굴",
       "reference": "참고 자료",
       "controls": "조작법",
+      "settings": "설정 및 성능",
       "combat": "전투",
       "talents": "특성",
       "arena": "투기장과 PvP",
@@ -1291,7 +1425,7 @@ export const ko_KR: EnTranslations = {
         "valeName": "동부개울 골짜기",
         "valeBlurb": "모든 모험이 시작되는 푸른 언덕과 오래된 숲.",
         "marshName": "진흙늪 습지",
-        "marshBlurb": "가라앉은 늪지와 조수에 닳은 폐허, 멀록을 비롯한 더한 것들의 보금자리.",
+        "marshBlurb": "가라앉은 늪지와 조수에 닳은 폐허, 진흙지느러미를 비롯한 더한 것들의 보금자리.",
         "peaksName": "가시봉우리 고원",
         "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선."
       },
@@ -1313,12 +1447,12 @@ export const ko_KR: EnTranslations = {
         "q2": "암호화폐 지갑이 필요한가요?",
         "a2": "아니요. 지갑 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식만 해제하며, 결코 능력에 영향을 주지 않습니다.",
         "q3": "오프라인으로 플레이할 수 있나요?",
-        "a3": "네. 브라우저에서 바로 즐기는 1인 플레이 모드와 함께 모두가 모이는 온라인 렐름도 있습니다.",
+        "a3": "네. 브라우저에서 바로 즐기는 1인 플레이 모드와 함께 모두가 모이는 온라인 월드도 있습니다.",
         "q4": "최고 레벨까지 얼마나 걸리나요?",
         "a4": "최고 레벨은 {cap}레벨이며, 퀘스트와 던전, 탐험으로 가득한 3개 지역을 거쳐 도달합니다."
       },
       "community": {
-        "heading": "렐름에 참여하세요",
+        "heading": "월드에 참여하세요",
         "body": "지금 바로 뛰어들거나, 들러서 인사를 건네세요. 세계는 함께할 때 더 즐겁습니다.",
         "play": "지금 플레이",
         "discord": "Discord 참여하기",
@@ -1352,7 +1486,7 @@ export const ko_KR: EnTranslations = {
       "groupingTitle": "함께 플레이하기",
       "groupingBody": "다른 사람을 파티에 초대해 퀘스트 점수를 나누고 던전에 도전하세요. 세계 대부분은 혼자서도 누빌 수 있으니, 파티 플레이는 의무가 아니라 선택입니다.",
       "onlineTitle": "온라인 또는 오프라인",
-      "onlineBody": "모두와 함께하는 온라인 렐름에서 플레이하거나, 브라우저에서 즉시 오프라인 세계를 열어 기본기를 익히세요.",
+      "onlineBody": "모두와 함께하는 온라인 월드에서 플레이하거나, 브라우저에서 즉시 오프라인 세계를 열어 기본기를 익히세요.",
       "reassure": "특성은 10레벨에 해금되며 언제든 초기화할 수 있으니, 초반 선택이 영구적인 일은 결코 없습니다. 마음껏 실험해 보세요.",
       "controlsLink": "전체 조작법 참고 자료 보기"
     },
@@ -1376,6 +1510,66 @@ export const ko_KR: EnTranslations = {
       "controllerHeading": "컨트롤러에서",
       "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 창을 열면 메뉴를 다룰 화면 포인터가 나타납니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있습니다."
     },
+    "settingsPage": {
+      "heading": "설정 및 성능",
+      "intro": "화면을 가장 아름답게, 혹은 게임을 가장 빠르게. 바로 쓸 수 있는 세 가지 추천 설정과 함께, 모든 그래픽 옵션이 실제로 하는 일을 정리했습니다.",
+      "wherePath": "이 페이지의 모든 항목은 게임 안에 있습니다. Esc 키를 누르고 그래픽, 인터페이스, 성능 오버레이에서 확인하세요.",
+      "fairnessTitle": "설계부터 공정하게",
+      "fairnessBody": "이곳의 어떤 옵션도 화면과 유불리를 맞바꾸지 않습니다. 설정을 낮추면 겉모습의 화려함만 줄어들 뿐, 전투에 쓰는 정보는 그대로 남습니다. 약화 효과, 시전 막대, 파티원 체력, 피해량 숫자는 낮음부터 울트라까지 완전히 동일합니다. 사양이 낮은 기기로 플레이해도 결코 불리하지 않습니다.",
+      "loadoutsHeading": "바로 쓸 수 있는 세 가지 추천 설정",
+      "loadoutsIntro": "내 기기와 가장 비슷한 추천 설정에서 시작한 뒤, 마음에 들 때까지 옵션을 하나씩 조정해 보세요.",
+      "recommended": "추천",
+      "whyLabel": "추천 이유:",
+      "tagReload": "새로고침 후 적용",
+      "fpsTitle": "FPS 우선",
+      "fpsTagline": "오래된 노트북, 내장 그래픽, 배터리 사용 환경을 위한 설정입니다.",
+      "fpsWhy": "그래픽 품질은 전체를 좌우하는 메인 스위치이고, 렌더 품질은 효과가 가장 큰 슬라이더입니다. 70%로 두면 인터페이스는 완벽하게 선명한 채로, 세계는 픽셀을 약 절반만 그립니다.",
+      "balancedTitle": "균형",
+      "balancedTagline": "대부분의 기기에 딱 맞는 최적점이자, 기본으로 권하는 설정입니다.",
+      "balancedWhy": "중간에서는 실제 그림자와 온전한 재질이 표현되고, 높음에서는 앰비언트 오클루전과 블룸이 더해집니다. 울트라 아래 등급에서는 내장 안전장치가 격렬한 전투 중의 순간적인 프레임 저하를 흡수해 주므로, 균형 설정은 따로 신경 쓰지 않아도 계속 부드럽게 유지됩니다.",
+      "visualsTitle": "최고 화질",
+      "visualsTagline": "고성능 데스크톱을 위한 스크린샷 모드입니다.",
+      "visualsWhy": "울트라는 디스플레이가 지원하는 가장 높은 해상도와 가장 풍부한 조명으로 세계를 그립니다. 내장 안전장치도 함께 꺼지며, 데스크톱 전용입니다. 휴대폰과 앱에서는 높음이 최고 단계입니다.",
+      "value50to70": "50%에서 70%",
+      "value90to100": "90%에서 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "게이밍 PC에서는 높음, 노트북에서는 중간",
+      "valueOnOptional": "켜짐(선택 사항)",
+      "howHeading": "옵션은 이렇게 동작합니다",
+      "factDetectTitle": "게임이 먼저 스스로 조율합니다",
+      "factDetectBody": "게임을 처음 실행하면 기기 사양을 읽어 알맞은 등급을 자동으로 골라 줍니다. 보급형 휴대폰이라면 낮음, 고성능 데스크톱이라면 울트라까지 선택됩니다. 직접 바꾼 설정이 있다면 언제나 그 선택이 우선합니다.",
+      "factReloadTitle": "두 종류의 옵션",
+      "factReloadBody": "그래픽 품질과 고급 옵션은 새로고침 후에 적용되며, 필요할 때는 패널에 지금 새로고침 버튼이 표시됩니다. 그 밖의 모든 옵션은 바꾸는 즉시 적용됩니다.",
+      "factGovernorTitle": "내장 안전장치",
+      "factGovernorBody": "울트라 아래의 모든 등급에서는 큰 전투로 부하가 치솟는 순간 풀과 효과, 조명을 잠시 줄였다가 곧바로 되돌립니다. 울트라를 선택하면 어떤 순간에도 모든 세부 표현을 그대로 유지하겠다는 뜻이 됩니다.",
+      "advancedHeading": "고급 프리셋: 나만의 조합 만들기",
+      "advancedBody": "고급은 높음 등급에서 시작해 지형 세부 묘사, 초목 밀도, 효과 및 조명, 그림자 품질까지 네 가지 옵션을 추가로 열어 줍니다. 차이가 실제로 느껴지는 곳에만 프레임을 골라 쓸 수 있습니다. 그래픽 품질과 마찬가지로 새로고침 후에 적용됩니다.",
+      "advancedMixes": "즐겨 쓰는 조합 두 가지를 소개합니다. 그림자 품질을 높음으로 두고 효과 및 조명을 낮음으로 내리면 글로우 없이 또렷하고 가벼운 화면이 되고, 반대로 하면 블룸을 살린 채 그림자를 부드럽게 만들 수 있습니다.",
+      "tableHeading": "모든 옵션 자세히 보기",
+      "colSetting": "설정",
+      "colDoes": "기능",
+      "colImpact": "FPS 영향",
+      "impactNone": "없음",
+      "impactLight": "적음",
+      "impactModerate": "보통",
+      "impactHeavy": "큼",
+      "rowGraphicsQuality": "전체를 좌우하는 메인 스위치입니다. 단계마다 해상도, 그림자, 재질, 초목, 조명 효과가 함께 바뀝니다. 단일 옵션으로는 가장 큰 차이를 만듭니다.",
+      "rowRenderQuality": "3D 세계를 더 낮은 내부 해상도로 그린 뒤 화면에 맞게 키웁니다. 인터페이스는 계속 선명합니다. 저사양 기기와 고해상도 화면에서 즉시 체감되는 가장 강력한 슬라이더입니다.",
+      "rowFieldOfView": "화면에 담기는 세계의 범위를 정합니다. 가깝게 당긴 55도부터 넓게 펼쳐진 100도까지 고를 수 있습니다. 편안함을 위한 선택이며, 시야가 넓을수록 그려야 할 양이 조금 늘어납니다.",
+      "rowBrightness": "장면의 노출을 어둡게 또는 밝게 조절합니다. 순전히 취향의 영역입니다.",
+      "rowWeather": "은은하게 내리는 비와 눈입니다. 분위기 연출일 뿐이며, 꺼 두면 폭풍이 칠 때 성능을 조금 아낄 수 있습니다.",
+      "rowBrowserEffects": "인터페이스 자체를 얼마나 화려하게 꾸밀지 정합니다. 유리 흐림, 글로우, 메뉴 애니메이션이 여기에 해당합니다. 자동은 사용 중인 브라우저에 맞춰 조절하며, 어느 쪽을 골라도 3D 세계에는 영향이 없습니다.",
+      "rowTerrainDetail": "여러 질감이 어우러진 풍부한 지면 표현과 더 단순하고 빠른 지형 표현 사이에서 선택합니다.",
+      "rowFoliageDensity": "캐릭터 주변에 풀이 자라는 거리와 밀도를 정합니다.",
+      "rowEffectsQuality": "블룸과 앰비언트 오클루전, 그리고 실제 빛을 드리우는 횃불과 주문의 수를 결정합니다. 고급 옵션 가운데 성능을 가장 크게 아낄 수 있는 항목입니다.",
+      "rowShadowQuality": "그림자의 또렷함을 정합니다. 낮음에서도 그림자는 사라지지 않고 가장자리만 부드러워집니다.",
+      "rowFrostedPanels": "창 뒤로 젖빛 유리 같은 흐림을 더합니다. 아름답지만 성능이 낮은 브라우저에는 부담이 되기 쉬운 효과이기도 하니, 클래식한 또렷함을 원한다면 꺼 두세요.",
+      "rowReduceMotion": "인터페이스 애니메이션을 없애 창이 즉시 나타나게 합니다. 접근성을 위한 옵션이 우선이지만, 성능에도 약간의 보너스가 있습니다.",
+      "rowPerfOverlay": "FPS, 프레임 시간 등을 화면 위에 실시간으로 보여 줍니다. 이 페이지를 참고해 설정을 조정하는 동안 켜 두었다가 다시 숨기면 됩니다.",
+      "tableFoot": "시야 거리 슬라이더나 FPS 제한을 찾고 계신가요? 따로 찾을 필요가 없습니다. 시야 거리는 각 품질 등급에 포함되어 있고, 프레임은 사용 중인 디스플레이에 맞춰 조절됩니다.",
+      "mobileTitle": "휴대폰과 태블릿에서",
+      "mobileBody": "모바일에서는 게임이 더 많은 것을 대신 관리해 줍니다. 등급을 자동으로 고르고, 배터리와 발열 부담을 줄이기 위해 해상도를 살짝 낮게 유지하며, 최상위 등급은 데스크톱 전용으로 남겨 둡니다. 위의 추천 설정은 그대로 유효하며, 휴대폰에서는 높음이 최고 단계입니다."
+    },
     "combat": {
       "intro": "전투는 익숙한 클래식 MMO 규칙을 따릅니다. 잘 플레이하기 위해 이를 공부할 필요는 전혀 없으며, 그저 전투가 어떻게 돌아가는지에 대한 개요일 뿐입니다.",
       "hitTitle": "모든 일격이 맞는 것은 아닙니다",
@@ -1388,7 +1582,7 @@ export const ko_KR: EnTranslations = {
       "growBody": "레벨이 오를 때마다 더 단단해지고 새 능력이 해금되며, 최고 레벨인 {cap}레벨까지 이어집니다. 퀘스트가 가장 빠른 성장 길이고, 던전과 탐험이 이를 채워줍니다.",
       "effectsTitle": "강화, 약화, 그리고 군중 제어",
       "effectsBody": "많은 능력이 일정 시간 남는 효과를 부여합니다. 이로운 효과(강화)는 능력치를 올리거나 보호막을 씌우거나 조금씩 치유해 주고, 해로운 효과(약화)는 지속 피해로 생명력을 깎거나 당신을 약하게 만듭니다. 행동 단축바 근처의 작은 아이콘을 보고 무엇이 걸려 있고 얼마나 남았는지 확인하세요.",
-      "ccBody": "군중 제어는 대상이 할 수 있는 행동을 제한하는 특별한 종류의 약화 효과입니다. 기절, 속박과 둔화, 주문 시전을 막는 침묵, 무장 해제, 공포, 그리고 잠시 적을 무력하게 만드는 변이가 있습니다. 그중 속박, 공포, 변이 같은 일부는 너무 빨리 다시 걸면 효과가 풀리므로 무한정 이어 걸 수는 없습니다.",
+      "ccBody": "군중 제어는 대상이 할 수 있는 행동을 제한하는 특별한 종류의 약화 효과입니다. 기절, 속박과 둔화, 주문 시전을 막는 침묵, 무장 해제, 공포, 그리고 잠시 적을 무력하게 만드는 변신이 있습니다. 그중 속박, 공포, 변신 같은 일부는 너무 빨리 다시 걸면 효과가 풀리므로 무한정 이어 걸 수는 없습니다.",
       "deathTitle": "쓰러졌을 때",
       "deathBody": "생명력이 0에 이르면 쓰러집니다. 영혼을 풀어내 가장 가까운 묘지에서 온전한 생명력으로 되살아난 뒤 원래 자리로 돌아가면 되므로, 죽음은 약간의 시간을 앗아갈 뿐 진행 상황까지 빼앗지는 않습니다. 전투 사이에는 앉아서 먹고 마시며 온전한 상태로 다음 싸움에 임하세요."
     },
@@ -1529,12 +1723,12 @@ export const ko_KR: EnTranslations = {
       "charge": "멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.",
       "rend": "시간이 지나며 대상을 약화시키는 출혈을 입힙니다.",
       "thunder_clap": "주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.",
-      "seal_of_righteousness": "공격에 신성 피해를 부여하고, 심판으로 그 기운을 소모합니다.",
+      "seal_of_righteousness": "공격에 신성 피해를 부여하고, 선고로 그 기운을 소모합니다.",
       "holy_light": "아군이나 자신의 체력을 채워 주는 안정적이고 큰 치유입니다.",
       "devotion_aura": "방어도를 높여 받는 타격을 줄여 주는 지속형 자기 강화입니다.",
       "judgement": "현재 활성화된 인장을 소모해 근거리에서 적을 강타합니다.",
       "blessing_of_might": "아군 대상의 공격력을 높여 주며, 전투를 시작하기 전에 시전하면 좋습니다.",
-      "divine_protection": "상황이 험해질 때 피해를 흡수하는 신속한 신성 보호막입니다.",
+      "divine_protection": "상황이 험해질 때 피해를 흡수하는 신속한 보호의 결계입니다.",
       "raptor_strike": "무언가가 거리를 좁혀 왔을 때 강하게 휘두르는 근접 일격입니다.",
       "aspect_of_the_hawk": "유지해 두면 원거리 공격력을 높여 주는 상입니다.",
       "serpent_sting": "독을 묻혀 시간이 지나며 자연 피해의 출혈을 입힙니다.",
@@ -1566,7 +1760,7 @@ export const ko_KR: EnTranslations = {
       "conjure_water": "마나를 회복시켜 주는 음료를 창조하여 전투 사이에 채울 수 있습니다.",
       "conjure_food": "앉아서 먹으면 생명력을 회복시켜 주는 음식을 창조합니다.",
       "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",
-      "summon_imp": "원거리에서 적에게 화염 화살을 날리는 임프를 불러냅니다.",
+      "summon_imp": "원거리에서 적에게 화염 화살을 날리는 불씨족을 불러냅니다.",
       "demon_skin": "피부를 단단하게 만들어 방어도를 높여 주는 지속형 자기 강화입니다.",
       "immolate": "대상에 불을 붙여 첫 타격을 입히고 지속되는 화염 피해를 남깁니다.",
       "corruption": "대상을 어둠으로 부식시켜, 다른 일을 하는 동안에도 피해가 들어갑니다.",
@@ -1598,7 +1792,7 @@ export const ko_KR: EnTranslations = {
         "old_greyjaw": "어떤 덫도 가두지 못한, 상처투성이 늙은 늑대. 사냥개 셋과 마구간 소년의 팔이 이놈 탓으로 돌려졌습니다. 깊은 숲을 홀로 사냥하며, 싸움이 길어질수록 더욱 사나워집니다.",
         "grubjaw": "다른 트롤들조차 곁에서 땅을 파려 하지 않을 만큼 탐욕스러운 습지 트롤로, 한 상인의 마지막 짐말 두 마리를 멍에까지 통째로 삼켰다고 전해집니다.",
         "shardlord_kazzix": "어깨를 갖춘 폭풍의 정령으로, 스톰크래그 위 먼 바위산을 거닐며 번개를 무릅쓸 만한 가치가 있는 심장 파편을 지니고 있습니다.",
-        "mirejaw_frenzy": "전투 도중 스스로를 광란으로 몰아넣어 마구 날뛰는 습지 멀록으로, 시끄럽고 영역 의식 강한 무리 가운데서도 가장 요란합니다.",
+        "mirejaw_frenzy": "전투 도중 스스로를 광란으로 몰아넣어 마구 날뛰는 습지 진흙지느러미로, 시끄럽고 영역 의식 강한 무리 가운데서도 가장 요란합니다.",
         "gravecaller_cultist": "골짜기에서 봉우리까지 무덤을 더럽히는 죽음교단의 로브 두른 종복들. 이들이 모이는 곳에서는 죽은 자가 쉬지 못합니다."
       }
     },
@@ -1612,12 +1806,12 @@ export const ko_KR: EnTranslations = {
         "desc": "어둡고 뒤엉킨 곳에 둥지를 트는 거미줄 짜는 자들과 독을 품은 잠복자들. 사냥꾼은 야수와 마찬가지로 이들을 길들일 수 있습니다."
       },
       "mudfin": {
-        "name": "멀록",
+        "name": "진흙지느러미",
         "desc": "시끄럽고 영역 의식이 강한 무리를 이루어 얕은 물가에 떼지어 모이는 양서류 늪지 거주자들."
       },
       "burrower": {
-        "name": "코볼트",
-        "desc": "광산과 굴을 들끓게 하며 자기네 광석을 사납게 지키는, 머리에 양초를 단 굴착꾼들."
+        "name": "굴착꾼",
+        "desc": "광산과 굴을 들끓게 하며 자기네 광석을 사납게 지키는, 흙범벅이 된 굴착꾼들."
       },
       "humanoid": {
         "name": "인간형",
@@ -1653,7 +1847,7 @@ export const ko_KR: EnTranslations = {
       "places": "주요 명소",
       "residents": "만나게 될 이들",
       "valeBlurb": "새내기 영웅들이 동개울 마을 주변에서 늑대와 산적을 상대로 실력을 갈고닦는 푸른 시작의 골짜기.",
-      "marshBlurb": "안개와 폐허에 잠긴 땅. 멀록이 얕은 물가에 떼지어 모이고 물밑에서는 더 오래된 무언가가 꿈틀거리며, 펜브릿지 다리 마을에서 이를 지켜봅니다.",
+      "marshBlurb": "안개와 폐허에 잠긴 땅. 진흙지느러미가 얕은 물가에 떼지어 모이고 물밑에서는 더 오래된 무언가가 꿈틀거리며, 펜브리지 다리 마을에서 이를 지켜봅니다.",
       "peaksBlurb": "왕국에서 가장 차갑고 높은 위험을 향해 솟아오른, 바람에 깎인 능선과 오래된 광산 터. 높은감시 전초기지가 이곳을 지킵니다.",
       "valeGreeting": "칼을 가까이 두시오. 골짜기는 예전 같지 않으니.",
       "valeGreeter": "레드브룩 원수, 이스트브룩",
@@ -1661,9 +1855,9 @@ export const ko_KR: EnTranslations = {
       "marshGreeter": "감시관 펜윅, 펜브리지",
       "peaksGreeting": "이 성벽이 이백 년을 버텨 왔소. 내가 지키는 한 무너지지 않겠지만, 신음하고 있긴 하지.",
       "peaksGreeter": "대장 테살리, 하이워치",
-      "valePlaceNotes": "이스트브룩은 당신의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울 호수는 낚시하기 좋은 잔잔한 물입니다. 거미숲과 구리 채굴장에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 산적 야영지와 무너진 예배당은 한층 거친 일거리를 품습니다. 성유물 언덕은 서버 최초의 발굴 장소인 무너진 성유물고로 내려가는 길이며, 브라이트우드 숲은 북쪽의 고요하고 햇살 드는 숲입니다.",
-      "marshPlaceNotes": "펜브리지는 유일하게 마른 길을 지킵니다. 배회자 갈대밭과 깊은습지 얕은 물에는 습지 짐승과 멀록이 들끓고, 과부 덤불은 거미줄로 빽빽이 얽혀 있습니다. 익사한 예배당과 트롤 봉분은 한층 오래된 위험을 품고, 무덤부름 야영지는 교단이 자리를 틀고 박힌 곳이며, 가라앉은 요새는 습지의 인스턴스 심장부입니다.",
-      "peaksPlaceNotes": "하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 코볼트의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나며, 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.",
+      "valePlaceNotes": "이스트브룩은 당신의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울 호수는 낚시하기 좋은 잔잔한 물입니다. 흑거미줄과 구리 채굴장에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 산적 야영지와 무너진 예배당은 한층 거친 일거리를 품습니다. 성유물 언덕은 월드 최초의 발굴 장소인 무너진 성유물고로 내려가는 길이며, 브라이트우드 숲은 북쪽의 고요하고 햇살 드는 숲입니다.",
+      "marshPlaceNotes": "펜브리지는 유일하게 마른 길을 지킵니다. 배회자 갈대밭과 깊은습지 얕은 물에는 습지 짐승과 진흙지느러미가 들끓고, 과부 덤불은 거미줄로 빽빽이 얽혀 있습니다. 익사한 예배당과 트롤 봉분은 한층 오래된 위험을 품고, 무덤부름 야영지는 교단이 자리를 틀고 박힌 곳이며, 가라앉은 요새는 습지의 인스턴스 심장부입니다.",
+      "peaksPlaceNotes": "하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 굴착꾼의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나며, 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.",
       "gladeTitle": "고요한 한구석: 브라이트우드 숲",
       "gladeBody": "계곡의 모든 이야기가 죽은 자들에 관한 것은 아닙니다. 북쪽에는 브라이트우드 숲이라 불리는 햇살 드는 숲이 있어, 가지 아래로 어른거리는 빛과 조용한 길과 함께 더 부드러운 고유한 리듬을 지킵니다. 당신이 따라가는 흔적에 대한 차분한 대비이며, 길이 잠시 여유를 줄 때 둘러볼 만한 곳입니다."
     },
@@ -1698,7 +1892,7 @@ export const ko_KR: EnTranslations = {
       "sagaValeTitle": "골짜기: 인장에 새겨진 이름",
       "sagaValeBody": "동부개울에서는 죽은 자가 쉬지 못하고, 그 배후의 표식은 사라진 지 오래라 여겨지던 종파의 것입니다. 자취를 좇으면 예배당 묘실에서 일하는 무덤부름에 닿고, 그의 문서가 당신을 북쪽 습지로 가리킵니다.",
       "sagaMarshTitle": "습지: 영혼의 십일조",
-      "sagaMarshBody": "마이어펜의 익사는 우연이 아닙니다. 누군가 십일조 함을 채우듯 습지를 채우며, 물이 데려간 여행자마다 그를 일으켜 고분고분한 죽은 자로 만듭니다. 명령을 윗선으로 좇아 가면 가라앉은 요새의 안개부름에 닿고, 그의 마지막 말은 봉우리 아래에서 꿈틀거리는 한층 오래된 무언가를 가리킵니다.",
+      "sagaMarshBody": "마이어펜의 익사는 우연이 아닙니다. 누군가 십일조 함을 채우듯 습지를 채우며, 물이 데려간 여행자마다 그를 일으켜 고분고분한 죽은 자로 만듭니다. 명령을 윗선으로 좇아 가면 가라앉은 요새의 안개엮는자에 닿고, 그의 마지막 말은 봉우리 아래에서 꿈틀거리는 한층 오래된 무언가를 가리킵니다.",
       "sagaPeaksTitle": "봉우리: 십일조가 향한 곳",
       "sagaPeaksBody": "쏜피크에서 모든 계략이 환히 드러납니다. 골짜기 이래로 빼앗긴 영혼 하나하나가 산속 깊은 곳에서 벌어지는 교단의 음산한 작업에 부어진 십일조였습니다. 예배당 뜰에서 시작된 자취가 여기, 다섯 명이 함께 내려가 그 모든 일의 배후를 마주하는 곳에서 끝납니다. 그 밑바닥에 누가 기다리는지는 당신이 직접 알아내도록 남겨 두겠습니다.",
       "sideTitle": "큰길에서 갈라진 갈래들",
@@ -2053,9 +2247,9 @@ export const ko_KR: EnTranslations = {
       "undoCountTitle": "{count}단계 되돌릴 수 있음 (Ctrl+Z 실행 취소, Ctrl+Y 다시 실행)",
       "autosave": "자동 저장",
       "autosaveTitle": "저장하지 않은 변경이 있는 동안 맵을 자동으로 저장합니다. 저장에 실패하면 자동으로 꺼집니다.",
-      "undo": "Undo",
+      "undo": "실행 취소",
       "undoTitle": "마지막 변경 실행 취소 (Ctrl+Z)",
-      "redo": "Redo",
+      "redo": "다시 실행",
       "redoTitle": "실행 취소한 변경 다시 실행 (Ctrl+Y)",
       "offline": "오프라인",
       "offlineTitle": "로그인하지 않음: 맵은 이 브라우저에만 저장됩니다. 온라인 저장하려면 게임에서 로그인하세요.",
@@ -2480,10 +2674,10 @@ export const ko_KR: EnTranslations = {
     "donate": "후원"
   },
   "stats": {
-    "title": "렐름 상태",
+    "title": "월드 상태",
     "accountsCreated": "플레이어",
     "playersOnline": "현재 접속자 수",
-    "realmName": "렐름 이름"
+    "realmName": "월드 이름"
   },
   "footer": {
     "copyright": "2026 World of ClaudeCraft",
@@ -2501,7 +2695,7 @@ export const ko_KR: EnTranslations = {
   },
   "highscores": {
     "title": "최고 점수 순위표",
-    "desc": "렐름의 가장 위대한 챔피언들을 확인하고 당신의 진행 상태를 비교해 보세요."
+    "desc": "월드의 가장 위대한 챔피언들을 확인하고 당신의 진행 상태를 비교해 보세요."
   },
   "wiki": {
     "title": "게임 위키 및 가이드",
@@ -2519,16 +2713,20 @@ export const ko_KR: EnTranslations = {
   },
   "download": {
     "title": "데스크톱 런처 다운로드",
-    "desc": "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요."
+    "desc": "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.",
+    "macCta": "macOS용 다운로드",
+    "linuxCta": "Linux용 다운로드",
+    "linuxHint": "AppImage 형식입니다. 실행 권한만 부여하면 바로 실행되며, 설치는 필요 없습니다.",
+    "windowsPending": "Windows 빌드는 준비 중입니다."
   },
   "comingSoon": {
     "placeholder": "준비 중...",
-    "featureComingSoon": "이 기능은 곧 렐름에 업데이트될 예정입니다."
+    "featureComingSoon": "이 기능은 곧 월드에 추가될 예정입니다."
   },
   "mode": {
     "onlineTitle": "온라인 플레이",
-    "onlineDesc": "렐름에 로그인합니다. 생성한 캐릭터는 서버에 저장되며 온라인에 있는 다른 모든 플레이어와 같은 세상을 공유합니다.",
-    "onlineAria": "온라인 플레이: 지속적으로 공유되는 렐름에 로그인합니다",
+    "onlineDesc": "월드에 로그인합니다. 생성한 캐릭터는 서버에 저장되며 온라인에 있는 다른 모든 플레이어와 같은 세상을 공유합니다.",
+    "onlineAria": "온라인 플레이: 지속적으로 공유되는 월드에 로그인합니다",
     "offlineTitle": "오프라인 플레이",
     "offlineDesc": "브라우저에서 즉시 일인용 세상을 플레이합니다. 아무것도 저장되지 않아 빠른 전투나 연습에 적합합니다.",
     "offlineAria": "오프라인 플레이: 즉각적인 로컬 싱글 플레이 세션을 시작합니다",
@@ -2538,15 +2736,15 @@ export const ko_KR: EnTranslations = {
     "serverOffline": "오프라인",
     "play": "플레이",
     "playAria": "World of ClaudeCraft 플레이",
-    "serverLabel": "렐름을 선택하세요",
-    "serverAria": "렐름 선택: 온라인 또는 오프라인",
+    "serverLabel": "월드를 선택하세요",
+    "serverAria": "월드 선택: 온라인 또는 오프라인",
     "serverOfflineSub": "즉시 시작하는 로컬 세상",
     "caLabel": "$WOC 계약 주소",
     "caCopyAria": "계약 주소 복사",
     "caNote": "WOC는 커뮤니티 토큰입니다. 플레이에는 필요하지 않습니다. WOC의 활용과 선순환 구조에 관해 이야기하려면 Discord에 참여하세요."
   },
   "auth": {
-    "enterRealm": "렐름 입장",
+    "enterRealm": "월드 입장",
     "username": "사용자 이름",
     "usernameError": "사용자 이름을 입력해 주세요.",
     "usernamePlaceholder": "사용자 이름 입력",
@@ -2561,10 +2759,10 @@ export const ko_KR: EnTranslations = {
     "logIn": "로그인",
     "createAccount": "계정 생성",
     "back": "뒤로 가기",
-    "realmList": "렐름 목록",
-    "loadingRealms": "렐름을 불러오는 중...",
-    "changeRealm": "렐름 변경",
-    "realm": "렐름",
+    "realmList": "월드 목록",
+    "loadingRealms": "월드를 불러오는 중...",
+    "changeRealm": "월드 변경",
+    "realm": "월드",
     "newCharacter": "새 캐릭터",
     "appearance": "외형",
     "class": "직업",
@@ -2586,7 +2784,7 @@ export const ko_KR: EnTranslations = {
       "title": "복구 이메일 추가",
       "body": "계정을 복구할 수 있도록 이메일 주소를 설정하세요. 비밀번호를 재설정해야 할 경우 이 계정의 소유자임을 확인하는 용도로만 사용됩니다.",
       "save": "이메일 저장",
-      "logOut": "Log out",
+      "logOut": "로그아웃",
       "invalid": "유효한 이메일 주소를 입력하세요.",
       "failed": "이메일을 저장하지 못했습니다. 다시 시도해 주세요."
     }
@@ -2742,7 +2940,7 @@ export const ko_KR: EnTranslations = {
     "renderFailedStatus": "카드 렌더링에 실패했습니다.",
     "levelClass": "{level}레벨 - {className}",
     "topPercent": "상위 {percent}%",
-    "realmSubtitle": "{realm} 렐름",
+    "realmSubtitle": "{realm} 월드",
     "defaultRealm": "ClaudeCraft의 세계",
     "brandWordmark": "WORLD OF CLAUDECRAFT",
     "recruited": "{count}명 모집",
@@ -2751,7 +2949,7 @@ export const ko_KR: EnTranslations = {
     "footerCta": "당신의 전설을 벼리세요: {siteUrl}",
     "arenaStat": "투기장",
     "shareTierBit": ", {tier} 등급 $WOC 보유자",
-    "shareText": "World of ClaudeCraft에서 제 전설을 벼리고 있습니다: {level}레벨 {className}{tierBit}. 제 렐름에 합류하세요:",
+    "shareText": "World of ClaudeCraft에서 제 전설을 벼리고 있습니다: {level}레벨 {className}{tierBit}. 제 월드에 합류하세요:",
     "nativeShareTitle": "ClaudeCraft의 세계",
     "fileNameFallback": "플레이어",
     "actionShareX": "X에 공유",
@@ -2829,6 +3027,7 @@ export const ko_KR: EnTranslations = {
       "unknownTier": "알 수 없는 탐굴 등급입니다.",
       "levelRequired": "{name}에 진입하려면 레벨 {level} 이상이어야 합니다.",
       "levelRequiredTier": "{tier} 난이도로 {name}에 진입하려면 레벨 {level}이(가) 필요합니다.",
+      "partyTooLarge": "{name}은(는) 솔로 또는 듀오 전용입니다. {max}명 이상의 파티는 입장할 수 없습니다.",
       "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
       "runFailed": "{name} 진행에 실패했습니다.",
       "complete": "{name} 완료.",
@@ -2838,6 +3037,14 @@ export const ko_KR: EnTranslations = {
       "doorAlreadyOpen": "문이 이미 열려 있습니다.",
       "companionRankUp": "{name}이(가) {rank}등급에 도달했습니다.",
       "bossChest": "우두머리가 쓰러집니다. 봉인된 성물실 상자가 단상 위로 솟아오릅니다. 자물쇠를 따서 전리품을 차지하세요.",
+      "drownedLitanyReliquaryRise": "나할리아 수녀가 침묵한다. 익사한 유물함이 흑수에서 떠오른다. 다가가 의식을 시작하라.",
+      "riteSequenceReady": "성소들이 어둠에 잠긴다. 순서를 반복하라.",
+      "riteSequencePlaying": "성소들이 의식을 재생하고 있다. 기다려라.",
+      "riteCorrect": "부드러운 종소리가 그대의 손길에 응답한다.",
+      "riteWrong": "귀에 거슬리는 종의 균열음. 흑수가 발치에서 튄다.",
+      "riteReliquaryOpen": "익사한 유물함이 열린다.",
+      "riteReliquaryLocked": "유물함을 열려면 성소 의식을 완료하라.",
+      "riteReliquaryEmpty": "유물함이 비어 있다.",
       "surfaceStairs": "지상으로 향하는 계단이 열립니다. 계단에서 F 키를 눌러 나가세요.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "방을 정리하세요.",
@@ -2845,6 +3052,13 @@ export const ko_KR: EnTranslations = {
       "tombstoneHint": "방을 정리하면 북쪽으로 묘비 통로가 열립니다.",
       "tombstoneOpen": "봉인된 묘비 통로가 북쪽으로 갈리며 열립니다. 그 안으로 걸어 들어가 계속 진행하세요.",
       "tombstoneInto": "묘비를 통과해 {name}(으)로 들어갑니다.",
+      "bellRopeShock": "종줄이 팽팽하게 당겨진다. 익사한 영창자들이 충격에 비틀거린다.",
+      "eggSacBurst": "알집이 터진다. 거미 새끼들이 세례당 가장자리로 흩어져 달아난다.",
+      "baptistryEggs": "세례당이 고요해진다. 거미 알집이 축축하게 가장자리에 들러붙어 있다.",
+      "baptistrySpidersSealed": "거미 알집을 파괴해 보아야 할 것이다.",
+      "puzzleSealed": "방 안 어딘가에 압력을 가해 봉인을 풀어야 한다.",
+      "ropesSealed": "종줄을 당겨 보아야 할 것이다.",
+      "baptistryWave": "세례당의 검은 물속에서 무언가가 꿈틀거린다.",
       "chestEmpty": "상자가 비어 있습니다.",
       "notInDelve": "탐굴 중이 아닙니다.",
       "cannotInteract": "그것과는 상호작용할 수 없습니다.",
@@ -2863,9 +3077,12 @@ export const ko_KR: EnTranslations = {
       "passageSealed": "통로가 봉인되어 있습니다.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
+      "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
       "nothingToTake": "이제 가져갈 것이 없습니다.",
       "wayOutNotOpen": "나가는 길이 아직 열리지 않았습니다.",
-      "moveCloserStairs": "계단에 더 가까이 다가가세요."
+      "moveCloserStairs": "계단에 더 가까이 다가가세요.",
+      "nhaliaCantorShield": "영창자들이여, 음을 유지하라!",
+      "nhaliaBlackwaterMark": "{name}이(가) {player}에게 흑수 표식을 남긴다!"
     },
     "lockpick": {
       "lockYields": "자물쇠가 열립니다! {tier} 전리품.",
@@ -2928,6 +3145,26 @@ export const ko_KR: EnTranslations = {
       "abandoned": "도구를 도로 빼냅니다. 자물쇠가 기다립니다."
     }
   },
+  "delveRiteUi": {
+    "title": "익사한 유물 의식",
+    "blurb": "성소들이 순서대로 빛난다. 각 성소를 차례로 활성화하여 순서를 반복하라. 잘못된 접촉은 시도를 실패시키고 순서를 다시 재생한다. 완벽한 시도는 가장 풍성한 전리품을 얻고, 시도 횟수를 모두 소진하면 유물함이 가장 초라한 상태로 열린다. 의식이 그대를 어떻게 시험할지 선택하라.",
+    "easy": "쉬움",
+    "medium": "보통",
+    "hard": "어려움",
+    "guideWatch": "선택하면 네 개의 제단이 차례로 빛납니다. 순서를 기억하세요.",
+    "guideRepeat": "제단이 어두워지면 같은 순서로 각 제단에 걸어가 F(상호작용)를 누르세요.",
+    "guideStakes": "잘못된 제단을 만지면 검은 물을 뒤집어쓰고 시도 횟수를 잃습니다. 순서를 완성하면 성물함이 열립니다.",
+    "showsTimes": "순서를 {count}회 표시",
+    "showsOnce": "순서를 한 번만 표시",
+    "symbols": "기호 {count}개",
+    "tries": "시도 {count}회",
+    "reward": {
+      "easy": "소박한 전리품",
+      "medium": "풍성한 전리품",
+      "hard": "최상급 전리품"
+    },
+    "closeAria": "닫기"
+  },
   "delveUi": {
     "board": {
       "title": "탐굴 게시판",
@@ -2937,6 +3174,7 @@ export const ko_KR: EnTranslations = {
       "openDelveAria": "{name}에서 탐굴 게시판 열기",
       "marks": "탐굴 증표: {count}",
       "minLevel": "필요 레벨 {level}",
+      "partyTooLarge": "솔로 또는 듀오 전용 (최대 {max}명)",
       "tier": {
         "normal": "일반",
         "heroic": "영웅"
@@ -2944,6 +3182,7 @@ export const ko_KR: EnTranslations = {
       "companion": {
         "pick": "동료 선택",
         "tessa": "수련사제 테사",
+        "edda": "에다 리드핸드",
         "rank": "{rank}등급",
         "boon": "전투 사이에 파티를 치유합니다. 3랭크에서는 탐굴마다 한 번 쓰러진 아군을 부활시킵니다.",
         "upgrade": "{rank}랭크로 강화 (증표 {marks}개)",
@@ -2969,7 +3208,11 @@ export const ko_KR: EnTranslations = {
       "complete": "완료",
       "marks": "탐굴 증표: {count}",
       "exitHintOpen": "묘비 통로로 걸어 들어가세요 (북쪽)",
-      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요"
+      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요",
+      "riteChoose": "가라앉은 성물함에 다가가 F를 눌러 의식을 시작하세요",
+      "ritePlayback": "제단을 지켜보세요: 빛나는 순서를 기억하세요",
+      "riteInput": "빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})",
+      "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요"
     },
     "objective": {
       "kill_boss": "{boss} 처치",
@@ -2990,27 +3233,54 @@ export const ko_KR: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "아래의 성물실이 또 움직였소. 자정이 지나면 바닥 너머로 영창 소리가 들리고, 수련사제 테사는 매장 명부가 스스로 잉크를 바꾼다고 단언하오. 용기가 있다면, {playerName}, 촛불을 들고 아래로 내려가시오. 거기서 들리는 모든 목소리를 믿지는 마시오. 그중 몇은 그대가 태어나기도 전에 그대의 이름을 알고 있었으니."
+      },
+      "halvenMarsh": {
+        "greeting": "오솔길이 북쪽 늪지로 이어졌다, {playerName}. 또 다른 성물실이 검은 물 아래서 노래하고, 익사한 자들이 종소리에 화답한다. 신도 에다가 나보다 이 갈대밭을 더 잘 안다, 그녀의 등불 곁에 머물러라. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
       }
     },
     "intro": {
       "normal": "계단은 차갑고 어둡습니다. 부서진 성인석이 내려가는 길에 흩어져 있고, 부드러운 종소리가 축축한 공기 속에 맴돕니다. 수련사제 테사가 속삭입니다. \"성물실이 이렇게까지 열려 있어선 안 돼요. 가까이 붙어 있어요, {playerName}.\"",
-      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\""
+      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\"",
+      "litanyNormal": "갈대로 막힌 계단이 펜브릿지 아래로 떨어진다. 에다 리드핸드가 등불을 들어올린다. \"늪은 익사시킨 모든 자의 이름을 기억한다, {playerName}. 빛 속에 머물러라.\"",
+      "litanyHeroic": "흑수가 둑길의 돌을 핥는다. 에다의 불꽃이 녹색으로 일렁인다. \"그들이 아래서 다시 노래하고 있다, {playerName}. 성가대에 응답하지 마라.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "물이 매장 선반 사이로 스며들며 은빛 검은 줄기로 오래된 재를 실어 나릅니다.",
       "reliquary_bell_niche": "수십 개의 손종이 침묵 속에 매달려 있고, 저마다 장례 천으로 묶여 있습니다.",
       "reliquary_saintless_hall": "정성스러운 증오로 얼굴이 깎여 나간 조각상들.",
-      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다."
+      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다.",
+      "litany_sluice": "이끼로 뒤덮인 수문에서 흑수가 방울져 떨어져 오래된 성가대 지하실로 흘러든다.",
+      "litany_ledger": "장부의 섬들이 물에 잠긴 수로에서 솟아오르고, 잉크가 늪으로 번져 나간다.",
+      "litany_ring": "유물의 고리가 봉인된 흑수의 중앙 성수반을 둘러싼다.",
+      "litany_baptistry": "싱크홀 세례당이 갈라진 성자석과 알주머니 아래로 아가리를 벌리고 있다.",
+      "litany_choir_loft": "부채꼴로 펼쳐진 성가대석에 밧줄에 매달린 종소리가 결코 멈추지 않고 울려 퍼진다.",
+      "litany_causeway": "Y자로 갈라진 둑길이 허리 깊이의 늪물 위로 갈라진다.",
+      "litany_apse": "익사한 후진이 나할리아 수녀의 제단 섬으로 열린다."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "물에 잠긴 납골당",
       "reliquary_bell_niche": "종의 감실",
       "reliquary_saintless_hall": "성인 없는 회랑",
-      "reliquary_finale": "종이 묻힌 방"
+      "reliquary_finale": "종이 묻힌 방",
+      "litany_sluice": "초승달 수문",
+      "litany_ledger": "섬의 장부",
+      "litany_ring": "유물의 고리",
+      "litany_baptistry": "싱크홀 세례당",
+      "litany_choir_loft": "부채꼴 성가대석",
+      "litany_causeway": "Y자 갈림길 둑길",
+      "litany_apse": "익사한 후진"
+    },
+    "object": {
+      "sluice_valve": "수문 밸브",
+      "grave_tablet": "무덤 석판",
+      "corpse_candle": "시체양초",
+      "bell_rope": "종 밧줄"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "초와 명부는 챙겼어요, {playerName}. 앞장서 주세요.",
+        "ally_revive": "일어나요. 오늘 밤 명부에 당신의 이름은 없어요.",
         "combat_start": "발을 단단히 디뎌요, {playerName}. 이곳의 죽은 자들은 잠들지 못했어요.",
         "low_hp": "숨을 고르세요. 당신을 위한 기도가 아직 남아 있어요.",
         "trap_spotted": "멈춰요, 바닥에 있는 무언가가 발소리를 기억하고 있어요.",
@@ -3022,6 +3292,20 @@ export const ko_KR: EnTranslations = {
           "3": "성물실 수련사제",
           "4": "무덤부름의 목격자",
           "5": "예배당 수호자"
+        }
+      },
+      "edda": {
+        "run_start": "널빤지 길을 따라가라, {playerName}. 진창은 오만한 발걸음부터 삼킨다.",
+        "ally_revive": "어서 일어나라. 오늘은 늪이 그대를 데려가지 못한다.",
+        "combat_start": "흑수를 조심해라, {playerName}. 늪이 듣고 있다.",
+        "low_hp": "침착해라. 내 등불은 아직 꺼지지 않았다.",
+        "trap_spotted": "잠깐. 여기 갈대가 이상하다.",
+        "boss_pull": "저 성가가 그대의 이름을 알고 있다, {playerName}. 노래로 답하지 마라.",
+        "completion": "늪은 하룻밤 더 그 비밀을 삼킬 수 있다.",
+        "rank": {
+          "1": "등불지기",
+          "2": "갈대 감시자",
+          "3": "펜브릿지 신도"
         }
       }
     },
@@ -3065,7 +3349,10 @@ export const ko_KR: EnTranslations = {
       "flooded_paths": "침수된 길",
       "grave_tax": "무덤의 대가",
       "unstable_roof": "불안정한 천장",
-      "cult_remnants": "교단의 잔당"
+      "cult_remnants": "교단의 잔당",
+      "high_water": "불어난 물",
+      "lively_choir": "활기찬 성가대",
+      "belligerent_dead": "호전적인 사자"
     },
     "blessing": {
       "chapel_candle": "예배당 촛불: 더 안전한 진행, 완료 시 탐굴 증표 1개 감소."
@@ -3148,7 +3435,7 @@ export const ko_KR: EnTranslations = {
         "desc": "당신의 물리 공격이 15% 더 강하게 적중합니다."
       },
       "aug_spellfire": {
-        "name": "주문 화염",
+        "name": "음산한 불꽃",
         "desc": "당신의 주문이 15% 더 많은 피해를 입힙니다."
       },
       "aug_toughness": {
@@ -3192,7 +3479,7 @@ export const ko_KR: EnTranslations = {
         "desc": "모든 종류의 피해 +18%, 이동 속도 +12%."
       },
       "aug_lightwell": {
-        "name": "빛의 샘",
+        "name": "무덤빛",
         "desc": "치유량 +30%, 최대 생명력 +15%. 팀의 중심이 되세요."
       },
       "aug_bounty_hunter": {
@@ -3243,13 +3530,13 @@ export const ko_KR: EnTranslations = {
   },
   "seo": {
     "title": "World of ClaudeCraft: 클래식 스타일 웹 MMO",
-    "description": "브라우저에서 바로 즐기는 클래식 스타일 마이크로 MMO, World of ClaudeCraft에서 장대한 모험을 시작하세요. 지속되는 공유 렐름에 접속해 직업을 성장시키고 적을 물리치세요.",
+    "description": "브라우저에서 바로 즐기는 클래식 스타일 마이크로 MMO, World of ClaudeCraft에서 장대한 모험을 시작하세요. 지속되는 공유 월드에 접속해 직업을 성장시키고 적을 물리치세요.",
     "genre": "MMORPG",
     "playMode": "멀티플레이어",
     "applicationCategory": "게임",
     "operatingSystem": "웹 브라우저",
     "officialLabel": "World of ClaudeCraft 공식 웹사이트",
-    "officialBody": "worldofclaudecraft.com은 Claudemoon 렐름의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
+    "officialBody": "worldofclaudecraft.com은 Claudemoon 월드의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요."
   },
   "a11y": {
     "goHome": "홈으로 이동",
@@ -3265,11 +3552,12 @@ export const ko_KR: EnTranslations = {
     "world": "세계 불러오는 중...",
     "worldProgress": "세계 불러오는 중... {done}/{total}",
     "enteringWorld": "세계에 입장하는 중...",
-    "connectingRealm": "렐름에 연결하는 중...",
+    "connectingRealm": "월드에 연결하는 중...",
     "assetsFailed": "리소스 불러오기에 실패했습니다. 새로고침해 보세요. {error}",
     "rendererFailed": "렌더러를 시작할 수 없습니다. 새로고침해 보세요. {error}",
     "enterTimeout": "세계에 입장할 수 없습니다. 연결 시간이 초과되었습니다. 게임 서버가 실행 중인가요?",
     "connectionLost": "서버와의 연결이 끊어졌습니다.",
+    "reconnecting": "연결이 끊어졌습니다. 다시 연결하는 중...",
     "connectionRejected": "서버가 연결을 종료했습니다."
   },
   "errors": {
@@ -3302,9 +3590,12 @@ export const ko_KR: EnTranslations = {
       "webLoginOnly": "로그인은 게임 클라이언트에서만 허용됩니다.",
       "accountSuspended": "이 계정은 {date}까지 정지되었습니다.",
       "alreadyInWorld": "캐릭터가 이미 세계에 있습니다.",
+      "accountSessionLimit": "이 계정의 너무 많은 캐릭터가 이미 세계에 있습니다.",
       "takenOver": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "renameBeforeEntering": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
-      "renameNotPermitted": "이 캐릭터의 이름을 변경할 수 없습니다."
+      "renameNotPermitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
+      "unsupportedMediaType": "지원되지 않는 요청 형식입니다.",
+      "crossSiteOrigin": "보안상의 이유로 요청이 차단되었습니다."
     }
   },
   "desktop": {
@@ -3323,25 +3614,25 @@ export const ko_KR: EnTranslations = {
     }
   },
   "realm": {
-    "noRealms": "사용 가능한 렐름이 없습니다.",
-    "loading": "렐름 불러오는 중...",
+    "noRealms": "사용 가능한 월드가 없습니다.",
+    "loading": "월드 불러오는 중...",
     "recommended": "추천",
     "checkingStatus": "상태 확인 중...",
     "onlineNow": "현재 {count}명 접속 중",
-    "down": "렐름이 중단되었습니다",
+    "down": "월드가 중단되었습니다",
     "offline": "오프라인",
     "full": "포화",
     "high": "높음",
     "medium": "보통",
     "low": "낮음",
     "popTipLow": "낮은 인구: 현재 접속자 15명 미만. 여유롭고 새로 시작하기에 좋습니다.",
-    "popTipMedium": "보통 인구: 현재 접속자 15~39명. 건강하고 활발한 렐름입니다.",
+    "popTipMedium": "보통 인구: 현재 접속자 15~39명. 건강하고 활발한 월드입니다.",
     "popTipHigh": "높은 인구: 현재 접속자 40~79명. 붐비고 플레이어가 많습니다.",
     "popTipFull": "포화 인구: 현재 접속자 80명 이상. 매우 붐비며 로그인 대기열이 있을 수 있습니다.",
-    "popTipOffline": "오프라인: 이 렐름은 현재 연결할 수 없어 입장할 수 없습니다.",
+    "popTipOffline": "오프라인: 이 월드는 현재 연결할 수 없어 입장할 수 없습니다.",
     "characterCountOne": "캐릭터 {count}개",
     "characterCountOther": "캐릭터 {count}개",
-    "selectedRealm": "렐름: {name}",
+    "selectedRealm": "월드: {name}",
     "statsOffline": "오프라인",
     "statsRealmOffline": "{realm}(오프라인)"
   },
@@ -3425,13 +3716,13 @@ export const ko_KR: EnTranslations = {
     },
     "lore": {
       "warrior": "전사는 피해를 주거나 받을 때 분노를 쌓는 단련된 근접 전투원입니다. 강한 공격을 버티거나 강력한 무기로 적을 압도합니다.",
-      "paladin": "성기사는 축복으로 아군을 돕고 성스러운 빛으로 상처를 치유하며 중갑으로 약자를 보호하는 성전사입니다.",
+      "paladin": "성기사는 축복으로 아군을 돕고 치유의 빛으로 상처를 치유하며 중갑으로 약자를 보호하는 성전사입니다.",
       "hunter": "사냥꾼은 길들인 야수와 함께 싸우는 원거리 전문가로, 일격 사격과 속사를 퍼부어 적을 공략하고 맹독과 충격 사격으로 적의 발을 묶으며 상황에 맞춰 화신을 전환합니다.",
       "rogue": "도적은 기력과 연계 점수를 사용해 그림자 속에서 기습과 마무리 일격을 가하는 암살자입니다.",
-      "priest": "사제는 성스러운 빛으로 아군을 치유하고 보호하며, 암흑 마법으로 적의 생명력을 흡수합니다.",
+      "priest": "사제는 치유의 빛으로 아군을 치유하고 보호하며, 암흑 마법으로 적의 생명력을 흡수합니다.",
       "shaman": "주술사는 정령을 다루고 무기에 힘을 불어넣으며 번개로 적을 충격시키고 아군을 회복시킵니다.",
       "mage": "마법사는 화염, 냉기, 비전의 힘으로 적을 파괴하고 물을 만들어내며 위협을 얼립니다.",
-      "warlock": "흑마법사는 악마를 소환하고 저주와 지속 피해 마법을 걸며 생명력을 흡수해 버팁니다.",
+      "warlock": "흑마법사는 악마를 소환하고 저주와 지속 피해 마법을 걸며 적에게서 생명력을 흡수해 버팁니다.",
       "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다."
     },
     "aria": "{className} 직업 세부 정보: 역할 {role}. 시작 능력치: 힘 {str}, 민첩 {agi}, 체력 {sta}, 지능 {int}, 정신력 {spi}.",
@@ -3456,10 +3747,10 @@ export const ko_KR: EnTranslations = {
     "otherInstallDetail": "최상의 모바일 전체 화면 경험을 위해 이 페이지를 설치하거나 홈 화면에 추가하세요."
   },
   "serverUnavailable": {
-    "title": "World of ClaudeCraft - 렐름 이용 불가",
+    "title": "World of ClaudeCraft - 월드 이용 불가",
     "logoAlt": "World of ClaudeCraft",
-    "eyebrow": "렐름 점검",
-    "heading": "렐름을 일시적으로 이용할 수 없습니다.",
+    "eyebrow": "월드 점검",
+    "heading": "월드를 일시적으로 이용할 수 없습니다.",
     "body": "게임 서비스를 재시작하고 있으며 Claudemoon은 곧 돌아올 예정입니다. 이 페이지는 자동으로 계속 확인합니다.",
     "status": "곧 돌아옵니다"
   },
@@ -3780,9 +4071,9 @@ export const ko_KR: EnTranslations = {
       "requiresCombo": "그 능력은 연계 점수가 필요합니다.",
       "requiresForm": "{form} 변신 상태여야 합니다.",
       "cantInForm": "{form} 변신 상태에서는 할 수 없습니다.",
-      "bear": "곰",
+      "bear": "큰곰",
       "cat": "늑대",
-      "travel": "여행",
+      "travel": "쾌속",
       "shapeshifted": "변신 중에는 할 수 없습니다.",
       "stealthed": "은신 상태여야 합니다.",
       "inCombat": "전투 중에는 할 수 없습니다.",
@@ -4192,7 +4483,7 @@ export const ko_KR: EnTranslations = {
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
-      "bag": "Bag"
+      "bag": "가방"
     },
     "stats": {
       "armor": "방어도",
@@ -4235,7 +4526,7 @@ export const ko_KR: EnTranslations = {
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기",
-      "bagSlots": "{slots} Slot Bag"
+      "bagSlots": "{slots}칸 가방"
     },
     "bags": {
       "title": "가방",
@@ -4401,55 +4692,55 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 {damage}만큼 치유한 후 주변 아군 최대 2명에게 연쇄됩니다. 연쇄될 때마다 치유량이 절반으로 줄어듭니다."
       },
       "heroic_strike": {
-        "name": "영웅의 일격",
+        "name": "약탈자의 일격",
         "description": "강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다."
       },
       "battle_shout": {
-        "name": "전투의 외침",
+        "name": "강철의 외침",
         "description": "2분 동안 전투력이 20만큼 증가합니다."
       },
       "commanding_shout": {
-        "name": "지휘의 외침",
+        "name": "북돋는 외침",
         "description": "2분 동안 체력이 6만큼 증가합니다."
       },
       "demoralizing_shout": {
-        "name": "사기의 외침",
+        "name": "흉포한 울부짖음",
         "description": "무시무시한 고함을 질러 주위 모든 적이 입히는 피해를 20초 동안 20% 감소시킵니다."
       },
       "charge": {
-        "name": "돌진",
+        "name": "쇄도",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd."
       },
       "rend": {
-        "name": "분쇄",
+        "name": "깊은 상처",
         "description": "대상을 상처 입혀 9초에 걸쳐 {damage}의 출혈 피해를 입힙니다."
       },
       "thunder_clap": {
-        "name": "천둥벼락",
+        "name": "진동의 일격",
         "description": "주위 적에게 {damage}의 피해를 입히고 10초 동안 공격 속도를 10%만큼 늦춥니다."
       },
       "hamstring": {
-        "name": "무력화",
+        "name": "절뚝이는 베기",
         "description": "적에게 5의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "bloodrage": {
-        "name": "피의 분노",
+        "name": "피의 대가",
         "description": "생명력을 희생하여 분노 {rage}을(를) 생성합니다."
       },
       "overpower": {
-        "name": "제압",
+        "name": "붉은 손",
         "description": "무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성합니다. 회피할 수 없습니다."
       },
       "execute": {
-        "name": "마무리 일격",
+        "name": "이른 무덤",
         "description": "상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다."
       },
       "slam": {
-        "name": "격돌",
+        "name": "우악스러운 휘두르기",
         "description": "상대에게 무기 피해에 {damage}를 더한 피해를 입힙니다."
       },
       "cleave": {
-        "name": "회전베기",
+        "name": "수확의 호",
         "description": "전방의 모든 적을 휩쓸어 {damage}의 피해를 입힙니다."
       },
       "defensive_stance": {
@@ -4457,27 +4748,27 @@ export const ko_KR: EnTranslations = {
         "description": "방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 다시 시전하면 태세를 해제합니다."
       },
       "sunder_armor": {
-        "name": "방어구 가르기",
+        "name": "방어구 절단",
         "description": "대상의 방어구를 가르고 적용마다 {damage}만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다."
       },
       "taunt": {
-        "name": "도발",
+        "name": "부추김",
         "description": "대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다."
       },
       "fireball": {
-        "name": "화염구",
+        "name": "잉걸 화살",
         "description": "불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
       },
       "frost_armor": {
-        "name": "냉기 갑옷",
+        "name": "서리 망토",
         "description": "자신을 냉기로 감싸 30분 동안 방어도를 30만큼 증가시킵니다."
       },
       "arcane_intellect": {
-        "name": "비전 지능",
+        "name": "에테르 통찰",
         "description": "30분 동안 지능이 2만큼 증가합니다."
       },
       "frostbolt": {
-        "name": "얼음 화살",
+        "name": "서리 창",
         "description": "냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다."
       },
       "conjure_water": {
@@ -4485,91 +4776,91 @@ export const ko_KR: EnTranslations = {
         "description": "마시면 마나를 회복하는 물병 2개를 창조합니다. 높은 등급은 더 순수한 물을 창조합니다."
       },
       "conjure_food": {
-        "name": "음식 창조",
+        "name": "빵 창조",
         "description": "먹으면 생명력을 회복하는 빵 2개를 창조합니다. 높은 등급은 더 든든한 음식을 창조합니다."
       },
       "fire_blast": {
-        "name": "화염 작열",
+        "name": "잉걸 작렬",
         "description": "적에게 {damage}의 화염 피해를 입힙니다. 즉시 시전됩니다."
       },
       "arcane_missiles": {
-        "name": "비전 화살",
-        "description": "적에게 비전 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다."
+        "name": "에테르 화살",
+        "description": "적에게 에테르 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다."
       },
       "polymorph": {
-        "name": "변이",
-        "description": "적을 최대 15초 동안 양으로 변이시킵니다. 양은 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다."
+        "name": "홀리기",
+        "description": "적을 최대 15초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다."
       },
       "frost_nova": {
-        "name": "얼음 회오리",
+        "name": "얼음 속박",
         "description": "주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다."
       },
       "arcane_explosion": {
-        "name": "비전 폭발",
+        "name": "에테르 폭발",
         "description": "비전 에너지 폭발이 주위 모든 적에게 {damage}의 비전 피해를 입힙니다."
       },
       "scorch": {
-        "name": "불태우기",
+        "name": "그을리기",
         "description": "적을 불태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다."
       },
       "pyroblast": {
-        "name": "화염 폭발",
+        "name": "화염 창",
         "description": "거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
       },
       "ice_barrier": {
-        "name": "얼음 보호막",
+        "name": "서리 장막",
         "description": "얼음으로 자신을 보호해 60초 동안 130의 피해를 흡수합니다."
       },
       "sinister_strike": {
-        "name": "사악한 일격",
+        "name": "사악한 베기",
         "description": "즉시 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다."
       },
       "eviscerate": {
-        "name": "절개",
+        "name": "영면",
         "description": "연계 점수당 피해를 입히는 결정타입니다."
       },
       "backstab": {
-        "name": "기습",
+        "name": "비겁한 찌르기",
         "description": "대상을 등 뒤에서 찔러 무기 피해의 150%에 {damage}를 더한 피해를 입힙니다. 대상 뒤에 있어야 합니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다."
       },
       "gouge": {
-        "name": "후려치기",
+        "name": "눈 찌르기",
         "description": "대상을 가격해 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. 연계 점수 1점을 얻습니다."
       },
       "evasion": {
-        "name": "회피",
+        "name": "유령 걸음",
         "description": "15초 동안 회피 확률이 50%만큼 증가합니다."
       },
       "slice_and_dice": {
-        "name": "난도질",
+        "name": "살수의 박자",
         "description": "근접 공격 속도를 30%만큼 증가시키는 결정타입니다. 연계 점수당 지속시간이 길어집니다."
       },
       "sprint": {
-        "name": "전력 질주",
+        "name": "날쌘 발",
         "description": "15초 동안 이동 속도가 70%만큼 증가합니다."
       },
       "kidney_shot": {
-        "name": "급소 가격",
+        "name": "반칙 가격",
         "description": "대상을 기절시키는 결정타입니다. 연계 점수당 1초 더 지속됩니다."
       },
       "ambush": {
-        "name": "매복",
+        "name": "잠복자의 일격",
         "description": "은신 상태에서 대상 뒤를 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다."
       },
       "stealth": {
-        "name": "은신",
-        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 은신이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
+        "name": "황혼장막",
+        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다."
       },
       "adrenaline_rush": {
-        "name": "아드레날린 촉진",
+        "name": "들끓는 피",
         "description": "피가 끓어올라 즉시 기력 60을 회복합니다."
       },
       "garrote": {
-        "name": "목조르기",
+        "name": "철사 목조르기",
         "description": "적의 목을 졸라 즉시 피해를 입히고 18초에 걸쳐 {damage}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다."
       },
       "cheap_shot": {
-        "name": "비열한 습격",
+        "name": "명치 가격",
         "description": "대상을 가격해 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다."
       },
       "sap": {
@@ -4577,135 +4868,135 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 8초 동안 무력화합니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다."
       },
       "crippling_poison": {
-        "name": "무력화 독",
-        "description": "대상을 무력화 독으로 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
+        "name": "둔중한 독",
+        "description": "대상을 둔중한 독으로 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "expose_armor": {
-        "name": "방어구 노출",
+        "name": "방어구 돌파",
         "description": "대상의 약점을 드러내 방어도를 감소시키는 결정타입니다. 연계 점수를 많이 소모할수록 더 깊게 베어 들어갑니다."
       },
       "rupture": {
-        "name": "파열",
+        "name": "과다출혈",
         "description": "대상에게 상처를 입혀 16초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다."
       },
       "vanish": {
-        "name": "소멸",
-        "description": "시야에서 사라져 전투 중에도 은신 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다."
+        "name": "연막 걸음",
+        "description": "시야에서 사라져 전투 중에도 황혼장막 상태가 됩니다. 숨어 있는 동안 이동 속도가 50% 감소합니다. 최대 10초 동안 지속됩니다."
       },
       "instant_poison": {
-        "name": "속효성 독",
+        "name": "독사의 이빨",
         "description": "30분 동안 무기에 독을 발라 근접 공격마다 8의 추가 자연 피해를 입힙니다."
       },
       "deadly_poison": {
-        "name": "맹독",
+        "name": "곪는 독",
         "description": "30분 동안 무기에 독을 발라 근접 공격마다 14의 추가 자연 피해를 입힙니다."
       },
       "blind": {
-        "name": "실명",
+        "name": "흙 뿌리기",
         "description": "대상의 눈을 멀게 해 8초 동안 방향을 잃고 헤매게 만듭니다. 피해를 받으면 효과가 해제됩니다."
       },
       "seal_of_righteousness": {
-        "name": "정의의 문장",
-        "description": "30초 동안 신성한 힘으로 가득 차 근접 공격마다 4의 추가 신성 피해를 입힙니다. 심판으로 해방할 수 있습니다."
+        "name": "맹세의 낙인",
+        "description": "30초 동안 신성한 힘으로 가득 차 근접 공격마다 4의 추가 신성 피해를 입힙니다. 선고로 해방할 수 있습니다."
       },
       "holy_light": {
-        "name": "성스러운 빛",
+        "name": "치유의 빛",
         "description": "아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "devotion_aura": {
-        "name": "기원의 오라",
+        "name": "굳건함의 오라",
         "description": "30분 동안 방어도가 40만큼 증가합니다."
       },
       "judgement": {
-        "name": "심판",
-        "description": "활성화된 문장을 적에게 해방하여 소모하고 심판 피해를 입힙니다."
+        "name": "선고",
+        "description": "활성화된 문장을 적에게 해방하고 소모하여 축적된 신성 피해를 입힙니다."
       },
       "blessing_of_might": {
-        "name": "힘의 축복",
+        "name": "강철의 맹세",
         "description": "아군 대상에게 축복을 내려 5분 동안 전투력을 15만큼 증가시킵니다."
       },
       "divine_protection": {
-        "name": "신의 가호",
-        "description": "신성한 보호막이 10초 동안 50의 피해를 흡수합니다."
+        "name": "신념의 결계",
+        "description": "보호의 결계가 10초 동안 50의 피해를 흡수합니다."
       },
       "hammer_of_justice": {
-        "name": "심판의 망치",
+        "name": "분쇄의 망치",
         "description": "대상을 3초 동안 기절시킵니다."
       },
       "lay_on_hands": {
-        "name": "신의 축복",
+        "name": "마지막 의식",
         "description": "막대한 치유의 힘으로 생명력 250을 회복시킵니다. 재사용 대기시간 10분."
       },
       "flash_of_light": {
-        "name": "빛의 섬광",
-        "description": "빠르고 효율적인 빛으로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
+        "name": "빛의 치유",
+        "description": "빠르고 효율적인 빛줄기로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "exorcism": {
-        "name": "퇴마술",
+        "name": "추방 의식",
         "description": "신성한 분노로 악을 몰아내 {damage}의 신성 피해를 입힙니다."
       },
       "consecration": {
-        "name": "신성화",
+        "name": "신성한 땅",
         "description": "발밑의 땅을 신성화하여 주위 적에게 {damage}의 신성 피해를 입힙니다."
       },
       "righteous_fury": {
-        "name": "정의의 격노",
+        "name": "불타는 맹세",
         "description": "30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다."
       },
       "retribution_aura": {
-        "name": "응징의 오라",
+        "name": "응보의 오라",
         "description": "30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다."
       },
       "tame_beast": {
-        "name": "야수 길들이기",
+        "name": "야생의 결속",
         "description": "야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다."
       },
       "dismiss_pet": {
-        "name": "소환수 해제",
+        "name": "동료 해제",
         "description": "소환수를 야생으로 돌려보냅니다."
       },
       "raptor_strike": {
-        "name": "랩터의 일격",
+        "name": "내장 가르기",
         "description": "강력한 근접 공격으로 피해가 5만큼 증가합니다. 다음 무기 공격 시 발동됩니다."
       },
       "aspect_of_the_hawk": {
-        "name": "매의 상",
-        "description": "매의 상을 취해 30분 동안 전투력이 20만큼 증가합니다."
+        "name": "새매의 상",
+        "description": "새매의 상을 취해 30분 동안 전투력이 20만큼 증가합니다."
       },
       "serpent_sting": {
-        "name": "독사 쐐기",
+        "name": "독 미늘",
         "description": "대상을 쏘아 15초에 걸쳐 {damage}의 자연 피해를 입힙니다."
       },
       "arcane_shot": {
-        "name": "비전 사격",
+        "name": "사악한 사격",
         "description": "즉시 사격하여 {damage}의 비전 피해를 입힙니다."
       },
       "concussive_shot": {
-        "name": "충격포",
+        "name": "뒤흔드는 사격",
         "description": "대상을 멍하게 만들어 4초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "mongoose_bite": {
-        "name": "살쾡이의 이빨",
+        "name": "반격의 송곳니",
         "description": "대상이 회피한 후 반격하여 무기 피해에 12를 더한 피해를 입힙니다. 회피할 수 없습니다."
       },
       "wing_clip": {
-        "name": "날개 절단",
+        "name": "족쇄 베기",
         "description": "상처를 내어 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다."
       },
       "aspect_of_the_monkey": {
-        "name": "원숭이의 상",
-        "description": "원숭이의 상을 취해 30분 동안 회피 확률이 8%만큼 증가합니다."
+        "name": "담비의 상",
+        "description": "담비의 상을 취해 30분 동안 회피 확률이 8%만큼 증가합니다."
       },
       "aspect_of_the_cheetah": {
-        "name": "치타의 상",
-        "description": "치타의 상을 취해 30분 동안 이동 속도가 30%만큼 증가합니다."
+        "name": "준마의 상",
+        "description": "준마의 상을 취해 30분 동안 이동 속도가 30%만큼 증가합니다."
       },
       "aimed_shot": {
-        "name": "조준 사격",
-        "description": "정밀하게 조준한 사격으로 {damage}의 피해를 입힙니다."
+        "name": "긴 시위",
+        "description": "신중하게 시위를 당긴 사격으로 {damage}의 피해를 입힙니다."
       },
       "rapid_fire": {
-        "name": "속사",
+        "name": "열광의 연사",
         "description": "15초 동안 공격 속도가 40%만큼 증가합니다."
       },
       "smite": {
@@ -4713,47 +5004,47 @@ export const ko_KR: EnTranslations = {
         "description": "적에게 {damage}의 신성 피해를 입힙니다."
       },
       "lesser_heal": {
-        "name": "하급 치유",
+        "name": "속삭이는 기도",
         "description": "아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "power_word_fortitude": {
-        "name": "신의 권능: 인내",
+        "name": "결의의 연도",
         "description": "30분 동안 대상의 체력이 3만큼 증가합니다."
       },
       "shadow_word_pain": {
-        "name": "어둠의 권능: 고통",
+        "name": "부패의 만가",
         "description": "어둠의 말로 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다."
       },
       "power_word_shield": {
-        "name": "신의 권능: 보호막",
+        "name": "수호의 성가",
         "description": "대상을 보호하여 30초 동안 48의 피해를 흡수합니다."
       },
       "renew": {
-        "name": "소생",
+        "name": "지속되는 은총",
         "description": "15초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "mind_blast": {
-        "name": "정신의 일격",
+        "name": "정신 파열",
         "description": "대상의 정신을 강타해 {damage}의 암흑 피해를 입힙니다."
       },
       "heal": {
-        "name": "치유",
+        "name": "엄숙한 기도",
         "description": "느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "mind_flay": {
-        "name": "정신의 채찍",
+        "name": "비탄의 연도",
         "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다."
       },
       "flash_heal": {
-        "name": "순간 치유",
+        "name": "다급한 기도",
         "description": "빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "lightning_bolt": {
-        "name": "번개 화살",
+        "name": "전격 화살",
         "description": "번개 화살을 던져 {damage}의 자연 피해를 입힙니다."
       },
       "rockbiter_weapon": {
-        "name": "대지의 무기",
+        "name": "바위결속 무기",
         "description": "바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 5의 추가 피해를 입힙니다."
       },
       "healing_wave": {
@@ -4761,116 +5052,116 @@ export const ko_KR: EnTranslations = {
         "description": "아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "earth_shock": {
-        "name": "대지 충격",
+        "name": "대지의 충격",
         "description": "대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다."
       },
       "lightning_shield": {
-        "name": "번개 보호막",
+        "name": "천둥 결계",
         "description": "자신을 번개로 감싸 근접 공격자가 13의 자연 피해를 받게 합니다."
       },
       "flame_shock": {
-        "name": "화염 충격",
+        "name": "잉걸 충격",
         "description": "대상을 불태워 25의 피해를 입히고 12초에 걸쳐 추가로 {damage}의 피해를 입힙니다."
       },
       "flametongue_weapon": {
-        "name": "화염의 무기",
+        "name": "화염낙인 무기",
         "description": "원소의 불꽃으로 무기를 강화합니다. 5분 동안 매 공격마다 8의 추가 화염 피해를 입힙니다."
       },
       "frost_shock": {
-        "name": "냉기 충격",
+        "name": "서리 충격",
         "description": "대상을 즉시 냉기로 강타해 {damage}의 냉기 피해를 입히고 8초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "frostbrand_weapon": {
-        "name": "냉기의 무기",
+        "name": "서리결속 무기",
         "description": "살을 에는 냉기로 무기를 강화합니다. 5분 동안 매 공격마다 8의 추가 피해를 입힙니다."
       },
       "ghost_wolf": {
-        "name": "늑대 정령",
-        "description": "늑대 정령으로 변신하여 10분 동안 이동 속도가 40%만큼 증가합니다."
+        "name": "그림자늑대",
+        "description": "그림자늑대로 변신하여 10분 동안 이동 속도가 40%만큼 증가합니다."
       },
       "stormstrike": {
-        "name": "폭풍의 일격",
+        "name": "선조의 일격",
         "description": "무기에 폭풍의 힘을 흘려 넣어 즉시 무기 피해에 {damage}를 더한 피해를 입힙니다."
       },
       "shadow_bolt": {
-        "name": "어둠의 화살",
+        "name": "어스름 화살",
         "description": "적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다."
       },
       "demon_skin": {
-        "name": "악마의 피부",
+        "name": "마귀 가죽",
         "description": "악마의 피부가 30분 동안 방어도를 30만큼 증가시킵니다."
       },
       "immolate": {
-        "name": "제물",
+        "name": "불타는 계약",
         "description": "적을 불태워 11의 화염 피해를 입히고 15초에 걸쳐 추가로 {damage}의 피해를 입힙니다."
       },
       "corruption": {
-        "name": "부패",
+        "name": "검은 부패",
         "description": "대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다."
       },
       "life_tap": {
-        "name": "생명력 전환",
+        "name": "가혹한 거래",
         "description": "생명력 30을 마나 30으로 전환합니다."
       },
       "curse_of_agony": {
-        "name": "고통의 저주",
+        "name": "고뇌의 저주",
         "description": "대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다."
       },
       "drain_life": {
-        "name": "생명력 흡수",
+        "name": "집어삼키기",
         "description": "대상의 생명력을 흡수해 5초 동안 매초 {damage}의 생명력을 자신에게 이전합니다."
       },
       "fear": {
-        "name": "공포",
+        "name": "번민",
         "description": "적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다."
       },
       "searing_pain": {
-        "name": "불타는 고통",
+        "name": "지지기",
         "description": "고통스러운 불길로 적을 태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다."
       },
       "shadowburn": {
-        "name": "어둠의 연소",
-        "description": "즉시 대상에게 암흑불길을 폭발시켜 {damage}의 암흑 피해를 입힙니다."
+        "name": "황혼불꽃",
+        "description": "즉시 대상에게 타오르는 어둠을 폭발시켜 {damage}의 암흑 피해를 입힙니다."
       },
       "wrath": {
-        "name": "천벌",
+        "name": "야생 벼락",
         "description": "자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다."
       },
       "healing_touch": {
-        "name": "치유의 손길",
+        "name": "야생 치유",
         "description": "아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "mark_of_the_wild": {
-        "name": "야생의 징표",
-        "description": "아군 대상에게 야생의 징표를 걸어 30분 동안 방어도를 25만큼 증가시킵니다."
+        "name": "야생의 수호",
+        "description": "아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 25만큼 증가시킵니다."
       },
       "moonfire": {
-        "name": "달빛 섬광",
+        "name": "달빛 폭풍",
         "description": "달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다."
       },
       "rejuvenation": {
-        "name": "회복",
+        "name": "야생 개화",
         "description": "12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "thorns": {
-        "name": "가시",
+        "name": "가시 수호",
         "description": "대상에게 가시가 돋아 근접 공격자가 3의 자연 피해를 받습니다."
       },
       "entangling_roots": {
-        "name": "휘감는 뿌리",
+        "name": "옥죄는 뿌리",
         "description": "대상을 최대 12초 동안 제자리에 묶습니다."
       },
       "bear_form": {
-        "name": "곰 변신",
+        "name": "큰곰 변신",
         "description": "곰으로 변신합니다. 방어도 +65%, 전투력 +15, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
-        "name": "후려치기",
-        "description": "근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 곰 변신 전용."
+        "name": "뼈 분쇄",
+        "description": "근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용."
       },
       "growl": {
-        "name": "포효",
-        "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 곰 변신 전용."
+        "name": "위협",
+        "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
       },
       "cat_form": {
         "name": "늑대 변신",
@@ -4881,43 +5172,43 @@ export const ko_KR: EnTranslations = {
         "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용."
       },
       "ferocious_bite": {
-        "name": "흉포한 이빨",
+        "name": "유혈 물어뜯기",
         "description": "연계 점수당 피해를 입히는 결정타입니다. 늑대 변신 전용."
       },
       "swipe": {
-        "name": "휘둘러치기",
-        "description": "주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 곰 변신 전용."
+        "name": "휩쓰는 발톱",
+        "description": "주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용."
       },
       "regrowth": {
-        "name": "재생",
+        "name": "두 번째 개화",
         "description": "아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다."
       },
       "barkskin": {
-        "name": "나무 껍질",
+        "name": "참나무 가죽",
         "description": "피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다."
       },
       "starfire": {
-        "name": "별빛 화살",
+        "name": "창공 낙하",
         "description": "별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다."
       },
       "travel_form": {
-        "name": "여행 형태",
-        "description": "날렵한 여행 형태로 변신하여 이동 속도를 40% 증가시킵니다. 전투 중에는 사용할 수 없습니다."
+        "name": "쾌속 형태",
+        "description": "즉시 날렵한 쾌속 형태로 변신하여 이동 속도가 40% 증가합니다. 변신 중에는 다른 능력을 사용할 수 없지만 전투 중에도 자유롭게 변신할 수 있어 도주에 이상적입니다."
       },
       "enrage": {
-        "name": "격노",
-        "description": "즉시 분노 20을 생성합니다. 곰 변신 전용."
+        "name": "불지피기",
+        "description": "즉시 분노 20을 생성합니다. 큰곰 변신 전용."
       },
       "bash": {
-        "name": "곤봉 세례",
-        "description": "대상을 2초 동안 기절시킵니다. 곰 변신 전용."
+        "name": "뇌진탕",
+        "description": "대상을 2초 동안 기절시킵니다. 큰곰 변신 전용."
       },
       "faerie_fire": {
-        "name": "요정의 불꽃",
+        "name": "마녀불빛",
         "description": "대상의 방어도를 40초 동안 35만큼 감소시킵니다."
       },
       "hibernate": {
-        "name": "동면",
+        "name": "깊은 잠",
         "description": "대상을 최대 8초 동안 깊은 잠에 빠뜨립니다. 피해를 입으면 깨어납니다."
       },
       "dash": {
@@ -4925,15 +5216,15 @@ export const ko_KR: EnTranslations = {
         "description": "앞으로 돌진하여 이동 속도를 15초 동안 50% 증가시킵니다. 늑대 변신 전용."
       },
       "pounce": {
-        "name": "덮치기",
+        "name": "살금 기습",
         "description": "은신 상태에서 사용하는 시작 공격으로 대상을 2초 동안 기절시킵니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용."
       },
       "insect_swarm": {
-        "name": "곤충 떼",
+        "name": "쏘는 벌레 떼",
         "description": "적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다."
       },
       "tigers_fury": {
-        "name": "호랑이의 분노",
+        "name": "늑대의 피",
         "description": "전투력을 6초 동안 40만큼 증가시킵니다. 늑대 변신 전용."
       },
       "rip": {
@@ -4941,24 +5232,24 @@ export const ko_KR: EnTranslations = {
         "description": "12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용."
       },
       "mortal_strike": {
-        "name": "죽음의 일격",
+        "name": "불구의 일격",
         "description": "잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)"
       },
       "bloodthirst": {
-        "name": "피의 갈증",
+        "name": "사혈",
         "description": "피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)"
       },
       "shield_slam": {
-        "name": "방패 밀쳐내기",
+        "name": "방패 강타",
         "description": "방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)"
       },
       "whirlwind": {
-        "name": "소용돌이",
+        "name": "칼날 회오리",
         "description": "치명적인 호를 그리며 돌아 주변 모든 적에게 {damage}의 피해를 줍니다. (분노 특성)"
       },
       "berserker_rage": {
-        "name": "광전사의 격노",
-        "description": "광전사의 격노에 들어가 분노 20을 생성합니다. (전사 특성)"
+        "name": "들끓는 격노",
+        "description": "들끓는 격노에 들어가 분노 20을 생성합니다. (전사 특성)"
       },
       "holy_shock": {
         "name": "신성 충격",
@@ -5105,47 +5396,47 @@ export const ko_KR: EnTranslations = {
         "description": "재집결의 함성을 질러 자신과 40미터 내 파티원의 최대 생명력을 10초 동안 20% 증가시킵니다."
       },
       "summon_imp": {
-        "name": "임프 소환",
-        "description": "흑마법사의 명령을 따르는 임프를 소환합니다. 임프는 멀리서 적에게 화염 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "불씨족 소환",
+        "description": "흑마법사의 명령을 따르는 불씨족을 소환합니다. 불씨족은 멀리서 적에게 잿불 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "summon_voidwalker": {
-        "name": "공허추적자 소환",
-        "description": "흑마법사의 명령을 따르는 공허추적자를 소환합니다. 공허추적자는 적을 도발하고 피해를 견뎌내는 튼튼한 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "어스름망령 소환",
+        "description": "흑마법사의 명령을 따르는 어스름망령을 소환합니다. 어스름망령은 적을 도발하고 피해를 견뎌내는 튼튼한 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "summon_succubus": {
-        "name": "서큐버스 소환",
-        "description": "흑마법사의 명령을 따르는 서큐버스를 소환합니다. 서큐버스는 연약한 악마이지만 빠르게 공격하며 근접전에서 강력한 피해를 입힙니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "황혼태생 소환",
+        "description": "흑마법사의 명령을 따르는 황혼태생을 소환합니다. 황혼태생은 연약한 악마이지만 빠르게 공격하며 근접전에서 강력한 피해를 입힙니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "summon_felhunter": {
-        "name": "지옥사냥개 소환",
-        "description": "흑마법사의 명령을 따르는 지옥사냥개를 소환합니다. 지옥사냥개는 어둠의 이빨로 멀리서 적을 괴롭히며 시전자를 사냥하는 데 능합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "주문사냥개 소환",
+        "description": "흑마법사의 명령을 따르는 주문사냥개를 소환합니다. 주문사냥개는 어스름이빨로 멀리서 적을 괴롭히며 시전자를 사냥하는 데 능합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "summon_felguard": {
-        "name": "지옥수호병 소환",
-        "description": "흑마법사의 명령을 따르는 지옥수호병을 소환합니다. 지옥수호병은 전장에 뛰어들어 굳건히 버티는 튼튼한 근접 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "전쟁마귀 소환",
+        "description": "흑마법사의 명령을 따르는 전쟁마귀를 소환합니다. 전쟁마귀는 전장에 뛰어들어 굳건히 버티는 튼튼한 근접 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "summon_infernal": {
-        "name": "지옥불정령 소환",
-        "description": "지옥불정령을 당신의 의지에 결속합니다. 지옥불정령은 모든 악마 중 가장 높은 생명력과 방어도를 지닌 거대한 파괴자로, 강력한 근접 공격을 가합니다. 긴 재사용 대기시간이 그 막강한 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "화염거상 소환",
+        "description": "화염거상을 당신의 의지에 결속합니다. 화염거상은 모든 악마 중 가장 높은 생명력과 방어도를 지닌 거대한 파괴자로, 강력한 근접 공격을 가합니다. 긴 재사용 대기시간이 그 막강한 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "summon_doomguard": {
-        "name": "파멸의 수호병 소환",
-        "description": "파멸의 수호병을 당신의 의지에 결속합니다. 파멸의 수호병은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
+        "name": "망령태생 소환",
+        "description": "망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다."
       },
       "bear_charge": {
-        "name": "곰 돌진",
-        "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 곰 변신 상태에서만 사용 가능."
+        "name": "큰곰 돌진",
+        "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd. 큰곰 변신 상태에서만 사용 가능."
       },
       "demoralizing_roar": {
-        "name": "사기 저하의 포효",
-        "description": "주변의 적들을 위축시켜 20초 동안 그들의 전투력을 20만큼 감소시킵니다. 곰 변신 상태에서만 사용 가능."
+        "name": "비겁한 포효",
+        "description": "주변의 적들을 위축시켜 20초 동안 그들의 전투력을 20만큼 감소시킵니다. 큰곰 변신 상태에서만 사용 가능."
       },
       "prowl": {
-        "name": "은신 보행",
+        "name": "몰래 접근",
         "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
-        "name": "할퀴기",
+        "name": "저미기",
         "description": "은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능."
       },
       "revive_pet": {
@@ -5155,10 +5446,10 @@ export const ko_KR: EnTranslations = {
     },
     "items": {
       "worn_sword": {
-        "name": "낡은 쇼트소드"
+        "name": "흠집 난 쇼트소드"
       },
       "gnarled_staff": {
-        "name": "옹이진 지팡이"
+        "name": "늪참나무 지팡이"
       },
       "rusty_dagger": {
         "name": "녹슨 단검"
@@ -5170,13 +5461,13 @@ export const ko_KR: EnTranslations = {
         "name": "녹슨 손도끼"
       },
       "recruit_tunic": {
-        "name": "신병 튜닉"
+        "name": "징집병 튜닉"
       },
       "apprentice_robe": {
-        "name": "견습생 로브"
+        "name": "해진 로브"
       },
       "footpad_jerkin": {
-        "name": "노상강도의 웃옷"
+        "name": "소매치기의 웃옷"
       },
       "redbrook_blade": {
         "name": "레드브룩 민병대 검"
@@ -5206,22 +5497,22 @@ export const ko_KR: EnTranslations = {
         "name": "그레이죠의 털가죽 다리보호구"
       },
       "baked_bread": {
-        "name": "갓 구운 빵"
+        "name": "시골 빵"
       },
       "spring_water": {
-        "name": "상쾌한 샘물"
+        "name": "차가운 우물물"
       },
       "roasted_boar": {
-        "name": "구운 멧돼지 고기"
+        "name": "꼬치에 꿴 멧돼지 뒷다리"
       },
       "conjured_water": {
-        "name": "창조된 샘물"
+        "name": "창조된 빗물"
       },
       "conjured_water2": {
-        "name": "창조된 광천수"
+        "name": "창조된 우물물"
       },
       "conjured_water3": {
-        "name": "창조된 탄산수"
+        "name": "창조된 맑은 물"
       },
       "eastbrook_arming_sword": {
         "name": "이스트브룩 무장검"
@@ -5281,7 +5572,7 @@ export const ko_KR: EnTranslations = {
         "name": "유령 정수"
       },
       "webwood_silk": {
-        "name": "그물나무 비단샘"
+        "name": "흑거미줄 비단샘"
       },
       "supply_crate": {
         "name": "도난당한 보급 상자"
@@ -5302,13 +5593,13 @@ export const ko_KR: EnTranslations = {
         "name": "붉은 두건"
       },
       "tough_jerky": {
-        "name": "질긴 육포"
+        "name": "소금에 절인 육포"
       },
       "mudfin_scale": {
-        "name": "끈적한 멀록 비늘"
+        "name": "끈적한 진흙지느러미 비늘"
       },
       "tallow_candle": {
-        "name": "수지 양초"
+        "name": "기름진 수지 덩어리"
       },
       "spider_leg": {
         "name": "꿈틀대는 거미 다리"
@@ -5374,7 +5665,7 @@ export const ko_KR: EnTranslations = {
         "name": "늪지걸음 장화"
       },
       "mistcallers_edge": {
-        "name": "안개부름 칼날"
+        "name": "안개엮는자의 칼날"
       },
       "vaels_mist_staff": {
         "name": "바엘의 안개지팡이"
@@ -5518,7 +5809,7 @@ export const ko_KR: EnTranslations = {
         "name": "벨카르의 지팡이"
       },
       "shadowmeld_tunic": {
-        "name": "그림자녹임 튜닉"
+        "name": "밤장막 튜닉"
       },
       "gravewyrm_scale_hauberk": {
         "name": "무덤고룡 비늘갑옷"
@@ -5587,13 +5878,13 @@ export const ko_KR: EnTranslations = {
         "name": "갈라진 고룡 비늘"
       },
       "conjured_bread": {
-        "name": "마력의 빵"
+        "name": "마력의 귀리빵"
       },
       "conjured_bread2": {
-        "name": "마력의 호밀빵"
+        "name": "마력의 검은 빵"
       },
       "conjured_bread3": {
-        "name": "마력의 단빵"
+        "name": "마력의 꿀과자"
       },
       "roadwardens_helm": {
         "name": "도로 수호자의 투구"
@@ -5698,7 +5989,7 @@ export const ko_KR: EnTranslations = {
         "name": "무덤결 가방"
       },
       "mistcallers_duffel": {
-        "name": "안개소환사의 더플백"
+        "name": "안개엮는자의 더플백"
       },
       "copper_mining_pick": {
         "name": "구리 채광 곡괭이"
@@ -5727,8 +6018,26 @@ export const ko_KR: EnTranslations = {
       "silverleaf_sickle": {
         "name": "은엽 낫"
       },
+      "thorium_mining_pick": {
+        "name": "토륨 채광 곡괭이"
+      },
+      "arcanite_mining_pick": {
+        "name": "비전 채광 곡괭이"
+      },
+      "ashwood_axe": {
+        "name": "물푸레나무 도끼"
+      },
+      "elderwood_axe": {
+        "name": "고목 도끼"
+      },
+      "goldleaf_sickle": {
+        "name": "금엽 낫"
+      },
+      "sunpetal_sickle": {
+        "name": "태양꽃잎 낫"
+      },
       "bristleback_maul": {
-        "name": "뻣센등뼈 철퇴"
+        "name": "갤로글래스 망치"
       },
       "broodmother_silk_robe": {
         "name": "무리어미의 비단 로브"
@@ -5737,16 +6046,16 @@ export const ko_KR: EnTranslations = {
         "name": "묘지뼈 경갑"
       },
       "cryptstalker_jerkin": {
-        "name": "묘지추적자 웃옷"
+        "name": "무덤추적자 웃옷"
       },
       "deathlord_legguards": {
-        "name": "죽음군주 다리보호구"
+        "name": "고분군주 다리보호구"
       },
       "deathlord_sabatons": {
-        "name": "죽음군주 쇠장화"
+        "name": "고분군주 쇠장화"
       },
       "deathlord_warplate": {
-        "name": "죽음군주 전쟁판금"
+        "name": "고분군주 전쟁판금"
       },
       "drogmar_warboots": {
         "name": "드로그마르의 전쟁장화"
@@ -5824,13 +6133,13 @@ export const ko_KR: EnTranslations = {
         "name": "모거의 짓밟이 장화"
       },
       "necromancers_legwraps": {
-        "name": "강령술사의 다리싸개"
+        "name": "비탄직물 다리싸개"
       },
       "necromancers_soulsteps": {
-        "name": "강령술사의 영혼걸음"
+        "name": "비탄직물 영혼걸음"
       },
       "necromancers_starshroud": {
-        "name": "강령술사의 별장막"
+        "name": "비탄직물 별장막"
       },
       "nhalias_dirgeblade": {
         "name": "날리아의 비가검"
@@ -5866,13 +6175,13 @@ export const ko_KR: EnTranslations = {
         "name": "고룡교단 영혼걸음"
       },
       "wyrmshadow_harness": {
-        "name": "고룡그림자 멜빵"
+        "name": "밤송곳니 멜빵"
       },
       "wyrmshadow_legguards": {
-        "name": "고룡그림자 다리보호구"
+        "name": "밤송곳니 다리보호구"
       },
       "wyrmshadow_treads": {
-        "name": "고룡그림자 발보호구"
+        "name": "밤송곳니 발보호구"
       },
       "glimmerfin_koi": {
         "name": "반짝이는 지느러미 코이"
@@ -5890,7 +6199,7 @@ export const ko_KR: EnTranslations = {
         "name": "날 강농어"
       },
       "raw_stonescale_carp": {
-        "name": "날 돌비늘 잉어"
+        "name": "날 석판지느러미 잉어"
       },
       "soggy_boot": {
         "name": "흠뻑 젖은 장화"
@@ -6001,13 +6310,13 @@ export const ko_KR: EnTranslations = {
         "name": "달비늘 세이버"
       },
       "moonshroud_breastplate": {
-        "name": "달수의 흉갑"
+        "name": "달파멸 흉갑"
       },
       "moonshroud_robe": {
-        "name": "달수의 법복"
+        "name": "달파멸 법복"
       },
       "moonshroud_tunic": {
-        "name": "달수의 튜닉"
+        "name": "달파멸 튜닉"
       },
       "pale_pearl": {
         "name": "창백한 진주"
@@ -6043,7 +6352,7 @@ export const ko_KR: EnTranslations = {
         "name": "묘지뼈 견갑"
       },
       "deathlords_dread_visage": {
-        "name": "죽음군주의 공포 얼굴가리개"
+        "name": "고분군주의 공포 얼굴가리개"
       },
       "gravewyrm_gauntlets": {
         "name": "무덤고룡 건틀릿"
@@ -6058,10 +6367,10 @@ export const ko_KR: EnTranslations = {
         "name": "안개장막 손아귀"
       },
       "necromancers_soulspire_mantle": {
-        "name": "강령술사의 영혼첨탑 어깨덮개"
+        "name": "비탄직물 영혼첨탑 어깨덮개"
       },
       "wyrmshadow_talongrips": {
-        "name": "고룡그림자 갈퀴손아귀"
+        "name": "밤송곳니 갈퀴손아귀"
       },
       "reliquary_plate_chest": {
         "name": "성물실 수호 갑옷"
@@ -6089,6 +6398,69 @@ export const ko_KR: EnTranslations = {
       },
       "varric_shadow_cowl": {
         "name": "바릭의 그림자 두건"
+      },
+      "siltguard_helm": {
+        "name": "진흙수호 투구"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "방벽의 녹슨 어깨보호구"
+      },
+      "nhalias_bell_maul": {
+        "name": "나할리아의 종메"
+      },
+      "reedstalker_jerkin": {
+        "name": "갈대추적자 조끼"
+      },
+      "mirejaw_fang_knife": {
+        "name": "진흙턱 송곳니검"
+      },
+      "widow_silk_hood": {
+        "name": "과부실 후드"
+      },
+      "cantors_drowned_sash": {
+        "name": "영창자의 익사한 허리띠"
+      },
+      "corpse_candle_focus": {
+        "name": "시체양초 집중구"
+      },
+      "nhalias_litany_rod": {
+        "name": "나할리아의 연도 지팡이"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "흑수 선봉대 흉갑"
+      },
+      "siltstep_leggings": {
+        "name": "진흙보 각반"
+      },
+      "sunken_reliquary_hood": {
+        "name": "침몰한 유물함 후드"
+      },
+      "litany_legs": {
+        "name": "진흙보행자 각반"
+      },
+      "litany_shoulder": {
+        "name": "흑수 표류 망토"
+      },
+      "litany_gloves_rog": {
+        "name": "갈대묶음 손보호구"
+      },
+      "litany_plate_chest": {
+        "name": "늪지기 흉갑"
+      },
+      "litany_leather_chest": {
+        "name": "깊은진흙 겉옷"
+      },
+      "litany_cloth_chest": {
+        "name": "익사한 성가대 예복"
+      },
+      "litany_helm": {
+        "name": "성물사냥꾼의 익사 두건"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "나할리아 수녀의 성가 단조 판금"
+      },
+      "drowned_choir_fang": {
+        "name": "익사한 성가대의 송곳니"
       },
       "the_codfather": {
         "name": "대구 대부"
@@ -6133,31 +6505,31 @@ export const ko_KR: EnTranslations = {
         "name": "죽지 않는 왕관의 심재"
       },
       "kingsbane_last_oath": {
-        "name": "왕살해자, 손피크의 마지막 맹세"
+        "name": "왕좌살해자, 손피크의 마지막 맹세"
       },
       "crownforged_dreadhelm": {
-        "name": "왕관벼림 공포투구"
+        "name": "뼈벼림 공포투구"
       },
       "crownforged_warspaulders": {
-        "name": "왕관벼림 전쟁 어깨갑옷"
+        "name": "뼈벼림 전쟁 어깨갑옷"
       },
       "nighttalon_crown": {
-        "name": "밤발톱 왕관"
+        "name": "흉포송곳니 왕관"
       },
       "nighttalon_shoulderguards": {
-        "name": "밤발톱 어깨수호대"
+        "name": "흉포송곳니 어깨수호대"
       },
       "soulflame_cowl": {
-        "name": "영혼불꽃 두건"
+        "name": "망령불꽃 두건"
       },
       "soulflame_mantle": {
-        "name": "영혼불꽃 어깨덮개"
+        "name": "망령불꽃 어깨덮개"
       },
       "stormcallers_crown": {
-        "name": "폭풍소환사의 관"
+        "name": "강풍부름 관"
       },
       "stormcallers_spaulders": {
-        "name": "폭풍소환사의 어깨갑옷"
+        "name": "강풍부름 어깨갑옷"
       },
       "unknown_alien_weaponry": {
         "name": "알 수 없는 외계 무기"
@@ -6246,13 +6618,13 @@ export const ko_KR: EnTranslations = {
         "name": "야생 멧돼지"
       },
       "webwood_spider": {
-        "name": "그물나무 잠복자"
+        "name": "흑거미줄 잠복자"
       },
       "mudfin_murloc": {
         "name": "진흙지느러미 잠복자"
       },
       "tunnel_rat": {
-        "name": "굴쥐 채굴꾼"
+        "name": "깊은바위 채굴꾼"
       },
       "vale_bandit": {
         "name": "계곡 도적"
@@ -6354,13 +6726,13 @@ export const ko_KR: EnTranslations = {
         "name": "기사대장 올렌"
       },
       "vael_the_mistcaller": {
-        "name": "안개부름 바엘"
+        "name": "안개엮는자 바엘"
       },
       "sanctum_boneguard": {
         "name": "성소 뼈수호자"
       },
       "sanctum_drakonid": {
-        "name": "성소 드라코니드"
+        "name": "성소 비늘수호병"
       },
       "raised_bonewalker": {
         "name": "되살아난 뼈걸음꾼"
@@ -6425,6 +6797,39 @@ export const ko_KR: EnTranslations = {
       "acolyte_tessa": {
         "name": "수련사제 테사"
       },
+      "drowned_cantor": {
+        "name": "익사한 영창자"
+      },
+      "reedbound_acolyte": {
+        "name": "갈대에 묶인 신도"
+      },
+      "deepfen_spearjaw": {
+        "name": "깊은늪 창턱"
+      },
+      "mirefen_widowling": {
+        "name": "진창늪 과부거미"
+      },
+      "spider_egg_sac": {
+        "name": "거미 알집"
+      },
+      "grave_silt_bulwark": {
+        "name": "무덤진흙 방벽"
+      },
+      "sump_troll_devourer": {
+        "name": "오물트롤 포식자"
+      },
+      "choir_thrall": {
+        "name": "성가대 노예"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "나할리아 수녀, 익사한 성가"
+      },
+      "edda_reedhand": {
+        "name": "에다 리드핸드"
+      },
+      "tolling_bell": {
+        "name": "울리는 종"
+      },
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
       },
@@ -6462,13 +6867,13 @@ export const ko_KR: EnTranslations = {
         "name": "바르카스 뼈수호병"
       },
       "emberkin": {
-        "name": "임프"
+        "name": "불씨족"
       },
       "gloomshade": {
-        "name": "공허추적자"
+        "name": "어스름망령"
       },
       "duskborn": {
-        "name": "서큐버스"
+        "name": "황혼태생"
       },
       "grix_the_tunnelking": {
         "name": "땅굴왕 그릭스"
@@ -6492,16 +6897,16 @@ export const ko_KR: EnTranslations = {
         "name": "영혼결속자 말드렉"
       },
       "spellhound": {
-        "name": "지옥사냥개"
+        "name": "주문사냥개"
       },
       "warfiend": {
-        "name": "지옥수호병"
+        "name": "전쟁마귀"
       },
       "pyre_colossus": {
-        "name": "지옥불정령"
+        "name": "화염거상"
       },
       "wraithborn": {
-        "name": "파멸의 수호병"
+        "name": "망령태생"
       },
       "choirmother_selthe": {
         "name": "성가대모 셀세"
@@ -6574,12 +6979,12 @@ export const ko_KR: EnTranslations = {
       "fisherman_brandt": {
         "name": "어부 브란트",
         "title": "늙은 뱃사람",
-        "greeting": "그르멀그르... 죄송합니다. 저 물고기 인간들 말을 너무 오래 들었습니다."
+        "greeting": "블르브글럽... 죄송합니다. 저 물고기 인간들 말을 너무 오래 들었습니다."
       },
       "foreman_odell": {
         "name": "감독관 오델",
         "title": "광산 감독관",
-        "greeting": "갱도 전체가 머리에 촛불을 단 해충들로 들끓고 있습니다!"
+        "greeting": "갱도 전체가 저 흙범벅이 된 해충들로 들끓고 있습니다!"
       },
       "warden_fenwick": {
         "name": "감시관 펜윅",
@@ -6651,6 +7056,11 @@ export const ko_KR: EnTranslations = {
         "title": "성물실 관리인",
         "greeting": "아래의 성물실이 또 움직였소."
       },
+      "brother_halven_marsh": {
+        "name": "브라더 할벤",
+        "title": "성물실 관리인",
+        "greeting": "오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소."
+      },
       "spirit_healer": {
         "name": "영혼 치유사",
         "title": "죽은 자의 수호자",
@@ -6684,7 +7094,7 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_boars": {
-        "title": "성난등 가죽",
+        "title": "뻣뻣한 멧돼지 가죽",
         "text": "멧돼지 가죽은 여행용 꾸러미에 좋고, 들판에는 멧돼지가 가득합니다. 억센 멧돼지 가죽 5장을 가져오십시오.",
         "completion": "좋은 억센 가죽입니다. 값이 꽤 나가겠군요.",
         "objectives": {
@@ -6694,21 +7104,21 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_spiders": {
-        "title": "그물나무의 위협",
-        "text": "그물나무 잠복자의 비단은 찜질약에 필요하지만, 숫자가 너무 늘었습니다. 6마리를 죽이고 비단샘 4개를 잘라 오십시오.",
+        "title": "흑거미줄의 위협",
+        "text": "동쪽 숲의 잠복자들은 제 찜질약에 필요한 비단을 자아냅니다. 게다가 그 수가 너무 많이 불어났습니다. 흑거미줄 잠복자 6마리를 솎아내고 그 배에서 비단샘 4개를 잘라 오십시오.",
         "completion": "윽, 아직 꿈틀거립니다. 완벽합니다. 보상을 받으십시오.",
         "objectives": {
           "0": {
-            "label": "그물나무 잠복자 처치"
+            "label": "흑거미줄 잠복자 처치"
           },
           "1": {
-            "label": "그물나무 비단샘"
+            "label": "흑거미줄 비단샘"
           }
         }
       },
       "q_murlocs": {
         "title": "호숫가의 골칫거리",
-        "text": "나는 거울호수에서 이십 년을 낚시했습니다. 저 물고기 인간들이 얕은 물에서 기어 나오기 전까지는요. 진흙지느러미 8마리를 몰아내십시오.",
+        "text": "저는 스무 해 동안 거울호수에서 낚시를 했고, 저 꾸르륵대는 물고기 인간들이 얕은 물에서 기어 나오기 전까지는 그물 하나 잃은 적이 없습니다. 진흙지느러미를 몰아내십시오. 여덟 마리를 처치하십시오. 그리고 조심하십시오. 진흙지느러미 한 마리가 있는 곳에는 다섯 마리가 있습니다.",
         "completion": "하! 이제 제 진흙구덩이를 지키는 법을 배우겠지요.",
         "objectives": {
           "0": {
@@ -6718,11 +7128,11 @@ export const ko_KR: EnTranslations = {
       },
       "q_mine": {
         "title": "광산의 쥐들",
-        "text": "좋은 구리 광맥을 찾자마자 코볼트들이 언덕에서 쏟아졌습니다. 굴쥐 채굴꾼 10마리를 처치해 광부들을 돌려보내십시오.",
+        "text": "좋은 구리 광맥을 찾자마자 그 땅 파는 해충들이 언덕 비탈에서 쏟아져 나왔습니다. 갱도가 정리되기 전까지는 제 인부들이 발도 들이지 않을 겁니다. 깊은바위 채굴꾼 10마리를 처치하십시오.",
         "completion": "하! 다시 일하러 가라, 친구들! 감사와 보수를 받으십시오.",
         "objectives": {
           "0": {
-            "label": "굴쥐 채굴꾼 처치"
+            "label": "깊은바위 채굴꾼 처치"
           }
         }
       },
@@ -6778,7 +7188,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_rite": {
         "title": "속박 의식",
-        "text": "묘실을 열어야 하지만, 산 자가 지나가려면 속박 의식이 필요합니다. 축복받은 수지 4개와 유령 정수 6개를 가져오십시오.",
+        "text": "무덤부름을 막으려면 예배당 아래 묘실의 봉인을 풀어야 합니다. 하지만 오직 속박 의식만이 산 자를 지나가게 해줍니다. 축복받은 수지 4덩어리가 필요합니다. 광산의 굴착꾼들이 수지를 궤짝째 쌓아둡니다. 그리고 안식하지 못한 죽은 자들에게서 유령 정수 6개를 가져오십시오.",
         "completion": "끝났습니다. 아래로 가는 길이 열렸습니다... 가장 강한 동료들을 모으십시오, {playerName}.",
         "objectives": {
           "0": {
@@ -6812,7 +7222,7 @@ export const ko_KR: EnTranslations = {
       "q_gravecallers_trail": {
         "title": "무덤부름의 흔적",
         "text": "모르덴은 죽었지만, 한 세기 숨어 있던 교단이 한 예배당 때문에 움직였을 리 없습니다. {playerName}이여, 폐허에서 그의 마법서를 찾으십시오.",
-        "completion": "모르덴은 북쪽 습지의 안개부름에게 편지를 보냈습니다. {playerName}이여, 교단은 죽지 않았고, 기다렸을 뿐입니다.",
+        "completion": "모르덴은 북쪽 습지의 '안개엮는자'에게 편지를 보냈습니다. 교단은 죽지 않았습니다, {playerName}이여. 그저 참을성 있게 기다렸을 뿐입니다.",
         "objectives": {
           "0": {
             "label": "모르덴의 마법서"
@@ -6841,7 +7251,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_fenbridge_muster": {
         "title": "펜브리지 소집",
-        "text": "모르덴의 글은 북쪽 습지의 주인을 말합니다. 나는 우연을 믿지 않습니다, {playerName}이여. 펜브리지 문기둥의 소집 명령서를 가져와 감시관에게 보이십시오.",
+        "text": "모르덴의 기록은 북쪽 습지의 주인, '안개엮는자'를 지목했습니다. 그리고 이제 감시관 펜윅이 펜브리지에서 소집 나팔을 울렸으니, 저는 우연을 믿지 않습니다, {playerName}이여. 둑길을 따라 북쪽으로 가서 성문 기둥에 붙은 소집 명령서를 떼어 감시관에게 전하십시오.",
         "completion": "알드릭의 인장입니까? 그럼 충분합니다. 습지가 내 순찰대를 통째로 삼키고 있습니다.",
         "objectives": {
           "0": {
@@ -6881,7 +7291,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_deepfen": {
         "title": "딥펜의 동요",
-        "text": "딥펜 멀록들이 호수 바닥에서 무언가를 끌어올리고 있습니다. 무는이 12마리를 처치해 그 이유를 알아봅시다.",
+        "text": "딥펜 진흙지느러미들은 스무 해 동안 얕은 물에만 머물렀습니다. 그런데 이제 시체에 꼬이는 파리처럼 동쪽 기슭에 떼지어 몰려들고, 제 감시병들 말로는 호수 바닥에서 무언가를 끌어올리고 있다 합니다. 무엇이 그들을 들쑤셨든, 저는 그것을 멈추고 싶습니다. 무는이 12마리를 솎아내십시오.",
         "completion": "한동안은 진흙으로 밀려날 겁니다. 하지만 무언가가 그들을 파게 만들었습니다.",
         "objectives": {
           "0": {
@@ -6891,7 +7301,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_idols": {
         "title": "깊은 곳의 우상",
-        "text": "물고기 인간들이 바닥에서 건진 우상을 성물처럼 안고 있습니다. 딥펜 무는이에게서 5개를 빼앗아 오십시오.",
+        "text": "펜윅의 감시병들 말로는 물고기 인간들이 호수 바닥에서 우상을 건져 올려 성물처럼 끌어안는다 합니다. 그 우상들이 제가 두려워하는 그것이라면, 제 눈으로 직접 확인해야겠습니다. 딥펜 무는이에게서 5개를 빼앗아 오십시오. 그들은 순순히 내놓지 않을 겁니다.",
         "completion": "무덤부름의 작품입니다. 모르덴보다 오래되었습니다. 교단은 여기서 시작된 것입니다, {playerName}.",
         "objectives": {
           "0": {
@@ -6911,7 +7321,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_deepfen_purge": {
         "title": "얕은 물가로",
-        "text": "그 우상들은 교단의 물건이고, 멀록들은 습지의 오래된 악을 퍼 올리고 있습니다. 얕은 물로 돌아가 14마리를 더 처치하십시오.",
+        "text": "알드릭은 그 우상들이 교단이 만든 것이라 합니다. 곧 진흙지느러미들이 습지의 오래된 악을 한 아름씩 퍼 올리고 있다는 뜻입니다. 그것이 제 둑길로 밀려오게 둘 수는 없습니다. 얕은 물로 돌아가 그 준설을 완전히 끝내십시오. 무는이 14마리를 더 처치하십시오.",
         "completion": "무자비하고 철저합니다. 이 습지가 마르면 감시관 일을 맡아도 되겠습니다.",
         "objectives": {
           "0": {
@@ -7018,7 +7428,7 @@ export const ko_KR: EnTranslations = {
       "q_summoners": {
         "title": "소환 저지",
         "text": "소환사들은 휘파람에 개를 부르듯 익사자를 물에서 부릅니다. 8명을 침묵시키고 암호문 4장을 가져오십시오.",
-        "completion": "모든 암호문은 부제 보스가 부서했고, 요새의 안개부름에게 보낸 것입니다. 모르덴의 주인입니다, {playerName}이여. 찾았습니다.",
+        "completion": "모든 암호문은 '부제 보스'가 부서했고, 요새의 '안개엮는자'에게 다시 보내는 것이었습니다. 모르덴의 주인입니다, {playerName}이여. 우리가 그를 찾아냈습니다.",
         "objectives": {
           "0": {
             "label": "무덤부름 소환사 처치"
@@ -7040,7 +7450,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_bastion_door": {
         "title": "가라앉은 요새",
-        "text": "가라앉은 요새는 안개부름의 자리이고, 문은 묘석으로 봉해져 있습니다. {playerName}이여, 수호석 하나를 가져오면 내가 봉인을 풀겠습니다.",
+        "text": "가라앉은 요새, 한 세기 전 습지에 잠긴 기사단의 거점이야말로 보스의 편지가 가리키는 곳이자 이 안개엮는자가 익사의 성가를 부르는 곳입니다. 교단은 그 문을 묘석으로 봉인해 두었습니다. {playerName}이여, 수호석 하나를 가져오면 내가 봉인을 풀겠습니다.",
         "completion": "봉인이 썩은 밧줄처럼 갈라집니다. 문이 열렸고, 어둠이 듣고 있습니다.",
         "objectives": {
           "0": {
@@ -7050,7 +7460,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_olen": {
         "title": "기사대장의 치욕",
-        "text": "올렌은 요새를 지키다 익사했고, 이제 꼭두각시가 되어 같은 문을 지킵니다. 그 치욕을 끝내십시오, {playerName}이여. 네 동료와 내려가 안식을 주십시오.",
+        "text": "기사단장 올렌은 요새가 가라앉을 때 그곳을 지켰습니다. 자리를 버리느니 제 위치에서 익사하는 쪽을 택했지요. 감시관이라면 누구나 그의 이름을 자랑스레 배웁니다. 그런데 이제 안개엮는자가 그를 꼭두각시로 되살려, 그가 목숨 바쳐 지키던 바로 그 문을 지키게 만들었습니다. 그 치욕은 여기서 끝납니다, {playerName}이여. 네 명의 동료를 데리고 아래로 내려가 올렌에게 마땅히 얻은 안식을 주십시오.",
         "completion": "그의 경계가 마침내 끝났습니다. 문에 새길 이름은 내가 직접 새기겠습니다. 고맙습니다, {playerName}이여.",
         "objectives": {
           "0": {
@@ -7059,12 +7469,12 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_mistcaller": {
-        "title": "안개부름",
-        "text": "바엘은 요새 밑바닥에서 기다립니다. 백 명의 여행자를 익사시켜 군대를 만든 목소리입니다. 그를 끝내십시오, {playerName}이여. 네 동료와 함께라면 습지의 죽은 자들도 마침내 잠들 것입니다.",
+        "title": "안개엮는자",
+        "text": "요새 밑바닥에서 안개엮는자 바엘이 기다립니다. 모르덴의 주인이자 보스의 주인이며, 스스로 군대를 일으키려 백 명의 여행자를 익사시킨 목소리입니다. 그는 영웅 한 사람으로 감당할 상대가 결코 아닙니다. 네 명의 동료를 데려가십시오, 그 이하는 안 됩니다. 그를 끝내십시오, {playerName}이여. 그리하면 습지의 죽은 자들도 마침내 잠들 수 있을 것입니다.",
         "completion": "바엘은 죽었고 안개가 걷힙니다. 그러나 마지막 말이 피를 얼립니다. 고룡이 봉우리 아래서 꿈틀댄다고 했습니다. {playerName}이여, 할 수 있을 때 쉬십시오. 다음은 산입니다.",
         "objectives": {
           "0": {
-            "label": "안개부름 바엘 처치"
+            "label": "안개엮는자 바엘 처치"
           }
         }
       },
@@ -7130,8 +7540,8 @@ export const ko_KR: EnTranslations = {
       },
       "q_kobold_tunnels": {
         "title": "깊은바위 문제",
-        "text": "딥록 코볼트들이 성벽 아래에서 부르는 것처럼 곧장 아래로 파고 있습니다. {playerName}이여, 굴꾼 12마리를 처치하십시오.",
-        "completion": "모든 갱도가 곧장 아래입니다. 코볼트가 혼자 이렇게 파지는 않습니다.",
+        "text": "깊은바위 굴의 굴꾼들이 여느 굴쥐가 팔 법한 깊이보다 훨씬 더 깊이, 곧장 아래로 파고 있습니다. 마치 무언가가 그들을 부르는 것처럼 말입니다. 그 굴이 우리 성벽 아래로 뻗어 있습니다, {playerName}이여. 이 문제를 무너뜨리십시오. 깊은바위 굴꾼 열두 마리를 처치하십시오.",
+        "completion": "곧장 아래로, 갱도 하나하나가 다 그렇습니다. 굴착꾼들이 혼자서 그렇게 파지는 않습니다. 제 책들을 살펴봐야겠습니다.",
         "objectives": {
           "0": {
             "label": "깊은바위 굴꾼 처치"
@@ -7140,7 +7550,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_glowing_wax": {
         "title": "이상한 밀랍",
-        "text": "굴꾼에게서 나온 밀랍은 빛나고, {playerName}이여, 심장처럼 따뜻합니다. 캐디스의 연구를 위해 빛나는 밀랍 6개를 가져오십시오.",
+        "text": "캐디스가 그 굴꾼 중 하나에게서 떼어낸 밀랍 덩어리를 보여주었습니다. 그것은 빛나고, {playerName}이여, 심장 박동처럼 따뜻합니다. 그는 연구를 위해 더 원하고, 저는 그것을 제 물자 목록에서 지우고 싶습니다. 빛나는 밀랍 여섯 덩어리를 가져오십시오.",
         "completion": "아직 따뜻합니다. 이 빛은 현자가 아는 어떤 불꽃과도 맞지 않습니다.",
         "objectives": {
           "0": {
@@ -7445,6 +7855,26 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_archetype_acceptance": {
+        "title": "스스로 택하는 기술",
+        "text": "이스트브룩의 모든 장인은 결국 자신만의 기술 하나를 택하게 된다. {playerName}, 하나의 행동으로 스스로를 증명하고 그대의 길을 선언하라.",
+        "completion": "그대의 길이 정해졌다. 그 길을 굳건히 걸어가라.",
+        "objectives": {
+          "0": {
+            "label": "숲늑대 처치"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "속죄",
+        "text": "한 기술을 버리고 다른 기술로 나아가려면, 장인은 먼저 걷지 않은 길에 대해 속죄해야 한다, {playerName}.",
+        "completion": "속죄가 이루어졌다. 그대에게 새로운 길이 열렸다.",
+        "objectives": {
+          "0": {
+            "label": "숲늑대 처치"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -7527,7 +7957,7 @@ export const ko_KR: EnTranslations = {
             "label": "거울호수"
           },
           "4": {
-            "label": "그물나무숲"
+            "label": "흑거미줄"
           },
           "5": {
             "label": "구리 광산"
@@ -7650,6 +8080,11 @@ export const ko_KR: EnTranslations = {
         "name": "무너진 성물실",
         "enterText": "무너진 성물실로 내려갑니다.",
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
+      },
+      "drowned_litany": {
+        "name": "익사한 연도",
+        "enterText": "그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.",
+        "leaveText": "그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다."
       }
     },
     "letters": {
@@ -7675,38 +8110,50 @@ export const ko_KR: EnTranslations = {
       }
     },
     "itemSets": {
+      "boundstone_vanguard": {
+        "name": "속박석 선봉대",
+        "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
       "crownforged": {
-        "name": "왕관벼림 전투장비",
+        "name": "뼈벼림 전투장비",
         "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
+        "bonus3": "힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다."
       },
       "deathlord": {
-        "name": "죽음군주의 전투장비",
+        "name": "고분군주의 전투장비",
         "bonus2": "전투력이 40만큼 증가합니다.",
         "bonus3": "힘이 15, 체력이 15만큼 증가합니다."
       },
+      "greyjaw_stalker": {
+        "name": "그레이죠 추적자의 장비",
+        "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
       "necromancers": {
-        "name": "강령술사의 의복",
+        "name": "비탄직물 의복",
         "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
         "bonus3": "지능이 10, 체력이 10만큼 증가합니다."
       },
       "nighttalon": {
-        "name": "밤발톱 가죽장비",
+        "name": "흉포송곳니 가죽장비",
         "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
+        "bonus3": "민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다."
       },
       "soulflame": {
-        "name": "영혼불꽃 의복",
+        "name": "망령불꽃 의복",
         "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
-        "bonus3": "지능이 15, 정신력이 15만큼 증가합니다."
+        "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다."
       },
       "stormcallers": {
-        "name": "폭풍소환사의 의복",
+        "name": "강풍부름 의복",
         "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
-        "bonus3": "지능이 15, 정신력이 15만큼 증가합니다."
+        "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "vale_arcanist": {
+        "name": "계곡 비전술사의 예복",
+        "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
       "wyrmshadow": {
-        "name": "고룡그림자 의복",
+        "name": "밤송곳니 의복",
         "bonus2": "전투력이 40만큼 증가합니다.",
         "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다."
       }
@@ -7720,6 +8167,11 @@ export const ko_KR: EnTranslations = {
     "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
     "delveRewardChestInteract": "F를 눌러 전리품 받기",
     "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기",
+    "delveReliquaryInteract": "가라앉은 성물함: F를 눌러 의식 시작",
+    "delveRiteShrineBellInteract": "종 제단: F를 눌러 울리기",
+    "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
+    "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
+    "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
     "mailboxName": "우편함"
   }
 };

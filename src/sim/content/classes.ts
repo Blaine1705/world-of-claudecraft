@@ -1689,7 +1689,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 14, cost: 25, effects: [{ type: 'absorb', amount: 110, duration: 10 }] },
     ],
-    description: 'A holy shield absorbs 50 damage for 10 sec.',
+    description: 'A hallowed wall absorbs 50 damage for 10 sec.',
   },
   hammer_of_justice: {
     id: 'hammer_of_justice',
@@ -3871,7 +3871,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   holy_shield: {
     id: 'holy_shield',
-    name: 'Holy Shield',
+    name: 'Hallowed Wall',
     class: 'paladin',
     learnLevel: 10,
     cost: 45,
@@ -3904,7 +3904,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bestial_wrath: {
     id: 'bestial_wrath',
-    name: 'Bestial Wrath',
+    name: 'Howling Rage',
     class: 'hunter',
     learnLevel: 10,
     cost: 40,
@@ -3919,7 +3919,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   trueshot_aura: {
     id: 'trueshot_aura',
-    name: 'Trueshot Aura',
+    name: 'Sureflight Aura',
     class: 'hunter',
     learnLevel: 10,
     cost: 40,
@@ -3951,7 +3951,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   arcane_power: {
     id: 'arcane_power',
-    name: 'Arcane Power',
+    name: 'Aether Surge',
     class: 'mage',
     learnLevel: 10,
     cost: 70,
@@ -3962,11 +3962,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_spellpower', value: 28, duration: 12 }],
     description:
-      'Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)',
+      'Fills you with aether energy, increasing spell power by 28 for 12 sec. (Arcane signature)',
   },
   combustion: {
     id: 'combustion',
-    name: 'Combustion',
+    name: 'Flashfire',
     class: 'mage',
     learnLevel: 10,
     cost: 55,
@@ -3995,7 +3995,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   cold_blood: {
     id: 'cold_blood',
-    name: 'Cold Blood',
+    name: "Killer's Calm",
     class: 'rogue',
     learnLevel: 10,
     cost: 0,
@@ -4010,7 +4010,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blade_flurry: {
     id: 'blade_flurry',
-    name: 'Blade Flurry',
+    name: 'Mirrored Blades',
     class: 'rogue',
     learnLevel: 10,
     cost: 25,
@@ -4025,7 +4025,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hemorrhage: {
     id: 'hemorrhage',
-    name: 'Hemorrhage',
+    name: 'Red Ribbon',
     class: 'rogue',
     learnLevel: 10,
     cost: 35,
@@ -4044,7 +4044,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   power_infusion: {
     id: 'power_infusion',
-    name: 'Power Infusion',
+    name: 'Anointing',
     class: 'priest',
     learnLevel: 10,
     cost: 55,
@@ -4074,11 +4074,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
     ],
     description:
-      'Causes an explosion of Holy light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
+      'Causes an explosion of Mending Light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
   },
   shadowform: {
     id: 'shadowform',
-    name: 'Shadowform',
+    name: 'Gloamveil',
     class: 'priest',
     learnLevel: 10,
     cost: 60,
@@ -4089,11 +4089,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
     description:
-      'Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+      'Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
   },
   elemental_mastery: {
     id: 'elemental_mastery',
-    name: 'Elemental Mastery',
+    name: 'Primal Mastery',
     class: 'shaman',
     learnLevel: 10,
     cost: 45,
@@ -4103,8 +4103,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
-    description:
-      'Calls on elemental mastery, making your next spell instant. (Elemental signature)',
+    description: 'Calls on primal mastery, making your next spell instant. (Elemental signature)',
   },
   shamanistic_rage: {
     id: 'shamanistic_rage',
@@ -4136,7 +4135,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   siphon_life: {
     id: 'siphon_life',
-    name: 'Siphon Life',
+    name: 'Veinleech',
     class: 'warlock',
     learnLevel: 10,
     cost: 45,
@@ -4180,7 +4179,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   moonkin_form: {
     id: 'moonkin_form',
-    name: 'Moonkin Form',
+    name: 'Moonwing Form',
     class: 'druid',
     learnLevel: 10,
     cost: 55,
@@ -4191,7 +4190,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_moonkin', value: 15, duration: 3600 }],
     description:
-      'Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
+      'Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
   },
   feral_charge: {
     id: 'feral_charge',
@@ -4207,7 +4206,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     offGcd: true,
     effects: [{ type: 'charge' }, { type: 'root', duration: 1 }],
-    description: 'Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)',
+    description: 'Charge an enemy and root it for 1 sec. 8-25 yard range. (Feral signature)',
   },
   swiftmend: {
     id: 'swiftmend',

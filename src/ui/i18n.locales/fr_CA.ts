@@ -11,12 +11,14 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
+  'download.macCta': 'Telecharger la version macOS',
+  'download.windowsPending': 'Version Windows a venir.',
   // Stat tooltips inherit the fr_FR base: none of these strings has a genuine
   // Quebec-specific form, so per the divergence-only policy fr_CA carries no
   // hudChrome.statInfo.* overrides.
   'seo.title': 'World of ClaudeCraft: MMO Web de style classique',
   'seo.description':
-    "Partez à l'aventure dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un royaume partagé, faites progresser vos classes et terrassez des ennemis.",
+    'Lancez-vous dans une aventure épique dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un monde partagé et persistant, faites monter vos classes en niveau et terrassez vos ennemis.',
   'seo.operatingSystem': 'Navigateur Web',
   'a11y.toggleMenu': 'Ouvrir ou fermer le menu',
   'loading.assetsFailed': 'Le chargement des ressources a échoué: rechargez la page. {error}',
@@ -43,15 +45,15 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.warrior':
     'Les guerriers sont des combattants endurcis qui gagnent de la rage en infligeant ou subissant des dégâts. Ils encaissent ou écrasent leurs ennemis.',
   'classDetails.lore.paladin':
-    'Les paladins sont des croisés sacrés qui aident par des bénédictions, soignent avec la Lumière sacrée et protègent les plus faibles.',
+    'Les paladins sont de saints croisés qui épaulent leurs alliés par des bénédictions, soignent les blessures avec la Lumière guérisseuse et protègent les faibles sous une armure lourde.',
   'classDetails.lore.hunter':
     "Les chasseurs sont des spécialistes à distance qui combattent aux côtés d'une bête apprivoisée, criblant leurs ennemis de tirs précis et rapides, les ralentissant de morsures et de traits de choc, et changeant d'aspect selon le moment.",
   'classDetails.lore.shaman':
     'Les chamans commandent les éléments, imprègnent leurs armes, frappent avec la foudre et restaurent leurs alliés.',
   'classDetails.lore.mage':
-    "Les mages manipulent Feu, Givre et Arcane pour détruire, conjurer de l'eau et figer les menaces.",
+    "Les mages manient le Feu, le Givre et la force des Arcanes pour détruire leurs ennemis, conjurer de l'eau et figer les menaces sur place.",
   'classDetails.lore.warlock':
-    'Les démonistes invoquent des démons, posent malédictions et dégâts prolongés, puis drainent la vie pour survivre.',
+    'Les démonistes invoquent des démons, jettent des malédictions et des dégâts prolongés, puis drainent la vie de leurs ennemis pour tenir bon.',
   'classDetails.lore.druid':
     'Les druides canalisent la nature, guérissent, entravent les ennemis et prennent des formes animales pour défendre ou attaquer.',
   'classDetails.aria':
@@ -167,6 +169,8 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.lockJammed':
     "La serrure est bloquée, impossible à crocheter : terminez l'excavation de nouveau pour une autre tentative.",
   'sim.lockpick.lockYields': 'La serrure cède! Butin {tier}.',
+  // Mobile touch controls: the hotbar page-flip button and its accessible name.
+  // Corpse-harvest focus picker (window title, confirm button, component labels).
   // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Cause {value} points de dégâts de {school} toutes les {interval} s',
   'hudChrome.auraEffect.hot': 'Redonne {value} points de vie toutes les {interval} s',
@@ -213,14 +217,15 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.disarm': "Désarmé, impossible d'utiliser des attaques d'arme",
   'hudChrome.auraEffect.lockout': 'École de magie verrouillée',
   'hudChrome.auraEffect.imbue': 'Arme enchantée avec effets bonus',
-  'hudChrome.auraEffect.imbueRange': 'Arme enchantée : {min} à {max} dégâts bonus au jugement',
+  'hudChrome.auraEffect.imbueRange': 'Arme enchantée : {min} à {max} dégâts bonus au Verdict',
   'hudChrome.auraEffect.stealth': 'Dissimulé ; vitesse de déplacement réduite de {pct}%',
-  'hudChrome.auraEffect.formBear': 'Forme ours : points de vie et armure augmentés',
+  'hudChrome.auraEffect.formBear': 'Forme de Bruin : points de vie et armure accrus',
   'hudChrome.auraEffect.formCat': 'Forme féline : dégâts de mêlée et énergie',
-  'hudChrome.auraEffect.formTravel': 'Forme voyage : vitesse de déplacement augmentée de {pct}%',
-  'hudChrome.auraEffect.defensiveStance': 'Posture défensive, dégâts subis réduits, menace accrue',
+  'hudChrome.auraEffect.formTravel': 'Forme de Fleet : vitesse de déplacement accrue de {pct}%',
+  'hudChrome.auraEffect.defensiveStance':
+    'Guarded Stance : dégâts encaissés réduits, menace accrue',
   'hudChrome.auraEffect.righteousFury':
-    'Fureur vertueuse, menace des dégâts Sacré fortement accrue',
+    'Burning Oath : menace générée par les dégâts Sacrés fortement accrue',
   'hudChrome.auraEffect.scale': 'Gabarit augmentée de {pct}%',
   'hudChrome.auraEffect.jump': 'Saut augmentée de {pct}%',
   'hudChrome.auraEffect.school.physical': 'physique',
@@ -230,76 +235,4 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
-  'entities.abilities.holy_shock.name': 'Horion sacré',
-  'entities.abilities.holy_shock.description':
-    "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)",
-  'entities.abilities.holy_shield.name': 'Bouclier sacré',
-  'entities.abilities.holy_shield.description':
-    "Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)",
-  'entities.abilities.repentance.name': 'Repentir',
-  'entities.abilities.repentance.description':
-    "Plonge l’ennemi dans un état de méditation pendant un maximum de 6 s. Tout dégât interrompt l’effet. (signature Vindicte)",
-  'entities.abilities.bestial_wrath.name': 'Courroux bestial',
-  'entities.abilities.bestial_wrath.description':
-    "Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)",
-  'entities.abilities.trueshot_aura.name': 'Aura de précision',
-  'entities.abilities.trueshot_aura.description':
-    "Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)",
-  'entities.abilities.wyvern_sting.name': 'Piqûre de wyverne',
-  'entities.abilities.wyvern_sting.description':
-    "Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)",
-  'entities.abilities.arcane_power.name': 'Pouvoir des Arcanes',
-  'entities.abilities.arcane_power.description':
-    "Vous emplit de puissance arcanique, augmentant la puissance des sorts de 28 pendant 12 s. (signature Arcane)",
-  'entities.abilities.combustion.name': 'Combustion',
-  'entities.abilities.combustion.description':
-    "Concentre votre magie du feu afin que votre prochaine attaque soit un coup critique. (signature Feu)",
-  'entities.abilities.cone_of_cold.name': 'Cône de froid',
-  'entities.abilities.cone_of_cold.description':
-    "Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)",
-  'entities.abilities.cold_blood.name': 'Sang froid',
-  'entities.abilities.cold_blood.description':
-    "Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)",
-  'entities.abilities.blade_flurry.name': 'Déluge de lames',
-  'entities.abilities.blade_flurry.description':
-    "Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)",
-  'entities.abilities.hemorrhage.name': 'Hémorragie',
-  'entities.abilities.hemorrhage.description':
-    "Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)",
-  'entities.abilities.power_infusion.name': 'Infusion de puissance',
-  'entities.abilities.power_infusion.description':
-    "Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)",
-  'entities.abilities.holy_nova.name': 'Nova sacrée',
-  'entities.abilities.holy_nova.description':
-    "Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)",
-  'entities.abilities.shadowform.name': "Forme d'Ombre",
-  'entities.abilities.shadowform.description':
-    "Adopte la Forme d’Ombre, renforçant la magie de l’ombre jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Ombre)",
-  'entities.abilities.elemental_mastery.name': 'Maîtrise élémentaire',
-  'entities.abilities.elemental_mastery.description':
-    "Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)",
-  'entities.abilities.shamanistic_rage.name': 'Rage chamanique',
-  'entities.abilities.shamanistic_rage.description':
-    "Libère une rage chamanique et rend 160 points de mana. (signature Amélioration)",
-  'entities.abilities.natures_swiftness.name': 'Rapidité de la nature',
-  'entities.abilities.natures_swiftness.description':
-    "Fait appel à la nature pour rendre votre prochain sort instantané. (signature Restauration)",
-  'entities.abilities.siphon_life.name': 'Siphon de vie',
-  'entities.abilities.siphon_life.description':
-    "Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)",
-  'entities.abilities.fel_domination.name': 'Domination corrompue',
-  'entities.abilities.fel_domination.description':
-    "Domine les énergies gangrenées, rendant votre prochain sort instantané. (signature Démonologie)",
-  'entities.abilities.conflagrate.name': 'Conflagration',
-  'entities.abilities.conflagrate.description':
-    "Consume votre Immolation sur l’ennemi pour l’enflammer et lui infliger {damage} points de dégâts de Feu. (signature Destruction)",
-  'entities.abilities.moonkin_form.name': 'Forme de sélénien',
-  'entities.abilities.moonkin_form.description':
-    "Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)",
-  'entities.abilities.feral_charge.name': 'Charge farouche',
-  'entities.abilities.feral_charge.description':
-    "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)",
-  'entities.abilities.swiftmend.name': 'Prompte guérison',
-  'entities.abilities.swiftmend.description':
-    "Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)",
 };

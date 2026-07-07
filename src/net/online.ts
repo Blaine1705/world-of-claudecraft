@@ -20,12 +20,19 @@ import {
   type TalentAllocation,
   talentPointsAtLevel,
 } from '../sim/content/talents';
-import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
+import {
+  abilitiesKnownAt,
+  CLASSES,
+  COMMON_RECIPES,
+  NPCS,
+  resolveDelveShopOffers,
+} from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
@@ -40,6 +47,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiteIntensity,
   type SimEvent,
 } from '../sim/types';
 import {
@@ -47,6 +55,7 @@ import {
   type ArenaInfo,
   type CharacterSearchResult,
   type ClientCommand,
+  type CraftResultView,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -71,9 +80,11 @@ import {
   type PlayerProfessionsView,
   type PresenceStatus,
   type RaidLockout,
+  type RecipeDef,
   type SocialInfo,
   type TradeInfo,
 } from '../world_api';
+import { isTransientReconnectRejection } from './reconnect_policy';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -89,6 +100,11 @@ export interface CharacterSummary {
   forceRename: boolean;
   lastPlayed?: string | null;
   playtimeSeconds?: number;
+  // Real, in-world appearance so the char-select preview matches the game. Both
+  // optional for back-compat with an older server that omits them: absent
+  // skinCatalog defaults to the class rig, absent mainhand shows no weapon.
+  skinCatalog?: 'class' | 'mech';
+  mainhandItemId?: string | null;
 }
 
 function stringList(value: unknown): string[] {
@@ -171,10 +187,29 @@ export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    // The stable machine code from the server's error body (RFC 9457 problem+json
+    // `code`, or the additive `code` on a migrated legacy body), when present. The
+    // client matcher (src/ui/api_error_i18n.ts) prefers it over the English message.
+    readonly code?: string,
+    // The parsed error body, so the matcher can read code params (e.g.
+    // retryAfterSeconds, date) that ride top-level alongside the code.
+    readonly params?: Record<string, unknown>,
   ) {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+// Builds the ApiError for a non-ok JSON response, capturing the stable `code` and
+// the body params when the server sent them (both problem+json and the migrated
+// legacy `{ error, code, ... }` bodies carry a top-level `code`).
+function apiErrorFromBody(data: unknown, status: number): ApiError {
+  const body = data && typeof data === 'object' ? (data as Record<string, unknown>) : undefined;
+  const rawError = body?.error;
+  const message = typeof rawError === 'string' ? rawError : `request failed (${status})`;
+  const rawCode = body?.code;
+  const code = typeof rawCode === 'string' && rawCode.length > 0 ? rawCode : undefined;
+  return new ApiError(message, status, code, code ? body : undefined);
 }
 
 /** True for an auth-class failure where a stored token should be discarded. */
@@ -237,7 +272,7 @@ export class Api {
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
+    if (!res.ok) throw apiErrorFromBody(data, res.status);
     return data;
   }
 
@@ -246,7 +281,7 @@ export class Api {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
+    if (!res.ok) throw apiErrorFromBody(data, res.status);
     return data;
   }
 
@@ -260,7 +295,7 @@ export class Api {
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.error ?? `request failed (${res.status})`, res.status);
+    if (!res.ok) throw apiErrorFromBody(data, res.status);
     return data;
   }
 
@@ -271,7 +306,7 @@ export class Api {
     turnstileToken = '',
     ref = '',
     nativeAttestation: unknown = undefined,
-  ): Promise<void> {
+  ): Promise<{ accountId?: number }> {
     const data = await this.post('/api/register', {
       username,
       password,
@@ -284,6 +319,7 @@ export class Api {
     this.username = data.username;
     // A fresh registration always has the mandatory email; trust the server flag.
     this.emailMissing = data.emailMissing === true;
+    return { accountId: typeof data.accountId === 'number' ? data.accountId : undefined };
   }
 
   // Returns { twoFactorRequired: true } when the account has 2FA on and no code
@@ -439,13 +475,13 @@ export class Api {
     });
     const text = await res.text();
     if (!res.ok) {
-      let msg = `request failed (${res.status})`;
+      let data: unknown;
       try {
-        msg = JSON.parse(text).error ?? msg;
+        data = JSON.parse(text);
       } catch {
-        /* non-JSON error body */
+        /* non-JSON error body: apiErrorFromBody keeps the diagnostic message */
       }
-      throw new ApiError(msg, res.status);
+      throw apiErrorFromBody(data, res.status);
     }
     return JSON.parse(text);
   }
@@ -712,6 +748,15 @@ const TELEPORT_SNAP_DIST_SQ = 40 * 40;
 // entity map; hold it at its last pose for this window instead. Kept short so a
 // genuine leaver (logout, corpse cleanup) lingers only momentarily.
 const DESPAWN_GRACE_MS = 600;
+
+// Auto-reconnect backoff for an unexpectedly dropped game socket. The server
+// holds the character in-world (linkdead) for five minutes; the retry window
+// is deliberately longer, since past the grace a successful auth simply
+// performs a fresh join from the last save. 1s, 2s, 4s, 8s, then 15s apart:
+// 40 attempts spans roughly nine minutes before giving up for good.
+const RECONNECT_BASE_DELAY_MS = 1_000;
+const RECONNECT_MAX_DELAY_MS = 15_000;
+const RECONNECT_MAX_ATTEMPTS = 40;
 // ...but only for entities last seen near/beyond the interest boundary, where
 // that churn happens. A close-range disappearance is intentional (an enemy going
 // stealth) and must hide at once, so anything nearer than this drops immediately.
@@ -758,6 +803,9 @@ function blankEntity(id: number): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    meleeHaste: 0,
+    rangedHaste: 0,
+    spellHaste: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
     moveSpeed: 7,
@@ -803,6 +851,9 @@ function blankEntity(id: number): Entity {
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
+    aoeSlowTimer: 0,
+    loudYellTimer: 0,
+    loudYellIndex: 0,
     detonateTimer: Infinity,
     firedSummons: 0,
     summonedIds: [],
@@ -828,6 +879,7 @@ function blankEntity(id: number): Entity {
     respawnTimer: 0,
     corpseTimer: 0,
     lootFfaTimer: Infinity,
+    harvestClaimedBy: null,
     lootable: false,
     loot: null,
     xpValue: 0,
@@ -931,6 +983,7 @@ export class ClientWorld implements IWorld {
   // all-zero default until the wheel/mass-conservation follow-up wires a self-snap
   // field the way `dmarks`/`dcomp` do for delveMarks/companionUpgrades above.
   craftSkills: Record<string, number> = emptyCraftSkills();
+  gatheringProficiency: Record<string, number> = {};
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -940,6 +993,36 @@ export class ClientWorld implements IWorld {
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };
+  // Stub for #1121: per-node respawn state is server-authoritative and not yet
+  // wired onto the snapshot (see src/sim/professions/CLAUDE.md), so the client
+  // cannot know another player's, or even its own, real per-node timer yet.
+  // Always reports harvestable; the server re-validates and denies via a
+  // normal error event on an actual attempt, same as every other authoritative
+  // action (see src/net/CLAUDE.md "Never predict an outcome"). Wiring the real
+  // per-player timer is future work once the snapshot carries it.
+  nodeHarvestableByMe(_nodeId: string): boolean {
+    return true;
+  }
+  // Static content read (#1127): the common-tier recipe list ships with the
+  // client bundle like every other content table, so this needs no wire
+  // round-trip. See src/world_api/professions.ts.
+  recipeList: readonly RecipeDef[] = COMMON_RECIPES;
+  // Active-archetype identity (#1129, superseded scope). Same not-yet-wired-on-the-
+  // wire status as craftSkills/gatheringProficiency above: this change lands the
+  // sim-side state machine + persistence only, so online play sees the all-unset
+  // default (no archetype, switchCount 0) until a follow-up wires a self-snap field
+  // and the corresponding `cmd` dispatch cases in server/game.ts the way
+  // craft_item/harvest_node do for recipeList/nodeHarvestableByMe.
+  activeArchetype: string | null = null;
+  archetypeSwitchCount = 0;
+  archetypeAmendsProgress = 0;
+  archetypeAmendsRequired = 0;
+  acceptArchetypeQuest(_craftId: string): void {}
+  advanceAmendsProgress(): void {}
+  switchArchetype(_craftId: string): void {}
+  // Craft-result surface (#1127), mirrored from the server's `craftResult`
+  // event (applyEvent below). Null until this session's first craft attempt.
+  lastCraftResult: CraftResultView | null = null;
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
@@ -959,9 +1042,22 @@ export class ClientWorld implements IWorld {
   pendingFacingDelta = 0;
   connected = false;
   onDisconnect: ((reason: string) => void) | null = null;
+  // fired on each unexpected socket drop while auto-reconnect is pending, and
+  // once the world is live again; main.ts shows/hides the reconnect overlay
+  onConnectionLost: (() => void) | null = null;
+  onReconnected: (() => void) | null = null;
+  private reconnectAttempts = 0;
+  // consecutive 'character already in world' rejections during a reconnect;
+  // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
+  private conflictRejections = 0;
+  private reconnectTimer: number | undefined;
+  // set by close() and by a server 'error' frame: the session is over for
+  // good, so a subsequent socket close must not schedule a reconnect
+  private sessionEnded = false;
   readonly characterId: number;
 
-  private ws: WebSocket;
+  // assigned by openSocket() from the ctor, and reassigned on every reconnect
+  private ws!: WebSocket;
   private readonly token: string;
   private readonly base: string;
   private readonly clientSeed: string;
@@ -994,6 +1090,12 @@ export class ClientWorld implements IWorld {
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
+    this.openSocket();
+    // input stream at sim rate
+    this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+  }
+
+  private openSocket(): void {
     // when a realm was picked, connect to that realm's origin; otherwise the
     // page's own host
     const wsUrl = this.base
@@ -1001,22 +1103,60 @@ export class ClientWorld implements IWorld {
       : buildWebSocketUrl(location.protocol, location.host);
     this.ws = new WebSocket(wsUrl);
     this.ws.onopen = () => {
-      this.ws.send(JSON.stringify(buildWebSocketAuthMessage(token, characterId, this.clientSeed)));
+      this.ws.send(
+        JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
+      );
     };
     this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
-    this.ws.onclose = () => {
-      this.connected = false;
+    this.ws.onclose = () => this.socketClosed();
+  }
+
+  // A dropped socket schedules a reconnect with exponential backoff: the
+  // server holds the character in-world (linkdead) for five minutes, and a
+  // re-auth on the same character resumes that session seamlessly. Past the
+  // server grace a successful auth is simply a fresh join from the last save,
+  // so retrying stays correct at any point. onDisconnect fires only when the
+  // retries are exhausted or the server rejected the session outright (an
+  // 'error' frame, handled in onMessage, which sets sessionEnded).
+  private socketClosed(): void {
+    this.connected = false;
+    if (this.sessionEnded) return;
+    if (this.reconnectAttempts >= RECONNECT_MAX_ATTEMPTS) {
+      this.sessionEnded = true;
       clearInterval(this.sendTimer);
       this.onDisconnect?.('Connection to the server was lost.');
-    };
-    // input stream at sim rate
-    this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+      return;
+    }
+    this.reconnectAttempts++;
+    this.onConnectionLost?.();
+    const delayMs = Math.min(
+      RECONNECT_MAX_DELAY_MS,
+      RECONNECT_BASE_DELAY_MS * 2 ** (this.reconnectAttempts - 1),
+    );
+    this.reconnectTimer = window.setTimeout(() => this.openSocket(), delayMs);
+  }
+
+  private endSession(): void {
+    this.sessionEnded = true;
+    clearInterval(this.sendTimer);
+    if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
   }
 
   close(): void {
-    clearInterval(this.sendTimer);
+    this.endSession();
     this.ws.onclose = null;
     this.ws.close();
+  }
+
+  // Signal a deliberate logout to the server so it skips linkdead grace and
+  // calls leave() immediately. Must be called before a page reload so the
+  // character is properly removed from the world instead of being held
+  // in-world for the 5-minute linkdead window.
+  sendLogout(): void {
+    this.endSession();
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ t: 'logout' }));
+    }
   }
 
   get player(): Entity {
@@ -1157,6 +1297,28 @@ export class ClientWorld implements IWorld {
         );
         this.profanityDirty = true;
       }
+      if (this.reconnectAttempts > 0) {
+        // fresh transport after an auto-reconnect: the server restarts input
+        // acking at 0 and resends the world from an empty interest set, and
+        // any stale mirrored entities fall out via the snapshot prune
+        this.reconnectAttempts = 0;
+        this.conflictRejections = 0;
+        this.inputSeq = 0;
+        this.lastInputSig = '';
+        this.lastInputSentAt = 0;
+        this.pendingInputSeqSentAt.clear();
+        this.ackedInputSeq = 0;
+        this.inputEchoSamples = [];
+        this.missingSince.clear();
+        this.lastSnapAt = 0;
+        // the server exits spectate at grace start, so undo the whole client
+        // spectate swap too (playerId is already restored from this hello)
+        this.spectating = null;
+        this.cfg.playerClass = this.ownPlayerClass;
+        this.spectateFacingPending = false;
+        this.pendingSpectateFacing = null;
+        this.onReconnected?.();
+      }
       this.connected = true;
       return;
     }
@@ -1184,12 +1346,28 @@ export class ClientWorld implements IWorld {
     }
     if (msg.t === 'error') {
       this.connected = false;
+      // Mid-reconnect, 'character already in world' is the transient window
+      // where the server has not yet noticed the old socket died (a
+      // black-holed drop sends no FIN/RST): keep backing off, the server's
+      // keepalive sweep flips the held session linkdead within a ping
+      // interval or two and the next retry resumes. Bounded, so a character
+      // genuinely held by another device's live socket still ends fatal.
+      if (
+        isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
+      ) {
+        this.conflictRejections++;
+        return; // the server closes this socket; onclose schedules the retry
+      }
+      // any other server rejection (kick, moderation, takeover, failed auth)
+      // ends the session for good: no auto-reconnect
+      this.endSession();
       this.onDisconnect?.(msg.error ?? 'rejected by server');
       return;
     }
     if (msg.t === 'events') {
       for (const ev of msg.list) {
         this.applyLockpickEvent(ev as SimEvent);
+        this.applyCraftResultEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -1544,6 +1722,9 @@ export class ClientWorld implements IWorld {
       e.attackPower = s.ap ?? 0;
       e.rangedPower = s.rp ?? 0;
       e.spellPower = s.sp ?? 0;
+      // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
+      // no wiring (the swing timers already ride the snapshot).
+      e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
       e.weapon = s.weapon ?? e.weapon;
@@ -1636,6 +1817,7 @@ export class ClientWorld implements IWorld {
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
+      if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -1811,6 +1993,9 @@ export class ClientWorld implements IWorld {
   autoLoot(id: number): void {
     this.cmd({ cmd: 'autoloot', id });
   }
+  harvestCorpse(id: number, components?: string[]): void {
+    this.cmd({ cmd: 'harvestCorpse', id, components });
+  }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
     this.cmd({ cmd: 'lootRoll', rollId, choice });
@@ -1866,6 +2051,12 @@ export class ClientWorld implements IWorld {
   }
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
+  }
+  harvestNode(nodeId: string): void {
+    this.cmd({ cmd: 'harvest_node', node: nodeId });
+  }
+  craftItem(recipeId: string): void {
+    this.cmd({ cmd: 'craft_item', recipe: recipeId });
   }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
@@ -2215,6 +2406,22 @@ export class ClientWorld implements IWorld {
   }
   collectDelveChestLoot(chestId: number): void {
     this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });
+  }
+  // Mirror the authoritative craftResult event into lastCraftResult (#1127).
+  // The event still flows to the HUD (drainEvents) for a toast/log line.
+  private applyCraftResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'craftResult') return;
+    this.lastCraftResult = {
+      ok: ev.ok,
+      recipeId: ev.recipeId,
+      itemId: ev.itemId,
+      count: ev.count,
+      quality: ev.quality as MaterialRarity | undefined,
+      reason: ev.reason,
+    };
+  }
+  delveRiteChoose(intensity: RiteIntensity): void {
+    this.cmd({ cmd: 'delve_rite_choose', intensity });
   }
   // Mirror the authoritative lockpick lifecycle into lockpickState. The events
   // still flow to the HUD (drainEvents) for transient feedback (juice/sounds).

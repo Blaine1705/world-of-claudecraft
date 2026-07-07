@@ -27,7 +27,7 @@
 // DOM/Three/render/ui/game/net, no Math.random/Date.now), enforced by
 // tests/architecture.test.ts.
 
-import { ITEMS, MOBS } from '../data';
+import { ITEMS, isDelvePos, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -125,6 +125,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // completed ground-targeted channels drop their aim like every other
       // resolve path: castAim is always cleared on resolve
       p.castAim = null;
+      p.castTargetId = null;
       ctx.emit({ type: 'castStop', entityId: p.id, success: true });
     }
     return;
@@ -144,6 +145,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // the aim point is consumed by the resolved area effects; drop it so a later
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
+    p.castTargetId = null;
   }
 }
 
@@ -153,6 +155,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.castRemaining = 0;
   p.channeling = false;
   p.castAim = null;
+  p.castTargetId = null;
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
 
@@ -359,7 +362,13 @@ export function castAbility(
       if (eff.type === 'polymorph') {
         if (target.kind === 'mob') {
           const fam = MOBS[target.templateId]?.family;
-          if (fam === 'undead' || target.templateId === 'gorrak') {
+          // Undead/gorrak are lore-exempt; cc-immune mobs (raid bosses) reject it here so
+          // the cast never reaches the effect's sheep full-heal side effect.
+          if (
+            fam === 'undead' ||
+            target.templateId === 'gorrak' ||
+            MOBS[target.templateId]?.ccImmune
+          ) {
             ctx.error(p.id, 'This creature cannot be polymorphed.');
             return;
           }
@@ -431,6 +440,7 @@ export function castAbility(
     if (!p.autoAttack && target) ctx.startAutoAttack(p.id);
     return;
   }
+  p.castTargetId = target?.id ?? null;
 
   const gcd = ctx.playerGcdFor(meta.cls);
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
@@ -452,30 +462,34 @@ export function castAbility(
   if (ability.channel) {
     spendResource(p, res.cost);
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1);
+    // Spell haste (item-set bonus) shortens the whole channel and so each tick.
+    const channelDuration = ability.channel.duration / (1 + p.spellHaste);
     p.castingAbility = ability.id;
-    p.castTargetId = null; // channels are hostile-path; never carry an override
-    p.castTotal = ability.channel.duration;
-    p.castRemaining = ability.channel.duration;
+    p.castTotal = channelDuration;
+    p.castRemaining = channelDuration;
     p.channeling = true;
-    p.channelTickEvery = ability.channel.duration / ability.channel.ticks;
+    p.channelTickEvery = channelDuration / ability.channel.ticks;
     p.channelTickTimer = p.channelTickEvery;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
     ctx.emit({
       type: 'castStart',
       entityId: p.id,
       ability: ability.id,
-      time: ability.channel.duration,
+      time: channelDuration,
     });
     return;
   }
 
   if (castTime > 0 && !togglingOff) {
-    // Curse of Tongues stretches the resolved (already haste-adjusted) cast time.
-    const stretchedCastTime = castTime * tonguesMult(p);
+    // Spell haste (item-set bonus) shortens the cast; Curse of Tongues stretches it.
+    // Physical-school casts (Slam) ride spellHaste too: set-bonus haste is ONE stat,
+    // so meleeHaste always equals spellHaste and the classic melee-haste scaling
+    // falls out identically. If the haste channels ever split, give physical casts
+    // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
+    const stretchedCastTime = (castTime * tonguesMult(p)) / (1 + p.spellHaste);
     p.castingAbility = ability.id;
-    // A timed cast re-resolves its friendly target at FINISH, so the mouseover
-    // override must ride on the entity until applyAbility consumes it.
-    p.castTargetId = castTargetId;
+    // The resolved target (incl. the mouseover-resolved friendly) was captured
+    // into p.castTargetId above; the finish path re-validates it.
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
@@ -487,6 +501,7 @@ export function castAbility(
   applyAbility(ctx, p, meta, res, castTargetId);
   // instant ground-targeted cast: its effects have consumed the aim point.
   p.castAim = null;
+  p.castTargetId = null;
 }
 
 export function spendResource(p: Entity, cost: number): void {
@@ -606,7 +621,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
-  const target = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
     cancelCast(ctx, p);
     return;
@@ -708,7 +723,10 @@ function applyAbility(
   if (ability.id === 'revive_pet') {
     const pet = ctx.petOf(p.id, true);
     if (!pet) {
-      ctx.error(p.id, 'You have no pet.');
+      ctx.error(
+        p.id,
+        isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+      );
       return;
     }
     if (!pet.dead) {
@@ -723,6 +741,8 @@ function applyAbility(
 
   let target: Entity | null = null;
   if (ability.requiresTarget && ability.targetType === 'friendly') {
+    // Keep the branch's mouseover-cast resolution (Clique-style): the explicit
+    // override wins while valid, else current-friendly-target-else-self.
     target = resolveFriendlyTarget(ctx, p, castTarget);
     if (dist2d(p.pos, target.pos) > Math.max(ability.range, 5) + 2) {
       ctx.error(p.id, 'Out of range.');
@@ -733,7 +753,9 @@ function applyAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    // The locked cast target (captured at cast start; the prologue moved it
+    // into the local so it can never leak into a later cast).
+    target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
       ctx.error(p.id, 'You have no target.');
       return;

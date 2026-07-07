@@ -1,5 +1,6 @@
 import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
 import { t } from '../ui/i18n';
+import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
 import type { HoverCursorKind } from './cursors';
 
@@ -126,8 +127,12 @@ export function handlePickedEntity(
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else if (e.templateId === 'mailbox') hud.openMailbox();
-      else world.pickUpObject(id);
+      else if (e.templateId === 'mailbox') {
+        // Dead players (ghosts included) cannot use the mail; the server-side
+        // interact path refuses too, this just keeps the window from opening.
+        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
+        else hud.openMailbox();
+      } else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
       else hud.showError(t('questUi.errors.tooFar'));
@@ -138,7 +143,12 @@ export function handlePickedEntity(
           // Sickness). To the living it offers only watchful flavor.
           if (world.player.ghost) world.resurrectAtSpiritHealer();
           else hud.showError(t('hudChrome.death.spiritHealerAlive'));
-        } else if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
+        } else if (world.player.dead) {
+          // Dead players and ghosts cannot talk to NPCs (the server refuses the
+          // command too); do not open the quest dialog client-side.
+          hud.showError(tSim('error.cantWhileDead'));
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
     } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
@@ -155,8 +165,10 @@ export function handlePickedEntity(
       if (d > INTERACT_RANGE + 1) return;
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else if (e.templateId === 'mailbox') hud.openMailbox();
-      else world.pickUpObject(id);
+      else if (e.templateId === 'mailbox') {
+        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
+        else hud.openMailbox();
+      } else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
@@ -164,8 +176,11 @@ export function handlePickedEntity(
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)
       const d = dist2d(world.player.pos, e.pos);
-      if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
+      // No quest dialog while dead (the server refuses quest talk too); a ghost
+      // takes the Spirit Healer res via right-click or the death panel button.
+      if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
+        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       }
     }

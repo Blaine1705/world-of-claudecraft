@@ -46,6 +46,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.loot = null;
   mob.lootRecipientIds = undefined;
   mob.tappedById = null;
+  mob.harvestClaimedBy = null;
   mob.ownerId = null;
   mob.hostile = true;
   mob.pos = { ...mob.spawnPos };
@@ -86,6 +87,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
     mob.castingAbility = null;
     mob.castTotal = 0;
     mob.castRemaining = 0;
+    mob.castTargetId = null;
   }
   mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);

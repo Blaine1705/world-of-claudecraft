@@ -407,6 +407,10 @@ export interface SetBonusEffect {
   spi?: number;
   ap?: number; // flat attack power
   crit?: number; // flat crit chance, 0..1
+  // Haste fraction (0.15 = 15% faster). ONE stat: it speeds melee and ranged
+  // auto-attack swings AND shortens spell cast/channel time, all together
+  // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
+  haste?: number;
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
 }
@@ -578,6 +582,11 @@ export interface MobTemplate {
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
+  // Profession harvesting: the skinning/salvage component types this mob's corpse
+  // can yield (e.g. 'hide', 'horn', 'venomSac', 'gills', 'fang', 'claw', 'feather').
+  // Consumed by the corpse-harvest command (src/sim/interaction.ts harvestCorpse)
+  // via the tag-to-item map in src/sim/content/professions.ts (#1141).
+  componentTags?: string[];
   boss?: boolean;
   rare?: boolean;
   // World boss: a server-wide elite that spawns on a fixed cadence (not from a
@@ -587,9 +596,16 @@ export interface MobTemplate {
   worldBoss?: boolean;
   // Elite scaling, classic-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
+  // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP
+  // spider egg-sac) that must not pay full kill XP for a single hit.
+  xpMult?: number;
   // Rare/miniboss controls.
   canSwim?: boolean;
   ccImmune?: boolean;
+  // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
+  // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
+  // leaves snares landing so most elites can still be kited; a raid boss sets both.
+  slowImmune?: boolean;
   respawnMult?: number;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
@@ -733,6 +749,28 @@ export interface MobTemplate {
     name: string;
     school?: Aura['school'];
   };
+  // Boss mechanic ("Howling Gale"): the ANTI-KITE snare. A periodic, room-wide AoE
+  // that slows every player within `radius` to `mult` of run speed (moveSpeedMult
+  // already honors `slow` auras, so 0.2 = 20% speed) for `duration`s. Unlike the
+  // aoePulse/stomp/bigCast pulses, which gate on the boss being in melee range, this
+  // one ALSO fires while the boss is chasing a fleeing target: that is the whole
+  // point, a ranged kiter can otherwise hold a sub-run-speed boss out of melee
+  // forever and none of the other pulses ever land. Deals no damage and draws no
+  // rng (fixed radius/mult/duration). Telegraphed like the sibling pulses (the first
+  // gust lands one full `every` after engage).
+  aoeSlow?: {
+    radius: number;
+    mult: number;
+    duration: number;
+    every: number;
+    name: string;
+    school?: Aura['school'];
+  };
+  // Boss flavor ("loud"): a booming voice. `range` widens how far EVERY yell this mob
+  // barks (engage/summon/enrage too) carries, past the default YELL_RANGE, and `lines`
+  // are extra battle cries it bellows every `every`s while in combat (cycled in order,
+  // no rng). Chat-channel text, so it ships English under the boss-yell precedent.
+  battleYells?: { lines: string[]; every: number; range: number };
   // Melee mechanic: each landed swing also splashes onto other players near the
   // primary target for `mult` of the (pre-armor) hit. A classic-style cleave arc.
   cleave?: { radius: number; mult: number; name?: string };
@@ -1025,6 +1063,12 @@ export interface MobTemplate {
     max: number;
     range: number;
     every: number;
+    /** Telegraph seconds between the windup spellfx (the renderer starts the
+     *  throw animation on it) and the actual release (projectile + damage).
+     *  Eats into `every`, so the fire-to-fire cadence is unchanged; the
+     *  release is committed once the windup starts. Omitted = release at the
+     *  timer with no telegraph, the original behavior (warlock demon bolts). */
+    windup?: number;
   };
   // On-hit mechanic: chance to silence the victim, locking out spell (non-physical) casts for a duration.
   silence?: { chance: number; duration: number; name: string; school?: string };
@@ -1346,6 +1390,17 @@ export interface GroundObjectDef {
   positions: { x: number; z: number }[];
 }
 
+// Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
+// issue is content plus visibility only, no harvest logic (see G3).
+export type GatherNodeType = 'ore' | 'wood' | 'herb';
+
+export interface GatherNodeDef {
+  id: string;
+  zoneId: string;
+  type: GatherNodeType;
+  pos: { x: number; z: number };
+}
+
 export interface DungeonSpawn {
   mobId: string;
   x: number; // relative to instance origin
@@ -1548,6 +1603,11 @@ export interface Entity {
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
   spellPower: number; // casters: added to spell damage via per-spell coefficients
+  // Haste fractions from item-set bonuses (0 = none). Melee/ranged haste speed up
+  // the respective auto-attack swing; spell haste shortens cast and channel time.
+  meleeHaste: number;
+  rangedHaste: number;
+  spellHaste: number;
   critChance: number; // 0..1
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
@@ -1558,6 +1618,9 @@ export interface Entity {
   targetId: number | null;
   autoAttack: boolean;
   swingTimer: number;
+  /** petSpell windup in flight: sim tick the committed release fires on
+   *  (transient combat state like swingTimer; never persisted or wired). */
+  rangedWindupReleaseTick?: number | null;
   inCombat: boolean;
   combatTimer: number; // time since last combat event
   auras: Aura[];
@@ -1567,13 +1630,16 @@ export interface Entity {
   stealthed: boolean;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
-  // Mouseover-cast override (Clique-style): the friendly entity id an
-  // in-progress cast should land on instead of targetId. Set when a cast
-  // starts via castAbilityOn, consumed at finish, cleared on cancel. Runtime
-  // combat state only: never serialized, never on the wire.
-  castTargetId: number | null;
   castRemaining: number;
   castTotal: number;
+  // Entity-targeted casting: the target captured at cast start for entity-targeted
+  // casts (hostile and friendly) and channels; also carries the mouseover-cast
+  // (Clique-style) friendly override set by castAbilityOn. Timed casts and channel
+  // ticks resolve against this id, so retargeting mid-cast/mid-channel cannot
+  // redirect the spell, and clearing your target no longer cancels a channel. The
+  // channel still cancels if the locked target dies or turns non-hostile. Runtime
+  // combat state only: never serialized, never on the wire.
+  castTargetId: number | null;
   // Ground-targeted casting: the world point a `targetMode: 'position'` ability is
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
@@ -1631,6 +1697,9 @@ export interface Entity {
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
+  aoeSlowTimer: number; // Howling Gale anti-kite snare-pulse countdown
+  loudYellTimer: number; // battle-cry (loud boss) bark countdown
+  loudYellIndex: number; // next battle-cry line to bark (cycles through battleYells.lines)
   detonateTimer: number; // Death Throes fuse on a volatile corpse; Infinity = no pending detonation
   mendTimer: number; // mendAlly support-heal cast countdown
   wardTimer: number; // wardAllies support-shield cast countdown
@@ -1653,9 +1722,20 @@ export interface Entity {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
+   *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
+   *  own death can never re-trigger the same affix (would otherwise chain forever). */
+  affixSpawned?: boolean;
   respawnTimer: number;
   corpseTimer: number;
   lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
+  // Profession harvest: single-use, first-come claim on this corpse's componentTags
+  // yield. null = unharvested; once set to a player's entity id, every later attempt
+  // (same tick or later) is denied. The opposite of a world gathering node (per-player).
+  // SERVER-PRIVATE today: no snapshot delta mirrors it, so the online ClientWorld
+  // always reads null (src/net/online.ts blankEntity). Mirror it over the wire
+  // before any UI/render consumer reads it through IWorld.
+  harvestClaimedBy: number | null;
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
@@ -1944,13 +2024,16 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       ability: string;
     }
-  // visual-only cue for the renderer: spell projectiles, channel beams, dot ticks, aoe novas
+  // visual-only cue for the renderer: spell projectiles, channel beams, dot
+  // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
+  // the START of a petSpell windup so the throw animation leads the release;
+  // the 'projectile' for the same throw follows petSpell.windup later).
   | {
       type: 'spellfx';
       sourceId: number;
       targetId: number;
       school: string;
-      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'chainHeal' | 'lightning';
+      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'chainHeal' | 'windup' | 'lightning';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
@@ -1969,10 +2052,11 @@ export type SimEvent = { pid?: number } & (
   // delivers it to nearby players; anchorless logs broadcast server-wide
   | { type: 'log'; text: string; color?: string; entityId?: number }
   | { type: 'delveEntered'; delveId: string; tierId: string }
+  | { type: 'delveObjectiveComplete'; delveId: string; tierId: string }
   | { type: 'delveComplete'; delveId: string; tierId: string }
   | { type: 'delveFailed'; delveId: string; tierId: string }
   | { type: 'delveLoreUnlock'; loreId: string }
-  | { type: 'companionBark'; barkId: string; pid?: number }
+  | { type: 'companionBark'; barkId: string; companionId: string; pid?: number }
   // Lockpicking minigame ("Tumbler's Path"). All personal (pid-scoped). The sim
   // emits structured data only, the client builds every visible string. Cells
   // are always limited to the fog window (anti-cheat: the full lock is never
@@ -2014,11 +2098,46 @@ export type SimEvent = { pid?: number } & (
       lootTier?: LootTier;
     }
   | { type: 'lockpickBonus'; tier: LootTier; marks: number; copper: number }
-  | { type: 'delveChestLoot'; chestId: number; items: { itemId: string; count: number }[] }
+  | {
+      type: 'delveChestLoot';
+      chestId: number;
+      delveId: string;
+      tierId: string;
+      lootTier: LootTier;
+      bountiful: boolean;
+      items: { itemId: string; count: number }[];
+    }
+  // Carries the shrine as `entityId` so the server's eventAnchor interest-scopes
+  // the pulse to players near the apse instead of broadcasting it realm-wide
+  // (the HUD closes the rite popup on the first pulse).
+  | { type: 'delveRitePulse'; entityId: number; shrineKind: RiteShrineKind }
+  | {
+      type: 'delveRiteFeedback';
+      shrineId: number;
+      shrineKind: RiteShrineKind;
+      correct: boolean;
+    }
+  // Personal cue (carries `pid`) to open the rite difficulty popup when a player
+  // interacts with the risen reliquary before choosing. Text-free: the client
+  // renders its own localized copy, so no sim/server i18n matcher rule is needed.
+  | { type: 'delveRiteChoosePrompt'; reliquaryId: number }
   // personal cue (carries `pid`) to open the cosmetic skin-select overlay with
   // the server-rolled rank. Text-free on purpose — the client renders its own
   // localized copy, so no sim/server i18n matcher rule is needed.
   | { type: 'skinEvent'; rank: SkinRank; catalog?: SkinCatalog }
+  // Common-tier crafting outcome (#1127): mirrors CraftResult so the online
+  // client can reflect the local result of a craftItem command without
+  // deciding it itself. Text-free on purpose (see skinEvent above): the
+  // client renders its own localized copy off the structured fields.
+  | {
+      type: 'craftResult';
+      ok: boolean;
+      recipeId: string;
+      itemId?: string;
+      count?: number;
+      quality?: ItemDef['quality'];
+      reason?: 'unknown_recipe' | 'insufficient_materials';
+    }
 );
 
 export interface MoveInput {
@@ -2125,6 +2244,11 @@ export interface SimConfig {
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  // Live server: schedule the first world-boss rise at boot instead of one
+  // interval out, so a freshly (re)started realm has Thunzharr up immediately.
+  // Offline worlds and parity traces keep the default (first rise after one
+  // interval), so this never fires inside a short deterministic scenario.
+  worldBossAtBoot?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -2182,6 +2306,11 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+// The Drowned Litany finale boss. Used by the drowned_litany_boss driver.
+export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';
+// The Tolling Bells projectile mob (Drowned Litany finale): moved exclusively by
+// the boss driver. Shared with mob/locomotion.ts so the AI dispatcher skips it.
+export const TOLLING_BELL_TEMPLATE_ID = 'tolling_bell';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
@@ -2204,7 +2333,7 @@ export const MAX_VIRTUAL_LEVEL = 200; // table bound; far beyond any reachable l
 
 // VLEVEL_CUM[v] = total lifetime XP required to *reach* virtual level v.
 // VLEVEL_CUM[1] = 0; index 0 is unused padding.
-function buildVlevelCum(): number[] {
+const VLEVEL_CUM: number[] = (() => {
   const cum: number[] = [0, 0];
   let total = 0;
   // real levels: 1→2 … 19→20 come straight from XP_TABLE
@@ -2220,18 +2349,7 @@ function buildVlevelCum(): number[] {
     step *= POSTCAP_GROWTH;
   }
   return cum;
-}
-
-const VLEVEL_CUM: number[] = buildVlevelCum();
-
-// The cumulative table above is derived from XP_TABLE at module eval. A host
-// that mutates XP_TABLE (the game-config override layer, src/sim/game_config.ts)
-// must call this afterwards so virtual levels keep matching the live curve.
-export function refreshPostcapXpTable(): void {
-  const next = buildVlevelCum();
-  VLEVEL_CUM.length = 0;
-  VLEVEL_CUM.push(...next);
-}
+})();
 
 // Total lifetime XP needed to reach a given (virtual or real) level. Used to
 // backfill `lifetimeXp` for characters saved before the counter existed.
@@ -2533,6 +2651,22 @@ export interface DelveInteractableSlot {
   variants: string[];
 }
 
+// A static environmental hazard circle (instance-local coords), e.g. the Drowned
+// Litany's Blackwater pools. Standing players take damage on a fixed interval; it
+// is NOT a collider (mobs/companions walk through, pathing ignores it), it only
+// shapes where players choose to stand.
+export interface DelveHazardZone {
+  x: number;
+  z: number;
+  r: number;
+  // An authored ellipse (e.g. the apse moat, wider along x than z to fit
+  // between its flanking islands): rx/rz win over r for both the damage
+  // check and every visual (map, render). Omit for a plain circle of radius r.
+  rx?: number;
+  rz?: number;
+  tier?: 'shallow' | 'deep';
+}
+
 export interface DelveModuleDef {
   id: string;
   interior: 'crypt' | 'cave' | 'mine';
@@ -2541,6 +2675,8 @@ export interface DelveModuleDef {
   spawnSets: DelveSpawnSet[];
   interactableSlots: DelveInteractableSlot[];
   sideRoom?: { chance: number; moduleId: string };
+  // Static Blackwater (or similar) hazard zones for this module, instance-local.
+  hazards?: DelveHazardZone[];
 }
 
 export interface DelveDef {
@@ -2550,6 +2686,8 @@ export interface DelveDef {
   index: number;
   minLevel: number;
   suggestedPlayers: number;
+  // Hard cap: a party larger than this may not enter (delves are solo/duo content).
+  maxPlayers: number;
   doorPos: { x: number; z: number };
   modules: string[];
   moduleCount: [number, number];
@@ -2598,7 +2736,14 @@ export interface DelveRun {
   raiseDeadChannel: DelveRaiseDeadChannel | null;
   restlessPending: DelveRestlessPending[];
   badAirTimer: number;
+  /** Accumulates DT for the static Blackwater hazard pulse (damage every interval
+   * a player stands in a module hazard zone). Reset on run start / module change. */
+  blackwaterTimer: number;
   companionBarks: string[];
+  /** Rank 3 boon: set once the once-per-run ally revive has been spent. Lives on
+   * the run (like companionBarks), not on the companion state, so leaving and
+   * re-entering mid-run cannot recharge it. */
+  companionReviveUsed: boolean;
   /** True when the current module exit portal is active (trash cleared + plate if any). */
   exitPortalOpen: boolean;
   /** §7.6, this run rolled Bountiful (ultra-rare): the reward chest is a purple
@@ -2611,6 +2756,22 @@ export interface DelveRun {
   surfaceExitId: number | null;
   /** Active lockpicking attempt on the finale chest (single interactor, v1), or null. In-memory only. */
   lockpick: LockSession | null;
+  /** Sister Nhalia boss mechanics (The Drowned Litany finale only). */
+  nhaliaBoss?: DrownedLitanyBossState;
+  /** Drowned Reliquary Rite shrine puzzle (The Drowned Litany finale only). */
+  drownedLitanyRite?: DrownedLitanyRiteState;
+  /** Sinkhole Baptistry wave progression (egg-sacs gated until wave 3). */
+  litanyBaptistry?: DrownedLitanyBaptistryState;
+}
+
+export interface DrownedLitanyBaptistryState {
+  /** Index of the active wave in BAPTISTRY_WAVES (0..2). */
+  wave: number;
+  eggsEnabled: boolean;
+  /** Mob ids of the spawned spider_egg_sac adds (set once, at spawn time). */
+  eggSacIds: number[];
+  /** Subset of eggSacIds whose death burst has already fired, so a kill is processed once. */
+  burstIds: number[];
 }
 
 export interface DelveDailyState {
@@ -2650,6 +2811,10 @@ export interface DelveObjectState {
   pendingLoot?: { itemId: string; count: number }[];
   /** Entity id of the player who picked the lock; only they may collect the loot. */
   lootOwnerId?: number;
+  // Drowned Reliquary loot (kind === 'drowned_reliquary'): each party member rolls
+  // and collects their own items independently, so there is no single owner to
+  // front-run. Keyed by pid; emptied per member as they collect.
+  partyLoot?: Record<number, { itemId: string; count: number }[]>;
 }
 
 export interface DelveRaiseDeadChannel {
@@ -2658,6 +2823,88 @@ export interface DelveRaiseDeadChannel {
   mobId: string;
   count: number;
   remaining: number;
+}
+
+/** A boss-spawned Blackwater Mark puddle (world coords, instance-local). */
+export interface DrownedLitanyBlackwaterMark {
+  x: number;
+  z: number;
+  remaining: number;
+  tickTimer: number;
+}
+
+/** A single Tolling Bell projectile entity in flight (entity id + expiry timer). */
+export interface TollingBellEntity {
+  /** Entity id of the mob entity representing this bell. */
+  entityId: number;
+  /** Seconds until the bell expires (travels out of bounds). */
+  remaining: number;
+  /** Velocity direction: unit vector (dx, dz). */
+  vx: number;
+  vz: number;
+}
+
+/** Per-run Sister Nhalia encounter state (DelveRun.nhaliaBoss). */
+export interface DrownedLitanyBossState {
+  markTimer: number;
+  marks: DrownedLitanyBlackwaterMark[];
+  firedCantorPhases: number;
+  /** Entity ids from the active Cantor phase; shield drops when all are dead. */
+  cantorShieldAdds: number[];
+  finalBellFired: boolean;
+  /** Countdown until the next Tolling Bells volley (seconds). */
+  bellVolleyTimer: number;
+  /** Currently in-flight bell projectile entities. */
+  bells: TollingBellEntity[];
+}
+
+export type RiteShrineKind =
+  | 'rite_shrine_bell'
+  | 'rite_shrine_candle'
+  | 'rite_shrine_reed'
+  | 'rite_shrine_skull';
+
+export const RITE_SHRINE_KINDS: RiteShrineKind[] = [
+  'rite_shrine_bell',
+  'rite_shrine_candle',
+  'rite_shrine_reed',
+  'rite_shrine_skull',
+];
+
+/** Player-chosen rite difficulty: more playbacks + shorter for Easy, fewer + longer
+ * for Hard. Loot ceiling rises with difficulty (Easy=low, Medium=medium, Hard=premium). */
+export type RiteIntensity = 'easy' | 'medium' | 'hard';
+
+export const RITE_INTENSITIES: RiteIntensity[] = ['easy', 'medium', 'hard'];
+
+/** Per-run Drowned Reliquary Rite puzzle state (DelveRun.drownedLitanyRite). */
+export interface DrownedLitanyRiteState {
+  /** True after the reliquary rises until the player picks a difficulty; the
+   * sequence is empty and playback has not started while this is set. */
+  awaitingChoice: boolean;
+  /** The chosen difficulty, or null while awaitingChoice. */
+  intensity: RiteIntensity | null;
+  sequence: RiteShrineKind[];
+  currentIndex: number;
+  mistakes: number;
+  /** How many wrong touches are tolerated before the reliquary opens on low loot.
+   * Equals tries - 1: a wrong touch fails the current try and (if tries remain)
+   * replays the sequence from the top. */
+  mistakesAllowed: number;
+  /** Full attempts the player gets at repeating the sequence (Easy 3, Medium 2,
+   * Hard 1). Each wrong touch consumes a try. */
+  tries: number;
+  /** How many times the full sequence is shown before input is accepted. */
+  playbacks: number;
+  /** Which playback pass (0-based) is currently showing. */
+  playbackLoop: number;
+  puzzleActive: boolean;
+  sequencePlaying: boolean;
+  playbackIndex: number;
+  playbackTimer: number;
+  shrineEntityIds: Record<RiteShrineKind, number>;
+  reliquaryId: number;
+  opened: boolean;
 }
 
 export interface DelveRestlessPending {

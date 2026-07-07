@@ -254,6 +254,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showItemLevel',
       'showSecondaryActionBar',
       'showTargetOfTarget',
+      'showDailyRewardsChest',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
   });

@@ -188,6 +188,7 @@ export const en: EnTranslations = {
       "loading": "Loading daily rewards...",
       "error": "Could not load daily rewards.",
       "intro": "Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.",
+      "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Prize Pool",
       "reset": "Reset",
       "endsIn": "Ends in {time}",
@@ -209,6 +210,12 @@ export const en: EnTranslations = {
       "tasks": "Tasks",
       "taskMultiplier": "x{multiplier} multiplier",
       "pointsGained": "{points} daily rewards points gained.",
+      "showChestButton": "Show Chest",
+      "hideChestButton": "Hide Chest",
+      "hideChestConfirmTitle": "Hide Daily Rewards Chest?",
+      "hideChestConfirmBody": "This removes the chest shortcut from your HUD. Rewards, eligibility, and this panel stay available; you can bring the shortcut back from Options.",
+      "hideChestConfirmOk": "Hide Chest",
+      "hideChestConfirmCancel": "Cancel",
       "leaderboard": "Daily Leaderboard",
       "totalPlayer": "{count} player today",
       "totalPlayers": "{count} players today",
@@ -413,7 +420,8 @@ export const en: EnTranslations = {
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
-      "showTargetOfTarget": "Show Target of Target"
+      "showTargetOfTarget": "Show Target of Target",
+      "showDailyRewardsChest": "Show Daily Rewards Chest"
     },
     "talentRows": {
       "tab": "Choices",
@@ -736,6 +744,23 @@ export const en: EnTranslations = {
       "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
       "summaryGroup": "Loot Settings: Group Loot."
     },
+    "corpseHarvest": {
+      "title": "Harvest",
+      "harvestButton": "Harvest",
+      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "alreadyHarvested": "This corpse has already been harvested.",
+      "componentAria": "Harvest {component}",
+      "components": {
+        "hide": "Hide",
+        "fang": "Fang",
+        "silk": "Silk",
+        "venomSac": "Venom Sac",
+        "gills": "Gills",
+        "claw": "Claw",
+        "horn": "Horn",
+        "tusk": "Tusk"
+      }
+    },
     "party": {
       "promoteLeader": "Promote to Leader",
       "inviteUsage": "Invite whom? Usage: /invite <name>."
@@ -979,6 +1004,7 @@ export const en: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Dev",
         "mods": "Mod",
         "artists": "Artist"
@@ -1043,6 +1069,18 @@ export const en: EnTranslations = {
           "hint": "Ask the community for help"
         }
       }
+    },
+    "crafting": {
+      "title": "Crafting",
+      "close": "Close crafting",
+      "craft": "Craft",
+      "reagentsNeeded": "Requires:",
+      "reagentLine": "{name} x{have}/{required}",
+      "empty": "No recipes known yet.",
+      "resultAria": "Craft {name}",
+      "craftedToast": "Crafted: {name}",
+      "insufficientMaterials": "You do not have the materials for that.",
+      "unknownRecipe": "That recipe does not exist."
     },
     "devBadge": {
       "title": "Developer",
@@ -1181,6 +1219,101 @@ export const en: EnTranslations = {
     "social": {
       "lastSeen": "Last seen: {when}",
       "lastSeenNever": "never"
+    },
+    "gathering": {
+      "title": "Gathering",
+      "mining": "Mining",
+      "logging": "Logging",
+      "herbalism": "Herbalism"
+    }
+  },
+  "apiError": {
+    "validation": {
+      "failed": "Some fields are invalid. Check the form and try again."
+    },
+    "json": {
+      "malformed": "That request could not be read. Please try again."
+    },
+    "body": {
+      "too_large": "That request is too large. Try again with less data.",
+      "unsupported_media_type": "Unsupported request format."
+    },
+    "db": {
+      "conflict": "That change conflicted with another update. Please try again."
+    },
+    "rate_limit": {
+      "exceeded": "Too many requests. Try again in {seconds}."
+    },
+    "internal": {
+      "error": "Something went wrong on our end. Please try again."
+    },
+    "auth": {
+      "token_missing": "You need to be signed in to do that.",
+      "token_invalid": "Your session has expired. Please sign in again.",
+      "forbidden": "You do not have permission to do that.",
+      "invalid_credentials": "Invalid username or password.",
+      "required": "Not authenticated.",
+      "web_login_only": "Logins are only allowed from the game client.",
+      "too_many_attempts": "Too many attempts. Wait a minute and try again.",
+      "too_many_failed_attempts": "Too many failed attempts. Wait a few minutes and try again.",
+      "current_password_incorrect": "Your current password is incorrect.",
+      "password_incorrect": "Your password is incorrect.",
+      "verification_failed": "Verification failed. Please try again."
+    },
+    "account": {
+      "username_invalid": "Username must be 3-24 characters and use letters, digits, or underscore.",
+      "username_not_allowed": "That username is not allowed.",
+      "username_taken": "That username is already taken.",
+      "username_mismatch": "That username does not match your account.",
+      "password_too_short": "Password must be at least 6 characters.",
+      "password_too_long": "New password must be at most 128 characters.",
+      "characters_online": "Log out all of your characters before deactivating.",
+      "deactivated": "This account has been deactivated. Contact an admin to restore it.",
+      "not_found": "Account not found."
+    },
+    "character": {
+      "name_invalid": "Invalid character name. Use 2-16 letters.",
+      "name_not_allowed": "That character name is not allowed.",
+      "invalid_class": "Invalid class.",
+      "limit_reached": "Character limit reached.",
+      "name_taken": "That name is taken.",
+      "not_found": "Character not found.",
+      "online": "Character is currently online.",
+      "rename_not_permitted": "Renaming this character is not allowed.",
+      "delete_confirm": "Type the character name to confirm deletion.",
+      "already_in_world": "Character is already in world.",
+      "taken_over": "Your character was taken over by another session.",
+      "rename_required": "This character must be renamed before entering the world."
+    },
+    "moderation": {
+      "suspended_until": "This account is suspended until {date}.",
+      "suspended": "This account is suspended.",
+      "banned": "This account has been banned.",
+      "force_rename": "A moderator requires one of your characters to be renamed."
+    },
+    "email": {
+      "invalid": "Enter a valid email address.",
+      "unchanged": "That is already your email address."
+    },
+    "two_factor": {
+      "code_invalid": "That code is not valid, try again.",
+      "setup_required": "Start two-factor setup first.",
+      "already_enabled": "Two-factor is already enabled.",
+      "not_enabled": "Two-factor is not enabled."
+    },
+    "origin": {
+      "cross_site": "Request blocked for security reasons."
+    },
+    "discord": {
+      "not_configured": "Discord integration is not available right now.",
+      "expired": "That Discord sign-in expired. Please sign in with Discord again.",
+      "already_linked": "That Discord account is already linked to another account.",
+      "password_required": "Set a password before unlinking your Discord account.",
+      "unknown_swag": "That reward is not available.",
+      "link_required": "Link your Discord account first.",
+      "swag_claimed": "You have already claimed this reward.",
+      "swag_tier": "Reach a higher rank to claim this.",
+      "swag_points": "Not enough points."
     }
   },
   "guide": {
@@ -1208,6 +1341,7 @@ export const en: EnTranslations = {
       "delves": "Delves",
       "reference": "Reference",
       "controls": "Controls",
+      "settings": "Settings & Performance",
       "combat": "Combat",
       "talents": "Talents",
       "arena": "Arena & PvP",
@@ -1375,6 +1509,66 @@ export const en: EnTranslations = {
       "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere on the right to look, and on-screen buttons for your abilities and menus.",
       "controllerHeading": "On a controller",
       "controllerBody": "Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open any window to bring up an on-screen pointer for menus. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options."
+    },
+    "settingsPage": {
+      "heading": "Settings & Performance",
+      "intro": "Make the game look its best or run its fastest. Three ready-made loadouts, plus what every graphics option really does.",
+      "wherePath": "Everything on this page lives in the game: press Esc and look in Graphics, Interface, and Performance Overlay.",
+      "fairnessTitle": "Fair by design",
+      "fairnessBody": "No option here trades beauty for power. Lower settings shed cosmetic polish only, never information you fight with: your debuffs, cast bars, party health, and damage numbers are identical from Low to Ultra. Playing on a modest machine is never a handicap.",
+      "loadoutsHeading": "Three ready-made loadouts",
+      "loadoutsIntro": "Start from the loadout that sounds like your machine, then adjust one option at a time until it feels right.",
+      "recommended": "Recommended",
+      "whyLabel": "Why it works:",
+      "tagReload": "after reload",
+      "fpsTitle": "Best FPS",
+      "fpsTagline": "For older laptops, integrated graphics, and battery play.",
+      "fpsWhy": "Graphics Quality is the master switch, and Render Quality is the strongest slider: at 70% the world draws roughly half the pixels while the interface stays perfectly sharp.",
+      "balancedTitle": "Balanced",
+      "balancedTagline": "The sweet spot for most machines, and our default advice.",
+      "balancedWhy": "Medium brings real shadows and full materials; High adds ambient occlusion and bloom. Below Ultra a built-in safety net absorbs sudden dips in busy fights, so Balanced stays smooth without babysitting.",
+      "visualsTitle": "Best Visuals",
+      "visualsTagline": "Screenshot mode for powerful desktop machines.",
+      "visualsWhy": "Ultra renders at the highest resolution your display offers with the richest lighting. It also switches the safety net off, and it is desktop-only: phones and the app top out at High.",
+      "value50to70": "50 to 70%",
+      "value90to100": "90 to 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "High on a gaming PC, Medium on a laptop",
+      "valueOnOptional": "On (optional)",
+      "howHeading": "How the options behave",
+      "factDetectTitle": "The game tunes itself first",
+      "factDetectBody": "On your first launch the game reads your device and picks a sensible tier, from Low on a modest phone to Ultra on a strong desktop. Any choice you make yourself always wins.",
+      "factReloadTitle": "Two kinds of options",
+      "factReloadBody": "Graphics Quality and the Advanced pickers take effect after a reload, and the panel offers a Reload Now button when needed. Every other option applies the moment you change it.",
+      "factGovernorTitle": "A built-in safety net",
+      "factGovernorBody": "On every tier below Ultra, the game quietly thins grass, effects, and lighting for a moment when a big fight spikes, then restores them. Choosing Ultra tells it you would rather keep every detail.",
+      "advancedHeading": "The Advanced preset: mix your own",
+      "advancedBody": "Advanced starts from the High tier and unlocks four extra pickers, so you can spend your frames where you actually notice them: Terrain Detail, Foliage Density, Effects & Lighting, and Shadow Quality. Like Graphics Quality, they apply after a reload.",
+      "advancedMixes": "Two favorite mixes: keep Shadow Quality on High and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows.",
+      "tableHeading": "Every option, explained",
+      "colSetting": "Setting",
+      "colDoes": "What it does",
+      "colImpact": "FPS impact",
+      "impactNone": "None",
+      "impactLight": "Light",
+      "impactModerate": "Moderate",
+      "impactHeavy": "Heavy",
+      "rowGraphicsQuality": "The master switch. Each step changes resolution, shadows, materials, foliage, and lighting effects together. The biggest single difference you can make.",
+      "rowRenderQuality": "Draws the 3D world at a lower internal resolution and scales it up; the interface stays sharp. The strongest instant slider on weaker machines and high-resolution screens.",
+      "rowFieldOfView": "How much of the world fits on screen, from a zoomed 55 to a sweeping 100 degrees. A comfort choice; wider views draw slightly more.",
+      "rowBrightness": "Scene exposure, darker or brighter. Pure preference.",
+      "rowWeather": "Ambient rain and snow. Atmosphere only, and switching it off saves a little during storms.",
+      "rowBrowserEffects": "How fancy the interface itself is allowed to be: glass blur, glow, animated menus. Auto matches your browser; the 3D world is untouched either way.",
+      "rowTerrainDetail": "Rich, blended ground textures versus a simpler, faster terrain look.",
+      "rowFoliageDensity": "How far and how thick the grass grows around your character.",
+      "rowEffectsQuality": "Bloom, ambient occlusion, and how many torches and spells cast real light. The single biggest saving among the Advanced pickers.",
+      "rowShadowQuality": "Shadow crispness. Low keeps shadows but softens their edges.",
+      "rowFrostedPanels": "A frosted-glass blur behind windows. Pretty, and exactly the kind of effect a weaker browser feels; leave it off for the classic crisp look.",
+      "rowReduceMotion": "Removes interface animations so windows appear instantly. An accessibility option first, with a small performance bonus.",
+      "rowPerfOverlay": "An on-screen readout of FPS, frame time, and more. Turn it on while you tune this page, then hide it again.",
+      "tableFoot": "Looking for a draw-distance slider or an FPS cap? There is nothing to hunt for: view distance is part of each quality tier, and frame pacing follows your display.",
+      "mobileTitle": "On phones and tablets",
+      "mobileBody": "Mobile manages more for you: the game picks the tier, holds resolution a touch lower to protect battery and heat, and keeps the highest tiers desktop-only. The loadouts above still apply; phones simply top out at High."
     },
     "combat": {
       "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",
@@ -2113,7 +2307,7 @@ export const en: EnTranslations = {
     "water": {
       "title": "Water Level",
       "level": "Water level",
-      "hint": "Sets the map-wide water surface height, from {min} to {max} yards.",
+      "hint": "Sets each declared lake's water surface height, from {min} to {max} yards.",
       "reset": "Reset to the built-in level"
     },
     "place": {
@@ -2358,7 +2552,7 @@ export const en: EnTranslations = {
         "smooth": "Smooth bumps toward the local average height.",
         "flatten": "Level the ground to the height where the drag starts.",
         "paint": "Paint biome ground cover over the zone default.",
-        "water": "Set the map-wide water level.",
+        "water": "Set a declared lake's water level.",
         "place": "Place catalog or uploaded assets on the ground.",
         "blocker": "Drag invisible walls that block movement in playtest.",
         "camp": "Add and edit mob camps that spawn in playtest.",
@@ -2519,7 +2713,11 @@ export const en: EnTranslations = {
   },
   "download": {
     "title": "Download Desktop Launcher",
-    "desc": "Get the standalone launcher for optimized performance and full-screen play."
+    "desc": "Get the standalone launcher for optimized performance and full-screen play.",
+    "macCta": "Download for macOS",
+    "linuxCta": "Download for Linux",
+    "linuxHint": "AppImage: make it executable, then run it. No install needed.",
+    "windowsPending": "Windows build pending."
   },
   "comingSoon": {
     "placeholder": "Coming Soon...",
@@ -2829,6 +3027,7 @@ export const en: EnTranslations = {
       "unknownTier": "Unknown delve tier.",
       "levelRequired": "You must be level {level} to enter {name}.",
       "levelRequiredTier": "You must be level {level} to enter {name} on {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "All instances of {name} are busy. Try again soon.",
       "runFailed": "{name} run failed.",
       "complete": "{name} complete.",
@@ -2838,6 +3037,14 @@ export const en: EnTranslations = {
       "doorAlreadyOpen": "The door is already open.",
       "companionRankUp": "{name} reaches rank {rank}.",
       "bossChest": "The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "A stairway to the surface opens. Press F at the stairs to leave.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Clear the room.",
@@ -2845,6 +3052,13 @@ export const en: EnTranslations = {
       "tombstoneHint": "A tombstone passage opens to the north when the room is cleared.",
       "tombstoneOpen": "A sealed tombstone passage grinds open to the north. Walk into it to continue.",
       "tombstoneInto": "You pass through the tombstone into {name}.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
+      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
+      "ropesSealed": "You should try pulling the bell ropes.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "The chest is empty.",
       "notInDelve": "You are not in a delve.",
       "cannotInteract": "You cannot interact with that.",
@@ -2863,9 +3077,12 @@ export const en: EnTranslations = {
       "passageSealed": "The passage is sealed.",
       "moveCloserPassage": "Move closer to the passage.",
       "moveCloserChest": "Move closer to the chest.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "There is nothing left to take.",
       "wayOutNotOpen": "The way out is not yet open.",
-      "moveCloserStairs": "Move closer to the stairs."
+      "moveCloserStairs": "Move closer to the stairs.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "The lock yields! {tier} spoils.",
@@ -2928,6 +3145,26 @@ export const en: EnTranslations = {
       "abandoned": "You ease the picks back out. The lock waits."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
+    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
+    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Delve Board",
@@ -2937,6 +3174,7 @@ export const en: EnTranslations = {
       "openDelveAria": "Open Delve Board from {name}",
       "marks": "Delve Marks: {count}",
       "minLevel": "Requires Level {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroic"
@@ -2944,6 +3182,7 @@ export const en: EnTranslations = {
       "companion": {
         "pick": "Choose a companion",
         "tessa": "Acolyte Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Rank {rank}",
         "boon": "Heals the party between fights. Rank 3 revives a fallen ally once per run.",
         "upgrade": "Upgrade to Rank {rank} ({marks} Marks)",
@@ -2969,7 +3208,11 @@ export const en: EnTranslations = {
       "complete": "Complete",
       "marks": "Delve Marks: {count}",
       "exitHintOpen": "Walk into the tombstone passage (north)",
-      "exitHintLocked": "Clear trash mobs to open the passage north"
+      "exitHintLocked": "Clear trash mobs to open the passage north",
+      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
+      "ritePlayback": "Watch the shrines: memorize the order they light up",
+      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
+      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
     },
     "objective": {
       "kill_boss": "Slay {boss}",
@@ -2990,27 +3233,54 @@ export const en: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born."
+      },
+      "halvenMarsh": {
+        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, \"The reliquary should not be open this far. Stay close, {playerName}.\"",
-      "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\""
+      "heroic": "The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa's candle burns blue. \"They are not calling the dead now, {playerName}. They are answering something.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Water seeps through burial shelves, carrying old ash in silver-black streams.",
       "reliquary_bell_niche": "Dozens of handbells hang in silence, each tied with funeral cloth.",
       "reliquary_saintless_hall": "Statues with faces chiseled away with careful hatred.",
-      "reliquary_finale": "The buried bell tolls once beneath your boots."
+      "reliquary_finale": "The buried bell tolls once beneath your boots.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "The Sunken Ossuary",
       "reliquary_bell_niche": "The Bell Niche",
       "reliquary_saintless_hall": "The Saintless Hall",
-      "reliquary_finale": "The Bell-Buried Chamber"
+      "reliquary_finale": "The Bell-Buried Chamber",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Reedsong Gallery",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
+        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Keep your footing, {playerName}. The dead are restless here.",
         "low_hp": "Breathe. I still have prayers left for you.",
         "trap_spotted": "Hold. Something in the floor remembers footsteps.",
@@ -3022,6 +3292,20 @@ export const en: EnTranslations = {
           "3": "Reliquary Acolyte",
           "4": "Gravecall Witness",
           "5": "Chapel Warden"
+        }
+      },
+      "edda": {
+        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
+        "ally_revive": "Up, now. The marsh does not get you today.",
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -3065,7 +3349,10 @@ export const en: EnTranslations = {
       "flooded_paths": "Flooded Paths",
       "grave_tax": "Grave Tax",
       "unstable_roof": "Unstable Roof",
-      "cult_remnants": "Cult Remnants"
+      "cult_remnants": "Cult Remnants",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Chapel Candle: safer run, one fewer Mark on completion."
@@ -3270,6 +3557,7 @@ export const en: EnTranslations = {
     "rendererFailed": "Could not start the renderer: try reloading. {error}",
     "enterTimeout": "Could not enter world. The connection timed out. Is the game server running?",
     "connectionLost": "Connection to the server was lost.",
+    "reconnecting": "Connection lost. Reconnecting...",
     "connectionRejected": "The server closed the connection."
   },
   "errors": {
@@ -3302,9 +3590,12 @@ export const en: EnTranslations = {
       "webLoginOnly": "Logins are only allowed from the game client.",
       "accountSuspended": "This account is suspended until {date}.",
       "alreadyInWorld": "Character is already in world.",
+      "accountSessionLimit": "Too many characters on this account are already in the world.",
       "takenOver": "Your character was taken over by another session.",
       "renameBeforeEntering": "This character must be renamed before entering the world.",
-      "renameNotPermitted": "Renaming this character is not allowed."
+      "renameNotPermitted": "Renaming this character is not allowed.",
+      "unsupportedMediaType": "Unsupported request format.",
+      "crossSiteOrigin": "Request blocked for security reasons."
     }
   },
   "desktop": {
@@ -4965,7 +5256,7 @@ export const en: EnTranslations = {
         "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
       },
       "holy_shield": {
-        "name": "Holy Shield",
+        "name": "Hallowed Wall",
         "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
       },
       "repentance": {
@@ -4973,11 +5264,11 @@ export const en: EnTranslations = {
         "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
-        "name": "Bestial Wrath",
+        "name": "Howling Rage",
         "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
       },
       "trueshot_aura": {
-        "name": "Trueshot Aura",
+        "name": "Sureflight Aura",
         "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
@@ -4985,11 +5276,11 @@ export const en: EnTranslations = {
         "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
       },
       "arcane_power": {
-        "name": "Arcane Power",
-        "description": "Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)"
+        "name": "Aether Surge",
+        "description": "Fills you with aether surge, increasing spell power by 28 for 12 sec. (Arcane signature)"
       },
       "combustion": {
-        "name": "Combustion",
+        "name": "Flashfire",
         "description": "Focuses your fire magic so your next attack is a critical strike. (Fire signature)"
       },
       "cone_of_cold": {
@@ -4997,32 +5288,32 @@ export const en: EnTranslations = {
         "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "cold_blood": {
-        "name": "Cold Blood",
+        "name": "Killer's Calm",
         "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
       },
       "blade_flurry": {
-        "name": "Blade Flurry",
+        "name": "Mirrored Blades",
         "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
       },
       "hemorrhage": {
-        "name": "Hemorrhage",
+        "name": "Red Ribbon",
         "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
       },
       "power_infusion": {
-        "name": "Power Infusion",
+        "name": "Anointing",
         "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
       },
       "holy_nova": {
         "name": "Holy Nova",
-        "description": "Causes an explosion of Holy light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+        "description": "Causes an explosion of Mending Light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
       },
       "shadowform": {
-        "name": "Shadowform",
-        "description": "Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "name": "Gloamveil",
+        "description": "Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
       },
       "elemental_mastery": {
-        "name": "Elemental Mastery",
-        "description": "Calls on elemental mastery, making your next spell instant. (Elemental signature)"
+        "name": "Primal Mastery",
+        "description": "Calls on primal mastery, making your next spell instant. (Elemental signature)"
       },
       "shamanistic_rage": {
         "name": "Shamanistic Rage",
@@ -5033,7 +5324,7 @@ export const en: EnTranslations = {
         "description": "Calls on nature to make your next spell instant. (Restoration signature)"
       },
       "siphon_life": {
-        "name": "Siphon Life",
+        "name": "Veinleech",
         "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
       },
       "fel_domination": {
@@ -5045,12 +5336,12 @@ export const en: EnTranslations = {
         "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
       },
       "moonkin_form": {
-        "name": "Moonkin Form",
-        "description": "Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+        "name": "Moonwing Form",
+        "description": "Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
       },
       "feral_charge": {
         "name": "Feral Charge",
-        "description": "Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)"
+        "description": "Charge an enemy and root it for 1 sec. 8-25 yard range. (Feral signature)"
       },
       "swiftmend": {
         "name": "Swiftmend",
@@ -5698,7 +5989,7 @@ export const en: EnTranslations = {
         "name": "Gravewoven Bag"
       },
       "mistcallers_duffel": {
-        "name": "Mistcaller's Duffel"
+        "name": "Fogbinder's Duffel"
       },
       "copper_mining_pick": {
         "name": "Copper Mining Pick"
@@ -5726,6 +6017,24 @@ export const en: EnTranslations = {
       },
       "silverleaf_sickle": {
         "name": "Silverleaf Sickle"
+      },
+      "thorium_mining_pick": {
+        "name": "Thorium Mining Pick"
+      },
+      "arcanite_mining_pick": {
+        "name": "Arcanite Mining Pick"
+      },
+      "ashwood_axe": {
+        "name": "Ashwood Axe"
+      },
+      "elderwood_axe": {
+        "name": "Elderwood Axe"
+      },
+      "goldleaf_sickle": {
+        "name": "Goldleaf Sickle"
+      },
+      "sunpetal_sickle": {
+        "name": "Sunpetal Sickle"
       },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"
@@ -6090,6 +6399,69 @@ export const en: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varric's Shadow Cowl"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
+      "litany_legs": {
+        "name": "Silt-Walker Greaves"
+      },
+      "litany_shoulder": {
+        "name": "Blackwater Drift Mantle"
+      },
+      "litany_gloves_rog": {
+        "name": "Reed-Bound Handwraps"
+      },
+      "litany_plate_chest": {
+        "name": "Sump-Warden Cuirass"
+      },
+      "litany_leather_chest": {
+        "name": "Silt-Deep Vestment"
+      },
+      "litany_cloth_chest": {
+        "name": "Choir-Drowned Raiment"
+      },
+      "litany_helm": {
+        "name": "Reliquant's Drowned Cowl"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "Sister Nhalia's Choir-Forged Plate"
+      },
+      "drowned_choir_fang": {
+        "name": "Drowned Choir-Fang"
+      },
       "the_codfather": {
         "name": "The Codfather"
       },
@@ -6425,6 +6797,39 @@ export const en: EnTranslations = {
       "acolyte_tessa": {
         "name": "Acolyte Tessa"
       },
+      "drowned_cantor": {
+        "name": "Drowned Cantor"
+      },
+      "reedbound_acolyte": {
+        "name": "Reedbound Acolyte"
+      },
+      "deepfen_spearjaw": {
+        "name": "Deepfen Spearjaw"
+      },
+      "mirefen_widowling": {
+        "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
+      },
+      "grave_silt_bulwark": {
+        "name": "Grave-Silt Bulwark"
+      },
+      "sump_troll_devourer": {
+        "name": "Sump Troll Devourer"
+      },
+      "choir_thrall": {
+        "name": "Bog Thrall"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "Sister Nhalia, the Drowned Canticle"
+      },
+      "edda_reedhand": {
+        "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
+      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
       },
@@ -6650,6 +7055,11 @@ export const en: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The reliquary below has shifted again."
+      },
+      "brother_halven_marsh": {
+        "name": "Brother Halven",
+        "title": "Reliquary Keeper",
+        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "spirit_healer": {
         "name": "The Pale Keeper",
@@ -7445,6 +7855,26 @@ export const en: EnTranslations = {
           }
         }
       },
+      "q_archetype_acceptance": {
+        "title": "A Craft to Call Your Own",
+        "text": "Every artisan of Eastbrook eventually settles on one craft to call their own. Prove yourself with a single deed, {playerName}, and declare your path.",
+        "completion": "Your path is chosen; walk it well.",
+        "objectives": {
+          "0": {
+            "label": "Forest Wolf slain"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Making Amends",
+        "text": "To set aside one craft for another, an artisan must first make amends for the path not walked, {playerName}.",
+        "completion": "Amends made; a new path is open to you.",
+        "objectives": {
+          "0": {
+            "label": "Forest Wolf slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "The Drowned Choir",
         "text": "The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.",
@@ -7650,6 +8080,11 @@ export const en: EnTranslations = {
         "name": "The Collapsed Reliquary",
         "enterText": "You descend into the collapsed reliquary.",
         "leaveText": "You climb back to Brother Halven at the reliquary ruin."
+      },
+      "drowned_litany": {
+        "name": "The Drowned Litany",
+        "enterText": "You descend into the drowned shrine at the marsh's edge.",
+        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "letters": {
@@ -7675,15 +8110,23 @@ export const en: EnTranslations = {
       }
     },
     "itemSets": {
+      "boundstone_vanguard": {
+        "name": "Boundstone Vanguard",
+        "bonus3": "Increases attack and casting speed by 15%."
+      },
       "crownforged": {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15 and Stamina by 15."
+        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%."
       },
       "deathlord": {
         "name": "Barrowlord Battlegear",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Strength by 15 and Stamina by 15."
+      },
+      "greyjaw_stalker": {
+        "name": "Greyjaw Stalker's Kit",
+        "bonus3": "Increases attack and casting speed by 15%."
       },
       "necromancers": {
         "name": "Mournweave Raiment",
@@ -7693,17 +8136,21 @@ export const en: EnTranslations = {
       "nighttalon": {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%."
+        "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
         "bonus2": "You cannot be knocked back (100% knockback resistance).",
-        "bonus3": "Increases Intellect by 15 and Spirit by 15."
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
         "bonus2": "You cannot be knocked back (100% knockback resistance).",
-        "bonus3": "Increases Intellect by 15 and Spirit by 15."
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%."
+      },
+      "vale_arcanist": {
+        "name": "Vale Arcanist's Regalia",
+        "bonus3": "Increases attack and casting speed by 15%."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",
@@ -7720,6 +8167,11 @@ export const en: EnTranslations = {
     "delveLockedChestInteract": "Press F to pick the lock",
     "delveRewardChestInteract": "Press F to claim spoils",
     "delveSurfaceExitInteract": "Press F to climb",
+    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
+    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
+    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
+    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
     "mailboxName": "Mailbox"
   }
 };

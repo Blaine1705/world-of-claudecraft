@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
-      "state": "0949a805",
+      "nextId": 401,
+      "state": "7dfedf0b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,6 +26,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -41,7 +42,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -54,19 +55,11 @@
             }
           ],
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -81,7 +74,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -124,9 +117,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 421,
-      "state": "a18e6ff5",
-      "events": "776625f2",
+      "nextId": 422,
+      "state": "ca1d2019",
+      "events": "3669b315",
       "rng": {
         "draws": 1,
         "digest": "5eb1ea5d"
@@ -135,8 +128,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 421,
-      "state": "c9b64dfb",
+      "nextId": 422,
+      "state": "d62c39db",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -146,6 +139,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -161,7 +155,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -175,19 +169,11 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -201,7 +187,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -243,9 +229,9 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 421,
-      "state": "bf9cccd1",
-      "events": "02dc9841",
+      "nextId": 422,
+      "state": "356ced2d",
+      "events": "81315207",
       "rng": {
         "draws": 3,
         "digest": "e3485a8b"
@@ -254,6 +240,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -275,7 +262,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -290,19 +277,11 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -316,7 +295,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 338,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -358,8 +337,8 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 421,
-      "state": "6fd26fa7",
+      "nextId": 422,
+      "state": "4cd8f95f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -369,6 +348,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -390,7 +370,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 399,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -405,19 +385,11 @@
           ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -431,7 +403,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 338,
-          "id": 399,
+          "id": 400,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

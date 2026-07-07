@@ -280,7 +280,8 @@ async function stageScene(page, scene) {
     }
 
     function ability(id) {
-      const resolved = sim.resolvedAbility?.(id, playerId) ?? sim.known.find((a) => a.def.id === id);
+      const resolved =
+        sim.resolvedAbility?.(id, playerId) ?? sim.known.find((a) => a.def.id === id);
       if (!resolved) fail(`missing ability ${id}`);
       return resolved;
     }
@@ -373,7 +374,11 @@ async function stageScene(page, scene) {
       placePlayerFromTarget(target, 12);
       target.hp = target.maxHp;
       castAndResolve('immolate', target, 120);
-      tickUntil(() => auraOn(target, (a) => a.id === 'immolate' && a.sourceId === playerId), 80, 'immolate dot');
+      tickUntil(
+        () => auraOn(target, (a) => a.id === 'immolate' && a.sourceId === playerId),
+        80,
+        'immolate dot',
+      );
       const before = {
         hp: target.hp,
         hasImmolate: !!auraOn(target, (a) => a.id === 'immolate'),
@@ -404,11 +409,18 @@ async function stageScene(page, scene) {
       placePlayerFromTarget(target, 15);
       const beforeDist = dist(player, target);
       cast('feral_charge');
-      tickUntil(() => player.chargeTargetId === null || dist(player, target) < 5, 100, 'feral charge arrival');
+      tickUntil(
+        () => player.chargeTargetId === null || dist(player, target) < 5,
+        100,
+        'feral charge arrival',
+      );
       result.assertions.distanceBefore = beforeDist;
       result.assertions.distanceAfter = dist(player, target);
       result.assertions.rootApplied = !!auraOn(target, (a) => a.kind === 'root');
-      result.target = { id: target.id, auras: target.auras.map((a) => ({ id: a.id, kind: a.kind })) };
+      result.target = {
+        id: target.id,
+        auras: target.auras.map((a) => ({ id: a.id, kind: a.kind })),
+      };
     } else if (key === 'cone_of_cold') {
       const mobs = livingHostiles().slice(0, 3);
       if (mobs.length < 2) fail('need at least two hostiles');
@@ -433,25 +445,40 @@ async function stageScene(page, scene) {
       result.target = { ids: mobs.map((m) => m.id), damagedIds: damaged.map((m) => m.id) };
     } else if (key === 'bestial_wrath') {
       cast('bestial_wrath');
-      result.assertions.buffPresent = !!auraOn(player, (a) => a.id === 'bestial_wrath' || a.kind === 'buff_ap');
+      result.assertions.buffPresent = !!auraOn(
+        player,
+        (a) => a.id === 'bestial_wrath' || a.kind === 'buff_ap',
+      );
       result.playerAuras = player.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
     } else if (key === 'blade_flurry') {
       cast('blade_flurry');
-      result.assertions.hasteBuffPresent = !!auraOn(player, (a) => a.id === 'blade_flurry' && a.kind === 'buff_haste');
+      result.assertions.hasteBuffPresent = !!auraOn(
+        player,
+        (a) => a.id === 'blade_flurry' && a.kind === 'buff_haste',
+      );
       result.playerAuras = player.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
     } else if (key === 'wyvern_sting') {
       const target = nearestHostile();
       placePlayerFromTarget(target, 18);
       cast('wyvern_sting');
       result.assertions.incapacitateApplied = !!auraOn(target, (a) => a.kind === 'incapacitate');
-      result.target = { id: target.id, auras: target.auras.map((a) => ({ id: a.id, kind: a.kind })) };
+      result.target = {
+        id: target.id,
+        auras: target.auras.map((a) => ({ id: a.id, kind: a.kind })),
+      };
     } else if (key === 'trueshot_aura') {
       const friend = addFriend('warrior', 'Archer', 4, 1);
       const target = nearestHostile();
       placeTargetFromPlayer(target, 10);
       cast('trueshot_aura');
-      result.assertions.playerAuraPresent = !!auraOn(player, (a) => a.id === 'trueshot_aura' && a.kind === 'buff_ap');
-      result.assertions.friendAuraPresent = !!auraOn(friend, (a) => a.id === 'trueshot_aura' && a.kind === 'buff_ap');
+      result.assertions.playerAuraPresent = !!auraOn(
+        player,
+        (a) => a.id === 'trueshot_aura' && a.kind === 'buff_ap',
+      );
+      result.assertions.friendAuraPresent = !!auraOn(
+        friend,
+        (a) => a.id === 'trueshot_aura' && a.kind === 'buff_ap',
+      );
       result.playerAuras = player.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
       result.friendAuras = friend.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
       result.targetAuras = target.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
@@ -470,7 +497,8 @@ async function stageScene(page, scene) {
         sim.castAbility('sinister_strike', playerId);
         tick(1);
         critEvent = (sim.events ?? []).find(
-          (e) => e.type === 'damage' && e.sourceId === playerId && e.targetId === target.id && e.crit,
+          (e) =>
+            e.type === 'damage' && e.sourceId === playerId && e.targetId === target.id && e.crit,
         );
       }
       result.assertions.critChancePinned = player.critChance === 0;
@@ -497,9 +525,16 @@ async function stageScene(page, scene) {
       player.hp = Math.round(player.maxHp * 0.8);
       const beforeHp = player.hp;
       cast('siphon_life');
-      tickUntil(() => auraOn(target, (a) => a.id === 'siphon_life' && a.kind === 'dot'), 20, 'siphon life dot');
+      tickUntil(
+        () => auraOn(target, (a) => a.id === 'siphon_life' && a.kind === 'dot'),
+        20,
+        'siphon life dot',
+      );
       tick(125);
-      result.assertions.dotPresent = !!auraOn(target, (a) => a.id === 'siphon_life' && a.kind === 'dot');
+      result.assertions.dotPresent = !!auraOn(
+        target,
+        (a) => a.id === 'siphon_life' && a.kind === 'dot',
+      );
       result.assertions.selfHealed = player.hp > beforeHp;
       result.player = { hpBefore: beforeHp, hpAfter: player.hp };
       result.target = { id: target.id, hpAfter: target.hp };

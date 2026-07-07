@@ -29,7 +29,7 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { groundHeight, waterLevel, zoneBiomeAt } from '../sim/world';
+import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
@@ -47,6 +47,7 @@ import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
+import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
@@ -58,6 +59,7 @@ import {
   type FoliageView,
 } from './foliage';
 import { activeFormTint } from './form_tint';
+import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -79,6 +81,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
@@ -87,6 +90,7 @@ import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
+import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
@@ -186,7 +190,6 @@ const SELECTION_RING_SPIN = 0.6; // rad/s — slow classic target-reticle rotati
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const GROUND_AIM_RETICLE_PULSE_HZ = 2;
 const SPARKLE_BOOST = 1.5;
-const PORTAL_BOOST = 2;
 // Third-person camera collision (see updateCamera). Prop colliders marked
 // camGhost are hidden by props.ts/foliage.ts instead; this path is for
 // non-hideable blockers such as large rocks and interior walls.
@@ -516,6 +519,10 @@ export interface EntityView {
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
+  /** templateId the object mesh was built from. The sim swaps delve interactable
+   *  templates in place (plate -> triggered, rope -> pulled); diffing this each
+   *  frame drops the stale view so it rebuilds with the new mesh. */
+  builtTemplateId?: string;
   portal?: THREE.Mesh; // dungeon door swirl
   objectCasters: THREE.Object3D[]; // object-view shadow meshes, distance-gated
   viewLights: THREE.PointLight[]; // point lights this view contributes to the budget
@@ -667,24 +674,6 @@ function isPersistentPortalObject(e: Entity): boolean {
   return (
     e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
   );
-}
-
-function markSharedGeometry<T extends THREE.BufferGeometry>(geometry: T): T {
-  geometry.userData.sharedRendererResource = true;
-  return geometry;
-}
-
-function markSharedMaterial<T extends THREE.Material>(material: T): T {
-  material.userData.sharedRendererResource = true;
-  return material;
-}
-
-function isSharedGeometry(geometry: THREE.BufferGeometry): boolean {
-  return geometry.userData.sharedRendererResource === true;
-}
-
-function isSharedMaterial(material: THREE.Material): boolean {
-  return material.userData.sharedRendererResource === true;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -1255,6 +1244,12 @@ export class Renderer {
       this.scene.add(this.placedAssetsView.group);
     }
 
+    const gatherNodes = buildGatherNodes(this.sim.cfg.seed);
+    setRenderCategory(gatherNodes.group, 'props');
+    this.scene.add(gatherNodes.group);
+    // Baked into world space at build with no per-frame update(), same as props.
+    freezeStaticMatrices(gatherNodes.group);
+
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
     // frame (see drapeRingLocalY / sync) so it stays legible on slopes instead
@@ -1502,7 +1497,7 @@ export class Renderer {
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
     if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevel();
+    const wl = waterLevelAt(x, z);
     if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
     const biome = zoneBiomeAt(z);
     if (biome === 'vale') return 'grass';
@@ -2806,12 +2801,36 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx':
+        if (ev.fx === 'windup') {
+          // A petSpell windup telegraph: start the throw animation NOW; the
+          // projectile for this throw follows petSpell.windup later, timed to
+          // the clip's release pose (the acolyte def's attackTimeScale is
+          // tuned so both meet).
+          this.triggerAttack(ev.sourceId);
+          break;
+        }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
+        // A mob that hurls an instant bolt with NO windup (the warlock
+        // demon's bolt) has no cast state for the looping cast channel, and
+        // the damage event that animates melee fires on ARRIVAL and only for
+        // the physical school: play the shooter's attack one-shot at launch
+        // so the throw reads. A windup-telegraphed throw already started its
+        // one-shot above (still mid-flight at the release: skip the
+        // retrigger). Real casts (castingAbility set) animate via the cast
+        // channel; players animate through their own cast/swing paths.
+        if (ev.fx === 'projectile' || ev.fx === 'beam') {
+          const src = this.sim.entities.get(ev.sourceId);
+          if (src && src.kind === 'mob' && !src.castingAbility) {
+            const view = this.views.get(ev.sourceId);
+            const vis = view ? this.activeVisual(view) : null;
+            if (!vis?.isMidOneShot) this.triggerAttack(ev.sourceId);
+          }
+        }
         break;
       case 'spellfxAt': {
         // Ground-targeted impact: burst draped onto the terrain where the spell
@@ -2847,6 +2866,27 @@ export class Renderer {
         break;
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
+        break;
+      case 'delveRitePulse': {
+        // The Drowned Reliquary Rite plays its sequence by pulsing each shrine
+        // in turn; a school-coloured nova on the shrine entity shows which one
+        // (colour matches the shrine's accent so the sequence is readable).
+        const school =
+          ev.shrineKind === 'rite_shrine_candle'
+            ? 'fire'
+            : ev.shrineKind === 'rite_shrine_reed'
+              ? 'nature'
+              : ev.shrineKind === 'rite_shrine_skull'
+                ? 'shadow'
+                : 'holy';
+        this.vfx.nova(ev.entityId, school);
+        break;
+      }
+      case 'delveRiteFeedback':
+        // A correct touch answers with a green up-glow; a wrong one with a dark
+        // shadow burst on the shrine the player pressed.
+        if (ev.correct) this.vfx.healGlow(ev.shrineId);
+        else this.vfx.nova(ev.shrineId, 'shadow');
         break;
       case 'fiestaPowerup':
         // Big celebratory pop on grab, plus a lingering coloured glow.
@@ -2975,147 +3015,16 @@ export class Renderer {
   // -------------------------------------------------------------------------
 
   // Shared object-view resources: views must not own materials/textures, or
-  // interest churn leaks them (removeView only disposes per-view geometry).
-  private doorStoneMat: THREE.Material | null = null;
-  private doorArchGeo: THREE.BufferGeometry | null = null;
-  private doorKeystoneGeo: THREE.BufferGeometry | null = null;
-  private doorPlinthGeo: THREE.BufferGeometry | null = null;
-  private doorPortalGeo: THREE.BufferGeometry | null = null;
-  private doorNythraxisClickGeo: THREE.BufferGeometry | null = null;
-  private doorNythraxisClickMat: THREE.MeshBasicMaterial | null = null;
-  private doorEntrancePortalMat: THREE.MeshBasicMaterial | null = null;
-  private doorExitPortalMat: THREE.MeshBasicMaterial | null = null;
+  // interest churn leaks them (removeView only disposes per-view geometry). The
+  // dungeon door/portal resources moved to door_portal.ts (same shared tagging).
   private sparkleMat: THREE.SpriteMaterial | null = null;
-
-  private doorStoneMaterial(): THREE.Material {
-    this.doorStoneMat ??= markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
-    return this.doorStoneMat;
-  }
-
-  private doorArchGeometry(): THREE.BufferGeometry {
-    if (!this.doorArchGeo) {
-      const outer = new THREE.Shape();
-      outer.moveTo(-2.1, 0);
-      outer.lineTo(-2.1, 3.1);
-      outer.quadraticCurveTo(-2.1, 4.85, 0, 5.05);
-      outer.quadraticCurveTo(2.1, 4.85, 2.1, 3.1);
-      outer.lineTo(2.1, 0);
-      outer.closePath();
-      const inner = new THREE.Path();
-      inner.moveTo(-1.3, -0.5);
-      inner.lineTo(-1.3, 2.9);
-      inner.quadraticCurveTo(-1.3, 4.05, 0, 4.22);
-      inner.quadraticCurveTo(1.3, 4.05, 1.3, 2.9);
-      inner.lineTo(1.3, -0.5);
-      inner.closePath();
-      outer.holes.push(inner);
-      const archGeo = new THREE.ExtrudeGeometry(outer, {
-        depth: 0.7,
-        bevelEnabled: true,
-        bevelThickness: 0.07,
-        bevelSize: 0.07,
-        bevelSegments: 1,
-      });
-      archGeo.translate(0, 0, -0.35);
-      this.doorArchGeo = markSharedGeometry(archGeo);
-    }
-    return this.doorArchGeo;
-  }
-
-  private doorKeystoneGeometry(): THREE.BufferGeometry {
-    this.doorKeystoneGeo ??= markSharedGeometry(new THREE.BoxGeometry(0.7, 1.0, 0.95));
-    return this.doorKeystoneGeo;
-  }
-
-  private doorPlinthGeometry(): THREE.BufferGeometry {
-    this.doorPlinthGeo ??= markSharedGeometry(new THREE.BoxGeometry(1.15, 0.7, 1.15));
-    return this.doorPlinthGeo;
-  }
-
-  private doorPortalGeometry(): THREE.BufferGeometry {
-    this.doorPortalGeo ??= markSharedGeometry(new THREE.CircleGeometry(1.55, 24));
-    return this.doorPortalGeo;
-  }
-
-  private doorNythraxisClickGeometry(): THREE.BufferGeometry {
-    this.doorNythraxisClickGeo ??= markSharedGeometry(new THREE.BoxGeometry(4.6, 4.2, 2.4));
-    return this.doorNythraxisClickGeo;
-  }
-
-  private doorNythraxisClickMaterial(): THREE.MeshBasicMaterial {
-    this.doorNythraxisClickMat ??= markSharedMaterial(
-      new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.001,
-        depthWrite: false,
-      }),
-    );
-    return this.doorNythraxisClickMat;
-  }
-
-  private doorPortalMaterial(entering: boolean): THREE.MeshBasicMaterial {
-    const tint = entering ? 0x9a5df0 : 0x6ab8ff;
-    const existing = entering ? this.doorEntrancePortalMat : this.doorExitPortalMat;
-    if (existing) return existing;
-    const material = markSharedMaterial(
-      new THREE.MeshBasicMaterial({
-        color: tint,
-        transparent: true,
-        opacity: 0.55,
-        side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      }),
-    );
-    if (!this.lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
-    if (entering) this.doorEntrancePortalMat = material;
-    else this.doorExitPortalMat = material;
-    return material;
-  }
-
-  private buildDoorBody(
-    entering: boolean,
-    dungeonId?: string | null,
-  ): { body: THREE.Group; portal?: THREE.Mesh } {
-    const body = new THREE.Group();
-    if (entering && dungeonId === 'nythraxis_crypt') {
-      const clickBox = new THREE.Mesh(
-        this.doorNythraxisClickGeometry(),
-        this.doorNythraxisClickMaterial(),
-      );
-      clickBox.position.y = 2.1;
-      body.add(clickBox);
-      return { body };
-    }
-
-    const stone = this.doorStoneMaterial();
-    const arch = new THREE.Mesh(this.doorArchGeometry(), stone);
-    arch.castShadow = true;
-    body.add(arch);
-    const keystone = new THREE.Mesh(this.doorKeystoneGeometry(), stone);
-    keystone.position.set(0, 4.75, 0);
-    keystone.castShadow = true;
-    body.add(keystone);
-    for (const sx of [-1.7, 1.7]) {
-      const plinth = new THREE.Mesh(this.doorPlinthGeometry(), stone);
-      plinth.position.set(sx, 0.35, 0);
-      plinth.castShadow = true;
-      body.add(plinth);
-    }
-    const portal = new THREE.Mesh(this.doorPortalGeometry(), this.doorPortalMaterial(entering));
-    portal.position.y = 2.15;
-    portal.scale.set(1, 1.35, 1);
-    body.add(portal);
-    return { body, portal };
-  }
 
   private buildDoorPrewarmGroup(): THREE.Group {
     const group = new THREE.Group();
-    const entrance = this.buildDoorBody(true).body;
+    const entrance = buildDoorBody(true, null, this.lowGfx).body;
     entrance.position.x = -3;
     group.add(entrance);
-    const exit = this.buildDoorBody(false).body;
+    const exit = buildDoorBody(false, null, this.lowGfx).body;
     exit.position.x = 3;
     group.add(exit);
     const p = this.sim.player;
@@ -3142,7 +3051,7 @@ export class Renderer {
       (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
     ) {
       const entering = e.templateId === 'dungeon_door';
-      const built = this.buildDoorBody(entering, e.dungeonId);
+      const built = buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
       height = 4.6;
@@ -3166,6 +3075,12 @@ export class Renderer {
       if (
         e.templateId !== 'delve_pressure_plate' &&
         e.templateId !== 'delve_pressure_plate_triggered' &&
+        !e.templateId.startsWith('delve_sluice_valve') &&
+        !e.templateId.startsWith('delve_grave_tablet') &&
+        !e.templateId.startsWith('delve_corpse_candle') &&
+        // A pullable rope IS an F-interactable, so it keeps the sparkle until
+        // pulled (unlike the flush walk-on plates above).
+        e.templateId !== 'delve_bell_rope_pulled' &&
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'
       ) {
@@ -3395,6 +3310,7 @@ export class Renderer {
       sparkle,
       objectMesh,
       objectPoolKey,
+      builtTemplateId: e.kind === 'object' ? e.templateId : undefined,
       portal,
       nameplateDisplay: 'none',
       nameplateTransform: '',
@@ -3549,14 +3465,18 @@ export class Renderer {
 
   // Outdoor fog presets per biome (high tier eases between them as the
   // player crosses zone bands; low keeps the legacy vale fog everywhere).
+  // far/near trimmed from the original release so a zone's own mountains (the
+  // rim wall, the inter-zone ridges) fade into haze instead of standing out
+  // crisp when viewed from the zone's hub/centre; ratio near:far kept roughly
+  // constant per biome so the fog gradient itself doesn't change shape.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 130, far: 470 },
-    marsh: { color: 0xa3b294, near: 80, far: 330 },
-    peaks: { color: 0xbdd3ec, near: 160, far: 560 },
-    beach: { color: 0xbcd6e6, near: 150, far: 520 },
-    desert: { color: 0xd8c9a8, near: 140, far: 500 },
-    volcano: { color: 0x8a7468, near: 70, far: 300 },
-    cave: { color: 0x76807c, near: 60, far: 260 },
+    vale: { color: 0xa6c6e0, near: 95, far: 340 },
+    marsh: { color: 0xa3b294, near: 60, far: 240 },
+    peaks: { color: 0xbdd3ec, near: 110, far: 390 },
+    beach: { color: 0xbcd6e6, near: 105, far: 370 },
+    desert: { color: 0xd8c9a8, near: 100, far: 360 },
+    volcano: { color: 0x8a7468, near: 50, far: 220 },
+    cave: { color: 0x76807c, near: 45, far: 190 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3674,7 +3594,7 @@ export class Renderer {
           ? 'nythraxis'
           : inside
             ? 'dungeon'
-            : camY < waterLevel() - 0.05
+            : camY < waterLevelAt(px, pz) - 0.05
               ? 'underwater'
               : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
@@ -4074,6 +3994,17 @@ export class Renderer {
       v.group.rotation.y = facing;
 
       if (e.kind === 'object') {
+        // The sim swaps delve interactable templates in place (pressure plate ->
+        // triggered, bell rope -> pulled). Rebuild the view from the new template
+        // right here rather than leaving it to the budgeted create pass: that
+        // pass never collects past the create radius, so a bare remove could
+        // strand the object invisible through the whole 80-96yd hysteresis band
+        // if the viewer retreats before the rebuild lands.
+        if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
+          this.removeView(id);
+          this.createView(e);
+          continue;
+        }
         const isPortalObject = isPersistentPortalObject(e);
         const vis = e.lootable && (!isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ);
         v.group.visible = vis;
@@ -4145,13 +4076,15 @@ export class Renderer {
       }
 
       // swimming pose: prone at the surface (derived here — the sim is unaware).
-      // The cheap feet-depth test gates the expensive terrain-noise sample: an
-      // entity whose feet are above the swim line can't be swimming, so the vast
-      // majority (everyone on land) skip groundHeight() entirely each frame.
+      // waterLevelAt is -Infinity outside a declared lake, so the cheap feet-depth
+      // test also gates entities standing in a dry sunken feature: they can't be
+      // swimming there, and the vast majority (everyone on land) skip
+      // groundHeight() entirely each frame.
+      const wl = waterLevelAt(e.pos.x, e.pos.z);
       const swimming =
         !e.dead &&
-        e.pos.y <= waterLevel() - 0.5 &&
-        groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < waterLevel() - 0.8;
+        e.pos.y <= wl - 0.5 &&
+        groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < wl - 0.8;
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       if (polyed && !v.sheepVisual) {
@@ -4917,10 +4850,36 @@ export class Renderer {
   /**
    * Re-seat the water surface at the ACTIVE waterLevel() and recompute the
    * shoreline depth attribute from the current terrain (after a water-level
-   * edit or a shoreline sculpt). Editor-only.
+   * edit or a shoreline sculpt). A cheap in-place update: it does NOT change
+   * which lakes exist or where they are, only their shared level/shore depth.
+   * Editor-only.
    */
   rebuildWater(): void {
     this.waterView.setLevel();
+  }
+
+  /**
+   * Full water rebuild: dispose every existing lake mesh and rebuild from the
+   * CURRENT `waterBodies()` (declared lake list). Needed after the editor adds,
+   * removes, or moves a lake marker: `rebuildWater()` only reseats existing
+   * meshes in place, so a moved marker would otherwise leave the water mesh,
+   * shader `uCenter`/`uRadius`, and shore-depth attribute at the OLD footprint
+   * while the terrain basin itself has already moved. Editor-only.
+   */
+  rebuildWaterBodies(): void {
+    for (const mesh of this.waterView.meshes) {
+      this.scene.remove(mesh);
+      mesh.geometry.dispose();
+      const mat = mesh.material as THREE.Material | THREE.Material[];
+      if (Array.isArray(mat)) for (const m of mat) m.dispose();
+      else mat.dispose();
+    }
+    this.waterView = buildWater(this.sim.cfg.seed);
+    for (const mesh of this.waterView.meshes) {
+      setRenderCategory(mesh, 'water');
+      this.scene.add(mesh);
+      freezeStaticMatrices(mesh);
+    }
   }
 
   /**
@@ -5053,7 +5012,7 @@ export class Renderer {
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevel() + 0.4;
+      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       sink.ambience(biome, inDungeon, precip, nearWater);
     }
   }
@@ -5131,6 +5090,7 @@ export class Renderer {
     );
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.clickTargets, true);
+    const directHitIds: number[] = [];
     for (const hit of hits) {
       let o: THREE.Object3D | null = hit.object;
       while (o) {
@@ -5142,16 +5102,22 @@ export class Renderer {
           const hitView = this.views.get(id);
           if (hitView && !hitView.group.visible) break;
           const e = this.sim.entities.get(id);
-          if (e?.kind === 'object' && !e.lootable) return null;
           // The graveyard angel is hidden from the living, so it must not be
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !this.sim.player?.ghost) break;
-          return id;
+          directHitIds.push(id);
+          break;
         }
         o = o.parent;
       }
     }
+    const directPick = resolveDirectPickEntityId(
+      directHitIds,
+      this.sim.entities,
+      this.sim.player.targetId,
+    );
+    if (directHitIds.length > 0) return directPick;
     // Forgiving assist: nothing under the ray, so snap to the nearest
     // targetable character within a small screen radius — chibi proportions
     // and melee scrums (often hidden behind the player's own model) make

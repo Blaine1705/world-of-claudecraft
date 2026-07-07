@@ -65,6 +65,11 @@ export interface Overview {
   peakOnlineAllTime: number;
   siteUsersNow: number;
   server: ServerStats;
+}
+
+// Provider usage is served on its own ops_usage.read-gated route, not inside
+// the overview payload.
+export interface ProviderUsageResponse {
   usage: ProviderUsageSnapshot;
 }
 
@@ -101,6 +106,13 @@ export interface SuspiciousEvidence {
   weight: number;
   detail: string;
   expiresAt: number;
+  // Recurrence history, present only on kinds where re-triggering carries
+  // information: distinct episodes this session, first and latest (epoch ms),
+  // and the opening timestamps of the most recent episodes (bounded ring).
+  occurrences?: number;
+  firstAt?: number;
+  lastAt?: number;
+  episodesAt?: number[];
 }
 
 export interface SuspiciousPlayer {
@@ -110,6 +122,11 @@ export interface SuspiciousPlayer {
     name: string;
     ip: string;
   };
+  // CONFIRMED = an automated moderator report went out for this session.
+  state: 'SUSPICIOUS' | 'CONFIRMED';
+  snapshot: {
+    capturedAt: number;
+  } | null;
   score: number;
   evidence: SuspiciousEvidence[];
 }
@@ -430,267 +447,70 @@ export interface LinePoint {
   title?: string;
 }
 
-// ---------------------------------------------------------------------------
-// Housekeeping (game-config overrides). Shapes mirror server/housekeeping.ts
-// exactly (this bundle never imports server or sim code).
-// ---------------------------------------------------------------------------
+// Bot Detector > Configuration. Field ids, groups, labels, and help arrive as
+// server data (the detector decides them at runtime; the evidence-detail
+// precedent), so they render as-is rather than through t().
+export type AntibotConfigValue = string | number | boolean | string[];
 
-export interface HkNumericFieldSpec {
-  key: string;
-  min: number;
-  max: number;
-  integer?: boolean;
-}
-
-export interface HkStatus {
-  restartPending: boolean;
-  savedErrors: string[];
-  savedUpdatedAt: string | null;
-}
-
-export interface HkRates {
-  xpRate: number;
-  goldDropRate: number;
-  lootChanceRate: number;
-  mobHpRate: number;
-  mobDmgRate: number;
-  respawnSeconds: number;
-  worldSeed: number | null;
-}
-
-export interface HkOverview {
-  realm: string;
-  worldSeed: number;
-  devCommands: boolean;
-  appliedAt: string | null;
-  bootWarnings: string[];
-  counts: {
-    mobs: number;
-    quests: number;
-    items: number;
-    npcs: number;
-    camps: number;
-    zones: number;
-    dungeons: number;
-    delves: number;
-  };
-  overrideCounts: {
-    rates: number;
-    calendar: number;
-    xpTable: boolean;
-    mobs: number;
-    quests: number;
-    items: number;
-    npcs: number;
-    camps: number;
-  };
-  status: HkStatus;
-}
-
-export interface HkCalendar {
-  eventLimit: number;
-  titleMax: number;
-  noteMax: number;
-  horizonDays: number;
-  keepPastDays: number;
-}
-
-export interface HkCalendarCatalog {
-  fields: HkNumericFieldSpec[];
-  defaults: HkCalendar;
-  applied: HkCalendar;
-  saved: Partial<HkCalendar> | null;
-  status: HkStatus;
-}
-
-export interface HkRatesCatalog {
-  fields: HkNumericFieldSpec[];
-  defaults: HkRates;
-  applied: HkRates;
-  saved: Partial<HkRates> | null;
-  xpTableDefault: number[];
-  xpTableSaved: number[] | null;
-  status: HkStatus;
-}
-
-export interface HkLootRow {
-  itemId?: string;
-  itemName?: string;
-  copper?: number;
-  chance: number;
-  questId?: string;
-  rollGroup?: string;
-}
-
-export interface HkMobSpawnSummary {
-  campCount: number;
-  totalSpawns: number;
-  zones: string[];
-  dungeons: string[];
-}
-
-export type HkNumericValues = Record<string, number | undefined>;
-export type HkFlagValues = Record<string, boolean | undefined>;
-
-export interface HkMobRow {
+export interface AntibotConfigField {
   id: string;
-  name: string;
-  family: string;
-  defaults: HkNumericValues;
-  live: HkNumericValues;
-  defaultFlags: HkFlagValues;
-  liveFlags: HkFlagValues;
-  lootDefault: HkLootRow[];
-  lootLive: HkLootRow[];
-  spawns: HkMobSpawnSummary;
-  override: Record<string, unknown> | null;
-}
-
-export interface HkMobsCatalog {
-  fields: HkNumericFieldSpec[];
-  flagFields: string[];
-  rows: HkMobRow[];
-  status: HkStatus;
-}
-
-export interface HkQuestObjective {
+  group: string;
   label: string;
-  type: string;
-  target: string;
-  countDefault: number;
-  countLive: number;
+  type: 'string' | 'number' | 'boolean' | 'select' | 'multi_select';
+  defaultValue: AntibotConfigValue;
+  value: AntibotConfigValue;
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+  options?: { value: string; label: string }[];
+  help?: string;
 }
 
-export interface HkQuestRow {
-  id: string;
-  name: string;
-  zone: string | null;
-  giverNpc: string | null;
-  turnInNpc: string | null;
-  requiresQuest: string | null;
-  suggestedPlayers: number | null;
-  defaults: HkNumericValues;
-  live: HkNumericValues;
-  retiredDefault: boolean;
-  retiredLive: boolean;
-  objectives: HkQuestObjective[];
-  override: Record<string, unknown> | null;
+export interface AntibotConfigCatalog {
+  fields: AntibotConfigField[];
+  updatedAt: string | null;
 }
 
-export interface HkQuestsCatalog {
-  fields: HkNumericFieldSpec[];
-  rows: HkQuestRow[];
-  status: HkStatus;
+export interface AntibotConfigHistoryEntry {
+  id: number;
+  beforeData: Record<string, AntibotConfigValue>;
+  afterData: Record<string, AntibotConfigValue>;
+  note: string;
+  createdAt: string;
+  adminAccountId: number | null;
+  adminUsername: string | null;
 }
 
-export interface HkItemRow {
-  id: string;
-  name: string;
-  kind: string;
-  slot: string | null;
-  quality: string | null;
-  defaults: HkNumericValues;
-  live: HkNumericValues;
-  statsDefault: Record<string, number> | null;
-  statsLive: Record<string, number> | null;
-  override: Record<string, unknown> | null;
+export interface AntibotConfigHistory {
+  entries: AntibotConfigHistoryEntry[];
 }
 
-export interface HkItemsCatalog {
-  fields: HkNumericFieldSpec[];
-  rows: HkItemRow[];
-  status: HkStatus;
+// Staff page (role management). assignableRoles never contains superadmin:
+// it is grantable only via the grant script, and superadmin rows render
+// read-only.
+export interface StaffRow {
+  accountId: number;
+  username: string;
+  roles: string[];
+  lastLogin: string | null;
 }
 
-export interface HkNpcRow {
-  id: string;
-  name: string;
-  title: string;
-  zone: string;
-  posDefault: { x: number; z: number };
-  posLive: { x: number; z: number };
-  questIds: string[];
-  questNames: string[];
-  market: boolean;
-  dynamic: boolean;
-  vendorDefault: { itemId: string; name: string }[] | null;
-  vendorLive: { itemId: string; name: string }[] | null;
-  override: Record<string, unknown> | null;
+export interface StaffData {
+  rows: StaffRow[];
+  assignableRoles: string[];
 }
 
-export interface HkNpcsCatalog {
-  rows: HkNpcRow[];
-  status: HkStatus;
+export interface RoleChangeRow {
+  id: number;
+  accountId: number;
+  username: string | null;
+  adminUsername: string | null;
+  rolesBefore: string[];
+  rolesAfter: string[];
+  createdAt: string;
 }
 
-export interface HkCampRow {
-  index: number;
-  mobId: string;
-  mobName: string;
-  zone: string;
-  defaults: { count: number; radius: number; center: { x: number; z: number } };
-  live: { count: number; radius: number; center: { x: number; z: number } };
-  override: Record<string, unknown> | null;
-}
-
-export interface HkSpawnsCatalog {
-  fields: HkNumericFieldSpec[];
-  rows: HkCampRow[];
-  status: HkStatus;
-}
-
-export interface HkZoneRow {
-  id: string;
-  name: string;
-  levelRange: [number, number];
-  biome: string;
-  hubName: string;
-  pois: string[];
-  lakeCount: number;
-  campCount: number;
-  npcCount: number;
-  questCount: number;
-}
-
-export interface HkDungeonRow {
-  id: string;
-  name: string;
-  suggestedPlayers: number;
-  spawnCount: number;
-  bossNames: string[];
-  overworldDoor: boolean;
-}
-
-export interface HkDelveRow {
-  id: string;
-  name: string;
-  minLevel: number;
-  suggestedPlayers: number;
-  bosses: string[];
-  tiers: {
-    id: string;
-    label: string;
-    enemyLevelBonus: number;
-    affixCount: number;
-    rewardMult: number;
-  }[];
-  baseRewards: {
-    copperMin: number;
-    copperMax: number;
-    firstClearXp: number;
-    repeatClearXp: number;
-  };
-}
-
-export interface HkWorldCatalog {
-  zones: HkZoneRow[];
-  dungeons: HkDungeonRow[];
-  delves: HkDelveRow[];
-  status: HkStatus;
-}
-
-export interface HkSaveResponse {
-  saved: Record<string, unknown>;
-  warnings: string[];
-  status: HkStatus;
+export interface StaffHistoryData {
+  rows: RoleChangeRow[];
 }

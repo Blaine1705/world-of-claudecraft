@@ -11,13 +11,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
-  // Stat tooltips inherit the es base: none of these keys needs a genuine Iberian
-  // divergence (es already uses "hechizos" and neutral wording), so per the
-  // divergence-only policy es_ES carries no hudChrome.statInfo.* overrides.
   'hudChrome.emotes.question': '¿Tío?',
   'nav.loginRegister': 'Iniciar sesión/Registrarse',
   'stats.playersOnline': 'Jugadores en línea',
-  'stats.realmName': 'Nombre del reino',
+  'stats.realmName': 'Nombre del mundo',
   'footer.githubLabel': 'Proyecto de código abierto',
   'footer.terms': 'Términos de servicio',
   'footer.privacy': 'Política de privacidad',
@@ -25,15 +22,17 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'wiki.title': 'Wiki y guía del juego',
   'news.title': 'Noticias y actualizaciones',
   'download.title': 'Descargar lanzador de escritorio',
+  'download.macCta': 'Descargar version macOS',
+  'download.windowsPending': 'Compilacion de Windows pendiente.',
   'mode.onlineTitle': 'Jugar en línea',
-  'mode.onlineAria': 'Jugar en línea: inicia sesión en el reino compartido persistente',
+  'mode.onlineAria': 'Jugar en línea: conéctate al mundo compartido persistente',
   'mode.offlineTitle': 'Jugar en solitario',
   'mode.offlineAria': 'Jugar en solitario: inicia una sesión local instantánea de un jugador',
-  'auth.enterRealm': 'Entrar al reino',
+  'auth.enterRealm': 'Entrar al mundo',
   'auth.logIn': 'Iniciar sesión',
   'auth.createAccount': 'Crear cuenta',
-  'auth.realmList': 'Lista de reinos',
-  'auth.changeRealm': 'Cambiar de reino',
+  'auth.realmList': 'Lista de mundos',
+  'auth.changeRealm': 'Cambiar de mundo',
   'auth.createCharacter': 'Crear personaje',
   'auth.characterName': 'Nombre del personaje',
   'auth.enterWorld': 'Entrar al mundo',
@@ -60,7 +59,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'controls.friends': 'Amigos y hermandad',
   'controls.chat': 'Abrir chat',
   'seo.description':
-    'Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico jugable directamente en el navegador. Únete a un reino compartido, sube clases de nivel y derrota enemigos.',
+    'Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico jugable directamente en tu navegador. Únete a un mundo compartido persistente, sube de nivel tus clases y derrota a tus enemigos.',
   'a11y.goHome': 'Ir a la página de inicio',
   'a11y.characterActions': 'Acciones del personaje',
   'a11y.githubProject': 'Abrir el proyecto World of ClaudeCraft en GitHub',
@@ -85,7 +84,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.shaman':
     'Los chamanes dominan los elementos, imbuyen armas con poder, golpean con relámpagos y restauran a sus aliados.',
   'classDetails.lore.warlock':
-    'Los brujos invocan demonios, lanzan maldiciones y daño en el tiempo, y drenan vida para resistir.',
+    'Los brujos invocan demonios, lanzan maldiciones y magia de daño continuo, y sorben la vida de sus enemigos para aguantar.',
   'classDetails.lore.druid':
     'Los druidas canalizan la naturaleza, curan heridas, enredan enemigos y cambian a formas animales para defender o dañar.',
   'mobilePreflight.baseLandscape': 'Gira el dispositivo a horizontal antes de entrar en el mundo.',
@@ -102,11 +101,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'En Chrome, toca el menú y luego Instalar app o Añadir a pantalla de inicio.',
   'mobilePreflight.otherInstallDetail':
     'Instala o añade esta página a la pantalla de inicio para la mejor experiencia móvil a pantalla completa.',
-  // Quest-tracker header toggle hover hint (es_ES uses "seguimiento" vs es-LatAm
-  // "rastreador"); the count badge inherits es (identical "({count})").
   'hudChrome.questTracker.collapseHint': 'Contraer el seguimiento de misiones',
   'hudChrome.questTracker.expandHint': 'Expandir el seguimiento de misiones',
-  // v0.13.0 release i18n fill: bug report, chat window, character takeover, admin bug reports
   'hudChrome.bugReport.failed': 'No se pudo enviar el informe de error. Inténtalo de nuevo.',
   'hudChrome.bugReport.menuButton': 'Informar de un error',
   'hudChrome.bugReport.rateLimited':
@@ -222,7 +218,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.noAttempt': 'No hay ningún intento de forzar la cerradura en curso.',
   'sim.lockpick.tierPremium': 'Premium',
   'sim.lockpick.toolSlips': 'Esa herramienta resbala en esta cerradura.',
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Provoca {value} de daño de {school} cada {interval} s',
   'hudChrome.auraEffect.hot': 'Recupera {value} de salud cada {interval} s',
   'hudChrome.auraEffect.absorb': 'Bloquea {value} de daño',
@@ -270,13 +265,14 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.disarm': 'Desarme: no puede usar ataques con arma',
   'hudChrome.auraEffect.lockout': 'Escuela mágica bloqueada',
   'hudChrome.auraEffect.imbue': 'Arma encantada con efectos adicionales',
-  'hudChrome.auraEffect.imbueRange': 'Arma encantada: {min} a {max} de daño adicional al juzgar',
+  'hudChrome.auraEffect.imbueRange': 'Arma imbuida: {min} a {max} de daño extra con Verdict',
   'hudChrome.auraEffect.stealth': 'Encubierto; velocidad de movimiento reducida un {pct}%',
-  'hudChrome.auraEffect.formBear': 'Forma de oso, salud y armadura aumentadas',
+  'hudChrome.auraEffect.formBear': 'Forma de Bruin: mayor salud y armadura',
   'hudChrome.auraEffect.formCat': 'Forma felina, daño cuerpo a cuerpo y energía',
-  'hudChrome.auraEffect.formTravel': 'Forma de viaje, velocidad de movimiento aumentada un {pct}%',
-  'hudChrome.auraEffect.defensiveStance': 'Actitud defensiva, daño recibido reducido, más amenaza',
-  'hudChrome.auraEffect.righteousFury': 'Furia recta, amenaza de daño Sagrado muy aumentada',
+  'hudChrome.auraEffect.formTravel': 'Forma Fleet: velocidad de desplazamiento aumentada un {pct}%',
+  'hudChrome.auraEffect.defensiveStance': 'Guarded Stance: menos daño recibido, más amenaza',
+  'hudChrome.auraEffect.righteousFury':
+    'Burning Oath: amenaza por daño Sagrado enormemente aumentada',
   'hudChrome.auraEffect.scale': 'Talla aumentado un {pct}%',
   'hudChrome.auraEffect.jump': 'Salto aumentada un {pct}%',
   'hudChrome.auraEffect.school.physical': 'Daño físico',
@@ -286,76 +282,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombra',
   'hudChrome.auraEffect.school.holy': 'Sagrada',
   'hudChrome.auraEffect.school.nature': 'Natural',
-  'entities.abilities.holy_shock.name': 'Choque Sagrado',
-  'entities.abilities.holy_shock.description':
-    "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)",
-  'entities.abilities.holy_shield.name': 'Escudo Sagrado',
-  'entities.abilities.holy_shield.description':
-    "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)",
-  'entities.abilities.repentance.name': 'Arrepentimiento',
-  'entities.abilities.repentance.description':
-    "Pone al enemigo en estado de meditación hasta 6 s. Cualquier daño rompe el efecto. (habilidad distintiva de Reprensión)",
-  'entities.abilities.bestial_wrath.name': 'Cólera de las bestias',
-  'entities.abilities.bestial_wrath.description':
-    "Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)",
-  'entities.abilities.trueshot_aura.name': 'Aura de disparo certero',
-  'entities.abilities.trueshot_aura.description':
-    "Inspira a los aliados cercanos, aumentando el poder de ataque en 35 durante 5 min. (habilidad distintiva de Puntería)",
-  'entities.abilities.wyvern_sting.name': 'Picadura de dracoleón',
-  'entities.abilities.wyvern_sting.description':
-    "Pica al enemigo a distancia y lo incapacita hasta 4 s. Cualquier daño rompe el efecto. (habilidad distintiva de Supervivencia)",
-  'entities.abilities.arcane_power.name': 'Poder Arcano',
-  'entities.abilities.arcane_power.description':
-    "Te llena de poder Arcano, aumentando el poder con hechizos en 28 durante 12 s. (habilidad distintiva de Arcano)",
-  'entities.abilities.combustion.name': 'Combustión',
-  'entities.abilities.combustion.description':
-    "Concentra tu magia de fuego para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Fuego)",
-  'entities.abilities.cone_of_cold.name': 'Cono de frío',
-  'entities.abilities.cone_of_cold.description':
-    "Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)",
-  'entities.abilities.cold_blood.name': 'Sangre fría',
-  'entities.abilities.cold_blood.description':
-    "Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)",
-  'entities.abilities.blade_flurry.name': 'Aluvión de acero',
-  'entities.abilities.blade_flurry.description':
-    "Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)",
-  'entities.abilities.hemorrhage.name': 'Hemorragia',
-  'entities.abilities.hemorrhage.description':
-    "Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)",
-  'entities.abilities.power_infusion.name': 'Infusión de poder',
-  'entities.abilities.power_infusion.description':
-    "Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)",
-  'entities.abilities.holy_nova.name': 'Nova Sagrada',
-  'entities.abilities.holy_nova.description':
-    "Provoca una explosión de luz Sagrada, sana a los aliados cercanos por {damage} y daña a los enemigos cercanos. (habilidad distintiva de Sagrado)",
-  'entities.abilities.shadowform.name': 'Forma de las Sombras',
-  'entities.abilities.shadowform.description':
-    "Adopta Forma de las Sombras, potenciando la magia de sombras hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Sombras)",
-  'entities.abilities.elemental_mastery.name': 'Maestría elemental',
-  'entities.abilities.elemental_mastery.description':
-    "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)",
-  'entities.abilities.shamanistic_rage.name': 'Ira del chamán',
-  'entities.abilities.shamanistic_rage.description':
-    "Libera ira chamánica y restaura 160 de maná. (habilidad distintiva de Mejora)",
-  'entities.abilities.natures_swiftness.name': 'Presteza de la Naturaleza',
-  'entities.abilities.natures_swiftness.description':
-    "Invoca a la naturaleza para hacer que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Restauración)",
-  'entities.abilities.siphon_life.name': 'Succionar vida',
-  'entities.abilities.siphon_life.description':
-    "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)",
-  'entities.abilities.fel_domination.name': 'Dominación vil',
-  'entities.abilities.fel_domination.description':
-    "Domina energías viles, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Demonología)",
-  'entities.abilities.conflagrate.name': 'Conflagrar',
-  'entities.abilities.conflagrate.description':
-    "Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)",
-  'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
-  'entities.abilities.moonkin_form.description':
-    "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)",
-  'entities.abilities.feral_charge.name': 'Carga feral',
-  'entities.abilities.feral_charge.description':
-    "Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)",
-  'entities.abilities.swiftmend.name': 'Alivio presto',
-  'entities.abilities.swiftmend.description':
-    "Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)",
+  'hudChrome.corpseHarvest.title': 'Recolección',
+  'hudChrome.corpseHarvest.components.gills': 'Branquias',
 };

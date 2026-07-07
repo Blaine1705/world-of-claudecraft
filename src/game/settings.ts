@@ -252,6 +252,9 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
+  // it only removes the shortcut; rewards, eligibility, and the panel remain available.
+  showDailyRewardsChest: { def: true },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and

@@ -25,7 +25,6 @@
 import { ABILITIES, DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
-import { tunedXpAmount } from '../game_config';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -91,11 +90,12 @@ export function dealDamage(
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
-  // A mob that broke leash (or a pet freed to the wild) is in 'evade': it has
-  // dropped its hate table and walks home without fighting back, healing to
-  // full only on arrival. Classic mechanics make it immune while it retreats,
-  // so it can't be chipped down — or killed outright — for a risk-free kill.
-  if (target.kind === 'mob' && target.aiState === 'evade') return;
+  // A wild mob that broke leash is in 'evade': it has dropped its hate table
+  // and walks home without fighting back, healing to full only on arrival.
+  // Classic mechanics make it immune while it retreats, so it can't be chipped
+  // down or killed outright for a risk-free kill. Owned pets use pet AI, not
+  // wild-mob leash recovery, and must not inherit this immunity from stale state.
+  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
@@ -538,6 +538,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.auras = aurasSurvivingDeath(e.auras);
   e.ccDr.clear();
   e.castingAbility = null;
+  e.castTargetId = null;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
@@ -597,7 +598,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       run.objective.complete = true;
       ctx.onDelveBossDefeated(run);
     }
-    if (run?.affixes.includes('restless_graves') && template && !template.boss && !template.elite) {
+    if (
+      run?.affixes.includes('restless_graves') &&
+      template &&
+      !template.boss &&
+      !template.elite &&
+      !e.affixSpawned
+    ) {
       run.restlessPending.push({
         at: ctx.time + 3,
         x: e.pos.x,
@@ -642,7 +649,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
     if (meta && creditEntity) {
-      const eliteMult = MOBS[e.templateId]?.elite ? 2 : 1;
+      const tmpl = MOBS[e.templateId];
+      // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
+      // in one hit by design, so it must not pay full kill XP.
+      const eliteMult = (tmpl?.elite ? 2 : 1) * (tmpl?.xpMult ?? 1);
       // party play: kill credit, xp split and quest progress shared with
       // members nearby (classic group rules + group bonus). A member downed
       // during the fight still counts while their corpse is in range: classic
@@ -754,11 +764,6 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
-  // Operator XP rate (game_config override layer). Identity at the default 1,
-  // so unconfigured hosts keep the exact classic-era awards. Applied before the
-  // rested draw-down so the rested bonus scales with the same knob.
-  amount = tunedXpAmount(amount);
-  if (amount <= 0) return;
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.

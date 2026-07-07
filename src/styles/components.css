@@ -207,7 +207,10 @@
   }
 
   /* ---------- lockpicking minigame ("Tumbler's Path") ---------- */
-  #lockpick-panel {
+  /* #delve-rite-panel (the Drowned Reliquary Rite difficulty popup) reuses the
+     lp-ante-* selector family by design (rite_window.ts mirrors the ante picker). */
+  #lockpick-panel,
+  #delve-rite-panel {
     width: 420px;
     max-width: 92vw;
     --window-pad: 14px;
@@ -216,18 +219,29 @@
     transform: translate(-50%, -50%);
     position: fixed;
   }
-  #lockpick-panel .lp-blurb {
+  #lockpick-panel .lp-blurb,
+  #delve-rite-panel .lp-blurb {
     font-size: 12px;
     color: #e8e0c8;
     line-height: 1.4;
     margin: 8px 0 12px;
   }
-  #lockpick-panel .lp-ante-row {
+  #delve-rite-panel .rite-guide {
+    margin: 0 0 12px;
+    padding-left: 18px;
+    list-style: decimal;
+  }
+  #delve-rite-panel .rite-guide li {
+    margin: 2px 0;
+  }
+  #lockpick-panel .lp-ante-row,
+  #delve-rite-panel .lp-ante-row {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
-  #lockpick-panel .lp-ante-btn {
+  #lockpick-panel .lp-ante-btn,
+  #delve-rite-panel .lp-ante-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -241,20 +255,25 @@
     gap: 12px;
   }
   #lockpick-panel .lp-ante-btn:hover,
-  #lockpick-panel .lp-ante-btn:focus-visible {
+  #lockpick-panel .lp-ante-btn:focus-visible,
+  #delve-rite-panel .lp-ante-btn:hover,
+  #delve-rite-panel .lp-ante-btn:focus-visible {
     border-color: var(--gold);
     background: #2a2010;
   }
-  #lockpick-panel .lp-ante-tier {
+  #lockpick-panel .lp-ante-tier,
+  #delve-rite-panel .lp-ante-tier {
     font-family: var(--title-font);
     font-size: 15px;
   }
-  #lockpick-panel .lp-ante-badges {
+  #lockpick-panel .lp-ante-badges,
+  #delve-rite-panel .lp-ante-badges {
     display: flex;
     gap: 6px;
     align-items: center;
   }
-  #lockpick-panel .lp-ante-pages {
+  #lockpick-panel .lp-ante-pages,
+  #delve-rite-panel .lp-ante-pages {
     font-size: 11px;
     color: #1a1410;
     background: var(--gold);
@@ -263,7 +282,8 @@
     font-weight: 700;
     white-space: nowrap;
   }
-  #lockpick-panel .lp-ante-tries {
+  #lockpick-panel .lp-ante-tries,
+  #delve-rite-panel .lp-ante-tries {
     font-size: 11px;
     color: #c9b27a;
     border: 1px solid #5a4a28;
@@ -271,10 +291,24 @@
     padding: 2px 8px;
     white-space: nowrap;
   }
-  #lockpick-panel .lp-ante-timer {
+  #lockpick-panel .lp-ante-timer,
+  #delve-rite-panel .lp-ante-timer {
     font-size: 11px;
     color: #ff9e5a;
     white-space: nowrap;
+  }
+  /* The rite buttons carry two long trailing labels (playback count + reward),
+     so unlike the lockpick ante row they must wrap instead of overflowing the
+     420px panel (and the 92vw mobile panel). Placed AFTER the shared lp-ante
+     rules so these same-specificity overrides win the cascade. */
+  #delve-rite-panel .lp-ante-btn {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 4px;
+  }
+  #delve-rite-panel .lp-ante-timer {
+    white-space: normal;
+    text-align: left;
   }
   /* §7.6 Bountiful Coffer, purple/epic accent overriding the gold ante selector. */
   #lockpick-panel .lp-blurb-coffer {
@@ -678,6 +712,37 @@
   }
   .loot-item:hover {
     background: #ffffff10;
+  }
+  .corpse-harvest {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border-default);
+  }
+  .corpse-harvest-title {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .corpse-harvest-hint {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
+  .corpse-harvest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .corpse-harvest-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .corpse-harvest-btn {
+    width: 100%;
   }
   #loot-rolls {
     position: fixed;
@@ -1387,6 +1452,12 @@
     font-size: 12px;
     line-height: 1.4;
   }
+  .dr-disclaimer {
+    margin: -4px 0 10px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
   .dr-summary strong {
     color: #ffe27a;
     font-size: 13px;
@@ -1778,9 +1849,17 @@
     color: #ffe27a;
     text-align: right;
   }
+  .dr-chest-toggle {
+    margin-top: 8px;
+  }
   .dr-ranks {
     display: grid;
     gap: 4px;
+  }
+  .dr-leaderboard-ranks {
+    max-height: 222px;
+    overflow-y: auto;
+    padding-right: 2px;
   }
   .dr-rank span {
     color: var(--color-text-muted);
@@ -5359,6 +5438,30 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
     border-color: var(--color-border-focus);
+  }
+  /* Recipient field autocomplete: relative wrapper anchors the listbox below the
+     input. Reuses .soc-sugg-item / .soc-suggest visual tokens from the social panel
+     so no new design-system surface is introduced. */
+  .mail-to-wrap {
+    position: relative;
+  }
+  .mail-to-suggest {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 3px);
+    display: none;
+    z-index: 30;
+    background: #14110d;
+    border: 1px solid #6f5a2a;
+    border-radius: 5px;
+    max-height: 210px;
+    overflow-y: auto;
+    box-shadow: 0 6px 18px #000a;
+  }
+  .mail-to-suggest.up {
+    top: auto;
+    bottom: calc(100% + 3px);
   }
   .mail-coin-row {
     flex-direction: row;
