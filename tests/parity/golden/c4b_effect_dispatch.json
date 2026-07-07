@@ -1677,8 +1677,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 409,
-      "state": "bec056d9",
-      "events": "f51126d1",
+      "state": "99340383",
+      "events": "eb8d13d4",
       "rng": {
         "draws": 445,
         "digest": "357c3bc7"
@@ -1727,7 +1727,8 @@
           ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           }
         },
         {
@@ -1983,13 +1984,13 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 812,
           "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 812,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -2011,7 +2012,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 414,
             "int": 10,
             "spi": 11,
             "sta": 60,
@@ -2409,7 +2410,7 @@
           "threat": [
             [
               400,
-              1
+              170
             ]
           ],
           "weapon": {
@@ -2424,7 +2425,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 411,
-      "state": "4ff41b6e",
+      "state": "78c9f5b4",
       "events": "127e4e96",
       "rng": {
         "draws": 447,
@@ -2474,7 +2475,8 @@
           ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           }
         },
         {
@@ -2732,13 +2734,13 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 812,
           "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 812,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -2760,7 +2762,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 414,
             "int": 10,
             "spi": 11,
             "sta": 60,
@@ -3158,7 +3160,7 @@
           "threat": [
             [
               400,
-              1
+              170
             ]
           ],
           "weapon": {
@@ -3281,7 +3283,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 412,
-      "state": "0d40ded2",
+      "state": "35b6f7bc",
       "events": "cde66e66",
       "rng": {
         "draws": 452,
@@ -3331,7 +3333,8 @@
           ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           }
         },
         {
@@ -3591,13 +3594,13 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 812,
           "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 812,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -3619,7 +3622,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 414,
             "int": 10,
             "spi": 11,
             "sta": 60,
@@ -4025,7 +4028,7 @@
           "threat": [
             [
               400,
-              1
+              170
             ]
           ],
           "weapon": {
@@ -4213,7 +4216,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 413,
-      "state": "ebe928f8",
+      "state": "ad46ccf4",
       "events": "cf5cfb25",
       "rng": {
         "draws": 453,
@@ -4263,7 +4266,8 @@
           ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           }
         },
         {
@@ -4525,13 +4529,13 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 812,
           "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 812,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -4553,7 +4557,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 414,
             "int": 10,
             "spi": 11,
             "sta": 60,
@@ -4984,7 +4988,7 @@
           "threat": [
             [
               400,
-              1
+              170
             ]
           ],
           "weapon": {
@@ -5223,7 +5227,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 414,
-      "state": "a7b6e34d",
+      "state": "0464d44f",
       "events": "ca6a288e",
       "rng": {
         "draws": 453,
@@ -5273,7 +5277,8 @@
           ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           }
         },
         {
@@ -5535,13 +5540,13 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 812,
           "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 812,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -5563,7 +5568,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 414,
             "int": 10,
             "spi": 11,
             "sta": 60,
@@ -6007,7 +6012,7 @@
           "threat": [
             [
               400,
-              1
+              170
             ]
           ],
           "weapon": {
@@ -6287,7 +6292,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 414,
-      "state": "a7b6e34d",
+      "state": "0464d44f",
       "events": "741638a5",
       "rng": {
         "draws": 453,
@@ -6337,7 +6342,8 @@
           ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           }
         },
         {
@@ -6599,13 +6605,13 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 812,
           "id": 400,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 812,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -6627,7 +6633,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 414,
             "int": 10,
             "spi": 11,
             "sta": 60,
@@ -7071,7 +7077,7 @@
           "threat": [
             [
               400,
-              1
+              170
             ]
           ],
           "weapon": {
