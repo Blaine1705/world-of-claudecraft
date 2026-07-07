@@ -127,8 +127,8 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
       player: { pos: { x: number } };
       delveRun: unknown;
     };
-    w.player.pos.x = 100000; // a delve-band x
-    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 100000, z: 0 } };
+    w.player.pos.x = 5000; // a delve-band x (past the arena, below the rift band)
+    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 5000, z: 0 } };
     expect(minimapMode(w as unknown as IWorld)).toBe('delve');
   });
 });

@@ -75,6 +75,7 @@ export function addEntityToRoster(ctx: SimContext, e: Entity): void {
   ctx.grid.insert(e);
   if (e.kind === 'player') ctx.playerGrid.insert(e);
   if (e.templateId === 'dungeon_door' && ctx.dungeonDoorIds) ctx.dungeonDoorIds.push(e.id);
+  if (e.templateId === 'rift_portal' && ctx.riftPortalIds) ctx.riftPortalIds.push(e.id);
 }
 
 export function dropEntityFromRoster(ctx: SimContext, id: number): void {

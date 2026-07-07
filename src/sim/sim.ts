@@ -101,6 +101,7 @@ import {
   FISHING_TABLES,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
+  RIFT_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isDelvePos,
@@ -265,6 +266,15 @@ import {
   updateDoorTriggers as updateDoorTriggersImpl,
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
+import {
+  enterRift as enterRiftImpl,
+  leaveRift as leaveRiftImpl,
+  riftInstanceAtPos,
+  updateRiftInstances as updateRiftInstancesImpl,
+  updateRiftTriggers as updateRiftTriggersImpl,
+} from './rift/runs';
+import { generateRiftFloor } from './rift/rift_gen';
+import type { RiftInstance } from './rift/types';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -1057,6 +1067,10 @@ export class Sim {
   private channelSubs = new Map<number, Set<JoinableChannel>>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  // procedural rift instances (separate slot pool + coordinate band from dungeons)
+  riftInstances: RiftInstance[] = [];
+  // rift-portal registry (built lazily by updateRiftTriggers, appended on rift_portal spawn)
+  private riftPortalIds: number[] | null = null;
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -1278,6 +1292,30 @@ export class Sim {
           lockpick: null,
         });
       }
+    }
+
+    // Procedural rift instance pool (dev-spawned; empty until a portal is entered).
+    for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
+      this.riftInstances.push({
+        slot: i,
+        partyKey: null,
+        seed: 0,
+        baseLevel: 1,
+        floorIndex: 0,
+        floorCount: 0,
+        mobIds: [],
+        objectIds: [],
+        bossId: null,
+        exitId: null,
+        descentAt: null,
+        descentId: null,
+        descentOpen: false,
+        pylonIds: [],
+        litPylons: new Set(),
+        pylonTotal: 0,
+        returnPos: { x: 0, z: 0 },
+        emptyFor: 0,
+      });
     }
 
     if (!cfg.noPlayer) {
@@ -2291,6 +2329,15 @@ export class Sim {
       get instances() {
         return sim.instances;
       },
+      get riftInstances() {
+        return sim.riftInstances;
+      },
+      get riftPortalIds() {
+        return sim.riftPortalIds;
+      },
+      set riftPortalIds(v) {
+        sim.riftPortalIds = v;
+      },
       get arenaMatches() {
         return sim.arenaMatches;
       },
@@ -2474,6 +2521,8 @@ export class Sim {
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
+      enterRift: sim.enterRift.bind(sim),
+      leaveRift: sim.leaveRift.bind(sim),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -2848,6 +2897,7 @@ export class Sim {
       if (!p.dead) {
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        this.updateRiftTriggers(p);
         this.updateCasting(p, meta);
         this.updatePlayerAutoAttack(p, meta);
         updateRegen(this.ctx, p, meta);
@@ -2860,6 +2910,7 @@ export class Sim {
         // death model), or resurrect at its corpse / an overworld Spirit Healer.
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        this.updateRiftTriggers(p);
       }
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
@@ -2914,6 +2965,7 @@ export class Sim {
     this.updateTradesAndInvites();
     this.updateLootRolls();
     this.updateInstances();
+    this.updateRiftInstances();
     this.updateDelveRuns();
     this.market.update();
     this.postOffice.update();
@@ -6115,6 +6167,23 @@ export class Sim {
     leaveDungeonImpl(this.ctx, pid);
   }
 
+  // Procedural rift delegates (dev command + interaction click + tick drivers).
+  enterRift(seed: number, baseLevel: number, pid?: number, returnPos?: { x: number; z: number }): void {
+    enterRiftImpl(this.ctx, seed, baseLevel, pid, returnPos);
+  }
+
+  leaveRift(pid?: number): void {
+    leaveRiftImpl(this.ctx, pid);
+  }
+
+  private updateRiftTriggers(p: Entity): void {
+    updateRiftTriggersImpl(this.ctx, p);
+  }
+
+  private updateRiftInstances(): void {
+    updateRiftInstancesImpl(this.ctx);
+  }
+
   // Legacy single-dungeon entry points (tests + scripts use these).
   enterCrypt(pid?: number): void {
     enterCryptImpl(this.ctx, pid);
@@ -6623,6 +6692,24 @@ export class Sim {
 
   delveDailyWire(pid: number): { date: string; firstClearXp: string[]; markClears: number } {
     return runsMod.delveDailyWire(this.ctx, pid);
+  }
+
+  // The primary player's active procedural Rift floor (offline IWorld read). The
+  // renderer regenerates geometry/style from this descriptor; null outside a rift.
+  get riftFloor(): import('../world_api/dungeons').RiftFloorView | null {
+    const p = this.entities.get(this.primaryId);
+    if (!p) return null;
+    const inst = riftInstanceAtPos(this.ctx, p.pos);
+    if (!inst || inst.partyKey === null) return null;
+    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    return {
+      seed: inst.seed,
+      baseLevel: inst.baseLevel,
+      floorIndex: inst.floorIndex,
+      floorCount: inst.floorCount,
+      name: floor.name,
+      themeName: floor.themeName,
+    };
   }
 
   get delveRun(): DelveRunInfo | null {

@@ -6667,6 +6667,81 @@ export const zh_CN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
+      "rift_spawnling": {
+        "name": "裂隙孽生体"
+      },
+      "rift_bonewalker": {
+        "name": "复生骨行者"
+      },
+      "rift_frost_revenant": {
+        "name": "霜缚亡魂"
+      },
+      "rift_rime_elemental": {
+        "name": "白霜元素"
+      },
+      "rift_ember_fiend": {
+        "name": "余烬恶鬼"
+      },
+      "rift_magma_brute": {
+        "name": "熔岩蛮兽"
+      },
+      "rift_venom_weaver": {
+        "name": "毒液织网者"
+      },
+      "rift_thornback": {
+        "name": "荆棘潜袭者"
+      },
+      "rift_boneclad": {
+        "name": "骨甲战士"
+      },
+      "rift_marrow_troll": {
+        "name": "骨髓巨魔"
+      },
+      "rift_void_acolyte": {
+        "name": "虚空侍僧"
+      },
+      "rift_dread_stalker": {
+        "name": "恐惧潜猎者"
+      },
+      "rift_storm_caller": {
+        "name": "唤风者"
+      },
+      "rift_stormscale": {
+        "name": "风暴鳞龙"
+      },
+      "rift_tide_thrall": {
+        "name": "潮汐奴仆"
+      },
+      "rift_deep_lurker": {
+        "name": "深渊潜伏者"
+      },
+      "rift_stone_ogre": {
+        "name": "石食人魔"
+      },
+      "rift_boss_frost": {
+        "name": "白霜守望者"
+      },
+      "rift_boss_ember": {
+        "name": "余烬熔炉暴君"
+      },
+      "rift_boss_venom": {
+        "name": "育母维斯卡"
+      },
+      "rift_boss_necro": {
+        "name": "骨领主萨瑞斯"
+      },
+      "rift_boss_brute": {
+        "name": "督军格拉斯克"
+      },
+      "rift_boss_arcane": {
+        "name": "执政官尼克萨里斯"
+      },
+      "rift_boss_storm": {
+        "name": "风暴威洛克"
+      },
+      "rift_boss_tide": {
+        "name": "深渊之喉"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },

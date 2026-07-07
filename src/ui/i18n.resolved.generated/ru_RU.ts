@@ -6667,6 +6667,81 @@ export const ru_RU: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Пробуждённый элементаль бури"
       },
+      "rift_spawnling": {
+        "name": "Отпрыск Разлома"
+      },
+      "rift_bonewalker": {
+        "name": "Восставший Костоход"
+      },
+      "rift_frost_revenant": {
+        "name": "Скованный Морозом Возвращенец"
+      },
+      "rift_rime_elemental": {
+        "name": "Изморозевый Элементаль"
+      },
+      "rift_ember_fiend": {
+        "name": "Тлеющий Изверг"
+      },
+      "rift_magma_brute": {
+        "name": "Магмовый Громила"
+      },
+      "rift_venom_weaver": {
+        "name": "Ядовитый Ткач"
+      },
+      "rift_thornback": {
+        "name": "Терноспинный Охотник"
+      },
+      "rift_boneclad": {
+        "name": "Костяной Воин"
+      },
+      "rift_marrow_troll": {
+        "name": "Костномозговой Тролль"
+      },
+      "rift_void_acolyte": {
+        "name": "Аколит Пустотного Шрама"
+      },
+      "rift_dread_stalker": {
+        "name": "Жуткий Преследователь"
+      },
+      "rift_storm_caller": {
+        "name": "Призыватель Бури"
+      },
+      "rift_stormscale": {
+        "name": "Грозочешуйчатый Дрейк"
+      },
+      "rift_tide_thrall": {
+        "name": "Приливный Раб"
+      },
+      "rift_deep_lurker": {
+        "name": "Глубинный Обитатель"
+      },
+      "rift_stone_ogre": {
+        "name": "Каменный Огр"
+      },
+      "rift_boss_frost": {
+        "name": "Инеевый Страж"
+      },
+      "rift_boss_ember": {
+        "name": "Тиран Пепельной Кузни"
+      },
+      "rift_boss_venom": {
+        "name": "Прародительница Висска"
+      },
+      "rift_boss_necro": {
+        "name": "Костяной Владыка Ксаррет"
+      },
+      "rift_boss_brute": {
+        "name": "Полководец Граск"
+      },
+      "rift_boss_arcane": {
+        "name": "Архонт Никсарис"
+      },
+      "rift_boss_storm": {
+        "name": "Буревой Вхарок"
+      },
+      "rift_boss_tide": {
+        "name": "Бездонная Пасть"
+      },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"
       },

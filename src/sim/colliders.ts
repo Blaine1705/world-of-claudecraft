@@ -10,6 +10,9 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isRiftPos,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
@@ -392,6 +395,50 @@ function resolveAgainst(
   return { x: px, z: pz };
 }
 
+// ---------------------------------------------------------------------------
+// Procedural Rift regions. A rift floor's collision comes from its GENERATED
+// DungeonLayout, so it cannot be a static INTERIOR_COLLIDERS entry. rift/runs.ts
+// publishes the active floor's instance-local collider set here on spawn/descent
+// and clears it on free; every region-aware collision function below reads it, so
+// movement, mob pathing, line-of-sight and camera occlusion all respect the
+// generated geometry uniformly. Keyed by WORLD seed (per-Sim, like gridFor) plus
+// the instance origin, so concurrent rifts and multiple Sims stay isolated.
+interface RiftRegion {
+  ox: number;
+  oz: number;
+  colliders: Collider[];
+}
+const RIFT_REGIONS = new Map<number, RiftRegion[]>();
+
+export function setRiftRegion(seed: number, ox: number, oz: number, colliders: Collider[]): void {
+  let list = RIFT_REGIONS.get(seed >>> 0);
+  if (!list) {
+    list = [];
+    RIFT_REGIONS.set(seed >>> 0, list);
+  }
+  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
+  if (i >= 0) list[i] = { ox, oz, colliders };
+  else list.push({ ox, oz, colliders });
+}
+
+export function clearRiftRegion(seed: number, ox: number, oz: number): void {
+  const list = RIFT_REGIONS.get(seed >>> 0);
+  if (!list) return;
+  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
+  if (i >= 0) list.splice(i, 1);
+}
+
+function riftRegionAt(seed: number, x: number, z: number): RiftRegion | null {
+  const list = RIFT_REGIONS.get(seed >>> 0);
+  if (!list) return null;
+  for (const r of list) {
+    if (Math.abs(x - r.ox) <= RIFT_REGION_HALF_X && Math.abs(z - r.oz) <= RIFT_REGION_HALF_Z) {
+      return r;
+    }
+  }
+  return null;
+}
+
 function instanceLocal(x: number, z: number): { ox: number; oz: number; interior: string } {
   const dungeon = dungeonAt(x);
   const index = dungeon?.index ?? 0;
@@ -431,6 +478,12 @@ export function resolvePosition(
     const o = arenaOriginAt(z);
     const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
+  }
+  if (isRiftPos(x)) {
+    const region = riftRegionAt(seed, x, z);
+    if (!region) return { x, z };
+    const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
+    return { x: local.x + region.ox, z: local.z + region.oz };
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
@@ -694,6 +747,21 @@ export function cameraOcclusion(
       true,
     );
   }
+  if (isRiftPos(ax)) {
+    const region = riftRegionAt(seed, ax, az);
+    if (!region) return 1;
+    return sweepColliders(
+      region.colliders,
+      ax - region.ox,
+      ay,
+      az - region.oz,
+      bx - region.ox,
+      by,
+      bz - region.oz,
+      pad,
+      true,
+    );
+  }
   if (ax > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(ax, az);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
@@ -749,6 +817,10 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+  }
+  if (isRiftPos(x)) {
+    const region = riftRegionAt(seed, x, z);
+    return region ? overlapsAny(region.colliders, x - region.ox, z - region.oz, false) : false;
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);

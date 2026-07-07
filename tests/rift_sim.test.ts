@@ -1,0 +1,167 @@
+import { describe, expect, it } from 'vitest';
+import { resolveMovement } from '../src/sim/colliders';
+import { isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import type { Entity, SimEvent } from '../src/sim/types';
+
+const SEED = 4242;
+
+function makeSim() {
+  return new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, devCommands: true });
+}
+
+// Tick while keeping the player alive, so the dev tester survives the elites long
+// enough to exercise the gate/descent flow (a dead, unreleased player cannot move).
+function tickAlive(sim: Sim, n: number): void {
+  for (let i = 0; i < n; i++) {
+    sim.player.hp = sim.player.maxHp;
+    sim.tick();
+  }
+}
+
+function killTrash(sim: Sim): void {
+  const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+  if (!inst) return;
+  for (const id of inst.mobIds) {
+    if (id === inst.bossId) continue;
+    const e = sim.entities.get(id);
+    if (e) {
+      e.hp = 0;
+      e.dead = true;
+    }
+  }
+}
+
+function killAll(sim: Sim): void {
+  const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+  if (!inst) return;
+  for (const id of inst.mobIds) {
+    const e = sim.entities.get(id);
+    if (e) {
+      e.hp = 0;
+      e.dead = true;
+    }
+  }
+}
+
+describe('rift sim: dev portal + entry', () => {
+  it('/dev portal spawns a walk-through rift portal', () => {
+    const sim = makeSim();
+    sim.chat('/dev portal 555 12', sim.player.id);
+    const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal');
+    expect(portal).toBeTruthy();
+    expect(portal?.riftSeed).toBe(555);
+    expect(portal?.riftBaseLevel).toBe(12);
+  });
+
+  it('walking into the portal enters a generated floor with spawned mobs', () => {
+    const sim = makeSim();
+    sim.enterRift(SEED, 15, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null);
+    expect(inst).toBeTruthy();
+    expect(isRiftPos(sim.player.pos.x)).toBe(true);
+    expect((inst?.mobIds.length ?? 0)).toBeGreaterThan(0);
+    // Spawned mobs are real, alive, and near the instance origin.
+    const origin = riftInstanceOrigin(inst!.slot, inst!.floorIndex);
+    for (const id of inst!.mobIds) {
+      const m = sim.entities.get(id) as Entity;
+      expect(m.kind).toBe('mob');
+      expect(Math.abs(m.pos.x - origin.x)).toBeLessThan(60);
+    }
+  });
+
+  it('registers generated collision (walls push the player back inside)', () => {
+    const sim = makeSim();
+    sim.enterRift(SEED, 15, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+    // A swept move from the centre spine outward must be stopped by the side wall
+    // (max wall centre is |x|=28), not tunnel through to the target.
+    const resolved = resolveMovement(SEED, origin.x, origin.z + 20, origin.x + 40, origin.z + 20, 0.6);
+    expect(resolved.x).toBeLessThan(origin.x + 30);
+  });
+});
+
+describe('rift sim: floor progression', () => {
+  it('opens the descent only after the floor is cleared, then descends', () => {
+    const sim = makeSim();
+    sim.enterRift(SEED, 15, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst.floorIndex).toBe(0);
+    expect(inst.descentOpen).toBe(false);
+
+    // Before clearing (mobs alive): the descent stays closed.
+    tickAlive(sim, 21);
+    expect(inst.descentOpen).toBe(false);
+
+    // Clear trash (and light any pylons) then tick: the descent opens.
+    killTrash(sim);
+    inst.litPylons = new Set(inst.pylonIds);
+    tickAlive(sim, 21);
+    expect(inst.descentOpen).toBe(true);
+    expect(inst.descentId).not.toBeNull();
+
+    // Walk onto the descent -> next floor.
+    const desc = sim.entities.get(inst.descentId!)!;
+    sim.player.pos = { ...desc.pos };
+    sim.player.hp = sim.player.maxHp;
+    sim.tick();
+    expect(inst.floorIndex).toBe(1);
+  });
+
+  it('reaches the boss floor, and the exit opens only after the boss dies', () => {
+    const sim = makeSim();
+    sim.enterRift(SEED, 15, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+
+    // Descend until the boss floor (bounded loop).
+    for (let guard = 0; guard < 10 && inst.floorIndex < inst.floorCount - 1; guard++) {
+      killTrash(sim);
+      inst.litPylons = new Set(inst.pylonIds);
+      tickAlive(sim, 21);
+      if (inst.descentId === null) break;
+      const desc = sim.entities.get(inst.descentId)!;
+      sim.player.pos = { ...desc.pos };
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    expect(inst.floorIndex).toBe(inst.floorCount - 1);
+    expect(inst.bossId).not.toBeNull();
+
+    // Boss alive: no exit yet.
+    tickAlive(sim, 21);
+    expect(inst.exitId).toBeNull();
+
+    // Kill the boss: the exit opens.
+    killAll(sim);
+    tickAlive(sim, 21);
+    expect(inst.exitId).not.toBeNull();
+
+    // Walk into the exit -> back to the overworld.
+    const exit = sim.entities.get(inst.exitId!)!;
+    sim.player.pos = { ...exit.pos };
+    sim.player.hp = sim.player.maxHp;
+    sim.tick();
+    expect(isRiftPos(sim.player.pos.x)).toBe(false);
+  });
+});
+
+describe('rift sim: client-sync event', () => {
+  it('emits a riftState event on entry with the descriptor', () => {
+    const sim = makeSim();
+    let evt: Extract<SimEvent, { type: 'riftState' }> | undefined;
+    // enterRift emits during the call; capture via the next tick's drained events
+    // is not possible (emit happens synchronously), so drive it through a portal.
+    sim.chat('/dev portal 91 18', sim.player.id);
+    const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal')!;
+    sim.player.pos = { ...portal.pos };
+    const events = sim.tick();
+    for (const e of events) if (e.type === 'riftState') evt = e;
+    expect(evt).toBeTruthy();
+    expect(evt?.active).toBe(true);
+    expect(evt?.seed).toBe(91);
+    expect(evt?.baseLevel).toBe(18);
+    expect(evt?.floorIndex).toBe(0);
+    expect(evt?.floorCount).toBeGreaterThanOrEqual(3);
+  });
+});

@@ -93,6 +93,8 @@ function makeCtx() {
       return dungeonDoorIds;
     },
     instances: [],
+    riftInstances: [],
+    riftPortalIds: null,
     get arenaMatches() {
       return arenaMatches;
     },
@@ -183,6 +185,8 @@ function makeCtx() {
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    enterRift: vi.fn(),
+    leaveRift: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),

@@ -6667,6 +6667,81 @@ export const ko_KR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },
+      "rift_spawnling": {
+        "name": "균열의 산물"
+      },
+      "rift_bonewalker": {
+        "name": "되살아난 뼈걷는자"
+      },
+      "rift_frost_revenant": {
+        "name": "서리에 묶인 망령"
+      },
+      "rift_rime_elemental": {
+        "name": "상고대 정령"
+      },
+      "rift_ember_fiend": {
+        "name": "잉걸불 마귀"
+      },
+      "rift_magma_brute": {
+        "name": "용암 야수"
+      },
+      "rift_venom_weaver": {
+        "name": "독액 직조자"
+      },
+      "rift_thornback": {
+        "name": "가시등 추적자"
+      },
+      "rift_boneclad": {
+        "name": "뼈갑옷 전사"
+      },
+      "rift_marrow_troll": {
+        "name": "골수 트롤"
+      },
+      "rift_void_acolyte": {
+        "name": "공허상흔 시종"
+      },
+      "rift_dread_stalker": {
+        "name": "공포의 추적자"
+      },
+      "rift_storm_caller": {
+        "name": "폭풍 소환사"
+      },
+      "rift_stormscale": {
+        "name": "폭풍비늘 드레이크"
+      },
+      "rift_tide_thrall": {
+        "name": "조수의 노예"
+      },
+      "rift_deep_lurker": {
+        "name": "심연의 잠복자"
+      },
+      "rift_stone_ogre": {
+        "name": "돌 오우거"
+      },
+      "rift_boss_frost": {
+        "name": "서리 파수꾼"
+      },
+      "rift_boss_ember": {
+        "name": "잉걸불 대장간의 폭군"
+      },
+      "rift_boss_venom": {
+        "name": "어미 비스카"
+      },
+      "rift_boss_necro": {
+        "name": "뼈군주 자레스"
+      },
+      "rift_boss_brute": {
+        "name": "군주 그라스크"
+      },
+      "rift_boss_arcane": {
+        "name": "집정관 닉사리스"
+      },
+      "rift_boss_storm": {
+        "name": "폭풍 바로크"
+      },
+      "rift_boss_tide": {
+        "name": "심연의 아가리"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },

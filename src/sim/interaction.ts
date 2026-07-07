@@ -368,6 +368,14 @@ export function interact(ctx: SimContext, pid?: number): void {
           ctx.leaveDungeon(p.id);
           return;
         }
+        if (target.templateId === 'rift_portal' && target.riftSeed !== undefined) {
+          ctx.enterRift(target.riftSeed, target.riftBaseLevel ?? p.level, p.id);
+          return;
+        }
+        if (target.templateId === 'rift_exit') {
+          ctx.leaveRift(p.id);
+          return;
+        }
         if (target.templateId === 'mailbox') {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
@@ -417,6 +425,14 @@ export function interact(ctx: SimContext, pid?: number): void {
     }
     if (obj.templateId === 'dungeon_exit') {
       ctx.leaveDungeon(p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_portal' && obj.riftSeed !== undefined) {
+      ctx.enterRift(obj.riftSeed, obj.riftBaseLevel ?? p.level, p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_exit') {
+      ctx.leaveRift(p.id);
       return;
     }
     if (obj.templateId === 'mailbox') {

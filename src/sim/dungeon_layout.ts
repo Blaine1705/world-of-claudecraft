@@ -63,6 +63,34 @@ export interface DungeonLayout {
   shellPole?: { x: number; z: number };
 }
 
+// The four hand-authored KayKit interior "kits" a procedural rift can build on.
+// A rift floor picks one kit for its module geometry (wall/floor/prop mesh mix)
+// and then RE-GRADES it with generated torch colour, fog, and material tints, so
+// the same kit reads as a different environment each run. This mirrors how the
+// Drowned Litany delve already re-tints the crypt kit into a marsh (marshMaterial
+// in render/dungeon.ts); InteriorStyle just makes that tinting data-driven.
+export type InteriorKit = 'crypt' | 'bastion' | 'sanctum' | 'temple';
+
+/** A generated re-grade of one of the four KayKit interior kits. Sim-layer data
+ * (no Three imports); the renderer reads it in DungeonInteriors.build and the fog
+ * pass, and the colliders never look at it (geometry comes from the DungeonLayout).
+ * All colour fields are 0xRRGGBB. When a field is omitted the renderer falls back
+ * to the kit's hand-authored default, so an empty style renders as the base kit. */
+export interface InteriorStyle {
+  /** Which hand-authored kit supplies the wall/floor/prop mesh mix. */
+  kit: InteriorKit;
+  /** Torch flame / emissive / point-light colours (replaces TORCH_COLORS[kit]). */
+  torch: { flame: number; emissive: number; light: number };
+  /** Scene fog while inside this floor (replaces the renderer's fogState switch). */
+  fog: { color: number; near: number; far: number };
+  /** Multiplicative material tints, exactly like MARSH_WALL_TINT/MARSH_FLOOR_TINT.
+   * Omit for the kit's untinted stone. */
+  wallTint?: number;
+  floorTint?: number;
+  /** Whether the boss dais is a raised platform (as sanctum/temple) or flush. */
+  daisRaised?: boolean;
+}
+
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {
   const out: GridPoint[] = [];
   for (let z = zFrom; z <= zTo; z += zStep) {

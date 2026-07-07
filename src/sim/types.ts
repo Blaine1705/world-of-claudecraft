@@ -1641,6 +1641,10 @@ export interface Entity {
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
+  // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
+  // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
+  riftSeed?: number;
+  riftBaseLevel?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
@@ -2030,6 +2034,22 @@ export type SimEvent = { pid?: number } & (
       count?: number;
       quality?: ItemDef['quality'];
       reason?: 'unknown_recipe' | 'insufficient_materials';
+    }
+  // Procedural Rift state, pushed to the entering player so the client can
+  // regenerate the current floor's geometry + visual style from the descriptor
+  // (the same pure generator the server ran). `active:false` clears it on leave.
+  // Text-free structured fields (like skinEvent/craftResult): the client renders
+  // its own localized floor label from name/themeName.
+  | {
+      type: 'riftState';
+      pid: number;
+      active: boolean;
+      seed: number;
+      baseLevel: number;
+      floorIndex: number;
+      floorCount: number;
+      name: string;
+      themeName: string;
     }
 );
 

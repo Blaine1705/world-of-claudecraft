@@ -36,6 +36,7 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { RIFT_MOBS } from './content/rift/mobs';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
@@ -167,6 +168,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
+  ...RIFT_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {
@@ -464,7 +466,51 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
 }
 
 export function isDelvePos(x: number): boolean {
-  return x >= DELVE_BAND_X_MIN;
+  return x >= DELVE_BAND_X_MIN && x < RIFT_BAND_X_MIN;
+}
+
+// ---------------------------------------------------------------------------
+// Procedural Rift instances — the seed-driven infinite dungeon system. Their
+// instances live in a far x-band well past the delve band, one room region per
+// slot stacked along z. Rooms are regenerated in-place on descent, so a slot
+// holds one floor at a time. Geometry/collision comes from the generated
+// DungeonLayout (see src/sim/rift/), not a fixed interior kit.
+// ---------------------------------------------------------------------------
+export const RIFT_X_MIN = 9000; // rift instance x (all slots share it; slots stack along z)
+// A generated room is at most ~28u half-width; sit the band edge clear of the
+// west wall face so isRiftPos covers the whole footprint and delve/rift never
+// overlap (delves end far below this).
+export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
+export const RIFT_SLOT_COUNT = 8; // concurrent rifts the world can host
+export const RIFT_MAX_FLOORS = 6; // matches rift_gen MAX_FLOORS
+const RIFT_Z0 = -1250;
+// Each FLOOR gets its own z-stacked origin within a slot, so descending builds a
+// fresh interior at a new origin (no in-place geometry teardown). A room runs
+// zMin -19 .. zMax up to ~129 from origin; 340u between floors keeps the ±160
+// detection regions from overlapping, and a slot reserves room for all floors.
+const RIFT_FLOOR_SPACING = 340;
+const RIFT_SLOT_SPACING = RIFT_FLOOR_SPACING * RIFT_MAX_FLOORS + 200;
+/** Region half-extents used to map a far-off position back to its rift floor. */
+export const RIFT_REGION_HALF_X = 60;
+export const RIFT_REGION_HALF_Z = 160;
+
+export function riftInstanceOrigin(slot: number, floorIndex: number): { x: number; z: number } {
+  return { x: RIFT_X_MIN, z: RIFT_Z0 + slot * RIFT_SLOT_SPACING + floorIndex * RIFT_FLOOR_SPACING };
+}
+
+export function isRiftPos(x: number): boolean {
+  return x >= RIFT_BAND_X_MIN;
+}
+
+// Nearest rift-floor origin to a far-off z (all floors share RIFT_X_MIN; they
+// stack along z, slot-major then floor-minor). Mirrors arenaOriginAt: the renderer
+// uses it to place the generated interior at the same origin the sim spawned it.
+export function riftOriginAt(z: number): { x: number; z: number } {
+  const off = z - RIFT_Z0;
+  const slot = Math.max(0, Math.min(RIFT_SLOT_COUNT - 1, Math.floor(off / RIFT_SLOT_SPACING)));
+  const withinSlot = off - slot * RIFT_SLOT_SPACING;
+  const floor = Math.max(0, Math.min(RIFT_MAX_FLOORS - 1, Math.round(withinSlot / RIFT_FLOOR_SPACING)));
+  return riftInstanceOrigin(slot, floor);
 }
 
 export function delveAt(x: number): DelveDef | null {

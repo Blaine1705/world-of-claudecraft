@@ -243,6 +243,7 @@ export const IWORLD_MEMBERS = [
   { name: 'advanceAmendsProgress', kind: 'method' },
   { name: 'switchArchetype', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
+  { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
@@ -361,8 +362,8 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(181);
-    expect(DATA_MEMBERS.length).toBe(49);
+    expect(IWORLD_MEMBERS.length).toBe(182);
+    expect(DATA_MEMBERS.length).toBe(50);
     expect(METHOD_MEMBERS.length).toBe(132);
   });
 
@@ -520,6 +521,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'resurrectAtCorpse',
       'resurrectAtSpiritHealer',
       'revivePet',
+      'riftFloor',
       'saveLoadout',
       'searchCharacters',
       'sellAllJunk',
@@ -602,6 +604,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'realm',
       'recipeList',
       'restedXp',
+      'riftFloor',
       'socialInfo',
       'talentRole',
       'talentSpec',
@@ -1039,6 +1042,7 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
+  'riftFloor',
 ] as const satisfies readonly (keyof IWorldDungeons)[];
 type _ExhaustDungeons = AssertNever<Exclude<keyof IWorldDungeons, (typeof FACET_DUNGEONS)[number]>>;
 
@@ -1143,8 +1147,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 22 fa
 
   it('the union of the 22 facets equals the pinned 181-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(181);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(181);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(182);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(182);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

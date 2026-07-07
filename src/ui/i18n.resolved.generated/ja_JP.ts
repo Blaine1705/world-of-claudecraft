@@ -6667,6 +6667,81 @@ export const ja_JP: EnTranslations = {
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
       },
+      "rift_spawnling": {
+        "name": "リフトの落とし子"
+      },
+      "rift_bonewalker": {
+        "name": "蘇りし骨歩き"
+      },
+      "rift_frost_revenant": {
+        "name": "氷縛の亡霊"
+      },
+      "rift_rime_elemental": {
+        "name": "樹氷のエレメンタル"
+      },
+      "rift_ember_fiend": {
+        "name": "燃え殻の魔物"
+      },
+      "rift_magma_brute": {
+        "name": "マグマの猛獣"
+      },
+      "rift_venom_weaver": {
+        "name": "毒織り"
+      },
+      "rift_thornback": {
+        "name": "茨背の追跡者"
+      },
+      "rift_boneclad": {
+        "name": "骨鎧の戦士"
+      },
+      "rift_marrow_troll": {
+        "name": "髄のトロル"
+      },
+      "rift_void_acolyte": {
+        "name": "虚空傷の侍祭"
+      },
+      "rift_dread_stalker": {
+        "name": "恐怖の追跡者"
+      },
+      "rift_storm_caller": {
+        "name": "嵐呼び"
+      },
+      "rift_stormscale": {
+        "name": "嵐鱗のドレイク"
+      },
+      "rift_tide_thrall": {
+        "name": "潮の下僕"
+      },
+      "rift_deep_lurker": {
+        "name": "深淵の潜伏者"
+      },
+      "rift_stone_ogre": {
+        "name": "石のオーガ"
+      },
+      "rift_boss_frost": {
+        "name": "樹氷の守護者"
+      },
+      "rift_boss_ember": {
+        "name": "燃え殻鍛冶の暴君"
+      },
+      "rift_boss_venom": {
+        "name": "母胎ヴィスカ"
+      },
+      "rift_boss_necro": {
+        "name": "骨王ザレス"
+      },
+      "rift_boss_brute": {
+        "name": "軍将グラスク"
+      },
+      "rift_boss_arcane": {
+        "name": "アルコン・ニクサリス"
+      },
+      "rift_boss_storm": {
+        "name": "嵐のヴァロク"
+      },
+      "rift_boss_tide": {
+        "name": "深淵の顎"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },

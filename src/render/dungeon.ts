@@ -25,6 +25,7 @@ import {
   DUNGEON_WALL_HW,
   DUNGEON_WALL_X,
   type DungeonLayout,
+  type InteriorStyle,
   type GridPoint,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
@@ -656,6 +657,10 @@ export class DungeonInteriors {
         tier?: 'shallow' | 'deep';
       }>;
       moduleId?: DelveModuleId;
+      // Procedural Rift re-grade: a generated palette layered over one of the four
+      // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
+      // overrides the torch/light colours. Undefined for authored dungeons/delves.
+      style?: InteriorStyle;
     },
   ): Promise<void> {
     await ensureDungeonAssets();
@@ -674,17 +679,19 @@ export class DungeonInteriors {
             : interior === 'nythraxis'
               ? NYTHRAXIS_LAYOUT
               : CRYPT_LAYOUT);
-    const variant = opts?.variant ?? this.variantFor(interior, ox);
+    const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox);
+    const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
+    const daisRaised = opts?.style?.daisRaised;
     const group = new THREE.Group();
     const p = new Placements();
     const arenaWalls = variant === 'arena' ? this.pendingArenaWalls(layout, ox, oz) : undefined;
 
     this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
-    this.placePillarsAndTorches(group, p, layout, variant);
+    this.placePillarsAndTorches(group, p, layout, variant, torch);
     this.placeTombs(p, layout, variant);
     this.placeStubs(p, layout.stubs, variant);
-    this.placeDais(group, p, layout, variant);
+    this.placeDais(group, p, layout, variant, torch, daisRaised);
     this.placeAisleClutter(p, layout, variant);
     this.placeWallDressing(p, layout, variant, arenaWalls);
     if (variant === 'temple') {
@@ -1416,12 +1423,13 @@ export class DungeonInteriors {
     p: Placements,
     layout: DungeonLayout,
     variant: Variant,
+    torch?: TorchColors,
   ): void {
     const kind =
       variant === 'sanctum' || variant === 'temple' || variant === 'delve_hall'
         ? 'pillar_decorated'
         : 'pillar';
-    const colors = TORCH_COLORS[variant];
+    const colors = torch ?? TORCH_COLORS[variant];
     for (const pt of layout.pillars) {
       const faceAisle = pt.x < 0 ? Math.PI / 2 : -Math.PI / 2;
       p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
@@ -1624,12 +1632,17 @@ export class DungeonInteriors {
     p: Placements,
     layout: DungeonLayout,
     variant: Variant,
+    torch?: TorchColors,
+    daisRaisedOverride?: boolean,
   ): void {
     const d = layout.dais;
+    const glow = (torch ?? TORCH_COLORS[variant]).light;
     // The arena and Nythraxis raid keep flat fighting floors: no raised platform
-    // or rim clutter to visually disagree with the walkable sim collision.
-    if (!dungeonDaisHasRaisedPlatform(variant)) {
-      this.addTorchGlow(group, d.x, d.z, TORCH_COLORS[variant].light, 0.07, 2.4);
+    // or rim clutter to visually disagree with the walkable sim collision. A rift
+    // style can force either shape (daisRaisedOverride) independent of the kit.
+    const raised = daisRaisedOverride ?? dungeonDaisHasRaisedPlatform(variant);
+    if (!raised) {
+      this.addTorchGlow(group, d.x, d.z, glow, 0.07, 2.4);
       return;
     }
     const quarter = Math.PI / 2;
@@ -1642,7 +1655,7 @@ export class DungeonInteriors {
     }
     // ritual glow pooled on the dais top so the boss stage never reads as a
     // black slab (torch pillars stop short of the back chamber)
-    this.addTorchGlow(group, d.x, d.z, TORCH_COLORS[variant].light, 0.68, 1.6);
+    this.addTorchGlow(group, d.x, d.z, glow, 0.68, 1.6);
     // rim decor (small, walk-through by design)
     const rim = d.r - 1.6;
     for (let i = 0; i < 6; i++) {

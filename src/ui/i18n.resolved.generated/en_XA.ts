@@ -6667,6 +6667,81 @@ export const en_XA: EnTranslations = {
       "thunzharr_stormling": {
         "name": "[Ŕóúšéð Šţóŕɱļíñĝ]"
       },
+      "rift_spawnling": {
+        "name": "[Ŕíƒţ Šþáŵñļíñĝ]"
+      },
+      "rift_bonewalker": {
+        "name": "[Ŕíšéñ Ɓóñéŵáļķéŕ]"
+      },
+      "rift_frost_revenant": {
+        "name": "[Ƒŕóšţƀóúñð Ŕéʋéñáñţ]"
+      },
+      "rift_rime_elemental": {
+        "name": "[Ŕíɱé Éļéɱéñţáļ]"
+      },
+      "rift_ember_fiend": {
+        "name": "[Éɱƀéŕ Ƒíéñð]"
+      },
+      "rift_magma_brute": {
+        "name": "[Ɱáĝɱá Ɓŕúţé]"
+      },
+      "rift_venom_weaver": {
+        "name": "[Ʋéñóɱ Ŵéáʋéŕ]"
+      },
+      "rift_thornback": {
+        "name": "[Ţĥóŕñƀáçķ Šţáļķéŕ]"
+      },
+      "rift_boneclad": {
+        "name": "[Ɓóñéçļáð Ŵáŕŕíóŕ]"
+      },
+      "rift_marrow_troll": {
+        "name": "[Ɱáŕŕóŵ Ţŕóļļ]"
+      },
+      "rift_void_acolyte": {
+        "name": "[Ʋóíðšçáŕ Áçóļýţé]"
+      },
+      "rift_dread_stalker": {
+        "name": "[Ðŕéáð Šţáļķéŕ]"
+      },
+      "rift_storm_caller": {
+        "name": "[Šţóŕɱ Çáļļéŕ]"
+      },
+      "rift_stormscale": {
+        "name": "[Šţóŕɱšçáļé Ðŕáķé]"
+      },
+      "rift_tide_thrall": {
+        "name": "[Ţíðé Ţĥŕáļļ]"
+      },
+      "rift_deep_lurker": {
+        "name": "[Ðééþ Ļúŕķéŕ]"
+      },
+      "rift_stone_ogre": {
+        "name": "[Šţóñé Óĝŕé]"
+      },
+      "rift_boss_frost": {
+        "name": "[Ĥóáŕƒŕóšţ Ŵáŕðéñ]"
+      },
+      "rift_boss_ember": {
+        "name": "[Éɱƀéŕƒóŕĝé Ţýŕáñţ]"
+      },
+      "rift_boss_venom": {
+        "name": "[Ɓŕóóðɱóţĥéŕ Ʋýššķá]"
+      },
+      "rift_boss_necro": {
+        "name": "[Ɓóñéļóŕð Ẋáŕŕéţĥ]"
+      },
+      "rift_boss_brute": {
+        "name": "[Ŵáŕļóŕð Ĝŕášķ]"
+      },
+      "rift_boss_arcane": {
+        "name": "[Áŕçĥóñ Ñýẋáŕíš]"
+      },
+      "rift_boss_storm": {
+        "name": "[Ţéɱþéšţ Ʋĥáŕóķ]"
+      },
+      "rift_boss_tide": {
+        "name": "[Áƀýššáļ Ɱáŵ]"
+      },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"
       },

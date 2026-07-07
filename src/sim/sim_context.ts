@@ -17,6 +17,7 @@ import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { PendingProjectile } from './projectile_travel';
+import type { RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type {
   ArenaMatch,
@@ -98,6 +99,12 @@ export interface SimContextPrimitives {
   // reads/finds/iterates it and mutates slot fields in place; the array identity
   // stays Sim-owned (like delayedEvents/groundAoEs), so this is a live read-only view.
   readonly instances: InstanceSlot[];
+  // Procedural Rift instance pool (seeded in the Sim ctor). Live view: the backing
+  // array stays Sim-owned; rift/runs.ts mutates slot fields in place.
+  readonly riftInstances: RiftInstance[];
+  // rift-portal registry, appended to on rift_portal spawn; null until built.
+  // Read-write: rift/runs.ts lazily assigns the array on first build (like dungeonDoorIds).
+  riftPortalIds: number[] | null;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -181,6 +188,11 @@ export interface SimContextCallbacks {
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   enterDungeon(dungeonId: string, pid?: number): void;
   leaveDungeon(pid?: number): void;
+  // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
+  // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
+  // these two are on the seam so foreign callers reach them through ctx.
+  enterRift(seed: number, baseLevel: number, pid?: number, returnPos?: { x: number; z: number }): void;
+  leaveRift(pid?: number): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -665,6 +677,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     get instances() {
       return host.instances;
     },
+    get riftInstances() {
+      return host.riftInstances;
+    },
+    get riftPortalIds() {
+      return host.riftPortalIds;
+    },
+    set riftPortalIds(v) {
+      host.riftPortalIds = v;
+    },
     get arenaMatches() {
       return host.arenaMatches;
     },
@@ -748,6 +769,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     instanceOriginOf: host.instanceOriginOf,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
+    enterRift: host.enterRift,
+    leaveRift: host.leaveRift,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
     cancelCast: host.cancelCast,

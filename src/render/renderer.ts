@@ -20,12 +20,15 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isRiftPos,
   MOBS,
   NPCS,
+  riftOriginAt,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
+import { generateRiftFloor } from '../sim/rift/rift_gen';
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
@@ -3043,11 +3046,29 @@ export class Renderer {
     const isQuestVision = e.kind === 'mob' && e.templateId.startsWith('vision_');
 
     let portal: THREE.Mesh | undefined;
+    // Rift portals reuse the dungeon-door arch+swirl body: the overworld entrance
+    // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
+    // "leaving" portal; rune pylons render as small glowing portal pillars so the
+    // walk-on puzzle is visible.
+    const RIFT_PORTAL_IDS = new Set([
+      'rift_portal',
+      'rift_descent',
+      'rift_exit',
+      'rift_pylon',
+      'rift_pylon_lit',
+    ]);
     if (
       e.kind === 'object' &&
-      (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
+      (e.templateId === 'dungeon_door' ||
+        e.templateId === 'dungeon_exit' ||
+        RIFT_PORTAL_IDS.has(e.templateId))
     ) {
-      const entering = e.templateId === 'dungeon_door';
+      const entering =
+        e.templateId === 'dungeon_door' ||
+        e.templateId === 'rift_portal' ||
+        e.templateId === 'rift_descent' ||
+        e.templateId === 'rift_pylon' ||
+        e.templateId === 'rift_pylon_lit';
       const built = buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
@@ -3450,12 +3471,20 @@ export class Renderer {
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
-  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'delve' | 'underwater' =
+  // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
+  // descent (same 'rift' fogState, different palette) still refreshes the fog.
+  private riftFogKey: string | null = null;
+  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'delve' | 'underwater' | 'rift' =
     'outdoor';
 
-  private buildInterior(interior: string, ox: number, oz: number): void {
+  private buildInterior(
+    interior: string,
+    ox: number,
+    oz: number,
+    opts?: Parameters<DungeonInteriors['buildInterior']>[3],
+  ): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
-    void this.dungeons.buildInterior(interior, ox, oz).catch((err) => {
+    void this.dungeons.buildInterior(interior, ox, oz, opts).catch((err) => {
       console.error('Failed to build dungeon interior:', err);
     });
   }
@@ -3562,6 +3591,28 @@ export class Renderer {
           this.buildInterior('arena', o.x, o.z);
         }
       }
+    } else if (isRiftPos(px)) {
+      // Procedural rift: regenerate the floor's geometry + style from the
+      // descriptor (IWorld.riftFloor) and build it at the floor's own z-stacked
+      // origin. Each (seed, floorIndex) is a distinct key + origin, so descending
+      // builds a fresh interior; the previous floor's geometry harmlessly persists
+      // off-screen (the player has descended away), like authored dungeon copies.
+      const rf = this.sim.riftFloor;
+      if (rf) {
+        void ensureDungeonAssets().catch(() => undefined);
+        const key = `rift:${rf.seed}:${rf.floorIndex}`;
+        if (!this.builtInteriors.has(key)) {
+          const o = riftOriginAt(pz);
+          if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
+            this.builtInteriors.add(key);
+            const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex);
+            void this.buildInterior(floor.style.kit, o.x, o.z, {
+              layout: floor.layout,
+              style: floor.style,
+            });
+          }
+        }
+      }
     } else if (inside) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the interior copy the player is standing in
@@ -3595,6 +3646,32 @@ export class Renderer {
               ? 'underwater'
               : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
+    // Procedural rift: dynamic fog from the generated floor style, re-applied when
+    // the floor changes (descent keeps fogState='rift' but swaps the palette).
+    const riftFloor = inside && isRiftPos(px) ? this.sim.riftFloor : null;
+    if (riftFloor) {
+      const fogKey = `${riftFloor.seed}:${riftFloor.floorIndex}`;
+      if (fogKey !== this.riftFogKey) {
+        this.riftFogKey = fogKey;
+        const style = generateRiftFloor(
+          riftFloor.seed,
+          riftFloor.baseLevel,
+          riftFloor.floorIndex,
+        ).style;
+        fog.color.setHex(style.fog.color);
+        fog.near = style.fog.near;
+        fog.far = style.fog.far;
+      }
+      this.fogState = 'rift';
+      if (!this.lowGfx) {
+        this.sun.intensity = DUNGEON_SUN_INTENSITY;
+        this.hemi.intensity = DUNGEON_HEMI_INTENSITY;
+        this.scene.environmentIntensity = DUNGEON_ENV_INTENSITY;
+        sharedUniforms.uRimBoost.value = DUNGEON_RIM_BOOST;
+      }
+      return;
+    }
+    this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
       if (desired === 'dungeon') {

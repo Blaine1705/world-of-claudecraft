@@ -16,7 +16,9 @@
 import { type AssistCandidate, resolveAssist } from '../assist';
 import { GATHERING_PROFESSIONS } from '../content/professions';
 import { CLASSES, ITEMS, zoneAt } from '../data';
+import { createGroundObject } from '../entity';
 import { graveyardReadout } from '../entity_roster';
+import { generateRiftPlan } from '../rift/rift_gen';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
 import {
   type AwayStatus,
@@ -923,6 +925,36 @@ export function handleDevChat(
     else ctx.emit({ type: 'log', text: okText, pid });
     return null;
   }
+  // [dev] Spawn a procedural rift portal in front of the player. Each invocation
+  // rolls a fresh seed (so every portal opens a different, infinite dungeon) unless
+  // one is supplied for reproducibility: /dev portal [seed] [level].
+  const portalM = /^\/(?:dev\s+portal|devportal)(?:\s+(\d+))?(?:\s+(\d+))?\s*$/i.exec(raw);
+  if (portalM) {
+    const e = ctx.entities.get(pid);
+    if (!e) return null;
+    const seed = (portalM[1] ? Number(portalM[1]) : ctx.rng.int(1, 1_000_000_000)) >>> 0;
+    const baseLevel = Math.max(1, Math.min(60, portalM[2] ? Number(portalM[2]) : e.level));
+    const d = 5;
+    const px = e.pos.x + Math.sin(e.facing) * d;
+    const pz = e.pos.z + Math.cos(e.facing) * d;
+    const plan = generateRiftPlan(seed, baseLevel);
+    const portal = createGroundObject(ctx.nextId++, '', plan.name, ctx.groundPos(px, pz));
+    portal.templateId = 'rift_portal';
+    portal.objectItemId = null;
+    portal.lootable = true;
+    portal.riftSeed = seed;
+    portal.riftBaseLevel = baseLevel;
+    portal.facing = e.facing + Math.PI; // face back toward the player
+    portal.prevFacing = portal.facing;
+    ctx.addEntity(portal);
+    ctx.emit({
+      type: 'log',
+      text: `[dev] Opened a portal to ${plan.name} (${plan.floorCount} floors, L${baseLevel}). Walk through it.`,
+      color: '#b9f',
+      pid,
+    });
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -934,7 +966,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level], /dev kill',
     );
     return null;
   }

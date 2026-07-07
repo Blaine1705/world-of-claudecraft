@@ -97,6 +97,33 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
+  // content; English names come from the MOBS table like every other id here.
+  'rift_spawnling',
+  'rift_bonewalker',
+  'rift_frost_revenant',
+  'rift_rime_elemental',
+  'rift_ember_fiend',
+  'rift_magma_brute',
+  'rift_venom_weaver',
+  'rift_thornback',
+  'rift_boneclad',
+  'rift_marrow_troll',
+  'rift_void_acolyte',
+  'rift_dread_stalker',
+  'rift_storm_caller',
+  'rift_stormscale',
+  'rift_tide_thrall',
+  'rift_deep_lurker',
+  'rift_stone_ogre',
+  'rift_boss_frost',
+  'rift_boss_ember',
+  'rift_boss_venom',
+  'rift_boss_necro',
+  'rift_boss_brute',
+  'rift_boss_arcane',
+  'rift_boss_storm',
+  'rift_boss_tide',
 ] as const;
 
 const NPC_IDS = [
