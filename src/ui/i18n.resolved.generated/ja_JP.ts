@@ -5237,7 +5237,7 @@ export const ja_JP: EnTranslations = {
       },
       "bloodthirst": {
         "name": "瀉血",
-        "description": "血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与えます。（狂怒シグネチャー）"
+        "description": "血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与え、最大体力の3%を回復し、怒りを10得ます。（狂怒シグネチャー）"
       },
       "raging_gale": {
         "name": "双撃",
@@ -5249,7 +5249,7 @@ export const ja_JP: EnTranslations = {
       },
       "furious_mending": {
         "name": "憤怒の治癒",
-        "description": "怒りが傷を癒やします：10秒かけて最大体力の20%を回復し、その間に受けるダメージが20%減少します。（狂怒）"
+        "description": "10秒間、受けるダメージが20%減少し、その間はあなたの瀉血が最大体力の20%を回復します。（狂怒）"
       },
       "emboldening_roar": {
         "name": "鼓舞の咆哮",

@@ -1130,7 +1130,7 @@ const classAbilityNamesEn = {
       [
         'bloodthirst',
         'Bloodletting',
-        'Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health. (Fury signature)',
+        'Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health and generating 10 rage. (Fury signature)',
       ],
       [
         'raging_gale',
@@ -1145,12 +1145,12 @@ const classAbilityNamesEn = {
       [
         'furious_mending',
         'Furious Mending',
-        'Your fury knits your wounds: heal 20% of your maximum health over 10 sec and take 20% reduced damage while it mends. (Fury)',
+        'For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)',
       ],
       [
         'emboldening_roar',
         'Emboldening Roar',
-        'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+        'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Protection)',
       ],
       [
         'raised_guard',

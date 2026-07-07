@@ -598,7 +598,10 @@ describe('Sim integration — active talents & ability modifiers', () => {
   });
 
   it('tank-role Vengeance Mastery multiplies generated threat (+30%)', () => {
-    const sunderThreat = (vengeance: boolean): number => {
+    // Brute Swing (slam) is a plain damage strike both no-spec and prot know, so
+    // its damage-driven threat isolates the +30% Recompense threat mastery.
+    // (Sunder's flat threat is now prot-only, so it can't be the base case.)
+    const slamThreat = (vengeance: boolean): number => {
       const sim = new Sim({ seed: 3, playerClass: 'warrior' });
       sim.setPlayerLevel(20);
       if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+30% threat)
@@ -609,11 +612,11 @@ describe('Sim integration — active talents & ability modifiers', () => {
       sim.player.facing = Math.atan2(mob.pos.x - sim.player.pos.x, mob.pos.z - sim.player.pos.z);
       sim.player.resource = 100;
       sim.targetEntity(mob.id);
-      sim.castAbility('sunder_armor');
+      sim.castAbility('slam');
       return mob.threat.get(sim.playerId) ?? 0;
     };
-    const base = sunderThreat(false);
-    const venge = sunderThreat(true);
+    const base = slamThreat(false);
+    const venge = slamThreat(true);
     expect(base).toBeGreaterThan(0);
     // ~+30% (a tiny constant "seed" threat on combat entry isn't multiplied, so
     // assert the band rather than the exact ratio): clearly boosted, not doubled.

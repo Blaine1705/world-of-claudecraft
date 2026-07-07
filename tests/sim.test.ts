@@ -178,7 +178,7 @@ describe('classic formulas', () => {
 
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
-    expect(w1).toEqual(['heroic_strike', 'battle_shout']);
+    expect(w1).toEqual(['heroic_strike']); // battle_shout now unlocks at level 7
     const w10 = abilitiesKnownAt('warrior', 10);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
     const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
@@ -1418,10 +1418,12 @@ describe('food, drink, vendor', () => {
 describe('leveling', () => {
   it('levels up, heals to full, and learns new abilities', () => {
     const sim = makeSim('warrior');
-    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike', 'battle_shout']);
+    // At level 1 only Reaver Strike is known: battle_shout unlocks at 7, rend at 5.
+    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike']);
     const _events: any[] = [];
-    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + 10);
-    expect(sim.player.level).toBe(4);
+    // to level 5: Onrush (charge) unlocks at 4, Deep Gash (rend) at 5
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + xpForLevel(4) + 10);
+    expect(sim.player.level).toBe(5);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
     expect(sim.known.map((k) => k.def.id)).toContain('rend');

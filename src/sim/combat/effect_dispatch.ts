@@ -1311,9 +1311,15 @@ export function runEffects(
         break;
       }
       case 'selfHealPctMax': {
-        // Victory Rush's rider: a flat fraction of max health, through the
-        // shared heal path (threat/heal-absorb/crit handled there).
-        ctx.applyHeal(p, p, Math.round(p.maxHp * eff.pct), ability.name);
+        // A flat fraction of max health through the shared heal path (threat/
+        // heal-absorb/crit handled there). Furious Mending (aura id
+        // 'furious_mending') supercharges Bloodletting's self-heal to 20% while
+        // it holds; Math.max keeps Victory Rush's own 0.20 unchanged and only
+        // lifts Bloodletting's 0.03 under the buff. No rng.
+        const pct = p.auras.some((a) => a.id === 'furious_mending')
+          ? Math.max(eff.pct, 0.2)
+          : eff.pct;
+        ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
         break;
       }
       case 'charge': {
@@ -1369,8 +1375,13 @@ export function runEffects(
             school: 'physical',
           });
         }
-        // sunder deals no damage: its threat is the flat value, stance-scaled
-        addThreat(target, p.id, res.threatFlat * ctx.threatMod(p, 'physical'));
+        // Sunder deals no damage: its only threat is the flat value,
+        // stance-scaled. Armor Shear's high tank threat spikes ONLY for a
+        // committed Protection warrior; for Arms (and no spec) the flat bonus
+        // is 0 (the armor shred and any normal action threat still apply, just
+        // not the tank spike). Spec decision: docs/prd/warrior-talents.md.
+        const sunderFlat = ctx.playerMods(meta).spec === 'prot' ? res.threatFlat : 0;
+        addThreat(target, p.id, sunderFlat * ctx.threatMod(p, 'physical'));
         ctx.enterCombat(p, target);
         break;
       }

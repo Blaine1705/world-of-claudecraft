@@ -423,7 +423,7 @@ describe('PR3 signature mechanics', () => {
     expect(p.spellPower).toBe(spBefore);
   });
 
-  it('Bloodletting (bloodthirst) heals the caster for exactly 3% of maximum health', () => {
+  it('Bloodletting (bloodthirst) heals the caster for 3% of max health AND generates 10 rage', () => {
     const { sim, p } = makeSim('warrior');
     expect(sim.setSpec('fury')).toBe(true);
     spawnTarget(sim, p);
@@ -431,10 +431,15 @@ describe('PR3 signature mechanics', () => {
 
     p.hp = Math.round(p.maxHp / 2);
     const before = p.hp;
+    const cost = sim.resolvedAbility('bloodthirst')!.cost;
     p.resource = p.maxResource;
+    const rageBefore = p.resource;
     sim.castAbility('bloodthirst');
 
+    // Without Furious Mending the self-heal stays 3% of maximum health.
     expect(p.hp - before).toBe(Math.round(p.maxHp * 0.03));
+    // Bloodletting is Fury's rage generator: it mints 10 rage, net of its cost.
+    expect(p.resource).toBe(rageBefore - cost + 10);
   });
 
   it('Maiming Strike (mortal_strike) halves healing the victim receives for 10 sec', () => {
