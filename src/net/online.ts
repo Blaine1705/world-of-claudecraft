@@ -20,12 +20,14 @@ import {
   type TalentAllocation,
   talentPointsAtLevel,
 } from '../sim/content/talents';
+import { resolveSportKit } from '../sim/content/vale_cup';
 import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { getArchetypeTitle } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
@@ -44,6 +46,9 @@ import {
   type QuestState,
   type RiteIntensity,
   type SimEvent,
+  type SportRole,
+  type VcBracket,
+  type VcNationId,
 } from '../sim/types';
 import {
   type AccountCosmetics,
@@ -51,6 +56,7 @@ import {
   type CharacterSearchResult,
   type ClientCommand,
   type CraftResultView,
+  type CupInfo,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -955,6 +961,16 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
+  // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
+  // explicit null clears it, same as `s.arena`). ---
+  cupInfo: CupInfo | null = null;
+  // My live sport role, mirrored from the wireRev-gated heavy self field
+  // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
+  // the per-snapshot known rebuild resolves the role kit via the ONE shared
+  // resolveSportKit instead of the class/level/talent derivation, so the
+  // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
+  sportRole: SportRole | null = null;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -1024,6 +1040,13 @@ export class ClientWorld implements IWorld {
   acceptArchetypeQuest(_craftId: string): void {}
   advanceAmendsProgress(): void {}
   switchArchetype(_craftId: string): void {}
+  // Title granted by the active archetype (#1130): derived, not a stored mirror
+  // field, so it stays correct the moment a future wire-up starts pushing
+  // `activeArchetype` snapshot updates (until then it tracks the stub default
+  // above, i.e. always null). See src/sim/professions/archetype.ts.
+  get archetypeTitle(): string | null {
+    return getArchetypeTitle(this.activeArchetype);
+  }
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
@@ -1797,11 +1820,20 @@ export class ClientWorld implements IWorld {
       }
       if (!this.talents) this.talents = emptyAllocation();
       const talents = this.talents;
-      this.known = abilitiesKnownAt(
-        this.cfg.playerClass,
-        e.level,
-        computeTalentModifiers(this.cfg.playerClass, talents),
-      );
+      // IWorldValeCup sport-kit swap (the wire trap, docs/prd/vale-cup.md): a
+      // server-side meta.known swap is invisible to this derived rebuild, so
+      // the server flags the live role via the wireRev-gated heavy `sport`
+      // field. While the mirrored role is set, known is the role kit from the
+      // shared resolver (identical to the Sim's swap); otherwise the normal
+      // class/level/talent derivation below applies.
+      if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
+      this.known = this.sportRole
+        ? resolveSportKit(this.sportRole)
+        : abilitiesKnownAt(
+            this.cfg.playerClass,
+            e.level,
+            computeTalentModifiers(this.cfg.playerClass, talents),
+          );
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -1813,6 +1845,7 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
@@ -2239,6 +2272,34 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
+  // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---
+  vcupQueueJoin(
+    bracket: VcBracket,
+    nation: VcNationId,
+    role: SportRole,
+    enterAsGuild: boolean,
+  ): void {
+    this.cmd({ cmd: 'vcup_queue', bracket, nation, role, guild: enterAsGuild });
+  }
+  vcupQueueLeave(): void {
+    this.cmd({ cmd: 'vcup_leave' });
+  }
+  vcupSetRole(role: SportRole): void {
+    this.cmd({ cmd: 'vcup_role', role });
+  }
+  vcupReady(): void {
+    this.cmd({ cmd: 'vcup_ready' });
+  }
+  vcupBet(side: 'A' | 'B', amount: number): void {
+    this.cmd({ cmd: 'vcup_bet', side, amount });
+  }
+  // Private practice bout against bots: the server seats it on an instanced pitch
+  // copy far from the Sowfield, so it runs in parallel with the real match and
+  // every other practice. Same command online and off.
+  vcupPracticeStart(bracket: VcBracket): void {
+    this.cmd({ cmd: 'vcup_practice', bracket });
   }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
