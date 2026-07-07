@@ -8595,9 +8595,12 @@ export function tTalent(request: TalentTranslationRequest): string {
         );
   }
   if (request.kind === 'talentChoice') {
-    return request.field === 'name'
-      ? translateTitle(request.choice.name, lang)
-      : effectDescription(request.choice.effect, 1, lang);
+    if (request.field === 'name') return translateTitle(request.choice.name, lang);
+    // Proc and rider mechanics have no generated form yet: fall back to the
+    // authored English description (the standard English-fill model) rather
+    // than rendering an empty "no effect" tooltip.
+    const generated = effectDescription(request.choice.effect, 1, lang);
+    return generated === localeText[lang].noEffect ? request.choice.description : generated;
   }
   const exhaustive: never = request;
   return exhaustive;

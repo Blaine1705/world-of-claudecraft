@@ -506,7 +506,7 @@ export function castAbility(
     // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target ?? null, 'spellCast');
-    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
     return;
   }
 
@@ -786,7 +786,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target, 'spellCast');
-    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
     return;
   }
 
@@ -838,7 +838,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // resisted or fizzled bolt was still a cast). Physical projectile shots
     // (hunter Aimed / Concussive) are not spells and never roll.
     if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
-    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
     return;
   }
 
@@ -849,5 +849,5 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
     ctx.applySetProcs(p, target, 'spellCast');
-  if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id);
+  if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id, target);
 }

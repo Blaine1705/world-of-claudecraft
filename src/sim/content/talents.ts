@@ -70,6 +70,10 @@ export interface AbilityModEffect {
   cooldownPct?: number; // -0.50 = half cooldown
   castPct?: number; // -0.50 = half cast time
   buffPct?: number; // +0.20 = +20% to this ability's selfBuff/buffTarget value (e.g. Improved Devotion Aura)
+  // Conditional damage: bonus multiplier when the CASTER'S damage-over-time
+  // effect is ticking on the target (priest Twisted Faith). Applied in
+  // effect_dispatch at hit time, never baked into the resolved min/max.
+  dmgPctVsDotted?: number;
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
   addEffects?: AbilityEffect[];
 }
@@ -162,6 +166,7 @@ export const SAVED_LOADOUT_BAR_SLOTS = 22;
 
 export interface ResolvedAbilityMod {
   dmgPct: number;
+  dmgPctVsDotted: number;
   flatDmg: number;
   costPct: number;
   cooldownPct: number;
@@ -357,6 +362,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
 function zeroAbilityMod(): ResolvedAbilityMod {
   return {
     dmgPct: 0,
+    dmgPctVsDotted: 0,
     flatDmg: 0,
     costPct: 0,
     cooldownPct: 0,
@@ -438,6 +444,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
       mods.abilities[am.ability] = cur;
     }
     cur.dmgPct += (am.dmgPct ?? 0) * mult;
+    cur.dmgPctVsDotted += (am.dmgPctVsDotted ?? 0) * mult;
     cur.flatDmg += (am.flatDmg ?? 0) * mult;
     cur.costPct += (am.costPct ?? 0) * mult;
     cur.cooldownPct += (am.cooldownPct ?? 0) * mult;

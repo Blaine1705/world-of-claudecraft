@@ -25,6 +25,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponStrike: 'damage',
   directDamage: 'damage',
   interrupt: 'other',
+  extendDot: 'other',
+  consumeDot: 'damage',
   silence: 'breakCC',
   aoeFear: 'breakCC',
   clearCooldowns: 'other',

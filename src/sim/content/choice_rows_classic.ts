@@ -409,9 +409,18 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r5_vengeful_exorcism',
           name: 'Vengeful Exorcism',
-          description: 'Exorcism deals 25% more damage and costs 25% less.',
+          description:
+            'Rite of Expulsion deals 25% more damage, costs 25% less, and Verdict resets its cooldown.',
           icon: 'exorcism',
-          effect: { ability: [{ ability: 'exorcism', dmgPct: 0.25, costPct: -0.25 }] },
+          effect: {
+            ability: [{ ability: 'exorcism', dmgPct: 0.25, costPct: -0.25 }],
+            proc: {
+              id: 'pal_vengeful_exorcism',
+              name: 'Vengeful Exorcism',
+              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+              responses: [{ kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' }],
+            },
+          },
         },
       ],
     },
@@ -449,13 +458,23 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r11_divine_wisdom',
           name: 'Divine Wisdom',
-          description: 'Holy Light and Flash of Light cost 15% less.',
+          description:
+            'Every 3rd healing spell you cast makes your next Mending Light within 10 sec instant.',
           icon: 'flash_of_light',
           effect: {
-            ability: [
-              { ability: 'holy_light', costPct: -0.15 },
-              { ability: 'flash_of_light', costPct: -0.15 },
-            ],
+            proc: {
+              id: 'pal_divine_wisdom',
+              name: 'Divine Wisdom',
+              trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['holy_light'],
+                  duration: 10,
+                },
+              ],
+            },
           },
         },
         {
@@ -500,13 +519,16 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r14_righteous_cause',
           name: 'Righteous Cause',
-          description: 'Seal of Righteousness and Judgement deal 15% more damage.',
+          description:
+            'Melee swings while your Oathbrand is active shave 0.5 sec off the cooldown of Verdict.',
           icon: 'seal_of_righteousness',
           effect: {
-            ability: [
-              { ability: 'seal_of_righteousness', dmgPct: 0.15 },
-              { ability: 'judgement', dmgPct: 0.15 },
-            ],
+            proc: {
+              id: 'pal_righteous_cause',
+              name: 'Righteous Cause',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+              responses: [{ kind: 'cooldownRefund', ability: 'judgement', seconds: 0.5 }],
+            },
           },
         },
       ],
@@ -525,21 +547,25 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r17_sacred_ward',
           name: 'Sacred Ward',
-          description: 'Devotion Aura effect increased by 50% and Lay on Hands healing by 30%.',
+          description:
+            'Last Rite also wraps its target in a sacred ward absorbing 120 damage for 10 sec.',
           icon: 'devotion_aura',
           effect: {
             ability: [
-              { ability: 'devotion_aura', buffPct: 0.5 },
-              { ability: 'lay_on_hands', dmgPct: 0.3 },
+              {
+                ability: 'lay_on_hands',
+                addEffects: [{ type: 'absorb', amount: 120, duration: 10 }],
+              },
             ],
           },
         },
         {
           id: 'pal_r17_ardent_defender',
           name: 'Deathless Ardor',
-          description: 'Armor increased by 10% and maximum health increased by 8%.',
+          description:
+            'A blow that would kill you leaves you at 1 health instead. Once every 180 sec.',
           icon: 'divine_protection',
-          effect: { stats: { armorPct: 0.1, maxHpPct: 0.08 } },
+          effect: { global: { cheatDeathIcd: 180 } },
         },
       ],
     },
@@ -563,15 +589,10 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pal_r20_aura_mastery',
-          name: 'Aura Mastery',
-          description: 'Paladin aura effects increased by 60%.',
+          name: 'Radiant Swell',
+          description: 'Grants Radiant Swell: overcharge your aura into a hardened bulwark.',
           icon: 'retribution_aura',
-          effect: {
-            ability: [
-              { ability: 'devotion_aura', buffPct: 0.6 },
-              { ability: 'retribution_aura', buffPct: 0.6 },
-            ],
-          },
+          effect: { grant: { ability: 'aura_surge' } },
         },
       ],
     },
@@ -952,9 +973,25 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r20_master_assassin',
           name: 'Master Assassin',
-          description: 'Critical strike chance increased by 5%.',
+          description:
+            'Your spell critical strikes reset Earthen Jolt and make your next Earthen Jolt within 8 sec free.',
           icon: 'ambush',
-          effect: { stats: { crit: 0.05 } },
+          effect: {
+            proc: {
+              id: 'sha_earthen_fury',
+              name: 'Earthen Fury',
+              trigger: { on: 'spellCrit' },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['earth_shock'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -970,23 +1007,47 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r5_searing_light',
           name: 'Searing Light',
-          description: 'Smite deals 25% more damage.',
+          description:
+            'Every 3rd Smite ignites your faith: your next healing spell within 8 sec is free.',
           icon: 'smite',
-          effect: { ability: [{ ability: 'smite', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'pri_searing_light',
+              name: 'Searing Light',
+              trigger: { on: 'castNth', n: 3, abilities: ['smite'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['lesser_heal', 'heal', 'flash_heal', 'renew', 'prayer_of_healing'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'pri_r5_improved_renew',
           name: 'Improved Lingering Grace',
-          description: 'Renew heals 25% more.',
+          description:
+            'A Lingering Grace that runs its full course hardens into a ward absorbing 40 damage for 10 sec.',
           icon: 'renew',
-          effect: { ability: [{ ability: 'renew', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'pri_lingering_ward',
+              name: 'Lingering Grace',
+              trigger: { on: 'hotExpired', ability: 'renew' },
+              responses: [{ kind: 'absorb', amount: 40, duration: 10, name: 'Lingering Grace' }],
+            },
+          },
         },
         {
           id: 'pri_r5_twisted_faith',
           name: 'Twisted Faith',
-          description: 'Shadow Word: Pain deals 20% more damage.',
+          description:
+            'Mindfracture deals 25% more damage to targets afflicted by your Dirge of Decay.',
           icon: 'shadow_word_pain',
-          effect: { ability: [{ ability: 'shadow_word_pain', dmgPct: 0.2 }] },
+          effect: { ability: [{ ability: 'mind_blast', dmgPctVsDotted: 0.25 }] },
         },
       ],
     },
@@ -1011,9 +1072,17 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r8_improved_shield',
           name: 'Improved Shield',
-          description: 'Power Word: Shield absorbs 25% more.',
+          description:
+            'When your Psalm of Warding is fully consumed, it bursts, healing its owner for 45.',
           icon: 'power_word_shield',
-          effect: { ability: [{ ability: 'power_word_shield', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'pri_shield_burst',
+              name: 'Improved Shield',
+              trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
+              responses: [{ kind: 'heal', amount: 45 }],
+            },
+          },
         },
       ],
     },
@@ -1031,15 +1100,28 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r11_meditation',
           name: 'Nocturns',
-          description: 'Priest heals cost 15% less.',
+          description:
+            'Every 3rd healing spell you cast makes your next heal within 10 sec cost 50% less.',
           icon: 'lesser_heal',
           effect: {
-            ability: [
-              { ability: 'lesser_heal', costPct: -0.15 },
-              { ability: 'heal', costPct: -0.15 },
-              { ability: 'flash_heal', costPct: -0.15 },
-              { ability: 'prayer_of_healing', costPct: -0.15 },
-            ],
+            proc: {
+              id: 'pri_nocturns',
+              name: 'Nocturns',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['lesser_heal', 'heal', 'flash_heal', 'renew', 'prayer_of_healing'],
+              },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['lesser_heal', 'heal', 'flash_heal', 'renew', 'prayer_of_healing'],
+                  duration: 10,
+                  costPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {
@@ -1073,19 +1155,34 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r14_greater_heal',
           name: 'Greater Heal',
-          description: 'Heal restores 25% more and casts 15% faster.',
+          description:
+            'Solemn Prayer leaves an echo for 10 sec: if the target falls below 35% health, they are instantly healed for 60.',
           icon: 'heal',
-          effect: { ability: [{ ability: 'heal', dmgPct: 0.25, castPct: -0.15 }] },
+          effect: {
+            proc: {
+              id: 'pri_heal_echo',
+              name: 'Greater Heal',
+              trigger: { on: 'castNth', n: 1, abilities: ['heal'] },
+              responses: [
+                { kind: 'echo', belowFrac: 0.35, window: 10, heal: 60, name: 'Greater Heal' },
+              ],
+            },
+          },
         },
         {
           id: 'pri_r14_pain_and_suffering',
           name: 'Pain and Suffering',
-          description: 'Shadow Word: Pain and Mind Flay deal 15% more damage.',
+          description:
+            'Each Litany of Woe tick extends your Shadow Word: Pain on the target by 1 sec, up to 6 added sec.',
           icon: 'mind_flay',
           effect: {
             ability: [
-              { ability: 'shadow_word_pain', dmgPct: 0.15 },
-              { ability: 'mind_flay', dmgPct: 0.15 },
+              {
+                ability: 'mind_flay',
+                addEffects: [
+                  { type: 'extendDot', dot: 'shadow_word_pain', seconds: 1, maxBonus: 6 },
+                ],
+              },
             ],
           },
         },
@@ -1112,9 +1209,17 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r17_inner_fire',
           name: 'Inner Fire',
-          description: 'Armor increased by 10% and Spirit increased by 3.',
+          description:
+            'Taking a hit above 15% of your maximum health kindles a ward absorbing 70 damage for 10 sec. 20 sec internal cooldown.',
           icon: 'power_word_shield',
-          effect: { stats: { armorPct: 0.1, spi: 3 } },
+          effect: {
+            proc: {
+              id: 'pri_inner_fire',
+              name: 'Inner Fire',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [{ kind: 'absorb', amount: 70, duration: 10, name: 'Inner Fire' }],
+            },
+          },
         },
       ],
     },
@@ -1139,9 +1244,19 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r20_blessed_recovery',
           name: 'Blessed Recovery',
-          description: 'Flash Heal casts 25% faster and costs 25% less.',
+          description: 'Your critical heals also ward the target, absorbing 50 damage for 10 sec.',
           icon: 'flash_heal',
-          effect: { ability: [{ ability: 'flash_heal', castPct: -0.25, costPct: -0.25 }] },
+          effect: {
+            proc: {
+              id: 'pri_blessed_recovery',
+              name: 'Blessed Recovery',
+              trigger: {
+                on: 'spellCrit',
+                abilities: ['lesser_heal', 'heal', 'flash_heal', 'prayer_of_healing'],
+              },
+              responses: [{ kind: 'absorb', amount: 50, duration: 10, name: 'Blessed Recovery' }],
+            },
+          },
         },
       ],
     },
@@ -1157,16 +1272,46 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r5_concussion',
           name: 'Fault Line',
-          description: 'Lightning Bolt deals 15% more damage.',
+          description:
+            'Every 3rd Arc Bolt charges the earth: your next shock within 8 sec is free.',
           icon: 'lightning_bolt',
-          effect: { ability: [{ ability: 'lightning_bolt', dmgPct: 0.15 }] },
+          effect: {
+            proc: {
+              id: 'sha_fault_line',
+              name: 'Fault Line',
+              trigger: { on: 'castNth', n: 3, abilities: ['lightning_bolt'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'sha_r5_improved_lightning_shield',
           name: 'Improved Thunder Ward',
-          description: 'Lightning Shield damage increased by 40%.',
+          description:
+            'When your Thunder Ward reflects a strike, your next Arc Bolt within 8 sec is instant.',
           icon: 'lightning_shield',
-          effect: { ability: [{ ability: 'lightning_shield', buffPct: 0.4 }] },
+          effect: {
+            proc: {
+              id: 'sha_ward_surge',
+              name: 'Thunder Ward',
+              trigger: { on: 'thornsReflect' },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['lightning_bolt'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'sha_r5_imbue_mastery',
@@ -1199,10 +1344,10 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r8_frost_bind',
           name: 'Frost Bind',
-          description: 'Frost Shock also roots the target for 1 sec.',
+          description: 'Rime Jolt also roots the target for 2 sec.',
           icon: 'frost_shock',
           effect: {
-            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 1 }] }],
+            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
           },
         },
         {
@@ -1227,9 +1372,24 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r11_ancestral_guidance',
           name: 'Guiding Spirits',
-          description: 'Healing Wave casts 20% faster.',
+          description:
+            'When your Mending Waters critically heals, your next Mending Waters within 10 sec is instant.',
           icon: 'healing_wave',
-          effect: { ability: [{ ability: 'healing_wave', castPct: -0.2 }] },
+          effect: {
+            proc: {
+              id: 'sha_guiding_spirits',
+              name: 'Guiding Spirits',
+              trigger: { on: 'spellCrit', abilities: ['healing_wave'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['healing_wave'],
+                  duration: 10,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'sha_r11_elemental_attunement',
@@ -1261,16 +1421,32 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r14_improved_flame_shock',
           name: 'Improved Cinder Jolt',
-          description: 'Flame Shock deals 30% more damage.',
+          description:
+            'Earthen Jolt detonates your Cinder Jolt on the target, dealing its remaining damage instantly.',
           icon: 'flame_shock',
-          effect: { ability: [{ ability: 'flame_shock', dmgPct: 0.3 }] },
+          effect: {
+            ability: [
+              { ability: 'earth_shock', addEffects: [{ type: 'consumeDot', dot: 'flame_shock' }] },
+            ],
+          },
         },
         {
           id: 'sha_r14_weapon_fury',
           name: 'Weapon Fury',
-          description: 'Attack power increased by 10%.',
+          description: 'Melee swings with an imbued weapon shave 0.5 sec off your shock cooldowns.',
           icon: 'stormstrike',
-          effect: { stats: { apPct: 0.1 } },
+          effect: {
+            proc: {
+              id: 'sha_weapon_fury',
+              name: 'Weapon Fury',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
+              ],
+            },
+          },
         },
       ],
     },
@@ -1295,9 +1471,17 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r17_elemental_warding',
           name: 'Elemental Warding',
-          description: 'Armor and maximum health increased by 8%.',
+          description:
+            'Taking a hit above 15% of your maximum health raises an earthen shell absorbing 80 damage for 10 sec. 20 sec internal cooldown.',
           icon: 'lightning_shield',
-          effect: { stats: { armorPct: 0.08, maxHpPct: 0.08 } },
+          effect: {
+            proc: {
+              id: 'sha_elemental_warding',
+              name: 'Elemental Warding',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [{ kind: 'absorb', amount: 80, duration: 10, name: 'Elemental Warding' }],
+            },
+          },
         },
       ],
     },
@@ -1322,9 +1506,24 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r20_tidal_waves',
           name: 'Tidal Waves',
-          description: 'Healing Wave heals 20% more and costs 10% less.',
+          description:
+            'Each Chain Heal you cast makes your next Mending Waters within 10 sec instant.',
           icon: 'healing_wave',
-          effect: { ability: [{ ability: 'healing_wave', dmgPct: 0.2, costPct: -0.1 }] },
+          effect: {
+            proc: {
+              id: 'sha_tidal_waves',
+              name: 'Tidal Waves',
+              trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['healing_wave'],
+                  duration: 10,
+                },
+              ],
+            },
+          },
         },
       ],
     },

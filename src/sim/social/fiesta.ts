@@ -149,6 +149,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
       if (!m.abilities[am.ability]) {
         m.abilities[am.ability] = {
           dmgPct: 0,
+          dmgPctVsDotted: 0,
           flatDmg: 0,
           costPct: 0,
           cooldownPct: 0,
