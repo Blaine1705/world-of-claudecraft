@@ -376,6 +376,7 @@ const NIGHT_LAND_LOBES = [
   { x: 130, z: 3760, r: 50 }, // the east arm
   { x: 30, z: 4160, r: 48 }, // the Crowgate's southern footing
   { x: 10, z: 4100, r: 50 }, // the dream road's shoulder past the Barrowmere
+  { x: 60, z: 3980, r: 62 }, // the Dreamer's Rise: dry footing under the caldera
 ] as const;
 const NIGHT_BAYS = [
   { x: 170, z: 3900, r: 55 }, // the east sound
@@ -856,6 +857,120 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
   return out;
 }
 
+// ---------------------------------------------------------------------------
+// Signature landforms: one distinctive terrain idea per northern realm, so
+// no two maps read alike. All of them yield to roads (every marked route
+// stays a walkable pass) and are placed clear of hubs, lakes, and camps.
+// ---------------------------------------------------------------------------
+
+// The Veilspires: the Frostveil's central massif. The terrace applier below
+// steps its flanks into benched paths; the plateau tables are cut flat at
+// the end of terrainHeight (mesa-style, after the rims).
+const FROST_MASSIF = [
+  { x: -6, z: 2310, r: 46, h: 24 }, // the south spire, over the road fork
+  { x: -40, z: 2410, r: 46, h: 28 }, // the crown massif
+  { x: 30, z: 2470, r: 44, h: 22 }, // the north spire at the pass road
+  { x: 66, z: 2320, r: 40, h: 18 }, // the east shoulder above the tarn
+] as const;
+const FROST_PLATEAUS = [
+  { x: -18, z: 2352, r: 20, h: 12 }, // the low shelf
+  { x: -2, z: 2386, r: 15, h: 19 }, // the mid shelf
+  { x: -26, z: 2420, r: 12, h: 26 }, // the crown table
+] as const;
+function frostMassifOffset(x: number, z: number): number {
+  if (z < 2100 || z > FROST_ZMAX - 20) return 0;
+  let dh = 0;
+  for (const m of FROST_MASSIF) {
+    const d = Math.hypot(x - m.x, z - m.z);
+    if (d < m.r) dh += m.h * (1 - smoothstep(m.r * 0.3, m.r, d));
+  }
+  if (dh <= 0) return 0;
+  // roads pierce the range as valley passes
+  return dh * smoothstep(7, 16, roadDistance(x, z));
+}
+
+// The Golden Shelf: the Amberfall's raised northeast tableland, an amber
+// escarpment overlooking the Great Mere.
+const AMBER_SHELF = [
+  { x: 124, z: 2700, r: 55, h: 13 },
+  { x: 96, z: 2636, r: 42, h: 9 },
+  { x: 140, z: 2790, r: 48, h: 11 },
+] as const;
+function amberShelfOffset(x: number, z: number): number {
+  if (z < 2600 || z > 2900) return 0;
+  let dh = 0;
+  for (const m of AMBER_SHELF) {
+    const d = Math.hypot(x - m.x, z - m.z);
+    if (d < m.r) dh += m.h * (1 - smoothstep(m.r * 0.35, m.r, d));
+  }
+  if (dh <= 0) return 0;
+  return dh * smoothstep(7, 16, roadDistance(x, z));
+}
+
+// The Dreamer's Bowl: the Nightbloom's caldera. A climbable ring with a
+// notch entrance on its road-facing side, a sunken dream-meadow floor, and
+// a knoll at the very center.
+const BOWL_X = 60;
+const BOWL_Z = 3980;
+function nightCalderaOffset(x: number, z: number): number {
+  const d = Math.hypot(x - BOWL_X, z - BOWL_Z);
+  if (d > 68) return 0;
+  // the ring: a rounded rampart at radius 40, tall enough that its crest
+  // takes the night biome's violet crag tint on the map (h > 20) instead
+  // of reading as mid-slope rock
+  const ring = 17 * (1 - smoothstep(0, 18, Math.abs(d - 40)));
+  // the notch: the rampart parts on the southwest, toward Moonrest's road
+  const ang = Math.atan2(x - BOWL_X, z - BOWL_Z);
+  const notch = 1 - smoothstep(0.28, 0.62, Math.abs(ang + 2.3));
+  // the floor: the bowl sinks gently inside the ring
+  const bowl = -3.5 * (1 - smoothstep(10, 34, d));
+  // the knoll: the dream stands centered
+  const knoll = 7 * (1 - smoothstep(0, 10, d));
+  // a gentle pedestal lifts the whole formation, so the rampart's crest
+  // clears the caret and crag bands all the way around the circle
+  const pedestal = 4 * (1 - smoothstep(30, 58, d));
+  return ring * (1 - notch) + bowl + knoll + pedestal;
+}
+
+// The Firemount: the Palmreach's volcano, a climbable cone over the deep
+// jungle with a cupped summit crater.
+const CONE_X = 16;
+const CONE_Z = 5062;
+function palmConeOffset(x: number, z: number): number {
+  const d = Math.hypot(x - CONE_X, z - CONE_Z);
+  if (d > 36) return 0;
+  // crest ~25: above the map's crown stipple (22) so the summit reads as
+  // bare volcanic rock and carets, below the snow-cap band (26)
+  const cone = 22 * (1 - smoothstep(4, 32, d));
+  const crater = -8 * (1 - smoothstep(0, 9, d));
+  return (cone + crater) * smoothstep(7, 14, roadDistance(x, z));
+}
+
+// The Braids: the Willowfen's east water-meadows dissolve into winding
+// channels and grassy islets. Channels follow the valleys of a ridged
+// noise field; roads, the hub, camps (which flattened first), and the
+// border pass caps are all left dry.
+function applyFenBraids(x: number, z: number, h: number): number {
+  if (z < 3180 || z > 3560 || x < -20) return h;
+  if (h < WATER_LEVEL + 0.5 || h > 5.5) return h;
+  const ridge = Math.abs(fbm2(x * 0.021, z * 0.021, 9301, 3) - 0.5) * 2;
+  let channel = 1 - smoothstep(0.05, 0.17, ridge);
+  if (channel <= 0) return h;
+  // feathered region edges: a hard gate would print a straight hillshade
+  // seam across the fen
+  channel *= smoothstep(-20, 4, x);
+  channel *= smoothstep(3180, 3215, z) * (1 - smoothstep(3525, 3560, z));
+  const roadGate = smoothstep(8, 15, roadDistance(x, z));
+  let campGate = 1;
+  for (const camp of CAMPS) {
+    if (camp.center.z < 3140 || camp.center.z > 3600) continue;
+    const d = Math.hypot(x - camp.center.x, z - camp.center.z);
+    campGate = Math.min(campGate, smoothstep(camp.radius * 1.6, camp.radius * 2.4, d));
+  }
+  const depth = (WATER_LEVEL - 1.4 - h) * channel * roadGate * campGate;
+  return depth < 0 ? h + depth : h;
+}
+
 // The Frostveil's terraced benches: the whole massif steps into flats,
 // ramps, and short steep risers (multi-level mountain ground). Suppressed
 // near roads so every marked route stays climbable, and below the shore
@@ -1123,6 +1238,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h += mirefenImpactCraterOffset(x, z);
   h += hollowShapingOffset(x, z, seed);
   h += emberShapingOffset(x, z, seed);
+  h += frostMassifOffset(x, z);
+  h += amberShelfOffset(x, z);
+  h += nightCalderaOffset(x, z);
+  h += palmConeOffset(x, z);
   h = applyHollowCoast(x, z, h);
   h = applyEmberCoast(x, z, h);
   h = applyFrostCoast(x, z, h);
@@ -1134,6 +1253,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyGardenCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
+  h = applyFenBraids(x, z, h);
   // The Great Maze rises out of the finished lawn: walls are pure additive
   // hedge over whatever the garden terrain does beneath them, so corridors
   // follow the ground and the walls stay a constant unclimbable height.
@@ -1168,6 +1288,27 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   if (dMesaS < 26) {
     const t = smoothstep(11, 26, dMesaS);
     h = h * t + 30 * (1 - t);
+  }
+  // The Veilspires' plateau tables: level shelves cut into the massif at
+  // rising heights (flattened after the rims and terraces, so each top is
+  // a true plateau).
+  if (z > 2280 && z < 2480) {
+    for (const p of FROST_PLATEAUS) {
+      const dP = Math.hypot(x - p.x, z - p.z);
+      if (dP < p.r) {
+        const t = smoothstep(p.r * 0.55, p.r, dP);
+        h = h * t + p.h * (1 - t);
+      }
+    }
+  }
+  // The Huntsman's Bluff: the Pale Huntsman's clearing sits on a flat-top
+  // rise; his road from Gallowmere climbs the blended rim as the ramp.
+  if (z > 4560 && z < 4690) {
+    const dBluff = Math.hypot(x - 20, z - 4620);
+    if (dBluff < 32) {
+      const t = smoothstep(17, 32, dBluff);
+      h = h * t + 14 * (1 - t);
+    }
   }
   return h;
 }
