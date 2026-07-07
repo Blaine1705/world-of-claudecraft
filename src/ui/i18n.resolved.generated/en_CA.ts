@@ -879,6 +879,7 @@ export const en_CA: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const en_CA: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "A rallying cry that raises attack power for the party.",
       "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
       "charge": "Rushes a distant enemy to open the fight with a brief stun.",
@@ -4695,13 +4697,17 @@ export const en_CA: EnTranslations = {
         "name": "Reaver Strike",
         "description": "A strong attack that increases melee damage by {damage}. Activates on your next swing."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "Iron Bellow",
         "description": "Increases the attack power of you and nearby allies by 20 for 1 hour."
       },
       "commanding_shout": {
         "name": "Bolstering Cry",
-        "description": "Increases your Stamina by 6 for 2 min."
+        "description": "Increases your Stamina by 6 for 1 hour."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
@@ -5257,7 +5263,7 @@ export const en_CA: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",

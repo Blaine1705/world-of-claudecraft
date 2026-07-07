@@ -1771,6 +1771,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
   'entities.abilities.battle_shout.name': 'Железный рёв',
   'entities.abilities.battle_shout.description': 'Повышает вашу силу атаки на 20 на 2 мин.',
+  'entities.abilities.revenge.name': 'Месть',
+  'entities.abilities.revenge.description':
+    'Атака широкой дугой, наносящая физический урон всем врагам перед вами. При более чем 5 целях урон снижается. При уклонении или парировании следующая Месть может не стоить ярости.',
   'entities.abilities.commanding_shout.name': 'Ободряющий клич',
   'entities.abilities.commanding_shout.description': 'Повышает вашу выносливость на 6 на 2 мин.',
   'entities.abilities.demoralizing_shout.name': 'Зловещий вой',
@@ -4294,6 +4297,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.backstab':
     'Зайдите цели за спину и нанесите кинжалом тяжелый удар, набирающий ресурс.',
   'guide.abilityHook.battle_shout': 'Боевой клич, повышающий силу атаки всей группы.',
+  'guide.abilityHook.revenge': 'Размашистая контратака, поражающая всех врагов перед вами; сразу после парирования или уклонения она обходится дешевле.',
   'guide.abilityHook.blessing_of_might':
     'Повышает силу атаки дружественной цели, удобно наложить перед началом боя.',
   'guide.abilityHook.charge': 'Рывок к далекому врагу, открывающий бой коротким оглушением.',
@@ -6187,6 +6191,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine':
     'Скорость атаки увеличена на {hastePct}%, наносимый урон на {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': 'Следующий Удар героя или Мощный удар не расходует ярость',
+  'hudChrome.auraEffect.revengeFree': 'Следующая Месть не расходует ярость',
   'hudChrome.auraEffect.victoryRush': 'Победный рывок готов',
   'hudChrome.auraEffect.maxHpPct': 'Максимальный запас здоровья увеличен на {pct}%',
   'entities.abilities.holy_shock.name': 'Шок небес',

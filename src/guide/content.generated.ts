@@ -115,6 +115,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Reaver Strike"
       },
       {
+        "id": "revenge",
+        "name": "Revenge"
+      },
+      {
         "id": "battle_shout",
         "name": "Iron Bellow"
       },
@@ -129,16 +133,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rend",
         "name": "Deep Gash"
-      },
-      {
-        "id": "thunder_clap",
-        "name": "Quaking Blow"
       }
     ],
     "abilities": [
       {
         "id": "heroic_strike",
         "name": "Reaver Strike"
+      },
+      {
+        "id": "revenge",
+        "name": "Revenge"
       },
       {
         "id": "battle_shout",

@@ -1752,6 +1752,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。',
   'entities.abilities.battle_shout.name': '鉄の咆哮',
   'entities.abilities.battle_shout.description': '2分間、攻撃力が20増加します。',
+  'entities.abilities.revenge.name': 'リベンジ',
+  'entities.abilities.revenge.description':
+    '大きく弧を描いて攻撃し、前方のすべての敵に物理ダメージを与える。対象が5体を超えるとダメージが減少する。回避または受け流しに成功すると、次のリベンジの怒りコストがゼロになることがある。',
   'entities.abilities.commanding_shout.name': '鼓舞の号令',
   'entities.abilities.commanding_shout.description': '2分間、スタミナが6増加します。',
   'entities.abilities.demoralizing_shout.name': '戦慄の遠吠え',
@@ -4231,6 +4234,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.backstab':
     'ダガーで標的の背後に回り込み、コンボポイントを稼ぐ強力な一撃です。',
   'guide.abilityHook.battle_shout': 'パーティの攻撃力を高める鼓舞の雄叫びです。',
+  'guide.abilityHook.revenge': '前方のすべての敵をなぎ払う反撃で、攻撃を受け流すか回避した直後はコストが下がります。',
   'guide.abilityHook.blessing_of_might':
     '味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。',
   'guide.abilityHook.charge': '離れた敵に突進し、短いスタンで戦闘の口火を切ります。',
@@ -6067,6 +6071,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dieBySword': '受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）',
   'hudChrome.auraEffect.sanguine': '攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加',
   'hudChrome.auraEffect.battleTrance': '次の英雄の一撃またはスラムの怒りコストがゼロになる',
+  'hudChrome.auraEffect.revengeFree': '次のリベンジの怒りコストがゼロになる',
   'hudChrome.auraEffect.victoryRush': 'ビクトリーラッシュが使用可能',
   'hudChrome.auraEffect.maxHpPct': '最大体力が{pct}%増加',
   'entities.abilities.holy_shock.name': 'ホーリーショック',

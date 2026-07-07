@@ -238,6 +238,11 @@ export type AuraKind =
   // Swing costs no rage. An ability-scoped sibling of next_cast_free, armed by
   // connected auto-attack swings and consumed by combat/empower_next.ts.
   | 'battle_trance'
+  // Revenge free-cost proc (Protection): a dodge or parry against the warrior
+  // has a chance to make the next Revenge cost no rage. Scoped like Battle Trance
+  // (only Revenge consumes it), applied in mobSwing and consumed by
+  // combat/empower_next.ts; the action bar reads the same free-cost predicate.
+  | 'revenge_free'
   // Victory Rush's on-kill window: worn for VICTORY_RUSH_WINDOW seconds after
   // a credited kill; the granted strike requires it and consumes it on cast.
   | 'victory_rush'
@@ -1256,6 +1261,11 @@ export type AbilityEffect =
       radius: number;
       frontal?: boolean;
       stunSec?: number;
+      // Classic AoE soft target cap (Revenge): once more than `softCap` targets
+      // are struck, each rolled hit is scaled by softCap/targets so the TOTAL
+      // damage caps at softCap x per-target. Scales the already-rolled amount, so
+      // it draws no extra rng.
+      softCap?: number;
     }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
@@ -1406,6 +1416,12 @@ export interface AbilityDef {
   // has not committed to a spec keeps the full kit, and talent/row GRANTS are
   // never filtered (the tree they come from is already spec-scoped).
   specs?: readonly string[];
+  // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
+  // spec id is in the list DROPS this ability from their known list, even though
+  // it is otherwise ungated. Used to swap one ability for a spec-exclusive
+  // replacement (heroic_strike excludeSpecs ['prot'], since prot uses revenge).
+  // A no-spec player and any non-listed spec keep it. Grants are never filtered.
+  excludeSpecs?: readonly string[];
   targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
@@ -2600,6 +2616,11 @@ export const AVATAR_SCALE = 1.15;
 // seconds. No stacking: a re-proc refreshes the one aura (applyAura by id).
 export const BATTLE_TRANCE_CHANCE = 0.2;
 export const BATTLE_TRANCE_DURATION = 10;
+// Revenge (Protection): a dodge or parry against the warrior has this chance to
+// make the next Revenge free, for this many seconds. No stacking: a re-proc
+// refreshes the one aura (applyAura by id).
+export const REVENGE_FREE_CHANCE = 0.3;
+export const REVENGE_FREE_DURATION = 10;
 // Victory Rush (choice row): how long the on-kill window stays open.
 export const VICTORY_RUSH_WINDOW = 20;
 

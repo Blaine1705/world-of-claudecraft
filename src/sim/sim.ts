@@ -362,6 +362,8 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  REVENGE_FREE_CHANCE,
+  REVENGE_FREE_DURATION,
   type RiteIntensity,
   RUN_SPEED,
   type SimConfig,
@@ -4414,6 +4416,29 @@ export class Sim {
         ability: null,
         kind: 'dodge',
       });
+      // Revenge proc (Protection): a dodge or parry against the warrior has a
+      // chance to make the next Revenge cost no rage. Only a defender who KNOWS
+      // Revenge (committed prot) rolls, so this conditional rng draw is scoped to
+      // prot warriors and stays deterministic through this.rng.
+      if (target.kind === 'player') {
+        const dmeta = this.players.get(target.id);
+        if (
+          dmeta &&
+          dmeta.known.some((k) => k.def.id === 'revenge') &&
+          this.rng.chance(REVENGE_FREE_CHANCE)
+        ) {
+          this.applyAura(target, {
+            id: 'revenge_free',
+            name: 'Revenge!',
+            kind: 'revenge_free',
+            remaining: REVENGE_FREE_DURATION,
+            duration: REVENGE_FREE_DURATION,
+            value: 0,
+            sourceId: target.id,
+            school: 'physical',
+          });
+        }
+      }
       return;
     }
     let dmg =

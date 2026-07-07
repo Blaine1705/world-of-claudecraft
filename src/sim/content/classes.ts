@@ -58,6 +58,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startItems: START_RATIONS,
     abilities: [
       'heroic_strike',
+      'revenge',
       'battle_shout',
       'commanding_shout',
       'charge',
@@ -388,6 +389,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     onNextSwing: true,
     offGcd: true,
+    // Reaver Strike is the shared filler for every warrior EXCEPT committed
+    // Protection, which replaces it with Revenge (specs ['prot']).
+    excludeSpecs: ['prot'],
     threat: { flat: 20 }, // classic per-rank values: 20/39/59/78
     effects: [{ type: 'weaponDamage', bonus: 11 }],
     ranks: [
@@ -450,23 +454,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'warrior',
     learnLevel: 14,
     specs: ['prot'],
-    cost: 10,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    exclusiveGroup: 'warrior_shout',
-    effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 6, duration: 120 }],
+    effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 6, duration: 3600 }],
     ranks: [
       {
         rank: 2,
         level: 24,
-        cost: 10,
-        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 11, duration: 120 }],
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 11, duration: 3600 }],
       },
     ],
-    description: 'Increases your Stamina by 6 for 2 min.',
+    description: 'Increases your Stamina by 6 for 1 hour.',
   },
   demoralizing_shout: {
     id: 'demoralizing_shout',
@@ -798,6 +801,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 15,
     castTime: 0,
     cooldown: 12,
+    maxCharges: 2,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -813,7 +817,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)',
+      'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
   },
   // Protection's rage-dump survival wall (operator design, Ignorar Dolor): the
   // FIRST spendsAllResource ability. `cost` is the 20-rage minimum gate;
@@ -932,7 +936,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Reaping Arc',
     class: 'warrior',
     learnLevel: 18,
-    specs: ['arms', 'prot'],
+    specs: ['arms'],
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -942,6 +946,28 @@ export const ABILITIES: Record<string, AbilityDef> = {
     threat: { flat: 30 }, // classic 100 at rank 5/level 58, scaled to the 1-20 band
     effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
+  },
+  // Protection's frontal-arc filler, replacing Reaver Strike for committed prot
+  // (heroic_strike excludeSpecs ['prot'] + this specs ['prot']). Hits every enemy
+  // in the melee facing arc; a soft cap (softCap 5) holds the TOTAL to 5x per-
+  // target above 5 enemies. A dodge or parry against the warrior has a chance to
+  // make the next cast free (the revenge_free proc, applied in mobSwing).
+  revenge: {
+    id: 'revenge',
+    name: 'Revenge',
+    class: 'warrior',
+    learnLevel: 1,
+    specs: ['prot'],
+    cost: 15,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    threat: { flat: 30 },
+    effects: [{ type: 'aoeDamage', min: 18, max: 24, radius: 8, frontal: true, softCap: 5 }],
+    description:
+      'Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
   },
   defensive_stance: {
     id: 'defensive_stance',
@@ -4701,6 +4727,12 @@ export function abilitiesKnownAt(
     // kit stays but every spec-exclusive drops out, so exclusivity is visible
     // before committing. Grants bypass entirely (already spec-scoped).
     if (!granted && def.specs && (!mods?.spec || !def.specs.includes(mods.spec))) continue;
+    // Spec EXCLUSION: an otherwise-ungated ability drops out for a committed spec
+    // in its `excludeSpecs` list (Reaver Strike hides for Protection, which uses
+    // Revenge instead). A no-spec player and non-listed specs keep it; grants
+    // bypass entirely (already spec-scoped).
+    if (!granted && def.excludeSpecs && mods?.spec && def.excludeSpecs.includes(mods.spec))
+      continue;
 
     let rank = 1,
       cost = def.cost,

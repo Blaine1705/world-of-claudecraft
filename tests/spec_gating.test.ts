@@ -34,7 +34,8 @@ const GATED: Record<string, string[]> = {
   rend: ['arms'],
   overpower: ['arms'],
   slam: ['arms', 'prot'],
-  cleave: ['arms', 'prot'],
+  cleave: ['arms'], // removed from prot 2026-07-08; prot uses Revenge
+  revenge: ['prot'], // prot-only, replaces Reaver Strike (heroic_strike) for prot
   bloodrage: ['arms', 'prot'], // Fury replaces it with its signature (Bloodletting)
 };
 
@@ -49,6 +50,15 @@ describe('spec-gated warrior base kit (content table)', () => {
     for (const id of ['heroic_strike', 'battle_shout', 'charge', 'execute', 'taunt']) {
       expect(ABILITIES[id]?.specs, id).toBeUndefined();
     }
+  });
+
+  it('Reaver Strike is excluded from prot via excludeSpecs, and Revenge is prot-only', () => {
+    // heroic_strike stays ungated (no `specs`) but drops out for committed prot.
+    expect(ABILITIES.heroic_strike?.specs).toBeUndefined();
+    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot']);
+    // revenge is the prot replacement.
+    expect(ABILITIES.revenge?.specs).toEqual(['prot']);
+    expect(ABILITIES.revenge?.excludeSpecs).toBeUndefined();
   });
 });
 
@@ -69,18 +79,20 @@ describe('abilitiesKnownAt spec filter', () => {
     expect(ids.has('bloodthirst')).toBe(true); // the signature grant is untouched
   });
 
-  it('arms keeps its exclusives (incl. the shared strikes) but not the prot-only shouts', () => {
+  it('arms keeps its exclusives (incl. the shared strikes) but not the prot-only kit', () => {
     const ids = knownIds('arms');
     for (const id of ['defensive_stance', 'sunder_armor', 'rend', 'overpower', 'slam', 'cleave']) {
       expect(ids.has(id), id).toBe(true);
     }
-    for (const id of ['commanding_shout', 'demoralizing_shout']) {
+    for (const id of ['commanding_shout', 'demoralizing_shout', 'revenge']) {
       expect(ids.has(id), id).toBe(false);
     }
+    // Arms keeps Reaver Strike (only prot excludes it).
+    expect(ids.has('heroic_strike')).toBe(true);
     expect(ids.has('bloodrage')).toBe(true);
   });
 
-  it('prot keeps tank staples and the shared strikes but no arms-only strikes', () => {
+  it('prot keeps tank staples and Revenge but not Reaver Strike, Reaping Arc, or arms strikes', () => {
     const ids = knownIds('prot');
     for (const id of [
       'defensive_stance',
@@ -88,12 +100,29 @@ describe('abilitiesKnownAt spec filter', () => {
       'commanding_shout',
       'demoralizing_shout',
       'slam',
-      'cleave',
+      'revenge',
       'bloodrage',
     ]) {
       expect(ids.has(id), id).toBe(true);
     }
-    for (const id of ['rend', 'overpower']) expect(ids.has(id), id).toBe(false);
+    // Reaver Strike (excludeSpecs prot), Reaping Arc (arms-only now), and the
+    // arms-only strikes all drop out for committed prot.
+    for (const id of ['heroic_strike', 'cleave', 'rend', 'overpower']) {
+      expect(ids.has(id), id).toBe(false);
+    }
+  });
+
+  it('excludeSpecs: only committed prot swaps Reaver Strike for Revenge', () => {
+    // No spec, arms, and fury all keep Reaver Strike and none see Revenge.
+    for (const spec of [null, 'arms', 'fury'] as const) {
+      const ids = knownIds(spec);
+      expect(ids.has('heroic_strike'), `${spec} heroic_strike`).toBe(true);
+      expect(ids.has('revenge'), `${spec} revenge`).toBe(false);
+    }
+    // Committed prot is the mirror image: Revenge in, Reaver Strike out.
+    const prot = knownIds('prot');
+    expect(prot.has('heroic_strike')).toBe(false);
+    expect(prot.has('revenge')).toBe(true);
   });
 
   it('a talent grant bypasses the spec filter (grants are already spec-scoped)', () => {

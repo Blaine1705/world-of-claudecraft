@@ -879,6 +879,7 @@ export const zh_TW: EnTranslations = {
       "dieBySword": "受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）",
       "sanguine": "攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%",
       "battleTrance": "你的下一次英勇打擊或猛擊不消耗怒氣",
+      "revengeFree": "你的下一次復仇不消耗怒氣",
       "victoryRush": "乘勝追擊已就緒",
       "maxHpPct": "最大生命值提高 {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const zh_TW: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
+      "revenge": "橫掃式的反擊，命中你面前的所有敵人；在你招架或閃避一次攻擊後，消耗更低。",
       "battle_shout": "鼓舞士氣的怒吼，提升隊伍的攻擊強度。",
       "commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
       "charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
@@ -4694,6 +4696,10 @@ export const zh_TW: EnTranslations = {
       "heroic_strike": {
         "name": "劫掠打擊",
         "description": "一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。"
+      },
+      "revenge": {
+        "name": "復仇",
+        "description": "以寬闊的弧線攻擊，對你面前的所有敵人造成物理傷害。目標超過 5 個時，傷害會降低。當你閃避或招架時，你的下一次復仇可能不消耗怒氣。"
       },
       "battle_shout": {
         "name": "鐵嗓怒吼",

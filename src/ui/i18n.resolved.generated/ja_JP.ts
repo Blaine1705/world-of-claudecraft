@@ -879,6 +879,7 @@ export const ja_JP: EnTranslations = {
       "dieBySword": "受けるダメージが{pct}%減少（体力{hpPct}%未満では{lowPct}%）",
       "sanguine": "攻撃速度が{hastePct}%、与えるダメージが{dmgPct}%増加",
       "battleTrance": "次の英雄の一撃またはスラムの怒りコストがゼロになる",
+      "revengeFree": "次のリベンジの怒りコストがゼロになる",
       "victoryRush": "ビクトリーラッシュが使用可能",
       "maxHpPct": "最大体力が{pct}%増加",
       "school": {
@@ -1718,6 +1719,7 @@ export const ja_JP: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
+      "revenge": "前方のすべての敵をなぎ払う反撃で、攻撃を受け流すか回避した直後はコストが下がります。",
       "battle_shout": "パーティの攻撃力を高める鼓舞の雄叫びです。",
       "commanding_shout": "持久力を底上げし、長い戦いでも全員が粘り強く戦えるようにします。",
       "charge": "離れた敵に突進し、短いスタンで戦闘の口火を切ります。",
@@ -4694,6 +4696,10 @@ export const ja_JP: EnTranslations = {
       "heroic_strike": {
         "name": "略奪者の一撃",
         "description": "強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。"
+      },
+      "revenge": {
+        "name": "リベンジ",
+        "description": "大きく弧を描いて攻撃し、前方のすべての敵に物理ダメージを与える。対象が5体を超えるとダメージが減少する。回避または受け流しに成功すると、次のリベンジの怒りコストがゼロになることがある。"
       },
       "battle_shout": {
         "name": "鉄の咆哮",

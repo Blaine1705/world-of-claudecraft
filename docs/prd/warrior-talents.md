@@ -18,8 +18,9 @@ Status legend: DONE = implemented and green on `integration`; PENDING = not yet 
 
 ## Base-kit changes (DONE)
 - `battle_shout` "Iron Bellow": GROUP attack-power buff (caster + friendlies within 40 yd),
-  duration 1 HOUR, ranks 20/35/50 AP, cost 0 (free), learnLevel 7. Mutually exclusive with
-  `commanding_shout` (the `warrior_shout` group).
+  duration 1 HOUR, ranks 20/35/50 AP, cost 0 (free), learnLevel 7. Stays in the `warrior_shout`
+  group, but as of Batch 2026-07-08 it is the sole member (Bolstering Cry left the group), so the two
+  shouts now COEXIST.
 - `bloodthirst` "Bloodletting" (es "Sangria"): Fury signature. Instant weapon attack that heals the
   caster 3% of max health AND generates 10 rage. Fury has NO `bloodrage`: Bloodletting is its
   generator instead (see gating). While `furious_mending` is active its self-heal is 20% (below).
@@ -129,6 +130,17 @@ DATA must be re-expressed in ryze's `choice_rows.ts` format. A naive cherry-pick
 differ); it is a manual port. Do NOT push anything until the operator has playtested.
 
 ## Handoff notes (update on every session switch)
+- 2026-07-08: Batch 2026-07-08 IMPLEMENTED and green on `integration` (local only). `commanding_shout`
+  is now free (cost 0), 1-hour duration, and left the `warrior_shout` group so it coexists with Iron
+  Bellow. `cleave` is arms-only. `raised_guard` stores 2 charges (`maxCharges: 2`). NEW `revenge`
+  "Revenge" (es "Revancha"): prot-only frontal-arc AoE (radius 8, 18-24), soft target cap
+  (`aoeDamage.softCap: 5`, total held to 5x per-target above 5 enemies), and a dodge/parry -> free-cost
+  proc (30%, `revenge_free` aura applied in `mobSwing`, consumed via `empower_next.ts`). Reaver Strike
+  (`heroic_strike`) gained `excludeSpecs: ['prot']` (new `AbilityDef` field) so committed prot swaps it
+  for Revenge; no-spec/arms/fury keep Reaver Strike. Icon, en+es+5-non-Latin i18n (ability name/desc,
+  the revengeFree buff line, and the guide abilityHook), and the guide content regen are all in. Tests:
+  new `tests/revenge.test.ts` + updates to spec_gating/prot_kit/battle_shout/commanding_shout. Parity
+  goldens NOT re-minted here (the new prot dodge/parry rng draw + gating shifts them; operator re-mints).
 - 2026-07-07: the WHOLE warrior kit is DONE and green on `integration` (local only, never pushed):
   base-kit changes, spec gating, Fury kit, Protection kit, Arms kit (Breachmaker + Measured Fury),
   and all operator tweaks (battle_shout free/lvl7, rend lvl5, slam/cleave arms+prot, demoralizing_shout

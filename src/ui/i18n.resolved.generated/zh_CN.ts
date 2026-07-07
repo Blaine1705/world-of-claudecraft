@@ -879,6 +879,7 @@ export const zh_CN: EnTranslations = {
       "dieBySword": "受到的伤害降低 {pct}%（生命值低于 {hpPct}% 时为 {lowPct}%）",
       "sanguine": "攻击速度提高 {hastePct}%，造成的伤害提高 {dmgPct}%",
       "battleTrance": "你的下一次英勇打击或猛击不消耗怒气",
+      "revengeFree": "你的下一次复仇不消耗怒气",
       "victoryRush": "乘胜追击已就绪",
       "maxHpPct": "最大生命值提高 {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const zh_CN: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "预备一次更重的挥击，在下次攻击时消耗怒气。",
+      "revenge": "横扫式的反击，命中你面前的所有敌人；在你格挡或闪避一次攻击后，消耗更低。",
       "battle_shout": "一声号召呐喊，提升全队的攻击强度。",
       "commanding_shout": "提升耐力，让所有人在战斗中更耐打。",
       "charge": "冲向远处的敌人，以一次短暂的昏迷开场。",
@@ -4694,6 +4696,10 @@ export const zh_CN: EnTranslations = {
       "heroic_strike": {
         "name": "劫掠打击",
         "description": "一次强力攻击，使近战伤害提高 {damage}。在你的下一次挥击时触发。"
+      },
+      "revenge": {
+        "name": "复仇",
+        "description": "以宽阔的弧线攻击，对你面前的所有敌人造成物理伤害。目标超过 5 个时，伤害会降低。当你躲闪或招架时，你的下一次复仇可能不消耗怒气。"
       },
       "battle_shout": {
         "name": "铁血怒吼",

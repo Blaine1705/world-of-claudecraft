@@ -879,6 +879,7 @@ export const ko_KR: EnTranslations = {
       "dieBySword": "받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)",
       "sanguine": "공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다",
       "battleTrance": "다음 영웅의 일격 또는 격돌에 분노가 소모되지 않습니다",
+      "revengeFree": "다음 복수에 분노가 소모되지 않습니다",
       "victoryRush": "연전연승을 사용할 수 있습니다",
       "maxHpPct": "최대 생명력이 {pct}% 증가합니다",
       "school": {
@@ -1718,6 +1719,7 @@ export const ko_KR: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.",
+      "revenge": "전방의 모든 적을 휩쓰는 반격으로, 공격을 막거나 회피한 직후에는 소모가 줄어듭니다.",
       "battle_shout": "파티 전체의 공격력을 높여 주는 사기를 북돋우는 외침입니다.",
       "commanding_shout": "체력을 높여 모두가 전투에서 더 오래 버틸 수 있게 합니다.",
       "charge": "멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.",
@@ -4694,6 +4696,10 @@ export const ko_KR: EnTranslations = {
       "heroic_strike": {
         "name": "약탈자의 일격",
         "description": "강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다."
+      },
+      "revenge": {
+        "name": "복수",
+        "description": "넓은 호를 그리며 공격하여 전방의 모든 적에게 물리 피해를 입힙니다. 대상이 5명을 초과하면 피해가 감소합니다. 회피하거나 무기막기에 성공하면 다음 복수의 분노 소모가 없어질 수 있습니다."
       },
       "battle_shout": {
         "name": "강철의 외침",

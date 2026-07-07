@@ -5,8 +5,9 @@ import type { Entity } from '../src/sim/types';
 
 // Iron Bellow (battle_shout) is a GROUP buff: the caster and every nearby
 // friendly player gain the attack-power aura for 1 hour, riding the same
-// aoeAllyAttackPower effect Trueshot Aura uses (radius 40). It stays in the
-// 'warrior_shout' exclusive group, so it and Bolstering Cry cancel each other.
+// aoeAllyAttackPower effect Trueshot Aura uses (radius 40). Batch 2026-07-08:
+// Bolstering Cry left the 'warrior_shout' group, so Iron Bellow and Bolstering
+// Cry now COEXIST (both auras stay up at once).
 
 const makeWarrior = (seed = 42) => {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -72,7 +73,7 @@ describe('Iron Bellow (battle_shout) group buff', () => {
     expect(shoutAura(far)).toBeUndefined();
   });
 
-  it('stays mutually exclusive with Bolstering Cry in both cast orders', () => {
+  it('coexists with Bolstering Cry: both shouts stay up at once (no exclusive group)', () => {
     const sim = makeWarrior();
     sim.setPlayerLevel(14); // battle(1) + commanding(14) known
     // Bolstering Cry (commanding_shout) is prot-gated base kit (2026-07-07), so a
@@ -86,23 +87,25 @@ describe('Iron Bellow (battle_shout) group buff', () => {
     sim.castAbility('battle_shout');
     expect(shoutAura(p)).toBeTruthy();
     expect(p.attackPower).toBeGreaterThan(baseAp);
+    const apWithShout = p.attackPower;
     settleGcd(sim);
 
-    // Bolstering Cry (selfBuff) must cancel the group shout aura and its AP.
+    // Bolstering Cry (selfBuff) must NOT cancel the group shout: both auras and
+    // both stat boosts (AP + stamina/health) stack.
     p.resource = 100;
     sim.castAbility('commanding_shout');
-    expect(shoutAura(p)).toBeUndefined();
+    expect(shoutAura(p)).toBeTruthy(); // Iron Bellow's AP aura survives
     expect(p.auras.some((a) => a.id === 'commanding_shout')).toBe(true);
-    expect(p.attackPower).toBe(baseAp);
-    expect(p.maxHp).toBeGreaterThan(baseMaxHp);
+    expect(p.attackPower).toBe(apWithShout); // AP buff still applied, unchanged
+    expect(p.maxHp).toBeGreaterThan(baseMaxHp); // stamina buff also applied
     settleGcd(sim);
 
-    // And casting Iron Bellow back must cancel Bolstering Cry.
+    // And re-casting Iron Bellow leaves Bolstering Cry in place.
     p.resource = 100;
     sim.castAbility('battle_shout');
-    expect(p.auras.some((a) => a.id === 'commanding_shout')).toBe(false);
+    expect(p.auras.some((a) => a.id === 'commanding_shout')).toBe(true);
     expect(shoutAura(p)).toBeTruthy();
-    expect(p.maxHp).toBe(baseMaxHp);
+    expect(p.maxHp).toBeGreaterThan(baseMaxHp);
   });
 
   it('is deterministic for a fixed seed', () => {

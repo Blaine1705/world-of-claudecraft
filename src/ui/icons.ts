@@ -2238,6 +2238,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_aggressive: r('fury', 'blood', ['claw_slash'], ['glow']),
   // warrior
   heroic_strike: r('fury', 'steel', ['sword'], ['glow']),
+  // Revenge: a wide frontal sweep (sword crossed with a broad slash arc), steel,
+  // distinct from cleave's axe+arcs and heroic_strike's bare sword+glow.
+  revenge: r('steel', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['arcs']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
   commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),
