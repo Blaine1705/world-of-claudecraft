@@ -3637,7 +3637,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   metamorphosis: {
     id: 'metamorphosis',
-    name: 'Fiendshape',
+    name: 'Dread Aspect',
     class: 'warlock',
     learnLevel: 10,
     cost: 75,
@@ -3677,7 +3677,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   holy_shield: {
     id: 'holy_shield',
-    name: 'Radiant Aegis',
+    name: 'Hallowed Wall',
     class: 'paladin',
     learnLevel: 10,
     cost: 30,
@@ -3695,7 +3695,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bestial_wrath: {
     id: 'bestial_wrath',
-    name: 'Wild Fury',
+    name: 'Howling Rage',
     class: 'hunter',
     learnLevel: 10,
     cost: 40,
@@ -3713,7 +3713,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   trueshot_aura: {
     id: 'trueshot_aura',
-    name: 'Coldsight Aura',
+    name: 'Sureflight Aura',
     class: 'hunter',
     learnLevel: 10,
     cost: 40,
@@ -3810,7 +3810,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blade_flurry: {
     id: 'blade_flurry',
-    name: 'Knifestorm',
+    name: 'Mirrored Blades',
     class: 'rogue',
     learnLevel: 10,
     cost: 25,
@@ -3825,7 +3825,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hemorrhage: {
     id: 'hemorrhage',
-    name: 'Deep Cut',
+    name: 'Red Ribbon',
     class: 'rogue',
     learnLevel: 10,
     cost: 35,
@@ -3845,7 +3845,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   power_infusion: {
     id: 'power_infusion',
-    name: 'Fervor',
+    name: 'Anointing',
     class: 'priest',
     learnLevel: 10,
     cost: 55,
@@ -3879,7 +3879,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   shadowform: {
     id: 'shadowform',
-    name: 'Vesper Form',
+    name: 'Gloamveil Form',
     class: 'priest',
     learnLevel: 10,
     cost: 60,
@@ -3894,7 +3894,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   elemental_mastery: {
     id: 'elemental_mastery',
-    name: 'Stormsurge',
+    name: 'Primal Mastery',
     class: 'shaman',
     learnLevel: 10,
     cost: 45,
@@ -3908,7 +3908,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   siphon_life: {
     id: 'siphon_life',
-    name: 'Life Leech',
+    name: 'Veinleech',
     class: 'warlock',
     learnLevel: 10,
     cost: 45,
@@ -3938,7 +3938,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   moonkin_form: {
     id: 'moonkin_form',
-    name: 'Owl Form',
+    name: 'Moonwing Form',
     class: 'druid',
     learnLevel: 10,
     cost: 55,
