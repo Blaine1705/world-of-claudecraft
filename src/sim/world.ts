@@ -1419,13 +1419,24 @@ export function inBorderLake(x: number, z: number): boolean {
 // beyond it, so only the x flanks bite there now; the Frostveil's far north
 // is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
-  if (z < 960 || x > DUNGEON_X_THRESHOLD) return false;
+  if (z < 180 || x > DUNGEON_X_THRESHOLD) return false;
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
   // the interior border meres are landlocked, never open sea (the Hollow's
   // moat sections are deliberately NOT on that list)
   if (inBorderLake(x, z)) return false;
   const seaXb = worldXBoundsAt(z);
+  if (z <= 960) {
+    // the columns' southern outer coasts: open ocean to the world edge
+    // (the strip center sits hundreds of yards from the row bounds here,
+    // so this only ever bites the fen, gale, jungle, and garden flanks)
+    const dRim = Math.min(x - seaXb.min, seaXb.max - x);
+    return (
+      dRim < 48 &&
+      Math.max(fenLandness(x, z), galeLandness(x, z), reachLandness(x, z), gardenLandness(x, z)) <
+        0.02
+    );
+  }
   if (z <= HOLLOW_ZMAX + 2) {
     // the moat: within reach of the sealed realm's OWN rect edges, open
     // water stays open sea however wide the row has grown, so no swimmer
@@ -1650,12 +1661,18 @@ export function terrainHeight(x: number, z: number, seed: number): number {
         ? 1
         : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(along - edge.passAt));
       // jagged crest so the wall reads as mountains, not a berm
+      // Thornpeak's edges carry real peaks: the mountain realm's borders
+      // are taller and craggier than the rest of the grid's low ranges
+      // (the Sunway and Gardenwalk passes still open through them)
+      const peaksEdge =
+        (edge.kind === 'v' && edge.lo >= 540 && edge.hi <= 900) ||
+        (edge.kind === 'h' && edge.at === 540);
       const crestNoise =
         edge.kind === 'h'
-          ? (fbm2(x * 0.03, edge.at * 0.03, seed + 19, 2) - 0.5) * 0.7
-          : (fbm2(edge.at * 0.03, z * 0.03, seed + 19, 2) - 0.5) * 0.7;
+          ? (fbm2(x * 0.03, edge.at * 0.03, seed + 19, 2) - 0.5) * (peaksEdge ? 1.0 : 0.7)
+          : (fbm2(edge.at * 0.03, z * 0.03, seed + 19, 2) - 0.5) * (peaksEdge ? 1.0 : 0.7);
       const crest = 1 + (edge.sealed ? Math.abs(crestNoise) : crestNoise);
-      const height = edge.sealed ? SEALED_RIDGE_HEIGHT : RIDGE_HEIGHT;
+      const height = edge.sealed ? SEALED_RIDGE_HEIGHT : peaksEdge ? 34 : RIDGE_HEIGHT;
       // The Hollow/Drakelands boundary ridge rises only where there is land
       // to carry it (the Wyrmgate mountains around the causeway head); over
       // the open sea the two realms' waters simply meet. Sealed walls are
@@ -1733,6 +1750,11 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // wall) turns swimmers back before the band edge.
   const xb = worldXBoundsAt(z);
   let rimX = Math.max(smoothstep(xb.max - 30, xb.max, x), smoothstep(-xb.min - 30, -xb.min, -x));
+  // the southern columns end in open coast, not a rim range: the fen, the
+  // headlands, the jungle, and the lawns all meet the sea at their outer
+  // edges (the sketch's request), and swim fatigue does the containment
+  // (bounded to the playable world: far instance-space x keeps its rim)
+  if (z > 180 && z <= 1260 && Math.abs(x) <= 600) rimX = 0;
   const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
   let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
   if (inHollowOpenSea(x, z)) {
