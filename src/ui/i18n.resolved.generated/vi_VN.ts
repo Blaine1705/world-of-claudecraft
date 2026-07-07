@@ -1060,18 +1060,6 @@ export const vi_VN: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Chế tạo",
-      "close": "Đóng chế tạo",
-      "craft": "thủ công",
-      "reagentsNeeded": "Yêu cầu:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Chưa có công thức nấu ăn nào được biết đến.",
-      "resultAria": "Thủ công {name}",
-      "craftedToast": "Đã chế tác: {name}",
-      "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
-      "unknownRecipe": "Công thức đó không tồn tại."
-    },
     "devBadge": {
       "title": "Nhà phát triển",
       "tiers": {
@@ -1215,6 +1203,19 @@ export const vi_VN: EnTranslations = {
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học"
+    },
+    "crafting": {
+      "title": "Chế tạo",
+      "close": "Đóng chế tạo",
+      "craft": "thủ công",
+      "reagentsNeeded": "Yêu cầu:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Chưa có công thức nấu ăn nào được biết đến.",
+      "resultAria": "Thủ công {name}",
+      "craftedToast": "Đã chế tác: {name}",
+      "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
+      "unknownRecipe": "Công thức đó không tồn tại.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

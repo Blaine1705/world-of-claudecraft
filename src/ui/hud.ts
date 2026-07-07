@@ -126,6 +126,7 @@ import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
+import { bagsWindowShown } from './bags_view';
 import { BagsWindow } from './bags_window';
 import { CalendarWindow } from './calendar_window';
 import { CastBarPainter } from './cast_bar_painter';
@@ -7787,7 +7788,9 @@ export class Hud {
               t(
                 ev.reason === 'unknown_recipe'
                   ? 'hudChrome.crafting.unknownRecipe'
-                  : 'hudChrome.crafting.insufficientMaterials',
+                  : ev.reason === 'combo_requirement_unmet'
+                    ? 'hudChrome.crafting.comboRequirementUnmet'
+                    : 'hudChrome.crafting.insufficientMaterials',
               ),
               '#ff6b6b',
             );
@@ -10097,7 +10100,7 @@ export class Hud {
   private renderCrafting(): void {
     renderCraftingWindow(
       $('#crafting-window'),
-      buildCraftingView(this.sim.recipeList, this.sim.inventory, ITEMS),
+      buildCraftingView(this.sim.recipeList, this.sim.inventory, ITEMS, this.sim.craftSkills),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
@@ -10188,9 +10191,12 @@ export class Hud {
 
   toggleBags(): void {
     const el = $('#bags');
-    if (el.style.display !== 'none') {
+    if (bagsWindowShown(el.style.display)) {
       // Close through the painter so focus returns to the opener (WCAG 2.4.3); close()
       // owns the hide + tooltip + pet-feed teardown, so keep only the audio cue here.
+      // Only a genuinely shown window closes here: on a cold load the inline display
+      // is '' (hidden by the .window CSS rule), which must open on the first press,
+      // not take this close branch and play the close sound (issue #1538).
       audio.bagClose();
       this.bagsWindow.close();
       return;

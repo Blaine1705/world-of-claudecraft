@@ -1060,18 +1060,6 @@ export const nl_NL: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Knutselen",
-      "close": "Sluit het maken",
-      "craft": "Ambacht",
-      "reagentsNeeded": "Vereist:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Nog geen recepten bekend.",
-      "resultAria": "Ambacht {name}",
-      "craftedToast": "Gemaakt: {name}",
-      "insufficientMaterials": "Daar heb je de materialen niet voor.",
-      "unknownRecipe": "Dat recept bestaat niet."
-    },
     "devBadge": {
       "title": "Ontwikkelaar",
       "tiers": {
@@ -1215,6 +1203,19 @@ export const nl_NL: EnTranslations = {
       "mining": "Mijnbouw",
       "logging": "Houtkap",
       "herbalism": "Kruidenkunde"
+    },
+    "crafting": {
+      "title": "Knutselen",
+      "close": "Sluit het maken",
+      "craft": "Ambacht",
+      "reagentsNeeded": "Vereist:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Nog geen recepten bekend.",
+      "resultAria": "Ambacht {name}",
+      "craftedToast": "Gemaakt: {name}",
+      "insufficientMaterials": "Daar heb je de materialen niet voor.",
+      "unknownRecipe": "Dat recept bestaat niet.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

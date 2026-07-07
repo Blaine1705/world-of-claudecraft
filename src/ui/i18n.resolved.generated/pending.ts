@@ -12,32 +12,38 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "es_ES": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_FR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_CA": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "de_DE": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "zh_CN": [
@@ -55,6 +61,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "ru_RU": [
@@ -107,6 +114,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.trueshot_aura.name",
     "entities.abilities.wyvern_sting.description",
     "entities.abilities.wyvern_sting.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.mobile.actionPageIndicator",
     "hudChrome.mobile.actionPageToggle",
@@ -122,36 +130,43 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "pl_PL": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "id_ID": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "tr_TR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "sv_SE": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "vi_VN": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "da_DK": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs"
   ]
 };
