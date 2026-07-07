@@ -2182,7 +2182,7 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
-      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning';
+      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning' | 'chainHeal';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
