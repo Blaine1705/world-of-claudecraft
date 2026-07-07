@@ -84,6 +84,12 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  // Dev "smite" mode: a flagged player's hit one-shots any mob (overrides the
+  // rolled amount before mitigation, so armor/absorb can't save the target). Only
+  // the player's own damage, only vs mobs; never touches players/NPCs/PvP.
+  if (source?.oneShot && source.kind === 'player' && target.kind === 'mob') {
+    amount = target.maxHp * 1000 + 1_000_000;
+  }
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (

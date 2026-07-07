@@ -204,6 +204,23 @@ describe('rift sim: generator clearance matches runtime collision', () => {
   });
 });
 
+describe('rift sim: /dev smite one-shots mobs', () => {
+  it('a smiting player deletes any mob in one hit, but the toggle is off by default', () => {
+    const sim = makeSim();
+    sim.enterRift(SEED, 20, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const mob = sim.entities.get(inst.mobIds[0])!;
+    // Without smite, a small hit barely dents a raid-tier mob.
+    sim.dealDamage(sim.player, mob, 5, false, 'physical', 'test', 'hit');
+    expect(mob.dead).toBe(false);
+    // Toggle smite on: the same small hit one-shots it.
+    sim.chat('/dev smite', sim.player.id);
+    expect(sim.player.oneShot).toBe(true);
+    sim.dealDamage(sim.player, mob, 5, false, 'physical', 'test', 'hit');
+    expect(mob.dead).toBe(true);
+  });
+});
+
 describe('rift sim: giga bosses', () => {
   it('the final boss is huge and raid-tier tanky', () => {
     const sim = makeSim();

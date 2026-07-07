@@ -1615,6 +1615,9 @@ export interface Entity {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  /** Dev "smite" mode: this player's damage one-shots any mob it hits. Toggled by
+   *  the dev command /dev smite (gated by ALLOW_DEV_COMMANDS); never set otherwise. */
+  oneShot?: boolean;
   /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */

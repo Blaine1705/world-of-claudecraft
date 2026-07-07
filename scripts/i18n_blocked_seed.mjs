@@ -306,6 +306,8 @@ export const V07_SLASH = [
   '[dev] God mode ON (invulnerable).',
   '[dev] Level set to 5.',
   '[dev] Opened a portal to Aki (5 floors, L5). Walk through it.',
+  '[dev] Smite mode OFF.',
+  '[dev] Smite mode ON (one-shot everything).',
   '[dev] Teleported to Aki, Aki.',
   "[dev] Unknown item 'Aki'.",
 ];

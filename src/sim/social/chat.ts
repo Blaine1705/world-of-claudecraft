@@ -972,6 +972,21 @@ export function handleDevChat(
     }
     return null;
   }
+  // [dev] Toggle one-shot ("smite") mode: this player's every hit deletes any mob
+  // it lands on (see dealDamage). Handy for blasting through the giga-boss rifts.
+  if (/^\/(?:dev\s+(?:smite|oneshot|nuke)|devsmite)\s*$/i.test(raw)) {
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.oneShot = !e.oneShot;
+      ctx.emit({
+        type: 'log',
+        text: e.oneShot ? '[dev] Smite mode ON (one-shot everything).' : '[dev] Smite mode OFF.',
+        color: '#b9f',
+        pid,
+      });
+    }
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -983,7 +998,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level], /dev god, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level], /dev god, /dev smite, /dev kill',
     );
     return null;
   }
