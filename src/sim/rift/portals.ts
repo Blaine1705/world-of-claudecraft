@@ -27,9 +27,13 @@ import { generateRiftPlan } from './rift_gen';
 // level player walking into an Eastbrook portal gets the denial line instead).
 export const RIFT_MIN_LEVEL = 20;
 
+// Sim time is wall-clock on the live server (fixed 20 Hz), so these seconds are
+// real seconds there. A ranked gate opens roughly every 3 hours; the first
+// comes soon after boot so a fresh realm is not empty, and an uncleared gate
+// lingers an hour before it collapses (a real window to muster and clear it).
 export const RIFT_PORTAL_FIRST_AT = 120; // s of sim time before the first natural portal
-export const RIFT_PORTAL_INTERVAL = 300; // s between natural portal spawns
-export const RIFT_PORTAL_LIFETIME = 900; // s an unclosed portal stays before collapsing
+export const RIFT_PORTAL_INTERVAL = 3 * 60 * 60; // s between natural portal spawns (~3 h)
+export const RIFT_PORTAL_LIFETIME = 60 * 60; // s an unclosed portal stays before collapsing (1 h)
 export const RIFT_PORTAL_MAX_OPEN = 3; // open natural portals at once, world-wide
 
 /** Per-rank tuning: the generated dungeon's baseLevel (MAX_LEVEL is 20, so B+
