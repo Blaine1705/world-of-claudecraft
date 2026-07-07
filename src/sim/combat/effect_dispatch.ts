@@ -447,8 +447,10 @@ export function runEffects(
         p.auras.splice(sealIdx, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: seal.name, gained: false });
         // Judgement is an instant holy nuke; scale it with Spell Power too.
+        const baseDmg = ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15);
         let dmg =
-          ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
+          baseDmg * (eff.dmgMult ?? 1) +
+          (eff.flat ?? 0) +
           directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
         if (crit) dmg *= 1.5 + p.critDmgBonus;

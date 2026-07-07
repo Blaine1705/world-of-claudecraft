@@ -1286,7 +1286,7 @@ export type AbilityEffect =
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
-  | { type: 'judgement' } // consume your imbue, deal its judgement damage to the target
+  | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | { type: 'buffTarget'; kind: AuraKind; value: number; duration: number } // fortitude/might/mark on a friendly target

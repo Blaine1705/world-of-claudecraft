@@ -1,4 +1,4 @@
-import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '../types';
+import type { AbilityDef, AbilityEffect, AuraKind, PlayerClass, Stats, WeaponInfo } from '../types';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
@@ -433,7 +433,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'commanding_shout',
     name: 'Bolstering Cry',
     class: 'warrior',
-    learnLevel: 14,
+    learnLevel: 11,
     cost: 10,
     castTime: 0,
     cooldown: 0,
@@ -902,7 +902,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'conjure_food',
     name: 'Breadbind',
     class: 'mage',
-    learnLevel: 6,
+    learnLevel: 5,
     cost: 45,
     castTime: 3,
     cooldown: 0,
@@ -921,7 +921,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'fire_blast',
     name: 'Cinderfall',
     class: 'mage',
-    learnLevel: 6,
+    learnLevel: 5,
     cost: 40,
     castTime: 0,
     cooldown: 8,
@@ -939,7 +939,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_missiles',
     name: 'Aether Darts',
     class: 'mage',
-    learnLevel: 8,
+    learnLevel: 5,
     cost: 50,
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
@@ -959,7 +959,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'polymorph',
     name: 'Bewitch',
     class: 'mage',
-    learnLevel: 8,
+    learnLevel: 5,
     cost: 50,
     castTime: 1.5,
     cooldown: 0,
@@ -975,7 +975,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'frost_nova',
     name: 'Icebind',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 22,
@@ -997,7 +997,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_explosion',
     name: 'Aetherburst',
     class: 'mage',
-    learnLevel: 14,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 0,
@@ -1014,7 +1014,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'flamestrike',
     name: 'Flamestrike',
     class: 'mage',
-    learnLevel: 20,
+    learnLevel: 5,
     cost: 80,
     castTime: 0,
     cooldown: 12,
@@ -1048,7 +1048,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'volley',
     name: 'Volley',
     class: 'hunter',
-    learnLevel: 18,
+    learnLevel: 11,
     cost: 60,
     castTime: 0,
     cooldown: 8,
@@ -1096,7 +1096,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'scorch',
     name: 'Scald',
     class: 'mage',
-    learnLevel: 16,
+    learnLevel: 5,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
@@ -1110,7 +1110,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'pyroblast',
     name: 'Pyrelance',
     class: 'mage',
-    learnLevel: 20,
+    learnLevel: 5,
     cost: 125,
     castTime: 6.0,
     cooldown: 0,
@@ -1128,7 +1128,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ice_barrier',
     name: 'Frostveil',
     class: 'mage',
-    learnLevel: 20,
+    learnLevel: 5,
     cost: 90,
     castTime: 0,
     cooldown: 30,
@@ -1299,7 +1299,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'kidney_shot',
     name: 'Low Blow',
     class: 'rogue',
-    learnLevel: 14,
+    learnLevel: 8,
     cost: 25,
     castTime: 0,
     cooldown: 20,
@@ -1314,7 +1314,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ambush',
     name: "Lurker's Strike",
     class: 'rogue',
-    learnLevel: 16,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 0,
@@ -1465,7 +1465,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rupture',
     name: 'Bleed Out',
     class: 'rogue',
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -1496,7 +1496,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'instant_poison',
     name: "Adder's Bite",
     class: 'rogue',
-    learnLevel: 18,
+    learnLevel: 14,
     cost: 40,
     castTime: 0,
     cooldown: 0,
@@ -1511,7 +1511,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'deadly_poison',
     name: 'Festering Venom',
     class: 'rogue',
-    learnLevel: 20,
+    learnLevel: 14,
     cost: 40,
     castTime: 0,
     cooldown: 0,
@@ -1913,7 +1913,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_shot',
     name: 'Fell Shot',
     class: 'hunter',
-    learnLevel: 6,
+    learnLevel: 5,
     cost: 25,
     castTime: 0,
     cooldown: 6,
@@ -1996,7 +1996,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'aspect_of_the_monkey',
     name: "Marten's Guise",
     class: 'hunter',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -2026,7 +2026,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'aimed_shot',
     name: 'Long Draw',
     class: 'hunter',
-    learnLevel: 16,
+    learnLevel: 11,
     cost: 50,
     castTime: 3.0,
     cooldown: 6,
@@ -2799,7 +2799,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'searing_pain',
     name: 'Sear',
     class: 'warlock',
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
@@ -2813,7 +2813,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'shadowburn',
     name: 'Duskfire',
     class: 'warlock',
-    learnLevel: 20,
+    learnLevel: 14,
     cost: 70,
     castTime: 0,
     cooldown: 15,
@@ -3134,7 +3134,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'bear_form',
     name: 'Bruin Form',
     class: 'druid',
-    learnLevel: 10,
+    learnLevel: 8,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3236,7 +3236,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'cat_form',
     name: 'Wolf Form',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3251,7 +3251,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'prowl',
     name: 'Stalk',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 0,
@@ -3267,7 +3267,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rake',
     name: 'Flense',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 0,
@@ -3299,7 +3299,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'claw',
     name: 'Claw',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 45,
     castTime: 0,
     cooldown: 0,
@@ -3381,7 +3381,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'starfire',
     name: 'Skyfall',
     class: 'druid',
-    learnLevel: 18,
+    learnLevel: 14,
     cost: 80,
     castTime: 3.0,
     cooldown: 0,
@@ -3395,7 +3395,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'travel_form',
     name: 'Fleet Form',
     class: 'druid',
-    learnLevel: 16,
+    learnLevel: 11,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3426,7 +3426,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'bash',
     name: 'Concuss',
     class: 'druid',
-    learnLevel: 16,
+    learnLevel: 8,
     cost: 10,
     castTime: 0,
     cooldown: 60,
@@ -3532,7 +3532,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rip',
     name: 'Rip',
     class: 'druid',
-    learnLevel: 20,
+    learnLevel: 14,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3749,7 +3749,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_power',
     name: 'Aether Surge',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 90,
@@ -3767,7 +3767,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'combustion',
     name: 'Flashfire',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 120,
@@ -3781,7 +3781,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'icy_veins',
     name: 'Icy Veins',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 180,
@@ -4067,7 +4067,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'blink',
     name: 'Flickerstep',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 40,
     castTime: 0,
     cooldown: 15,
@@ -4141,7 +4141,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'cone_of_cold',
     name: 'Frostsweep',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 20,
@@ -4172,7 +4172,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'counterspell',
     name: 'Spellbreak',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 45,
     castTime: 0,
     cooldown: 24,
@@ -4220,7 +4220,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'deep_freeze',
     name: 'Deadfrost',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 30,
@@ -4296,7 +4296,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'evocation',
     name: 'Aetherwell',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 120,
@@ -4435,7 +4435,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ice_block',
     name: 'Cold Coffin',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 15,
     castTime: 0,
     cooldown: 240,
@@ -4523,7 +4523,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'meteor',
     name: 'Skystone',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 120,
     castTime: 0,
     cooldown: 45,
@@ -4604,7 +4604,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'presence_of_mind',
     name: 'Racing Mind',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 60,
@@ -4786,6 +4786,22 @@ export interface KnownAbility {
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
 }
 
+const INTEGRAL_BUFF_KINDS: ReadonlySet<AuraKind> = new Set([
+  'buff_ap',
+  'buff_armor',
+  'buff_int',
+  'buff_agi',
+  'buff_sta',
+  'buff_allstats',
+  'buff_spellpower',
+  'thorns',
+]);
+
+function scaleBuffValue(kind: AuraKind, value: number, mul: number): number {
+  const scaled = value * mul;
+  return INTEGRAL_BUFF_KINDS.has(kind) ? Math.round(scaled) : scaled;
+}
+
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
 // base content arrays are shared module data and must never be mutated. `flat`
 // is added once to the effect's primary magnitude.
@@ -4835,6 +4851,12 @@ function scaleEffect(
           eff.judgeMin === undefined ? undefined : Math.round(eff.judgeMin * dmgMult + flat),
         judgeMax:
           eff.judgeMax === undefined ? undefined : Math.round(eff.judgeMax * dmgMult + flat),
+      };
+    case 'judgement':
+      return {
+        ...eff,
+        dmgMult: (eff.dmgMult ?? 1) * dmgMult,
+        flat: (eff.flat ?? 0) + flat,
       };
     case 'heal':
       return {
@@ -4903,14 +4925,16 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
-    // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
-    // giving more armor. Only the buff effects scale; damage on the same ability does not.
+    // buffPct strengthens a buff-like effect. Count-like aura values round to whole
+    // points; rate and multiplier values keep their fractions.
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        (e.type === 'selfBuff' || e.type === 'buffTarget') && Math.abs(e.value) >= 1
-          ? { ...e, value: Math.round(e.value * mul) }
-          : e,
+        e.type === 'selfBuff' || e.type === 'buffTarget'
+          ? { ...e, value: scaleBuffValue(e.kind, e.value, mul) }
+          : e.type === 'finisherHaste'
+            ? { ...e, mult: 1 + (e.mult - 1) * mul }
+            : e,
       );
     }
   }
