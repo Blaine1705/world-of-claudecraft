@@ -100,8 +100,9 @@ describe('duel: non-lethal cleanup', () => {
     (sim as any).applyAura(eb, opponentDot(ea.id));
     eb.hp = 30; // wounded but alive
 
-    // Bet flees past the forfeit distance, ending the duel as a draw.
-    teleport(sim, b, 400, -40);
+    // Bet flees past the forfeit distance, ending the duel as a draw (a
+    // quiet vale spot clear of camps: the old far point is island land now).
+    teleport(sim, b, 40, -140);
     sim.tick();
     expect((sim as any).duels.has(b)).toBe(false);
 

@@ -132,6 +132,10 @@ const MOB_IDS = [
   'gale_wisp',
   'shoal_scuttler',
   'the_wreck_warden',
+  'riftspawn',
+  'breach_wretch',
+  'void_stalker',
+  'sundered_horror',
 ] as const;
 
 const NPC_IDS = [
@@ -163,6 +167,13 @@ const NPC_IDS = [
   'provisioner_fenna',
   'wardsmith_orun',
   'archivist_tullo',
+  // Gullhaven, the Farshore redoubt
+  'warden_coalfast',
+  'riftwatch_ollun',
+  'quartermaster_edda',
+  'mender_saul',
+  'bellkeeper_tam',
+  'fisher_nell',
 ] as const;
 
 const QUEST_IDS = [
@@ -268,6 +279,7 @@ const ZONE_IDS = [
   'palmreach',
   'evergarden',
   'galecrest',
+  'farshore_isle',
 ] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',

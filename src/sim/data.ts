@@ -96,6 +96,19 @@ import {
   GALECREST_ROADS,
   GALECREST_ZONE,
 } from './content/galecrest';
+import {
+  FARSHORE_CAMPS,
+  FARSHORE_ITEMS,
+  FARSHORE_MOBS,
+  FARSHORE_NPCS,
+  FARSHORE_OBJECTS,
+  FARSHORE_PORTALS,
+  FARSHORE_PROPS,
+  FARSHORE_QUEST_ORDER,
+  FARSHORE_QUESTS,
+  FARSHORE_ROADS,
+  FARSHORE_ZONE,
+} from './content/farshore';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
   NIGHTBLOOM_CAMPS,
@@ -277,6 +290,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   PALMREACH_ITEMS,
   EVERGARDEN_ITEMS,
   GALECREST_ITEMS,
+  FARSHORE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -301,6 +315,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...PALMREACH_MOBS,
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
+  ...FARSHORE_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -321,6 +336,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...PALMREACH_NPCS,
   ...EVERGARDEN_NPCS,
   ...GALECREST_NPCS,
+  ...FARSHORE_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -338,6 +354,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...PALMREACH_QUESTS,
   ...EVERGARDEN_QUESTS,
   ...GALECREST_QUESTS,
+  ...FARSHORE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -355,6 +372,7 @@ export const QUEST_ORDER: string[] = [
   ...PALMREACH_QUEST_ORDER,
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
+  ...FARSHORE_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -380,6 +398,7 @@ export const CAMPS: CampDef[] = [
   ...PALMREACH_CAMPS,
   ...EVERGARDEN_CAMPS,
   ...GALECREST_CAMPS,
+  ...FARSHORE_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -397,6 +416,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...PALMREACH_OBJECTS,
   ...EVERGARDEN_OBJECTS,
   ...GALECREST_OBJECTS,
+  ...FARSHORE_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -413,6 +433,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...PALMREACH_ROADS,
   ...EVERGARDEN_ROADS,
   ...GALECREST_ROADS,
+  ...FARSHORE_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -426,6 +447,7 @@ export const PORTALS: PortalDef[] = [
   ...PALMREACH_PORTALS,
   ...EVERGARDEN_PORTALS,
   ...GALECREST_PORTALS,
+  ...FARSHORE_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -443,6 +465,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   PALMREACH_PROPS,
   EVERGARDEN_PROPS,
   GALECREST_PROPS,
+  FARSHORE_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -514,6 +537,7 @@ export const ZONES: ZoneDef[] = [
   PALMREACH_ZONE,
   EVERGARDEN_ZONE,
   GALECREST_ZONE,
+  FARSHORE_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)

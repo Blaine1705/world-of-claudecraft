@@ -136,14 +136,26 @@ describe('collision & terrain', () => {
     expect(dist2d(p.pos, { x: 10, y: 0, z: 12 })).toBeGreaterThan(2.2);
   });
 
-  it('steep rims are walls, not ramps', () => {
+  it('the open shore is sea with the fatigue turnback, not a wall', () => {
+    // The vale's east rim range became coastline (the Farshore's strait):
+    // walking east now wades into open water, and the sea itself guards
+    // the border: the swimmer takes the fatigue warning and damage long
+    // before the far shore.
     const sim = makeSim();
     const p = sim.player;
     teleportTo(sim, 150, 0);
-    p.facing = Math.PI / 2; // +x, toward the world rim
+    p.facing = Math.PI / 2; // +x, into the strait
     sim.moveInput.forward = true;
-    for (let i = 0; i < 400; i++) sim.tick();
-    expect(p.pos.x).toBeLessThan(170);
+    let warned = false;
+    for (let i = 0; i < 400; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'log' && ev.text.includes('open sea')) warned = true;
+      }
+    }
+    expect(p.pos.y).toBeLessThan(WATER_LEVEL + 0.6); // swimming, not standing
+    expect(warned).toBe(true); // the sea is doing the guarding
+    // (the escalating fatigue damage itself is pinned by the open-sea test
+    // in tests/veiled_hollow.test.ts)
   });
 
   it('NPCs spawn on dry land outside buildings', () => {

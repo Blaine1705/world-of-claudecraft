@@ -33,9 +33,11 @@ function zone(partial: Partial<ZoneDef> & { id: string; zMin: number; zMax: numb
 describe('the continent derives the right border set', () => {
   const edges = computeBorderEdges(ZONES);
 
-  it('has ten horizontal borders and fourteen column edges', () => {
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(10);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(14);
+  it('has eleven horizontal borders and fifteen column edges', () => {
+    // the Farshore adds a v-edge against the vale and an h-line under the
+    // Galecrest: both are open-sea borders with no isthmus (ferry only)
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(11);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(15);
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -74,7 +76,8 @@ describe('the continent derives the right border set', () => {
 
   it('row bounds widen exactly where columns live', () => {
     for (const z of [-100, 100]) {
-      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: STRIP_MAX_X });
+      // the Farshore widens the starter row east
+      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: 540 });
     }
     for (const z of [300, 800, 1100, 1700, 1900]) {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });

@@ -2,6 +2,8 @@
 /* eslint-disable */
 export const BASE_NEW = {
   da_DK: {
+    'log.ferryEnter': 'Færgeklokken slår et slag, og Fjernkysten rejser sig af skummet.',
+    'log.ferryLeave': 'Klokken svarer fra dalen, og fastlandet tager dig tilbage.',
     'log.seaFatigue': 'Det åbne hav tærer på dine kræfter. Svøm tilbage til kysten!',
     'log.veilEnter': 'Et slør af tusmørke deler sig foran dig, og Lavningen åbner sig forude.',
     'log.veilLeave': 'Sløret lukker sig bag dig, og bjergluften bider igen.',
@@ -146,6 +148,8 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Du er nu i Forstyr Ikke-tilstand: {message}',
   },
   id_ID: {
+    'log.ferryEnter': 'Lonceng feri berdentang sekali, dan Pantai Jauh muncul dari buih ombak.',
+    'log.ferryLeave': 'Lonceng menjawab dari lembah, dan daratan menyambutmu kembali.',
     'log.seaFatigue': 'Laut lepas menguras tenagamu. Berenanglah kembali ke pantai!',
     'log.veilEnter':
       'Tabir senja terbuka di hadapanmu, dan Lembah Tersembunyi terbentang di depan.',
@@ -291,6 +295,8 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Kamu kini dalam mode Jangan Diganggu: {message}',
   },
   nl_NL: {
+    'log.ferryEnter': 'De veerklok luidt een keer, en de Verre Oever rijst op uit het schuim.',
+    'log.ferryLeave': 'De klok antwoordt vanuit het dal, en het vasteland neemt je terug.',
     'log.seaFatigue': 'De open zee put je krachten uit. Zwem terug naar de kust!',
     'log.veilEnter': 'Een sluier van schemering wijkt voor je, en de Kom opent zich verderop.',
     'log.veilLeave': 'De sluier sluit zich achter je, en de berglucht bijt weer.',
@@ -435,6 +441,8 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Je bent nu in de modus Niet Storen: {message}',
   },
   pl_PL: {
+    'log.ferryEnter': 'Dzwon promu bije raz i Daleki Brzeg wyrasta z piany.',
+    'log.ferryLeave': 'Dzwon odpowiada z doliny i stały ląd przyjmuje cię z powrotem.',
     'log.seaFatigue': 'Otwarte morze wysysa twoje siły. Płyń z powrotem do brzegu!',
     'log.veilEnter': 'Zasłona zmierzchu rozstępuje się, a przed tobą otwiera się Kotlina.',
     'log.veilLeave': 'Zasłona zamyka się za tobą, a górskie powietrze znów szczypie.',
@@ -579,6 +587,8 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Jesteś teraz w trybie Nie przeszkadzać: {message}',
   },
   sv_SE: {
+    'log.ferryEnter': 'Färjklockan slår ett slag, och Fjärranstranden reser sig ur skummet.',
+    'log.ferryLeave': 'Klockan svarar från dalen, och fastlandet tar dig tillbaka.',
     'log.seaFatigue': 'Öppna havet tär på dina krafter. Simma tillbaka till stranden!',
     'log.veilEnter': 'En skymningsslöja delar sig framför dig, och Dälden öppnar sig där framme.',
     'log.veilLeave': 'Slöjan sluter sig bakom dig, och bergsluften biter igen.',
@@ -723,6 +733,8 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Du är nu i läget Stör ej: {message}',
   },
   tr_TR: {
+    'log.ferryEnter': 'Feribot çanı bir kez çalar ve Uzak Kıyı serpintilerin içinden yükselir.',
+    'log.ferryLeave': 'Çan vadiden karşılık verir ve anakara seni geri alır.',
     'log.seaFatigue': 'Açık deniz gücünü tüketiyor. Kıyıya geri yüz!',
     'log.veilEnter': 'Alacakaranlık perdesi önünde aralanır ve Kuytu Vadi ileride açılır.',
     'log.veilLeave': 'Perde ardında kapanır ve dağ havası yeniden ısırır.',
@@ -866,6 +878,8 @@ export const BASE_NEW = {
     'presence.nowDnd': 'Artık Rahatsız Etmeyin modundasın: {message}',
   },
   vi_VN: {
+    'log.ferryEnter': 'Chuông phà ngân lên một tiếng, và Bờ Xa hiện ra giữa bọt sóng.',
+    'log.ferryLeave': 'Chuông đáp lời từ thung lũng, và đất liền đón bạn trở về.',
     'log.seaFatigue': 'Biển khơi đang rút cạn sức lực của bạn. Hãy bơi trở lại bờ!',
     'log.veilEnter': 'Bức màn hoàng hôn hé mở trước mặt bạn, và Thung Lũng Ẩn hiện ra phía trước.',
     'log.veilLeave': 'Bức màn khép lại sau lưng bạn, và khí núi lại buốt giá.',

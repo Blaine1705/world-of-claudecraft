@@ -5816,6 +5816,18 @@ export const zh_TW: EnTranslations = {
       "the_wreck_warden": {
         "name": "沉船守衛"
       },
+      "riftspawn": {
+        "name": "裂隙孽生"
+      },
+      "breach_wretch": {
+        "name": "裂口惡徒"
+      },
+      "void_stalker": {
+        "name": "虛空潛獵者"
+      },
+      "sundered_horror": {
+        "name": "碎裂之恐怖"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -6060,6 +6072,36 @@ export const zh_TW: EnTranslations = {
         "name": "檔案員圖洛",
         "title": "讀石者",
         "greeting": "外面那些石碑已經許久不曾對人開口。也許它們正等著新的耳朵。"
+      },
+      "warden_coalfast": {
+        "name": "守望者 煤堅",
+        "title": "堡壘指揮官",
+        "greeting": "裂隙可不管鷗港有多小，{className}。我們守住這片海岸，否則便再無海岸可守。與我們並肩而戰，我絕不會忘記。"
+      },
+      "riftwatch_ollun": {
+        "name": "裂隙守望 歐倫",
+        "title": "裂隙學者",
+        "greeting": "若你聽得出那聲響，每道裂隙開啟之前都會歌唱。此刻我聽見島上有三道正在騷動，其中一道就在近旁。"
+      },
+      "quartermaster_edda": {
+        "name": "軍需官 艾妲",
+        "title": "堡壘軍械師",
+        "greeting": "鋼與鹽，{className}，這便是我僅剩能發放的一切了。收下它，讓那些裂隙後悔開在我搆得著的地方。"
+      },
+      "mender_saul": {
+        "name": "療者 索爾",
+        "title": "戰地外科醫",
+        "greeting": "這一個月裡我接的斷骨，比十年來替漁人跌傷接的還要多。裂隙奪走的東西，鮮少留下什麼。若你能辦到，就完好無缺地回到我身邊吧。"
+      },
+      "bellkeeper_tam": {
+        "name": "守鐘人 塔姆",
+        "title": "守望鐘司",
+        "greeting": "這口鐘是裂隙唯一給我們的警訊，{className}。一響是田野有變，兩響是崖壁告急，三響時它已近得再怎麼奔逃也無濟於事。留心聽著它，它或許便能保你周全。"
+      },
+      "fisher_nell": {
+        "name": "受驚的 奈兒",
+        "title": "鷗港漁人",
+        "greeting": "它就開在曬網的地方。就在那裡，就在我這輩子每天清晨站立的地方。我再也不下海岸了。如今哪兒我都幾乎不再去了。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -7064,6 +7106,9 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "明木林地"
+          },
+          "10": {
+            "label": "遠岸沙洲堤道"
           }
         }
       },
@@ -7388,6 +7433,27 @@ export const zh_TW: EnTranslations = {
           },
           "6": {
             "label": "鏡湖"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "遠岸",
+        "welcome": "越過那道沙洲，鷗港的鐘聲會先於城鎮尋著你。裂隙無預警地撕裂而開，這座據點便死守著自己的海岸，抵擋一切從中傾湧而出之物。他們已等候像你這樣的人許久了。",
+        "pois": {
+          "0": {
+            "label": "鷗港"
+          },
+          "1": {
+            "label": "登岸碼頭"
+          },
+          "2": {
+            "label": "守望草原"
+          },
+          "3": {
+            "label": "碎裂斷崖"
+          },
+          "4": {
+            "label": "裂隙原野"
           }
         }
       }

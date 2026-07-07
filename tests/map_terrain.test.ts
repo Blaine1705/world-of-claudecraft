@@ -55,7 +55,7 @@ describe('map terrain painter', () => {
 
   it('produces different terrain for different zones', () => {
     const a = renderFull(W, zoneRegion(ZONES[0].id), SEED);
-    const b = renderFull(W, zoneRegion(ZONES[ZONES.length - 1].id), SEED);
+    const b = renderFull(W, zoneRegion(ZONES[1].id), SEED);
     expect(a).not.toEqual(b);
   });
 

@@ -1241,7 +1241,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Bandit Camp",
       "Fallen Chapel",
       "Reliquary Hill",
-      "Brightwood Glade"
+      "Brightwood Glade",
+      "The Farshore Causeway"
     ],
     "welcome": "Find Marshal Redbrook in town — he has work for you."
   },
@@ -1460,6 +1461,22 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Mirror Tarn"
     ],
     "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you."
+  },
+  {
+    "id": "farshore_isle",
+    "name": "The Farshore",
+    "min": 3,
+    "max": 7,
+    "biome": "vale",
+    "hub": "Gullhaven",
+    "pois": [
+      "Gullhaven",
+      "The Landing",
+      "The Watch Meadow",
+      "The Sundered Cliffs",
+      "The Riftfields"
+    ],
+    "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you."
   }
 ];
 
