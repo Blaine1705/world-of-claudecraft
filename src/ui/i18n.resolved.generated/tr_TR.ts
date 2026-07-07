@@ -146,6 +146,7 @@ export const tr_TR: EnTranslations = {
         "noTree": "Sınıfının henüz bir yetenek ağacı yok.",
         "locked": "Henüz yetenekleri açmadın — {level}. seviyede başlarlar.",
         "noSpec": "uzmanlık yok",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Yetenekler: {head} — {spent}/{total} puan harcandı ({breakdown}).",
         "breakdownClass": "Sınıf {classPts}",
         "breakdownSpec": "Sınıf {classPts}, {spec} {specPts}",

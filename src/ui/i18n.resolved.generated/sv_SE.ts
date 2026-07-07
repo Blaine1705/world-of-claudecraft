@@ -146,6 +146,7 @@ export const sv_SE: EnTranslations = {
         "noTree": "Din klass har inget talangträd än.",
         "locked": "Du har inte låst upp talanger än, de börjar vid nivå {level}.",
         "noSpec": "ingen specialisering",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talanger: {head} — {spent}/{total} poäng lagda ({breakdown}).",
         "breakdownClass": "Klass {classPts}",
         "breakdownSpec": "Klass {classPts}, {spec} {specPts}",

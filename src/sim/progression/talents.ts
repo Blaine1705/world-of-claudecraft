@@ -88,19 +88,7 @@ export function talentPointBudget(ctx: SimContext, pid?: number): { total: numbe
 }
 
 function sanitizeTalentAllocation(alloc: TalentAllocation): TalentAllocation {
-  const sanitized: TalentAllocation = {
-    spec: alloc.spec ?? null,
-    ranks: {},
-    choices: { ...alloc.choices },
-    // Row picks pass through untouched; validateAllocation authoritatively
-    // re-checks every level gate and option id (validateRows).
-    rows: { ...(alloc.rows ?? {}) },
-  };
-  for (const id in alloc.ranks) {
-    const v = Math.floor(alloc.ranks[id]);
-    if (v > 0) sanitized.ranks[id] = v;
-  }
-  return sanitized;
+  return { spec: alloc.spec ?? null, rows: { ...(alloc.rows ?? {}) } };
 }
 
 // Commit a whole staged allocation in one shot (the UI's "Apply"). Rejects any
@@ -122,12 +110,7 @@ export function applyTalentAllocation(
     ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
     return false;
   }
-  const check = validateAllocation(
-    r.meta.cls,
-    sanitized,
-    talentPointsAtLevel(r.e.level),
-    r.e.level,
-  );
+  const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
   if (!check.ok) {
     ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
     return false;
@@ -156,35 +139,6 @@ export function applyTalentAllocation(
   return true;
 }
 
-// The active pet's summoning ability under the OLD build may be gone under
-// the new one (Summon Water Elemental is frost-only): send the pet home. The
-// summon->pet link is data-driven: any known summonDemon ability whose mobId
-// matches the live pet keeps it; no match, no pet.
-function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
-  const pet = petOf(ctx, e.id);
-  if (!pet) return;
-  const summons = (def: (typeof ABILITIES)[string]) =>
-    def.effects.some(
-      (eff) =>
-        (eff.type === 'summonDemon' && eff.mobId === pet.templateId) ||
-        (eff.type === 'summonPet' && eff.templateId === pet.templateId),
-    );
-  // A pet no class summon creates (a tamed hunter beast) is never spec-bound.
-  const summonable = Object.values(ABILITIES).some((d) => d.class === meta.cls && summons(d));
-  if (!summonable) return;
-  const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
-  if (known.some((k) => summons(k.def))) return;
-  despawnPersistentPet(ctx, pet);
-  // The registered despawn line (log.petFadesVoid, localized for every locale
-  // in sim_i18n), the same farewell a warlock demon gives.
-  ctx.emit({
-    type: 'log',
-    pid: e.id,
-    text: `${pet.name} fades back into the void.`,
-    color: '#b894ff',
-  });
-}
-
 // Legacy incremental API retained for old scripts. The node system is gone, so
 // this no longer changes state.
 export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
@@ -211,38 +165,6 @@ export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: numb
   const cand = cloneAllocation(r.meta.talents);
   cand.spec = specId;
   return applyTalentAllocation(ctx, cand, pid);
-}
-
-// Pick (or clear, optionId null) a choice-row talent (the Pandaria-style row
-// system, content/talent_rows.ts). Server-authoritative: the row must be
-// unlocked by level, the option must belong to that row, and the same
-// out-of-combat lock as the point tree applies. Re-picking a row replaces its
-// previous choice (free respec by design). Structural invalids return false
-// silently (nothing player-triggerable reaches here until the picker UI phase,
-// which will carry its own messaging).
-export function pickChoiceRowTalent(
-  ctx: SimContext,
-  rowIndex: number,
-  optionId: string | null,
-  pid?: number,
-): boolean {
-  const r = ctx.resolve(pid);
-  if (!r) return false;
-  const lock = talentLockReason(ctx, r.e);
-  if (lock) {
-    ctx.error(r.e.id, lock);
-    return false;
-  }
-  const tree = rowTreeFor(r.meta.cls);
-  if (!tree) return false;
-  const row = tree[rowIndex];
-  if (!row || r.e.level < row.level) return false;
-  if (optionId !== null && !row.options.some((o) => o.id === optionId)) return false;
-  if (r.meta.rowPicks[rowIndex] === optionId) return true;
-  r.meta.rowPicks[rowIndex] = optionId;
-  recomputeTalents(ctx, r.meta);
-  ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents updated.', color: '#ffd100' });
-  return true;
 }
 
 // Free respec (out of combat): wipe choice rows. Spec is retained.
@@ -285,12 +207,7 @@ export function saveTalentLoadout(
       ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
       return -1;
     }
-    const check = validateAllocation(
-      r.meta.cls,
-      sanitized,
-      talentPointsAtLevel(r.e.level),
-      r.e.level,
-    );
+    const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
     if (!check.ok) {
       ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
       return -1;

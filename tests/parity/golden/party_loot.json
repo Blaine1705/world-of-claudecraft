@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 403,
-      "state": "62f5ab21",
+      "state": "5398e2e7",
       "events": "e50fb0d8",
       "rng": {
         "draws": 2,
@@ -95,8 +95,6 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -159,8 +157,6 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }

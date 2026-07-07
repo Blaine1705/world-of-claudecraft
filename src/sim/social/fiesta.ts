@@ -223,7 +223,7 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   if (meta.fiestaRestore) return;
   meta.fiestaRestore = { level: e.level, xp: meta.xp, talents: cloneAllocation(meta.talents) };
   e.level = FIESTA_STANDARD_LEVEL;
-  meta.talents = defaultBuild(meta.cls, talentPointsAtLevel(FIESTA_STANDARD_LEVEL));
+  meta.talents = defaultBuild(meta.cls, FIESTA_STANDARD_LEVEL);
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly

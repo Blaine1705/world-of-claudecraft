@@ -1,4 +1,3 @@
-import type { ProcDef } from '../sim/combat/talent_procs';
 import { CHOICE_ROWS, type ChoiceRowOption } from '../sim/content/choice_rows';
 import {
   type ClassTalents,
@@ -12,13 +11,7 @@ import {
 import { ABILITIES } from '../sim/data';
 import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import {
-  getLanguage,
-  type InterpolationValues,
-  languageTag,
-  type SupportedLanguage,
-  t,
-} from './i18n';
+import { getLanguage, languageTag, type SupportedLanguage, t } from './i18n';
 import { TALENT_NEW, TALENT_NEW_TITLE_OVERRIDES } from './talent_i18n.newlocales';
 
 declare module '../sim/content/talents' {
@@ -9730,18 +9723,7 @@ export function tTalent(request: TalentTranslationRequest): string {
         ? request.spec.name
         : `${request.spec.description} Signature: ${abilityName(request.spec.signature)}.`;
     }
-    if (request.kind === 'talentChoice') {
-      if (request.field === 'name') return request.choice.name;
-      // A grant option's authored description is a bare "Grants X."; append the
-      // granted ability's own description so the tooltip tells the player what
-      // the spell actually does.
-      const grantId = request.choice.effect.grant?.ability;
-      if (grantId) {
-        const gd = abilityDescription(grantId);
-        return gd ? `${request.choice.description} ${gd}` : request.choice.description;
-      }
-      return request.choice.description;
-    }
+    if (request.kind === 'talentChoice') return request.choice[request.field];
     const exhaustive: never = request;
     return exhaustive;
   }

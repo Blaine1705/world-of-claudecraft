@@ -146,6 +146,7 @@ export const ko_KR: EnTranslations = {
         "noTree": "이 직업은 아직 특성 트리가 없습니다.",
         "locked": "아직 특성을 해제하지 않았습니다 — 특성은 {level}레벨부터 시작됩니다.",
         "noSpec": "전문화 없음",
+        "rowsSummary": "특성: {head}, 선택한 줄 {picked}/{unlocked}.",
         "summary": "특성: {head} — {spent}/{total} 점 사용 ({breakdown}).",
         "breakdownClass": "직업 {classPts}",
         "breakdownSpec": "직업 {classPts}, {spec} {specPts}",

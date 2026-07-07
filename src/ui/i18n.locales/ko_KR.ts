@@ -793,6 +793,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'game.talents.classTab': '직업',
   'game.talents.specTab': '전문화',
   'game.talents.choicesTab': '선택',
+  'game.talents.readout.rowsSummary': '특성: {head}, 선택한 줄 {picked}/{unlocked}.',
   'game.talents.rowUnlockToast': '새로운 특성 선택이 열렸습니다!',
   'game.talents.rowUnlocks': '{level} 레벨에 해제',
   'game.talents.available': '사용 가능',

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "33c78e16",
+      "state": "b528afd3",
       "events": "ca1afc51",
       "rng": {
         "draws": 3,
@@ -87,8 +87,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -146,8 +144,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -200,8 +196,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }
@@ -442,7 +436,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "f846c09d",
+      "state": "45b0fc48",
       "events": "00031d53",
       "rng": {
         "draws": 6,
@@ -499,8 +493,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -558,8 +550,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -612,8 +602,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }
@@ -854,7 +842,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "1b3f9c01",
+      "state": "7075e900",
       "events": "00031d53",
       "rng": {
         "draws": 9,
@@ -911,8 +899,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -970,8 +956,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -1024,8 +1008,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }
@@ -1266,7 +1248,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "da4034ee",
+      "state": "099b662d",
       "events": "00031d53",
       "rng": {
         "draws": 12,
@@ -1323,8 +1305,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -1382,8 +1362,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -1436,8 +1414,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }
@@ -1678,7 +1654,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 404,
-      "state": "ef3a8372",
+      "state": "20992df9",
       "events": "6c23c6b5",
       "rng": {
         "draws": 15,
@@ -1689,7 +1665,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 404,
-      "state": "6238d3a7",
+      "state": "2d3639a4",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1700,7 +1676,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 404,
-      "state": "6238d3a7",
+      "state": "2d3639a4",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1758,8 +1734,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -1817,8 +1791,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         },
@@ -1871,8 +1843,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }

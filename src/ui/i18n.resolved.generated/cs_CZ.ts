@@ -146,6 +146,7 @@ export const cs_CZ: EnTranslations = {
         "noTree": "Tvoje třída zatím nemá talentový strom.",
         "locked": "Talenty ještě nemáš odemčené - začínají na úrovni {level}.",
         "noSpec": "žádná specializace",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talenty: {head} - utraceno {spent}/{total} bodů ({breakdown}).",
         "breakdownClass": "Třída {classPts}",
         "breakdownSpec": "Třída {classPts}, {spec} {specPts}",

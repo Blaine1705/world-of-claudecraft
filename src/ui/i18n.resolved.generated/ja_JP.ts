@@ -146,6 +146,7 @@ export const ja_JP: EnTranslations = {
         "noTree": "あなたのクラスにはまだタレントツリーがありません。",
         "locked": "タレントはまだ解除されていません——レベル{level}から始まります。",
         "noSpec": "専門化なし",
+        "rowsSummary": "タレント: {head}、選択済み行 {picked}/{unlocked}。",
         "summary": "タレント: {head}——{spent}/{total} ポイント使用済み（{breakdown}）。",
         "breakdownClass": "クラス {classPts}",
         "breakdownSpec": "クラス {classPts}、{spec} {specPts}",

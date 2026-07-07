@@ -146,6 +146,7 @@ export const ru_RU: EnTranslations = {
         "noTree": "У вашего класса пока нет дерева талантов.",
         "locked": "Вы еще не открыли таланты — они появляются на уровне {level}.",
         "noSpec": "без специализации",
+        "rowsSummary": "Таланты: {head}, выбрано рядов {picked}/{unlocked}.",
         "summary": "Таланты: {head} — потрачено очков: {spent}/{total} ({breakdown}).",
         "breakdownClass": "Класс {classPts}",
         "breakdownSpec": "Класс {classPts}, {spec} {specPts}",

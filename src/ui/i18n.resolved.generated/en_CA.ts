@@ -146,6 +146,7 @@ export const en_CA: EnTranslations = {
         "noTree": "Your class has no talent tree yet.",
         "locked": "You have not unlocked talents yet — they begin at level {level}.",
         "noSpec": "no specialization",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talents: {head} — {spent}/{total} points spent ({breakdown}).",
         "breakdownClass": "Class {classPts}",
         "breakdownSpec": "Class {classPts}, {spec} {specPts}",
