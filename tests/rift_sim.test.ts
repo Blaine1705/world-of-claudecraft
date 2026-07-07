@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { resolveMovement, resolvePosition } from '../src/sim/colliders';
 import { isRiftPos, riftInstanceOrigin } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
 
 const SEED = 4242;
 
@@ -173,6 +173,45 @@ describe('rift sim: floor progression', () => {
     sim.player.pos = { ...exit.pos };
     sim.player.hp = sim.player.maxHp;
     sim.tick();
+    expect(isRiftPos(sim.player.pos.x)).toBe(false);
+  });
+});
+
+describe('rift sim: leaving never bounces the player back in (regression)', () => {
+  it('walking out of the final exit lands clear of the portal and stays out', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    sim.chat('/dev portal 991 20', sim.player.id);
+    const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal')!;
+    // Walk in standing dead-centre on the portal (the worst-case return spot).
+    sim.player.pos = { ...portal.pos };
+    sim.player.prevPos = { ...portal.pos };
+    sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    // Force to the boss floor and kill everything so the exit opens.
+    for (let guard = 0; guard < 10 && inst.floorIndex < inst.floorCount - 1; guard++) {
+      killTrash(sim);
+      inst.litPylons = new Set(inst.pylonIds);
+      tickAlive(sim, 21);
+      if (inst.descentId === null) break;
+      const desc = sim.entities.get(inst.descentId)!;
+      sim.player.pos = { ...desc.pos };
+      sim.player.prevPos = { ...desc.pos };
+      tickAlive(sim, 1);
+    }
+    killAll(sim);
+    tickAlive(sim, 21);
+    expect(inst.exitId).not.toBeNull();
+    // Walk into the exit: back to the overworld...
+    const exit = sim.entities.get(inst.exitId!)!;
+    sim.player.pos = { ...exit.pos };
+    sim.player.prevPos = { ...exit.pos };
+    tickAlive(sim, 1);
+    expect(isRiftPos(sim.player.pos.x)).toBe(false);
+    // ...landing OUTSIDE the portal's walk-in radius, and staying out for the
+    // following seconds (before the fix this re-entered on the next tick).
+    expect(dist2d(sim.player.pos, portal.pos)).toBeGreaterThan(2.2);
+    tickAlive(sim, 80);
     expect(isRiftPos(sim.player.pos.x)).toBe(false);
   });
 });

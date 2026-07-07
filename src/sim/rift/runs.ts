@@ -229,7 +229,22 @@ export function enterRift(
     inst.baseLevel = Math.max(1, Math.min(60, Math.round(baseLevel)));
     inst.floorIndex = 0;
     inst.floorCount = generateRiftFloor(inst.seed, inst.baseLevel, 0).floorCount;
-    inst.returnPos = returnPos ?? { x: r.e.pos.x, z: r.e.pos.z };
+    // Return spot: never inside the portal's walk-in radius, or leaving the
+    // rift would drop the player onto the portal and bounce them straight back
+    // in. Push the entry position away from the portal to a safe distance.
+    let ret = returnPos ?? { x: r.e.pos.x, z: r.e.pos.z };
+    if (portal) {
+      const dx = ret.x - portal.pos.x;
+      const dz = ret.z - portal.pos.z;
+      const d = Math.hypot(dx, dz);
+      const SAFE = PORTAL_TRIGGER_RADIUS + 2.5;
+      if (d < SAFE) {
+        const ux = d > 1e-3 ? dx / d : 0;
+        const uz = d > 1e-3 ? dz / d : 1;
+        ret = { x: portal.pos.x + ux * SAFE, z: portal.pos.z + uz * SAFE };
+      }
+    }
+    inst.returnPos = ret;
     inst.tier = portal?.riftTier ?? null;
     inst.portalId = portal?.id ?? null;
     inst.rewarded = false;
@@ -312,6 +327,9 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   if (!inst) return;
   const dest = inst.returnPos;
   const p = r.e;
+  // Walk-in grace so the overworld portal cannot re-swallow the player the
+  // tick they land next to it (clicking it deliberately still re-enters).
+  p.riftReentryGraceUntil = ctx.time + 3;
   p.pos = ctx.groundPos(dest.x, dest.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -368,7 +386,9 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
     return;
   }
 
-  // Overworld: walk into a rift portal to enter.
+  // Overworld: walk into a rift portal to enter (unless inside the short
+  // post-exit grace, so leaving a rift never bounces the player back in).
+  if (ctx.time < (p.riftReentryGraceUntil ?? -Infinity)) return;
   if (ctx.riftPortalIds === null) {
     ctx.riftPortalIds = [];
     for (const e of ctx.entities.values()) {
