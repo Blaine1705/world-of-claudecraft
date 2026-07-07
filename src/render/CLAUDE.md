@@ -25,7 +25,8 @@ renderer:
 | `water.ts` · `sky.ts` | per-zone water planes · HDRI sky dome + clouds |
 | `vfx.ts` | pooled `THREE.Points` spell/impact particles (Kenney atlas) |
 | `dungeon.ts` | instanced KayKit interiors from `sim/dungeon_layout.ts` |
-| `door_portal.ts` | dungeon-door / exit-portal bodies (stone arch + additive portal swirl) |
+| `door_portal.ts` | dungeon-door / exit-portal bodies (stone arch + additive portal swirl); also the bespoke world-rift "gate" GLB with its rank-tinted energy membrane (`buildRiftGateBody`) |
+| `rift_rank.ts` | the floating C/B/A/S rank badge above a world rift portal |
 | `post.ts` | post chain (see below) |
 | `gfx.ts`, `textures.ts`, `render_budget.ts`, `locomotion.ts`, `stealth.ts`, `shared_resource.ts` | shared helpers (below) |
 | `self_motion.ts` · `facing_smooth.ts` | pure, Node-tested display-only self layers: bounded intent-driven pose extrapolation online (runs `sim/player_motion.ts`; never touches world state, see `src/net/CLAUDE.md`) · rate-limited self yaw |

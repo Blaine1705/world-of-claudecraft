@@ -75,6 +75,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `pet/pet_commands.ts` | the pet command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip (`stowPetForDelve`/`restorePetFromDelveStash`) |
 | `quests/quest_credit.ts` | kill/collect/turn-in quest credit, ready-check |
 | `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates |
+| `rift/runs.ts` + `rift/portals.ts` | procedural "Rift" run lifecycle (enter/descend/exit, floor gates, level-20 gate, Heroic Mark rewards) + the ranked (C/B/A/S) world-portal scheduler. See `docs/design/rift-portals.md` |
 | `delves/runs.ts` | delve run lifecycle (`updateDelveRuns`, modules, rewards, shop) |
 | `delves/lockpick_controller.ts` | the lockpick session machine |
 | `delves/companion.ts` | `updateDelveCompanion` |
