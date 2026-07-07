@@ -411,7 +411,12 @@ export function fenLandness(x: number, z: number): number {
 // the other realms' (bog country, not sea cliffs).
 function applyFenCoast(x: number, z: number, h: number): number {
   if (z <= AMBER_ZMAX || z > FEN_ZMAX + 2) return h;
-  if (x > STRIP_MAX_X) return h; // the Galecrest column keeps its own coast
+  // The Galecrest column keeps its own coast; the two recipes CROSS-FADE
+  // over a seam band at the column border rather than hard-partitioning,
+  // because a step in terrainHeight along the border line buries walkers
+  // (the render mesh interpolates across it, the sim does not).
+  const seam = 1 - smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
+  if (seam <= 0) return h;
   const land = fenLandness(x, z);
   const t = smoothstep(0.02, 0.34, land);
   const shelf = smoothstep(-0.5, 0.06, land);
@@ -427,7 +432,7 @@ function applyFenCoast(x: number, z: number, h: number): number {
   // column border (the world's first sideways gate)
   const passE = (1 - smoothstep(26, 52, Math.abs(z - 3380))) * smoothstep(100, 145, x);
   if (passE > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passE;
-  return out;
+  return h + (out - h) * seam;
 }
 
 // ---------------------------------------------------------------------------
@@ -808,7 +813,9 @@ export function galeLandness(x: number, z: number): number {
 // flat pass floor at the Windway meeting the fen's east ramp.
 function applyGaleCoast(x: number, z: number, h: number): number {
   if (z <= GALE_ZMIN - 2 || z > GALE_ZMAX + 2) return h;
-  if (x <= STRIP_MAX_X) return h; // west of the column border: the fen's coast
+  // the seam twin of applyFenCoast's gate: cross-fade, never a hard cut
+  const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
+  if (seam <= 0) return h;
   const land = galeLandness(x, z);
   const t = smoothstep(0.02, 0.28, land);
   const shelf = smoothstep(-0.4, 0.06, land);
@@ -817,7 +824,20 @@ function applyGaleCoast(x: number, z: number, h: number): number {
   // the Windway: flat pass floor across the column border
   const passT = (1 - smoothstep(26, 52, Math.abs(z - 3380))) * (1 - smoothstep(230, 280, x));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
-  return out;
+  return h + (out - h) * seam;
+}
+
+// The strait between the fen and the Galecrest: the seam blend of the two
+// coasts leaves the border line hovering at the waterline (a mushy mudflat
+// neither walkable nor swimmable); this carves it into honest water,
+// leaving the Windway corridor untouched.
+function applyWindwayStrait(x: number, z: number, h: number): number {
+  if (z <= GALE_ZMIN || z > GALE_ZMAX) return h;
+  const strait =
+    (1 - smoothstep(2, 12, Math.abs(x - STRIP_MAX_X))) * smoothstep(26, 52, Math.abs(z - 3380));
+  if (strait <= 0) return h;
+  const channel = Math.min(h, WATER_LEVEL - 2.5);
+  return h + (channel - h) * strait;
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
@@ -1404,6 +1424,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyReachCoast(x, z, h);
   h = applyGardenCoast(x, z, h);
   h = applyGaleCoast(x, z, h);
+  h = applyWindwayStrait(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
