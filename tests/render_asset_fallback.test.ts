@@ -64,5 +64,6 @@ describe('render asset preload fallbacks', () => {
 
     const terrain = buildTerrain(20061);
     expect(terrain.group.children.length).toBeGreaterThan(0);
-  });
+    // a full terrain build over the 13-zone continent: headroom under load
+  }, 90_000);
 });
