@@ -40,6 +40,7 @@ import type {
   Aura,
   CrowdControlDrCategory,
   DelveRun,
+  DungeonDifficulty,
   Entity,
   ErrorReason,
   ItemInstancePayload,
@@ -115,8 +116,10 @@ export interface SimContextPrimitives {
   // Backing fields stay on Sim. `duels` is also read per-attack by isHostileTo/
   // dealDamage (PvP hostility), so it stays Sim-owned (A2).
   readonly duels: Map<number, DuelState>;
-  // `world` stays optional (custom play-test map, else undefined); the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
+  // `world` stays optional (custom play-test map, else undefined; perfLap is the
+  // temporary host-owned tick profiler probe); the rest defaulted.
+  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
+    Pick<SimConfig, 'world' | 'perfLap'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.
@@ -184,6 +187,12 @@ export interface SimContextCallbacks {
   // (N1, the delve slice, quest spawns, the interaction dispatchers) reaches them
   // through the seam; implemented in instances/dungeons, Sim keeps thin delegates so
   // existing `this.enterDungeon` etc. call sites resolve unchanged.
+  // dungeonDifficulty/setDungeonDifficulty are the heroic-selection commands: the
+  // body-stays-on-Sim kind (party/meta state lives on Sim), exposed so the chat
+  // slash command and instances/dungeons reach them through the seam.
+  // awardHeroicMarks is owned by instances/dungeons: the C1 death hub calls it after
+  // rollLoot so a heroic final-boss corpse gains one personal Heroic Mark slot per
+  // eligible participant (no rng draws).
   lockoutNowMs(): number;
   // The next raid-reset instant (epoch ms) for a given lockout "now". The host owns
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
@@ -203,6 +212,9 @@ export interface SimContextCallbacks {
     returnPos?: { x: number; z: number },
   ): void;
   leaveRift(pid?: number): void;
+  dungeonDifficulty(pid?: number): DungeonDifficulty;
+  setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
   // drives mid-tick. `dealDamage` is the post-mitigation entry (crit/dodge/miss and
@@ -783,6 +795,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     leaveDungeon: host.leaveDungeon,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
+    dungeonDifficulty: host.dungeonDifficulty,
+    setDungeonDifficulty: host.setDungeonDifficulty,
+    awardHeroicMarks: host.awardHeroicMarks,
     dealDamage: host.dealDamage,
     handleDeath: host.handleDeath,
     cancelCast: host.cancelCast,

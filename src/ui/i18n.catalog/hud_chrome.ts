@@ -344,6 +344,11 @@ export const hudChromeStrings = {
     // Entry-denied toast, enriched client-side with the live unlock countdown
     // ({raid} = the localized raid name, {time} = the formatted countdown).
     lockedToast: 'You are locked to {raid}. Unlocks in {time}.',
+    // Display name for a heroic-difficulty lockout row ({name} = dungeon name).
+    heroicName: 'Heroic {name}',
+    // Entry-denied toast for a heroic daily lockout when no live countdown is
+    // mirrored yet ({name} = dungeon name).
+    heroicLocked: 'You are locked to Heroic {name}.',
   },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
@@ -381,6 +386,9 @@ export const hudChromeStrings = {
   options: {
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
+    // Running client version + build id, shown as small secondary text at the foot
+    // of the settings menu so players can confirm their build without closing it.
+    version: 'v{version} ({build})',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',
@@ -513,6 +521,7 @@ export const hudChromeStrings = {
       fps01Low: '0.1% Low',
       ping: 'Ping',
       jitter: 'Jitter',
+      predLead: 'Prediction Lead',
       snapshot: 'Snapshot Rate',
       connection: 'Connection',
       drawCalls: 'Draw Calls',
@@ -906,9 +915,23 @@ export const hudChromeStrings = {
     leaderOption: 'Master Looter: Leader (You)',
     masterOption: 'Master Looter: {name}',
   },
+  // Self-portrait context menu: the dungeon-difficulty toggle (classic
+  // portrait-menu placement). The labels are ACTION labels (what clicking
+  // does); shown only to solo players and party leaders, since the sim
+  // rejects the change from anyone else.
+  dungeonDifficulty: {
+    setHeroic: 'Set Dungeon Difficulty: Heroic',
+    setNormal: 'Set Dungeon Difficulty: Normal',
+  },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {
+    // Right-click destroy affordance: rejected when the item is flagged noDiscard
+    // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
+    cannotDestroy: 'This item cannot be destroyed.',
+    // Tooltip sub-line advertising the right-click destroy affordance, shown only
+    // for a destroyable item so junk is removable without hunting for a menu.
+    rightClickDestroy: 'Right-click to destroy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -1397,6 +1420,25 @@ export const hudChromeStrings = {
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
+  },
+  // Archetype title (#1130): the named title granted by a character's currently
+  // active craft archetype (see src/sim/professions/archetype.ts). `none` is shown
+  // before the zone-1 acceptance quest has ever been completed (no "Jack of All
+  // Trades" fallback, just untitled). The ten per-craft names are keyed by the
+  // same craft id as CRAFT_RING (src/sim/content/professions.ts); keep both in sync.
+  archetypeTitle: {
+    label: 'Title',
+    none: 'None',
+    armorcrafting: 'Armorer',
+    weaponcrafting: 'Weaponsmith',
+    jewelcrafting: 'Jeweler',
+    alchemy: 'Alchemist',
+    engineering: 'Tinkerer',
+    cooking: 'Chef',
+    inscription: 'Scribe',
+    enchanting: 'Enchanter',
+    tailoring: 'Tailor',
+    leatherworking: 'Leathercrafter',
   },
   // Crafting window (#1127): the minimal common-tier crafting action, one row
   // per known recipe, a Craft button enabled only when every reagent is held.
