@@ -206,7 +206,12 @@ export function saveTalentLoadout(
       ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
       return -1;
     }
-    const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+    const check = validateAllocation(
+      r.meta.cls,
+      sanitized,
+      talentPointsAtLevel(r.e.level),
+      r.e.level,
+    );
     if (!check.ok) {
       ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
       return -1;

@@ -47,7 +47,7 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'war_r5_heroic_leap',
-          name: 'Heroic Leap',
+          name: 'Warleap',
           description: 'Leap to a ground target, dealing small area damage. 20 sec cooldown.',
           icon: 'heroic_leap',
           effect: { grant: { ability: 'heroic_leap' } },
@@ -103,7 +103,7 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'war_r11_berserker_rage',
-          name: 'Berserker Rage',
+          name: 'Seething Fury',
           description: 'Grants Berserker Rage.',
           icon: 'berserker_rage',
           effect: { grant: { ability: 'berserker_rage' } },
@@ -147,7 +147,7 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'war_r14_whirlwind',
-          name: 'Whirlwind',
+          name: 'Bladed Gyre',
           description: 'Grants Whirlwind.',
           icon: 'whirlwind',
           effect: { grant: { ability: 'whirlwind' } },
@@ -167,14 +167,14 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'war_r17_shield_wall',
-          name: 'Shield Wall',
+          name: 'Bulwark',
           description: 'Grants Shield Wall.',
           icon: 'shield_wall',
           effect: { grant: { ability: 'shield_wall' } },
         },
         {
           id: 'war_r17_last_stand',
-          name: 'Last Stand',
+          name: 'Eleventh Hour',
           description: 'Grants Last Stand.',
           icon: 'last_stand',
           effect: { grant: { ability: 'last_stand' } },
@@ -194,21 +194,21 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'war_r20_bladestorm',
-          name: 'Bladestorm',
+          name: 'Steel Cyclone',
           description: 'Grants Bladestorm.',
           icon: 'bladestorm',
           effect: { grant: { ability: 'bladestorm' } },
         },
         {
           id: 'war_r20_avatar',
-          name: 'Avatar',
+          name: 'Colossus',
           description: 'Grants Avatar.',
           icon: 'avatar',
           effect: { grant: { ability: 'avatar' } },
         },
         {
           id: 'war_r20_rallying_cry',
-          name: 'Rallying Cry',
+          name: 'Muster',
           description: 'Grants Rallying Cry.',
           icon: 'rallying_cry',
           effect: { grant: { ability: 'rallying_cry' } },
@@ -253,7 +253,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'mag_r8_counterspell',
-          name: 'Counterspell',
+          name: 'Spellbreak',
           description: 'Grants Counterspell.',
           icon: 'counterspell',
           effect: { grant: { ability: 'counterspell' } },
@@ -280,7 +280,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'mag_r11_cone_of_cold',
-          name: 'Cone of Cold',
+          name: 'Frostsweep',
           description: 'Grants Cone of Cold.',
           icon: 'cone_of_cold',
           effect: { grant: { ability: 'cone_of_cold' } },
@@ -307,7 +307,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'mag_r14_presence_of_mind',
-          name: 'Presence of Mind',
+          name: 'Racing Mind',
           description: 'Grants Presence of Mind.',
           icon: 'presence_of_mind',
           effect: { grant: { ability: 'presence_of_mind' } },
@@ -336,14 +336,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'mag_r17_blink',
-          name: 'Blink',
+          name: 'Flickerstep',
           description: 'Grants Blink.',
           icon: 'blink',
           effect: { grant: { ability: 'blink' } },
         },
         {
           id: 'mag_r17_ice_block',
-          name: 'Ice Block',
+          name: 'Cold Coffin',
           description: 'Grants Ice Block.',
           icon: 'ice_block',
           effect: { grant: { ability: 'ice_block' } },
@@ -363,21 +363,21 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'mag_r20_deep_freeze',
-          name: 'Deep Freeze',
+          name: 'Deadfrost',
           description: 'Grants Deep Freeze.',
           icon: 'deep_freeze',
           effect: { grant: { ability: 'deep_freeze' } },
         },
         {
           id: 'mag_r20_meteor',
-          name: 'Meteor',
+          name: 'Skystone',
           description: 'Grants Meteor.',
           icon: 'meteor',
           effect: { grant: { ability: 'meteor' } },
         },
         {
           id: 'mag_r20_evocation',
-          name: 'Evocation',
+          name: 'Aetherwell',
           description: 'Grants Evocation.',
           icon: 'evocation',
           effect: { grant: { ability: 'evocation' } },
@@ -422,7 +422,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pal_r8_rebuke',
-          name: 'Rebuke',
+          name: 'Reproach',
           description: 'Grants Rebuke.',
           icon: 'rebuke',
           effect: { grant: { ability: 'rebuke' } },
@@ -493,7 +493,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pal_r14_holy_wrath',
-          name: 'Holy Wrath',
+          name: "Saint's Ire",
           description: 'Grants Holy Wrath.',
           icon: 'holy_wrath',
           effect: { grant: { ability: 'holy_wrath' } },
@@ -518,7 +518,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pal_r17_divine_shield',
-          name: 'Divine Shield',
+          name: 'Lightward',
           description: 'Grants Divine Shield.',
           icon: 'divine_shield',
           effect: { grant: { ability: 'divine_shield' } },
@@ -550,14 +550,14 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pal_r20_avenging_wrath',
-          name: 'Avenging Wrath',
+          name: 'Wrathwing',
           description: 'Grants Avenging Wrath.',
           icon: 'avenging_wrath',
           effect: { grant: { ability: 'avenging_wrath' } },
         },
         {
           id: 'pal_r20_hammer_of_wrath',
-          name: 'Hammer of Wrath',
+          name: 'Tolling Hammer',
           description: 'Grants Hammer of Wrath.',
           icon: 'hammer_of_wrath',
           effect: { grant: { ability: 'hammer_of_wrath' } },
@@ -619,14 +619,14 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r8_counter_shot',
-          name: 'Counter Shot',
+          name: 'Hushing Shot',
           description: 'Grants Counter Shot.',
           icon: 'counter_shot',
           effect: { grant: { ability: 'counter_shot' } },
         },
         {
           id: 'hun_r8_frost_trap',
-          name: 'Frost Trap',
+          name: 'Rime Snare',
           description: 'Grants Frost Trap.',
           icon: 'frost_trap',
           effect: { grant: { ability: 'frost_trap' } },
@@ -646,7 +646,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r11_mend_pet',
-          name: 'Mend Pet',
+          name: 'Patch Up',
           description: 'Grants Mend Pet.',
           icon: 'mend_pet',
           effect: { grant: { ability: 'mend_pet' } },
@@ -682,7 +682,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r14_multi_shot',
-          name: 'Multi-Shot',
+          name: 'Splitshot',
           description: 'Grants Multi-Shot.',
           icon: 'multi_shot',
           effect: { grant: { ability: 'multi_shot' } },
@@ -716,7 +716,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r17_deterrence',
-          name: 'Deterrence',
+          name: 'Bristleguard',
           description: 'Grants Deterrence.',
           icon: 'deterrence',
           effect: { grant: { ability: 'deterrence' } },
@@ -762,7 +762,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r20_aspect_of_the_wild',
-          name: 'Aspect of the Wild',
+          name: 'Wildfang Guise',
           description: 'Grants Aspect of the Wild.',
           icon: 'aspect_of_the_wild',
           effect: { grant: { ability: 'aspect_of_the_wild' } },
@@ -812,7 +812,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'rog_r8_kick',
-          name: 'Kick',
+          name: 'Boot',
           description: 'Grants Kick.',
           icon: 'kick',
           effect: { grant: { ability: 'kick' } },
@@ -839,7 +839,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'rog_r11_preparation',
-          name: 'Preparation',
+          name: 'Contingency',
           description: 'Grants Preparation.',
           icon: 'preparation',
           effect: { grant: { ability: 'preparation' } },
@@ -883,7 +883,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'rog_r14_ghostly_strike',
-          name: 'Ghostly Strike',
+          name: 'Wraith Strike',
           description: 'Grants Ghostly Strike.',
           icon: 'ghostly_strike',
           effect: { grant: { ability: 'ghostly_strike' } },
@@ -909,7 +909,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'rog_r17_cloak_of_shadows',
-          name: 'Cloak of Shadows',
+          name: 'Shadecloak',
           description: 'Grants Cloak of Shadows.',
           icon: 'cloak_of_shadows',
           effect: { grant: { ability: 'cloak_of_shadows' } },
@@ -936,7 +936,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'rog_r20_shadowstep',
-          name: 'Shadowstep',
+          name: 'Shadeslip',
           description: 'Grants Shadowstep.',
           icon: 'shadowstep',
           effect: { grant: { ability: 'shadowstep' } },
@@ -995,14 +995,14 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pri_r8_silence',
-          name: 'Silence',
+          name: 'Silent Treatment',
           description: 'Grants Silence.',
           icon: 'silence',
           effect: { grant: { ability: 'silence' } },
         },
         {
           id: 'pri_r8_psychic_scream',
-          name: 'Psychic Scream',
+          name: 'Terror Shriek',
           description: 'Grants Psychic Scream.',
           icon: 'psychic_scream',
           effect: { grant: { ability: 'psychic_scream' } },
@@ -1022,7 +1022,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pri_r11_inner_focus',
-          name: 'Inner Focus',
+          name: 'Stilled Mind',
           description: 'Grants Inner Focus.',
           icon: 'inner_focus',
           effect: { grant: { ability: 'inner_focus' } },
@@ -1095,7 +1095,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pri_r17_desperate_prayer',
-          name: 'Desperate Prayer',
+          name: 'Last Prayer',
           description: 'Grants Desperate Prayer.',
           icon: 'desperate_prayer',
           effect: { grant: { ability: 'desperate_prayer' } },
@@ -1122,14 +1122,14 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'pri_r20_prayer_of_healing',
-          name: 'Prayer of Healing',
+          name: 'Choirmend',
           description: 'Grants Prayer of Healing.',
           icon: 'prayer_of_healing',
           effect: { grant: { ability: 'prayer_of_healing' } },
         },
         {
           id: 'pri_r20_mind_sear',
-          name: 'Mind Sear',
+          name: 'Thoughtburn',
           description: 'Grants Mind Sear.',
           icon: 'mind_sear',
           effect: { grant: { ability: 'mind_sear' } },
@@ -1238,7 +1238,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r11_healing_stream',
-          name: 'Healing Stream',
+          name: 'Springwell',
           description: 'Grants Healing Stream.',
           icon: 'healing_stream',
           effect: { grant: { ability: 'healing_stream' } },
@@ -1251,7 +1251,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'sha_r14_chain_lightning',
-          name: 'Chain Lightning',
+          name: 'Forked Lightning',
           description: 'Grants Chain Lightning.',
           icon: 'chain_lightning',
           effect: { grant: { ability: 'chain_lightning' } },
@@ -1278,7 +1278,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'sha_r17_earthbind',
-          name: 'Earthbind',
+          name: 'Gripping Earth',
           description: 'Grants Earthbind.',
           icon: 'earthbind',
           effect: { grant: { ability: 'earthbind' } },
@@ -1305,7 +1305,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'sha_r20_bloodlust',
-          name: 'Bloodlust',
+          name: 'War Drums',
           description: 'Grants Bloodlust.',
           icon: 'bloodlust',
           effect: { grant: { ability: 'bloodlust' } },
@@ -1364,21 +1364,21 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r8_spell_lock',
-          name: 'Spell Lock',
+          name: 'Gag Order',
           description: 'Grants Spell Lock.',
           icon: 'spell_lock',
           effect: { grant: { ability: 'spell_lock' } },
         },
         {
           id: 'wlk_r8_howl_of_terror',
-          name: 'Howl of Terror',
+          name: 'Dread Howl',
           description: 'Grants Howl of Terror.',
           icon: 'howl_of_terror',
           effect: { grant: { ability: 'howl_of_terror' } },
         },
         {
           id: 'wlk_r8_curse_of_exhaustion',
-          name: 'Curse of Exhaustion',
+          name: 'Leaden Hex',
           description: 'Grants Curse of Exhaustion.',
           icon: 'curse_of_exhaustion',
           effect: { grant: { ability: 'curse_of_exhaustion' } },
@@ -1450,7 +1450,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r17_death_coil',
-          name: 'Death Coil',
+          name: 'Grave Coil',
           description: 'Grants Death Coil.',
           icon: 'death_coil',
           effect: { grant: { ability: 'death_coil' } },
@@ -1477,7 +1477,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r20_chaos_bolt',
-          name: 'Chaos Bolt',
+          name: 'Ruinbolt',
           description: 'Grants Chaos Bolt.',
           icon: 'chaos_bolt',
           effect: { grant: { ability: 'chaos_bolt' } },
@@ -1546,7 +1546,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'dru_r8_skull_bash',
-          name: 'Skull Bash',
+          name: 'Headbutt',
           description: 'Grants Skull Bash.',
           icon: 'skull_bash',
           effect: { grant: { ability: 'skull_bash' } },
@@ -1573,7 +1573,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'dru_r11_innervate',
-          name: 'Innervate',
+          name: 'Lifesap',
           description: 'Grants Innervate.',
           icon: 'innervate',
           effect: { grant: { ability: 'innervate' } },
@@ -1650,7 +1650,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'dru_r17_frenzied_regeneration',
-          name: 'Frenzied Regeneration',
+          name: 'Savage Mending',
           description: 'Grants Frenzied Regeneration.',
           icon: 'frenzied_regeneration',
           effect: { grant: { ability: 'frenzied_regeneration' } },
@@ -1677,14 +1677,14 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'dru_r20_berserk',
-          name: 'Berserk',
+          name: 'Red Haze',
           description: 'Grants Berserk.',
           icon: 'berserk',
           effect: { grant: { ability: 'berserk' } },
         },
         {
           id: 'dru_r20_tranquility',
-          name: 'Tranquility',
+          name: 'Gladesong',
           description: 'Grants Tranquility.',
           icon: 'tranquility',
           effect: { grant: { ability: 'tranquility' } },
