@@ -18,8 +18,8 @@ import { GATHERING_PROFESSIONS } from '../content/professions';
 import { CLASSES, ITEMS, zoneAt } from '../data';
 import { createGroundObject } from '../entity';
 import { graveyardReadout } from '../entity_roster';
-import { generateRiftPlan } from '../rift/rift_gen';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
+import { generateRiftPlan } from '../rift/rift_gen';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -955,6 +955,23 @@ export function handleDevChat(
     });
     return null;
   }
+  // [dev] Toggle invulnerability (rides the existing GM damage-immunity funnel in
+  // dealDamage). Handy for touring the group-tuned rifts solo. Tops off HP when
+  // enabling so a mid-fight toggle is a clean reset.
+  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.gm = !e.gm;
+      if (e.gm) e.hp = e.maxHp;
+      ctx.emit({
+        type: 'log',
+        text: e.gm ? '[dev] God mode ON (invulnerable).' : '[dev] God mode OFF.',
+        color: '#b9f',
+        pid,
+      });
+    }
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -966,7 +983,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level], /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev portal [seed] [level], /dev god, /dev kill',
     );
     return null;
   }

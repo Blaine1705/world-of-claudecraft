@@ -302,6 +302,8 @@ export const V07_SLASH = [
   'Your vendor buyback list is empty.',
   'Zones (5): Aki.',
   '[dev] Added Akig to your purse.',
+  '[dev] God mode OFF.',
+  '[dev] God mode ON (invulnerable).',
   '[dev] Level set to 5.',
   '[dev] Opened a portal to Aki (5 floors, L5). Walk through it.',
   '[dev] Teleported to Aki, Aki.',
