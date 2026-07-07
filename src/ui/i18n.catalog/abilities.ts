@@ -1352,7 +1352,7 @@ const classAbilityNamesEn = {
       ],
       [
         'metamorphosis',
-        'Fiendshape',
+        'Dread Aspect',
         'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
       ],
       [
@@ -1362,17 +1362,17 @@ const classAbilityNamesEn = {
       ],
       [
         'holy_shield',
-        'Radiant Aegis',
+        'Hallowed Wall',
         'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
       ],
       [
         'bestial_wrath',
-        'Wild Fury',
+        'Howling Rage',
         'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
       ],
       [
         'trueshot_aura',
-        'Coldsight Aura',
+        'Sureflight Aura',
         'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
       ],
       [
@@ -1402,17 +1402,17 @@ const classAbilityNamesEn = {
       ],
       [
         'blade_flurry',
-        'Knifestorm',
+        'Mirrored Blades',
         'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
       ],
       [
         'hemorrhage',
-        'Deep Cut',
+        'Red Ribbon',
         'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
       ],
       [
         'power_infusion',
-        'Fervor',
+        'Anointing',
         'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
       ],
       [
@@ -1422,17 +1422,17 @@ const classAbilityNamesEn = {
       ],
       [
         'shadowform',
-        'Vesper Form',
+        'Gloamveil Form',
         'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
-        'Stormsurge',
+        'Primal Mastery',
         'Calls on the storm, making your next spell instant. (Elemental signature)',
       ],
       [
         'siphon_life',
-        'Life Leech',
+        'Veinleech',
         'Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
       ],
       [
@@ -1442,7 +1442,7 @@ const classAbilityNamesEn = {
       ],
       [
         'moonkin_form',
-        'Owl Form',
+        'Moonwing Form',
         'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
       ],
       [

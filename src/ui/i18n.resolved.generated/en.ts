@@ -6238,7 +6238,7 @@ export const en: EnTranslations = {
         "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
-        "name": "Fiendshape",
+        "name": "Dread Aspect",
         "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
       },
       "holy_shock": {
@@ -6246,15 +6246,15 @@ export const en: EnTranslations = {
         "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
       },
       "holy_shield": {
-        "name": "Radiant Aegis",
+        "name": "Hallowed Wall",
         "description": "Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
       },
       "bestial_wrath": {
-        "name": "Wild Fury",
+        "name": "Howling Rage",
         "description": "Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)"
       },
       "trueshot_aura": {
-        "name": "Coldsight Aura",
+        "name": "Sureflight Aura",
         "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
@@ -6278,15 +6278,15 @@ export const en: EnTranslations = {
         "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
       },
       "blade_flurry": {
-        "name": "Knifestorm",
+        "name": "Mirrored Blades",
         "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
       },
       "hemorrhage": {
-        "name": "Deep Cut",
+        "name": "Red Ribbon",
         "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
       },
       "power_infusion": {
-        "name": "Fervor",
+        "name": "Anointing",
         "description": "Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)"
       },
       "holy_nova": {
@@ -6294,15 +6294,15 @@ export const en: EnTranslations = {
         "description": "Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
       },
       "shadowform": {
-        "name": "Vesper Form",
+        "name": "Gloamveil Form",
         "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
       },
       "elemental_mastery": {
-        "name": "Stormsurge",
+        "name": "Primal Mastery",
         "description": "Calls on the storm, making your next spell instant. (Elemental signature)"
       },
       "siphon_life": {
-        "name": "Life Leech",
+        "name": "Veinleech",
         "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
       },
       "conflagrate": {
@@ -6310,7 +6310,7 @@ export const en: EnTranslations = {
         "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
       },
       "moonkin_form": {
-        "name": "Owl Form",
+        "name": "Moonwing Form",
         "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
       },
       "feral_charge": {
