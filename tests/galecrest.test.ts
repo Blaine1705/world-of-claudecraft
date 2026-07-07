@@ -73,8 +73,8 @@ describe('the Windway: a real walk-in border, no teleport', () => {
     expect(maxSlope).toBeLessThan(1.5); // PLAYER_MAX_CLIMB_SLOPE
   });
 
-  it('away from the isthmus the border is open water: a strait, not a wall', () => {
-    for (const z of [2680, 2760, 2960, 3040]) {
+  it('away from the isthmus the border is water: the Windmere, not a wall', () => {
+    for (const z of [2720, 2760, 2960, 3000]) {
       expect(terrainHeight(STRIP_MAX_X, z, SEED), `border at z=${z}`).toBeLessThan(WATER_LEVEL);
     }
   });

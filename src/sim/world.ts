@@ -227,6 +227,8 @@ const HOLLOW_LAND_LOBES = [
   { x: -178, z: 1190, r: 60 },
   { x: -180, z: 1255, r: 48 },
   { x: -176, z: 1080, r: 55 }, // ...and its southern reach over the old inlet
+  { x: -180, z: 1412, r: 46 }, // the corner arm carrying the Snowline cap's footing to the sound
+  { x: -118, z: 1420, r: 44 }, // the sound's north shore under the Gatewood's new west reach
 ] as const;
 const HOLLOW_BAYS = [
   // (the old bight at {182,1038} became the Mirrorshallow: see the edge arm
@@ -302,6 +304,13 @@ const EMBER_LAND_LOBES = [
   { x: 0, z: 2030, r: 80 },
   { x: -118, z: 1700, r: 42 }, // the Snowline crossing's waste-side shoulder
   { x: -152, z: 1700, r: 40 }, // ...carried to the column border
+  { x: -162, z: 1468, r: 48 }, // the Meltwater's south cap, waste side
+  { x: -118, z: 1478, r: 46 }, // the cap's shore joining the Gatewood...
+  { x: -96, z: 1528, r: 44 }, // ...so no channel runs behind it to the sound
+  { x: -162, z: 1932, r: 48 }, // the Meltwater's north cap, waste side
+  { x: -148, z: 1994, r: 50 }, // the northwest highland, joining the cap to the Goldmelt shore
+  { x: -128, z: 2022, r: 46 }, // the Goldmelt Water's west cap, waste side
+  { x: 132, z: 2010, r: 48 }, // the Goldmelt Water's east cap, waste side
 ] as const;
 const EMBER_BAYS = [
   { x: -165, z: 1600, r: 50 }, // the west bight
@@ -341,6 +350,9 @@ const FROST_LAND_LOBES = [
   { x: -274, z: 1824, r: 42 }, // the terrace road's north shoulder
   { x: -318, z: 1674, r: 40 }, // the tarn road's southern loop
   { x: -282, z: 1694, r: 38 }, // ...meeting the crossing shoulder
+  { x: -198, z: 1468, r: 48 }, // the Meltwater's south cap, ice side
+  { x: -198, z: 1930, r: 48 }, // the Meltwater's north cap, ice side
+  { x: -258, z: 1888, r: 46 }, // the shore between the Terraces and the crown, closing the cap
 ] as const;
 const FROST_BAYS = [
   { x: -195, z: 1660, r: 55 }, // the east sound
@@ -373,6 +385,13 @@ const AMBER_LAND_LOBES = [
   { x: 0, z: 2520, r: 85 }, // the north crown
   { x: -20, z: 2575, r: 55 }, // the Amberfen Steps' northern footing
   { x: 92, z: 2452, r: 40 }, // the mere lurkers' reeded shore
+  { x: -130, z: 2072, r: 48 }, // the Goldmelt Water's west cap, amber side
+  { x: 130, z: 2072, r: 48 }, // the Goldmelt Water's east cap, amber side
+  { x: 150, z: 2116, r: 46 }, // ...joined to Harvest Hollow's shelf
+  { x: -132, z: 2564, r: 50 }, // the Amber Broads' west cap, amber side
+  { x: -105, z: 2510, r: 46 }, // ...joined to the north crown and Cindermaple Rise
+  { x: 162, z: 2572, r: 50 }, // the southeast corner knot, amber quarter
+  { x: 135, z: 2500, r: 48 }, // ...joined to the Monolith heath
 ] as const;
 const AMBER_BAYS = [
   { x: 170, z: 2300, r: 55 }, // the east sound
@@ -406,6 +425,11 @@ const FEN_LAND_LOBES = [
   { x: 120, z: 2860, r: 45 }, // the Windway road's fen-side shoulder
   { x: 160, z: 2860, r: 42 }, // ...carried right up to the column border
   { x: 60, z: 2825, r: 42 }, // the east track's moor
+  { x: -132, z: 2638, r: 50 }, // the Amber Broads' west cap, fen side
+  { x: 162, z: 2630, r: 50 }, // the corner knot, fen quarter: seals the Windmere's mouth
+  { x: -162, z: 3092, r: 48 }, // the Nightwater's west cap, fen side
+  { x: -96, z: 3060, r: 44 }, // ...joined to the north fen
+  { x: 162, z: 3092, r: 48 }, // the Four Corners, fen quarter
 ] as const;
 const FEN_BAYS = [
   { x: 170, z: 2780, r: 55 }, // the east sound
@@ -472,6 +496,12 @@ const NIGHT_LAND_LOBES = [
   { x: -168, z: 3410, r: 40 }, // ...to the jungle's border
   { x: 172, z: 3400, r: 36 }, // the Dreamsedge corridor's border footing
   { x: 30, z: 3668, r: 40 }, // the Garden Gate's southern footing
+  { x: 162, z: 3148, r: 48 }, // the Four Corners, dream quarter
+  { x: -162, z: 3148, r: 48 }, // the Tanglewater's south cap, dream side
+  { x: 162, z: 3642, r: 48 }, // the Dreammere's north cap, dream side
+  { x: -162, z: 3642, r: 48 }, // the Tanglewater's north cap, dream side
+  { x: 162, z: 3660, r: 44 }, // the Moonmere's east seal, carried to the garden border
+  { x: -162, z: 3660, r: 44 }, // ...and its west twin
 ] as const;
 const NIGHT_BAYS = [
   { x: 170, z: 3380, r: 55 }, // the east sound
@@ -533,6 +563,11 @@ const WOOD_LAND_LOBES = [
   { x: 300, z: 3660, r: 42 }, // the border footing right under the pass
   { x: 214, z: 3400, r: 44 }, // the Dreamsedge crossing's wood-side shoulder
   { x: 250, z: 3400, r: 42 }, // ...under the first black eaves
+  { x: 198, z: 3146, r: 48 }, // the Four Corners, wood quarter
+  { x: 198, z: 3640, r: 48 }, // the Dreammere's north cap, wood side
+  { x: 252, z: 3652, r: 44 }, // ...joined to the Tanglemouth road's footing
+  { x: 508, z: 3224, r: 48 }, // the east eaves' shore, closing the coast under the corner
+  { x: 502, z: 3148, r: 48 }, // the Crowmere's east cap, wood side
 ] as const;
 const WOOD_BAYS = [
   { x: 530, z: 3380, r: 55 }, // the east sound
@@ -596,6 +631,11 @@ const REACH_LAND_LOBES = [
   { x: -310, z: 3676, r: 42 }, // ...carried right up to the border
   { x: -214, z: 3410, r: 44 }, // the Tanglemouth crossing's jungle-side shoulder
   { x: -252, z: 3435, r: 44 }, // ...back to the idol road
+  { x: -198, z: 3146, r: 48 }, // the Tanglewater's south cap, jungle side
+  { x: -248, z: 3160, r: 46 }, // ...joined to the shore road's back-beach
+  { x: -290, z: 3172, r: 46 }, // ...and carried onto the back-beach itself
+  { x: -198, z: 3640, r: 48 }, // the Tanglewater's north cap, jungle side
+  { x: -252, z: 3634, r: 44 }, // ...joined to the gate road's saddle
 ] as const;
 const REACH_BAYS = [
   { x: -530, z: 3370, r: 50 }, // the west reach
@@ -661,6 +701,10 @@ const GARDEN_LAND_LOBES = [
   { x: -96, z: 3828, r: 38 }, // the west lawn's elder stands dry
   { x: -46, z: 4104, r: 36 }, // the north lawn's elder too
   { x: 70, z: 3834, r: 46 }, // the pond road's east shoulder
+  { x: -162, z: 3706, r: 50 }, // the Moonmere's west cap, garden side
+  { x: -120, z: 3762, r: 46 }, // ...joined to Hedgewick's lawns
+  { x: 162, z: 3706, r: 50 }, // the Moonmere's east cap, garden side
+  { x: 128, z: 3766, r: 46 }, // ...joined to the Petal Pond's basin
 ] as const;
 const GARDEN_BAYS = [
   { x: -170, z: 3920, r: 50 }, // the west water
@@ -837,11 +881,17 @@ const GALE_LAND_LOBES = [
   { x: 300, z: 2930, r: 42 }, // the upper downs west of the saddle
   { x: 390, z: 3078, r: 44 }, // the Crowgate climb's south footing
   { x: 388, z: 3112, r: 38 }, // the Crowgate climb's border footing
+  { x: 200, z: 2632, r: 50 }, // the corner knot, gale quarter
+  { x: 250, z: 2684, r: 48 }, // the knot's shore rising onto the Howling Downs
+  { x: 200, z: 3094, r: 48 }, // the Four Corners, gale quarter
+  { x: 474, z: 3058, r: 44 }, // the east downs above the wrecks: the Crowmere's south neck
+  { x: 428, z: 3044, r: 44 }, // ...joined to the Wreckfields' back downs
+  { x: 502, z: 3092, r: 48 }, // the Crowmere's east cap, gale side
 ] as const;
 const GALE_BAYS = [
   { x: 470, z: 2810, r: 24 }, // the harbor cove in Wickharbor's lee
   { x: 530, z: 3020, r: 50 }, // the south sound
-  { x: 250, z: 3105, r: 45 }, // the north bight
+  { x: 272, z: 3096, r: 34 }, // the north bight, now a cove of the Crowmere
   { x: 535, z: 2630, r: 45 }, // the northeast water past the beacon
 ] as const;
 
@@ -870,15 +920,18 @@ function applyGaleCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam;
 }
 
-// The straits between columns: the seam blend of two adjacent coasts leaves
-// each border line hovering at the waterline (a mushy mudflat neither
+// The border meres between columns: the seam blend of two adjacent coasts
+// leaves each border line hovering at the waterline (a mushy mudflat neither
 // walkable nor swimmable); these carve every column border into honest
-// water, leaving each crossing's corridor untouched.
+// water, leaving each crossing's corridor untouched. Since the corner caps
+// landed, each carve is also windowed to its lake basin (lakeLo..lakeHi) and
+// fades out into the cap land at both ends, so the water is a landlocked
+// mere, not a sea strait.
 const COLUMN_STRAITS = [
-  { borderX: STRIP_MAX_X, passZ: 2860, zLo: GALE_ZMIN, zHi: GALE_ZMAX }, // the Windway
-  { borderX: STRIP_MIN_X, passZ: 1700, zLo: 1440, zHi: 1960 }, // the Snowline
-  { borderX: STRIP_MAX_X, passZ: 3400, zLo: 3120, zHi: 3680 }, // the Dreamsedge
-  { borderX: STRIP_MIN_X, passZ: 3410, zLo: 3120, zHi: 3680 }, // the Tanglemouth
+  { borderX: STRIP_MAX_X, passZ: 2860, zLo: GALE_ZMIN, zHi: GALE_ZMAX, lakeLo: 2676, lakeHi: 3050 }, // the Windmere
+  { borderX: STRIP_MIN_X, passZ: 1700, zLo: 1440, zHi: 1960, lakeLo: 1512, lakeHi: 1886 }, // the Meltwater
+  { borderX: STRIP_MAX_X, passZ: 3400, zLo: 3120, zHi: 3680, lakeLo: 3190, lakeHi: 3598 }, // the Dreammere
+  { borderX: STRIP_MIN_X, passZ: 3410, zLo: 3120, zHi: 3680, lakeLo: 3190, lakeHi: 3598 }, // the Tanglewater
 ] as const;
 function applyColumnStraits(x: number, z: number, h: number): number {
   let out = h;
@@ -886,7 +939,9 @@ function applyColumnStraits(x: number, z: number, h: number): number {
     if (z <= st.zLo || z > st.zHi) continue;
     const strait =
       (1 - smoothstep(2, 12, Math.abs(x - st.borderX))) *
-      smoothstep(26, 52, Math.abs(z - st.passZ));
+      smoothstep(26, 52, Math.abs(z - st.passZ)) *
+      smoothstep(st.lakeLo - 20, st.lakeLo + 20, z) *
+      (1 - smoothstep(st.lakeHi - 20, st.lakeHi + 20, z));
     if (strait <= 0) continue;
     const channel = Math.min(out, WATER_LEVEL - 2.5);
     out = out + (channel - out) * strait;
@@ -1205,6 +1260,27 @@ function applyFrostTerraces(x: number, z: number, h: number): number {
   return h + (ledge - h) * w;
 }
 
+// The continent's interior border meres: the landlocked lakes between the
+// realms' corner caps, one basin span per interior border. Ocean rules
+// (swim fatigue, rim suppression) must never treat them as open sea.
+const BORDER_LAKES = [
+  { x0: -224, x1: -136, z0: 1502, z1: 1896 }, // the Meltwater (the Snowline)
+  { x0: 136, x1: 224, z0: 2666, z1: 3060 }, // the Windmere (the Windway)
+  { x0: 136, x1: 224, z0: 3180, z1: 3608 }, // the Dreammere (the Dreamsedge)
+  { x0: -224, x1: -136, z0: 3180, z1: 3608 }, // the Tanglewater (the Tanglemouth)
+  { x0: -130, x1: 130, z0: 1998, z1: 2082 }, // the Goldmelt Water
+  { x0: -130, x1: 130, z0: 2558, z1: 2642 }, // the Amber Broads (the Amberfen)
+  { x0: -130, x1: 130, z0: 3078, z1: 3162 }, // the Nightwater (the Nightgate)
+  { x0: -130, x1: 130, z0: 3638, z1: 3722 }, // the Moonmere (the Garden Gate)
+  { x0: 232, x1: 470, z0: 3078, z1: 3162 }, // the Crowmere (the Crowgate)
+] as const;
+export function inBorderLake(x: number, z: number): boolean {
+  for (const l of BORDER_LAKES) {
+    if (x >= l.x0 && x <= l.x1 && z >= l.z0 && z <= l.z1) return true;
+  }
+  return false;
+}
+
 // The northern realms' open sea (swim fatigue + rim suppression): far enough
 // offshore that no land lobe reaches, near a true map border edge. The
 // Hollow's north edge stopped being a border when the Drakelands landed
@@ -1215,6 +1291,9 @@ export function inHollowOpenSea(x: number, z: number): boolean {
   const seaXb = worldXBoundsAt(z);
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
+  // the interior border meres are landlocked too, whatever the row's bounds
+  // do at their ends
+  if (inBorderLake(x, z)) return false;
   if (z <= HOLLOW_ZMAX + 2) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && hollowLandness(x, z) < 0.02;
