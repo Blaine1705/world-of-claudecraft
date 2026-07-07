@@ -522,6 +522,29 @@ export function zoneAt(x: number, z: number): ZoneDef {
   return fallback ?? ZONES[ZONES.length - 1];
 }
 
+// East-west extent of the world at a given z: the union of the zone rects
+// in that row. One column today (the original strip everywhere); a column
+// added east or west widens its own rows and nothing else. Beyond the world
+// ends this clamps to the nearest band, like zoneAt.
+export function worldXBoundsAt(z: number): { min: number; max: number } {
+  let min = Infinity;
+  let max = -Infinity;
+  for (const zone of ZONES) {
+    if (z < zone.zMin || z >= zone.zMax) continue;
+    min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
+    max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
+  }
+  if (min > max) {
+    const band = zoneAt(0, z);
+    for (const zone of ZONES) {
+      if (zone.zMin !== band.zMin || zone.zMax !== band.zMax) continue;
+      min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
+      max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
+    }
+  }
+  return { min, max };
+}
+
 export function zoneWelcomeText(
   zone: ZoneDef,
   questState: (questId: string) => QuestState,

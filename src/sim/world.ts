@@ -9,10 +9,11 @@ import {
   WORLD_MAX_Z,
   WORLD_MIN_X,
   WORLD_MIN_Z,
+  worldXBoundsAt,
   ZONES,
 } from './data';
 import { fbm2, hash2, noise2 } from './rng';
-import type { BiomeId } from './types';
+import type { BiomeId, ZoneDef } from './types';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
 // and the renderer (mesh) sample the same heightfield, so they always agree.
@@ -51,20 +52,78 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   garden: { hill: 9, base: 1.8, hubHeight: 2 },
 };
 
-// Ridge walls between zone bands, each opened by a road pass. A zone with
-// sealedSouthBorder instead gets a taller, narrower wall with NO pass, its
-// crest shifted into the sealed zone's own band so the southern neighbor's
-// border content keeps (nearly) its original ground. Sealed zones are entered
-// only through a portal (see portals content).
-const ZONE_RIDGES: { z: number; passX: number; sealed: boolean }[] = [];
-for (let i = 0; i + 1 < ZONES.length; i++) {
-  const sealed = ZONES[i + 1].sealedSouthBorder === true;
-  ZONE_RIDGES.push({
-    z: ZONES[i].zMax + (sealed ? 15 : 0),
-    passX: ZONES[i + 1].southPassX ?? 0,
-    sealed,
-  });
+// Ridge walls along every shared zone edge, each opened by a road pass. A
+// zone with sealedSouthBorder instead gets a taller, narrower wall with NO
+// pass, its crest shifted into the sealed zone's own band so the southern
+// neighbor's border content keeps (nearly) its original ground. Sealed
+// zones are entered only through a portal (see portals content).
+//
+// The world is a GRID of zone rectangles (see data.ts zoneAt): horizontal
+// edges separate north-south neighbors (the classic band borders) and
+// vertical edges separate east-west columns with the same math rotated a
+// quarter turn. An edge that spans its whole world row keeps the classic
+// unbounded ridge (byte-identical to the strip era); a partial edge
+// feathers to nothing past its span ends.
+export interface BorderEdge {
+  kind: 'h' | 'v';
+  at: number; // the edge line: z for 'h', x for 'v'
+  lo: number; // span start along the edge (x for 'h', z for 'v')
+  hi: number; // span end
+  fullRow: boolean; // spans the whole world row: no end feather
+  passAt: number; // pass coordinate along the span
+  sealed: boolean;
 }
+
+/** All shared edges between adjacent zone rects (pure; exported for tests). */
+export function computeBorderEdges(zones: readonly ZoneDef[]): BorderEdge[] {
+  const zx0 = (zn: ZoneDef) => zn.xMin ?? STRIP_MIN_X;
+  const zx1 = (zn: ZoneDef) => zn.xMax ?? STRIP_MAX_X;
+  const edges: BorderEdge[] = [];
+  for (const a of zones) {
+    for (const b of zones) {
+      // horizontal edge: b sits directly north of a, rects overlapping in x
+      if (a.zMax === b.zMin) {
+        const lo = Math.max(zx0(a), zx0(b));
+        const hi = Math.min(zx1(a), zx1(b));
+        if (hi - lo > 1) {
+          const sealed = b.sealedSouthBorder === true;
+          // full row = nothing in either adjacent row lies beyond this span
+          const fullRow =
+            zones.every((zn) => zn.zMin !== b.zMin || (zx0(zn) >= lo && zx1(zn) <= hi)) &&
+            zones.every((zn) => zn.zMax !== a.zMax || (zx0(zn) >= lo && zx1(zn) <= hi));
+          edges.push({
+            kind: 'h',
+            at: a.zMax + (sealed ? 15 : 0),
+            lo,
+            hi,
+            fullRow,
+            passAt: b.southPassX ?? 0,
+            sealed,
+          });
+        }
+      }
+      // vertical edge: b sits directly east of a, rects overlapping in z
+      if (zx1(a) === zx0(b)) {
+        const lo = Math.max(a.zMin, b.zMin);
+        const hi = Math.min(a.zMax, b.zMax);
+        if (hi - lo > 1) {
+          edges.push({
+            kind: 'v',
+            at: zx1(a),
+            lo,
+            hi,
+            fullRow: false, // a column border never spans the world's full z
+            passAt: b.westPassZ ?? a.eastPassZ ?? (lo + hi) / 2,
+            sealed: false,
+          });
+        }
+      }
+    }
+  }
+  return edges;
+}
+
+const BORDER_EDGES: readonly BorderEdge[] = computeBorderEdges(ZONES);
 const RIDGE_HEIGHT = 22;
 const RIDGE_SIGMA = 18; // gaussian width of the wall
 // Sealed walls: tall and steep enough that the straight-approach gradient
@@ -79,9 +138,9 @@ const SEALED_RIDGE_SIGMA = 12;
 
 // Crest z of every sealed border: an uncrossable line for swept movement.
 // Portal teleports assign positions directly and are unaffected.
-export const SEALED_BORDER_ZS: readonly number[] = ZONE_RIDGES.filter((r) => r.sealed).map(
-  (r) => r.z,
-);
+export const SEALED_BORDER_ZS: readonly number[] = BORDER_EDGES.filter(
+  (e) => e.kind === 'h' && e.sealed,
+).map((e) => e.at);
 
 export function crossesSealedBorder(z0: number, z1: number): boolean {
   for (const zc of SEALED_BORDER_ZS) {
@@ -999,42 +1058,43 @@ function applyFrostTerraces(x: number, z: number, h: number): number {
 // is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
   if (z < 960 || x > DUNGEON_X_THRESHOLD) return false;
+  const seaXb = worldXBoundsAt(z);
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
   if (z <= HOLLOW_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && hollowLandness(x, z) < 0.02;
   }
   if (z <= DRAKE_ZMAX) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && emberLandness(x, z) < 0.02;
   }
   if (z <= FROST_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && frostLandness(x, z) < 0.02;
   }
   if (z <= AMBER_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && amberLandness(x, z) < 0.02;
   }
   if (z <= FEN_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && fenLandness(x, z) < 0.02;
   }
   if (z <= NIGHT_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && nightLandness(x, z) < 0.02;
   }
   if (z <= WOOD_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && woodLandness(x, z) < 0.02;
   }
   if (z <= REACH_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
     return dEdge < 48 && reachLandness(x, z) < 0.02;
   }
   if (z <= GARDEN_ZMAX + 2) {
-    const dEdge = Math.min(x + 180, 180 - x, GARDEN_ZMAX - z);
+    const dEdge = Math.min(x - seaXb.min, seaXb.max - x, GARDEN_ZMAX - z);
     return dEdge < 48 && gardenLandness(x, z) < 0.02;
   }
   return false;
@@ -1196,27 +1256,32 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     }
   }
 
-  // Mountain ridge walls between zones, pierced by the road pass (sealed
-  // walls have no pass and only ever grow past their base height, so no
-  // crest dip opens a climbable notch)
-  for (const ridge of ZONE_RIDGES) {
-    const sigma = ridge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
-    const dz = Math.abs(z - ridge.z);
-    if (dz < sigma * 3) {
-      const profile = Math.exp(-(dz * dz) / (2 * sigma * sigma));
-      const pass = ridge.sealed
+  // Mountain ridge walls along shared zone edges, pierced by the road pass
+  // (sealed walls have no pass and only ever grow past their base height,
+  // so no crest dip opens a climbable notch)
+  for (const edge of BORDER_EDGES) {
+    const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
+    const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
+    if (dPerp < sigma * 3) {
+      const along = edge.kind === 'h' ? x : z;
+      const profile = Math.exp(-(dPerp * dPerp) / (2 * sigma * sigma));
+      const pass = edge.sealed
         ? 1
-        : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
+        : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(along - edge.passAt));
       // jagged crest so the wall reads as mountains, not a berm
-      const crestNoise = (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.7;
-      const crest = 1 + (ridge.sealed ? Math.abs(crestNoise) : crestNoise);
-      const height = ridge.sealed ? SEALED_RIDGE_HEIGHT : RIDGE_HEIGHT;
+      const crestNoise =
+        edge.kind === 'h'
+          ? (fbm2(x * 0.03, edge.at * 0.03, seed + 19, 2) - 0.5) * 0.7
+          : (fbm2(edge.at * 0.03, z * 0.03, seed + 19, 2) - 0.5) * 0.7;
+      const crest = 1 + (edge.sealed ? Math.abs(crestNoise) : crestNoise);
+      const height = edge.sealed ? SEALED_RIDGE_HEIGHT : RIDGE_HEIGHT;
       // The Hollow/Drakelands boundary ridge rises only where there is land
       // to carry it (the Wyrmgate mountains around the causeway head); over
       // the open sea the two realms' waters simply meet. Sealed walls are
       // never gated: the Drakemaw range runs down into the sea at its flanks.
       let seaGate = 1;
-      if (!ridge.sealed && ridge.z >= HOLLOW_ZMAX) {
+      const northern = edge.kind === 'h' ? edge.at >= HOLLOW_ZMAX : edge.lo >= HOLLOW_ZMAX;
+      if (!edge.sealed && northern) {
         seaGate = smoothstep(
           0.005,
           0.06,
@@ -1233,7 +1298,14 @@ export function terrainHeight(x: number, z: number, seed: number): number {
           ),
         );
       }
-      h += height * crest * profile * pass * seaGate;
+      // a partial edge (a column border, or a band split by columns) fades
+      // out past its span; a full-row edge keeps the classic unbounded wall
+      let end = 1;
+      if (!edge.fullRow) {
+        const outside = Math.max(edge.lo - along, along - edge.hi, 0);
+        end = 1 - smoothstep(0, 24, outside);
+      }
+      h += height * crest * profile * pass * seaGate * end;
     }
   }
 
@@ -1265,7 +1337,8 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // by it. The NORTH rim is suppressed over the Hollow's open sea: looking
   // out from the shore reads as water meeting sky, and swim fatigue (not a
   // wall) turns swimmers back before the band edge.
-  let rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
+  const xb = worldXBoundsAt(z);
+  let rimX = Math.max(smoothstep(xb.max - 30, xb.max, x), smoothstep(-xb.min - 30, -xb.min, -x));
   const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
   let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
   if (inHollowOpenSea(x, z)) {
