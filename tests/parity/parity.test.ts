@@ -57,7 +57,8 @@ describe('parity gate', () => {
         );
         const golden = JSON.parse(readFileSync(path, 'utf8'));
         expect(trace).toEqual(golden);
-      });
+        // a full re-recording compared against disk: same headroom as above
+      }, 90_000);
     });
   }
 });

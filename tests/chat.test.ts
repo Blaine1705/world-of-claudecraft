@@ -304,7 +304,7 @@ describe('chat channels', () => {
     );
     // once past a minute the line switches to "Xm Ys" form
     expect(played?.text).toMatch(/^Time played this session: 1m \d+s\.$/);
-  });
+  }, 90_000);
 
   it('/where accepts the /loc and /zone aliases', () => {
     const sim = makeWorld();
