@@ -2495,6 +2495,159 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': 'Tas Kulit Serigala',
   'entities.items.gravewoven_bag.name': 'Tas Tenunan Makam',
   'entities.items.mistcallers_duffel.name': 'Tas Fogbinder',
+  'entities.abilities.aspect_of_the_wild.name': 'Rupa Taring Liar',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a di dekat sekutu con fuerza salvaje, aumentando daya serang durante 5 mnt. (talenta hunter)',
+  'entities.abilities.avatar.name': 'Kolosus',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta daya serang durante 20 detik. (talenta warrior)',
+  'entities.abilities.avenging_wrath.name': 'Sayap Pembalas',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta daya serang y daya sihir durante 20 detik. (talenta paladin)',
+  'entities.abilities.berserk.name': 'Kabut Merah',
+  'entities.abilities.berserk.description':
+    'Aumenta daya serang durante 15 detik. (talenta druid)',
+  'entities.abilities.bladestorm.name': 'Siklon Baja',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a di dekat musuh cada segundo por {damage}. (talenta warrior)',
+  'entities.abilities.blink.name': 'Langkah Kilat',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (talenta mage)',
+  'entities.abilities.bloodlust.name': 'Genderang Perang',
+  'entities.abilities.bloodlust.description':
+    'Lleva a di dekat sekutu al frenesí y aumenta su velocidad de ataque durante 15 detik. (talenta shaman)',
+  'entities.abilities.chain_lightning.name': 'Petir Bercabang',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a di dekat musuh. (talenta shaman)',
+  'entities.abilities.chaos_bolt.name': 'Baut Reruntuhan',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Api. (talenta warlock)',
+  'entities.abilities.cloak_of_shadows.name': 'Jubah Bayang',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 detik. (talenta rogue)',
+  'entities.abilities.cone_of_cold.name': 'Sapuan Beku',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a di dekat musuh con escarcha e inflige {damage} de daño de Es. (talenta mage)',
+  'entities.abilities.counter_shot.name': 'Tembakan Peredam',
+  'entities.abilities.counter_shot.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta hunter)',
+  'entities.abilities.counterspell.name': 'Pematah Mantra',
+  'entities.abilities.counterspell.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 6 detik. (talenta mage)',
+  'entities.abilities.curse_of_exhaustion.name': 'Kutuk Timah',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a target y reduce su velocidad de movimiento un 30% durante 12 detik. (talenta warlock)',
+  'entities.abilities.death_coil.name': 'Kumparan Kubur',
+  'entities.abilities.death_coil.description':
+    'Golpea a target por {damage} de daño de Bayangan y luego lo aterroriza durante 3 detik. Esta versión no sana al lanzador. (talenta warlock)',
+  'entities.abilities.deep_freeze.name': 'Embun Mati',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a target, inflige {damage} de daño de Es y lo aturde durante 4 detik. (talenta mage)',
+  'entities.abilities.desperate_prayer.name': 'Doa Terakhir',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (talenta priest)',
+  'entities.abilities.deterrence.name': 'Penjaga Duri',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu peluang menghindar un 50% durante 10 detik. (talenta hunter)',
+  'entities.abilities.divine_shield.name': 'Pelindung Cahaya',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 detik. (talenta paladin)',
+  'entities.abilities.earthbind.name': 'Bumi Mencengkeram',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a di dekat musuh y los inmoviliza durante 2 detik. (talenta shaman)',
+  'entities.abilities.evocation.name': 'Sumur Eter',
+  'entities.abilities.evocation.description':
+    'Restaura mana rápidamente. (talenta mage)',
+  'entities.abilities.frenzied_regeneration.name': 'Pemulihan Liar',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 detik. Solo en Forma de oso. (talenta druid)',
+  'entities.abilities.frost_trap.name': 'Jerat Rima',
+  'entities.abilities.frost_trap.description':
+    'Congela a los musuh en el área objetivo durante 3 detik. (talenta hunter)',
+  'entities.abilities.ghostly_strike.name': 'Serangan Arwah',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a target por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talenta rogue)',
+  'entities.abilities.hammer_of_wrath.name': 'Palu Berdentang',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Suci. Solo se usa por debajo del 20% de salud. (talenta paladin)',
+  'entities.abilities.healing_stream.name': 'Mata Air',
+  'entities.abilities.healing_stream.description':
+    'Restaura a target sekutu durante 12 detik. (talenta shaman)',
+  'entities.abilities.heroic_leap.name': 'Lompatan Perang',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño Fisik a di dekat musuh. (talenta warrior)',
+  'entities.abilities.holy_wrath.name': 'Murka Santo',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a di dekat musuh. (talenta paladin)',
+  'entities.abilities.howl_of_terror.name': 'Lolongan Ngeri',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a di dekat musuh hasta 3 detik. El daño puede romper el efecto. (talenta warlock)',
+  'entities.abilities.ice_block.name': 'Peti Es',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)',
+  'entities.abilities.inner_focus.name': 'Pikiran Hening',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 detik. (talenta priest)',
+  'entities.abilities.innervate.name': 'Getah Hidup',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu sumber daya saat ini. (talenta druid)',
+  'entities.abilities.kick.name': 'Tendang',
+  'entities.abilities.kick.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta rogue)',
+  'entities.abilities.last_stand.name': 'Jam Kesebelas',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Stamina durante 15 detik, aumentando la salud máxima. (talenta warrior)',
+  'entities.abilities.mend_pet.name': 'Tambal Luka',
+  'entities.abilities.mend_pet.description':
+    'Sana a target sekutu por {damage} durante 15 detik. (talenta hunter)',
+  'entities.abilities.meteor.name': 'Batu Langit',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Api y quema el suelo. (talenta mage)',
+  'entities.abilities.mind_sear.name': 'Bakar Pikir',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Bayangan en el área objetivo e inflige {damage} cada segundo a di dekat musuh. (talenta priest)',
+  'entities.abilities.multi_shot.name': 'Tembakan Pecah',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a di dekat musuh. (talenta hunter)',
+  'entities.abilities.prayer_of_healing.name': 'Penyembuhan Koor',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a di dekat sekutu por {damage}. (talenta priest)',
+  'entities.abilities.preparation.name': 'Rencana Cadangan',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talenta rogue)',
+  'entities.abilities.presence_of_mind.name': 'Pikiran Melaju',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)',
+  'entities.abilities.psychic_scream.name': 'Jerit Psikis',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a di dekat musuh hasta 4 detik. El daño puede romper el efecto. (talenta priest)',
+  'entities.abilities.pummel.name': 'Pukul Hantam',
+  'entities.abilities.pummel.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta warrior)',
+  'entities.abilities.rallying_cry.name': 'Seruan Kumpul',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta daya serang de di dekat sekutu durante 10 detik. (talenta warrior)',
+  'entities.abilities.rebuke.name': 'Teguran',
+  'entities.abilities.rebuke.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta paladin)',
+  'entities.abilities.shadowstep.name': 'Selip Bayang',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu target. (talenta rogue)',
+  'entities.abilities.shield_wall.name': 'Benteng',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la armor durante 10 detik. (talenta warrior)',
+  'entities.abilities.silence.name': 'Senyap',
+  'entities.abilities.silence.description':
+    'Silencia a target durante 4 detik. (talenta priest)',
+  'entities.abilities.skull_bash.name': 'Benturan Kepala',
+  'entities.abilities.skull_bash.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta druid)',
+  'entities.abilities.spell_lock.name': 'Perintah Bungkam',
+  'entities.abilities.spell_lock.description':
+    'Menghentikan perapalan dan mencegah mantra sekolah itu selama 5 detik. (talenta warlock)',
+  'entities.abilities.tranquility.name': 'Lagu Rimba',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a di dekat sekutu cada segundo. (talenta druid)',
   'entities.items.worn_sword.name': 'Pedang Pendek Berkarat',
   'entities.items.woven_robe.name': 'Jubah Tenun Lembah',
   'entities.items.wyrmcult_grand_robe.name': 'Jubah Agung Sekte Wyrm',

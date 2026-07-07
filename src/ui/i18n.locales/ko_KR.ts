@@ -2611,6 +2611,159 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': '악마 변신',
   'entities.abilities.metamorphosis.description':
     '악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)',
+  'entities.abilities.aspect_of_the_wild.name': '야생송곳니 형상',
+  'entities.abilities.aspect_of_the_wild.description':
+    '야생의 힘으로 주위 아군을 고무하여 전투력을 높입니다. 5분 동안 지속됩니다. (사냥꾼 특성)',
+  'entities.abilities.avatar.name': '거상',
+  'entities.abilities.avatar.description':
+    '거상으로 변신하여 전투력을 높입니다. 20초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.avenging_wrath.name': '응징의 날개',
+  'entities.abilities.avenging_wrath.description':
+    '복수의 힘을 내려 전투력과 주문력을 높입니다. 20초 동안 지속됩니다. (성기사 특성)',
+  'entities.abilities.berserk.name': '붉은 안개',
+  'entities.abilities.berserk.description':
+    '전투력을 높입니다. 15초 동안 지속됩니다. (드루이드 특성)',
+  'entities.abilities.bladestorm.name': '강철 회오리',
+  'entities.abilities.bladestorm.description':
+    '강철의 폭풍이 되어 매초 주위 적에게 {damage}의 피해를 입힙니다. (전사 특성)',
+  'entities.abilities.blink.name': '섬광걸음',
+  'entities.abilities.blink.description':
+    '전방 15미터로 순간이동하며 이동 불가 효과를 해제합니다. (마법사 특성)',
+  'entities.abilities.bloodlust.name': '전쟁 북',
+  'entities.abilities.bloodlust.description':
+    '주위 아군을 광란에 빠뜨려 공격 속도를 높입니다. 15초 동안 지속됩니다. (주술사 특성)',
+  'entities.abilities.chain_lightning.name': '갈래 번개',
+  'entities.abilities.chain_lightning.description':
+    '대상 지역에 번개를 던져 주위 적에게 {damage}의 피해를 입힙니다. (주술사 특성)',
+  'entities.abilities.chaos_bolt.name': '파멸 화살',
+  'entities.abilities.chaos_bolt.description':
+    '혼돈의 화염 화살을 발사하여 {damage}의 화염 피해를 입힙니다. (흑마법사 특성)',
+  'entities.abilities.cloak_of_shadows.name': '그림자망토',
+  'entities.abilities.cloak_of_shadows.description':
+    '그림자로 몸을 감싸 피해를 흡수합니다. 5초 동안 지속됩니다. (도적 특성)',
+  'entities.abilities.cone_of_cold.name': '서리휩쓸기',
+  'entities.abilities.cone_of_cold.description':
+    '주위 적을 냉기로 강타하여 {damage}의 냉기 피해를 입힙니다. (마법사 특성)',
+  'entities.abilities.counter_shot.name': '침묵 사격',
+  'entities.abilities.counter_shot.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (사냥꾼 특성)',
+  'entities.abilities.counterspell.name': '주문파괴',
+  'entities.abilities.counterspell.description':
+    '적의 시전을 차단하고 해당 계열 주문을 6초 동안 시전할 수 없게 만듭니다. (마법사 특성)',
+  'entities.abilities.curse_of_exhaustion.name': '납빛 저주',
+  'entities.abilities.curse_of_exhaustion.description':
+    '대상을 저주하여 이동 속도를 30% 늦춥니다. 12초 동안 지속됩니다. (흑마법사 특성)',
+  'entities.abilities.death_coil.name': '무덤 고리',
+  'entities.abilities.death_coil.description':
+    '적에게 {damage}의 암흑 피해를 입힌 뒤 3초 동안 공포에 빠뜨립니다. 이 주문은 시전자를 치유하지 않습니다. (흑마법사 특성)',
+  'entities.abilities.deep_freeze.name': '죽은서리',
+  'entities.abilities.deep_freeze.description':
+    '대상을 깊이 얼려 {damage}의 냉기 피해를 입히고 4초 동안 기절시킵니다. (마법사 특성)',
+  'entities.abilities.desperate_prayer.name': '마지막 기도',
+  'entities.abilities.desperate_prayer.description':
+    '자신을 즉시 {damage}만큼 치유합니다. (사제 특성)',
+  'entities.abilities.deterrence.name': '가시수호',
+  'entities.abilities.deterrence.description':
+    '회피율을 50% 높입니다. 10초 동안 지속됩니다. (사냥꾼 특성)',
+  'entities.abilities.divine_shield.name': '빛의 수호',
+  'entities.abilities.divine_shield.description':
+    '신성한 힘으로 자신을 보호하여 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (성기사 특성)',
+  'entities.abilities.earthbind.name': '붙드는 대지',
+  'entities.abilities.earthbind.description':
+    '주위 적을 대지에 옭아매어 2초 동안 이동 불가로 만듭니다. (주술사 특성)',
+  'entities.abilities.evocation.name': '에테르샘',
+  'entities.abilities.evocation.description':
+    '마나를 빠르게 회복합니다. (마법사 특성)',
+  'entities.abilities.frenzied_regeneration.name': '야성 치유',
+  'entities.abilities.frenzied_regeneration.description':
+    '10초에 걸쳐 생명력을 회복합니다. 브루인 형상에서만 사용할 수 있습니다. (드루이드 특성)',
+  'entities.abilities.frost_trap.name': '서리덫',
+  'entities.abilities.frost_trap.description':
+    '대상 지역의 적을 3초 동안 그 자리에 얼립니다. (사냥꾼 특성)',
+  'entities.abilities.ghostly_strike.name': '망령의 일격',
+  'entities.abilities.ghostly_strike.description':
+    '적에게 무기 피해에 더해 {damage}의 피해를 입히고 잠시 회피율을 높입니다. 연계 점수를 1점 얻습니다. (도적 특성)',
+  'entities.abilities.hammer_of_wrath.name': '울림 망치',
+  'entities.abilities.hammer_of_wrath.description':
+    '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)',
+  'entities.abilities.healing_stream.name': '샘물',
+  'entities.abilities.healing_stream.description':
+    '12초에 걸쳐 아군 대상을 치유합니다. (주술사 특성)',
+  'entities.abilities.heroic_leap.name': '전쟁도약',
+  'entities.abilities.heroic_leap.description':
+    '대상 지역으로 도약하여 주위 적에게 {damage}의 물리 피해를 입힙니다. (전사 특성)',
+  'entities.abilities.holy_wrath.name': '성자의 분노',
+  'entities.abilities.holy_wrath.description':
+    '신성한 힘을 발산하여 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)',
+  'entities.abilities.howl_of_terror.name': '공포의 울부짖음',
+  'entities.abilities.howl_of_terror.description':
+    '주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (흑마법사 특성)',
+  'entities.abilities.ice_block.name': '차가운 관',
+  'entities.abilities.ice_block.description':
+    '자신을 얼음 속에 가두어 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (마법사 특성)',
+  'entities.abilities.inner_focus.name': '고요한 마음',
+  'entities.abilities.inner_focus.description':
+    '다음 주문의 소모값을 없앱니다. 60초 동안 지속됩니다. (사제 특성)',
+  'entities.abilities.innervate.name': '생명 수액',
+  'entities.abilities.innervate.description':
+    '현재 자원을 즉시 200 회복합니다. (드루이드 특성)',
+  'entities.abilities.kick.name': '발차기',
+  'entities.abilities.kick.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (도적 특성)',
+  'entities.abilities.last_stand.name': '열한 번째 시각',
+  'entities.abilities.last_stand.description':
+    '일시적으로 체력을 높여 최대 생명력을 증가시킵니다. 15초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.mend_pet.name': '응급처치',
+  'entities.abilities.mend_pet.description':
+    '15초에 걸쳐 아군 대상을 {damage}만큼 치유합니다. (사냥꾼 특성)',
+  'entities.abilities.meteor.name': '하늘돌',
+  'entities.abilities.meteor.description':
+    '대상 지역에 운석을 떨어뜨려 {damage}의 화염 피해를 입히고 지면을 불태웁니다. (마법사 특성)',
+  'entities.abilities.mind_sear.name': '생각불꽃',
+  'entities.abilities.mind_sear.description':
+    '대상 지역에 암흑 기운을 퍼부어 매초 주위 적에게 {damage}의 피해를 입힙니다. (사제 특성)',
+  'entities.abilities.multi_shot.name': '분산 사격',
+  'entities.abilities.multi_shot.description':
+    '여러 발의 화살을 쏘아 주위 적에게 {damage}의 피해를 입힙니다. (사냥꾼 특성)',
+  'entities.abilities.prayer_of_healing.name': '성가 치유',
+  'entities.abilities.prayer_of_healing.description':
+    '주위 아군을 {damage}만큼 치유합니다. (사제 특성)',
+  'entities.abilities.preparation.name': '대비책',
+  'entities.abilities.preparation.description':
+    '전력 질주, 회피, 소멸의 재사용 대기시간을 초기화합니다. (도적 특성)',
+  'entities.abilities.presence_of_mind.name': '질주하는 정신',
+  'entities.abilities.presence_of_mind.description':
+    '시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)',
+  'entities.abilities.psychic_scream.name': '정신의 절규',
+  'entities.abilities.psychic_scream.description':
+    '주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (사제 특성)',
+  'entities.abilities.pummel.name': '턱 부수기',
+  'entities.abilities.pummel.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (전사 특성)',
+  'entities.abilities.rallying_cry.name': '집결',
+  'entities.abilities.rallying_cry.description':
+    '결집의 함성을 질러 주위 아군의 전투력을 높입니다. 10초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.rebuke.name': '꾸짖음',
+  'entities.abilities.rebuke.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (성기사 특성)',
+  'entities.abilities.shadowstep.name': '그림자걸음',
+  'entities.abilities.shadowstep.description':
+    '그림자를 통과해 대상 곁으로 이동합니다. (도적 특성)',
+  'entities.abilities.shield_wall.name': '보루',
+  'entities.abilities.shield_wall.description':
+    '무너지지 않는 방벽을 세워 방어도를 크게 높입니다. 10초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.silence.name': '침묵',
+  'entities.abilities.silence.description':
+    '대상을 4초 동안 침묵시킵니다. (사제 특성)',
+  'entities.abilities.skull_bash.name': '박치기',
+  'entities.abilities.skull_bash.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (드루이드 특성)',
+  'entities.abilities.spell_lock.name': '재갈 명령',
+  'entities.abilities.spell_lock.description':
+    '시전을 차단하고 해당 계열 주문을 5초 동안 시전할 수 없게 만듭니다. (흑마법사 특성)',
+  'entities.abilities.tranquility.name': '숲노래',
+  'entities.abilities.tranquility.description':
+    '회복의 기운을 쏟아 매초 주위 아군을 치유합니다. (드루이드 특성)',
   'entities.items.worn_sword.name': '흠집 난 쇼트소드',
   'entities.items.gnarled_staff.name': '늪참나무 지팡이',
   'entities.items.rusty_dagger.name': '녹슨 단검',

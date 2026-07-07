@@ -3675,6 +3675,159 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': 'Métamorphose',
   'entities.abilities.metamorphosis.description':
     'Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)',
+  'entities.abilities.aspect_of_the_wild.name': 'Apparence du Croc-sauvage',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a proches alliés con fuerza salvaje, aumentando puissance d’attaque durante 5 min. (talent de chasseur)',
+  'entities.abilities.avatar.name': 'Colosse',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta puissance d’attaque durante 20 s. (talent de guerrier)',
+  'entities.abilities.avenging_wrath.name': 'Aile vengeresse',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta puissance d’attaque y puissance des sorts durante 20 s. (talent de paladin)',
+  'entities.abilities.berserk.name': 'Brume rouge',
+  'entities.abilities.berserk.description':
+    'Aumenta puissance d’attaque durante 15 s. (talent de druide)',
+  'entities.abilities.bladestorm.name': 'Cyclone d’acier',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a proches ennemis cada segundo por {damage}. (talent de guerrier)',
+  'entities.abilities.blink.name': 'Pas scintillant',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (talent de mage)',
+  'entities.abilities.bloodlust.name': 'Tambours de guerre',
+  'entities.abilities.bloodlust.description':
+    'Lleva a proches alliés al frenesí y aumenta su velocidad de ataque durante 15 s. (talent de chaman)',
+  'entities.abilities.chain_lightning.name': 'Éclair fourchu',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a proches ennemis. (talent de chaman)',
+  'entities.abilities.chaos_bolt.name': 'Trait de ruine',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Feu. (talent de démoniste)',
+  'entities.abilities.cloak_of_shadows.name': 'Cape d’ombre',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 s. (talent de voleur)',
+  'entities.abilities.cone_of_cold.name': 'Balayage de givre',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a proches ennemis con escarcha e inflige {damage} de daño de Givre. (talent de mage)',
+  'entities.abilities.counter_shot.name': 'Tir assourdissant',
+  'entities.abilities.counter_shot.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de chasseur)',
+  'entities.abilities.counterspell.name': 'Brise-sort',
+  'entities.abilities.counterspell.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 6 s. (talent de mage)',
+  'entities.abilities.curse_of_exhaustion.name': 'Maléfice de plomb',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a cible y reduce su velocidad de movimiento un 30% durante 12 s. (talent de démoniste)',
+  'entities.abilities.death_coil.name': 'Spirale funèbre',
+  'entities.abilities.death_coil.description':
+    'Golpea a cible por {damage} de daño de Ombre y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talent de démoniste)',
+  'entities.abilities.deep_freeze.name': 'Gel mort',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a cible, inflige {damage} de daño de Givre y lo aturde durante 4 s. (talent de mage)',
+  'entities.abilities.desperate_prayer.name': 'Dernière prière',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (talent de prêtre)',
+  'entities.abilities.deterrence.name': 'Garde-hérissée',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu chances d’esquive un 50% durante 10 s. (talent de chasseur)',
+  'entities.abilities.divine_shield.name': 'Garde-lumière',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talent de paladin)',
+  'entities.abilities.earthbind.name': 'Terre agrippante',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a proches ennemis y los inmoviliza durante 2 s. (talent de chaman)',
+  'entities.abilities.evocation.name': 'Puits d’éther',
+  'entities.abilities.evocation.description':
+    'Restaura mana rápidamente. (talent de mage)',
+  'entities.abilities.frenzied_regeneration.name': 'Régénération sauvage',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 s. Solo en Forma de oso. (talent de druide)',
+  'entities.abilities.frost_trap.name': 'Piège de givre',
+  'entities.abilities.frost_trap.description':
+    'Congela a los ennemis en el área objetivo durante 3 s. (talent de chasseur)',
+  'entities.abilities.ghostly_strike.name': 'Frappe spectrale',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a cible por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talent de voleur)',
+  'entities.abilities.hammer_of_wrath.name': 'Marteau sonnant',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sacré. Solo se usa por debajo del 20% de salud. (talent de paladin)',
+  'entities.abilities.healing_stream.name': 'Puits de source',
+  'entities.abilities.healing_stream.description':
+    'Restaura a cible alliée durante 12 s. (talent de chaman)',
+  'entities.abilities.heroic_leap.name': 'Bond de guerre',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño Physique a proches ennemis. (talent de guerrier)',
+  'entities.abilities.holy_wrath.name': 'Courroux du saint',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a proches ennemis. (talent de paladin)',
+  'entities.abilities.howl_of_terror.name': 'Hurlement d’effroi',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a proches ennemis hasta 3 s. El daño puede romper el efecto. (talent de démoniste)',
+  'entities.abilities.ice_block.name': 'Cercueil froid',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)',
+  'entities.abilities.inner_focus.name': 'Esprit apaisé',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talent de prêtre)',
+  'entities.abilities.innervate.name': 'Sève vitale',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu ressource actuelle. (talent de druide)',
+  'entities.abilities.kick.name': 'Botte',
+  'entities.abilities.kick.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de voleur)',
+  'entities.abilities.last_stand.name': 'Onzième heure',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Endurance durante 15 s, aumentando la salud máxima. (talent de guerrier)',
+  'entities.abilities.mend_pet.name': 'Rapiécer',
+  'entities.abilities.mend_pet.description':
+    'Sana a cible alliée por {damage} durante 15 s. (talent de chasseur)',
+  'entities.abilities.meteor.name': 'Pierre du ciel',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Feu y quema el suelo. (talent de mage)',
+  'entities.abilities.mind_sear.name': 'Brûle-pensée',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Ombre en el área objetivo e inflige {damage} cada segundo a proches ennemis. (talent de prêtre)',
+  'entities.abilities.multi_shot.name': 'Tir fendu',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a proches ennemis. (talent de chasseur)',
+  'entities.abilities.prayer_of_healing.name': 'Soin du chœur',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a proches alliés por {damage}. (talent de prêtre)',
+  'entities.abilities.preparation.name': 'Contingence',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talent de voleur)',
+  'entities.abilities.presence_of_mind.name': 'Esprit fulgurant',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)',
+  'entities.abilities.psychic_scream.name': 'Cri psychique',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a proches ennemis hasta 4 s. El daño puede romper el efecto. (talent de prêtre)',
+  'entities.abilities.pummel.name': 'Rossée',
+  'entities.abilities.pummel.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de guerrier)',
+  'entities.abilities.rallying_cry.name': 'Ralliement',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta puissance d’attaque de proches alliés durante 10 s. (talent de guerrier)',
+  'entities.abilities.rebuke.name': 'Réprimande',
+  'entities.abilities.rebuke.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de paladin)',
+  'entities.abilities.shadowstep.name': 'Glissement d’ombre',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu cible. (talent de voleur)',
+  'entities.abilities.shield_wall.name': 'Rempart',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la armure durante 10 s. (talent de guerrier)',
+  'entities.abilities.silence.name': 'Silence',
+  'entities.abilities.silence.description':
+    'Silencia a cible durante 4 s. (talent de prêtre)',
+  'entities.abilities.skull_bash.name': 'Coup de crâne',
+  'entities.abilities.skull_bash.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de druide)',
+  'entities.abilities.spell_lock.name': 'Ordre de bâillon',
+  'entities.abilities.spell_lock.description':
+    'Interrompt l’incantation et empêche tout sort de cette école pendant 5 s. (talent de démoniste)',
+  'entities.abilities.tranquility.name': 'Chant du bosquet',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a proches alliés cada segundo. (talent de druide)',
   'entities.items.worn_sword.name': 'Épée courte corrodée',
   'entities.items.gnarled_staff.name': 'Bâton de Bogoak',
   'entities.items.rusty_dagger.name': 'Dague rouillée',

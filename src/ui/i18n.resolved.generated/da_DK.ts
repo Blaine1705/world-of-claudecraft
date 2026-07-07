@@ -6352,33 +6352,209 @@ export const da_DK: EnTranslations = {
         "name": "Tilkald Wraithborn",
         "description": "Binder en Wraithborn til din vilje, en elitedæmon der regner tung Skygge skade ned på afstand. En lang nedkøling holder dens ødelæggende kraft i skak. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
       },
-      "pummel": {
-        "name": "Kæbeknuser",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+      "aspect_of_the_wild": {
+        "name": "Vildtands skikkelse",
+        "description": "Inspira a nærliggende allierede con fuerza salvaje, aumentando angrebskraft durante 5 min. (jægertalent)"
       },
-      "kick": {
-        "name": "Spark",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+      "avatar": {
+        "name": "Kolossen",
+        "description": "Te transforma en un coloso y aumenta angrebskraft durante 20 sek. (krigertalent)"
       },
-      "counterspell": {
-        "name": "Besværgelsesbrud",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 6 sek."
+      "avenging_wrath": {
+        "name": "Hævnerfløj",
+        "description": "Invoca poder vengador y aumenta angrebskraft y trolddomskraft durante 20 sek. (paladintalent)"
+      },
+      "berserk": {
+        "name": "Rød dis",
+        "description": "Aumenta angrebskraft durante 15 sek. (druidentalent)"
+      },
+      "bladestorm": {
+        "name": "Stålcyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a nærliggende fjender cada segundo por {damage}. (krigertalent)"
+      },
+      "blink": {
+        "name": "Flimmertrin",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (magikertalent)"
+      },
+      "bloodlust": {
+        "name": "Krigstrommer",
+        "description": "Lleva a nærliggende allierede al frenesí y aumenta su velocidad de ataque durante 15 sek. (shamantent)"
+      },
+      "chain_lightning": {
+        "name": "Gaffellyn",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a nærliggende fjender. (shamantent)"
+      },
+      "chaos_bolt": {
+        "name": "Ruinbolt",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Ild. (troldmandstalent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Skyggekappe",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 sek. (snigmordertalent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostfej",
+        "description": "Golpea a nærliggende fjender con escarcha e inflige {damage} de daño de Frost. (magikertalent)"
       },
       "counter_shot": {
-        "name": "Dæmpende Skud",
-        "description": "Et hurtigt skud, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
+        "name": "Dæmpende skud",
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (jægertalent)"
+      },
+      "counterspell": {
+        "name": "Trolddomsbrud",
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 6 sek. (magikertalent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Blytung forbandelse",
+        "description": "Maldice a målet y reduce su velocidad de movimiento un 30% durante 12 sek. (troldmandstalent)"
+      },
+      "death_coil": {
+        "name": "Gravspiral",
+        "description": "Golpea a målet por {damage} de daño de Skygge y luego lo aterroriza durante 3 sek. Esta versión no sana al lanzador. (troldmandstalent)"
+      },
+      "deep_freeze": {
+        "name": "Dødfrost",
+        "description": "Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalent)"
+      },
+      "desperate_prayer": {
+        "name": "Sidste bøn",
+        "description": "Te sana al instante por {damage}. (præstetalent)"
+      },
+      "deterrence": {
+        "name": "Børsteværn",
+        "description": "Aumenta tu undvigelseschance un 50% durante 10 sek. (jægertalent)"
+      },
+      "divine_shield": {
+        "name": "Lysværn",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sek. (paladintalent)"
+      },
+      "earthbind": {
+        "name": "Gribende jord",
+        "description": "Ata a la tierra a nærliggende fjender y los inmoviliza durante 2 sek. (shamantent)"
+      },
+      "evocation": {
+        "name": "Æterbrønd",
+        "description": "Restaura mana rápidamente. (magikertalent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Vild heling",
+        "description": "Regenera salud durante 10 sek. Solo en Forma de oso. (druidentalent)"
+      },
+      "frost_trap": {
+        "name": "Rimfælde",
+        "description": "Congela a los fjender en el área objetivo durante 3 sek. (jægertalent)"
+      },
+      "ghostly_strike": {
+        "name": "Genfærdsslag",
+        "description": "Golpea a målet por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (snigmordertalent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Klanghammer",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Hellig. Solo se usa por debajo del 20% de salud. (paladintalent)"
+      },
+      "healing_stream": {
+        "name": "Kildebrønd",
+        "description": "Restaura a et venligt mål durante 12 sek. (shamantent)"
+      },
+      "heroic_leap": {
+        "name": "Krigsspring",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fysisk a nærliggende fjender. (krigertalent)"
+      },
+      "holy_wrath": {
+        "name": "Helgenvrede",
+        "description": "Desata poder sagrado e inflige {damage} de daño a nærliggende fjender. (paladintalent)"
+      },
+      "howl_of_terror": {
+        "name": "Rædselshyl",
+        "description": "Aterroriza a nærliggende fjender hasta 3 sek. El daño puede romper el efecto. (troldmandstalent)"
+      },
+      "ice_block": {
+        "name": "Kold kiste",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)"
+      },
+      "inner_focus": {
+        "name": "Stillet sind",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (præstetalent)"
+      },
+      "innervate": {
+        "name": "Livssaft",
+        "description": "Restaura al instante 200 de tu nuværende ressource. (druidentalent)"
+      },
+      "kick": {
+        "name": "Støvle",
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (snigmordertalent)"
+      },
+      "last_stand": {
+        "name": "Ellevte time",
+        "description": "Aumenta temporalmente Udholdenhed durante 15 sek, aumentando la salud máxima. (krigertalent)"
+      },
+      "mend_pet": {
+        "name": "Lappe sammen",
+        "description": "Sana a et venligt mål por {damage} durante 15 sek. (jægertalent)"
+      },
+      "meteor": {
+        "name": "Himmelsten",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ild y quema el suelo. (magikertalent)"
+      },
+      "mind_sear": {
+        "name": "Tankebrand",
+        "description": "Canaliza energía de Skygge en el área objetivo e inflige {damage} cada segundo a nærliggende fjender. (præstetalent)"
+      },
+      "multi_shot": {
+        "name": "Splitskud",
+        "description": "Dispara varios proyectiles e inflige {damage} a nærliggende fjender. (jægertalent)"
+      },
+      "prayer_of_healing": {
+        "name": "Korhelbredelse",
+        "description": "Sana a nærliggende allierede por {damage}. (præstetalent)"
+      },
+      "preparation": {
+        "name": "Nødplan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (snigmordertalent)"
+      },
+      "presence_of_mind": {
+        "name": "Ræsende sind",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)"
+      },
+      "psychic_scream": {
+        "name": "Psykisk skrig",
+        "description": "Aterroriza a nærliggende fjender hasta 4 sek. El daño puede romper el efecto. (præstetalent)"
+      },
+      "pummel": {
+        "name": "Prygl",
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (krigertalent)"
+      },
+      "rallying_cry": {
+        "name": "Mønstring",
+        "description": "Lanza un grito de reunión y aumenta angrebskraft de nærliggende allierede durante 10 sek. (krigertalent)"
       },
       "rebuke": {
         "name": "Irettesættelse",
-        "description": "Afbryder målets besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 4 sek."
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (paladintalent)"
+      },
+      "shadowstep": {
+        "name": "Skyggesmut",
+        "description": "Das un paso entre las sombras hacia tu målet. (snigmordertalent)"
+      },
+      "shield_wall": {
+        "name": "Bolværk",
+        "description": "Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigertalent)"
+      },
+      "silence": {
+        "name": "Tavshed",
+        "description": "Silencia a målet durante 4 sek. (præstetalent)"
       },
       "skull_bash": {
-        "name": "Skalle",
-        "description": "En fremadstormende skalle, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek."
+        "name": "Pandeskal",
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (druidentalent)"
       },
       "spell_lock": {
         "name": "Mundkurv",
-        "description": "Gør målet tavst midt i en besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 5 sek."
+        "description": "Afbryder besværgelse og forhindrer magi fra den skole i 5 sek. (troldmandstalent)"
+      },
+      "tranquility": {
+        "name": "Lundens sang",
+        "description": "Canaliza energía restauradora y sana a nærliggende allierede cada segundo. (druidentalent)"
       },
       "bear_charge": {
         "name": "Bruin-storm",

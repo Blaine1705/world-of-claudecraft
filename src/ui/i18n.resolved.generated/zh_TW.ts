@@ -6352,33 +6352,209 @@ export const zh_TW: EnTranslations = {
         "name": "召喚怨魂裔",
         "description": "將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。"
       },
-      "pummel": {
-        "name": "碎顎擊",
-        "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
+      "aspect_of_the_wild": {
+        "name": "野牙偽裝",
+        "description": "以野性之力激勵附近的盟友，提高攻擊強度，持續 5 分鐘。（獵人天賦）"
       },
-      "kick": {
-        "name": "飛踢",
-        "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
+      "avatar": {
+        "name": "巨像",
+        "description": "化身為巨像，提高攻擊強度，持續 20 秒。（戰士天賦）"
+      },
+      "avenging_wrath": {
+        "name": "復仇之翼",
+        "description": "喚降復仇之力，提高攻擊強度與法術強度，持續 20 秒。（聖騎士天賦）"
+      },
+      "berserk": {
+        "name": "赤紅迷霧",
+        "description": "提高攻擊強度，持續 15 秒。（德魯伊天賦）"
+      },
+      "bladestorm": {
+        "name": "鋼鐵旋風",
+        "description": "化作鋼鐵風暴，每秒對附近敵人造成 {damage} 點傷害。（戰士天賦）"
+      },
+      "blink": {
+        "name": "閃爍步",
+        "description": "向前瞬移 15 碼並解除定身效果。（法師天賦）"
+      },
+      "bloodlust": {
+        "name": "戰鼓",
+        "description": "使附近的盟友陷入狂熱，提高攻擊速度，持續 15 秒。（薩滿天賦）"
+      },
+      "chain_lightning": {
+        "name": "叉狀閃電",
+        "description": "向目標區域擲出閃電，對附近敵人造成 {damage} 點傷害。（薩滿天賦）"
+      },
+      "chaos_bolt": {
+        "name": "毀滅箭",
+        "description": "擲出一枚混亂火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影斗篷",
+        "description": "以暗影包裹自身，吸收傷害，持續 5 秒。（盜賊天賦）"
+      },
+      "cone_of_cold": {
+        "name": "寒霜橫掃",
+        "description": "以寒霜衝擊附近的敵人，造成 {damage} 點冰霜傷害。（法師天賦）"
+      },
+      "counter_shot": {
+        "name": "緘默射擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）"
       },
       "counterspell": {
         "name": "破法",
-        "description": "反制目標的施法，並在6秒內封鎖該法術學派。"
+        "description": "反制敵人的施法，使該系法術在 6 秒內無法施放。（法師天賦）"
       },
-      "counter_shot": {
-        "name": "靜默射擊",
-        "description": "一記快射，打斷目標的施法，並在4秒內封鎖該學派。"
+      "curse_of_exhaustion": {
+        "name": "鉛沉妖咒",
+        "description": "詛咒目標，使其移動速度降低 30%，持續 12 秒。（術士天賦）"
+      },
+      "death_coil": {
+        "name": "墓穴纏卷",
+        "description": "對敵人造成 {damage} 點暗影傷害，隨後使其恐懼 3 秒。此法術不會治療施法者。（術士天賦）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "將目標深度凍結，造成 {damage} 點冰霜傷害並使其昏迷 4 秒。（法師天賦）"
+      },
+      "desperate_prayer": {
+        "name": "最後祈禱",
+        "description": "立即為你治療 {damage} 點生命值。（牧師天賦）"
+      },
+      "deterrence": {
+        "name": "鬃刺守衛",
+        "description": "提高你的閃躲機率 50%，持續 10 秒。（獵人天賦）"
+      },
+      "divine_shield": {
+        "name": "聖光守護",
+        "description": "以神聖之力護佑你，吸收大量傷害，持續 8 秒。（聖騎士天賦）"
+      },
+      "earthbind": {
+        "name": "攫握大地",
+        "description": "將附近的敵人束縛於大地，定身 2 秒。（薩滿天賦）"
+      },
+      "evocation": {
+        "name": "乙太之井",
+        "description": "快速恢復法力。（法師天賦）"
+      },
+      "frenzied_regeneration": {
+        "name": "野性癒合",
+        "description": "在 10 秒內恢復生命值。僅限蠻熊形態。（德魯伊天賦）"
+      },
+      "frost_trap": {
+        "name": "霜紋陷阱",
+        "description": "將目標區域的敵人凍結在原地，持續 3 秒。（獵人天賦）"
+      },
+      "ghostly_strike": {
+        "name": "幽魂打擊",
+        "description": "對敵人造成武器傷害外加 {damage} 點傷害，並短暫提高閃躲機率。獲得 1 個連擊點。（盜賊天賦）"
+      },
+      "hammer_of_wrath": {
+        "name": "鳴鐘之錘",
+        "description": "向受創的敵人擲出神聖之鎚，造成 {damage} 點神聖傷害。僅可對生命值低於 20% 的目標使用。（聖騎士天賦）"
+      },
+      "healing_stream": {
+        "name": "泉湧",
+        "description": "在 12 秒內治療一名友方目標。（薩滿天賦）"
+      },
+      "heroic_leap": {
+        "name": "戰躍",
+        "description": "躍向目標區域，對附近敵人造成 {damage} 點物理傷害。（戰士天賦）"
+      },
+      "holy_wrath": {
+        "name": "聖徒之怒",
+        "description": "釋放神聖之力，對附近敵人造成 {damage} 點傷害。（聖騎士天賦）"
+      },
+      "howl_of_terror": {
+        "name": "恐懼嚎叫",
+        "description": "恐嚇附近的敵人，最多持續 3 秒。受到傷害可能打破該效果。（術士天賦）"
+      },
+      "ice_block": {
+        "name": "寒冰棺",
+        "description": "將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）"
+      },
+      "inner_focus": {
+        "name": "靜心",
+        "description": "使你的下一個法術不消耗法力。持續 60 秒。（牧師天賦）"
+      },
+      "innervate": {
+        "name": "生命樹液",
+        "description": "立即恢復 200 點當前資源。（德魯伊天賦）"
+      },
+      "kick": {
+        "name": "踢擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（盜賊天賦）"
+      },
+      "last_stand": {
+        "name": "第十一刻",
+        "description": "暫時提高耐力，持續 15 秒，提高最大生命值。（戰士天賦）"
+      },
+      "mend_pet": {
+        "name": "修補",
+        "description": "在 15 秒內為友方目標治療 {damage} 點生命值。（獵人天賦）"
+      },
+      "meteor": {
+        "name": "天石",
+        "description": "喚降一顆隕石轟擊目標區域，造成 {damage} 點火焰傷害並點燃地面。（法師天賦）"
+      },
+      "mind_sear": {
+        "name": "灼思",
+        "description": "向目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"
+      },
+      "multi_shot": {
+        "name": "分裂射擊",
+        "description": "射出多枚箭矢，對附近敵人造成 {damage} 點傷害。（獵人天賦）"
+      },
+      "prayer_of_healing": {
+        "name": "聖歌癒療",
+        "description": "治療附近的盟友 {damage} 點生命值。（牧師天賦）"
+      },
+      "preparation": {
+        "name": "應變",
+        "description": "結束疾跑、閃避和消失的冷卻時間。（盜賊天賦）"
+      },
+      "presence_of_mind": {
+        "name": "疾思",
+        "description": "使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）"
+      },
+      "psychic_scream": {
+        "name": "心靈尖嘯",
+        "description": "恐嚇附近的敵人，最多持續 4 秒。受到傷害可能打破該效果。（牧師天賦）"
+      },
+      "pummel": {
+        "name": "裂顎擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（戰士天賦）"
+      },
+      "rallying_cry": {
+        "name": "集結",
+        "description": "發出激勵的吶喊，提高附近盟友的攻擊強度，持續 10 秒。（戰士天賦）"
       },
       "rebuke": {
-        "name": "譴喝",
-        "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
+        "name": "斥責",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（聖騎士天賦）"
+      },
+      "shadowstep": {
+        "name": "影步",
+        "description": "穿過暗影，移動到目標身旁。（盜賊天賦）"
+      },
+      "shield_wall": {
+        "name": "壁壘",
+        "description": "築起堅不可摧的壁壘，大幅提高護甲，持續 10 秒。（戰士天賦）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "沉默目標，持續 4 秒。（牧師天賦）"
       },
       "skull_bash": {
-        "name": "頭槌",
-        "description": "猛然頭槌，打斷目標的施法，並在4秒內封鎖該學派。"
+        "name": "顱擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（德魯伊天賦）"
       },
       "spell_lock": {
         "name": "封口令",
-        "description": "在施法中沉默目標，並在5秒內封鎖該法術學派。"
+        "description": "打斷施法，並使該系法術在 5 秒內無法施放。（術士天賦）"
+      },
+      "tranquility": {
+        "name": "林地之歌",
+        "description": "引導恢復之力，每秒治療附近的盟友。（德魯伊天賦）"
       },
       "bear_charge": {
         "name": "巨熊衝鋒",

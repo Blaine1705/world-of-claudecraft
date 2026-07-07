@@ -3298,6 +3298,159 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': 'Metamorphose',
   'entities.abilities.metamorphosis.description':
     'Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)',
+  'entities.abilities.aspect_of_the_wild.name': 'Wildfanggewand',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a nahe Verbündete con fuerza salvaje, aumentando Angriffskraft durante 5 Min.. (Jäger-Talent)',
+  'entities.abilities.avatar.name': 'Koloss',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta Angriffskraft durante 20 Sek.. (Krieger-Talent)',
+  'entities.abilities.avenging_wrath.name': 'Zornschwinge',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta Angriffskraft y Zaubermacht durante 20 Sek.. (Paladin-Talent)',
+  'entities.abilities.berserk.name': 'Roter Dunst',
+  'entities.abilities.berserk.description':
+    'Aumenta Angriffskraft durante 15 Sek.. (Druiden-Talent)',
+  'entities.abilities.bladestorm.name': 'Stahlzyklon',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a nahe Gegner cada segundo por {damage}. (Krieger-Talent)',
+  'entities.abilities.blink.name': 'Flimmerschritt',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (Magier-Talent)',
+  'entities.abilities.bloodlust.name': 'Kriegstrommeln',
+  'entities.abilities.bloodlust.description':
+    'Lleva a nahe Verbündete al frenesí y aumenta su velocidad de ataque durante 15 Sek.. (Schamanen-Talent)',
+  'entities.abilities.chain_lightning.name': 'Gabelblitz',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a nahe Gegner. (Schamanen-Talent)',
+  'entities.abilities.chaos_bolt.name': 'Verderbensblitz',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Feuer. (Hexenmeister-Talent)',
+  'entities.abilities.cloak_of_shadows.name': 'Schattenmantel',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 Sek.. (Schurken-Talent)',
+  'entities.abilities.cone_of_cold.name': 'Frostfeger',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a nahe Gegner con escarcha e inflige {damage} de daño de Frost. (Magier-Talent)',
+  'entities.abilities.counter_shot.name': 'Dämpfender Schuss',
+  'entities.abilities.counter_shot.description':
+    'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Jäger-Talent)',
+  'entities.abilities.counterspell.name': 'Zauberbruch',
+  'entities.abilities.counterspell.description':
+    'Unterbricht das Wirken und verhindert 6 Sek. lang Zauber dieser Schule. (Magier-Talent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Bleierner Fluch',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a Ziel y reduce su velocidad de movimiento un 30% durante 12 Sek.. (Hexenmeister-Talent)',
+  'entities.abilities.death_coil.name': 'Grabspirale',
+  'entities.abilities.death_coil.description':
+    'Golpea a Ziel por {damage} de daño de Schatten y luego lo aterroriza durante 3 Sek.. Esta versión no sana al lanzador. (Hexenmeister-Talent)',
+  'entities.abilities.deep_freeze.name': 'Totenfrost',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a Ziel, inflige {damage} de daño de Frost y lo aturde durante 4 Sek.. (Magier-Talent)',
+  'entities.abilities.desperate_prayer.name': 'Letztes Gebet',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (Priester-Talent)',
+  'entities.abilities.deterrence.name': 'Borstenwacht',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu Ausweichchance un 50% durante 10 Sek.. (Jäger-Talent)',
+  'entities.abilities.divine_shield.name': 'Lichtwacht',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 Sek.. (Paladin-Talent)',
+  'entities.abilities.earthbind.name': 'Greifende Erde',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a nahe Gegner y los inmoviliza durante 2 Sek.. (Schamanen-Talent)',
+  'entities.abilities.evocation.name': 'Ätherbrunnen',
+  'entities.abilities.evocation.description':
+    'Restaura Mana rápidamente. (Magier-Talent)',
+  'entities.abilities.frenzied_regeneration.name': 'Wilde Heilung',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 Sek.. Solo en Forma de oso. (Druiden-Talent)',
+  'entities.abilities.frost_trap.name': 'Reifschlinge',
+  'entities.abilities.frost_trap.description':
+    'Congela a los Gegner en el área objetivo durante 3 Sek.. (Jäger-Talent)',
+  'entities.abilities.ghostly_strike.name': 'Geisterschlag',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a Ziel por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (Schurken-Talent)',
+  'entities.abilities.hammer_of_wrath.name': 'Läutender Hammer',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Heilig. Solo se usa por debajo del 20% de salud. (Paladin-Talent)',
+  'entities.abilities.healing_stream.name': 'Quellbrunnen',
+  'entities.abilities.healing_stream.description':
+    'Restaura a freundliches Ziel durante 12 Sek.. (Schamanen-Talent)',
+  'entities.abilities.heroic_leap.name': 'Kriegssprung',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño physischen a nahe Gegner. (Krieger-Talent)',
+  'entities.abilities.holy_wrath.name': 'Heiligenzorn',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a nahe Gegner. (Paladin-Talent)',
+  'entities.abilities.howl_of_terror.name': 'Schreckensheulen',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a nahe Gegner hasta 3 Sek.. El daño puede romper el efecto. (Hexenmeister-Talent)',
+  'entities.abilities.ice_block.name': 'Kalter Sarg',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)',
+  'entities.abilities.inner_focus.name': 'Stiller Geist',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 Sek.. (Priester-Talent)',
+  'entities.abilities.innervate.name': 'Lebenssaft',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu aktuellen Ressource. (Druiden-Talent)',
+  'entities.abilities.kick.name': 'Stiefeltritt',
+  'entities.abilities.kick.description':
+    'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)',
+  'entities.abilities.last_stand.name': 'Elfte Stunde',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Ausdauer durante 15 Sek., aumentando la salud máxima. (Krieger-Talent)',
+  'entities.abilities.mend_pet.name': 'Zusammenflicken',
+  'entities.abilities.mend_pet.description':
+    'Sana a freundliches Ziel por {damage} durante 15 Sek.. (Jäger-Talent)',
+  'entities.abilities.meteor.name': 'Himmelsstein',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Feuer y quema el suelo. (Magier-Talent)',
+  'entities.abilities.mind_sear.name': 'Gedankenbrand',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Schatten en el área objetivo e inflige {damage} cada segundo a nahe Gegner. (Priester-Talent)',
+  'entities.abilities.multi_shot.name': 'Spaltschuss',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a nahe Gegner. (Jäger-Talent)',
+  'entities.abilities.prayer_of_healing.name': 'Chorheilung',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a nahe Verbündete por {damage}. (Priester-Talent)',
+  'entities.abilities.preparation.name': 'Notfallplan',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (Schurken-Talent)',
+  'entities.abilities.presence_of_mind.name': 'Rasender Geist',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)',
+  'entities.abilities.psychic_scream.name': 'Schreckensschrei',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a nahe Gegner hasta 4 Sek.. El daño puede romper el efecto. (Priester-Talent)',
+  'entities.abilities.pummel.name': 'Prügel',
+  'entities.abilities.pummel.description':
+    'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Krieger-Talent)',
+  'entities.abilities.rallying_cry.name': 'Sammelruf',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta Angriffskraft de nahe Verbündete durante 10 Sek.. (Krieger-Talent)',
+  'entities.abilities.rebuke.name': 'Tadel',
+  'entities.abilities.rebuke.description':
+    'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Paladin-Talent)',
+  'entities.abilities.shadowstep.name': 'Schattengleiten',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu Ziel. (Schurken-Talent)',
+  'entities.abilities.shield_wall.name': 'Bollwerk',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la Rüstung durante 10 Sek.. (Krieger-Talent)',
+  'entities.abilities.silence.name': 'Stille',
+  'entities.abilities.silence.description':
+    'Silencia a Ziel durante 4 Sek.. (Priester-Talent)',
+  'entities.abilities.skull_bash.name': 'Schädelstoß',
+  'entities.abilities.skull_bash.description':
+    'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Druiden-Talent)',
+  'entities.abilities.spell_lock.name': 'Knebelbefehl',
+  'entities.abilities.spell_lock.description':
+    'Unterbricht das Wirken und verhindert 5 Sek. lang Zauber dieser Schule. (Hexenmeister-Talent)',
+  'entities.abilities.tranquility.name': 'Hainlied',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a nahe Verbündete cada segundo. (Druiden-Talent)',
   'entities.items.worn_sword.name': 'Abgenutztes Kurzschwert',
   'entities.items.gnarled_staff.name': 'Mooreichenstab',
   'entities.items.rusty_dagger.name': 'Rostiger Dolch',

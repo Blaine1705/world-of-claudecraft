@@ -6352,33 +6352,209 @@ export const de_DE: EnTranslations = {
         "name": "Wraithborn beschwören",
         "description": "Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."
       },
-      "pummel": {
-        "name": "Jawcrack",
-        "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
+      "aspect_of_the_wild": {
+        "name": "Wildfanggewand",
+        "description": "Inspira a nahe Verbündete con fuerza salvaje, aumentando Angriffskraft durante 5 Min.. (Jäger-Talent)"
       },
-      "kick": {
-        "name": "Boot",
-        "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
+      "avatar": {
+        "name": "Koloss",
+        "description": "Te transforma en un coloso y aumenta Angriffskraft durante 20 Sek.. (Krieger-Talent)"
       },
-      "counterspell": {
-        "name": "Spellbreak",
-        "description": "Kontert das Zauberwirken des Ziels und hindert es 6 Sek. lang daran, Zauber dieser Schule zu wirken."
+      "avenging_wrath": {
+        "name": "Zornschwinge",
+        "description": "Invoca poder vengador y aumenta Angriffskraft y Zaubermacht durante 20 Sek.. (Paladin-Talent)"
+      },
+      "berserk": {
+        "name": "Roter Dunst",
+        "description": "Aumenta Angriffskraft durante 15 Sek.. (Druiden-Talent)"
+      },
+      "bladestorm": {
+        "name": "Stahlzyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a nahe Gegner cada segundo por {damage}. (Krieger-Talent)"
+      },
+      "blink": {
+        "name": "Flimmerschritt",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (Magier-Talent)"
+      },
+      "bloodlust": {
+        "name": "Kriegstrommeln",
+        "description": "Lleva a nahe Verbündete al frenesí y aumenta su velocidad de ataque durante 15 Sek.. (Schamanen-Talent)"
+      },
+      "chain_lightning": {
+        "name": "Gabelblitz",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a nahe Gegner. (Schamanen-Talent)"
+      },
+      "chaos_bolt": {
+        "name": "Verderbensblitz",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Feuer. (Hexenmeister-Talent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Schattenmantel",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 Sek.. (Schurken-Talent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostfeger",
+        "description": "Golpea a nahe Gegner con escarcha e inflige {damage} de daño de Frost. (Magier-Talent)"
       },
       "counter_shot": {
-        "name": "Hushing Shot",
-        "description": "Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken."
+        "name": "Dämpfender Schuss",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Jäger-Talent)"
+      },
+      "counterspell": {
+        "name": "Zauberbruch",
+        "description": "Unterbricht das Wirken und verhindert 6 Sek. lang Zauber dieser Schule. (Magier-Talent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Bleierner Fluch",
+        "description": "Maldice a Ziel y reduce su velocidad de movimiento un 30% durante 12 Sek.. (Hexenmeister-Talent)"
+      },
+      "death_coil": {
+        "name": "Grabspirale",
+        "description": "Golpea a Ziel por {damage} de daño de Schatten y luego lo aterroriza durante 3 Sek.. Esta versión no sana al lanzador. (Hexenmeister-Talent)"
+      },
+      "deep_freeze": {
+        "name": "Totenfrost",
+        "description": "Congela profundamente a Ziel, inflige {damage} de daño de Frost y lo aturde durante 4 Sek.. (Magier-Talent)"
+      },
+      "desperate_prayer": {
+        "name": "Letztes Gebet",
+        "description": "Te sana al instante por {damage}. (Priester-Talent)"
+      },
+      "deterrence": {
+        "name": "Borstenwacht",
+        "description": "Aumenta tu Ausweichchance un 50% durante 10 Sek.. (Jäger-Talent)"
+      },
+      "divine_shield": {
+        "name": "Lichtwacht",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 Sek.. (Paladin-Talent)"
+      },
+      "earthbind": {
+        "name": "Greifende Erde",
+        "description": "Ata a la tierra a nahe Gegner y los inmoviliza durante 2 Sek.. (Schamanen-Talent)"
+      },
+      "evocation": {
+        "name": "Ätherbrunnen",
+        "description": "Restaura Mana rápidamente. (Magier-Talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Wilde Heilung",
+        "description": "Regenera salud durante 10 Sek.. Solo en Forma de oso. (Druiden-Talent)"
+      },
+      "frost_trap": {
+        "name": "Reifschlinge",
+        "description": "Congela a los Gegner en el área objetivo durante 3 Sek.. (Jäger-Talent)"
+      },
+      "ghostly_strike": {
+        "name": "Geisterschlag",
+        "description": "Golpea a Ziel por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (Schurken-Talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Läutender Hammer",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Heilig. Solo se usa por debajo del 20% de salud. (Paladin-Talent)"
+      },
+      "healing_stream": {
+        "name": "Quellbrunnen",
+        "description": "Restaura a freundliches Ziel durante 12 Sek.. (Schamanen-Talent)"
+      },
+      "heroic_leap": {
+        "name": "Kriegssprung",
+        "description": "Saltas al área objetivo e infliges {damage} de daño physischen a nahe Gegner. (Krieger-Talent)"
+      },
+      "holy_wrath": {
+        "name": "Heiligenzorn",
+        "description": "Desata poder sagrado e inflige {damage} de daño a nahe Gegner. (Paladin-Talent)"
+      },
+      "howl_of_terror": {
+        "name": "Schreckensheulen",
+        "description": "Aterroriza a nahe Gegner hasta 3 Sek.. El daño puede romper el efecto. (Hexenmeister-Talent)"
+      },
+      "ice_block": {
+        "name": "Kalter Sarg",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)"
+      },
+      "inner_focus": {
+        "name": "Stiller Geist",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 Sek.. (Priester-Talent)"
+      },
+      "innervate": {
+        "name": "Lebenssaft",
+        "description": "Restaura al instante 200 de tu aktuellen Ressource. (Druiden-Talent)"
+      },
+      "kick": {
+        "name": "Stiefeltritt",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)"
+      },
+      "last_stand": {
+        "name": "Elfte Stunde",
+        "description": "Aumenta temporalmente Ausdauer durante 15 Sek., aumentando la salud máxima. (Krieger-Talent)"
+      },
+      "mend_pet": {
+        "name": "Zusammenflicken",
+        "description": "Sana a freundliches Ziel por {damage} durante 15 Sek.. (Jäger-Talent)"
+      },
+      "meteor": {
+        "name": "Himmelsstein",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Feuer y quema el suelo. (Magier-Talent)"
+      },
+      "mind_sear": {
+        "name": "Gedankenbrand",
+        "description": "Canaliza energía de Schatten en el área objetivo e inflige {damage} cada segundo a nahe Gegner. (Priester-Talent)"
+      },
+      "multi_shot": {
+        "name": "Spaltschuss",
+        "description": "Dispara varios proyectiles e inflige {damage} a nahe Gegner. (Jäger-Talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Chorheilung",
+        "description": "Sana a nahe Verbündete por {damage}. (Priester-Talent)"
+      },
+      "preparation": {
+        "name": "Notfallplan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (Schurken-Talent)"
+      },
+      "presence_of_mind": {
+        "name": "Rasender Geist",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)"
+      },
+      "psychic_scream": {
+        "name": "Schreckensschrei",
+        "description": "Aterroriza a nahe Gegner hasta 4 Sek.. El daño puede romper el efecto. (Priester-Talent)"
+      },
+      "pummel": {
+        "name": "Prügel",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Krieger-Talent)"
+      },
+      "rallying_cry": {
+        "name": "Sammelruf",
+        "description": "Lanza un grito de reunión y aumenta Angriffskraft de nahe Verbündete durante 10 Sek.. (Krieger-Talent)"
       },
       "rebuke": {
-        "name": "Reproach",
-        "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
+        "name": "Tadel",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Paladin-Talent)"
+      },
+      "shadowstep": {
+        "name": "Schattengleiten",
+        "description": "Das un paso entre las sombras hacia tu Ziel. (Schurken-Talent)"
+      },
+      "shield_wall": {
+        "name": "Bollwerk",
+        "description": "Alzas un muro de escudo y aumentas mucho la Rüstung durante 10 Sek.. (Krieger-Talent)"
+      },
+      "silence": {
+        "name": "Stille",
+        "description": "Silencia a Ziel durante 4 Sek.. (Priester-Talent)"
       },
       "skull_bash": {
-        "name": "Headbutt",
-        "description": "Ein vorstoßender Kopfstoß, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken."
+        "name": "Schädelstoß",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Druiden-Talent)"
       },
       "spell_lock": {
-        "name": "Gag Order",
-        "description": "Bringt das Ziel mitten im Zauberwirken zum Schweigen und hindert es 5 Sek. lang daran, Zauber dieser Schule zu wirken."
+        "name": "Knebelbefehl",
+        "description": "Unterbricht das Wirken und verhindert 5 Sek. lang Zauber dieser Schule. (Hexenmeister-Talent)"
+      },
+      "tranquility": {
+        "name": "Hainlied",
+        "description": "Canaliza energía restauradora y sana a nahe Verbündete cada segundo. (Druiden-Talent)"
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",

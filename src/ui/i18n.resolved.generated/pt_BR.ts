@@ -6352,33 +6352,209 @@ export const pt_BR: EnTranslations = {
         "name": "Invocar Wraithborn",
         "description": "Vincula um Wraithborn à sua vontade, um demônio de elite que faz chover pesado dano Sombrio à distância. Uma longa recarga limita seu poder devastador. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."
       },
-      "pummel": {
-        "name": "Quebra-queixo",
-        "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 4 s."
+      "aspect_of_the_wild": {
+        "name": "Aspecto Presa Selvagem",
+        "description": "Inspira a próximos aliados con fuerza salvaje, aumentando poder de ataque durante 5 min. (talento de caçador)"
       },
-      "kick": {
-        "name": "Chute",
-        "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 4 s."
+      "avatar": {
+        "name": "Colosso",
+        "description": "Te transforma en un coloso y aumenta poder de ataque durante 20 s. (talento de guerreiro)"
+      },
+      "avenging_wrath": {
+        "name": "Asa Vingadora",
+        "description": "Invoca poder vengador y aumenta poder de ataque y poder mágico durante 20 s. (talento de paladino)"
+      },
+      "berserk": {
+        "name": "Névoa Rubra",
+        "description": "Aumenta poder de ataque durante 15 s. (talento de druida)"
+      },
+      "bladestorm": {
+        "name": "Ciclone de Aço",
+        "description": "Te convierte en una tormenta de acero que golpea a próximos inimigos cada segundo por {damage}. (talento de guerreiro)"
+      },
+      "blink": {
+        "name": "Passo Cintilante",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (talento de mago)"
+      },
+      "bloodlust": {
+        "name": "Tambores de Guerra",
+        "description": "Lleva a próximos aliados al frenesí y aumenta su velocidad de ataque durante 15 s. (talento de xamã)"
+      },
+      "chain_lightning": {
+        "name": "Relâmpago Bifurcado",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a próximos inimigos. (talento de xamã)"
+      },
+      "chaos_bolt": {
+        "name": "Seta da Ruína",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fogo. (talento de bruxo)"
+      },
+      "cloak_of_shadows": {
+        "name": "Manto Sombrio",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 s. (talento de ladino)"
+      },
+      "cone_of_cold": {
+        "name": "Varredura Gélida",
+        "description": "Golpea a próximos inimigos con escarcha e inflige {damage} de daño de Gelo. (talento de mago)"
+      },
+      "counter_shot": {
+        "name": "Disparo Abafador",
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de caçador)"
       },
       "counterspell": {
         "name": "Quebra-feitiço",
-        "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 6 s."
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 6 s. (talento de mago)"
       },
-      "counter_shot": {
-        "name": "Tiro Silenciador",
-        "description": "Um disparo rápido que interrompe a conjuração do alvo e bloqueia essa escola por 4 s."
+      "curse_of_exhaustion": {
+        "name": "Maldição Chúmbea",
+        "description": "Maldice a alvo y reduce su velocidad de movimiento un 30% durante 12 s. (talento de bruxo)"
+      },
+      "death_coil": {
+        "name": "Espiral da Tumba",
+        "description": "Golpea a alvo por {damage} de daño de Sombra y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talento de bruxo)"
+      },
+      "deep_freeze": {
+        "name": "Geada Morta",
+        "description": "Congela profundamente a alvo, inflige {damage} de daño de Gelo y lo aturde durante 4 s. (talento de mago)"
+      },
+      "desperate_prayer": {
+        "name": "Última Prece",
+        "description": "Te sana al instante por {damage}. (talento de sacerdote)"
+      },
+      "deterrence": {
+        "name": "Guarda Espinhosa",
+        "description": "Aumenta tu chance de esquiva un 50% durante 10 s. (talento de caçador)"
+      },
+      "divine_shield": {
+        "name": "Guarda de Luz",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talento de paladino)"
+      },
+      "earthbind": {
+        "name": "Terra Agarradora",
+        "description": "Ata a la tierra a próximos inimigos y los inmoviliza durante 2 s. (talento de xamã)"
+      },
+      "evocation": {
+        "name": "Poço Etéreo",
+        "description": "Restaura mana rápidamente. (talento de mago)"
+      },
+      "frenzied_regeneration": {
+        "name": "Remendo Selvagem",
+        "description": "Regenera salud durante 10 s. Solo en Forma de oso. (talento de druida)"
+      },
+      "frost_trap": {
+        "name": "Armadilha de Geada",
+        "description": "Congela a los inimigos en el área objetivo durante 3 s. (talento de caçador)"
+      },
+      "ghostly_strike": {
+        "name": "Golpe Espectral",
+        "description": "Golpea a alvo por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talento de ladino)"
+      },
+      "hammer_of_wrath": {
+        "name": "Martelo Badalante",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sagrado. Solo se usa por debajo del 20% de salud. (talento de paladino)"
+      },
+      "healing_stream": {
+        "name": "Fonte Viva",
+        "description": "Restaura a alvo aliado durante 12 s. (talento de xamã)"
+      },
+      "heroic_leap": {
+        "name": "Salto de Guerra",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Físico a próximos inimigos. (talento de guerreiro)"
+      },
+      "holy_wrath": {
+        "name": "Ira do Santo",
+        "description": "Desata poder sagrado e inflige {damage} de daño a próximos inimigos. (talento de paladino)"
+      },
+      "howl_of_terror": {
+        "name": "Uivo de Terror",
+        "description": "Aterroriza a próximos inimigos hasta 3 s. El daño puede romper el efecto. (talento de bruxo)"
+      },
+      "ice_block": {
+        "name": "Caixão Frio",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)"
+      },
+      "inner_focus": {
+        "name": "Mente Serena",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento de sacerdote)"
+      },
+      "innervate": {
+        "name": "Seiva Vital",
+        "description": "Restaura al instante 200 de tu recurso atual. (talento de druida)"
+      },
+      "kick": {
+        "name": "Botada",
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de ladino)"
+      },
+      "last_stand": {
+        "name": "Décima Primeira Hora",
+        "description": "Aumenta temporalmente Vigor durante 15 s, aumentando la salud máxima. (talento de guerreiro)"
+      },
+      "mend_pet": {
+        "name": "Remendar",
+        "description": "Sana a alvo aliado por {damage} durante 15 s. (talento de caçador)"
+      },
+      "meteor": {
+        "name": "Pedra Celeste",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Fogo y quema el suelo. (talento de mago)"
+      },
+      "mind_sear": {
+        "name": "Queima-mente",
+        "description": "Canaliza energía de Sombra en el área objetivo e inflige {damage} cada segundo a próximos inimigos. (talento de sacerdote)"
+      },
+      "multi_shot": {
+        "name": "Disparo Dividido",
+        "description": "Dispara varios proyectiles e inflige {damage} a próximos inimigos. (talento de caçador)"
+      },
+      "prayer_of_healing": {
+        "name": "Cura do Coro",
+        "description": "Sana a próximos aliados por {damage}. (talento de sacerdote)"
+      },
+      "preparation": {
+        "name": "Contingência",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talento de ladino)"
+      },
+      "presence_of_mind": {
+        "name": "Mente Acelerada",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento de mago)"
+      },
+      "psychic_scream": {
+        "name": "Grito Psíquico",
+        "description": "Aterroriza a próximos inimigos hasta 4 s. El daño puede romper el efecto. (talento de sacerdote)"
+      },
+      "pummel": {
+        "name": "Sovar",
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de guerreiro)"
+      },
+      "rallying_cry": {
+        "name": "Reunir",
+        "description": "Lanza un grito de reunión y aumenta poder de ataque de próximos aliados durante 10 s. (talento de guerreiro)"
       },
       "rebuke": {
         "name": "Repreensão",
-        "description": "Interrompe a conjuração do alvo e impede lançar feitiços dessa escola por 4 s."
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de paladino)"
+      },
+      "shadowstep": {
+        "name": "Passo Sombrio",
+        "description": "Das un paso entre las sombras hacia tu alvo. (talento de ladino)"
+      },
+      "shield_wall": {
+        "name": "Baluarte",
+        "description": "Alzas un muro de escudo y aumentas mucho la armadura durante 10 s. (talento de guerreiro)"
+      },
+      "silence": {
+        "name": "Silêncio",
+        "description": "Silencia a alvo durante 4 s. (talento de sacerdote)"
       },
       "skull_bash": {
         "name": "Cabeçada",
-        "description": "Uma cabeçada em avanço que interrompe a conjuração do alvo e bloqueia essa escola por 4 s."
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de druida)"
       },
       "spell_lock": {
-        "name": "Ordem de Silêncio",
-        "description": "Silencia o alvo durante a conjuração e impede lançar feitiços dessa escola por 5 s."
+        "name": "Ordem de Mordaça",
+        "description": "Interrompe a conjuração e impede feitiços daquela escola por 5 s. (talento de bruxo)"
+      },
+      "tranquility": {
+        "name": "Canto do Bosque",
+        "description": "Canaliza energía restauradora y sana a próximos aliados cada segundo. (talento de druida)"
       },
       "bear_charge": {
         "name": "Investida de Bruin",

@@ -1498,7 +1498,7 @@ const classAbilityNamesEn = {
       [
         'avatar',
         'Colossus',
-        'Break control effects and become a colossus, increasing damage dealt by 20% for 20 sec. (Warrior talent)',
+        'Transform into a colossus, increasing attack power for 20 sec. (Warrior talent)',
       ],
       [
         'avenging_wrath',
@@ -1512,26 +1512,14 @@ const classAbilityNamesEn = {
         'Become a storm of steel, striking nearby enemies each second for {damage}. (Warrior talent)',
       ],
       [
-        'razor_howl',
-        'Razor Howl',
-        'A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)',
+        'blink',
+        'Flickerstep',
+        'Teleports you 15 yd forward and breaks roots. (Mage talent)',
       ],
-      ['stormthrow', 'Stormthrow', 'Hurl your weapon to stun a target for 3 sec. (Warrior talent)'],
-      [
-        'reckless_vow',
-        'Reckless Vow',
-        'Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)',
-      ],
-      [
-        'red_banner',
-        'Red Banner',
-        'You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)',
-      ],
-      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
       [
         'bloodlust',
         'War Drums',
-        'Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Bloodlust or Temporal Acceleration are too exhausted to benefit. (Shaman talent)',
+        'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
       ],
       [
         'chain_lightning',
@@ -1594,11 +1582,7 @@ const classAbilityNamesEn = {
         'Gripping Earth',
         'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
       ],
-      [
-        'evocation',
-        'Aetherwell',
-        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
-      ],
+      ['evocation', 'Aetherwell', 'Rapidly restores mana. (Mage talent)'],
       [
         'frenzied_regeneration',
         'Savage Mending',
@@ -1619,7 +1603,11 @@ const classAbilityNamesEn = {
         'Tolling Hammer',
         'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
       ],
-      ['healing_stream', 'Springwell', 'Restores a friendly target over 12 sec. (Shaman talent)'],
+      [
+        'healing_stream',
+        'Springwell',
+        'Restores a friendly target over 12 sec. (Shaman talent)',
+      ],
       [
         'heroic_leap',
         'Warleap',
@@ -1644,7 +1632,7 @@ const classAbilityNamesEn = {
       [
         'innervate',
         'Lifesap',
-        'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
+        'Instantly restores 200 of your current resource. (Druid talent)',
       ],
       [
         'kick',
@@ -1661,51 +1649,6 @@ const classAbilityNamesEn = {
         'meteor',
         'Skystone',
         'Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)',
-      ],
-      [
-        'temporal_mend',
-        'Temporal Mend',
-        'Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)',
-      ],
-      [
-        'temporal_barrier',
-        'Temporal Barrier',
-        'Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back.',
-      ],
-      [
-        'temporal_echo',
-        'Temporal Echo',
-        'Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
-      ],
-      [
-        'temporal_cascade',
-        'Temporal Cascade',
-        'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
-      ],
-      [
-        'temporal_reversal',
-        'Temporal Reversal',
-        "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
-      ],
-      [
-        'temporal_rewind',
-        'Rewind',
-        'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
-      ],
-      [
-        'temporal_acceleration',
-        'Temporal Acceleration',
-        'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)',
-      ],
-      [
-        'perfect_moment',
-        'Perfect Moment',
-        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)',
-      ],
-      [
-        'arcane_surge',
-        'Aether Surge',
-        "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
       ],
       [
         'mind_sear',

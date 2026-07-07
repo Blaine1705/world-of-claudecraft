@@ -5529,7 +5529,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'bear',
     effects: [{ type: 'hot', total: 180, duration: 10, interval: 2 }],
-    description: 'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
+    description: 'Regenerates health over 10 sec. Bruin Form only. (Druid talent)',
   },
   frost_trap: {
     id: 'frost_trap',
@@ -5841,7 +5841,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   pummel: {
     id: 'pummel',
-    name: 'Pummel',
+    name: 'Jawcrack',
     class: 'warrior',
     learnLevel: 10,
     cost: 10,
@@ -5867,7 +5867,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAllyAttackPower', amount: 45, duration: 10, radius: 30 }],
     description:
-      "Lets loose a rallying cry, increasing nearby allies' attack power for 10 sec. (Warrior talent)",
+      "Lets loose a mustering cry, increasing nearby allies' attack power for 10 sec. (Warrior talent)",
   },
   rebuke: {
     id: 'rebuke',
@@ -5910,7 +5910,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 1200, duration: 10 }],
-    description: 'Raise your shield wall, greatly increasing armor for 10 sec. (Warrior talent)',
+    description: 'Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)',
   },
   silence: {
     id: 'silence',

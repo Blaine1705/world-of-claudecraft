@@ -6352,33 +6352,209 @@ export const vi_VN: EnTranslations = {
         "name": "Triệu Hồi Wraithborn",
         "description": "Ràng buộc một Wraithborn theo ý chí của bạn, một con quỷ tinh nhuệ trút sát thương Bóng Tối nặng nề từ xa. Thời gian hồi chiêu dài kìm hãm sức mạnh tàn phá của nó. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
-      "pummel": {
-        "name": "Đấm Dồn Dập",
-        "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
+      "aspect_of_the_wild": {
+        "name": "Dáng Nanh Hoang",
+        "description": "Inspira a gần đó đồng minh con fuerza salvaje, aumentando sức tấn công durante 5 phút. (thiên phú thợ săn)"
       },
-      "kick": {
-        "name": "Cú Đá",
-        "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
+      "avatar": {
+        "name": "Khổng Tượng",
+        "description": "Te transforma en un coloso y aumenta sức tấn công durante 20 giây. (thiên phú chiến binh)"
       },
-      "counterspell": {
-        "name": "Phản Phép",
-        "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
+      "avenging_wrath": {
+        "name": "Cánh Báo Thù",
+        "description": "Invoca poder vengador y aumenta sức tấn công y sức mạnh phép durante 20 giây. (thiên phú hiệp sĩ)"
+      },
+      "berserk": {
+        "name": "Sương Đỏ",
+        "description": "Aumenta sức tấn công durante 15 giây. (thiên phú druid)"
+      },
+      "bladestorm": {
+        "name": "Lốc Thép",
+        "description": "Te convierte en una tormenta de acero que golpea a gần đó kẻ địch cada segundo por {damage}. (thiên phú chiến binh)"
+      },
+      "blink": {
+        "name": "Bước Chớp",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (thiên phú pháp sư)"
+      },
+      "bloodlust": {
+        "name": "Trống Chiến",
+        "description": "Lleva a gần đó đồng minh al frenesí y aumenta su velocidad de ataque durante 15 giây. (thiên phú pháp sư tổ linh)"
+      },
+      "chain_lightning": {
+        "name": "Sét Rẽ Nhánh",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a gần đó kẻ địch. (thiên phú pháp sư tổ linh)"
+      },
+      "chaos_bolt": {
+        "name": "Tia Hủy Diệt",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Lửa. (thiên phú thuật sĩ)"
+      },
+      "cloak_of_shadows": {
+        "name": "Áo Choàng Bóng",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 giây. (thiên phú đạo tặc)"
+      },
+      "cone_of_cold": {
+        "name": "Quét Băng",
+        "description": "Golpea a gần đó kẻ địch con escarcha e inflige {damage} de daño de Băng. (thiên phú pháp sư)"
       },
       "counter_shot": {
-        "name": "Phát Bắn Phản Đòn",
-        "description": "Một phát bắn nhanh làm gián đoạn quá trình niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây."
+        "name": "Phát Bắn Nín Lặng",
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú thợ săn)"
+      },
+      "counterspell": {
+        "name": "Phá Phép",
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 6 giây. (thiên phú pháp sư)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Lời Nguyền Chì",
+        "description": "Maldice a mục tiêu y reduce su velocidad de movimiento un 30% durante 12 giây. (thiên phú thuật sĩ)"
+      },
+      "death_coil": {
+        "name": "Vòng Xoáy Mộ",
+        "description": "Golpea a mục tiêu por {damage} de daño de Bóng tối y luego lo aterroriza durante 3 giây. Esta versión no sana al lanzador. (thiên phú thuật sĩ)"
+      },
+      "deep_freeze": {
+        "name": "Băng Chết",
+        "description": "Congela profundamente a mục tiêu, inflige {damage} de daño de Băng y lo aturde durante 4 giây. (thiên phú pháp sư)"
+      },
+      "desperate_prayer": {
+        "name": "Lời Cầu Cuối",
+        "description": "Te sana al instante por {damage}. (thiên phú tu sĩ)"
+      },
+      "deterrence": {
+        "name": "Hộ Vệ Gai",
+        "description": "Aumenta tu tỉ lệ né un 50% durante 10 giây. (thiên phú thợ săn)"
+      },
+      "divine_shield": {
+        "name": "Hộ Vệ Ánh Sáng",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú hiệp sĩ)"
+      },
+      "earthbind": {
+        "name": "Đất Níu Giữ",
+        "description": "Ata a la tierra a gần đó kẻ địch y los inmoviliza durante 2 giây. (thiên phú pháp sư tổ linh)"
+      },
+      "evocation": {
+        "name": "Giếng Ête",
+        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+      },
+      "frenzied_regeneration": {
+        "name": "Hồi Phục Hoang Dã",
+        "description": "Regenera salud durante 10 giây. Solo en Forma de oso. (thiên phú druid)"
+      },
+      "frost_trap": {
+        "name": "Bẫy Sương Giá",
+        "description": "Congela a los kẻ địch en el área objetivo durante 3 giây. (thiên phú thợ săn)"
+      },
+      "ghostly_strike": {
+        "name": "Đòn Ma Ảnh",
+        "description": "Golpea a mục tiêu por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (thiên phú đạo tặc)"
+      },
+      "hammer_of_wrath": {
+        "name": "Búa Ngân Chuông",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Thánh. Solo se usa por debajo del 20% de salud. (thiên phú hiệp sĩ)"
+      },
+      "healing_stream": {
+        "name": "Giếng Suối",
+        "description": "Restaura a mục tiêu thân thiện durante 12 giây. (thiên phú pháp sư tổ linh)"
+      },
+      "heroic_leap": {
+        "name": "Bước Nhảy Chiến",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Vật lý a gần đó kẻ địch. (thiên phú chiến binh)"
+      },
+      "holy_wrath": {
+        "name": "Cơn Giận Thánh",
+        "description": "Desata poder sagrado e inflige {damage} de daño a gần đó kẻ địch. (thiên phú hiệp sĩ)"
+      },
+      "howl_of_terror": {
+        "name": "Tiếng Hú Kinh Hoàng",
+        "description": "Aterroriza a gần đó kẻ địch hasta 3 giây. El daño puede romper el efecto. (thiên phú thuật sĩ)"
+      },
+      "ice_block": {
+        "name": "Quan Tài Lạnh",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+      },
+      "inner_focus": {
+        "name": "Tâm Trí Tĩnh",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 giây. (thiên phú tu sĩ)"
+      },
+      "innervate": {
+        "name": "Nhựa Sống",
+        "description": "Restaura al instante 200 de tu tài nguyên hiện tại. (thiên phú druid)"
+      },
+      "kick": {
+        "name": "Đá",
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú đạo tặc)"
+      },
+      "last_stand": {
+        "name": "Giờ Thứ Mười Một",
+        "description": "Aumenta temporalmente Thể lực durante 15 giây, aumentando la salud máxima. (thiên phú chiến binh)"
+      },
+      "mend_pet": {
+        "name": "Băng Bó",
+        "description": "Sana a mục tiêu thân thiện por {damage} durante 15 giây. (thiên phú thợ săn)"
+      },
+      "meteor": {
+        "name": "Đá Trời",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Lửa y quema el suelo. (thiên phú pháp sư)"
+      },
+      "mind_sear": {
+        "name": "Thiêu Ý Nghĩ",
+        "description": "Canaliza energía de Bóng tối en el área objetivo e inflige {damage} cada segundo a gần đó kẻ địch. (thiên phú tu sĩ)"
+      },
+      "multi_shot": {
+        "name": "Bắn Tách",
+        "description": "Dispara varios proyectiles e inflige {damage} a gần đó kẻ địch. (thiên phú thợ săn)"
+      },
+      "prayer_of_healing": {
+        "name": "Hồi Phục Hợp Xướng",
+        "description": "Sana a gần đó đồng minh por {damage}. (thiên phú tu sĩ)"
+      },
+      "preparation": {
+        "name": "Dự Phòng",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (thiên phú đạo tặc)"
+      },
+      "presence_of_mind": {
+        "name": "Tâm Trí Tăng Tốc",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+      },
+      "psychic_scream": {
+        "name": "Tiếng Thét Tâm Linh",
+        "description": "Aterroriza a gần đó kẻ địch hasta 4 giây. El daño puede romper el efecto. (thiên phú tu sĩ)"
+      },
+      "pummel": {
+        "name": "Nện",
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú chiến binh)"
+      },
+      "rallying_cry": {
+        "name": "Hiệu Triệu",
+        "description": "Lanza un grito de reunión y aumenta sức tấn công de gần đó đồng minh durante 10 giây. (thiên phú chiến binh)"
       },
       "rebuke": {
         "name": "Quở Trách",
-        "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú hiệp sĩ)"
+      },
+      "shadowstep": {
+        "name": "Trượt Bóng",
+        "description": "Das un paso entre las sombras hacia tu mục tiêu. (thiên phú đạo tặc)"
+      },
+      "shield_wall": {
+        "name": "Thành Lũy",
+        "description": "Alzas un muro de escudo y aumentas mucho la giáp durante 10 giây. (thiên phú chiến binh)"
+      },
+      "silence": {
+        "name": "Câm Lặng",
+        "description": "Silencia a mục tiêu durante 4 giây. (thiên phú tu sĩ)"
       },
       "skull_bash": {
-        "name": "Húc Sọ",
-        "description": "Một cú húc đầu lao tới làm gián đoạn niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây."
+        "name": "Cú Húc Đầu",
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú druid)"
       },
       "spell_lock": {
-        "name": "Khóa Phép",
-        "description": "Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây."
+        "name": "Lệnh Bịt Miệng",
+        "description": "Ngắt niệm phép và chặn phép cùng hệ trong 5 giây. (thiên phú thuật sĩ)"
+      },
+      "tranquility": {
+        "name": "Khúc Ca Rừng Thưa",
+        "description": "Canaliza energía restauradora y sana a gần đó đồng minh cada segundo. (thiên phú druid)"
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",

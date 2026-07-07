@@ -6352,33 +6352,209 @@ export const zh_CN: EnTranslations = {
         "name": "召唤亡魂裔",
         "description": "将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
       },
-      "pummel": {
-        "name": "碎颚击",
-        "description": "打断目标的施法，并在4秒内封锁该法术学派。"
+      "aspect_of_the_wild": {
+        "name": "野牙伪装",
+        "description": "以野性之力激励附近的盟友，提高攻击强度，持续 5 分钟。（猎人天赋）"
       },
-      "kick": {
-        "name": "飞踢",
-        "description": "打断目标的施法，并在4秒内封锁该法术学派。"
+      "avatar": {
+        "name": "巨像",
+        "description": "化身为巨像，提高攻击强度，持续 20 秒。（战士天赋）"
+      },
+      "avenging_wrath": {
+        "name": "复仇之翼",
+        "description": "唤降复仇之力，提高攻击强度和法术强度，持续 20 秒。（圣骑士天赋）"
+      },
+      "berserk": {
+        "name": "赤红迷雾",
+        "description": "提高攻击强度，持续 15 秒。（德鲁伊天赋）"
+      },
+      "bladestorm": {
+        "name": "钢铁旋风",
+        "description": "化作钢铁风暴，每秒对附近敌人造成 {damage} 点伤害。（战士天赋）"
+      },
+      "blink": {
+        "name": "闪烁步",
+        "description": "向前瞬移 15 码并解除定身效果。（法师天赋）"
+      },
+      "bloodlust": {
+        "name": "战鼓",
+        "description": "让附近的盟友陷入狂热，提高攻击速度，持续 15 秒。（萨满天赋）"
+      },
+      "chain_lightning": {
+        "name": "叉状闪电",
+        "description": "向目标区域掷出闪电，对附近敌人造成 {damage} 点伤害。（萨满天赋）"
+      },
+      "chaos_bolt": {
+        "name": "毁灭箭",
+        "description": "掷出一枚混乱火焰之箭，造成 {damage} 点火焰伤害。（术士天赋）"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影斗篷",
+        "description": "以暗影包裹自身，吸收伤害，持续 5 秒。（潜行者天赋）"
+      },
+      "cone_of_cold": {
+        "name": "寒霜横扫",
+        "description": "以寒霜冲击附近的敌人，造成 {damage} 点冰霜伤害。（法师天赋）"
+      },
+      "counter_shot": {
+        "name": "缄默射击",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（猎人天赋）"
       },
       "counterspell": {
         "name": "破法",
-        "description": "反制目标的施法，并在6秒内封锁该法术学派。"
+        "description": "反制敌人的施法，使该系法术在 6 秒内无法施放。（法师天赋）"
       },
-      "counter_shot": {
-        "name": "静默射击",
-        "description": "一记快射，打断目标的施法，并在4秒内封锁该学派。"
+      "curse_of_exhaustion": {
+        "name": "铅沉妖咒",
+        "description": "诅咒目标，使其移动速度降低 30%，持续 12 秒。（术士天赋）"
+      },
+      "death_coil": {
+        "name": "墓穴缠卷",
+        "description": "对敌人造成 {damage} 点暗影伤害，随后使其恐惧 3 秒。此法术不会治疗施法者。（术士天赋）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "将目标深度冻结，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）"
+      },
+      "desperate_prayer": {
+        "name": "最后祈祷",
+        "description": "立即为你治疗 {damage} 点生命值。（牧师天赋）"
+      },
+      "deterrence": {
+        "name": "鬃刺守卫",
+        "description": "提高你的躲闪几率 50%，持续 10 秒。（猎人天赋）"
+      },
+      "divine_shield": {
+        "name": "圣光守护",
+        "description": "以神圣之力护佑你，吸收大量伤害，持续 8 秒。（圣骑士天赋）"
+      },
+      "earthbind": {
+        "name": "攫握大地",
+        "description": "将附近的敌人束缚于大地，定身 2 秒。（萨满天赋）"
+      },
+      "evocation": {
+        "name": "以太之井",
+        "description": "快速恢复法力。（法师天赋）"
+      },
+      "frenzied_regeneration": {
+        "name": "野性愈合",
+        "description": "在 10 秒内恢复生命值。仅限蛮熊形态。（德鲁伊天赋）"
+      },
+      "frost_trap": {
+        "name": "霜纹陷阱",
+        "description": "将目标区域的敌人冻结在原地，持续 3 秒。（猎人天赋）"
+      },
+      "ghostly_strike": {
+        "name": "幽魂打击",
+        "description": "对敌人造成武器伤害外加 {damage} 点伤害，并短暂提高躲闪几率。获得 1 个连击点。（潜行者天赋）"
+      },
+      "hammer_of_wrath": {
+        "name": "鸣钟之锤",
+        "description": "向受创的敌人掷出神圣之锤，造成 {damage} 点神圣伤害。仅可对生命值低于 20% 的目标使用。（圣骑士天赋）"
+      },
+      "healing_stream": {
+        "name": "泉涌",
+        "description": "在 12 秒内治疗一名友方目标。（萨满天赋）"
+      },
+      "heroic_leap": {
+        "name": "战跃",
+        "description": "跃向目标区域，对附近敌人造成 {damage} 点物理伤害。（战士天赋）"
+      },
+      "holy_wrath": {
+        "name": "圣徒之怒",
+        "description": "释放神圣之力，对附近敌人造成 {damage} 点伤害。（圣骑士天赋）"
+      },
+      "howl_of_terror": {
+        "name": "恐惧嚎叫",
+        "description": "恐吓附近的敌人，最多持续 3 秒。受到伤害可能打破该效果。（术士天赋）"
+      },
+      "ice_block": {
+        "name": "寒冰棺",
+        "description": "将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）"
+      },
+      "inner_focus": {
+        "name": "静心",
+        "description": "使你的下一个法术不消耗法力。持续 60 秒。（牧师天赋）"
+      },
+      "innervate": {
+        "name": "生命树液",
+        "description": "立即恢复 200 点当前资源。（德鲁伊天赋）"
+      },
+      "kick": {
+        "name": "踢击",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）"
+      },
+      "last_stand": {
+        "name": "第十一刻",
+        "description": "暂时提高耐力，持续 15 秒，提高最大生命值。（战士天赋）"
+      },
+      "mend_pet": {
+        "name": "修补",
+        "description": "在 15 秒内为友方目标治疗 {damage} 点生命值。（猎人天赋）"
+      },
+      "meteor": {
+        "name": "天石",
+        "description": "唤降一颗陨石轰击目标区域，造成 {damage} 点火焰伤害并点燃地面。（法师天赋）"
+      },
+      "mind_sear": {
+        "name": "灼思",
+        "description": "向目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"
+      },
+      "multi_shot": {
+        "name": "分裂射击",
+        "description": "射出多枚箭矢，对附近敌人造成 {damage} 点伤害。（猎人天赋）"
+      },
+      "prayer_of_healing": {
+        "name": "圣歌愈疗",
+        "description": "治疗附近的盟友 {damage} 点生命值。（牧师天赋）"
+      },
+      "preparation": {
+        "name": "应变",
+        "description": "结束疾跑、闪避和消失的冷却时间。（潜行者天赋）"
+      },
+      "presence_of_mind": {
+        "name": "疾思",
+        "description": "使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）"
+      },
+      "psychic_scream": {
+        "name": "心灵尖啸",
+        "description": "恐吓附近的敌人，最多持续 4 秒。受到伤害可能打破该效果。（牧师天赋）"
+      },
+      "pummel": {
+        "name": "裂颚击",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（战士天赋）"
+      },
+      "rallying_cry": {
+        "name": "集结",
+        "description": "发出激励的呐喊，提高附近盟友的攻击强度，持续 10 秒。（战士天赋）"
       },
       "rebuke": {
-        "name": "谴喝",
-        "description": "打断目标的施法，并在4秒内封锁该法术学派。"
+        "name": "斥责",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（圣骑士天赋）"
+      },
+      "shadowstep": {
+        "name": "影步",
+        "description": "穿过暗影，移动到目标身旁。（潜行者天赋）"
+      },
+      "shield_wall": {
+        "name": "壁垒",
+        "description": "筑起坚不可摧的壁垒，大幅提高护甲，持续 10 秒。（战士天赋）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "沉默目标，持续 4 秒。（牧师天赋）"
       },
       "skull_bash": {
-        "name": "头槌",
-        "description": "猛然头槌，打断目标的施法，并在4秒内封锁该学派。"
+        "name": "颅击",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（德鲁伊天赋）"
       },
       "spell_lock": {
         "name": "封口令",
-        "description": "在施法中沉默目标，并在5秒内封锁该法术学派。"
+        "description": "打断施法，并使该系法术在 5 秒内无法施放。（术士天赋）"
+      },
+      "tranquility": {
+        "name": "林地之歌",
+        "description": "引导恢复之力，每秒治疗附近的盟友。（德鲁伊天赋）"
       },
       "bear_charge": {
         "name": "巨熊冲锋",

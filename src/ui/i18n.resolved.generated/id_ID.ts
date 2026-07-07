@@ -6352,33 +6352,209 @@ export const id_ID: EnTranslations = {
         "name": "Panggil Wraithborn",
         "description": "Mengikat Wraithborn pada kehendakmu, iblis elit yang menghujani kerusakan Bayangan berat dari kejauhan. Waktu jeda yang panjang membatasi kekuatannya yang menghancurkan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
       },
-      "pummel": {
-        "name": "Pukulan Bertubi",
-        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
+      "aspect_of_the_wild": {
+        "name": "Rupa Taring Liar",
+        "description": "Inspira a di dekat sekutu con fuerza salvaje, aumentando daya serang durante 5 mnt. (talenta hunter)"
       },
-      "kick": {
-        "name": "Tendangan",
-        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
+      "avatar": {
+        "name": "Kolosus",
+        "description": "Te transforma en un coloso y aumenta daya serang durante 20 detik. (talenta warrior)"
       },
-      "counterspell": {
-        "name": "Penangkal Mantra",
-        "description": "Menangkal perapalan mantra target dan mencegah perapalan dari aliran sihir itu selama 6 detik."
+      "avenging_wrath": {
+        "name": "Sayap Pembalas",
+        "description": "Invoca poder vengador y aumenta daya serang y daya sihir durante 20 detik. (talenta paladin)"
+      },
+      "berserk": {
+        "name": "Kabut Merah",
+        "description": "Aumenta daya serang durante 15 detik. (talenta druid)"
+      },
+      "bladestorm": {
+        "name": "Siklon Baja",
+        "description": "Te convierte en una tormenta de acero que golpea a di dekat musuh cada segundo por {damage}. (talenta warrior)"
+      },
+      "blink": {
+        "name": "Langkah Kilat",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (talenta mage)"
+      },
+      "bloodlust": {
+        "name": "Genderang Perang",
+        "description": "Lleva a di dekat sekutu al frenesí y aumenta su velocidad de ataque durante 15 detik. (talenta shaman)"
+      },
+      "chain_lightning": {
+        "name": "Petir Bercabang",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a di dekat musuh. (talenta shaman)"
+      },
+      "chaos_bolt": {
+        "name": "Baut Reruntuhan",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Api. (talenta warlock)"
+      },
+      "cloak_of_shadows": {
+        "name": "Jubah Bayang",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 detik. (talenta rogue)"
+      },
+      "cone_of_cold": {
+        "name": "Sapuan Beku",
+        "description": "Golpea a di dekat musuh con escarcha e inflige {damage} de daño de Es. (talenta mage)"
       },
       "counter_shot": {
-        "name": "Tembakan Penangkal",
-        "description": "Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik."
+        "name": "Tembakan Peredam",
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta hunter)"
+      },
+      "counterspell": {
+        "name": "Pematah Mantra",
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 6 detik. (talenta mage)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Kutuk Timah",
+        "description": "Maldice a target y reduce su velocidad de movimiento un 30% durante 12 detik. (talenta warlock)"
+      },
+      "death_coil": {
+        "name": "Kumparan Kubur",
+        "description": "Golpea a target por {damage} de daño de Bayangan y luego lo aterroriza durante 3 detik. Esta versión no sana al lanzador. (talenta warlock)"
+      },
+      "deep_freeze": {
+        "name": "Embun Mati",
+        "description": "Congela profundamente a target, inflige {damage} de daño de Es y lo aturde durante 4 detik. (talenta mage)"
+      },
+      "desperate_prayer": {
+        "name": "Doa Terakhir",
+        "description": "Te sana al instante por {damage}. (talenta priest)"
+      },
+      "deterrence": {
+        "name": "Penjaga Duri",
+        "description": "Aumenta tu peluang menghindar un 50% durante 10 detik. (talenta hunter)"
+      },
+      "divine_shield": {
+        "name": "Pelindung Cahaya",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 detik. (talenta paladin)"
+      },
+      "earthbind": {
+        "name": "Bumi Mencengkeram",
+        "description": "Ata a la tierra a di dekat musuh y los inmoviliza durante 2 detik. (talenta shaman)"
+      },
+      "evocation": {
+        "name": "Sumur Eter",
+        "description": "Restaura mana rápidamente. (talenta mage)"
+      },
+      "frenzied_regeneration": {
+        "name": "Pemulihan Liar",
+        "description": "Regenera salud durante 10 detik. Solo en Forma de oso. (talenta druid)"
+      },
+      "frost_trap": {
+        "name": "Jerat Rima",
+        "description": "Congela a los musuh en el área objetivo durante 3 detik. (talenta hunter)"
+      },
+      "ghostly_strike": {
+        "name": "Serangan Arwah",
+        "description": "Golpea a target por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talenta rogue)"
+      },
+      "hammer_of_wrath": {
+        "name": "Palu Berdentang",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Suci. Solo se usa por debajo del 20% de salud. (talenta paladin)"
+      },
+      "healing_stream": {
+        "name": "Mata Air",
+        "description": "Restaura a target sekutu durante 12 detik. (talenta shaman)"
+      },
+      "heroic_leap": {
+        "name": "Lompatan Perang",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fisik a di dekat musuh. (talenta warrior)"
+      },
+      "holy_wrath": {
+        "name": "Murka Santo",
+        "description": "Desata poder sagrado e inflige {damage} de daño a di dekat musuh. (talenta paladin)"
+      },
+      "howl_of_terror": {
+        "name": "Lolongan Ngeri",
+        "description": "Aterroriza a di dekat musuh hasta 3 detik. El daño puede romper el efecto. (talenta warlock)"
+      },
+      "ice_block": {
+        "name": "Peti Es",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)"
+      },
+      "inner_focus": {
+        "name": "Pikiran Hening",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 detik. (talenta priest)"
+      },
+      "innervate": {
+        "name": "Getah Hidup",
+        "description": "Restaura al instante 200 de tu sumber daya saat ini. (talenta druid)"
+      },
+      "kick": {
+        "name": "Tendang",
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta rogue)"
+      },
+      "last_stand": {
+        "name": "Jam Kesebelas",
+        "description": "Aumenta temporalmente Stamina durante 15 detik, aumentando la salud máxima. (talenta warrior)"
+      },
+      "mend_pet": {
+        "name": "Tambal Luka",
+        "description": "Sana a target sekutu por {damage} durante 15 detik. (talenta hunter)"
+      },
+      "meteor": {
+        "name": "Batu Langit",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Api y quema el suelo. (talenta mage)"
+      },
+      "mind_sear": {
+        "name": "Bakar Pikir",
+        "description": "Canaliza energía de Bayangan en el área objetivo e inflige {damage} cada segundo a di dekat musuh. (talenta priest)"
+      },
+      "multi_shot": {
+        "name": "Tembakan Pecah",
+        "description": "Dispara varios proyectiles e inflige {damage} a di dekat musuh. (talenta hunter)"
+      },
+      "prayer_of_healing": {
+        "name": "Penyembuhan Koor",
+        "description": "Sana a di dekat sekutu por {damage}. (talenta priest)"
+      },
+      "preparation": {
+        "name": "Rencana Cadangan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talenta rogue)"
+      },
+      "presence_of_mind": {
+        "name": "Pikiran Melaju",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)"
+      },
+      "psychic_scream": {
+        "name": "Jerit Psikis",
+        "description": "Aterroriza a di dekat musuh hasta 4 detik. El daño puede romper el efecto. (talenta priest)"
+      },
+      "pummel": {
+        "name": "Pukul Hantam",
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta warrior)"
+      },
+      "rallying_cry": {
+        "name": "Seruan Kumpul",
+        "description": "Lanza un grito de reunión y aumenta daya serang de di dekat sekutu durante 10 detik. (talenta warrior)"
       },
       "rebuke": {
         "name": "Teguran",
-        "description": "Mengganggu perapalan mantra target dan mencegah casting dari sekolah itu selama 4 detik."
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta paladin)"
+      },
+      "shadowstep": {
+        "name": "Selip Bayang",
+        "description": "Das un paso entre las sombras hacia tu target. (talenta rogue)"
+      },
+      "shield_wall": {
+        "name": "Benteng",
+        "description": "Alzas un muro de escudo y aumentas mucho la armor durante 10 detik. (talenta warrior)"
+      },
+      "silence": {
+        "name": "Senyap",
+        "description": "Silencia a target durante 4 detik. (talenta priest)"
       },
       "skull_bash": {
-        "name": "Hantaman Tengkorak",
-        "description": "Serudukan kepala yang menerjang, mengganggu perapalan mantra target dan mengunci aliran sihir itu selama 4 detik."
+        "name": "Benturan Kepala",
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta druid)"
       },
       "spell_lock": {
-        "name": "Kunci Mantra",
-        "description": "Membungkam target saat sedang merapal dan mencegah perapalan dari aliran sihir itu selama 5 detik."
+        "name": "Perintah Bungkam",
+        "description": "Menghentikan perapalan dan mencegah mantra sekolah itu selama 5 detik. (talenta warlock)"
+      },
+      "tranquility": {
+        "name": "Lagu Rimba",
+        "description": "Canaliza energía restauradora y sana a di dekat sekutu cada segundo. (talenta druid)"
       },
       "bear_charge": {
         "name": "Terjangan Bruin",

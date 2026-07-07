@@ -2381,6 +2381,159 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': 'Ulveskindstaske',
   'entities.items.gravewoven_bag.name': 'Gravvævet taske',
   'entities.items.mistcallers_duffel.name': 'Fogbinderens køjesæk',
+  'entities.abilities.aspect_of_the_wild.name': 'Vildtands skikkelse',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a nærliggende allierede con fuerza salvaje, aumentando angrebskraft durante 5 min. (jægertalent)',
+  'entities.abilities.avatar.name': 'Kolossen',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta angrebskraft durante 20 sek. (krigertalent)',
+  'entities.abilities.avenging_wrath.name': 'Hævnerfløj',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta angrebskraft y trolddomskraft durante 20 sek. (paladintalent)',
+  'entities.abilities.berserk.name': 'Rød dis',
+  'entities.abilities.berserk.description':
+    'Aumenta angrebskraft durante 15 sek. (druidentalent)',
+  'entities.abilities.bladestorm.name': 'Stålcyklon',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a nærliggende fjender cada segundo por {damage}. (krigertalent)',
+  'entities.abilities.blink.name': 'Flimmertrin',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (magikertalent)',
+  'entities.abilities.bloodlust.name': 'Krigstrommer',
+  'entities.abilities.bloodlust.description':
+    'Lleva a nærliggende allierede al frenesí y aumenta su velocidad de ataque durante 15 sek. (shamantent)',
+  'entities.abilities.chain_lightning.name': 'Gaffellyn',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a nærliggende fjender. (shamantent)',
+  'entities.abilities.chaos_bolt.name': 'Ruinbolt',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Ild. (troldmandstalent)',
+  'entities.abilities.cloak_of_shadows.name': 'Skyggekappe',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 sek. (snigmordertalent)',
+  'entities.abilities.cone_of_cold.name': 'Frostfej',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a nærliggende fjender con escarcha e inflige {damage} de daño de Frost. (magikertalent)',
+  'entities.abilities.counter_shot.name': 'Dæmpende skud',
+  'entities.abilities.counter_shot.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (jægertalent)',
+  'entities.abilities.counterspell.name': 'Trolddomsbrud',
+  'entities.abilities.counterspell.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 6 sek. (magikertalent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Blytung forbandelse',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a målet y reduce su velocidad de movimiento un 30% durante 12 sek. (troldmandstalent)',
+  'entities.abilities.death_coil.name': 'Gravspiral',
+  'entities.abilities.death_coil.description':
+    'Golpea a målet por {damage} de daño de Skygge y luego lo aterroriza durante 3 sek. Esta versión no sana al lanzador. (troldmandstalent)',
+  'entities.abilities.deep_freeze.name': 'Dødfrost',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalent)',
+  'entities.abilities.desperate_prayer.name': 'Sidste bøn',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (præstetalent)',
+  'entities.abilities.deterrence.name': 'Børsteværn',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu undvigelseschance un 50% durante 10 sek. (jægertalent)',
+  'entities.abilities.divine_shield.name': 'Lysværn',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sek. (paladintalent)',
+  'entities.abilities.earthbind.name': 'Gribende jord',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a nærliggende fjender y los inmoviliza durante 2 sek. (shamantent)',
+  'entities.abilities.evocation.name': 'Æterbrønd',
+  'entities.abilities.evocation.description':
+    'Restaura mana rápidamente. (magikertalent)',
+  'entities.abilities.frenzied_regeneration.name': 'Vild heling',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 sek. Solo en Forma de oso. (druidentalent)',
+  'entities.abilities.frost_trap.name': 'Rimfælde',
+  'entities.abilities.frost_trap.description':
+    'Congela a los fjender en el área objetivo durante 3 sek. (jægertalent)',
+  'entities.abilities.ghostly_strike.name': 'Genfærdsslag',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a målet por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (snigmordertalent)',
+  'entities.abilities.hammer_of_wrath.name': 'Klanghammer',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Hellig. Solo se usa por debajo del 20% de salud. (paladintalent)',
+  'entities.abilities.healing_stream.name': 'Kildebrønd',
+  'entities.abilities.healing_stream.description':
+    'Restaura a et venligt mål durante 12 sek. (shamantent)',
+  'entities.abilities.heroic_leap.name': 'Krigsspring',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño Fysisk a nærliggende fjender. (krigertalent)',
+  'entities.abilities.holy_wrath.name': 'Helgenvrede',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a nærliggende fjender. (paladintalent)',
+  'entities.abilities.howl_of_terror.name': 'Rædselshyl',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a nærliggende fjender hasta 3 sek. El daño puede romper el efecto. (troldmandstalent)',
+  'entities.abilities.ice_block.name': 'Kold kiste',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)',
+  'entities.abilities.inner_focus.name': 'Stillet sind',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (præstetalent)',
+  'entities.abilities.innervate.name': 'Livssaft',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu nuværende ressource. (druidentalent)',
+  'entities.abilities.kick.name': 'Støvle',
+  'entities.abilities.kick.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (snigmordertalent)',
+  'entities.abilities.last_stand.name': 'Ellevte time',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Udholdenhed durante 15 sek, aumentando la salud máxima. (krigertalent)',
+  'entities.abilities.mend_pet.name': 'Lappe sammen',
+  'entities.abilities.mend_pet.description':
+    'Sana a et venligt mål por {damage} durante 15 sek. (jægertalent)',
+  'entities.abilities.meteor.name': 'Himmelsten',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ild y quema el suelo. (magikertalent)',
+  'entities.abilities.mind_sear.name': 'Tankebrand',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Skygge en el área objetivo e inflige {damage} cada segundo a nærliggende fjender. (præstetalent)',
+  'entities.abilities.multi_shot.name': 'Splitskud',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a nærliggende fjender. (jægertalent)',
+  'entities.abilities.prayer_of_healing.name': 'Korhelbredelse',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a nærliggende allierede por {damage}. (præstetalent)',
+  'entities.abilities.preparation.name': 'Nødplan',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (snigmordertalent)',
+  'entities.abilities.presence_of_mind.name': 'Ræsende sind',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)',
+  'entities.abilities.psychic_scream.name': 'Psykisk skrig',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a nærliggende fjender hasta 4 sek. El daño puede romper el efecto. (præstetalent)',
+  'entities.abilities.pummel.name': 'Prygl',
+  'entities.abilities.pummel.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (krigertalent)',
+  'entities.abilities.rallying_cry.name': 'Mønstring',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta angrebskraft de nærliggende allierede durante 10 sek. (krigertalent)',
+  'entities.abilities.rebuke.name': 'Irettesættelse',
+  'entities.abilities.rebuke.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (paladintalent)',
+  'entities.abilities.shadowstep.name': 'Skyggesmut',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu målet. (snigmordertalent)',
+  'entities.abilities.shield_wall.name': 'Bolværk',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigertalent)',
+  'entities.abilities.silence.name': 'Tavshed',
+  'entities.abilities.silence.description':
+    'Silencia a målet durante 4 sek. (præstetalent)',
+  'entities.abilities.skull_bash.name': 'Pandeskal',
+  'entities.abilities.skull_bash.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (druidentalent)',
+  'entities.abilities.spell_lock.name': 'Mundkurv',
+  'entities.abilities.spell_lock.description':
+    'Afbryder besværgelse og forhindrer magi fra den skole i 5 sek. (troldmandstalent)',
+  'entities.abilities.tranquility.name': 'Lundens sang',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a nærliggende allierede cada segundo. (druidentalent)',
   'entities.items.worn_sword.name': 'Rustæret Kortsværd',
   'entities.items.woven_robe.name': 'Dalvævet Kjortel',
   'entities.items.wyrmcult_grand_robe.name': 'Ormekultens Storkjortel',

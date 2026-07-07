@@ -2631,6 +2631,159 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': '悪魔変身',
   'entities.abilities.metamorphosis.description':
     '悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）',
+  'entities.abilities.aspect_of_the_wild.name': '野牙の装い',
+  'entities.abilities.aspect_of_the_wild.description':
+    '野生の力で周囲の味方を鼓舞し、攻撃力を高める。効果時間 5 分。（ハンタータレント）',
+  'entities.abilities.avatar.name': '巨像',
+  'entities.abilities.avatar.description':
+    '巨像と化し、攻撃力を高める。効果時間 20 秒。（ウォリアータレント）',
+  'entities.abilities.avenging_wrath.name': '復讐の翼',
+  'entities.abilities.avenging_wrath.description':
+    '報復の力を呼び降ろし、攻撃力と呪文能力を高める。効果時間 20 秒。（パラディンタレント）',
+  'entities.abilities.berserk.name': '赤き霞',
+  'entities.abilities.berserk.description':
+    '攻撃力を高める。効果時間 15 秒。（ドルイドタレント）',
+  'entities.abilities.bladestorm.name': '鋼の旋風',
+  'entities.abilities.bladestorm.description':
+    '鋼鉄の嵐と化し、毎秒周囲の敵に {damage} のダメージを与える。（ウォリアータレント）',
+  'entities.abilities.blink.name': '瞬き歩み',
+  'entities.abilities.blink.description':
+    '前方 15 ヤードに瞬間移動し、移動不能効果を解除する。（メイジタレント）',
+  'entities.abilities.bloodlust.name': '戦の太鼓',
+  'entities.abilities.bloodlust.description':
+    '周囲の味方を狂乱させ、攻撃速度を高める。効果時間 15 秒。（シャーマンタレント）',
+  'entities.abilities.chain_lightning.name': '枝分かれの稲妻',
+  'entities.abilities.chain_lightning.description':
+    '対象地点に稲妻を放ち、周囲の敵に {damage} のダメージを与える。（シャーマンタレント）',
+  'entities.abilities.chaos_bolt.name': '破滅の矢',
+  'entities.abilities.chaos_bolt.description':
+    '混沌の炎の矢を放ち、{damage} の火炎ダメージを与える。（ウォーロックタレント）',
+  'entities.abilities.cloak_of_shadows.name': '影まとい',
+  'entities.abilities.cloak_of_shadows.description':
+    '影で身を包み、ダメージを吸収する。効果時間 5 秒。（ローグタレント）',
+  'entities.abilities.cone_of_cold.name': '霜払い',
+  'entities.abilities.cone_of_cold.description':
+    '周囲の敵を冷気で吹き飛ばし、{damage} の冷気ダメージを与える。（メイジタレント）',
+  'entities.abilities.counter_shot.name': '沈黙の射撃',
+  'entities.abilities.counter_shot.description':
+    '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ハンタータレント）',
+  'entities.abilities.counterspell.name': '呪文砕き',
+  'entities.abilities.counterspell.description':
+    '敵の詠唱を打ち消し、その系統の呪文を 6 秒間詠唱不能にする。（メイジタレント）',
+  'entities.abilities.curse_of_exhaustion.name': '鉛の呪い',
+  'entities.abilities.curse_of_exhaustion.description':
+    '対象を呪い、移動速度を 30% 低下させる。効果時間 12 秒。（ウォーロックタレント）',
+  'entities.abilities.death_coil.name': '墓所の螺旋',
+  'entities.abilities.death_coil.description':
+    '敵に {damage} の暗影ダメージを与え、その後 3 秒間恐怖させる。この呪文は詠唱者を回復しない。（ウォーロックタレント）',
+  'entities.abilities.deep_freeze.name': '死霜',
+  'entities.abilities.deep_freeze.description':
+    '対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）',
+  'entities.abilities.desperate_prayer.name': '最後の祈り',
+  'entities.abilities.desperate_prayer.description':
+    '自身を即座に {damage} 回復する。（プリーストタレント）',
+  'entities.abilities.deterrence.name': '針毛の守り',
+  'entities.abilities.deterrence.description':
+    '回避率を 50% 高める。効果時間 10 秒。（ハンタータレント）',
+  'entities.abilities.divine_shield.name': '光の護り',
+  'entities.abilities.divine_shield.description':
+    '聖なる力で身を守り、大量のダメージを吸収する。効果時間 8 秒。（パラディンタレント）',
+  'entities.abilities.earthbind.name': '大地の縛り',
+  'entities.abilities.earthbind.description':
+    '周囲の敵を大地に縛り付け、2 秒間移動不能にする。（シャーマンタレント）',
+  'entities.abilities.evocation.name': 'エーテルの井戸',
+  'entities.abilities.evocation.description':
+    'マナを急速に回復する。（メイジタレント）',
+  'entities.abilities.frenzied_regeneration.name': '野生の癒し',
+  'entities.abilities.frenzied_regeneration.description':
+    '10 秒かけて体力を回復する。ブルーインフォーム限定。（ドルイドタレント）',
+  'entities.abilities.frost_trap.name': '霧氷の罠',
+  'entities.abilities.frost_trap.description':
+    '対象地点の敵を 3 秒間その場に凍結させる。（ハンタータレント）',
+  'entities.abilities.ghostly_strike.name': '亡霊の一撃',
+  'entities.abilities.ghostly_strike.description':
+    '敵に武器ダメージに加え {damage} のダメージを与え、短時間回避率を高める。コンボポイントを 1 獲得する。（ローグタレント）',
+  'entities.abilities.hammer_of_wrath.name': '鐘鳴りの槌',
+  'entities.abilities.hammer_of_wrath.description':
+    '傷ついた敵に聖なる鎚を投げ、{damage} の神聖ダメージを与える。体力が 20% 未満の対象にのみ使用可能。（パラディンタレント）',
+  'entities.abilities.healing_stream.name': '湧き水',
+  'entities.abilities.healing_stream.description':
+    '12 秒かけて味方一人を回復する。（シャーマンタレント）',
+  'entities.abilities.heroic_leap.name': '戦跳び',
+  'entities.abilities.heroic_leap.description':
+    '対象地点へ跳躍し、周囲の敵に {damage} の物理ダメージを与える。（ウォリアータレント）',
+  'entities.abilities.holy_wrath.name': '聖者の怒り',
+  'entities.abilities.holy_wrath.description':
+    '聖なる力を解き放ち、周囲の敵に {damage} のダメージを与える。（パラディンタレント）',
+  'entities.abilities.howl_of_terror.name': '恐怖の遠吠え',
+  'entities.abilities.howl_of_terror.description':
+    '周囲の敵を最大 3 秒間恐怖させる。ダメージで効果が解ける場合がある。（ウォーロックタレント）',
+  'entities.abilities.ice_block.name': '冷たき棺',
+  'entities.abilities.ice_block.description':
+    '自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）',
+  'entities.abilities.inner_focus.name': '静まる心',
+  'entities.abilities.inner_focus.description':
+    '次の呪文のコストを無料にする。効果時間 60 秒。（プリーストタレント）',
+  'entities.abilities.innervate.name': '生命の樹液',
+  'entities.abilities.innervate.description':
+    '現在のリソースを即座に 200 回復する。（ドルイドタレント）',
+  'entities.abilities.kick.name': '蹴り',
+  'entities.abilities.kick.description':
+    '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ローグタレント）',
+  'entities.abilities.last_stand.name': '第十一刻',
+  'entities.abilities.last_stand.description':
+    '一時的にスタミナを高め、最大体力を増加させる。効果時間 15 秒。（ウォリアータレント）',
+  'entities.abilities.mend_pet.name': '手当て',
+  'entities.abilities.mend_pet.description':
+    '15 秒かけて味方対象を {damage} 回復する。（ハンタータレント）',
+  'entities.abilities.meteor.name': '天の石',
+  'entities.abilities.meteor.description':
+    '対象地点に隕石を呼び降ろし、{damage} の火炎ダメージを与えて地面を燃やす。（メイジタレント）',
+  'entities.abilities.mind_sear.name': '思念焼き',
+  'entities.abilities.mind_sear.description':
+    '対象地点に暗影の力を注ぎ、毎秒周囲の敵に {damage} のダメージを与える。（プリーストタレント）',
+  'entities.abilities.multi_shot.name': '分裂射撃',
+  'entities.abilities.multi_shot.description':
+    '複数の矢を放ち、周囲の敵に {damage} のダメージを与える。（ハンタータレント）',
+  'entities.abilities.prayer_of_healing.name': '聖歌の癒し',
+  'entities.abilities.prayer_of_healing.description':
+    '周囲の味方を {damage} 回復する。（プリーストタレント）',
+  'entities.abilities.preparation.name': '備え',
+  'entities.abilities.preparation.description':
+    'スプリント、回避、バニッシュのクールダウンを終了させる。（ローグタレント）',
+  'entities.abilities.presence_of_mind.name': '駆ける心',
+  'entities.abilities.presence_of_mind.description':
+    '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
+  'entities.abilities.psychic_scream.name': '精神の絶叫',
+  'entities.abilities.psychic_scream.description':
+    '周囲の敵を最大 4 秒間恐怖させる。ダメージで効果が解ける場合がある。（プリーストタレント）',
+  'entities.abilities.pummel.name': '顎砕き',
+  'entities.abilities.pummel.description':
+    '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ウォリアータレント）',
+  'entities.abilities.rallying_cry.name': '奮起の叫び',
+  'entities.abilities.rallying_cry.description':
+    '鼓舞の雄叫びを上げ、周囲の味方の攻撃力を高める。効果時間 10 秒。（ウォリアータレント）',
+  'entities.abilities.rebuke.name': '叱責',
+  'entities.abilities.rebuke.description':
+    '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（パラディンタレント）',
+  'entities.abilities.shadowstep.name': '影すべり',
+  'entities.abilities.shadowstep.description':
+    '影を抜けて対象のもとへ移動する。（ローグタレント）',
+  'entities.abilities.shield_wall.name': '防壁',
+  'entities.abilities.shield_wall.description':
+    '揺るぎない防壁を築き、アーマーを大幅に高める。効果時間 10 秒。（ウォリアータレント）',
+  'entities.abilities.silence.name': '沈黙',
+  'entities.abilities.silence.description':
+    '対象を 4 秒間沈黙させる。（プリーストタレント）',
+  'entities.abilities.skull_bash.name': '頭突き',
+  'entities.abilities.skull_bash.description':
+    '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ドルイドタレント）',
+  'entities.abilities.spell_lock.name': '口封じ令',
+  'entities.abilities.spell_lock.description':
+    '詠唱を妨害し、その系統の呪文を 5 秒間詠唱不能にする。（ウォーロックタレント）',
+  'entities.abilities.tranquility.name': '木立の歌',
+  'entities.abilities.tranquility.description':
+    '回復の力を注ぎ、毎秒周囲の味方を回復する。（ドルイドタレント）',
   'entities.items.worn_sword.name': '錆穴だらけのショートソード',
   'entities.items.gnarled_staff.name': '沼樫の杖',
   'entities.items.rusty_dagger.name': '錆びたダガー',

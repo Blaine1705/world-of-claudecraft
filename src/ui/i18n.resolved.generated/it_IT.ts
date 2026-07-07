@@ -6352,33 +6352,209 @@ export const it_IT: EnTranslations = {
         "name": "Evoca Wraithborn",
         "description": "Vincola un Wraithborn al tuo volere: un demone d'élite che scaglia da lontano ingenti danni d'Ombra. Un lungo tempo di recupero ne limita la potenza devastante. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta."
       },
-      "pummel": {
-        "name": "Spaccamascella",
-        "description": "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 4 s."
+      "aspect_of_the_wild": {
+        "name": "Aspetto Zannaferina",
+        "description": "Inspira a vicini alleati con fuerza salvaje, aumentando potenza d’attacco durante 5 min. (talento da cacciatore)"
       },
-      "kick": {
-        "name": "Calcio",
-        "description": "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 4 s."
+      "avatar": {
+        "name": "Colosso",
+        "description": "Te transforma en un coloso y aumenta potenza d’attacco durante 20 s. (talento da guerriero)"
       },
-      "counterspell": {
-        "name": "Spezzaincantesimi",
-        "description": "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 6 s."
+      "avenging_wrath": {
+        "name": "Alavendetta",
+        "description": "Invoca poder vengador y aumenta potenza d’attacco y potenza magica durante 20 s. (talento da paladino)"
+      },
+      "berserk": {
+        "name": "Bruma Rossa",
+        "description": "Aumenta potenza d’attacco durante 15 s. (talento da druido)"
+      },
+      "bladestorm": {
+        "name": "Ciclone d’Acciaio",
+        "description": "Te convierte en una tormenta de acero que golpea a vicini nemici cada segundo por {damage}. (talento da guerriero)"
+      },
+      "blink": {
+        "name": "Passo Baleno",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (talento da mago)"
+      },
+      "bloodlust": {
+        "name": "Tamburi di Guerra",
+        "description": "Lleva a vicini alleati al frenesí y aumenta su velocidad de ataque durante 15 s. (talento da sciamano)"
+      },
+      "chain_lightning": {
+        "name": "Fulmine Biforcuto",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a vicini nemici. (talento da sciamano)"
+      },
+      "chaos_bolt": {
+        "name": "Dardo della Rovina",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuoco. (talento da stregone)"
+      },
+      "cloak_of_shadows": {
+        "name": "Manto d’Ombra",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 s. (talento da ladro)"
+      },
+      "cone_of_cold": {
+        "name": "Spazzata Gelida",
+        "description": "Golpea a vicini nemici con escarcha e inflige {damage} de daño de Gelo. (talento da mago)"
       },
       "counter_shot": {
-        "name": "Tiro Silenziante",
-        "description": "Un tiro rapido che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s."
+        "name": "Tiro Ammutolente",
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da cacciatore)"
+      },
+      "counterspell": {
+        "name": "Spezzaincanti",
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 6 s. (talento da mago)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Maleficio Plum beo",
+        "description": "Maldice a bersaglio y reduce su velocidad de movimiento un 30% durante 12 s. (talento da stregone)"
+      },
+      "death_coil": {
+        "name": "Spira Sepolcrale",
+        "description": "Golpea a bersaglio por {damage} de daño de Ombra y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talento da stregone)"
+      },
+      "deep_freeze": {
+        "name": "Gelo Morto",
+        "description": "Congela profundamente a bersaglio, inflige {damage} de daño de Gelo y lo aturde durante 4 s. (talento da mago)"
+      },
+      "desperate_prayer": {
+        "name": "Ultima Preghiera",
+        "description": "Te sana al instante por {damage}. (talento da sacerdote)"
+      },
+      "deterrence": {
+        "name": "Guardia Ispida",
+        "description": "Aumenta tu probabilità di schivata un 50% durante 10 s. (talento da cacciatore)"
+      },
+      "divine_shield": {
+        "name": "Custodia di Luce",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talento da paladino)"
+      },
+      "earthbind": {
+        "name": "Terra Avvinghiante",
+        "description": "Ata a la tierra a vicini nemici y los inmoviliza durante 2 s. (talento da sciamano)"
+      },
+      "evocation": {
+        "name": "Pozzo d’Etere",
+        "description": "Restaura mana rápidamente. (talento da mago)"
+      },
+      "frenzied_regeneration": {
+        "name": "Rammendo Selvaggio",
+        "description": "Regenera salud durante 10 s. Solo en Forma de oso. (talento da druido)"
+      },
+      "frost_trap": {
+        "name": "Trappola di Brina",
+        "description": "Congela a los nemici en el área objetivo durante 3 s. (talento da cacciatore)"
+      },
+      "ghostly_strike": {
+        "name": "Colpo Spettrale",
+        "description": "Golpea a bersaglio por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talento da ladro)"
+      },
+      "hammer_of_wrath": {
+        "name": "Martello Rintoccante",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sacro. Solo se usa por debajo del 20% de salud. (talento da paladino)"
+      },
+      "healing_stream": {
+        "name": "Fonte Viva",
+        "description": "Restaura a bersaglio alleato durante 12 s. (talento da sciamano)"
+      },
+      "heroic_leap": {
+        "name": "Balzo di Guerra",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fisico a vicini nemici. (talento da guerriero)"
+      },
+      "holy_wrath": {
+        "name": "Ira del Santo",
+        "description": "Desata poder sagrado e inflige {damage} de daño a vicini nemici. (talento da paladino)"
+      },
+      "howl_of_terror": {
+        "name": "Ululato del Terrore",
+        "description": "Aterroriza a vicini nemici hasta 3 s. El daño puede romper el efecto. (talento da stregone)"
+      },
+      "ice_block": {
+        "name": "Bara Fredda",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento da mago)"
+      },
+      "inner_focus": {
+        "name": "Mente Quietata",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento da sacerdote)"
+      },
+      "innervate": {
+        "name": "Linfa Vitale",
+        "description": "Restaura al instante 200 de tu risorsa attuale. (talento da druido)"
+      },
+      "kick": {
+        "name": "Pedata",
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da ladro)"
+      },
+      "last_stand": {
+        "name": "Undicesima Ora",
+        "description": "Aumenta temporalmente Tempra durante 15 s, aumentando la salud máxima. (talento da guerriero)"
+      },
+      "mend_pet": {
+        "name": "Rattoppo",
+        "description": "Sana a bersaglio alleato por {damage} durante 15 s. (talento da cacciatore)"
+      },
+      "meteor": {
+        "name": "Pietra Celeste",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Fuoco y quema el suelo. (talento da mago)"
+      },
+      "mind_sear": {
+        "name": "Bruciamente",
+        "description": "Canaliza energía de Ombra en el área objetivo e inflige {damage} cada segundo a vicini nemici. (talento da sacerdote)"
+      },
+      "multi_shot": {
+        "name": "Tiro Sdoppiato",
+        "description": "Dispara varios proyectiles e inflige {damage} a vicini nemici. (talento da cacciatore)"
+      },
+      "prayer_of_healing": {
+        "name": "Cura del Coro",
+        "description": "Sana a vicini alleati por {damage}. (talento da sacerdote)"
+      },
+      "preparation": {
+        "name": "Contingenza",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talento da ladro)"
+      },
+      "presence_of_mind": {
+        "name": "Mente Rapida",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)"
+      },
+      "psychic_scream": {
+        "name": "Urlo Psichico",
+        "description": "Aterroriza a vicini nemici hasta 4 s. El daño puede romper el efecto. (talento da sacerdote)"
+      },
+      "pummel": {
+        "name": "Pestaggio",
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da guerriero)"
+      },
+      "rallying_cry": {
+        "name": "Adunata",
+        "description": "Lanza un grito de reunión y aumenta potenza d’attacco de vicini alleati durante 10 s. (talento da guerriero)"
       },
       "rebuke": {
         "name": "Rimprovero",
-        "description": "Interrompe il lancio dell'incantesimo del bersaglio e impedisce di lanciare incantesimi di quella scuola per 4 s."
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da paladino)"
+      },
+      "shadowstep": {
+        "name": "Scivolo d’Ombra",
+        "description": "Das un paso entre las sombras hacia tu bersaglio. (talento da ladro)"
+      },
+      "shield_wall": {
+        "name": "Baluardo",
+        "description": "Alzas un muro de escudo y aumentas mucho la armatura durante 10 s. (talento da guerriero)"
+      },
+      "silence": {
+        "name": "Silenzio",
+        "description": "Silencia a bersaglio durante 4 s. (talento da sacerdote)"
       },
       "skull_bash": {
         "name": "Testata",
-        "description": "Una testata in affondo che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s."
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da druido)"
       },
       "spell_lock": {
-        "name": "Ordine del Silenzio",
-        "description": "Silenzia il bersaglio durante il lancio e impedisce di lanciare incantesimi di quella scuola per 5 s."
+        "name": "Ordine di Bavaglio",
+        "description": "Interrompe il lancio e impedisce incantesimi di quella scuola per 5 s. (talento da stregone)"
+      },
+      "tranquility": {
+        "name": "Canto della Radura",
+        "description": "Canaliza energía restauradora y sana a vicini alleati cada segundo. (talento da druido)"
       },
       "bear_charge": {
         "name": "Carica di Bruin",

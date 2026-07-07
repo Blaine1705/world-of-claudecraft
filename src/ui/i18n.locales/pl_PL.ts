@@ -2401,6 +2401,159 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': 'Torba z wilczej skóry',
   'entities.items.gravewoven_bag.name': 'Grobowo tkana torba',
   'entities.items.mistcallers_duffel.name': 'Worek Fogbindera',
+  'entities.abilities.aspect_of_the_wild.name': 'Postać Dzikiego Kła',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a pobliskich sojuszników con fuerza salvaje, aumentando siłę ataku durante 5 min. (talent łowcy)',
+  'entities.abilities.avatar.name': 'Kolos',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta siłę ataku durante 20 s. (talent wojownika)',
+  'entities.abilities.avenging_wrath.name': 'Skrzydło Zemsty',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta siłę ataku y moc zaklęć durante 20 s. (talent paladyna)',
+  'entities.abilities.berserk.name': 'Czerwona Mgła',
+  'entities.abilities.berserk.description':
+    'Aumenta siłę ataku durante 15 s. (talent druida)',
+  'entities.abilities.bladestorm.name': 'Stalowy Cyklon',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a pobliskich wrogów cada segundo por {damage}. (talent wojownika)',
+  'entities.abilities.blink.name': 'Migotliwy Krok',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (talent maga)',
+  'entities.abilities.bloodlust.name': 'Bębny Wojny',
+  'entities.abilities.bloodlust.description':
+    'Lleva a pobliskich sojuszników al frenesí y aumenta su velocidad de ataque durante 15 s. (talent szamana)',
+  'entities.abilities.chain_lightning.name': 'Rozgałęziona Błyskawica',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a pobliskich wrogów. (talent szamana)',
+  'entities.abilities.chaos_bolt.name': 'Pocisk Ruiny',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Ognia. (talent czarnoksiężnika)',
+  'entities.abilities.cloak_of_shadows.name': 'Cieniopłaszcz',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 s. (talent łotrzyka)',
+  'entities.abilities.cone_of_cold.name': 'Mroźny Zamiatacz',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a pobliskich wrogów con escarcha e inflige {damage} de daño de Mrozu. (talent maga)',
+  'entities.abilities.counter_shot.name': 'Wyciszający Strzał',
+  'entities.abilities.counter_shot.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent łowcy)',
+  'entities.abilities.counterspell.name': 'Łamacz Zaklęć',
+  'entities.abilities.counterspell.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 6 s. (talent maga)',
+  'entities.abilities.curse_of_exhaustion.name': 'Ołowiana Klątwa',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a cel y reduce su velocidad de movimiento un 30% durante 12 s. (talent czarnoksiężnika)',
+  'entities.abilities.death_coil.name': 'Grobowa Spirala',
+  'entities.abilities.death_coil.description':
+    'Golpea a cel por {damage} de daño de Cienia y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talent czarnoksiężnika)',
+  'entities.abilities.deep_freeze.name': 'Martwy Mróz',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a cel, inflige {damage} de daño de Mrozu y lo aturde durante 4 s. (talent maga)',
+  'entities.abilities.desperate_prayer.name': 'Ostatnia Modlitwa',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (talent kapłana)',
+  'entities.abilities.deterrence.name': 'Kolczasta Straż',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu szansę na unik un 50% durante 10 s. (talent łowcy)',
+  'entities.abilities.divine_shield.name': 'Straż Światła',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talent paladyna)',
+  'entities.abilities.earthbind.name': 'Chwytająca Ziemia',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a pobliskich wrogów y los inmoviliza durante 2 s. (talent szamana)',
+  'entities.abilities.evocation.name': 'Studnia Eteru',
+  'entities.abilities.evocation.description':
+    'Restaura manę rápidamente. (talent maga)',
+  'entities.abilities.frenzied_regeneration.name': 'Dzikie Gojenie',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 s. Solo en Forma de oso. (talent druida)',
+  'entities.abilities.frost_trap.name': 'Szronowa Pułapka',
+  'entities.abilities.frost_trap.description':
+    'Congela a los wrogów en el área objetivo durante 3 s. (talent łowcy)',
+  'entities.abilities.ghostly_strike.name': 'Widmowe Uderzenie',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a cel por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talent łotrzyka)',
+  'entities.abilities.hammer_of_wrath.name': 'Bijący Młot',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Świętości. Solo se usa por debajo del 20% de salud. (talent paladyna)',
+  'entities.abilities.healing_stream.name': 'Źródlisko',
+  'entities.abilities.healing_stream.description':
+    'Restaura a przyjazny cel durante 12 s. (talent szamana)',
+  'entities.abilities.heroic_leap.name': 'Wojenny Skok',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño Fizyczne a pobliskich wrogów. (talent wojownika)',
+  'entities.abilities.holy_wrath.name': 'Gniew Świętego',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a pobliskich wrogów. (talent paladyna)',
+  'entities.abilities.howl_of_terror.name': 'Wycie Grozy',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a pobliskich wrogów hasta 3 s. El daño puede romper el efecto. (talent czarnoksiężnika)',
+  'entities.abilities.ice_block.name': 'Zimna Trumna',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent maga)',
+  'entities.abilities.inner_focus.name': 'Wyciszony Umysł',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talent kapłana)',
+  'entities.abilities.innervate.name': 'Życiodajna Soki',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu obecny zasób. (talent druida)',
+  'entities.abilities.kick.name': 'Kopniak',
+  'entities.abilities.kick.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent łotrzyka)',
+  'entities.abilities.last_stand.name': 'Jedenasta Godzina',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Wytrzymałość durante 15 s, aumentando la salud máxima. (talent wojownika)',
+  'entities.abilities.mend_pet.name': 'Opatrunek',
+  'entities.abilities.mend_pet.description':
+    'Sana a przyjazny cel por {damage} durante 15 s. (talent łowcy)',
+  'entities.abilities.meteor.name': 'Niebiański Kamień',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ognia y quema el suelo. (talent maga)',
+  'entities.abilities.mind_sear.name': 'Myślopalenie',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Cienia en el área objetivo e inflige {damage} cada segundo a pobliskich wrogów. (talent kapłana)',
+  'entities.abilities.multi_shot.name': 'Rozszczepiony Strzał',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a pobliskich wrogów. (talent łowcy)',
+  'entities.abilities.prayer_of_healing.name': 'Chóralne Uzdrowienie',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a pobliskich sojuszników por {damage}. (talent kapłana)',
+  'entities.abilities.preparation.name': 'Plan Awaryjny',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talent łotrzyka)',
+  'entities.abilities.presence_of_mind.name': 'Pędzący Umysł',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent maga)',
+  'entities.abilities.psychic_scream.name': 'Psychiczny Krzyk',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a pobliskich wrogów hasta 4 s. El daño puede romper el efecto. (talent kapłana)',
+  'entities.abilities.pummel.name': 'Okładanie',
+  'entities.abilities.pummel.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent wojownika)',
+  'entities.abilities.rallying_cry.name': 'Zbiórka',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta siłę ataku de pobliskich sojuszników durante 10 s. (talent wojownika)',
+  'entities.abilities.rebuke.name': 'Nagana',
+  'entities.abilities.rebuke.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent paladyna)',
+  'entities.abilities.shadowstep.name': 'Cieniokrok',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu cel. (talent łotrzyka)',
+  'entities.abilities.shield_wall.name': 'Bastion',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la pancerz durante 10 s. (talent wojownika)',
+  'entities.abilities.silence.name': 'Cisza',
+  'entities.abilities.silence.description':
+    'Silencia a cel durante 4 s. (talent kapłana)',
+  'entities.abilities.skull_bash.name': 'Uderzenie Głową',
+  'entities.abilities.skull_bash.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent druida)',
+  'entities.abilities.spell_lock.name': 'Rozkaz Knebla',
+  'entities.abilities.spell_lock.description':
+    'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 5 s. (talent czarnoksiężnika)',
+  'entities.abilities.tranquility.name': 'Pieśń Gaju',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a pobliskich sojuszników cada segundo. (talent druida)',
   'entities.items.worn_sword.name': 'Wyszczerbiony krótki miecz',
   'entities.items.woven_robe.name': 'Szata tkana w dolinie',
   'entities.items.wyrmcult_grand_robe.name': 'Wspaniała szata kultu żmija',

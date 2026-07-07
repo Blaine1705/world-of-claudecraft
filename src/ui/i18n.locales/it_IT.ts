@@ -3283,6 +3283,159 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': 'Metamorfosi',
   'entities.abilities.metamorphosis.description':
     'Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspetto Zannaferina',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a vicini alleati con fuerza salvaje, aumentando potenza d’attacco durante 5 min. (talento da cacciatore)',
+  'entities.abilities.avatar.name': 'Colosso',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta potenza d’attacco durante 20 s. (talento da guerriero)',
+  'entities.abilities.avenging_wrath.name': 'Alavendetta',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta potenza d’attacco y potenza magica durante 20 s. (talento da paladino)',
+  'entities.abilities.berserk.name': 'Bruma Rossa',
+  'entities.abilities.berserk.description':
+    'Aumenta potenza d’attacco durante 15 s. (talento da druido)',
+  'entities.abilities.bladestorm.name': 'Ciclone d’Acciaio',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a vicini nemici cada segundo por {damage}. (talento da guerriero)',
+  'entities.abilities.blink.name': 'Passo Baleno',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (talento da mago)',
+  'entities.abilities.bloodlust.name': 'Tamburi di Guerra',
+  'entities.abilities.bloodlust.description':
+    'Lleva a vicini alleati al frenesí y aumenta su velocidad de ataque durante 15 s. (talento da sciamano)',
+  'entities.abilities.chain_lightning.name': 'Fulmine Biforcuto',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a vicini nemici. (talento da sciamano)',
+  'entities.abilities.chaos_bolt.name': 'Dardo della Rovina',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuoco. (talento da stregone)',
+  'entities.abilities.cloak_of_shadows.name': 'Manto d’Ombra',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 s. (talento da ladro)',
+  'entities.abilities.cone_of_cold.name': 'Spazzata Gelida',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a vicini nemici con escarcha e inflige {damage} de daño de Gelo. (talento da mago)',
+  'entities.abilities.counter_shot.name': 'Tiro Ammutolente',
+  'entities.abilities.counter_shot.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da cacciatore)',
+  'entities.abilities.counterspell.name': 'Spezzaincanti',
+  'entities.abilities.counterspell.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 6 s. (talento da mago)',
+  'entities.abilities.curse_of_exhaustion.name': 'Maleficio Plum beo',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a bersaglio y reduce su velocidad de movimiento un 30% durante 12 s. (talento da stregone)',
+  'entities.abilities.death_coil.name': 'Spira Sepolcrale',
+  'entities.abilities.death_coil.description':
+    'Golpea a bersaglio por {damage} de daño de Ombra y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talento da stregone)',
+  'entities.abilities.deep_freeze.name': 'Gelo Morto',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a bersaglio, inflige {damage} de daño de Gelo y lo aturde durante 4 s. (talento da mago)',
+  'entities.abilities.desperate_prayer.name': 'Ultima Preghiera',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (talento da sacerdote)',
+  'entities.abilities.deterrence.name': 'Guardia Ispida',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu probabilità di schivata un 50% durante 10 s. (talento da cacciatore)',
+  'entities.abilities.divine_shield.name': 'Custodia di Luce',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talento da paladino)',
+  'entities.abilities.earthbind.name': 'Terra Avvinghiante',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a vicini nemici y los inmoviliza durante 2 s. (talento da sciamano)',
+  'entities.abilities.evocation.name': 'Pozzo d’Etere',
+  'entities.abilities.evocation.description':
+    'Restaura mana rápidamente. (talento da mago)',
+  'entities.abilities.frenzied_regeneration.name': 'Rammendo Selvaggio',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 s. Solo en Forma de oso. (talento da druido)',
+  'entities.abilities.frost_trap.name': 'Trappola di Brina',
+  'entities.abilities.frost_trap.description':
+    'Congela a los nemici en el área objetivo durante 3 s. (talento da cacciatore)',
+  'entities.abilities.ghostly_strike.name': 'Colpo Spettrale',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a bersaglio por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talento da ladro)',
+  'entities.abilities.hammer_of_wrath.name': 'Martello Rintoccante',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sacro. Solo se usa por debajo del 20% de salud. (talento da paladino)',
+  'entities.abilities.healing_stream.name': 'Fonte Viva',
+  'entities.abilities.healing_stream.description':
+    'Restaura a bersaglio alleato durante 12 s. (talento da sciamano)',
+  'entities.abilities.heroic_leap.name': 'Balzo di Guerra',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño Fisico a vicini nemici. (talento da guerriero)',
+  'entities.abilities.holy_wrath.name': 'Ira del Santo',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a vicini nemici. (talento da paladino)',
+  'entities.abilities.howl_of_terror.name': 'Ululato del Terrore',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a vicini nemici hasta 3 s. El daño puede romper el efecto. (talento da stregone)',
+  'entities.abilities.ice_block.name': 'Bara Fredda',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento da mago)',
+  'entities.abilities.inner_focus.name': 'Mente Quietata',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento da sacerdote)',
+  'entities.abilities.innervate.name': 'Linfa Vitale',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu risorsa attuale. (talento da druido)',
+  'entities.abilities.kick.name': 'Pedata',
+  'entities.abilities.kick.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da ladro)',
+  'entities.abilities.last_stand.name': 'Undicesima Ora',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Tempra durante 15 s, aumentando la salud máxima. (talento da guerriero)',
+  'entities.abilities.mend_pet.name': 'Rattoppo',
+  'entities.abilities.mend_pet.description':
+    'Sana a bersaglio alleato por {damage} durante 15 s. (talento da cacciatore)',
+  'entities.abilities.meteor.name': 'Pietra Celeste',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Fuoco y quema el suelo. (talento da mago)',
+  'entities.abilities.mind_sear.name': 'Bruciamente',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Ombra en el área objetivo e inflige {damage} cada segundo a vicini nemici. (talento da sacerdote)',
+  'entities.abilities.multi_shot.name': 'Tiro Sdoppiato',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a vicini nemici. (talento da cacciatore)',
+  'entities.abilities.prayer_of_healing.name': 'Cura del Coro',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a vicini alleati por {damage}. (talento da sacerdote)',
+  'entities.abilities.preparation.name': 'Contingenza',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talento da ladro)',
+  'entities.abilities.presence_of_mind.name': 'Mente Rapida',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)',
+  'entities.abilities.psychic_scream.name': 'Urlo Psichico',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a vicini nemici hasta 4 s. El daño puede romper el efecto. (talento da sacerdote)',
+  'entities.abilities.pummel.name': 'Pestaggio',
+  'entities.abilities.pummel.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da guerriero)',
+  'entities.abilities.rallying_cry.name': 'Adunata',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta potenza d’attacco de vicini alleati durante 10 s. (talento da guerriero)',
+  'entities.abilities.rebuke.name': 'Rimprovero',
+  'entities.abilities.rebuke.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da paladino)',
+  'entities.abilities.shadowstep.name': 'Scivolo d’Ombra',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu bersaglio. (talento da ladro)',
+  'entities.abilities.shield_wall.name': 'Baluardo',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la armatura durante 10 s. (talento da guerriero)',
+  'entities.abilities.silence.name': 'Silenzio',
+  'entities.abilities.silence.description':
+    'Silencia a bersaglio durante 4 s. (talento da sacerdote)',
+  'entities.abilities.skull_bash.name': 'Testata',
+  'entities.abilities.skull_bash.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da druido)',
+  'entities.abilities.spell_lock.name': 'Ordine di Bavaglio',
+  'entities.abilities.spell_lock.description':
+    'Interrompe il lancio e impedisce incantesimi di quella scuola per 5 s. (talento da stregone)',
+  'entities.abilities.tranquility.name': 'Canto della Radura',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a vicini alleati cada segundo. (talento da druido)',
   'entities.items.worn_sword.name': 'Spada corta corrosa',
   'entities.items.gnarled_staff.name': 'Bastone di Rovere Palustre',
   'entities.items.rusty_dagger.name': 'Pugnale arrugginito',

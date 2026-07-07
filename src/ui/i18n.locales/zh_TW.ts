@@ -2516,6 +2516,159 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': '惡魔變形',
   'entities.abilities.metamorphosis.description':
     '化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）',
+  'entities.abilities.aspect_of_the_wild.name': '野牙偽裝',
+  'entities.abilities.aspect_of_the_wild.description':
+    '以野性之力激勵附近的盟友，提高攻擊強度，持續 5 分鐘。（獵人天賦）',
+  'entities.abilities.avatar.name': '巨像',
+  'entities.abilities.avatar.description':
+    '化身為巨像，提高攻擊強度，持續 20 秒。（戰士天賦）',
+  'entities.abilities.avenging_wrath.name': '復仇之翼',
+  'entities.abilities.avenging_wrath.description':
+    '喚降復仇之力，提高攻擊強度與法術強度，持續 20 秒。（聖騎士天賦）',
+  'entities.abilities.berserk.name': '赤紅迷霧',
+  'entities.abilities.berserk.description':
+    '提高攻擊強度，持續 15 秒。（德魯伊天賦）',
+  'entities.abilities.bladestorm.name': '鋼鐵旋風',
+  'entities.abilities.bladestorm.description':
+    '化作鋼鐵風暴，每秒對附近敵人造成 {damage} 點傷害。（戰士天賦）',
+  'entities.abilities.blink.name': '閃爍步',
+  'entities.abilities.blink.description':
+    '向前瞬移 15 碼並解除定身效果。（法師天賦）',
+  'entities.abilities.bloodlust.name': '戰鼓',
+  'entities.abilities.bloodlust.description':
+    '使附近的盟友陷入狂熱，提高攻擊速度，持續 15 秒。（薩滿天賦）',
+  'entities.abilities.chain_lightning.name': '叉狀閃電',
+  'entities.abilities.chain_lightning.description':
+    '向目標區域擲出閃電，對附近敵人造成 {damage} 點傷害。（薩滿天賦）',
+  'entities.abilities.chaos_bolt.name': '毀滅箭',
+  'entities.abilities.chaos_bolt.description':
+    '擲出一枚混亂火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）',
+  'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
+  'entities.abilities.cloak_of_shadows.description':
+    '以暗影包裹自身，吸收傷害，持續 5 秒。（盜賊天賦）',
+  'entities.abilities.cone_of_cold.name': '寒霜橫掃',
+  'entities.abilities.cone_of_cold.description':
+    '以寒霜衝擊附近的敵人，造成 {damage} 點冰霜傷害。（法師天賦）',
+  'entities.abilities.counter_shot.name': '緘默射擊',
+  'entities.abilities.counter_shot.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）',
+  'entities.abilities.counterspell.name': '破法',
+  'entities.abilities.counterspell.description':
+    '反制敵人的施法，使該系法術在 6 秒內無法施放。（法師天賦）',
+  'entities.abilities.curse_of_exhaustion.name': '鉛沉妖咒',
+  'entities.abilities.curse_of_exhaustion.description':
+    '詛咒目標，使其移動速度降低 30%，持續 12 秒。（術士天賦）',
+  'entities.abilities.death_coil.name': '墓穴纏卷',
+  'entities.abilities.death_coil.description':
+    '對敵人造成 {damage} 點暗影傷害，隨後使其恐懼 3 秒。此法術不會治療施法者。（術士天賦）',
+  'entities.abilities.deep_freeze.name': '死霜',
+  'entities.abilities.deep_freeze.description':
+    '將目標深度凍結，造成 {damage} 點冰霜傷害並使其昏迷 4 秒。（法師天賦）',
+  'entities.abilities.desperate_prayer.name': '最後祈禱',
+  'entities.abilities.desperate_prayer.description':
+    '立即為你治療 {damage} 點生命值。（牧師天賦）',
+  'entities.abilities.deterrence.name': '鬃刺守衛',
+  'entities.abilities.deterrence.description':
+    '提高你的閃躲機率 50%，持續 10 秒。（獵人天賦）',
+  'entities.abilities.divine_shield.name': '聖光守護',
+  'entities.abilities.divine_shield.description':
+    '以神聖之力護佑你，吸收大量傷害，持續 8 秒。（聖騎士天賦）',
+  'entities.abilities.earthbind.name': '攫握大地',
+  'entities.abilities.earthbind.description':
+    '將附近的敵人束縛於大地，定身 2 秒。（薩滿天賦）',
+  'entities.abilities.evocation.name': '乙太之井',
+  'entities.abilities.evocation.description':
+    '快速恢復法力。（法師天賦）',
+  'entities.abilities.frenzied_regeneration.name': '野性癒合',
+  'entities.abilities.frenzied_regeneration.description':
+    '在 10 秒內恢復生命值。僅限蠻熊形態。（德魯伊天賦）',
+  'entities.abilities.frost_trap.name': '霜紋陷阱',
+  'entities.abilities.frost_trap.description':
+    '將目標區域的敵人凍結在原地，持續 3 秒。（獵人天賦）',
+  'entities.abilities.ghostly_strike.name': '幽魂打擊',
+  'entities.abilities.ghostly_strike.description':
+    '對敵人造成武器傷害外加 {damage} 點傷害，並短暫提高閃躲機率。獲得 1 個連擊點。（盜賊天賦）',
+  'entities.abilities.hammer_of_wrath.name': '鳴鐘之錘',
+  'entities.abilities.hammer_of_wrath.description':
+    '向受創的敵人擲出神聖之鎚，造成 {damage} 點神聖傷害。僅可對生命值低於 20% 的目標使用。（聖騎士天賦）',
+  'entities.abilities.healing_stream.name': '泉湧',
+  'entities.abilities.healing_stream.description':
+    '在 12 秒內治療一名友方目標。（薩滿天賦）',
+  'entities.abilities.heroic_leap.name': '戰躍',
+  'entities.abilities.heroic_leap.description':
+    '躍向目標區域，對附近敵人造成 {damage} 點物理傷害。（戰士天賦）',
+  'entities.abilities.holy_wrath.name': '聖徒之怒',
+  'entities.abilities.holy_wrath.description':
+    '釋放神聖之力，對附近敵人造成 {damage} 點傷害。（聖騎士天賦）',
+  'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
+  'entities.abilities.howl_of_terror.description':
+    '恐嚇附近的敵人，最多持續 3 秒。受到傷害可能打破該效果。（術士天賦）',
+  'entities.abilities.ice_block.name': '寒冰棺',
+  'entities.abilities.ice_block.description':
+    '將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）',
+  'entities.abilities.inner_focus.name': '靜心',
+  'entities.abilities.inner_focus.description':
+    '使你的下一個法術不消耗法力。持續 60 秒。（牧師天賦）',
+  'entities.abilities.innervate.name': '生命樹液',
+  'entities.abilities.innervate.description':
+    '立即恢復 200 點當前資源。（德魯伊天賦）',
+  'entities.abilities.kick.name': '踢擊',
+  'entities.abilities.kick.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（盜賊天賦）',
+  'entities.abilities.last_stand.name': '第十一刻',
+  'entities.abilities.last_stand.description':
+    '暫時提高耐力，持續 15 秒，提高最大生命值。（戰士天賦）',
+  'entities.abilities.mend_pet.name': '修補',
+  'entities.abilities.mend_pet.description':
+    '在 15 秒內為友方目標治療 {damage} 點生命值。（獵人天賦）',
+  'entities.abilities.meteor.name': '天石',
+  'entities.abilities.meteor.description':
+    '喚降一顆隕石轟擊目標區域，造成 {damage} 點火焰傷害並點燃地面。（法師天賦）',
+  'entities.abilities.mind_sear.name': '灼思',
+  'entities.abilities.mind_sear.description':
+    '向目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）',
+  'entities.abilities.multi_shot.name': '分裂射擊',
+  'entities.abilities.multi_shot.description':
+    '射出多枚箭矢，對附近敵人造成 {damage} 點傷害。（獵人天賦）',
+  'entities.abilities.prayer_of_healing.name': '聖歌癒療',
+  'entities.abilities.prayer_of_healing.description':
+    '治療附近的盟友 {damage} 點生命值。（牧師天賦）',
+  'entities.abilities.preparation.name': '應變',
+  'entities.abilities.preparation.description':
+    '結束疾跑、閃避和消失的冷卻時間。（盜賊天賦）',
+  'entities.abilities.presence_of_mind.name': '疾思',
+  'entities.abilities.presence_of_mind.description':
+    '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
+  'entities.abilities.psychic_scream.name': '心靈尖嘯',
+  'entities.abilities.psychic_scream.description':
+    '恐嚇附近的敵人，最多持續 4 秒。受到傷害可能打破該效果。（牧師天賦）',
+  'entities.abilities.pummel.name': '裂顎擊',
+  'entities.abilities.pummel.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（戰士天賦）',
+  'entities.abilities.rallying_cry.name': '集結',
+  'entities.abilities.rallying_cry.description':
+    '發出激勵的吶喊，提高附近盟友的攻擊強度，持續 10 秒。（戰士天賦）',
+  'entities.abilities.rebuke.name': '斥責',
+  'entities.abilities.rebuke.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（聖騎士天賦）',
+  'entities.abilities.shadowstep.name': '影步',
+  'entities.abilities.shadowstep.description':
+    '穿過暗影，移動到目標身旁。（盜賊天賦）',
+  'entities.abilities.shield_wall.name': '壁壘',
+  'entities.abilities.shield_wall.description':
+    '築起堅不可摧的壁壘，大幅提高護甲，持續 10 秒。（戰士天賦）',
+  'entities.abilities.silence.name': '沉默',
+  'entities.abilities.silence.description':
+    '沉默目標，持續 4 秒。（牧師天賦）',
+  'entities.abilities.skull_bash.name': '顱擊',
+  'entities.abilities.skull_bash.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（德魯伊天賦）',
+  'entities.abilities.spell_lock.name': '封口令',
+  'entities.abilities.spell_lock.description':
+    '打斷施法，並使該系法術在 5 秒內無法施放。（術士天賦）',
+  'entities.abilities.tranquility.name': '林地之歌',
+  'entities.abilities.tranquility.description':
+    '引導恢復之力，每秒治療附近的盟友。（德魯伊天賦）',
   'entities.items.worn_sword.name': '鏽蝕短劍',
   'entities.items.gnarled_staff.name': '沼櫟法杖',
   'entities.items.rusty_dagger.name': '生鏽匕首',
