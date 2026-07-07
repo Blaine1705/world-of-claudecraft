@@ -3020,6 +3020,15 @@ export const cs_CZ: EnTranslations = {
     "chat": "Otevřít chat"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "All rifts are unstable right now. Try again soon.",
+      "enterFloor": "You step through the rift into {name}.",
+      "descendFloor": "You descend deeper into {name}.",
+      "stepBack": "You step back through the rift.",
+      "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
+      "wayDownOpens": "The way down tears open.",
+      "exitOpens": "The rift shudders. A way home tears open behind the fallen."
+    },
     "delve": {
       "cannotEnterNow": "Teď nemůžeš vstoupit do výpravy.",
       "leaveDungeonFirst": "Nejdřív opusť dungeon.",

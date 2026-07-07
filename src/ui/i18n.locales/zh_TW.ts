@@ -5427,6 +5427,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'sim.delve.baptistryWave': '洗禮堂的黑水中有什麼東西在攪動。',
   'sim.delve.nhaliaCantorShield': '誦經者們，穩住音符！',
   'sim.delve.nhaliaBlackwaterMark': '{name}用黑水標記了{player}！',
+  'sim.rift.allUnstable': '所有裂隙目前都不穩定。請稍後再試。',
+  'sim.rift.descendFloor': '你深入{name}的更深處。',
+  'sim.rift.enterFloor': '你穿過裂隙，進入了{name}。',
+  'sim.rift.exitOpens': '裂隙震顫。一條歸途在倒下的敵人身後撕裂開來。',
+  'sim.rift.pylonLit': '一座符文尖塔亮起（{lit}/{total}）。',
+  'sim.rift.stepBack': '你退回裂隙，返回原地。',
+  'sim.rift.wayDownOpens': '通往下層的裂口被撕開了。',
   'delveRiteUi.title': '溺亡聖髑儀式',
   'delveRiteUi.blurb':
     '神龕將依序亮起。依次啟動每一座神龕以重複順序。觸碰錯誤會導致本次嘗試失敗並重演順序，完美無誤的嘗試將贏得最豐厚的戰利品，而用盡嘗試次數則會以最寒酸的方式打開聖髑匣。選擇儀式將如何考驗你。',

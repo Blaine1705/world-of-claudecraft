@@ -3020,6 +3020,15 @@ export const zh_TW: EnTranslations = {
     "chat": "開啟對話框"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "所有裂隙目前都不穩定。請稍後再試。",
+      "enterFloor": "你穿過裂隙，進入了{name}。",
+      "descendFloor": "你深入{name}的更深處。",
+      "stepBack": "你退回裂隙，返回原地。",
+      "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
+      "wayDownOpens": "通往下層的裂口被撕開了。",
+      "exitOpens": "裂隙震顫。一條歸途在倒下的敵人身後撕裂開來。"
+    },
     "delve": {
       "cannotEnterNow": "你現在無法進入秘探。",
       "leaveDungeonFirst": "請先離開地下城。",

@@ -3020,6 +3020,15 @@ export const da_DK: EnTranslations = {
     "chat": "Åbn Chat"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "All rifts are unstable right now. Try again soon.",
+      "enterFloor": "You step through the rift into {name}.",
+      "descendFloor": "You descend deeper into {name}.",
+      "stepBack": "You step back through the rift.",
+      "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
+      "wayDownOpens": "The way down tears open.",
+      "exitOpens": "The rift shudders. A way home tears open behind the fallen."
+    },
     "delve": {
       "cannotEnterNow": "Du kan ikke gå ind i et delve lige nu.",
       "leaveDungeonFirst": "Forlad fangekælderen først.",

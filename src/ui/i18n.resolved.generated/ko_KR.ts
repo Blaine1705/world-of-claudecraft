@@ -3020,6 +3020,15 @@ export const ko_KR: EnTranslations = {
     "chat": "채팅창 열기"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "모든 균열이 지금은 불안정합니다. 잠시 후 다시 시도하세요.",
+      "enterFloor": "균열을 통과해 {name}에 들어섰습니다.",
+      "descendFloor": "{name}의 더 깊은 곳으로 내려갑니다.",
+      "stepBack": "균열을 통해 원래 자리로 돌아왔습니다.",
+      "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
+      "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
+      "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다."
+    },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
       "leaveDungeonFirst": "먼저 던전에서 나가세요.",

@@ -906,6 +906,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // #1121: per-player node harvest command denials (dead gate, unknown node,
     // range, respawn timer, bag-full pre-check).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
+    // Procedural Rifts: the run lifecycle's player-facing emits (enter/descend/
+    // exit, pylons, "all rifts unstable"), re-localized via the sim.rift.* rules.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/runs.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

@@ -3020,6 +3020,15 @@ export const ja_JP: EnTranslations = {
     "chat": "チャットを開く"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "すべての裂け目が今は不安定だ。しばらくしてからもう一度試そう。",
+      "enterFloor": "裂け目をくぐり、{name}へ足を踏み入れた。",
+      "descendFloor": "{name}のさらに深くへ降りていく。",
+      "stepBack": "裂け目を通って元の場所へ戻った。",
+      "pylonLit": "ルーンの尖塔が光を放った（{lit}/{total}）。",
+      "wayDownOpens": "下層への道が裂け開いた。",
+      "exitOpens": "裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。"
+    },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
       "leaveDungeonFirst": "まずダンジョンから出よ。",

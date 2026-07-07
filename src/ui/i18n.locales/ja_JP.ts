@@ -5736,6 +5736,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.delve.baptistryWave': '洗礼堂の黒い水の中で何かが蠢く。',
   'sim.delve.nhaliaCantorShield': '詠唱者たちよ、音を保て！',
   'sim.delve.nhaliaBlackwaterMark': '{name}が{player}に黒水の刻印を刻む！',
+  'sim.rift.allUnstable': 'すべての裂け目が今は不安定だ。しばらくしてからもう一度試そう。',
+  'sim.rift.descendFloor': '{name}のさらに深くへ降りていく。',
+  'sim.rift.enterFloor': '裂け目をくぐり、{name}へ足を踏み入れた。',
+  'sim.rift.exitOpens': '裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。',
+  'sim.rift.pylonLit': 'ルーンの尖塔が光を放った（{lit}/{total}）。',
+  'sim.rift.stepBack': '裂け目を通って元の場所へ戻った。',
+  'sim.rift.wayDownOpens': '下層への道が裂け開いた。',
   'delveRiteUi.title': '溺れし聖遺物の儀式',
   'delveRiteUi.blurb':
     '祠は順番に光る。各祠を順に起動して順序を繰り返せ。誤った接触は試みを失敗させ順序を再生する。完璧な試みは最も豊かな戦利品を得て、試行回数を使い果たすと聖遺物匣は最も貧しい形で開く。儀式がお前をどう試すか選べ。',

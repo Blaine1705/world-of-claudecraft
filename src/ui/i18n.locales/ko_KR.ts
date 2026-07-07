@@ -5726,6 +5726,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.baptistryWave': '세례당의 검은 물속에서 무언가가 꿈틀거린다.',
   'sim.delve.nhaliaCantorShield': '영창자들이여, 음을 유지하라!',
   'sim.delve.nhaliaBlackwaterMark': '{name}이(가) {player}에게 흑수 표식을 남긴다!',
+  'sim.rift.allUnstable': '모든 균열이 지금은 불안정합니다. 잠시 후 다시 시도하세요.',
+  'sim.rift.descendFloor': '{name}의 더 깊은 곳으로 내려갑니다.',
+  'sim.rift.enterFloor': '균열을 통과해 {name}에 들어섰습니다.',
+  'sim.rift.exitOpens': '균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다.',
+  'sim.rift.pylonLit': '룬 첨탑이 빛을 발합니다 ({lit}/{total}).',
+  'sim.rift.stepBack': '균열을 통해 원래 자리로 돌아왔습니다.',
+  'sim.rift.wayDownOpens': '아래로 향하는 길이 찢겨 열립니다.',
   'delveRiteUi.title': '익사한 유물 의식',
   'delveRiteUi.blurb':
     '성소들이 순서대로 빛난다. 각 성소를 차례로 활성화하여 순서를 반복하라. 잘못된 접촉은 시도를 실패시키고 순서를 다시 재생한다. 완벽한 시도는 가장 풍성한 전리품을 얻고, 시도 횟수를 모두 소진하면 유물함이 가장 초라한 상태로 열린다. 의식이 그대를 어떻게 시험할지 선택하라.',

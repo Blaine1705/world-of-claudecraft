@@ -48,7 +48,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "es_ES": [
     "entities.itemSets.necromancers.bonus4",
@@ -89,7 +96,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "fr_FR": [
     "entities.itemSets.necromancers.bonus4",
@@ -130,7 +144,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "fr_CA": [
     "entities.itemSets.necromancers.bonus4",
@@ -171,7 +192,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "en_CA": [],
   "it_IT": [
@@ -213,7 +241,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "de_DE": [
     "entities.itemSets.necromancers.bonus4",
@@ -254,7 +289,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "zh_CN": [
     "hudChrome.discord.roleTag.coredevs"
@@ -307,7 +349,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "ru_RU": [
     "hudChrome.discord.roleTag.coredevs"
@@ -361,7 +410,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "nl_NL": [
     "entities.itemSets.necromancers.bonus4",
@@ -402,7 +458,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "pl_PL": [
     "entities.itemSets.necromancers.bonus4",
@@ -443,7 +506,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "id_ID": [
     "entities.itemSets.necromancers.bonus4",
@@ -484,7 +554,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "tr_TR": [
     "entities.itemSets.necromancers.bonus4",
@@ -525,7 +602,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "sv_SE": [
     "entities.itemSets.necromancers.bonus4",
@@ -566,7 +650,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "vi_VN": [
     "entities.itemSets.necromancers.bonus4",
@@ -607,7 +698,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ],
   "da_DK": [
     "entities.itemSets.necromancers.bonus4",
@@ -648,6 +746,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "hudChrome.statInfo.names.hasteRating",
+    "sim.rift.allUnstable",
+    "sim.rift.descendFloor",
+    "sim.rift.enterFloor",
+    "sim.rift.exitOpens",
+    "sim.rift.pylonLit",
+    "sim.rift.stepBack",
+    "sim.rift.wayDownOpens"
   ]
 };

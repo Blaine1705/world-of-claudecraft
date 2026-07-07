@@ -452,6 +452,18 @@ export const en = {
   // Locale overlays are English-filled + marked pending by the i18n build until a
   // translation pass. ENGLISH ONLY here; never add per-locale blocks to this section.
   sim: {
+    // Procedural Rift sim-emitted player text (src/sim/rift/runs.ts). Same model
+    // as sim.delve below: the sim emits English, sim_i18n.ts re-localizes. The
+    // {name} value is the generated floor name (spliced verbatim, like build names).
+    rift: {
+      allUnstable: 'All rifts are unstable right now. Try again soon.',
+      enterFloor: 'You step through the rift into {name}.',
+      descendFloor: 'You descend deeper into {name}.',
+      stepBack: 'You step back through the rift.',
+      pylonLit: 'A rune pylon flares to life ({lit}/{total}).',
+      wayDownOpens: 'The way down tears open.',
+      exitOpens: 'The rift shudders. A way home tears open behind the fallen.',
+    },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',
       leaveDungeonFirst: 'Leave the dungeon first.',

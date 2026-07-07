@@ -5242,6 +5242,31 @@ const RULES: Rule[] = [
   // sim.lockpick.* keys (src/ui/i18n.catalog/index.ts). The module-enter banner is two
   // rules anchored on the fixed objective lines ("X: Clear the room." / "X: Defeat the
   // boss."), each localizing the captured module name, so there is no bare catch-all.
+  // Procedural Rift sim text (src/sim/rift/runs.ts), re-localized through the
+  // sim.rift.* keys. The captured floor name is a generated English name and is
+  // spliced verbatim, like player/build names.
+  {
+    re: /^All rifts are unstable right now\. Try again soon\.$/,
+    build: () => t('sim.rift.allUnstable'),
+  },
+  {
+    re: /^You step through the rift into (.+)\.$/,
+    build: (m) => t('sim.rift.enterFloor', { name: m[1] }),
+  },
+  {
+    re: /^You descend deeper into (.+)\.$/,
+    build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
+  },
+  { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
+  {
+    re: /^A rune pylon flares to life \(([^/)]+)\/([^)]+)\)\.$/,
+    build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
+  },
+  { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  {
+    re: /^The rift shudders\. A way home tears open behind the fallen\.$/,
+    build: () => t('sim.rift.exitOpens'),
+  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },
