@@ -59,12 +59,12 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   // the Palmreach borrows the fen's bright day until its own tropical sky
   // lands (skies_in/palmreach.png)
   jungle: { gain: 0.62, clamp: 2.6 },
-  // the Evergarden borrows the vale's day until its own sky lands
+  // the Evergarden borrows the fen's day until its own sky lands
   // (skies_in/evergarden.png)
   garden: { gain: 0.6, clamp: 2.6 },
-  // the Galecrest borrows the peaks' dawn until its own storm-light sky
+  // the Galecrest borrows the fen's day until its own storm-light sky
   // lands (skies_in/galecrest.png)
-  gale: { gain: 0.48, clamp: 1.7 },
+  gale: { gain: 0.6, clamp: 2.6 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -83,8 +83,8 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   night: '/env/nightbloom_dream_2k.hdr',
   haunt: '/env/wraithwood_gloom_2k.hdr',
   jungle: '/env/fen_day_2k.hdr',
-  garden: '/env/vale_day_2k.hdr',
-  gale: '/env/peaks_dawn_2k.hdr',
+  garden: '/env/fen_day_2k.hdr',
+  gale: '/env/fen_day_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -99,8 +99,8 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   night: '/env/nightbloom_dream_1k.hdr',
   haunt: '/env/wraithwood_gloom_1k.hdr',
   jungle: '/env/fen_day_1k.hdr',
-  garden: '/env/vale_day_1k.hdr',
-  gale: '/env/peaks_dawn_1k.hdr',
+  garden: '/env/fen_day_1k.hdr',
+  gale: '/env/fen_day_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -272,8 +272,8 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   night: 0.324, // the dream sky's low sun over its glowing sea
   haunt: 0.282, // the storm sky's dying sun on the horizon
   jungle: 0.497, // shared with the fen's day sky while borrowed
-  garden: 0.595, // shared with the vale's day sky while borrowed
-  gale: 0.631, // shared with the peaks' dawn sky while borrowed
+  garden: 0.497, // shared with the fen's day sky while borrowed
+  gale: 0.497, // shared with the fen's day sky while borrowed
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
