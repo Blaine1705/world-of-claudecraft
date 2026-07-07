@@ -732,7 +732,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'weaponStrike', bonus: 40 },
     ],
     description:
-      'Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)',
+      'Spend everything: strike three times in a frenzy for weapon damage plus {damage} each. (Fury)',
   },
   // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
   // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
