@@ -37,9 +37,10 @@ const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
-// Bladestorm whirl: how fast the body spins on itself (radians/sec, ~1.75
-// turns/sec reads like the classic warrior whirl) and the swing-loop speed.
-const SPIN_RATE = 11;
+// Bladestorm whirl: how fast the body spins on itself (radians/sec, ~2.2
+// turns/sec; operator asked for a visibly quicker whirl than the classic
+// ~1.75) and the swing-loop speed.
+const SPIN_RATE = 14;
 const SPIN_ATTACK_TIMESCALE = 1.6;
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
