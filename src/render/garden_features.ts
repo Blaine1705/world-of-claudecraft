@@ -23,8 +23,8 @@ export interface GardenFeaturesView {
   update(time: number): void;
 }
 
-const GARDEN_ZMIN = 5320;
-const GARDEN_ZMAX = 5880;
+const GARDEN_ZMIN = 3680;
+const GARDEN_ZMAX = 4240;
 
 // The specimen elders reuse the twisted-elder model the Hollow, the
 // Wraithwood, and the Palmreach already preload, regrown into clipped
@@ -179,7 +179,7 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
   {
     const spots: { x: number; z: number; y: number; s: number; rot: number }[] = [];
     for (let i = 0; i < 6; i++) {
-      const z = 5460 + i * 17;
+      const z = 3820 + i * 17;
       for (const x of [-7, 7]) {
         const y = terrainHeight(x, z, seed);
         if (y < WATER_LEVEL + 0.5) continue;
@@ -194,10 +194,10 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
       }
     }
     for (const [x, z] of [
-      [-10, 5628],
-      [10, 5628],
-      [-10, 5645],
-      [10, 5645],
+      [-10, 3988],
+      [10, 3988],
+      [-10, 4005],
+      [10, 4005],
     ]) {
       const y = terrainHeight(x, z, seed);
       spots.push({
@@ -205,7 +205,7 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
         z,
         y: y - 0.1,
         s: 1.05,
-        rot: Math.atan2(0 - x, 5636.5 - z), // all four face the fountain
+        rot: Math.atan2(0 - x, 3996.5 - z), // all four face the fountain
       });
     }
     instance(statueGeo(), mat(MARBLE, 0.75), spots);
@@ -213,8 +213,8 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
 
   // --- the fountain at the heart of the Great Maze ---
   {
-    const y = terrainHeight(0, 5636.5, seed);
-    if (y > WATER_LEVEL) group.add(buildFountain(0, 5636.5, y - 0.1));
+    const y = terrainHeight(0, 3996.5, seed);
+    if (y > WATER_LEVEL) group.add(buildFountain(0, 3996.5, y - 0.1));
   }
 
   // --- the topiary forms: a deterministic scatter over the open lawns,

@@ -10,31 +10,31 @@ import { terrainHeight } from '../sim/world';
 export interface FrostSkyView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
-  update(time: number, camZ: number): void;
+  update(time: number, camX: number, camZ: number): void;
 }
 
-const ICEMANTLE = { x: -30, z: 2160 };
+const ICEMANTLE = { x: -390, z: 1560 };
 const LANTERN_REACH = 95; // posts line the roads this far out of town
 const LANTERN_SPACING = 13;
 
 // Ice shards: glassy blue spires scattered over the benches, with monolith
 // rings at the landmarks (the Reach's answer to the Hollow's crystals).
 const ICE_FIELDS = [
-  { x: 30, z: 2345, r: 26, n: 12 }, // the Aurora Steps
-  { x: 52, z: 2238, r: 20, n: 8 }, // Glacier Tarn's shore
-  { x: 96, z: 2416, r: 22, n: 9 }, // the Howling Terraces
-  { x: -84, z: 2338, r: 18, n: 6 }, // the Shiverfen's edge
-  { x: -10, z: 2260, r: 40, n: 8 }, // the inner valley, scattered wide
+  { x: -330, z: 1745, r: 26, n: 12 }, // the Aurora Steps
+  { x: -308, z: 1638, r: 20, n: 8 }, // Glacier Tarn's shore
+  { x: -264, z: 1816, r: 22, n: 9 }, // the Howling Terraces
+  { x: -444, z: 1738, r: 18, n: 6 }, // the Shiverfen's edge
+  { x: -370, z: 1660, r: 40, n: 8 }, // the inner valley, scattered wide
 ] as const;
 const ICE_TINTS = [0xbfe8ff, 0x9fd4f2, 0xd8f2ff];
 
 const RIBBONS = [
-  { x: -60, z: 2260, y: 130, len: 420, h: 46, rot: 0.5, tint: 0x62f2b2, phase: 0 },
-  { x: 40, z: 2340, y: 150, len: 470, h: 56, rot: -0.35, tint: 0x52e8d8, phase: 2.1 },
-  { x: -10, z: 2180, y: 118, len: 360, h: 36, rot: 0.15, tint: 0x96f2da, phase: 4.2 },
-  { x: 90, z: 2430, y: 142, len: 340, h: 42, rot: -0.7, tint: 0x72e8a2, phase: 1.3 },
-  { x: -90, z: 2400, y: 158, len: 380, h: 40, rot: 0.9, tint: 0x58e8c0, phase: 3.2 },
-  { x: 30, z: 2500, y: 136, len: 320, h: 34, rot: -0.15, tint: 0x7af2c8, phase: 5.1 },
+  { x: -420, z: 1660, y: 130, len: 420, h: 46, rot: 0.5, tint: 0x62f2b2, phase: 0 },
+  { x: -320, z: 1740, y: 150, len: 470, h: 56, rot: -0.35, tint: 0x52e8d8, phase: 2.1 },
+  { x: -370, z: 1580, y: 118, len: 360, h: 36, rot: 0.15, tint: 0x96f2da, phase: 4.2 },
+  { x: -270, z: 1830, y: 142, len: 340, h: 42, rot: -0.7, tint: 0x72e8a2, phase: 1.3 },
+  { x: -450, z: 1800, y: 158, len: 380, h: 40, rot: 0.9, tint: 0x58e8c0, phase: 3.2 },
+  { x: -330, z: 1900, y: 136, len: 320, h: 34, rot: -0.15, tint: 0x7af2c8, phase: 5.1 },
 ] as const;
 
 // Real aurora anatomy: a sharp bright LOWER border that fades upward into
@@ -263,19 +263,21 @@ export function buildFrostSky(seed = 0): FrostSkyView {
   return {
     group,
     glowLights,
-    update(time: number, camZ: number): void {
+    update(time: number, camX: number, camZ: number): void {
       // lantern flames flicker together, gently
       for (const mat of lanternMats) {
         mat.emissiveIntensity = 1.4 + Math.sin(time * 6.2) * 0.12 + Math.sin(time * 1.7) * 0.1;
       }
       // The aurora belongs to the Reach: the curtains hang far above the
       // fog (fog: false, additive), so without this gate every neighboring
-      // realm sees them over its horizon. Fade with the CAMERA's z across
-      // the frost band edges: appearing as you crest the Snowline, gone
-      // once you leave for the Amberfall.
-      const fadeIn = Math.min(1, Math.max(0, (camZ - 2000) / 80));
-      const fadeOut = 1 - Math.min(1, Math.max(0, (camZ - 2520) / 80));
-      const band = Math.min(fadeIn, fadeOut);
+      // realm sees them over its horizon. Fade with the CAMERA across the
+      // frost rect's edges: its z band, and (now that the Reach lives in
+      // the west column) its east border with the Drakelands, so the waste
+      // never sees the lights over the Snowline.
+      const fadeIn = Math.min(1, Math.max(0, (camZ - 1400) / 80));
+      const fadeOut = 1 - Math.min(1, Math.max(0, (camZ - 1920) / 80));
+      const fadeX = Math.min(1, Math.max(0, (-140 - camX) / 80));
+      const band = Math.min(fadeIn, fadeOut, fadeX);
       for (const r of ribbons) {
         r.mesh.visible = band > 0.001;
         if (!r.mesh.visible) continue;

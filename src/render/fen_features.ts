@@ -13,8 +13,8 @@ export interface FenFeaturesView {
   update(time: number): void;
 }
 
-const FEN_ZMIN = 3120;
-const FEN_ZMAX = 3640;
+const FEN_ZMIN = 2600;
+const FEN_ZMAX = 3120;
 const WILLOW_TINTS = [0x8fc47e, 0x7eb474, 0xa2d488];
 const BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xd8b8f2, 0xffffff, 0xf2a88f];
 

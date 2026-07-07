@@ -18,8 +18,8 @@ export interface HauntFeaturesView {
   update(time: number): void;
 }
 
-const WOOD_ZMIN = 4200;
-const WOOD_ZMAX = 4760;
+const WOOD_ZMIN = 3120;
+const WOOD_ZMAX = 3680;
 
 // The giant trees are the Eldergleam's twisted-elder model (realm_flora
 // already preloads the same URL, so the loader cache makes this free),
@@ -34,21 +34,21 @@ registerPreload(
 
 // Ground-mist banks: wide soft sheets pooled in the realm's low spots.
 const MISTS = [
-  { x: 0, z: 4330, r: 46, phase: 0 },
-  { x: -70, z: 4440, r: 40, phase: 1.6 }, // Widow's Thicket pools
-  { x: 76, z: 4462, r: 42, phase: 3.1 }, // the Hanging Glade
-  { x: -56, z: 4566, r: 38, phase: 4.5 }, // the chapel tarn
-  { x: 16, z: 4620, r: 44, phase: 2.2 }, // the Huntsman's clearing
-  { x: -20, z: 4500, r: 40, phase: 5.3 },
+  { x: 360, z: 3250, r: 46, phase: 0 },
+  { x: 290, z: 3360, r: 40, phase: 1.6 }, // Widow's Thicket pools
+  { x: 436, z: 3382, r: 42, phase: 3.1 }, // the Hanging Glade
+  { x: 304, z: 3486, r: 38, phase: 4.5 }, // the chapel tarn
+  { x: 376, z: 3540, r: 44, phase: 2.2 }, // the Huntsman's clearing
+  { x: 340, z: 3420, r: 40, phase: 5.3 },
 ] as const;
 
 // Ghost-lights: pale will-o-wisps that circle slowly between the trunks.
 const WISP_HOMES = [
-  { x: -62, z: 4548, r: 9, phase: 0.4 }, // the chapel graves
-  { x: 24, z: 4614, r: 10, phase: 2.1 }, // the Huntsman's ring
-  { x: -80, z: 4432, r: 8, phase: 3.8 },
-  { x: 60, z: 4488, r: 9, phase: 5.0 },
-  { x: 24, z: 4358, r: 7, phase: 1.2 }, // Gallowmere's own graveyard
+  { x: 298, z: 3468, r: 9, phase: 0.4 }, // the chapel graves
+  { x: 384, z: 3534, r: 10, phase: 2.1 }, // the Huntsman's ring
+  { x: 280, z: 3352, r: 8, phase: 3.8 },
+  { x: 420, z: 3408, r: 9, phase: 5.0 },
+  { x: 384, z: 3278, r: 7, phase: 1.2 }, // Gallowmere's own graveyard
 ] as const;
 
 function mistTexture(): THREE.CanvasTexture | null {

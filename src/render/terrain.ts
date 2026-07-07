@@ -373,8 +373,8 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     if (forest > 0) cTmp.lerp(emberForestC, forest * 0.85);
     const sandT = clamp01((z - 1545) / 145);
     lerpSplat(w, 3, sandT * 0.75);
-    // the Snowline valley: a sheltered green corridor through the volcanic
-    // belt, the realm's second gradient (green rises where scorch would)
+    // the Goldmelt valley: a sheltered green corridor through the volcanic
+    // belt toward the Amberfall, the realm's second gradient
     const passT = 1 - clamp01((Math.abs(x + 10) - 26) / 26);
     const valley = passT * clamp01((z - 1930) / 80);
     const scorch = clamp01((z - 1880) / 100) * (1 - valley);
@@ -465,10 +465,11 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   }
   if (biome === 'frost') {
     // the Reach is snowbound from the shore up, not just on its crowns; in
-    // the Snowline corridor the green valley floor fades under the snow
-    // northward instead of flipping white at the border
-    const passT = 1 - clamp01((Math.abs(x + 10) - 26) / 26);
-    const snowline = Math.max(clamp01((z - 2055) / 85), 1 - passT);
+    // the Snowline corridor (the sideways crossing at z 1700) the green
+    // valley floor fades under the snow westward instead of flipping white
+    // at the border
+    const passT = 1 - clamp01((Math.abs(z - 1700) - 26) / 26);
+    const snowline = Math.max(clamp01((-195 - x) / 85), 1 - passT);
     const green = (1 - snowline) * passT;
     if (green > 0) cTmp.lerp(emberForestC, green * 0.8);
     const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * snowline;

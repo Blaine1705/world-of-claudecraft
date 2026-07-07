@@ -4523,7 +4523,7 @@ export class Renderer {
     // they tint warm sunward / cool anti-sun to anchor the key light's azimuth
     for (const cl of this.clouds) {
       cl.position.x += dt * ((cl.userData.drift as number | undefined) ?? 1.6);
-      if (cl.position.x > 320) cl.position.x = -320;
+      if (cl.position.x > 620) cl.position.x = -620;
       if (!this.lowGfx) {
         const along =
           ((cl.position.x - this.camera.position.x) * this.sunAzimuth.x +
@@ -4590,7 +4590,7 @@ export class Renderer {
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.realmFlora.update(this.time);
     this.emberFeatures.update(this.time);
-    this.frostSky.update(this.time, this.camera.position.z);
+    this.frostSky.update(this.time, this.camera.position.x, this.camera.position.z);
     this.fenFeatures.update(this.time);
     this.amberFeatures.update(this.time);
     this.nightFeatures.update(this.time);

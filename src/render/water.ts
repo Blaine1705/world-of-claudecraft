@@ -170,13 +170,19 @@ function buildShaderWater(seed: number): WaterView {
   }
   for (const zone of ZONES) {
     const depth = zone.zMax - zone.zMin;
+    // each plane covers its zone's own rect: the side columns live at
+    // x beyond the strip, and a strip-centered plane would leave their
+    // shores (and the border meres straddling the column line) on the
+    // featureless apron with no foam or shallow grading
+    const x0 = zone.xMin ?? -WORLD_SIZE / 2;
+    const x1 = zone.xMax ?? WORLD_SIZE / 2;
     const geo = new THREE.PlaneGeometry(
-      WORLD_SIZE,
+      x1 - x0,
       depth,
       SEGMENTS_PER_ZONE,
       SEGMENTS_PER_ZONE,
     ).rotateX(-Math.PI / 2);
-    geo.translate(0, 0, (zone.zMin + zone.zMax) / 2);
+    geo.translate((x0 + x1) / 2, 0, (zone.zMin + zone.zMax) / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
     for (let i = 0; i < pos.count; i++) {

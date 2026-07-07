@@ -17,8 +17,8 @@ export interface JungleFeaturesView {
   update(time: number): void;
 }
 
-const REACH_ZMIN = 4760;
-const REACH_ZMAX = 5320;
+const REACH_ZMIN = 3120;
+const REACH_ZMAX = 3680;
 
 // The banyans reuse the twisted-elder model the Hollow's centerpiece and the
 // Wraithwood's giants wear (already preloaded twice over, so free), regrown
@@ -136,7 +136,7 @@ export function buildJungleFeatures(seed: number): JungleFeaturesView {
   {
     const geos = palmGeos();
     const spots: { x: number; z: number; y: number; s: number; rot: number; tint: number }[] = [];
-    for (let gx = -176; gx <= 176; gx += 8) {
+    for (let gx = -536; gx <= -184; gx += 8) {
       for (let gz = REACH_ZMIN + 10; gz <= REACH_ZMAX - 10; gz += 8) {
         const r = hash2(gx, gz, seed + 5101);
         if (r > 0.62) continue;

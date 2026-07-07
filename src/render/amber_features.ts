@@ -13,15 +13,15 @@ export interface AmberFeaturesView {
 // Sunbeam fans breaking from the cloud line over the weald (x, z, lean,
 // size): stretched wide so the ray columns read as a spread of beams.
 const RAYS = [
-  { x: -40, z: 2700, rot: 0.4, w: 70, h: 110, phase: 0 },
-  { x: 50, z: 2760, rot: -0.3, w: 55, h: 100, phase: 1.7 },
-  { x: 0, z: 2860, rot: 0.15, w: 85, h: 120, phase: 3.1 }, // over the Great Mere
-  { x: -80, z: 2930, rot: 0.6, w: 50, h: 95, phase: 4.4 },
-  { x: 90, z: 2900, rot: -0.5, w: 60, h: 105, phase: 2.3 },
-  { x: -20, z: 2620, rot: 0.2, w: 50, h: 90, phase: 5.2 },
+  { x: -40, z: 2180, rot: 0.4, w: 70, h: 110, phase: 0 },
+  { x: 50, z: 2240, rot: -0.3, w: 55, h: 100, phase: 1.7 },
+  { x: 0, z: 2340, rot: 0.15, w: 85, h: 120, phase: 3.1 }, // over the Great Mere
+  { x: -80, z: 2410, rot: 0.6, w: 50, h: 95, phase: 4.4 },
+  { x: 90, z: 2380, rot: -0.5, w: 60, h: 105, phase: 2.3 },
+  { x: -20, z: 2100, rot: 0.2, w: 50, h: 90, phase: 5.2 },
   // ...and two wide fans low over the sunset bank itself
-  { x: -180, z: 2840, rot: 1.55, w: 120, h: 130, phase: 2.9 },
-  { x: 180, z: 2840, rot: -1.55, w: 120, h: 130, phase: 0.9 },
+  { x: -180, z: 2320, rot: 1.55, w: 120, h: 130, phase: 2.9 },
+  { x: 180, z: 2320, rot: -1.55, w: 120, h: 130, phase: 0.9 },
 ] as const;
 
 // The aurora curtain's anatomy turned upside down and gilded: a bright top

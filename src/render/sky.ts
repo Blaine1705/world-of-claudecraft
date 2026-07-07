@@ -634,7 +634,11 @@ export function buildClouds(lowGfx: boolean): CloudLayer {
       const sprite = new THREE.Sprite(mat);
       const sc = scaleMin + Math.random() * (scaleMax - scaleMin);
       sprite.scale.set(sc, sc * 0.45, 1);
-      sprite.position.set((Math.random() - 0.5) * 600, y, WORLD_MIN_Z - 120 + Math.random() * span);
+      sprite.position.set(
+        (Math.random() - 0.5) * 1200,
+        y,
+        WORLD_MIN_Z - 120 + Math.random() * span,
+      );
       sprite.userData.drift = drift;
       sprites.push(sprite);
     }

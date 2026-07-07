@@ -169,8 +169,9 @@ export function paintTerrainRows(
         b = b * (1 - scorch * 0.4) - 25 * valley;
       } else if (biome === 'frost') {
         // the Snowline corridor greens the map too, fading under the snow
-        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x + 10) - 26) / 26));
-        const snowline = Math.max(Math.min(1, Math.max(0, (z - 2055) / 85)), 1 - passT);
+        // (the sideways crossing: keyed on z, whitening westward)
+        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(z - 1700) - 26) / 26));
+        const snowline = Math.max(Math.min(1, Math.max(0, (-195 - x) / 85)), 1 - passT);
         r = 74 + 140 * snowline;
         g = 110 + 114 * snowline;
         b = 52 + 184 * snowline;
