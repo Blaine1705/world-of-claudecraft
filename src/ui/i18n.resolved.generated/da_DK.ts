@@ -6245,6 +6245,10 @@ export const da_DK: EnTranslations = {
         "name": "Metamorfose",
         "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"
       },
+      "aura_surge": {
+        "name": "Strålende Svulmen",
+        "description": "Overbelaster din aura og hærder dig med 160 rustning i 10 sek. (Paladintalent)"
+      },
       "holy_shock": {
         "name": "Hellig chok",
         "description": "Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)"

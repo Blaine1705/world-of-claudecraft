@@ -6245,6 +6245,10 @@ export const pl_PL: EnTranslations = {
         "name": "Metamorfoza",
         "description": "Przyjmujesz demoniczną moc, zwiększając pancerz i siłę ataku na 20 s. (talent czarnoksiężnika)"
       },
+      "aura_surge": {
+        "name": "Promienna Fala",
+        "description": "Przeciąża twoją aurę, wzmacniając cię 160 pkt. pancerza na 10 sek. (talent Paladyna)"
+      },
       "holy_shock": {
         "name": "Święty wstrząs",
         "description": "Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)"

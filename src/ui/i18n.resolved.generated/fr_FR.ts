@@ -6245,6 +6245,10 @@ export const fr_FR: EnTranslations = {
         "name": "Métamorphose",
         "description": "Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)"
       },
+      "aura_surge": {
+        "name": "Houle radieuse",
+        "description": "Surcharge votre aura et vous renforce de 160 points d'armure pendant 10 s. (talent de Paladin)"
+      },
       "holy_shock": {
         "name": "Horion sacré",
         "description": "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)"

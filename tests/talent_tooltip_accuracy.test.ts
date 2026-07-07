@@ -12,6 +12,9 @@ import { grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
 
 const PCT_FIELDS = new Set([
   'leechPct',
+  'hpFrac',
+  'belowFrac',
+  'dmgPctVsDotted',
   'crit',
   'dodge',
   'apPct',
@@ -78,6 +81,9 @@ function expectedTokens(effect: unknown): string[] {
           toks.push('instant');
           continue;
         }
+        // A proc firing on EVERY matching cast (n: 1) reads as "every cast";
+        // no numeral is required in the copy.
+        if (key === 'n' && value === 1) continue;
         toks.push(
           PCT_FIELDS.has(key)
             ? `${+(Math.abs(value) * 100).toFixed(1)}%`
@@ -101,6 +107,9 @@ function legitNumbers(effect: unknown): Set<number> {
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         add(value, PCT_FIELDS.has(key));
+        // Cheat death leaves the player at 1 health: the floor is intrinsic to
+        // the mechanic, so copy may state the 1.
+        if (key === 'cheatDeathIcd') out.add(1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).
         if (key === 'mult' && value > 0 && value < 1) out.add(Math.round((1 - value) * 100));
       } else if (Array.isArray(value)) value.forEach(walk);

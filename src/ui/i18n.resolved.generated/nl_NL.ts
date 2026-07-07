@@ -6245,6 +6245,10 @@ export const nl_NL: EnTranslations = {
         "name": "Metamorfose",
         "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"
       },
+      "aura_surge": {
+        "name": "Stralende Golf",
+        "description": "Overlaadt je aura en verhardt je met 160 bepantsering gedurende 10 sec. (Paladijntalent)"
+      },
       "holy_shock": {
         "name": "Heilige schok",
         "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"

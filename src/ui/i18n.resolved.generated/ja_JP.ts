@@ -6245,6 +6245,10 @@ export const ja_JP: EnTranslations = {
         "name": "悪魔変身",
         "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
       },
+      "aura_surge": {
+        "name": "光輝の高まり",
+        "description": "オーラを過負荷させ、10秒間160の防御力で身を固める。(パラディンの才能)"
+      },
       "holy_shock": {
         "name": "ホーリーショック",
         "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"

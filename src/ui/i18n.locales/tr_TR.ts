@@ -2005,6 +2005,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     '{damage} Doğa hasarı için bir doğa enerjisi oku fırlatır.',
   'entities.abilities.wrath.name': 'Yaban Oku',
+  'entities.abilities.aura_surge.name': 'Nurlu Kabarma',
+  'entities.abilities.aura_surge.description':
+    'Auranızı aşırı yükleyerek 10 sn boyunca 160 zırh kazandırır. (Paladin yeteneği)',
   'entities.abilities.holy_shock.name': 'Kutsal Şok',
   'entities.abilities.holy_shock.description':
     'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',

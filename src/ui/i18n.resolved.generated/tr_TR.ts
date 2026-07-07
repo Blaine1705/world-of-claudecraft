@@ -6245,6 +6245,10 @@ export const tr_TR: EnTranslations = {
         "name": "Metamorfoz",
         "description": "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)"
       },
+      "aura_surge": {
+        "name": "Nurlu Kabarma",
+        "description": "Auranızı aşırı yükleyerek 10 sn boyunca 160 zırh kazandırır. (Paladin yeteneği)"
+      },
       "holy_shock": {
         "name": "Kutsal Şok",
         "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"

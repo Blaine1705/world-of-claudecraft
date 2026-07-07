@@ -1356,6 +1356,11 @@ const classAbilityNamesEn = {
         'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
       ],
       [
+        'aura_surge',
+        'Radiant Swell',
+        'Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)',
+      ],
+      [
         'holy_shock',
         'Holy Shock',
         'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',

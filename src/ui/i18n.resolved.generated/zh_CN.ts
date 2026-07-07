@@ -6245,6 +6245,10 @@ export const zh_CN: EnTranslations = {
         "name": "恶魔变形",
         "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
       },
+      "aura_surge": {
+        "name": "光辉涌动",
+        "description": "过载你的光环，使你在10秒内获得160点护甲。（圣骑士天赋）"
+      },
       "holy_shock": {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"

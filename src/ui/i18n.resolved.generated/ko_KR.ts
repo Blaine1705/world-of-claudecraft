@@ -6245,6 +6245,10 @@ export const ko_KR: EnTranslations = {
         "name": "악마 변신",
         "description": "악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)"
       },
+      "aura_surge": {
+        "name": "광휘의 파동",
+        "description": "오라를 과충전하여 10초 동안 방어도 160으로 몸을 단단히 합니다. (성기사 특성)"
+      },
       "holy_shock": {
         "name": "신성 충격",
         "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"

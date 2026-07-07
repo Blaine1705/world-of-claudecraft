@@ -364,6 +364,11 @@ export function runEffects(
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
+        // Conditional talent damage vs a target carrying the CASTER'S DoT
+        // (Twisted Faith style). Deterministic aura scan, no rng.
+        const vsDotted = ctx.playerMods(meta).abilities[ability.id]?.dmgPctVsDotted ?? 0;
+        if (vsDotted > 0 && target.auras.some((a) => a.kind === 'dot' && a.sourceId === p.id))
+          dmg *= 1 + vsDotted;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
         if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -726,6 +731,52 @@ export function runEffects(
         if (crit) dmg *= 1.5 + p.critDmgBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         noteSpellHit(ctx, p, crit);
+        break;
+      }
+      case 'extendDot': {
+        // Channel-tick rider: stretch the caster's named DoT on the target,
+        // capped per DoT application (extendedBy bookkeeping on the aura).
+        if (!target) break;
+        const dotAura = target.auras.find(
+          (a) => a.kind === 'dot' && a.id === eff.dot && a.sourceId === p.id,
+        );
+        if (!dotAura) break;
+        const already = dotAura.extendedBy ?? 0;
+        const add = Math.min(eff.seconds, eff.maxBonus - already);
+        if (add <= 0) break;
+        dotAura.extendedBy = already + add;
+        dotAura.remaining += add;
+        dotAura.duration += add;
+        break;
+      }
+      case 'consumeDot': {
+        // Detonate the caster's named DoT: its remaining damage lands now as
+        // this ability's school, and the DoT is removed. Deterministic: the
+        // remaining-tick count is plain math on the aura's timers, no rng.
+        if (!target) break;
+        const di = target.auras.findIndex(
+          (a) => a.kind === 'dot' && a.id === eff.dot && a.sourceId === p.id,
+        );
+        if (di < 0) break;
+        const dot = target.auras[di];
+        const interval = dot.tickInterval ?? 1;
+        const ticksLeft = Math.max(0, Math.floor(dot.remaining / interval));
+        const remainingDmg = Math.round(dot.value * ticksLeft);
+        target.auras.splice(di, 1);
+        ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
+        if (remainingDmg > 0) {
+          ctx.dealDamage(
+            p,
+            target,
+            remainingDmg,
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+          );
+        }
         break;
       }
       case 'interrupt': {

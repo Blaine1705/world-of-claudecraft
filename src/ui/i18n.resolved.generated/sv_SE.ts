@@ -6245,6 +6245,10 @@ export const sv_SE: EnTranslations = {
         "name": "Metamorfos",
         "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"
       },
+      "aura_surge": {
+        "name": "Strålande Svall",
+        "description": "Överladdar din aura och härdar dig med 160 rustning i 10 sek. (Paladintalang)"
+      },
       "holy_shock": {
         "name": "Helig chock",
         "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"

@@ -15,7 +15,9 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
-  | { on: 'meleeSwingWhile'; auraKind: string };
+  | { on: 'meleeSwingWhile'; auraKind: string }
+  // The player's charge-limited thorns aura (Thunder Ward) reflected a hit.
+  | { on: 'thornsReflect' };
 
 export type ProcResponse =
   | {
@@ -23,7 +25,7 @@ export type ProcResponse =
       aura: 'next_cast_free' | 'next_cast_instant' | 'next_cast_cheap';
       abilities?: string[]; // which casts may consume it (undefined = any)
       duration: number;
-      value?: number; // next_cast_cheap: cost multiplier (0.5 = half cost)
+      costPct?: number; // next_cast_cheap: fraction of the cost removed (0.5 = half off)
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
   | { kind: 'resource'; amount: number }
@@ -84,7 +86,7 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
           kind: r.aura,
           remaining: r.duration,
           duration: r.duration,
-          value: r.value ?? 0,
+          value: r.costPct !== undefined ? 1 - r.costPct : 0,
           sourceId: p.id,
           school: 'holy',
           empowerAbilities: r.abilities,
@@ -136,8 +138,14 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
   }
 }
 
-/** A cast completed (casting_lifecycle). Drives castNth counters. */
-export function onCastCompleted(ctx: SimContext, p: Entity, abilityId: string): void {
+/** A cast completed (casting_lifecycle). Drives castNth counters. The cast's
+ * target (when friendly) is the subject for heal/absorb/echo responses. */
+export function onCastCompleted(
+  ctx: SimContext,
+  p: Entity,
+  abilityId: string,
+  target?: Entity | null,
+): void {
   for (const def of procsFor(ctx, p)) {
     const t = def.trigger;
     if (t.on !== 'castNth' || !t.abilities.includes(abilityId)) continue;
@@ -145,8 +153,16 @@ export function onCastCompleted(ctx: SimContext, p: Entity, abilityId: string): 
     const c = (s.counters[def.id] ?? 0) + 1;
     if (c >= t.n) {
       s.counters[def.id] = 0;
-      fire(ctx, p, def, p);
+      fire(ctx, p, def, target && !target.dead ? target : p);
     } else s.counters[def.id] = c;
+  }
+}
+
+/** The player's charge-limited thorns aura reflected a melee hit. */
+export function onThornsReflect(ctx: SimContext, p: Entity): void {
+  for (const def of procsFor(ctx, p)) {
+    if (def.trigger.on !== 'thornsReflect') continue;
+    fire(ctx, p, def, p);
   }
 }
 

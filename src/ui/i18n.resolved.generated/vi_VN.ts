@@ -6245,6 +6245,10 @@ export const vi_VN: EnTranslations = {
         "name": "Biến Hình",
         "description": "Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)"
       },
+      "aura_surge": {
+        "name": "Sóng Hào Quang",
+        "description": "Quá tải hào quang của bạn, gia cố 160 giáp trong 10 giây. (thiên phú Paladin)"
+      },
       "holy_shock": {
         "name": "Sốc Thánh",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"

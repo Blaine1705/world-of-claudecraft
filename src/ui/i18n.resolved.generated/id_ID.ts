@@ -6245,6 +6245,10 @@ export const id_ID: EnTranslations = {
         "name": "Metamorfosis",
         "description": "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)"
       },
+      "aura_surge": {
+        "name": "Gelombang Cemerlang",
+        "description": "Mengisi berlebih aura Anda, memperkuat dengan 160 zirah selama 10 detik. (talenta Paladin)"
+      },
       "holy_shock": {
         "name": "Kejutan Suci",
         "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"

@@ -2566,6 +2566,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
   'entities.abilities.revive_pet.name': 'ペット蘇生',
   'entities.abilities.revive_pet.description': '死んだペットを蘇生させ、自分のそばに呼び戻す。',
+  'entities.abilities.aura_surge.name': '光輝の高まり',
+  'entities.abilities.aura_surge.description':
+    'オーラを過負荷させ、10秒間160の防御力で身を固める。(パラディンの才能)',
   'entities.abilities.holy_shock.name': 'ホーリーショック',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',

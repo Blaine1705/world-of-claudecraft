@@ -6245,6 +6245,10 @@ export const it_IT: EnTranslations = {
         "name": "Metamorfosi",
         "description": "Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)"
       },
+      "aura_surge": {
+        "name": "Ondata Radiosa",
+        "description": "Sovraccarica la tua aura, indurendoti con 160 armatura per 10 sec. (talento del Paladino)"
+      },
       "holy_shock": {
         "name": "Shock Sacro",
         "description": "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)"

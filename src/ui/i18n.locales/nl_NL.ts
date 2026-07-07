@@ -1976,6 +1976,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wrath.description':
     'Slingert een bout van natuurenergie voor {damage} Natuurschade.',
   'entities.abilities.wrath.name': 'Wildbout',
+  'entities.abilities.aura_surge.name': 'Stralende Golf',
+  'entities.abilities.aura_surge.description':
+    'Overlaadt je aura en verhardt je met 160 bepantsering gedurende 10 sec. (Paladijntalent)',
   'entities.abilities.holy_shock.name': 'Heilige schok',
   'entities.abilities.holy_shock.description':
     'Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)',

@@ -6245,6 +6245,10 @@ export const es: EnTranslations = {
         "name": "Metamorfosis",
         "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"
       },
+      "aura_surge": {
+        "name": "Oleada Radiante",
+        "description": "Sobrecarga tu aura y te endurece con 160 de armadura durante 10 s. (talento de Paladín)"
+      },
       "holy_shock": {
         "name": "Choque Sagrado",
         "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"

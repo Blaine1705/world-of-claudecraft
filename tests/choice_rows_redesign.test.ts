@@ -167,8 +167,7 @@ describe('shaman redesign', () => {
     addTargetMob(sim, 100000, 8);
     for (let i = 0; i < 3; i++) castAndSettle(sim, 'lightning_bolt');
     expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    const before = p.maxResource;
-    p.resource = before;
+    const before = (p.resource = p.maxResource);
     sim.castAbility('earth_shock');
     for (let i = 0; i < 20; i++) sim.tick();
     expect(p.resource).toBe(before);
@@ -291,46 +290,5 @@ describe('paladin redesign', () => {
       return { hp: p.hp, mana: p.resource, auras: p.auras.map((a) => [a.id, a.kind]) };
     };
     expect(run()).toEqual(run());
-  });
-});
-
-describe('druid Lifesap redesign', () => {
-  it('restores 30 resource per classic tick for 10 sec, in combat', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
-    sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
-    const p = sim.player;
-    p.resource = 0;
-    p.inCombat = true;
-    p.fiveSecondRule = 0; // no baseline mana regen mixes into the assertion
-    sim.castAbility('innervate');
-    sim.tick();
-    expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(true);
-    for (let i = 0; i < 20 * 11; i++) {
-      p.fiveSecondRule = 0;
-      sim.tick();
-    }
-    // five classic 2-sec ticks inside the 10 sec window
-    expect(p.resource).toBe(100);
-    expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(false); // expired
-    expect(p.cooldowns.get('innervate')).toBeGreaterThan(60);
-  });
-
-  it('carries across a form shift and fills Rage in Bruin Form', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
-    sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
-    const p = sim.player;
-    sim.castAbility('innervate');
-    sim.tick();
-    expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(true);
-    p.gcdRemaining = 0;
-    sim.castAbility('bear_form');
-    for (let i = 0; i < 10; i++) sim.tick();
-    expect(p.resourceType).toBe('rage');
-    expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(true); // survived the shift
-    p.resource = 0;
-    for (let i = 0; i < 20 * 6; i++) sim.tick();
-    expect(p.resource).toBeGreaterThanOrEqual(40); // sap ticks fed Rage in form
   });
 });

@@ -3254,6 +3254,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Revivir mascota',
   'entities.abilities.revive_pet.description':
     'Revive a tu mascota muerta y la devuelve a tu lado.',
+  'entities.abilities.aura_surge.name': 'Oleada Radiante',
+  'entities.abilities.aura_surge.description':
+    'Sobrecarga tu aura y te endurece con 160 de armadura durante 10 s. (talento de Paladín)',
   'entities.abilities.holy_shock.name': 'Choque Sagrado',
   'entities.abilities.holy_shock.description':
     'Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)',

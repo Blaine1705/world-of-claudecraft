@@ -2449,6 +2449,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
   'entities.abilities.revive_pet.name': '复活宠物',
   'entities.abilities.revive_pet.description': '复活你死去的宠物，并将其召回身边。',
+  'entities.abilities.aura_surge.name': '光辉涌动',
+  'entities.abilities.aura_surge.description':
+    '过载你的光环，使你在10秒内获得160点护甲。（圣骑士天赋）',
   'entities.abilities.holy_shock.name': '神圣震击',
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',

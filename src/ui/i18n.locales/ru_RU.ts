@@ -2592,6 +2592,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Оживление питомца',
   'entities.abilities.revive_pet.description':
     'Оживляет вашего павшего питомца и возвращает его к вам.',
+  'entities.abilities.aura_surge.name': 'Лучезарная волна',
+  'entities.abilities.aura_surge.description':
+    'Перегружает вашу ауру, укрепляя вас 160 ед. брони на 10 сек. (талант паладина)',
   'entities.abilities.holy_shock.name': 'Шок небес',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',

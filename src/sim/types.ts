@@ -447,6 +447,9 @@ export interface Aura {
   // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
   // ids may consume this aura; undefined means any eligible cast.
   empowerAbilities?: string[];
+  // extendDot bookkeeping: seconds already added to this DoT application, so
+  // the per-application maxBonus cap holds across channel ticks.
+  extendedBy?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
@@ -1575,6 +1578,12 @@ export type AbilityEffect =
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
+  // Channel-tick rider: each application extends the caster's named DoT on the
+  // target by `seconds`, up to `maxBonus` total added per DoT application.
+  | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
+  // Detonates the caster's named DoT on the target: its remaining damage lands
+  // instantly as this ability's school and the DoT is removed.
+  | { type: 'consumeDot'; dot: string }
   | { type: 'silence'; duration: number }
   | { type: 'aoeFear'; duration: number; radius: number }
   | { type: 'clearCooldowns'; abilities: string[] }

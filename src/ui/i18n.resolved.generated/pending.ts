@@ -165,6 +165,8 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "entities.abilities.arcane_power.description",
     "entities.abilities.arcane_power.name",
+    "entities.abilities.aura_surge.description",
+    "entities.abilities.aura_surge.name",
     "entities.abilities.bestial_wrath.description",
     "entities.abilities.bestial_wrath.name",
     "entities.abilities.blade_flurry.description",

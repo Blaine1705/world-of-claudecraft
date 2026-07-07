@@ -3217,6 +3217,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Rianima Famiglio',
   'entities.abilities.revive_pet.description':
     'Rianima il tuo famiglio morto e lo richiama al tuo fianco.',
+  'entities.abilities.aura_surge.name': 'Ondata Radiosa',
+  'entities.abilities.aura_surge.description':
+    'Sovraccarica la tua aura, indurendoti con 160 armatura per 10 sec. (talento del Paladino)',
   'entities.abilities.holy_shock.name': 'Shock Sacro',
   'entities.abilities.holy_shock.description':
     'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',

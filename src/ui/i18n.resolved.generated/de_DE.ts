@@ -6245,6 +6245,10 @@ export const de_DE: EnTranslations = {
         "name": "Metamorphose",
         "description": "Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)"
       },
+      "aura_surge": {
+        "name": "Strahlende Woge",
+        "description": "Überlädt Eure Aura und härtet Euch mit 160 Rüstung für 10 Sek. (Paladintalent)"
+      },
       "holy_shock": {
         "name": "Heiliger Schock",
         "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"

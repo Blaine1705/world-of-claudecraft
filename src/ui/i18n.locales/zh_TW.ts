@@ -2451,6 +2451,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',
   'entities.abilities.revive_pet.name': '復活寵物',
   'entities.abilities.revive_pet.description': '復活你已死亡的寵物，並使其重回你身邊。',
+  'entities.abilities.aura_surge.name': '光輝湧動',
+  'entities.abilities.aura_surge.description':
+    '過載你的光環，使你在10秒內獲得160點護甲。（聖騎士天賦）',
   'entities.abilities.holy_shock.name': '神聖震擊',
   'entities.abilities.holy_shock.description':
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
