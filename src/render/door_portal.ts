@@ -115,6 +115,58 @@ function doorPortalMaterial(entering: boolean, lowGfx: boolean): THREE.MeshBasic
   return material;
 }
 
+// Soft radial "energy membrane" texture for the rift gate: a bright core fading
+// to transparent at the rim (so the disc fills the opening with soft edges that
+// tuck behind the frame instead of a hard-edged spinning oval), plus faint
+// spiral arms so the renderer's per-frame rotation reads as swirling energy
+// rather than a rotating ball. White so the material colour tints it per rank.
+let riftPortalTex: THREE.CanvasTexture | null = null;
+
+function riftPortalTexture(): THREE.CanvasTexture | null {
+  if (riftPortalTex) return riftPortalTex;
+  if (typeof document === 'undefined') return null;
+  const S = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = S;
+  canvas.height = S;
+  const g = canvas.getContext('2d');
+  if (!g) return null;
+  const c = S / 2;
+  const grad = g.createRadialGradient(c, c, 0, c, c, c);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.45, 'rgba(235,235,255,0.6)');
+  grad.addColorStop(0.78, 'rgba(210,210,255,0.18)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = grad;
+  g.beginPath();
+  g.arc(c, c, c, 0, Math.PI * 2);
+  g.fill();
+  // Faint spiral arms (deterministic, no rng): each is a widening curved streak
+  // spun around the centre, giving the rotation something to carry.
+  g.globalCompositeOperation = 'lighter';
+  g.strokeStyle = 'rgba(255,255,255,0.10)';
+  g.lineCap = 'round';
+  const ARMS = 5;
+  for (let a = 0; a < ARMS; a++) {
+    const base = (a / ARMS) * Math.PI * 2;
+    g.beginPath();
+    for (let t = 0; t <= 1; t += 0.04) {
+      const r = t * c * 0.92;
+      const ang = base + t * 2.4; // spiral twist
+      const x = c + Math.cos(ang) * r;
+      const y = c + Math.sin(ang) * r;
+      if (t === 0) g.moveTo(x, y);
+      else g.lineTo(x, y);
+    }
+    g.lineWidth = 6;
+    g.stroke();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  riftPortalTex = tex;
+  return tex;
+}
+
 // Rift-gate shimmer tinted by rank (shared with the rank badge + chat colour via
 // RIFT_TIER_COLORS), so a C gate glows green, B blue, A violet, S gold. Cached
 // per (tier, lowGfx) like doorPortalMaterial.
@@ -127,8 +179,9 @@ function riftPortalMaterial(tier: RiftTier, lowGfx: boolean): THREE.MeshBasicMat
   const material = markSharedMaterial(
     new THREE.MeshBasicMaterial({
       color: RIFT_TIER_COLORS[tier],
+      map: riftPortalTexture() ?? undefined,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.85,
       side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -202,16 +255,20 @@ export function buildRiftGateBody(
     if (mesh.isMesh) mesh.castShadow = true;
   });
   body.add(gate);
-  // A chunky 3D archway with a real see-through opening: the additive shimmer
-  // sits CENTERED in the hole (z=0, double-sided so it reads from either side)
-  // and is sized proportionally to the gate so it fills the opening. The base
-  // circle has radius 1.55; scale it to roughly half the gate width and a third
-  // of its height.
+  // A chunky 3D archway with a real see-through opening: the energy membrane
+  // sits CENTERED in the hole (z=0, double-sided so it reads from either side).
+  // It is UNIFORMLY scaled (a circle, not an ellipse) so the renderer's spin
+  // reads as swirling energy via the spiral texture instead of a rotating oval,
+  // and it is sized to overfill the opening so its soft-edged rim tucks behind
+  // the frame pillars and the glow fills the whole arch.
   const gateWidth = size.x * s;
   const midY = RIFT_GATE_HEIGHT * 0.46;
+  // Cover the larger opening dimension (the arch is taller than it is wide); the
+  // radial falloff fades the spill-over behind the frame.
+  const fillR = Math.max(gateWidth * 0.42, RIFT_GATE_HEIGHT * 0.4);
   const portal = new THREE.Mesh(doorPortalGeometry(), riftPortalMaterial(tier, lowGfx));
   portal.position.set(0, midY, 0);
-  portal.scale.set((gateWidth * 0.3) / 1.55, (RIFT_GATE_HEIGHT * 0.34) / 1.55, 1);
+  portal.scale.setScalar(fillR / 1.55);
   body.add(portal);
   return { body, portal };
 }
