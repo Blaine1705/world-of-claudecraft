@@ -385,12 +385,22 @@ interface BaseItemDef {
 export interface SetProc {
   id: string; // unique aura/proc id, e.g. 'set_clearcasting'
   name: string; // buff display name, e.g. 'Clearcasting'
-  trigger: 'spellCast' | 'meleeCrit' | 'spellCrit' | 'kill';
+  // weaponCrit fires on any critical white swing or weapon strike, melee AND
+  // ranged (Auto Shot / wand), so the leather sets work for hunters too.
+  trigger: 'spellCast' | 'weaponCrit' | 'spellCrit' | 'kill';
   chance: number; // 0..1 proc chance
   aura: AuraKind; // the buff to grant, e.g. 'next_cast_free'
   duration: number; // seconds the granted aura lasts
-  value?: number; // optional aura value
+  value?: number; // optional aura value (per stack when maxStacks is set)
   icd?: number; // internal cooldown seconds, min gap between procs
+  // Target-applied procs (the stacking bleeds): 'target' lands the aura on the
+  // struck enemy instead of the wearer. Defaults to the wearer.
+  applyTo?: 'self' | 'target';
+  tickInterval?: number; // dot/hot tick cadence, seconds
+  // Stacking cap: reapplication adds a stack (magnitude scales linearly with
+  // the count) and refreshes the duration.
+  maxStacks?: number;
+  school?: Aura['school']; // granted aura's school (bleeds are physical); default arcane
 }
 
 export interface SetBonusEffect {
@@ -2272,6 +2282,12 @@ export interface SimConfig {
   // so callers that set this MUST also call setActiveWorldContent() with content
   // whose terrain-relevant fields are identical (see the sim.ts ctor invariant).
   world?: WorldContent;
+  // Optional per-phase timing hook: tick() calls this after each internal phase and
+  // the HOST owns the clock, attributing the elapsed time since its previous mark to
+  // `phase` (keeps wall-clock reads out of the sim, per the determinism guard). The
+  // server injects it to feed its tick profiler during an on-demand capture; undefined
+  // offline/headless, so the sim draws no wall clock in a deterministic scenario.
+  perfLap?: (phase: string) => void;
 }
 
 export function emptyMoveInput(): MoveInput {
