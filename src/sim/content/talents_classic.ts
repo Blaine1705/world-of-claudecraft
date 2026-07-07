@@ -1035,8 +1035,17 @@ const MAGE_SPECS: SpecDef[] = [
     'A controlling caster who trades peak burst for survival and slows.',
     'icy_veins',
     'Brittlebreak',
-    'Increases critical strike chance against rooted or chilled targets by 10%. Increases armor by 10%.',
-    { global: { critVsRooted: 0.1 }, stats: { armorPct: 0.1 } },
+    'Increases your Frost spell damage by 25%. Increases armor by 10%.',
+    // The scalable mastery axis is the Frost-kit damage (ability-scoped so the
+    // mage's fire/arcane baseline spells stay untouched); armor is the static
+    // secondary. Crit-vs-rooted identity returns as a Shatter-style row option.
+    {
+      ability: [
+        { ability: 'frostbolt', dmgPct: 0.25 },
+        { ability: 'frost_nova', dmgPct: 0.25 },
+      ],
+      stats: { armorPct: 0.1 },
+    },
   ),
 ];
 
