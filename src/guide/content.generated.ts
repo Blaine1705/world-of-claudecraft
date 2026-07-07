@@ -173,6 +173,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Redhand"
       },
       {
+        "id": "raging_gale",
+        "name": "Twinstrike"
+      },
+      {
         "id": "pummel",
         "name": "Pummel"
       },
@@ -183,6 +187,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "slam",
         "name": "Brute Swing"
+      },
+      {
+        "id": "red_harvest",
+        "name": "Red Harvest"
       },
       {
         "id": "heroic_leap",

@@ -2379,6 +2379,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   shield_slam: r('steel', 'steel', ['shield', { p: 'mace', ...BR }]),
   whirlwind: r('fury', 'steel', ['sword'], ['arcs']),
   berserker_rage: r('fury', 'blood', ['fist'], ['glow']),
+  // fury-only kit: Twinstrike = two crossed blades mid-swing; Red Harvest = a
+  // blood-soaked axe with a falling droplet (distinct from execute's bare axe)
+  raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),
+  red_harvest: r('blood', 'blood', ['axe', { p: 'droplet', ...BR }], ['drips']),
   // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
   pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
   heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact

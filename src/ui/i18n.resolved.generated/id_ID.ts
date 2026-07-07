@@ -5239,6 +5239,14 @@ export const id_ID: EnTranslations = {
         "name": "Pertumpahan Darah",
         "description": "Seketika menyerang dalam amukan darah untuk {damage}. (Penanda Fury)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Shieldcrack",
         "description": "Menghantam target dengan perisaimu sebesar {damage} dan ancaman besar. (Ciri khas Perlindungan)"

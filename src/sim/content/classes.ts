@@ -66,9 +66,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'hamstring',
       'bloodrage',
       'overpower',
+      'raging_gale',
       'pummel',
       'execute',
       'slam',
+      'red_harvest',
       'heroic_leap',
       'cleave',
       'rallying_cry',
@@ -641,6 +643,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged.',
   },
+  // Fury's active rage builder (operator design, Arremetida Enfurecida): two
+  // 60%-weapon hits so the pair lands slightly more than one signature
+  // Bloodletting swing, plus a rage kick. First BASE-KIT user of the
+  // multi-charge cooldown flow (maxCharges; the Double Charge talent row
+  // pioneered the Entity.charges machinery).
+  raging_gale: {
+    id: 'raging_gale',
+    name: 'Twinstrike',
+    class: 'warrior',
+    learnLevel: 10,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 8,
+    maxCharges: 2,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
+      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
+      { type: 'gainResource', amount: 8 },
+    ],
+    description:
+      'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)',
+  },
   execute: {
     id: 'execute',
     name: 'Early Grave',
@@ -673,6 +701,29 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 25 }],
     description: 'Slams the opponent for weapon damage plus $d.',
+  },
+  // Fury's dump-everything spender (operator design, Desenfreno): three full
+  // weapon hits, each carrying a Maiming Strike-scale bonus (era table:
+  // docs/design/spell-ranks.md), for the whole 80-rage bar. GCD only.
+  red_harvest: {
+    id: 'red_harvest',
+    name: 'Red Harvest',
+    class: 'warrior',
+    learnLevel: 16,
+    specs: ['fury'],
+    cost: 80,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      { type: 'weaponStrike', bonus: 40 },
+      { type: 'weaponStrike', bonus: 40 },
+      { type: 'weaponStrike', bonus: 40 },
+    ],
+    description:
+      'Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)',
   },
   cleave: {
     id: 'cleave',
@@ -4255,7 +4306,7 @@ export interface KnownAbility {
   threatFlat: number;
   threatMult: number;
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
-  charges?: number; // talent-granted stored uses (Double Charge); undefined = 1
+  charges?: number; // stored uses (def maxCharges and/or Double Charge talent); undefined = 1
 }
 
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
@@ -4382,9 +4433,11 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
-    // Stored uses (Double Charge): base 1; the combat gate + recharge live in
-    // casting_lifecycle / updateTimers, keyed off this resolved max.
-    if (am.bonusCharges) entry.charges = 1 + am.bonusCharges;
+    // Stored uses (Double Charge): base 1 unless the def itself is
+    // charge-limited (maxCharges, already resolved onto entry.charges); the
+    // combat gate + recharge live in casting_lifecycle / updateTimers, keyed
+    // off this resolved max.
+    if (am.bonusCharges) entry.charges = (entry.charges ?? 1) + am.bonusCharges;
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
     // Multiplier-shaped values (buff_haste/scale/jump/mortal_wound) are exempt like in
@@ -4452,6 +4505,11 @@ export function abilitiesKnownAt(
       threatFlat,
       threatMult,
     };
+    // Charge-limited base kit (Twinstrike): the def's stored-use max resolves
+    // exactly like the Double Charge talent's, so casting_lifecycle's charge
+    // gate + updateTimers' recharge refund need no new path. Talent
+    // bonusCharges (applyTalentMods) stacks on top of this base.
+    if (def.maxCharges !== undefined) entry.charges = def.maxCharges;
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);
   }

@@ -5239,6 +5239,14 @@ export const pl_PL: EnTranslations = {
         "name": "Upust krwi",
         "description": "Natychmiast atakuj w krwawym szale, zadając {damage}. (Sygnatura furii)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Trzask tarczy",
         "description": "Uderza cel tarczą, zadając {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)"

@@ -5239,6 +5239,14 @@ export const fr_CA: EnTranslations = {
         "name": "Saignée",
         "description": "Attaque instantanément dans une frénésie sanguinaire pour {damage}. (signature Fureur)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Shieldcrack",
         "description": "Heurte la cible avec votre bouclier pour {damage} et génère une menace énorme. (signature Protection)"

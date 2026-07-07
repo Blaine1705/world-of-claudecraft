@@ -5239,6 +5239,14 @@ export const pt_BR: EnTranslations = {
         "name": "Sangria",
         "description": "Ataca instantaneamente em frenesi sangrento, causando {damage}. (assinatura de Fúria)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Estrondo de Escudo",
         "description": "Golpeia o alvo com seu escudo, causando {damage} e muita ameaça. (assinatura de Proteção)"

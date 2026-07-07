@@ -5239,6 +5239,14 @@ export const zh_CN: EnTranslations = {
         "name": "放血",
         "description": "在鲜血狂怒中立即攻击，造成 {damage} 点伤害。（狂怒专精标志技能）"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "碎盾击",
         "description": "用盾牌猛击目标，造成 {damage} 点伤害并产生巨量威胁。（防护专精标志技能）"

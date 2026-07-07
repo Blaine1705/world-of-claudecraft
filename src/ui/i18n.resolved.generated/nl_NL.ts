@@ -5239,6 +5239,14 @@ export const nl_NL: EnTranslations = {
         "name": "Aderlating",
         "description": "Val onmiddellijk aan in een bloedrazernij voor {damage}. (Razernij-kenmerk)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Schildbreuk",
         "description": "Sla het doelwit met je schild voor {damage} en enorme dreiging. (Protectie-kenmerk)"

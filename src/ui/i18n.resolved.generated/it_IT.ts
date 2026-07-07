@@ -5239,6 +5239,14 @@ export const it_IT: EnTranslations = {
         "name": "Salasso",
         "description": "Attacca istantaneamente in una frenesia sanguigna per {damage}. (firma Furia)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Frantumascudo",
         "description": "Colpisce il bersaglio con lo scudo per {damage} e genera una minaccia enorme. (firma Protezione)"
