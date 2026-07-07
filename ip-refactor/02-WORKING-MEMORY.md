@@ -276,3 +276,4 @@ pressure before this process was found; veto = rename in a follow-up):
 | Pummel | Jawcrack | missed in the first batch; warrior interrupt, Eye Jab register |
 | Moonfury (row option) | Moonspite | balance druid row; Moongrove register |
 | Shatter (row option) | Coldsnap Break | map's Brittlebreak is taken by the frost mastery |
+| Aura Mastery (row option + new active) | Radiant Swell | paladin row-quality pass; the WoW-named passive option became a coined active (aura_surge); veto = rename in a follow-up |
