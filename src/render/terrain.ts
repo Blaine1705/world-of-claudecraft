@@ -367,17 +367,17 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   const v2 = (Math.sin(x * 0.043 + 5) * Math.cos(z * 0.05 + 2) + 1) / 2;
   cTmp.lerp(grassYellowC, v2 * 0.35);
   if (biome === 'ember') {
-    // the gatewood is green at the Wyrmgate and dries into sand northward;
-    // the volcanic belt then darkens toward scorched basalt
-    const forest = 1 - clamp01((z - 1545) / 145);
+    // the gatewood is green in the south near Wyrmwatch and dries into sand
+    // northward; the volcanic belt then darkens toward scorched basalt
+    const forest = 1 - clamp01((z - 1925) / 145);
     if (forest > 0) cTmp.lerp(emberForestC, forest * 0.85);
-    const sandT = clamp01((z - 1545) / 145);
+    const sandT = clamp01((z - 1925) / 145);
     lerpSplat(w, 3, sandT * 0.75);
-    // the Goldmelt valley: a sheltered green corridor through the volcanic
-    // belt toward the Amberfall, the realm's second gradient
-    const passT = 1 - clamp01((Math.abs(x + 10) - 26) / 26);
-    const valley = passT * clamp01((z - 1930) / 80);
-    const scorch = clamp01((z - 1880) / 100) * (1 - valley);
+    // the Wyrmroad: a sheltered green corridor along x 404 through the
+    // volcanic belt toward the south crossing, the realm's second gradient
+    const passT = 1 - clamp01((Math.abs(x - 404) - 26) / 26);
+    const valley = passT * clamp01((z - 2310) / 80);
+    const scorch = clamp01((z - 2260) / 100) * (1 - valley);
     if (scorch > 0) {
       cTmp.lerp(emberScorchC, scorch * 0.55);
       lerpSplat(w, 2, scorch * 0.5);
@@ -464,13 +464,13 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     if (t2 > 0) cTmp.lerp(emberBasaltC, t2 * 0.85);
   }
   if (biome === 'frost') {
-    // the Reach is snowbound from the shore up, not just on its crowns; in
-    // the Snowline corridor (the sideways crossing at z 1700) the green
-    // valley floor fades under the snow westward instead of flipping white
-    // at the border
-    const passT = 1 - clamp01((Math.abs(z - 1700) - 26) / 26);
-    const snowline = Math.max(clamp01((-195 - x) / 85), 1 - passT);
-    const green = (1 - snowline) * passT;
+    // the Reach is snowbound from the shore up, not just on its crowns; the
+    // Snowline and the Goldmelt (the sideways crossings) both sit at z 1890
+    // on opposite borders, so the green valley floors fade under the snow
+    // toward the interior instead of flipping white at the borders
+    const passT = 1 - clamp01((Math.abs(z - 1890) - 26) / 26);
+    const green = passT * clamp01((Math.abs(x) - 95) / 85);
+    const snowline = 1 - green;
     if (green > 0) cTmp.lerp(emberForestC, green * 0.8);
     const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * snowline;
     cTmp.lerp(snowCapC, 0.8 * blanket);

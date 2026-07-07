@@ -15,29 +15,29 @@ export interface NightFeaturesView {
   update(time: number): void;
 }
 
-const NIGHT_ZMIN = 3120;
-const NIGHT_ZMAX = 3680;
+const NIGHT_ZMIN = 1260;
+const NIGHT_ZMAX = 1820;
 
 // Dreambeam fans: the aurora/sunbeam texture anatomy in pale violet. Each
 // plane's bright top edge is the cloud line the dream-light breaks through;
 // the columns fall as soft shafts over the meadows and the Moonwell.
 const BEAMS = [
-  { x: 60, z: 3242, rot: 0.3, w: 60, h: 105, phase: 0 }, // over the Moonwell
-  { x: -70, z: 3348, rot: -0.4, w: 70, h: 110, phase: 1.9 }, // Gloamfield
-  { x: 10, z: 3430, rot: 0.5, w: 55, h: 100, phase: 3.4 },
-  { x: 90, z: 3400, rot: -0.2, w: 50, h: 95, phase: 4.7 }, // the Vigil
-  { x: -20, z: 3520, rot: 0.15, w: 65, h: 115, phase: 2.6 }, // the Barrow
+  { x: -300, z: 1382, rot: 0.3, w: 60, h: 105, phase: 0 }, // over the Moonwell
+  { x: -430, z: 1488, rot: -0.4, w: 70, h: 110, phase: 1.9 }, // Gloamfield
+  { x: -350, z: 1570, rot: 0.5, w: 55, h: 100, phase: 3.4 },
+  { x: -270, z: 1540, rot: -0.2, w: 50, h: 95, phase: 4.7 }, // the Vigil
+  { x: -380, z: 1660, rot: 0.15, w: 65, h: 115, phase: 2.6 }, // the Barrow
 ] as const;
 
 // Lumen blossom clusters: patches of tall glowing flowers, thickest around
 // the pools and the flower downs (deterministic hash placement like the
 // foliage grid, but emissive so they bloom on composer tiers).
 const BLOSSOM_FIELDS = [
-  { x: -84, z: 3356, r: 34 }, // Gloamfield
-  { x: 62, z: 3248, r: 26 }, // the Moonwell's shore
-  { x: -20, z: 3200, r: 24 }, // the Nightgate meadows
-  { x: 30, z: 3380, r: 28 }, // the midrealm saddle
-  { x: 6, z: 3526, r: 22 }, // the barrow downs
+  { x: -444, z: 1496, r: 34 }, // Gloamfield
+  { x: -298, z: 1388, r: 26 }, // the Moonwell's shore
+  { x: -380, z: 1340, r: 24 }, // the Nightgate meadows
+  { x: -330, z: 1520, r: 28 }, // the midrealm saddle
+  { x: -354, z: 1666, r: 22 }, // the barrow downs
 ] as const;
 
 const BLOSSOM_TINTS = [0x9fdcff, 0xe8f4ff, 0xc8a8ff, 0xa0ffd8];
@@ -177,9 +177,9 @@ export function buildNightFeatures(seed: number): NightFeaturesView {
 
   // --- glow at the stone rings and the tarn: soft dream-fire ---
   const GLOWS = [
-    { x: 88, z: 3398, c: 0xc8b4ff, i: 1.6 }, // the Standing Vigil
-    { x: 0, z: 3510, c: 0xb0a0e8, i: 1.4 }, // the Sleepless Barrow
-    { x: 70, z: 3240, c: 0xffc8ec, i: 1.2 }, // the Moonwell's water glow
+    { x: -272, z: 1538, c: 0xc8b4ff, i: 1.6 }, // the Standing Vigil
+    { x: -360, z: 1650, c: 0xb0a0e8, i: 1.4 }, // the Sleepless Barrow
+    { x: -290, z: 1380, c: 0xffc8ec, i: 1.2 }, // the Moonwell's water glow
   ];
   for (const g of GLOWS) {
     const y = Math.max(terrainHeight(g.x, g.z, seed), WATER_LEVEL) + 3;

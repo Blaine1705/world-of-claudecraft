@@ -17,8 +17,8 @@ export interface JungleFeaturesView {
   update(time: number): void;
 }
 
-const REACH_ZMIN = 3120;
-const REACH_ZMAX = 3680;
+const REACH_ZMIN = 700;
+const REACH_ZMAX = 1260;
 
 // The banyans reuse the twisted-elder model the Hollow's centerpiece and the
 // Wraithwood's giants wear (already preloaded twice over, so free), regrown

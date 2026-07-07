@@ -14,21 +14,21 @@ export interface GaleFeaturesView {
   update(time: number): void;
 }
 
-const BEACON = { x: 498, z: 2728 };
+const BEACON = { x: 498, z: 308 };
 // stacks stand in the water off the Shear's cliffs
 const SEA_STACKS = [
-  { x: 496, z: 2932, r: 4.2, h: 22 },
-  { x: 510, z: 2966, r: 3.4, h: 17 },
-  { x: 488, z: 2996, r: 5.0, h: 26 },
-  { x: 522, z: 2912, r: 2.8, h: 13 },
-  { x: 504, z: 3028, r: 3.8, h: 19 },
-  { x: 474, z: 3036, r: 3.0, h: 15 },
+  { x: 496, z: 512, r: 4.2, h: 22 },
+  { x: 510, z: 546, r: 3.4, h: 17 },
+  { x: 488, z: 576, r: 5.0, h: 26 },
+  { x: 522, z: 492, r: 2.8, h: 13 },
+  { x: 504, z: 608, r: 3.8, h: 19 },
+  { x: 474, z: 616, r: 3.0, h: 15 },
 ] as const;
 // hull ribs on the Wreckfields beach: position, heading, rib count, size
 const WRECKS = [
-  { x: 322, z: 3076, rot: 0.7, ribs: 7, r: 5.2 },
-  { x: 356, z: 3086, rot: -0.9, ribs: 5, r: 3.8 },
-  { x: 300, z: 3054, rot: 2.2, ribs: 6, r: 4.4 },
+  { x: 322, z: 656, rot: 0.7, ribs: 7, r: 5.2 },
+  { x: 356, z: 666, rot: -0.9, ribs: 5, r: 3.8 },
+  { x: 300, z: 634, rot: 2.2, ribs: 6, r: 4.4 },
 ] as const;
 
 function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {

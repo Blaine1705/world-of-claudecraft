@@ -156,22 +156,24 @@ export function paintTerrainRows(
         g = 84;
         b = 104;
       } else if (biome === 'ember') {
-        // green gatewood in the south drying to sand, scorched near the belt
-        const sandT = Math.max(0, Math.min(1, (z - 1545) / 145));
+        // green gatewood in the south near Wyrmwatch drying to sand, scorched
+        // near the belt; the Wyrmroad corridor stays green through it
+        const sandT = Math.max(0, Math.min(1, (z - 1925) / 145));
         r = 74 + 76 * sandT;
         g = 110 + 10 * sandT;
         b = 52 + 32 * sandT;
-        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x + 10) - 26) / 26));
-        const valley = passT * Math.max(0, Math.min(1, (z - 1930) / 80));
-        const scorch = Math.max(0, Math.min(1, (z - 1880) / 100)) * (1 - valley);
+        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x - 404) - 26) / 26));
+        const valley = passT * Math.max(0, Math.min(1, (z - 2310) / 80));
+        const scorch = Math.max(0, Math.min(1, (z - 2260) / 100)) * (1 - valley);
         r = r * (1 - scorch * 0.35) - 60 * valley * (sandT > 0 ? 1 : 0);
         g = g * (1 - scorch * 0.45);
         b = b * (1 - scorch * 0.4) - 25 * valley;
       } else if (biome === 'frost') {
-        // the Snowline corridor greens the map too, fading under the snow
-        // (the sideways crossing: keyed on z, whitening westward)
-        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(z - 1700) - 26) / 26));
-        const snowline = Math.max(Math.min(1, Math.max(0, (-195 - x) / 85)), 1 - passT);
+        // the Snowline and Goldmelt corridors green the map too, fading under
+        // the snow (both sideways crossings sit at z 1890 on opposite borders)
+        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(z - 1890) - 26) / 26));
+        const green = passT * Math.max(0, Math.min(1, (Math.abs(x) - 95) / 85));
+        const snowline = 1 - green;
         r = 74 + 140 * snowline;
         g = 110 + 114 * snowline;
         b = 52 + 184 * snowline;

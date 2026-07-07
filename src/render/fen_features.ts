@@ -13,8 +13,8 @@ export interface FenFeaturesView {
   update(time: number): void;
 }
 
-const FEN_ZMIN = 2600;
-const FEN_ZMAX = 3120;
+const FEN_ZMIN = 180;
+const FEN_ZMAX = 700;
 const WILLOW_TINTS = [0x8fc47e, 0x7eb474, 0xa2d488];
 const BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xd8b8f2, 0xffffff, 0xf2a88f];
 
@@ -169,7 +169,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     bloomGeo.scale(1, 0.7, 1);
     const geo = bloomGeo.toNonIndexed();
     const spots: { x: number; z: number; y: number; s: number; rot: number; tint: number }[] = [];
-    for (let gx = -160; gx <= 160; gx += 11) {
+    for (let gx = -520; gx <= -200; gx += 11) {
       for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 11) {
         const r = hash2(gx, gz, seed + 2301);
         if (r > 0.42) continue;
