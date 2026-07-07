@@ -2048,6 +2048,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.emboldening_roar.name': '振奮咆哮',
   'entities.abilities.emboldening_roar.description':
     '發出振奮的咆哮：你和 40 碼內的友方玩家獲得振奮效果，接下來的 3 個技能必定造成爆擊。（狂怒）',
+  'entities.abilities.raised_guard.name': '舉盾格擋',
+  'entities.abilities.raised_guard.description': '舉盾自守：6 秒內受到的物理傷害降低 50%。（防護）',
+  'entities.abilities.iron_resolve.name': '無視疼痛',
+  'entities.abilities.iron_resolve.description':
+    '咬牙硬撐，無視疼痛：消耗你的全部怒氣（至少 20 點），每消耗 1 點怒氣便吸收 4 點傷害，最多持續 10 秒。（防護）',
+  'entities.abilities.faultline.name': '震盪波',
+  'entities.abilities.faultline.description':
+    '向地面轟出一道震盪波：你面前 8 碼內的敵人受到 {damage} 點傷害並被擊暈 3 秒。（防護）',
+  'entities.abilities.defiant_bellow.name': '挑釁怒吼',
+  'entities.abilities.defiant_bellow.description':
+    '發出挑釁的怒吼：10 碼內的所有敵人都被嘲諷，被迫攻擊你，持續 3 秒。（防護）',
   'entities.abilities.shield_slam.name': '碎盾擊',
   'entities.abilities.shield_slam.description':
     '用盾牌猛擊目標，造成 {damage} 點傷害並產生巨量威脅。（防護專精標誌技能）',

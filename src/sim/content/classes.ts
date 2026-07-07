@@ -67,15 +67,19 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'bloodrage',
       'overpower',
       'raging_gale',
+      'raised_guard',
       'pummel',
       'execute',
       'furious_mending',
+      'iron_resolve',
       'slam',
       'red_harvest',
+      'faultline',
       'heroic_leap',
       'cleave',
       'rallying_cry',
       'emboldening_roar',
+      'defiant_bellow',
       'defensive_stance',
       'demoralizing_shout',
       'intimidating_shout',
@@ -776,6 +780,96 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
     description:
       'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+  },
+  // Protection's active shield block (operator design, Bloquear con Escudo):
+  // an off-GCD 6 sec self buff cutting PHYSICAL damage taken in half (the
+  // 'buff_dr_phys' sibling of Furious Mending's buff_dr, read at the same
+  // combat/damage.ts fold but gated on the school being physical).
+  raised_guard: {
+    id: 'raised_guard',
+    name: 'Raised Guard',
+    class: 'warrior',
+    learnLevel: 10,
+    specs: ['prot'],
+    cost: 15,
+    castTime: 0,
+    cooldown: 12,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'buff_dr_phys',
+        value: 0.5,
+        duration: 6,
+        auraId: 'raised_guard_dr',
+        auraName: 'Raised Guard',
+      },
+    ],
+    description:
+      'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)',
+  },
+  // Protection's rage-dump survival wall (operator design, Ignorar Dolor): the
+  // FIRST spendsAllResource ability. `cost` is the 20-rage minimum gate;
+  // casting drains the whole bar and grants a damage-absorb shield (the
+  // priest-style 'absorb' aura kind, drained by dealDamage and read by the HUD
+  // absorb bar) soaking 4 damage per rage actually spent, up to 10 sec.
+  iron_resolve: {
+    id: 'iron_resolve',
+    name: 'Iron Resolve',
+    class: 'warrior',
+    learnLevel: 14,
+    specs: ['prot'],
+    cost: 20,
+    spendsAllResource: true,
+    castTime: 0,
+    cooldown: 15,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'absorbSpentResource', mult: 4, duration: 10 }],
+    description:
+      'Grit your teeth and ignore the pain: consumes all of your rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+  },
+  // Protection's frontal control slam (operator design, Ola de Choque): modest
+  // aoe damage plus a 3 sec stun, restricted to enemies in the MELEE_ARC
+  // frontal arc (the aoeDamage `frontal` flag) within 8 yd.
+  faultline: {
+    id: 'faultline',
+    name: 'Faultline',
+    class: 'warrior',
+    learnLevel: 16,
+    specs: ['prot'],
+    cost: 15,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeDamage', min: 15, max: 20, radius: 8, frontal: true, stunSec: 3 }],
+    description:
+      'Send a shockwave through the ground: enemies in front of you within 8 yards take $d damage and are stunned for 3 sec. (Protection)',
+  },
+  // Protection's aoe taunt (operator design, Grito Desafiante): every hostile
+  // mob within 10 yd goes through the SHARED applyTaunt entry (threat lifted
+  // to the top of its table + forced onto the caster), the fan-out of Goad.
+  defiant_bellow: {
+    id: 'defiant_bellow',
+    name: 'Defiant Bellow',
+    class: 'warrior',
+    learnLevel: 18,
+    specs: ['prot'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeTaunt', radius: 10 }],
+    description:
+      'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
   },
   cleave: {
     id: 'cleave',

@@ -2153,6 +2153,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.emboldening_roar.name': '鼓舞の咆哮',
   'entities.abilities.emboldening_roar.description':
     '鼓舞の咆哮を上げ、自身と40ヤード以内の味方プレイヤーが鼓舞状態になります。次の3回のアビリティが必ずクリティカルヒットになります。（狂怒）',
+  'entities.abilities.raised_guard.name': '盾構え',
+  'entities.abilities.raised_guard.description':
+    '盾を構えて身を守ります：6秒間、受ける物理ダメージが50%減少します。（防御）',
+  'entities.abilities.iron_resolve.name': '痛み無視',
+  'entities.abilities.iron_resolve.description':
+    '歯を食いしばって痛みを無視します：怒りをすべて消費し（最低20）、消費した怒り1につき4のダメージを吸収します。最大10秒持続します。（防御）',
+  'entities.abilities.faultline.name': '衝撃波',
+  'entities.abilities.faultline.description':
+    '地面に衝撃波を放ちます：前方8ヤード以内の敵に {damage} のダメージを与え、3秒間スタンさせます。（防御）',
+  'entities.abilities.defiant_bellow.name': '反抗の雄叫び',
+  'entities.abilities.defiant_bellow.description':
+    '反抗の雄叫びを上げます：10ヤード以内のすべての敵を挑発し、3秒間自分を攻撃させます。（防御）',
   'entities.abilities.shield_slam.name': '盾砕き',
   'entities.abilities.shield_slam.description':
     '盾で対象を叩きつけ、{damage} のダメージと大量の脅威を与えます。（防御シグネチャー）',

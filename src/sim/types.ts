@@ -253,7 +253,11 @@ export type AuraKind =
   // less damage from any external source while worn (summed across auras,
   // floored at a zero multiplier; the cut lives in combat/damage.ts beside the
   // Die by the Sword arm).
-  | 'buff_dr';
+  | 'buff_dr'
+  // Raised Guard's physical-only sibling of buff_dr: the wearer takes `value`
+  // fraction less PHYSICAL damage while worn (other schools untouched). Same
+  // fold site in combat/damage.ts, gated on the damage school.
+  | 'buff_dr_phys';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -1225,7 +1229,17 @@ export type AbilityEffect =
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
-  | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  // `frontal` restricts the blast to enemies within the melee facing arc
+  // (MELEE_ARC, the castAbility facing gate); `stunSec` is a paired stun rider
+  // applied to each enemy actually hit (Faultline). Neither draws extra rng.
+  | {
+      type: 'aoeDamage';
+      min: number;
+      max: number;
+      radius: number;
+      frontal?: boolean;
+      stunSec?: number;
+    }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
@@ -1301,6 +1315,15 @@ export type AbilityEffect =
   | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
   | { type: 'charge' }
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
+  // Iron Resolve: a damage-absorb shield (the priest-style 'absorb' aura kind)
+  // sized from the resource ACTUALLY spent by the cast (`mult` damage soaked
+  // per point). Pairs with AbilityDef.spendsAllResource, which snapshots the
+  // spend-all bill into the resolved cost the effect reads.
+  | { type: 'absorbSpentResource'; mult: number; duration: number }
+  // Defiant Bellow: taunt every hostile mob within radius through the shared
+  // applyTaunt entry (threat to top + forced attack), the aoe fan-out of the
+  // single-target 'taunt' effect. Draws no rng.
+  | { type: 'aoeTaunt'; radius: number }
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
@@ -1390,6 +1413,11 @@ export interface AbilityDef {
   // Usable only while the caster wears an aura of this kind (Victory Rush's
   // on-kill window); runEffects consumes the enabling aura on a successful cast.
   requiresAuraKind?: AuraKind;
+  // Spend-ALL ability (Iron Resolve): `cost` is only the MINIMUM gate; the
+  // actual bill is the caster's entire resource bar, snapshotted into the
+  // resolved cost at apply time so both the spend and the effects (e.g.
+  // absorbSpentResource) read the true spent amount.
+  spendsAllResource?: boolean;
   learnLevel: number;
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)

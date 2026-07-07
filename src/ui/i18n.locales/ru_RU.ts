@@ -2183,6 +2183,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.emboldening_roar.name': 'Ободряющий рев',
   'entities.abilities.emboldening_roar.description':
     'Вы издаете ободряющий рев: вы и дружественные игроки в радиусе 40 м получаете эффект «Воодушевление», и ваши следующие 3 способности наносят гарантированный критический удар. (ветка «Неистовство»)',
+  'entities.abilities.raised_guard.name': 'Поднятый щит',
+  'entities.abilities.raised_guard.description':
+    'Вы укрываетесь за щитом: в течение 6 сек получаемый физический урон снижен на 50%. (ветка «Защита»)',
+  'entities.abilities.iron_resolve.name': 'Игнорирование боли',
+  'entities.abilities.iron_resolve.description':
+    'Вы стискиваете зубы и игнорируете боль: расходует всю вашу ярость (минимум 20) и поглощает 4 ед. урона за каждую потраченную единицу ярости, до 10 сек. (ветка «Защита»)',
+  'entities.abilities.faultline.name': 'Ударная волна',
+  'entities.abilities.faultline.description':
+    'Вы сотрясаете землю ударной волной: противники перед вами в радиусе 8 м получают {damage} урона и оглушаются на 3 сек. (ветка «Защита»)',
+  'entities.abilities.defiant_bellow.name': 'Вызывающий рев',
+  'entities.abilities.defiant_bellow.description':
+    'Вы издаете вызывающий рев: все противники в радиусе 10 м провоцируются и вынуждены атаковать вас в течение 3 сек. (ветка «Защита»)',
   'entities.abilities.shield_slam.name': 'Раскол щита',
   'entities.abilities.shield_slam.description':
     'Бьет цель щитом, нанося {damage} и создавая огромную угрозу. (ключевая способность ветки «Защита»)',

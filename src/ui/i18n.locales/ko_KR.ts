@@ -2145,6 +2145,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.emboldening_roar.name': '고무의 포효',
   'entities.abilities.emboldening_roar.description':
     '고무의 포효를 질러 자신과 40미터 내 아군 플레이어를 고무시킵니다. 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노)',
+  'entities.abilities.raised_guard.name': '방패 올리기',
+  'entities.abilities.raised_guard.description':
+    '방패 뒤에 몸을 웅크립니다: 6초 동안 받는 물리 피해가 50% 감소합니다. (방어)',
+  'entities.abilities.iron_resolve.name': '고통 무시',
+  'entities.abilities.iron_resolve.description':
+    '이를 악물고 고통을 무시합니다: 모든 분노를 소모해(최소 20) 소모한 분노 1당 4의 피해를 흡수합니다. 최대 10초 동안 지속됩니다. (방어)',
+  'entities.abilities.faultline.name': '충격파',
+  'entities.abilities.faultline.description':
+    '땅에 충격파를 일으킵니다: 전방 8미터 내의 적에게 {damage}의 피해를 주고 3초 동안 기절시킵니다. (방어)',
+  'entities.abilities.defiant_bellow.name': '도전의 외침',
+  'entities.abilities.defiant_bellow.description':
+    '도전의 외침을 내지릅니다: 10미터 내의 모든 적을 도발해 3초 동안 자신을 공격하게 만듭니다. (방어)',
   'entities.abilities.shield_slam.name': '방패 강타',
   'entities.abilities.shield_slam.description':
     '방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',

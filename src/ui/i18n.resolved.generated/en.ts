@@ -5255,6 +5255,22 @@ export const en: EnTranslations = {
         "name": "Emboldening Roar",
         "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
+      "raised_guard": {
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+      },
+      "iron_resolve": {
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: consumes all of your rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
+      },
+      "faultline": {
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
+      },
+      "defiant_bellow": {
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
+      },
       "shield_slam": {
         "name": "Shieldcrack",
         "description": "Slam the target with your shield for {damage} and massive threat. (Protection signature)"
