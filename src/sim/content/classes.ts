@@ -4696,9 +4696,11 @@ export function abilitiesKnownAt(
     if (!def) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
     if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
-    // Spec-gated kit: once a spec is chosen, abilities reserved for other specs
-    // drop out. No spec chosen = full kit; grants bypass (already spec-scoped).
-    if (!granted && def.specs && mods?.spec && !def.specs.includes(mods.spec)) continue;
+    // Spec-gated kit: a spec-restricted ability is shown ONLY when the player's
+    // committed spec is in its `specs` list. With no spec chosen the shared base
+    // kit stays but every spec-exclusive drops out, so exclusivity is visible
+    // before committing. Grants bypass entirely (already spec-scoped).
+    if (!granted && def.specs && (!mods?.spec || !def.specs.includes(mods.spec))) continue;
 
     let rank = 1,
       cost = def.cost,

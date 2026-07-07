@@ -311,10 +311,12 @@ describe('(e) Defiant Bellow taunts every nearby hostile mob onto the caster', (
 });
 
 describe('(f) spec gating', () => {
-  it('prot and no-spec know all four; arms and fury know none', () => {
+  it('prot knows all four; no-spec, arms, and fury know none', () => {
+    // Spec-gating (2026-07-07): a no-spec warrior sees only the shared base kit,
+    // so the prot exclusives are hidden until prot is committed.
     for (const id of PROT_IDS) {
-      expect(knownIds(null).has(id), `${id} (no spec)`).toBe(true);
       expect(knownIds('prot').has(id), `${id} (prot)`).toBe(true);
+      expect(knownIds(null).has(id), `${id} (no spec)`).toBe(false);
       expect(knownIds('arms').has(id), `${id} (arms)`).toBe(false);
       expect(knownIds('fury').has(id), `${id} (fury)`).toBe(false);
     }

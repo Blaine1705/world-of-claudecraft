@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -115,11 +116,15 @@ describe('Spell Power balance band (cap)', () => {
   });
 
   it('a warrior bleed (Rend) folds melee Attack Power into each DoT tick', () => {
-    const { sim, p } = leveled('warrior');
+    const { sim, pid, p } = leveled('warrior');
+    // Deep Gash (rend) is arms-gated base kit (2026-07-07): commit arms so it is
+    // known and castable, and resolve its def under arms.
+    expect(sim.setSpec('arms', pid)).toBe(true);
     const dummy = spawnDummy(sim, p);
     p.targetId = dummy.id;
     p.resource = 100; // rage to pay for Rend
-    const rend = abilitiesKnownAt('warrior', MAX_LEVEL).find((k) => k.def.id === 'rend')!;
+    const armsMods = computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' });
+    const rend = abilitiesKnownAt('warrior', MAX_LEVEL, armsMods).find((k) => k.def.id === 'rend')!;
     const dot = rend.effects.find((e) => e.type === 'dot') as {
       total: number;
       duration: number;

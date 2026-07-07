@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import {
   abilitiesKnownAt,
   DEEPFEN_SHALLOWS_LAKE,
@@ -179,7 +180,10 @@ describe('classic formulas', () => {
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
     expect(w1).toEqual(['heroic_strike']); // battle_shout now unlocks at level 7
-    const w10 = abilitiesKnownAt('warrior', 10);
+    // Redhand (overpower) is arms-gated base kit (2026-07-07): hidden with no
+    // spec, so commit arms to confirm it unlocks (with the ungated staples) at 10.
+    const armsMods = computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' });
+    const w10 = abilitiesKnownAt('warrior', 10, armsMods);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
     const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
     expect(hs10.rank).toBe(2);
@@ -1426,7 +1430,16 @@ describe('leveling', () => {
     expect(sim.player.level).toBe(5);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
-    expect(sim.known.map((k) => k.def.id)).toContain('rend');
+    // Deep Gash (rend) unlocks at level 5 but is arms-gated (2026-07-07): a
+    // no-spec warrior does not learn it (and a spec cannot be committed until
+    // level 10). Under arms its level-5 unlock is present.
+    expect(sim.known.map((k) => k.def.id)).not.toContain('rend');
+    const armsAt5 = abilitiesKnownAt(
+      'warrior',
+      5,
+      computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' }),
+    );
+    expect(armsAt5.map((k) => k.def.id)).toContain('rend');
   });
 
   it('caps at max level', () => {

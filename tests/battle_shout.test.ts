@@ -75,6 +75,9 @@ describe('Iron Bellow (battle_shout) group buff', () => {
   it('stays mutually exclusive with Bolstering Cry in both cast orders', () => {
     const sim = makeWarrior();
     sim.setPlayerLevel(14); // battle(1) + commanding(14) known
+    // Bolstering Cry (commanding_shout) is prot-gated base kit (2026-07-07), so a
+    // no-spec warrior no longer knows it: commit prot to cast it here.
+    expect(sim.setSpec('prot')).toBe(true);
     const p = sim.player;
     const baseAp = p.attackPower;
     const baseMaxHp = p.maxHp;

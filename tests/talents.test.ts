@@ -51,6 +51,15 @@ function nearestMob(sim: Sim) {
 
 const effOf = (k: any, i = 0) => k.effects[i] as any;
 
+// Resolve a spec-gated ability's RAW (unmodified) effects: a grant bypasses the
+// spec filter (spec-gating 2026-07-07) without applying any spec mastery, so the
+// resolved effect is the pristine base to snapshot against.
+const grantMods = (ability: string) => {
+  const m = computeTalentModifiers('warrior', alloc());
+  m.grants.push({ ability, rank: 1 });
+  return m;
+};
+
 describe('talent tree validation (load-time)', () => {
   it('every registered tree is structurally valid', () => {
     for (const ct of Object.values(TALENTS)) {
@@ -515,7 +524,7 @@ describe('Sim integration — active talents & ability modifiers', () => {
 
   it('snapshot-locks Overpower damage before/after Improved Overpower (+ Arms mastery)', () => {
     const baseBonus = effOf(
-      abilitiesKnownAt('warrior', 20).find((k) => k.def.id === 'overpower'),
+      abilitiesKnownAt('warrior', 20, grantMods('overpower')).find((k) => k.def.id === 'overpower'),
     ).bonus;
     const mods = computeTalentModifiers(
       'warrior',
@@ -529,7 +538,7 @@ describe('Sim integration — active talents & ability modifiers', () => {
     expect(buffed).toBeGreaterThan(baseBonus);
     // shared content data must NOT be mutated by the modifier pass
     const baseAgain = effOf(
-      abilitiesKnownAt('warrior', 20).find((k) => k.def.id === 'overpower'),
+      abilitiesKnownAt('warrior', 20, grantMods('overpower')).find((k) => k.def.id === 'overpower'),
     ).bonus;
     expect(baseAgain).toBe(baseBonus);
   });
@@ -568,7 +577,9 @@ describe('Sim integration — active talents & ability modifiers', () => {
   });
 
   it('a choice node applies only the chosen option ability mod', () => {
-    const baseMin = effOf(abilitiesKnownAt('warrior', 20).find((k) => k.def.id === 'cleave')).min;
+    const baseMin = effOf(
+      abilitiesKnownAt('warrior', 20, grantMods('cleave')).find((k) => k.def.id === 'cleave'),
+    ).min;
     const sweeping = effOf(
       abilitiesKnownAt(
         'warrior',
@@ -598,10 +609,11 @@ describe('Sim integration — active talents & ability modifiers', () => {
   });
 
   it('tank-role Vengeance Mastery multiplies generated threat (+30%)', () => {
-    // Brute Swing (slam) is a plain damage strike both no-spec and prot know, so
+    // Hobbling Cut (hamstring) is an ungated damage strike EVERY warrior knows, so
     // its damage-driven threat isolates the +30% Recompense threat mastery.
-    // (Sunder's flat threat is now prot-only, so it can't be the base case.)
-    const slamThreat = (vengeance: boolean): number => {
+    // (Brute Swing is now arms/prot-gated so a no-spec warrior cannot cast it, and
+    // sunder's flat threat is prot-only, so neither can be the base case.)
+    const hamstringThreat = (vengeance: boolean): number => {
       const sim = new Sim({ seed: 3, playerClass: 'warrior' });
       sim.setPlayerLevel(20);
       if (vengeance) expect(sim.setSpec('prot')).toBe(true); // grants Vengeance (+30% threat)
@@ -612,11 +624,11 @@ describe('Sim integration — active talents & ability modifiers', () => {
       sim.player.facing = Math.atan2(mob.pos.x - sim.player.pos.x, mob.pos.z - sim.player.pos.z);
       sim.player.resource = 100;
       sim.targetEntity(mob.id);
-      sim.castAbility('slam');
+      sim.castAbility('hamstring');
       return mob.threat.get(sim.playerId) ?? 0;
     };
-    const base = slamThreat(false);
-    const venge = slamThreat(true);
+    const base = hamstringThreat(false);
+    const venge = hamstringThreat(true);
     expect(base).toBeGreaterThan(0);
     // ~+30% (a tiny constant "seed" threat on combat entry isn't multiplied, so
     // assert the band rather than the exact ratio): clearly boosted, not doubled.

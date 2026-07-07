@@ -23,9 +23,9 @@ import { localizeSimAuraName } from '../src/ui/sim_i18n';
 // 'furious_mending', read by combat/damage.ts) and, WHILE IT LASTS, Bloodletting
 // (bloodthirst) heals the caster for 20% of maximum health instead of 3%
 // (combat/effect_dispatch.ts selfHealPctMax). It is NOT a flat heal-over-time
-// (operator correction 2026-07-07). A player with NO spec keeps the whole kit,
-// so the sure-crit tests drive a no-spec warrior that knows both Emboldening
-// Roar and the damaging strikes it empowers.
+// (operator correction 2026-07-07). Emboldening Roar, Furious Mending, and Red
+// Harvest are all fury-gated base kit, so under spec-gating (2026-07-07) the
+// sure-crit tests commit fury and empower a fury-known strike (Hobbling Cut).
 
 type TestSim = Sim & {
   nextId: number;
@@ -33,12 +33,13 @@ type TestSim = Sim & {
   addEntity(entity: Entity): void;
 };
 
-// spec = null keeps the full kit (Emboldening Roar + Brute Swing + Red Harvest);
-// 'fury' grants Bloodletting and gates in Furious Mending.
+// Fury is the default: it owns Emboldening Roar, Furious Mending, Red Harvest,
+// and Bloodletting. The sure-crit strike used below (Hobbling Cut / hamstring)
+// is an ungated staple fury keeps. Pass another spec explicitly to override.
 function makeSim(
   seed = 31337,
   level = 20,
-  spec: 'fury' | 'prot' | null = null,
+  spec: 'fury' | 'prot' | null = 'fury',
 ): { sim: TestSim; p: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as unknown as TestSim;
   sim.setPlayerLevel(level);
@@ -188,7 +189,7 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
       }
       const out: { crit: boolean; amount: number }[] = [];
       for (let i = 0; i < 4; i++) {
-        const hits = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
+        const hits = hitsBy(recast(sim, p, 'hamstring'), 'Hobbling Cut');
         expect(hits).toHaveLength(1);
         out.push({ crit: hits[0].crit, amount: hits[0].amount });
       }
@@ -201,18 +202,18 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
     sim.drainEvents();
     sim.castAbility('emboldening_roar');
 
-    const first = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
+    const first = hitsBy(recast(sim, p, 'hamstring'), 'Hobbling Cut');
     expect(first).toHaveLength(1);
     expect(first[0].crit).toBe(true);
     expect(sureCritAura(p)?.charges).toBe(2);
 
-    const second = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
+    const second = hitsBy(recast(sim, p, 'hamstring'), 'Hobbling Cut');
     expect(second[0].crit).toBe(true);
     expect(sureCritAura(p)?.charges).toBe(1);
 
     sim.drainEvents();
-    const thirdEvents = recast(sim, p, 'slam');
-    const third = hitsBy(thirdEvents, 'Brute Swing');
+    const thirdEvents = recast(sim, p, 'hamstring');
+    const third = hitsBy(thirdEvents, 'Hobbling Cut');
     expect(third[0].crit).toBe(true);
     // The last charge drops the aura with its fade event.
     expect(sureCritAura(p)).toBeUndefined();
@@ -221,7 +222,7 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
     ).toBe(true);
 
     // 4th cast: back to the normal roll, byte-identical to the no-roar twin.
-    const fourth = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
+    const fourth = hitsBy(recast(sim, p, 'hamstring'), 'Hobbling Cut');
     expect({ crit: fourth[0].crit, amount: fourth[0].amount }).toEqual(control.out[3]);
     expect(control.aura).toBeUndefined();
   });
@@ -358,10 +359,11 @@ describe('(d) Furious Mending: 20% damage cut and a supercharged Bloodletting he
 });
 
 describe('(e) spec gating', () => {
-  it('Emboldening Roar is fury + no-spec only; Furious Mending is fury + no-spec only', () => {
-    // No spec keeps the whole kit.
-    expect(knownIds(null).has('emboldening_roar')).toBe(true);
-    expect(knownIds(null).has('furious_mending')).toBe(true);
+  it('Emboldening Roar and Furious Mending are fury-only; no-spec, arms, and prot know neither', () => {
+    // Spec-gating (2026-07-07): a no-spec warrior sees only the shared base kit,
+    // so these fury exclusives are hidden until fury is committed.
+    expect(knownIds(null).has('emboldening_roar')).toBe(false);
+    expect(knownIds(null).has('furious_mending')).toBe(false);
     // Emboldening Roar moved back to Fury.
     expect(knownIds('fury').has('emboldening_roar')).toBe(true);
     expect(knownIds('prot').has('emboldening_roar')).toBe(false);

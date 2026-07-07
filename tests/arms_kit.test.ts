@@ -216,10 +216,12 @@ describe('(c) Measured Fury: 10% cheaper rage abilities, arms only, never castab
 });
 
 describe('(d) spec gating', () => {
-  it('arms and no-spec know both; fury and prot know neither', () => {
+  it('arms knows both; no-spec, fury, and prot know neither', () => {
+    // Spec-gating (2026-07-07): a no-spec warrior sees only the shared base kit,
+    // so the arms exclusives are hidden until arms is committed.
     for (const id of ARMS_IDS) {
-      expect(knownIds(null).has(id), `${id} (no spec)`).toBe(true);
       expect(knownIds('arms').has(id), `${id} (arms)`).toBe(true);
+      expect(knownIds(null).has(id), `${id} (no spec)`).toBe(false);
       expect(knownIds('fury').has(id), `${id} (fury)`).toBe(false);
       expect(knownIds('prot').has(id), `${id} (prot)`).toBe(false);
     }
