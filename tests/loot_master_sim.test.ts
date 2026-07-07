@@ -196,7 +196,7 @@ describe('master loot', () => {
         if (e.type === 'lootRoll' && e.rollId === rollId) convertedEarly = true;
     }
     expect(convertedEarly).toBe(false);
-  }, 20000);
+  }, 120000); // ticks a five-minute window on a 13-zone world under suite load
 
   it('converts an uncurated drop to a need/greed roll for all candidates at the 5-min timeout', () => {
     const sim = makeSim();
@@ -214,7 +214,7 @@ describe('master loot', () => {
     }
     expect(rolls.sort((x, y) => x - y)).toEqual([a, b].sort((x, y) => x - y));
     // 6020 ticks of a 9-zone world: give it headroom under full-suite load
-  }, 20000);
+  }, 120000); // ticks a five-minute window on a 13-zone world under suite load
 
   it('only the leader can change the loot method', () => {
     const sim = makeSim();

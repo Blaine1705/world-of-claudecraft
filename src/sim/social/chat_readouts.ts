@@ -108,7 +108,10 @@ export function partyReadout(ctx: SimContext, pid: number): string {
 export function zonesReadout(currentX: number, currentZ: number): string {
   if (ZONES.length === 0) return 'No zones are defined.';
   const here = zoneAt(currentX, currentZ);
-  const parts = ZONES.map((z) => {
+  // travel order, not append order: south to north, then west to east
+  // within a row (a column zone appends LAST for rng-stream stability)
+  const ordered = [...ZONES].sort((a, b) => a.zMin - b.zMin || (a.xMin ?? -180) - (b.xMin ?? -180));
+  const parts = ordered.map((z) => {
     const line = `${z.name} (Lvl ${z.levelRange[0]}-${z.levelRange[1]})`;
     return z.id === here.id ? `${line} [you are here]` : line;
   });

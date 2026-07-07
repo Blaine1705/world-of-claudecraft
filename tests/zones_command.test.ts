@@ -49,7 +49,7 @@ describe('/zones command', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     // Stand deep in the last zone, then read.
     const last = ZONES[ZONES.length - 1];
-    teleport(sim, a, 0, last.zMin + 1);
+    teleport(sim, a, last.hub.x, last.hub.z); // inside the zone's own rect (columns!)
     sim.tick();
     expect(zoneAt(sim.entities.get(a)!.pos.x, sim.entities.get(a)!.pos.z).name).toBe(last.name);
     sim.chat('/zones', a);

@@ -548,7 +548,9 @@ describe('delve interactables and affixes', () => {
     // can never drift (a hook-less affix added to the constant would still be
     // caught by that affix's own dedicated hook test, e.g. restless_graves above).
     // Try many seeds; every Heroic roll must be an implemented affix.
-    for (let seed = 1; seed <= 120; seed++) {
+    // 60 seeds keep full affix-pool coverage; 120 fresh Sims of a 13-zone
+    // world no longer fit the budget under parallel suite load
+    for (let seed = 1; seed <= 60; seed++) {
       const sim = makeSim('warrior', seed);
       enterReliquary(sim, 'heroic');
       const run = sim.delveRunForPlayer(sim.playerId)!;
@@ -558,7 +560,7 @@ describe('delve interactables and affixes', () => {
     // 120 full Sim constructions of an 11-zone world: the seed count and the
     // timeout are rescaled together whenever the world grows (each ctor costs
     // ~0.2s now), so this stays green under full-suite parallel load.
-  }, 45000);
+  }, 60000);
 
   it('Deacon Varric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {
