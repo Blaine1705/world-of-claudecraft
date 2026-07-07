@@ -506,9 +506,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castFx: 'shout',
     name: 'Bolstering Cry',
     class: 'warrior',
-    learnLevel: 14,
-    specs: ['prot'],
-    cost: 0,
+    learnLevel: 11,
+    cost: 10,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -1807,7 +1806,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Aether Darts',
     class: 'mage',
     learnLevel: 5,
-    specs: ['arcane'],
     cost: 50,
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
@@ -1827,7 +1825,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'polymorph',
     name: 'Bewitch',
     class: 'mage',
-    learnLevel: 7,
+    learnLevel: 5,
     cost: 50,
     castTime: 1.5,
     cooldown: 0,
@@ -1865,8 +1863,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_explosion',
     name: 'Aetherburst',
     class: 'mage',
-    learnLevel: 7,
-    specs: ['arcane'],
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 0,
@@ -1886,7 +1883,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['fire'],
     name: 'Flamestrike',
     class: 'mage',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 80,
     // Owner rule 2026-07-11: a real cast, EXCEPT under Hot Streak, whose
     // next_cast_instant makes it instant and free (the spender machinery).
@@ -1979,7 +1976,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['fire'],
     name: 'Scald',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
@@ -2262,68 +2259,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
   temporal_acceleration: {
     id: 'temporal_acceleration',
     name: 'Temporal Acceleration',
-    class: 'mage',
-    learnLevel: 20,
-    specs: ['arcane'],
-    cost: 120,
-    castTime: 0,
-    cooldown: 300,
-    range: 0,
-    school: 'arcane',
-    requiresTarget: false,
-    effects: [
-      {
-        type: 'aoeAllyHaste',
-        mult: 1.3,
-        duration: 15,
-        radius: 40,
-        spell: true,
-        exhaust: true,
-        groupOnly: true,
-      },
-    ],
-    description:
-      'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)',
-  },
-  // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
-  // sections 13.4 / 14. The single-target Arcane spender that drives the offensive
-  // heal rotation. `projectile: false` so cost, damage and the +1 charge all
-  // resolve at cast completion in one controlled order (cost reads N charges,
-  // damage reads N, then banks N+1); a traveling bolt would race a back-to-back
-  // recast. Each held Arcane Charge scales damage (+30%) and cost (x1.9, steep)
-  // via combat/chronomancy.ts; Aether Darts consumes the charges. PLAYTEST-
-  // provisional: the base cost is DERIVED by tests/chronomancy_balance.test.ts to
-  // land the conservative rotation near 70-80s to OOM at the level-20 pool.
-  arcane_surge: {
-    id: 'arcane_surge',
-    name: 'Aether Surge',
-    class: 'mage',
-    learnLevel: 5,
-    specs: ['arcane'],
-    cost: 16,
-    castTime: 2,
-    cooldown: 0,
-    range: 30,
-    school: 'arcane',
-    requiresTarget: true,
-    // Instant impact at cast completion (no traveling bolt): keeps the charge
-    // read/write in one deterministic order, see combat/chronomancy.ts.
-    projectile: false,
-    // (base cost is `cost: 16` above; DERIVED via the balance harness so the
-    // targets hold WITH the 25% free-cast proc's mana relief.)
-    // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
-    // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
-    // the payoff is ramping it with charges (and the Echo healing it feeds).
-    effects: [{ type: 'directDamage', min: 10, max: 13 }],
-    description:
-      "Draws a surge of raw Arcane power through the enemy for $d damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
-  },
-  ice_barrier: {
-    id: 'ice_barrier',
-    // Frost's personal barrier (owner leveling pass 2026-07-14): Fire gets its
-    // own Blazing Barrier at the spec pick, so the shared Frostveil is gone.
-    specs: ['frost'],
-    name: 'Frostveil',
     class: 'mage',
     learnLevel: 5,
     cost: 90,
@@ -4959,7 +4894,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_power',
     name: 'Aether Surge',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 90,
@@ -4977,7 +4912,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'combustion',
     name: 'Flashfire',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 120,
@@ -4991,7 +4926,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'icy_veins',
     name: 'Icy Veins',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 180,
@@ -5277,7 +5212,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'blink',
     name: 'Flickerstep',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 40,
     castTime: 0,
     cooldown: 15,
@@ -5351,7 +5286,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'cone_of_cold',
     name: 'Frostsweep',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 20,
@@ -5382,7 +5317,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'counterspell',
     name: 'Spellbreak',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 45,
     castTime: 0,
     cooldown: 24,
@@ -5430,7 +5365,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'deep_freeze',
     name: 'Deadfrost',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 30,
@@ -5506,7 +5441,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'evocation',
     name: 'Aetherwell',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 120,
@@ -5645,7 +5580,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ice_block',
     name: 'Cold Coffin',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 15,
     castTime: 0,
     cooldown: 240,
@@ -5733,7 +5668,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'meteor',
     name: 'Skystone',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 120,
     castTime: 0,
     cooldown: 45,
@@ -5814,7 +5749,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'presence_of_mind',
     name: 'Racing Mind',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 60,
@@ -5992,7 +5927,23 @@ export interface KnownAbility {
   bonusCharges?: number; // +N stored uses resolved from def/talents; drives the abilityCharges recharge model
 }
 
-// Scale one effect's damage/heal magnitudes, returning a NEW effect object - the
+const INTEGRAL_BUFF_KINDS: ReadonlySet<AuraKind> = new Set([
+  'buff_ap',
+  'buff_armor',
+  'buff_int',
+  'buff_agi',
+  'buff_sta',
+  'buff_allstats',
+  'buff_spellpower',
+  'thorns',
+]);
+
+function scaleBuffValue(kind: AuraKind, value: number, mul: number): number {
+  const scaled = value * mul;
+  return INTEGRAL_BUFF_KINDS.has(kind) ? Math.round(scaled) : scaled;
+}
+
+// Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
 // base content arrays are shared module data and must never be mutated. `flat`
 // is added once to the effect's primary magnitude.
 // Buff-value kinds whose magnitude is an INTEGER count (attack power, armor,
@@ -6139,21 +6090,16 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     // cooldown-less cast instant by trading in a real cooldown.
     if (am.cooldownFlat) entry.cooldown = Math.max(0, entry.cooldown + am.cooldownFlat);
     if (am.castWhileMoving) entry.castWhileMoving = true;
-    // Stored uses (Double Charge): base 1 unless the def itself is
-    // charge-limited (maxCharges, already resolved onto entry.charges); the
-    // combat gate + recharge live in casting_lifecycle / updateTimers, keyed
-    // off this resolved max.
-    if (am.bonusCharges) entry.charges = (entry.charges ?? 1) + am.bonusCharges;
-    // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
-    // giving more armor. Only the buff effects scale; damage on the same ability does not.
-    // Multiplier-shaped values (buff_haste/scale/jump/mortal_wound) are exempt like in
-    // scaleEffect.
+    // buffPct strengthens a buff-like effect. Count-like aura values round to whole
+    // points; rate and multiplier values keep their fractions.
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        (e.type === 'selfBuff' || e.type === 'buffTarget') && Math.abs(e.value) >= 1
-          ? { ...e, value: Math.round(e.value * mul) }
-          : e,
+        e.type === 'selfBuff' || e.type === 'buffTarget'
+          ? { ...e, value: scaleBuffValue(e.kind, e.value, mul) }
+          : e.type === 'finisherHaste'
+            ? { ...e, mult: 1 + (e.mult - 1) * mul }
+            : e,
       );
     }
   }
