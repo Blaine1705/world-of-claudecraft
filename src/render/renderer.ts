@@ -4579,7 +4579,7 @@ export class Renderer {
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.realmFlora.update(this.time);
     this.emberFeatures.update(this.time);
-    this.frostSky.update(this.time);
+    this.frostSky.update(this.time, this.camera.position.z);
     this.fenFeatures.update(this.time);
     this.amberFeatures.update(this.time);
     this.nightFeatures.update(this.time);

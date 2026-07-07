@@ -10,7 +10,7 @@ import { terrainHeight } from '../sim/world';
 export interface FrostSkyView {
   group: THREE.Group;
   glowLights: THREE.PointLight[];
-  update(time: number): void;
+  update(time: number, camZ: number): void;
 }
 
 const ICEMANTLE = { x: -30, z: 2160 };
@@ -210,8 +210,13 @@ export function buildFrostSky(seed = 0): FrostSkyView {
     }
   }
   const tex = auroraTexture();
-  const ribbons: { mat: THREE.MeshBasicMaterial; base: number; phase: number; drift: number }[] =
-    [];
+  const ribbons: {
+    mat: THREE.MeshBasicMaterial;
+    mesh: THREE.Mesh;
+    base: number;
+    phase: number;
+    drift: number;
+  }[] = [];
 
   if (tex) {
     const curtain = (
@@ -245,7 +250,7 @@ export function buildFrostSky(seed = 0): FrostSkyView {
       mesh.rotation.x = 0.18; // lean the curtain slightly overhead
       mesh.renderOrder = 2;
       group.add(mesh);
-      ribbons.push({ mat, base, phase: r.phase + lift * 2.4, drift });
+      ribbons.push({ mat, mesh, base, phase: r.phase + lift * 2.4, drift });
     };
     for (const r of RIBBONS) {
       // the main green curtain, and a taller fainter violet veil behind it
@@ -258,16 +263,26 @@ export function buildFrostSky(seed = 0): FrostSkyView {
   return {
     group,
     glowLights,
-    update(time: number): void {
+    update(time: number, camZ: number): void {
       // lantern flames flicker together, gently
       for (const mat of lanternMats) {
         mat.emissiveIntensity = 1.4 + Math.sin(time * 6.2) * 0.12 + Math.sin(time * 1.7) * 0.1;
       }
+      // The aurora belongs to the Reach: the curtains hang far above the
+      // fog (fog: false, additive), so without this gate every neighboring
+      // realm sees them over its horizon. Fade with the CAMERA's z across
+      // the frost band edges: appearing as you crest the Snowline, gone
+      // once you leave for the Amberfall.
+      const fadeIn = Math.min(1, Math.max(0, (camZ - 2000) / 80));
+      const fadeOut = 1 - Math.min(1, Math.max(0, (camZ - 2520) / 80));
+      const band = Math.min(fadeIn, fadeOut);
       for (const r of ribbons) {
+        r.mesh.visible = band > 0.001;
+        if (!r.mesh.visible) continue;
         // slow curtain shimmer: opacity waves and the ray columns drift
         // (layers drift in opposite directions, which is what sells the
         // depth of a real display)
-        r.mat.opacity = r.base * (0.75 + 0.25 * Math.sin(time * 0.21 + r.phase));
+        r.mat.opacity = r.base * (0.75 + 0.25 * Math.sin(time * 0.21 + r.phase)) * band;
         if (r.mat.map) r.mat.map.offset.x = (time * r.drift + r.phase) % 1;
       }
     },
