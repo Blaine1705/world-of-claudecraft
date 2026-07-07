@@ -2036,6 +2036,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': '放血',
   'entities.abilities.bloodthirst.description':
     '在鮮血狂怒中立即攻擊，造成 {damage} 點傷害。（狂怒專精標誌技能）',
+  'entities.abilities.raging_gale.name': '雙斬',
+  'entities.abilities.raging_gale.description':
+    '立即用武器連續攻擊兩次，每次造成 60% 武器傷害外加 {damage} 點傷害，並產生 {rage} 點怒氣。最多儲存 2 次使用次數。（狂怒）',
+  'entities.abilities.red_harvest.name': '血色收割',
+  'entities.abilities.red_harvest.description':
+    '孤注一擲：三次兇猛的打擊，每次造成武器傷害外加 {damage} 點傷害。（狂怒）',
   'entities.abilities.shield_slam.name': '碎盾擊',
   'entities.abilities.shield_slam.description':
     '用盾牌猛擊目標，造成 {damage} 點傷害並產生巨量威脅。（防護專精標誌技能）',

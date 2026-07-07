@@ -5240,12 +5240,12 @@ export const ja_JP: EnTranslations = {
         "description": "血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与えます。（狂怒シグネチャー）"
       },
       "raging_gale": {
-        "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "name": "双撃",
+        "description": "武器で即座に2回攻撃し、それぞれ武器ダメージの60%に加えて {damage} のダメージを与え、{rage} の怒りを生成します。最大2チャージまで蓄積します。（狂怒）"
       },
       "red_harvest": {
-        "name": "Red Harvest",
-        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+        "name": "紅の収穫",
+        "description": "全てを注ぎ込む：3回の猛烈な打撃を放ち、それぞれ武器ダメージに加えて {damage} のダメージを与えます。（狂怒）"
       },
       "shield_slam": {
         "name": "盾砕き",

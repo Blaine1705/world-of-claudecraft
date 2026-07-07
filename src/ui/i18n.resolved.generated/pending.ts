@@ -10,17 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "es_ES": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_FR": [
@@ -129,34 +121,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "zh_CN": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "zh_TW": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ko_KR": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ja_JP": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
@@ -187,10 +163,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ru_RU": [
-    "entities.abilities.raging_gale.description",
-    "entities.abilities.raging_gale.name",
-    "entities.abilities.red_harvest.description",
-    "entities.abilities.red_harvest.name",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],

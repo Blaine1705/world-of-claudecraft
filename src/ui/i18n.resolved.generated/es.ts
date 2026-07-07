@@ -5240,12 +5240,12 @@ export const es: EnTranslations = {
         "description": "Atacas al instante en un frenesí sangriento por {damage}. (habilidad distintiva de Furia)"
       },
       "raging_gale": {
-        "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "name": "Arremetida Enfurecida",
+        "description": "Golpeas al instante dos veces con tu arma; cada golpe inflige un 60% del daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)"
       },
       "red_harvest": {
-        "name": "Red Harvest",
-        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+        "name": "Desenfreno",
+        "description": "Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)"
       },
       "shield_slam": {
         "name": "Quiebra de Escudo",
