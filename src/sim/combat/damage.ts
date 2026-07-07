@@ -53,22 +53,8 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
-import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
-import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
-import { recordDamageTaken } from './damage_history';
-import {
-  cauterizeFireDamageMult,
-  fireMageCauterize,
-  igniteOnCrit,
-  PERSONAL_BARRIER_IDS,
-} from './fire_mage';
+import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
-
-// Choice-row on-kill talent tuning (owner design draft: Pursuit +30% speed for
-// 6s; Bloodbath +5% crit and damage per stack, 8s, capped at 5 stacks).
-const PURSUIT_SPEED_DURATION = 6;
-const BLOODBATH_DURATION = 8;
-const BLOODBATH_MAX_STACKS = 5;
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -349,34 +335,6 @@ export function dealDamage(
           noRage,
           threatOpts,
           direct,
-          // Carry the AoE flag so a redirected slice of an area Arcane hit still
-          // rates its Temporal Echo conversion at the area (15%) coefficient, not
-          // the single-target 35%.
-          aoe,
-        );
-      }
-    }
-  }
-
-  if (target.kind === 'player' && amount > 0) {
-    const meta = ctx.players.get(target.id);
-    const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
-    const pet = share > 0 ? ctx.petOf(target.id) : null;
-    if (pet && !pet.dead) {
-      const redirected = Math.min(amount, Math.round(amount * share));
-      if (redirected > 0) {
-        amount -= redirected;
-        ctx.dealDamage(
-          source,
-          pet,
-          redirected,
-          crit,
-          school,
-          ability,
-          kind,
-          noRage,
-          threatOpts,
-          direct,
         );
       }
     }
@@ -513,12 +471,6 @@ export function dealDamage(
     }
   }
 
-  // Cauterize (fire spec passive, combat/fire_mage.ts): the FIRST lethal hit heals the
-  // mage to 25% max HP and sets them burning instead of killing them. Checked before
-  // the generic cheat-death: on a save it negates the blow (returns 0), so the generic
-  // save below sees a non-lethal amount and does not also fire.
-  const cauterized = fireMageCauterize(ctx, target, amount);
-  if (cauterized !== null) amount = cauterized;
   // Cheat death (talent global): a killing blow leaves the player at 1 hp
   // instead, gated by a long internal cooldown on procState. No rng.
   if (target.kind === 'player' && amount >= target.hp && !target.dead) {
@@ -529,35 +481,9 @@ export function dealDamage(
       if (target.procState.icds.cheat_death === undefined) {
         target.procState.icds.cheat_death = icd;
         amount = Math.max(0, target.hp - 1);
-        // The save is a MOMENT: a golden ward bloom on the survivor.
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: target.id,
-          targetId: target.id,
-          school: 'holy',
-          fx: 'wardBloom',
-        });
-        ctx.emit({
-          type: 'log',
-          pid: target.id,
-          text: 'Cheat Death saves you!',
-          color: '#ffd100',
-        });
       }
     }
   }
-  // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
-  // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
-  // absorb shields already resolved above, so a shielded cat soaks first.
-  if (target.kind === 'mob') {
-    const ymatch = ctx.yumiCatMatches.get(target.id);
-    if (ymatch) {
-      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
-      return;
-    }
-  }
-
-  const preHp = target.hp;
   target.hp = Math.max(0, target.hp - amount);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
@@ -618,16 +544,7 @@ export function dealDamage(
       target.auras.splice(i, 1);
       ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
       const healer = ctx.entities.get(a.sourceId);
-      if (healer && !healer.dead) {
-        ctx.applyHeal(healer, target, a.value, a.name);
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: a.sourceId,
-          targetId: target.id,
-          school: a.school,
-          fx: 'echoBurst',
-        });
-      }
+      if (healer && !healer.dead) ctx.applyHeal(healer, target, a.value, a.name);
     }
   }
 

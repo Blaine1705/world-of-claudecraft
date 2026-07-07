@@ -32,7 +32,6 @@ import { pctValue, recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
-import { isStunned } from './cc';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { tickThornsCooldown } from './thorns_charge';
 

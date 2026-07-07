@@ -290,9 +290,6 @@ export type AuraKind =
   | 'next_cast_instant'
   | 'next_cast_free'
   | 'next_cast_cheap'
-  // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
-  // any resource type, combat or not, carried across form shifts.
-  | 'resource_sap'
   | 'next_attack_crit'
   | 'heal_echo'
   | 'buff_spi'
@@ -447,6 +444,9 @@ export interface Aura {
   charges?: number;
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
+  // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
+  // ids may consume this aura; undefined means any eligible cast.
+  empowerAbilities?: string[];
   leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
@@ -2114,40 +2114,6 @@ export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
-  // Chronomancy Rewind (combat/damage_history.ts): a bounded ring of the REAL HP
-  // loss this player took, tagged by sim tick, pruned to the last few seconds on
-  // every write. Recorded only for players, only at the canonical post-mitigation/
-  // post-absorb point in dealDamage. Runtime-only: never serialized, wired, or
-  // pinned by the parity digest (excluded in tests/parity/trace.ts ENTITY_EXCLUDE);
-  // it lives on the entity so it is dropped automatically when the entity is removed.
-  damageHistory?: DamageTick[];
-  // Transient per-cast budget: how much Frozen Orb cooldown this Blizzard
-  // channel has already refunded (combat/frost_mage.ts, reset at channel
-  // start). Never serialized or wired.
-  blizzardOrbCdr?: number;
-  // Transient Aether Darts dump state (combat/chronomancy.ts, reset at channel
-  // start): whether THIS Aether Darts channel still owes the one-time Arcane
-  // Charge consume, and the flat per-missile bonus locked in when it consumed.
-  // Never serialized or wired.
-  aetherDartsConsumePending?: boolean;
-  aetherDartsBonusPerBolt?: number;
-  // Missile count for THIS Aether Darts channel: 0/undefined = the ability default
-  // (3), or a full-charge barrage (5 at max Arcane Charges). Never wired.
-  aetherDartsTicks?: number;
-  // DEV-ONLY (ALLOW_DEV_COMMANDS): the running Cascada temporal playtest tally,
-  // set by /dev cascade and fed by the dev-gated hooks in combat/chronomancy.ts.
-  // Pure observation for the manual playtest readout: it is NEVER read by any
-  // gameplay decision, never serialized, never wired, and is absent in production.
-  cascadeDevStats?: CascadeDevStats;
-  abilityCharges?: Record<
-    string,
-    {
-      charges: number;
-      maxCharges: number;
-      recharge: number;
-      rechargeLength: number;
-    }
-  >;
   id: number;
   kind: EntityKind;
   templateId: string; // mob/npc template id, or class for player

@@ -106,64 +106,10 @@ export interface GlobalModEffect {
   // it shortens every cast and the cast-time tooltips reflect it live.
   spellHastePct?: number;
   critVsRooted?: number; // additive spell crit chance against rooted targets
-  // Rage-generation multipliers (warrior choice rows, e.g. Anger Management).
-  // `autoRagePct` scales the rage minted by auto-attack damage dealt;
-  // `abilityRagePct` scales ability-granted rage (gainResource, Charge's burst).
-  // Rage from TAKING damage is deliberately unscaled by either.
-  autoRagePct?: number;
-  abilityRagePct?: number;
-  // Warrior choice-row passives, read by their runtime hooks (all 0 = off):
-  // Pursuit's on-kill speed burst (+fraction, handleDeath), Second Wind's
-  // in-combat regen below 35% health (fraction of max HP per second,
-  // updateRegen), Battle Rhythm's every-3rd-cast empower (a 0/1 flag,
-  // runEffects), Bloodbath's per-stack on-kill crit+damage fraction
-  // (handleDeath), and Colossal Might's cooldown seconds shaved per rage spent
-  // (spendAbilityCost).
-  onKillSpeedPct?: number;
-  secondWindPctPerSec?: number;
-  battleRhythm?: number;
-  bloodbathPct?: number;
-  cdrPerRage?: number;
-  // Lingering Dread: fraction of the target's max health a fear the player
-  // applies can soak before breaking (0 = classic break on any damage).
-  fearBreakPct?: number;
-  // Master Armorer (Arms mastery): fraction of extra physical damage dealt WHILE
-  // wielding a two-handed weapon. Declares the magnitude so the tooltip is
-  // effect-backed, but is applied only by the 2H-gated hook in combat/damage.ts
-  // (never folded into the generic meleeDmgPct path), so it never double-counts
-  // and never leaks to one-handed builds.
-  masteryTwoHandDmgPct?: number;
   // Cheat death (Deathless Ardor style): a killing blow leaves the player at
   // 1 hp instead, once per this many seconds (0 disables). Consumed in
   // combat/damage.ts behind the procState internal cooldown.
   cheatDeathIcd?: number;
-  // PTR spec-mastery duration/cap riders for the on-kill speed + bloodbath procs.
-  onKillSpeedDuration?: number;
-  bloodbathDuration?: number;
-  bloodbathMaxPct?: number;
-  // Mage choice rows (owner tree 2026-07-11):
-  // Warded: fraction less damage taken while the caster's own personal barrier
-  // (an ice_barrier absorb aura) is up. Folded target-side in combat/damage.ts.
-  barrierDrPct?: number;
-  // Temporal Rift: 1 when picked. Every 20 sec the next stun/root/silence to
-  // land on the wearer is cleansed instantly (the applyAura funnel in sim.ts,
-  // ICD carried by a 'temporal_rift_cd' aura). Draws no rng.
-  temporalRift?: number;
-  // Overflowing Power: seconds shaved off the mage defensive cooldowns per 10%
-  // of maximum mana spent, capped at 10 sec per 30 sec (casting_lifecycle's
-  // spendAbilityCost, the Colossal Might pattern on mana).
-  manaDefCdrPer10?: number;
-  // Blink While Casting: 1 when picked; Flickerstep slips through the busy
-  // guard without touching the cast in progress (casting_lifecycle).
-  blinkCast?: number;
-  // Elemental Convergence: 1 when picked; alternating a Fire and a Frost cast
-  // opens the surge window (casting_lifecycle convergenceOnCast, marker +
-  // ICD carried by auras so no entity field enters the parity hash).
-  convergence?: number;
-  // Ignition (fire mage mastery): fraction of a spell crit's damage banked as
-  // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
-  // amount). Scales with level like every spec mastery.
-  ignitionPct?: number;
 }
 
 export interface TalentEffect {
@@ -420,6 +366,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
     critDmgPct: 0,
     spellHastePct: 0,
     critVsRooted: 0,
+    cheatDeathIcd: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -500,26 +447,8 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.critDmgPct += (e.critDmgPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
-    g.autoRagePct += (e.autoRagePct ?? 0) * mult;
-    g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
-    g.onKillSpeedPct += (e.onKillSpeedPct ?? 0) * mult;
-    g.onKillSpeedDuration += (e.onKillSpeedDuration ?? 0) * mult;
-    g.secondWindPctPerSec += (e.secondWindPctPerSec ?? 0) * mult;
-    g.battleRhythm += (e.battleRhythm ?? 0) * mult;
-    g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
-    g.bloodbathDuration += (e.bloodbathDuration ?? 0) * mult;
-    g.bloodbathMaxPct += (e.bloodbathMaxPct ?? 0) * mult;
-    g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
-    g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
-    g.masteryTwoHandDmgPct += (e.masteryTwoHandDmgPct ?? 0) * mult;
     // An ICD is a duration, not a rate: take the longest granted, ignore mult.
     g.cheatDeathIcd = Math.max(g.cheatDeathIcd, e.cheatDeathIcd ?? 0);
-    g.barrierDrPct += (e.barrierDrPct ?? 0) * mult;
-    g.temporalRift += (e.temporalRift ?? 0) * mult;
-    g.manaDefCdrPer10 += (e.manaDefCdrPer10 ?? 0) * mult;
-    g.blinkCast += (e.blinkCast ?? 0) * mult;
-    g.convergence += (e.convergence ?? 0) * mult;
-    g.ignitionPct += (e.ignitionPct ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

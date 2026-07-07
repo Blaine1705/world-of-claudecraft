@@ -432,9 +432,6 @@ export function meleeSwing(
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.
   if (crit && attacker.kind === 'player') ctx.applySetProcs(attacker, target, 'weaponCrit');
-  // Bladed Echo hook: report the resolved amount of a CONNECTED swing so the
-  // effect-dispatch caller can fan it out (no rng drawn here or there).
-  opts.onDealt?.(dealtAmount);
   // Talent procs keyed to a landed swing while a condition aura (seal, imbue)
   // is up (deterministic, no rng draw).
   if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);

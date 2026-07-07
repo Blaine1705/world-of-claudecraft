@@ -507,7 +507,7 @@ export function castAbility(
   }
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
-  const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -752,7 +752,7 @@ export function castAbility(
   if (ability.onNextSwing) {
     const toggledOff = p.queuedOnSwing === ability.id;
     p.queuedOnSwing = toggledOff ? null : ability.id;
-    if (!toggledOff && canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
+    if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p, ability.id)) {
       p.queuedOnSwingFree = true;
     } else {
       delete p.queuedOnSwingFree;
@@ -786,7 +786,7 @@ export function castAbility(
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
+    if (canCastFree && consumeNextCastFree(ctx, p, ability.id)) {
       res = { ...res, cost: 0 };
     } else if (res.cost > 0) {
       const cheap = consumeNextCastCheap(ctx, p, ability.id);
@@ -830,7 +830,7 @@ export function castAbility(
     // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target ?? null, 'spellCast');
-    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
 
@@ -1257,7 +1257,7 @@ function applyAbility(
   // this too or a free conjure/revive would keep the charge alive.
   const billableCost = (): number => {
     if (res.cost <= 0 || togglingOff) return res.cost;
-    if (consumeFreeCostFor(ctx, p, ability.id)) return 0;
+    if (consumeNextCastFree(ctx, p, ability.id)) return 0;
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     return cheap !== null ? Math.ceil(res.cost * cheap) : res.cost;
   };
@@ -1361,28 +1361,16 @@ function applyAbility(
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }
-  if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
+  if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p, ability.id)) {
     res = { ...res, cost: 0 };
   } else if (res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
-  }
-  // Spend-ALL abilities (Iron Resolve): the def's `cost` is only the MINIMUM
-  // gate (checked just above); the actual bill is the caster's entire bar,
-  // snapshotted into the resolved cost here so spendAbilityCost drains it and
-  // the effects read the true spent amount (the finisher path's spentCombo
-  // precedent, carried on the ResolvedAbility instead of the entity).
-  if (ability.spendsAllResource && !togglingOff) {
-    const spend =
-      ability.spendResourceCap !== undefined
-        ? Math.min(p.resource, ability.spendResourceCap)
-        : p.resource;
-    res = { ...res, cost: spend };
   }
 
   // helpful spells never miss
@@ -1396,7 +1384,7 @@ function applyAbility(
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target, 'spellCast');
-    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
 
@@ -1468,7 +1456,7 @@ function applyAbility(
     // resisted or fizzled bolt was still a cast). Physical projectile shots
     // (hunter Aimed / Concussive) are not spells and never roll.
     if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
-    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
 
@@ -1498,5 +1486,5 @@ function applyAbility(
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
     ctx.applySetProcs(p, target, 'spellCast');
-  if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id, target);
+  if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id);
 }

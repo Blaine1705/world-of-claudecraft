@@ -8,8 +8,6 @@
 
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
-import { convergenceOnCast } from './convergence';
-import { PERSONAL_BARRIER_IDS } from './fire_mage';
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
@@ -17,9 +15,7 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
-  | { on: 'meleeSwingWhile'; auraKind: string }
-  // The player's charge-limited thorns aura (Thunder Ward) reflected a hit.
-  | { on: 'thornsReflect' };
+  | { on: 'meleeSwingWhile'; auraKind: string };
 
 export type ProcResponse =
   | {
@@ -27,7 +23,7 @@ export type ProcResponse =
       aura: 'next_cast_free' | 'next_cast_instant' | 'next_cast_cheap';
       abilities?: string[]; // which casts may consume it (undefined = any)
       duration: number;
-      costPct?: number; // next_cast_cheap: fraction of the cost removed (0.5 = half off)
+      value?: number; // next_cast_cheap: cost multiplier (0.5 = half cost)
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
   | { kind: 'resource'; amount: number }
@@ -38,8 +34,6 @@ export type ProcResponse =
 export interface ProcDef {
   id: string; // stable id: the counter/icd key and the granted aura id
   name: string; // display name for granted auras (localized via sim_i18n)
-  // Visual school for the proc's spellfx moments (default holy).
-  school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];
 }
@@ -90,18 +84,10 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
           kind: r.aura,
           remaining: r.duration,
           duration: r.duration,
-          value: r.costPct !== undefined ? 1 - r.costPct : 0,
+          value: r.value ?? 0,
           sourceId: p.id,
-          school: def.school ?? 'holy',
+          school: 'holy',
           empowerAbilities: r.abilities,
-        });
-        // The arming moment: a visible surge so the player feels the rhythm hit.
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: def.school ?? 'holy',
-          fx: 'procSurge',
         });
       }
       break;
@@ -129,14 +115,7 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
         duration: r.duration,
         value: r.amount,
         sourceId: p.id,
-        school: def.school ?? 'holy',
-      });
-      ctx.emit({
-        type: 'spellfx',
-        sourceId: p.id,
-        targetId: subject.id,
-        school: def.school ?? 'holy',
-        fx: 'wardBloom',
+        school: 'holy',
       });
       break;
     case 'echo':
@@ -157,17 +136,8 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
   }
 }
 
-/** A cast completed (casting_lifecycle). Drives castNth counters. The cast's
- * target (when friendly) is the subject for heal/absorb/echo responses. */
-export function onCastCompleted(
-  ctx: SimContext,
-  p: Entity,
-  abilityId: string,
-  target?: Entity | null,
-): void {
-  // Elemental Convergence (mage choice row): school-alternation memory, kept
-  // here because every completed cast funnels through this hook. Draws no rng.
-  convergenceOnCast(ctx, p, abilityId);
+/** A cast completed (casting_lifecycle). Drives castNth counters. */
+export function onCastCompleted(ctx: SimContext, p: Entity, abilityId: string): void {
   for (const def of procsFor(ctx, p)) {
     const t = def.trigger;
     if (t.on !== 'castNth' || !t.abilities.includes(abilityId)) continue;
@@ -175,16 +145,8 @@ export function onCastCompleted(
     const c = (s.counters[def.id] ?? 0) + 1;
     if (c >= t.n) {
       s.counters[def.id] = 0;
-      fire(ctx, p, def, target && !target.dead ? target : p);
+      fire(ctx, p, def, p);
     } else s.counters[def.id] = c;
-  }
-}
-
-/** The player's charge-limited thorns aura reflected a melee hit. */
-export function onThornsReflect(ctx: SimContext, p: Entity): void {
-  for (const def of procsFor(ctx, p)) {
-    if (def.trigger.on !== 'thornsReflect') continue;
-    fire(ctx, p, def, p);
   }
 }
 
@@ -207,15 +169,7 @@ export function onShieldConsumed(
 ): void {
   for (const def of procsFor(ctx, p)) {
     const t = def.trigger;
-    if (t.on !== 'shieldConsumed') continue;
-    // 'personal_barrier' is the SLOT sentinel (owner rule): a row talent keyed
-    // to it fires for whichever personal barrier the player's spec provides
-    // (Frostveil or Blazing Barrier), never one hardcoded id.
-    const matches =
-      t.ability === 'personal_barrier'
-        ? PERSONAL_BARRIER_IDS.includes(shieldAbilityId)
-        : t.ability === shieldAbilityId;
-    if (!matches) continue;
+    if (t.on !== 'shieldConsumed' || t.ability !== shieldAbilityId) continue;
     fire(ctx, p, def, owner);
   }
 }
