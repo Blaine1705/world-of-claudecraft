@@ -27,4 +27,8 @@ export interface IWorldDungeons {
   raidLockouts(): RaidLockout[];
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
+  // Key into the per-Sim rift collision registry (sim/colliders.ts), used by the
+  // renderer's camera occlusion inside a rift. Per world INSTANCE, not per seed;
+  // 0 where no rift regions are registered (the online ClientWorld).
+  riftCollisionToken: number;
 }

@@ -28,8 +28,8 @@ import {
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
-import { generateRiftFloor } from '../sim/rift/rift_gen';
 import type { DelveModuleId } from '../sim/delve_layout';
+import { generateRiftFloor } from '../sim/rift/rift_gen';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
@@ -3474,8 +3474,14 @@ export class Renderer {
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
-  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'delve' | 'underwater' | 'rift' =
-    'outdoor';
+  private fogState:
+    | 'outdoor'
+    | 'dungeon'
+    | 'temple'
+    | 'nythraxis'
+    | 'delve'
+    | 'underwater'
+    | 'rift' = 'outdoor';
 
   private buildInterior(
     interior: string,
@@ -5006,7 +5012,19 @@ export class Renderer {
       // Thread the active run's module chain so camera collision matches the
       // delve's actual (possibly Heroic/varied) layout, not just the default.
       const delveMods = this.sim.delveRun?.modules;
-      let hardT = cameraOcclusion(seed, px, eyeY, pz, cx, cy, cz, CAMERA_COLLIDER_PAD, delveMods);
+      const riftToken = this.sim.riftCollisionToken;
+      let hardT = cameraOcclusion(
+        seed,
+        px,
+        eyeY,
+        pz,
+        cx,
+        cy,
+        cz,
+        CAMERA_COLLIDER_PAD,
+        delveMods,
+        riftToken,
+      );
       let softT = cameraOcclusion(
         seed,
         px,
@@ -5017,6 +5035,7 @@ export class Renderer {
         cz,
         CAMERA_SOFT_COLLIDER_PAD,
         delveMods,
+        riftToken,
       );
       const segLen = Math.hypot(cx - px, cy - eyeY, cz - pz);
       if (segLen > 1e-3) {

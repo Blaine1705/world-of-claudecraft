@@ -52,6 +52,7 @@ function makeCtx() {
   const clearEntityMarker = vi.fn();
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
+    riftCollisionToken: 1,
     get rng() {
       return rng;
     },

@@ -82,7 +82,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
 
   // Publish the generated collision so movement/pathing/LoS/camera respect it.
-  setRiftRegion(ctx.cfg.seed, origin.x, origin.z, layoutColliders(floor.layout));
+  setRiftRegion(ctx.riftCollisionToken, origin.x, origin.z, layoutColliders(floor.layout));
 
   inst.mobIds = [];
   inst.objectIds = [];
@@ -161,7 +161,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   if (inst.descentId !== null) dropObjects(ctx, [inst.descentId]);
   if (inst.exitId !== null) dropObjects(ctx, [inst.exitId]);
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  clearRiftRegion(ctx.cfg.seed, origin.x, origin.z);
+  clearRiftRegion(ctx.riftCollisionToken, origin.x, origin.z);
   inst.mobIds = [];
   inst.objectIds = [];
   inst.pylonIds = [];

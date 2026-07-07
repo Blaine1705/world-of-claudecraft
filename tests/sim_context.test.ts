@@ -215,6 +215,7 @@ function makeFakeHost() {
   const entities = new Map<number, Entity>();
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
+    riftCollisionToken: 1,
     get rng() {
       return rng;
     },

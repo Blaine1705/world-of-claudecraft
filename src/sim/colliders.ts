@@ -401,35 +401,42 @@ function resolveAgainst(
 // publishes the active floor's instance-local collider set here on spawn/descent
 // and clears it on free; every region-aware collision function below reads it, so
 // movement, mob pathing, line-of-sight and camera occlusion all respect the
-// generated geometry uniformly. Keyed by WORLD seed (per-Sim, like gridFor) plus
-// the instance origin, so concurrent rifts and multiple Sims stay isolated.
+// generated geometry uniformly. Keyed by a per-Sim COLLISION TOKEN (allocated
+// once per world via allocRiftCollisionToken, NOT the world seed: two Sims in
+// one process can share a seed) plus the instance origin, so concurrent rifts
+// and multiple Sims stay isolated. Token 0 means "no rift regions".
 interface RiftRegion {
   ox: number;
   oz: number;
   colliders: Collider[];
 }
 const RIFT_REGIONS = new Map<number, RiftRegion[]>();
+let NEXT_RIFT_TOKEN = 1;
 
-export function setRiftRegion(seed: number, ox: number, oz: number, colliders: Collider[]): void {
-  let list = RIFT_REGIONS.get(seed >>> 0);
+export function allocRiftCollisionToken(): number {
+  return NEXT_RIFT_TOKEN++;
+}
+
+export function setRiftRegion(token: number, ox: number, oz: number, colliders: Collider[]): void {
+  let list = RIFT_REGIONS.get(token);
   if (!list) {
     list = [];
-    RIFT_REGIONS.set(seed >>> 0, list);
+    RIFT_REGIONS.set(token, list);
   }
   const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
   if (i >= 0) list[i] = { ox, oz, colliders };
   else list.push({ ox, oz, colliders });
 }
 
-export function clearRiftRegion(seed: number, ox: number, oz: number): void {
-  const list = RIFT_REGIONS.get(seed >>> 0);
+export function clearRiftRegion(token: number, ox: number, oz: number): void {
+  const list = RIFT_REGIONS.get(token);
   if (!list) return;
   const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
   if (i >= 0) list.splice(i, 1);
 }
 
-function riftRegionAt(seed: number, x: number, z: number): RiftRegion | null {
-  const list = RIFT_REGIONS.get(seed >>> 0);
+function riftRegionAt(token: number, x: number, z: number): RiftRegion | null {
+  const list = RIFT_REGIONS.get(token);
   if (!list) return null;
   for (const r of list) {
     if (Math.abs(x - r.ox) <= RIFT_REGION_HALF_X && Math.abs(z - r.oz) <= RIFT_REGION_HALF_Z) {
@@ -465,6 +472,7 @@ export function resolvePosition(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): { x: number; z: number } {
   if (isDelvePos(x)) {
     const delve = delveAt(x);
@@ -480,7 +488,7 @@ export function resolvePosition(
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (isRiftPos(x)) {
-    const region = riftRegionAt(seed, x, z);
+    const region = riftRegionAt(riftToken, x, z);
     if (!region) return { x, z };
     const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
     return { x: local.x + region.ox, z: local.z + region.oz };
@@ -536,11 +544,12 @@ export function resolveMovement(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): { x: number; z: number } {
   const dx = toX - fromX;
   const dz = toZ - fromZ;
   const d = Math.hypot(dx, dz);
-  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r, ignoreFences, delveModules);
+  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r, ignoreFences, delveModules, riftToken);
   const steps = Math.max(1, Math.ceil(d / 0.2));
   let x = fromX,
     z = fromZ;
@@ -549,7 +558,7 @@ export function resolveMovement(
     const nextX = fromX + dx * t;
     const nextZ = fromZ + dz * t;
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
-    const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules);
+    const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules, riftToken);
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {
@@ -570,8 +579,9 @@ export function isBlocked(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): boolean {
-  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules);
+  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules, riftToken);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
 }
 
@@ -715,6 +725,7 @@ export function cameraOcclusion(
   bz: number,
   pad = 0.35,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): number {
   if (isDelvePos(ax)) {
     const delve = delveAt(ax);
@@ -748,7 +759,7 @@ export function cameraOcclusion(
     );
   }
   if (isRiftPos(ax)) {
-    const region = riftRegionAt(seed, ax, az);
+    const region = riftRegionAt(riftToken, ax, az);
     if (!region) return 1;
     return sweepColliders(
       region.colliders,
@@ -795,7 +806,14 @@ export const SIGHT_HEIGHT = 1.6;
 // sight line at that sample)? Mirrors resolvePosition's zone routing so
 // interiors, delves and the arena keep their wall sets, but tests pure overlap
 // (no push-out) and applies the low-obstacle skip only where tops are known.
-function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: number): boolean {
+function sightBlockedAt(
+  seed: number,
+  x: number,
+  z: number,
+  r: number,
+  sightY: number,
+  riftToken = 0,
+): boolean {
   const overlapsAny = (list: Collider[], lx: number, lz: number, skipLow: boolean): boolean => {
     for (const c of list) {
       if (skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY) continue;
@@ -819,7 +837,7 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
   }
   if (isRiftPos(x)) {
-    const region = riftRegionAt(seed, x, z);
+    const region = riftRegionAt(riftToken, x, z);
     return region ? overlapsAny(region.colliders, x - region.ox, z - region.oz, false) : false;
   }
   if (x > DUNGEON_X_THRESHOLD) {
@@ -837,6 +855,7 @@ export function lineOfSightClear(
   to: { x: number; z: number },
   r = 0.05,
   delveModules?: readonly string[],
+  riftToken = 0,
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
@@ -869,7 +888,7 @@ export function lineOfSightClear(
     const t = i / steps;
     const x = from.x + dx * t;
     const z = from.z + dz * t;
-    if (sightBlockedAt(seed, x, z, r, eyeFrom + (eyeTo - eyeFrom) * t)) return false;
+    if (sightBlockedAt(seed, x, z, r, eyeFrom + (eyeTo - eyeFrom) * t, riftToken)) return false;
   }
   return true;
 }

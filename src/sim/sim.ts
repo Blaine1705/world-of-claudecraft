@@ -11,7 +11,12 @@ import type {
 } from '../world_api';
 import * as bagsMod from './bags';
 import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
-import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
+import {
+  allocRiftCollisionToken,
+  lineOfSightClear,
+  resolveMovement,
+  resolvePosition,
+} from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import {
   cleanseFriendlyNpcAuras,
@@ -102,12 +107,12 @@ import {
   FISHING_TABLES,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
-  RIFT_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isDelvePos,
   MOBS,
   QUESTS,
+  RIFT_SLOT_COUNT,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
@@ -272,6 +277,13 @@ import {
   updateDoorTriggers as updateDoorTriggersImpl,
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
+import * as questCommands from './quests/quest_commands';
+import {
+  checkQuestReady,
+  onInventoryChangedForQuests,
+  onMobKilledForQuests,
+} from './quests/quest_credit';
+import { generateRiftFloor } from './rift/rift_gen';
 import {
   enterRift as enterRiftImpl,
   leaveRift as leaveRiftImpl,
@@ -279,14 +291,7 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
-import { generateRiftFloor } from './rift/rift_gen';
 import type { RiftInstance } from './rift/types';
-import * as questCommands from './quests/quest_commands';
-import {
-  checkQuestReady,
-  onInventoryChangedForQuests,
-  onMobKilledForQuests,
-} from './quests/quest_credit';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
 // re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
@@ -1110,6 +1115,11 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+
+  // Per-world key for the rift collision registry in colliders.ts. Allocated per
+  // Sim INSTANCE (not per seed): two same-seed Sims in one process must never
+  // read or overwrite each other's active rift regions.
+  readonly riftCollisionToken = allocRiftCollisionToken();
 
   constructor(cfg: SimConfig) {
     this.devCommands = cfg.devCommands ?? false;
@@ -2243,7 +2253,7 @@ export class Sim {
     const seed = this.cfg.seed;
     const ok = (px: number, pz: number): boolean => {
       if (groundHeight(px, pz, seed) < minHeight) return false;
-      const res = resolvePosition(seed, px, pz, 0.6);
+      const res = resolvePosition(seed, px, pz, 0.6, false, undefined, this.riftCollisionToken);
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
     };
     if (ok(x, z)) return { x, z };
@@ -2280,6 +2290,9 @@ export class Sim {
     const host: SimContextHost = {
       get rng() {
         return sim.rng;
+      },
+      get riftCollisionToken() {
+        return sim.riftCollisionToken;
       },
       get time() {
         return sim.time;
@@ -3158,7 +3171,15 @@ export class Sim {
   }
 
   private findChargePath(p: Entity, target: Entity): Vec3[] {
-    return findPlayerPath(this.cfg.seed, p.pos, target.pos, 64).map((w) => ({
+    return findPlayerPath(
+      this.cfg.seed,
+      p.pos,
+      target.pos,
+      64,
+      false,
+      false,
+      this.riftCollisionToken,
+    ).map((w) => ({
       x: w.x,
       y: 0,
       z: w.z,
@@ -3585,7 +3606,14 @@ export class Sim {
       this.delveRunForMob(target.id) ??
       this.delveRunForPlayer(source.id) ??
       this.delveRunForPlayer(target.id);
-    return lineOfSightClear(this.cfg.seed, source.pos, target.pos, 0.05, run?.modules);
+    return lineOfSightClear(
+      this.cfg.seed,
+      source.pos,
+      target.pos,
+      0.05,
+      run?.modules,
+      this.riftCollisionToken,
+    );
   }
 
   private lineOfSightBlocked(source: Entity, target: Entity, ability: AbilityDef): boolean {
@@ -6115,7 +6143,12 @@ export class Sim {
   }
 
   // Procedural rift delegates (dev command + interaction click + tick drivers).
-  enterRift(seed: number, baseLevel: number, pid?: number, returnPos?: { x: number; z: number }): void {
+  enterRift(
+    seed: number,
+    baseLevel: number,
+    pid?: number,
+    returnPos?: { x: number; z: number },
+  ): void {
     enterRiftImpl(this.ctx, seed, baseLevel, pid, returnPos);
   }
 
@@ -6276,7 +6309,17 @@ export class Sim {
     ignoreFences = false,
   ): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
-    const res = resolveMovement(this.cfg.seed, fromX, fromZ, nx, nz, r, ignoreFences, run?.modules);
+    const res = resolveMovement(
+      this.cfg.seed,
+      fromX,
+      fromZ,
+      nx,
+      nz,
+      r,
+      ignoreFences,
+      run?.modules,
+      this.riftCollisionToken,
+    );
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);
@@ -6285,7 +6328,15 @@ export class Sim {
   // Point resolution for mob wander / blocked checks, with the same delve layering.
   private resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
-    const res = resolvePosition(this.cfg.seed, nx, nz, r, false, run?.modules);
+    const res = resolvePosition(
+      this.cfg.seed,
+      nx,
+      nz,
+      r,
+      false,
+      run?.modules,
+      this.riftCollisionToken,
+    );
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);

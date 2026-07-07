@@ -84,8 +84,32 @@ describe('rift sim: dev portal + entry', () => {
       origin.x + 40,
       origin.z + 20,
       0.6,
+      false,
+      undefined,
+      sim.riftCollisionToken,
     );
     expect(resolved.x).toBeLessThan(origin.x + 30);
+  });
+
+  it('two same-seed Sims keep isolated rift collision (regression: shared registry)', () => {
+    const simA = makeSim();
+    const simB = makeSim();
+    expect(simA.riftCollisionToken).not.toBe(simB.riftCollisionToken);
+    simA.enterRift(777, 15, simA.player.id);
+    const instA = simA.riftInstances.find((i) => i.partyKey !== null)!;
+    const origin = riftInstanceOrigin(instA.slot, instA.floorIndex);
+    const probe = (token: number) =>
+      resolvePosition(SEED, origin.x + 40, origin.z + 20, 0.6, false, undefined, token);
+    const before = probe(simA.riftCollisionToken);
+    // Sim B enters a DIFFERENT rift; Sim A's collision must not change at all,
+    // and Sim B's token must not resolve against Sim A's region.
+    simB.enterRift(31337, 15, simB.player.id);
+    const after = probe(simA.riftCollisionToken);
+    expect(after).toEqual(before);
+    // Both Sims allocate the same slot origin, so before this fix Sim B's
+    // registration overwrote Sim A's region under the shared seed key.
+    const instB = simB.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(riftInstanceOrigin(instB.slot, instB.floorIndex)).toEqual(origin);
   });
 });
 

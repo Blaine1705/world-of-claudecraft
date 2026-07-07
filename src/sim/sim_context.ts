@@ -117,6 +117,10 @@ export interface SimContextPrimitives {
   readonly duels: Map<number, DuelState>;
   // `world` stays optional (custom play-test map, else undefined); the rest defaulted.
   readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
+  // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
+  // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
+  // not per seed: two same-seed Sims in one process must stay isolated.
+  readonly riftCollisionToken: number;
   // A2 duel + arena state. Live views: the backing fields stay on Sim (mutated in
   // place / reassigned), like E1's delayedEvents. The three queues are REASSIGNED by
   // the matchmaker's filter, so they are read-write; the maps/set and the match-id
@@ -192,7 +196,12 @@ export interface SimContextCallbacks {
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
-  enterRift(seed: number, baseLevel: number, pid?: number, returnPos?: { x: number; z: number }): void;
+  enterRift(
+    seed: number,
+    baseLevel: number,
+    pid?: number,
+    returnPos?: { x: number; z: number },
+  ): void;
   leaveRift(pid?: number): void;
 
   // C1 damage/death hub + the casting/leash/arena/duel/fiesta/loot teardown it
@@ -694,6 +703,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get cfg() {
       return host.cfg;
+    },
+    get riftCollisionToken() {
+      return host.riftCollisionToken;
     },
     get trades() {
       return host.trades;
