@@ -47,6 +47,7 @@ import {
   MELEE_RANGE,
   normAngle,
 } from '../types';
+import { abilityQualifiesForAreaEcho, hasAreaEchoAura } from './area_echo';
 import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   consumeFreeCostFor,
@@ -787,6 +788,18 @@ function applyAbility(
     return;
   }
 
+  // Bladed Echo (combat/area_echo.ts): eligibility is resolved ONCE per cast,
+  // at the ability level, so a multi-strike ability (Red Harvest) echoes all
+  // of its strikes and consumes a single charge. Only a hostile-entity-targeted
+  // cast that passed the validation above can qualify (a refused cast never
+  // reaches this line, so it can never consume a charge), and an already-AoE
+  // ability, whirlwind itself included, never qualifies, so arming the aura
+  // cannot spend it. runEffects consumes the charge after damage is dealt.
+  const echoOpts =
+    target !== null && hasAreaEchoAura(p) && abilityQualifiesForAreaEcho(res.effects)
+      ? { areaEcho: true }
+      : undefined;
+
   // A ranged attack travels as a projectile, so its damage/effects resolve when the
   // bolt LANDS, not at cast completion. Every non-physical spell is a bolt by
   // convention (school proxy); a physical ranged shot (hunter Aimed / Concussive Shot)
@@ -828,12 +841,12 @@ function applyAbility(
         ctx.enterCombat(src, tgt);
         return;
       }
-      ctx.runEffects(src, meta, tgt, res);
+      ctx.runEffects(src, meta, tgt, res, echoOpts);
     });
     return;
   }
 
   spendAbilityCost(ctx, p, meta, res);
   armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
-  ctx.runEffects(p, meta, target, res);
+  ctx.runEffects(p, meta, target, res, echoOpts);
 }

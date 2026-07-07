@@ -1150,7 +1150,7 @@ const classAbilityNamesEn = {
       [
         'whirlwind',
         'Bladed Gyre',
-        'Spin in a deadly arc, striking all nearby enemies for {damage}. (Fury talent)',
+        'Spin in a deadly arc, striking all nearby enemies for {damage}. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
       ],
       [
         'berserker_rage',

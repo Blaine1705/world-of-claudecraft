@@ -238,6 +238,7 @@ const baseEnTable = {
   'aura.feedingFrenzy': 'Feeding Frenzy',
   'aura.demoralized': 'Demoralized',
   'aura.resurrectionSickness': "The Keeper's Toll",
+  'aura.bladedEcho': 'Bladed Echo',
 } as const;
 
 const petEnTable = {
@@ -3824,6 +3825,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Feeding Frenzy': 'aura.feedingFrenzy',
   Demoralized: 'aura.demoralized',
   'Resurrection Sickness': 'aura.resurrectionSickness',
+  // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
+  // src/sim/content/classes.ts); shown on the buff bar and combat log.
+  'Bladed Echo': 'aura.bladedEcho',
 };
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];

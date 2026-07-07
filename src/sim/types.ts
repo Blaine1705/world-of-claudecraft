@@ -235,7 +235,13 @@ export type AuraKind =
   | 'battle_trance'
   // Victory Rush's on-kill window: worn for VICTORY_RUSH_WINDOW seconds after
   // a credited kill; the granted strike requires it and consumes it on cast.
-  | 'victory_rush';
+  | 'victory_rush'
+  // Bladed Echo (Bladed Gyre's rider): the caster's next N single-target
+  // damaging ability CASTS also strike enemies near their primary target for
+  // the same resolved amounts. `charges` counts the remaining casts (the buff
+  // badge shows it); armed by whirlwind's selfBuff, consumed once per cast by
+  // combat/area_echo.ts after the cast actually dealt single-target damage.
+  | 'aoe_echo';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -1236,8 +1242,14 @@ export type AbilityEffect =
       duration: number;
       // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
       // many melee hits reflect, gated by an internal cooldown between reflects.
+      // aoe_echo reuses charges as its remaining-casts counter.
       charges?: number;
       internalCooldown?: number;
+      // Optional distinct buff identity (aoe_echo: Bladed Gyre arms 'Bladed
+      // Echo', id 'bladed_echo'): lets the HUD name/icon the armed buff apart
+      // from the granting ability. Absent, the aura reuses the ability id/name.
+      auraId?: string;
+      auraName?: string;
     }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo

@@ -496,6 +496,9 @@ export interface SimContextCallbacks {
   // `runEffects` itself is the C4b boundary: it flips points-at to effect_dispatch
   // (the moved switch), reached only via the cast lifecycle's applyAbility/applyChannelTick.
   awardCombo(p: Entity, target: Entity, points: number): void;
+  // meleeSwing's optional onDealt reports the resolved damage of a connected
+  // swing (Bladed Echo, combat/area_echo.ts); runEffects' optional opts carries
+  // the per-cast area-echo flag applyAbility resolved. Both are additive.
   meleeSwing(
     attacker: Entity,
     target: Entity,
@@ -506,12 +509,19 @@ export interface SimContextCallbacks {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
+      onDealt?: (amount: number) => void;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;
   hasLineOfSight(source: Entity, target: Entity): boolean;
   findChargePath(p: Entity, target: Entity): Vec3[];
-  runEffects(p: Entity, meta: PlayerMeta, target: Entity | null, res: ResolvedAbility): void;
+  runEffects(
+    p: Entity,
+    meta: PlayerMeta,
+    target: Entity | null,
+    res: ResolvedAbility,
+    opts?: { areaEcho?: boolean },
+  ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
   // reach back for these. All STAY on Sim. `syncPetAspect` is pet-management (the P1b
