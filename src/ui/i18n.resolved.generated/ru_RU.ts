@@ -311,7 +311,15 @@ export const ru_RU: EnTranslations = {
       "nameplates": "Имена",
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
-      "toggleHaptics": "Вкл/выкл вибрацию"
+      "toggleHaptics": "Вкл/выкл вибрацию",
+      "hotbarPage": "Навыки",
+      "hotbarPageAria": "Показать следующий набор навыков",
+      "actionRing": "Боевые действия",
+      "actionPageToggle": "Переключить страницу действий",
+      "actionPageIndicator": "Стр. {page}",
+      "targetCycle": "Сменить цель",
+      "targetCycleShort": "Цель",
+      "spellbookPageLabel": "Страница {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -418,7 +426,9 @@ export const ru_RU: EnTranslations = {
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
-      "showDailyRewardsChest": "Показывать сундук ежедневных наград"
+      "showDailyRewardsChest": "Показывать сундук ежедневных наград",
+      "mobileCameraJoystick": "Джойстик камеры",
+      "mobileLeftHanded": "Раскладка для левшей"
     },
     "controller": {
       "title": "Геймпад",
@@ -512,7 +522,9 @@ export const ru_RU: EnTranslations = {
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
       "names": {
-        "spellPower": "Сила заклинаний"
+        "spellPower": "Сила заклинаний",
+        "critRating": "Рейтинг крит. удара",
+        "hasteRating": "Рейтинг ускорения"
       },
       "desc": {
         "str": "Увеличивает силу атаки, благодаря чему удары вашим оружием бьют сильнее.",
@@ -525,7 +537,9 @@ export const ru_RU: EnTranslations = {
         "spellPower": "Увеличивает урон ваших заклинаний и силу исцелений. Каждая единица интеллекта дает немного силы заклинаний, вдобавок к получаемой от снаряжения и усилений.",
         "dps": "Приблизительный урон вашего оружия в секунду с учетом урона и скорости оружия, а также вашей силы атаки.",
         "critChance": "Ваш шанс нанести критический удар, наносящий двойной урон.",
-        "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона."
+        "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона.",
+        "critRating": "Рейтинг критического удара от снаряжения и бонусов комплекта повышает шанс критического удара. Примерно 10 рейтинга дают 1% крит. удара.",
+        "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения."
       },
       "effects": {
         "attackPower": "+{value} к силе атаки",
@@ -565,6 +579,15 @@ export const ru_RU: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "Шанс при попадании ({chance}%): {effect}",
+      "onSpellDamage": "Шанс от уронных заклинаний ({chance}%): {effect}",
+      "onHeal": "Шанс при исцелении ({chance}%): {effect}",
+      "chainArc": "поражает цель эффектом «{name}» ({school}, {damage}) и перескакивает на {jumps} ближайших врагов с затухающим уроном",
+      "attackSlow": "и снижает скорость атаки цели на {pct}% на {duration} сек",
+      "dot": "вызывает «{name}», периодический урон ({school}), нанося {total} за {duration} сек",
+      "hot": "распускает «{name}», периодическое исцеление, восполняя {total} за {duration} сек"
     },
     "questShare": {
       "notShareable": "Этим заданием нельзя поделиться.",
@@ -1050,18 +1073,6 @@ export const ru_RU: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Крафт",
-      "close": "Закрыть крафт",
-      "craft": "Создать",
-      "reagentsNeeded": "Требуется:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Известных рецептов пока нет.",
-      "resultAria": "Создать {name}",
-      "craftedToast": "Создано: {name}",
-      "insufficientMaterials": "У вас недостаточно материалов.",
-      "unknownRecipe": "Такого рецепта не существует."
-    },
     "devBadge": {
       "title": "Разработчик",
       "tiers": {
@@ -1205,6 +1216,19 @@ export const ru_RU: EnTranslations = {
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
       "herbalism": "Травничество"
+    },
+    "crafting": {
+      "title": "Крафт",
+      "close": "Закрыть крафт",
+      "craft": "Создать",
+      "reagentsNeeded": "Требуется:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Известных рецептов пока нет.",
+      "resultAria": "Создать {name}",
+      "craftedToast": "Создано: {name}",
+      "insufficientMaterials": "У вас недостаточно материалов.",
+      "unknownRecipe": "Такого рецепта не существует.",
+      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта."
     }
   },
   "apiError": {
@@ -8037,7 +8061,8 @@ export const ru_RU: EnTranslations = {
       "necromancers": {
         "name": "Одеяние Скорбного плетения",
         "bonus2": "Вас невозможно отбросить (100% сопротивление отбрасыванию).",
-        "bonus3": "Интеллект повышается на 10, выносливость на 10."
+        "bonus3": "Интеллект повышается на 10, выносливость на 10.",
+        "bonus4": "Ваши заклинания могут даровать «Ясность», делая следующее заклинание бесплатным."
       },
       "nighttalon": {
         "name": "Кожаный доспех Лютого Клыка",

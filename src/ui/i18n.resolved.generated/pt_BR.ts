@@ -311,7 +311,15 @@ export const pt_BR: EnTranslations = {
       "nameplates": "Nomes",
       "haptics": "Vibração",
       "hapticsOff": "Vibração desligada",
-      "toggleHaptics": "Alternar vibração"
+      "toggleHaptics": "Alternar vibração",
+      "hotbarPage": "Habilidades",
+      "hotbarPageAria": "Mostrar o próximo conjunto de habilidades",
+      "actionRing": "Ações de combate",
+      "actionPageToggle": "Mudar página de ação",
+      "actionPageIndicator": "Pág. {page}",
+      "targetCycle": "Trocar alvo",
+      "targetCycleShort": "Alvo",
+      "spellbookPageLabel": "Página {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Use o analógico de movimento para se mover e arraste a tela para olhar ao redor. Dê alguns passos para começar.",
@@ -418,7 +426,9 @@ export const pt_BR: EnTranslations = {
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
-      "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias"
+      "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
+      "mobileCameraJoystick": "Joystick da câmera",
+      "mobileLeftHanded": "Layout para canhotos"
     },
     "controller": {
       "title": "Controle",
@@ -512,7 +522,9 @@ export const pt_BR: EnTranslations = {
     "statInfo": {
       "fromYour": "Do seu {value} de {stat}:",
       "names": {
-        "spellPower": "Poder Mágico"
+        "spellPower": "Poder Mágico",
+        "critRating": "Crit Rating",
+        "hasteRating": "Haste Rating"
       },
       "desc": {
         "str": "Aumenta seu poder de ataque, de modo que seus golpes com armas atinjam com mais força.",
@@ -525,7 +537,9 @@ export const pt_BR: EnTranslations = {
         "spellPower": "Aumenta o dano das suas magias e a força das suas curas. Cada ponto de Intelecto concede um pouco de Poder Mágico, além do que vem de equipamentos ou benefícios.",
         "dps": "Seu dano por segundo estimado com armas, combinando o dano e a velocidade da sua arma com seu poder de ataque.",
         "critChance": "Sua chance de um ataque atingir criticamente, causando dano dobrado.",
-        "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano."
+        "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano.",
+        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
       },
       "effects": {
         "attackPower": "+{value} de Poder de ataque",
@@ -565,6 +579,15 @@ export const pt_BR: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "Chance on hit ({chance}%): {effect}",
+      "onSpellDamage": "Chance on your damaging spells ({chance}%): {effect}",
+      "onHeal": "Chance on your heals ({chance}%): {effect}",
+      "chainArc": "blasts the target with a {school} {name} ({damage}) that leaps to {jumps} nearby foes for decaying damage",
+      "attackSlow": "and slows the target attack speed by {pct}% for {duration} sec",
+      "dot": "festers {name}, a {school} damage-over-time dealing {total} over {duration} sec",
+      "hot": "blooms {name}, a heal-over-time restoring {total} over {duration} sec"
     },
     "questShare": {
       "notShareable": "Esta missão não pode ser compartilhada.",
@@ -1050,18 +1073,6 @@ export const pt_BR: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Artesanato",
-      "close": "Fechar elaboração",
-      "craft": "Arte",
-      "reagentsNeeded": "Requer:",
-      "reagentLine": "{name}x{have}/{required}",
-      "empty": "Nenhuma receita conhecida ainda.",
-      "resultAria": "Artesanato {name}",
-      "craftedToast": "Feito: {name}",
-      "insufficientMaterials": "Você não tem os materiais para isso.",
-      "unknownRecipe": "Essa receita não existe."
-    },
     "devBadge": {
       "title": "Desenvolvedor",
       "tiers": {
@@ -1205,6 +1216,19 @@ export const pt_BR: EnTranslations = {
       "mining": "Mineração",
       "logging": "Lenharia",
       "herbalism": "Herborismo"
+    },
+    "crafting": {
+      "title": "Artesanato",
+      "close": "Fechar elaboração",
+      "craft": "Arte",
+      "reagentsNeeded": "Requer:",
+      "reagentLine": "{name}x{have}/{required}",
+      "empty": "Nenhuma receita conhecida ainda.",
+      "resultAria": "Artesanato {name}",
+      "craftedToast": "Feito: {name}",
+      "insufficientMaterials": "Você não tem os materiais para isso.",
+      "unknownRecipe": "Essa receita não existe.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {
@@ -8037,7 +8061,8 @@ export const pt_BR: EnTranslations = {
       "necromancers": {
         "name": "Vestes Mournweave",
         "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
-        "bonus3": "Aumenta o intelecto em 10 e o vigor em 10."
+        "bonus3": "Aumenta o intelecto em 10 e o vigor em 10.",
+        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Traje de Couro Direfang",

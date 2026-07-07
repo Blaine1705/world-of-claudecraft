@@ -230,6 +230,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
+  'hudChrome.statInfo.names.critRating': '치명타 등급',
+  'hudChrome.statInfo.names.hasteRating': '가속 등급',
+  'hudChrome.statInfo.desc.critRating':
+    '장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.',
+  'hudChrome.statInfo.desc.hasteRating':
+    '장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.',
   'hudChrome.statInfo.desc.spellPower':
     '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
   'hudChrome.statInfo.sources.header': '구성:',
@@ -378,6 +384,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
+  'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
+  'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
   'hudChrome.options.itemScoreLine': '점수 {score}',
   'hudChrome.landing.highContrast': '고대비',
@@ -3494,12 +3502,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/초',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}초',
+  'hudChrome.mobile.actionPageToggle': '행동 페이지 전환',
+  'hudChrome.mobile.actionRing': '전투 행동',
   'hudChrome.mobile.autorun': '자동 달리기',
   'hudChrome.mobile.haptics': '진동',
   'hudChrome.mobile.hapticsOff': '진동 꺼짐',
+  'hudChrome.mobile.hotbarPage': '스킬',
+  'hudChrome.mobile.hotbarPageAria': '다음 스킬 세트 표시',
   'hudChrome.mobile.jump': '점프',
   'hudChrome.mobile.leaderboard': '순위',
   'hudChrome.mobile.nameplates': '이름표',
+  'hudChrome.mobile.targetCycle': '대상 전환',
+  'hudChrome.mobile.targetCycleShort': '대상',
   'hudChrome.mobile.toggleHaptics': '진동 전환',
   'hudChrome.rest.resting': '휴식 중',
   'hudChrome.swing.ready': '공격',
@@ -5127,6 +5141,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.name': '비탄직물 의복',
   'entities.itemSets.necromancers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',
+  'entities.itemSets.necromancers.bonus4':
+    '주문 사용 시 일정 확률로 “선명한 시전”이 발동하여 다음 주문을 무료로 시전합니다.',
   'entities.itemSets.nighttalon.name': '흉포송곳니 가죽장비',
   'entities.itemSets.nighttalon.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.nighttalon.bonus3':
@@ -5145,6 +5161,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
+  'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
+  'hudChrome.itemProc.onHeal': '치유 시 확률 ({chance}%): {effect}',
+  'hudChrome.itemProc.chainArc':
+    '{school} {name}({damage})으로 대상을 강타하고 주변의 적 {jumps}명에게 감소하는 피해로 도약합니다',
+  'hudChrome.itemProc.attackSlow': '대상의 공격 속도를 {duration}초 동안 {pct}% 감소시킵니다',
+  'hudChrome.itemProc.dot':
+    '{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다',
+  'hudChrome.itemProc.hot': '{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   // Discord integration (two-way login, rewards, relay, in-game flair).
@@ -5834,15 +5859,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}분',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
-  'hudChrome.crafting.title': '제작',
-  'hudChrome.crafting.close': '제작 닫기',
-  'hudChrome.crafting.craft': '제작',
-  'hudChrome.crafting.reagentsNeeded': '필요 재료:',
-  'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
-  'hudChrome.crafting.resultAria': '{name} 제작',
-  'hudChrome.crafting.craftedToast': '제작 완료:{name}',
-  'hudChrome.crafting.insufficientMaterials': '재료가 부족합니다.',
-  'hudChrome.crafting.unknownRecipe': '해당 제작법이 존재하지 않습니다.',
   // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
   'apiError.validation.failed': '일부 항목이 올바르지 않습니다. 양식을 확인하고 다시 시도하세요.',
   'apiError.json.malformed': '요청을 읽을 수 없습니다. 다시 시도해 주세요.',
@@ -6018,4 +6034,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.title': '제작',
+  'hudChrome.crafting.close': '제작 닫기',
+  'hudChrome.crafting.craft': '제작',
+  'hudChrome.crafting.reagentsNeeded': '필요 재료:',
+  'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
+  'hudChrome.crafting.resultAria': '{name} 제작',
+  'hudChrome.crafting.craftedToast': '제작 완료:{name}',
+  'hudChrome.crafting.insufficientMaterials': '재료가 부족합니다.',
+  'hudChrome.crafting.unknownRecipe': '해당 제작법이 존재하지 않습니다.',
+  'hudChrome.crafting.comboRequirementUnmet':
+    '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
+  'hudChrome.mobile.actionPageIndicator': '{page}페이지',
+  'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
 };

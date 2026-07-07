@@ -222,6 +222,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
+  'hudChrome.statInfo.names.critRating': '暴擊等級',
+  'hudChrome.statInfo.names.hasteRating': '急速等級',
+  'hudChrome.statInfo.desc.critRating':
+    '來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。',
+  'hudChrome.statInfo.desc.hasteRating':
+    '來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
   'hudChrome.statInfo.sources.header': '構成：',
@@ -362,6 +368,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '顯示物品等級',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
+  'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
+  'hudChrome.options.mobileLeftHanded': '左手配置',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
   'hudChrome.options.itemScoreLine': '評分 {score}',
   'hudChrome.landing.highContrast': '高對比度',
@@ -3352,12 +3360,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
+  'hudChrome.mobile.actionPageToggle': '切換動作頁',
+  'hudChrome.mobile.actionRing': '戰鬥動作',
   'hudChrome.mobile.autorun': '自動奔跑',
   'hudChrome.mobile.haptics': '觸覺回饋',
   'hudChrome.mobile.hapticsOff': '觸覺回饋已關閉',
+  'hudChrome.mobile.hotbarPage': '技能',
+  'hudChrome.mobile.hotbarPageAria': '顯示下一組技能',
   'hudChrome.mobile.jump': '跳躍',
   'hudChrome.mobile.leaderboard': '排行榜',
   'hudChrome.mobile.nameplates': '名條',
+  'hudChrome.mobile.targetCycle': '切換目標',
+  'hudChrome.mobile.targetCycleShort': '目標',
   'hudChrome.mobile.toggleHaptics': '切換觸覺回饋',
   'hudChrome.rest.resting': '休息中',
   'hudChrome.swing.ready': '揮砍',
@@ -4863,6 +4877,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.name': '哀織法衣',
   'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
+  'entities.itemSets.necromancers.bonus4':
+    '你的法術有機率觸發「清晰施法」，使你的下一個法術免費施放。',
   'entities.itemSets.nighttalon.name': '厲牙皮甲',
   'entities.itemSets.nighttalon.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.nighttalon.bonus3':
@@ -4881,6 +4897,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onHeal': '治療時機率（{chance}%）：{effect}',
+  'hudChrome.itemProc.chainArc':
+    '以{school}{name}（{damage}）轟擊目標，並跳躍至{jumps}個附近敵人，造成遞減傷害',
+  'hudChrome.itemProc.attackSlow': '並使目標攻擊速度降低{pct}%，持續{duration}秒',
+  'hudChrome.itemProc.dot':
+    '引發{name}，一種{school}持續傷害效果，在{duration}秒內造成{total}點傷害',
+  'hudChrome.itemProc.hot': '綻放{name}，一種持續治療效果，在{duration}秒內恢復{total}點生命',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   // Discord integration (two-way login, rewards, relay, in-game flair).
@@ -5526,15 +5551,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
-  'hudChrome.crafting.title': '製作',
-  'hudChrome.crafting.close': '關閉製作',
-  'hudChrome.crafting.craft': '製作',
-  'hudChrome.crafting.reagentsNeeded': '需要:',
-  'hudChrome.crafting.empty': '尚無已知配方。',
-  'hudChrome.crafting.resultAria': '製作{name}',
-  'hudChrome.crafting.craftedToast': '已製作:{name}',
-  'hudChrome.crafting.insufficientMaterials': '你沒有足夠的材料。',
-  'hudChrome.crafting.unknownRecipe': '該配方不存在。',
   // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
   'apiError.validation.failed': '部分欄位無效。請檢查表單後再試一次。',
   'apiError.json.malformed': '無法讀取該請求。請再試一次。',
@@ -5700,4 +5716,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '藥草學',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.title': '製作',
+  'hudChrome.crafting.close': '關閉製作',
+  'hudChrome.crafting.craft': '製作',
+  'hudChrome.crafting.reagentsNeeded': '需要:',
+  'hudChrome.crafting.empty': '尚無已知配方。',
+  'hudChrome.crafting.resultAria': '製作{name}',
+  'hudChrome.crafting.craftedToast': '已製作:{name}',
+  'hudChrome.crafting.insufficientMaterials': '你沒有足夠的材料。',
+  'hudChrome.crafting.unknownRecipe': '該配方不存在。',
+  'hudChrome.crafting.comboRequirementUnmet': '你尚未達到該配方所需組合的兩項製造技能等級。',
+  'hudChrome.mobile.actionPageIndicator': '第{page}頁',
+  'hudChrome.mobile.spellbookPageLabel': '頁{page}',
 };

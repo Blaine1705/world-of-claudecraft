@@ -45,6 +45,7 @@ import type {
   ItemInstancePayload,
   PlayerClass,
   QuestProgress,
+  SetProc,
   SimConfig,
   SimEvent,
   SkinCatalog,
@@ -408,16 +409,12 @@ export interface SimContextCallbacks {
   ): void;
   fleeMoveSpeed(e: Entity): number;
   // --- mob-AI helpers the dispatcher consults ---
-  usesProfiledMobCombat(mob: Entity): boolean;
-  updateProfiledMobCombat(mob: Entity): void;
-  tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean;
   maybeFlee(mob: Entity, target: Entity): boolean;
   aggroMob(mob: Entity, target: Entity, social: boolean): void;
   isStunned(e: Entity): boolean;
   isRooted(e: Entity): boolean;
   moveSpeedMult(e: Entity): number;
   swingIntervalMult(e: Entity): number;
-  mobEffectiveMeleeRange(mob: Entity): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
   // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1) ---
@@ -599,6 +596,9 @@ export interface SimContextCallbacks {
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
   // through this; the binding points at the PostOffice instance on Sim.
   queueQuestLetter(questId: string, pid: number): void;
+
+  // Set proc firing is owned by combat/set_procs.ts.
+  applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
 }
 
 // The seam consumed by extracted modules.
@@ -862,16 +862,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     mobSwing: host.mobSwing,
     updateRangedPetAttack: host.updateRangedPetAttack,
     fleeMoveSpeed: host.fleeMoveSpeed,
-    usesProfiledMobCombat: host.usesProfiledMobCombat,
-    updateProfiledMobCombat: host.updateProfiledMobCombat,
-    tryMobMeleeSwingInRange: host.tryMobMeleeSwingInRange,
     maybeFlee: host.maybeFlee,
     aggroMob: host.aggroMob,
     isStunned: host.isStunned,
     isRooted: host.isRooted,
     moveSpeedMult: host.moveSpeedMult,
     swingIntervalMult: host.swingIntervalMult,
-    mobEffectiveMeleeRange: host.mobEffectiveMeleeRange,
     mobCanSwim: host.mobCanSwim,
     resolveMovePoint: host.resolveMovePoint,
     updatePet: host.updatePet,
@@ -952,5 +948,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     canAddItem: host.canAddItem,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
+    applySetProcs: host.applySetProcs,
   };
 }

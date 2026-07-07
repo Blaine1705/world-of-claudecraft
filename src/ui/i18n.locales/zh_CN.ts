@@ -222,6 +222,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
+  'hudChrome.statInfo.names.critRating': '暴击等级',
+  'hudChrome.statInfo.names.hasteRating': '急速等级',
+  'hudChrome.statInfo.desc.critRating':
+    '来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。',
+  'hudChrome.statInfo.desc.hasteRating':
+    '来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。',
   'hudChrome.statInfo.sources.header': '构成：',
@@ -361,6 +367,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '显示物品等级',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showDailyRewardsChest': '显示每日奖励宝箱',
+  'hudChrome.options.mobileCameraJoystick': '摄像机摇杆',
+  'hudChrome.options.mobileLeftHanded': '左手布局',
   'hudChrome.options.itemLevelLine': '物品等级 {level}',
   'hudChrome.options.itemScoreLine': '评分 {score}',
   'hudChrome.landing.highContrast': '高对比度',
@@ -3351,12 +3359,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
+  'hudChrome.mobile.actionPageToggle': '切换动作页',
+  'hudChrome.mobile.actionRing': '战斗动作',
   'hudChrome.mobile.autorun': '自动奔跑',
   'hudChrome.mobile.haptics': '震动反馈',
   'hudChrome.mobile.hapticsOff': '震动反馈：关',
+  'hudChrome.mobile.hotbarPage': '技能',
+  'hudChrome.mobile.hotbarPageAria': '显示下一组技能',
   'hudChrome.mobile.jump': '跳跃',
   'hudChrome.mobile.leaderboard': '排行榜',
   'hudChrome.mobile.nameplates': '姓名板',
+  'hudChrome.mobile.targetCycle': '切换目标',
+  'hudChrome.mobile.targetCycleShort': '目标',
   'hudChrome.mobile.toggleHaptics': '切换震动反馈',
   'hudChrome.rest.resting': '休息中',
   'hudChrome.swing.ready': '挥击',
@@ -4862,6 +4876,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.name': '哀织法衣',
   'entities.itemSets.necromancers.bonus2': '你不会被击退（击退抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 点，耐力提高 10 点。',
+  'entities.itemSets.necromancers.bonus4':
+    '你的法术有几率触发“清晰施法”，使你的下一个法术免费施放。',
   'entities.itemSets.nighttalon.name': '恐牙皮甲',
   'entities.itemSets.nighttalon.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.nighttalon.bonus3':
@@ -4880,6 +4896,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 点，致命一击几率提高 2%。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemProc.onMeleeHit': '命中时几率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onSpellDamage': '造成伤害的法术几率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onHeal': '治疗时几率（{chance}%）：{effect}',
+  'hudChrome.itemProc.chainArc':
+    '以{school}{name}（{damage}）轰击目标，并跳跃至{jumps}个附近敌人，造成递减伤害',
+  'hudChrome.itemProc.attackSlow': '并使目标攻击速度降低{pct}%，持续{duration}秒',
+  'hudChrome.itemProc.dot':
+    '引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害',
+  'hudChrome.itemProc.hot': '绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   // Discord integration (two-way login, rewards, relay, in-game flair).
@@ -5525,15 +5550,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
-  'hudChrome.crafting.title': '制作',
-  'hudChrome.crafting.close': '关闭制作',
-  'hudChrome.crafting.craft': '制作',
-  'hudChrome.crafting.reagentsNeeded': '需要:',
-  'hudChrome.crafting.empty': '尚无已知配方。',
-  'hudChrome.crafting.resultAria': '制作{name}',
-  'hudChrome.crafting.craftedToast': '已制作:{name}',
-  'hudChrome.crafting.insufficientMaterials': '你没有足够的材料。',
-  'hudChrome.crafting.unknownRecipe': '该配方不存在。',
   // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
   'apiError.validation.failed': '部分字段无效。请检查表单后重试。',
   'apiError.json.malformed': '无法读取该请求。请重试。',
@@ -5699,4 +5715,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '草药学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.title': '制作',
+  'hudChrome.crafting.close': '关闭制作',
+  'hudChrome.crafting.craft': '制作',
+  'hudChrome.crafting.reagentsNeeded': '需要:',
+  'hudChrome.crafting.empty': '尚无已知配方。',
+  'hudChrome.crafting.resultAria': '制作{name}',
+  'hudChrome.crafting.craftedToast': '已制作:{name}',
+  'hudChrome.crafting.insufficientMaterials': '你没有足够的材料。',
+  'hudChrome.crafting.unknownRecipe': '该配方不存在。',
+  'hudChrome.crafting.comboRequirementUnmet': '你没有达到该配方所需组合的两项制造技能等级。',
+  'hudChrome.mobile.actionPageIndicator': '第{page}页',
+  'hudChrome.mobile.spellbookPageLabel': '页{page}',
 };

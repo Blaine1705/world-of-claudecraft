@@ -311,7 +311,15 @@ export const de_DE: EnTranslations = {
       "nameplates": "Namen",
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
-      "toggleHaptics": "Haptik umschalten"
+      "toggleHaptics": "Haptik umschalten",
+      "hotbarPage": "Fähigkeiten",
+      "hotbarPageAria": "Nächste Fähigkeitengruppe anzeigen",
+      "actionRing": "Kampfhandlungen",
+      "actionPageToggle": "Aktionsseite wechseln",
+      "actionPageIndicator": "Seite {page}",
+      "targetCycle": "Ziel tauschen",
+      "targetCycleShort": "Ziel",
+      "spellbookPageLabel": "Seite {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Nutze den Bewegungsstick zum Bewegen und zieh über den Bildschirm, um dich umzusehen. Mach ein paar Schritte, um zu beginnen.",
@@ -418,7 +426,9 @@ export const de_DE: EnTranslations = {
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
-      "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen"
+      "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
+      "mobileCameraJoystick": "Kamera-Joystick",
+      "mobileLeftHanded": "Linkshänder-Layout"
     },
     "controller": {
       "title": "Controller",
@@ -512,7 +522,9 @@ export const de_DE: EnTranslations = {
     "statInfo": {
       "fromYour": "Von deinen {value} Punkten {stat}:",
       "names": {
-        "spellPower": "Zaubermacht"
+        "spellPower": "Zaubermacht",
+        "critRating": "Crit Rating",
+        "hasteRating": "Haste Rating"
       },
       "desc": {
         "str": "Erhöht deine Angriffskraft, sodass deine Waffenschläge härter treffen.",
@@ -525,7 +537,9 @@ export const de_DE: EnTranslations = {
         "spellPower": "Erhöht den Schaden deiner Zauber und die Stärke deiner Heilungen. Jeder Punkt Intelligenz gewährt etwas Zaubermacht, zusätzlich zu der aus Ausrüstung oder Stärkungszaubern.",
         "dps": "Dein geschätzter Waffenschaden pro Sekunde, der Schaden und Geschwindigkeit deiner Waffe mit deiner Angriffskraft verbindet.",
         "critChance": "Deine Chance, dass ein Angriff kritisch trifft und doppelten Schaden verursacht.",
-        "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden."
+        "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden.",
+        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
       },
       "effects": {
         "attackPower": "+{value} Angriffskraft",
@@ -565,6 +579,15 @@ export const de_DE: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "Chance on hit ({chance}%): {effect}",
+      "onSpellDamage": "Chance on your damaging spells ({chance}%): {effect}",
+      "onHeal": "Chance on your heals ({chance}%): {effect}",
+      "chainArc": "blasts the target with a {school} {name} ({damage}) that leaps to {jumps} nearby foes for decaying damage",
+      "attackSlow": "and slows the target attack speed by {pct}% for {duration} sec",
+      "dot": "festers {name}, a {school} damage-over-time dealing {total} over {duration} sec",
+      "hot": "blooms {name}, a heal-over-time restoring {total} over {duration} sec"
     },
     "questShare": {
       "notShareable": "Diese Quest kann nicht geteilt werden.",
@@ -1050,18 +1073,6 @@ export const de_DE: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Basteln",
-      "close": "Enges Basteln",
-      "craft": "Handwerk",
-      "reagentsNeeded": "Erfordert:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Noch keine Rezepte bekannt.",
-      "resultAria": "Basteln {name}",
-      "craftedToast": "Hergestellt: {name}",
-      "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
-      "unknownRecipe": "Dieses Rezept existiert nicht."
-    },
     "devBadge": {
       "title": "Entwickler",
       "tiers": {
@@ -1205,6 +1216,19 @@ export const de_DE: EnTranslations = {
       "mining": "Bergbau",
       "logging": "Holzfällen",
       "herbalism": "Kräuterkunde"
+    },
+    "crafting": {
+      "title": "Basteln",
+      "close": "Enges Basteln",
+      "craft": "Handwerk",
+      "reagentsNeeded": "Erfordert:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Noch keine Rezepte bekannt.",
+      "resultAria": "Basteln {name}",
+      "craftedToast": "Hergestellt: {name}",
+      "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
+      "unknownRecipe": "Dieses Rezept existiert nicht.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {
@@ -8037,7 +8061,8 @@ export const de_DE: EnTranslations = {
       "necromancers": {
         "name": "Mournweave-Gewänder",
         "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
-        "bonus3": "Erhöht Intelligenz um 10 und Ausdauer um 10."
+        "bonus3": "Erhöht Intelligenz um 10 und Ausdauer um 10.",
+        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Direfang-Pelz",

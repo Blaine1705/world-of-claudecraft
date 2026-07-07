@@ -311,7 +311,15 @@ export const en_XA: EnTranslations = {
       "nameplates": "[Ñáɱéš]",
       "haptics": "[Ĥáþţíçš]",
       "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
-      "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]"
+      "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]",
+      "hotbarPage": "[Šķíļļš]",
+      "hotbarPageAria": "[Šĥóŵ ñéẋţ šéţ óƒ šķíļļš]",
+      "actionRing": "[Çóɱƀáţ áçţíóñš]",
+      "actionPageToggle": "[Šŵíţçĥ áçţíóñ þáĝé]",
+      "actionPageIndicator": "[{page}]",
+      "targetCycle": "[Šŵáþ ţáŕĝéţ]",
+      "targetCycleShort": "[Ţáŕĝéţ]",
+      "spellbookPageLabel": "[Þáĝé {page}]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -418,7 +426,9 @@ export const en_XA: EnTranslations = {
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
-      "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]"
+      "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
+      "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",
+      "mobileLeftHanded": "[Ļéƒţ-ĥáñðéð ļáýóúţ]"
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
@@ -512,7 +522,9 @@ export const en_XA: EnTranslations = {
     "statInfo": {
       "fromYour": "[Ƒŕóɱ ýóúŕ {value} {stat}:]",
       "names": {
-        "spellPower": "[Šþéļļ Þóŵéŕ]"
+        "spellPower": "[Šþéļļ Þóŵéŕ]",
+        "critRating": "[Çŕíţ Ŕáţíñĝ]",
+        "hasteRating": "[Ĥášţé Ŕáţíñĝ]"
       },
       "desc": {
         "str": "[Íñçŕéášéš ýóúŕ áţţáçķ þóŵéŕ, šó ýóúŕ ŵéáþóñ šţŕíķéš ļáñð ĥáŕðéŕ.]",
@@ -525,7 +537,9 @@ export const en_XA: EnTranslations = {
         "spellPower": "[Íñçŕéášéš ţĥé ðáɱáĝé óƒ ýóúŕ šþéļļš áñð ţĥé šţŕéñĝţĥ óƒ ýóúŕ ĥéáļš. Éáçĥ þóíñţ óƒ Íñţéļļéçţ ĝŕáñţš á ļíţţļé Šþéļļ Þóŵéŕ, óñ ţóþ óƒ áñý ƒŕóɱ ĝéáŕ óŕ ƀúƒƒš.]",
         "dps": "[Ýóúŕ éšţíɱáţéð ŵéáþóñ ðáɱáĝé þéŕ šéçóñð, çóɱƀíñíñĝ ýóúŕ ŵéáþóñ'š ðáɱáĝé áñð šþééð ŵíţĥ ýóúŕ áţţáçķ þóŵéŕ.]",
         "critChance": "[Ýóúŕ çĥáñçé ƒóŕ áñ áţţáçķ ţó šţŕíķé çŕíţíçáļļý, ðéáļíñĝ ðóúƀļé ðáɱáĝé.]",
-        "dodge": "[Ýóúŕ çĥáñçé ţó çóɱþļéţéļý áʋóíð áñ íñçóɱíñĝ ɱéļéé áţţáçķ, ţáķíñĝ ñó ðáɱáĝé.]"
+        "dodge": "[Ýóúŕ çĥáñçé ţó çóɱþļéţéļý áʋóíð áñ íñçóɱíñĝ ɱéļéé áţţáçķ, ţáķíñĝ ñó ðáɱáĝé.]",
+        "critRating": "[Çŕíţ ŕáţíñĝ ƒŕóɱ ýóúŕ ĝéáŕ áñð šéţ ƀóñúšéš, ŕáíšíñĝ ýóúŕ çŕíţíçáļ šţŕíķé çĥáñçé. Áƀóúţ 10 ŕáţíñĝ ĝŕáñţš 1% çŕíţ.]",
+        "hasteRating": "[Ĥášţé ŕáţíñĝ ƒŕóɱ ýóúŕ ĝéáŕ áñð šéţ ƀóñúšéš, šþééðíñĝ úþ ýóúŕ áţţáçķš áñð šþéļļçášţíñĝ. Áƀóúţ 10 ŕáţíñĝ ĝŕáñţš 1% ĥášţé.]"
       },
       "effects": {
         "attackPower": "[+{value} Áţţáçķ Þóŵéŕ]",
@@ -565,6 +579,15 @@ export const en_XA: EnTranslations = {
     "itemSet": {
       "header": "[{name} ({have}/{total})]",
       "bonusLine": "[({pieces}) {bonus}]"
+    },
+    "itemProc": {
+      "onMeleeHit": "[Çĥáñçé óñ ĥíţ ({chance}%): {effect}]",
+      "onSpellDamage": "[Çĥáñçé óñ ýóúŕ ðáɱáĝíñĝ šþéļļš ({chance}%): {effect}]",
+      "onHeal": "[Çĥáñçé óñ ýóúŕ ĥéáļš ({chance}%): {effect}]",
+      "chainArc": "[ƀļášţš ţĥé ţáŕĝéţ ŵíţĥ á {school} {name} ({damage}) ţĥáţ ļéáþš ţó {jumps} ñéáŕƀý ƒóéš ƒóŕ ðéçáýíñĝ ðáɱáĝé]",
+      "attackSlow": "[áñð šļóŵš ţĥé ţáŕĝéţ áţţáçķ šþééð ƀý {pct}% ƒóŕ {duration} šéç]",
+      "dot": "[ƒéšţéŕš {name}, á {school} ðáɱáĝé-óʋéŕ-ţíɱé ðéáļíñĝ {total} óʋéŕ {duration} šéç]",
+      "hot": "[ƀļóóɱš {name}, á ĥéáļ-óʋéŕ-ţíɱé ŕéšţóŕíñĝ {total} óʋéŕ {duration} šéç]"
     },
     "questShare": {
       "notShareable": "[Ţĥíš ɋúéšţ çáñ'ţ ƀé šĥáŕéð.]",
@@ -1050,18 +1073,6 @@ export const en_XA: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "[Çŕáƒţíñĝ]",
-      "close": "[Çļóšé çŕáƒţíñĝ]",
-      "craft": "[Çŕáƒţ]",
-      "reagentsNeeded": "[Ŕéɋúíŕéš:]",
-      "reagentLine": "[{name} ẋ{have}/{required}]",
-      "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
-      "resultAria": "[Çŕáƒţ {name}]",
-      "craftedToast": "[Çŕáƒţéð: {name}]",
-      "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
-      "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]"
-    },
     "devBadge": {
       "title": "[Ðéʋéļóþéŕ]",
       "tiers": {
@@ -1205,6 +1216,19 @@ export const en_XA: EnTranslations = {
       "mining": "[Ɱíñíñĝ]",
       "logging": "[Ļóĝĝíñĝ]",
       "herbalism": "[Ĥéŕƀáļíšɱ]"
+    },
+    "crafting": {
+      "title": "[Çŕáƒţíñĝ]",
+      "close": "[Çļóšé çŕáƒţíñĝ]",
+      "craft": "[Çŕáƒţ]",
+      "reagentsNeeded": "[Ŕéɋúíŕéš:]",
+      "reagentLine": "[{name} ẋ{have}/{required}]",
+      "empty": "[Ñó ŕéçíþéš ķñóŵñ ýéţ.]",
+      "resultAria": "[Çŕáƒţ {name}]",
+      "craftedToast": "[Çŕáƒţéð: {name}]",
+      "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
+      "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]",
+      "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]"
     }
   },
   "apiError": {
@@ -6183,7 +6207,7 @@ export const en_XA: EnTranslations = {
         "name": "[Çŕýþţƀóñé Þáúļðŕóñš]"
       },
       "deathlords_dread_visage": {
-        "name": "[Ɓáŕŕóŵļóŕð'š Ðŕéáð Ʋíšáĝé]"
+        "name": "[Ɓáŕŕóŵļóŕð Ðŕéáð Ʋíšáĝé]"
       },
       "gravewyrm_gauntlets": {
         "name": "[Ĝŕáʋéŵýŕɱ Ĝáúñţļéţš]"
@@ -6414,28 +6438,28 @@ export const en_XA: EnTranslations = {
         "name": "[Ʋáñĝúáŕð Çĥŕóɱé]"
       },
       "crownforged_gauntlets": {
-        "name": "[Çŕóŵñƒóŕĝéð Ĝáúñţļéţš]"
+        "name": "[Ɓóñéŵŕóúĝĥţ Ĝáúñţļéţš]"
       },
       "nighttalon_grips": {
-        "name": "[Ñíĝĥţţáļóñ Ĝŕíþš]"
+        "name": "[Ðíŕéƒáñĝ Ĝŕíþš]"
       },
       "soulflame_gloves": {
-        "name": "[Šóúļƒļáɱé Ĝļóʋéš]"
+        "name": "[Ŵŕáíţĥƒíŕé Ĝļóʋéš]"
       },
       "stormcallers_handguards": {
-        "name": "[Šţóŕɱçáļļéŕ'š Ĥáñðĝúáŕðš]"
+        "name": "[Ĝáļéçáļļ Ĥáñðĝúáŕðš]"
       },
       "crownforged_girdle": {
-        "name": "[Çŕóŵñƒóŕĝéð Ĝíŕðļé]"
+        "name": "[Ɓóñéŵŕóúĝĥţ Ĝíŕðļé]"
       },
       "nighttalon_waistband": {
-        "name": "[Ñíĝĥţţáļóñ Ŵáíšţƀáñð]"
+        "name": "[Ðíŕéƒáñĝ Ŵáíšţƀáñð]"
       },
       "soulflame_cord": {
-        "name": "[Šóúļƒļáɱé Çóŕð]"
+        "name": "[Ŵŕáíţĥƒíŕé Çóŕð]"
       },
       "stormcallers_waistguard": {
-        "name": "[Šţóŕɱçáļļéŕ'š Ŵáíšţĝúáŕð]"
+        "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
       }
     },
     "mobs": {
@@ -8036,8 +8060,9 @@ export const en_XA: EnTranslations = {
       },
       "necromancers": {
         "name": "[Ɱóúŕñŵéáʋé Ŕáíɱéñţ]",
-        "bonus2": "[Ýóú çáññóţ ƀé ķñóçķéð ƀáçķ (100% ķñóçķƀáçķ ŕéšíšţáñçé).]",
-        "bonus3": "[Íñçŕéášéš Íñţéļļéçţ ƀý 10 áñð Šţáɱíñá ƀý 10.]"
+        "bonus2": "[Íñçŕéášéš šþéļļ þóŵéŕ ƀý 20. Ýóú çáññóţ ƀé ķñóçķéð ƀáçķ (100% ķñóçķƀáçķ ŕéšíšţáñçé).]",
+        "bonus3": "[Íñçŕéášéš Íñţéļļéçţ ƀý 10 áñð Šţáɱíñá ƀý 10.]",
+        "bonus4": "[Ýóúŕ šþéļļš ĥáʋé á çĥáñçé ţó ĝŕáñţ Çļéáŕçášţíñĝ, ɱáķíñĝ ýóúŕ ñéẋţ šþéļļ ƒŕéé.]"
       },
       "nighttalon": {
         "name": "[Ðíŕéƒáñĝ Þéļţ]",
@@ -8046,12 +8071,12 @@ export const en_XA: EnTranslations = {
       },
       "soulflame": {
         "name": "[Ŵŕáíţĥƒíŕé Ŕéĝáļíá]",
-        "bonus2": "[Ýóú çáññóţ ƀé ķñóçķéð ƀáçķ (100% ķñóçķƀáçķ ŕéšíšţáñçé).]",
+        "bonus2": "[Íñçŕéášéš šþéļļ þóŵéŕ ƀý 20. Ýóú çáññóţ ƀé ķñóçķéð ƀáçķ (100% ķñóçķƀáçķ ŕéšíšţáñçé).]",
         "bonus3": "[Íñçŕéášéš Íñţéļļéçţ ƀý 15, Šþíŕíţ ƀý 15, áñð áţţáçķ áñð çášţíñĝ šþééð ƀý 15%.]"
       },
       "stormcallers": {
         "name": "[Ĝáļéçáļļ Ʋéšţɱéñţš]",
-        "bonus2": "[Ýóú çáññóţ ƀé ķñóçķéð ƀáçķ (100% ķñóçķƀáçķ ŕéšíšţáñçé).]",
+        "bonus2": "[Íñçŕéášéš šþéļļ þóŵéŕ ƀý 20. Ýóú çáññóţ ƀé ķñóçķéð ƀáçķ (100% ķñóçķƀáçķ ŕéšíšţáñçé).]",
         "bonus3": "[Íñçŕéášéš Íñţéļļéçţ ƀý 15, Šþíŕíţ ƀý 15, áñð áţţáçķ áñð çášţíñĝ šþééð ƀý 15%.]"
       },
       "vale_arcanist": {

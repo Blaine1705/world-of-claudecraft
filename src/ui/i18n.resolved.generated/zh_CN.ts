@@ -311,7 +311,15 @@ export const zh_CN: EnTranslations = {
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
-      "toggleHaptics": "切换震动反馈"
+      "toggleHaptics": "切换震动反馈",
+      "hotbarPage": "技能",
+      "hotbarPageAria": "显示下一组技能",
+      "actionRing": "战斗动作",
+      "actionPageToggle": "切换动作页",
+      "actionPageIndicator": "第{page}页",
+      "targetCycle": "切换目标",
+      "targetCycleShort": "目标",
+      "spellbookPageLabel": "页{page}"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -418,7 +426,9 @@ export const zh_CN: EnTranslations = {
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
-      "showDailyRewardsChest": "显示每日奖励宝箱"
+      "showDailyRewardsChest": "显示每日奖励宝箱",
+      "mobileCameraJoystick": "摄像机摇杆",
+      "mobileLeftHanded": "左手布局"
     },
     "controller": {
       "title": "手柄",
@@ -512,7 +522,9 @@ export const zh_CN: EnTranslations = {
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
-        "spellPower": "法术强度"
+        "spellPower": "法术强度",
+        "critRating": "暴击等级",
+        "hasteRating": "急速等级"
       },
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
@@ -525,7 +537,9 @@ export const zh_CN: EnTranslations = {
         "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
-        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。"
+        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
+        "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
+        "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -565,6 +579,15 @@ export const zh_CN: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "命中时几率（{chance}%）：{effect}",
+      "onSpellDamage": "造成伤害的法术几率（{chance}%）：{effect}",
+      "onHeal": "治疗时几率（{chance}%）：{effect}",
+      "chainArc": "以{school}{name}（{damage}）轰击目标，并跳跃至{jumps}个附近敌人，造成递减伤害",
+      "attackSlow": "并使目标攻击速度降低{pct}%，持续{duration}秒",
+      "dot": "引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害",
+      "hot": "绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命"
     },
     "questShare": {
       "notShareable": "该任务无法分享。",
@@ -1050,18 +1073,6 @@ export const zh_CN: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "制作",
-      "close": "关闭制作",
-      "craft": "制作",
-      "reagentsNeeded": "需要:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "尚无已知配方。",
-      "resultAria": "制作{name}",
-      "craftedToast": "已制作:{name}",
-      "insufficientMaterials": "你没有足够的材料。",
-      "unknownRecipe": "该配方不存在。"
-    },
     "devBadge": {
       "title": "开发者",
       "tiers": {
@@ -1205,6 +1216,19 @@ export const zh_CN: EnTranslations = {
       "mining": "采矿",
       "logging": "伐木",
       "herbalism": "草药学"
+    },
+    "crafting": {
+      "title": "制作",
+      "close": "关闭制作",
+      "craft": "制作",
+      "reagentsNeeded": "需要:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "尚无已知配方。",
+      "resultAria": "制作{name}",
+      "craftedToast": "已制作:{name}",
+      "insufficientMaterials": "你没有足够的材料。",
+      "unknownRecipe": "该配方不存在。",
+      "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。"
     }
   },
   "apiError": {
@@ -8037,7 +8061,8 @@ export const zh_CN: EnTranslations = {
       "necromancers": {
         "name": "哀织法衣",
         "bonus2": "你不会被击退（击退抗性 100%）。",
-        "bonus3": "智力提高 10 点，耐力提高 10 点。"
+        "bonus3": "智力提高 10 点，耐力提高 10 点。",
+        "bonus4": "你的法术有几率触发“清晰施法”，使你的下一个法术免费施放。"
       },
       "nighttalon": {
         "name": "恐牙皮甲",
