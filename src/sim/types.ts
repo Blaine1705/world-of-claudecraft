@@ -1218,6 +1218,14 @@ export type AbilityEffect =
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
+  | { type: 'silence'; duration: number }
+  | { type: 'aoeFear'; duration: number; radius: number }
+  | { type: 'clearCooldowns'; abilities: string[] }
+  // Swept teleports: reposition along the line, stopping at walls/fences/steep
+  // slopes/deep water (never clips through). repositionToAim uses the ground-target
+  // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
+  | { type: 'repositionToAim'; breakRoots?: boolean }
+  | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
   // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
   // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
@@ -1312,6 +1320,7 @@ export interface AbilityDef {
   castWhileMoving?: boolean;
   // A cast/channel with this flag cannot be stopped by interrupt effects.
   uninterruptible?: boolean;
+  fearDr?: boolean; // incapacitate effects use fear PvP diminishing returns
   channel?: { duration: number; ticks: number }; // arcane missiles
   cooldown: number; // seconds, 0 = none (GCD only)
   range: number; // yards; 0 = melee range

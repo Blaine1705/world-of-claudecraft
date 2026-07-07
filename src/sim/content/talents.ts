@@ -577,6 +577,16 @@ export function emptyModifiers(): TalentModifiers {
   };
 }
 
+// Exported for the choice-row engine (choice_rows.ts folds a picked option's
+// effect into the same flat TalentModifiers this module bakes).
+export function accumulateTalentEffect(
+  mods: TalentModifiers,
+  eff: TalentEffect | undefined,
+  mult: number,
+): void {
+  accumulate(mods, eff, mult);
+}
+
 function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
   if (!eff) return;
   if (eff.stats) {
