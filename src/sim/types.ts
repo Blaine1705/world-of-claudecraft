@@ -1295,6 +1295,12 @@ export interface AbilityDef {
   uninterruptible?: boolean;
   channel?: { duration: number; ticks: number }; // arcane missiles
   cooldown: number; // seconds, 0 = none (GCD only)
+  // Stored uses for a charge-limited BASE-KIT ability (Twinstrike): `cooldown`
+  // becomes the per-charge RECHARGE timer. Resolved into KnownAbility.charges by
+  // abilitiesKnownAt, exactly like the Double Charge talent's bonusCharges (the
+  // combat gate + sequential recharge live in casting_lifecycle / updateTimers).
+  // undefined = 1 (a plain cooldown).
+  maxCharges?: number;
   range: number; // yards; 0 = melee range
   minRange?: number;
   // The attack travels to its target as a projectile, so its damage and effects

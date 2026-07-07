@@ -1133,6 +1133,16 @@ const classAbilityNamesEn = {
         'Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health. (Fury signature)',
       ],
       [
+        'raging_gale',
+        'Twinstrike',
+        'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)',
+      ],
+      [
+        'red_harvest',
+        'Red Harvest',
+        'Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)',
+      ],
+      [
         'shield_slam',
         'Shieldcrack',
         'Slam the target with your shield for {damage} and massive threat. (Protection signature)',

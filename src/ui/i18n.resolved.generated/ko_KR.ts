@@ -5239,6 +5239,14 @@ export const ko_KR: EnTranslations = {
         "name": "사혈",
         "description": "피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "방패 강타",
         "description": "방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)"

@@ -5239,6 +5239,14 @@ export const tr_TR: EnTranslations = {
         "name": "Kan Akıtma",
         "description": "Bir kan çılgınlığıyla anında {damage} hasar veren bir saldırı yap. (Hiddet imzası)"
       },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+      },
       "shield_slam": {
         "name": "Kalkan Kırma",
         "description": "Hedefe kalkanınla {damage} hasar ve devasa tehdit için vurursun. (Koruma imzası)"
