@@ -103,7 +103,11 @@ DATA must be re-expressed in ryze's `choice_rows.ts` format. A naive cherry-pick
 differ); it is a manual port. Do NOT push anything until the operator has playtested.
 
 ## Handoff notes (update on every session switch)
-- 2026-07-07: base kit + spec gating + Fury kit + Protection kit DONE and green on `integration`.
-  Arms kit (Breachmaker + Measured Fury) in progress. The 5 operator gating/level/cost decisions
-  above are applied. Codex's earlier Arms commit is preserved on branch `integration-codex-arms`.
-  Not yet ported to ryze's #1614; not yet pushed.
+- 2026-07-07: the WHOLE warrior kit is DONE and green on `integration` (local only, never pushed):
+  base-kit changes, spec gating, Fury kit, Protection kit, Arms kit (Breachmaker + Measured Fury),
+  and all operator tweaks (battle_shout free/lvl7, rend lvl5, slam/cleave arms+prot, demoralizing_shout
+  prot, emboldening_roar Fury->Prot, bloodthirst +10 rage, furious_mending<->bloodletting coupling,
+  sunder spec-conditional threat). Parity goldens re-minted (rng draw order unchanged). Codex's earlier
+  Arms commit is preserved on branch `integration-codex-arms`. The only deferred item is choice-row
+  force-save (to the consolidation). NEXT: port onto ryze's #1614 engine (operator confirmed HIS warrior
+  rows win, no ryze conversation needed); nothing pushed until the operator playtests + approves.
