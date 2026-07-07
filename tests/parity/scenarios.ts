@@ -1160,7 +1160,10 @@ function drownedLitany(): Scenario {
       'cantor phases + Final Bell + rite choose -> playback pulses',
     ],
     sampleEvery: 10,
-    build: () => new Sim({ seed: 3131, playerClass: 'warrior', autoEquip: true }),
+    // Seed 3132 (was 3131): the branch's Battle Trance per-swing roll shifted
+    // the shared stream so 3131's Blackwater Mark never landed inside the
+    // ride-out window; 3132 exercises every anchored mechanic again.
+    build: () => new Sim({ seed: 3132, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const def = DELVES.drowned_litany;
@@ -1249,15 +1252,28 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
+        // Sample the driver's transient outputs as RUNNING MAXIMA across the
+        // window, not a single end instant: marks and bell volleys live on rng
+        // timers, and any upstream draw-cadence change (e.g. the warrior's
+        // Battle Trance per-swing roll) legitimately shifts WHICH tick they
+        // are live on. The coverage claim is "the driver fired", not "it was
+        // live at tick N".
+        let marksMax = 0;
+        let bellsMax = 0;
         for (let round = 0; round < 15; round++) {
           rec.tick(20);
           if (!boss.dead) face(p, boss);
+          marksMax = Math.max(marksMax, (run.nhaliaBoss?.marks?.length ?? 0) as number);
+          bellsMax = Math.max(
+            bellsMax,
+            run.mobIds.filter((id: number) => {
+              const m = sim.entities.get(id) as AnyEntity | undefined;
+              return m && !m.dead && m.templateId === 'tolling_bell';
+            }).length,
+          );
         }
-        rec.notes.marksSeen = (run.nhaliaBoss?.marks?.length ?? 0) as number;
-        rec.notes.bellsLive = run.mobIds.filter((id: number) => {
-          const m = sim.entities.get(id) as AnyEntity | undefined;
-          return m && !m.dead && m.templateId === 'tolling_bell';
-        }).length;
+        rec.notes.marksSeen = marksMax;
+        rec.notes.bellsLive = bellsMax;
         // Drop the shield adds, cross the 35% gate (phase 2), then the Final
         // Bell at 10%, and finish the boss.
         for (const id of [...run.mobIds]) {

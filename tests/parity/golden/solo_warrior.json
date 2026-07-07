@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7dfedf0b",
+      "state": "194fe20f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -57,6 +57,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -119,30 +127,30 @@
       "tick": 20,
       "time": 1,
       "nextId": 402,
-      "state": "c73fe898",
-      "events": "b208f192",
+      "state": "3e766f06",
+      "events": "e1dcdc01",
       "rng": {
-        "draws": 6,
-        "digest": "93f0e12e"
+        "draws": 7,
+        "digest": "101398c0"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 402,
-      "state": "63d4c129",
+      "state": "6c828701",
       "events": "741638a5",
       "rng": {
-        "draws": 6,
-        "digest": "93f0e12e"
+        "draws": 7,
+        "digest": "101398c0"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 402,
-      "state": "89e9d46d",
-      "events": "e161a3dc",
+      "state": "acce6afc",
+      "events": "e0546241",
       "rng": {
         "draws": 98,
         "digest": "92f0a886"
@@ -152,7 +160,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 402,
-      "state": "e5e347a9",
+      "state": "addbc1f4",
       "events": "76a7f7e3",
       "rng": {
         "draws": 154,
@@ -175,8 +183,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7074,
-            "damageTaken": 11,
+            "damageDealt": 7073,
+            "damageTaken": 4,
             "kills": 1
           },
           "craftSkills": {},
@@ -197,6 +205,14 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -214,7 +230,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49989,
+          "hp": 49996,
           "id": 400,
           "inCombat": true,
           "kind": "player",
@@ -322,7 +338,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 402,
-      "state": "efbb028d",
+      "state": "68dc30d0",
       "events": "741638a5",
       "rng": {
         "draws": 172,
@@ -345,8 +361,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7074,
-            "damageTaken": 11,
+            "damageDealt": 7073,
+            "damageTaken": 4,
             "kills": 1
           },
           "craftSkills": {},
@@ -367,6 +383,14 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -385,7 +409,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 49989,
+          "hp": 49996,
           "id": 400,
           "inCombat": true,
           "kind": "player",

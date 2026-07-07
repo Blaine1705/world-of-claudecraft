@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "523de5c3",
+      "state": "e45e0ef7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,6 +59,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -123,7 +131,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 404,
-      "state": "2411aff3",
+      "state": "e6961aa7",
       "events": "d01fe473",
       "rng": {
         "draws": 6,
@@ -134,7 +142,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 404,
-      "state": "85dbb9a7",
+      "state": "a9f8923b",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -145,7 +153,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 404,
-      "state": "bc47fa41",
+      "state": "2cd416d9",
       "events": "e02f37be",
       "rng": {
         "draws": 96,
@@ -156,7 +164,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 404,
-      "state": "cb1600bd",
+      "state": "a80ce005",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -167,7 +175,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "985b60ab",
+      "state": "4a8a46ef",
       "events": "4468bb01",
       "rng": {
         "draws": 294,
@@ -178,7 +186,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 404,
-      "state": "711c0b63",
+      "state": "2a3aced7",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -189,7 +197,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 404,
-      "state": "711c0b63",
+      "state": "2a3aced7",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -234,6 +242,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7dfedf0b",
+      "state": "194fe20f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,6 +56,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -118,7 +126,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "c0c2372a",
+      "state": "6041fc08",
       "events": "00bafcff",
       "rng": {
         "draws": 0,
@@ -170,6 +178,14 @@
                 "state": "active"
               }
             ]
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},
@@ -233,7 +249,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "0bdbd8b9",
+      "state": "2ab6ce01",
       "events": "d894ee18",
       "rng": {
         "draws": 40,
@@ -289,6 +305,14 @@
                 "state": "ready"
               }
             ]
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},
@@ -353,7 +377,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "26db3dc0",
+      "state": "c31b49dc",
       "events": "272aafab",
       "rng": {
         "draws": 40,
@@ -403,6 +427,14 @@
           "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},
@@ -468,7 +500,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "bd08b448",
+      "state": "3dff6d74",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -518,6 +550,14 @@
           "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
+          ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
           ],
           "talents": {
             "choices": {},

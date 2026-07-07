@@ -29,7 +29,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "d5c5ed18",
+      "state": "1e0c1ff8",
       "events": "5247b342",
       "rng": {
         "draws": 0,
@@ -68,6 +68,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -108,6 +116,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -220,7 +236,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "d5c5ed18",
+      "state": "1e0c1ff8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -259,6 +275,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -299,6 +323,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -411,7 +443,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "d5c5ed18",
+      "state": "1e0c1ff8",
       "events": "0e7377d1",
       "rng": {
         "draws": 0,
@@ -450,6 +482,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -490,6 +530,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -602,7 +650,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "356481ba",
+      "state": "473bb47e",
       "events": "e9ef6efe",
       "rng": {
         "draws": 0,
@@ -641,6 +689,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -693,6 +749,14 @@
               }
             ]
           ],
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -805,7 +869,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "d5c5ed18",
+      "state": "1e0c1ff8",
       "events": "5eaa4afa",
       "rng": {
         "draws": 0,
@@ -844,6 +908,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -884,6 +956,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -996,7 +1076,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 402,
-      "state": "72c8f0dc",
+      "state": "ce3a8d3c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1035,6 +1115,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1075,6 +1163,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

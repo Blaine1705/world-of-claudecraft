@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "71c5bba0",
+      "state": "c504724a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,6 +56,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -120,7 +128,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 414,
-      "state": "988ccd2c",
+      "state": "fbde2b66",
       "events": "a8af5cb6",
       "rng": {
         "draws": 4,
@@ -131,7 +139,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 414,
-      "state": "0bf68c97",
+      "state": "06488b6b",
       "events": "b93c7dc5",
       "rng": {
         "draws": 4,
@@ -142,7 +150,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 414,
-      "state": "16a23e34",
+      "state": "ac90757e",
       "events": "0b43bbc3",
       "rng": {
         "draws": 5,
@@ -153,7 +161,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 416,
-      "state": "e8900fb3",
+      "state": "295976fd",
       "events": "6c6bd0f2",
       "rng": {
         "draws": 8,
@@ -210,6 +218,14 @@
           "lifetimeXp": 12098,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -413,7 +429,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "3e4d2b6e",
+      "state": "56612d82",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -424,7 +440,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "3e4d2b6e",
+      "state": "56612d82",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -481,6 +497,14 @@
           "lifetimeXp": 12098,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}

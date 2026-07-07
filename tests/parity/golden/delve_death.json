@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "71c5bba0",
+      "state": "c504724a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,6 +55,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -119,7 +127,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "943d2821",
+      "state": "76ff4d79",
       "events": "23be8555",
       "rng": {
         "draws": 1,
@@ -160,6 +168,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -223,7 +239,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 410,
-      "state": "7f243ad0",
+      "state": "de29d73a",
       "events": "c2d0b576",
       "rng": {
         "draws": 1,
@@ -264,6 +280,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -328,7 +352,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 410,
-      "state": "7f243ad0",
+      "state": "de29d73a",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -369,6 +393,14 @@
           "lifetimeXp": 11200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
