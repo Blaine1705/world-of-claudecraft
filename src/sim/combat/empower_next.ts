@@ -23,12 +23,19 @@ export function consumeNextCastFree(ctx: SimContext, e: Entity): boolean {
 // for its proc glow / usable state, so sim and UI can never disagree on scope.
 export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set(['heroic_strike', 'slam']);
 
+// Revenge free-cost proc (Protection): the dodge/parry-armed sibling of
+// battle_trance. Applied in mobSwing when the warrior dodges or parries; only
+// Revenge may spend it. The action bar imports the same predicate for its proc
+// glow / usable state, so sim and UI can never disagree on scope.
+export const REVENGE_FREE_ABILITIES: ReadonlySet<string> = new Set(['revenge']);
+
 /** Pure aura-list predicate: is `abilityId`'s cost covered by a free-cost
  *  proc? Structural input so the UI drives it with a mirrored aura list. */
 export function freeCostAuraActive(auras: readonly { kind: string }[], abilityId: string): boolean {
   for (const a of auras) {
     if (a.kind === 'next_cast_free') return true;
     if (a.kind === 'battle_trance' && BATTLE_TRANCE_ABILITIES.has(abilityId)) return true;
+    if (a.kind === 'revenge_free' && REVENGE_FREE_ABILITIES.has(abilityId)) return true;
   }
   return false;
 }
@@ -41,7 +48,9 @@ export function hasFreeCostFor(e: Entity, abilityId: string): boolean {
  *  next_cast_free first, then a scope-matched Battle Trance). */
 export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string): boolean {
   if (consumeNextCastFree(ctx, e)) return true;
-  return BATTLE_TRANCE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'battle_trance');
+  if (BATTLE_TRANCE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'battle_trance'))
+    return true;
+  return REVENGE_FREE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'revenge_free');
 }
 
 export function consumeNextCastInstant(ctx: SimContext, e: Entity): boolean {

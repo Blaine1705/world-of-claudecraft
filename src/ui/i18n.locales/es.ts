@@ -2394,7 +2394,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.description':
     'Aumenta el poder de ataque tuyo y de tus aliados cercanos en 20 durante 1 hora.',
   'entities.abilities.commanding_shout.name': 'Grito Alentador',
-  'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en 6 durante 2 min.',
+  'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en 6 durante 1 hora.',
+  'entities.abilities.revenge.name': 'Revancha',
+  'entities.abilities.revenge.description':
+    'Atacas en un amplio arco infligiendo daño físico a todos los enemigos frente a ti. Por encima de 5 objetivos, el daño se reduce. Al esquivar o parar, tu siguiente Revancha puede no costar ira.',
   'entities.abilities.demoralizing_shout.name': 'Aullido Pavoroso',
   'entities.abilities.demoralizing_shout.description':
     'Lanza un grito aterrador y reduce un 20% el daño que infligen todos los enemigos cercanos durante 20 s.',
@@ -2810,7 +2813,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)',
   'entities.abilities.raised_guard.name': 'Bloquear con Escudo',
   'entities.abilities.raised_guard.description':
-    'Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. (Protección)',
+    'Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. Almacena hasta 2 cargas. (Protección)',
   'entities.abilities.iron_resolve.name': 'Ignorar Dolor',
   'entities.abilities.iron_resolve.description':
     'Aprietas los dientes e ignoras el dolor: consumes toda tu ira (mínimo 20) para absorber 4 puntos de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
@@ -4751,6 +4754,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.backstab':
     'Colócate tras el objetivo con una daga para un golpe demoledor que genera puntos de combo.',
   'guide.abilityHook.battle_shout': 'Un grito de aliento que aumenta el poder de ataque del grupo.',
+  'guide.abilityHook.revenge':
+    'Un contraataque en arco que golpea a todos los enemigos frente a ti, y cuesta menos justo después de esquivar o parar un golpe.',
   'guide.abilityHook.blessing_of_might':
     'Aumenta el poder de ataque de un objetivo amistoso; conviene lanzarla antes de iniciar el combate.',
   'guide.abilityHook.charge':
@@ -6264,6 +6269,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine':
     'Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%',
   'hudChrome.auraEffect.battleTrance': 'Tu próximo Golpe heroico o Embate no cuesta ira',
+  'hudChrome.auraEffect.revengeFree': 'Tu próxima Revancha no cuesta ira',
   'hudChrome.auraEffect.victoryRush': 'Victory Rush está listo',
   'hudChrome.auraEffect.maxHpPct': 'Aumenta la salud máxima un {pct}%',
   'hudChrome.options.showTargetOfTarget': 'Mostrar objetivo del objetivo',

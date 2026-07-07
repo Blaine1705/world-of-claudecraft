@@ -879,6 +879,7 @@ export const pl_PL: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const pl_PL: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Kolejkuje cięższy zamach, który zużywa wściekłość przy następnym ciosie.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "Mobilizujący okrzyk, który zwiększa siłę ataku całej drużyny.",
       "commanding_shout": "Wzmacnia wytrzymałość, by każdy dłużej wytrzymał w walce.",
       "charge": "Szarżujesz na odległego wroga, otwierając walkę krótkim ogłuszeniem.",
@@ -4695,6 +4697,10 @@ export const pl_PL: EnTranslations = {
         "name": "Cios łupieżcy",
         "description": "Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "Żelazny ryk",
         "description": "Zwiększa twoją moc ataku o 20 na 2 min."
@@ -5257,7 +5263,7 @@ export const pl_PL: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",

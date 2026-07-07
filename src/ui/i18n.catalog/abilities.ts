@@ -613,11 +613,16 @@ const classAbilityNamesEn = {
         'A strong attack that increases melee damage by {damage}. Activates on your next swing.',
       ],
       [
+        'revenge',
+        'Revenge',
+        'Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage.',
+      ],
+      [
         'battle_shout',
         'Iron Bellow',
         'Increases the attack power of you and nearby allies by 20 for 1 hour.',
       ],
-      ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by 6 for 2 min.'],
+      ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by 6 for 1 hour.'],
       [
         'demoralizing_shout',
         'Direhowl',
@@ -1155,7 +1160,7 @@ const classAbilityNamesEn = {
       [
         'raised_guard',
         'Raised Guard',
-        'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)',
+        'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
       ],
       [
         'iron_resolve',

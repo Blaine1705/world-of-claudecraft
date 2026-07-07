@@ -879,6 +879,7 @@ export const id_ID: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const id_ID: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "Pekik penggugah semangat yang menaikkan daya serang seluruh kelompok.",
       "commanding_shout": "Memperkuat stamina agar semua orang lebih tahan lama dalam pertarungan.",
       "charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
@@ -4695,6 +4697,10 @@ export const id_ID: EnTranslations = {
         "name": "Serangan Perampas",
         "description": "Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "Raungan Besi",
         "description": "Meningkatkan daya serangmu sebesar 20 selama 2 menit."
@@ -5257,7 +5263,7 @@ export const id_ID: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",

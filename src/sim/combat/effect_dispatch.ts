@@ -775,21 +775,36 @@ export function runEffects(
           res.castTime,
           true,
         );
+        // Collect the eligible targets FIRST (LoS + frontal gate) so a soft
+        // target cap can know the count before any hit lands. The skips draw no
+        // rng (they happen before the damage roll), so the stream position is
+        // identical to the uncapped path for every filtered enemy.
+        const aoeTargets: Entity[] = [];
         for (const m of ctx.hostilesInRadius(p, aoeCenter, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          // Frontal-arc variant (Faultline): only enemies within the melee
-          // facing arc are hit, the same MELEE_ARC check castAbility's facing
-          // gate uses. A filtered enemy draws no rng (the skip happens before
-          // the damage roll), so the stream position is untouched for it.
+          // Frontal-arc variant (Faultline / Revenge): only enemies within the
+          // melee facing arc are hit, the same MELEE_ARC check castAbility's
+          // facing gate uses.
           if (eff.frontal) {
             const facingDiff = Math.abs(normAngle(angleTo(p.pos, m.pos) - p.facing));
             if (facingDiff > MELEE_ARC) continue;
           }
+          aoeTargets.push(m);
+        }
+        // Classic AoE soft cap (Revenge): above `softCap` targets, hold the TOTAL
+        // to softCap x per-target by scaling every rolled hit. Scales the already-
+        // rolled amount, so it draws no extra rng.
+        const capScale =
+          eff.softCap && aoeTargets.length > eff.softCap ? eff.softCap / aoeTargets.length : 1;
+        for (const m of aoeTargets) {
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+          // Soft-cap scale (Revenge above 5 targets): applied after the roll and
+          // armor so the total, not any single hit, is what the cap bounds.
+          dmg *= capScale;
           ctx.dealDamage(
             p,
             m,

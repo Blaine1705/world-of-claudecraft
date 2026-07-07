@@ -879,6 +879,7 @@ export const es_ES: EnTranslations = {
       "dieBySword": "Reduce el daño recibido un {pct}% ({lowPct}% por debajo del {hpPct}% de salud)",
       "sanguine": "Aumenta la velocidad de ataque un {hastePct}% y el daño infligido un {dmgPct}%",
       "battleTrance": "Tu próximo Golpe heroico o Embate no cuesta ira",
+      "revengeFree": "Tu próxima Revancha no cuesta ira",
       "victoryRush": "Victory Rush está listo",
       "maxHpPct": "Aumenta la salud máxima un {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const es_ES: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
+      "revenge": "Un contraataque en arco que golpea a todos los enemigos frente a ti, y cuesta menos justo después de esquivar o parar un golpe.",
       "battle_shout": "Un grito de aliento que aumenta el poder de ataque del grupo.",
       "commanding_shout": "Refuerza el aguante para que todos resistan más en combate.",
       "charge": "Embiste a un enemigo lejano para abrir el combate con un breve aturdimiento.",
@@ -4695,13 +4697,17 @@ export const es_ES: EnTranslations = {
         "name": "Golpe del Saqueador",
         "description": "Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe."
       },
+      "revenge": {
+        "name": "Revancha",
+        "description": "Atacas en un amplio arco infligiendo daño físico a todos los enemigos frente a ti. Por encima de 5 objetivos, el daño se reduce. Al esquivar o parar, tu siguiente Revancha puede no costar ira."
+      },
       "battle_shout": {
         "name": "Bramido de Hierro",
         "description": "Aumenta el poder de ataque tuyo y de tus aliados cercanos en 20 durante 1 hora."
       },
       "commanding_shout": {
         "name": "Grito Alentador",
-        "description": "Aumenta tu Aguante en 6 durante 2 min."
+        "description": "Aumenta tu Aguante en 6 durante 1 hora."
       },
       "demoralizing_shout": {
         "name": "Aullido Pavoroso",
@@ -5257,7 +5263,7 @@ export const es_ES: EnTranslations = {
       },
       "raised_guard": {
         "name": "Bloquear con Escudo",
-        "description": "Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. (Protección)"
+        "description": "Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. Almacena hasta 2 cargas. (Protección)"
       },
       "iron_resolve": {
         "name": "Ignorar Dolor",

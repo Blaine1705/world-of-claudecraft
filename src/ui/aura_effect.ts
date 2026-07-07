@@ -252,6 +252,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       // The warrior free-strike proc: the summary is the covered abilities,
       // not a number (their names are baked per locale in the catalog value).
       return { key: `${KEY}.battleTrance` };
+    case 'revenge_free':
+      // The Protection dodge/parry proc: the summary is the readiness of a free
+      // Revenge, not a number.
+      return { key: `${KEY}.revengeFree` };
     case 'victory_rush':
       // The on-kill window: the summary is the readiness, not a number.
       return { key: `${KEY}.victoryRush` };

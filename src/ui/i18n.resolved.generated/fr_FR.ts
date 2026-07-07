@@ -879,6 +879,7 @@ export const fr_FR: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const fr_FR: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Prépare un coup plus lourd qui dépense de la rage sur votre prochaine attaque.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "Un cri de ralliement qui augmente la puissance d'attaque du groupe.",
       "commanding_shout": "Renforce l'endurance pour que chacun tienne plus longtemps au combat.",
       "charge": "Fonce sur un ennemi lointain pour ouvrir le combat avec un bref étourdissement.",
@@ -4695,6 +4697,10 @@ export const fr_FR: EnTranslations = {
         "name": "Frappe du pillard",
         "description": "Une attaque puissante qui augmente les dégâts de mêlée de {damage}. S'active lors de votre prochaine frappe."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "Beuglement de fer",
         "description": "Augmente votre puissance d'attaque de 20 pendant 2 min."
@@ -5257,7 +5263,7 @@ export const fr_FR: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",

@@ -94,6 +94,7 @@ describe('(a) prot kit content defs', () => {
     expect(def.cost).toBe(15);
     expect(def.castTime).toBe(0);
     expect(def.cooldown).toBe(12);
+    expect(def.maxCharges).toBe(2); // stores up to 2 charges (Batch 2026-07-08)
     expect(def.school).toBe('physical');
     expect(def.requiresTarget).toBe(false);
     expect(def.offGcd).toBe(true);

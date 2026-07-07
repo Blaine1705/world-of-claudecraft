@@ -879,6 +879,7 @@ export const tr_TR: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const tr_TR: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Bir sonraki vuruşunda öfke harcayan daha ağır bir savruş sıraya koyar.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "Grubun saldırı gücünü yükselten coşturucu bir nara.",
       "commanding_shout": "Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.",
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
@@ -4695,6 +4697,10 @@ export const tr_TR: EnTranslations = {
         "name": "Yağmacı Darbesi",
         "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "Demir Nara",
         "description": "Saldırı gücünü 2 dakika boyunca 20 artırır."
@@ -5257,7 +5263,7 @@ export const tr_TR: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",

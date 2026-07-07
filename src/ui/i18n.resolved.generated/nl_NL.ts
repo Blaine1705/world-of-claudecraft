@@ -879,6 +879,7 @@ export const nl_NL: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const nl_NL: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Zet een zwaardere uithaal in de wachtrij die rage besteedt bij je volgende klap.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "Een strijdkreet die de aanvalskracht van de groep verhoogt.",
       "commanding_shout": "Versterkt uithoudingsvermogen zodat iedereen meer staande blijft in een gevecht.",
       "charge": "Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.",
@@ -4695,6 +4697,10 @@ export const nl_NL: EnTranslations = {
         "name": "Plunderaarsslag",
         "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "IJzeren Gebrul",
         "description": "Verhoogt je aanvalskracht met 20 gedurende 2 min."
@@ -5257,7 +5263,7 @@ export const nl_NL: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",

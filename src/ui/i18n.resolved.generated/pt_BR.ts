@@ -879,6 +879,7 @@ export const pt_BR: EnTranslations = {
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
       "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
@@ -1718,6 +1719,7 @@ export const pt_BR: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Prepara um golpe mais pesado que gasta fúria no seu próximo ataque.",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "Um grito de incentivo que aumenta o poder de ataque do grupo.",
       "commanding_shout": "Reforça o vigor para que todos tenham mais resistência numa luta.",
       "charge": "Avança contra um inimigo distante para abrir a luta com um breve atordoamento.",
@@ -4695,6 +4697,10 @@ export const pt_BR: EnTranslations = {
         "name": "Golpe do Saqueador",
         "description": "Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe."
       },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+      },
       "battle_shout": {
         "name": "Brado de Ferro",
         "description": "Aumenta seu poder de ataque em 20 por 2 min."
@@ -5257,7 +5263,7 @@ export const pt_BR: EnTranslations = {
       },
       "raised_guard": {
         "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)"
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
         "name": "Iron Resolve",
