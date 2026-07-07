@@ -43,7 +43,8 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
 | `rend` (Deep Gash) | arms |
 | `overpower` (Redhand) | arms |
 | `slam` (Brute Swing) | arms, prot |
-| `cleave` (Reaping Arc) | arms, prot |
+| `cleave` (Reaping Arc, es "Arco Segador") | arms (removed from prot 2026-07-08; prot uses Revenge) |
+| `heroic_strike` (Reaver Strike, es "Golpe del Saqueador") | ungated BUT `excludeSpecs: ['prot']` (prot uses Revenge instead) |
 | `bloodrage` (Blood Toll) | arms, prot (Fury uses Bloodletting instead) |
 
 ## New abilities
@@ -95,6 +96,20 @@ commit is still open, but deferred to ryze's #1614 engine (that UX is its territ
   consolidation on purpose: making row picks staged means folding them into the build/loadout system,
   which ryze's engine will own, so it is built once there rather than twice. Raise it as a UX
   preference for the consolidated engine.
+
+## Batch 2026-07-08 (operator)
+- `commanding_shout` (Bolstering Cry, es "Grito Alentador", the STAMINA shout, prot-only): cost 10 -> 0,
+  duration 120s -> 3600s (1 hour), and REMOVE `exclusiveGroup: 'warrior_shout'` so it coexists with
+  Iron Bellow (the AP shout). Stays a self buff unless the operator asks for group.
+- NEW `revenge` "Revenge" (es "Revancha"), PROT-only, REPLACES `heroic_strike` for prot (via the new
+  `AbilityDef.excludeSpecs: ['prot']` on heroic_strike + `specs: ['prot']` on revenge). Frontal-arc AoE
+  physical hit to all enemies in front; reduced damage above 5 targets (soft cap: total caps at 5x per
+  target); and a defensive proc: when the warrior DODGES or PARRIES an incoming attack, a chance
+  (default 30%) that the next Revenge costs no rage. Chosen defaults to tune: learnLevel 1, cost 15,
+  no cooldown (GCD), radius 8, damage ~ cleave-tier, proc 30%. New mechanics: `excludeSpecs` field,
+  aoeDamage `softCap`, and a dodge/parry -> free-cost proc (reuses the next_cast_free machinery).
+- `cleave` (Reaping Arc): removed from prot -> `specs: ['arms']`.
+- `raised_guard` (Raised Guard / Bloquear con Escudo): add `maxCharges: 2`.
 
 ## Naming (de-brand)
 New ability names must be original (not WoW). The locked rename table is `ip-refactor/NAME-MAP.md`.
