@@ -20,8 +20,9 @@ Status legend: DONE = implemented and green on `integration`; PENDING = not yet 
 - `battle_shout` "Iron Bellow": GROUP attack-power buff (caster + friendlies within 40 yd),
   duration 1 HOUR, ranks 20/35/50 AP, cost 0 (free), learnLevel 7. Mutually exclusive with
   `commanding_shout` (the `warrior_shout` group).
-- `bloodthirst` "Bloodletting": Fury signature. Instant weapon attack that also heals the caster
-  3% of max health. Fury has NO `bloodrage`: Bloodletting is its generator instead (see gating).
+- `bloodthirst` "Bloodletting" (es "Sangria"): Fury signature. Instant weapon attack that heals the
+  caster 3% of max health AND generates 10 rage. Fury has NO `bloodrage`: Bloodletting is its
+  generator instead (see gating). While `furious_mending` is active its self-heal is 20% (below).
 - `mortal_strike` "Maiming Strike": Arms signature. Adds a 50% healing-reduction debuff on the
   target for 10 sec (the `mortal_wound` aura).
 - `rend` "Deep Gash": learnLevel 5.
@@ -36,8 +37,9 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
 | Ability (id) | Specs that keep it |
 |---|---|
 | `defensive_stance` (Guarded Stance) | arms, prot |
-| `sunder_armor` (Armor Shear) | arms, prot |
+| `sunder_armor` (Armor Shear) | arms, prot (but its HIGH threat applies ONLY for prot, see below) |
 | `commanding_shout` (Bolstering Cry) | prot |
+| `demoralizing_shout` (Direhowl) | prot |
 | `rend` (Deep Gash) | arms |
 | `overpower` (Redhand) | arms |
 | `slam` (Brute Swing) | arms, prot |
@@ -48,7 +50,10 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
 
 ### Fury (DONE)
 - `raging_gale` "Twinstrike": lvl 10, free, 2 charges (8s recharge), two 60%-weapon strikes + 8 rage.
-- `furious_mending` "Furious Mending": lvl 14, heals 20% max health over 10s + 20% reduced damage taken.
+- `furious_mending` "Furious Mending" (Regeneracion Enfurecida): lvl 14. For 10s you take 20% reduced
+  damage AND, while it is active, your `bloodthirst` (Sangria) self-heal becomes 20% of max health
+  (instead of 3%). It is NOT a flat 20% HoT (operator correction 2026-07-07): the healing is
+  delivered by casting Bloodletting under the buff.
 - `red_harvest` "Red Harvest": lvl 16, 80 rage, three full weapon strikes.
 
 ### Arms (PENDING as of this writing; being built)
@@ -67,6 +72,12 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
   lvl 18. Caster + allies within 40 yd: their next 3 ability casts are guaranteed crits.
   Open tweak to confirm with operator: prot then has two lvl-18 abilities (this + Defiant Bellow),
   and Fury loses its lvl-18 slot.
+
+## Spec-conditional and UI decisions (operator, 2026-07-07)
+- `sunder_armor` (Armor Shear) threat: the HIGH tank threat applies ONLY when the caster's committed
+  spec is Protection. For Arms it is a plain armor-shred with normal threat (no tank threat bonus).
+- Choosing a spec must be a STAGED edit that requires an explicit Save, like talent points; it must
+  NOT apply the instant it is clicked.
 
 ## Naming (de-brand)
 New ability names must be original (not WoW). The locked rename table is `ip-refactor/NAME-MAP.md`.
