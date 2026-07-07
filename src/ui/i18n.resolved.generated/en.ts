@@ -4697,7 +4697,7 @@ export const en: EnTranslations = {
       },
       "battle_shout": {
         "name": "Iron Bellow",
-        "description": "Increases your attack power by 20 for 2 min."
+        "description": "Increases the attack power of you and nearby allies by 20 for 1 hour."
       },
       "commanding_shout": {
         "name": "Bolstering Cry",
@@ -5233,11 +5233,11 @@ export const en: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Maiming Strike",
-        "description": "A vicious strike dealing weapon damage plus {damage}. (Arms signature)"
+        "description": "A vicious strike dealing weapon damage plus {damage} and reducing healing the target receives by 50% for 10 sec. (Arms signature)"
       },
       "bloodthirst": {
         "name": "Bloodletting",
-        "description": "Instantly attack in a blood frenzy for {damage}. (Fury signature)"
+        "description": "Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health. (Fury signature)"
       },
       "shield_slam": {
         "name": "Shieldcrack",

@@ -63,6 +63,18 @@ function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
 }
 
+// Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
+// selfBuff aura) or the `<abilityId>_ap` id the aoeAllyAttackPower case stamps
+// (Iron Bellow's group shout), so a group buff and a self buff sharing one
+// exclusiveGroup cancel each other (battle_shout vs commanding_shout). Ids
+// whose base ability has no group (trueshot_aura_ap) resolve to undefined,
+// exactly as before.
+function exclusiveGroupOfAura(id: string): string | undefined {
+  const direct = ABILITIES[id]?.exclusiveGroup;
+  if (direct) return direct;
+  return id.endsWith('_ap') ? ABILITIES[id.slice(0, -3)]?.exclusiveGroup : undefined;
+}
+
 function removeRootAuras(ctx: SimContext, p: Entity): void {
   for (let i = p.auras.length - 1; i >= 0; i--) {
     const aura = p.auras[i];
@@ -884,9 +896,24 @@ export function runEffects(
       }
       case 'aoeAllyAttackPower': {
         // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
-        // nearby allies (Trueshot Aura), riding the PR3a friendlies seam. No
-        // party requirement: friendliesInRadius includes the caster and every
-        // friendly entity within radius.
+        // nearby allies (Trueshot Aura, Iron Bellow), riding the PR3a
+        // friendlies seam. No party requirement: friendliesInRadius includes
+        // the caster and every friendly entity within radius.
+        //
+        // An exclusiveGroup ability here (battle_shout, group 'warrior_shout')
+        // first cancels the caster's sibling buffs, mirroring the selfBuff
+        // case; a re-cast's own `<id>_ap` aura is skipped (applyAura refreshes
+        // it in place). Trueshot Aura has no group, so this is a no-op for it.
+        for (const i of exclusiveAuraConflicts(
+          ability.exclusiveGroup,
+          `${ability.id}_ap`,
+          p.auras,
+          exclusiveGroupOfAura,
+        )) {
+          const a = p.auras[i];
+          p.auras.splice(i, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+        }
         for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
           ctx.applyAura(mE, {
             id: `${ability.id}_ap`,
@@ -1077,7 +1104,7 @@ export function runEffects(
           ability.exclusiveGroup,
           ability.id,
           p.auras,
-          (id) => ABILITIES[id]?.exclusiveGroup,
+          exclusiveGroupOfAura,
         )) {
           const a = p.auras[i];
           p.auras.splice(i, 1);

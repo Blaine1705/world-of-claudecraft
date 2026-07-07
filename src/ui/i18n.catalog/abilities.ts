@@ -612,7 +612,11 @@ const classAbilityNamesEn = {
         'Reaver Strike',
         'A strong attack that increases melee damage by {damage}. Activates on your next swing.',
       ],
-      ['battle_shout', 'Iron Bellow', 'Increases your attack power by 20 for 2 min.'],
+      [
+        'battle_shout',
+        'Iron Bellow',
+        'Increases the attack power of you and nearby allies by 20 for 1 hour.',
+      ],
       ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by 6 for 2 min.'],
       [
         'demoralizing_shout',
@@ -1121,12 +1125,12 @@ const classAbilityNamesEn = {
       [
         'mortal_strike',
         'Maiming Strike',
-        'A vicious strike dealing weapon damage plus {damage}. (Arms signature)',
+        'A vicious strike dealing weapon damage plus {damage} and reducing healing the target receives by 50% for 10 sec. (Arms signature)',
       ],
       [
         'bloodthirst',
         'Bloodletting',
-        'Instantly attack in a blood frenzy for {damage}. (Fury signature)',
+        'Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health. (Fury signature)',
       ],
       [
         'shield_slam',
