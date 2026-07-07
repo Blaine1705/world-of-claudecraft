@@ -221,4 +221,86 @@ describe('spec masteries', () => {
     expect(at20).toBeCloseTo(0.25, 10);
     expect(at20).toBeGreaterThan(at10);
   });
+
+  it('every spec ships its designated mastery-rating axis (PRD: Mastery rating readiness)', () => {
+    // The future mastery stat (item rating, unimplemented) scales exactly one axis per
+    // spec. This pins that the shipped mastery DATA carries that axis, so the rating PR
+    // can be a pure multiplier over existing fields. Table mirrors docs/prd/talents-2.0.md.
+    type Axis =
+      | { global: string; value: number }
+      | { stat: string; value: number }
+      | { abilities: string[]; dmgPct?: number; costPct?: number };
+    const AXES: Record<string, Record<string, Axis>> = {
+      warrior: {
+        arms: { global: 'meleeDmgPct', value: 0.15 },
+        fury: { stat: 'crit', value: 0.1 },
+        prot: { global: 'threatPct', value: 0.5 },
+      },
+      paladin: {
+        holy: { global: 'critDmgPct', value: 0.5 },
+        protection: { global: 'threatPct', value: 0.5 },
+        retribution: { global: 'meleeDmgPct', value: 0.2 },
+      },
+      hunter: {
+        beast_mastery: { global: 'petDmgPct', value: 0.35 },
+        marksmanship: { global: 'meleeDmgPct', value: 0.2 },
+        survival: { global: 'meleeDmgPct', value: 0.15 },
+      },
+      mage: {
+        arcane: { global: 'spellDmgPct', value: 0.15 },
+        fire: { global: 'critDmgPct', value: 0.5 },
+        frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
+      },
+      rogue: {
+        assassination: { global: 'dotDmgPct', value: 0.2 },
+        combat: { global: 'meleeHastePct', value: 0.1 },
+        subtlety: { global: 'critDmgPct', value: 0.4 },
+      },
+      priest: {
+        discipline: { global: 'absorbPct', value: 0.3 },
+        holy: { global: 'healPct', value: 0.2 },
+        shadow: { global: 'dotDmgPct', value: 0.15 },
+      },
+      shaman: {
+        elemental: { global: 'spellDmgPct', value: 0.15 },
+        enhancement: { global: 'meleeHastePct', value: 0.1 },
+        restoration: { abilities: ['chain_heal', 'healing_wave'], costPct: -0.2 },
+      },
+      warlock: {
+        affliction: { global: 'dotDmgPct', value: 0.2 },
+        demonology: { global: 'petDmgSharePct', value: 0.2 },
+        destruction: { global: 'critDmgPct', value: 0.5 },
+      },
+      druid: {
+        balance: { global: 'spellDmgPct', value: 0.15 },
+        feral: { global: 'meleeDmgPct', value: 0.15 },
+        restoration: { global: 'hotHealPct', value: 0.25 },
+      },
+    };
+    for (const [cls, specs] of Object.entries(AXES)) {
+      for (const [specId, axis] of Object.entries(specs)) {
+        const spec = TALENTS[cls as PlayerClass]?.specs.find((s) => s.id === specId);
+        expect(spec, `${cls}/${specId} spec def`).toBeTruthy();
+        const eff = spec?.mastery.effect ?? {};
+        if ('global' in axis) {
+          expect(
+            (eff.global as Record<string, number> | undefined)?.[axis.global],
+            `${cls}/${specId} axis ${axis.global}`,
+          ).toBeCloseTo(axis.value, 10);
+        } else if ('stat' in axis) {
+          expect(
+            (eff.stats as Record<string, number> | undefined)?.[axis.stat],
+            `${cls}/${specId} axis stat ${axis.stat}`,
+          ).toBeCloseTo(axis.value, 10);
+        } else {
+          for (const ab of axis.abilities) {
+            const mod = eff.ability?.find((a) => a.ability === ab);
+            expect(mod, `${cls}/${specId} ability axis ${ab}`).toBeTruthy();
+            if (axis.dmgPct !== undefined) expect(mod?.dmgPct).toBeCloseTo(axis.dmgPct, 10);
+            if (axis.costPct !== undefined) expect(mod?.costPct).toBeCloseTo(axis.costPct, 10);
+          }
+        }
+      }
+    }
+  });
 });
