@@ -1266,6 +1266,10 @@ export type AbilityEffect =
       // damage caps at softCap x per-target. Scales the already-rolled amount, so
       // it draws no extra rng.
       softCap?: number;
+      // Rage-generating AoE (Bladed Gyre): after the blast, the caster gains
+      // `base + perTarget * min(targetsHit, capTargets)` rage (e.g. 5 + 1 per
+      // enemy struck, capped at +5). Deterministic state change, no extra rng.
+      rageOnHit?: { base: number; perTarget: number; capTargets: number };
     }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {

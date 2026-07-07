@@ -730,9 +730,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 40 },
-      { type: 'weaponStrike', bonus: 40 },
-      { type: 'weaponStrike', bonus: 40 },
+      { type: 'weaponStrike', bonus: 55 },
+      { type: 'weaponStrike', bonus: 55 },
+      { type: 'weaponStrike', bonus: 55 },
     ],
     description:
       'Spend everything: strike three times in a frenzy for weapon damage plus {damage} each. (Fury)',
@@ -958,7 +958,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'warrior',
     learnLevel: 1,
     specs: ['prot'],
-    cost: 15,
+    cost: 20,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3903,14 +3903,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Bladed Gyre',
     class: 'warrior',
     learnLevel: 10,
-    cost: 25,
+    // Bladed Gyre GENERATES rage instead of costing it (operator, Batch
+    // 2026-07-08): cost 0, and the aoeDamage's rageOnHit grants 5 rage plus 1
+    // per enemy struck (capped at +5), so 5 to 10 rage per spin.
+    cost: 0,
     castTime: 0,
     cooldown: 10,
     range: 0,
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'aoeDamage', min: 30, max: 42, radius: 8 },
+      {
+        type: 'aoeDamage',
+        min: 30,
+        max: 42,
+        radius: 8,
+        rageOnHit: { base: 5, perTarget: 1, capTargets: 5 },
+      },
       // Bladed Echo: arms the caster for 2 echoing casts (combat/area_echo.ts).
       // Its own aoeDamage disqualifies whirlwind from consuming the charge.
       {
@@ -3924,7 +3933,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Spin in a deadly arc, striking all nearby enemies for $d. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
+      'Spin in a deadly arc, striking all nearby enemies for $d and generating rage for each foe struck instead of costing any. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
   },
   berserker_rage: {
     id: 'berserker_rage',
