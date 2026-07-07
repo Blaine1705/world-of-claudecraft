@@ -103,6 +103,8 @@ describe('classic self-buff mutual exclusion groups', () => {
   it('keeps only one self-applied warrior shout active', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(14); // battle(1) + commanding(14) known
+    // Bolstering Cry (commanding_shout) is prot-gated base kit (2026-07-07).
+    expect(sim.setSpec('prot')).toBe(true);
     const baseAp = sim.player.attackPower;
 
     sim.player.resource = 100;

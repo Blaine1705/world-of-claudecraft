@@ -69,6 +69,8 @@ describe('Blood Offering', () => {
   it('empowers the base Blood Toll: 30 rage and half its cooldown', () => {
     const run = (pick: boolean) => {
       const sim = warriorAtCap(42);
+      // Blood Toll (bloodrage) is arms/prot-gated base kit (2026-07-07).
+      expect(sim.setSpec('prot')).toBe(true);
       if (pick) sim.pickRowTalent(3, 'war_row_blood_offering');
       const p = sim.player;
       p.hp = p.maxHp;
@@ -202,6 +204,7 @@ describe('Piercing Howl', () => {
 describe('Battle Rhythm', () => {
   it('empowers every third cast: +20% rage generation on it', () => {
     const sim = warriorAtCap(49);
+    expect(sim.setSpec('prot')).toBe(true); // Direhowl (demoralizing_shout) is prot-gated base kit
     sim.pickRowTalent(3, 'war_row_battle_rhythm');
     const p = sim.player;
     const mob = mobsNear(sim, 1)[0];
@@ -227,6 +230,7 @@ describe('Battle Rhythm', () => {
 describe('Colossal Might', () => {
   it('shaves offensive cooldowns as rage is spent', () => {
     const sim = warriorAtCap(50);
+    expect(sim.setSpec('prot')).toBe(true); // Direhowl (demoralizing_shout) is prot-gated base kit
     sim.pickRowTalent(5, 'war_row_colossal_might');
     sim.pickRowTalent(4, 'war_row_recklessness');
     const p = sim.player;

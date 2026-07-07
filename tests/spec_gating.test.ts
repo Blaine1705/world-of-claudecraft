@@ -53,9 +53,13 @@ describe('spec-gated warrior base kit (content table)', () => {
 });
 
 describe('abilitiesKnownAt spec filter', () => {
-  it('no spec chosen: the full level-appropriate kit stays available', () => {
+  it('no spec chosen: only the shared base kit, every spec-exclusive is hidden', () => {
     const ids = knownIds(null);
-    for (const id of Object.keys(GATED)) expect(ids.has(id), id).toBe(true);
+    for (const id of Object.keys(GATED)) expect(ids.has(id), id).toBe(false);
+    // the ungated base kit stays available before a spec is committed
+    for (const id of ['heroic_strike', 'battle_shout', 'charge', 'execute', 'taunt']) {
+      expect(ids.has(id), id).toBe(true);
+    }
   });
 
   it('fury loses every arms/prot exclusive (incl. Blood Toll, replaced by its signature)', () => {
@@ -102,14 +106,21 @@ describe('abilitiesKnownAt spec filter', () => {
 });
 
 describe('spec gating end to end in the sim', () => {
-  it('choosing fury removes Deep Gash from the known list and the cast resolve', () => {
+  it('a no-spec warrior lacks Deep Gash; arms grants it in the known list and cast resolve, fury never does', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
+    // No committed spec: the arms-only Deep Gash (rend) is hidden and unresolvable.
+    expect(sim.known.some((k) => k.def.id === 'rend')).toBe(false);
+    expect(sim.resolvedAbility('rend')).toBeNull();
+    // Committing arms reveals it in the known list AND the cast resolve.
+    expect(sim.setSpec('arms')).toBe(true);
     expect(sim.known.some((k) => k.def.id === 'rend')).toBe(true);
+    expect(sim.resolvedAbility('rend')).not.toBeNull();
+    // Switching to fury drops it again (fury never keeps the arms-only bleed).
     expect(sim.setSpec('fury')).toBe(true);
     expect(sim.known.some((k) => k.def.id === 'rend')).toBe(false);
     expect(sim.resolvedAbility('rend')).toBeNull();
-    // Staples survive the spec choice.
+    // Staples survive every spec choice.
     expect(sim.known.some((k) => k.def.id === 'heroic_strike')).toBe(true);
   });
 

@@ -73,6 +73,15 @@ function beefUp(mob: Entity) {
   mob.hp = 5000;
 }
 
+// Grant a spec-gated ability to a no-spec warrior for a base-mechanic test: the
+// grant bypasses the spec filter (spec-gating 2026-07-07) WITHOUT applying any
+// spec mastery, so the isolated threat number stays the pristine base value.
+function grantAbility(sim: Sim, abilityId: string, pid: number) {
+  const meta = (sim as any).players.get(pid);
+  meta.talentMods.grants.push({ ability: abilityId, rank: 1 });
+  (sim as any).refreshKnownAbilities(meta, false);
+}
+
 describe('threat from damage', () => {
   it('damage lands on the hate table 1:1 without modifiers (plus the aggro seed)', () => {
     const sim = makeSim('warrior');
@@ -86,6 +95,10 @@ describe('threat from damage', () => {
   it('defensive stance: -10% damage dealt, x1.3 threat on what lands', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    // Guarded Stance (defensive_stance) is arms/prot-gated base kit (2026-07-07).
+    // Grant it (no spec mastery) so the x1.3 stance threat is isolated: committing
+    // prot would stack its +30% Recompense threat mastery and skew the number.
+    grantAbility(sim, 'defensive_stance', sim.playerId);
     sim.castAbility('defensive_stance');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(true);
@@ -161,6 +174,9 @@ describe('threat from damage', () => {
     sim.setPlayerLevel(8);
     expect(sim.resolvedAbility('heroic_strike')!.threatFlat).toBe(39);
     sim.setPlayerLevel(10);
+    // Armor Shear (sunder_armor) is arms/prot-gated base kit (2026-07-07): commit
+    // prot so it resolves (its flat threat value is unchanged by the spec commit).
+    expect(sim.setSpec('prot')).toBe(true);
     expect(sim.resolvedAbility('sunder_armor')!.threatFlat).toBe(100);
   });
 });
@@ -439,11 +455,16 @@ describe('sunder armor', () => {
     expect(threat).toBeGreaterThanOrEqual(100 * applications);
   });
 
-  it('for Arms (and no spec) the flat tank threat is dropped (armor shred only)', () => {
+  it('for Arms the flat tank threat is dropped (armor shred only); no-spec cannot sunder at all', () => {
     // Arms keeps sunder as a plain armor-shred with NO tank-threat spike, so the
     // only threat is the tiny combat-entry seed, well under one 100-flat sunder.
     expect(sunderTwice('arms').threat).toBeLessThan(100);
-    expect(sunderTwice(null).threat).toBeLessThan(100);
+    // A no-spec warrior does not know Armor Shear at all (spec-gated, 2026-07-07),
+    // so there is no sunder to carry any threat, flat or otherwise.
+    const noSpec = makeSim('warrior');
+    noSpec.setPlayerLevel(10);
+    expect(noSpec.known.some((k) => k.def.id === 'sunder_armor')).toBe(false);
+    expect(noSpec.resolvedAbility('sunder_armor')).toBeNull();
   });
 });
 

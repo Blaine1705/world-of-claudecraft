@@ -26,6 +26,10 @@ type TestSim = Sim & {
 function makeSim(seed = 31337, level = 20): { sim: TestSim; p: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as unknown as TestSim;
   sim.setPlayerLevel(level);
+  // Twinstrike and Red Harvest are fury-gated base kit: commit fury so a
+  // no-spec warrior's hidden kit does not swallow them (spec-gating design,
+  // 2026-07-07). The "live sim drops both on an arms choice" test re-specs.
+  expect(sim.setSpec('fury')).toBe(true);
   return { sim, p: sim.player };
 }
 
@@ -170,12 +174,15 @@ describe('Red Harvest in combat', () => {
 });
 
 describe('fury spec gating', () => {
-  it('no spec chosen keeps both; fury keeps both at 20', () => {
-    for (const spec of [null, 'fury']) {
-      const ids = knownIds(spec);
-      expect(ids.has('raging_gale'), `raging_gale under ${spec}`).toBe(true);
-      expect(ids.has('red_harvest'), `red_harvest under ${spec}`).toBe(true);
-    }
+  it('no spec knows neither; fury keeps both at 20', () => {
+    // With spec-gating, a no-spec warrior sees only the shared base kit, so the
+    // fury exclusives are hidden until fury is committed.
+    const none = knownIds(null);
+    expect(none.has('raging_gale'), 'raging_gale under no spec').toBe(false);
+    expect(none.has('red_harvest'), 'red_harvest under no spec').toBe(false);
+    const fury = knownIds('fury');
+    expect(fury.has('raging_gale'), 'raging_gale under fury').toBe(true);
+    expect(fury.has('red_harvest'), 'red_harvest under fury').toBe(true);
   });
 
   it('arms and prot lose both', () => {

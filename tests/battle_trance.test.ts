@@ -17,6 +17,16 @@ function warriorAtCap(seed = 7): Sim {
   return sim;
 }
 
+// Grant a spec-gated ability to a no-spec warrior for a base-mechanic test: the
+// grant bypasses the spec filter (spec-gating 2026-07-07) WITHOUT applying any
+// spec mastery, so the isolated rage numbers stay the pristine base values (arms
+// mastery would otherwise inflate Redhand's rage generation by 10%).
+function grantAbility(sim: Sim, abilityId: string, pid: number) {
+  const meta = (sim as any).players.get(pid);
+  meta.talentMods.grants.push({ ability: abilityId, rank: 1 });
+  (sim as any).refreshKnownAbilities(meta, false);
+}
+
 function nearestMob(sim: Sim, opts: { thornless?: boolean } = {}) {
   let best: any = null;
   let bestD = Infinity;
@@ -93,6 +103,7 @@ describe('Battle Trance: arming', () => {
 describe('Battle Trance: consumption scope', () => {
   it('makes Brute Swing (slam) free at zero rage and is consumed by it', () => {
     const sim = warriorAtCap(62);
+    expect(sim.setSpec('arms')).toBe(true); // Brute Swing is arms/prot-gated base kit
     swingUntilProc(sim);
     const p = sim.player;
     p.gcdRemaining = 0;
@@ -142,6 +153,7 @@ describe('Battle Trance: consumption scope', () => {
 describe('Redhand (overpower): the active rage builder', () => {
   it('casts with no dodge proc required and generates 10 rage on a 5s cooldown', () => {
     const sim = warriorAtCap(65);
+    grantAbility(sim, 'overpower', sim.playerId); // Redhand is arms-gated; grant to isolate base rage
     const p = sim.player;
     const mob = nearestMob(sim, { thornless: true });
     standOff(sim, mob, 2);
@@ -156,6 +168,9 @@ describe('Redhand (overpower): the active rage builder', () => {
   it('scales with Anger Management like every ability rage source', () => {
     const sim = warriorAtCap(66);
     expect(sim.pickRowTalent(3, 'war_row_anger_management')).toBe(true);
+    // Grant AFTER the row pick: pickRowTalent recomputes talentMods (which would
+    // drop an earlier grant). Redhand is arms-gated; grant to isolate base rage.
+    grantAbility(sim, 'overpower', sim.playerId);
     const p = sim.player;
     const mob = nearestMob(sim, { thornless: true });
     standOff(sim, mob, 2);

@@ -7,10 +7,15 @@
 // (tests/threat.test.ts).
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+
+// Direhowl (demoralizing_shout) is prot-gated base kit (2026-07-07): it is only in
+// the known list and castable once prot is committed.
+const protMods = () => computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'prot' });
 
 function spawnDummy(sim: Sim, target: Entity): Entity {
   const mob = createMob((sim as any).nextId++, MOBS.gravecaller_summoner, 14, {
@@ -42,10 +47,12 @@ describe('warrior Direhowl (reworked)', () => {
 
   it('sits in the warrior learn order and gates on level', () => {
     expect(CLASSES.warrior.abilities).toContain('demoralizing_shout');
-    expect(abilitiesKnownAt('warrior', 13).some((k) => k.def.id === 'demoralizing_shout')).toBe(
-      false,
+    expect(
+      abilitiesKnownAt('warrior', 13, protMods()).some((k) => k.def.id === 'demoralizing_shout'),
+    ).toBe(false);
+    const at14 = abilitiesKnownAt('warrior', 14, protMods()).find(
+      (k) => k.def.id === 'demoralizing_shout',
     );
-    const at14 = abilitiesKnownAt('warrior', 14).find((k) => k.def.id === 'demoralizing_shout');
     expect(at14?.rank).toBe(1);
   });
 
@@ -53,6 +60,7 @@ describe('warrior Direhowl (reworked)', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     const p = sim.player;
     sim.setPlayerLevel(14, p.id);
+    expect(sim.setSpec('prot', p.id)).toBe(true); // Direhowl is prot-gated base kit
     p.gm = true;
     p.resource = 100; // rage for the shout
     const mob = spawnDummy(sim, p);
@@ -130,6 +138,7 @@ describe('warrior Direhowl (reworked)', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     const p = sim.player;
     sim.setPlayerLevel(14, p.id);
+    expect(sim.setSpec('prot', p.id)).toBe(true); // Direhowl is prot-gated base kit
     p.gm = true;
     p.resource = 100; // rage for the shout
     const far = spawnDummy(sim, p);
