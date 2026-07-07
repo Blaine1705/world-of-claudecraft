@@ -18,11 +18,12 @@ function clears(colliders: readonly Collider[], x: number, z: number, r = BODY_R
       const dz = z - c.z;
       if (dx * dx + dz * dz < (c.r + r) * (c.r + r)) return false;
     } else {
-      // Rotated OBB: test the point in the box's local frame (matches pushOut).
+      // Rotated OBB in the box's local frame, matching colliders.ts pushOut
+      // (rotY(dx, dz, -rot) == (dx*cos(rot) - dz*sin(rot), dx*sin(rot) + dz*cos(rot))).
       const dx = x - c.x;
       const dz = z - c.z;
-      const cos = Math.cos(-c.rot);
-      const sin = Math.sin(-c.rot);
+      const cos = Math.cos(c.rot);
+      const sin = Math.sin(c.rot);
       const lx = dx * cos - dz * sin;
       const lz = dx * sin + dz * cos;
       if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return false;

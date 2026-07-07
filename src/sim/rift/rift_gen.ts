@@ -12,7 +12,6 @@
 import type { Collider } from '../colliders';
 import { RIFT_THEMES, type RiftTheme } from '../content/rift/themes';
 import {
-  DUNGEON_WALL_X,
   type DungeonLayout,
   type GridPoint,
   type InteriorStyle,
@@ -105,10 +104,15 @@ function isClear(colliders: readonly Collider[], x: number, z: number, r = BODY_
       const dz = z - c.z;
       if (dx * dx + dz * dz < (c.r + r) * (c.r + r)) return false;
     } else {
+      // Match colliders.ts pushOut exactly: it computes the box-local point via
+      // rotY(dx, dz, -c.rot), which expands to (dx*cos(rot) - dz*sin(rot),
+      // dx*sin(rot) + dz*cos(rot)) because rotY carries a z-sign flip. Using -rot
+      // in cos/sin here (an earlier bug) swapped the dz sign and disagreed with
+      // pushOut on tilted polygon-wall segments.
       const dx = x - c.x;
       const dz = z - c.z;
-      const cos = Math.cos(-c.rot);
-      const sin = Math.sin(-c.rot);
+      const cos = Math.cos(c.rot);
+      const sin = Math.sin(c.rot);
       const lx = dx * cos - dz * sin;
       const lz = dx * sin + dz * cos;
       if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return false;
@@ -387,7 +391,6 @@ function planPuzzle(rng: Rng, isBoss: boolean): RiftPuzzle {
 }
 
 function planObjects(
-  rng: Rng,
   geo: GeneratedGeometry,
   isBoss: boolean,
   puzzle: RiftPuzzle,
@@ -472,7 +475,7 @@ export function generateRiftFloor(
   const floorLevel = floorLevelFor(baseLevel, clampedIndex);
   const puzzle = planPuzzle(rng, isBoss);
   const spawns = planSpawns(rng, theme, geo, floorLevel, isBoss);
-  const objects = planObjects(rng, geo, isBoss, puzzle);
+  const objects = planObjects(geo, isBoss, puzzle);
 
   const plan: RiftFloorPlan = {
     seed: seed >>> 0,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveMovement } from '../src/sim/colliders';
+import { resolveMovement, resolvePosition } from '../src/sim/colliders';
 import { isRiftPos, riftInstanceOrigin } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -179,6 +179,28 @@ describe('rift sim: death returns to the entry zone cemetery', () => {
     sim.enterRift(SEED, 20, sim.player.id, { x: 138, z: 838 });
     dieAndRelease(sim);
     expect(sim.player.pos.z).toBeGreaterThan(500);
+  });
+});
+
+describe('rift sim: generator clearance matches runtime collision', () => {
+  it('spawned mobs sit on genuinely clear tiles (the real pushOut resolver does not move them)', () => {
+    // Covers many floor-0 shapes (incl. tilted-wall apse/rotunda/cavern), so a
+    // mismatch between the generator's isClear and colliders.ts pushOut (e.g. a
+    // rotated-OBB sign flip) would surface as a spawn getting shoved on tick 1.
+    for (let seed = 0; seed < 30; seed++) {
+      const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+      sim.enterRift(seed, 20, sim.player.id);
+      const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+      for (const id of inst.mobIds) {
+        const e = sim.entities.get(id)!;
+        const res = resolvePosition(seed, e.pos.x, e.pos.z, 0.6);
+        const moved = Math.hypot(res.x - e.pos.x, res.z - e.pos.z);
+        expect(
+          moved,
+          `seed ${seed} mob ${e.templateId} @${e.pos.x},${e.pos.z} pushed ${moved}`,
+        ).toBeLessThan(0.1);
+      }
+    }
   });
 });
 
