@@ -2391,8 +2391,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Invoca poder vengador y aumenta angrebskraft y trolddomskraft durante 20 sek. (paladintalent)',
   'entities.abilities.berserk.name': 'Rød dis',
-  'entities.abilities.berserk.description':
-    'Aumenta angrebskraft durante 15 sek. (druidentalent)',
+  'entities.abilities.berserk.description': 'Aumenta angrebskraft durante 15 sek. (druidentalent)',
   'entities.abilities.bladestorm.name': 'Stålcyklon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a nærliggende fjender cada segundo por {damage}. (krigertalent)',
@@ -2442,8 +2441,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a nærliggende fjender y los inmoviliza durante 2 sek. (shamantent)',
   'entities.abilities.evocation.name': 'Æterbrønd',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (magikertalent)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalent)',
   'entities.abilities.frenzied_regeneration.name': 'Vild heling',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 sek. Solo en Forma de oso. (druidentalent)',
@@ -2523,8 +2521,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigertalent)',
   'entities.abilities.silence.name': 'Tavshed',
-  'entities.abilities.silence.description':
-    'Silencia a målet durante 4 sek. (præstetalent)',
+  'entities.abilities.silence.description': 'Silencia a målet durante 4 sek. (præstetalent)',
   'entities.abilities.skull_bash.name': 'Pandeskal',
   'entities.abilities.skull_bash.description':
     'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (druidentalent)',

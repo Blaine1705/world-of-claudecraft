@@ -3381,8 +3381,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a cercanos enemigos y los inmoviliza durante 2 s. (talento de chamán)',
   'entities.abilities.evocation.name': 'Pozo de Éter',
-  'entities.abilities.evocation.description':
-    'Restaura maná rápidamente. (talento de mago)',
+  'entities.abilities.evocation.description': 'Restaura maná rápidamente. (talento de mago)',
   'entities.abilities.frenzied_regeneration.name': 'Remiendo Salvaje',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (talento de druida)',

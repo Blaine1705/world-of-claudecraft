@@ -5910,7 +5910,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 1200, duration: 10 }],
-    description: 'Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)',
+    description:
+      'Raise an unbreakable bulwark, greatly increasing armor for 10 sec. (Warrior talent)',
   },
   silence: {
     id: 'silence',

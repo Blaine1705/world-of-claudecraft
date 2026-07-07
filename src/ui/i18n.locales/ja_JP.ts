@@ -2641,8 +2641,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     '報復の力を呼び降ろし、攻撃力と呪文能力を高める。効果時間 20 秒。（パラディンタレント）',
   'entities.abilities.berserk.name': '赤き霞',
-  'entities.abilities.berserk.description':
-    '攻撃力を高める。効果時間 15 秒。（ドルイドタレント）',
+  'entities.abilities.berserk.description': '攻撃力を高める。効果時間 15 秒。（ドルイドタレント）',
   'entities.abilities.bladestorm.name': '鋼の旋風',
   'entities.abilities.bladestorm.description':
     '鋼鉄の嵐と化し、毎秒周囲の敵に {damage} のダメージを与える。（ウォリアータレント）',
@@ -2692,8 +2691,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     '周囲の敵を大地に縛り付け、2 秒間移動不能にする。（シャーマンタレント）',
   'entities.abilities.evocation.name': 'エーテルの井戸',
-  'entities.abilities.evocation.description':
-    'マナを急速に回復する。（メイジタレント）',
+  'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
   'entities.abilities.frenzied_regeneration.name': '野生の癒し',
   'entities.abilities.frenzied_regeneration.description':
     '10 秒かけて体力を回復する。ブルーインフォーム限定。（ドルイドタレント）',
@@ -2767,14 +2765,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rebuke.description':
     '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（パラディンタレント）',
   'entities.abilities.shadowstep.name': '影すべり',
-  'entities.abilities.shadowstep.description':
-    '影を抜けて対象のもとへ移動する。（ローグタレント）',
+  'entities.abilities.shadowstep.description': '影を抜けて対象のもとへ移動する。（ローグタレント）',
   'entities.abilities.shield_wall.name': '防壁',
   'entities.abilities.shield_wall.description':
     '揺るぎない防壁を築き、アーマーを大幅に高める。効果時間 10 秒。（ウォリアータレント）',
   'entities.abilities.silence.name': '沈黙',
-  'entities.abilities.silence.description':
-    '対象を 4 秒間沈黙させる。（プリーストタレント）',
+  'entities.abilities.silence.description': '対象を 4 秒間沈黙させる。（プリーストタレント）',
   'entities.abilities.skull_bash.name': '頭突き',
   'entities.abilities.skull_bash.description':
     '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ドルイドタレント）',

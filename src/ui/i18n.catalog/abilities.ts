@@ -1511,11 +1511,7 @@ const classAbilityNamesEn = {
         'Steel Cyclone',
         'Become a storm of steel, striking nearby enemies each second for {damage}. (Warrior talent)',
       ],
-      [
-        'blink',
-        'Flickerstep',
-        'Teleports you 15 yd forward and breaks roots. (Mage talent)',
-      ],
+      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
       [
         'bloodlust',
         'War Drums',
@@ -1603,11 +1599,7 @@ const classAbilityNamesEn = {
         'Tolling Hammer',
         'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
       ],
-      [
-        'healing_stream',
-        'Springwell',
-        'Restores a friendly target over 12 sec. (Shaman talent)',
-      ],
+      ['healing_stream', 'Springwell', 'Restores a friendly target over 12 sec. (Shaman talent)'],
       [
         'heroic_leap',
         'Warleap',
@@ -1629,11 +1621,7 @@ const classAbilityNamesEn = {
         'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
       ],
       ['inner_focus', 'Stilled Mind', 'Makes your next spell free. Lasts 60 sec. (Priest talent)'],
-      [
-        'innervate',
-        'Lifesap',
-        'Instantly restores 200 of your current resource. (Druid talent)',
-      ],
+      ['innervate', 'Lifesap', 'Instantly restores 200 of your current resource. (Druid talent)'],
       [
         'kick',
         'Boot',

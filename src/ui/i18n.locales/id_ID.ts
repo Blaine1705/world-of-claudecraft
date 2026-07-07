@@ -2505,8 +2505,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Invoca poder vengador y aumenta daya serang y daya sihir durante 20 detik. (talenta paladin)',
   'entities.abilities.berserk.name': 'Kabut Merah',
-  'entities.abilities.berserk.description':
-    'Aumenta daya serang durante 15 detik. (talenta druid)',
+  'entities.abilities.berserk.description': 'Aumenta daya serang durante 15 detik. (talenta druid)',
   'entities.abilities.bladestorm.name': 'Siklon Baja',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a di dekat musuh cada segundo por {damage}. (talenta warrior)',
@@ -2556,8 +2555,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a di dekat musuh y los inmoviliza durante 2 detik. (talenta shaman)',
   'entities.abilities.evocation.name': 'Sumur Eter',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (talenta mage)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talenta mage)',
   'entities.abilities.frenzied_regeneration.name': 'Pemulihan Liar',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 detik. Solo en Forma de oso. (talenta druid)',
@@ -2637,8 +2635,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la armor durante 10 detik. (talenta warrior)',
   'entities.abilities.silence.name': 'Senyap',
-  'entities.abilities.silence.description':
-    'Silencia a target durante 4 detik. (talenta priest)',
+  'entities.abilities.silence.description': 'Silencia a target durante 4 detik. (talenta priest)',
   'entities.abilities.skull_bash.name': 'Benturan Kepala',
   'entities.abilities.skull_bash.description':
     'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta druid)',

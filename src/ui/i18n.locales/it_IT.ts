@@ -3344,8 +3344,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a vicini nemici y los inmoviliza durante 2 s. (talento da sciamano)',
   'entities.abilities.evocation.name': 'Pozzo d’Etere',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (talento da mago)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento da mago)',
   'entities.abilities.frenzied_regeneration.name': 'Rammendo Selvaggio',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (talento da druido)',

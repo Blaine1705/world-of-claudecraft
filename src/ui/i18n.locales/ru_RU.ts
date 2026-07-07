@@ -2667,8 +2667,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Призывает карающую силу, повышая силу атаки и силу заклинаний на 20 сек. (Талант паладина)',
   'entities.abilities.berserk.name': 'Багровая дымка',
-  'entities.abilities.berserk.description':
-    'Повышает силу атаки на 15 сек. (Талант друида)',
+  'entities.abilities.berserk.description': 'Повышает силу атаки на 15 сек. (Талант друида)',
   'entities.abilities.bladestorm.name': 'Стальной циклон',
   'entities.abilities.bladestorm.description':
     'Вы становитесь стальным вихрем, каждую секунду нанося ближайшим врагам {damage} ед. урона. (Талант воина)',
@@ -2718,8 +2717,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Приковывает ближайших врагов к земле, обездвиживая их на 2 сек. (Талант шамана)',
   'entities.abilities.evocation.name': 'Эфирный колодец',
-  'entities.abilities.evocation.description':
-    'Быстро восполняет ману. (Талант мага)',
+  'entities.abilities.evocation.description': 'Быстро восполняет ману. (Талант мага)',
   'entities.abilities.frenzied_regeneration.name': 'Дикое исцеление',
   'entities.abilities.frenzied_regeneration.description':
     'Восстанавливает здоровье в течение 10 сек. Только в облике бурого медведя. (Талант друида)',
@@ -2799,8 +2797,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Возводит нерушимую преграду, значительно повышая броню на 10 сек. (Талант воина)',
   'entities.abilities.silence.name': 'Безмолвие',
-  'entities.abilities.silence.description':
-    'Заставляет цель замолчать на 4 сек. (Талант жреца)',
+  'entities.abilities.silence.description': 'Заставляет цель замолчать на 4 сек. (Талант жреца)',
   'entities.abilities.skull_bash.name': 'Удар черепом',
   'entities.abilities.skull_bash.description':
     'Прерывает произнесение заклинания и запрещает заклинания этой школы на 4 сек. (Талант друида)',

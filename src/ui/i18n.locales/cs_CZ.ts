@@ -4501,8 +4501,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Invoca poder vengador y aumenta útočnou sílu y sílu kouzel durante 20 s. (paladinský talent)',
   'entities.abilities.berserk.name': 'Rudý opar',
-  'entities.abilities.berserk.description':
-    'Aumenta útočnou sílu durante 15 s. (druidský talent)',
+  'entities.abilities.berserk.description': 'Aumenta útočnou sílu durante 15 s. (druidský talent)',
   'entities.abilities.bladestorm.name': 'Ocelový cyklon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a blízké nepřátele cada segundo por {damage}. (válečnický talent)',
@@ -4552,8 +4551,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a blízké nepřátele y los inmoviliza durante 2 s. (šamanský talent)',
   'entities.abilities.evocation.name': 'Éterická studna',
-  'entities.abilities.evocation.description':
-    'Restaura manu rápidamente. (mágovský talent)',
+  'entities.abilities.evocation.description': 'Restaura manu rápidamente. (mágovský talent)',
   'entities.abilities.frenzied_regeneration.name': 'Divoké zacelení',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (druidský talent)',
@@ -4633,8 +4631,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la zbroj durante 10 s. (válečnický talent)',
   'entities.abilities.silence.name': 'Umlčení',
-  'entities.abilities.silence.description':
-    'Silencia a cíl durante 4 s. (kněžský talent)',
+  'entities.abilities.silence.description': 'Silencia a cíl durante 4 s. (kněžský talent)',
   'entities.abilities.skull_bash.name': 'Čelní úder',
   'entities.abilities.skull_bash.description':
     'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (druidský talent)',

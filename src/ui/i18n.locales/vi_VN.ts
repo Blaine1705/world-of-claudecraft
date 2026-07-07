@@ -2528,8 +2528,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a gần đó kẻ địch y los inmoviliza durante 2 giây. (thiên phú pháp sư tổ linh)',
   'entities.abilities.evocation.name': 'Giếng Ête',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (thiên phú pháp sư)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (thiên phú pháp sư)',
   'entities.abilities.frenzied_regeneration.name': 'Hồi Phục Hoang Dã',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 giây. Solo en Forma de oso. (thiên phú druid)',
@@ -2609,8 +2608,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la giáp durante 10 giây. (thiên phú chiến binh)',
   'entities.abilities.silence.name': 'Câm Lặng',
-  'entities.abilities.silence.description':
-    'Silencia a mục tiêu durante 4 giây. (thiên phú tu sĩ)',
+  'entities.abilities.silence.description': 'Silencia a mục tiêu durante 4 giây. (thiên phú tu sĩ)',
   'entities.abilities.skull_bash.name': 'Cú Húc Đầu',
   'entities.abilities.skull_bash.description':
     'Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú druid)',

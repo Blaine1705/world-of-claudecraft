@@ -3359,8 +3359,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a nahe Gegner y los inmoviliza durante 2 Sek.. (Schamanen-Talent)',
   'entities.abilities.evocation.name': 'Ätherbrunnen',
-  'entities.abilities.evocation.description':
-    'Restaura Mana rápidamente. (Magier-Talent)',
+  'entities.abilities.evocation.description': 'Restaura Mana rápidamente. (Magier-Talent)',
   'entities.abilities.frenzied_regeneration.name': 'Wilde Heilung',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 Sek.. Solo en Forma de oso. (Druiden-Talent)',
@@ -3440,8 +3439,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la Rüstung durante 10 Sek.. (Krieger-Talent)',
   'entities.abilities.silence.name': 'Stille',
-  'entities.abilities.silence.description':
-    'Silencia a Ziel durante 4 Sek.. (Priester-Talent)',
+  'entities.abilities.silence.description': 'Silencia a Ziel durante 4 Sek.. (Priester-Talent)',
   'entities.abilities.skull_bash.name': 'Schädelstoß',
   'entities.abilities.skull_bash.description':
     'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Druiden-Talent)',

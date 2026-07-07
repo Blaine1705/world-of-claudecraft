@@ -3736,8 +3736,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a proches ennemis y los inmoviliza durante 2 s. (talent de chaman)',
   'entities.abilities.evocation.name': 'Puits d’éther',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (talent de mage)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talent de mage)',
   'entities.abilities.frenzied_regeneration.name': 'Régénération sauvage',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (talent de druide)',
@@ -3817,8 +3816,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la armure durante 10 s. (talent de guerrier)',
   'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description':
-    'Silencia a cible durante 4 s. (talent de prêtre)',
+  'entities.abilities.silence.description': 'Silencia a cible durante 4 s. (talent de prêtre)',
   'entities.abilities.skull_bash.name': 'Coup de crâne',
   'entities.abilities.skull_bash.description':
     'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de druide)',

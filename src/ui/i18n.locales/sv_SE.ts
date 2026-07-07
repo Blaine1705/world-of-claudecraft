@@ -2397,8 +2397,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Invoca poder vengador y aumenta attackkraft y besvärjelsekraft durante 20 sek. (paladintalang)',
   'entities.abilities.berserk.name': 'Röd dimma',
-  'entities.abilities.berserk.description':
-    'Aumenta attackkraft durante 15 sek. (druidtalang)',
+  'entities.abilities.berserk.description': 'Aumenta attackkraft durante 15 sek. (druidtalang)',
   'entities.abilities.bladestorm.name': 'Stålcyklon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a närliggande fiender cada segundo por {damage}. (krigartalang)',
@@ -2448,8 +2447,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a närliggande fiender y los inmoviliza durante 2 sek. (shamantalang)',
   'entities.abilities.evocation.name': 'Eterbrunn',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (magikertalang)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalang)',
   'entities.abilities.frenzied_regeneration.name': 'Vild läkning',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 sek. Solo en Forma de oso. (druidtalang)',
@@ -2529,8 +2527,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigartalang)',
   'entities.abilities.silence.name': 'Tystnad',
-  'entities.abilities.silence.description':
-    'Silencia a målet durante 4 sek. (prästtalang)',
+  'entities.abilities.silence.description': 'Silencia a målet durante 4 sek. (prästtalang)',
   'entities.abilities.skull_bash.name': 'Skallskall',
   'entities.abilities.skull_bash.description':
     'Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (druidtalang)',

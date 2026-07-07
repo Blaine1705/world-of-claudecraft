@@ -3332,8 +3332,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a próximos inimigos y los inmoviliza durante 2 s. (talento de xamã)',
   'entities.abilities.evocation.name': 'Poço Etéreo',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (talento de mago)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento de mago)',
   'entities.abilities.frenzied_regeneration.name': 'Remendo Selvagem',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (talento de druida)',
@@ -3413,8 +3412,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la armadura durante 10 s. (talento de guerreiro)',
   'entities.abilities.silence.name': 'Silêncio',
-  'entities.abilities.silence.description':
-    'Silencia a alvo durante 4 s. (talento de sacerdote)',
+  'entities.abilities.silence.description': 'Silencia a alvo durante 4 s. (talento de sacerdote)',
   'entities.abilities.skull_bash.name': 'Cabeçada',
   'entities.abilities.skull_bash.description':
     'Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de druida)',

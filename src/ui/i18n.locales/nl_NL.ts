@@ -2441,8 +2441,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Invoca poder vengador y aumenta aanvalskracht y spreukkracht durante 20 sec. (paladijntalent)',
   'entities.abilities.berserk.name': 'Rode nevel',
-  'entities.abilities.berserk.description':
-    'Aumenta aanvalskracht durante 15 sec. (druïdetalent)',
+  'entities.abilities.berserk.description': 'Aumenta aanvalskracht durante 15 sec. (druïdetalent)',
   'entities.abilities.bladestorm.name': 'Stalen cycloon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a nabije vijanden cada segundo por {damage}. (krijgerstalent)',
@@ -2492,8 +2491,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a nabije vijanden y los inmoviliza durante 2 sec. (sjamaantalent)',
   'entities.abilities.evocation.name': 'Etherbron',
-  'entities.abilities.evocation.description':
-    'Restaura mana rápidamente. (magiertalent)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magiertalent)',
   'entities.abilities.frenzied_regeneration.name': 'Wilde genezing',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 sec. Solo en Forma de oso. (druïdetalent)',
@@ -2573,8 +2571,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la pantser durante 10 sec. (krijgerstalent)',
   'entities.abilities.silence.name': 'Stilte',
-  'entities.abilities.silence.description':
-    'Silencia a doelwit durante 4 sec. (priestertalent)',
+  'entities.abilities.silence.description': 'Silencia a doelwit durante 4 sec. (priestertalent)',
   'entities.abilities.skull_bash.name': 'Kopstoot',
   'entities.abilities.skull_bash.description':
     'Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (druïdetalent)',

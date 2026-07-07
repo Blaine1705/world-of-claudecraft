@@ -2672,8 +2672,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     '주위 적을 대지에 옭아매어 2초 동안 이동 불가로 만듭니다. (주술사 특성)',
   'entities.abilities.evocation.name': '에테르샘',
-  'entities.abilities.evocation.description':
-    '마나를 빠르게 회복합니다. (마법사 특성)',
+  'entities.abilities.evocation.description': '마나를 빠르게 회복합니다. (마법사 특성)',
   'entities.abilities.frenzied_regeneration.name': '야성 치유',
   'entities.abilities.frenzied_regeneration.description':
     '10초에 걸쳐 생명력을 회복합니다. 브루인 형상에서만 사용할 수 있습니다. (드루이드 특성)',
@@ -2705,8 +2704,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '다음 주문의 소모값을 없앱니다. 60초 동안 지속됩니다. (사제 특성)',
   'entities.abilities.innervate.name': '생명 수액',
-  'entities.abilities.innervate.description':
-    '현재 자원을 즉시 200 회복합니다. (드루이드 특성)',
+  'entities.abilities.innervate.description': '현재 자원을 즉시 200 회복합니다. (드루이드 특성)',
   'entities.abilities.kick.name': '발차기',
   'entities.abilities.kick.description':
     '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (도적 특성)',
@@ -2753,8 +2751,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     '무너지지 않는 방벽을 세워 방어도를 크게 높입니다. 10초 동안 지속됩니다. (전사 특성)',
   'entities.abilities.silence.name': '침묵',
-  'entities.abilities.silence.description':
-    '대상을 4초 동안 침묵시킵니다. (사제 특성)',
+  'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
   'entities.abilities.skull_bash.name': '박치기',
   'entities.abilities.skull_bash.description':
     '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (드루이드 특성)',

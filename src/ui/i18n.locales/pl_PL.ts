@@ -2411,8 +2411,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.description':
     'Invoca poder vengador y aumenta siłę ataku y moc zaklęć durante 20 s. (talent paladyna)',
   'entities.abilities.berserk.name': 'Czerwona Mgła',
-  'entities.abilities.berserk.description':
-    'Aumenta siłę ataku durante 15 s. (talent druida)',
+  'entities.abilities.berserk.description': 'Aumenta siłę ataku durante 15 s. (talent druida)',
   'entities.abilities.bladestorm.name': 'Stalowy Cyklon',
   'entities.abilities.bladestorm.description':
     'Te convierte en una tormenta de acero que golpea a pobliskich wrogów cada segundo por {damage}. (talent wojownika)',
@@ -2462,8 +2461,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a pobliskich wrogów y los inmoviliza durante 2 s. (talent szamana)',
   'entities.abilities.evocation.name': 'Studnia Eteru',
-  'entities.abilities.evocation.description':
-    'Restaura manę rápidamente. (talent maga)',
+  'entities.abilities.evocation.description': 'Restaura manę rápidamente. (talent maga)',
   'entities.abilities.frenzied_regeneration.name': 'Dzikie Gojenie',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (talent druida)',
@@ -2543,8 +2541,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la pancerz durante 10 s. (talent wojownika)',
   'entities.abilities.silence.name': 'Cisza',
-  'entities.abilities.silence.description':
-    'Silencia a cel durante 4 s. (talent kapłana)',
+  'entities.abilities.silence.description': 'Silencia a cel durante 4 s. (talent kapłana)',
   'entities.abilities.skull_bash.name': 'Uderzenie Głową',
   'entities.abilities.skull_bash.description':
     'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent druida)',

@@ -2517,20 +2517,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.description':
     '以野性之力激励附近的盟友，提高攻击强度，持续 5 分钟。（猎人天赋）',
   'entities.abilities.avatar.name': '巨像',
-  'entities.abilities.avatar.description':
-    '化身为巨像，提高攻击强度，持续 20 秒。（战士天赋）',
+  'entities.abilities.avatar.description': '化身为巨像，提高攻击强度，持续 20 秒。（战士天赋）',
   'entities.abilities.avenging_wrath.name': '复仇之翼',
   'entities.abilities.avenging_wrath.description':
     '唤降复仇之力，提高攻击强度和法术强度，持续 20 秒。（圣骑士天赋）',
   'entities.abilities.berserk.name': '赤红迷雾',
-  'entities.abilities.berserk.description':
-    '提高攻击强度，持续 15 秒。（德鲁伊天赋）',
+  'entities.abilities.berserk.description': '提高攻击强度，持续 15 秒。（德鲁伊天赋）',
   'entities.abilities.bladestorm.name': '钢铁旋风',
   'entities.abilities.bladestorm.description':
     '化作钢铁风暴，每秒对附近敌人造成 {damage} 点伤害。（战士天赋）',
   'entities.abilities.blink.name': '闪烁步',
-  'entities.abilities.blink.description':
-    '向前瞬移 15 码并解除定身效果。（法师天赋）',
+  'entities.abilities.blink.description': '向前瞬移 15 码并解除定身效果。（法师天赋）',
   'entities.abilities.bloodlust.name': '战鼓',
   'entities.abilities.bloodlust.description':
     '让附近的盟友陷入狂热，提高攻击速度，持续 15 秒。（萨满天赋）',
@@ -2562,20 +2559,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.description':
     '将目标深度冻结，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）',
   'entities.abilities.desperate_prayer.name': '最后祈祷',
-  'entities.abilities.desperate_prayer.description':
-    '立即为你治疗 {damage} 点生命值。（牧师天赋）',
+  'entities.abilities.desperate_prayer.description': '立即为你治疗 {damage} 点生命值。（牧师天赋）',
   'entities.abilities.deterrence.name': '鬃刺守卫',
-  'entities.abilities.deterrence.description':
-    '提高你的躲闪几率 50%，持续 10 秒。（猎人天赋）',
+  'entities.abilities.deterrence.description': '提高你的躲闪几率 50%，持续 10 秒。（猎人天赋）',
   'entities.abilities.divine_shield.name': '圣光守护',
   'entities.abilities.divine_shield.description':
     '以神圣之力护佑你，吸收大量伤害，持续 8 秒。（圣骑士天赋）',
   'entities.abilities.earthbind.name': '攫握大地',
-  'entities.abilities.earthbind.description':
-    '将附近的敌人束缚于大地，定身 2 秒。（萨满天赋）',
+  'entities.abilities.earthbind.description': '将附近的敌人束缚于大地，定身 2 秒。（萨满天赋）',
   'entities.abilities.evocation.name': '以太之井',
-  'entities.abilities.evocation.description':
-    '快速恢复法力。（法师天赋）',
+  'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
   'entities.abilities.frenzied_regeneration.name': '野性愈合',
   'entities.abilities.frenzied_regeneration.description':
     '在 10 秒内恢复生命值。仅限蛮熊形态。（德鲁伊天赋）',
@@ -2589,8 +2582,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     '向受创的敌人掷出神圣之锤，造成 {damage} 点神圣伤害。仅可对生命值低于 20% 的目标使用。（圣骑士天赋）',
   'entities.abilities.healing_stream.name': '泉涌',
-  'entities.abilities.healing_stream.description':
-    '在 12 秒内治疗一名友方目标。（萨满天赋）',
+  'entities.abilities.healing_stream.description': '在 12 秒内治疗一名友方目标。（萨满天赋）',
   'entities.abilities.heroic_leap.name': '战跃',
   'entities.abilities.heroic_leap.description':
     '跃向目标区域，对附近敌人造成 {damage} 点物理伤害。（战士天赋）',
@@ -2607,11 +2599,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '使你的下一个法术不消耗法力。持续 60 秒。（牧师天赋）',
   'entities.abilities.innervate.name': '生命树液',
-  'entities.abilities.innervate.description':
-    '立即恢复 200 点当前资源。（德鲁伊天赋）',
+  'entities.abilities.innervate.description': '立即恢复 200 点当前资源。（德鲁伊天赋）',
   'entities.abilities.kick.name': '踢击',
-  'entities.abilities.kick.description':
-    '打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）',
+  'entities.abilities.kick.description': '打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）',
   'entities.abilities.last_stand.name': '第十一刻',
   'entities.abilities.last_stand.description':
     '暂时提高耐力，持续 15 秒，提高最大生命值。（战士天赋）',
@@ -2631,8 +2621,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.description':
     '治疗附近的盟友 {damage} 点生命值。（牧师天赋）',
   'entities.abilities.preparation.name': '应变',
-  'entities.abilities.preparation.description':
-    '结束疾跑、闪避和消失的冷却时间。（潜行者天赋）',
+  'entities.abilities.preparation.description': '结束疾跑、闪避和消失的冷却时间。（潜行者天赋）',
   'entities.abilities.presence_of_mind.name': '疾思',
   'entities.abilities.presence_of_mind.description':
     '使你的下一个有施法时间的法术立即完成。持续 60 秒。（法师天赋）',
@@ -2640,8 +2629,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '恐吓附近的敌人，最多持续 4 秒。受到伤害可能打破该效果。（牧师天赋）',
   'entities.abilities.pummel.name': '裂颚击',
-  'entities.abilities.pummel.description':
-    '打断施法，并使该系法术在 4 秒内无法施放。（战士天赋）',
+  'entities.abilities.pummel.description': '打断施法，并使该系法术在 4 秒内无法施放。（战士天赋）',
   'entities.abilities.rallying_cry.name': '集结',
   'entities.abilities.rallying_cry.description':
     '发出激励的呐喊，提高附近盟友的攻击强度，持续 10 秒。（战士天赋）',
@@ -2649,14 +2637,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rebuke.description':
     '打断施法，并使该系法术在 4 秒内无法施放。（圣骑士天赋）',
   'entities.abilities.shadowstep.name': '影步',
-  'entities.abilities.shadowstep.description':
-    '穿过暗影，移动到目标身旁。（潜行者天赋）',
+  'entities.abilities.shadowstep.description': '穿过暗影，移动到目标身旁。（潜行者天赋）',
   'entities.abilities.shield_wall.name': '壁垒',
   'entities.abilities.shield_wall.description':
     '筑起坚不可摧的壁垒，大幅提高护甲，持续 10 秒。（战士天赋）',
   'entities.abilities.silence.name': '沉默',
-  'entities.abilities.silence.description':
-    '沉默目标，持续 4 秒。（牧师天赋）',
+  'entities.abilities.silence.description': '沉默目标，持续 4 秒。（牧师天赋）',
   'entities.abilities.skull_bash.name': '颅击',
   'entities.abilities.skull_bash.description':
     '打断施法，并使该系法术在 4 秒内无法施放。（德鲁伊天赋）',
@@ -2664,8 +2650,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.spell_lock.description':
     '打断施法，并使该系法术在 5 秒内无法施放。（术士天赋）',
   'entities.abilities.tranquility.name': '林地之歌',
-  'entities.abilities.tranquility.description':
-    '引导恢复之力，每秒治疗附近的盟友。（德鲁伊天赋）',
+  'entities.abilities.tranquility.description': '引导恢复之力，每秒治疗附近的盟友。（德鲁伊天赋）',
   'entities.items.worn_sword.name': '斑驳短剑',
   'entities.items.gnarled_staff.name': '沼橡法杖',
   'entities.items.rusty_dagger.name': '生锈匕首',

@@ -2520,8 +2520,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a yakındaki düşmanları y los inmoviliza durante 2 sn. (şaman yeteneği)',
   'entities.abilities.evocation.name': 'Eter Kuyusu',
-  'entities.abilities.evocation.description':
-    'Restaura manayı rápidamente. (büyücü yeteneği)',
+  'entities.abilities.evocation.description': 'Restaura manayı rápidamente. (büyücü yeteneği)',
   'entities.abilities.frenzied_regeneration.name': 'Yaban Onarımı',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 sn. Solo en Forma de oso. (druid yeteneği)',
@@ -2601,8 +2600,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_wall.description':
     'Alzas un muro de escudo y aumentas mucho la zırhı durante 10 sn. (savaşçı yeteneği)',
   'entities.abilities.silence.name': 'Sessizlik',
-  'entities.abilities.silence.description':
-    'Silencia a hedefi durante 4 sn. (rahip yeteneği)',
+  'entities.abilities.silence.description': 'Silencia a hedefi durante 4 sn. (rahip yeteneği)',
   'entities.abilities.skull_bash.name': 'Kafa Darbesi',
   'entities.abilities.skull_bash.description':
     'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (druid yeteneği)',
