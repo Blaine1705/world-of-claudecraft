@@ -77,7 +77,13 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
 - `sunder_armor` (Armor Shear) threat: the HIGH tank threat applies ONLY when the caster's committed
   spec is Protection. For Arms it is a plain armor-shred with normal threat (no tank threat bonus).
 - Choosing a spec must be a STAGED edit that requires an explicit Save, like talent points; it must
-  NOT apply the instant it is clicked.
+  NOT apply the instant it is clicked. STATUS: spec selection is ALREADY staged in our engine
+  (`talents_window.ts` `setSpec` mutates the staged allocation, committed only on loadout save).
+- Choice-row picks should ALSO require an explicit Save instead of applying instantly (they are
+  respec-free/instant today via `pickRow` -> `sim.pickRowTalent`). DEFERRED to the ryze #1614
+  consolidation on purpose: making row picks staged means folding them into the build/loadout system,
+  which ryze's engine will own, so it is built once there rather than twice. Raise it as a UX
+  preference for the consolidated engine.
 
 ## Naming (de-brand)
 New ability names must be original (not WoW). The locked rename table is `ip-refactor/NAME-MAP.md`.
