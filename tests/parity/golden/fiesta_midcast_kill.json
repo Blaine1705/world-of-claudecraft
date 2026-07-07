@@ -10,8 +10,8 @@
     "fiesta lifesteal augment arm (~5499)",
     "multi-player fiesta meta"
   ],
-  "draws": 869,
-  "drawDigest": "787a1f9b",
+  "draws": 863,
+  "drawDigest": "a43403ca",
   "frames": [
     {
       "tick": 0,
@@ -56,8 +56,8 @@
       "state": "e2c78901",
       "events": "d9de3d9e",
       "rng": {
-        "draws": 231,
-        "digest": "1ec2d30e"
+        "draws": 230,
+        "digest": "66fece7c"
       }
     },
     {
@@ -67,8 +67,8 @@
       "state": "ad2b8b23",
       "events": "45e68fb6",
       "rng": {
-        "draws": 476,
-        "digest": "44110d0e"
+        "draws": 474,
+        "digest": "9bea032a"
       }
     },
     {
@@ -78,8 +78,8 @@
       "state": "542a0d04",
       "events": "e6b32142",
       "rng": {
-        "draws": 487,
-        "digest": "8c68e48b"
+        "draws": 485,
+        "digest": "003e98e0"
       },
       "label": "midcast-pushback",
       "players": [
@@ -425,8 +425,8 @@
       "state": "a65d20a6",
       "events": "2eb555fd",
       "rng": {
-        "draws": 487,
-        "digest": "8c68e48b"
+        "draws": 485,
+        "digest": "003e98e0"
       },
       "label": "midcast-fishcancel",
       "players": [
@@ -770,8 +770,8 @@
       "state": "fe5619cc",
       "events": "fa912c7a",
       "rng": {
-        "draws": 487,
-        "digest": "8c68e48b"
+        "draws": 485,
+        "digest": "003e98e0"
       },
       "label": "takedown",
       "players": [
@@ -1117,8 +1117,8 @@
       "state": "f88b2cd2",
       "events": "741638a5",
       "rng": {
-        "draws": 708,
-        "digest": "aff2f908"
+        "draws": 703,
+        "digest": "7bbc925d"
       }
     },
     {
@@ -1128,8 +1128,8 @@
       "state": "727ef112",
       "events": "741638a5",
       "rng": {
-        "draws": 869,
-        "digest": "787a1f9b"
+        "draws": 863,
+        "digest": "a43403ca"
       },
       "label": "final",
       "players": [
