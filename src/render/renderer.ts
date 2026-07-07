@@ -4254,6 +4254,14 @@ export class Renderer {
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
+      // Shapeshift-form particle auras riding the tints above: metamorph fire,
+      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+      // (the auras themselves drop, but a corpse must not smolder for a frame).
+      if (!e.dead) {
+        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
+      }
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
       if (swimming) this.vfx.swimRipple(v.group.position, moving ? dt * 3 : dt);

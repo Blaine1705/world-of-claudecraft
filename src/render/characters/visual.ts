@@ -45,8 +45,10 @@ const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
 // purplish tint like ghost form but a bit brighter).
 const MOONKIN_OPACITY = 0.72;
 const MOONKIN_TINT = new THREE.Color(0x9d6bff);
-// Metamorphosis: a monstrous demon shell, near-black body with a hot fel-purple glow.
-const METAMORPH_TINT = new THREE.Color(0x140a24);
+// Metamorphosis: a monstrous demon shell, deep fel-purple body with a hot glow
+// (the fire aura around it comes from vfx.formAura, not the material). Kept
+// dark enough that the body still shades and the flames read against it.
+const METAMORPH_TINT = new THREE.Color(0x4f2170);
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -652,7 +654,10 @@ export class CharacterVisual {
     if (withColor.color) withColor.color.copy(METAMORPH_TINT);
     if (withColor.emissive) {
       withColor.emissive.setHex(0x7a1abf);
-      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.7);
+      // Set, don't floor: the source materials ship emissiveIntensity 1 (with a
+      // black emissive color), so a Math.max floor keeps full-strength glow and
+      // the body renders as flat neon, drowning the fire aura and all shading.
+      withColor.emissiveIntensity = 0.35;
     }
     this.metamorphMaterials.set(material, marked);
     return marked;
