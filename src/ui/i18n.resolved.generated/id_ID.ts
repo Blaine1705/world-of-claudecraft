@@ -5245,7 +5245,7 @@ export const id_ID: EnTranslations = {
       },
       "red_harvest": {
         "name": "Red Harvest",
-        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+        "description": "Spend everything: strike three times in a frenzy for weapon damage plus {damage} each. (Fury)"
       },
       "furious_mending": {
         "name": "Furious Mending",
