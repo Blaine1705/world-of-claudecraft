@@ -62,7 +62,12 @@ describe('spec masteries', () => {
       stats: { crit: 0.02 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
-      global: { critVsRooted: 0.1 },
+      // Frost-kit scoped so the mage's fire/arcane baseline spells stay untouched;
+      // this per-ability damage is the spec's future mastery-rating scaling axis.
+      ability: [
+        { ability: 'frostbolt', dmgPct: 0.25 },
+        { ability: 'frost_nova', dmgPct: 0.25 },
+      ],
       stats: { armorPct: 0.1 },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({
