@@ -52,6 +52,7 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
@@ -1616,7 +1617,7 @@ export class Sim {
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
-    meta.talentMods = computeTalentModifiers(cls, meta.talents);
+    meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
     if (savedState) {
@@ -3046,6 +3047,17 @@ export class Sim {
     return Math.max(0, attackPower);
   }
 
+  private petDamageMult(e: Entity): number {
+    if (e.ownerId === null) return 1;
+    let mult = 1;
+    for (const a of e.auras) {
+      if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+    }
+    const ownerMeta = this.players.get(e.ownerId);
+    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
+    return mult;
+  }
+
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
   // these thin delegates for the applyAura/aura-expiry callers (this.applyNonPlayerStatAura)
   // and respawnMob's ctx.clearNonPlayerStatAuras.
@@ -3479,7 +3491,9 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
+      const isSpell = effect.school !== 'physical';
+      const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
+      const dmg = Math.round(isSpell ? rawDmg * spellDamageMultFromAuras(source) : rawDmg);
       this.dealDamage(
         source,
         target,
@@ -3579,7 +3593,7 @@ export class Sim {
   }
 
   private spellCrit(p: Entity): number {
-    return 0.05 + p.stats.int * 0.0008;
+    return 0.05 + p.stats.int * 0.0008 + spellCritBonusFromAuras(p);
   }
 
   // Heal core, heal multipliers, heal-absorb soak, crit-vuln bonus, and the
@@ -4291,6 +4305,7 @@ export class Sim {
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
+    dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
     const dealt = Math.max(1, Math.round(dmg));
@@ -4353,7 +4368,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         const dmg = Math.round(
-          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1),
+          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
+            this.petDamageMult(pet),
         );
         this.dealDamage(pet, target, Math.max(1, dmg), false, spell.school, spell.name, 'hit');
       }

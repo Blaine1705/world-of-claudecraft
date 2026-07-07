@@ -262,7 +262,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_shock',
       'frostbrand_weapon',
       'ghost_wolf',
-      'stormstrike',
       'earthquake',
     ],
     color: 0x0070de,
@@ -2335,6 +2334,25 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Imbues your weapon with the fury of stone: each swing deals 5 additional damage for 5 min.',
   },
+  // Restoration shaman signature (granted only via the Restoration spec, not in the base
+  // kit). v1 is a strong single-target heal; the multi-target "chain" bounce is a
+  // follow-up once a bounce/jump primitive exists.
+  chain_heal: {
+    id: 'chain_heal',
+    name: 'Chain Heal',
+    class: 'shaman',
+    learnLevel: 10,
+    cost: 60,
+    castTime: 2.5,
+    cooldown: 0,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.6, radius: 12 }],
+    description:
+      'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)',
+  },
   healing_wave: {
     id: 'healing_wave',
     name: 'Mending Waters',
@@ -3603,6 +3621,369 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'gainResource', amount: 20 }],
     description: 'Enter a berserker rage, generating 20 rage. (Warrior talent)',
   },
+  crusader_strike: {
+    id: 'crusader_strike',
+    name: 'Crusader Strike',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 30,
+    castTime: 0,
+    cooldown: 4,
+    range: 0,
+    school: 'holy',
+    requiresTarget: true,
+    effects: [{ type: 'weaponStrike', bonus: 24 }],
+    description: 'Strikes the target for weapon damage plus $d Holy damage. (Paladin talent)',
+  },
+  metamorphosis: {
+    id: 'metamorphosis',
+    name: 'Dread Aspect',
+    class: 'warlock',
+    learnLevel: 10,
+    cost: 75,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'form_metamorph', value: 1, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_spelldmg', value: 0.2, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.2, duration: 20 },
+      { type: 'petBuff', kind: 'pet_damage_pct', value: 50, duration: 20 },
+      { type: 'petBuff', kind: 'pet_spellhaste', value: 0.2, duration: 20 },
+    ],
+    description:
+      'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
+  },
+  holy_shock: {
+    id: 'holy_shock',
+    name: 'Holy Shock',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    targetType: 'any',
+    effects: [
+      { type: 'heal', min: 40, max: 50 },
+      { type: 'directDamage', min: 40, max: 50 },
+    ],
+    description:
+      'Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)',
+  },
+  holy_shield: {
+    id: 'holy_shield',
+    name: 'Hallowed Wall',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 30,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 90, max: 110 },
+      { type: 'aoeDamage', min: 60, max: 75, radius: 10 },
+    ],
+    description:
+      'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+  },
+  bestial_wrath: {
+    id: 'bestial_wrath',
+    name: 'Howling Rage',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 40,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'buff_ap_pct', value: 20, duration: 15 },
+      { type: 'petBuff', kind: 'pet_damage_pct', value: 100, duration: 15 },
+    ],
+    description:
+      'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
+  },
+  trueshot_aura: {
+    id: 'trueshot_aura',
+    name: 'Sureflight Aura',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'aoeAllyAttackPower', apPct: 10, duration: 1800, radius: 30 }],
+    description:
+      'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
+  },
+  wyvern_sting: {
+    id: 'wyvern_sting',
+    name: 'Wyvern Sting',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 60,
+    range: 30,
+    minRange: 8,
+    school: 'nature',
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    effects: [{ type: 'incapacitate', duration: 4 }],
+    description:
+      'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+  },
+  arcane_power: {
+    id: 'arcane_power',
+    name: 'Aether Surge',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'buff_spelldmg', value: 0.2, duration: 10 },
+      { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.1, duration: 10 },
+    ],
+    description:
+      'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
+  },
+  combustion: {
+    id: 'combustion',
+    name: 'Flashfire',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_spellcrit', value: 0.5, duration: 15 }],
+    description: 'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+  },
+  icy_veins: {
+    id: 'icy_veins',
+    name: 'Icy Veins',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.3, duration: 10 },
+      { type: 'selfBuff', kind: 'cast_shield', value: 1, duration: 10 },
+    ],
+    description:
+      'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
+  },
+  cold_blood: {
+    id: 'cold_blood',
+    name: "Killer's Calm",
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
+    description:
+      'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
+  },
+  blade_flurry: {
+    id: 'blade_flurry',
+    name: 'Mirrored Blades',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 25,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 12 }],
+    description:
+      'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
+  },
+  hemorrhage: {
+    id: 'hemorrhage',
+    name: 'Red Ribbon',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    awardsCombo: 1,
+    effects: [
+      { type: 'weaponStrike', bonus: 16 },
+      { type: 'dot', total: 36, duration: 12, interval: 3 },
+      { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
+    ],
+    description:
+      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+  },
+  power_infusion: {
+    id: 'power_infusion',
+    name: 'Anointing',
+    class: 'priest',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 120,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'buffTarget', kind: 'buff_spellhaste', value: 0.2, duration: 15 }],
+    description:
+      'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
+  },
+  holy_nova: {
+    id: 'holy_nova',
+    name: 'Holy Nova',
+    class: 'priest',
+    learnLevel: 10,
+    cost: 70,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    effects: [
+      { type: 'aoeHeal', min: 34, max: 42, radius: 10 },
+      { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
+    ],
+    description:
+      'Causes an explosion of holy radiance, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
+  },
+  shadowform: {
+    id: 'shadowform',
+    name: 'Gloamveil Form',
+    class: 'priest',
+    learnLevel: 10,
+    cost: 60,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
+    description:
+      'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+  },
+  elemental_mastery: {
+    id: 'elemental_mastery',
+    name: 'Primal Mastery',
+    class: 'shaman',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
+    description: 'Calls on the storm, making your next spell instant. (Elemental signature)',
+  },
+  siphon_life: {
+    id: 'siphon_life',
+    name: 'Veinleech',
+    class: 'warlock',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    effects: [{ type: 'dot', total: 60, duration: 30, interval: 3, leechPct: 1 }],
+    description:
+      'Siphons life from the enemy, causing $d Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
+  },
+  conflagrate: {
+    id: 'conflagrate',
+    name: 'Conflagrate',
+    class: 'warlock',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 6,
+    range: 30,
+    school: 'fire',
+    requiresTarget: true,
+    effects: [{ type: 'consumeAura', auraIds: ['immolate'], deal: { min: 54, max: 64 } }],
+    description:
+      'Consumes your Immolate on the enemy to ignite them for $d Fire damage. (Destruction signature)',
+  },
+  moonkin_form: {
+    id: 'moonkin_form',
+    name: 'Moonwing Form',
+    class: 'druid',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_moonkin', value: 0, duration: 3600 }],
+    description:
+      'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
+  },
+  feral_charge: {
+    id: 'feral_charge',
+    name: 'Primal Surge',
+    class: 'druid',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    usableInForm: true,
+    effects: [{ type: 'feralCharge' }],
+    description:
+      'Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)',
+  },
+  swiftmend: {
+    id: 'swiftmend',
+    name: 'Swiftmend',
+    class: 'druid',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
+    description:
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. (Restoration signature)',
+  },
 };
 
 // A class ability resolved to a concrete rank, with talent modifiers already
@@ -3628,6 +4009,9 @@ function scaleEffect(
   eff: AbilityEffect,
   dmgMult: number,
   healMult: number,
+  dotMult: number,
+  hotMult: number,
+  absorbMult: number,
   flat: number,
 ): AbilityEffect {
   switch (eff.type) {
@@ -3642,7 +4026,7 @@ function scaleEffect(
         max: Math.round(eff.max * dmgMult + flat),
       };
     case 'dot':
-      return { ...eff, total: Math.round(eff.total * dmgMult + flat) };
+      return { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
     case 'aoeDamage':
       return {
         ...eff,
@@ -3675,13 +4059,22 @@ function scaleEffect(
         max: Math.round(eff.max * healMult + flat),
       };
     case 'hot':
-      return { ...eff, total: Math.round(eff.total * healMult + flat) };
+      return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
     case 'absorb':
-      return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
+      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
+    // A buff value below 1 is a RATE (haste/spell-damage/crit fraction, e.g. 0.2), not a
+    // magnitude: scaling it by a global damage mult and rounding would floor it to 0 (this
+    // silently zeroed Arcane Power's haste for an Arcane mage). Only integer magnitudes
+    // (armor, attack power, thorns damage) scale; rates pass through untouched. Intentional
+    // buff scaling still rides the per-ability buffPct in applyTalentMods.
     case 'buffTarget':
-      return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
+      return Math.abs(eff.value) < 1
+        ? eff
+        : { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'selfBuff':
-      return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
+      return Math.abs(eff.value) < 1
+        ? eff
+        : { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'lifeTap':
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
     case 'gainResource':
@@ -3700,14 +4093,26 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
+  const dotMult = 1 + mods.global.dotDmgPct;
+  const hotMult = 1 + mods.global.hotHealPct;
+  const absorbMult = 1 + mods.global.absorbPct;
   const flat = am?.flatDmg ?? 0;
   if (am?.addEffects.length) {
     // Append copies before the scaling pass so added effects inherit the same
     // global and per-ability damage/heal modifiers as native effects.
     entry.effects = [...entry.effects, ...am.addEffects.map((e) => ({ ...e }))];
   }
-  if (dmgMult !== 1 || healMult !== 1 || flat !== 0) {
-    entry.effects = entry.effects.map((e) => scaleEffect(e, dmgMult, healMult, flat));
+  if (
+    dmgMult !== 1 ||
+    healMult !== 1 ||
+    dotMult !== 1 ||
+    hotMult !== 1 ||
+    absorbMult !== 1 ||
+    flat !== 0
+  ) {
+    entry.effects = entry.effects.map((e) =>
+      scaleEffect(e, dmgMult, healMult, dotMult, hotMult, absorbMult, flat),
+    );
   }
   if (am) {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
@@ -3719,7 +4124,7 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        e.type === 'selfBuff' || e.type === 'buffTarget'
+        (e.type === 'selfBuff' || e.type === 'buffTarget') && Math.abs(e.value) >= 1
           ? { ...e, value: Math.round(e.value * mul) }
           : e,
       );

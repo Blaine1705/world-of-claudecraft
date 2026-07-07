@@ -54,6 +54,12 @@ import {
   consumeNextCastInstant,
   hasNextCastFree,
 } from './empower_next';
+import {
+  hasCastShield,
+  noteSpellHit,
+  spellDamageMultFromAuras,
+  spellHasteMult,
+} from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
@@ -64,7 +70,11 @@ function isFormToggle(ability: AbilityDef): boolean {
   return ability.effects.some(
     (e) =>
       e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' || e.kind === 'form_cat' || e.kind === 'form_travel'),
+      (e.kind === 'form_bear' ||
+        e.kind === 'form_cat' ||
+        e.kind === 'form_travel' ||
+        e.kind === 'form_moonkin' ||
+        e.kind === 'form_shadow'),
   );
 }
 
@@ -78,6 +88,8 @@ function isToggleBuff(ability: AbilityDef): boolean {
       (e.kind === 'form_bear' ||
         e.kind === 'form_cat' ||
         e.kind === 'form_travel' ||
+        e.kind === 'form_moonkin' ||
+        e.kind === 'form_shadow' ||
         e.kind === 'defensive_stance' ||
         e.kind === 'stealth'),
   );
@@ -166,6 +178,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 }
 
 export function pushbackCast(p: Entity): void {
+  if (hasCastShield(p)) return;
   // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
   const factor = 1 - p.castPushbackReduction;
   if (factor <= 0) return;
@@ -266,7 +279,7 @@ export function castAbility(
       ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Wolf'} Form.`);
       return;
     }
-  } else if (form && !isFormToggle(ability)) {
+  } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
     ctx.error(p.id, "You can't do that while shapeshifted.");
     return;
   }
@@ -286,6 +299,22 @@ export function castAbility(
     target = cur && !cur.dead && ctx.isFriendlyTo(p, cur) ? cur : p;
     const d = dist2d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5)) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetType === 'any') {
+    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+      ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
+      return;
+    }
+    const d = dist2d(p.pos, target.pos);
+    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
@@ -445,7 +474,7 @@ export function castAbility(
     spendResource(p, res.cost);
     armAbilityCooldown(p, ability.id, res.cooldown);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
-    const channelDuration = ability.channel.duration / (1 + p.spellHaste);
+    const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
     p.castTotal = channelDuration;
     p.castRemaining = channelDuration;
@@ -473,7 +502,7 @@ export function castAbility(
     // so meleeHaste always equals spellHaste and the classic melee-haste scaling
     // falls out identically. If the haste channels ever split, give physical casts
     // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
-    const stretchedCastTime = (castTime * tonguesMult(p)) / (1 + p.spellHaste);
+    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMult(p);
     p.castingAbility = ability.id;
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;
@@ -593,8 +622,10 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       if (eff.type === 'directDamage') {
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+        noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
@@ -681,6 +712,22 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       ctx.error(p.id, 'Line of sight.');
       return;
     }
+  } else if (ability.requiresTarget && ability.targetType === 'any') {
+    target = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
+    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+      ctx.error(p.id, 'You have no target.');
+      return;
+    }
+    const d = dist2d(p.pos, target.pos);
+    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    if (d > maxRange + 2) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
   } else if (ability.requiresTarget) {
     target = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
@@ -706,7 +753,10 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
 
   // helpful spells never miss
-  if (ability.targetType === 'friendly') {
+  if (
+    ability.targetType === 'friendly' ||
+    (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
+  ) {
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);

@@ -2009,6 +2009,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 5의 추가 피해를 입힙니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
+  'entities.abilities.chain_heal.name': '연쇄 치유',
+  'entities.abilities.chain_heal.description':
+    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 40% 감소합니다. (복원 전문화)',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
@@ -2188,6 +2191,72 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',
   'entities.abilities.revive_pet.name': '소환수 소생',
   'entities.abilities.revive_pet.description': '죽은 소환수를 되살려 당신의 곁으로 되돌립니다.',
+  'entities.abilities.holy_shock.name': '신성 충격',
+  'entities.abilities.holy_shock.description':
+    '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
+  'entities.abilities.holy_shield.name': '신성한 방패',
+  'entities.abilities.holy_shield.description':
+    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
+  'entities.abilities.bestial_wrath.name': '야수의 격노',
+  'entities.abilities.bestial_wrath.description':
+    '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
+  'entities.abilities.trueshot_aura.name': '정조준 오라',
+  'entities.abilities.trueshot_aura.description':
+    '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
+  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
+  'entities.abilities.wyvern_sting.description':
+    '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
+  'entities.abilities.arcane_power.name': '신비의 마법 강화',
+  'entities.abilities.arcane_power.description':
+    '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
+  'entities.abilities.combustion.name': '발화',
+  'entities.abilities.combustion.description':
+    '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)',
+  'entities.abilities.icy_veins.name': '얼음 핏줄',
+  'entities.abilities.icy_veins.description':
+    '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
+  'entities.abilities.cold_blood.name': '냉혈',
+  'entities.abilities.cold_blood.description':
+    '살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)',
+  'entities.abilities.blade_flurry.name': '폭풍의 칼날',
+  'entities.abilities.blade_flurry.description':
+    '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
+  'entities.abilities.hemorrhage.name': '과다출혈',
+  'entities.abilities.hemorrhage.description':
+    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+  'entities.abilities.power_infusion.name': '마력 주입',
+  'entities.abilities.power_infusion.description':
+    '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
+  'entities.abilities.holy_nova.name': '신성한 폭발',
+  'entities.abilities.holy_nova.description':
+    '신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)',
+  'entities.abilities.shadowform.name': '어둠의 형상',
+  'entities.abilities.shadowform.description':
+    '어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)',
+  'entities.abilities.elemental_mastery.name': '정기의 깨달음',
+  'entities.abilities.elemental_mastery.description':
+    '정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)',
+  'entities.abilities.siphon_life.name': '생명력 착취',
+  'entities.abilities.siphon_life.description':
+    '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
+  'entities.abilities.conflagrate.name': '점화',
+  'entities.abilities.conflagrate.description':
+    '적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)',
+  'entities.abilities.moonkin_form.name': '달빛야수 변신',
+  'entities.abilities.moonkin_form.description':
+    '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
+  'entities.abilities.feral_charge.name': '야성의 돌진',
+  'entities.abilities.feral_charge.description':
+    '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
+  'entities.abilities.swiftmend.name': '신속한 치유',
+  'entities.abilities.swiftmend.description':
+    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
+  'entities.abilities.crusader_strike.name': '성전사의 일격',
+  'entities.abilities.crusader_strike.description':
+    '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
+  'entities.abilities.metamorphosis.name': '악마 변신',
+  'entities.abilities.metamorphosis.description':
+    '악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)',
   'entities.items.worn_sword.name': '흠집 난 쇼트소드',
   'entities.items.gnarled_staff.name': '늪참나무 지팡이',
   'entities.items.rusty_dagger.name': '녹슨 단검',

@@ -22,6 +22,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { computeTalentModifiers } from '../content/talents';
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -163,7 +164,31 @@ export function dealDamage(
 
   const sourcePlayer = ctx.pvpController(source);
 
-  // duels end at 1 hp — nobody dies
+  if (target.kind === 'player' && amount > 0) {
+    const meta = ctx.players.get(target.id);
+    const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
+    const pet = share > 0 ? ctx.petOf(target.id) : null;
+    if (pet && !pet.dead) {
+      const redirected = Math.min(amount, Math.round(amount * share));
+      if (redirected > 0) {
+        amount -= redirected;
+        ctx.dealDamage(
+          source,
+          pet,
+          redirected,
+          crit,
+          school,
+          ability,
+          kind,
+          noRage,
+          threatOpts,
+          direct,
+        );
+      }
+    }
+  }
+
+  // duels end at 1 hp, nobody dies
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
   if (
     duel &&
@@ -680,6 +705,10 @@ export function grantXp(
     meta.xp -= xpForLevel(p.level);
     p.level++;
     meta.counters.levelUps++;
+    // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
+    // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
+    // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
+    meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;

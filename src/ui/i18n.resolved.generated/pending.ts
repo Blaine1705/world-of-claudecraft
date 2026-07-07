@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -26,6 +28,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "es_ES": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -42,6 +46,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "fr_FR": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -58,6 +64,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "fr_CA": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -75,6 +83,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -91,6 +101,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "de_DE": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -119,6 +131,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.coredevs"
   ],
   "pt_BR": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -138,6 +152,52 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.discord.roleTag.coredevs"
   ],
   "cs_CZ": [
+    "entities.abilities.arcane_power.description",
+    "entities.abilities.arcane_power.name",
+    "entities.abilities.bestial_wrath.description",
+    "entities.abilities.bestial_wrath.name",
+    "entities.abilities.blade_flurry.description",
+    "entities.abilities.blade_flurry.name",
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
+    "entities.abilities.cold_blood.description",
+    "entities.abilities.cold_blood.name",
+    "entities.abilities.combustion.description",
+    "entities.abilities.combustion.name",
+    "entities.abilities.conflagrate.description",
+    "entities.abilities.conflagrate.name",
+    "entities.abilities.crusader_strike.description",
+    "entities.abilities.crusader_strike.name",
+    "entities.abilities.elemental_mastery.description",
+    "entities.abilities.elemental_mastery.name",
+    "entities.abilities.feral_charge.description",
+    "entities.abilities.feral_charge.name",
+    "entities.abilities.hemorrhage.description",
+    "entities.abilities.hemorrhage.name",
+    "entities.abilities.holy_nova.description",
+    "entities.abilities.holy_nova.name",
+    "entities.abilities.holy_shield.description",
+    "entities.abilities.holy_shield.name",
+    "entities.abilities.holy_shock.description",
+    "entities.abilities.holy_shock.name",
+    "entities.abilities.icy_veins.description",
+    "entities.abilities.icy_veins.name",
+    "entities.abilities.metamorphosis.description",
+    "entities.abilities.metamorphosis.name",
+    "entities.abilities.moonkin_form.description",
+    "entities.abilities.moonkin_form.name",
+    "entities.abilities.power_infusion.description",
+    "entities.abilities.power_infusion.name",
+    "entities.abilities.shadowform.description",
+    "entities.abilities.shadowform.name",
+    "entities.abilities.siphon_life.description",
+    "entities.abilities.siphon_life.name",
+    "entities.abilities.swiftmend.description",
+    "entities.abilities.swiftmend.name",
+    "entities.abilities.trueshot_aura.description",
+    "entities.abilities.trueshot_aura.name",
+    "entities.abilities.wyvern_sting.description",
+    "entities.abilities.wyvern_sting.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -164,6 +224,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "nl_NL": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -180,6 +242,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "pl_PL": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -196,6 +260,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "id_ID": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -212,6 +278,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "tr_TR": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -228,6 +296,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "sv_SE": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -244,6 +314,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "vi_VN": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
@@ -260,6 +332,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "da_DK": [
+    "entities.abilities.chain_heal.description",
+    "entities.abilities.chain_heal.name",
     "entities.itemSets.necromancers.bonus4",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
