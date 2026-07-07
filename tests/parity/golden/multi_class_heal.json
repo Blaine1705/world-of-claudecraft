@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "a2230d7d",
+      "state": "4ba7acee",
       "events": "36482172",
       "rng": {
         "draws": 6,
@@ -79,7 +79,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -119,7 +120,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -159,7 +161,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -199,7 +202,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -235,7 +239,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -739,7 +744,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "92b3bd76",
+      "state": "65c42525",
       "events": "730d9ac4",
       "rng": {
         "draws": 6,
@@ -784,7 +789,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -824,7 +830,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -866,7 +873,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -906,7 +914,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -942,7 +951,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -1464,7 +1474,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "5e78a772",
+      "state": "f1b76631",
       "events": "fb83a59d",
       "rng": {
         "draws": 10,
@@ -1475,7 +1485,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "a0d2d7c8",
+      "state": "5add29d7",
       "events": "fb83a59d",
       "rng": {
         "draws": 10,
@@ -1520,7 +1530,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1560,7 +1571,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1602,7 +1614,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1642,7 +1655,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1678,7 +1692,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],

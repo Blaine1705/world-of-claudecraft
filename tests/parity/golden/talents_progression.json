@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7dfedf0b",
+      "state": "9ee20c78",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,7 +59,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -119,7 +120,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "ed964ce9",
+      "state": "0f75253e",
       "events": "d85bae6f",
       "rng": {
         "draws": 0,
@@ -166,6 +167,7 @@
               "arms_imp_overpower": 2,
               "war_cruelty": 2
             },
+            "rows": {},
             "spec": "arms"
           }
         }
@@ -332,7 +334,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "f879ec09",
+      "state": "d28fc985",
       "events": "a7d95be1",
       "rng": {
         "draws": 0,
@@ -377,6 +379,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -394,6 +397,7 @@
             "ranks": {
               "war_cruelty": 3
             },
+            "rows": {},
             "spec": "arms"
           }
         }
@@ -455,7 +459,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "52b07d54",
+      "state": "771ad182",
       "events": "980c682a",
       "rng": {
         "draws": 0,
@@ -500,6 +504,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -517,6 +522,7 @@
             "ranks": {
               "arms_imp_overpower": 2
             },
+            "rows": {},
             "spec": "arms"
           }
         }
@@ -578,7 +584,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "94783e24",
+      "state": "67598136",
       "events": "6e54fd06",
       "rng": {
         "draws": 0,
@@ -623,6 +629,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -638,6 +645,7 @@
           "talents": {
             "choices": {},
             "ranks": {},
+            "rows": {},
             "spec": "fury"
           }
         }
@@ -698,7 +706,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "94783e24",
+      "state": "67598136",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -743,6 +751,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -758,6 +767,7 @@
           "talents": {
             "choices": {},
             "ranks": {},
+            "rows": {},
             "spec": "fury"
           }
         }

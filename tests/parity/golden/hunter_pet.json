@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "523de5c3",
+      "state": "88688740",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -123,7 +124,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 404,
-      "state": "95025911",
+      "state": "bfce99ce",
       "events": "7004e6e9",
       "rng": {
         "draws": 9,
@@ -134,7 +135,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 404,
-      "state": "3c6d6b92",
+      "state": "9f57f985",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -145,7 +146,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 404,
-      "state": "76132701",
+      "state": "a46c81fe",
       "events": "a568ed21",
       "rng": {
         "draws": 100,
@@ -156,7 +157,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 404,
-      "state": "0a96c672",
+      "state": "07e9ece5",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -167,7 +168,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "30a99eac",
+      "state": "7fff752f",
       "events": "882dedb7",
       "rng": {
         "draws": 298,
@@ -178,7 +179,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 404,
-      "state": "3e22d8d7",
+      "state": "91d18004",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -189,7 +190,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 404,
-      "state": "3e22d8d7",
+      "state": "91d18004",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -238,7 +239,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],

@@ -13,6 +13,12 @@
 import type { AbilityEffect } from '../types';
 import { MAX_LEVEL, type PlayerClass } from '../types';
 import {
+  accumulateRowEffects,
+  type ChoiceRowAllocation,
+  repairRows,
+  validateRows,
+} from './choice_rows';
+import {
   DRUID_TALENTS,
   HUNTER_TALENTS,
   MAGE_TALENTS,
@@ -146,14 +152,22 @@ export interface TalentAllocation {
   spec: string | null;
   ranks: Record<string, number>; // nodeId -> ranks spent
   choices: Record<string, string>; // choice nodeId -> chosen option id
+  // Choice rows (level -> picked option id). Optional while the point trees
+  // coexist; the flip makes rows the only allocation. Absent = no picks.
+  rows?: ChoiceRowAllocation;
 }
 
 export function emptyAllocation(): TalentAllocation {
-  return { spec: null, ranks: {}, choices: {} };
+  return { spec: null, ranks: {}, choices: {}, rows: {} };
 }
 
 export function cloneAllocation(a: TalentAllocation): TalentAllocation {
-  return { spec: a.spec, ranks: { ...a.ranks }, choices: { ...a.choices } };
+  return {
+    spec: a.spec,
+    ranks: { ...a.ranks },
+    choices: { ...a.choices },
+    rows: { ...(a.rows ?? {}) },
+  };
 }
 
 export interface SavedLoadout {
@@ -387,6 +401,7 @@ export function validateAllocation(
   cls: PlayerClass,
   alloc: TalentAllocation,
   availablePoints: number,
+  playerLevel = MAX_LEVEL,
 ): AllocCheck {
   const ct = talentsFor(cls);
   if (!ct) return { ok: false, reason: 'no talent tree for class' };
@@ -395,6 +410,9 @@ export function validateAllocation(
   if (alloc.spec !== null && !ct.specs.some((s) => s.id === alloc.spec)) {
     return { ok: false, reason: 'unknown specialization' };
   }
+
+  const rowCheck = validateRows(cls, playerLevel, alloc.rows ?? {});
+  if (!rowCheck.ok) return rowCheck;
 
   let total = 0;
   for (const id in alloc.ranks) {
@@ -467,6 +485,7 @@ export function repairAllocation(
   cls: PlayerClass,
   alloc: TalentAllocation,
   availablePoints: number,
+  playerLevel = MAX_LEVEL,
 ): TalentAllocation {
   const ct = talentsFor(cls);
   if (!ct) return emptyAllocation();
@@ -477,7 +496,12 @@ export function repairAllocation(
     alloc.spec !== null && availablePoints > 0 && ct.specs.some((s) => s.id === alloc.spec)
       ? alloc.spec
       : null;
-  const out: TalentAllocation = { spec, ranks: {}, choices: {} };
+  const out: TalentAllocation = {
+    spec,
+    ranks: {},
+    choices: {},
+    rows: repairRows(cls, playerLevel, alloc.rows),
+  };
   const order = [...ct.nodes].sort((a, b) => {
     if (a.tree !== b.tree) return a.tree === 'class' ? -1 : 1;
     return a.row - b.row || a.col - b.col;
@@ -725,6 +749,9 @@ export function computeTalentModifiers(
       accumulate(mods, node.effect, rank);
     }
   }
+  // Choice-row picks fold into the same flat modifiers (grants included), so the
+  // combat hot path never learns rows exist.
+  accumulateRowEffects(mods, cls, alloc.rows ?? {});
   return mods;
 }
 
@@ -752,6 +779,7 @@ export function exportBuild(cls: PlayerClass, alloc: TalentAllocation): string {
     s: alloc.spec,
     r: alloc.ranks,
     h: alloc.choices,
+    w: alloc.rows ?? {},
   };
   return b64encode(JSON.stringify(payload));
 }
@@ -787,6 +815,16 @@ export function importBuild(str: string): BuildImport {
       if (typeof v === 'string') choices[k] = v;
     }
   }
+  const rows: ChoiceRowAllocation = {};
+  if (payload.w && typeof payload.w === 'object') {
+    for (const k in payload.w) {
+      const level = Number(k);
+      const v = payload.w[k];
+      if (Number.isInteger(level) && typeof v === 'string') {
+        (rows as Record<number, string>)[level] = v;
+      }
+    }
+  }
   const spec = typeof payload.s === 'string' ? payload.s : null;
-  return { ok: true, cls: payload.c, alloc: { spec, ranks, choices } };
+  return { ok: true, cls: payload.c, alloc: { spec, ranks, choices, rows } };
 }

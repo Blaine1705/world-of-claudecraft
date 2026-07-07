@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "aaa5d0cb",
+      "state": "33c78e16",
       "events": "ca1afc51",
       "rng": {
         "draws": 3,
@@ -73,7 +73,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -115,7 +116,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -153,7 +155,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -388,7 +391,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "c28c04b8",
+      "state": "f846c09d",
       "events": "00031d53",
       "rng": {
         "draws": 6,
@@ -431,7 +434,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -473,7 +477,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -511,7 +516,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -746,7 +752,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "80188ba4",
+      "state": "1b3f9c01",
       "events": "00031d53",
       "rng": {
         "draws": 9,
@@ -789,7 +795,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -831,7 +838,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -869,7 +877,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -1104,7 +1113,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "3f1ee075",
+      "state": "da4034ee",
       "events": "00031d53",
       "rng": {
         "draws": 12,
@@ -1147,7 +1156,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1189,7 +1199,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1227,7 +1238,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -1462,7 +1474,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 404,
-      "state": "8a2c64f9",
+      "state": "ef3a8372",
       "events": "6c23c6b5",
       "rng": {
         "draws": 15,
@@ -1473,7 +1485,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 404,
-      "state": "7917d010",
+      "state": "6238d3a7",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1484,7 +1496,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 404,
-      "state": "7917d010",
+      "state": "6238d3a7",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1528,7 +1540,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1570,7 +1583,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         },
         {
@@ -1608,7 +1622,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],

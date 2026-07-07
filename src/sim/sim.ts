@@ -1583,8 +1583,10 @@ export class Sim {
             spec: s.talents.spec ?? null,
             ranks: { ...s.talents.ranks },
             choices: { ...s.talents.choices },
+            rows: { ...(s.talents.rows ?? {}) },
           },
           talentPointsAtLevel(player.level),
+          player.level,
         );
       if (s.loadouts)
         meta.loadouts = s.loadouts.map((l) => ({

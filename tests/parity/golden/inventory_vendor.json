@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7a61430c",
+      "state": "c23a6a0f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -77,7 +77,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -137,7 +138,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "1a684162",
+      "state": "58e8fc15",
       "events": "531aebc5",
       "rng": {
         "draws": 0,
@@ -187,7 +188,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -247,7 +249,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "652e46c6",
+      "state": "c5ff2f39",
       "events": "a6017c57",
       "rng": {
         "draws": 0,
@@ -302,7 +304,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -362,7 +365,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "2cfbbb1e",
+      "state": "d7141241",
       "events": "6eca1d53",
       "rng": {
         "draws": 0,
@@ -417,7 +420,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -477,7 +481,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "4ffc71a0",
+      "state": "a1266d63",
       "events": "695c81aa",
       "rng": {
         "draws": 0,
@@ -535,7 +539,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -595,7 +600,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "17c6851e",
+      "state": "85862c41",
       "events": "1df0a44d",
       "rng": {
         "draws": 0,
@@ -653,7 +658,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -726,7 +732,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "1ba40f09",
+      "state": "2ca649d6",
       "events": "fdae55a8",
       "rng": {
         "draws": 0,
@@ -780,7 +786,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -853,7 +860,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "894e1b00",
+      "state": "01b004c3",
       "events": "4b948de8",
       "rng": {
         "draws": 0,
@@ -907,7 +914,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -992,7 +1000,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "09e2b45e",
+      "state": "aa6a3f81",
       "events": "3efe81a4",
       "rng": {
         "draws": 0,
@@ -1050,7 +1058,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           }
         }
       ],
@@ -1135,7 +1144,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "72facea9",
+      "state": "288e3468",
       "events": "fc57ebc8",
       "rng": {
         "draws": 0,
@@ -1193,7 +1202,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           },
           "vendorBuyback": [
             {
@@ -1284,7 +1294,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "8a59b5c2",
+      "state": "79b78417",
       "events": "7c2d5847",
       "rng": {
         "draws": 0,
@@ -1338,7 +1348,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           },
           "vendorBuyback": [
             {
@@ -1433,7 +1444,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "156b4720",
+      "state": "ec9a96ed",
       "events": "daa824d5",
       "rng": {
         "draws": 0,
@@ -1491,7 +1502,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           },
           "vendorBuyback": [
             {
@@ -1586,7 +1598,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "156b4720",
+      "state": "ec9a96ed",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1644,7 +1656,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "rows": {}
           },
           "vendorBuyback": [
             {

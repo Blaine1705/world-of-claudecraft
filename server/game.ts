@@ -250,10 +250,22 @@ function stringRecord(value: unknown): Record<string, string> {
 function talentAllocationFromWire(value: unknown): TalentAllocation | null {
   const source = recordValue(value);
   if (!source) return null;
+  const rows: Record<number, string> = {};
+  const rawRows = recordValue(source.rows);
+  if (rawRows) {
+    for (const k in rawRows) {
+      const level = Number(k);
+      const v = rawRows[k];
+      // Shape-only normalization; validateRows re-checks level gates and option
+      // ids authoritatively inside the shared sim module on apply.
+      if (Number.isInteger(level) && typeof v === 'string') rows[level] = v;
+    }
+  }
   return {
     spec: typeof source.spec === 'string' ? source.spec : null,
     ranks: numberRecord(source.ranks),
     choices: stringRecord(source.choices),
+    rows,
   };
 }
 
