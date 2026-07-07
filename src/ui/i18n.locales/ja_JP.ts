@@ -2140,7 +2140,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
   'entities.abilities.bloodthirst.name': '瀉血',
   'entities.abilities.bloodthirst.description':
-    '血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与えます。（狂怒シグネチャー）',
+    '血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与え、最大体力の3%を回復し、怒りを10得ます。（狂怒シグネチャー）',
   'entities.abilities.raging_gale.name': '双撃',
   'entities.abilities.raging_gale.description':
     '武器で即座に2回攻撃し、それぞれ武器ダメージの60%に加えて {damage} のダメージを与え、{rage} の怒りを生成します。最大2チャージまで蓄積します。（狂怒）',
@@ -2149,7 +2149,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '全てを注ぎ込む：3回の猛烈な打撃を放ち、それぞれ武器ダメージに加えて {damage} のダメージを与えます。（狂怒）',
   'entities.abilities.furious_mending.name': '憤怒の治癒',
   'entities.abilities.furious_mending.description':
-    '怒りが傷を癒やします：10秒かけて最大体力の20%を回復し、その間に受けるダメージが20%減少します。（狂怒）',
+    '10秒間、受けるダメージが20%減少し、その間はあなたの瀉血が最大体力の20%を回復します。（狂怒）',
   'entities.abilities.emboldening_roar.name': '鼓舞の咆哮',
   'entities.abilities.emboldening_roar.description':
     '鼓舞の咆哮を上げ、自身と40ヤード以内の味方プレイヤーが鼓舞状態になります。次の3回のアビリティが必ずクリティカルヒットになります。（狂怒）',

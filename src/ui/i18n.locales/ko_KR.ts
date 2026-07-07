@@ -2132,7 +2132,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
   'entities.abilities.bloodthirst.name': '사혈',
   'entities.abilities.bloodthirst.description':
-    '피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)',
+    '피의 광란으로 즉시 공격하여 {damage}의 피해를 주고, 최대 생명력의 3%를 회복하며, 분노를 10 생성합니다. (분노 특화 대표 기술)',
   'entities.abilities.raging_gale.name': '쌍격',
   'entities.abilities.raging_gale.description':
     '무기로 즉시 두 번 공격하여 각각 무기 공격력의 60%에 {damage}의 피해를 추가로 입히고 분노를 {rage} 생성합니다. 최대 2회 충전됩니다. (분노)',
@@ -2141,7 +2141,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 것을 쏟아붓습니다: 세 번의 흉포한 일격으로 각각 무기 공격력에 {damage}의 피해를 추가로 입힙니다. (분노)',
   'entities.abilities.furious_mending.name': '성난 치유',
   'entities.abilities.furious_mending.description':
-    '분노가 상처를 아물게 합니다: 10초에 걸쳐 최대 생명력의 20%를 회복하고, 그동안 받는 피해가 20% 감소합니다. (분노)',
+    '10초 동안 받는 피해가 20% 감소하며, 지속되는 동안 사혈이 최대 생명력의 20%를 회복시킵니다. (분노)',
   'entities.abilities.emboldening_roar.name': '고무의 포효',
   'entities.abilities.emboldening_roar.description':
     '고무의 포효를 질러 자신과 40미터 내 아군 플레이어를 고무시킵니다. 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노)',

@@ -419,8 +419,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'battle_shout',
     name: 'Iron Bellow',
     class: 'warrior',
-    learnLevel: 1,
-    cost: 10,
+    learnLevel: 7,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -432,13 +432,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 2,
         level: 12,
-        cost: 10,
+        cost: 0,
         effects: [{ type: 'aoeAllyAttackPower', amount: 35, duration: 3600, radius: 40 }],
       },
       {
         rank: 3,
         level: 20,
-        cost: 10,
+        cost: 0,
         effects: [{ type: 'aoeAllyAttackPower', amount: 50, duration: 3600, radius: 40 }],
       },
     ],
@@ -473,6 +473,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Direhowl',
     class: 'warrior',
     learnLevel: 14,
+    specs: ['prot'],
     cost: 10,
     castTime: 0,
     // Owner rework: a real defensive cooldown instead of a spammable flat AP
@@ -506,7 +507,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rend',
     name: 'Deep Gash',
     class: 'warrior',
-    learnLevel: 4,
+    learnLevel: 5,
     specs: ['arms'],
     cost: 10,
     castTime: 0,
@@ -698,7 +699,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Brute Swing',
     class: 'warrior',
     learnLevel: 16,
-    specs: ['arms'],
+    specs: ['arms', 'prot'],
     cost: 15,
     // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
     // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
@@ -733,10 +734,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)',
   },
-  // Fury's defensive cooldown (operator design, Regeneracion Enfurecida): a
-  // standalone self-mend, both halves on one cast: a pct-of-max heal-over-time
-  // (the 'hot' aura kind Renew uses, via selfHotPctMax) plus a parameterized
-  // 20% damage-taken cut (the buff_dr aura read by combat/damage.ts).
+  // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
+  // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
+  // combat/damage.ts), NOT a flat heal-over-time. The healing is delivered
+  // through Bloodletting: while this aura (detectable id 'furious_mending') is
+  // up, bloodthirst's selfHealPctMax jumps from 3% to 20% of max health
+  // (combat/effect_dispatch.ts).
   furious_mending: {
     id: 'furious_mending',
     name: 'Furious Mending',
@@ -750,18 +753,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     effects: [
-      { type: 'selfHotPctMax', pct: 0.2, duration: 10, interval: 2 },
       {
         type: 'selfBuff',
         kind: 'buff_dr',
         value: 0.2,
         duration: 10,
-        auraId: 'furious_mending_dr',
+        auraId: 'furious_mending',
         auraName: 'Furious Mending',
       },
     ],
     description:
-      'Your fury knits your wounds: heal 20% of your maximum health over 10 sec and take 20% reduced damage while it mends. (Fury)',
+      'For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)',
   },
   // Fury's support offensive cooldown (operator design, Grito Alentador): the
   // caster and friendly players within 40 yd are Emboldened, their next 3
@@ -772,7 +774,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Emboldening Roar',
     class: 'warrior',
     learnLevel: 18,
-    specs: ['fury'],
+    specs: ['prot'],
     cost: 0,
     castTime: 0,
     cooldown: 180,
@@ -781,7 +783,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
     description:
-      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Protection)',
   },
   // Protection's active shield block (operator design, Bloquear con Escudo):
   // an off-GCD 6 sec self buff cutting PHYSICAL damage taken in half (the
@@ -930,6 +932,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Reaping Arc',
     class: 'warrior',
     learnLevel: 18,
+    specs: ['arms', 'prot'],
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -3848,9 +3851,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
       { type: 'selfHealPctMax', pct: 0.03 },
+      { type: 'gainResource', amount: 10 },
     ],
     description:
-      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health. (Fury signature)',
+      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 10 rage. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',

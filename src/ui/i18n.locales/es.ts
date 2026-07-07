@@ -2794,7 +2794,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
-    'Atacas al instante en un frenesí sangriento por {damage}. (habilidad distintiva de Furia)',
+    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 10 de furia. (habilidad distintiva de Furia)',
   'entities.abilities.raging_gale.name': 'Arremetida Enfurecida',
   'entities.abilities.raging_gale.description':
     'Golpeas al instante dos veces con tu arma; cada golpe inflige un 60% del daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)',
@@ -2803,10 +2803,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)',
   'entities.abilities.furious_mending.name': 'Regeneración Enfurecida',
   'entities.abilities.furious_mending.description':
-    'Tu furia cierra tus heridas: recuperas un 20% de tu salud máxima durante 10 s y recibes un 20% menos de daño mientras dura el efecto. (Furia)',
+    'Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te cura un 20% de tu salud máxima. (Furia)',
   'entities.abilities.emboldening_roar.name': 'Grito Alentador',
   'entities.abilities.emboldening_roar.description':
-    'Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)',
+    'Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Protección)',
   'entities.abilities.raised_guard.name': 'Bloquear con Escudo',
   'entities.abilities.raised_guard.description':
     'Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. (Protección)',

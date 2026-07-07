@@ -233,7 +233,8 @@ describe('Colossal Might', () => {
     p.resource = 60;
     sim.castAbility('recklessness');
     expect(p.cooldowns.get('recklessness')).toBe(180);
-    sim.castAbility('battle_shout'); // 10 rage -> 1s shaved
+    // Iron Bellow is free now, so spend a 10-rage shout instead (Direhowl).
+    sim.castAbility('demoralizing_shout'); // 10 rage -> 1s shaved
     expect(p.cooldowns.get('recklessness')).toBeCloseTo(179);
   });
 });

@@ -30,9 +30,11 @@ const GATED: Record<string, string[]> = {
   defensive_stance: ['arms', 'prot'],
   sunder_armor: ['arms', 'prot'],
   commanding_shout: ['prot'],
+  demoralizing_shout: ['prot'],
   rend: ['arms'],
   overpower: ['arms'],
-  slam: ['arms'],
+  slam: ['arms', 'prot'],
+  cleave: ['arms', 'prot'],
   bloodrage: ['arms', 'prot'], // Fury replaces it with its signature (Bloodletting)
 };
 
@@ -63,21 +65,31 @@ describe('abilitiesKnownAt spec filter', () => {
     expect(ids.has('bloodthirst')).toBe(true); // the signature grant is untouched
   });
 
-  it('arms keeps its exclusives but not the prot-only shout', () => {
+  it('arms keeps its exclusives (incl. the shared strikes) but not the prot-only shouts', () => {
     const ids = knownIds('arms');
-    for (const id of ['defensive_stance', 'sunder_armor', 'rend', 'overpower', 'slam']) {
+    for (const id of ['defensive_stance', 'sunder_armor', 'rend', 'overpower', 'slam', 'cleave']) {
       expect(ids.has(id), id).toBe(true);
     }
-    expect(ids.has('commanding_shout')).toBe(false);
+    for (const id of ['commanding_shout', 'demoralizing_shout']) {
+      expect(ids.has(id), id).toBe(false);
+    }
     expect(ids.has('bloodrage')).toBe(true);
   });
 
-  it('prot keeps tank staples but no arms-only strikes', () => {
+  it('prot keeps tank staples and the shared strikes but no arms-only strikes', () => {
     const ids = knownIds('prot');
-    for (const id of ['defensive_stance', 'sunder_armor', 'commanding_shout', 'bloodrage']) {
+    for (const id of [
+      'defensive_stance',
+      'sunder_armor',
+      'commanding_shout',
+      'demoralizing_shout',
+      'slam',
+      'cleave',
+      'bloodrage',
+    ]) {
       expect(ids.has(id), id).toBe(true);
     }
-    for (const id of ['rend', 'overpower', 'slam']) expect(ids.has(id), id).toBe(false);
+    for (const id of ['rend', 'overpower']) expect(ids.has(id), id).toBe(false);
   });
 
   it('a talent grant bypasses the spec filter (grants are already spec-scoped)', () => {

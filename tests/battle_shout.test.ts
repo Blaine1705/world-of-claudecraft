@@ -10,6 +10,7 @@ import type { Entity } from '../src/sim/types';
 
 const makeWarrior = (seed = 42) => {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  sim.setPlayerLevel(7); // Iron Bellow (battle_shout) rank 1 is learned at level 7
   sim.player.resource = 100;
   return sim;
 };
@@ -24,6 +25,9 @@ describe('Iron Bellow (battle_shout) group buff', () => {
   it('is a 1-hour, 40-yd group attack-power buff with era rank values 20/35/50', () => {
     const def = ABILITIES.battle_shout;
     expect(def.exclusiveGroup).toBe('warrior_shout');
+    expect(def.learnLevel).toBe(7); // learned at level 7
+    expect(def.cost).toBe(0); // free
+    for (const r of def.ranks ?? []) expect(r.cost).toBe(0);
     expect(def.effects).toEqual([
       { type: 'aoeAllyAttackPower', amount: 20, duration: 3600, radius: 40 },
     ]);
@@ -32,7 +36,8 @@ describe('Iron Bellow (battle_shout) group buff', () => {
       const eff = known?.effects[0];
       return eff && eff.type === 'aoeAllyAttackPower' ? eff.amount : 0;
     };
-    expect(amountAt(1)).toBe(20);
+    expect(amountAt(6)).toBe(0); // not learned until level 7
+    expect(amountAt(7)).toBe(20);
     expect(amountAt(12)).toBe(35);
     expect(amountAt(20)).toBe(50);
   });

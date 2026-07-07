@@ -406,9 +406,12 @@ describe('taunt and growl', () => {
 });
 
 describe('sunder armor', () => {
-  it('stacks an armor debuff and generates stance-scaled flat threat', () => {
+  // Sink two sunders onto a beefed wolf and report [armor stacks, caster threat].
+  // spec is the committed warrior spec ('prot', 'arms', or null for no spec).
+  function sunderTwice(spec: 'prot' | 'arms' | null): { applications: number; threat: number } {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    if (spec) expect(sim.setSpec(spec)).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
@@ -425,10 +428,22 @@ describe('sunder armor', () => {
       applications = aura?.stacks ?? 0;
     }
     expect(applications).toBeGreaterThanOrEqual(2);
+    // The armor shred lands for every spec (auto-attack never started).
     expect((sim as any).effectiveArmor(wolf)).toBe(armorBefore - 25 * applications);
-    // 100 flat threat per landed sunder (no stance up) + auto-attack noise is
-    // excluded because auto-attack never started
-    expect(wolf.threat.get(sim.playerId)).toBeGreaterThanOrEqual(100 * applications);
+    return { applications, threat: wolf.threat.get(sim.playerId) ?? 0 };
+  }
+
+  it('for Protection the high flat threat lands (>= 100 per application, x1.3 mastery)', () => {
+    const { applications, threat } = sunderTwice('prot');
+    // rank-1 flat 100 per sunder, scaled by the +30% Recompense threat mastery.
+    expect(threat).toBeGreaterThanOrEqual(100 * applications);
+  });
+
+  it('for Arms (and no spec) the flat tank threat is dropped (armor shred only)', () => {
+    // Arms keeps sunder as a plain armor-shred with NO tank-threat spike, so the
+    // only threat is the tiny combat-entry seed, well under one 100-flat sunder.
+    expect(sunderTwice('arms').threat).toBeLessThan(100);
+    expect(sunderTwice(null).threat).toBeLessThan(100);
   });
 });
 

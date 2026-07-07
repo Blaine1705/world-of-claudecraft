@@ -5237,7 +5237,7 @@ export const ko_KR: EnTranslations = {
       },
       "bloodthirst": {
         "name": "사혈",
-        "description": "피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)"
+        "description": "피의 광란으로 즉시 공격하여 {damage}의 피해를 주고, 최대 생명력의 3%를 회복하며, 분노를 10 생성합니다. (분노 특화 대표 기술)"
       },
       "raging_gale": {
         "name": "쌍격",
@@ -5249,7 +5249,7 @@ export const ko_KR: EnTranslations = {
       },
       "furious_mending": {
         "name": "성난 치유",
-        "description": "분노가 상처를 아물게 합니다: 10초에 걸쳐 최대 생명력의 20%를 회복하고, 그동안 받는 피해가 20% 감소합니다. (분노)"
+        "description": "10초 동안 받는 피해가 20% 감소하며, 지속되는 동안 사혈이 최대 생명력의 20%를 회복시킵니다. (분노)"
       },
       "emboldening_roar": {
         "name": "고무의 포효",

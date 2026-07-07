@@ -5237,7 +5237,7 @@ export const es: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Sangría",
-        "description": "Atacas al instante en un frenesí sangriento por {damage}. (habilidad distintiva de Furia)"
+        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 10 de furia. (habilidad distintiva de Furia)"
       },
       "raging_gale": {
         "name": "Arremetida Enfurecida",
@@ -5249,11 +5249,11 @@ export const es: EnTranslations = {
       },
       "furious_mending": {
         "name": "Regeneración Enfurecida",
-        "description": "Tu furia cierra tus heridas: recuperas un 20% de tu salud máxima durante 10 s y recibes un 20% menos de daño mientras dura el efecto. (Furia)"
+        "description": "Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te cura un 20% de tu salud máxima. (Furia)"
       },
       "emboldening_roar": {
         "name": "Grito Alentador",
-        "description": "Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)"
+        "description": "Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Protección)"
       },
       "raised_guard": {
         "name": "Bloquear con Escudo",

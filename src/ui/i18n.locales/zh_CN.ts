@@ -2033,7 +2033,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
   'entities.abilities.bloodthirst.name': '放血',
   'entities.abilities.bloodthirst.description':
-    '在鲜血狂怒中立即攻击，造成 {damage} 点伤害。（狂怒专精标志技能）',
+    '在鲜血狂怒中立即攻击，造成 {damage} 点伤害，恢复你最大生命值的 3%，并产生 10 点怒气。（狂怒专精标志技能）',
   'entities.abilities.raging_gale.name': '双斩',
   'entities.abilities.raging_gale.description':
     '立即用武器连续攻击两次，每次造成 60% 武器伤害外加 {damage} 点伤害，并产生 {rage} 点怒气。最多储存 2 次使用次数。（狂怒）',
@@ -2042,7 +2042,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '孤注一掷：三次凶猛的打击，每次造成武器伤害外加 {damage} 点伤害。（狂怒）',
   'entities.abilities.furious_mending.name': '狂怒愈合',
   'entities.abilities.furious_mending.description':
-    '怒火愈合伤口：在 10 秒内为你恢复最大生命值的 20%，持续期间受到的伤害降低 20%。（狂怒）',
+    '10 秒内你受到的伤害降低 20%，持续期间你的放血将为你恢复最大生命值的 20%。（狂怒）',
   'entities.abilities.emboldening_roar.name': '振奋咆哮',
   'entities.abilities.emboldening_roar.description':
     '发出振奋的咆哮：你和 40 码内的友方玩家获得振奋效果，接下来的 3 个技能必定造成暴击。（狂怒）',

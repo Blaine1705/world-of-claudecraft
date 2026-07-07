@@ -5237,7 +5237,7 @@ export const zh_TW: EnTranslations = {
       },
       "bloodthirst": {
         "name": "放血",
-        "description": "在鮮血狂怒中立即攻擊，造成 {damage} 點傷害。（狂怒專精標誌技能）"
+        "description": "在鮮血狂怒中立即攻擊，造成 {damage} 點傷害，恢復你最大生命值的 3%，並產生 10 點怒氣。（狂怒專精標誌技能）"
       },
       "raging_gale": {
         "name": "雙斬",
@@ -5249,7 +5249,7 @@ export const zh_TW: EnTranslations = {
       },
       "furious_mending": {
         "name": "狂怒癒合",
-        "description": "怒火癒合傷口：在 10 秒內為你恢復最大生命值的 20%，持續期間受到的傷害降低 20%。（狂怒）"
+        "description": "10 秒內你受到的傷害降低 20%，持續期間你的放血將為你恢復最大生命值的 20%。（狂怒）"
       },
       "emboldening_roar": {
         "name": "振奮咆哮",

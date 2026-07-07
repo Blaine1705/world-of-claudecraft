@@ -12,15 +12,20 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 
-// Fury support cooldowns (operator design): Emboldening Roar
-// (emboldening_roar), a 3 min support cooldown that Emboldens the caster and
-// friendly players within 40 yd (aura kind 'sure_crit', 3 charges: the next 3
-// damaging ability CASTS are guaranteed crits, the normal crit rng still drawn
-// and only its outcome overridden, one charge per cast, auto-attacks exempt;
-// src/sim/combat/sure_crit.ts), and Furious Mending (furious_mending), a 2 min
-// defensive cooldown healing 20% of maximum health over 10 sec (a 'hot' aura
-// via selfHotPctMax) while taking 20% reduced damage (a 'buff_dr' aura read by
-// combat/damage.ts). Both are spec-gated base kit (`specs: ['fury']`).
+// Warrior support cooldowns (operator design). Emboldening Roar
+// (emboldening_roar) is a PROTECTION 3 min support cooldown (moved from Fury,
+// operator 2026-07-07) that Emboldens the caster and friendly players within
+// 40 yd (aura kind 'sure_crit', 3 charges: the next 3 damaging ability CASTS
+// are guaranteed crits, the normal crit rng still drawn and only its outcome
+// overridden, one charge per cast, auto-attacks exempt; src/sim/combat/
+// sure_crit.ts). Furious Mending (furious_mending) is a FURY 2 min defensive
+// cooldown: 20% reduced damage taken for 10 sec (a 'buff_dr' aura, id
+// 'furious_mending', read by combat/damage.ts) and, WHILE IT LASTS, Bloodletting
+// (bloodthirst) heals the caster for 20% of maximum health instead of 3%
+// (combat/effect_dispatch.ts selfHealPctMax). It is NOT a flat heal-over-time
+// (operator correction 2026-07-07). A player with NO spec keeps the whole kit,
+// so the sure-crit tests drive a no-spec warrior that knows both Emboldening
+// Roar and the damaging strikes it empowers.
 
 type TestSim = Sim & {
   nextId: number;
@@ -28,10 +33,16 @@ type TestSim = Sim & {
   addEntity(entity: Entity): void;
 };
 
-function makeSim(seed = 31337, level = 20): { sim: TestSim; p: Entity } {
+// spec = null keeps the full kit (Emboldening Roar + Brute Swing + Red Harvest);
+// 'fury' grants Bloodletting and gates in Furious Mending.
+function makeSim(
+  seed = 31337,
+  level = 20,
+  spec: 'fury' | 'prot' | null = null,
+): { sim: TestSim; p: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as unknown as TestSim;
   sim.setPlayerLevel(level);
-  expect(sim.setSpec('fury')).toBe(true);
+  if (spec) expect(sim.setSpec(spec)).toBe(true);
   return { sim, p: sim.player };
 }
 
@@ -84,8 +95,8 @@ const knownIds = (spec: string | null): Set<string> =>
     ),
   );
 
-describe('(a) fury support content defs', () => {
-  it('pins Emboldening Roar: free 3 min support cooldown, fury only, 3 sure-crit charges at 40 yd', () => {
+describe('(a) warrior support content defs', () => {
+  it('pins Emboldening Roar: free 3 min support cooldown, PROT only, 3 sure-crit charges at 40 yd', () => {
     const def = ABILITIES.emboldening_roar;
     expect(def).toBeDefined();
     expect(def.name).toBe('Emboldening Roar');
@@ -96,13 +107,13 @@ describe('(a) fury support content defs', () => {
     expect(def.cooldown).toBe(180);
     expect(def.school).toBe('physical');
     expect(def.requiresTarget).toBe(false);
-    expect(def.specs).toEqual(['fury']);
+    expect(def.specs).toEqual(['prot']);
     expect(def.effects).toEqual([
       { type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 },
     ]);
   });
 
-  it('pins Furious Mending: free 2 min defensive cooldown, fury only, 20% HoT plus 20% DR for 10 sec', () => {
+  it('pins Furious Mending: free 2 min defensive cooldown, FURY only, 20% DR for 10 sec, no HoT', () => {
     const def = ABILITIES.furious_mending;
     expect(def).toBeDefined();
     expect(def.name).toBe('Furious Mending');
@@ -114,14 +125,15 @@ describe('(a) fury support content defs', () => {
     expect(def.school).toBe('physical');
     expect(def.requiresTarget).toBe(false);
     expect(def.specs).toEqual(['fury']);
+    // Only the 20% damage-reduction aura remains (id 'furious_mending', the id
+    // the Bloodletting self-heal reads); the flat 20% HoT was removed.
     expect(def.effects).toEqual([
-      { type: 'selfHotPctMax', pct: 0.2, duration: 10, interval: 2 },
       {
         type: 'selfBuff',
         kind: 'buff_dr',
         value: 0.2,
         duration: 10,
-        auraId: 'furious_mending_dr',
+        auraId: 'furious_mending',
         auraName: 'Furious Mending',
       },
     ]);
@@ -176,7 +188,7 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
       }
       const out: { crit: boolean; amount: number }[] = [];
       for (let i = 0; i < 4; i++) {
-        const hits = hitsBy(recast(sim, p, 'bloodthirst'), 'Bloodletting');
+        const hits = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
         expect(hits).toHaveLength(1);
         out.push({ crit: hits[0].crit, amount: hits[0].amount });
       }
@@ -189,18 +201,18 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
     sim.drainEvents();
     sim.castAbility('emboldening_roar');
 
-    const first = hitsBy(recast(sim, p, 'bloodthirst'), 'Bloodletting');
+    const first = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
     expect(first).toHaveLength(1);
     expect(first[0].crit).toBe(true);
     expect(sureCritAura(p)?.charges).toBe(2);
 
-    const second = hitsBy(recast(sim, p, 'bloodthirst'), 'Bloodletting');
+    const second = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
     expect(second[0].crit).toBe(true);
     expect(sureCritAura(p)?.charges).toBe(1);
 
     sim.drainEvents();
-    const thirdEvents = recast(sim, p, 'bloodthirst');
-    const third = hitsBy(thirdEvents, 'Bloodletting');
+    const thirdEvents = recast(sim, p, 'slam');
+    const third = hitsBy(thirdEvents, 'Brute Swing');
     expect(third[0].crit).toBe(true);
     // The last charge drops the aura with its fade event.
     expect(sureCritAura(p)).toBeUndefined();
@@ -209,7 +221,7 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
     ).toBe(true);
 
     // 4th cast: back to the normal roll, byte-identical to the no-roar twin.
-    const fourth = hitsBy(recast(sim, p, 'bloodthirst'), 'Bloodletting');
+    const fourth = hitsBy(recast(sim, p, 'slam'), 'Brute Swing');
     expect({ crit: fourth[0].crit, amount: fourth[0].amount }).toEqual(control.out[3]);
     expect(control.aura).toBeUndefined();
   });
@@ -257,36 +269,48 @@ describe('(c) guaranteed crits: 3 casts, one charge per cast, autos exempt', () 
   });
 });
 
-describe('(d) Furious Mending heals over time and cuts damage taken', () => {
-  it('heals about 20% of maximum health over 10 sec (vs a no-cast twin)', () => {
-    const run = (cast: boolean): { healed: number; maxHp: number } => {
-      const { sim, p } = makeSim(11);
-      p.hp = Math.round(p.maxHp * 0.2);
-      const before = p.hp;
-      sim.drainEvents();
-      if (cast) {
-        sim.castAbility('furious_mending');
-        const hot = p.auras.find((a) => a.id === 'furious_mending' && a.kind === 'hot');
-        expect(hot).toBeDefined();
-        expect(hot?.duration).toBe(10);
-        const dr = p.auras.find((a) => a.id === 'furious_mending_dr');
-        expect(dr?.kind).toBe('buff_dr');
-        expect(dr?.value).toBe(0.2);
-        expect(dr?.duration).toBe(10);
-      }
-      for (let i = 0; i < 20 * 11; i++) sim.tick();
-      return { healed: p.hp - before, maxHp: p.maxHp };
-    };
-    const withCast = run(true);
-    const withoutCast = run(false);
-    // The twin isolates natural regen; the difference is the HoT's total.
-    const hotTotal = withCast.healed - withoutCast.healed;
-    expect(hotTotal).toBeGreaterThanOrEqual(Math.floor(0.19 * withCast.maxHp));
-    expect(hotTotal).toBeLessThanOrEqual(Math.ceil(0.21 * withCast.maxHp));
+describe('(d) Furious Mending: 20% damage cut and a supercharged Bloodletting heal', () => {
+  it('Bloodletting heals 20% of max health while Furious Mending is up, 3% without', () => {
+    const { sim, p } = makeSim(11, 20, 'fury');
+    spawnTarget(sim, p);
+    sim.tick();
+
+    // Baseline: no buff, so Bloodletting heals the normal 3% of maximum health.
+    // Zero out spell crit (int -62.5) so the heal never rolls x1.5.
+    p.stats.int = -62.5;
+    p.hp = Math.round(p.maxHp * 0.5);
+    let before = p.hp;
+    p.resource = p.maxResource;
+    p.gcdRemaining = 0;
+    p.cooldowns.delete('bloodthirst');
+    sim.castAbility('bloodthirst');
+    expect(p.hp - before).toBe(Math.round(p.maxHp * 0.03));
+
+    // Now cast Furious Mending: its aura (id 'furious_mending') lifts the next
+    // Bloodletting's self-heal to 20% of maximum health.
+    p.gcdRemaining = 0;
+    p.cooldowns.delete('furious_mending');
+    sim.drainEvents();
+    sim.castAbility('furious_mending');
+    const dr = p.auras.find((a) => a.id === 'furious_mending');
+    expect(dr?.kind).toBe('buff_dr');
+    expect(dr?.value).toBe(0.2);
+    expect(dr?.duration).toBe(10);
+    // No flat heal-over-time is applied by Furious Mending itself.
+    expect(p.auras.some((a) => a.id === 'furious_mending' && a.kind === 'hot')).toBe(false);
+
+    p.stats.int = -62.5;
+    p.hp = Math.round(p.maxHp * 0.5);
+    before = p.hp;
+    p.resource = p.maxResource;
+    p.gcdRemaining = 0;
+    p.cooldowns.delete('bloodthirst');
+    sim.castAbility('bloodthirst');
+    expect(p.hp - before).toBe(Math.round(p.maxHp * 0.2));
   });
 
   it('reduces damage taken by 20% while active, and not after it fades', () => {
-    const { sim, p } = makeSim();
+    const { sim, p } = makeSim(31337, 20, 'fury');
     const mob = spawnMob(sim, p, 5);
     p.hp = p.maxHp;
 
@@ -316,9 +340,9 @@ describe('(d) Furious Mending heals over time and cuts damage taken', () => {
     );
     expect(p.maxHp - p.hp).toBe(80);
 
-    // Let the 10s buff lapse (the HoT will heal along the way), then re-hit.
+    // Let the 10s buff lapse, then re-hit at full damage.
     for (let i = 0; i < 20 * 11; i++) sim.tick();
-    expect(p.auras.some((a) => a.id === 'furious_mending_dr')).toBe(false);
+    expect(p.auras.some((a) => a.id === 'furious_mending')).toBe(false);
     p.hp = p.maxHp;
     (sim as unknown as { dealDamage(...args: unknown[]): void }).dealDamage(
       mob,
@@ -334,20 +358,25 @@ describe('(d) Furious Mending heals over time and cuts damage taken', () => {
 });
 
 describe('(e) spec gating', () => {
-  it('fury and no-spec know both; arms and prot know neither', () => {
-    for (const id of ['emboldening_roar', 'furious_mending']) {
-      expect(knownIds(null).has(id), `${id} (no spec)`).toBe(true);
-      expect(knownIds('fury').has(id), `${id} (fury)`).toBe(true);
-      expect(knownIds('arms').has(id), `${id} (arms)`).toBe(false);
-      expect(knownIds('prot').has(id), `${id} (prot)`).toBe(false);
-    }
+  it('Emboldening Roar is prot + no-spec only; Furious Mending is fury + no-spec only', () => {
+    // No spec keeps the whole kit.
+    expect(knownIds(null).has('emboldening_roar')).toBe(true);
+    expect(knownIds(null).has('furious_mending')).toBe(true);
+    // Emboldening Roar moved to Protection.
+    expect(knownIds('prot').has('emboldening_roar')).toBe(true);
+    expect(knownIds('fury').has('emboldening_roar')).toBe(false);
+    expect(knownIds('arms').has('emboldening_roar')).toBe(false);
+    // Furious Mending stays Fury.
+    expect(knownIds('fury').has('furious_mending')).toBe(true);
+    expect(knownIds('prot').has('furious_mending')).toBe(false);
+    expect(knownIds('arms').has('furious_mending')).toBe(false);
   });
 });
 
 describe('(f) determinism', () => {
-  it('an identical seeded roar + mending fight replays byte-identically', () => {
+  it('an identical seeded Furious Mending + Bloodletting fight replays byte-identically', () => {
     const run = (): string => {
-      const { sim, p } = makeSim(23);
+      const { sim, p } = makeSim(23, 20, 'fury');
       const mob = spawnTarget(sim, p);
       const amounts: number[] = [];
       const record = (events: SimEvent[]) => {
@@ -357,20 +386,12 @@ describe('(f) determinism', () => {
         }
       };
       sim.drainEvents();
-      sim.castAbility('emboldening_roar');
-      record(sim.drainEvents());
-      record(recast(sim, p, 'bloodthirst'));
-      record(recast(sim, p, 'red_harvest'));
       p.hp = Math.round(p.maxHp * 0.4);
       record(recast(sim, p, 'furious_mending'));
+      record(recast(sim, p, 'bloodthirst'));
+      record(recast(sim, p, 'red_harvest'));
       for (let i = 0; i < 20 * 12; i++) record(sim.tick());
-      return JSON.stringify([
-        amounts,
-        mob.hp,
-        p.hp,
-        sureCritAura(p)?.charges ?? null,
-        p.auras.map((a) => a.id),
-      ]);
+      return JSON.stringify([amounts, mob.hp, p.hp, p.auras.map((a) => a.id)]);
     };
     expect(run()).toBe(run());
   });
