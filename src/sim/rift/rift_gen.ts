@@ -19,6 +19,7 @@ import {
   layoutColliders,
   type WallStub,
 } from '../dungeon_layout';
+import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
 import type { RiftFloorPlan, RiftObjectPlan, RiftPlan, RiftPuzzle, RiftSpawn } from './types';
 
@@ -94,7 +95,9 @@ function buildStyle(rng: Rng, theme: RiftTheme): InteriorStyle {
 
 // ---- Geometry ---------------------------------------------------------------
 
-/** Whether (x,z) clears every obstacle by the body radius (walkable). */
+/** Whether (x,z) clears every obstacle by the body radius (walkable). Handles
+ * rotated OBBs (polygon-shell wall segments carry a non-zero rot) by testing the
+ * point in each box's local frame, matching colliders.ts pushOut. */
 function isClear(colliders: readonly Collider[], x: number, z: number, r = BODY_R): boolean {
   for (const c of colliders) {
     if (c.type === 'circle') {
@@ -102,8 +105,13 @@ function isClear(colliders: readonly Collider[], x: number, z: number, r = BODY_
       const dz = z - c.z;
       if (dx * dx + dz * dz < (c.r + r) * (c.r + r)) return false;
     } else {
-      // axis-aligned OBBs (all layout colliders have rot 0)
-      if (Math.abs(x - c.x) < c.hw + r && Math.abs(z - c.z) < c.hd + r) return false;
+      const dx = x - c.x;
+      const dz = z - c.z;
+      const cos = Math.cos(-c.rot);
+      const sin = Math.sin(-c.rot);
+      const lx = dx * cos - dz * sin;
+      const lz = dx * sin + dz * cos;
+      if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return false;
     }
   }
   return true;
@@ -128,80 +136,177 @@ function toClear(colliders: readonly Collider[], x: number, z: number): GridPoin
 interface GeneratedGeometry {
   layout: DungeonLayout;
   colliders: Collider[];
+  /** Room half-width at instance-local z (the walkable envelope; obstacles + spawns
+   * are kept inside it). For a rectangle this is a constant. */
+  halfWidthAt: (z: number) => number;
+  archetype: string;
+}
+
+// Room silhouettes. Each is a symmetric half-width PROFILE over the room length
+// (t in [0,1]); the centre spine (x=0) always stays inside and walkable. `hall`
+// is the plain rectangle; the rest become star-shaped `shellPolygon` rooms that
+// render + collide as their true shape. Boss floors bias to wide-open shapes so
+// the giant boss has room to fight.
+type Profile = (t: number) => number;
+const ROOM_ARCHETYPES = [
+  'hall',
+  'rotunda',
+  'taper',
+  'apse',
+  'hourglass',
+  'chambers',
+  'cavern',
+] as const;
+// Boss floors only use shapes that are WIDE at the back (where the boss + dais
+// sit), so the giant boss always has an open arena.
+const BOSS_ARCHETYPES = ['hall', 'taper', 'apse'] as const;
+
+function smoothstep(u: number): number {
+  const c = Math.max(0, Math.min(1, u));
+  return c * c * (3 - 2 * c);
+}
+
+function makeProfile(rng: Rng, archetype: string, wMin: number, wMax: number): Profile {
+  const span = wMax - wMin;
+  switch (archetype) {
+    case 'rotunda': // bulging round hall
+      return (t) => wMin + span * Math.sin(Math.PI * t);
+    case 'taper': // widens toward the boss end
+      return (t) => wMin + span * t;
+    case 'apse': // narrow nave, then a wide round chamber at the boss end
+      return (t) => (t < 0.5 ? wMin : wMin + span * smoothstep((t - 0.5) / 0.5));
+    case 'hourglass': // wide ends, a narrow passage at the waist
+      return (t) => wMin + span * (1 - Math.sin(Math.PI * t));
+    case 'chambers': {
+      // Two bulges joined by a passage: cos(4*pi*t) gives wide/narrow/wide/narrow/wide.
+      return (t) => wMin + span * (0.5 + 0.5 * Math.cos(4 * Math.PI * t));
+    }
+    case 'cavern': {
+      // Organic wobble from a few fixed-phase harmonics (deterministic per rng).
+      const p1 = rng.range(0, Math.PI * 2);
+      const p2 = rng.range(0, Math.PI * 2);
+      const p3 = rng.range(0, Math.PI * 2);
+      return (t) => {
+        const w =
+          0.55 +
+          0.22 * Math.sin(3 * Math.PI * t + p1) +
+          0.14 * Math.sin(5 * Math.PI * t + p2) +
+          0.09 * Math.sin(8 * Math.PI * t + p3);
+        return wMin + span * Math.max(0, Math.min(1, w));
+      };
+    }
+    default: // 'hall'
+      return () => wMax;
+  }
 }
 
 function buildLayout(rng: Rng, floorIndex: number, isBoss: boolean): GeneratedGeometry {
-  // Width and length vary per floor for silhouette variety. wallX is the side-wall
-  // centreline; the KayKit modules tile at any width via layout.wallX/floorHalfX.
-  const wallX = rng.pick([19, 21, 23, 25, 28]);
   const zMin = -19;
-  const length = isBoss ? rng.int(96, 120) : rng.int(104, 148);
+  const length = isBoss ? rng.int(104, 132) : rng.int(104, 152);
   const zMax = zMin + length;
-  const sideWallZ = (zMin + zMax) / 2;
-  const sideWallHd = (zMax - zMin) / 2 + 1;
+  const midZ = (zMin + zMax) / 2;
+  const range = zMax - zMin;
 
-  const daisR = isBoss ? rng.range(11, 14) : rng.range(8, 10.5);
-  const dais = { x: 0, z: zMax - Math.round(daisR + 4), r: daisR };
+  const archetype = isBoss
+    ? rng.pick(BOSS_ARCHETYPES as unknown as string[])
+    : rng.pick(ROOM_ARCHETYPES as unknown as string[]);
+  // Narrowest half-width keeps the spine + a walkable margin (>= AISLE_HALF + ~4);
+  // widest drives how grand the room feels. Boss chambers skew wide.
+  const wMin = rng.range(10, 13);
+  const wMax = isBoss ? rng.range(24, 38) : rng.range(16, 34);
+  const profile = makeProfile(rng, archetype, wMin, Math.max(wMin + 4, wMax));
+  const halfWidthAt = (z: number): number =>
+    Math.max(wMin, profile(Math.max(0, Math.min(1, (z - zMin) / range))));
 
-  // Pillar rows down the nave, off the centre spine. Row cadence + inset vary.
-  const pillars: GridPoint[] = [];
-  const pillarInset = Math.min(wallX - 6, rng.pick([12, 14, 16]));
-  const rowGap = rng.pick([14, 16, 18, 20]);
-  const firstRow = zMin + rng.int(22, 30);
-  const lastRow = dais.z - 16;
-  for (let z = firstRow; z <= lastRow; z += rowGap) {
-    // Occasionally stagger a row to one side for asymmetry.
-    const stagger = rng.chance(0.25);
-    if (stagger) {
-      pillars.push({ x: rng.chance(0.5) ? -pillarInset : pillarInset, z });
+  // Assemble the shell polygon for non-rectangular archetypes; validate it is
+  // simple + star-shaped from the centre pole (so render/collision/pathing all
+  // behave), else fall back to a plain rectangle.
+  let shellPolygon: Array<{ x: number; z: number }> | undefined;
+  let shellPole: { x: number; z: number } | undefined;
+  let wallX: number;
+  if (archetype === 'hall') {
+    wallX = Math.round(wMax);
+  } else {
+    const zs: number[] = [];
+    for (let z = zMin; z <= zMax; z += 6) zs.push(z);
+    if (zs[zs.length - 1] !== zMax) zs.push(zMax);
+    const right = zs.map((z) => ({ x: Math.round(halfWidthAt(z) * 10) / 10, z }));
+    const left = zs.map((z) => ({ x: -Math.round(halfWidthAt(z) * 10) / 10, z })).reverse();
+    let poly = [...right, ...left];
+    if (polygonSignedArea(poly) < 0) poly = poly.slice().reverse();
+    const pole = { x: 0, z: midZ };
+    if (!polygonSelfIntersects(poly) && polygonIsStarShaped(poly, pole)) {
+      shellPolygon = poly;
+      shellPole = pole;
+      wallX = Math.ceil(Math.max(...poly.map((p) => Math.abs(p.x)))) + 2;
     } else {
-      pillars.push({ x: -pillarInset, z }, { x: pillarInset, z });
+      wallX = Math.round(wMax); // fall back to a rectangle
     }
   }
+  const isPoly = shellPolygon !== undefined;
 
-  // Wall-side obstacles (sarcophagi / crates / altars, per kit) hugging the walls.
+  const daisR = Math.min(
+    isBoss ? rng.range(12, 15) : rng.range(8, 10.5),
+    halfWidthAt(zMax - 12) - 2,
+  );
+  const dais = { x: 0, z: zMax - Math.round(daisR + 5), r: Math.max(6, daisR) };
+
+  // Pillar rows down the nave, off the centre spine but inside the local width.
+  const pillars: GridPoint[] = [];
+  const pillarBase = rng.pick([12, 14, 16]);
+  const rowGap = rng.pick([14, 16, 18, 20]);
+  for (let z = zMin + rng.int(22, 30); z <= dais.z - 16; z += rowGap) {
+    const inset = Math.min(pillarBase, halfWidthAt(z) - 3);
+    if (inset < AISLE_HALF + 2) continue; // too narrow here for flanking pillars
+    if (rng.chance(0.25)) pillars.push({ x: rng.chance(0.5) ? -inset : inset, z });
+    else pillars.push({ x: -inset, z }, { x: inset, z });
+  }
+
+  // Wall-side obstacles hugging the (possibly curved) walls.
   const tombs: GridPoint[] = [];
-  const tombInset = wallX - 4;
   if (rng.chance(0.8)) {
     const tombGap = rng.pick([20, 24, 28]);
     for (let z = zMin + rng.int(16, 24); z <= dais.z - 20; z += tombGap) {
-      if (rng.chance(0.85)) tombs.push({ x: -tombInset, z });
-      if (rng.chance(0.85)) tombs.push({ x: tombInset, z });
+      const inset = halfWidthAt(z) - 4;
+      if (inset < AISLE_HALF + 2) continue;
+      if (rng.chance(0.85)) tombs.push({ x: -inset, z });
+      if (rng.chance(0.85)) tombs.push({ x: inset, z });
     }
   }
 
-  // Optional chamber waist(s): stubs that pinch the room to a centre passage,
-  // giving multi-chamber structure. Always leave a >= 2*AISLE_HALF passage.
+  // Chamber-waist stubs only for the rectangular hall (polygon rooms get their
+  // structure from the shell itself; a stub could poke outside a narrow section).
   const stubs: WallStub[] = [];
-  const waistCount = rng.pick([0, 0, 1, 2]);
-  for (let i = 0; i < waistCount; i++) {
-    const wz = zMin + Math.round(((i + 1) / (waistCount + 1)) * (dais.z - 20 - zMin)) + 20;
-    const hd = rng.pick([3, 4, 5]);
-    // A pinch that leaves a centre passage: each stub fills from the wall (|x|=wallX)
-    // inward to |x|=passageHalf, so the walkable spine (|x| <= AISLE_HALF) stays open.
-    const passageHalf = AISLE_HALF + rng.range(1.5, 3);
-    const hw = (wallX - passageHalf) / 2;
-    if (hw <= 0.5) continue;
-    const centerMag = (wallX + passageHalf) / 2;
-    stubs.push({ x: -centerMag, z: wz, hw, hd });
-    stubs.push({ x: centerMag, z: wz, hw, hd });
+  if (!isPoly && rng.chance(0.5)) {
+    const waistCount = rng.pick([1, 2]);
+    for (let i = 0; i < waistCount; i++) {
+      const wz = zMin + Math.round(((i + 1) / (waistCount + 1)) * (dais.z - 20 - zMin)) + 20;
+      const passageHalf = AISLE_HALF + rng.range(1.5, 3);
+      const hw = (wallX - passageHalf) / 2;
+      if (hw <= 0.5) continue;
+      const centerMag = (wallX + passageHalf) / 2;
+      const hd = rng.pick([3, 4, 5]);
+      stubs.push({ x: -centerMag, z: wz, hw, hd }, { x: centerMag, z: wz, hw, hd });
+    }
   }
 
-  // Floor clutter, scattered off-centre; renderer draws matching props.
+  // Floor clutter, scattered off-centre, inside the local width.
   const clutter: GridPoint[] = [];
   const clutterCount = rng.int(4, 10);
   for (let i = 0; i < clutterCount; i++) {
     const z = zMin + rng.range(14, dais.z - 18 - zMin);
+    const hw = halfWidthAt(z);
+    if (hw - AISLE_HALF < 4) continue;
     const side = rng.chance(0.5) ? -1 : 1;
-    const x = side * rng.range(AISLE_HALF + 2, wallX - 3);
+    const x = side * rng.range(AISLE_HALF + 2, hw - 2);
     clutter.push({ x: Math.round(x * 10) / 10, z: Math.round(z * 10) / 10 });
   }
 
   const layout: DungeonLayout = {
     zMin,
     zMax,
-    sideWallZ,
-    sideWallHd,
+    sideWallZ: midZ,
+    sideWallHd: range / 2 + 1,
     wallX,
     endWallHw: wallX + 1,
     floorHalfX: wallX,
@@ -211,8 +316,10 @@ function buildLayout(rng: Rng, floorIndex: number, isBoss: boolean): GeneratedGe
     stubs,
     dais,
     clutter,
+    shellPolygon,
+    shellPole,
   };
-  return { layout, colliders: layoutColliders(layout) };
+  return { layout, colliders: layoutColliders(layout), halfWidthAt, archetype };
 }
 
 // ---- Spawns + objects -------------------------------------------------------
@@ -224,9 +331,8 @@ function planSpawns(
   floorLevel: number,
   isBoss: boolean,
 ): RiftSpawn[] {
-  const { layout, colliders } = geo;
+  const { layout, colliders, halfWidthAt } = geo;
   const out: RiftSpawn[] = [];
-  const wallX = layout.wallX ?? DUNGEON_WALL_X;
 
   const packStartZ = layout.zMin + 22;
   const packEndZ = layout.dais.z - (isBoss ? 22 : 14);
@@ -238,10 +344,11 @@ function planSpawns(
     const size = isBoss ? rng.int(1, 2) : rng.int(2, 3);
     for (let j = 0; j < size; j++) {
       const templateId = rng.pick(theme.trash as string[]);
-      // Spread the pack across the aisle, then pull any blocked spawn to a clear tile.
-      // Round BEFORE the clearance march so the stored point is exactly the one
-      // validated as clear (no post-rounding drift into an obstacle).
-      const rawX = Math.round(rng.range(-wallX + 4, wallX - 4) * 10) / 10;
+      // Spread the pack across the aisle within the local width, then pull any
+      // blocked spawn to a clear tile. Round BEFORE the clearance march so the
+      // stored point is exactly the one validated as clear (no rounding drift).
+      const spread = Math.max(2, halfWidthAt(z) - 4);
+      const rawX = Math.round(rng.range(-spread, spread) * 10) / 10;
       const rawZ = Math.round((z + rng.range(-2, 2)) * 10) / 10;
       const p = toClear(colliders, rawX, rawZ);
       // color/scale left undefined: the base template's (theme-appropriate) values
@@ -308,8 +415,8 @@ function planObjects(
       const zBase = layout.zMin + 40;
       for (let i = 0; i < puzzle.pylonCount; i++) {
         const side = i % 2 === 0 ? -1 : 1;
-        const x = side * ((layout.wallX ?? DUNGEON_WALL_X) - 5);
         const z = zBase + i * 22;
+        const x = side * Math.max(AISLE_HALF + 2, geo.halfWidthAt(z) - 5);
         const p = toClear(colliders, x, z);
         out.push({ kind: 'rune_pylon', x: p.x, z: p.z, name: 'Rune Pylon' });
       }

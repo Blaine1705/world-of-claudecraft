@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Collider } from '../src/sim/colliders';
+import { RIFT_THEMES } from '../src/sim/content/rift/themes';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import {
   generateRiftFloor,
@@ -7,7 +8,6 @@ import {
   riftFloorColliders,
   riftFloorCount,
 } from '../src/sim/rift/rift_gen';
-import { RIFT_THEMES } from '../src/sim/content/rift/themes';
 
 const BODY_R = 0.6;
 
@@ -17,8 +17,15 @@ function clears(colliders: readonly Collider[], x: number, z: number, r = BODY_R
       const dx = x - c.x;
       const dz = z - c.z;
       if (dx * dx + dz * dz < (c.r + r) * (c.r + r)) return false;
-    } else if (Math.abs(x - c.x) < c.hw + r && Math.abs(z - c.z) < c.hd + r) {
-      return false;
+    } else {
+      // Rotated OBB: test the point in the box's local frame (matches pushOut).
+      const dx = x - c.x;
+      const dz = z - c.z;
+      const cos = Math.cos(-c.rot);
+      const sin = Math.sin(-c.rot);
+      const lx = dx * cos - dz * sin;
+      const lz = dx * sin + dz * cos;
+      if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return false;
     }
   }
   return true;
@@ -88,6 +95,46 @@ describe('rift generator: variety', () => {
     expect(pillarCounts.size).toBeGreaterThan(5);
   });
 
+  it('produces non-rectangular room shapes (not just plain rectangles)', () => {
+    let polygonFloors = 0;
+    let total = 0;
+    const distinctWidthProfiles = new Set<string>();
+    for (let s = 0; s < 120; s++) {
+      const n = riftFloorCount(s);
+      for (let f = 0; f < n; f++) {
+        const fl = generateRiftFloor(s, 15, f);
+        total++;
+        if (fl.layout.shellPolygon) {
+          polygonFloors++;
+          // fingerprint the silhouette by its rounded half-width samples
+          distinctWidthProfiles.add(
+            fl.layout.shellPolygon
+              .filter((p) => p.x >= 0)
+              .map((p) => Math.round(p.x))
+              .join(','),
+          );
+        }
+      }
+    }
+    // The large majority of floors should be shaped rooms, not rectangles.
+    expect(polygonFloors / total).toBeGreaterThan(0.5);
+    // ...and those silhouettes should be highly varied.
+    expect(distinctWidthProfiles.size).toBeGreaterThan(30);
+  });
+
+  it('boss floors give the giant boss an open arena (dais fits the room width)', () => {
+    for (let s = 0; s < 120; s++) {
+      const n = riftFloorCount(s);
+      const fl = generateRiftFloor(s, 15, n - 1);
+      // The dais radius never exceeds the room half-width at the boss end.
+      const backWidth = fl.layout.shellPolygon
+        ? Math.max(...fl.layout.shellPolygon.map((p) => Math.abs(p.x)))
+        : (fl.layout.wallX ?? DUNGEON_WALL_X);
+      expect(fl.layout.dais.r).toBeLessThanOrEqual(backWidth);
+      expect(fl.layout.dais.r).toBeGreaterThanOrEqual(6);
+    }
+  });
+
   it('uses varied boss types across seeds', () => {
     const bosses = new Set<string>();
     for (let s = 0; s < 200; s++) {
@@ -125,7 +172,9 @@ describe('rift generator: playability', () => {
         expect(Math.abs(sp.x)).toBeLessThan(wallX);
         expect(sp.z).toBeGreaterThan(fl.layout.zMin);
         expect(sp.z).toBeLessThan(fl.layout.zMax);
-        expect(clears(colliders, sp.x, sp.z), `spawn seed ${seed} f${f} @${sp.x},${sp.z}`).toBe(true);
+        expect(clears(colliders, sp.x, sp.z), `spawn seed ${seed} f${f} @${sp.x},${sp.z}`).toBe(
+          true,
+        );
         expect(sp.level).toBeGreaterThanOrEqual(1);
         expect(sp.level).toBeLessThanOrEqual(60);
       }

@@ -41,7 +41,9 @@ await page.evaluate(() => {
 
 await page.waitForFunction(() => !!window.__game?.world?.player, { timeout: 20000, polling: 200 });
 await sleep(2500); // let assets + first frames settle
-console.log('in-game.');
+// God mode so the tester survives the group-tuned elites long enough to shoot.
+await page.evaluate(() => window.__game.world.chat('/dev god', window.__game.world.player.id));
+console.log('in-game (god on).');
 
 // Drive a rift entirely through the offline sim seam, advancing frames between steps.
 async function tick(frames = 40) {
@@ -116,8 +118,21 @@ for (let guard = 0; guard < 8; guard++) {
   });
   await tick(10);
 }
+await tick(20);
+// Stand a few yards in front of the giant boss and face it for the shot.
+const bossInfo = await page.evaluate(() => {
+  const w = window.__game.world;
+  const inst = w.riftInstances.find((i) => i.partyKey !== null);
+  const boss = inst?.bossId != null ? w.entities.get(inst.bossId) : null;
+  if (boss) {
+    w.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 16 };
+    w.player.prevPos = { ...w.player.pos };
+    w.player.facing = 0; // face +z toward the boss at the back
+    w.player.hp = w.player.maxHp;
+  }
+  return { rf: w.riftFloor, bossScale: boss?.scale, bossHp: boss?.maxHp, bossName: boss?.name };
+});
 await tick(40);
-const bossInfo = await page.evaluate(() => window.__game.world.riftFloor);
 await page.screenshot({ path: 'tmp/rift/seed101_boss.png' });
 console.log(`boss floor: ${JSON.stringify(bossInfo)}`);
 

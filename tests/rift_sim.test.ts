@@ -60,7 +60,7 @@ describe('rift sim: dev portal + entry', () => {
     const inst = sim.riftInstances.find((i) => i.partyKey !== null);
     expect(inst).toBeTruthy();
     expect(isRiftPos(sim.player.pos.x)).toBe(true);
-    expect((inst?.mobIds.length ?? 0)).toBeGreaterThan(0);
+    expect(inst?.mobIds.length ?? 0).toBeGreaterThan(0);
     // Spawned mobs are real, alive, and near the instance origin.
     const origin = riftInstanceOrigin(inst!.slot, inst!.floorIndex);
     for (const id of inst!.mobIds) {
@@ -77,7 +77,14 @@ describe('rift sim: dev portal + entry', () => {
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
     // A swept move from the centre spine outward must be stopped by the side wall
     // (max wall centre is |x|=28), not tunnel through to the target.
-    const resolved = resolveMovement(SEED, origin.x, origin.z + 20, origin.x + 40, origin.z + 20, 0.6);
+    const resolved = resolveMovement(
+      SEED,
+      origin.x,
+      origin.z + 20,
+      origin.x + 40,
+      origin.z + 20,
+      0.6,
+    );
     expect(resolved.x).toBeLessThan(origin.x + 30);
   });
 });
@@ -143,6 +150,67 @@ describe('rift sim: floor progression', () => {
     sim.player.hp = sim.player.maxHp;
     sim.tick();
     expect(isRiftPos(sim.player.pos.x)).toBe(false);
+  });
+});
+
+describe('rift sim: death returns to the entry zone cemetery', () => {
+  function dieAndRelease(sim: Sim): void {
+    sim.player.gm = false;
+    sim.dealDamage(null, sim.player, 999999, false, 'physical', 'test', 'hit');
+    expect(sim.player.dead).toBe(true);
+    sim.releaseSpirit(sim.player.id);
+    expect(sim.player.ghost).toBe(true);
+  }
+
+  it('a rift entered from Eastbrook sends the spirit to an Eastbrook graveyard (not Thornpeak)', () => {
+    const sim = makeSim();
+    // Enter with an Eastbrook-Vale overworld return position (zone 1, z ~ 0).
+    sim.enterRift(SEED, 20, sim.player.id, { x: 0, z: 0 });
+    expect(isRiftPos(sim.player.pos.x)).toBe(true);
+    dieAndRelease(sim);
+    // Eastbrook graveyards sit at z ~ -14/-56; Thornpeak's are z ~ 645+.
+    expect(sim.player.pos.z).toBeLessThan(100);
+    expect(isRiftPos(sim.player.pos.x)).toBe(false);
+  });
+
+  it('a rift entered from Thornpeak sends the spirit to a Thornpeak graveyard', () => {
+    const sim = makeSim();
+    // Enter with a Thornpeak-Heights overworld return position (zone 3, z ~ 838).
+    sim.enterRift(SEED, 20, sim.player.id, { x: 138, z: 838 });
+    dieAndRelease(sim);
+    expect(sim.player.pos.z).toBeGreaterThan(500);
+  });
+});
+
+describe('rift sim: giga bosses', () => {
+  it('the final boss is huge and raid-tier tanky', () => {
+    const sim = makeSim();
+    sim.enterRift(SEED, 20, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    // Descend to the boss floor.
+    for (let guard = 0; guard < 10 && inst.floorIndex < inst.floorCount - 1; guard++) {
+      for (const id of inst.mobIds) {
+        if (id === inst.bossId) continue;
+        const e = sim.entities.get(id);
+        if (e) {
+          e.hp = 0;
+          e.dead = true;
+        }
+      }
+      inst.litPylons = new Set(inst.pylonIds);
+      for (let i = 0; i < 21; i++) {
+        sim.player.hp = sim.player.maxHp;
+        sim.tick();
+      }
+      if (inst.descentId === null) break;
+      const desc = sim.entities.get(inst.descentId)!;
+      sim.player.pos = { ...desc.pos };
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    const boss = sim.entities.get(inst.bossId!)!;
+    expect(boss.scale).toBeGreaterThan(2.4); // towering
+    expect(boss.maxHp).toBeGreaterThan(2500); // raid-tier at this level
   });
 });
 

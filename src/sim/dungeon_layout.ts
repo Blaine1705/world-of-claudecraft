@@ -241,25 +241,68 @@ export const ARENA_SPAWNS_B_2v2 = [
   { x: 7, z: 18, facing: Math.PI },
 ];
 
+// Longest wall-shell OBB segment along a polygon edge before it is split, so a
+// long straight run still reads as a wall of DUNGEON_WALL_HW thickness (mirrors
+// the delve litany's polygonShellColliders).
+const SHELL_SEGMENT_MAX = 8;
+
+/** Chain of rotated OBB wall segments tracing a simple polygon boundary. Each
+ * edge is split into equal segments; the OBB's long (hw) axis is rotated along
+ * the edge. Used for non-rectangular (`shellPolygon`) rooms so collision matches
+ * the rendered walls exactly. */
+export function polygonWallColliders(points: readonly { x: number; z: number }[]): Collider[] {
+  const out: Collider[] = [];
+  const n = points.length;
+  for (let i = 0; i < n; i++) {
+    const a = points[i];
+    const b = points[(i + 1) % n];
+    const dx = b.x - a.x;
+    const dz = b.z - a.z;
+    const len = Math.hypot(dx, dz);
+    if (len < 1e-6) continue;
+    const segCount = Math.max(1, Math.ceil(len / SHELL_SEGMENT_MAX));
+    const segLen = len / segCount;
+    const rot = Math.atan2(-dz, dx);
+    for (let s = 0; s < segCount; s++) {
+      const midT = (s + 0.5) / segCount;
+      out.push({
+        type: 'obb',
+        x: a.x + dx * midT,
+        z: a.z + dz * midT,
+        hw: segLen / 2,
+        hd: DUNGEON_WALL_HW,
+        rot,
+      });
+    }
+  }
+  return out;
+}
+
 /** Interior collision set for a layout, in instance-local coordinates. */
 export function layoutColliders(layout: DungeonLayout): Collider[] {
   const out: Collider[] = [];
   const wallX = layout.wallX ?? DUNGEON_WALL_X;
   const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
-  // side walls
-  for (const sx of [-wallX, wallX]) {
-    out.push({
-      type: 'obb',
-      x: sx,
-      z: layout.sideWallZ,
-      hw: DUNGEON_WALL_HW,
-      hd: layout.sideWallHd,
-      rot: 0,
-    });
+  if (layout.shellPolygon) {
+    // Non-rectangular room: the polygon's own edges ARE the walls (front, back,
+    // and both curved sides), so skip the rectangular shell.
+    out.push(...polygonWallColliders(layout.shellPolygon));
+  } else {
+    // side walls
+    for (const sx of [-wallX, wallX]) {
+      out.push({
+        type: 'obb',
+        x: sx,
+        z: layout.sideWallZ,
+        hw: DUNGEON_WALL_HW,
+        hd: layout.sideWallHd,
+        rot: 0,
+      });
+    }
+    // back wall, then front wall (entrance porch: chase cam fits inside)
+    out.push({ type: 'obb', x: 0, z: layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
+    out.push({ type: 'obb', x: 0, z: layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
   }
-  // back wall, then front wall (entrance porch: chase cam fits inside)
-  out.push({ type: 'obb', x: 0, z: layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
-  out.push({ type: 'obb', x: 0, z: layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
   // chamber waists
   for (const s of layout.stubs)
     out.push({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 });
