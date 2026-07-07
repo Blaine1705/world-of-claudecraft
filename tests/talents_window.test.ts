@@ -16,17 +16,10 @@ describe('talents_window: no magic values', () => {
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
-  it('drives the tree-arrow + accent colors through CSS custom properties', () => {
-    for (const token of [
-      'var(--color-talent-arrow)',
-      'var(--color-talent-arrow-dim)',
-      'var(--color-talent-opt-dim)',
-      'var(--color-talent-hint)',
-      'var(--color-talent-req)',
-      'var(--color-talent-dormant)',
-      'var(--color-text-muted)',
-      'var(--gold)',
-    ]) {
+  it('drives the accent colors through CSS custom properties', () => {
+    // The tree arrows died with the point trees (Talents 2.0 flip); the surviving
+    // palette is the spec cards + Choices tab accents.
+    for (const token of ['var(--color-talent-dormant)', 'var(--color-text-muted)', 'var(--gold)']) {
       expect(painter, `expected ${token}`).toContain(token);
     }
   });
