@@ -5247,6 +5247,14 @@ export const zh_CN: EnTranslations = {
         "name": "血色收割",
         "description": "孤注一掷：三次凶猛的打击，每次造成武器伤害外加 {damage} 点伤害。（狂怒）"
       },
+      "furious_mending": {
+        "name": "狂怒愈合",
+        "description": "怒火愈合伤口：在 10 秒内为你恢复最大生命值的 20%，持续期间受到的伤害降低 20%。（狂怒）"
+      },
+      "emboldening_roar": {
+        "name": "振奋咆哮",
+        "description": "发出振奋的咆哮：你和 40 码内的友方玩家获得振奋效果，接下来的 3 个技能必定造成暴击。（狂怒）"
+      },
       "shield_slam": {
         "name": "碎盾击",
         "description": "用盾牌猛击目标，造成 {damage} 点伤害并产生巨量威胁。（防护专精标志技能）"

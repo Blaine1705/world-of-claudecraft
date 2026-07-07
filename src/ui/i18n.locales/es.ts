@@ -2801,6 +2801,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.red_harvest.name': 'Desenfreno',
   'entities.abilities.red_harvest.description':
     'Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)',
+  'entities.abilities.furious_mending.name': 'Regeneración Enfurecida',
+  'entities.abilities.furious_mending.description':
+    'Tu furia cierra tus heridas: recuperas un 20% de tu salud máxima durante 10 s y recibes un 20% menos de daño mientras dura el efecto. (Furia)',
+  'entities.abilities.emboldening_roar.name': 'Grito Alentador',
+  'entities.abilities.emboldening_roar.description':
+    'Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)',
   'entities.abilities.shield_slam.name': 'Quiebra de Escudo',
   'entities.abilities.shield_slam.description':
     'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',

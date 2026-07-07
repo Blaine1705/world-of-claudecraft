@@ -2147,6 +2147,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.red_harvest.name': '紅の収穫',
   'entities.abilities.red_harvest.description':
     '全てを注ぎ込む：3回の猛烈な打撃を放ち、それぞれ武器ダメージに加えて {damage} のダメージを与えます。（狂怒）',
+  'entities.abilities.furious_mending.name': '憤怒の治癒',
+  'entities.abilities.furious_mending.description':
+    '怒りが傷を癒やします：10秒かけて最大体力の20%を回復し、その間に受けるダメージが20%減少します。（狂怒）',
+  'entities.abilities.emboldening_roar.name': '鼓舞の咆哮',
+  'entities.abilities.emboldening_roar.description':
+    '鼓舞の咆哮を上げ、自身と40ヤード以内の味方プレイヤーが鼓舞状態になります。次の3回のアビリティが必ずクリティカルヒットになります。（狂怒）',
   'entities.abilities.shield_slam.name': '盾砕き',
   'entities.abilities.shield_slam.description':
     '盾で対象を叩きつけ、{damage} のダメージと大量の脅威を与えます。（防御シグネチャー）',

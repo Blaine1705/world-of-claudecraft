@@ -5247,6 +5247,14 @@ export const es: EnTranslations = {
         "name": "Desenfreno",
         "description": "Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)"
       },
+      "furious_mending": {
+        "name": "Regeneración Enfurecida",
+        "description": "Tu furia cierra tus heridas: recuperas un 20% de tu salud máxima durante 10 s y recibes un 20% menos de daño mientras dura el efecto. (Furia)"
+      },
+      "emboldening_roar": {
+        "name": "Grito Alentador",
+        "description": "Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)"
+      },
       "shield_slam": {
         "name": "Quiebra de Escudo",
         "description": "Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)"

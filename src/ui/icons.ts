@@ -2383,6 +2383,13 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // blood-soaked axe with a falling droplet (distinct from execute's bare axe)
   raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),
   red_harvest: r('blood', 'blood', ['axe', { p: 'droplet', ...BR }], ['drips']),
+  // fury support cooldowns: Emboldening Roar = a golden shout bursting into
+  // guaranteed crits (distinct from rallying_cry's roar+heart and
+  // intimidating_shout's roar+skull); Furious Mending = a heart shedding a
+  // blood droplet on a gold palette (distinct from life_tap's purple pair and
+  // sanguine_aura's droplet-first layout)
+  emboldening_roar: r('fury', 'gold', ['roar', { p: 'sunburst', ...TR }], ['glow']),
+  furious_mending: r('blood', 'gold', ['heart', { p: 'droplet', ...BR }], ['glow']),
   // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
   pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
   heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact
@@ -2703,6 +2710,12 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
   // Bladed Echo (whirlwind's armed area-echo buff, aura id 'bladed_echo')
   aura_aoe_echo: r('fury', 'steel', ['sword'], ['motion']),
+  // Emboldened (Emboldening Roar's armed guaranteed-crit buff, aura id
+  // 'emboldening_roar_crit')
+  aura_sure_crit: r('fury', 'gold', ['sunburst'], ['glow']),
+  // Parameterized damage-reduction buffs (Furious Mending's 20% cut, aura id
+  // 'furious_mending_dr')
+  aura_buff_dr: r('blood', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

@@ -2139,6 +2139,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.red_harvest.name': '붉은 수확',
   'entities.abilities.red_harvest.description':
     '모든 것을 쏟아붓습니다: 세 번의 흉포한 일격으로 각각 무기 공격력에 {damage}의 피해를 추가로 입힙니다. (분노)',
+  'entities.abilities.furious_mending.name': '성난 치유',
+  'entities.abilities.furious_mending.description':
+    '분노가 상처를 아물게 합니다: 10초에 걸쳐 최대 생명력의 20%를 회복하고, 그동안 받는 피해가 20% 감소합니다. (분노)',
+  'entities.abilities.emboldening_roar.name': '고무의 포효',
+  'entities.abilities.emboldening_roar.description':
+    '고무의 포효를 질러 자신과 40미터 내 아군 플레이어를 고무시킵니다. 다음 3개의 기술이 반드시 치명타로 적중합니다. (분노)',
   'entities.abilities.shield_slam.name': '방패 강타',
   'entities.abilities.shield_slam.description':
     '방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',

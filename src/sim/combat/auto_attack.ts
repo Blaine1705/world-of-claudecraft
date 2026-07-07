@@ -237,6 +237,11 @@ export function meleeSwing(
     // damage (post crit/armor, the exact number dealDamage received) on a
     // connected swing only, so the caller can replay it without re-rolling.
     onDealt?: (amount: number) => void;
+    // Emboldened (combat/sure_crit.ts): the weaponStrike dispatch path forces
+    // a connected swing to crit. The crit rng below is STILL drawn exactly as
+    // before (determinism: the stream position never moves); only the rolled
+    // outcome is overridden. Plain auto swings never set this.
+    forceCrit?: boolean;
   },
 ): boolean {
   const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
@@ -293,7 +298,9 @@ export function meleeSwing(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
   );
-  const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
+  const crit =
+    ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance) ||
+    opts.forceCrit === true;
   if (crit) dmg *= 2;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   const dealtAmount = Math.max(1, Math.round(dmg));

@@ -46,6 +46,7 @@ import { isRooted } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { isFormAuraKind } from './forms';
+import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 // repositionToAim sweep tuning (harvested from PR #1348): the leap walks the
@@ -175,6 +176,15 @@ export function runEffects(
   // actually dealt single-target hostile damage; gates the charge consumption
   // after the loop (a fully whiffed cast keeps its charge).
   let areaEchoDealt = false;
+  // Emboldened (combat/sure_crit.ts): resolved ONCE per cast, so a
+  // multi-strike cast (Red Harvest) crits every strike and spends a single
+  // charge below. Each crit-roll site still draws its rng exactly as before
+  // (the stream position never moves); the flag only overrides the outcome.
+  // `sureCritRolled` is set where a crit roll actually happened, so a fully
+  // whiffed cast or a cast with no crit roll (pure buffs, plain AoE) never
+  // spends a charge.
+  const sureCrit = hasSureCritAura(p);
+  let sureCritRolled = false;
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -224,6 +234,9 @@ export function runEffects(
           weaponMult: eff.weaponMult ?? 1,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
+          // Emboldened: override the swing's crit outcome (its rng is still
+          // drawn inside meleeSwing exactly as before).
+          forceCrit: sureCrit,
           // Bladed Echo: fan this swing's RESOLVED damage (post crit/armor, the
           // exact number the primary dealDamage received) out to enemies near
           // the primary target. No re-roll; a miss/dodge never fires this.
@@ -242,6 +255,9 @@ export function runEffects(
               }
             : undefined,
         });
+        // A connected swing rolled (and had overridden) its crit; a miss or
+        // dodge never reached the crit roll, so it spends nothing.
+        if (hit && sureCrit) sureCritRolled = true;
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -265,7 +281,9 @@ export function runEffects(
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
+        // Emboldened: the roll is still drawn; only the outcome is overridden.
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit;
+        if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= isSpell ? 1.5 : 2;
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -298,7 +316,9 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
+        // Emboldened: the roll is still drawn; only the outcome is overridden.
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) || sureCrit;
+        if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= 2;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -488,7 +508,10 @@ export function runEffects(
         let dmg =
           ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
           directHitBonus(p.spellPower, ability, res.castTime);
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+        // Emboldened: the roll is still drawn; only the outcome is overridden.
+        const crit =
+          ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
+        if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         break;
@@ -961,6 +984,48 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllySureCrit': {
+        // Emboldening Roar: the friendly fan-out shape of aoeAllyAttackPower
+        // (no party requirement: friendliesInRadius includes the caster and
+        // every friendly entity within radius). Each carrier's next
+        // `eff.charges` damaging ability casts are guaranteed critical
+        // strikes; the override + per-cast charge spend live in
+        // combat/sure_crit.ts.
+        for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+          ctx.applyAura(mE, {
+            id: `${ability.id}_crit`,
+            name: 'Emboldened',
+            kind: 'sure_crit',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: 0,
+            charges: eff.charges,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'selfHotPctMax': {
+        // Furious Mending's healing half: a plain self 'hot' aura (the same
+        // kind Renew applies, ticked by combat/auras.ts) whose total is a
+        // fraction of the caster's MAXIMUM health. No spell-power rider: the
+        // pct already scales with the caster.
+        const ticks = Math.max(1, Math.round(eff.duration / eff.interval));
+        ctx.applyAura(p, {
+          id: ability.id,
+          name: ability.name,
+          kind: 'hot',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: Math.max(1, Math.round((p.maxHp * eff.pct) / ticks)),
+          tickInterval: eff.interval,
+          tickTimer: eff.interval,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
       case 'aoeAllyMaxHp': {
         // Rallying Cry (owner rework): a temporary maximum-health fraction on
         // the caster and party members within radius. buff_maxhp_pct folds in
@@ -1081,7 +1146,10 @@ export function runEffects(
           let dmg =
             ctx.rng.range(eff.deal.min, eff.deal.max) +
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
-          const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          // Emboldened: the roll is still drawn; only the outcome is overridden.
+          const crit =
+            ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p)) || sureCrit;
+          if (sureCrit) sureCritRolled = true;
           if (crit) dmg *= isSpell ? 1.5 : 2;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           ctx.dealDamage(
@@ -1291,6 +1359,10 @@ export function runEffects(
   // Bladed Echo: one charge per CAST (not per strike), spent only after the
   // cast actually dealt single-target hostile damage this resolution.
   if (opts?.areaEcho && areaEchoDealt) consumeAreaEchoCharge(ctx, p);
+
+  // Emboldened: one charge per CAST (not per strike/effect), spent only after
+  // this cast actually rolled (and overrode) at least one crit.
+  if (sureCritRolled) consumeSureCritCharge(ctx, p);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

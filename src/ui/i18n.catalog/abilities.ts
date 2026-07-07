@@ -1143,6 +1143,16 @@ const classAbilityNamesEn = {
         'Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)',
       ],
       [
+        'furious_mending',
+        'Furious Mending',
+        'Your fury knits your wounds: heal 20% of your maximum health over 10 sec and take 20% reduced damage while it mends. (Fury)',
+      ],
+      [
+        'emboldening_roar',
+        'Emboldening Roar',
+        'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+      ],
+      [
         'shield_slam',
         'Shieldcrack',
         'Slam the target with your shield for {damage} and massive threat. (Protection signature)',
