@@ -299,6 +299,7 @@ import {
   onMobKilledForQuests,
 } from './quests/quest_credit';
 import { generateRiftFloor } from './rift/rift_gen';
+import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enterRift as enterRiftImpl,
   leaveRift as leaveRiftImpl,
@@ -1113,6 +1114,10 @@ export class Sim {
   riftInstances: RiftInstance[] = [];
   // rift-portal registry (built lazily by updateRiftTriggers, appended on rift_portal spawn)
   private riftPortalIds: number[] | null = null;
+  // Open world-spawned ranked rift portals + the spawn ordinal (rift/portals.ts
+  // scheduler; both live SimContext views).
+  naturalRiftPortals: NaturalRiftPortal[] = [];
+  riftPortalSpawnCount = 0;
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -1159,6 +1164,7 @@ export class Sim {
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
+      riftPortals: cfg.riftPortals ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
@@ -1377,6 +1383,9 @@ export class Sim {
         pylonTotal: 0,
         returnPos: { x: 0, z: 0 },
         emptyFor: 0,
+        tier: null,
+        portalId: null,
+        rewarded: false,
       });
     }
 
@@ -2402,6 +2411,15 @@ export class Sim {
       get riftInstances() {
         return sim.riftInstances;
       },
+      get naturalRiftPortals() {
+        return sim.naturalRiftPortals;
+      },
+      get riftPortalSpawnCount() {
+        return sim.riftPortalSpawnCount;
+      },
+      set riftPortalSpawnCount(v: number) {
+        sim.riftPortalSpawnCount = v;
+      },
       get riftPortalIds() {
         return sim.riftPortalIds;
       },
@@ -3061,6 +3079,7 @@ export class Sim {
     lap?.('lootRolls');
     this.updateInstances();
     this.updateRiftInstances();
+    if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -6039,8 +6058,9 @@ export class Sim {
     baseLevel: number,
     pid?: number,
     returnPos?: { x: number; z: number },
+    portal?: Entity,
   ): void {
-    enterRiftImpl(this.ctx, seed, baseLevel, pid, returnPos);
+    enterRiftImpl(this.ctx, seed, baseLevel, pid, returnPos, portal);
   }
 
   leaveRift(pid?: number): void {

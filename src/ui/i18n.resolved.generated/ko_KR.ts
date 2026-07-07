@@ -3081,7 +3081,11 @@ export const ko_KR: EnTranslations = {
       "stepBack": "균열을 통해 원래 자리로 돌아왔습니다.",
       "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
       "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
-      "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다."
+      "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다.",
+      "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
+      "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
+      "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
+      "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",

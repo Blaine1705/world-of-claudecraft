@@ -43,6 +43,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiftTier,
   type RiteIntensity,
   type SimEvent,
 } from '../sim/types';
@@ -1514,6 +1515,7 @@ export class ClientWorld implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
+        e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         if (e.kind === 'npc') {

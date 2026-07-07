@@ -204,7 +204,7 @@ function makeProfile(rng: Rng, archetype: string, wMin: number, wMax: number): P
   }
 }
 
-function buildLayout(rng: Rng, floorIndex: number, isBoss: boolean): GeneratedGeometry {
+function buildLayout(rng: Rng, _floorIndex: number, isBoss: boolean): GeneratedGeometry {
   const zMin = -19;
   const length = isBoss ? rng.int(104, 132) : rng.int(104, 152);
   const zMax = zMin + length;

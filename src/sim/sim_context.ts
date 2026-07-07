@@ -17,6 +17,7 @@ import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { PendingProjectile } from './projectile_travel';
+import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type {
@@ -107,6 +108,12 @@ export interface SimContextPrimitives {
   // rift-portal registry, appended to on rift_portal spawn; null until built.
   // Read-write: rift/runs.ts lazily assigns the array on first build (like dungeonDoorIds).
   riftPortalIds: number[] | null;
+  // Open world-spawned ranked rift portals (rift/portals.ts scheduler). Live view:
+  // the backing array stays Sim-owned, mutated in place (push/splice).
+  readonly naturalRiftPortals: NaturalRiftPortal[];
+  // Natural-portal spawn ordinal: seeds each spawn's dedicated Rng and paces the
+  // sim-time cadence. Read-write (the scheduler increments it).
+  riftPortalSpawnCount: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -210,6 +217,7 @@ export interface SimContextCallbacks {
     baseLevel: number,
     pid?: number,
     returnPos?: { x: number; z: number },
+    portal?: Entity,
   ): void;
   leaveRift(pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
@@ -706,6 +714,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set riftPortalIds(v) {
       host.riftPortalIds = v;
+    },
+    get naturalRiftPortals() {
+      return host.naturalRiftPortals;
+    },
+    get riftPortalSpawnCount() {
+      return host.riftPortalSpawnCount;
+    },
+    set riftPortalSpawnCount(v) {
+      host.riftPortalSpawnCount = v;
     },
     get arenaMatches() {
       return host.arenaMatches;

@@ -2696,6 +2696,9 @@ async function startOffline(
     playerClass,
     playerName: name,
     devCommands: import.meta.env.DEV,
+    // The offline world runs the ranked rift portal scheduler like the live
+    // server (custom editor play-test maps keep it off: their zones differ).
+    riftPortals: world === undefined,
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);

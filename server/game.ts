@@ -627,6 +627,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
   if (e.guild) out.gd = e.guild;
   if (e.dungeonId) out.dgn = e.dungeonId;
+  if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
@@ -910,6 +911,8 @@ export class GameServer {
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
+      // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
+      riftPortals: true,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
@@ -4097,7 +4100,7 @@ export class GameServer {
         }
         const mine: SimEvent[] = [];
         for (const ev of events) {
-          if (suppressedInvites !== null && suppressedInvites.has(ev)) continue;
+          if (suppressedInvites?.has(ev)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

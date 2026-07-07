@@ -219,6 +219,8 @@ function makeFakeHost() {
   const clock = { time: 0, tick: 0 };
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    naturalRiftPortals: [],
+    riftPortalSpawnCount: 0,
     get rng() {
       return rng;
     },

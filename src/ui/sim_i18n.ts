@@ -11,7 +11,7 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
-import { ABILITIES, DELVES, ITEMS, MOBS } from '../sim/data';
+import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import { tEntity } from './entity_i18n';
 import {
@@ -3777,6 +3777,12 @@ function locAbility(name: string): string {
   const id = abilityNameToId.get(name);
   return id ? tEntity({ kind: 'ability', id, field: 'name' }) : name;
 }
+const zoneNameToId = new Map<string, string>();
+for (const z of ZONES) zoneNameToId.set(z.name, z.id);
+function locZone(name: string): string {
+  const id = zoneNameToId.get(name);
+  return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
+}
 function locDelve(name: string): string {
   const id = delveNameToId.get(name);
   return id ? tEntity({ kind: 'delve', id, field: 'name' }) : name;
@@ -5324,6 +5330,22 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
   },
   { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  {
+    re: /^A ([CBAS])-rank rift tears open in (.+)!$/,
+    build: (m) => t('sim.rift.portalOpens', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^The ([CBAS])-rank rift in (.+) has been sealed\.$/,
+    build: (m) => t('sim.rift.portalSealed', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^The ([CBAS])-rank rift in (.+) collapses\.$/,
+    build: (m) => t('sim.rift.portalCollapses', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^Only adventurers of level (\d+) or higher may enter this rift\.$/,
+    build: (m) => t('sim.rift.levelGate', { level: m[1] }),
+  },
   {
     re: /^The rift shudders\. A way home tears open behind the fallen\.$/,
     build: () => t('sim.rift.exitOpens'),

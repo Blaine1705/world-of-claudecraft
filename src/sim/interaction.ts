@@ -218,7 +218,7 @@ export function harvestCorpse(
     return;
   }
   const mob = ctx.entities.get(mobId);
-  if (!mob || mob.kind !== 'mob' || !mob.dead) return;
+  if (mob?.kind !== 'mob' || !mob.dead) return;
   const componentTags = MOBS[mob.templateId]?.componentTags;
   if (!isHarvestableCorpse(componentTags)) {
     ctx.error(meta.entityId, 'That corpse has nothing to harvest.');
@@ -369,7 +369,7 @@ export function interact(ctx: SimContext, pid?: number): void {
           return;
         }
         if (target.templateId === 'rift_portal' && target.riftSeed !== undefined) {
-          ctx.enterRift(target.riftSeed, target.riftBaseLevel ?? p.level, p.id);
+          ctx.enterRift(target.riftSeed, target.riftBaseLevel ?? p.level, p.id, undefined, target);
           return;
         }
         if (target.templateId === 'rift_exit') {
@@ -428,7 +428,7 @@ export function interact(ctx: SimContext, pid?: number): void {
       return;
     }
     if (obj.templateId === 'rift_portal' && obj.riftSeed !== undefined) {
-      ctx.enterRift(obj.riftSeed, obj.riftBaseLevel ?? p.level, p.id);
+      ctx.enterRift(obj.riftSeed, obj.riftBaseLevel ?? p.level, p.id, undefined, obj);
       return;
     }
     if (obj.templateId === 'rift_exit') {

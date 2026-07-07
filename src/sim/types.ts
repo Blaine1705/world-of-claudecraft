@@ -1777,6 +1777,13 @@ export interface Entity {
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;
   riftBaseLevel?: number;
+  // Rank of a world-spawned rift portal (rift/portals.ts); drives the rank badge
+  // both hosts render above the portal and the Heroic Mark payout on sealing.
+  // Absent on dev-spawned portals.
+  riftTier?: RiftTier;
+  // Sim time of the last "level too low" rift denial shown to this player, so
+  // standing inside the portal trigger radius does not spam the toast per tick.
+  riftDeniedAt?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
@@ -2294,6 +2301,10 @@ export interface SimConfig {
   // Offline worlds and parity traces keep the default (first rise after one
   // interval), so this never fires inside a short deterministic scenario.
   worldBossAtBoot?: boolean;
+  // Live worlds (server + offline client): enable the natural ranked rift portal
+  // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
+  // traces, and the RL env keep a portal-free world unless they opt in.
+  riftPortals?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -2358,6 +2369,19 @@ export const XP_TABLE = [
   400, 900, 1400, 2100, 2800, 3600, 4500, 5400, 6500, 7600, 8800, 10100, 11400, 12900, 14400, 16000,
   17700, 19400, 21300, 23200,
 ];
+// Procedural Rift rank ladder (C lowest, S highest); tuning per rank lives in
+// rift/portals.ts (RIFT_TIER_INFO). Declared here so Entity can carry it.
+export type RiftTier = 'C' | 'B' | 'A' | 'S';
+
+// Rank badge colours, shared by the sim tuning table and the renderer's
+// floating rank badge (single source so the two can never drift).
+export const RIFT_TIER_COLORS: Record<RiftTier, number> = {
+  C: 0x3fbf5f,
+  B: 0x3f7fff,
+  A: 0xb04fff,
+  S: 0xffb020,
+};
+
 export const MAX_LEVEL = 20;
 
 // Shared sim constants relocated here (C1) so both sim.ts and the extracted damage

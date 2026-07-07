@@ -11,6 +11,7 @@
 // updateRiftInstances) are called from tick().
 
 import { clearRiftRegion, setRiftRegion } from '../colliders';
+import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
   isRiftPos,
   MOBS,
@@ -22,6 +23,7 @@ import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type Vec3 } from '../types';
+import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { generateRiftFloor } from './rift_gen';
 import type { RiftInstance } from './types';
 
@@ -178,6 +180,9 @@ function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
   inst.descentOpen = false;
   inst.descentAt = null;
   inst.emptyFor = 0;
+  inst.tier = null;
+  inst.portalId = null;
+  inst.rewarded = false;
 }
 
 // ---- Enter / descend / leave ------------------------------------------------
@@ -188,10 +193,26 @@ export function enterRift(
   baseLevel: number,
   pid?: number,
   returnPos?: { x: number; z: number },
+  portal?: Entity,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   if (r.e.dead && !r.e.ghost) return;
+  // Every rift is endgame content: level 20+ in every zone (the Eastbrook
+  // portal exists for low levels to see, but turns them away with this line).
+  // Gated on the PORTAL path (walk-in + interaction click, which always pass
+  // the portal entity); the direct programmatic call stays open for tests.
+  // Throttled so standing inside the trigger radius does not spam per tick.
+  if (portal && r.e.level < RIFT_MIN_LEVEL) {
+    if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
+      r.e.riftDeniedAt = ctx.time;
+      ctx.error(
+        r.meta.entityId,
+        `Only adventurers of level ${RIFT_MIN_LEVEL} or higher may enter this rift.`,
+      );
+    }
+    return;
+  }
   const key = riftKeyFor(ctx, r.meta.entityId);
 
   // A party member joining the same portal shares the instance (matched by seed).
@@ -209,6 +230,9 @@ export function enterRift(
     inst.floorIndex = 0;
     inst.floorCount = generateRiftFloor(inst.seed, inst.baseLevel, 0).floorCount;
     inst.returnPos = returnPos ?? { x: r.e.pos.x, z: r.e.pos.z };
+    inst.tier = portal?.riftTier ?? null;
+    inst.portalId = portal?.id ?? null;
+    inst.rewarded = false;
     spawnRiftFloor(ctx, inst);
   }
 
@@ -235,7 +259,7 @@ export function descendRift(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const inst = riftInstanceAtPos(ctx, r.e.pos);
-  if (!inst || !inst.descentOpen) return;
+  if (!inst?.descentOpen) return;
   if (inst.floorIndex >= inst.floorCount - 1) return;
 
   // Collect everyone currently standing in this floor's region before we tear it
@@ -358,7 +382,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
       portal.riftSeed !== undefined &&
       dist2d(p.pos, portal.pos) < PORTAL_TRIGGER_RADIUS
     ) {
-      enterRift(ctx, portal.riftSeed, portal.riftBaseLevel ?? p.level, p.id);
+      enterRift(ctx, portal.riftSeed, portal.riftBaseLevel ?? p.level, p.id, undefined, portal);
       return;
     }
   }
@@ -420,6 +444,40 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   }
 }
 
+// Closing a ranked rift (final boss down) seals its overworld portal and pays
+// Heroic Marks scaled by rank onto the boss corpse (personal loot slots), gated
+// once per rank per host UTC day via the same meta.heroicDaily set the heroic
+// dungeons use (key `rift_<tier>`, disjoint from dungeon ids). Dev-portal runs
+// (tier null) seal nothing and pay nothing.
+function rewardRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): void {
+  if (inst.rewarded) return;
+  inst.rewarded = true;
+  if (inst.tier === null) return;
+  if (inst.portalId !== null) closeNaturalRiftPortal(ctx, inst.portalId, 'sealed');
+  if (!boss) return;
+  const marks = RIFT_TIER_INFO[inst.tier].marks;
+  const loot = boss.loot ?? { copper: 0, items: [] };
+  const dailyKey = `rift_${inst.tier}`;
+  let awarded = false;
+  for (const pid of instancePlayerIds(ctx, inst)) {
+    const meta = ctx.players.get(pid);
+    if (!meta) continue;
+    const today = ctx.utcDay;
+    if (today && meta.heroicDaily.date !== today) {
+      meta.heroicDaily = { date: today, marked: new Set() };
+    }
+    if (meta.heroicDaily.marked.has(dailyKey)) continue;
+    meta.heroicDaily.marked.add(dailyKey);
+    for (let i = 0; i < marks; i++) {
+      loot.items.push({ itemId: HEROIC_MARK_ITEM_ID, count: 1, personalFor: [pid] });
+    }
+    awarded = true;
+  }
+  if (!awarded) return;
+  boss.loot = loot;
+  boss.lootable = true;
+}
+
 function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const out: number[] = [];
@@ -448,6 +506,7 @@ export function updateRiftInstances(ctx: SimContext): void {
       const boss = inst.bossId !== null ? ctx.entities.get(inst.bossId) : null;
       if ((boss === null || boss === undefined || boss.dead) && inst.exitId === null) {
         openExit(ctx, inst);
+        rewardRiftClear(ctx, inst, boss ?? null);
       }
     } else if (!inst.descentOpen) {
       const pylonsDone = inst.litPylons.size >= inst.pylonTotal;

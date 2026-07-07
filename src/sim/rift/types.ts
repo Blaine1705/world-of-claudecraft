@@ -8,6 +8,7 @@
 // Sim layer: no DOM/Three imports. This file is types only.
 
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
+import type { RiftTier } from '../types';
 
 /** The whole wire/persistence footprint of a rift instance. Both hosts turn this
  * into identical content via rift_gen. `origin` is the instance-space anchor the
@@ -99,6 +100,15 @@ export interface RiftInstance {
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
   emptyFor: number;
+  /** Rank of the world-spawned portal this run came through (null for dev
+   * portals): drives the Heroic Mark payout and the sealed announcement. */
+  tier: RiftTier | null;
+  /** Overworld portal entity id the run came through (null for dev portals);
+   * the portal is sealed (despawned + announced) when the final boss dies. */
+  portalId: number | null;
+  /** True once the final boss kill has paid out (marks + seal), so a slot that
+   * lingers after the kill never double-pays. */
+  rewarded: boolean;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

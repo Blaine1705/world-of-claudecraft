@@ -3081,7 +3081,11 @@ export const zh_CN: EnTranslations = {
       "stepBack": "你退回裂隙，返回原地。",
       "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
       "wayDownOpens": "通往下层的裂口被撕开了。",
-      "exitOpens": "裂隙震颤。一条归途在倒下的敌人身后撕裂开来。"
+      "exitOpens": "裂隙震颤。一条归途在倒下的敌人身后撕裂开来。",
+      "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
+      "portalSealed": "{zone}的{tier}级裂隙已被封印。",
+      "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
+      "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。"
     },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",

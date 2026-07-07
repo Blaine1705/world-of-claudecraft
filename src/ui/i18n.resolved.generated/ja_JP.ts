@@ -3081,7 +3081,11 @@ export const ja_JP: EnTranslations = {
       "stepBack": "裂け目を通って元の場所へ戻った。",
       "pylonLit": "ルーンの尖塔が光を放った（{lit}/{total}）。",
       "wayDownOpens": "下層への道が裂け開いた。",
-      "exitOpens": "裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。"
+      "exitOpens": "裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。",
+      "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
+      "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
+      "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
+      "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",

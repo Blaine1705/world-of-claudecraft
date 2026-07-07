@@ -92,6 +92,7 @@ import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
+import { buildRiftRankBadge } from './rift_rank';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
@@ -3128,6 +3129,11 @@ export class Renderer {
       portal = built.portal;
       height = 4.6;
       objectMesh = body!;
+      // World-spawned ranked portals carry their rank as a big floating badge
+      // (colour square + letter) so the tier reads from across the zone.
+      if (e.templateId === 'rift_portal' && e.riftTier) {
+        body?.add(buildRiftRankBadge(e.riftTier));
+      }
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).

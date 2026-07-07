@@ -283,6 +283,7 @@ describe('rift sim: client-sync event', () => {
     let evt: Extract<SimEvent, { type: 'riftState' }> | undefined;
     // enterRift emits during the call; capture via the next tick's drained events
     // is not possible (emit happens synchronously), so drive it through a portal.
+    sim.setPlayerLevel(20); // all portal entries are level-20 gated
     sim.chat('/dev portal 91 18', sim.player.id);
     const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal')!;
     sim.player.pos = { ...portal.pos };

@@ -53,6 +53,8 @@ function makeCtx() {
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    naturalRiftPortals: [],
+    riftPortalSpawnCount: 0,
     get rng() {
       return rng;
     },

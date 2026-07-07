@@ -463,6 +463,10 @@ export const en = {
       pylonLit: 'A rune pylon flares to life ({lit}/{total}).',
       wayDownOpens: 'The way down tears open.',
       exitOpens: 'The rift shudders. A way home tears open behind the fallen.',
+      portalOpens: 'A {tier}-rank rift tears open in {zone}!',
+      portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
+      portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
+      levelGate: 'Only adventurers of level {level} or higher may enter this rift.',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',
