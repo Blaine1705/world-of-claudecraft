@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 404,
-      "state": "d2029b32",
+      "state": "4344dbd8",
       "events": "a1a98eff",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 404,
-      "state": "47c9a4d4",
+      "state": "b7f6a552",
       "events": "6e60008d",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 404,
-      "state": "83be42a2",
+      "state": "aa8f2708",
       "events": "9b3dbf7d",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "f6b8172c",
+      "state": "fa7f08aa",
       "events": "e324e10d",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "cd3bbd27",
+      "state": "13cae3c9",
       "events": "eac8ab97",
       "rng": {
         "draws": 300,
@@ -125,7 +125,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -190,7 +191,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -260,7 +262,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -325,7 +328,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -564,7 +568,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "9116fbd3",
+      "state": "1c68277d",
       "events": "abc18e50",
       "rng": {
         "draws": 300,
@@ -614,7 +618,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -679,7 +684,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -749,7 +755,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -814,7 +821,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1051,7 +1059,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "556dac07",
+      "state": "67198141",
       "events": "d24eb35d",
       "rng": {
         "draws": 300,
@@ -1102,7 +1110,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1169,7 +1178,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1240,7 +1250,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1305,7 +1316,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1542,7 +1554,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 404,
-      "state": "a4528ffb",
+      "state": "19705645",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1553,7 +1565,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 404,
-      "state": "c04833cb",
+      "state": "db341c55",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1604,7 +1616,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1671,7 +1684,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1742,7 +1756,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},
@@ -1807,7 +1822,8 @@
             "level": 1,
             "talents": {
               "choices": {},
-              "ranks": {}
+              "ranks": {},
+              "rows": {}
             }
           },
           "gatheringProficiency": {},

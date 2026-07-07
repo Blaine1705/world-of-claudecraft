@@ -1929,8 +1929,11 @@ export class Sim {
           cls,
           {
             spec: s.talents.spec ?? null,
+            ranks: { ...s.talents.ranks },
+            choices: { ...s.talents.choices },
             rows: { ...(s.talents.rows ?? {}) },
           },
+          talentPointsAtLevel(player.level),
           player.level,
         );
       // Choice-row picks are revalidated the same way: unknown option ids and

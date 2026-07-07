@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "6bd4c62d",
+      "nextId": 401,
+      "state": "9ee20c78",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,9 +72,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -132,9 +132,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 415,
-      "state": "7c57f6dc",
-      "events": "56b757c4",
+      "nextId": 407,
+      "state": "bf4b62d8",
+      "events": "b215f456",
       "rng": {
         "draws": 54,
         "digest": "d9836924"
@@ -143,9 +143,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 415,
-      "state": "80683d83",
-      "events": "5174d031",
+      "nextId": 407,
+      "state": "0c6839e2",
+      "events": "04e020e2",
       "rng": {
         "draws": 95,
         "digest": "43c2d2eb"
@@ -154,9 +154,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 415,
-      "state": "e2a1681f",
-      "events": "57fc463a",
+      "nextId": 407,
+      "state": "b48ee364",
+      "events": "3f4d9418",
       "rng": {
         "draws": 224,
         "digest": "22d4749f"
@@ -165,8 +165,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 415,
-      "state": "88bf5193",
+      "nextId": 407,
+      "state": "5f4667e2",
       "events": "741638a5",
       "rng": {
         "draws": 224,
@@ -246,9 +246,9 @@
           "renown": 30,
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -647,8 +647,8 @@
     {
       "tick": 64,
       "time": 3.2,
-      "nextId": 415,
-      "state": "d5259144",
+      "nextId": 407,
+      "state": "25e7887b",
       "events": "741638a5",
       "rng": {
         "draws": 244,
@@ -728,9 +728,9 @@
           "renown": 30,
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [

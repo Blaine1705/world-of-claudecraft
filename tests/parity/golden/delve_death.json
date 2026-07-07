@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "20380ff5",
+      "nextId": 401,
+      "state": "20cb0763",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,9 +70,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -132,9 +132,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 419,
-      "state": "3240d560",
-      "events": "5f48187d",
+      "nextId": 410,
+      "state": "43126c9e",
+      "events": "23be8555",
       "rng": {
         "draws": 1,
         "digest": "8d59a9d6"
@@ -189,9 +189,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -250,9 +250,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 419,
-      "state": "7df77ea3",
-      "events": "e33b1222",
+      "nextId": 410,
+      "state": "3bfc8593",
+      "events": "c2d0b576",
       "rng": {
         "draws": 1,
         "digest": "8d59a9d6"
@@ -318,9 +318,9 @@
           "renown": 10,
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -380,8 +380,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 419,
-      "state": "7df77ea3",
+      "nextId": 410,
+      "state": "3bfc8593",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -448,9 +448,9 @@
           "renown": 10,
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [

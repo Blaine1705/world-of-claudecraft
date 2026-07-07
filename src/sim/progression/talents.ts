@@ -88,7 +88,19 @@ export function talentPointBudget(ctx: SimContext, pid?: number): { total: numbe
 }
 
 function sanitizeTalentAllocation(alloc: TalentAllocation): TalentAllocation {
-  return { spec: alloc.spec ?? null, rows: { ...(alloc.rows ?? {}) } };
+  const sanitized: TalentAllocation = {
+    spec: alloc.spec ?? null,
+    ranks: {},
+    choices: { ...alloc.choices },
+    // Row picks pass through untouched; validateAllocation authoritatively
+    // re-checks every level gate and option id (validateRows).
+    rows: { ...(alloc.rows ?? {}) },
+  };
+  for (const id in alloc.ranks) {
+    const v = Math.floor(alloc.ranks[id]);
+    if (v > 0) sanitized.ranks[id] = v;
+  }
+  return sanitized;
 }
 
 // Commit a whole staged allocation in one shot (the UI's "Apply"). Rejects any
@@ -110,7 +122,12 @@ export function applyTalentAllocation(
     ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
     return false;
   }
-  const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
+  const check = validateAllocation(
+    r.meta.cls,
+    sanitized,
+    talentPointsAtLevel(r.e.level),
+    r.e.level,
+  );
   if (!check.ok) {
     ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
     return false;

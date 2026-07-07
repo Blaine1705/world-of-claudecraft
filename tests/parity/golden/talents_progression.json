@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "6bd4c62d",
+      "nextId": 401,
+      "state": "9ee20c78",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,9 +72,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -133,7 +133,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "2c6b5f2c",
+      "state": "0f75253e",
       "events": "d85bae6f",
       "rng": {
         "draws": 0,
@@ -193,6 +193,7 @@
               "arms_imp_overpower": 2,
               "war_cruelty": 2
             },
+            "rows": {},
             "spec": "arms"
           },
           "townFocus": {}
@@ -374,7 +375,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "3275ea48",
+      "state": "d28fc985",
       "events": "a7d95be1",
       "rng": {
         "draws": 0,
@@ -432,6 +433,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -449,6 +451,7 @@
             "ranks": {
               "war_cruelty": 3
             },
+            "rows": {},
             "spec": "arms"
           },
           "townFocus": {}
@@ -511,7 +514,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "cab61c49",
+      "state": "771ad182",
       "events": "980c682a",
       "rng": {
         "draws": 0,
@@ -569,6 +572,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -586,6 +590,7 @@
             "ranks": {
               "arms_imp_overpower": 2
             },
+            "rows": {},
             "spec": "arms"
           },
           "townFocus": {}
@@ -648,7 +653,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "fd8d2b47",
+      "state": "67598136",
       "events": "6e54fd06",
       "rng": {
         "draws": 0,
@@ -706,6 +711,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -721,6 +727,7 @@
           "talents": {
             "choices": {},
             "ranks": {},
+            "rows": {},
             "spec": "fury"
           },
           "townFocus": {}
@@ -782,7 +789,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "fd8d2b47",
+      "state": "67598136",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -840,6 +847,7 @@
                 "ranks": {
                   "arms_imp_overpower": 2
                 },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -855,6 +863,7 @@
           "talents": {
             "choices": {},
             "ranks": {},
+            "rows": {},
             "spec": "fury"
           },
           "townFocus": {}

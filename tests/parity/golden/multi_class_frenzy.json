@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 412,
-      "state": "4a7a1da1",
-      "events": "acbb306d",
+      "nextId": 404,
+      "state": "33c78e16",
+      "events": "ca1afc51",
       "rng": {
         "draws": 3,
         "digest": "44b810ef"
@@ -88,9 +88,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -147,9 +147,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -201,9 +201,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -441,9 +441,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 412,
-      "state": "047a3d01",
-      "events": "da74e837",
+      "nextId": 404,
+      "state": "f846c09d",
+      "events": "00031d53",
       "rng": {
         "draws": 6,
         "digest": "c15af9da"
@@ -500,9 +500,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -559,9 +559,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -613,9 +613,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -853,9 +853,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 412,
-      "state": "771cc200",
-      "events": "da74e837",
+      "nextId": 404,
+      "state": "1b3f9c01",
+      "events": "00031d53",
       "rng": {
         "draws": 9,
         "digest": "88aac2f9"
@@ -912,9 +912,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -971,9 +971,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1025,9 +1025,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -1265,9 +1265,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 412,
-      "state": "e719bd07",
-      "events": "da74e837",
+      "nextId": 404,
+      "state": "da4034ee",
+      "events": "00031d53",
       "rng": {
         "draws": 12,
         "digest": "1a1053bd"
@@ -1324,9 +1324,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1383,9 +1383,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1437,9 +1437,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
@@ -1677,9 +1677,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 412,
-      "state": "83575a6d",
-      "events": "a8be1cf0",
+      "nextId": 404,
+      "state": "ef3a8372",
+      "events": "6c23c6b5",
       "rng": {
         "draws": 15,
         "digest": "ca70052b"
@@ -1688,8 +1688,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 412,
-      "state": "183ffc2c",
+      "nextId": 404,
+      "state": "6238d3a7",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1699,8 +1699,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 412,
-      "state": "183ffc2c",
+      "nextId": 404,
+      "state": "6238d3a7",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1759,9 +1759,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1818,9 +1818,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1872,9 +1872,9 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
+            "ranks": {},
+            "rows": {}
+          }
         }
       ],
       "entities": [
