@@ -1,5 +1,6 @@
 import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '../types';
 import type { TalentModifiers } from './talents';
+import { SPORT_ABILITIES } from './vale_cup';
 
 // ---------------------------------------------------------------------------
 // Player classes — per-level base stats follow classic-era growth curves.
@@ -4761,6 +4762,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeHeal', min: 42, max: 52, radius: 30 }],
     description: 'Channels restorative energy, healing nearby allies each second. (Druid talent)',
   },
+
+  // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
+  // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
+  // resolves sport ids; no class lists them, so abilitiesKnownAt never grants
+  // them outside a match (resolveSportKit is the only entry).
+  ...SPORT_ABILITIES,
 };
 
 // A class ability resolved to a concrete rank, with talent modifiers already

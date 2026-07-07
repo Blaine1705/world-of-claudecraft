@@ -13,7 +13,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 401,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,9 +27,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
-      "state": "8074b8c5",
-      "events": "714d87c5",
+      "nextId": 406,
+      "state": "48f54e92",
+      "events": "338d39eb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -53,12 +53,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -97,51 +98,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "gatheringProficiency": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "rows": {}
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "cls": "priest",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "delveClears": {},
-          "delveDaily": {},
           "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -181,6 +144,7 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -220,6 +184,47 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {}
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "cls": "priest",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 405,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -249,7 +254,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -285,56 +290,6 @@
             "max": 5,
             "min": 2,
             "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0555,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0555,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 51,
-          "id": 401,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resource": 175,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 12,
-          "stats": {
-            "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
-            "str": 10
-          },
-          "templateId": "priest",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
           }
         },
         {
@@ -449,6 +404,56 @@
           "fiveSecondRule": 99,
           "hp": 51,
           "id": 404,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 51,
+          "maxResource": 175,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 175,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 12,
+          "stats": {
+            "agi": 11,
+            "armor": 50,
+            "int": 23,
+            "spi": 24,
+            "sta": 13,
+            "str": 10
+          },
+          "templateId": "priest",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0555,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0555,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 51,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -492,9 +497,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
-      "state": "8074b8c5",
-      "events": "c2f748b2",
+      "nextId": 406,
+      "state": "48f54e92",
+      "events": "7ff177a1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -518,12 +523,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -562,51 +568,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "gatheringProficiency": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "rows": {}
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "cls": "priest",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "delveClears": {},
-          "delveDaily": {},
           "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -646,6 +614,7 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -685,6 +654,47 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {}
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "cls": "priest",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 405,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -714,7 +724,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -750,56 +760,6 @@
             "max": 5,
             "min": 2,
             "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0555,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0555,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 51,
-          "id": 401,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resource": 175,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 12,
-          "stats": {
-            "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
-            "str": 10
-          },
-          "templateId": "priest",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
           }
         },
         {
@@ -914,6 +874,56 @@
           "fiveSecondRule": 99,
           "hp": 51,
           "id": 404,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 51,
+          "maxResource": 175,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 175,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 12,
+          "stats": {
+            "agi": 11,
+            "armor": 50,
+            "int": 23,
+            "spi": 24,
+            "sta": 13,
+            "str": 10
+          },
+          "templateId": "priest",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0555,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0555,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 51,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -957,8 +967,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 405,
-      "state": "ba7d8325",
+      "nextId": 406,
+      "state": "d669f58a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -983,12 +993,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1027,51 +1038,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "gatheringProficiency": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "rows": {}
-          }
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "cls": "priest",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "delveClears": {},
-          "delveDaily": {},
           "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1111,6 +1084,7 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1150,6 +1124,47 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {}
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "cls": "priest",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 405,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1179,7 +1194,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.05,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1215,56 +1230,6 @@
             "max": 5,
             "min": 2,
             "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99.05,
-          "comboUntil": -1,
-          "critChance": 0.0555,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0555,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99.05,
-          "hp": 51,
-          "id": 401,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 51,
-          "maxResource": 175,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resource": 175,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 12,
-          "stats": {
-            "agi": 11,
-            "armor": 50,
-            "int": 23,
-            "spi": 24,
-            "sta": 13,
-            "str": 10
-          },
-          "templateId": "priest",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
           }
         },
         {
@@ -1379,6 +1344,56 @@
           "fiveSecondRule": 99.05,
           "hp": 51,
           "id": 404,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 51,
+          "maxResource": 175,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 175,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 12,
+          "stats": {
+            "agi": 11,
+            "armor": 50,
+            "int": 23,
+            "spi": 24,
+            "sta": 13,
+            "str": 10
+          },
+          "templateId": "priest",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99.05,
+          "comboUntil": -1,
+          "critChance": 0.0555,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0555,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99.05,
+          "hp": 51,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 401,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 404,
-      "state": "548ffc0d",
-      "events": "ad17345d",
+      "nextId": 405,
+      "state": "3b9e276b",
+      "events": "71e79a99",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 404,
-      "state": "fc14209f",
-      "events": "6e60008d",
+      "nextId": 405,
+      "state": "5a6dac15",
+      "events": "7fc93399",
       "rng": {
         "draws": 54,
         "digest": "addf5faa"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 404,
-      "state": "60253e25",
-      "events": "9b3dbf7d",
+      "nextId": 405,
+      "state": "f13a9f03",
+      "events": "59acab11",
       "rng": {
         "draws": 152,
         "digest": "8e2944b7"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 404,
-      "state": "1109aa71",
-      "events": "e324e10d",
+      "nextId": 405,
+      "state": "18790217",
+      "events": "72fdf341",
       "rng": {
         "draws": 276,
         "digest": "73e9d0e2"
@@ -72,9 +72,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 404,
-      "state": "37a91855",
-      "events": "daaa2835",
+      "nextId": 405,
+      "state": "398b39e3",
+      "events": "af9f6c5d",
       "rng": {
         "draws": 280,
         "digest": "a2a55785"
@@ -98,12 +98,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -133,12 +134,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -172,12 +174,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 402,
+          "entityId": 403,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -207,12 +210,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 403,
+          "entityId": 404,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -241,7 +245,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 104.05,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -288,7 +292,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.05,
           "hp": 54,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -337,7 +341,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 62,
-          "id": 402,
+          "id": 403,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -387,7 +391,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "hp": 51,
-          "id": 403,
+          "id": 404,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -430,9 +434,9 @@
     {
       "tick": 102,
       "time": 5.1,
-      "nextId": 404,
-      "state": "23ac5245",
-      "events": "cfe12802",
+      "nextId": 405,
+      "state": "bd56f1b7",
+      "events": "de77307b",
       "rng": {
         "draws": 281,
         "digest": "9090c1ff"
@@ -456,12 +460,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -491,12 +496,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -532,12 +538,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 402,
+          "entityId": 403,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -567,12 +574,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 403,
+          "entityId": 404,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -601,7 +609,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 104.1,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -648,7 +656,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.1,
           "hp": 54,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -697,7 +705,7 @@
           "dodgeChance": 0.0625,
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
-          "id": 402,
+          "id": 403,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -747,7 +755,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.1,
           "hp": 51,
-          "id": 403,
+          "id": 404,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -790,9 +798,9 @@
     {
       "tick": 103,
       "time": 5.15,
-      "nextId": 404,
-      "state": "c04d5c89",
-      "events": "62948351",
+      "nextId": 405,
+      "state": "382ef715",
+      "events": "1c7e0b6a",
       "rng": {
         "draws": 284,
         "digest": "22941d42"
@@ -817,12 +825,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -853,12 +862,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -895,12 +905,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 402,
+          "entityId": 403,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -933,12 +944,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 403,
+          "entityId": 404,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -967,7 +979,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 104.15,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1014,7 +1026,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 104.15,
           "hp": 54,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1063,7 +1075,7 @@
           "dodgeChance": 0.0625,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
-          "id": 402,
+          "id": 403,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1113,7 +1125,7 @@
           "dodgeChance": 0.0555,
           "facing": 3.141593,
           "fiveSecondRule": 104.15,
-          "id": 403,
+          "id": 404,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1156,8 +1168,8 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 404,
-      "state": "b84e9b77",
+      "nextId": 405,
+      "state": "5db455a7",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -1167,8 +1179,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 404,
-      "state": "c65e20ad",
+      "nextId": 405,
+      "state": "5638b61d",
       "events": "741638a5",
       "rng": {
         "draws": 548,
@@ -1178,8 +1190,8 @@
     {
       "tick": 175,
       "time": 8.75,
-      "nextId": 404,
-      "state": "8f902a4f",
+      "nextId": 405,
+      "state": "cd356c33",
       "events": "741638a5",
       "rng": {
         "draws": 712,
@@ -1189,8 +1201,8 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 404,
-      "state": "d318c765",
+      "nextId": 405,
+      "state": "ed753d11",
       "events": "741638a5",
       "rng": {
         "draws": 902,
@@ -1200,9 +1212,9 @@
     {
       "tick": 225,
       "time": 11.25,
-      "nextId": 404,
-      "state": "5d11ad0f",
-      "events": "01be3279",
+      "nextId": 405,
+      "state": "4c625f83",
+      "events": "d1989f59",
       "rng": {
         "draws": 1011,
         "digest": "e9b4d4be"
@@ -1211,8 +1223,8 @@
     {
       "tick": 243,
       "time": 12.15,
-      "nextId": 404,
-      "state": "4e040d67",
+      "nextId": 405,
+      "state": "e423060f",
       "events": "741638a5",
       "rng": {
         "draws": 1088,
@@ -1238,12 +1250,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1274,12 +1287,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1316,12 +1330,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 402,
+          "entityId": 403,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1354,12 +1369,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 403,
+          "entityId": 404,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1389,7 +1405,7 @@
           "fallStartY": 3.238738,
           "fiveSecondRule": 111.15,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1437,7 +1453,7 @@
           "fallStartY": 3.09695,
           "fiveSecondRule": 111.15,
           "hp": 54,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1487,7 +1503,7 @@
           "fallStartY": 2.656939,
           "fiveSecondRule": 111.15,
           "hp": 62,
-          "id": 402,
+          "id": 403,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1538,7 +1554,7 @@
           "fallStartY": 1.893785,
           "fiveSecondRule": 111.15,
           "hp": 51,
-          "id": 403,
+          "id": 404,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1582,8 +1598,8 @@
     {
       "tick": 243,
       "time": 12.15,
-      "nextId": 404,
-      "state": "4e040d67",
+      "nextId": 405,
+      "state": "e423060f",
       "events": "741638a5",
       "rng": {
         "draws": 1088,
@@ -1609,12 +1625,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1645,12 +1662,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1687,12 +1705,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 402,
+          "entityId": 403,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1725,12 +1744,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 403,
+          "entityId": 404,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -1760,7 +1780,7 @@
           "fallStartY": 3.238738,
           "fiveSecondRule": 111.15,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1808,7 +1828,7 @@
           "fallStartY": 3.09695,
           "fiveSecondRule": 111.15,
           "hp": 54,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1858,7 +1878,7 @@
           "fallStartY": 2.656939,
           "fiveSecondRule": 111.15,
           "hp": 62,
-          "id": 402,
+          "id": 403,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1909,7 +1929,7 @@
           "fallStartY": 1.893785,
           "fiveSecondRule": 111.15,
           "hp": 51,
-          "id": 403,
+          "id": 404,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
