@@ -131,8 +131,12 @@ export function computeBorderEdges(zones: readonly ZoneDef[]): BorderEdge[] {
 }
 
 const BORDER_EDGES: readonly BorderEdge[] = computeBorderEdges(ZONES);
-const RIDGE_HEIGHT = 22;
-const RIDGE_SIGMA = 18; // gaussian width of the wall
+// Low, broad border ranges: steep enough to read as a border, gentle
+// enough that ANY land contact between two maps is walkable over (the
+// pass roads stay the easy way; the hills are never a hard wall). Only
+// the sealed border is a true barrier.
+const RIDGE_HEIGHT = 15;
+const RIDGE_SIGMA = 26; // gaussian width of the wall
 // Sealed walls: tall and steep enough that the straight-approach gradient
 // beats PLAYER_MAX_CLIMB_SLOPE everywhere along the border. The slope gate
 // alone cannot seal a smooth wall (it projects rise along the movement
@@ -463,7 +467,9 @@ export function fenLandness(x: number, z: number): number {
 // Gentle everywhere: the fen's shelf is wider and its floor shallower than
 // the other realms' (bog country, not sea cliffs).
 function applyFenCoast(x: number, z: number, h: number): number {
-  if (z <= FEN_ZMIN - 2 || z > FEN_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(FEN_ZMIN - 8, FEN_ZMIN + 8, z) * (1 - smoothstep(FEN_ZMAX - 8, FEN_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the west column: cross-fade toward the marsh at the border (a step in
   // terrainHeight along the border line buries walkers; the render mesh
   // interpolates across it, the sim does not)
@@ -481,7 +487,7 @@ function applyFenCoast(x: number, z: number, h: number): number {
   // ...and the Tanglemouth's south ramp, meeting the jungle's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 400))) * smoothstep(640, 685, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // ---------------------------------------------------------------------------
@@ -527,7 +533,10 @@ export function nightLandness(x: number, z: number): number {
 
 // Gentle everywhere, the fen's recipe: soft downs easing into a dark sea.
 function applyNightCoast(x: number, z: number, h: number): number {
-  if (z <= NIGHT_ZMIN - 2 || z > NIGHT_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(NIGHT_ZMIN - 8, NIGHT_ZMIN + 8, z) *
+    (1 - smoothstep(NIGHT_ZMAX - 8, NIGHT_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the west column: cross-fade toward the strip at the border
   if (x < -566) return h; // nothing west of the world
   const seam = 1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
@@ -543,7 +552,7 @@ function applyNightCoast(x: number, z: number, h: number): number {
   // ...and the gold road's south ramp, meeting the Amberfall's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 350))) * smoothstep(1760, 1805, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // ---------------------------------------------------------------------------
@@ -587,7 +596,9 @@ export function woodLandness(x: number, z: number): number {
 
 // Gentle shores under the murk, the fen recipe again.
 function applyWoodCoast(x: number, z: number, h: number): number {
-  if (z <= WOOD_ZMIN - 2 || z > WOOD_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(WOOD_ZMIN - 8, WOOD_ZMIN + 8, z) * (1 - smoothstep(WOOD_ZMAX - 8, WOOD_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the east column: cross-fade toward the strip at the border
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
   const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
@@ -603,7 +614,7 @@ function applyWoodCoast(x: number, z: number, h: number): number {
   // ...and the Wyrmgate road's north ramp, meeting the waste's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x - 404))) * smoothstep(1760, 1805, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // ---------------------------------------------------------------------------
@@ -659,7 +670,10 @@ export function reachLandness(x: number, z: number): number {
 // The tropical coast: the fen recipe, then every low shore flattened into a
 // broad sand shelf (the beach cap) so the strand runs wide and walkable.
 function applyReachCoast(x: number, z: number, h: number): number {
-  if (z <= REACH_ZMIN - 2 || z > REACH_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(REACH_ZMIN - 8, REACH_ZMIN + 8, z) *
+    (1 - smoothstep(REACH_ZMAX - 8, REACH_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the west column: cross-fade toward the strip at the border
   if (x < -566) return h; // nothing west of the world
   const seam = 1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
@@ -682,7 +696,7 @@ function applyReachCoast(x: number, z: number, h: number): number {
   // ...and the Nightgate's south ramp, meeting the dream's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 330))) * smoothstep(1200, 1245, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // ---------------------------------------------------------------------------
@@ -737,7 +751,10 @@ export function gardenLandness(x: number, z: number): number {
 
 // The garden coast: the fen recipe over lawn instead of reeds.
 function applyGardenCoast(x: number, z: number, h: number): number {
-  if (z <= GARDEN_ZMIN - 2 || z > GARDEN_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(GARDEN_ZMIN - 8, GARDEN_ZMIN + 8, z) *
+    (1 - smoothstep(GARDEN_ZMAX - 8, GARDEN_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the east column: cross-fade toward the strip at the border
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
   const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
@@ -756,7 +773,7 @@ function applyGardenCoast(x: number, z: number, h: number): number {
   // ...and the Crowgate's south ramp, up into the haunted wood
   const passN = (1 - smoothstep(26, 52, Math.abs(x - 390))) * smoothstep(1200, 1245, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // The Great Maze. '#' cells are hedge walls raised straight out of the
@@ -930,7 +947,9 @@ export function galeLandness(x: number, z: number): number {
 // The headland coast: the fen recipe cut steeper (sea cliffs, not bog), a
 // flat pass floor at the Windway meeting the fen's east ramp.
 function applyGaleCoast(x: number, z: number, h: number): number {
-  if (z <= GALE_ZMIN - 2 || z > GALE_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(GALE_ZMIN - 8, GALE_ZMIN + 8, z) * (1 - smoothstep(GALE_ZMAX - 8, GALE_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the seam twin of applyFenCoast's gate: cross-fade, never a hard cut
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
   const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
@@ -946,7 +965,7 @@ function applyGaleCoast(x: number, z: number, h: number): number {
   // ...and the Garden Gate's south ramp, up onto the lawns
   const passN = (1 - smoothstep(26, 52, Math.abs(x - 400))) * smoothstep(640, 685, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // The border meres between columns: the seam blend of two adjacent coasts
@@ -1029,7 +1048,10 @@ function greenSeamT(x: number, z: number): number {
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
 function applyAmberCoast(x: number, z: number, h: number): number {
-  if (z <= AMBER_ZMIN - 2 || z > AMBER_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(AMBER_ZMIN - 8, AMBER_ZMIN + 8, z) *
+    (1 - smoothstep(AMBER_ZMAX - 8, AMBER_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the west column: cross-fade toward the strip at the border
   if (x < -566) return h; // nothing west of the world
   const seam = 1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
@@ -1045,7 +1067,7 @@ function applyAmberCoast(x: number, z: number, h: number): number {
   // ...and the gold road's south cap, meeting the dream's ramp at the border
   const passS = (1 - smoothstep(26, 52, Math.abs(x + 350))) * (1 - smoothstep(1870, 1920, z));
   if (passS > 0) out = out + (6 + (out - 6) * 0.15 - out) * passS;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // Sink everything beyond the coast to the seabed. The outer 10yd of the band
@@ -1054,7 +1076,9 @@ function applyAmberCoast(x: number, z: number, h: number): number {
 function applyHollowCoast(x: number, z: number, h: number): number {
   // the sea starts north of the sealed range: the realm's south is mountain,
   // its other shores are coast (and the wall never wets)
-  if (z < 960 || z > HOLLOW_ZMAX + 2) return h;
+  if (z < 960) return h;
+  const zSeam = 1 - smoothstep(HOLLOW_ZMAX - 8, HOLLOW_ZMAX + 8, z);
+  if (zSeam <= 0) return h;
   // the moat columns flank the Hollow now: its coast owns only the strip,
   // cross-fading toward the lawns and the wood at the border meres
   const seam =
@@ -1099,7 +1123,7 @@ function applyHollowCoast(x: number, z: number, h: number): number {
       }
     }
   }
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // The Drakelands' coast, same recipe as the Hollow's. It fades OUT toward
@@ -1107,7 +1131,10 @@ function applyHollowCoast(x: number, z: number, h: number): number {
 // footing all the way across the band: over the flanks the sealed range
 // simply runs down into the sea instead of being sunk by the coast.
 function applyEmberCoast(x: number, z: number, h: number): number {
-  if (z < DRAKE_ZMIN - 2 || z > DRAKE_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(DRAKE_ZMIN - 8, DRAKE_ZMIN + 8, z) *
+    (1 - smoothstep(DRAKE_ZMAX - 8, DRAKE_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the east column: cross-fade toward the strip at the border
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
   const emberSeam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
@@ -1123,13 +1150,16 @@ function applyEmberCoast(x: number, z: number, h: number): number {
   // ...and the Snowline's east floor, fire cooling into ice at the border
   const passW = (1 - smoothstep(26, 52, Math.abs(z - 1890))) * (1 - smoothstep(230, 280, x));
   if (passW > 0) out = out + (6 + (out - 6) * 0.15 - out) * passW;
-  return h + (out - h) * emberSeam;
+  return h + (out - h) * emberSeam * zSeam;
 }
 
 // The Frostveil's coast. Fades IN north of the sealed wall's footing for the
 // same reason (the wall crest sits at the band's south fringe).
 function applyFrostCoast(x: number, z: number, h: number): number {
-  if (z <= HOLLOW_ZMAX - 2 || z > FROST_ZMAX + 2) return h;
+  const zSeam =
+    smoothstep(HOLLOW_ZMAX - 8, HOLLOW_ZMAX + 8, z) *
+    (1 - smoothstep(FROST_ZMAX - 8, FROST_ZMAX + 8, z));
+  if (zSeam <= 0) return h;
   // the Reach holds the strip's north end: cross-fade toward both columns
   const seam =
     smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x) *
@@ -1151,7 +1181,7 @@ function applyFrostCoast(x: number, z: number, h: number): number {
   // ...and the Goldmelt's east ramp, toward the autumn on the west border
   const passW = (1 - smoothstep(26, 52, Math.abs(z - 1890))) * (1 - smoothstep(-145, -100, x));
   if (passW > 0) out = out + (7 + (out - 7) * 0.15 - out) * passW;
-  return h + (out - h) * seam;
+  return h + (out - h) * seam * zSeam;
 }
 
 // The Drakemaw's volcano cones: raised shields with crater dips. The caldera
@@ -1609,6 +1639,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // Mountain ridge walls along shared zone edges, pierced by the road pass
   // (sealed walls have no pass and only ever grow past their base height,
   // so no crest dip opens a climbable notch)
+  let wallAdd = 0;
   for (const edge of BORDER_EDGES) {
     const sigma = edge.sealed ? SEALED_RIDGE_SIGMA : RIDGE_SIGMA;
     const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
@@ -1661,9 +1692,12 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       // east border: the wall's gaussian tail must not lean into its bowl
       const dCrater = Math.hypot(x - MIREFEN_IMPACT_CRATER.x, z - MIREFEN_IMPACT_CRATER.z);
       const craterGate = smoothstep(34, 56, dCrater);
-      h += height * crest * profile * pass * seaGate * end * craterGate;
+      // where two borders meet, the TALLER range wins instead of stacking
+      // (summed corners built unclimbable knots at every junction)
+      wallAdd = Math.max(wallAdd, height * crest * profile * pass * seaGate * end * craterGate);
     }
   }
+  h += wallAdd;
 
   h += mirefenImpactCraterOffset(x, z);
   h += hollowShapingOffset(x, z, seed);
@@ -1720,7 +1754,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     40 *
     smoothstep(150, 180, x) *
     (1 - smoothstep(184, 214, x)) *
-    (1 - smoothstep(45, 75, Math.abs(z - MIREFEN_IMPACT_CRATER.z)));
+    (1 - smoothstep(45, 75, Math.abs(z - MIREFEN_IMPACT_CRATER.z))) *
+    // ...with a walkable breach at the wall's north end, so the relic is a
+    // landmark to route around, not a shut border
+    (1 - 0.85 * (1 - smoothstep(10, 26, Math.abs(z - 348))));
   // the Tablecrag's crown: a level table cut into the eastern border range
   // (flattened AFTER the rims so the top is a true plateau, not rim noise)
   const dMesa = Math.hypot(x + 168, z - 1195);
