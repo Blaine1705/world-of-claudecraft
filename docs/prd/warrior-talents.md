@@ -60,13 +60,14 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
   within 40 yd: their next 3 ability casts are guaranteed crits. (Was briefly moved to Prot on
   2026-07-07 then moved back to Fury same day.)
 
-## KNOWN GOTCHA: spec must be COMMITTED for gating to show
-The spec-gating only applies once the player has a COMMITTED spec (`mods.spec`). Default is NO spec,
-and the current rule is "no spec chosen = full kit" (so a specless warrior sees ALL three specs'
-abilities, which reads as "exclusivity is broken" but is not). A spec is committed today only via the
-talents panel (N) -> pick a spec card -> Save a loadout. OPEN DECISION with operator: change the rule
-to "no spec = shared base kit only" so exclusivity is visible by default, and/or make spec selection a
-simpler one-click commit (this UX is otherwise ryze-#1614-engine territory).
+## Spec must be COMMITTED for the kit to unlock (DONE 2026-07-07)
+Spec-gating keys off the COMMITTED spec (`mods.spec`); default is NO spec. RULE (implemented):
+a spec-restricted ability shows ONLY when the committed spec matches, so a NO-SPEC warrior sees
+only the ungated shared base kit and gains a spec's exclusives by committing that spec. This is why
+a specless warrior briefly "saw everything" (the old rule was "no spec = full kit"); fixed.
+Committing a spec today: talents panel (N) -> pick a spec card -> Save a loadout (level 10+
+required; `saveTalentLoadout` sets `meta.talents` + recomputes known). A simpler one-click spec
+commit is still open, but deferred to ryze's #1614 engine (that UX is its territory).
 
 ### Arms (PENDING as of this writing; being built)
 - `breachmaker` "Breachmaker" (Aplastar Coloso): lvl 16, 10 rage, 45s cd. Weapon strike + marks the
