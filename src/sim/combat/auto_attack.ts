@@ -233,6 +233,10 @@ export function meleeSwing(
     weaponMult?: number;
     threatFlat?: number;
     threatMult?: number;
+    // Bladed Echo consumer (combat/area_echo.ts): receives the RESOLVED swing
+    // damage (post crit/armor, the exact number dealDamage received) on a
+    // connected swing only, so the caller can replay it without re-rolling.
+    onDealt?: (amount: number) => void;
   },
 ): boolean {
   const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
@@ -292,17 +296,14 @@ export function meleeSwing(
   const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
   if (crit) dmg *= 2;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  ctx.dealDamage(
-    attacker,
-    target,
-    Math.max(1, Math.round(dmg)),
-    crit,
-    'physical',
-    abilityName,
-    'hit',
-    false,
-    { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
-  );
+  const dealtAmount = Math.max(1, Math.round(dmg));
+  ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
+    flat: opts.threatFlat ?? 0,
+    mult: opts.threatMult ?? 1,
+  });
+  // Bladed Echo hook: report the resolved amount of a CONNECTED swing so the
+  // effect-dispatch caller can fan it out (no rng drawn here or there).
+  opts.onDealt?.(dealtAmount);
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

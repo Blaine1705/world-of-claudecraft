@@ -3679,8 +3679,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'aoeDamage', min: 30, max: 42, radius: 8 }],
-    description: 'Spin in a deadly arc, striking all nearby enemies for $d. (Fury talent)',
+    effects: [
+      { type: 'aoeDamage', min: 30, max: 42, radius: 8 },
+      // Bladed Echo: arms the caster for 2 echoing casts (combat/area_echo.ts).
+      // Its own aoeDamage disqualifies whirlwind from consuming the charge.
+      {
+        type: 'selfBuff',
+        kind: 'aoe_echo',
+        value: 0,
+        duration: 12,
+        charges: 2,
+        auraId: 'bladed_echo',
+        auraName: 'Bladed Echo',
+      },
+    ],
+    description:
+      'Spin in a deadly arc, striking all nearby enemies for $d. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
   },
   berserker_rage: {
     id: 'berserker_rage',

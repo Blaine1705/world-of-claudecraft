@@ -2701,6 +2701,8 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  // Bladed Echo (whirlwind's armed area-echo buff, aura id 'bladed_echo')
+  aura_aoe_echo: r('fury', 'steel', ['sword'], ['motion']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

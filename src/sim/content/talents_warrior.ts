@@ -126,7 +126,7 @@ const FURY_NODES: TalentNode[] = [
     id: 'fury_whirlwind', tree: 'spec', specId: 'fury', kind: 'active', maxRank: 1, pointsGate: 2,
     requires: ['fury_cruelty'],
     effect: { grant: { ability: 'whirlwind' } },
-    icon: '🌀', name: 'Bladed Gyre', description: 'Grants Bladed Gyre: strike all nearby enemies in a single spin.',
+    icon: '🌀', name: 'Bladed Gyre', description: 'Grants Bladed Gyre: strike all nearby enemies in a single spin. Your next two single-target abilities also strike enemies near their target.',
     row: 1, col: 0,
   },
   {

@@ -41,6 +41,7 @@ import {
   rageGenAuraMult,
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
+import { consumeAreaEchoCharge, echoAreaDamage } from './area_echo';
 import { isRooted } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -161,11 +162,19 @@ export function runEffects(
   meta: PlayerMeta,
   target: Entity | null,
   res: ResolvedAbility,
+  // Bladed Echo (combat/area_echo.ts): applyAbility resolved this cast as
+  // echo-eligible ONCE at the ability level, so a multi-strike cast (Red
+  // Harvest) echoes every strike and consumes a single charge below.
+  opts?: { areaEcho?: boolean },
 ): void {
   const ability = res.def;
   const isSpell = ability.school !== 'physical';
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
+  // Set by the weaponStrike/directDamage cases when an echo-eligible cast
+  // actually dealt single-target hostile damage; gates the charge consumption
+  // after the loop (a fully whiffed cast keeps its charge).
+  let areaEchoDealt = false;
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -209,11 +218,29 @@ export function runEffects(
     switch (eff.type) {
       case 'weaponStrike': {
         if (!target) break;
-        const hit = ctx.meleeSwing(p, target, eff.bonus, ability.name, {
+        const strikeTarget = target;
+        const hit = ctx.meleeSwing(p, strikeTarget, eff.bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult: eff.weaponMult ?? 1,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
+          // Bladed Echo: fan this swing's RESOLVED damage (post crit/armor, the
+          // exact number the primary dealDamage received) out to enemies near
+          // the primary target. No re-roll; a miss/dodge never fires this.
+          onDealt: opts?.areaEcho
+            ? (amount) => {
+                areaEchoDealt = true;
+                echoAreaDamage(
+                  ctx,
+                  p,
+                  strikeTarget,
+                  amount,
+                  ability.school,
+                  ability.name,
+                  threatOpts,
+                );
+              }
+            : undefined,
         });
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -252,6 +279,12 @@ export function runEffects(
           false,
           threatOpts,
         );
+        // Bladed Echo: replay the SAME resolved amount (already rolled, post
+        // crit/armor; no new rng draw) onto enemies near the primary target.
+        if (opts?.areaEcho) {
+          areaEchoDealt = true;
+          echoAreaDamage(ctx, p, target, Math.round(dmg), ability.school, ability.name, threatOpts);
+        }
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -1111,8 +1144,11 @@ export function runEffects(
           ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
         }
         ctx.applyAura(p, {
-          id: ability.id,
-          name: ability.name,
+          // A selfBuff may carry its own buff identity (aoe_echo: Bladed Gyre
+          // arms 'Bladed Echo' under id 'bladed_echo', so the HUD names the
+          // rider apart from the granting ability); default is the ability's.
+          id: eff.auraId ?? ability.id,
+          name: eff.auraName ?? ability.name,
           kind: eff.kind,
           remaining: eff.duration,
           duration: eff.duration,
@@ -1121,6 +1157,7 @@ export function runEffects(
           school: ability.school,
           // charge-limited thorns (Lightning Shield): cap reflects and gate them
           // behind an internal cooldown. Absent on a plain always-on thorns coat.
+          // aoe_echo counts its remaining casts through the same charges field.
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
@@ -1250,6 +1287,10 @@ export function runEffects(
     }
     if (target?.dead) target = null;
   }
+
+  // Bladed Echo: one charge per CAST (not per strike), spent only after the
+  // cast actually dealt single-target hostile damage this resolution.
+  if (opts?.areaEcho && areaEchoDealt) consumeAreaEchoCharge(ctx, p);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;
