@@ -15,7 +15,13 @@ const cache = new Map<string, ArtState>();
 const waiters = new Map<string, ((img: HTMLImageElement) => void)[]>();
 
 /** Kick (or join) the load of a zone's plate; onReady fires only if it exists. */
+// Plates are parked while the world's shape settles: the shipped art was
+// painted for the old layout and no longer matches the terrain. Flip to
+// true when fresh plates land in public/map_art/.
+const MAP_ART_ENABLED = false;
+
 export function onMapArtReady(zoneId: string, onReady: (img: HTMLImageElement) => void): void {
+  if (!MAP_ART_ENABLED) return;
   const state = cache.get(zoneId);
   if (state === 'missing') return;
   if (state instanceof HTMLImageElement) {

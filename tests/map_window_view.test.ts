@@ -172,11 +172,13 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.blit).toEqual({ sxFrac: 0, syFrac: 0, swFrac: 1, shFrac: 1 });
     expect(model.cursor).toBe('default');
     expect(model.detail).toBeNull();
+    // the view follows the ZONE rect (the strip default here), matching
+    // the terrain bg it blits against
     expect(model.view).toEqual({
-      spanX: WORLD_MAX_X - WORLD_MIN_X,
+      spanX: 360,
       spanZ: ZONE.zMax - ZONE.zMin,
-      minX: WORLD_MIN_X,
-      maxX: WORLD_MAX_X,
+      minX: -180,
+      maxX: 180,
       minZ: ZONE.zMin,
       maxZ: ZONE.zMax,
     });
@@ -187,7 +189,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 3));
     expect(model.cursor).toBe('grab');
     expect(model.blit.swFrac).toBeCloseTo(1 / 3, 10);
-    expect(model.view.spanX).toBeCloseTo((WORLD_MAX_X - WORLD_MIN_X) / 3, 6);
+    expect(model.view.spanX).toBeCloseTo(360 / 3, 6);
   });
 
   it('builds the zoomed-detail overlay only at/above MAP_DETAIL_ZOOM', () => {
@@ -203,6 +205,46 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(detail).not.toBeNull();
     // rock/tree(pine)/tree2(oak) map to the three decoration color keys, in order.
     expect(detail?.decorations.map((d) => d.kind)).toEqual(['rock', 'tree', 'oak']);
+  });
+
+  it('projects markers against the zone rect, not the world bounds (column zones)', () => {
+    // Regression: the view once spanned WORLD_MIN_X..WORLD_MAX_X while the
+    // terrain bg spanned the zone rect, squeezing every marker into a third
+    // of the canvas once the columns widened the world. A galecrest-shaped
+    // zone (x 180..540) with the player at (394, 697) must land the marker
+    // where the terrain puts that ground: (540 - 394) / 360 of the width.
+    const col: typeof ZONE = {
+      ...ZONE,
+      id: 'col_zone',
+      zMin: 180,
+      zMax: 700,
+      xMin: 180,
+      xMax: 540,
+    };
+    const world = makeOverworldWorld('sim') as unknown as {
+      player: { pos: { x: number; z: number } };
+      entities: Map<number, { pos: { x: number; z: number } }>;
+    };
+    world.player.pos.x = 394;
+    world.player.pos.z = 697;
+    const npc = world.entities.get(2);
+    if (npc) {
+      npc.pos.x = 394;
+      npc.pos.z = 697;
+    }
+    const model = buildOverworldMapModel({
+      world: world as unknown as IWorld,
+      zone: col,
+      zoom: 1,
+      center: null,
+      canvasSize: CANVAS,
+      decorations: NO_DECOR,
+    });
+    expect(model.player).not.toBeNull();
+    const mx = model.player ? model.player.mx : Number.NaN;
+    expect(mx / CANVAS).toBeCloseTo((540 - 394) / 360, 3);
+    // and the blit still covers the whole cached zone background at zoom 1
+    expect(model.blit.swFrac).toBeCloseTo(1, 6);
   });
 
   it('emits a player arrow at -facing and one quest-giver glyph', () => {

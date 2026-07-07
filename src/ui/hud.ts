@@ -509,8 +509,6 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
   'cry',
 ];
 
-// yards past a zone boundary before the crossing banner/welcome commits
-const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
 // WoW-style chat tabs: the ordered channel tabs the player has opened, and the
 // tab that was active last session. The built-in `all`/`combat` views are
@@ -4898,21 +4896,18 @@ export class Hud {
       // A ~5yd dead-band past the boundary stops a player straddling the border
       // from re-triggering the banner/log (and the map canvas regen) every step.
       if (!inDungeon && currentZone.id !== this.lastZoneId) {
-        const lastZone = ZONES.find((z) => z.id === this.lastZoneId);
-        const pastDeadBand =
-          !lastZone ||
-          p.pos.z < lastZone.zMin - ZONE_BANNER_DEADBAND ||
-          p.pos.z >= lastZone.zMax + ZONE_BANNER_DEADBAND;
-        if (pastDeadBand) {
-          if (this.lastZoneId !== '') {
-            const currentZoneName = zoneDisplayName(currentZone.id);
-            this.showBanner(currentZoneName);
-            this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
-            this.logZoneWelcome(currentZone);
-          }
-          this.lastZoneId = currentZone.id;
-          this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
+        // commit the moment zoneAt flips: the old 1D z deadband never fired
+        // on an east-west crossing (the grid's column borders share the z
+        // band), so the banner and map lagged the border by a whole realm.
+        // Re-crossing costs only a banner re-emit; the map bg is cached.
+        if (this.lastZoneId !== '') {
+          const currentZoneName = zoneDisplayName(currentZone.id);
+          this.showBanner(currentZoneName);
+          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
+          this.logZoneWelcome(currentZone);
         }
+        this.lastZoneId = currentZone.id;
+        this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
       }
 
       // subzone text: a smaller banner when you step into a named landmark

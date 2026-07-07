@@ -20,6 +20,8 @@ import {
   isDelvePos,
   PROPS,
   QUESTS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MIN_X,
   type ZoneDef,
@@ -197,12 +199,17 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const { world, zone, zoom, center, canvasSize: S, decorations } = input;
   const p = world.player;
 
-  // The full committed-zone region: the whole world in X, the zone band in Z.
+  // The full committed-zone region: the zone's own rect (the columns ended
+  // the era when "the whole world in X" and "the zone in X" were the same
+  // thing; the terrain bg is rendered for the zone rect, so the view must
+  // match it or every marker lands off the art).
+  const zoneMinX = zone.xMin ?? STRIP_MIN_X;
+  const zoneMaxX = zone.xMax ?? STRIP_MAX_X;
   const full: MapViewRect = {
-    spanX: WORLD_MAX_X - WORLD_MIN_X,
+    spanX: zoneMaxX - zoneMinX,
     spanZ: zone.zMax - zone.zMin,
-    minX: WORLD_MIN_X,
-    maxX: WORLD_MAX_X,
+    minX: zoneMinX,
+    maxX: zoneMaxX,
     minZ: zone.zMin,
     maxZ: zone.zMax,
   };
