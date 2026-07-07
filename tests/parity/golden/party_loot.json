@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 404,
-      "state": "a9504847",
+      "state": "023a9a4f",
       "events": "abc8fc8f",
       "rng": {
         "draws": 2,
@@ -74,7 +74,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -114,7 +115,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [

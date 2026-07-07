@@ -323,6 +323,7 @@ export const COMMAND_NAMES = [
   'autoloot',
   'resurrect_corpse',
   'resurrect_healer',
+  'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
   'vcup_queue',

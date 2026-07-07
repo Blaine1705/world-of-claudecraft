@@ -1062,6 +1062,18 @@ export const hudChromeStrings = {
       tusk: 'Tusk',
     },
   },
+  // #1143: persistent town focus allocation panel. Reuses the corpseHarvest
+  // component-name map above for consistency; only town-focus-specific copy
+  // lives here.
+  townFocus: {
+    title: 'Town Focus',
+    hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
+    budgetLabel: 'Points remaining: {remaining} / {budget}',
+    saveButton: 'Save Focus',
+    notInTownHint: 'You must be in town to set your focus.',
+    increaseAria: 'Increase focus on {component}',
+    decreaseAria: 'Decrease focus on {component}',
+  },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
   // hud_chrome domain so an English-only PR compiles; the new-leader announcement

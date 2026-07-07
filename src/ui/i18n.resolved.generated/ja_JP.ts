@@ -922,6 +922,15 @@ export const ja_JP: EnTranslations = {
         "tusk": "牙"
       }
     },
+    "townFocus": {
+      "title": "町のフォーカス",
+      "hint": "フォーカスポイントは各素材の基本産出量にボーナスを加算します。フォーカスしていない素材は基本産出量のままです。",
+      "budgetLabel": "残りポイント：{remaining} / {budget}",
+      "saveButton": "フォーカスを保存",
+      "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
+      "increaseAria": "{component}へのフォーカスを増やす",
+      "decreaseAria": "{component}へのフォーカスを減らす"
+    },
     "party": {
       "promoteLeader": "パーティリーダーに指定",
       "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"

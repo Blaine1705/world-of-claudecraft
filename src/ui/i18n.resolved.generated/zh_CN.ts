@@ -922,6 +922,15 @@ export const zh_CN: EnTranslations = {
         "tusk": "獠牙"
       }
     },
+    "townFocus": {
+      "title": "城镇专注",
+      "hint": "专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。",
+      "budgetLabel": "剩余点数：{remaining} / {budget}",
+      "saveButton": "保存专注",
+      "notInTownHint": "你必须在城镇中才能设置专注。",
+      "increaseAria": "增加对{component}的专注",
+      "decreaseAria": "减少对{component}的专注"
+    },
     "party": {
       "promoteLeader": "提升为队长",
       "inviteUsage": "邀请谁？用法：/invite <名称>。"

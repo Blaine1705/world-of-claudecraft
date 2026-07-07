@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 405,
-      "state": "a647d3c8",
+      "state": "fcab7ff8",
       "events": "43829cd3",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 405,
-      "state": "0cfc56c0",
+      "state": "d0bef070",
       "events": "7fc93399",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 405,
-      "state": "55f60cc4",
+      "state": "3c8b6bb4",
       "events": "59acab11",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "f1da5df8",
+      "state": "a336d768",
       "events": "72fdf341",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 405,
-      "state": "ec534c01",
+      "state": "37e56871",
       "events": "9e6a5a8d",
       "rng": {
         "draws": 300,
@@ -133,7 +133,8 @@
               "20": "war_r20_bladestorm"
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -187,7 +188,8 @@
               "20": "mag_r20_deep_freeze"
             },
             "spec": "arcane"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -239,7 +241,8 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -293,7 +296,8 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -504,7 +508,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 405,
-      "state": "1c296211",
+      "state": "0531efbd",
       "events": "cf9ec829",
       "rng": {
         "draws": 300,
@@ -562,7 +566,8 @@
               "20": "war_r20_bladestorm"
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -616,7 +621,8 @@
               "20": "mag_r20_deep_freeze"
             },
             "spec": "arcane"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -668,7 +674,8 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -722,7 +729,8 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -931,7 +939,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 405,
-      "state": "6c5017d1",
+      "state": "d063eec9",
       "events": "6e8891dd",
       "rng": {
         "draws": 300,
@@ -990,7 +998,8 @@
               "20": "war_r20_bladestorm"
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1044,7 +1053,8 @@
               "20": "mag_r20_deep_freeze"
             },
             "spec": "arcane"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1097,7 +1107,8 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1151,7 +1162,8 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1360,7 +1372,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 405,
-      "state": "9bf3ce61",
+      "state": "a13c21d9",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1371,7 +1383,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 405,
-      "state": "94ce12e7",
+      "state": "3fbbf2e7",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1430,7 +1442,8 @@
               "20": "war_r20_bladestorm"
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1484,7 +1497,8 @@
               "20": "mag_r20_deep_freeze"
             },
             "spec": "arcane"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1537,7 +1551,8 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1591,7 +1606,8 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [

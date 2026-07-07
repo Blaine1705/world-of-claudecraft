@@ -29,7 +29,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 403,
-      "state": "1ec29c16",
+      "state": "03b1211e",
       "events": "47a7d65d",
       "rng": {
         "draws": 0,
@@ -71,7 +71,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -111,7 +112,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -220,7 +222,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 403,
-      "state": "1ec29c16",
+      "state": "03b1211e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -262,7 +264,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -302,7 +305,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -411,7 +415,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 403,
-      "state": "1ec29c16",
+      "state": "03b1211e",
       "events": "61c14069",
       "rng": {
         "draws": 0,
@@ -453,7 +457,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -493,7 +498,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -602,7 +608,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 403,
-      "state": "145cdfc8",
+      "state": "63427860",
       "events": "4474da9b",
       "rng": {
         "draws": 0,
@@ -644,7 +650,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -696,7 +703,8 @@
           ],
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -805,7 +813,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 403,
-      "state": "1ec29c16",
+      "state": "03b1211e",
       "events": "d2523ccb",
       "rng": {
         "draws": 0,
@@ -847,7 +855,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -887,7 +896,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -996,7 +1006,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 403,
-      "state": "f9dbd1a2",
+      "state": "bbcf6a7a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1038,7 +1048,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1078,7 +1089,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [

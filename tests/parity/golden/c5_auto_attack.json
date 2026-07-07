@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 411,
-      "state": "f789c1fa",
+      "state": "e073e856",
       "events": "7bd5b666",
       "rng": {
         "draws": 20,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 411,
-      "state": "561812da",
+      "state": "ee8a7176",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 411,
-      "state": "e5055bad",
+      "state": "197631cb",
       "events": "bddd3366",
       "rng": {
         "draws": 23,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "067671d8",
+      "state": "4872c114",
       "events": "ed2093a3",
       "rng": {
         "draws": 26,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 411,
-      "state": "076a1981",
+      "state": "498e5027",
       "events": "b5f7c7d7",
       "rng": {
         "draws": 26,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 411,
-      "state": "530bde28",
+      "state": "4846ed24",
       "events": "741638a5",
       "rng": {
         "draws": 26,
@@ -101,7 +101,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 411,
-      "state": "e1ea4846",
+      "state": "fa08d16a",
       "events": "b5f7c7d7",
       "rng": {
         "draws": 26,
@@ -112,7 +112,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "dde96ab8",
+      "state": "f13dd9b4",
       "events": "7a58f452",
       "rng": {
         "draws": 27,
@@ -123,7 +123,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 411,
-      "state": "deba0857",
+      "state": "72e633b3",
       "events": "3f0f8232",
       "rng": {
         "draws": 68,
@@ -134,7 +134,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 411,
-      "state": "2489397b",
+      "state": "2dbc234b",
       "events": "178dc140",
       "rng": {
         "draws": 93,
@@ -145,7 +145,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 411,
-      "state": "9a5d6dac",
+      "state": "87741b9a",
       "events": "b5f7c7d7",
       "rng": {
         "draws": 105,
@@ -156,7 +156,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 411,
-      "state": "4c4df271",
+      "state": "b081905b",
       "events": "b5bbd082",
       "rng": {
         "draws": 129,
@@ -167,7 +167,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 411,
-      "state": "bb5acf71",
+      "state": "535d2f5b",
       "events": "b5f7c7d7",
       "rng": {
         "draws": 151,
@@ -178,7 +178,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 411,
-      "state": "54a5b6f6",
+      "state": "2871ab4e",
       "events": "741638a5",
       "rng": {
         "draws": 173,
@@ -189,7 +189,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 411,
-      "state": "25fefe71",
+      "state": "c48209a3",
       "events": "a7ecac95",
       "rng": {
         "draws": 198,
@@ -200,7 +200,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 411,
-      "state": "622a4f1e",
+      "state": "3123e53e",
       "events": "741638a5",
       "rng": {
         "draws": 217,
@@ -211,7 +211,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 411,
-      "state": "f10829f6",
+      "state": "83e253ea",
       "events": "c76c86bd",
       "rng": {
         "draws": 255,
@@ -222,7 +222,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 411,
-      "state": "b498e2f5",
+      "state": "a7dbb0bf",
       "events": "d1ffcc07",
       "rng": {
         "draws": 286,
@@ -233,7 +233,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 411,
-      "state": "517ab47d",
+      "state": "d1a97e47",
       "events": "b5f7c7d7",
       "rng": {
         "draws": 316,
@@ -244,7 +244,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 411,
-      "state": "ddf1566c",
+      "state": "aebdf6a4",
       "events": "741638a5",
       "rng": {
         "draws": 341,
@@ -255,7 +255,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 411,
-      "state": "05ed8859",
+      "state": "2c12d0f3",
       "events": "7f39472b",
       "rng": {
         "draws": 376,
@@ -266,7 +266,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 411,
-      "state": "fd3bd7d1",
+      "state": "3b4cf019",
       "events": "c106f245",
       "rng": {
         "draws": 399,
@@ -277,7 +277,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 411,
-      "state": "aca9d118",
+      "state": "d2682d16",
       "events": "b5f7c7d7",
       "rng": {
         "draws": 423,
@@ -288,7 +288,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 411,
-      "state": "12f678e4",
+      "state": "a376f28e",
       "events": "dd2e9497",
       "rng": {
         "draws": 484,
@@ -299,7 +299,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 411,
-      "state": "12f678e4",
+      "state": "a376f28e",
       "events": "741638a5",
       "rng": {
         "draws": 484,
@@ -345,7 +345,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -385,7 +386,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -429,7 +431,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -472,7 +475,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -515,7 +519,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1096,7 +1101,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 411,
-      "state": "ecea552c",
+      "state": "e1fe69ce",
       "events": "04bc4fb7",
       "rng": {
         "draws": 520,
@@ -1107,7 +1112,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 411,
-      "state": "ca2fdad0",
+      "state": "68b97332",
       "events": "741638a5",
       "rng": {
         "draws": 526,
@@ -1153,7 +1158,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1193,7 +1199,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1237,7 +1244,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1280,7 +1288,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1323,7 +1332,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1896,7 +1906,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 411,
-      "state": "ca2fdad0",
+      "state": "68b97332",
       "events": "741638a5",
       "rng": {
         "draws": 526,
@@ -1942,7 +1952,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -1982,7 +1993,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -2026,7 +2038,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -2069,7 +2082,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -2112,7 +2126,8 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [

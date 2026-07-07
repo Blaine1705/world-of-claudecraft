@@ -74,6 +74,9 @@ const baseEnTable = {
   'error.corpseNothingToHarvest': 'That corpse has nothing to harvest.',
   'error.gatherNodeMissing': 'That resource node does not exist.',
   'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
+  'error.townFocusNotInTown': 'You must be in town to set your focus.',
+  'error.townFocusOverBudget': 'That allocation exceeds your focus point budget.',
+  'error.townFocusInvalid': 'Invalid focus allocation.',
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT

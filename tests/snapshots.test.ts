@@ -1926,9 +1926,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 31 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 32 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 32nd unregistered delta key reddens this gate.
+// 33rd unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -1960,6 +1960,7 @@ const ALL_DELTA_KEYS = [
   'sport',
   'stats',
   'tal',
+  'tfocus',
   'trade',
   'vcup',
   'weapon',
@@ -2005,6 +2006,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rtype: 'resourceType',
   rxp: 'restedXp',
   sport: 'sportRole',
+  tfocus: 'townFocus',
   vcup: 'cupInfo',
 };
 
@@ -2247,9 +2249,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 33 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(33);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(33);
+  it('ALL_DELTA_KEYS contains exactly 34 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(34);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(34);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2261,7 +2263,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(33);
+    expect(scraped.size).toBe(34);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

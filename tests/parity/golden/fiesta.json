@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 405,
-      "state": "a647d3c8",
+      "state": "fcab7ff8",
       "events": "55a04957",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 405,
-      "state": "0cfc56c0",
+      "state": "d0bef070",
       "events": "7fc93399",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 405,
-      "state": "55f60cc4",
+      "state": "3c8b6bb4",
       "events": "59acab11",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "f1da5df8",
+      "state": "a336d768",
       "events": "72fdf341",
       "rng": {
         "draws": 230,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 405,
-      "state": "defa2ac2",
+      "state": "ebfc3c82",
       "events": "b6688c79",
       "rng": {
         "draws": 384,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 405,
-      "state": "72973230",
+      "state": "e4fe5518",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 405,
-      "state": "241e8add",
+      "state": "2ced2ad5",
       "events": "5ba07080",
       "rng": {
         "draws": 608,
@@ -154,7 +154,8 @@
               "20": "war_r20_bladestorm"
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -208,7 +209,8 @@
               "20": "mag_r20_deep_freeze"
             },
             "spec": "arcane"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -263,7 +265,8 @@
               "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
-          }
+          },
+          "townFocus": {}
         },
         {
           "activeLoadout": -1,
@@ -317,7 +320,8 @@
               "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [

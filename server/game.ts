@@ -2783,6 +2783,15 @@ export class GameServer {
           sim.harvestCorpse(msg.id, components, pid);
         }
         break;
+      case 'set_town_focus':
+        if (msg.allocation && typeof msg.allocation === 'object') {
+          const allocation: Record<string, number> = {};
+          for (const [k, v] of Object.entries(msg.allocation as Record<string, unknown>)) {
+            if (typeof v === 'number') allocation[k] = v;
+          }
+          sim.setTownFocus(allocation, pid);
+        }
+        break;
       case 'lootRoll':
         if (
           typeof msg.rollId === 'number' &&
@@ -3896,6 +3905,7 @@ export class GameServer {
     // mirrors the raw per-craft proficiency map for the `gatheringProficiency`
     // IWorld data member (#1119), independent of the `professionsState` view.
     maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
+    maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
     // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
     // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire

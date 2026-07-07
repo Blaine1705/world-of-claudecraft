@@ -922,6 +922,15 @@ export const ko_KR: EnTranslations = {
         "tusk": "엄니"
       }
     },
+    "townFocus": {
+      "title": "마을 집중",
+      "hint": "집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.",
+      "budgetLabel": "남은 포인트: {remaining} / {budget}",
+      "saveButton": "집중 저장",
+      "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
+      "increaseAria": "{component}에 대한 집중 증가",
+      "decreaseAria": "{component}에 대한 집중 감소"
+    },
     "party": {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."

@@ -922,6 +922,15 @@ export const ru_RU: EnTranslations = {
         "tusk": "Бивень"
       }
     },
+    "townFocus": {
+      "title": "Фокус города",
+      "hint": "Очки фокуса добавляют бонус поверх базового выхода каждого компонента. Компоненты без фокуса остаются на базовом уровне.",
+      "budgetLabel": "Осталось очков: {remaining} / {budget}",
+      "saveButton": "Сохранить фокус",
+      "notInTownHint": "Чтобы задать фокус, нужно находиться в городе.",
+      "increaseAria": "Увеличить фокус на {component}",
+      "decreaseAria": "Уменьшить фокус на {component}"
+    },
     "party": {
       "promoteLeader": "Назначить лидером",
       "inviteUsage": "Кого пригласить? Использование: /invite <имя>."
