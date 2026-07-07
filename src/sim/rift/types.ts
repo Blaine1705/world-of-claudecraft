@@ -62,7 +62,7 @@ export interface RiftFloorPlan {
   floorIndex: number;
   floorCount: number;
   isBoss: boolean;
-  /** Human-facing floor label, e.g. "Emberforge Reaches — Depth 2". */
+  /** Human-facing floor label, e.g. "Emberforge Reaches: Depth 2". */
   name: string;
   /** Short environment-type label for the HUD, e.g. "Emberforge". */
   themeName: string;

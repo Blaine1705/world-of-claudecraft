@@ -282,8 +282,11 @@ export function descendRift(ctx: SimContext, pid?: number): void {
 export function leaveRift(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r || r.e.dead) return;
+  // Only meaningful from inside a rift (reached via a rift_exit object); if the
+  // player is not in one, do nothing rather than yanking them to the world origin.
   const inst = riftInstanceAtPos(ctx, r.e.pos);
-  const dest = inst?.returnPos ?? { x: 0, z: 0 };
+  if (!inst) return;
+  const dest = inst.returnPos;
   const p = r.e;
   p.pos = ctx.groundPos(dest.x, dest.z);
   p.prevPos = { ...p.pos };

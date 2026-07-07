@@ -373,7 +373,7 @@ export function generateRiftFloor(
     floorIndex: clampedIndex,
     floorCount,
     isBoss,
-    name: `${theme.name} ${isBoss ? 'Sanctum' : `Reaches`} — Depth ${clampedIndex + 1}`,
+    name: `${theme.name} ${isBoss ? 'Sanctum' : 'Reaches'}: Depth ${clampedIndex + 1}`,
     themeName: theme.name,
     layout: geo.layout,
     style,

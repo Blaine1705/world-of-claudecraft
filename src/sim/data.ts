@@ -36,7 +36,6 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
-import { RIFT_MOBS } from './content/rift/mobs';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
@@ -46,6 +45,7 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { COMMON_RECIPES as COMMON_RECIPES_CONTENT } from './content/recipes';
+import { RIFT_MOBS } from './content/rift/mobs';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -490,8 +490,11 @@ const RIFT_Z0 = -1250;
 // detection regions from overlapping, and a slot reserves room for all floors.
 const RIFT_FLOOR_SPACING = 340;
 const RIFT_SLOT_SPACING = RIFT_FLOOR_SPACING * RIFT_MAX_FLOORS + 200;
-/** Region half-extents used to map a far-off position back to its rift floor. */
-export const RIFT_REGION_HALF_X = 60;
+/** Region half-extents used to map a far-off position back to its rift floor.
+ * HALF_X is aligned to the band edge (RIFT_X_MIN - RIFT_REGION_HALF_X ===
+ * RIFT_BAND_X_MIN) so a position is never region-detected while isRiftPos() reads
+ * false. Rooms are at most ~29u half-width, so 40 comfortably contains them. */
+export const RIFT_REGION_HALF_X = 40;
 export const RIFT_REGION_HALF_Z = 160;
 
 export function riftInstanceOrigin(slot: number, floorIndex: number): { x: number; z: number } {
@@ -509,7 +512,10 @@ export function riftOriginAt(z: number): { x: number; z: number } {
   const off = z - RIFT_Z0;
   const slot = Math.max(0, Math.min(RIFT_SLOT_COUNT - 1, Math.floor(off / RIFT_SLOT_SPACING)));
   const withinSlot = off - slot * RIFT_SLOT_SPACING;
-  const floor = Math.max(0, Math.min(RIFT_MAX_FLOORS - 1, Math.round(withinSlot / RIFT_FLOOR_SPACING)));
+  const floor = Math.max(
+    0,
+    Math.min(RIFT_MAX_FLOORS - 1, Math.round(withinSlot / RIFT_FLOOR_SPACING)),
+  );
   return riftInstanceOrigin(slot, floor);
 }
 
