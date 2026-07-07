@@ -449,7 +449,7 @@ export function resolveMovement(
     // climb gate projects rise along the movement direction, so a shallow
     // diagonal would otherwise sneak over the crest). Clamp z at the crest
     // and keep the x component, so pushing into the wall slides along it.
-    let nextZ = crossesSealedBorder(z, fromZ + dz * t) ? z : fromZ + dz * t;
+    let nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
     // The Great Maze's hedges are hard walls for the same reason, tested as
     // a segment crossing (an endpoint-only test teleports a stalled mover
     // across once its target passes the wall). The faces are axis-aligned,
@@ -463,7 +463,7 @@ export function resolveMovement(
     const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules);
     // ...and a static-collider slide (a tree hugging the crest) must not
     // shove the resolved position across it either
-    if (crossesSealedBorder(z, resolved.z)) break;
+    if (crossesSealedBorder(x, z, resolved.z)) break;
     if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
     x = resolved.x;
     z = resolved.z;

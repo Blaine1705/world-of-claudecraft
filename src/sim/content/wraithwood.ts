@@ -26,28 +26,27 @@ import { emptyZoneProps } from '../types';
 export const WRAITHWOOD_ZONE: ZoneDef = {
   id: 'wraithwood',
   name: 'The Wraithwood',
-  zMin: 3120,
-  zMax: 3680,
+  zMin: 1260,
+  zMax: 1820,
   xMin: 180,
   xMax: 540,
   levelRange: [20, 20],
   biome: 'haunt',
-  southPassX: 390, // the Crowgate: now the climb from the Galecrest's wrecks
-  westPassZ: 3400, // the Dreamsedge: where the nightmare leans on the dream
-  hub: { x: 360, z: 3290, radius: 17, name: 'Gallowmere' },
-  graveyard: { x: 378, z: 3272 },
+  southPassX: 390, // the Crowgate: the climb up from the garden's lawns
+  hub: { x: 360, z: 1430, radius: 17, name: 'Gallowmere' },
+  graveyard: { x: 378, z: 1412 },
   lakes: [
-    { x: 290, z: 3360, radius: 10 }, // the Black Looking-Glass
-    { x: 312, z: 3500, radius: 9 }, // the chapel tarn
-    { x: 452, z: 3304, radius: 11 }, // the Drowned Coppice
+    { x: 290, z: 1500, radius: 10 }, // the Black Looking-Glass
+    { x: 312, z: 1640, radius: 9 }, // the chapel tarn
+    { x: 452, z: 1444, radius: 11 }, // the Drowned Coppice
   ],
   pois: [
-    { x: 360, z: 3290, label: 'Gallowmere' },
-    { x: 390, z: 3152, label: 'The Crowgate' },
-    { x: 280, z: 3344, label: "Widow's Thicket" },
-    { x: 440, z: 3390, label: 'The Hanging Glade' },
-    { x: 300, z: 3480, label: 'The Mournstone Chapel' },
-    { x: 380, z: 3540, label: "The Huntsman's Clearing" },
+    { x: 360, z: 1430, label: 'Gallowmere' },
+    { x: 390, z: 1292, label: 'The Crowgate' },
+    { x: 280, z: 1484, label: "Widow's Thicket" },
+    { x: 440, z: 1530, label: 'The Hanging Glade' },
+    { x: 300, z: 1620, label: 'The Mournstone Chapel' },
+    { x: 380, z: 1680, label: "The Huntsman's Clearing" },
   ],
   welcome:
     'The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.',
@@ -55,46 +54,48 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
 
 export const WRAITHWOOD_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 390, z: 3128 },
-    { x: 384, z: 3186 },
-    { x: 370, z: 3242 },
-    { x: 360, z: 3290 },
+    { x: 390, z: 1268 },
+    { x: 384, z: 1326 },
+    { x: 370, z: 1382 },
+    { x: 360, z: 1430 },
   ], // the Crowgate -> Gallowmere
   [
-    { x: 360, z: 3290 },
-    { x: 322, z: 3314 },
-    { x: 296, z: 3332 },
+    { x: 360, z: 1430 },
+    { x: 322, z: 1454 },
+    { x: 296, z: 1472 },
   ], // Gallowmere -> Widow's Thicket
   [
-    { x: 360, z: 3290 },
-    { x: 396, z: 3328 },
-    { x: 422, z: 3364 },
+    { x: 360, z: 1430 },
+    { x: 396, z: 1468 },
+    { x: 422, z: 1504 },
   ], // Gallowmere -> the Hanging Glade
   [
-    { x: 360, z: 3290 },
-    { x: 338, z: 3360 },
-    { x: 318, z: 3430 },
-    { x: 306, z: 3468 },
+    { x: 360, z: 1430 },
+    { x: 338, z: 1500 },
+    { x: 318, z: 1570 },
+    { x: 306, z: 1608 },
   ], // Gallowmere -> the Mournstone Chapel
   [
-    { x: 360, z: 3290 },
-    { x: 368, z: 3370 },
-    { x: 374, z: 3450 },
-    { x: 378, z: 3520 },
-  ], // Gallowmere -> the Huntsman's Clearing
+    { x: 360, z: 1430 },
+    { x: 368, z: 1510 },
+    { x: 374, z: 1590 },
+    { x: 378, z: 1660 },
+    { x: 390, z: 1706 },
+    { x: 398, z: 1748 },
+    { x: 404, z: 1794 },
+  ], // Gallowmere -> the Huntsman's Clearing -> the Wyrmroad (into the waste)
   [
-    { x: 360, z: 3290 },
-    { x: 332, z: 3380 },
-    { x: 327, z: 3480 },
-    { x: 326, z: 3520 },
-    { x: 312, z: 3580 },
-    { x: 300, z: 3672 },
-  ], // Gallowmere -> east of the chapel tarn -> the Tanglemouth
+    { x: 360, z: 1430 },
+    { x: 332, z: 1520 },
+    { x: 327, z: 1620 },
+    { x: 326, z: 1660 },
+    { x: 306, z: 1744 },
+  ], // Gallowmere -> east of the chapel tarn -> the Ashmere's shore
   [
-    { x: 296, z: 3332 },
-    { x: 244, z: 3368 },
-    { x: 184, z: 3400 },
-  ], // Widow's Thicket -> west to the Dreamsedge (out of the wood)
+    { x: 296, z: 1472 },
+    { x: 262, z: 1496 },
+    { x: 244, z: 1512 },
+  ], // Widow's Thicket -> down to the Veilmelt's grey shore
 ];
 
 // No portals: walked into under the Crowgate.
@@ -181,12 +182,12 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {};
 export const WRAITHWOOD_QUEST_ORDER: string[] = [];
 export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {};
 export const WRAITHWOOD_CAMPS: CampDef[] = [
-  { mobId: 'widowsilk_spinner', center: { x: 282, z: 3338 }, radius: 10, count: 3 },
-  { mobId: 'widowsilk_spinner', center: { x: 468, z: 3324 }, radius: 10, count: 3 },
-  { mobId: 'wood_wraith', center: { x: 306, z: 3476 }, radius: 9, count: 3 },
-  { mobId: 'wood_wraith', center: { x: 418, z: 3428 }, radius: 10, count: 3 },
-  { mobId: 'gravenbark_shambler', center: { x: 444, z: 3386 }, radius: 10, count: 2 },
-  { mobId: 'pale_huntsman', center: { x: 380, z: 3540 }, radius: 5, count: 1 },
+  { mobId: 'widowsilk_spinner', center: { x: 282, z: 1478 }, radius: 10, count: 3 },
+  { mobId: 'widowsilk_spinner', center: { x: 468, z: 1464 }, radius: 10, count: 3 },
+  { mobId: 'wood_wraith', center: { x: 306, z: 1616 }, radius: 9, count: 3 },
+  { mobId: 'wood_wraith', center: { x: 418, z: 1568 }, radius: 10, count: 3 },
+  { mobId: 'gravenbark_shambler', center: { x: 444, z: 1526 }, radius: 10, count: 2 },
+  { mobId: 'pale_huntsman', center: { x: 380, z: 1680 }, radius: 5, count: 1 },
 ];
 export const WRAITHWOOD_OBJECTS: GroundObjectDef[] = [];
 
@@ -194,50 +195,50 @@ export const WRAITHWOOD_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Gallowmere: a shuttered hamlet under the eaves
   buildings: [
-    { kind: 'inn', x: 352, z: 3294, w: 6, d: 7, rot: 0.5 },
-    { kind: 'house', x: 368, z: 3286, w: 6, d: 6, rot: -1.2 },
-    { kind: 'house', x: 354, z: 3280, w: 5, d: 5, rot: 2.3 },
-    { kind: 'chapel', x: 365, z: 3300, w: 5, d: 7, rot: -2.2 },
+    { kind: 'inn', x: 352, z: 1434, w: 6, d: 7, rot: 0.5 },
+    { kind: 'house', x: 368, z: 1426, w: 6, d: 6, rot: -1.2 },
+    { kind: 'house', x: 354, z: 1420, w: 5, d: 5, rot: 2.3 },
+    { kind: 'chapel', x: 365, z: 1440, w: 5, d: 7, rot: -2.2 },
   ],
-  wells: [{ x: 360, z: 3292, r: 1.5 }],
-  stalls: [{ x: 356, z: 3286, rot: 0.6, r: 1.6 }],
+  wells: [{ x: 360, z: 1432, r: 1.5 }],
+  stalls: [{ x: 356, z: 1426, rot: 0.6, r: 1.6 }],
   crates: [
-    [349, 3290],
-    [369, 3292],
+    [349, 1430],
+    [369, 1432],
   ],
   campfires: [
-    [360, 3288],
-    [389, 3140], // the Crowgate's waycamp
+    [360, 1428],
+    [389, 1280], // the Crowgate's waycamp
   ],
   fences: [
     // the hamlet huddles behind its fence line
-    { x1: 346, z1: 3276, x2: 374, z2: 3276 },
-    { x1: 346, z1: 3306, x2: 374, z2: 3306 },
+    { x1: 346, z1: 1416, x2: 374, z2: 1416 },
+    { x1: 346, z1: 1446, x2: 374, z2: 1446 },
   ],
   // the Mournstone Chapel ruin and the Huntsman's ring of broken columns
   ruinRings: [
-    { x: 300, z: 3480, ringR: 8, columns: 6 },
-    { x: 380, z: 3540, ringR: 9, columns: 5 },
+    { x: 300, z: 1620, ringR: 8, columns: 6 },
+    { x: 380, z: 1680, ringR: 9, columns: 5 },
   ],
   // grave fields: the wood buries its own
   graveyards: [
-    { x: 294, z: 3472 },
-    { x: 386, z: 3280 },
-    { x: 434, z: 3398 },
+    { x: 294, z: 1612 },
+    { x: 386, z: 1420 },
+    { x: 434, z: 1538 },
   ],
   // The giant overgrown trees the realm is named for: solid trunk colliders
   // in the sim (colliders.ts reads this record), giant canopies drawn by
   // render/haunt_features.ts from the same spots. Kept off every road.
   greatTrees: [
-    { x: 326, z: 3220, r: 2.6 },
-    { x: 404, z: 3250, r: 3.0 },
-    { x: 308, z: 3382, r: 2.8 },
-    { x: 394, z: 3390, r: 2.6 },
-    { x: 344, z: 3450, r: 3.2 },
-    { x: 456, z: 3440, r: 2.6 },
-    { x: 264, z: 3420, r: 2.8 },
-    { x: 412, z: 3496, r: 3.0 },
-    { x: 330, z: 3566, r: 2.6 },
-    { x: 250, z: 3300, r: 2.6 },
+    { x: 326, z: 1360, r: 2.6 },
+    { x: 404, z: 1390, r: 3.0 },
+    { x: 308, z: 1522, r: 2.8 },
+    { x: 394, z: 1530, r: 2.6 },
+    { x: 344, z: 1590, r: 3.2 },
+    { x: 456, z: 1580, r: 2.6 },
+    { x: 264, z: 1560, r: 2.8 },
+    { x: 412, z: 1636, r: 3.0 },
+    { x: 330, z: 1706, r: 2.6 },
+    { x: 250, z: 1440, r: 2.6 },
   ],
 };

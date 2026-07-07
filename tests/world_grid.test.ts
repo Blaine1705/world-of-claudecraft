@@ -33,73 +33,78 @@ function zone(partial: Partial<ZoneDef> & { id: string; zMin: number; zMax: numb
 describe('the continent derives the right border set', () => {
   const edges = computeBorderEdges(ZONES);
 
-  it('has nine horizontal borders and four column crossings', () => {
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(9);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(4);
+  it('has ten horizontal borders and fourteen column edges', () => {
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(10);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(14);
   });
 
   it('every crossing sits where the atlas says', () => {
     const v = edges.filter((e) => e.kind === 'v');
-    const find = (at: number, passAt: number) => v.find((e) => e.at === at && e.passAt === passAt);
-    expect(find(-180, 1700), 'the Snowline (fire and ice)').toBeTruthy();
-    expect(find(180, 2860), 'the Windway').toBeTruthy();
-    expect(find(180, 3400), 'the Dreamsedge').toBeTruthy();
-    expect(find(-180, 3410), 'the Tanglemouth').toBeTruthy();
-    const woodClimb = edges.find((e) => e.kind === 'h' && e.at === 3120 && e.lo === 180);
-    expect(woodClimb?.passAt, 'the Crowgate climb').toBe(390);
-    const gardenGate = edges.find((e) => e.kind === 'h' && e.at === 3680);
-    expect(gardenGate?.passAt, 'the Garden Gate').toBe(30);
+    const h = edges.filter((e) => e.kind === 'h');
+    const findV = (at: number, lo: number, passAt: number) =>
+      v.find((e) => e.at === at && e.lo === lo && e.passAt === passAt);
+    const findH = (at: number, lo: number, passAt: number) =>
+      h.find((e) => e.at === at && e.lo === lo && e.passAt === passAt);
+    expect(findH(1440, -180, 44), 'the Wyrmgate (hollow to frost)').toBeTruthy();
+    expect(findV(-180, 180, 440), 'the Mirewalk (marsh to fen)').toBeTruthy();
+    expect(findV(180, 180, 440), 'the Windway (marsh to gale)').toBeTruthy();
+    expect(findV(-180, 700, 820), 'the Sunway (peaks to jungle)').toBeTruthy();
+    expect(findV(180, 700, 800), 'the Gardenwalk (peaks to lawns)').toBeTruthy();
+    expect(findV(180, 1820, 1890), 'the Snowline (frost to waste)').toBeTruthy();
+    expect(findV(-180, 1820, 1890), 'the Goldmelt (frost to autumn)').toBeTruthy();
+    expect(findH(700, 180, 400), 'the Garden Gate (gale to lawns)').toBeTruthy();
+    expect(findH(700, -540, -400), 'the Tanglemouth (fen to jungle)').toBeTruthy();
+    expect(findH(1260, 180, 390), 'the Crowgate (lawns to wood)').toBeTruthy();
+    expect(findH(1260, -540, -330), 'the Nightgate (jungle to dark)').toBeTruthy();
+    expect(findH(1820, 180, 404), 'the Wyrmroad (wood to waste)').toBeTruthy();
+    expect(findH(1820, -540, -350), 'the gold road (dark to autumn)').toBeTruthy();
   });
 
-  it('the sealed Hollow wall survives untouched', () => {
+  it('the sealed Hollow wall survives, bounded to the strip', () => {
     const sealed = edges.filter((e) => e.sealed);
     expect(sealed.length).toBe(1);
     expect(sealed[0].at).toBe(915);
+    expect(sealed[0].lo).toBe(STRIP_MIN_X);
+    expect(sealed[0].hi).toBe(STRIP_MAX_X);
+    // the columns whose bands span the same z are NOT walled or sealed:
+    // the wall is partial, and movement across z 915 is blocked only
+    // inside the strip span
+    expect(sealed[0].fullRow).toBe(false);
   });
 
   it('row bounds widen exactly where columns live', () => {
-    for (const z of [-100, 700, 1200, 2300, 3900, 9000]) {
+    for (const z of [-100, 100]) {
       expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: STRIP_MAX_X });
     }
-    for (const z of [1500, 1900]) {
-      expect(worldXBoundsAt(z)).toEqual({ min: -540, max: STRIP_MAX_X });
-    }
-    for (const z of [2700, 3000]) {
-      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: 540 });
-    }
-    for (const z of [3200, 3600]) {
+    for (const z of [300, 800, 1100, 1700, 1900]) {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
+    for (const z of [2000, 2300]) {
+      expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
+    }
+    expect(worldXBoundsAt(2400)).toEqual({ min: 180, max: 540 });
   });
 });
 
 describe('the interior waters are landlocked', () => {
-  // The continent's border waters are meres ringed by land, not sea
-  // straits: land caps hold every border's ends and corners, the basin
-  // between them stays honest water, and the open-sea rules (swim fatigue,
-  // rim suppression) never treat a mere as ocean. Enclosure itself (no
-  // water path from any mere to the outer ocean) is proven exhaustively by
+  // The grid's border waters are meres ringed by land: the Hollow's moats,
+  // the Reach's flanking lakes, and the six column-row meres. Enclosure
+  // itself (no water path to the outer ocean) is proven exhaustively by
   // the flood-fill probe (tmp/border_lakes_probe.mts); these pins keep the
-  // caps and basins from silently regressing.
+  // caps, basins, and green land seams from silently regressing.
   const SEEDS = [1337, 20061];
 
-  it('every corner cap and seal is dry land', () => {
+  it('the green seams and every cap hold dry land', () => {
     const caps: [string, number, number][] = [
-      ['the Snowline south cap', -180, 1468],
-      ['the Snowline north cap', -180, 1931],
-      ['the Goldmelt west seal', -130, 2040],
-      ['the Goldmelt east seal', 131, 2040],
-      ['the Amberfen west seal', -132, 2600],
-      ['the southeast corner knot', 162, 2600],
-      ['the Windmere south seal', 180, 2631],
-      ['the Four Corners, fen and night faces', 162, 3120],
-      ['the Four Corners, gale and wood faces', 199, 3120],
-      ['the Nightgate west seal', -162, 3120],
-      ['the Dreamsedge north seal', 180, 3641],
-      ['the Tanglemouth north seal', -180, 3641],
-      ['the Garden Gate west seal', -162, 3680],
-      ['the Garden Gate east seal', 162, 3680],
-      ['the Crowmere east seal', 502, 3120],
+      ['the green seam east, marsh row', 180, 300],
+      ['the green seam east, the Windway', 180, 440],
+      ['the green seam east, the Gardenwalk', 180, 800],
+      ['the green seam west, the Mirewalk', -180, 440],
+      ['the green seam west, the Sunway', -180, 820],
+      ['the Snowline isthmus', 180, 1890],
+      ['the Goldmelt isthmus', -180, 1890],
+      ['the Veilmelt north cap', 180, 1932],
+      ['the Palewater north cap', -180, 1932],
     ];
     for (const seed of SEEDS) {
       for (const [name, x, z] of caps) {
@@ -110,17 +115,12 @@ describe('the interior waters are landlocked', () => {
     }
   });
 
-  it('every mere still holds water, classified as lake, never open sea', () => {
+  it('the blue lakes hold water, classified as lakes, never open sea', () => {
     const hearts: [string, number, number][] = [
-      ['the Meltwater', -180, 1590],
-      ['the Windmere', 180, 2760],
-      ['the Dreammere', 180, 3280],
-      ['the Tanglewater', -180, 3520],
-      ['the Goldmelt Water', -80, 2045],
-      ['the Amber Broads', 70, 2600],
-      ['the Nightwater', 60, 3122],
-      ['the Moonmere', -60, 3680],
-      ['the Crowmere', 300, 3120],
+      ['the east moat', 180, 1100],
+      ['the west moat', -180, 1100],
+      ['the Veilmelt', 180, 1600],
+      ['the Palewater', -180, 1600],
     ];
     for (const seed of SEEDS) {
       for (const [name, x, z] of hearts) {
@@ -131,17 +131,38 @@ describe('the interior waters are landlocked', () => {
     }
   });
 
-  it('the outer ocean is still the outer ocean', () => {
-    // the flanks beyond the columns and the Hollow sound stay open sea
+  it('the row-border inlets hold water and open naturally to the sea', () => {
+    // the sketch's unmarked borders: sea inlets with organic mouths, not
+    // walled meres (the straight cap chains were removed by request)
+    const inlets: [string, number, number][] = [
+      ['the Lawn inlet', 300, 700],
+      ['the Grave inlet', 300, 1260],
+      ['the Ash inlet', 300, 1820],
+      ['the Palm inlet', -300, 700],
+      ['the Dusk inlet', -440, 1260],
+      ['the Gold inlet', -450, 1820],
+    ];
+    for (const seed of SEEDS) {
+      for (const [name, x, z] of inlets) {
+        expect(terrainHeight(x, z, seed), `${name} (seed ${seed})`).toBeLessThan(WATER_LEVEL);
+        expect(inBorderLake(x, z), `${name} keeps ocean rules`).toBe(false);
+      }
+    }
+  });
+
+  it('the outer ocean and the wider Hollow water stay open sea', () => {
     for (const [x, z] of [
+      [-560, 1200],
+      [560, 1200],
+      [0, 2100],
       [-560, 2300],
-      [560, 2000],
-      [-300, 3900],
-      [160, 1380],
     ]) {
       expect(terrainHeight(x, z, 20061), `ocean at ${x},${z}`).toBeLessThan(WATER_LEVEL);
       expect(inBorderLake(x, z), `not a mere at ${x},${z}`).toBe(false);
     }
+    // past the moat rect the Hollow's water keeps the fatigue turnback
+    expect(inBorderLake(160, 1380)).toBe(false);
+    expect(inHollowOpenSea(160, 1380)).toBe(true);
   });
 });
 

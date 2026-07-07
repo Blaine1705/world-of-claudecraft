@@ -126,14 +126,26 @@ describe('content referential integrity', () => {
     for (let i = 0; i + 1 < strip.length; i++) {
       expect(strip[i].zMax).toBe(strip[i + 1].zMin);
     }
-    // every column zone occupies a band some strip row already defines
+    // the columns stack beside the strip: bands may straddle strip rows
+    // (the realms kept their sizes when the grid landed), so the invariants
+    // are: no two zone rects overlap, and every column shares some z with
+    // the strip (an unreachable island would be a bug)
+    const x0 = (zn: (typeof ZONES)[number]) => zn.xMin ?? -180;
+    const x1 = (zn: (typeof ZONES)[number]) => zn.xMax ?? 180;
+    for (const a of ZONES) {
+      for (const b of ZONES) {
+        if (a.id >= b.id) continue;
+        const overlap = x0(a) < x1(b) && x1(a) > x0(b) && a.zMin < b.zMax && a.zMax > b.zMin;
+        expect(overlap, `${a.id} and ${b.id} rects must not overlap`).toBe(false);
+      }
+    }
+    const stripMin = strip[0].zMin;
+    const stripMax = strip[strip.length - 1].zMax;
     for (const zn of ZONES) {
-      if ((zn.xMin ?? -180) <= -180 && (zn.xMax ?? 180) >= 180) continue;
-      // a column may be shorter than its row (open sea fills the rest), but
-      // it must sit fully inside SOME strip row so the crossings line up
+      if (x0(zn) <= -180 && x1(zn) >= 180) continue;
       expect(
-        strip.some((row) => zn.zMin >= row.zMin && zn.zMax <= row.zMax),
-        `${zn.id} band sits inside a strip row`,
+        zn.zMin < stripMax && zn.zMax > stripMin,
+        `${zn.id} band overlaps the strip somewhere`,
       ).toBe(true);
     }
     const problems: string[] = [];

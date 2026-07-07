@@ -12,16 +12,16 @@ import { galeLandness, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../src/si
 const SEED = 1337; // matches the fixed client seed in src/main.ts
 
 describe('Galecrest zone registration', () => {
-  it('is a rectangle in the east column of the fen row', () => {
+  it('is a rectangle in the east column beside the marsh', () => {
     expect(GALECREST_ZONE.xMin).toBe(STRIP_MAX_X);
     expect(GALECREST_ZONE.xMax).toBe(540);
-    expect(GALECREST_ZONE.zMin).toBe(2600);
-    expect(GALECREST_ZONE.zMax).toBe(3120);
-    // the 2D lookup resolves both columns of the shared row
-    expect(zoneAt(0, 2860).id).toBe('willowfen');
-    expect(zoneAt(360, 2860).id).toBe('galecrest');
-    expect(zoneBiomeAt(360, 2860)).toBe('gale');
-    expect(zoneBiomeAt(0, 2860)).toBe('fen');
+    expect(GALECREST_ZONE.zMin).toBe(180);
+    expect(GALECREST_ZONE.zMax).toBe(700);
+    // the 2D lookup resolves both sides of the shared border
+    expect(zoneAt(0, 440).id).toBe('mirefen_marsh');
+    expect(zoneAt(360, 440).id).toBe('galecrest');
+    expect(zoneBiomeAt(360, 440)).toBe('gale');
+    expect(zoneBiomeAt(-360, 440)).toBe('fen');
     // append order is rng-stream order, not geography (the continent!)
     expect(ZONES.some((zn) => zn.id === 'galecrest')).toBe(true);
   });
@@ -60,12 +60,12 @@ describe('Galecrest zone registration', () => {
 });
 
 describe('the Windway: a real walk-in border, no teleport', () => {
-  it('is walkable on foot from the fen to the headlands', () => {
-    // the whole crossing, fen side to gale side, sampled at footstep scale
-    let prev = terrainHeight(140, 2860, SEED);
+  it('is walkable on foot from the marsh to the headlands', () => {
+    // the whole crossing, marsh side to gale side, at footstep scale
+    let prev = terrainHeight(140, 440, SEED);
     let maxSlope = 0;
     for (let x = 141; x <= 250; x++) {
-      const h = terrainHeight(x, 2860, SEED);
+      const h = terrainHeight(x, 440, SEED);
       expect(h, `crossing at x=${x}`).toBeGreaterThan(WATER_LEVEL);
       maxSlope = Math.max(maxSlope, Math.abs(h - prev));
       prev = h;
@@ -73,9 +73,12 @@ describe('the Windway: a real walk-in border, no teleport', () => {
     expect(maxSlope).toBeLessThan(1.5); // PLAYER_MAX_CLIMB_SLOPE
   });
 
-  it('away from the isthmus the border is water: the Windmere, not a wall', () => {
-    for (const z of [2720, 2760, 2960, 3000]) {
-      expect(terrainHeight(STRIP_MAX_X, z, SEED), `border at z=${z}`).toBeLessThan(WATER_LEVEL);
+  it('away from the pass the border is a green land seam under the ridge', () => {
+    // the sketch's land border: dry ground the whole way, no shoreline
+    for (const z of [260, 340, 560, 640]) {
+      expect(terrainHeight(STRIP_MAX_X, z, SEED), `border at z=${z}`).toBeGreaterThan(
+        WATER_LEVEL + 0.4,
+      );
     }
   });
 
@@ -85,8 +88,8 @@ describe('the Windway: a real walk-in border, no teleport', () => {
     const step = 8;
     const key = (x: number, z: number) => `${Math.round(x / step)},${Math.round(z / step)}`;
     const dry = (x: number, z: number) => terrainHeight(x, z, SEED) > WATER_LEVEL + 0.2;
-    const seen = new Set<string>([key(200, 2860)]);
-    const queue: [number, number][] = [[200, 2860]];
+    const seen = new Set<string>([key(200, 440)]);
+    const queue: [number, number][] = [[200, 440]];
     while (queue.length > 0) {
       const cur = queue.shift();
       if (!cur) break;
@@ -98,7 +101,7 @@ describe('the Windway: a real walk-in border, no teleport', () => {
       ]) {
         const x = cur[0] + dx;
         const z = cur[1] + dz;
-        if (x < 180 || x > 540 || z < 2600 || z > 3120) continue;
+        if (x < 180 || x > 540 || z < 180 || z > 700) continue;
         const k = key(x, z);
         if (seen.has(k) || !dry(x, z)) continue;
         seen.add(k);
@@ -106,10 +109,10 @@ describe('the Windway: a real walk-in border, no teleport', () => {
       }
     }
     const reached = (x: number, z: number) => seen.has(key(x, z));
-    expect(reached(420, 2780), 'Wickharbor').toBe(true);
-    expect(reached(496, 2728), 'the Old Beacon').toBe(true);
-    expect(reached(344, 3064), 'the Wreckfields').toBe(true);
-    expect(reached(300, 2942), 'the Mirror Tarn downs').toBe(true);
+    expect(reached(420, 360), 'Wickharbor').toBe(true);
+    expect(reached(496, 308), 'the Old Beacon').toBe(true);
+    expect(reached(344, 644), 'the Wreckfields').toBe(true);
+    expect(reached(300, 522), 'the Mirror Tarn downs').toBe(true);
   });
 
   it('the headland landmass carries real land under every POI', () => {

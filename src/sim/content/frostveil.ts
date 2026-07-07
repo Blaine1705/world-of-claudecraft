@@ -23,24 +23,23 @@ export const FROSTVEIL_ZONE: ZoneDef = {
   name: 'The Frostveil Reach',
   zMin: 1440,
   zMax: 1960,
-  xMin: -540,
-  xMax: -180,
   levelRange: [17, 20],
   biome: 'frost',
-  hub: { x: -390, z: 1560, radius: 22, name: 'Icemantle' },
-  graveyard: { x: -394, z: 1576 },
+  southPassX: 44, // the Wyrmgate: the causeway road now climbs into the snow
+  hub: { x: -30, z: 1560, radius: 22, name: 'Icemantle' },
+  graveyard: { x: -34, z: 1576 },
   lakes: [
-    { x: -300, z: 1640, radius: 16 }, // Glacier Tarn
-    { x: -312, z: 1652, radius: 9 }, // ...its still northern finger
-    { x: -450, z: 1760, radius: 12 }, // the Shiverfen pool
+    { x: 60, z: 1640, radius: 16 }, // Glacier Tarn
+    { x: 48, z: 1652, radius: 9 }, // ...its still northern finger
+    { x: -90, z: 1760, radius: 12 }, // the Shiverfen pool
   ],
   pois: [
-    { x: -390, z: 1560, label: 'Icemantle' },
-    { x: -370, z: 1495, label: 'The Snowline' },
-    { x: -300, z: 1640, label: 'Glacier Tarn' },
-    { x: -330, z: 1740, label: 'The Aurora Steps' },
-    { x: -450, z: 1760, label: 'The Shiverfen' },
-    { x: -260, z: 1810, label: 'The Howling Terraces' },
+    { x: -30, z: 1560, label: 'Icemantle' },
+    { x: -10, z: 1495, label: 'The Snowline' },
+    { x: 60, z: 1640, label: 'Glacier Tarn' },
+    { x: 30, z: 1740, label: 'The Aurora Steps' },
+    { x: -90, z: 1760, label: 'The Shiverfen' },
+    { x: 100, z: 1810, label: 'The Howling Terraces' },
   ],
   welcome: 'Snow swallows every sound. Under the dancing lights, the cold itself feels awake.',
 };
@@ -49,39 +48,47 @@ export const FROSTVEIL_ZONE: ZoneDef = {
 // marked route stays climbable (see the frost shaping in world.ts).
 export const FROSTVEIL_ROADS: { x: number; z: number }[][] = [
   [
-    { x: -390, z: 1560 },
-    { x: -350, z: 1600 },
-    { x: -318, z: 1626 },
+    { x: -30, z: 1560 },
+    { x: 10, z: 1600 },
+    { x: 42, z: 1626 },
   ], // Icemantle -> the Glacier Tarn shore
   [
-    { x: -318, z: 1626 },
-    { x: -332, z: 1662 },
-    { x: -320, z: 1700 },
-    { x: -330, z: 1740 },
+    { x: 42, z: 1626 },
+    { x: 28, z: 1662 },
+    { x: 40, z: 1700 },
+    { x: 30, z: 1740 },
   ], // the tarn shore -> the Aurora Steps, skirting the tarn's finger
   [
-    { x: -390, z: 1560 },
-    { x: -430, z: 1660 },
-    { x: -438, z: 1746 },
+    { x: -30, z: 1560 },
+    { x: -70, z: 1660 },
+    { x: -78, z: 1746 },
   ], // Icemantle -> the Shiverfen's edge
   [
-    { x: -330, z: 1740 },
-    { x: -290, z: 1790 },
-    { x: -270, z: 1830 },
+    { x: 30, z: 1740 },
+    { x: 70, z: 1790 },
+    { x: 90, z: 1830 },
   ], // the Aurora Steps -> the Howling Terraces
   [
-    { x: -330, z: 1740 },
-    { x: -342, z: 1850 },
-    { x: -350, z: 1958 },
-  ], // the Aurora Steps -> the Goldmelt pass
+    { x: 30, z: 1740 },
+    { x: -40, z: 1800 },
+    { x: -120, z: 1860 },
+    { x: -176, z: 1888 },
+  ], // the Aurora Steps -> the Goldmelt crossing (into the autumn)
   [
-    { x: -390, z: 1560 },
-    { x: -340, z: 1612 },
-    { x: -330, z: 1666 },
-    { x: -280, z: 1694 },
-    { x: -214, z: 1698 },
-    { x: -184, z: 1700 },
+    { x: -30, z: 1560 },
+    { x: 20, z: 1612 },
+    { x: 30, z: 1666 },
+    { x: 80, z: 1694 },
+    { x: 130, z: 1760 },
+    { x: 160, z: 1830 },
+    { x: 176, z: 1888 },
   ], // Icemantle -> around the tarn -> the Snowline crossing
+  [
+    { x: -30, z: 1560 },
+    { x: -10, z: 1520 },
+    { x: 20, z: 1480 },
+    { x: 44, z: 1448 },
+  ], // Icemantle -> south to the Wyrmgate (down to the causeway)
 ];
 
 // No portals: the Reach is walked into over the Snowline pass.
@@ -188,13 +195,13 @@ export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {};
 export const FROSTVEIL_QUEST_ORDER: string[] = [];
 export const FROSTVEIL_ITEMS: Record<string, ItemDef> = {};
 export const FROSTVEIL_CAMPS: CampDef[] = [
-  { mobId: 'snowdrift_wolf', center: { x: -340, z: 1610 }, radius: 10, count: 3 },
-  { mobId: 'snowdrift_wolf', center: { x: -420, z: 1690 }, radius: 10, count: 3 },
-  { mobId: 'ice_wisp', center: { x: -330, z: 1745 }, radius: 12, count: 4 },
-  { mobId: 'rime_elemental', center: { x: -294, z: 1622 }, radius: 9, count: 2 },
-  { mobId: 'rime_elemental', center: { x: -350, z: 1800 }, radius: 10, count: 2 },
-  { mobId: 'fen_sprite', center: { x: -444, z: 1738 }, radius: 11, count: 3 },
-  { mobId: 'frostmane_yeti', center: { x: -264, z: 1816 }, radius: 6, count: 1 },
+  { mobId: 'snowdrift_wolf', center: { x: 20, z: 1610 }, radius: 10, count: 3 },
+  { mobId: 'snowdrift_wolf', center: { x: -60, z: 1690 }, radius: 10, count: 3 },
+  { mobId: 'ice_wisp', center: { x: 30, z: 1745 }, radius: 12, count: 4 },
+  { mobId: 'rime_elemental', center: { x: 66, z: 1622 }, radius: 9, count: 2 },
+  { mobId: 'rime_elemental', center: { x: 10, z: 1800 }, radius: 10, count: 2 },
+  { mobId: 'fen_sprite', center: { x: -84, z: 1738 }, radius: 11, count: 3 },
+  { mobId: 'frostmane_yeti', center: { x: 96, z: 1816 }, radius: 6, count: 1 },
 ];
 export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [];
 
@@ -204,38 +211,38 @@ export const FROSTVEIL_PROPS: ZonePropsDef = {
   // and the great fire at the centre, stalls and crates crowding in, homes
   // and the lodge shouldering close against the cold)
   buildings: [
-    { kind: 'inn', x: -402, z: 1554, w: 6, d: 7, rot: 0.9 }, // the Hearth-Lodge
-    { kind: 'house', x: -380, z: 1550, w: 6, d: 6, rot: -0.5 },
-    { kind: 'house', x: -400, z: 1572, w: 6, d: 6, rot: 2.2 },
-    { kind: 'chapel', x: -378, z: 1570, w: 5, d: 7, rot: -2.0 },
-    { kind: 'house', x: -390, z: 1544, w: 5, d: 5, rot: 0.1 }, // the fisher's hut
-    { kind: 'house', x: -404, z: 1563, w: 5, d: 5, rot: 1.4 },
-    { kind: 'inn', x: -382, z: 1578, w: 5, d: 6, rot: -2.6 }, // the trade hall
+    { kind: 'inn', x: -42, z: 1554, w: 6, d: 7, rot: 0.9 }, // the Hearth-Lodge
+    { kind: 'house', x: -20, z: 1550, w: 6, d: 6, rot: -0.5 },
+    { kind: 'house', x: -40, z: 1572, w: 6, d: 6, rot: 2.2 },
+    { kind: 'chapel', x: -18, z: 1570, w: 5, d: 7, rot: -2.0 },
+    { kind: 'house', x: -30, z: 1544, w: 5, d: 5, rot: 0.1 }, // the fisher's hut
+    { kind: 'house', x: -44, z: 1563, w: 5, d: 5, rot: 1.4 },
+    { kind: 'inn', x: -22, z: 1578, w: 5, d: 6, rot: -2.6 }, // the trade hall
   ],
-  wells: [{ x: -390, z: 1562, r: 1.5 }],
+  wells: [{ x: -30, z: 1562, r: 1.5 }],
   stalls: [
-    { x: -384, z: 1556, rot: 0.6, r: 1.6 },
-    { x: -396, z: 1566, rot: -1.2, r: 1.6 },
-    { x: -394, z: 1554, rot: 2.1, r: 1.6 },
-    { x: -385, z: 1568, rot: -0.4, r: 1.6 },
+    { x: -24, z: 1556, rot: 0.6, r: 1.6 },
+    { x: -36, z: 1566, rot: -1.2, r: 1.6 },
+    { x: -34, z: 1554, rot: 2.1, r: 1.6 },
+    { x: -25, z: 1568, rot: -0.4, r: 1.6 },
   ],
   crates: [
-    [-387, 1558],
-    [-393, 1565],
-    [-383, 1562],
-    [-398, 1558],
+    [-27, 1558],
+    [-33, 1565],
+    [-23, 1562],
+    [-38, 1558],
   ],
   fences: [
-    { x1: -406, z1: 1546, x2: -398, z2: 1542 },
-    { x1: -376, z1: 1558, x2: -374, z2: 1566 },
-    { x1: -404, z1: 1578, x2: -396, z2: 1580 },
+    { x1: -46, z1: 1546, x2: -38, z2: 1542 },
+    { x1: -16, z1: 1558, x2: -14, z2: 1566 },
+    { x1: -44, z1: 1578, x2: -36, z2: 1580 },
   ],
   tents: [
-    { x: -372, z: 1500, rot: 0.4, scale: 1 }, // the Snowline waycamp
+    { x: -12, z: 1500, rot: 0.4, scale: 1 }, // the Snowline waycamp
   ],
   campfires: [
-    [-390, 1560],
-    [-388, 1564], // the plaza's great fire is really two, for a wider glow
-    [-371, 1498],
+    [-30, 1560],
+    [-28, 1564], // the plaza's great fire is really two, for a wider glow
+    [-11, 1498],
   ],
 };

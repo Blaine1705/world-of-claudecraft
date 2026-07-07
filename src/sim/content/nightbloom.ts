@@ -24,27 +24,29 @@ import { emptyZoneProps } from '../types';
 export const NIGHTBLOOM_ZONE: ZoneDef = {
   id: 'nightbloom',
   name: 'The Nightbloom',
-  zMin: 3120,
-  zMax: 3680,
+  zMin: 1260,
+  zMax: 1820,
+  xMin: -540,
+  xMax: -180,
   levelRange: [20, 20],
   biome: 'night',
-  southPassX: -30, // the Nightgate: where the fen road climbs into the dark
-  hub: { x: -10, z: 3280, radius: 18, name: 'Moonrest' },
-  graveyard: { x: -28, z: 3262 },
+  southPassX: -330, // the Nightgate: where the jungle road climbs into the dark
+  hub: { x: -370, z: 1420, radius: 18, name: 'Moonrest' },
+  graveyard: { x: -388, z: 1402 },
   lakes: [
-    { x: 70, z: 3240, radius: 14 }, // the Moonwell: a round mirror tarn
+    { x: -290, z: 1380, radius: 14 }, // the Moonwell: a round mirror tarn
     // the Gloamfield pools, scattered through the flower downs
-    { x: -80, z: 3380, radius: 10 },
-    { x: -102, z: 3352, radius: 8 },
-    { x: 24, z: 3542, radius: 12 }, // the Barrowmere below the Sleepless Barrow
+    { x: -440, z: 1520, radius: 10 },
+    { x: -462, z: 1492, radius: 8 },
+    { x: -336, z: 1682, radius: 12 }, // the Barrowmere below the Sleepless Barrow
   ],
   pois: [
-    { x: -10, z: 3280, label: 'Moonrest' },
-    { x: -30, z: 3152, label: 'The Nightgate' },
-    { x: 70, z: 3240, label: 'The Moonwell' },
-    { x: -84, z: 3356, label: 'Gloamfield' },
-    { x: 88, z: 3398, label: 'The Standing Vigil' },
-    { x: 0, z: 3510, label: 'The Sleepless Barrow' },
+    { x: -370, z: 1420, label: 'Moonrest' },
+    { x: -390, z: 1292, label: 'The Nightgate' },
+    { x: -290, z: 1380, label: 'The Moonwell' },
+    { x: -444, z: 1496, label: 'Gloamfield' },
+    { x: -272, z: 1538, label: 'The Standing Vigil' },
+    { x: -360, z: 1650, label: 'The Sleepless Barrow' },
   ],
   welcome:
     'Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.',
@@ -52,49 +54,47 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
 
 export const NIGHTBLOOM_ROADS: { x: number; z: number }[][] = [
   [
-    { x: -30, z: 3128 },
-    { x: -24, z: 3186 },
-    { x: -14, z: 3242 },
-    { x: -10, z: 3280 },
+    { x: -330, z: 1264 },
+    { x: -352, z: 1330 },
+    { x: -368, z: 1382 },
+    { x: -370, z: 1420 },
   ], // the Nightgate -> Moonrest
   [
-    { x: -10, z: 3280 },
-    { x: 26, z: 3262 },
-    { x: 52, z: 3248 },
+    { x: -370, z: 1420 },
+    { x: -334, z: 1402 },
+    { x: -308, z: 1388 },
   ], // Moonrest -> the Moonwell's shore
   [
-    { x: -10, z: 3280 },
-    { x: -48, z: 3312 },
-    { x: -72, z: 3340 },
+    { x: -370, z: 1420 },
+    { x: -408, z: 1452 },
+    { x: -432, z: 1480 },
   ], // Moonrest -> Gloamfield
   [
-    { x: -10, z: 3280 },
-    { x: 28, z: 3322 },
-    { x: 62, z: 3368 },
-    { x: 84, z: 3392 },
+    { x: -370, z: 1420 },
+    { x: -332, z: 1462 },
+    { x: -298, z: 1508 },
+    { x: -276, z: 1532 },
   ], // Moonrest -> the Standing Vigil
   [
-    { x: -10, z: 3280 },
-    { x: -6, z: 3360 },
-    { x: -2, z: 3430 },
-    { x: 0, z: 3496 },
+    { x: -370, z: 1420 },
+    { x: -366, z: 1500 },
+    { x: -362, z: 1570 },
+    { x: -360, z: 1636 },
   ], // Moonrest -> the Sleepless Barrow
   [
-    { x: 0, z: 3496 },
-    { x: 4, z: 3560 },
-    { x: 16, z: 3610 },
-    { x: 30, z: 3672 },
-  ], // the Barrow -> the Crowgate, west around the Barrowmere
+    { x: -360, z: 1636 },
+    { x: -356, z: 1700 },
+    { x: -350, z: 1760 },
+    { x: -348, z: 1816 },
+  ], // the Barrow -> the gold road, west around the Barrowmere
   [
-    { x: 80, z: 3410 },
-    { x: 132, z: 3404 },
-    { x: 176, z: 3400 },
-  ], // the Standing Vigil -> east to the Dreamsedge (into the wood)
+    { x: -280, z: 1550 },
+    { x: -240, z: 1546 },
+  ], // the Standing Vigil -> the Palewater's shore
   [
-    { x: -60, z: 3340 },
-    { x: -114, z: 3378 },
-    { x: -176, z: 3410 },
-  ], // Gloamfield -> west to the Tanglemouth (into the sun)
+    { x: -420, z: 1480 },
+    { x: -470, z: 1514 },
+  ], // Gloamfield -> the sunset shore
 ];
 
 // No portals: walked into over the Nightgate.
@@ -181,12 +181,12 @@ export const NIGHTBLOOM_QUESTS: Record<string, QuestDef> = {};
 export const NIGHTBLOOM_QUEST_ORDER: string[] = [];
 export const NIGHTBLOOM_ITEMS: Record<string, ItemDef> = {};
 export const NIGHTBLOOM_CAMPS: CampDef[] = [
-  { mobId: 'moonfleece_grazer', center: { x: -76, z: 3326 }, radius: 12, count: 4 },
-  { mobId: 'moonfleece_grazer', center: { x: 40, z: 3306 }, radius: 10, count: 3 },
-  { mobId: 'gloam_strider', center: { x: -50, z: 3382 }, radius: 10, count: 3 },
-  { mobId: 'gloam_strider', center: { x: 120, z: 3262 }, radius: 10, count: 3 },
-  { mobId: 'nightkin_stargazer', center: { x: 88, z: 3398 }, radius: 8, count: 3 },
-  { mobId: 'barrow_king', center: { x: 0, z: 3510 }, radius: 5, count: 1 },
+  { mobId: 'moonfleece_grazer', center: { x: -436, z: 1466 }, radius: 12, count: 4 },
+  { mobId: 'moonfleece_grazer', center: { x: -320, z: 1446 }, radius: 10, count: 3 },
+  { mobId: 'gloam_strider', center: { x: -410, z: 1522 }, radius: 10, count: 3 },
+  { mobId: 'gloam_strider', center: { x: -240, z: 1402 }, radius: 10, count: 3 },
+  { mobId: 'nightkin_stargazer', center: { x: -272, z: 1538 }, radius: 8, count: 3 },
+  { mobId: 'barrow_king', center: { x: -360, z: 1650 }, radius: 5, count: 1 },
 ];
 export const NIGHTBLOOM_OBJECTS: GroundObjectDef[] = [];
 
@@ -194,29 +194,29 @@ export const NIGHTBLOOM_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Moonrest: a snug lantern village on its rise
   buildings: [
-    { kind: 'inn', x: -18, z: 3284, w: 6, d: 7, rot: 0.6 },
-    { kind: 'house', x: -1, z: 3276, w: 6, d: 6, rot: -1.1 },
-    { kind: 'house', x: -16, z: 3270, w: 5, d: 5, rot: 2.2 },
-    { kind: 'chapel', x: -4, z: 3290, w: 5, d: 7, rot: -2.4 }, // the moon shrine
+    { kind: 'inn', x: -378, z: 1424, w: 6, d: 7, rot: 0.6 },
+    { kind: 'house', x: -361, z: 1416, w: 6, d: 6, rot: -1.1 },
+    { kind: 'house', x: -376, z: 1410, w: 5, d: 5, rot: 2.2 },
+    { kind: 'chapel', x: -364, z: 1430, w: 5, d: 7, rot: -2.4 }, // the moon shrine
   ],
-  wells: [{ x: -10, z: 3282, r: 1.5 }],
+  wells: [{ x: -370, z: 1422, r: 1.5 }],
   stalls: [
-    { x: -13, z: 3276, rot: 0.4, r: 1.6 },
-    { x: -5, z: 3284, rot: -1.5, r: 1.6 },
+    { x: -373, z: 1416, rot: 0.4, r: 1.6 },
+    { x: -365, z: 1424, rot: -1.5, r: 1.6 },
   ],
   crates: [
-    [-15, 3280],
-    [-2, 3272],
+    [-375, 1420],
+    [-362, 1412],
   ],
   campfires: [
-    [-10, 3278],
-    [-29, 3140], // the Nightgate's waycamp
+    [-370, 1418],
+    [-389, 1280], // the Nightgate's waycamp
   ],
   // the Standing Vigil: a ring of columns where the nightkin drift, and the
   // Sleepless Barrow: a tighter, older ring around the king's mound
   ruinRings: [
-    { x: 88, z: 3398, ringR: 9, columns: 7 },
-    { x: 0, z: 3510, ringR: 7, columns: 5 },
+    { x: -272, z: 1538, ringR: 9, columns: 7 },
+    { x: -360, z: 1650, ringR: 7, columns: 5 },
   ],
-  graveyards: [{ x: 6, z: 3520 }], // barrow field at the king's feet
+  graveyards: [{ x: -354, z: 1660 }], // barrow field at the king's feet
 };
