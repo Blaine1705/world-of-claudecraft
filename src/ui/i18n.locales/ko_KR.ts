@@ -2365,7 +2365,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.chain_heal.name': '연쇄 치유',
   'entities.abilities.chain_heal.description':
-    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 40% 감소합니다. (복원 전문화)',
+    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',

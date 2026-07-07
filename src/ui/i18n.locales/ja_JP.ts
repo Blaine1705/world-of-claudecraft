@@ -2387,7 +2387,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.chain_heal.name': 'チェインヒール',
   'entities.abilities.chain_heal.description':
-    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が40%減少します。（回復スペシャライゼーション）',
+    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',

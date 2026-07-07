@@ -6239,7 +6239,7 @@ export const ko_KR: EnTranslations = {
       },
       "chain_heal": {
         "name": "연쇄 치유",
-        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 40% 감소합니다. (복원 전문화)"
+        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
       },
       "metamorphosis": {
         "name": "악마 변신",

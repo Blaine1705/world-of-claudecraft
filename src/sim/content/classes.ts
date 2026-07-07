@@ -3525,9 +3525,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.6, radius: 12 }],
+    effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
     description:
-      'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)',
+      'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
   },
   healing_wave: {
     id: 'healing_wave',

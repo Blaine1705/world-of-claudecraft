@@ -3048,37 +3048,8 @@ export class Renderer {
           // Pyroblast's boulder: the same homing comet, doubled up.
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
-        else if (ev.fx === 'bubbleBeam') {
-          const duration = ev.duration ?? 4;
-          this.vfx.bubbleBeam(ev.sourceId, ev.targetId, duration);
-          if (duration <= 0) {
-            this.waterJetVisualChannels.delete(ev.sourceId);
-          } else {
-            this.waterJetVisualChannels.set(ev.sourceId, duration);
-            const view = this.views.get(ev.sourceId);
-            if (view) this.activeVisual(view)?.beginCastChannel();
-          }
-        } else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
-        else if (ev.fx === 'procSurge') {
-          this.vfx.procSurge(ev.targetId, ev.school);
-          this.pulseAt(ev.targetId, ev.school, 5, 0.4);
-        } else if (ev.fx === 'wardBloom') {
-          this.vfx.wardBloom(ev.targetId, ev.school);
-          this.pulseAt(ev.targetId, ev.school, 7, 0.55);
-        } else if (ev.fx === 'echoBurst') {
-          this.vfx.echoBurst(ev.targetId, ev.school);
-          this.pulseAt(ev.targetId, 'nature', 6, 0.5);
-        } else if (ev.fx === 'detonate') {
-          this.vfx.detonate(ev.targetId, ev.school);
-          this.pulseAt(ev.targetId, ev.school, 9, 0.5);
-        } else if (ev.fx === 'temporalGlyph') {
-          // Chronomancy Temporal Echo apply: a brief temporal glyph blooms
-          // directly OVER the marked ally (target-anchored, no projectile ever
-          // travels to them). A modest arcane bloom + glow, distinct from the
-          // per-hit heal-glow pulse the conversion heals emit.
-          this.vfx.wardBloom(ev.targetId, 'arcane');
-          this.pulseAt(ev.targetId, 'arcane', 5, 0.45);
-        } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
+        else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
+        else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock

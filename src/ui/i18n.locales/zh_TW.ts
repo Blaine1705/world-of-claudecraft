@@ -2284,7 +2284,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': '為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.chain_heal.name': '治療鏈',
   'entities.abilities.chain_heal.description':
-    '大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低40%。（恢復專精招牌）',
+    '大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）',
   'entities.abilities.earth_shock.name': '大地震擊',
   'entities.abilities.earth_shock.description':
     '立即以震盪之力衝擊目標，造成 {damage} 點自然傷害。',

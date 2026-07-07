@@ -277,6 +277,10 @@ export const SFX_CLIPS =
       }
     ]
   },
+  "cast_chain_heal": {
+    "url": "/audio/sfx/cast_chain_heal.wav",
+    "loop": false
+  },
   "cast_fire": {
     "url": "/audio/sfx/cast_fire.mp3?v=820cc28e3a14",
     "loop": true,

@@ -2761,45 +2761,7 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
-      fx:
-        | 'projectile'
-        // The same homing bolt drawn heavier (Pyroblast's boulder): mechanics
-        // identical to 'projectile', only the renderer scales it up.
-        | 'heavyBolt'
-        | 'beam'
-        | 'bubbleBeam'
-        | 'tick'
-        | 'nova'
-        | 'chainHeal'
-        | 'windup'
-        | 'lightning'
-        | 'shout'
-        | 'weaponAura'
-        | 'flourish'
-        // Talent-moment effects: a proc arming (procSurge), a ward appearing
-        // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
-        // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.
-        | 'procSurge'
-        | 'wardBloom'
-        | 'echoBurst'
-        | 'detonate'
-        // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13):
-        // a brief temporal glyph blooming directly OVER the marked ally on apply.
-        // Target-anchored, no projectile travels to the ally. Visual-only.
-        | 'temporalGlyph'
-        | 'frostCone'
-        | 'fireCone'
-        // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
-        // mover instead of arcing the reposition like a leap.
-        | 'blinkStep';
-      // The casting ability's id, carried only by fx kinds whose visual varies per
-      // ability (shouts pick their wave colour; weapon auras identify the buff).
-      ability?: string;
-      /** Lifetime of a persistent visual such as Water Jet's bubble stream. */
-      duration?: number;
-      range?: number;
-      angle?: number;
-      level?: number;
+      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning' | 'chainHeal';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

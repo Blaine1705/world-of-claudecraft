@@ -6239,7 +6239,7 @@ export const zh_TW: EnTranslations = {
       },
       "chain_heal": {
         "name": "治療鏈",
-        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低40%。（恢復專精招牌）"
+        "description": "大量治療一個友方目標，然後跳躍至多2個附近的盟友，每次跳躍的治療量降低50%。（恢復專精招牌）"
       },
       "metamorphosis": {
         "name": "惡魔變形",
