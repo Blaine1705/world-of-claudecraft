@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
 import { ZONES, zoneAt } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
@@ -10,7 +10,8 @@ function makeWorld() {
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
 }
@@ -50,7 +51,7 @@ describe('/zones command', () => {
     const last = ZONES[ZONES.length - 1];
     teleport(sim, a, 0, last.zMin + 1);
     sim.tick();
-    expect(zoneAt(sim.entities.get(a)!.pos.z).name).toBe(last.name);
+    expect(zoneAt(sim.entities.get(a)!.pos.x, sim.entities.get(a)!.pos.z).name).toBe(last.name);
     sim.chat('/zones', a);
     const text = errorText(sim.tick())!;
     // The current-zone marker sits on the last zone's line, not the first.

@@ -4403,7 +4403,7 @@ export class Sim {
     // The catch depends on which zone's water you're fishing — each has its own
     // weighted table (src/sim/content/items.ts). Fall back to the Vale table for
     // any spot without its own (e.g. fishable water inside a dungeon zone).
-    const table = FISHING_TABLES[zoneAt(p.pos.z).id] ?? FISHING_TABLES.eastbrook_vale;
+    const table = FISHING_TABLES[zoneAt(p.pos.x, p.pos.z).id] ?? FISHING_TABLES.eastbrook_vale;
     const total = table.reduce((sum, e) => sum + e.weight, 0);
     let roll = this.rng.next() * total;
     let caught: string | null = null;

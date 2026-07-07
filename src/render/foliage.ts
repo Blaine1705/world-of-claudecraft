@@ -1256,7 +1256,7 @@ function generateDressing(seed: number): DressingSpot[] {
   for (let gx = -xHalf; gx < xHalf; gx += step) {
     for (let gz = WORLD_MIN_Z + 16; gz < WORLD_MAX_Z - 16; gz += step) {
       const r = hashAt(gx, gz, 41);
-      const biome = zoneBiomeAt(gz);
+      const biome = zoneBiomeAt(gx, gz);
       const density = DRESS_DENSITY[biome] * (GFX.leanFoliage ? DRESS_DENSITY_LOW_SCALE : 1);
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
@@ -1339,25 +1339,25 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
           if (kind === 'mushroom') {
             // mushrooms keep their painted cap colors — brightness jitter only
             im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'amber') {
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'amber') {
             const tint =
               AMBER_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * AMBER_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'fen') {
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'fen') {
             const tint = FEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * FEN_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'night') {
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'night') {
             // the nightblooms take their tint raw: pale petals must pop
             // against the dark ground, not soften toward it
             const tint =
               NIGHT_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * NIGHT_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'garden') {
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'garden') {
             // the roses take their tint raw too: a rose bed should read red
             const tint =
               GARDEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GARDEN_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
-          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.z) === 'dusk') {
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'dusk') {
             // the Hollow's flowering bushes bloom in several colors, not one
             const tint =
               DUSK_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * DUSK_BLOOM_TINTS.length)];
@@ -1377,7 +1377,7 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
               softTint(
                 s.x,
                 s.z,
-                DRESS_TINT[zoneBiomeAt(s.z)],
+                DRESS_TINT[zoneBiomeAt(s.x, s.z)],
                 c,
                 GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
               ),
@@ -1649,7 +1649,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));
         im.setMatrixAt(n, m);
-        c.setHex(GRASS_TINT[zoneBiomeAt(z)]);
+        c.setHex(GRASS_TINT[zoneBiomeAt(x, z)]);
         c.offsetHSL(
           (hashAt(i, j, 3) - 0.5) * 0.05,
           (hashAt(i, j, 4) - 0.5) * 0.12,

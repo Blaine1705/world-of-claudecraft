@@ -1198,6 +1198,14 @@ export interface ZoneDef {
   id: string;
   name: string;
   zMin: number;
+  /**
+   * Optional east-west extent (a world GRID column). Omitted = the original
+   * full-width strip [-WORLD_SIZE/2, WORLD_SIZE/2]. Zones are rectangles;
+   * zoneAt(x, z) picks by rect, so side-by-side columns can share a z band
+   * and meet at a real walkable border, exactly like the north passes.
+   */
+  xMin?: number;
+  xMax?: number;
   zMax: number;
   levelRange: [number, number];
   biome: BiomeId;

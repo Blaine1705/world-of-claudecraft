@@ -120,7 +120,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       const rim = half - RIM_INSET;
       const rim2 = rim * rim;
       markers.length = 0;
-      model.zoneId = zoneAt(p.pos.z).id;
+      model.zoneId = zoneAt(p.pos.x, p.pos.z).id;
 
       // friend/guild lookup for colouring nearby allies; party members are drawn by the
       // party loop below, so the entity loop skips them (avoiding double dots). Built

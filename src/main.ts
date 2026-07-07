@@ -1637,7 +1637,7 @@ async function startGame(
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
           userAgent: navigator.userAgent,
           viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio },
-          zone: zoneBiomeAt(world.player.pos.z),
+          zone: zoneBiomeAt(world.player.pos.x, world.player.pos.z),
           level: world.player.level,
           // Entity has no `cls`; the player's class is its templateId (see Entity).
           className: world.player.templateId,

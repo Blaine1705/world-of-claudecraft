@@ -170,7 +170,10 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   // dying in a dungeon sends you to the graveyard of the zone its door is
   // in; dying outdoors, to your current zone's graveyard
   const dungeon = dungeonAt(p.pos.x);
-  const graveyard = zoneAt(dungeon ? dungeon.doorPos.z : p.pos.z).graveyard;
+  const graveyard = zoneAt(
+    dungeon ? dungeon.doorPos.x : p.pos.x,
+    dungeon ? dungeon.doorPos.z : p.pos.z,
+  ).graveyard;
   p.pos = ctx.groundPos(graveyard.x, graveyard.z);
   p.prevPos = { ...p.pos };
   rebucketEntity(ctx, p);
@@ -229,7 +232,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
 // guard does not see it as a literal emit.
 export function graveyardReadout(p: Entity): string {
   const dungeon = dungeonAt(p.pos.x);
-  const zone = zoneAt(dungeon ? dungeon.doorPos.z : p.pos.z);
+  const zone = zoneAt(dungeon ? dungeon.doorPos.x : p.pos.x, dungeon ? dungeon.doorPos.z : p.pos.z);
   const gy = zone.graveyard;
   return `If you fall here, your spirit returns to the ${zone.name} graveyard at (${Math.floor(gy.x)}, ${Math.floor(gy.z)}).`;
 }

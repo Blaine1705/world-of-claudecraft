@@ -3,6 +3,8 @@ import {
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   ROADS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -1455,11 +1457,16 @@ function isExcludedDecoration(x: number, z: number): boolean {
   );
 }
 
-export function zoneBiomeAt(z: number): BiomeId {
+export function zoneBiomeAt(x: number, z: number): BiomeId {
+  let fallback: BiomeId | null = null;
   for (const zone of ZONES) {
-    if (z < zone.zMax) return zone.biome;
+    if (z >= zone.zMax) continue;
+    if (fallback === null) fallback = zone.biome;
+    const x0 = zone.xMin ?? STRIP_MIN_X;
+    const x1 = zone.xMax ?? STRIP_MAX_X;
+    if (x >= x0 && x < x1) return zone.biome;
   }
-  return ZONES[ZONES.length - 1].biome;
+  return fallback ?? ZONES[ZONES.length - 1].biome;
 }
 
 export function generateDecorations(seed: number): Decoration[] {
@@ -1469,7 +1476,7 @@ export function generateDecorations(seed: number): Decoration[] {
   for (let gx = -xHalf; gx < xHalf; gx += step) {
     for (let gz = WORLD_MIN_Z + 14; gz < WORLD_MAX_Z - 14; gz += step) {
       const r = hash2(Math.round(gx), Math.round(gz), seed + 31);
-      const biome = zoneBiomeAt(gz);
+      const biome = zoneBiomeAt(gx, gz);
       // density gate + kind mix per biome
       let kind: Decoration['kind'] | null = null;
       if (biome === 'vale') {

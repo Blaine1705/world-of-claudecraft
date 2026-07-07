@@ -323,7 +323,7 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   ];
 
   paletteAt(z);
-  const biome = zoneBiomeAt(z);
+  const biome = zoneBiomeAt(x, z);
   const w: [number, number, number, number] = [1, 0, 0, 0];
   const impact = impactCraterTerrainBlend(x, z);
 

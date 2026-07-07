@@ -492,20 +492,34 @@ export const ZONES: ZoneDef[] = [
   EVERGARDEN_ZONE,
 ];
 
-export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
-export const WORLD_MIN_X = -WORLD_SIZE / 2;
-export const WORLD_MAX_X = WORLD_SIZE / 2;
+export const WORLD_SIZE = 360; // the original strip's width (one grid column)
+// A zone without an explicit x-range spans the original strip column.
+export const STRIP_MIN_X = -WORLD_SIZE / 2;
+export const STRIP_MAX_X = WORLD_SIZE / 2;
+// World bounds are the bounding box of all zone rects: today exactly the
+// strip, and they grow automatically when a column is added east or west.
+export const WORLD_MIN_X = Math.min(...ZONES.map((zn) => zn.xMin ?? STRIP_MIN_X));
+export const WORLD_MAX_X = Math.max(...ZONES.map((zn) => zn.xMax ?? STRIP_MAX_X));
 export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
 
 export const PLAYER_START = { x: 2, z: -2 };
 
-// Zone containing a world position (overworld only; clamps to the strip ends).
-export function zoneAt(z: number): ZoneDef {
+// Zone containing a world position (overworld only; clamps to the world
+// edges). Zones are rectangles: z picks the band (stacked south to north,
+// as always) and x picks the column within it. Every zone without an
+// explicit x-range spans the original full-width strip, so a one-column
+// world behaves exactly as before.
+export function zoneAt(x: number, z: number): ZoneDef {
+  let fallback: ZoneDef | null = null;
   for (const zone of ZONES) {
-    if (z < zone.zMax) return zone;
+    if (z >= zone.zMax) continue;
+    if (fallback === null) fallback = zone; // southmost band containing z
+    const x0 = zone.xMin ?? STRIP_MIN_X;
+    const x1 = zone.xMax ?? STRIP_MAX_X;
+    if (x >= x0 && x < x1) return zone;
   }
-  return ZONES[ZONES.length - 1];
+  return fallback ?? ZONES[ZONES.length - 1];
 }
 
 export function zoneWelcomeText(

@@ -108,7 +108,7 @@ export function buildMotes(seed: number): MotesView {
     positions[i * 3] = x;
     positions[i * 3 + 1] = h + bobAmp[i];
     positions[i * 3 + 2] = z;
-    tmpColor.setHex(MOTE_TINT[zoneBiomeAt(z)]);
+    tmpColor.setHex(MOTE_TINT[zoneBiomeAt(x, z)]);
     colors[i * 3] = tmpColor.r;
     colors[i * 3 + 1] = tmpColor.g;
     colors[i * 3 + 2] = tmpColor.b;

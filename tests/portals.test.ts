@@ -42,7 +42,7 @@ describe('the Duskfall passage', () => {
     teleport(sim, a, PORTAL.a.x, PORTAL.a.z);
     const events = sim.tick();
     const p = sim.entities.get(a)!;
-    expect(zoneAt(p.pos.z).id).toBe('veiled_hollow');
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('veiled_hollow');
     expect(p.pos.x).toBeCloseTo(PORTAL.b.landing.x, 5);
     expect(p.pos.z).toBeCloseTo(PORTAL.b.landing.z, 5);
     expect(logTexts(events)).toContain(PORTAL.enterText);
@@ -55,7 +55,7 @@ describe('the Duskfall passage', () => {
     teleport(sim, a, PORTAL.b.x, PORTAL.b.z);
     const events = sim.tick();
     const p = sim.entities.get(a)!;
-    expect(zoneAt(p.pos.z).id).toBe('thornpeak_heights');
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('thornpeak_heights');
     expect(p.pos.x).toBeCloseTo(PORTAL.a.landing.x, 5);
     expect(p.pos.z).toBeCloseTo(PORTAL.a.landing.z, 5);
     expect(logTexts(events)).toContain(PORTAL.leaveText);
@@ -72,7 +72,7 @@ describe('the Duskfall passage', () => {
     for (let i = 0; i < 100; i++) sim.tick();
     expect(p.pos.x).toBeCloseTo(landed.x, 5);
     expect(p.pos.z).toBeCloseTo(landed.z, 5);
-    expect(zoneAt(p.pos.z).id).toBe('veiled_hollow');
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('veiled_hollow');
   });
 
   it('emits the flavor line to the traveler only', () => {
@@ -102,7 +102,7 @@ describe('the Duskfall passage', () => {
     expect(p.dead).toBe(true);
     sim.releaseSpirit(a);
     sim.tick();
-    expect(zoneAt(p.pos.z).id).toBe('veiled_hollow');
+    expect(zoneAt(p.pos.x, p.pos.z).id).toBe('veiled_hollow');
   });
 
   it('keeps two same-seed worlds identical through a portal crossing', () => {

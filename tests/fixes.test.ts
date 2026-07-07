@@ -64,7 +64,7 @@ function formRaid(sim: Sim) {
 describe('quest lifecycle', () => {
   it('stops showing the Redbrook starter hint after the first quest is accepted', () => {
     const sim = makeSim();
-    const starterZone = zoneAt(sim.player.pos.z);
+    const starterZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
 
     expect(zoneWelcomeText(starterZone, (questId) => sim.questState(questId))).toBe(
       'Find Marshal Redbrook in town — he has work for you.',

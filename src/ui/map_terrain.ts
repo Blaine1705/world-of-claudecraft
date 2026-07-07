@@ -92,7 +92,7 @@ export function paintTerrainRows(
       const left = ix === 0 ? h : leftH;
       const up = iy === 0 ? h : prevRow[ix];
       leftH = h;
-      const biome = zoneBiomeAt(z);
+      const biome = zoneBiomeAt(x, z);
       let r = 58,
         g = 105,
         b = 48;

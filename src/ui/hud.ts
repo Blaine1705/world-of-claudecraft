@@ -50,6 +50,8 @@ import {
   NPCS,
   QUESTS,
   questRewardItem,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -1356,7 +1358,7 @@ export class Hud {
       music.setEnabled(!music.enabled);
       styleMusicBtn();
     });
-    const startZone = zoneAt(sim.player.pos.z);
+    const startZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
@@ -4890,7 +4892,7 @@ export class Hud {
     this.setDisplay(this.releaseSpiritBtnEl, deadInArena ? 'none' : '');
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
-    const currentZone = zoneAt(p.pos.z);
+    const currentZone = zoneAt(p.pos.x, p.pos.z);
     if (mediumHud) {
       // zone transitions: banner + welcome hint when crossing into a new band.
       // A ~5yd dead-band past the boundary stops a player straddling the border
@@ -5662,7 +5664,12 @@ export class Hud {
 
   // The full-zone band used by the world map (and prewarm), keyed only on z.
   private mapZoneRegion(zone: ZoneDef): MapRegion {
-    return { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
+    return {
+      minX: zone.xMin ?? STRIP_MIN_X,
+      maxX: zone.xMax ?? STRIP_MAX_X,
+      minZ: zone.zMin,
+      maxZ: zone.zMax,
+    };
   }
 
   // The cached terrain background for a zone, rendering it synchronously only if
@@ -6038,8 +6045,8 @@ export class Hud {
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
     const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+      ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
+      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
       bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
