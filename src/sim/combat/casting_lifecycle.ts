@@ -51,6 +51,7 @@ import {
 import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   consumeNextAttackCrit,
+  consumeNextCastCheap,
   consumeNextCastFree,
   consumeNextCastInstant,
   hasNextCastFree,
@@ -62,6 +63,7 @@ import {
   spellHasteMult,
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
+import { onCastCompleted } from './talent_procs';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -246,7 +248,7 @@ export function castAbility(
   }
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -449,7 +451,7 @@ export function castAbility(
   if (ability.onNextSwing) {
     const toggledOff = p.queuedOnSwing === ability.id;
     p.queuedOnSwing = toggledOff ? null : ability.id;
-    if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p)) {
+    if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p, ability.id)) {
       p.queuedOnSwingFree = true;
     } else {
       delete p.queuedOnSwingFree;
@@ -465,7 +467,7 @@ export function castAbility(
     !ability.channel &&
     res.castTime > 0 &&
     ability.school !== 'physical' &&
-    consumeNextCastInstant(ctx, p)
+    consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
   // A free cast is consumed where the cost is actually billed: here for channels
@@ -473,7 +475,12 @@ export function castAbility(
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
+    if (canCastFree && consumeNextCastFree(ctx, p, ability.id)) {
+      res = { ...res, cost: 0 };
+    } else if (res.cost > 0) {
+      const cheap = consumeNextCastCheap(ctx, p, ability.id);
+      if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
+    }
   }
 
   if (ability.channel) {
@@ -499,6 +506,7 @@ export function castAbility(
     // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target ?? null, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
 
@@ -661,8 +669,12 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   // The free charge is consumed exactly where a cost is actually billed; the
   // early-return utility branches below bill directly, so they must go through
   // this too or a free conjure/revive would keep the charge alive.
-  const billableCost = (): number =>
-    res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p) ? 0 : res.cost;
+  const billableCost = (): number => {
+    if (res.cost <= 0 || togglingOff) return res.cost;
+    if (consumeNextCastFree(ctx, p, ability.id)) return 0;
+    const cheap = consumeNextCastCheap(ctx, p, ability.id);
+    return cheap !== null ? Math.ceil(res.cost * cheap) : res.cost;
+  };
   if (ability.id === 'conjure_water') {
     // higher ranks conjure better water (falls back if the item isn't defined)
     const tiered = `conjured_water${res.rank}`;
@@ -751,12 +763,17 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, ability.id);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }
-  if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
+  if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p, ability.id)) {
+    res = { ...res, cost: 0 };
+  } else if (res.cost > 0 && !togglingOff) {
+    const cheap = consumeNextCastCheap(ctx, p, ability.id);
+    if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
+  }
 
   // helpful spells never miss
   if (
@@ -769,6 +786,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
 
@@ -820,6 +838,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // resisted or fizzled bolt was still a cast). Physical projectile shots
     // (hunter Aimed / Concussive) are not spells and never roll.
     if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
 
@@ -830,4 +849,5 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
     ctx.applySetProcs(p, target, 'spellCast');
+  if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id);
 }

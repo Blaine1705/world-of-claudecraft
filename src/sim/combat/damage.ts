@@ -47,6 +47,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
+import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -170,6 +171,10 @@ export function dealDamage(
       if (a.value <= 0) {
         target.auras.splice(i, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
+        // Talent procs listening for a fully consumed shield (deterministic).
+        const shielder = ctx.entities.get(a.sourceId);
+        if (shielder && !shielder.dead && shielder.kind === 'player')
+          onShieldConsumed(ctx, shielder, a.id, target);
       }
     }
   }
@@ -299,6 +304,19 @@ export function dealDamage(
     }
   }
 
+  // Cheat death (talent global): a killing blow leaves the player at 1 hp
+  // instead, gated by a long internal cooldown on procState. No rng.
+  if (target.kind === 'player' && amount >= target.hp && !target.dead) {
+    const meta = ctx.players.get(target.id);
+    const icd = meta ? ctx.playerMods(meta).global.cheatDeathIcd : 0;
+    if (icd > 0) {
+      if (!target.procState) target.procState = { counters: {}, icds: {} };
+      if (target.procState.icds.cheat_death === undefined) {
+        target.procState.icds.cheat_death = icd;
+        amount = Math.max(0, target.hp - 1);
+      }
+    }
+  }
   target.hp = Math.max(0, target.hp - amount);
   ctx.emit({
     type: 'damage',
@@ -325,6 +343,20 @@ export function dealDamage(
         });
         target.auras.splice(i, 1);
       }
+    }
+  }
+
+  // A heal echo (talent proc watcher) fires when its carrier drops below the
+  // stored health fraction: consume the aura and deliver the stored heal.
+  if (amount > 0 && !target.dead && target.maxHp > 0) {
+    for (let i = target.auras.length - 1; i >= 0; i--) {
+      const a = target.auras[i];
+      if (a.kind !== 'heal_echo') continue;
+      if (target.hp >= target.maxHp * (a.value2 ?? 0)) continue;
+      target.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
+      const healer = ctx.entities.get(a.sourceId);
+      if (healer && !healer.dead) ctx.applyHeal(healer, target, a.value, a.name);
     }
   }
 
@@ -368,6 +400,8 @@ export function dealDamage(
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
+    // Talent procs listening for spell crits (deterministic, no rng draw).
+    if (crit && school !== 'physical' && ability) onSpellCrit(ctx, source, ability, target);
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
       source.resource = Math.min(
         source.maxResource,
@@ -378,6 +412,8 @@ export function dealDamage(
   if (target.kind === 'player') {
     const meta = ctx.players.get(target.id);
     if (meta) meta.counters.damageTaken += amount;
+    // Talent procs listening for big single hits (deterministic, ICD-gated).
+    if (amount > 0 && !target.dead) onDamageTaken(ctx, target, amount);
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
       target.resource = Math.min(
         target.maxResource,
@@ -509,6 +545,7 @@ function reflectSpellWard(
 }
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+  resetProcState(e);
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);

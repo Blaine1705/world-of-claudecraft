@@ -10,6 +10,7 @@
 // numbers; they never walk the tree. See docs/prd/talents-and-specializations.md.
 // ---------------------------------------------------------------------------
 
+import type { ProcDef } from '../combat/talent_procs';
 import type { AbilityEffect } from '../types';
 import { MAX_LEVEL, type PlayerClass } from '../types';
 import {
@@ -94,11 +95,16 @@ export interface GlobalModEffect {
   // it shortens every cast and the cast-time tooltips reflect it live.
   spellHastePct?: number;
   critVsRooted?: number; // additive spell crit chance against rooted targets
+  // Cheat death (Deathless Ardor style): a killing blow leaves the player at
+  // 1 hp instead, once per this many seconds (0 disables). Consumed in
+  // combat/damage.ts behind the procState internal cooldown.
+  cheatDeathIcd?: number;
 }
 
 export interface TalentEffect {
   stats?: StatModEffect;
   grant?: { ability: string; rank?: number };
+  proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
 }
@@ -173,6 +179,7 @@ export interface TalentModifiers {
   abilities: Record<string, ResolvedAbilityMod>;
   global: Required<GlobalModEffect>;
   grants: { ability: string; rank: number }[];
+  procs: ProcDef[];
 }
 
 // ---------------------------------------------------------------------------
@@ -344,6 +351,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
     critDmgPct: 0,
     spellHastePct: 0,
     critVsRooted: 0,
+    cheatDeathIcd: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -367,6 +375,7 @@ export function emptyModifiers(): TalentModifiers {
     abilities: {},
     global: zeroGlobal(),
     grants: [],
+    procs: [],
   };
 }
 
@@ -419,6 +428,8 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.critDmgPct += (e.critDmgPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
+    // An ICD is a duration, not a rate: take the longest granted, ignore mult.
+    g.cheatDeathIcd = Math.max(g.cheatDeathIcd, e.cheatDeathIcd ?? 0);
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];
@@ -437,6 +448,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     if (am.addEffects) cur.addEffects.push(...am.addEffects);
   }
   if (eff.grant) mods.grants.push({ ability: eff.grant.ability, rank: eff.grant.rank ?? 1 });
+  if (eff.proc) mods.procs.push(eff.proc);
 }
 
 // A deterministic, always-valid allocation for a class, used by 2v2 Fiesta to

@@ -109,6 +109,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
     global: { ...base.global },
     abilities: {},
     grants: [...base.grants],
+    procs: [...base.procs],
   };
   for (const k in base.abilities) m.abilities[k] = { ...base.abilities[k] };
   for (const id of augIds) {

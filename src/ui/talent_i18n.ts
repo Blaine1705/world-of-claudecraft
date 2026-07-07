@@ -53,7 +53,7 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
-type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted'>;
+type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted' | 'cheatDeathIcd'>;
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
@@ -8498,7 +8498,7 @@ function effectDescription(
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
-    if (key === 'critVsRooted') continue;
+    if (key === 'critVsRooted' || key === 'cheatDeathIcd') continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
   }
 

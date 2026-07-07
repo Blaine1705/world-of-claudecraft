@@ -49,6 +49,7 @@ import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
+import { onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
@@ -312,6 +313,9 @@ export function meleeSwing(
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.
   if (crit && attacker.kind === 'player') ctx.applySetProcs(attacker, target, 'weaponCrit');
+  // Talent procs keyed to a landed swing while a condition aura (seal, imbue)
+  // is up (deterministic, no rng draw).
+  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

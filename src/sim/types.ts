@@ -233,7 +233,9 @@ export type AuraKind =
   | 'critvuln'
   | 'next_cast_instant'
   | 'next_cast_free'
+  | 'next_cast_cheap'
   | 'next_attack_crit'
+  | 'heal_echo'
   | 'buff_spi'
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
@@ -258,6 +260,9 @@ export interface Aura {
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
+  // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
+  // ids may consume this aura; undefined means any eligible cast.
+  empowerAbilities?: string[];
   leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
@@ -1661,6 +1666,9 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
 }
 
 export interface Entity {
+  // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
+  // Never serialized; reset on death.
+  procState?: { counters: Record<string, number>; icds: Record<string, number> };
   id: number;
   kind: EntityKind;
   templateId: string; // mob/npc template id, or class for player
