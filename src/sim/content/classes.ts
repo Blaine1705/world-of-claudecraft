@@ -439,6 +439,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Bolstering Cry',
     class: 'warrior',
     learnLevel: 14,
+    specs: ['prot'],
     cost: 10,
     castTime: 0,
     cooldown: 0,
@@ -496,6 +497,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Deep Gash',
     class: 'warrior',
     learnLevel: 4,
+    specs: ['arms'],
     cost: 10,
     castTime: 0,
     cooldown: 0,
@@ -590,6 +592,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Blood Toll',
     class: 'warrior',
     learnLevel: 10,
+    specs: ['arms', 'prot'],
     cost: 0,
     castTime: 0,
     cooldown: 60,
@@ -610,6 +613,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redhand',
     class: 'warrior',
     learnLevel: 10,
+    specs: ['arms'],
     cost: 0,
     castTime: 0,
     cooldown: 5,
@@ -658,6 +662,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Brute Swing',
     class: 'warrior',
     learnLevel: 16,
+    specs: ['arms'],
     cost: 15,
     // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
     // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
@@ -689,6 +694,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Guarded Stance',
     class: 'warrior',
     learnLevel: 10,
+    specs: ['arms', 'prot'],
     cost: 0,
     castTime: 0,
     cooldown: 1,
@@ -705,6 +711,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Armor Shear',
     class: 'warrior',
     learnLevel: 10,
+    specs: ['arms', 'prot'],
     cost: 15,
     castTime: 0,
     cooldown: 0,
@@ -4416,6 +4423,9 @@ export function abilitiesKnownAt(
     if (!def) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
     if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
+    // Spec-gated kit: once a spec is chosen, abilities reserved for other specs
+    // drop out. No spec chosen = full kit; grants bypass (already spec-scoped).
+    if (!granted && def.specs && mods?.spec && !def.specs.includes(mods.spec)) continue;
 
     let rank = 1,
       cost = def.cost,

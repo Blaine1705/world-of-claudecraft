@@ -1,0 +1,117 @@
+import { describe, expect, it } from 'vitest';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import {
+  computeTalentModifiers,
+  emptyAllocation,
+  type TalentAllocation,
+} from '../src/sim/content/talents';
+import { Sim } from '../src/sim/sim';
+
+// Spec-gated base kit (operator design, 2026-07-07): some warrior base
+// abilities belong to specific specializations. A player who has not yet
+// committed to a spec keeps the full kit; once a spec is chosen, abilities
+// whose `specs` list excludes it drop out of the known list (and with it the
+// spellbook, the action bar resolve, and the server cast path, which all read
+// meta.known). Talent/row GRANTS are never spec-filtered here: the tree they
+// come from is already spec-scoped.
+
+const alloc = (spec: string | null): TalentAllocation => ({
+  ...emptyAllocation(),
+  spec,
+});
+
+const mods = (spec: string | null) => computeTalentModifiers('warrior', alloc(spec));
+
+const knownIds = (spec: string | null, level = 20): Set<string> =>
+  new Set(abilitiesKnownAt('warrior', level, mods(spec)).map((k) => k.def.id));
+
+// The locked gating table: ability id -> specs that keep it.
+const GATED: Record<string, string[]> = {
+  defensive_stance: ['arms', 'prot'],
+  sunder_armor: ['arms', 'prot'],
+  commanding_shout: ['prot'],
+  rend: ['arms'],
+  overpower: ['arms'],
+  slam: ['arms'],
+  bloodrage: ['arms', 'prot'], // Fury replaces it with its signature (Bloodletting)
+};
+
+describe('spec-gated warrior base kit (content table)', () => {
+  it('every gated ability declares exactly the approved specs', () => {
+    for (const [id, specs] of Object.entries(GATED)) {
+      expect(ABILITIES[id]?.specs, id).toEqual(specs);
+    }
+  });
+
+  it('ungated staples carry no specs field', () => {
+    for (const id of ['heroic_strike', 'battle_shout', 'charge', 'execute', 'taunt']) {
+      expect(ABILITIES[id]?.specs, id).toBeUndefined();
+    }
+  });
+});
+
+describe('abilitiesKnownAt spec filter', () => {
+  it('no spec chosen: the full level-appropriate kit stays available', () => {
+    const ids = knownIds(null);
+    for (const id of Object.keys(GATED)) expect(ids.has(id), id).toBe(true);
+  });
+
+  it('fury loses every arms/prot exclusive (incl. Blood Toll, replaced by its signature)', () => {
+    const ids = knownIds('fury');
+    for (const id of Object.keys(GATED)) expect(ids.has(id), id).toBe(false);
+    expect(ids.has('heroic_strike')).toBe(true);
+    expect(ids.has('bloodthirst')).toBe(true); // the signature grant is untouched
+  });
+
+  it('arms keeps its exclusives but not the prot-only shout', () => {
+    const ids = knownIds('arms');
+    for (const id of ['defensive_stance', 'sunder_armor', 'rend', 'overpower', 'slam']) {
+      expect(ids.has(id), id).toBe(true);
+    }
+    expect(ids.has('commanding_shout')).toBe(false);
+    expect(ids.has('bloodrage')).toBe(true);
+  });
+
+  it('prot keeps tank staples but no arms-only strikes', () => {
+    const ids = knownIds('prot');
+    for (const id of ['defensive_stance', 'sunder_armor', 'commanding_shout', 'bloodrage']) {
+      expect(ids.has(id), id).toBe(true);
+    }
+    for (const id of ['rend', 'overpower', 'slam']) expect(ids.has(id), id).toBe(false);
+  });
+
+  it('a talent grant bypasses the spec filter (grants are already spec-scoped)', () => {
+    // Simulate a grant of a gated ability: even under fury, a grant wins.
+    const m = mods('fury');
+    m.grants.push({ ability: 'rend', rank: 1 });
+    const ids = new Set(abilitiesKnownAt('warrior', 20, m).map((k) => k.def.id));
+    expect(ids.has('rend')).toBe(true);
+  });
+});
+
+describe('spec gating end to end in the sim', () => {
+  it('choosing fury removes Deep Gash from the known list and the cast resolve', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.known.some((k) => k.def.id === 'rend')).toBe(true);
+    expect(sim.setSpec('fury')).toBe(true);
+    expect(sim.known.some((k) => k.def.id === 'rend')).toBe(false);
+    expect(sim.resolvedAbility('rend')).toBeNull();
+    // Staples survive the spec choice.
+    expect(sim.known.some((k) => k.def.id === 'heroic_strike')).toBe(true);
+  });
+
+  it('choosing prot keeps the tank kit and stays deterministic', () => {
+    const run = () => {
+      const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec('prot');
+      for (let i = 0; i < 20 * 3; i++) sim.tick();
+      return sim.known.map((k) => k.def.id).join(',');
+    };
+    const a = run();
+    expect(a).toContain('commanding_shout');
+    expect(a).not.toContain('overpower');
+    expect(run()).toBe(a);
+  });
+});
