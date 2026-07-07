@@ -30,7 +30,14 @@ import {
   type SentChat,
 } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, MAX_LEVEL, type OverheadEmoteId, YELL_RANGE } from '../types';
+import {
+  dist2d,
+  type Entity,
+  MAX_LEVEL,
+  type OverheadEmoteId,
+  type RiftTier,
+  YELL_RANGE,
+} from '../types';
 import * as readouts from './chat_readouts';
 
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -956,13 +963,20 @@ export function handleDevChat(
   }
   // [dev] Spawn a procedural rift portal in front of the player. Each invocation
   // rolls a fresh seed (so every portal opens a different, infinite dungeon) unless
-  // one is supplied for reproducibility: /dev portal [seed] [level].
-  const portalM = /^\/(?:dev\s+portal|devportal)(?:\s+(\d+))?(?:\s+(\d+))?\s*$/i.exec(raw);
+  // one is supplied for reproducibility. An optional rank letter forces the tier
+  // (colour + badge); omitted, a random rank is rolled so the portal always shows
+  // a coloured shimmer and its floating letter: /dev portal [seed] [level] [C|B|A|S].
+  const portalM =
+    /^\/(?:dev\s+portal|devportal)(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+([CBAScbas]))?\s*$/i.exec(raw);
   if (portalM) {
     const e = ctx.entities.get(pid);
     if (!e) return null;
     const seed = (portalM[1] ? Number(portalM[1]) : ctx.rng.int(1, 1_000_000_000)) >>> 0;
     const baseLevel = Math.max(1, Math.min(60, portalM[2] ? Number(portalM[2]) : e.level));
+    const TIERS: RiftTier[] = ['C', 'B', 'A', 'S'];
+    const tier: RiftTier = portalM[3]
+      ? (portalM[3].toUpperCase() as RiftTier)
+      : TIERS[ctx.rng.int(0, 3)];
     const d = 5;
     const px = e.pos.x + Math.sin(e.facing) * d;
     const pz = e.pos.z + Math.cos(e.facing) * d;
@@ -973,12 +987,13 @@ export function handleDevChat(
     portal.lootable = true;
     portal.riftSeed = seed;
     portal.riftBaseLevel = baseLevel;
+    portal.riftTier = tier;
     portal.facing = e.facing + Math.PI; // face back toward the player
     portal.prevFacing = portal.facing;
     ctx.addEntity(portal);
     ctx.emit({
       type: 'log',
-      text: `[dev] Opened a portal to ${plan.name} (${plan.floorCount} floors, L${baseLevel}). Walk through it.`,
+      text: `[dev] Opened a ${tier}-rank portal to ${plan.name} (${plan.floorCount} floors, L${baseLevel}). Walk through it.`,
       color: '#b9f',
       pid,
     });

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
@@ -114,11 +115,30 @@ function doorPortalMaterial(entering: boolean, lowGfx: boolean): THREE.MeshBasic
   return material;
 }
 
-// Build a dungeon-door (entering) or dungeon-exit (leaving) body: a stone arch +
-// keystone + plinths framing an additive portal swirl. The Nythraxis crypt door
-// is a bespoke invisible click-box instead (the visible arch is baked into that
-// dungeon's geometry). Returns the portal mesh separately so the renderer can
-// animate its swirl per frame.
+// Rift-gate shimmer tinted by rank (shared with the rank badge + chat colour via
+// RIFT_TIER_COLORS), so a C gate glows green, B blue, A violet, S gold. Cached
+// per (tier, lowGfx) like doorPortalMaterial.
+const riftPortalMats = new Map<string, THREE.MeshBasicMaterial>();
+
+function riftPortalMaterial(tier: RiftTier, lowGfx: boolean): THREE.MeshBasicMaterial {
+  const key = `${tier}:${lowGfx}`;
+  const existing = riftPortalMats.get(key);
+  if (existing) return existing;
+  const material = markSharedMaterial(
+    new THREE.MeshBasicMaterial({
+      color: RIFT_TIER_COLORS[tier],
+      transparent: true,
+      opacity: 0.6,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  if (!lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
+  riftPortalMats.set(key, material);
+  return material;
+}
+
 // The world-spawned ranked rift portal uses a bespoke "dimensional gate" GLB
 // (Solo Leveling style) instead of the procedural stone arch. Loaded once at
 // boot (preload gate), then cloned per portal view. Falls back to the arch if
@@ -160,6 +180,7 @@ if (typeof window !== 'undefined') {
  * the procedural arch). */
 export function buildRiftGateBody(
   lowGfx: boolean,
+  tier: RiftTier = 'A',
 ): { body: THREE.Group; portal?: THREE.Mesh } | null {
   if (!riftGateGltf) return null;
   const body = new THREE.Group();
@@ -188,13 +209,18 @@ export function buildRiftGateBody(
   // of its height.
   const gateWidth = size.x * s;
   const midY = RIFT_GATE_HEIGHT * 0.46;
-  const portal = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(true, lowGfx));
+  const portal = new THREE.Mesh(doorPortalGeometry(), riftPortalMaterial(tier, lowGfx));
   portal.position.set(0, midY, 0);
   portal.scale.set((gateWidth * 0.3) / 1.55, (RIFT_GATE_HEIGHT * 0.34) / 1.55, 1);
   body.add(portal);
   return { body, portal };
 }
 
+// Build a dungeon-door (entering) or dungeon-exit (leaving) body: a stone arch +
+// keystone + plinths framing an additive portal swirl. The Nythraxis crypt door
+// is a bespoke invisible click-box instead (the visible arch is baked into that
+// dungeon's geometry). Returns the portal mesh separately so the renderer can
+// animate its swirl per frame.
 export function buildDoorBody(
   entering: boolean,
   dungeonId: string | null | undefined,

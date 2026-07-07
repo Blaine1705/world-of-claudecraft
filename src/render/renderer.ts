@@ -3291,7 +3291,7 @@ export class Renderer {
       // else (dungeon doors, in-rift descent/exit/pylons) keeps the procedural
       // arch. The gate builder falls back to the arch if its asset is missing.
       const built =
-        (e.templateId === 'rift_portal' ? buildRiftGateBody(this.lowGfx) : null) ??
+        (e.templateId === 'rift_portal' ? buildRiftGateBody(this.lowGfx, e.riftTier) : null) ??
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
