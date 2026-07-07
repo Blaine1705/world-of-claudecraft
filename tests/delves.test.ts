@@ -13,6 +13,7 @@ import {
   delveModuleZOffset,
   delveOrigin,
   dungeonAt,
+  INSTANCE_X_BASE,
   isArenaPos,
   isDelvePos,
   MOBS,
@@ -140,11 +141,12 @@ describe('delve spatial band', () => {
     expect(isDelvePos(ARENA_X)).toBe(false);
   });
 
-  it('pins the absolute 4800 boundary against the arena seam (relocation regression)', () => {
-    // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200.
-    // Pin the load-bearing constant and the exact arena/delve seam so a future
-    // arena or delve respacing that re-introduces overlap fails here.
-    expect(DELVE_X_MIN).toBe(4800);
+  it('pins the delve boundary against the arena seam (relocation regression)', () => {
+    // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200,
+    // and the whole instance plane moved east by INSTANCE_X_BASE when the
+    // world went grid (stage 2). Pin the load-bearing offset and the exact
+    // arena/delve seam so a respacing that re-introduces overlap fails here.
+    expect(DELVE_X_MIN).toBe(INSTANCE_X_BASE + 4800);
     // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it is arena.
     expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
     expect(isDelvePos(DELVE_BAND_X_MIN - 1)).toBe(false);
@@ -170,6 +172,29 @@ describe('delve spatial band', () => {
     expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1); // at the board door (-5), NOT a dungeon door (~80)
     expect(Math.abs(e.pos.z - (door.z - 4))).toBeLessThan(1); // z-4 eject offset
     expect(isDelvePos(e.pos.x)).toBe(false); // no longer stuck in the delve band
+  });
+
+  it('migrates saves from the pre-move instance bands to the right doors', () => {
+    // Stage 2 of the world grid moved the whole instance plane east; a save
+    // recorded INSIDE an old band (dungeons at 900+index*600, delves at
+    // 4800+) must still eject to the same door the old load rule chose.
+    const src = makeSim();
+    const state = src.serializeCharacter(src.playerId)!;
+    // an old-coordinates delve save
+    state.pos = { x: 4800, z: -1230 };
+    const dst = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const pid = dst.addPlayer('warrior', 'LegacyDelver', { state });
+    const e = (dst as any).entities.get(pid)!;
+    const door = DELVES.collapsed_reliquary.doorPos;
+    expect(Math.abs(e.pos.x - door.x)).toBeLessThan(1);
+    expect(Math.abs(e.pos.z - (door.z - 4))).toBeLessThan(1);
+    // an old-coordinates dungeon save (index 0 band at x 900)
+    const state2 = src.serializeCharacter(src.playerId)!;
+    state2.pos = { x: 912, z: -1240 };
+    const dst2 = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const pid2 = dst2.addPlayer('warrior', 'LegacyCrawler', { state: state2 });
+    const e2 = (dst2 as any).entities.get(pid2)!;
+    expect(e2.pos.x).toBeLessThan(600); // ejected to an overworld door, not stranded
   });
 
   it('enterReliquary places player in delve band near instance origin', () => {

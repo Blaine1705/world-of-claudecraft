@@ -546,11 +546,17 @@ export const ZONE_NAME = ZONE1_ZONE.name;
 // populated when a party claims it, so a generous ceiling costs little memory
 // and lets a busy realm keep many leveling groups in the same dungeon at once.
 export const INSTANCE_SLOT_COUNT = 24;
-export const DUNGEON_X_THRESHOLD = 600; // x beyond this = inside an instance
+// The whole instance coordinate plane (dungeons, the arena, delves) lives
+// far east of any possible world land. It was based at x 600 when the world
+// was a single strip; the world-grid work (stage 2) moved it out so columns
+// of real zones can grow east without standing inside an instance band. The
+// relative layout below is unchanged: everything shifted by the same base.
+export const INSTANCE_X_BASE = 99_400;
+export const DUNGEON_X_THRESHOLD = INSTANCE_X_BASE + 600; // x beyond this = inside an instance
 export const DUNGEON_FLOOR_Y = 0;
 
 export function instanceOrigin(dungeonIndex: number, slot: number): { x: number; z: number } {
-  return { x: 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
+  return { x: INSTANCE_X_BASE + 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
 }
 
 export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE_DUNGEON_DEFS };
@@ -564,7 +570,7 @@ export function dungeonByIndex(index: number): DungeonDef | null {
 // Which dungeon a far-off instance position belongs to, by x-band.
 export function dungeonAt(x: number): DungeonDef | null {
   if (x <= DUNGEON_X_THRESHOLD || x >= ARENA_X_MIN) return null;
-  return dungeonByIndex(Math.round((x - 900) / 600));
+  return dungeonByIndex(Math.round((x - (INSTANCE_X_BASE + 900)) / 600));
 }
 
 // ---------------------------------------------------------------------------
@@ -575,7 +581,7 @@ export function dungeonAt(x: number): DungeonDef | null {
 // the band split below keeps arena positions from being read as a dungeon.
 // ---------------------------------------------------------------------------
 
-export const ARENA_X = 4200; // arena instances share this x; slots stack along z
+export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
 export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
@@ -606,6 +612,25 @@ export function arenaOriginAt(z: number): { x: number; z: number; slot: number }
   return { x: o.x, z: o.z, slot: best };
 }
 
+// Saved positions from before the instance plane moved east (stage 2 of the
+// world grid) sit in the old bands at x 600..5400+. Map them to the same
+// door the old load rule would have chosen, using the OLD layout frozen as
+// literals: dungeons at 900+index*600 past threshold 600, the delve band
+// from 4773. Anything unmapped falls back exactly like the old rule did.
+export function migrateLegacyInstancePos(pos: { x: number; z: number }): {
+  x: number;
+  z: number;
+} | null {
+  if (pos.x <= 600 || pos.x >= INSTANCE_X_BASE) return null; // not a legacy instance pos
+  if (pos.x >= 4773) {
+    const delve = DELVE_LIST.find((d) => d.index === Math.round((pos.x - 4800) / 600));
+    const door = (delve ?? DELVE_LIST[0]).doorPos;
+    return { x: door.x, z: door.z - 4 };
+  }
+  const dungeon = dungeonByIndex(Math.round((pos.x - 900) / 600)) ?? DUNGEON_LIST[0];
+  return { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
+}
+
 // Legacy aliases for the Hollow Crypt (tests + scripts reference these).
 export const CRYPT_DOOR_POS = DUNGEONS.hollow_crypt.doorPos;
 export const CRYPT_ENTRY = DUNGEONS.hollow_crypt.entry;
@@ -620,7 +645,7 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 // 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
 // the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
-export const DELVE_X_MIN = 4800;
+export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider
 // side walls than the base crypt kit: the side-wall centre is at instance-local
 // |x| = DELVE_WALL_X (25, mirror of delve_layout.ts WALL_X) and the collider's

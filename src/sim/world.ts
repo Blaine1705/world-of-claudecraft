@@ -998,7 +998,7 @@ function applyFrostTerraces(x: number, z: number, h: number): number {
 // beyond it, so only the x flanks bite there now; the Frostveil's far north
 // is the world's actual end again.
 export function inHollowOpenSea(x: number, z: number): boolean {
-  if (z < 960 || x > 600) return false;
+  if (z < 960 || x > DUNGEON_X_THRESHOLD) return false;
   // the Mirrorshallow: enclosed lake water, never open sea
   if (Math.hypot(x - 152, z - 1112) < 42) return false;
   if (z <= HOLLOW_ZMAX + 2) {

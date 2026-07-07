@@ -97,6 +97,7 @@ import {
   ITEMS,
   isDelvePos,
   MOBS,
+  migrateLegacyInstancePos,
   NPCS,
   PLAYER_START,
   QUESTS,
@@ -1134,6 +1135,10 @@ export class Sim {
     // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
     // position and eject the player to a dungeon door instead of the board door
     // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
+    if (savedPos) {
+      // saves from before the instance plane moved east (see data.ts)
+      savedPos = migrateLegacyInstancePos(savedPos) ?? savedPos;
+    }
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
