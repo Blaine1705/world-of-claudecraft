@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { computeTalentModifiers } from '../src/sim/content/talents';
+import {
+  accumulateTalentEffect,
+  computeTalentModifiers,
+  emptyModifiers,
+} from '../src/sim/content/talents';
 import type { AbilityEffect, PlayerClass } from '../src/sim/types';
 
 function rowMods(cls: PlayerClass, rows: Record<number, string>) {
@@ -62,11 +66,14 @@ describe('talent buffPct resolver fixes', () => {
     expect(effect).toMatchObject({ kind: 'buff_haste', value: 1.75 });
   });
 
-  it('Righteous Cause scales the Judgement trigger damage multiplier', () => {
-    const effect = resolvedEffect('paladin', 'judgement', 'judgement', {
-      14: 'pal_r14_righteous_cause',
-    });
-
+  it('a judgement dmgPct ability mod scales the trigger damage multiplier', () => {
+    // Righteous Cause no longer carries this mod (it became a swing-CDR proc in
+    // the row-quality pass), so the engine fix is pinned on a synthetic effect.
+    const mods = emptyModifiers();
+    accumulateTalentEffect(mods, { ability: [{ ability: 'judgement', dmgPct: 0.15 }] }, 1);
+    const ability = abilitiesKnownAt('paladin', 20, mods).find((a) => a.def.id === 'judgement');
+    const effect = ability?.effects.find((candidate) => candidate.type === 'judgement');
+    if (!effect || effect.type !== 'judgement') throw new Error('missing judgement effect');
     expect(effect.dmgMult).toBeCloseTo(1.15, 6);
     expect(effect.flat ?? 0).toBe(0);
   });
