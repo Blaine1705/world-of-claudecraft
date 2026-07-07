@@ -479,12 +479,7 @@ export function accumulateTalentEffect(
   accumulate(mods, eff, mult);
 }
 
-// Exported for the row engine (talent_rows.ts folds each picked row option in).
-export function accumulate(
-  mods: TalentModifiers,
-  eff: TalentEffect | undefined,
-  mult: number,
-): void {
+function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
   if (!eff) return;
   if (eff.stats) {
     const s = mods.stats,

@@ -1574,34 +1574,14 @@ export type AbilityEffect =
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
-  // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
-  // incentive design), scaled like ability-granted rage; never on a whiff.
-  | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
-  // Channel-tick rider: each application extends the caster's named DoT on the
-  // target by `seconds`, up to `maxBonus` total added per DoT application.
-  | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
-  // Detonates the caster's named DoT on the target: its remaining damage lands
-  // instantly as this ability's school and the DoT is removed.
-  | { type: 'consumeDot'; dot: string }
+  | { type: 'interrupt'; lockout: number }
   | { type: 'silence'; duration: number }
-  // `maxTargets` (Intimidating Shout) caps how many hostiles within radius are
-  // feared; absent = fear every hostile in radius (the warlock-style AoE fear).
-  | { type: 'aoeFear'; duration: number; radius: number; maxTargets?: number }
+  | { type: 'aoeFear'; duration: number; radius: number }
   | { type: 'clearCooldowns'; abilities: string[] }
-  | { type: 'breakControl' }
-  // Ice Block: strip EVERY debuff (control, DoTs, stat saps, ...) off the caster.
-  // Broader than breakControl (which covers control auras only). See effect_dispatch.
-  | { type: 'cleanseSelf' }
   // Swept teleports: reposition along the line, stopping at walls/fences/steep
   // slopes/deep water (never clips through). repositionToAim uses the ground-target
   // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
-  // `landingAoe` (Heroic Leap) defers a blast to touchdown (updateLeapMovement) so
-  // it slams down where the caster lands instead of firing at cast time.
-  | {
-      type: 'repositionToAim';
-      breakRoots?: boolean;
-      landingAoe?: { min: number; max: number; radius: number };
-    }
+  | { type: 'repositionToAim'; breakRoots?: boolean }
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
   // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed

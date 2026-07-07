@@ -35,7 +35,7 @@ export interface ClassChoiceRows {
 
 export type ChoiceRowAllocation = Partial<Record<ChoiceRowLevel, string>>;
 
-export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> & Record<string, ClassChoiceRows> = {
+export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> = {
   warrior: WARRIOR_CHOICE_ROWS,
   paladin: PALADIN_CHOICE_ROWS,
   hunter: HUNTER_CHOICE_ROWS,
@@ -69,12 +69,7 @@ export interface RowCheck {
 // string (error.invalidBuild in sim_i18n, translated in every locale): row
 // picks come from a pre-validating UI, so the distinct causes are only ever
 // reachable by tampered clients and do not earn their own player strings.
-export function validateRows(
-  cls: PlayerClass,
-  level: number,
-  rows: ChoiceRowAllocation | undefined | null,
-): RowCheck {
-  if (!rows) return { ok: true };
+export function validateRows(cls: PlayerClass, level: number, rows: ChoiceRowAllocation): RowCheck {
   const seen = new Set<number>();
   for (const [rawLevel, optionId] of Object.entries(rows)) {
     const rowLevel = Number(rawLevel);
@@ -116,9 +111,8 @@ export function repairRows(
 export function accumulateRowEffects(
   mods: TalentModifiers,
   cls: PlayerClass,
-  rows: ChoiceRowAllocation | undefined | null,
+  rows: ChoiceRowAllocation,
 ): void {
-  if (!rows) return;
   for (const [rawLevel, optionId] of Object.entries(rows)) {
     const rowLevel = Number(rawLevel);
     if (!Number.isInteger(rowLevel) || !isChoiceRowLevel(rowLevel)) continue;

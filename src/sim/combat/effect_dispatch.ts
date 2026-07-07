@@ -21,7 +21,6 @@ import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
-import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -36,6 +35,7 @@ import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
+import { groundHeight, WATER_LEVEL } from '../world';
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -62,6 +62,66 @@ function isStealthToggle(ability: AbilityDef): boolean {
 
 function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
+}
+
+// Swept-teleport tuning: step the reposition line and stop at walls, fences,
+// steep climbs, or deep water so a teleport can never clip through geometry.
+const TELEPORT_SWEEP_STEP = 0.5;
+const TELEPORT_MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+const TELEPORT_MIN_GROUND = WATER_LEVEL - PLAYER_SWIM_DEPTH;
+
+function removeRootAuras(ctx: SimContext, p: Entity): void {
+  for (let i = p.auras.length - 1; i >= 0; i--) {
+    const aura = p.auras[i];
+    if (aura.kind !== 'root') continue;
+    p.auras.splice(i, 1);
+    ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  }
+}
+
+function sweptReposition(ctx: SimContext, p: Entity, destX: number, destZ: number): void {
+  const fromX = p.pos.x;
+  const fromZ = p.pos.z;
+  const dx = destX - fromX;
+  const dz = destZ - fromZ;
+  const distance = Math.hypot(dx, dz);
+  let safeX = fromX;
+  let safeZ = fromZ;
+  let prevGround = groundHeight(fromX, fromZ, ctx.cfg.seed);
+  if (distance > 1e-6) {
+    const steps = Math.max(1, Math.ceil(distance / TELEPORT_SWEEP_STEP));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const nextX = fromX + dx * t;
+      const nextZ = fromZ + dz * t;
+      const step = Math.hypot(nextX - safeX, nextZ - safeZ);
+      const nextGround = groundHeight(nextX, nextZ, ctx.cfg.seed);
+      if (nextGround < TELEPORT_MIN_GROUND) break;
+      if (
+        nextGround > prevGround &&
+        step > 1e-6 &&
+        (nextGround - prevGround) / step > TELEPORT_MAX_CLIMB_SLOPE
+      ) {
+        break;
+      }
+      const resolved = ctx.resolveMove(safeX, safeZ, nextX, nextZ, PLAYER_BODY_RADIUS, p);
+      const moved = Math.hypot(resolved.x - safeX, resolved.z - safeZ);
+      const blocked =
+        Math.hypot(resolved.x - nextX, resolved.z - nextZ) > PLAYER_BODY_RADIUS * 0.25;
+      if (blocked || moved < step * 0.5) break;
+      safeX = resolved.x;
+      safeZ = resolved.z;
+      prevGround = groundHeight(safeX, safeZ, ctx.cfg.seed);
+    }
+  }
+  p.pos.x = safeX;
+  p.pos.z = safeZ;
+  p.pos.y = groundHeight(safeX, safeZ, ctx.cfg.seed);
+  p.vy = 0;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
+  p.chargeTargetId = null;
+  p.chargePath = [];
 }
 
 function consumeMatchingAura(
@@ -718,12 +778,6 @@ export function runEffects(
         break;
       }
       case 'aoeFear': {
-        // Howl of Terror / Intimidating Shout: fear hostiles around the caster.
-        // maxTargets (when set) caps the count; absent, every hostile in radius is
-        // feared. Applies the same fear_incap aura + flee movement the warlock Fear
-        // uses (updateFearMovement keys on that id), with the shared fear DR.
-        // Lingering Dread (fearBreakPct) arms a break threshold: the fear soaks a
-        // fraction of the victim's max health in damage before it snaps.
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
@@ -731,15 +785,10 @@ export function runEffects(
           school: ability.school,
           fx: 'nova',
         });
-        const fearBreakPct = mods.global.fearBreakPct;
-        let feared = 0;
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
-          if (m.dead) continue;
-          if (eff.maxTargets !== undefined && feared >= eff.maxTargets) break;
           if (!ctx.hasLineOfSight(p, m)) continue;
           const remaining = ctx.diminishedCrowdControlDuration(p, m, 'fear', eff.duration);
           if (remaining === null) continue;
-          feared++;
           ctx.applyAura(m, {
             id: 'fear_incap',
             name: ability.name,
@@ -750,12 +799,8 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
             breaksOnDamage: true,
-            breakThreshold:
-              fearBreakPct > 0 ? Math.max(1, Math.round(m.maxHp * fearBreakPct)) : undefined,
           });
           ctx.enterCombat(p, m);
-          if (m.kind === 'mob' && m.hostile)
-            addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
         }
         break;
       }
@@ -763,63 +808,10 @@ export function runEffects(
         for (const id of eff.abilities) p.cooldowns.delete(id);
         break;
       }
-      case 'breakControl': {
-        // Avatar / trinket: strip every control aura off the caster. The shared
-        // predicate covers stun/root/incapacitate/polymorph; silence/blind/disarm/
-        // slow join it ("breaks ALL control"). Emits the aura-lost events so client
-        // buff bars clear (the cleanseFriendlyNpcAuras precedent).
-        for (let i = p.auras.length - 1; i >= 0; i--) {
-          const aura = p.auras[i];
-          if (
-            ctx.isControlAura(aura.kind) ||
-            aura.kind === 'silence' ||
-            aura.kind === 'blind' ||
-            aura.kind === 'disarm' ||
-            aura.kind === 'slow'
-          ) {
-            p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
-          }
-        }
-        break;
-      }
-      case 'cleanseSelf': {
-        // Ice Block: strip EVERY debuff off the caster (control, DoTs, stat saps, ...),
-        // broader than breakControl. Uses the shared classifier so the split matches
-        // the buff/debuff frame exactly. Emits the aura-lost event so client bars clear.
-        for (let i = p.auras.length - 1; i >= 0; i--) {
-          const aura = p.auras[i];
-          if (isDebuffAura(aura.kind, aura.value)) {
-            p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
-          }
-        }
-        break;
-      }
       case 'repositionToAim': {
-        // With a landingAoe (Heroic Leap): resolve the (server-clamped) aimed point
-        // through the swept resolver, then ARM the arc. updateLeapMovement (sim.ts)
-        // flies the caster there over LEAP_DURATION and fires the landing AoE on
-        // touchdown, so it reads as a real jump. Without a landingAoe: a plain swept
-        // teleport relocates the caster to the landing this tick.
         if (eff.breakRoots) removeRootAuras(ctx, p);
         const aim = p.castAim ?? p.pos;
-        if (eff.landingAoe) {
-          const landing = computeSweptLanding(ctx, p, aim.x, aim.z);
-          p.chargeTargetId = null;
-          p.chargePath = [];
-          p.leap = {
-            from: { x: p.pos.x, y: p.pos.y, z: p.pos.z },
-            to: { x: landing.x, y: groundHeight(landing.x, landing.z, ctx.cfg.seed), z: landing.z },
-            elapsed: 0,
-            dur: LEAP_DURATION,
-            apex: LEAP_APEX,
-            aoe: eff.landingAoe ?? null,
-            ability: ability.name,
-          };
-        } else {
-          sweptRelocate(ctx, p, aim.x, aim.z);
-        }
+        sweptReposition(ctx, p, aim.x, aim.z);
         break;
       }
       case 'blinkForward': {
@@ -838,17 +830,7 @@ export function runEffects(
         }
         const x = p.pos.x + Math.sin(facing) * distance;
         const z = p.pos.z + Math.cos(facing) * distance;
-        sweptRelocate(ctx, p, x, z);
-        // The step is INSTANT: the renderer snaps the mover on this cue
-        // (without it, the self-reposition heuristic reads the jump as a
-        // leap and plays an arc, owner playtest 2026-07-11).
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'blinkStep',
-        });
+        sweptReposition(ctx, p, x, z);
         break;
       }
       case 'lifeTap': {

@@ -273,24 +273,3 @@ pressure before this process was found; veto = rename in a follow-up):
 |---|---|---|
 | Feral Charge (ability) | Primal Surge | map's Path of Fangs is the choice-row name, kept reserved |
 | Shadowform (ability) | Gloamveil Form | derived from locked Gloamveil (mastery); avoids exact display dup |
-| Pummel | Jawcrack | missed in the first batch; warrior interrupt, Eye Jab register |
-| Moonfury (row option) | Moonspite | balance druid row; Moongrove register |
-| Shatter (row option) | Coldsnap Break | map's Brittlebreak is taken by the frost mastery |
-| Aura Mastery (row option + new active) | Radiant Swell | paladin row-quality pass; the WoW-named passive option became a coined active (aura_surge); veto = rename in a follow-up |
-
-RATIFICATION REQUESTS (warrior Blaine1705 talent port, 2026-07-09):
-| old | shipped | note |
-|---|---|---|
-| Double Charge | Twin Onrush | warrior row option; pairs with Onrush ability |
-| Pursuit | Hot Pursuit | warrior row option and kill-speed aura |
-| Crushing Charge | Crushing Onrush | warrior row option; pairs with Onrush ability |
-| Second Wind | Rallying Breath | warrior row option; avoids verbatim talent name |
-| Die by the Sword | Swordguard | warrior row option and granted defensive cooldown |
-| Victory Rush | Triumph Rush | warrior row option and granted kill-window strike |
-| Piercing Howl | Razor Howl | warrior row option and granted AoE slow |
-| Storm Bolt | Stormthrow | warrior row option and granted ranged stun |
-| Anger Management | Rage Discipline | warrior row option; resource passive |
-| Recklessness | Reckless Vow | warrior row option and granted offensive cooldown |
-| Bloodbath | Red Harvest | warrior row option and kill-stack aura |
-| Colossal Might | Giant's Momentum | warrior row option; rage-spend cooldown refund |
-| Sanguine Aura | Red Banner | warrior row option and granted party damage cooldown |
