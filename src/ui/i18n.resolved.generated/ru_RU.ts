@@ -5240,12 +5240,12 @@ export const ru_RU: EnTranslations = {
         "description": "Мгновенно атакует в кровавом исступлении, нанося {damage}. (ключевая способность ветки «Неистовство»)"
       },
       "raging_gale": {
-        "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "name": "Двойной удар",
+        "description": "Мгновенно наносит два удара оружием, каждый из которых наносит 60% урона от оружия плюс {damage}, и дает {rage} ед. ярости. Накапливает до 2 зарядов. (ветка «Неистовство»)"
       },
       "red_harvest": {
-        "name": "Red Harvest",
-        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+        "name": "Красная жатва",
+        "description": "Потратьте все: три свирепых удара, каждый наносит урон от оружия плюс {damage}. (ветка «Неистовство»)"
       },
       "shield_slam": {
         "name": "Раскол щита",

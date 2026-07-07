@@ -2795,6 +2795,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
     'Atacas al instante en un frenesí sangriento por {damage}. (habilidad distintiva de Furia)',
+  'entities.abilities.raging_gale.name': 'Arremetida Enfurecida',
+  'entities.abilities.raging_gale.description':
+    'Golpeas al instante dos veces con tu arma; cada golpe inflige un 60% del daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)',
+  'entities.abilities.red_harvest.name': 'Desenfreno',
+  'entities.abilities.red_harvest.description':
+    'Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)',
   'entities.abilities.shield_slam.name': 'Quiebra de Escudo',
   'entities.abilities.shield_slam.description':
     'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',

@@ -5240,12 +5240,12 @@ export const ko_KR: EnTranslations = {
         "description": "피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)"
       },
       "raging_gale": {
-        "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "name": "쌍격",
+        "description": "무기로 즉시 두 번 공격하여 각각 무기 공격력의 60%에 {damage}의 피해를 추가로 입히고 분노를 {rage} 생성합니다. 최대 2회 충전됩니다. (분노)"
       },
       "red_harvest": {
-        "name": "Red Harvest",
-        "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
+        "name": "붉은 수확",
+        "description": "모든 것을 쏟아붓습니다: 세 번의 흉포한 일격으로 각각 무기 공격력에 {damage}의 피해를 추가로 입힙니다. (분노)"
       },
       "shield_slam": {
         "name": "방패 강타",

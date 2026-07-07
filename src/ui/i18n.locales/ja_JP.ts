@@ -2141,6 +2141,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': '瀉血',
   'entities.abilities.bloodthirst.description':
     '血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与えます。（狂怒シグネチャー）',
+  'entities.abilities.raging_gale.name': '双撃',
+  'entities.abilities.raging_gale.description':
+    '武器で即座に2回攻撃し、それぞれ武器ダメージの60%に加えて {damage} のダメージを与え、{rage} の怒りを生成します。最大2チャージまで蓄積します。（狂怒）',
+  'entities.abilities.red_harvest.name': '紅の収穫',
+  'entities.abilities.red_harvest.description':
+    '全てを注ぎ込む：3回の猛烈な打撃を放ち、それぞれ武器ダメージに加えて {damage} のダメージを与えます。（狂怒）',
   'entities.abilities.shield_slam.name': '盾砕き',
   'entities.abilities.shield_slam.description':
     '盾で対象を叩きつけ、{damage} のダメージと大量の脅威を与えます。（防御シグネチャー）',

@@ -2133,6 +2133,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': '사혈',
   'entities.abilities.bloodthirst.description':
     '피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)',
+  'entities.abilities.raging_gale.name': '쌍격',
+  'entities.abilities.raging_gale.description':
+    '무기로 즉시 두 번 공격하여 각각 무기 공격력의 60%에 {damage}의 피해를 추가로 입히고 분노를 {rage} 생성합니다. 최대 2회 충전됩니다. (분노)',
+  'entities.abilities.red_harvest.name': '붉은 수확',
+  'entities.abilities.red_harvest.description':
+    '모든 것을 쏟아붓습니다: 세 번의 흉포한 일격으로 각각 무기 공격력에 {damage}의 피해를 추가로 입힙니다. (분노)',
   'entities.abilities.shield_slam.name': '방패 강타',
   'entities.abilities.shield_slam.description':
     '방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',

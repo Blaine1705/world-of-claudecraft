@@ -2171,6 +2171,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Кровопускание',
   'entities.abilities.bloodthirst.description':
     'Мгновенно атакует в кровавом исступлении, нанося {damage}. (ключевая способность ветки «Неистовство»)',
+  'entities.abilities.raging_gale.name': 'Двойной удар',
+  'entities.abilities.raging_gale.description':
+    'Мгновенно наносит два удара оружием, каждый из которых наносит 60% урона от оружия плюс {damage}, и дает {rage} ед. ярости. Накапливает до 2 зарядов. (ветка «Неистовство»)',
+  'entities.abilities.red_harvest.name': 'Красная жатва',
+  'entities.abilities.red_harvest.description':
+    'Потратьте все: три свирепых удара, каждый наносит урон от оружия плюс {damage}. (ветка «Неистовство»)',
   'entities.abilities.shield_slam.name': 'Раскол щита',
   'entities.abilities.shield_slam.description':
     'Бьет цель щитом, нанося {damage} и создавая огромную угрозу. (ключевая способность ветки «Защита»)',
