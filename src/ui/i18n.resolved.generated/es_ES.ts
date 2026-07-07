@@ -4697,7 +4697,7 @@ export const es_ES: EnTranslations = {
       },
       "battle_shout": {
         "name": "Bramido de Hierro",
-        "description": "Aumenta tu poder de ataque en 20 durante 2 min."
+        "description": "Aumenta el poder de ataque tuyo y de tus aliados cercanos en 20 durante 1 hora."
       },
       "commanding_shout": {
         "name": "Grito Alentador",
@@ -5252,8 +5252,8 @@ export const es_ES: EnTranslations = {
         "description": "Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te cura un 20% de tu salud máxima. (Furia)"
       },
       "emboldening_roar": {
-        "name": "Grito Alentador",
-        "description": "Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Protección)"
+        "name": "Rugido Envalentonador",
+        "description": "Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)"
       },
       "raised_guard": {
         "name": "Bloquear con Escudo",
