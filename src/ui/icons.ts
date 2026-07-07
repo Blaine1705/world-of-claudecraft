@@ -2591,6 +2591,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   desperate_prayer: r('holy', 'holyGold', ['hand', { p: 'heart', ...BR }], ['sparkle']),
   deterrence: r('steel', 'leafGreen', ['shield', { p: 'paw', ...BR }], ['arcs']),
   divine_shield: r('holy', 'gold', ['shield', { p: 'cross', ...BR }], ['glow']),
+  aura_surge: r('holy', 'holyGold', ['sunburst', 'shield'], ['arcs', 'glow']),
   earthbind: r('earth', 'earthBrown', ['tendrils', { p: 'mace', ...BR }], ['crack']),
   evocation: r('arcane', 'arcanePink', ['hand', { p: 'gem', ...BR }], ['sparkle']),
   frenzied_regeneration: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow']),
