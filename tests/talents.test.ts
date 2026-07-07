@@ -66,12 +66,24 @@ describe('talent tree validation (load-time)', () => {
       expect(ct!.specs, cls).toHaveLength(3);
       expect(ct!.nodes.filter((n) => n.tree === 'class').length, cls).toBeGreaterThanOrEqual(7);
       for (const s of ct!.specs) {
+        // Arms sits at 5 nodes since the obsolete Improved Brute Swing was
+        // removed (Brute Swing is instant now, so its cast-time reduction did
+        // nothing); every other spec keeps the 6-node floor.
+        const floor = cls === 'warrior' && s.id === 'arms' ? 5 : 6;
         expect(
           ct!.nodes.filter((n) => n.tree === 'spec' && n.specId === s.id).length,
           `${cls}:${s.id}`,
-        ).toBeGreaterThanOrEqual(6);
+        ).toBeGreaterThanOrEqual(floor);
       }
     }
+  });
+
+  it('no longer carries the obsolete Improved Brute Swing node (slam is instant)', () => {
+    // arms_imp_slam reduced the cast time of slam, which is instant by owner
+    // decision, so the node was removed. Nothing may still require it.
+    const ct = talentsFor('warrior')!;
+    expect(ct.nodes.some((n) => n.id === 'arms_imp_slam')).toBe(false);
+    expect(ct.nodes.some((n) => (n.requires ?? []).includes('arms_imp_slam'))).toBe(false);
   });
 
   it('references only abilities that exist', () => {
@@ -550,16 +562,9 @@ describe('Sim integration — active talents & ability modifiers', () => {
       ),
     ).find((k) => k.def.id === 'taunt')!;
     expect(taunt.cooldown).toBeCloseTo(10 * 0.8); // Improved Taunt -20% -> 8s
-
-    // Slam is instant by owner decision (MoP-era Brute Swing), so Improved
-    // Brute Swing's castPct has nothing left to reduce: 0 stays 0 (the castPct
-    // fold itself is covered by the caster-class talents, e.g. mage fireball).
-    const slam = abilitiesKnownAt(
-      'warrior',
-      20,
-      computeTalentModifiers('warrior', alloc({ spec: 'arms', ranks: { arms_imp_slam: 2 } })),
-    ).find((k) => k.def.id === 'slam')!;
-    expect(slam.castTime).toBe(0);
+    // (The castPct fold itself is covered by the caster-class talents, e.g.
+    // mage fireball; the warrior no longer has a cast-time talent since slam
+    // went instant and Improved Brute Swing was removed.)
   });
 
   it('a choice node applies only the chosen option ability mod', () => {
@@ -847,6 +852,21 @@ describe('repairAllocation (load-time revalidation)', () => {
     expect(repaired.ranks.war_toughness).toBe(2);
     expect(repaired.ranks.war_tactical_choice).toBeUndefined();
     expect(repaired.choices.war_tactical_choice).toBeUndefined();
+    expect(validateAllocation('warrior', repaired, 11).ok).toBe(true);
+  });
+
+  it('drops ranks in a removed node (arms_imp_slam) without throwing, refunding the points', () => {
+    // A persisted build from before the obsolete Improved Brute Swing talent
+    // was removed still carries ranks under its id. Repair must drop the
+    // unknown node, keep the still-valid picks, and refund the spent points.
+    const a = alloc({ spec: 'arms', ranks: { arms_imp_overpower: 2, arms_imp_slam: 2 } });
+    let repaired!: TalentAllocation;
+    expect(() => {
+      repaired = repairAllocation('warrior', a, 11);
+    }).not.toThrow();
+    expect(repaired.ranks.arms_imp_slam).toBeUndefined();
+    expect(repaired.ranks.arms_imp_overpower).toBe(2);
+    expect(pointsSpent(repaired)).toBe(2);
     expect(validateAllocation('warrior', repaired, 11).ok).toBe(true);
   });
 

@@ -85,13 +85,6 @@ const ARMS_NODES: TalentNode[] = [
     row: 0, col: 2,
   },
   {
-    id: 'arms_imp_slam', tree: 'spec', specId: 'arms', kind: 'passive', maxRank: 2, pointsGate: 2,
-    requires: ['arms_imp_overpower'],
-    effect: { ability: [{ ability: 'slam', castPct: -0.25 }] },
-    icon: '⏱', name: 'Improved Brute Swing', description: 'Reduces the cast time of Brute Swing by 25% per rank.',
-    row: 1, col: 0,
-  },
-  {
     id: 'arms_tactical_mastery', tree: 'spec', specId: 'arms', kind: 'passive', maxRank: 2, pointsGate: 2,
     effect: { stats: { ap: 12 } },
     icon: '📈', name: 'Weapon Mastery', description: 'Increases your attack power by 12 per rank.',
