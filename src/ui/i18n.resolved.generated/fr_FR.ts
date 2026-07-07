@@ -5253,7 +5253,7 @@ export const fr_FR: EnTranslations = {
       },
       "emboldening_roar": {
         "name": "Emboldening Roar",
-        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Protection)"
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
         "name": "Raised Guard",

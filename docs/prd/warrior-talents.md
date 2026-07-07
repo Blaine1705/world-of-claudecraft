@@ -116,7 +116,8 @@ differ); it is a manual port. Do NOT push anything until the operator has playte
 - 2026-07-07: the WHOLE warrior kit is DONE and green on `integration` (local only, never pushed):
   base-kit changes, spec gating, Fury kit, Protection kit, Arms kit (Breachmaker + Measured Fury),
   and all operator tweaks (battle_shout free/lvl7, rend lvl5, slam/cleave arms+prot, demoralizing_shout
-  prot, emboldening_roar Fury->Prot, bloodthirst +10 rage, furious_mending<->bloodletting coupling,
+  prot, emboldening_roar Fury (moved to Prot then back to Fury; es renamed to "Rugido Envalentonador"),
+  bloodthirst +10 rage, furious_mending<->bloodletting coupling,
   sunder spec-conditional threat). Parity goldens re-minted (rng draw order unchanged). Codex's earlier
   Arms commit is preserved on branch `integration-codex-arms`. The only deferred item is choice-row
   force-save (to the consolidation). NEXT: port onto ryze's #1614 engine (operator confirmed HIS warrior

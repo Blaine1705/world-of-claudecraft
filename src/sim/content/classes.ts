@@ -774,7 +774,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Emboldening Roar',
     class: 'warrior',
     learnLevel: 18,
-    specs: ['prot'],
+    specs: ['fury'],
     cost: 0,
     castTime: 0,
     cooldown: 180,
@@ -783,7 +783,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
     description:
-      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Protection)',
+      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
   },
   // Protection's active shield block (operator design, Bloquear con Escudo):
   // an off-GCD 6 sec self buff cutting PHYSICAL damage taken in half (the

@@ -2391,7 +2391,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe.',
   'entities.abilities.battle_shout.name': 'Bramido de Hierro',
-  'entities.abilities.battle_shout.description': 'Aumenta tu poder de ataque en 20 durante 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Aumenta el poder de ataque tuyo y de tus aliados cercanos en 20 durante 1 hora.',
   'entities.abilities.commanding_shout.name': 'Grito Alentador',
   'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en 6 durante 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Aullido Pavoroso',
@@ -2804,9 +2805,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.furious_mending.name': 'Regeneración Enfurecida',
   'entities.abilities.furious_mending.description':
     'Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te cura un 20% de tu salud máxima. (Furia)',
-  'entities.abilities.emboldening_roar.name': 'Grito Alentador',
+  'entities.abilities.emboldening_roar.name': 'Rugido Envalentonador',
   'entities.abilities.emboldening_roar.description':
-    'Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Protección)',
+    'Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)',
   'entities.abilities.raised_guard.name': 'Bloquear con Escudo',
   'entities.abilities.raised_guard.description':
     'Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. (Protección)',

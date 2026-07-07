@@ -13,7 +13,7 @@ import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
 
 // Warrior support cooldowns (operator design). Emboldening Roar
-// (emboldening_roar) is a PROTECTION 3 min support cooldown (moved from Fury,
+// (emboldening_roar) is a FURY 3 min support cooldown (moved back to Fury,
 // operator 2026-07-07) that Emboldens the caster and friendly players within
 // 40 yd (aura kind 'sure_crit', 3 charges: the next 3 damaging ability CASTS
 // are guaranteed crits, the normal crit rng still drawn and only its outcome
@@ -96,7 +96,7 @@ const knownIds = (spec: string | null): Set<string> =>
   );
 
 describe('(a) warrior support content defs', () => {
-  it('pins Emboldening Roar: free 3 min support cooldown, PROT only, 3 sure-crit charges at 40 yd', () => {
+  it('pins Emboldening Roar: free 3 min support cooldown, FURY only, 3 sure-crit charges at 40 yd', () => {
     const def = ABILITIES.emboldening_roar;
     expect(def).toBeDefined();
     expect(def.name).toBe('Emboldening Roar');
@@ -107,7 +107,7 @@ describe('(a) warrior support content defs', () => {
     expect(def.cooldown).toBe(180);
     expect(def.school).toBe('physical');
     expect(def.requiresTarget).toBe(false);
-    expect(def.specs).toEqual(['prot']);
+    expect(def.specs).toEqual(['fury']);
     expect(def.effects).toEqual([
       { type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 },
     ]);
@@ -358,13 +358,13 @@ describe('(d) Furious Mending: 20% damage cut and a supercharged Bloodletting he
 });
 
 describe('(e) spec gating', () => {
-  it('Emboldening Roar is prot + no-spec only; Furious Mending is fury + no-spec only', () => {
+  it('Emboldening Roar is fury + no-spec only; Furious Mending is fury + no-spec only', () => {
     // No spec keeps the whole kit.
     expect(knownIds(null).has('emboldening_roar')).toBe(true);
     expect(knownIds(null).has('furious_mending')).toBe(true);
-    // Emboldening Roar moved to Protection.
-    expect(knownIds('prot').has('emboldening_roar')).toBe(true);
-    expect(knownIds('fury').has('emboldening_roar')).toBe(false);
+    // Emboldening Roar moved back to Fury.
+    expect(knownIds('fury').has('emboldening_roar')).toBe(true);
+    expect(knownIds('prot').has('emboldening_roar')).toBe(false);
     expect(knownIds('arms').has('emboldening_roar')).toBe(false);
     // Furious Mending stays Fury.
     expect(knownIds('fury').has('furious_mending')).toBe(true);
