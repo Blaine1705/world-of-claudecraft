@@ -181,23 +181,18 @@ export function buildRiftGateBody(
     if (mesh.isMesh) mesh.castShadow = true;
   });
   body.add(gate);
-  // The Meshy gate is a SOLID obsidian monolith (no see-through opening), so the
-  // Solo-Leveling look is a glowing energy membrane on its FACE, not a swirl seen
-  // through a hole. Place a large additive shimmer just proud of each thin (z)
-  // face so the gate glows from whichever side the player approaches; the front
-  // one is returned to the renderer for the spin/pulse animation.
-  const faceZ = (size.z * s) / 2 + 0.05;
-  const midY = RIFT_GATE_HEIGHT * 0.5;
-  const front = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(true, lowGfx));
-  front.position.set(0, midY, faceZ);
-  front.scale.set(0.95, 1.75, 1);
-  body.add(front);
-  const back = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(true, lowGfx));
-  back.position.set(0, midY, -faceZ);
-  back.rotation.y = Math.PI;
-  back.scale.set(0.95, 1.75, 1);
-  body.add(back);
-  return { body, portal: front };
+  // A chunky 3D archway with a real see-through opening: the additive shimmer
+  // sits CENTERED in the hole (z=0, double-sided so it reads from either side)
+  // and is sized proportionally to the gate so it fills the opening. The base
+  // circle has radius 1.55; scale it to roughly half the gate width and a third
+  // of its height.
+  const gateWidth = size.x * s;
+  const midY = RIFT_GATE_HEIGHT * 0.46;
+  const portal = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(true, lowGfx));
+  portal.position.set(0, midY, 0);
+  portal.scale.set((gateWidth * 0.3) / 1.55, (RIFT_GATE_HEIGHT * 0.34) / 1.55, 1);
+  body.add(portal);
+  return { body, portal };
 }
 
 export function buildDoorBody(
