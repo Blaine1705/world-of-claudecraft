@@ -55,6 +55,18 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
   (instead of 3%). It is NOT a flat 20% HoT (operator correction 2026-07-07): the healing is
   delivered by casting Bloodletting under the buff.
 - `red_harvest` "Red Harvest": lvl 16, 80 rage, three full weapon strikes.
+- `emboldening_roar` "Emboldening Roar" (es RENAMED to "Rugido Envalentonador" to avoid colliding
+  with `commanding_shout`, whose es name stays "Grito Alentador"): FURY-only, lvl 18. Caster + allies
+  within 40 yd: their next 3 ability casts are guaranteed crits. (Was briefly moved to Prot on
+  2026-07-07 then moved back to Fury same day.)
+
+## KNOWN GOTCHA: spec must be COMMITTED for gating to show
+The spec-gating only applies once the player has a COMMITTED spec (`mods.spec`). Default is NO spec,
+and the current rule is "no spec chosen = full kit" (so a specless warrior sees ALL three specs'
+abilities, which reads as "exclusivity is broken" but is not). A spec is committed today only via the
+talents panel (N) -> pick a spec card -> Save a loadout. OPEN DECISION with operator: change the rule
+to "no spec = shared base kit only" so exclusivity is visible by default, and/or make spec selection a
+simpler one-click commit (this UX is otherwise ryze-#1614-engine territory).
 
 ### Arms (PENDING as of this writing; being built)
 - `breachmaker` "Breachmaker" (Aplastar Coloso): lvl 16, 10 rage, 45s cd. Weapon strike + marks the
@@ -68,10 +80,8 @@ other specs drop out. Talent/row grants are never gated (their tree is already s
 - `iron_resolve` "Iron Resolve": lvl 14, spends ALL current rage (min 20), absorbs (rage x 4) for 10s.
 - `faultline` "Faultline": lvl 16, 15 rage, 30s cd, frontal AoE damage + 3s stun.
 - `defiant_bellow` "Defiant Bellow": lvl 18, free, 60s cd, area taunt (10 yd).
-- `emboldening_roar` "Emboldening Roar": MOVED from Fury to PROT (operator decision 2026-07-07),
-  lvl 18. Caster + allies within 40 yd: their next 3 ability casts are guaranteed crits.
-  Open tweak to confirm with operator: prot then has two lvl-18 abilities (this + Defiant Bellow),
-  and Fury loses its lvl-18 slot.
+- (emboldening_roar lives in Fury, see the Fury section: the operator moved it back to Fury
+  2026-07-07 late.)
 
 ## Spec-conditional and UI decisions (operator, 2026-07-07)
 - `sunder_armor` (Armor Shear) threat: the HIGH tank threat applies ONLY when the caster's committed
