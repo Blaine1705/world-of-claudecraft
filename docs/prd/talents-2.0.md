@@ -277,9 +277,9 @@ The designated scalable axis per spec (base value = shipped magnitude):
 
 | Spec | Scalable axis | Base |
 |---|---|---|
-| warrior/arms | melee ability damage (meleeDmgPct) | 10% |
-| warrior/fury | crit chance (crit) | 5% |
-| warrior/prot | threat (threatPct) | 30% |
+| warrior/arms | melee ability damage (meleeDmgPct) | 15% |
+| warrior/fury | crit chance (crit) | 10% |
+| warrior/prot | threat (threatPct) | 50% |
 | paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
 | paladin/protection | threat (threatPct) | 50% |
 | paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
