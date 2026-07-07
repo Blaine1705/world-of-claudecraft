@@ -470,7 +470,7 @@ export function isDelvePos(x: number): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Procedural Rift instances — the seed-driven infinite dungeon system. Their
+// Procedural Rift instances: the seed-driven infinite dungeon system. Their
 // instances live in a far x-band well past the delve band, one room region per
 // slot stacked along z. Rooms are regenerated in-place on descent, so a slot
 // holds one floor at a time. Geometry/collision comes from the generated
