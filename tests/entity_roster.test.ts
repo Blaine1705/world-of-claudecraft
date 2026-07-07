@@ -18,6 +18,7 @@ import {
 } from '../src/sim/entity_roster';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
+import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
 
@@ -207,6 +208,7 @@ function makeCtx() {
     nextLootRollId: 1,
     devCommands: false,
     marketListings: [],
+    vcup: createVcState(),
     grantXp: vi.fn(),
     enterCombat: vi.fn(),
     hexOutputMult: vi.fn(() => 1),
@@ -313,6 +315,12 @@ function makeCtx() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     applySetProcs: vi.fn(),
+    // The Vale Cup sport-move arms.
+    vcupBallKick: vi.fn(),
+    vcupBallPass: vi.fn(),
+    vcupShoot: vi.fn(),
+    vcupSportDash: vi.fn(),
+    vcupSportShove: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {

@@ -39,6 +39,7 @@ import {
 } from './game/interactions';
 import { Keybinds } from './game/keybinds';
 import { newKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
+import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import {
   interfaceModeFromSetting,
@@ -427,6 +428,7 @@ function syncBuildInfo(): void {
 function syncAppViewport(): void {
   syncAppViewportShared();
   applyMobileHudLayout();
+  applyMobileKeyboardViewport();
 }
 
 function preventMobileZoom(): void {
@@ -908,6 +910,10 @@ async function startGame(
 
   // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
   if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
+  // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
+  // through IWorld). Private instanced practice works online AND offline, so the
+  // button is always available.
+  hud.setVcupPracticeAvailable(true);
 
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;
@@ -964,6 +970,9 @@ async function startGame(
     chatInput.style.height = '';
     chatInput.style.overflowY = '';
     chatInput.blur();
+    // Leave mobile reply mode when the composer closes (issue 1577 round 2 (8)),
+    // so the in-log reply button reappears for the read state.
+    document.body.classList.remove('mobile-chat-reply');
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
@@ -983,8 +992,15 @@ async function startGame(
     anchorChatInput();
   });
   chatInput.addEventListener('focus', () => {
+    // Actively replying (issue 1577 round 2 (7)/(8)): the composer is focused, so
+    // expand it and fade the chat window behind it. Class is mirror-tied to focus
+    // so it clears the moment the composer loses focus.
+    document.body.classList.add('mobile-chat-reply');
     anchorChatInput();
     autosizeChatInput();
+  });
+  chatInput.addEventListener('blur', () => {
+    document.body.classList.remove('mobile-chat-reply');
   });
   chatInput.addEventListener('input', () => {
     autosizeChatInput();
@@ -1037,6 +1053,8 @@ async function startGame(
       // slot 0 (key 1) is Attack for every class, auto-attack without needing
       // right-click; keys and clicks share the Hud's remappable slot layout
       onAbility: (slot) => hud.castSlot(slot),
+      onAbilityDown: (slot) => hud.pressSlot(slot),
+      onAbilityUp: (slot) => hud.releaseSlot(slot),
       onInputIntent: (kind) => perf.markInputIntent(kind),
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
@@ -1076,6 +1094,9 @@ async function startGame(
             break;
           case 'arena':
             hud.toggleArena();
+            break;
+          case 'valecup':
+            hud.toggleValeCup();
             break;
           case 'leaderboard':
             hud.toggleLeaderboard();
@@ -1129,6 +1150,7 @@ async function startGame(
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
+    onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => hud.toggleChar(),
     onBags: () => hud.toggleBags(),
@@ -1136,6 +1158,7 @@ async function startGame(
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
+    onDailyRewards: () => hud.toggleDailyRewards(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);
@@ -1219,6 +1242,9 @@ async function startGame(
         break;
       case 'arena':
         hud.toggleArena();
+        break;
+      case 'valecup':
+        hud.toggleValeCup();
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();
@@ -2699,6 +2725,7 @@ async function startOffline(
     // The offline world runs the ranked rift portal scheduler like the live
     // server (custom editor play-test maps keep it off: their zones differ).
     riftPortals: world === undefined,
+    valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);

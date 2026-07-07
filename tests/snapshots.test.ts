@@ -93,6 +93,8 @@ function bareClient(pid: number): ClientWorld {
   c.ownPlayerId = pid;
   c.ownPlayerClass = 'warrior';
   c.spectating = null;
+  c.cupInfo = null;
+  c.sportRole = null;
   c.moveInput = {};
   c.inventory = [];
   c.vendorBuyback = [];
@@ -1924,9 +1926,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 31 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 32 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 32nd unregistered delta key reddens this gate.
+// 33rd unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -1955,9 +1957,12 @@ const ALL_DELTA_KEYS = [
   'prof',
   'qdone',
   'qlog',
+  'sport',
   'stats',
   'tal',
+  'tfocus',
   'trade',
+  'vcup',
   'weapon',
 ] as const;
 
@@ -2000,6 +2005,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
+  sport: 'sportRole',
+  tfocus: 'townFocus',
+  vcup: 'cupInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -2078,6 +2086,8 @@ function dirtyEveryDeltaField(): {
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
+  meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
   meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] }];
   meta.activeLoadout = 0;
@@ -2239,9 +2249,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 31 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(31);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(31);
+  it('ALL_DELTA_KEYS contains exactly 34 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(34);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(34);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2253,7 +2263,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(31);
+    expect(scraped.size).toBe(34);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -14,7 +14,13 @@ import { DT, type SimEvent } from '../src/sim/types';
 const SEED = 777;
 
 function makeSim(seed = SEED) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true, riftPortals: true });
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    riftPortals: true,
+  });
 }
 
 function tickSeconds(sim: Sim, seconds: number): SimEvent[] {
