@@ -85,6 +85,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'intimidating_shout',
       'sunder_armor',
       'taunt',
+      'measured_fury',
+      'breachmaker',
     ],
     color: 0xc79c6e,
   },
@@ -870,6 +872,58 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeTaunt', radius: 10 }],
     description:
       'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
+  },
+  // Arms's damage-amplifier (operator design, Aplastar Coloso): a modest weapon
+  // strike that also stamps a SOURCE-SCOPED vulnerability (vuln_source) on the
+  // target, so only YOUR hits on that target land 20% harder for 8 sec. The aura
+  // carries the caster's id (debuffTargetSource), so it never buffs other
+  // attackers, unlike the raid-wide 'vulnerability' curse.
+  breachmaker: {
+    id: 'breachmaker',
+    name: 'Breachmaker',
+    class: 'warrior',
+    learnLevel: 16,
+    specs: ['arms'],
+    cost: 10,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      { type: 'weaponStrike', bonus: 15 },
+      {
+        type: 'debuffTargetSource',
+        kind: 'vuln_source',
+        value: 0.2,
+        duration: 8,
+        auraId: 'breachmaker_vuln',
+        auraName: 'Breachmaker',
+      },
+    ],
+    description:
+      'Batter the target for weapon damage plus $d and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)',
+  },
+  // Arms's rage-economy passive (operator design, Intrepidez): a calm, measured
+  // fury makes every one of your abilities cost 10% less rage. Never castable and
+  // never on the action bar; the discount folds at the resolvedAbility cost choke
+  // point while the passive is in the known list (spec-gated to arms).
+  measured_fury: {
+    id: 'measured_fury',
+    name: 'Measured Fury',
+    class: 'warrior',
+    learnLevel: 12,
+    specs: ['arms'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)',
   },
   cleave: {
     id: 'cleave',
@@ -4556,7 +4610,8 @@ function scaleEffect(
         eff.kind === 'buff_haste' ||
         eff.kind === 'buff_scale' ||
         eff.kind === 'buff_jump' ||
-        eff.kind === 'mortal_wound'
+        eff.kind === 'mortal_wound' ||
+        eff.kind === 'vuln_source'
       ) {
         return eff;
       }
@@ -4609,7 +4664,8 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
         e.kind !== 'buff_haste' &&
         e.kind !== 'buff_scale' &&
         e.kind !== 'buff_jump' &&
-        e.kind !== 'mortal_wound'
+        e.kind !== 'mortal_wound' &&
+        e.kind !== 'vuln_source'
           ? { ...e, value: Math.round(e.value * mul) }
           : e,
       );

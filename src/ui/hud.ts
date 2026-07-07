@@ -4340,6 +4340,9 @@ export class Hud {
     // Only auto-place abilities that belong on the active form's bar, so newly
     // learned form abilities land on their form bar and not the caster bar.
     const consider = (id: string) => {
+      // A passive (Measured Fury) is known but never castable, so it never
+      // auto-places on the action bar (a manual drag would be a dead slot too).
+      if (ABILITIES[id]?.passive) return;
       if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSlotSync === null) {

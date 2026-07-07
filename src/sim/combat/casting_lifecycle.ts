@@ -213,6 +213,10 @@ export function castAbility(
   const { meta, e: p } = r;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res || p.dead) return;
+  // A passive (Measured Fury) is never castable: its benefit is folded where the
+  // known list is read, so a cast attempt is a complete no-op (not even a
+  // deliberate-action tick), and it is never placed on the action bar.
+  if (res.def.passive) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
   if (isStunned(p)) {

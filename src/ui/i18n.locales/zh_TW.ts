@@ -2059,6 +2059,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defiant_bellow.name': '挑釁怒吼',
   'entities.abilities.defiant_bellow.description':
     '發出挑釁的怒吼：10 碼內的所有敵人都被嘲諷，被迫攻擊你，持續 3 秒。（防護）',
+  'entities.abilities.breachmaker.name': '破防重擊',
+  'entities.abilities.breachmaker.description':
+    '重擊目標，造成武器傷害外加 {damage} 點傷害，並擊碎其防禦：你自己對其造成的傷害提高 20%，持續 8 秒。（武器）',
+  'entities.abilities.measured_fury.name': '沉穩之怒',
+  'entities.abilities.measured_fury.description':
+    '你沉穩的怒火磨礪了資源運用：你的技能怒氣消耗降低 10%。（武器）',
   'entities.abilities.shield_slam.name': '碎盾擊',
   'entities.abilities.shield_slam.description':
     '用盾牌猛擊目標，造成 {damage} 點傷害並產生巨量威脅。（防護專精標誌技能）',

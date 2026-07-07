@@ -2844,13 +2844,28 @@ export class Sim {
     if (!r) return null;
     const found = r.meta.known.find((k) => k.def.id === abilityId) ?? null;
     if (!found) return null;
+    // This is the ONE cost choke point every affordability check and spend
+    // reads, so both cost adjusters fold here and stay in lockstep.
+    let cost = found.cost;
+    // Measured Fury (Arms passive): every listed rage cost is 10% cheaper. Gated
+    // on the passive being KNOWN and the caster having committed to the arms
+    // spec: measured_fury is spec-gated to arms, but a player with NO spec still
+    // carries the full kit (and its full, undiscounted costs), so the spec check
+    // keeps this strictly arms-only and leaves every no-spec/fury/prot cost
+    // byte-identical. Applied FIRST, so the cost_tax curse composes on top.
+    if (
+      cost > 0 &&
+      this.playerMods(r.meta).spec === 'arms' &&
+      r.meta.known.some((k) => k.def.passive && k.def.id === 'measured_fury')
+    ) {
+      cost = Math.max(0, Math.round(cost * 0.9));
+    }
     // A "draining curse" (cost_tax aura) inflates the resource cost of every
-    // ability the victim uses. Resolve it here, the single choke point all cost
-    // checks/spends read, so the affordability check and the spend stay in
-    // lockstep. Return a shallow copy so the cached known-list entry is never
-    // mutated.
+    // ability the victim uses.
     const tax = this.costTaxMult(r.e);
-    if (tax > 1 && found.cost > 0) return { ...found, cost: Math.ceil(found.cost * tax) };
+    if (tax > 1 && cost > 0) cost = Math.ceil(cost * tax);
+    // Return a shallow copy so the cached known-list entry is never mutated.
+    if (cost !== found.cost) return { ...found, cost };
     return found;
   }
 

@@ -5271,6 +5271,14 @@ export const es: EnTranslations = {
         "name": "Grito Desafiante",
         "description": "Un grito desafiante: provocas a los enemigos en un radio de 10 yardas y los obligas a atacarte durante 3 s. (Protección)"
       },
+      "breachmaker": {
+        "name": "Aplastar Coloso",
+        "description": "Golpeas al objetivo por el daño de arma más {damage} y quiebras su guardia: tus propios ataques contra él infligen un 20% más de daño durante 8 s. (Armas)"
+      },
+      "measured_fury": {
+        "name": "Intrepidez",
+        "description": "Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)"
+      },
       "shield_slam": {
         "name": "Quiebra de Escudo",
         "description": "Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)"

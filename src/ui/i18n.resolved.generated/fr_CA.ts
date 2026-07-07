@@ -5271,6 +5271,14 @@ export const fr_CA: EnTranslations = {
         "name": "Defiant Bellow",
         "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
+      "breachmaker": {
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
+      },
+      "measured_fury": {
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
+      },
       "shield_slam": {
         "name": "Shieldcrack",
         "description": "Heurte la cible avec votre bouclier pour {damage} et génère une menace énorme. (signature Protection)"

@@ -598,6 +598,23 @@ export function runEffects(
         });
         break;
       }
+      case 'debuffTargetSource': {
+        // Source-scoped debuff (Breachmaker): the aura MUST carry the caster's
+        // id in sourceId so the vuln_source fold in combat/damage.ts amplifies
+        // only THIS caster's damage against the target. Distinct auraId/auraName.
+        if (!target || target.dead) break;
+        ctx.applyAura(target, {
+          id: eff.auraId,
+          name: eff.auraName,
+          kind: eff.kind,
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.value,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
       case 'dot': {
         if (!target || target.dead) break;
         // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
