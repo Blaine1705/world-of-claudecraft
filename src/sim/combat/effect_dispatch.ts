@@ -840,6 +840,18 @@ export function runEffects(
             }
           }
         }
+        // Rage-generating AoE (Bladed Gyre): grant the caster rage scaled by how
+        // many enemies were actually struck (reusing the soft-cap target list),
+        // capped by capTargets. Scaled like gainResource by the choice-row talent
+        // multiplier and the aura-driven bonus. Deterministic: no extra rng.
+        if (eff.rageOnHit && p.resourceType === 'rage') {
+          const hits = aoeTargets.length;
+          const rageBase =
+            eff.rageOnHit.base + eff.rageOnHit.perTarget * Math.min(hits, eff.rageOnHit.capTargets);
+          const rageGain =
+            rageBase * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p);
+          p.resource = Math.min(p.maxResource, p.resource + rageGain);
+        }
         break;
       }
       case 'aoeHeal': {

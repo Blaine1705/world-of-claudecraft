@@ -5291,7 +5291,7 @@ export const en_CA: EnTranslations = {
       },
       "whirlwind": {
         "name": "Bladed Gyre",
-        "description": "Spin in a deadly arc, striking all nearby enemies for {damage}. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)"
+        "description": "Spin in a deadly arc, striking all nearby enemies for {damage} and generating rage for each foe struck instead of costing any. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)"
       },
       "berserker_rage": {
         "name": "Seething Fury",

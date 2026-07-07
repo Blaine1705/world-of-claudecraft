@@ -2834,7 +2834,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',
   'entities.abilities.whirlwind.name': 'Remolino de Cuchillas',
   'entities.abilities.whirlwind.description':
-    'Giras en un arco letal y golpeas a todos los enemigos cercanos por {damage}. (talento de Furia)',
+    'Giras en un arco letal y golpeas a todos los enemigos cercanos por {damage}, generando ira por cada enemigo alcanzado en lugar de costarla. Tus 2 próximas habilidades de un solo objetivo también golpean a los enemigos cercanos a tu objetivo. (talento de Furia)',
   'entities.abilities.berserker_rage.name': 'Furia Hirviente',
   'entities.abilities.berserker_rage.description':
     'Entras en un frenesí hirviente y generas 20 de furia. (talento de guerrero)',

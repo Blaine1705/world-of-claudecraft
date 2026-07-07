@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ABILITIES } from '../src/sim/content/classes';
 import { emptyAllocation, type TalentAllocation } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -181,6 +182,37 @@ describe('single-target casts echo onto enemies near the target', () => {
     // Re-casting whirlwind re-arms rather than consuming.
     recast(sim, p, 'whirlwind');
     expect(echoAura(p)?.charges).toBe(2);
+  });
+});
+
+describe('Bladed Gyre generates rage instead of costing it', () => {
+  it('(g) whirlwind costs no rage', () => {
+    expect(ABILITIES.whirlwind.cost).toBe(0);
+  });
+
+  // Cast Bladed Gyre against `n` enemies clustered inside the 8 yd spin (the
+  // first is the melee target) from an EMPTY rage bar, and return the rage
+  // gained: rageOnHit = 5 base + 1 per enemy struck, capped at +5 (5 to 10).
+  function rageFromSpin(n: number, seed = 4242): number {
+    const { sim, p } = makeSim(seed);
+    const zs = [3, 2, 4, 5, 6, 7, 7.5, 6.5, 5.5, 4.5];
+    const mobs = zs.slice(0, n).map((dz) => spawnMob(sim, p, dz));
+    p.facing = 0; // facing +z, into the cluster
+    sim.targetEntity(mobs[0].id, p.id);
+    p.resource = 0;
+    sim.drainEvents();
+    sim.castAbility('whirlwind');
+    // Every clustered enemy was struck, so each counts toward the rage grant.
+    for (const m of mobs) expect(m.hp).toBeLessThan(m.maxHp);
+    return p.resource;
+  }
+
+  it('(h) 2 enemies struck grants 5 + min(2,5) = 7 rage', () => {
+    expect(rageFromSpin(2)).toBe(7);
+  });
+
+  it('(i) 7 enemies struck is capped at 5 + min(7,5) = 10 rage', () => {
+    expect(rageFromSpin(7)).toBe(10);
   });
 });
 
