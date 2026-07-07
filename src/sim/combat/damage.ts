@@ -144,6 +144,18 @@ export function dealDamage(
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
   }
 
+  // Breachmaker: a SOURCE-SCOPED vulnerability. Unlike the raid-wide
+  // 'vulnerability' above, only the attacker whose id matches the aura's
+  // sourceId sees the amplification, so the debuff sharpens the caster's own
+  // hits without buffing every other attacker on the target. Sums additively
+  // across the caster's own vuln_source auras.
+  if (source && amount > 0) {
+    let vs = 0;
+    for (const a of target.auras)
+      if (a.kind === 'vuln_source' && a.sourceId === source.id) vs += a.value;
+    if (vs > 0) amount = Math.round(amount * (1 + vs));
+  }
+
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in
   // applyHeal). Self-damage paths (source === target) are left untouched.
   if (source && source.id !== target.id) {

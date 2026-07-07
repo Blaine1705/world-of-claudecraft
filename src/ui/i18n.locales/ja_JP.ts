@@ -2165,6 +2165,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defiant_bellow.name': '反抗の雄叫び',
   'entities.abilities.defiant_bellow.description':
     '反抗の雄叫びを上げます：10ヤード以内のすべての敵を挑発し、3秒間自分を攻撃させます。（防御）',
+  'entities.abilities.breachmaker.name': '崩城の一撃',
+  'entities.abilities.breachmaker.description':
+    '対象を武器ダメージに加えて{damage}で殴りつけ、その防御を打ち砕きます：8秒間、あなた自身の攻撃がその対象に20%多くのダメージを与えます。（武器）',
+  'entities.abilities.measured_fury.name': '沈着なる怒り',
+  'entities.abilities.measured_fury.description':
+    'あなたの沈着な怒りが立ち回りを研ぎ澄まします：あなたの能力の怒り消費が10%減少します。（武器）',
   'entities.abilities.shield_slam.name': '盾砕き',
   'entities.abilities.shield_slam.description':
     '盾で対象を叩きつけ、{damage} のダメージと大量の脅威を与えます。（防御シグネチャー）',

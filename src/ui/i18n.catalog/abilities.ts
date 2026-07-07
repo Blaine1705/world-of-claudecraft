@@ -1173,6 +1173,16 @@ const classAbilityNamesEn = {
         'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
       ],
       [
+        'breachmaker',
+        'Breachmaker',
+        'Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)',
+      ],
+      [
+        'measured_fury',
+        'Measured Fury',
+        'Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)',
+      ],
+      [
         'shield_slam',
         'Shieldcrack',
         'Slam the target with your shield for {damage} and massive threat. (Protection signature)',

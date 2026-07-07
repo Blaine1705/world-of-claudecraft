@@ -43,6 +43,9 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   imbue: 'other',
   lifeTap: 'other',
   buffTarget: 'other',
+  // Breachmaker's source-scoped vulnerability debuff is a non-breaking amp; the
+  // ability's paired weaponStrike is what classifies it as an attack.
+  debuffTargetSource: 'other',
   slow: 'other',
   root: 'other',
   stun: 'other',

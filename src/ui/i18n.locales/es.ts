@@ -2819,6 +2819,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defiant_bellow.name': 'Grito Desafiante',
   'entities.abilities.defiant_bellow.description':
     'Un grito desafiante: provocas a los enemigos en un radio de 10 yardas y los obligas a atacarte durante 3 s. (Protección)',
+  'entities.abilities.breachmaker.name': 'Aplastar Coloso',
+  'entities.abilities.breachmaker.description':
+    'Golpeas al objetivo por el daño de arma más {damage} y quiebras su guardia: tus propios ataques contra él infligen un 20% más de daño durante 8 s. (Armas)',
+  'entities.abilities.measured_fury.name': 'Intrepidez',
+  'entities.abilities.measured_fury.description':
+    'Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)',
   'entities.abilities.shield_slam.name': 'Quiebra de Escudo',
   'entities.abilities.shield_slam.description':
     'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',

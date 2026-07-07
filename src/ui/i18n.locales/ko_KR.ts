@@ -2157,6 +2157,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defiant_bellow.name': '도전의 외침',
   'entities.abilities.defiant_bellow.description':
     '도전의 외침을 내지릅니다: 10미터 내의 모든 적을 도발해 3초 동안 자신을 공격하게 만듭니다. (방어)',
+  'entities.abilities.breachmaker.name': '붕괴 일격',
+  'entities.abilities.breachmaker.description':
+    '대상을 무기 공격력에 더해 {damage}만큼 강타하고 방어를 부숴, 8초 동안 자신의 공격이 그 대상에게 20% 더 큰 피해를 입힙니다. (무기)',
+  'entities.abilities.measured_fury.name': '침착한 분노',
+  'entities.abilities.measured_fury.description':
+    '침착한 분노가 자원 운용을 벼립니다: 당신의 능력의 분노 소모가 10% 감소합니다. (무기)',
   'entities.abilities.shield_slam.name': '방패 강타',
   'entities.abilities.shield_slam.description':
     '방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',

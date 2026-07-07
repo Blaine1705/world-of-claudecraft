@@ -187,6 +187,11 @@ export type AuraKind =
   | 'spellvuln'
   | 'lockout'
   | 'vulnerability'
+  // Source-scoped damage vulnerability (Breachmaker): unlike raid-wide
+  // 'vulnerability', this only amplifies damage dealt BY the caster whose id is
+  // in the aura's `sourceId`. `value` = the additive fraction (0.2 = +20%). Read
+  // in combat/damage.ts right after the raid-wide vulnerability fold.
+  | 'vuln_source'
   | 'hex'
   | 'tongues'
   | 'cost_tax'
@@ -1222,6 +1227,18 @@ export type AbilityEffect =
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | { type: 'buffTarget'; kind: AuraKind; value: number; duration: number } // fortitude/might/mark on a friendly target
+  // Source-scoped debuff on the target (Breachmaker): applies an aura carrying
+  // the CASTER's id in `sourceId`, so a source-scoped fold (e.g. vuln_source in
+  // combat/damage.ts) only amplifies what THIS caster deals. Distinct auraId /
+  // auraName let the debuff read apart from the granting ability. Draws no rng.
+  | {
+      type: 'debuffTargetSource';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      auraId: string;
+      auraName: string;
+    }
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
   | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
   | { type: 'slow'; mult: number; duration: number }
@@ -1379,6 +1396,11 @@ export interface AbilityDef {
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
   requiresTarget: boolean;
+  // Passive ability (Measured Fury): known and shown in the spellbook, but never
+  // castable and never auto-placed on the action bar. Its benefit is folded
+  // wherever the flat known list is read (e.g. the cost choke point in
+  // resolvedAbility); castAbility refuses it silently.
+  passive?: boolean;
   // Spec-gated base kit: when set, only players whose CHOSEN spec id is in the
   // list keep this ability in their known list (abilitiesKnownAt). A player who
   // has not committed to a spec keeps the full kit, and talent/row GRANTS are

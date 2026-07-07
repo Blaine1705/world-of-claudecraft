@@ -247,6 +247,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "taunt",
         "name": "Goad"
+      },
+      {
+        "id": "measured_fury",
+        "name": "Measured Fury"
+      },
+      {
+        "id": "breachmaker",
+        "name": "Breachmaker"
       }
     ],
     "model": "player_warrior",

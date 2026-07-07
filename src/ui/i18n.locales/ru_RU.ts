@@ -2195,6 +2195,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defiant_bellow.name': 'Вызывающий рев',
   'entities.abilities.defiant_bellow.description':
     'Вы издаете вызывающий рев: все противники в радиусе 10 м провоцируются и вынуждены атаковать вас в течение 3 сек. (ветка «Защита»)',
+  'entities.abilities.breachmaker.name': 'Пролом',
+  'entities.abilities.breachmaker.description':
+    'Вы обрушиваетесь на цель, нанося урон оружием плюс {damage} и проламывая ее защиту: ваши собственные атаки по ней наносят на 20% больше урона в течение 8 сек. (ветка «Оружие»)',
+  'entities.abilities.measured_fury.name': 'Выверенная ярость',
+  'entities.abilities.measured_fury.description':
+    'Ваша выверенная ярость оттачивает управление ресурсами: ваши способности стоят на 10% меньше ярости. (ветка «Оружие»)',
   'entities.abilities.shield_slam.name': 'Раскол щита',
   'entities.abilities.shield_slam.description':
     'Бьет цель щитом, нанося {damage} и создавая огромную угрозу. (ключевая способность ветки «Защита»)',

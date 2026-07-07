@@ -2402,6 +2402,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   iron_resolve: r('steel', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
   faultline: r('earth', 'earthBrown', [{ p: 'sunburst', ...BIG }, 'fist'], ['crack']),
   defiant_bellow: r('steel', 'steel', ['roar', { p: 'shield', ...TR }], ['arcs']),
+  // arms kit: Breachmaker = a sword biting a cracked guard on earthen steel
+  // (distinct from whirlwind's sword+arcs and faultline's sunburst+fist);
+  // Measured Fury = a calm steel helm shielding a steady heart (a passive; a
+  // composed steel look distinct from iron_resolve's shield+heart)
+  breachmaker: r('earth', 'steel', ['sword', { p: 'sunburst', ...TR }], ['crack']),
+  measured_fury: r('steel', 'steel', ['helm', { p: 'heart', ...BR }], ['glow']),
   // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
   pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
   heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact
@@ -2731,6 +2737,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Physical-only damage-reduction buffs (Raised Guard's 50% cut, aura id
   // 'raised_guard_dr'), mirroring aura_buff_dr on the steel palette
   aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // Breachmaker's source-scoped vulnerability debuff (aura id 'breachmaker_vuln',
+  // kind 'vuln_source'), shown on the target's debuff frame: a cracked guard
+  // struck by a blade on a blood palette
+  aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

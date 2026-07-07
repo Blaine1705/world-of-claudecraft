@@ -5271,6 +5271,14 @@ export const zh_TW: EnTranslations = {
         "name": "挑釁怒吼",
         "description": "發出挑釁的怒吼：10 碼內的所有敵人都被嘲諷，被迫攻擊你，持續 3 秒。（防護）"
       },
+      "breachmaker": {
+        "name": "破防重擊",
+        "description": "重擊目標，造成武器傷害外加 {damage} 點傷害，並擊碎其防禦：你自己對其造成的傷害提高 20%，持續 8 秒。（武器）"
+      },
+      "measured_fury": {
+        "name": "沉穩之怒",
+        "description": "你沉穩的怒火磨礪了資源運用：你的技能怒氣消耗降低 10%。（武器）"
+      },
       "shield_slam": {
         "name": "碎盾擊",
         "description": "用盾牌猛擊目標，造成 {damage} 點傷害並產生巨量威脅。（防護專精標誌技能）"
