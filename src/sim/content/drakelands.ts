@@ -189,7 +189,30 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
     { x: -60, z: 1796 },
     { x: 92, z: 1732 },
   ],
-  // a first waypost so Wyrmwatch reads as a camp, not bare ground
+  // Wyrmwatch: the dragon-watch garrison town on the Wyrmgate road. The
+  // north palisade parts at x 44 for the causeway gate; the southwest road
+  // to the dunes leaves between the inn and the well.
+  buildings: [
+    { kind: 'inn', x: 30, z: 1524, w: 6, d: 7, rot: 0.6 },
+    { kind: 'house', x: 54, z: 1512, w: 5, d: 5, rot: -1.1 },
+    { kind: 'house', x: 33, z: 1508, w: 5, d: 5, rot: 2.0 },
+    { kind: 'house', x: 56, z: 1532, w: 5, d: 6, rot: 2.6 },
+  ],
+  wells: [{ x: 50, z: 1522, r: 1.5 }],
+  stalls: [
+    { x: 38, z: 1516, rot: 0.5, r: 1.6 },
+    { x: 50, z: 1530, rot: -1.2, r: 1.6 },
+  ],
+  crates: [
+    [46, 1512],
+    [36, 1532],
+  ],
+  fences: [
+    // the north palisade, parted at the causeway gate
+    { x1: 30, z1: 1502, x2: 40, z2: 1502 },
+    { x1: 48, z1: 1502, x2: 56, z2: 1502 },
+  ],
+  // the old waypost stays: a garrison keeps its road camp
   tents: [
     { x: 36, z: 1514, rot: 0.8, scale: 1 },
     { x: 52, z: 1526, rot: -1.9, scale: 1 },
