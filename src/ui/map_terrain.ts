@@ -15,8 +15,9 @@
 // lines, depth-graded water with shallow foam, wet and dry sand shorelines,
 // hypsometric tinting, fbm vegetation mottling, rock exposure on steep
 // slopes, and worn dirt tracks with wobbling width and inked edges.
-import { ZONES } from '../sim/data';
+import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES, ZONES } from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
+import type { BiomeId } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 
 export interface MapRegion {
@@ -56,6 +57,114 @@ const CONTOUR_WIDTH = 0.42; // how much height-band each line inks
 // current and previous rows' heights, and a chunk's FIRST row recomputes its
 // previous row explicitly (same math, same values), so a chunked render is
 // byte-identical to a single-pass one (guarded by tests/map_terrain.test.ts).
+// The per-biome base land colour. Flat for most biomes; ember and frost carry
+// a position-graded tint (the same corridors the 3D map uses). Returned into
+// the scratch triple to avoid per-pixel allocation.
+function biomeBaseColor(biome: BiomeId, x: number, z: number, out: [number, number, number]): void {
+  switch (biome) {
+    case 'marsh':
+      out[0] = 64;
+      out[1] = 86;
+      out[2] = 48;
+      return;
+    case 'peaks':
+      out[0] = 92;
+      out[1] = 100;
+      out[2] = 82;
+      return;
+    case 'dusk':
+      out[0] = 96;
+      out[1] = 84;
+      out[2] = 104;
+      return;
+    case 'amber':
+      out[0] = 168;
+      out[1] = 130;
+      out[2] = 58;
+      return;
+    case 'night':
+      out[0] = 118;
+      out[1] = 106;
+      out[2] = 168;
+      return;
+    case 'haunt':
+      out[0] = 48;
+      out[1] = 56;
+      out[2] = 44;
+      return;
+    case 'garden':
+      out[0] = 82;
+      out[1] = 148;
+      out[2] = 72;
+      return;
+    case 'gale':
+      out[0] = 96;
+      out[1] = 138;
+      out[2] = 92;
+      return;
+    case 'ember': {
+      const sandT = Math.max(0, Math.min(1, (z - 1925) / 145));
+      let r = 74 + 76 * sandT;
+      let g = 110 + 10 * sandT;
+      let bb = 52 + 32 * sandT;
+      const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x - 404) - 26) / 26));
+      const valley = passT * Math.max(0, Math.min(1, (z - 2310) / 80));
+      const scorch = Math.max(0, Math.min(1, (z - 2260) / 100)) * (1 - valley);
+      r = r * (1 - scorch * 0.35) - 60 * valley * (sandT > 0 ? 1 : 0);
+      g = g * (1 - scorch * 0.45);
+      bb = bb * (1 - scorch * 0.4) - 25 * valley;
+      out[0] = r;
+      out[1] = g;
+      out[2] = bb;
+      return;
+    }
+    case 'frost': {
+      const passT = 1 - Math.max(0, Math.min(1, (Math.abs(z - 1890) - 26) / 26));
+      const green = passT * Math.max(0, Math.min(1, (Math.abs(x) - 95) / 85));
+      const snowline = 1 - green;
+      out[0] = 74 + 140 * snowline;
+      out[1] = 110 + 114 * snowline;
+      out[2] = 52 + 184 * snowline;
+      return;
+    }
+    default:
+      out[0] = 58;
+      out[1] = 105;
+      out[2] = 48;
+      return; // vale / fen / jungle
+  }
+}
+
+// The blended land colour at a point: the same cross-border blend the 3D
+// terrain uses (paletteAt), so adjacent maps' colours fade into each other
+// (e.g. the Hollow's dusk purple slowly turning snowy toward the Frostveil)
+// instead of meeting at a hard seam. Strip bands blend by z over the -30/+35
+// window; columns blend in sideways via columnBlendAt.
+const _lc: [number, number, number] = [0, 0, 0];
+function landColorAt(x: number, z: number, out: [number, number, number]): void {
+  biomeBaseColor(STRIP_ZONES[0].biome, x, z, out);
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const boundary = STRIP_ZONES[i].zMax;
+    const tt = Math.max(0, Math.min(1, (z - (boundary - 30)) / 65));
+    const t = tt * tt * (3 - 2 * tt);
+    if (t <= 0) continue;
+    biomeBaseColor(STRIP_ZONES[i + 1].biome, x, z, _lc);
+    out[0] += (_lc[0] - out[0]) * t;
+    out[1] += (_lc[1] - out[1]) * t;
+    out[2] += (_lc[2] - out[2]) * t;
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t <= 0) continue;
+    biomeBaseColor(col.biome, x, z, _lc);
+    out[0] += (_lc[0] - out[0]) * t;
+    out[1] += (_lc[1] - out[1]) * t;
+    out[2] += (_lc[2] - out[2]) * t;
+  }
+}
+
+const _land: [number, number, number] = [0, 0, 0];
+
 export function paintTerrainRows(
   data: Uint8ClampedArray,
   W: number,
@@ -141,67 +250,12 @@ export function paintTerrainRows(
         continue;
       }
 
-      // -- land base color per biome (the special regional grades keep their
-      // existing math) --
-      if (biome === 'marsh') {
-        r = 64;
-        g = 86;
-        b = 48;
-      } else if (biome === 'peaks') {
-        r = 92;
-        g = 100;
-        b = 82;
-      } else if (biome === 'dusk') {
-        r = 96;
-        g = 84;
-        b = 104;
-      } else if (biome === 'ember') {
-        // green gatewood in the south near Wyrmwatch drying to sand, scorched
-        // near the belt; the Wyrmroad corridor stays green through it
-        const sandT = Math.max(0, Math.min(1, (z - 1925) / 145));
-        r = 74 + 76 * sandT;
-        g = 110 + 10 * sandT;
-        b = 52 + 32 * sandT;
-        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(x - 404) - 26) / 26));
-        const valley = passT * Math.max(0, Math.min(1, (z - 2310) / 80));
-        const scorch = Math.max(0, Math.min(1, (z - 2260) / 100)) * (1 - valley);
-        r = r * (1 - scorch * 0.35) - 60 * valley * (sandT > 0 ? 1 : 0);
-        g = g * (1 - scorch * 0.45);
-        b = b * (1 - scorch * 0.4) - 25 * valley;
-      } else if (biome === 'frost') {
-        // the Snowline and Goldmelt corridors green the map too, fading under
-        // the snow (both sideways crossings sit at z 1890 on opposite borders)
-        const passT = 1 - Math.max(0, Math.min(1, (Math.abs(z - 1890) - 26) / 26));
-        const green = passT * Math.max(0, Math.min(1, (Math.abs(x) - 95) / 85));
-        const snowline = 1 - green;
-        r = 74 + 140 * snowline;
-        g = 110 + 114 * snowline;
-        b = 52 + 184 * snowline;
-      } else if (biome === 'amber') {
-        r = 168;
-        g = 130;
-        b = 58;
-      } else if (biome === 'night') {
-        // dream-violet downs
-        r = 118;
-        g = 106;
-        b = 168;
-      } else if (biome === 'haunt') {
-        // the haunted wood reads near-black forest
-        r = 48;
-        g = 56;
-        b = 44;
-      } else if (biome === 'garden') {
-        // mown parkland green
-        r = 82;
-        g = 148;
-        b = 72;
-      } else if (biome === 'gale') {
-        // wind-dried sage downs
-        r = 96;
-        g = 138;
-        b = 92;
-      }
+      // -- land base colour: blended across borders so neighbouring maps'
+      // palettes fade into each other (no hard colour seam) --
+      landColorAt(x, z, _land);
+      r = _land[0];
+      g = _land[1];
+      b = _land[2];
 
       // -- high ground overrides (crag/snow tints per biome, as before) --
       if (biome === 'dusk' && h > 26) {

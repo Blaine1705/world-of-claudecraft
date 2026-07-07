@@ -373,11 +373,17 @@ const FROST_LAND_LOBES = [
   { x: 162, z: 1468, r: 48 }, // the Meltwater's south cap, ice side
   { x: 162, z: 1930, r: 48 }, // the Meltwater's north cap, ice side
   { x: 102, z: 1888, r: 46 }, // the shore between the Terraces and the crown, closing the cap
+  { x: -60, z: 1958, r: 40 }, // the north crown's headlands push into the bay...
+  { x: 44, z: 1962, r: 36 }, // ...and a second, so the north shore is lobed
+  { x: -30, z: 1452, r: 46 }, // the south shore's rise east of the Wyrmgate
+  { x: 70, z: 1450, r: 42 }, // ...and its east headland over the sound
 ] as const;
 const FROST_BAYS = [
   { x: 165, z: 1660, r: 55 }, // the east sound
   { x: -165, z: 1580, r: 50 }, // the west inlet
   { x: 60, z: 1945, r: 50 }, // the north cove
+  { x: -108, z: 1952, r: 40 }, // ...and a second cove, west of the crown
+  { x: 8, z: 1470, r: 40 }, // a south cove biting the shore east of the Wyrmgate
 ] as const;
 
 export function frostLandness(x: number, z: number): number {
@@ -1062,6 +1068,17 @@ function applyCauseway(x: number, z: number, h: number): number {
 // north (the Galecrest, no crossing there) and open sea below its south
 // headland; the causeway's z-window sits between the two, untouched.
 function applyStarterMoat(x: number, z: number, h: number): number {
+  // the vale/island border strait (x~177..190): clear any crest sitting on
+  // the border line over the open water on either side of the Ferrywalk, so
+  // the only dry link is the causeway. Skipped on the causeway itself and
+  // north of z150 (the vale's own north-corner land).
+  if (x >= 177 && x <= 194 && z < 150 && z > -184 && !onCauseway(x, z)) {
+    const wb = smoothstep(177, 182, x) * (1 - smoothstep(188, 196, x));
+    if (wb > 0) {
+      const sea2 = Math.min(h, WATER_LEVEL - 5);
+      h = h + (sea2 - h) * wb;
+    }
+  }
   if (x < 184 || x > 548) return h;
   // the north channel: the border band with the Galecrest (z 164..186),
   // fading back to the Galecrest's own coast north of z 200
@@ -1122,8 +1139,6 @@ function applyIsleCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam * zSeam;
 }
 
-
-
 // The border meres between columns: the seam blend of two adjacent coasts
 // leaves each border line hovering at the waterline (a mushy mudflat neither
 // walkable nor swimmable); these carve every column border into honest
@@ -1147,9 +1162,37 @@ function applyColumnStraits(x: number, z: number, h: number): number {
       smoothstep(26, 52, Math.abs(z - st.passZ)) *
       smoothstep(st.lakeLo - 20, st.lakeLo + 20, z) *
       (1 - smoothstep(st.lakeHi - 20, st.lakeHi + 20, z));
-    if (strait <= 0) continue;
+    // The moat's fixed central channel keeps the Hollow enclosed. On top of it,
+    // scallop the INNER (Hollow-side) bank so the shore is not a ruled vertical
+    // moat wall: coves bite inland from the moat where the Hollow's own coast
+    // recedes (low landness), headlands stand proud where it swells. This only
+    // ever LOWERS the near-shore strip toward water, never raises the channel,
+    // so the moat stays continuous at every z (no bridge possible).
+    const zGate =
+      smoothstep(26, 52, Math.abs(z - st.passZ)) *
+      smoothstep(st.lakeLo - 20, st.lakeLo + 20, z) *
+      (1 - smoothstep(st.lakeHi - 20, st.lakeHi + 20, z));
+    let scallop = 0;
+    if (zGate > 0) {
+      // distance inland from the border (positive going into the Hollow)
+      const inland = st.borderX > 0 ? st.borderX - x : x - st.borderX;
+      if (inland > 8 && inland < 46) {
+        const land = hollowLandness(x, z);
+        // low landness -> deep cove; taper the band's inner lip so coves ease
+        // into the shore instead of ending in a step
+        const cove = 1 - smoothstep(-0.16, 0.1, land);
+        const lip = smoothstep(8, 16, inland) * (1 - smoothstep(34, 46, inland));
+        // only deepen ground that is ALREADY near the waterline, so the coves
+        // extend genuine shore into the moat and never bite a marginal sliver
+        // out of an elevated ridge foot (e.g. the z1440 border foot).
+        const lowGate = 1 - smoothstep(1, 8, out);
+        scallop = cove * lip * zGate * lowGate;
+      }
+    }
+    const carve = Math.max(strait, scallop);
+    if (carve <= 0) continue;
     const channel = Math.min(out, WATER_LEVEL - 2.5);
-    out = out + (channel - out) * strait;
+    out = out + (channel - out) * carve;
   }
   return out;
 }
@@ -1157,13 +1200,18 @@ function applyColumnStraits(x: number, z: number, h: number): number {
 // The row meres: the six column-row borders carved into honest lakes
 // between their green or capped ends, each crossed only by its pass road's
 // isthmus (the h-border twin of COLUMN_STRAITS).
+// xLo/xHi span the mere's water. The z700 row sits in the peaks green-seam
+// row, so its INNER cap (the x=+-180 seam) stays dry land; the z1260/z1820
+// rows sit against the Hollow/Frost moats, so their inner caps are water
+// too. All rows carve out to the world edge (x=+-540) so no cap sliver is
+// left proud at the map corners.
 const ROW_MERES = [
-  { borderZ: 700, passX: 400, xLo: 240, xHi: 500 }, // the Lawnmere
-  { borderZ: 1260, passX: 390, xLo: 240, xHi: 500 }, // the Gravemere
-  { borderZ: 1820, passX: 404, xLo: 240, xHi: 500 }, // the Ashmere
-  { borderZ: 700, passX: -400, xLo: -500, xHi: -240 }, // the Palmere
-  { borderZ: 1260, passX: -330, xLo: -500, xHi: -240 }, // the Duskmere
-  { borderZ: 1820, passX: -350, xLo: -500, xHi: -240 }, // the Goldmere
+  { borderZ: 700, passX: 400, xLo: 240, xHi: 552 }, // the Lawnmere
+  { borderZ: 1260, passX: 390, xLo: 168, xHi: 552 }, // the Gravemere
+  { borderZ: 1820, passX: 404, xLo: 168, xHi: 552 }, // the Ashmere
+  { borderZ: 700, passX: -400, xLo: -552, xHi: -240 }, // the Palmere
+  { borderZ: 1260, passX: -330, xLo: -552, xHi: -168 }, // the Duskmere
+  { borderZ: 1820, passX: -350, xLo: -552, xHi: -168 }, // the Goldmere
 ] as const;
 function applyRowMeres(x: number, z: number, h: number): number {
   let out = h;
@@ -1185,8 +1233,16 @@ function applyRowMeres(x: number, z: number, h: number): number {
 // the Reach's coast. No zone owns that gap, and untouched it would
 // soft-floor into dry mudflats instead of sea.
 function applyNorthBay(x: number, z: number, h: number): number {
-  if (z <= FROST_ZMAX || Math.abs(x) > STRIP_MAX_X + 8) return h;
-  const t = smoothstep(FROST_ZMAX, FROST_ZMAX + 44, z) * (1 - smoothstep(172, 188, Math.abs(x)));
+  if (z <= FROST_ZMAX - 20 || Math.abs(x) > STRIP_MAX_X + 8) return h;
+  // follow the Reach's own coastline north of the cap: the frost lobes that
+  // poke past z1960 stay dry headlands, the gaps between them open as coves,
+  // so the north shore is lobed, not a ruled z-parallel line
+  const land = frostLandness(x, z);
+  const shoreT = 1 - smoothstep(-0.04, 0.14, land);
+  const t =
+    smoothstep(FROST_ZMAX - 20, FROST_ZMAX + 44, z) *
+    (1 - smoothstep(172, 188, Math.abs(x))) *
+    shoreT;
   if (t <= 0) return h;
   const sea = Math.min(h, WATER_LEVEL - 6);
   return h + (sea - h) * t;
@@ -1231,15 +1287,19 @@ function applyAmberCoast(x: number, z: number, h: number): number {
 // the sealed border band is fully inside land lobes so the wall never wets.
 function applyHollowCoast(x: number, z: number, h: number): number {
   // the sea starts north of the sealed range: the realm's south is mountain,
-  // its other shores are coast (and the wall never wets)
-  if (z < 960) return h;
+  // its other shores are coast (and the wall never wets). The south limit
+  // wanders to z940 (well clear of the sealed crest at z900-915 and its
+  // feather) so the south shoreline is organic, not a horizontal chop; the
+  // z925-935 land lobes keep the whole wall band dry.
+  if (z < 940) return h;
+  const southEase = smoothstep(940, 968, z);
   const zSeam = 1 - smoothstep(HOLLOW_ZMAX - 8, HOLLOW_ZMAX + 8, z);
   if (zSeam <= 0) return h;
   // the moat columns flank the Hollow now: its coast owns only the strip,
   // cross-fading toward the lawns and the wood at the border meres
   const seam =
     smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x) *
-    (1 - smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x));
+    (1 - smoothstep(STRIP_MAX_X + 8, STRIP_MAX_X + 30, x));
   if (seam <= 0) return h;
   const land = hollowLandness(x, z);
   // a wide, gentle transition: a shallow near-shore shelf slopes into the
@@ -1279,7 +1339,7 @@ function applyHollowCoast(x: number, z: number, h: number): number {
       }
     }
   }
-  return h + (out - h) * seam * zSeam;
+  return h + (out - h) * seam * zSeam * southEase;
 }
 
 // The Drakelands' coast, same recipe as the Hollow's. It fades OUT toward
@@ -1820,7 +1880,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     const dPerp = Math.abs((edge.kind === 'h' ? z : x) - edge.at);
     if (dPerp < sigma * 3) {
       const along = edge.kind === 'h' ? x : z;
-      const profile = Math.exp(-(dPerp * dPerp) / (2 * sigma * sigma));
+      let profile = Math.exp(-(dPerp * dPerp) / (2 * sigma * sigma));
       const pass = edge.sealed
         ? 1
         : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(along - edge.passAt));
@@ -1831,18 +1891,52 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       const peaksEdge =
         (edge.kind === 'v' && edge.lo >= 540 && edge.hi <= 900) ||
         (edge.kind === 'h' && edge.at === 540);
+      // Thornpeak's range wanders instead of running dead straight: its crest
+      // LINE meanders +-16yd with low-frequency noise along its length, and
+      // its height swells and saddles over long runs, so the mountain front
+      // reads as an organic range, not a ruled berm. Placement (mean z540 /
+      // the column lines) is unchanged.
+      // The sealed south wall's VISIBLE crest also meanders so it reads as an
+      // organic range, not a ruled band, on the map. This moves only the
+      // terrain crest line; the movement seal (crossesSealedBorder / SEALED_
+      // BORDERS) is a separate, independent wall fixed at the border, so
+      // weaving the mountains never opens a gap the player can walk through.
+      let dPerpEdge = dPerp;
+      if (peaksEdge || edge.sealed) {
+        const amp = edge.sealed ? 14 : 32;
+        const amp2 = edge.sealed ? 6 : 10;
+        const wob =
+          (fbm2(along * 0.006, edge.at * 0.006, seed + 31, 2) - 0.5) * amp +
+          (fbm2(along * 0.02, edge.at * 0.02, seed + 33, 2) - 0.5) * amp2;
+        dPerpEdge = Math.abs((edge.kind === 'h' ? z : x) - (edge.at + wob));
+        profile = Math.exp(-(dPerpEdge * dPerpEdge) / (2 * sigma * sigma));
+      }
       const crestNoise =
         edge.kind === 'h'
           ? (fbm2(x * 0.03, edge.at * 0.03, seed + 19, 2) - 0.5) * (peaksEdge ? 1.0 : 0.7)
           : (fbm2(edge.at * 0.03, z * 0.03, seed + 19, 2) - 0.5) * (peaksEdge ? 1.0 : 0.7);
-      const crest = 1 + (edge.sealed ? Math.abs(crestNoise) : crestNoise);
-      const height = edge.sealed ? SEALED_RIDGE_HEIGHT : peaksEdge ? 34 : RIDGE_HEIGHT;
+      // a coarse height swell for peaks so the wall has big shoulders and
+      // saddles over long runs (broken silhouette, not uniform teeth)
+      const peaksSwell = peaksEdge
+        ? 0.55 + 0.9 * fbm2(along * 0.009, edge.at * 0.009, seed + 37, 2)
+        : 1;
+      const crest = (1 + (edge.sealed ? Math.abs(crestNoise) : crestNoise)) * peaksSwell;
+      // the marsh's mountain range (the z540 marsh|peaks wall) sits a little
+      // lower than the peaks' inner crags
+      const peaksHeight = edge.kind === 'h' && edge.at === 540 ? 27 : 34;
+      const height = edge.sealed ? SEALED_RIDGE_HEIGHT : peaksEdge ? peaksHeight : RIDGE_HEIGHT;
       // The Hollow/Drakelands boundary ridge rises only where there is land
       // to carry it (the Wyrmgate mountains around the causeway head); over
       // the open sea the two realms' waters simply meet. Sealed walls are
       // never gated: the Drakemaw range runs down into the sea at its flanks.
       let seaGate = 1;
-      const northern = edge.kind === 'h' ? edge.at >= HOLLOW_ZMAX : true;
+      // seaGate the northern realms' edges AND every column-row border (an
+      // east/west column h-edge, lo>=strip or hi<=-strip): those are mere
+      // crossings whose ridge must not rise over the open water at the mere
+      // caps. The classic full-strip land borders (vale/marsh, marsh/peaks)
+      // keep their ungated mountain range.
+      const columnRow = edge.kind === 'h' && (edge.lo >= STRIP_MAX_X || edge.hi <= STRIP_MIN_X);
+      const northern = (edge.kind === 'h' ? edge.at >= HOLLOW_ZMAX : true) || columnRow;
       if (!edge.sealed && northern) {
         seaGate = smoothstep(
           0.005,
