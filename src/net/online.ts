@@ -13,12 +13,12 @@ import {
   cloneAllocation,
   computeTalentModifiers,
   emptyAllocation,
-  pointsSpent,
   type Role,
+  rowsPicked,
+  rowsUnlockedAtLevel,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   type TalentAllocation,
-  talentPointsAtLevel,
 } from '../sim/content/talents';
 import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
@@ -2593,7 +2593,10 @@ export class ClientWorld implements IWorld {
   // Talents & Specializations: the server re-validates every allocation. ---
   talentPoints(): { total: number; spent: number } {
     const level = this.entities.get(this.playerId)?.level ?? 1;
-    return { total: talentPointsAtLevel(level), spent: pointsSpent(this.talents) };
+    return {
+      total: rowsUnlockedAtLevel(this.cfg.playerClass, level),
+      spent: rowsPicked(this.talents),
+    };
   }
   applyTalents(alloc: TalentAllocation): void {
     this.cmd({ cmd: 'applyTalents', alloc });

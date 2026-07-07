@@ -49,18 +49,14 @@ describe('choice row engine', () => {
     expect(validateRows('warrior', 19, { 20: r20 }).ok).toBe(false);
     expect(validateRows('warrior', 20, { 20: r20 }).ok).toBe(true);
     expect(validateRows('warrior', 20, { 5: 'mag_r5_not_ours' }).ok).toBe(false);
-    expect(
-      validateAllocation('warrior', { spec: null, ranks: {}, choices: {}, rows: { 5: r5 } }, 11, 20)
-        .ok,
-    ).toBe(true);
+    expect(validateAllocation('warrior', { spec: null, rows: { 5: r5 } }, 20).ok).toBe(true);
   });
 
   it('repair drops illegal picks and keeps legal ones (the free re-pick migration)', () => {
     const r5 = CHOICE_ROWS.mage.rows[0].options[1].id;
     const repaired = repairAllocation(
       'mage',
-      { spec: null, ranks: {}, choices: {}, rows: { 5: r5, 20: 'war_r20_bogus' } },
-      11,
+      { spec: null, rows: { 5: r5, 20: 'war_r20_bogus' } },
       12,
     );
     expect(repaired.rows).toEqual({ 5: r5 });
@@ -89,7 +85,7 @@ describe('choice row engine', () => {
     expect(cls).not.toBeNull();
     const mods = computeTalentModifiers(
       cls as PlayerClass,
-      { spec: null, ranks: {}, choices: {}, rows: { [level]: optId } },
+      { spec: null, rows: { [level]: optId } },
       20,
     );
     expect(mods.grants.some((g) => g.ability === granted)).toBe(true);
@@ -110,7 +106,7 @@ describe('choice row engine', () => {
 
   it('build strings round-trip rows', () => {
     const r5 = CHOICE_ROWS.rogue.rows[0].options[2].id;
-    const alloc = { spec: null, ranks: {}, choices: {}, rows: { 5: r5 } };
+    const alloc = { spec: null, rows: { 5: r5 } };
     const imported = importBuild(exportBuild('rogue', alloc));
     expect(imported.ok).toBe(true);
     if (imported.ok) expect(imported.alloc.rows).toEqual({ 5: r5 });
@@ -120,7 +116,7 @@ describe('choice row engine', () => {
     const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
     const r5 = CHOICE_ROWS.warrior.rows[0].options[0].id;
-    sim.applyTalents({ spec: 'arms', ranks: {}, choices: {}, rows: { 5: r5 } });
+    sim.applyTalents({ spec: 'arms', rows: { 5: r5 } });
     expect(sim.talents.rows).toEqual({ 5: r5 });
     const saved = sim.serializeCharacter(sim.playerId);
     expect(saved?.talents?.rows).toEqual({ 5: r5 });

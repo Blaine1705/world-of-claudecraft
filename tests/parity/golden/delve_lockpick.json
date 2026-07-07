@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "20cb0763",
+      "state": "2bcf2f74",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -57,8 +57,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }
@@ -121,7 +119,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 414,
-      "state": "3a9657af",
+      "state": "64945cc8",
       "events": "a8af5cb6",
       "rng": {
         "draws": 4,
@@ -132,7 +130,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 414,
-      "state": "03ce5dc4",
+      "state": "185908bf",
       "events": "b93c7dc5",
       "rng": {
         "draws": 4,
@@ -143,7 +141,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 414,
-      "state": "e8948467",
+      "state": "29508630",
       "events": "0b43bbc3",
       "rng": {
         "draws": 5,
@@ -154,7 +152,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 416,
-      "state": "a6810c4a",
+      "state": "ec417727",
       "events": "6c6bd0f2",
       "rng": {
         "draws": 8,
@@ -212,8 +210,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           },
           "xp": 898
@@ -415,7 +411,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "fc00ad57",
+      "state": "eaa45b86",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -426,7 +422,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "fc00ad57",
+      "state": "eaa45b86",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -484,8 +480,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           },
           "xp": 898

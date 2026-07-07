@@ -146,6 +146,7 @@ export const zh_CN: EnTranslations = {
         "noTree": "你的职业暂无天赋树。",
         "locked": "你尚未解锁天赋，天赋将在 {level} 级开启。",
         "noSpec": "未选择专精",
+        "rowsSummary": "天赋：{head}，已选择 {picked}/{unlocked} 行选项。",
         "summary": "天赋：{head} — 已用 {spent}/{total} 点（{breakdown}）。",
         "breakdownClass": "职业 {classPts}",
         "breakdownSpec": "职业 {classPts}，{spec} {specPts}",

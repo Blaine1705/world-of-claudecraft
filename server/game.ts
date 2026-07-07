@@ -227,26 +227,6 @@ function recordValue(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
-function numberRecord(value: unknown): Record<string, number> {
-  const source = recordValue(value);
-  if (!source) return {};
-  const out: Record<string, number> = {};
-  for (const [key, raw] of Object.entries(source)) {
-    if (typeof raw === 'number') out[key] = raw;
-  }
-  return out;
-}
-
-function stringRecord(value: unknown): Record<string, string> {
-  const source = recordValue(value);
-  if (!source) return {};
-  const out: Record<string, string> = {};
-  for (const [key, raw] of Object.entries(source)) {
-    if (typeof raw === 'string') out[key] = raw;
-  }
-  return out;
-}
-
 function talentAllocationFromWire(value: unknown): TalentAllocation | null {
   const source = recordValue(value);
   if (!source) return null;
@@ -263,8 +243,6 @@ function talentAllocationFromWire(value: unknown): TalentAllocation | null {
   }
   return {
     spec: typeof source.spec === 'string' ? source.spec : null,
-    ranks: numberRecord(source.ranks),
-    choices: stringRecord(source.choices),
     rows,
   };
 }

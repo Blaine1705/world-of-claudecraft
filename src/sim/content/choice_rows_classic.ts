@@ -13,7 +13,6 @@ const mageSpellCostMods = [
   'arcane_missiles',
   'polymorph',
   'frost_nova',
-  'ice_lance',
   'arcane_explosion',
   'arcane_power',
   'combustion',
@@ -70,14 +69,14 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'war_r8_pummel',
           name: 'Jawcrack',
-          description: 'Interrupt spellcasting for a 4 sec school lockout. Costs 10 rage.',
+          description: 'Interrupt spellcasting for a 4 sec school lockout.',
           icon: 'pummel',
           effect: { grant: { ability: 'pummel' } },
         },
         {
           id: 'war_r8_concussive_clap',
           name: 'Concussive Clap',
-          description: 'Thunder Clap also roots targets hit for 1 sec.',
+          description: 'Quaking Blow also roots targets hit within 8 yd for 1 sec.',
           icon: 'thunder_clap',
           effect: {
             ability: [
@@ -287,14 +286,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'mag_r11_shatter',
-          name: 'Shatter',
+          name: 'Coldsnap Break',
           description: 'Spell critical chance against rooted targets increased by 30%.',
           icon: 'frostbolt',
           effect: { global: { critVsRooted: 0.3 } },
         },
         {
           id: 'mag_r11_permafrost',
-          name: 'Permafrost',
+          name: 'Deep Rime',
           description: 'Ice Barrier absorb increased by 40%.',
           icon: 'ice_barrier',
           effect: { ability: [{ ability: 'ice_barrier', dmgPct: 0.4 }] },
@@ -537,7 +536,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pal_r17_ardent_defender',
-          name: 'Ardent Defender',
+          name: 'Deathless Ardor',
           description: 'Armor increased by 10% and maximum health increased by 8%.',
           icon: 'divine_protection',
           effect: { stats: { armorPct: 0.1, maxHpPct: 0.08 } },
@@ -587,7 +586,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r5_improved_serpent_sting',
-          name: 'Improved Serpent Sting',
+          name: 'Improved Venom Barb',
           description: 'Serpent Sting deals 30% more damage.',
           icon: 'serpent_sting',
           effect: { ability: [{ ability: 'serpent_sting', dmgPct: 0.3 }] },
@@ -653,7 +652,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r11_efficiency',
-          name: 'Efficiency',
+          name: 'Lean Quiver',
           description: 'Hunter shots cost 15% less.',
           icon: 'aimed_shot',
           effect: {
@@ -669,7 +668,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r11_survival_instincts',
-          name: 'Survival Instincts',
+          name: 'Deathless Will',
           description: 'Maximum health increased by 8% and dodge increased by 2%.',
           icon: 'aspect_of_the_monkey',
           effect: { stats: { maxHpPct: 0.08, dodge: 0.02 } },
@@ -697,7 +696,8 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r14_serpents_venom',
           name: "Serpent's Venom",
-          description: 'Arcane Shot also applies a short Nature damage over time effect.',
+          description:
+            'Fell Shot also envenoms the target for 24 Nature damage over 6 sec, ticking every 2 sec.',
           icon: 'serpent_sting',
           effect: {
             ability: [
@@ -735,7 +735,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r17_thick_hide',
-          name: 'Thick Hide',
+          name: 'Calloused Hide',
           description: 'Armor increased by 10% and dodge increased by 2%.',
           icon: 'aspect_of_the_monkey',
           effect: { stats: { armorPct: 0.1, dodge: 0.02 } },
@@ -780,7 +780,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'rog_r5_relentless_strikes',
-          name: 'Relentless Strikes',
+          name: 'Ceaseless Cuts',
           description: 'Sinister Strike costs 20% less.',
           icon: 'sinister_strike',
           effect: { ability: [{ ability: 'sinister_strike', costPct: -0.2 }] },
@@ -819,14 +819,14 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'rog_r8_improved_gouge',
-          name: 'Improved Gouge',
+          name: 'Improved Eye Jab',
           description: 'Gouge cooldown and cost reduced by 30%.',
           icon: 'gouge',
           effect: { ability: [{ ability: 'gouge', cooldownPct: -0.3, costPct: -0.3 }] },
         },
         {
           id: 'rog_r8_improved_kidney_shot',
-          name: 'Improved Kidney Shot',
+          name: 'Improved Low Blow',
           description: 'Kidney Shot costs 25% less.',
           icon: 'kidney_shot',
           effect: { ability: [{ ability: 'kidney_shot', costPct: -0.25 }] },
@@ -858,7 +858,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'rog_r11_improved_slice_and_dice',
-          name: 'Improved Slice and Dice',
+          name: 'Improved Cutthroat Tempo',
           description: 'Slice and Dice effect increased by 25%.',
           icon: 'slice_and_dice',
           effect: { ability: [{ ability: 'slice_and_dice', buffPct: 0.25 }] },
@@ -871,7 +871,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'rog_r14_seal_fate',
-          name: 'Seal Fate',
+          name: 'Final Notice',
           description: 'Eviscerate and Rupture deal 20% more damage.',
           icon: 'eviscerate',
           effect: {
@@ -975,7 +975,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pri_r5_improved_renew',
-          name: 'Improved Renew',
+          name: 'Improved Lingering Grace',
           description: 'Renew heals 25% more.',
           icon: 'renew',
           effect: { ability: [{ ability: 'renew', dmgPct: 0.25 }] },
@@ -1029,7 +1029,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pri_r11_meditation',
-          name: 'Meditation',
+          name: 'Nocturns',
           description: 'Priest heals cost 15% less.',
           icon: 'lesser_heal',
           effect: {
@@ -1043,8 +1043,9 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pri_r11_vampiric_embrace',
-          name: 'Vampiric Embrace',
-          description: 'Mind Blast heals you for a share of its damage over 3 sec.',
+          name: 'Leeching Dirge',
+          description:
+            'Mindfracture also afflicts the target for 30 damage over 3 sec, ticking every 1 sec and healing you for 100% of it.',
           icon: 'mind_blast',
           effect: {
             ability: [
@@ -1102,7 +1103,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pri_r17_improved_fortitude',
-          name: 'Improved Fortitude',
+          name: 'Improved Litany of Resolve',
           description: 'Power Word: Fortitude effect increased by 50%.',
           icon: 'power_word_fortitude',
           effect: { ability: [{ ability: 'power_word_fortitude', buffPct: 0.5 }] },
@@ -1154,14 +1155,14 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'sha_r5_concussion',
-          name: 'Concussion',
+          name: 'Fault Line',
           description: 'Lightning Bolt deals 15% more damage.',
           icon: 'lightning_bolt',
           effect: { ability: [{ ability: 'lightning_bolt', dmgPct: 0.15 }] },
         },
         {
           id: 'sha_r5_improved_lightning_shield',
-          name: 'Improved Lightning Shield',
+          name: 'Improved Thunder Ward',
           description: 'Lightning Shield damage increased by 40%.',
           icon: 'lightning_shield',
           effect: { ability: [{ ability: 'lightning_shield', buffPct: 0.4 }] },
@@ -1187,7 +1188,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'sha_r8_improved_earth_shock',
-          name: 'Improved Earth Shock',
+          name: 'Improved Earthen Jolt',
           description: 'Earth Shock also interrupts spellcasting for a 2 sec school lockout.',
           icon: 'earth_shock',
           effect: {
@@ -1224,7 +1225,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'sha_r11_ancestral_guidance',
-          name: 'Ancestral Guidance',
+          name: 'Guiding Spirits',
           description: 'Healing Wave casts 20% faster.',
           icon: 'healing_wave',
           effect: { ability: [{ ability: 'healing_wave', castPct: -0.2 }] },
@@ -1258,7 +1259,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r14_improved_flame_shock',
-          name: 'Improved Flame Shock',
+          name: 'Improved Cinder Jolt',
           description: 'Flame Shock deals 30% more damage.',
           icon: 'flame_shock',
           effect: { ability: [{ ability: 'flame_shock', dmgPct: 0.3 }] },
@@ -1285,7 +1286,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r17_improved_ghost_wolf',
-          name: 'Improved Ghost Wolf',
+          name: 'Improved Shadewolf',
           description: 'Ghost Wolf becomes instant.',
           icon: 'ghost_wolf',
           effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
@@ -1312,7 +1313,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r20_elemental_fury',
-          name: 'Elemental Fury',
+          name: 'Earthen Fury',
           description: 'Critical strike chance increased by 5%.',
           icon: 'lightning_bolt',
           effect: { stats: { crit: 0.05 } },
@@ -1337,14 +1338,14 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r5_bane',
-          name: 'Bane',
+          name: 'Hastened Doom',
           description: 'Shadow Bolt casts 20% faster.',
           icon: 'shadow_bolt',
           effect: { ability: [{ ability: 'shadow_bolt', castPct: -0.2 }] },
         },
         {
           id: 'wlk_r5_improved_corruption',
-          name: 'Improved Corruption',
+          name: 'Improved Blackrot',
           description: 'Corruption becomes instant.',
           icon: 'corruption',
           effect: { ability: [{ ability: 'corruption', castPct: -1 }] },
@@ -1391,14 +1392,14 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r11_improved_life_tap',
-          name: 'Improved Life Tap',
+          name: 'Improved Hard Bargain',
           description: 'Life Tap restores 30% more mana.',
           icon: 'life_tap',
           effect: { ability: [{ ability: 'life_tap', dmgPct: 0.3 }] },
         },
         {
           id: 'wlk_r11_fel_concentration',
-          name: 'Fel Concentration',
+          name: 'Unbroken Focus',
           description: 'Drain Life deals 25% more damage.',
           icon: 'drain_life',
           effect: { ability: [{ ability: 'drain_life', dmgPct: 0.25 }] },
@@ -1418,14 +1419,14 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r14_amplify_curse',
-          name: 'Amplify Curse',
+          name: 'Deepened Hex',
           description: 'Curse of Agony deals 25% more damage.',
           icon: 'curse_of_agony',
           effect: { ability: [{ ability: 'curse_of_agony', dmgPct: 0.25 }] },
         },
         {
           id: 'wlk_r14_ruin',
-          name: 'Ruin',
+          name: 'Desolation',
           description: 'Searing Pain and Shadowburn deal 20% more damage.',
           icon: 'shadowburn',
           effect: {
@@ -1437,7 +1438,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'wlk_r14_shadow_mastery',
-          name: 'Shadow Mastery',
+          name: 'Umbral Mastery',
           description: 'Spell damage increased by 6%.',
           icon: 'shadow_bolt',
           effect: { global: { spellDmgPct: 0.06 } },
@@ -1464,7 +1465,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'wlk_r17_demonic_resilience',
-          name: 'Demonic Resilience',
+          name: 'Unyielding Pact',
           description: 'Maximum health increased by 10%.',
           icon: 'demon_skin',
           effect: { stats: { maxHpPct: 0.1 } },
@@ -1484,8 +1485,8 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'wlk_r20_grimoire_of_haste',
-          name: 'Grimoire of Haste',
-          description: 'Your demon gains 20% attack speed and 10% damage.',
+          name: 'Grimoire of Carnage',
+          description: 'Your demon deals 10% more damage.',
           icon: 'summon_felhound',
           effect: { global: { petDmgPct: 0.1 } },
         },
@@ -1514,14 +1515,14 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'dru_r5_improved_wrath',
-          name: 'Improved Wrath',
+          name: 'Improved Wildbolt',
           description: 'Wrath casts 20% faster.',
           icon: 'wrath',
           effect: { ability: [{ ability: 'wrath', castPct: -0.2 }] },
         },
         {
           id: 'dru_r5_ferocity',
-          name: 'Ferocity',
+          name: 'Redmaw',
           description: 'Claw and Rake cost 20% less.',
           icon: 'claw',
           effect: {
@@ -1580,7 +1581,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'dru_r11_furor',
-          name: 'Furor',
+          name: 'Wildsurge',
           description: 'Shapeshift costs reduced by 50%.',
           icon: 'bear_form',
           effect: {
@@ -1618,7 +1619,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'dru_r14_moonfury',
-          name: 'Moonfury',
+          name: 'Moonspite',
           description: 'Starfire and Moonfire deal 15% more damage.',
           icon: 'moonfire',
           effect: {

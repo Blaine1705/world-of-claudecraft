@@ -4928,6 +4928,15 @@ const RULES: Rule[] = [
     build: (m) => t('game.talents.readout.locked', { level: m[1] }),
   },
   {
+    re: /^Talents: (.+), (.+)\/(.+) choice rows picked\.(.*)$/,
+    build: (m) =>
+      t('game.talents.readout.rowsSummary', {
+        head: m[1] === 'no specialization' ? t('game.talents.readout.noSpec') : m[1],
+        picked: m[2],
+        unlocked: m[3],
+      }) + (m[4] ? locTalentTail(m[4]) : ''),
+  },
+  {
     re: /^Talents: (.+) — (.+)\/(.+) points spent \((.+)\)\.(.*)$/,
     build: (m) =>
       t('game.talents.readout.summary', {

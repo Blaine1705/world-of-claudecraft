@@ -274,3 +274,5 @@ pressure before this process was found; veto = rename in a follow-up):
 | Feral Charge (ability) | Primal Surge | map's Path of Fangs is the choice-row name, kept reserved |
 | Shadowform (ability) | Gloamveil Form | derived from locked Gloamveil (mastery); avoids exact display dup |
 | Pummel | Jawcrack | missed in the first batch; warrior interrupt, Eye Jab register |
+| Moonfury (row option) | Moonspite | balance druid row; Moongrove register |
+| Shatter (row option) | Coldsnap Break | map's Brittlebreak is taken by the frost mastery |

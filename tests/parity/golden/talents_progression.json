@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "9ee20c78",
+      "state": "37e8f13b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -58,8 +58,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {}
           }
         }
@@ -120,7 +118,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "0f75253e",
+      "state": "ffa594aa",
       "events": "d85bae6f",
       "rng": {
         "draws": 0,
@@ -162,11 +160,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {
-              "arms_imp_overpower": 2,
-              "war_cruelty": 2
-            },
             "rows": {},
             "spec": "arms"
           }
@@ -178,7 +171,7 @@
           "attackPower": 122,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.0895,
+          "critChance": 0.0695,
           "critDmgBonus": 0.25,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
@@ -229,7 +222,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "9340757e",
+      "state": "ffa594aa",
       "events": "40479820",
       "rng": {
         "draws": 0,
@@ -271,8 +264,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
+            "rows": {},
             "spec": "arms"
           }
         }
@@ -334,7 +326,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d28fc985",
+      "state": "68f2e3a4",
       "events": "a7d95be1",
       "rng": {
         "draws": 0,
@@ -375,10 +367,6 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
                 "rows": {},
                 "spec": "arms"
               },
@@ -393,135 +381,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {
-              "war_cruelty": 3
-            },
-            "rows": {},
-            "spec": "arms"
-          }
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 122,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0995,
-          "critDmgBonus": 0.25,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 400,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 812,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 39,
-            "armor": 376,
-            "int": 10,
-            "spi": 11,
-            "sta": 60,
-            "str": 61
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 401,
-      "state": "771ad182",
-      "events": "980c682a",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "switch-loadout",
-      "players": [
-        {
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "autoEquip": true,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 400,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
-          },
-          "gatheringProficiency": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "loadouts": [
-            {
-              "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
-                "rows": {},
-                "spec": "arms"
-              },
-              "bar": [
-                "mortal_strike",
-                "overpower",
-                null
-              ],
-              "name": "Arms"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "choices": {},
-            "ranks": {
-              "arms_imp_overpower": 2
-            },
             "rows": {},
             "spec": "arms"
           }
@@ -584,7 +443,124 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "67598136",
+      "state": "68f2e3a4",
+      "events": "980c682a",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "switch-loadout",
+      "players": [
+        {
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 400,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "loadouts": [
+            {
+              "alloc": {
+                "rows": {},
+                "spec": "arms"
+              },
+              "bar": [
+                "mortal_strike",
+                "overpower",
+                null
+              ],
+              "name": "Arms"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {},
+            "spec": "arms"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "critDmgBonus": 0.25,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 812,
+          "id": 400,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 812,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 376,
+            "int": 10,
+            "spi": 11,
+            "sta": 60,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 401,
+      "state": "31c7161a",
       "events": "6e54fd06",
       "rng": {
         "draws": 0,
@@ -625,10 +601,6 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
                 "rows": {},
                 "spec": "arms"
               },
@@ -643,8 +615,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {},
             "spec": "fury"
           }
@@ -706,7 +676,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "67598136",
+      "state": "31c7161a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -747,10 +717,6 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
                 "rows": {},
                 "spec": "arms"
               },
@@ -765,8 +731,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {},
             "spec": "fury"
           }

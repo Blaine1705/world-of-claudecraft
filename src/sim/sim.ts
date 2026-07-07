@@ -81,7 +81,6 @@ import {
   type SavedLoadout,
   type TalentAllocation,
   type TalentModifiers,
-  talentPointsAtLevel,
 } from './content/talents';
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
@@ -1581,11 +1580,8 @@ export class Sim {
           cls,
           {
             spec: s.talents.spec ?? null,
-            ranks: { ...s.talents.ranks },
-            choices: { ...s.talents.choices },
             rows: { ...(s.talents.rows ?? {}) },
           },
-          talentPointsAtLevel(player.level),
           player.level,
         );
       if (s.loadouts)
