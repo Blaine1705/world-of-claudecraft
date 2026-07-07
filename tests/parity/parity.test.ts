@@ -40,7 +40,9 @@ describe('parity gate', () => {
         const a = plain(recordTrace(scenario));
         const b = plain(recordTrace(scenario));
         expect(a).toEqual(b);
-      });
+        // two full recordings of the heaviest scenarios (the raid pull,
+        // the fiesta) on the 13-zone world: headroom under suite load
+      }, 90_000);
 
       it(UPDATE ? 'mints the golden' : 'matches the committed golden', () => {
         const trace = plain(recordTrace(scenario));

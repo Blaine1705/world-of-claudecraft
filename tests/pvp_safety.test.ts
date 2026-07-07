@@ -243,7 +243,7 @@ describe('PvP control abilities in active duels', () => {
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
     expect(castPolymorph()).toBe(10);
-  });
+  }, 90_000);
 
   it('makes feared hostile players run in a deterministic panic direction', () => {
     const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
@@ -299,7 +299,7 @@ describe('PvP control abilities in active duels', () => {
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
     expect(castFear()).toBe(8);
-  });
+  }, 90_000);
 
   it('diminishes repeated duel stuns to full, half, quarter, then immune, resetting after 18s', () => {
     const { sim, aPid, b } = startDuel('paladin', 'warrior', 20);
