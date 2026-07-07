@@ -8,8 +8,8 @@
     "hazard ring burn (fiestaRingDamage) outside the closing ring",
     "down + respawn-timer revive (fiestaRevive)"
   ],
-  "draws": 4482,
-  "drawDigest": "ddc3af3b",
+  "draws": 4470,
+  "drawDigest": "71435c6b",
   "frames": [
     {
       "tick": 0,
@@ -417,8 +417,8 @@
       "state": "57524961",
       "events": "741638a5",
       "rng": {
-        "draws": 2743,
-        "digest": "5fd7a7f7"
+        "draws": 2745,
+        "digest": "e1a0d3cf"
       }
     },
     {
@@ -439,8 +439,8 @@
       "state": "6ba91271",
       "events": "741638a5",
       "rng": {
-        "draws": 2928,
-        "digest": "424111eb"
+        "draws": 2930,
+        "digest": "e04ebf37"
       }
     },
     {
@@ -450,8 +450,8 @@
       "state": "644832c3",
       "events": "741638a5",
       "rng": {
-        "draws": 3007,
-        "digest": "875b851e"
+        "draws": 3004,
+        "digest": "63039952"
       }
     },
     {
@@ -461,8 +461,8 @@
       "state": "04198af9",
       "events": "741638a5",
       "rng": {
-        "draws": 3086,
-        "digest": "8568ea0d"
+        "draws": 3089,
+        "digest": "225d26b7"
       }
     },
     {
@@ -472,8 +472,8 @@
       "state": "45eeb30b",
       "events": "741638a5",
       "rng": {
-        "draws": 3147,
-        "digest": "a7f0ab57"
+        "draws": 3153,
+        "digest": "7d6e2daa"
       }
     },
     {
@@ -483,8 +483,8 @@
       "state": "0be5723f",
       "events": "9f60c9bd",
       "rng": {
-        "draws": 3234,
-        "digest": "07eb1295"
+        "draws": 3235,
+        "digest": "93ec8b9f"
       }
     },
     {
@@ -494,8 +494,8 @@
       "state": "929c4e31",
       "events": "9f60c9bd",
       "rng": {
-        "draws": 3301,
-        "digest": "aa8717a7"
+        "draws": 3302,
+        "digest": "30b1d724"
       }
     },
     {
@@ -505,8 +505,8 @@
       "state": "d993da54",
       "events": "9f60c9bd",
       "rng": {
-        "draws": 3379,
-        "digest": "9a076fcf"
+        "draws": 3381,
+        "digest": "d0f6a0b3"
       }
     },
     {
@@ -516,8 +516,8 @@
       "state": "3e7d9303",
       "events": "57dd63b7",
       "rng": {
-        "draws": 3462,
-        "digest": "8bd856f6"
+        "draws": 3458,
+        "digest": "fa1a0a45"
       }
     },
     {
@@ -538,8 +538,8 @@
       "state": "92bf0b47",
       "events": "c2349ca4",
       "rng": {
-        "draws": 3622,
-        "digest": "ce954d63"
+        "draws": 3636,
+        "digest": "32b1a4d7"
       }
     },
     {
@@ -549,8 +549,8 @@
       "state": "feb998f3",
       "events": "fb1d2170",
       "rng": {
-        "draws": 3707,
-        "digest": "21d0025d"
+        "draws": 3724,
+        "digest": "412c7401"
       }
     },
     {
@@ -560,8 +560,8 @@
       "state": "6edc5571",
       "events": "16f5171b",
       "rng": {
-        "draws": 3776,
-        "digest": "c00ffe8f"
+        "draws": 3798,
+        "digest": "77e7caba"
       }
     },
     {
@@ -571,8 +571,8 @@
       "state": "3d657782",
       "events": "a0745c93",
       "rng": {
-        "draws": 3856,
-        "digest": "96550b0b"
+        "draws": 3879,
+        "digest": "ef72c9a0"
       }
     },
     {
@@ -582,8 +582,8 @@
       "state": "b113f1f2",
       "events": "a0745c93",
       "rng": {
-        "draws": 3943,
-        "digest": "92dea2ab"
+        "draws": 3967,
+        "digest": "8666c553"
       }
     },
     {
@@ -593,8 +593,8 @@
       "state": "fcef859e",
       "events": "a0745c93",
       "rng": {
-        "draws": 4032,
-        "digest": "b0b2341a"
+        "draws": 4059,
+        "digest": "cf35d66d"
       }
     },
     {
@@ -604,8 +604,8 @@
       "state": "1e45cd98",
       "events": "00965657",
       "rng": {
-        "draws": 4113,
-        "digest": "c4f1212e"
+        "draws": 4126,
+        "digest": "4973c5be"
       }
     },
     {
@@ -615,8 +615,8 @@
       "state": "8d5022e4",
       "events": "a49171ee",
       "rng": {
-        "draws": 4219,
-        "digest": "f55e7154"
+        "draws": 4235,
+        "digest": "c6cd3dd3"
       }
     },
     {
@@ -626,8 +626,8 @@
       "state": "cf8e93df",
       "events": "07134a04",
       "rng": {
-        "draws": 4311,
-        "digest": "797b2021"
+        "draws": 4323,
+        "digest": "a3de77c4"
       }
     },
     {
@@ -637,8 +637,8 @@
       "state": "2268578f",
       "events": "9f60c9bd",
       "rng": {
-        "draws": 4395,
-        "digest": "127ea3fb"
+        "draws": 4376,
+        "digest": "9e7ec1d2"
       }
     },
     {
@@ -648,8 +648,8 @@
       "state": "4b79485c",
       "events": "9f60c9bd",
       "rng": {
-        "draws": 4455,
-        "digest": "0daaa9e3"
+        "draws": 4434,
+        "digest": "6dd50e84"
       }
     },
     {
@@ -659,8 +659,8 @@
       "state": "1832bc87",
       "events": "741638a5",
       "rng": {
-        "draws": 4482,
-        "digest": "ddc3af3b"
+        "draws": 4470,
+        "digest": "71435c6b"
       },
       "label": "final",
       "players": [
