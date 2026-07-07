@@ -4097,6 +4097,159 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.windguard_leggings.name': 'Legíny větrné stráže',
   'entities.items.wolf_fang.name': 'Prasklý vlčí tesák',
   'entities.items.wolfhide_satchel.name': 'Brašna z vlčí kůže',
+  'entities.abilities.aspect_of_the_wild.name': 'Maska divokého tesáku',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspira a blízké spojence con fuerza salvaje, aumentando útočnou sílu durante 5 min. (lovecký talent)',
+  'entities.abilities.avatar.name': 'Kolos',
+  'entities.abilities.avatar.description':
+    'Te transforma en un coloso y aumenta útočnou sílu durante 20 s. (válečnický talent)',
+  'entities.abilities.avenging_wrath.name': 'Křídlo odplaty',
+  'entities.abilities.avenging_wrath.description':
+    'Invoca poder vengador y aumenta útočnou sílu y sílu kouzel durante 20 s. (paladinský talent)',
+  'entities.abilities.berserk.name': 'Rudý opar',
+  'entities.abilities.berserk.description':
+    'Aumenta útočnou sílu durante 15 s. (druidský talent)',
+  'entities.abilities.bladestorm.name': 'Ocelový cyklon',
+  'entities.abilities.bladestorm.description':
+    'Te convierte en una tormenta de acero que golpea a blízké nepřátele cada segundo por {damage}. (válečnický talent)',
+  'entities.abilities.blink.name': 'Mihokrok',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (mágovský talent)',
+  'entities.abilities.bloodlust.name': 'Válečné bubny',
+  'entities.abilities.bloodlust.description':
+    'Lleva a blízké spojence al frenesí y aumenta su velocidad de ataque durante 15 s. (šamanský talent)',
+  'entities.abilities.chain_lightning.name': 'Rozvětvený blesk',
+  'entities.abilities.chain_lightning.description':
+    'Lanza relámpagos al área objetivo e inflige {damage} de daño a blízké nepřátele. (šamanský talent)',
+  'entities.abilities.chaos_bolt.name': 'Zkázný šíp',
+  'entities.abilities.chaos_bolt.description':
+    'Lanza una descarga de fuego caótico que inflige {damage} de daño de Ohně. (černokněžnický talent)',
+  'entities.abilities.cloak_of_shadows.name': 'Stínoplášť',
+  'entities.abilities.cloak_of_shadows.description':
+    'Te envuelve en sombras y absorbe daño durante 5 s. (lotrovský talent)',
+  'entities.abilities.cone_of_cold.name': 'Mrazivý smyk',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a blízké nepřátele con escarcha e inflige {damage} de daño de Mrazu. (mágovský talent)',
+  'entities.abilities.counter_shot.name': 'Umlčující střela',
+  'entities.abilities.counter_shot.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (lovecký talent)',
+  'entities.abilities.counterspell.name': 'Lamač kouzel',
+  'entities.abilities.counterspell.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 6 s. (mágovský talent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Olověná kletba',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maldice a cíl y reduce su velocidad de movimiento un 30% durante 12 s. (černokněžnický talent)',
+  'entities.abilities.death_coil.name': 'Hrobová spirála',
+  'entities.abilities.death_coil.description':
+    'Golpea a cíl por {damage} de daño de Stínu y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (černokněžnický talent)',
+  'entities.abilities.deep_freeze.name': 'Mrtvý mráz',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a cíl, inflige {damage} de daño de Mrazu y lo aturde durante 4 s. (mágovský talent)',
+  'entities.abilities.desperate_prayer.name': 'Poslední modlitba',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana al instante por {damage}. (kněžský talent)',
+  'entities.abilities.deterrence.name': 'Štětinová stráž',
+  'entities.abilities.deterrence.description':
+    'Aumenta tu šanci na vyhnutí un 50% durante 10 s. (lovecký talent)',
+  'entities.abilities.divine_shield.name': 'Světelný štít',
+  'entities.abilities.divine_shield.description':
+    'Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (paladinský talent)',
+  'entities.abilities.earthbind.name': 'Svírající země',
+  'entities.abilities.earthbind.description':
+    'Ata a la tierra a blízké nepřátele y los inmoviliza durante 2 s. (šamanský talent)',
+  'entities.abilities.evocation.name': 'Éterická studna',
+  'entities.abilities.evocation.description':
+    'Restaura manu rápidamente. (mágovský talent)',
+  'entities.abilities.frenzied_regeneration.name': 'Divoké zacelení',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenera salud durante 10 s. Solo en Forma de oso. (druidský talent)',
+  'entities.abilities.frost_trap.name': 'Jinovatková léčka',
+  'entities.abilities.frost_trap.description':
+    'Congela a los nepřátele en el área objetivo durante 3 s. (lovecký talent)',
+  'entities.abilities.ghostly_strike.name': 'Přízračný úder',
+  'entities.abilities.ghostly_strike.description':
+    'Golpea a cíl por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (lotrovský talent)',
+  'entities.abilities.hammer_of_wrath.name': 'Zvonící kladivo',
+  'entities.abilities.hammer_of_wrath.description':
+    'Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Svaté magie. Solo se usa por debajo del 20% de salud. (paladinský talent)',
+  'entities.abilities.healing_stream.name': 'Pramenná studna',
+  'entities.abilities.healing_stream.description':
+    'Restaura a spřátelený cíl durante 12 s. (šamanský talent)',
+  'entities.abilities.heroic_leap.name': 'Válečný skok',
+  'entities.abilities.heroic_leap.description':
+    'Saltas al área objetivo e infliges {damage} de daño fyzického a blízké nepřátele. (válečnický talent)',
+  'entities.abilities.holy_wrath.name': 'Hněv světce',
+  'entities.abilities.holy_wrath.description':
+    'Desata poder sagrado e inflige {damage} de daño a blízké nepřátele. (paladinský talent)',
+  'entities.abilities.howl_of_terror.name': 'Děsivé zavytí',
+  'entities.abilities.howl_of_terror.description':
+    'Aterroriza a blízké nepřátele hasta 3 s. El daño puede romper el efecto. (černokněžnický talent)',
+  'entities.abilities.ice_block.name': 'Ledová rakev',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)',
+  'entities.abilities.inner_focus.name': 'Ztišená mysl',
+  'entities.abilities.inner_focus.description':
+    'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (kněžský talent)',
+  'entities.abilities.innervate.name': 'Míza života',
+  'entities.abilities.innervate.description':
+    'Restaura al instante 200 de tu aktuální zdroj. (druidský talent)',
+  'entities.abilities.kick.name': 'Kopnutí',
+  'entities.abilities.kick.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (lotrovský talent)',
+  'entities.abilities.last_stand.name': 'Jedenáctá hodina',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente Výdrž durante 15 s, aumentando la salud máxima. (válečnický talent)',
+  'entities.abilities.mend_pet.name': 'Ošetření',
+  'entities.abilities.mend_pet.description':
+    'Sana a spřátelený cíl por {damage} durante 15 s. (lovecký talent)',
+  'entities.abilities.meteor.name': 'Nebeský kámen',
+  'entities.abilities.meteor.description':
+    'Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ohně y quema el suelo. (mágovský talent)',
+  'entities.abilities.mind_sear.name': 'Spálení mysli',
+  'entities.abilities.mind_sear.description':
+    'Canaliza energía de Stínu en el área objetivo e inflige {damage} cada segundo a blízké nepřátele. (kněžský talent)',
+  'entities.abilities.multi_shot.name': 'Tříštivý výstřel',
+  'entities.abilities.multi_shot.description':
+    'Dispara varios proyectiles e inflige {damage} a blízké nepřátele. (lovecký talent)',
+  'entities.abilities.prayer_of_healing.name': 'Sborové zacelení',
+  'entities.abilities.prayer_of_healing.description':
+    'Sana a blízké spojence por {damage}. (kněžský talent)',
+  'entities.abilities.preparation.name': 'Záložní plán',
+  'entities.abilities.preparation.description':
+    'Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (lotrovský talent)',
+  'entities.abilities.presence_of_mind.name': 'Zrychlená mysl',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)',
+  'entities.abilities.psychic_scream.name': 'Výkřik hrůzy',
+  'entities.abilities.psychic_scream.description':
+    'Aterroriza a blízké nepřátele hasta 4 s. El daño puede romper el efecto. (kněžský talent)',
+  'entities.abilities.pummel.name': 'Drtivá rána',
+  'entities.abilities.pummel.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (válečnický talent)',
+  'entities.abilities.rallying_cry.name': 'Svolání',
+  'entities.abilities.rallying_cry.description':
+    'Lanza un grito de reunión y aumenta útočnou sílu de blízké spojence durante 10 s. (válečnický talent)',
+  'entities.abilities.rebuke.name': 'Pokárání',
+  'entities.abilities.rebuke.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (paladinský talent)',
+  'entities.abilities.shadowstep.name': 'Stínový skluz',
+  'entities.abilities.shadowstep.description':
+    'Das un paso entre las sombras hacia tu cíl. (lotrovský talent)',
+  'entities.abilities.shield_wall.name': 'Bašta',
+  'entities.abilities.shield_wall.description':
+    'Alzas un muro de escudo y aumentas mucho la zbroj durante 10 s. (válečnický talent)',
+  'entities.abilities.silence.name': 'Umlčení',
+  'entities.abilities.silence.description':
+    'Silencia a cíl durante 4 s. (kněžský talent)',
+  'entities.abilities.skull_bash.name': 'Čelní úder',
+  'entities.abilities.skull_bash.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (druidský talent)',
+  'entities.abilities.spell_lock.name': 'Rozkaz umlčení',
+  'entities.abilities.spell_lock.description':
+    'Přeruší sesílání a zabrání kouzlům dané školy na 5 s. (černokněžnický talent)',
+  'entities.abilities.tranquility.name': 'Píseň háje',
+  'entities.abilities.tranquility.description':
+    'Canaliza energía restauradora y sana a blízké spojence cada segundo. (druidský talent)',
   'entities.items.worn_sword.name': 'Zubatý krátký meč',
   'entities.items.woven_robe.name': 'Údolně tkané roucho',
   'entities.items.wyrmcult_grand_robe.name': 'Velké roucho kultu draka',

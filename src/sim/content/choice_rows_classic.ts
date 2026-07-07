@@ -69,7 +69,7 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'war_r8_pummel',
-          name: 'Pummel',
+          name: 'Jawcrack',
           description: 'Interrupt spellcasting for a 4 sec school lockout. Costs 10 rage.',
           icon: 'pummel',
           effect: { grant: { ability: 'pummel' } },
