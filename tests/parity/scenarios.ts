@@ -3500,6 +3500,8 @@ function c4bEffectDispatch(): Scenario {
       rec.snapshot('warlock-summon');
 
       // --- warrior: sunder_armor (sunder miss rng.chance + threat) ---
+      // Armor Shear is spec-gated (arms/prot); commit prot so it stays known.
+      sim.setSpec('prot', warrior);
       const mobW = dummy(eWarrior);
       face(eWarrior, mobW);
       sim.targetEntity(mobW.id, warrior);
