@@ -26,6 +26,7 @@ export const DRAKELANDS_ZONE: ZoneDef = {
   levelRange: [16, 20],
   biome: 'ember',
   southPassX: 44, // the Wyrmgate: where the causeway road crosses the border ridge
+  westPassZ: 1700, // the Snowline, turned sideways: ash meets ice at the column border
   hub: { x: 44, z: 1520, radius: 24, name: 'Wyrmwatch' },
   graveyard: { x: 62, z: 1505 },
   lakes: [
@@ -80,6 +81,12 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: -10, z: 1975 },
     { x: -10, z: 2042 },
   ], // the dune fork -> the Snowline pass, west of the Drakemaw
+  [
+    { x: -30, z: 1720 },
+    { x: -90, z: 1706 },
+    { x: -150, z: 1700 },
+    { x: -176, z: 1700 },
+  ], // the Cinder Dunes -> west to the Snowline crossing (fire meets ice)
 ];
 
 // Content fill (creatures, folk, quests) lands in a follow-up pass; the

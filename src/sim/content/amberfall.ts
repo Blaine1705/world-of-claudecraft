@@ -21,28 +21,28 @@ import { emptyZoneProps } from '../types';
 export const AMBERFALL_ZONE: ZoneDef = {
   id: 'amberfall',
   name: 'The Amberfall',
-  zMin: 2560,
-  zMax: 3120,
+  zMin: 2040,
+  zMax: 2600,
   levelRange: [18, 20],
   biome: 'amber',
-  southPassX: 10, // the Goldmelt: where the snow road melts into autumn
-  hub: { x: 0, z: 2812, radius: 24, name: 'Lanternmere' },
-  graveyard: { x: 24, z: 2790 },
+  southPassX: -10, // the Goldmelt: where the waste road cools into autumn
+  hub: { x: 0, z: 2292, radius: 24, name: 'Lanternmere' },
+  graveyard: { x: 24, z: 2270 },
   lakes: [
-    { x: 0, z: 2872, radius: 26 }, // the Great Mere
-    { x: 28, z: 2886, radius: 14 }, // ...its reeded eastern reach
-    { x: -30, z: 2884, radius: 13 }, // ...and the willow-shaded west
-    { x: -84, z: 2742, radius: 10 }, // the Orchard Pool
-    { x: 96, z: 2986, radius: 9 }, // the Monolith tarn
+    { x: 0, z: 2352, radius: 26 }, // the Great Mere
+    { x: 28, z: 2366, radius: 14 }, // ...its reeded eastern reach
+    { x: -30, z: 2364, radius: 13 }, // ...and the willow-shaded west
+    { x: -84, z: 2222, radius: 10 }, // the Orchard Pool
+    { x: 96, z: 2466, radius: 9 }, // the Monolith tarn
   ],
   pois: [
-    { x: 0, z: 2812, label: 'Lanternmere' },
-    { x: 10, z: 2588, label: 'The Goldmelt' },
-    { x: -72, z: 2732, label: 'The Gilded Orchard' },
-    { x: 70, z: 2700, label: 'Harvest Hollow' },
-    { x: 0, z: 2872, label: 'The Great Mere' },
-    { x: -70, z: 2950, label: 'Cindermaple Rise' },
-    { x: 84, z: 2970, label: 'The Leaning Monolith' },
+    { x: 0, z: 2292, label: 'Lanternmere' },
+    { x: 10, z: 2068, label: 'The Goldmelt' },
+    { x: -72, z: 2212, label: 'The Gilded Orchard' },
+    { x: 70, z: 2180, label: 'Harvest Hollow' },
+    { x: 0, z: 2352, label: 'The Great Mere' },
+    { x: -70, z: 2430, label: 'Cindermaple Rise' },
+    { x: 84, z: 2450, label: 'The Leaning Monolith' },
   ],
   welcome:
     'Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.',
@@ -50,38 +50,38 @@ export const AMBERFALL_ZONE: ZoneDef = {
 
 export const AMBERFALL_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 10, z: 2558 },
-    { x: 0, z: 2620 },
-    { x: -14, z: 2770 },
-    { x: 0, z: 2812 },
+    { x: -10, z: 2038 },
+    { x: -6, z: 2100 },
+    { x: -14, z: 2250 },
+    { x: 0, z: 2292 },
   ], // the Goldmelt pass -> Lanternmere
   [
-    { x: -12, z: 2790 },
-    { x: -50, z: 2760 },
-    { x: -72, z: 2734 },
+    { x: -12, z: 2270 },
+    { x: -50, z: 2240 },
+    { x: -72, z: 2214 },
   ], // Lanternmere -> the Gilded Orchard's edge
   [
-    { x: 12, z: 2790 },
-    { x: 45, z: 2740 },
-    { x: 70, z: 2700 },
+    { x: 12, z: 2270 },
+    { x: 45, z: 2220 },
+    { x: 70, z: 2180 },
   ], // Lanternmere -> Harvest Hollow
   [
-    { x: -14, z: 2830 },
-    { x: -58, z: 2886 },
-    { x: -70, z: 2950 },
+    { x: -14, z: 2310 },
+    { x: -58, z: 2366 },
+    { x: -70, z: 2430 },
   ], // Lanternmere -> Cindermaple Rise, west of the Mere
   [
-    { x: 16, z: 2832 },
-    { x: 58, z: 2910 },
-    { x: 88, z: 2966 },
+    { x: 16, z: 2312 },
+    { x: 58, z: 2390 },
+    { x: 88, z: 2446 },
   ], // Lanternmere -> the Leaning Monolith, east of the Mere
   [
-    { x: -14, z: 2830 },
-    { x: -44, z: 2848 },
-    { x: -52, z: 2920 },
-    { x: -24, z: 2990 },
-    { x: -20, z: 3040 },
-    { x: -20, z: 3122 },
+    { x: -14, z: 2310 },
+    { x: -44, z: 2328 },
+    { x: -52, z: 2400 },
+    { x: -24, z: 2470 },
+    { x: -20, z: 2520 },
+    { x: -20, z: 2602 },
   ], // Lanternmere -> west around the Mere -> the Amberfen Steps
 ];
 
@@ -191,13 +191,13 @@ export const AMBERFALL_QUESTS: Record<string, QuestDef> = {};
 export const AMBERFALL_QUEST_ORDER: string[] = [];
 export const AMBERFALL_ITEMS: Record<string, ItemDef> = {};
 export const AMBERFALL_CAMPS: CampDef[] = [
-  { mobId: 'gilded_stag', center: { x: 60, z: 2716 }, radius: 12, count: 3 },
-  { mobId: 'gilded_stag', center: { x: -60, z: 2760 }, radius: 11, count: 2 },
-  { mobId: 'gloam_fox', center: { x: 30, z: 2770 }, radius: 10, count: 2 },
-  { mobId: 'harvest_sprite', center: { x: -76, z: 2724 }, radius: 10, count: 3 },
-  { mobId: 'orchard_treant', center: { x: -66, z: 2942 }, radius: 9, count: 2 },
-  { mobId: 'mere_lurker', center: { x: 48, z: 2898 }, radius: 8, count: 2 },
-  { mobId: 'mere_lurker', center: { x: 90, z: 2976 }, radius: 8, count: 2 },
+  { mobId: 'gilded_stag', center: { x: 60, z: 2196 }, radius: 12, count: 3 },
+  { mobId: 'gilded_stag', center: { x: -60, z: 2240 }, radius: 11, count: 2 },
+  { mobId: 'gloam_fox', center: { x: 30, z: 2250 }, radius: 10, count: 2 },
+  { mobId: 'harvest_sprite', center: { x: -76, z: 2204 }, radius: 10, count: 3 },
+  { mobId: 'orchard_treant', center: { x: -66, z: 2422 }, radius: 9, count: 2 },
+  { mobId: 'mere_lurker', center: { x: 48, z: 2378 }, radius: 8, count: 2 },
+  { mobId: 'mere_lurker', center: { x: 78, z: 2446 }, radius: 8, count: 2 },
 ];
 export const AMBERFALL_OBJECTS: GroundObjectDef[] = [];
 
@@ -205,31 +205,31 @@ export const AMBERFALL_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Lanternmere: an autumn market town on the Mere's north shore
   buildings: [
-    { kind: 'inn', x: -12, z: 2806, w: 6, d: 7, rot: 0.6 },
-    { kind: 'house', x: 12, z: 2802, w: 6, d: 6, rot: -0.8 },
-    { kind: 'house', x: -14, z: 2824, w: 6, d: 6, rot: 2.0 },
-    { kind: 'chapel', x: 14, z: 2822, w: 5, d: 7, rot: -2.2 },
+    { kind: 'inn', x: -12, z: 2286, w: 6, d: 7, rot: 0.6 },
+    { kind: 'house', x: 12, z: 2282, w: 6, d: 6, rot: -0.8 },
+    { kind: 'house', x: -14, z: 2304, w: 6, d: 6, rot: 2.0 },
+    { kind: 'chapel', x: 14, z: 2302, w: 5, d: 7, rot: -2.2 },
   ],
-  wells: [{ x: 0, z: 2814, r: 1.5 }],
+  wells: [{ x: 0, z: 2294, r: 1.5 }],
   stalls: [
-    { x: 6, z: 2808, rot: 0.4, r: 1.6 },
-    { x: -6, z: 2820, rot: -1.4, r: 1.6 },
+    { x: 6, z: 2288, rot: 0.4, r: 1.6 },
+    { x: -6, z: 2300, rot: -1.4, r: 1.6 },
   ],
   fences: [
-    { x1: -18, z1: 2798, x2: -8, z2: 2794 },
-    { x1: 8, z1: 2828, x2: 18, z2: 2830 },
+    { x1: -18, z1: 2278, x2: -8, z2: 2274 },
+    { x1: 8, z1: 2308, x2: 18, z2: 2310 },
   ],
   // the Goldmelt shrine: column rings flanking the pass, statue-lined, so
   // the crossing reads as a gilded threshold between snow and autumn
   ruinRings: [
-    { x: 22, z: 2592, ringR: 7, columns: 6 },
-    { x: -4, z: 2578, ringR: 5, columns: 5 },
-    { x: 10, z: 2612, ringR: 4, columns: 4 },
+    { x: 22, z: 2072, ringR: 7, columns: 6 },
+    { x: -4, z: 2058, ringR: 5, columns: 5 },
+    { x: 10, z: 2092, ringR: 4, columns: 4 },
   ],
   campfires: [
-    [0, 2808],
-    [8, 2585],
-    [22, 2592],
-    [-4, 2578],
+    [0, 2288],
+    [8, 2065],
+    [22, 2072],
+    [-4, 2058],
   ],
 };

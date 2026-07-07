@@ -27,25 +27,25 @@ import { emptyZoneProps } from '../types';
 export const EVERGARDEN_ZONE: ZoneDef = {
   id: 'evergarden',
   name: 'The Evergarden',
-  zMin: 5320,
-  zMax: 5880,
+  zMin: 3680,
+  zMax: 4240,
   levelRange: [20, 20],
   biome: 'garden',
-  southPassX: 50, // the Garden Gate: where the beach road meets the lawns
-  hub: { x: -40, z: 5430, radius: 16, name: 'Hedgewick' },
-  graveyard: { x: -58, z: 5412 },
+  southPassX: 30, // the Garden Gate: where the dream road meets the lawns
+  hub: { x: -40, z: 3790, radius: 16, name: 'Hedgewick' },
+  graveyard: { x: -58, z: 3772 },
   lakes: [
-    { x: 80, z: 5470, radius: 11 }, // the Petal Pond
-    { x: -20, z: 5790, radius: 10 }, // the Lily Basin
+    { x: 80, z: 3830, radius: 11 }, // the Petal Pond
+    { x: -20, z: 4150, radius: 10 }, // the Lily Basin
   ],
   pois: [
-    { x: -40, z: 5430, label: 'Hedgewick' },
-    { x: 50, z: 5352, label: 'The Garden Gate' },
-    { x: 0, z: 5495, label: 'The Statuary Walk' },
-    { x: -90, z: 5530, label: 'The Rose Wilds' },
-    { x: 80, z: 5470, label: 'The Petal Pond' },
-    { x: 0, z: 5566, label: 'The Great Maze' },
-    { x: 0, z: 5636, label: 'The Fountain Court' },
+    { x: -40, z: 3790, label: 'Hedgewick' },
+    { x: 50, z: 3712, label: 'The Garden Gate' },
+    { x: 0, z: 3855, label: 'The Statuary Walk' },
+    { x: -90, z: 3890, label: 'The Rose Wilds' },
+    { x: 80, z: 3830, label: 'The Petal Pond' },
+    { x: 0, z: 3926, label: 'The Great Maze' },
+    { x: 0, z: 3996, label: 'The Fountain Court' },
   ],
   welcome:
     'Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.',
@@ -53,35 +53,36 @@ export const EVERGARDEN_ZONE: ZoneDef = {
 
 export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 50, z: 5328 },
-    { x: 36, z: 5372 },
-    { x: -2, z: 5404 },
-    { x: -40, z: 5430 },
+    { x: 30, z: 3688 },
+    { x: 28, z: 3732 },
+    { x: -2, z: 3764 },
+    { x: -40, z: 3790 },
   ], // the Garden Gate -> Hedgewick
   [
-    { x: -40, z: 5430 },
-    { x: -16, z: 5464 },
-    { x: 0, z: 5495 },
-    { x: 0, z: 5546 },
+    { x: -40, z: 3790 },
+    { x: -16, z: 3824 },
+    { x: 0, z: 3855 },
+    { x: 0, z: 3906 },
   ], // Hedgewick -> the Statuary Walk -> the maze mouth
   [
-    { x: -40, z: 5430 },
-    { x: -62, z: 5472 },
-    { x: -84, z: 5514 },
+    { x: -40, z: 3790 },
+    { x: -62, z: 3832 },
+    { x: -84, z: 3874 },
   ], // Hedgewick -> the Rose Wilds
   [
-    { x: -40, z: 5430 },
-    { x: 6, z: 5438 },
-    { x: 48, z: 5452 },
-    { x: 62, z: 5455 },
+    { x: -40, z: 3790 },
+    { x: 6, z: 3798 },
+    { x: 48, z: 3812 },
+    { x: 62, z: 3815 },
   ], // Hedgewick -> the Petal Pond's west shore
   [
-    { x: 62, z: 5455 },
-    { x: 94, z: 5540 },
-    { x: 98, z: 5640 },
-    { x: 80, z: 5730 },
-    { x: 36, z: 5782 },
-    { x: -8, z: 5790 },
+    { x: 62, z: 3815 },
+    { x: 60, z: 3858 },
+    { x: 94, z: 3900 },
+    { x: 98, z: 4000 },
+    { x: 80, z: 4090 },
+    { x: 36, z: 4142 },
+    { x: -8, z: 4150 },
   ], // the pond -> the long east walk around the maze -> the Lily Basin
 ] as { x: number; z: number }[][];
 
@@ -169,13 +170,13 @@ export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {};
 export const EVERGARDEN_QUEST_ORDER: string[] = [];
 export const EVERGARDEN_ITEMS: Record<string, ItemDef> = {};
 export const EVERGARDEN_CAMPS: CampDef[] = [
-  { mobId: 'topiary_stag', center: { x: 4, z: 5518 }, radius: 10, count: 3 },
-  { mobId: 'topiary_stag', center: { x: -34, z: 5766 }, radius: 10, count: 3 },
-  { mobId: 'topiary_wolf', center: { x: -88, z: 5532 }, radius: 10, count: 3 },
-  { mobId: 'topiary_wolf', center: { x: 58, z: 5744 }, radius: 10, count: 3 },
-  { mobId: 'hedge_gnome', center: { x: -92, z: 5622 }, radius: 10, count: 3 },
-  { mobId: 'hedge_gnome', center: { x: 96, z: 5562 }, radius: 10, count: 2 },
-  { mobId: 'the_topiary_bull', center: { x: 0, z: 5636 }, radius: 5, count: 1 },
+  { mobId: 'topiary_stag', center: { x: 4, z: 3878 }, radius: 10, count: 3 },
+  { mobId: 'topiary_stag', center: { x: -34, z: 4126 }, radius: 10, count: 3 },
+  { mobId: 'topiary_wolf', center: { x: -88, z: 3892 }, radius: 10, count: 3 },
+  { mobId: 'topiary_wolf', center: { x: 58, z: 4104 }, radius: 10, count: 3 },
+  { mobId: 'hedge_gnome', center: { x: -92, z: 3982 }, radius: 10, count: 3 },
+  { mobId: 'hedge_gnome', center: { x: 96, z: 3922 }, radius: 10, count: 2 },
+  { mobId: 'the_topiary_bull', center: { x: 0, z: 3996 }, radius: 5, count: 1 },
 ];
 export const EVERGARDEN_OBJECTS: GroundObjectDef[] = [];
 
@@ -183,40 +184,40 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Hedgewick: the groundskeepers' hamlet by the gate lawns
   buildings: [
-    { kind: 'inn', x: -48, z: 5424, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: -32, z: 5438, w: 5, d: 5, rot: -1.0 },
-    { kind: 'house', x: -46, z: 5440, w: 5, d: 5, rot: 2.1 },
+    { kind: 'inn', x: -48, z: 3784, w: 6, d: 7, rot: 0.7 },
+    { kind: 'house', x: -32, z: 3798, w: 5, d: 5, rot: -1.0 },
+    { kind: 'house', x: -46, z: 3800, w: 5, d: 5, rot: 2.1 },
   ],
-  wells: [{ x: -40, z: 5432, r: 1.5 }],
-  stalls: [{ x: -36, z: 5424, rot: 0.5, r: 1.6 }],
+  wells: [{ x: -40, z: 3792, r: 1.5 }],
+  stalls: [{ x: -36, z: 3784, rot: 0.5, r: 1.6 }],
   crates: [
-    [-51, 5430],
-    [-33, 5430],
+    [-51, 3790],
+    [-33, 3790],
   ],
   campfires: [
-    [-40, 5426],
-    [48, 5342], // the Garden Gate's waycamp
+    [-40, 3786],
+    [28, 3696], // the Garden Gate's waycamp
   ],
   fences: [
     // trimmed border hedgerows read as fence lines around the hamlet
-    { x1: -54, z1: 5416, x2: -26, z2: 5416 },
-    { x1: -54, z1: 5446, x2: -26, z2: 5446 },
+    { x1: -54, z1: 3776, x2: -26, z2: 3776 },
+    { x1: -54, z1: 3806, x2: -26, z2: 3806 },
   ],
   // the Statuary Walk's marble colonnade, and a folly on the north lawn
   ruinRings: [
-    { x: 0, z: 5495, ringR: 7, columns: 6 },
-    { x: 40, z: 5802, ringR: 6, columns: 5 },
+    { x: 0, z: 3855, ringR: 7, columns: 6 },
+    { x: 40, z: 4162, ringR: 6, columns: 5 },
   ],
   // the gardener's own plot, unweeded and unnamed
-  graveyards: [{ x: -62, z: 5416 }],
+  graveyards: [{ x: -62, z: 3776 }],
   // The specimen elders on the lawns: solid trunk colliders in the sim,
   // evergreen crowns drawn by render/garden_features.ts. Kept off every
   // road and clear of the maze.
   greatTrees: [
-    { x: -96, z: 5470, r: 2.8 },
-    { x: 30, z: 5522, r: 2.6 },
-    { x: -44, z: 5742, r: 3.0 },
-    { x: 102, z: 5688, r: 2.6 },
-    { x: -116, z: 5654, r: 2.6 },
+    { x: -96, z: 3830, r: 2.8 },
+    { x: 30, z: 3882, r: 2.6 },
+    { x: -44, z: 4102, r: 3.0 },
+    { x: 102, z: 4048, r: 2.6 },
+    { x: -116, z: 4014, r: 2.6 },
   ],
 };

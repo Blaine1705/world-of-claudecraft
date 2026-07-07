@@ -25,26 +25,26 @@ import { emptyZoneProps } from '../types';
 export const GALECREST_ZONE: ZoneDef = {
   id: 'galecrest',
   name: 'The Galecrest',
-  zMin: 3120,
-  zMax: 3640,
+  zMin: 2600,
+  zMax: 3120,
   xMin: 180,
   xMax: 540,
   levelRange: [20, 20],
   biome: 'gale',
-  westPassZ: 3380, // the Windway: where the fen road climbs into the wind
-  hub: { x: 420, z: 3300, radius: 16, name: 'Wickharbor' },
-  graveyard: { x: 404, z: 3284 },
+  westPassZ: 2860, // the Windway: where the fen road climbs into the wind
+  hub: { x: 420, z: 2780, radius: 16, name: 'Wickharbor' },
+  graveyard: { x: 404, z: 2764 },
   lakes: [
-    { x: 300, z: 3500, radius: 10 }, // the Mirror Tarn, up on the downs
+    { x: 300, z: 2980, radius: 10 }, // the Mirror Tarn, up on the downs
   ],
   pois: [
-    { x: 420, z: 3300, label: 'Wickharbor' },
-    { x: 200, z: 3380, label: 'The Windway' },
-    { x: 280, z: 3260, label: 'The Howling Downs' },
-    { x: 498, z: 3248, label: 'The Old Beacon' },
-    { x: 455, z: 3475, label: 'The Shear' },
-    { x: 340, z: 3585, label: 'The Wreckfields' },
-    { x: 300, z: 3500, label: 'The Mirror Tarn' },
+    { x: 420, z: 2780, label: 'Wickharbor' },
+    { x: 200, z: 2860, label: 'The Windway' },
+    { x: 280, z: 2740, label: 'The Howling Downs' },
+    { x: 498, z: 2728, label: 'The Old Beacon' },
+    { x: 455, z: 2955, label: 'The Shear' },
+    { x: 340, z: 3065, label: 'The Wreckfields' },
+    { x: 300, z: 2980, label: 'The Mirror Tarn' },
   ],
   welcome:
     'The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.',
@@ -52,34 +52,39 @@ export const GALECREST_ZONE: ZoneDef = {
 
 export const GALECREST_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 186, z: 3380 },
-    { x: 240, z: 3352 },
-    { x: 300, z: 3318 },
-    { x: 360, z: 3302 },
-    { x: 420, z: 3300 },
+    { x: 186, z: 2860 },
+    { x: 240, z: 2832 },
+    { x: 300, z: 2798 },
+    { x: 360, z: 2782 },
+    { x: 420, z: 2780 },
   ], // the Windway -> across the downs -> Wickharbor
   [
-    { x: 420, z: 3300 },
-    { x: 458, z: 3272 },
-    { x: 492, z: 3252 },
+    { x: 420, z: 2780 },
+    { x: 458, z: 2752 },
+    { x: 492, z: 2732 },
   ], // Wickharbor -> the Old Beacon
   [
-    { x: 420, z: 3300 },
-    { x: 432, z: 3380 },
-    { x: 446, z: 3452 },
-    { x: 410, z: 3528 },
-    { x: 352, z: 3576 },
+    { x: 420, z: 2780 },
+    { x: 432, z: 2860 },
+    { x: 446, z: 2932 },
+    { x: 410, z: 3008 },
+    { x: 352, z: 3056 },
   ], // Wickharbor -> above the Shear -> the Wreckfields
   [
-    { x: 420, z: 3300 },
-    { x: 352, z: 3282 },
-    { x: 296, z: 3264 },
+    { x: 420, z: 2780 },
+    { x: 352, z: 2762 },
+    { x: 296, z: 2744 },
   ], // Wickharbor -> the Howling Downs
   [
-    { x: 432, z: 3380 },
-    { x: 372, z: 3428 },
-    { x: 316, z: 3478 },
+    { x: 432, z: 2860 },
+    { x: 372, z: 2908 },
+    { x: 316, z: 2958 },
   ], // the cliff road -> up to the Mirror Tarn
+  [
+    { x: 352, z: 3056 },
+    { x: 374, z: 3086 },
+    { x: 390, z: 3116 },
+  ], // the Wreckfields -> up the Crowgate climb (into the wood)
 ] as { x: number; z: number }[][];
 
 // No portals: walked into through the Windway.
@@ -166,13 +171,13 @@ export const GALECREST_QUESTS: Record<string, QuestDef> = {};
 export const GALECREST_QUEST_ORDER: string[] = [];
 export const GALECREST_ITEMS: Record<string, ItemDef> = {};
 export const GALECREST_CAMPS: CampDef[] = [
-  { mobId: 'moor_ram', center: { x: 292, z: 3252 }, radius: 11, count: 3 },
-  { mobId: 'moor_ram', center: { x: 252, z: 3310 }, radius: 10, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 302, z: 3462 }, radius: 11, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 366, z: 3510 }, radius: 10, count: 3 },
-  { mobId: 'shoal_scuttler', center: { x: 444, z: 3378 }, radius: 10, count: 3 },
-  { mobId: 'shoal_scuttler', center: { x: 386, z: 3562 }, radius: 9, count: 2 },
-  { mobId: 'the_wreck_warden', center: { x: 340, z: 3588 }, radius: 5, count: 1 },
+  { mobId: 'moor_ram', center: { x: 292, z: 2732 }, radius: 11, count: 3 },
+  { mobId: 'moor_ram', center: { x: 262, z: 2780 }, radius: 10, count: 3 },
+  { mobId: 'gale_wisp', center: { x: 302, z: 2942 }, radius: 11, count: 3 },
+  { mobId: 'gale_wisp', center: { x: 366, z: 2990 }, radius: 10, count: 3 },
+  { mobId: 'shoal_scuttler', center: { x: 444, z: 2858 }, radius: 10, count: 3 },
+  { mobId: 'shoal_scuttler', center: { x: 386, z: 3042 }, radius: 9, count: 2 },
+  { mobId: 'the_wreck_warden', center: { x: 330, z: 3058 }, radius: 5, count: 1 },
 ];
 export const GALECREST_OBJECTS: GroundObjectDef[] = [];
 
@@ -180,34 +185,34 @@ export const GALECREST_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Wickharbor: a fishing town in the lee of the harbor cove
   buildings: [
-    { kind: 'inn', x: 412, z: 3292, w: 6, d: 7, rot: 0.4 },
-    { kind: 'house', x: 428, z: 3308, w: 5, d: 5, rot: -1.2 },
-    { kind: 'house', x: 410, z: 3310, w: 5, d: 5, rot: 2.2 },
+    { kind: 'inn', x: 412, z: 2772, w: 6, d: 7, rot: 0.4 },
+    { kind: 'house', x: 428, z: 2788, w: 5, d: 5, rot: -1.2 },
+    { kind: 'house', x: 410, z: 2790, w: 5, d: 5, rot: 2.2 },
   ],
-  wells: [{ x: 420, z: 3302, r: 1.5 }],
+  wells: [{ x: 420, z: 2782, r: 1.5 }],
   stalls: [
-    { x: 426, z: 3294, rot: 0.6, r: 1.6 },
-    { x: 414, z: 3300, rot: -1.4, r: 1.6 },
+    { x: 426, z: 2774, rot: 0.6, r: 1.6 },
+    { x: 414, z: 2780, rot: -1.4, r: 1.6 },
   ],
   crates: [
-    [432, 3296],
-    [408, 3298],
+    [432, 2776],
+    [408, 2778],
   ],
   campfires: [
-    [420, 3296],
-    [196, 3374], // the Windway's waycamp
+    [420, 2776],
+    [196, 2854], // the Windway's waycamp
   ],
   // the harbor: a working dock running into the cove east of town
-  docks: [{ x: 436, z: 3312, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
+  docks: [{ x: 436, z: 2792, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
   fences: [
     // windbreak lines, the only fences that matter here
-    { x1: 406, z1: 3286, x2: 434, z2: 3286 },
-    { x1: 406, z1: 3316, x2: 434, z2: 3316 },
+    { x1: 406, z1: 2766, x2: 434, z2: 2766 },
+    { x1: 406, z1: 2796, x2: 434, z2: 2796 },
   ],
   // an old watch ruin on the Howling Downs, and the beacon's fallen forecourt
   ruinRings: [
-    { x: 288, z: 3268, ringR: 7, columns: 5 },
-    { x: 492, z: 3256, ringR: 6, columns: 4 },
+    { x: 288, z: 2748, ringR: 7, columns: 5 },
+    { x: 492, z: 2736, ringR: 6, columns: 4 },
   ],
-  graveyards: [{ x: 400, z: 3282 }],
+  graveyards: [{ x: 400, z: 2762 }],
 };

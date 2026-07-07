@@ -25,29 +25,26 @@ describe('Veiled Hollow zone registration', () => {
     // the Drakelands tile against its north edge, the Frostveil past them.
     expect(ZONES[3].id).toBe('veiled_hollow');
     expect(ZONES[3].zMin).toBe(900);
-    expect(ZONES[4].id).toBe('drakelands');
-    expect(ZONES[4].zMin).toBe(ZONES[3].zMax);
-    expect(ZONES[5].id).toBe('frostveil');
-    expect(ZONES[5].zMin).toBe(ZONES[4].zMax);
-    expect(ZONES[6].id).toBe('amberfall');
-    expect(ZONES[6].zMin).toBe(ZONES[5].zMax);
-    expect(ZONES[7].id).toBe('willowfen');
-    expect(ZONES[7].zMin).toBe(ZONES[6].zMax);
-    expect(ZONES[8].id).toBe('nightbloom');
-    expect(ZONES[8].zMin).toBe(ZONES[7].zMax);
-    expect(ZONES[9].id).toBe('wraithwood');
-    expect(ZONES[9].zMin).toBe(ZONES[8].zMax);
-    expect(ZONES[10].id).toBe('palmreach');
-    expect(ZONES[10].zMin).toBe(ZONES[9].zMax);
-    expect(ZONES[11].id).toBe('evergarden');
-    expect(ZONES[11].zMin).toBe(ZONES[10].zMax);
+    // the continent: the strip column stacks vale to garden; the columns
+    // sit beside their rows (fire and ice, dream and nightmare, and so on)
+    const byId = (id: string) => ZONES.find((zn) => zn.id === id)!;
+    expect(byId('drakelands').zMin).toBe(ZONES[3].zMax);
+    expect(byId('frostveil').xMax).toBe(-180); // west of the Drakelands
+    expect(byId('frostveil').zMin).toBe(1440);
+    expect(byId('amberfall').zMin).toBe(byId('drakelands').zMax);
+    expect(byId('willowfen').zMin).toBe(byId('amberfall').zMax);
+    expect(byId('galecrest').xMin).toBe(180); // east of the Willowfen
+    expect(byId('nightbloom').zMin).toBe(byId('willowfen').zMax);
+    expect(byId('wraithwood').xMin).toBe(180); // east of the Nightbloom
+    expect(byId('palmreach').xMax).toBe(-180); // west of the Nightbloom
+    expect(byId('evergarden').zMin).toBe(byId('nightbloom').zMax);
     // append order is rng-stream order, not stack order, since the grid:
     // the world's north end is the MAX zMax over all zones
     expect(WORLD_MAX_Z).toBe(Math.max(...ZONES.map((zn) => zn.zMax)));
     expect(zoneAt(0, 1000).id).toBe('veiled_hollow');
     expect(zoneAt(0, 899).id).toBe('thornpeak_heights');
     expect(zoneAt(0, 1500).id).toBe('drakelands');
-    expect(zoneAt(0, 2100).id).toBe('frostveil');
+    expect(zoneAt(-360, 1700).id).toBe('frostveil');
   });
 
   it('declares its southern border sealed', () => {

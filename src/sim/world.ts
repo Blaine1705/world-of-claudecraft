@@ -300,6 +300,8 @@ const EMBER_LAND_LOBES = [
   { x: 90, z: 2020, r: 70 }, // the rim belt, wide under the sealed range
   { x: -90, z: 2020, r: 70 },
   { x: 0, z: 2030, r: 80 },
+  { x: -118, z: 1700, r: 42 }, // the Snowline crossing's waste-side shoulder
+  { x: -152, z: 1700, r: 40 }, // ...carried to the column border
 ] as const;
 const EMBER_BAYS = [
   { x: -165, z: 1600, r: 50 }, // the west bight
@@ -317,26 +319,33 @@ export function emberLandness(x: number, z: number): number {
 // benches (frost shaping below), and the north coast meets the world's edge
 // sea like the Hollow's does.
 // ---------------------------------------------------------------------------
-const FROST_ZMAX = 2560; // keep in sync with FROSTVEIL_ZONE.zMax
+const FROST_ZMAX = 1960; // keep in sync with FROSTVEIL_ZONE.zMax (west column)
 const FROST_LAND_LOBES = [
-  { x: 0, z: 2060, r: 95 }, // the south rim: Heartfrost Cavern's shelf
-  { x: -120, z: 2075, r: 60 }, // western wall footing
-  { x: 120, z: 2075, r: 60 }, // eastern wall footing
-  { x: 0, z: 2100, r: 85 }, // the rim benches
-  { x: -40, z: 2230, r: 90 }, // the Icemantle massif
-  { x: -30, z: 2158, r: 45 }, // the town shelf under Icemantle itself
-  { x: 80, z: 2200, r: 75 }, // Glacier Tarn's shoulder
-  { x: 30, z: 2270, r: 65 }, // the inner valley joining the tarn to the Steps
-  { x: 20, z: 2350, r: 95 }, // the Aurora Steps
-  { x: -100, z: 2320, r: 70 }, // the Shiverfen shelf
-  { x: 120, z: 2390, r: 65 }, // the Howling Terraces
-  { x: 0, z: 2470, r: 80 }, // the north crown
-  { x: 10, z: 2545, r: 50 }, // the Goldmelt corridor's south footing
+  { x: -360, z: 1460, r: 95 }, // the south rim: Heartfrost Cavern's shelf
+  { x: -480, z: 1475, r: 60 }, // western wall footing
+  { x: -240, z: 1475, r: 60 }, // eastern wall footing
+  { x: -360, z: 1500, r: 85 }, // the rim benches
+  { x: -400, z: 1630, r: 90 }, // the Icemantle massif
+  { x: -390, z: 1558, r: 45 }, // the town shelf under Icemantle itself
+  { x: -280, z: 1600, r: 75 }, // Glacier Tarn's shoulder
+  { x: -330, z: 1670, r: 65 }, // the inner valley joining the tarn to the Steps
+  { x: -340, z: 1750, r: 95 }, // the Aurora Steps
+  { x: -460, z: 1720, r: 70 }, // the Shiverfen shelf
+  { x: -240, z: 1790, r: 65 }, // the Howling Terraces
+  { x: -360, z: 1870, r: 80 }, // the north crown
+  { x: -350, z: 1945, r: 50 }, // the Goldmelt corridor's south footing
+  { x: -214, z: 1700, r: 44 }, // the Snowline crossing's ice-side shoulder
+  { x: -252, z: 1700, r: 42 }, // ...rising onto the benches
+  { x: -306, z: 1638, r: 42 }, // the crossing road's bench shoulder
+  { x: -262, z: 1672, r: 40 }, // ...stepping down toward the border
+  { x: -274, z: 1824, r: 42 }, // the terrace road's north shoulder
+  { x: -318, z: 1674, r: 40 }, // the tarn road's southern loop
+  { x: -282, z: 1694, r: 38 }, // ...meeting the crossing shoulder
 ] as const;
 const FROST_BAYS = [
-  { x: 165, z: 2260, r: 55 }, // the east sound
-  { x: -165, z: 2180, r: 50 }, // the west inlet
-  { x: 60, z: 2545, r: 50 }, // the north cove
+  { x: -195, z: 1660, r: 55 }, // the east sound
+  { x: -525, z: 1580, r: 50 }, // the west inlet
+  { x: -300, z: 1945, r: 50 }, // the north cove
 ] as const;
 
 export function frostLandness(x: number, z: number): number {
@@ -348,26 +357,27 @@ export function frostLandness(x: number, z: number): number {
 // carrying the sealed wall's footing, meadow shelves east and west, and a
 // north crown meeting the world's end sea.
 // ---------------------------------------------------------------------------
-const AMBER_ZMAX = 3120; // keep in sync with AMBERFALL_ZONE.zMax
+const AMBER_ZMAX = 2600; // keep in sync with AMBERFALL_ZONE.zMax
 const AMBER_LAND_LOBES = [
-  { x: 10, z: 2590, r: 60 }, // the Goldmelt pass mouth
-  { x: -60, z: 2620, r: 70 }, // the arrival shelf west of the pass
-  { x: 20, z: 2650, r: 80 }, // the south weald
-  { x: 100, z: 2690, r: 65 }, // Harvest Hollow's shelf
-  { x: 55, z: 2725, r: 50 }, // the harvest road's field saddle
-  { x: -90, z: 2750, r: 75 }, // the Gilded Orchard
-  { x: -40, z: 2690, r: 55 }, // the Rootway road's meadow saddle
-  { x: 0, z: 2780, r: 90 }, // Lanternmere's shore
-  { x: 0, z: 2870, r: 95 }, // the Great Mere basin
-  { x: -80, z: 2950, r: 70 }, // Cindermaple Rise
-  { x: 95, z: 2960, r: 70 }, // the Monolith heath
-  { x: 0, z: 3040, r: 85 }, // the north crown
-  { x: -20, z: 3095, r: 55 }, // the Amberfen Steps' northern footing
+  { x: 10, z: 2070, r: 60 }, // the Goldmelt pass mouth
+  { x: -60, z: 2100, r: 70 }, // the arrival shelf west of the pass
+  { x: 20, z: 2130, r: 80 }, // the south weald
+  { x: 100, z: 2170, r: 65 }, // Harvest Hollow's shelf
+  { x: 55, z: 2205, r: 50 }, // the harvest road's field saddle
+  { x: -90, z: 2230, r: 75 }, // the Gilded Orchard
+  { x: -40, z: 2170, r: 55 }, // the Rootway road's meadow saddle
+  { x: 0, z: 2260, r: 90 }, // Lanternmere's shore
+  { x: 0, z: 2350, r: 95 }, // the Great Mere basin
+  { x: -80, z: 2430, r: 70 }, // Cindermaple Rise
+  { x: 95, z: 2440, r: 70 }, // the Monolith heath
+  { x: 0, z: 2520, r: 85 }, // the north crown
+  { x: -20, z: 2575, r: 55 }, // the Amberfen Steps' northern footing
+  { x: 92, z: 2452, r: 40 }, // the mere lurkers' reeded shore
 ] as const;
 const AMBER_BAYS = [
-  { x: 170, z: 2820, r: 55 }, // the east sound
-  { x: -170, z: 2860, r: 55 }, // the west reach
-  { x: 40, z: 3115, r: 45 }, // the north cove
+  { x: 170, z: 2300, r: 55 }, // the east sound
+  { x: -170, z: 2340, r: 55 }, // the west reach
+  { x: 40, z: 2595, r: 45 }, // the north cove
 ] as const;
 
 export function amberLandness(x: number, z: number): number {
@@ -378,29 +388,29 @@ export function amberLandness(x: number, z: number): number {
 // The Willowfen: a low green wetland platter, widest of the north realms,
 // its coasts gentle everywhere (no cliffs in a fen).
 // ---------------------------------------------------------------------------
-const FEN_ZMAX = 3640; // keep in sync with WILLOWFEN_ZONE.zMax
+const FEN_ZMAX = 3120; // keep in sync with WILLOWFEN_ZONE.zMax
 const FEN_LAND_LOBES = [
-  { x: -20, z: 3150, r: 65 }, // the Amberfen Steps' shelf
-  { x: 30, z: 3200, r: 80 }, // the eastern fen
-  { x: -70, z: 3240, r: 85 }, // the Lilymoors' platter
-  { x: 0, z: 3300, r: 90 }, // Bridgemere's wetland heart
-  { x: 90, z: 3260, r: 65 }, // Bogshine's shelf
-  { x: -60, z: 3400, r: 85 }, // Willowweep
-  { x: 40, z: 3430, r: 80 }, // the Drowsy Flats
-  { x: 0, z: 3530, r: 85 }, // the north fen
-  { x: -110, z: 3330, r: 60 },
-  { x: 110, z: 3380, r: 60 },
-  { x: -30, z: 3600, r: 55 }, // the Nightgate's southern footing
-  { x: -42, z: 3478, r: 40 }, // the north track's shoulder (organic-warp dip)
-  { x: -30, z: 3634, r: 38 }, // the border footing right under the Nightgate
-  { x: 120, z: 3380, r: 45 }, // the Windway road's fen-side shoulder
-  { x: 160, z: 3380, r: 42 }, // ...carried right up to the column border
-  { x: 60, z: 3345, r: 42 }, // the east track's moor
+  { x: -20, z: 2630, r: 65 }, // the Amberfen Steps' shelf
+  { x: 30, z: 2680, r: 80 }, // the eastern fen
+  { x: -70, z: 2720, r: 85 }, // the Lilymoors' platter
+  { x: 0, z: 2780, r: 90 }, // Bridgemere's wetland heart
+  { x: 90, z: 2740, r: 65 }, // Bogshine's shelf
+  { x: -60, z: 2880, r: 85 }, // Willowweep
+  { x: 40, z: 2910, r: 80 }, // the Drowsy Flats
+  { x: 0, z: 3010, r: 85 }, // the north fen
+  { x: -110, z: 2810, r: 60 },
+  { x: 110, z: 2860, r: 60 },
+  { x: -30, z: 3080, r: 55 }, // the Nightgate's southern footing
+  { x: -42, z: 2958, r: 40 }, // the north track's shoulder (organic-warp dip)
+  { x: -30, z: 3114, r: 38 }, // the border footing right under the Nightgate
+  { x: 120, z: 2860, r: 45 }, // the Windway road's fen-side shoulder
+  { x: 160, z: 2860, r: 42 }, // ...carried right up to the column border
+  { x: 60, z: 2825, r: 42 }, // the east track's moor
 ] as const;
 const FEN_BAYS = [
-  { x: 170, z: 3300, r: 55 }, // the east sound
-  { x: -170, z: 3450, r: 55 }, // the west reach
-  { x: 30, z: 3635, r: 50 }, // the north cove
+  { x: 170, z: 2780, r: 55 }, // the east sound
+  { x: -170, z: 2930, r: 55 }, // the west reach
+  { x: 30, z: 3115, r: 50 }, // the north cove
 ] as const;
 
 export function fenLandness(x: number, z: number): number {
@@ -423,14 +433,14 @@ function applyFenCoast(x: number, z: number, h: number): number {
   const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
   let out = floor + (h - floor) * t;
   // the Amberfen Steps: flat pass floor across the border
-  const passT = (1 - smoothstep(26, 52, Math.abs(x + 20))) * (1 - smoothstep(3170, 3220, z));
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 20))) * (1 - smoothstep(2650, 2700, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
   // ...and the Nightgate's south ramp, meeting the night realm's pass cap
-  const passN = (1 - smoothstep(26, 52, Math.abs(x + 30))) * smoothstep(3560, 3605, z);
+  const passN = (1 - smoothstep(26, 52, Math.abs(x + 30))) * smoothstep(3040, 3085, z);
   if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
   // ...and the Windway's west ramp, meeting the Galecrest's pass cap at the
   // column border (the world's first sideways gate)
-  const passE = (1 - smoothstep(26, 52, Math.abs(z - 3380))) * smoothstep(100, 145, x);
+  const passE = (1 - smoothstep(26, 52, Math.abs(z - 2860))) * smoothstep(100, 145, x);
   if (passE > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passE;
   return h + (out - h) * seam;
 }
@@ -440,27 +450,33 @@ function applyFenCoast(x: number, z: number, h: number): number {
 // northern end. Gentle coasts like the fen's; the north shore looks out over
 // open starlit sea.
 // ---------------------------------------------------------------------------
-const NIGHT_ZMAX = 4200; // keep in sync with NIGHTBLOOM_ZONE.zMax
+const NIGHT_ZMAX = 3680; // keep in sync with NIGHTBLOOM_ZONE.zMax
 const NIGHT_LAND_LOBES = [
-  { x: -30, z: 3680, r: 60 }, // the Nightgate's shelf
-  { x: 20, z: 3760, r: 90 }, // the realm's heart: Moonrest and the Moonwell
-  { x: -80, z: 3860, r: 80 }, // Gloamfield's flower downs
-  { x: 80, z: 3930, r: 70 }, // the Standing Vigil's rise
-  { x: 0, z: 4040, r: 85 }, // the barrow downs
-  { x: -5, z: 3900, r: 80 }, // the midrealm saddle: bridges heart to barrow
-  { x: -12, z: 3828, r: 42 }, // the saddle's south seam, under the barrow road
-  { x: 0, z: 3968, r: 45 }, // ...and its north seam at the barrow's foot
-  { x: 35, z: 3865, r: 55 }, // the Vigil road's shoulder
-  { x: -120, z: 3950, r: 55 }, // the west arm
-  { x: 130, z: 3760, r: 50 }, // the east arm
-  { x: 30, z: 4160, r: 48 }, // the Crowgate's southern footing
-  { x: 10, z: 4100, r: 50 }, // the dream road's shoulder past the Barrowmere
-  { x: 60, z: 3980, r: 62 }, // the Dreamer's Rise: dry footing under the caldera
+  { x: -30, z: 3160, r: 60 }, // the Nightgate's shelf
+  { x: 20, z: 3240, r: 90 }, // the realm's heart: Moonrest and the Moonwell
+  { x: -80, z: 3340, r: 80 }, // Gloamfield's flower downs
+  { x: 80, z: 3410, r: 70 }, // the Standing Vigil's rise
+  { x: 0, z: 3520, r: 85 }, // the barrow downs
+  { x: -5, z: 3380, r: 80 }, // the midrealm saddle: bridges heart to barrow
+  { x: -12, z: 3308, r: 42 }, // the saddle's south seam, under the barrow road
+  { x: 0, z: 3448, r: 45 }, // ...and its north seam at the barrow's foot
+  { x: 35, z: 3345, r: 55 }, // the Vigil road's shoulder
+  { x: -120, z: 3430, r: 55 }, // the west arm
+  { x: 130, z: 3240, r: 50 }, // the east arm
+  { x: 30, z: 3640, r: 48 }, // the Crowgate's southern footing
+  { x: 10, z: 3580, r: 50 }, // the dream road's shoulder past the Barrowmere
+  { x: 60, z: 3460, r: 62 }, // the Dreamer's Rise: dry footing under the caldera
+  { x: 132, z: 3400, r: 44 }, // the Dreamsedge crossing's dream-side shoulder
+  { x: 168, z: 3400, r: 40 }, // ...to the wood's border
+  { x: -132, z: 3410, r: 44 }, // the Tanglemouth crossing's dream-side shoulder
+  { x: -168, z: 3410, r: 40 }, // ...to the jungle's border
+  { x: 172, z: 3400, r: 36 }, // the Dreamsedge corridor's border footing
+  { x: 30, z: 3668, r: 40 }, // the Garden Gate's southern footing
 ] as const;
 const NIGHT_BAYS = [
-  { x: 170, z: 3900, r: 55 }, // the east sound
-  { x: -170, z: 3760, r: 55 }, // the west reach
-  { x: -60, z: 4150, r: 50 }, // the north bight, open to the starlit sea
+  { x: 170, z: 3380, r: 55 }, // the east sound
+  { x: -170, z: 3240, r: 55 }, // the west reach
+  { x: -60, z: 3630, r: 50 }, // the north bight, open to the starlit sea
 ] as const;
 
 export function nightLandness(x: number, z: number): number {
@@ -470,44 +486,58 @@ export function nightLandness(x: number, z: number): number {
 // Gentle everywhere, the fen's recipe: soft downs easing into a dark sea.
 function applyNightCoast(x: number, z: number, h: number): number {
   if (z <= FEN_ZMAX || z > NIGHT_ZMAX + 2) return h;
+  // the dream holds the center of a three-realm row: cross-fade toward the
+  // Palmreach west and the Wraithwood east
+  const seam =
+    smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x) *
+    (1 - smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x));
+  if (seam <= 0) return h;
   const land = nightLandness(x, z);
   const t = smoothstep(0.02, 0.32, land);
   const shelf = smoothstep(-0.5, 0.06, land);
   const floor = WATER_LEVEL - 3.6 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.6)) * shelf;
   let out = floor + (h - floor) * t;
   // the Nightgate: flat pass floor across the border
-  const passT = (1 - smoothstep(26, 52, Math.abs(x + 30))) * (1 - smoothstep(3690, 3740, z));
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 30))) * (1 - smoothstep(3170, 3220, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
-  // ...and the Crowgate's south ramp, meeting the haunted wood's pass cap
-  const passN = (1 - smoothstep(26, 52, Math.abs(x - 30))) * smoothstep(4120, 4165, z);
+  // ...the Garden Gate's south ramp, meeting the Evergarden's pass cap
+  const passN = (1 - smoothstep(26, 52, Math.abs(x - 30))) * smoothstep(3600, 3645, z);
   if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return out;
+  // ...the Dreamsedge east ramp toward the Wraithwood...
+  const passE = (1 - smoothstep(26, 52, Math.abs(z - 3400))) * smoothstep(100, 145, x);
+  if (passE > 0) out = out + (6 + (out - 6) * 0.15 - out) * passE;
+  // ...and the Tanglemouth west ramp toward the Palmreach
+  const passW = (1 - smoothstep(26, 52, Math.abs(z - 3410))) * (1 - smoothstep(-145, -100, x));
+  if (passW > 0) out = out + (6 + (out - 6) * 0.15 - out) * passW;
+  return h + (out - h) * seam;
 }
 
 // ---------------------------------------------------------------------------
 // The Wraithwood: the haunted forest at the world's current northern end.
 // A broad wooded platter whose shores sink into a drowned grey sea.
 // ---------------------------------------------------------------------------
-const WOOD_ZMAX = 4760; // keep in sync with WRAITHWOOD_ZONE.zMax
+const WOOD_ZMAX = 3680; // keep in sync with WRAITHWOOD_ZONE.zMax (east column)
 const WOOD_LAND_LOBES = [
-  { x: 30, z: 4240, r: 55 }, // the Crowgate's shelf
-  { x: 0, z: 4360, r: 90 }, // the realm's heart: Gallowmere under the eaves
-  { x: -80, z: 4430, r: 80 }, // Widow's Thicket
-  { x: 80, z: 4470, r: 75 }, // the Hanging Glade
-  { x: -60, z: 4560, r: 70 }, // the Mournstone rise
-  { x: 10, z: 4630, r: 80 }, // the Huntsman's clearing
-  { x: -10, z: 4480, r: 70 }, // the midwood saddle: bridges hamlet to chapel
-  { x: 14, z: 4540, r: 50 }, // the clearing road's shoulder
-  { x: -130, z: 4500, r: 55 }, // the west arm
-  { x: 130, z: 4380, r: 50 }, // the east arm
-  { x: -60, z: 4710, r: 48 }, // the Tanglemouth's southern footing
-  { x: -52, z: 4645, r: 45 }, // the west track's shoulder toward the pass
-  { x: -60, z: 4740, r: 42 }, // the border footing right under the pass
+  { x: 390, z: 3160, r: 55 }, // the Crowgate's shelf
+  { x: 360, z: 3280, r: 90 }, // the realm's heart: Gallowmere under the eaves
+  { x: 280, z: 3350, r: 80 }, // Widow's Thicket
+  { x: 440, z: 3390, r: 75 }, // the Hanging Glade
+  { x: 300, z: 3480, r: 70 }, // the Mournstone rise
+  { x: 370, z: 3550, r: 80 }, // the Huntsman's clearing
+  { x: 350, z: 3400, r: 70 }, // the midwood saddle: bridges hamlet to chapel
+  { x: 374, z: 3460, r: 50 }, // the clearing road's shoulder
+  { x: 230, z: 3420, r: 55 }, // the west arm
+  { x: 490, z: 3300, r: 50 }, // the east arm
+  { x: 300, z: 3630, r: 48 }, // the Tanglemouth's southern footing
+  { x: 308, z: 3565, r: 45 }, // the west track's shoulder toward the pass
+  { x: 300, z: 3660, r: 42 }, // the border footing right under the pass
+  { x: 214, z: 3400, r: 44 }, // the Dreamsedge crossing's wood-side shoulder
+  { x: 250, z: 3400, r: 42 }, // ...under the first black eaves
 ] as const;
 const WOOD_BAYS = [
-  { x: 170, z: 4460, r: 55 }, // the east sound
-  { x: -170, z: 4340, r: 55 }, // the west reach
-  { x: 40, z: 4740, r: 50 }, // the north bight, open to the grey sea
+  { x: 530, z: 3380, r: 55 }, // the east sound
+  { x: 190, z: 3260, r: 55 }, // the west reach
+  { x: 400, z: 3660, r: 50 }, // the north bight, open to the grey sea
 ] as const;
 
 export function woodLandness(x: number, z: number): number {
@@ -516,19 +546,22 @@ export function woodLandness(x: number, z: number): number {
 
 // Gentle shores under the murk, the fen recipe again.
 function applyWoodCoast(x: number, z: number, h: number): number {
-  if (z <= NIGHT_ZMAX || z > WOOD_ZMAX + 2) return h;
+  if (z <= 3118 || z > WOOD_ZMAX + 2) return h;
+  // the east column: cross-fade toward the Nightbloom at the border
+  const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
+  if (seam <= 0) return h;
   const land = woodLandness(x, z);
   const t = smoothstep(0.02, 0.32, land);
   const shelf = smoothstep(-0.5, 0.06, land);
   const floor = WATER_LEVEL - 3.6 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.6)) * shelf;
   let out = floor + (h - floor) * t;
-  // the Crowgate: flat pass floor across the border
-  const passT = (1 - smoothstep(26, 52, Math.abs(x - 30))) * (1 - smoothstep(4250, 4300, z));
+  // the Crowgate: flat pass floor up from the Galecrest's wrecks
+  const passT = (1 - smoothstep(26, 52, Math.abs(x - 390))) * (1 - smoothstep(3170, 3220, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
-  // ...and the Tanglemouth's south ramp, meeting the jungle's pass cap
-  const passN = (1 - smoothstep(26, 52, Math.abs(x + 60))) * smoothstep(4680, 4725, z);
-  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return out;
+  // ...and the Dreamsedge: flat pass floor across the column border
+  const passW = (1 - smoothstep(26, 52, Math.abs(z - 3400))) * (1 - smoothstep(230, 280, x));
+  if (passW > 0) out = out + (6 + (out - 6) * 0.15 - out) * passW;
+  return h + (out - h) * seam;
 }
 
 // ---------------------------------------------------------------------------
@@ -537,35 +570,37 @@ function applyWoodCoast(x: number, z: number, h: number): number {
 // sloped beach shelf, so the land meets a turquoise sea over sand instead of
 // bluffs. The eastern arm cups the Sapphire Lagoon.
 // ---------------------------------------------------------------------------
-const REACH_ZMAX = 5320; // keep in sync with PALMREACH_ZONE.zMax
+const REACH_ZMAX = 3680; // keep in sync with PALMREACH_ZONE.zMax (west column)
 const REACH_LAND_LOBES = [
-  { x: -60, z: 4800, r: 55 }, // the Tanglemouth's shelf
-  { x: -100, z: 4950, r: 75 }, // the Palmstrand's long beach arm
-  { x: 0, z: 5000, r: 95 }, // the Emerald Tangle: the realm's green heart
-  { x: 60, z: 4890, r: 70 }, // Drifthaven's strand
-  { x: 95, z: 4955, r: 60 }, // the lagoon's northern arm...
-  { x: 125, z: 5050, r: 55 }, // ...curling east around the water
-  { x: 118, z: 5008, r: 40 }, // the idol road's shoulder on the lagoon's rim
-  { x: 100, z: 5140, r: 60 }, // the Sunken Idol's headland
-  { x: -40, z: 5140, r: 80 }, // the Vinefall
-  { x: 20, z: 5230, r: 70 }, // the north cape
-  { x: -120, z: 5080, r: 55 }, // the west arm
-  { x: -40, z: 5060, r: 55 }, // the Tangle's western shoulder
-  { x: 30, z: 5120, r: 50 }, // ...and its northeastern one
-  { x: 20, z: 4860, r: 55 }, // the shore road's back-beach
-  { x: -24, z: 4830, r: 45 }, // ...its western reach out of the pass
-  { x: -6, z: 4925, r: 45 }, // the Palmstrand road's shoulder
-  { x: 150, z: 4880, r: 42 }, // the offshore islet
-  { x: 118, z: 4886, r: 38 }, // ...and its sandbar back to the strand
-  { x: 78, z: 5205, r: 45 }, // the gate road's saddle over the cape's neck
-  { x: 66, z: 5245, r: 38 }, // ...and its rise to the gate footing
-  { x: 50, z: 5280, r: 45 }, // the Garden Gate road's northern footing
-  { x: 50, z: 5316, r: 42 }, // ...carried right up to the border
+  { x: -420, z: 3160, r: 55 }, // the Tanglemouth's shelf
+  { x: -460, z: 3310, r: 75 }, // the Palmstrand's long beach arm
+  { x: -360, z: 3360, r: 95 }, // the Emerald Tangle: the realm's green heart
+  { x: -300, z: 3250, r: 70 }, // Drifthaven's strand
+  { x: -265, z: 3315, r: 60 }, // the lagoon's northern arm...
+  { x: -235, z: 3410, r: 55 }, // ...curling east around the water
+  { x: -242, z: 3368, r: 40 }, // the idol road's shoulder on the lagoon's rim
+  { x: -260, z: 3500, r: 60 }, // the Sunken Idol's headland
+  { x: -400, z: 3500, r: 80 }, // the Vinefall
+  { x: -340, z: 3590, r: 70 }, // the north cape
+  { x: -480, z: 3440, r: 55 }, // the west arm
+  { x: -400, z: 3420, r: 55 }, // the Tangle's western shoulder
+  { x: -330, z: 3480, r: 50 }, // ...and its northeastern one
+  { x: -340, z: 3220, r: 55 }, // the shore road's back-beach
+  { x: -384, z: 3190, r: 45 }, // ...its western reach out of the pass
+  { x: -366, z: 3285, r: 45 }, // the Palmstrand road's shoulder
+  { x: -210, z: 3240, r: 42 }, // the offshore islet
+  { x: -242, z: 3246, r: 38 }, // ...and its sandbar back to the strand
+  { x: -282, z: 3565, r: 45 }, // the gate road's saddle over the cape's neck
+  { x: -294, z: 3605, r: 38 }, // ...and its rise to the gate footing
+  { x: -310, z: 3640, r: 45 }, // the Garden Gate road's northern footing
+  { x: -310, z: 3676, r: 42 }, // ...carried right up to the border
+  { x: -214, z: 3410, r: 44 }, // the Tanglemouth crossing's jungle-side shoulder
+  { x: -252, z: 3435, r: 44 }, // ...back to the idol road
 ] as const;
 const REACH_BAYS = [
-  { x: -170, z: 5010, r: 50 }, // the west reach
-  { x: 178, z: 5000, r: 45 }, // the east sound
-  { x: -30, z: 5312, r: 50 }, // the north bight, open to the warm sea
+  { x: -530, z: 3370, r: 50 }, // the west reach
+  { x: -182, z: 3360, r: 45 }, // the east sound
+  { x: -390, z: 3672, r: 50 }, // the north bight, open to the warm sea
 ] as const;
 
 export function reachLandness(x: number, z: number): number {
@@ -575,7 +610,10 @@ export function reachLandness(x: number, z: number): number {
 // The tropical coast: the fen recipe, then every low shore flattened into a
 // broad sand shelf (the beach cap) so the strand runs wide and walkable.
 function applyReachCoast(x: number, z: number, h: number): number {
-  if (z <= WOOD_ZMAX || z > REACH_ZMAX + 2) return h;
+  if (z <= 3118 || z > REACH_ZMAX + 2) return h;
+  // the west column: cross-fade toward the Nightbloom at the border
+  const seam = 1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
+  if (seam <= 0) return h;
   const land = reachLandness(x, z);
   const t = smoothstep(0.02, 0.32, land);
   const shelf = smoothstep(-0.5, 0.06, land);
@@ -585,13 +623,10 @@ function applyReachCoast(x: number, z: number, h: number): number {
   // apron instead of the other realms' bluff shores
   const beachT = 1 - smoothstep(0.05, 0.3, land);
   if (beachT > 0 && out > 1.4) out = out + (1.4 + (out - 1.4) * 0.2 - out) * beachT;
-  // the Tanglemouth: flat pass floor across the border
-  const passT = (1 - smoothstep(26, 52, Math.abs(x + 60))) * (1 - smoothstep(4810, 4860, z));
-  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
-  // ...and the Garden Gate's south ramp, meeting the garden's pass cap
-  const passN = (1 - smoothstep(26, 52, Math.abs(x - 50))) * smoothstep(5240, 5285, z);
-  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
-  return out;
+  // the Tanglemouth, turned sideways: flat pass floor at the dream border
+  const passT = (1 - smoothstep(26, 52, Math.abs(z - 3410))) * smoothstep(-260, -215, x);
+  if (passT > 0) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  return h + (out - h) * seam;
 }
 
 // ---------------------------------------------------------------------------
@@ -600,34 +635,37 @@ function applyReachCoast(x: number, z: number, h: number): number {
 // true hedge labyrinth grown from the heightfield itself (walls are terrain,
 // so sim collision, the renderer, and the map all read the same hedges).
 // ---------------------------------------------------------------------------
-const GARDEN_ZMAX = 5880; // keep in sync with EVERGARDEN_ZONE.zMax
+const GARDEN_ZMAX = 4240; // keep in sync with EVERGARDEN_ZONE.zMax
 const GARDEN_LAND_LOBES = [
-  { x: 50, z: 5330, r: 42 }, // the Garden Gate's border footing
-  { x: 50, z: 5360, r: 55 }, // the Garden Gate's approach lawn
-  { x: 18, z: 5385, r: 45 }, // the gate road's lawn, bridging to the hub
-  { x: -40, z: 5430, r: 70 }, // Hedgewick and the gate lawns
-  { x: 0, z: 5500, r: 80 }, // the Statuary Walk
-  { x: 80, z: 5470, r: 55 }, // the Petal Pond's basin
-  { x: -70, z: 5490, r: 40 }, // the rose road's shoulder
-  { x: -90, z: 5530, r: 60 }, // the Rose Wilds
-  { x: 0, z: 5636, r: 95 }, // the Great Maze's terrace...
-  { x: -55, z: 5580, r: 60 }, // ...and its four corners, kept well ashore
-  { x: 55, z: 5580, r: 60 },
-  { x: -55, z: 5695, r: 60 },
-  { x: 55, z: 5695, r: 60 },
-  { x: -20, z: 5790, r: 65 }, // the north lawn and the Lily Basin
-  { x: 60, z: 5760, r: 55 }, // the east walk's long lawn
-  { x: 88, z: 5515, r: 40 }, // the east walk's south shoulder
-  { x: 100, z: 5580, r: 55 }, // the east walk's shoulder
-  { x: 98, z: 5630, r: 40 }, // the east walk's midpoint lawn
-  { x: 100, z: 5680, r: 50 }, // the eastern border beds
-  { x: -110, z: 5650, r: 55 }, // the western wilds
-  { x: 30, z: 5850, r: 50 }, // the far hedgerow under the north rim
+  { x: 50, z: 3690, r: 42 }, // the Garden Gate's border footing
+  { x: 50, z: 3720, r: 55 }, // the Garden Gate's approach lawn
+  { x: 18, z: 3745, r: 45 }, // the gate road's lawn, bridging to the hub
+  { x: -40, z: 3790, r: 70 }, // Hedgewick and the gate lawns
+  { x: 0, z: 3860, r: 80 }, // the Statuary Walk
+  { x: 80, z: 3830, r: 55 }, // the Petal Pond's basin
+  { x: -70, z: 3850, r: 40 }, // the rose road's shoulder
+  { x: -90, z: 3890, r: 60 }, // the Rose Wilds
+  { x: 0, z: 3996, r: 95 }, // the Great Maze's terrace...
+  { x: -55, z: 3940, r: 60 }, // ...and its four corners, kept well ashore
+  { x: 55, z: 3940, r: 60 },
+  { x: -55, z: 4055, r: 60 },
+  { x: 55, z: 4055, r: 60 },
+  { x: -20, z: 4150, r: 65 }, // the north lawn and the Lily Basin
+  { x: 60, z: 4120, r: 55 }, // the east walk's long lawn
+  { x: 88, z: 3875, r: 40 }, // the east walk's south shoulder
+  { x: 100, z: 3940, r: 55 }, // the east walk's shoulder
+  { x: 98, z: 3990, r: 40 }, // the east walk's midpoint lawn
+  { x: 100, z: 4040, r: 50 }, // the eastern border beds
+  { x: -110, z: 4010, r: 55 }, // the western wilds
+  { x: 30, z: 4210, r: 50 }, // the far hedgerow under the north rim
+  { x: -96, z: 3828, r: 38 }, // the west lawn's elder stands dry
+  { x: -46, z: 4104, r: 36 }, // the north lawn's elder too
+  { x: 70, z: 3834, r: 46 }, // the pond road's east shoulder
 ] as const;
 const GARDEN_BAYS = [
-  { x: -170, z: 5560, r: 50 }, // the west water
-  { x: 175, z: 5480, r: 45 }, // the east water
-  { x: 150, z: 5845, r: 45 }, // the northeast bight
+  { x: -170, z: 3920, r: 50 }, // the west water
+  { x: 175, z: 3840, r: 45 }, // the east water
+  { x: 150, z: 4205, r: 45 }, // the northeast bight
 ] as const;
 
 export function gardenLandness(x: number, z: number): number {
@@ -636,14 +674,14 @@ export function gardenLandness(x: number, z: number): number {
 
 // The garden coast: the fen recipe over lawn instead of reeds.
 function applyGardenCoast(x: number, z: number, h: number): number {
-  if (z <= REACH_ZMAX || z > GARDEN_ZMAX + 2) return h;
+  if (z <= 3678 || z > GARDEN_ZMAX + 2) return h;
   const land = gardenLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = WATER_LEVEL - 3.2 + (WATER_LEVEL - 0.9 - (WATER_LEVEL - 3.2)) * shelf;
   let out = floor + (h - floor) * t;
-  // the Garden Gate: flat pass floor across the border
-  const passT = (1 - smoothstep(26, 52, Math.abs(x - 50))) * (1 - smoothstep(5370, 5420, z));
+  // the Garden Gate: flat pass floor across the border with the dream
+  const passT = (1 - smoothstep(26, 52, Math.abs(x - 30))) * (1 - smoothstep(3730, 3780, z));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
   return out;
 }
@@ -678,7 +716,7 @@ export const MAZE_CELL = 9; // yd per maze cell
 export const MAZE_COLS = 15;
 export const MAZE_ROWS = 17;
 export const MAZE_X0 = -(MAZE_COLS * MAZE_CELL) / 2; // west edge, x -67.5
-export const MAZE_Z1 = 5713; // north edge (row 0); south edge z 5560
+export const MAZE_Z1 = 4073; // north edge (row 0); south edge z 3920
 export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
 const MAZE_WALL_H = 12;
 const MAZE_SKIRT = 2.2; // yd of wall flank beyond the inset face
@@ -778,31 +816,33 @@ function gardenMazeOffset(x: number, z: number): number {
 // shared column edge, opened at the Windway (westPassZ 3380).
 // ---------------------------------------------------------------------------
 const GALE_XMIN = 180; // keep in sync with GALECREST_ZONE.xMin
-const GALE_ZMIN = 3120;
-const GALE_ZMAX = 3640;
+const GALE_ZMIN = 2600;
+const GALE_ZMAX = 3120;
 const GALE_LAND_LOBES = [
-  { x: 210, z: 3380, r: 48 }, // the Windway's shelf at the border
-  { x: 268, z: 3345, r: 55 }, // the road's rise onto the downs
-  { x: 290, z: 3280, r: 70 }, // the Howling Downs
-  { x: 340, z: 3320, r: 65 }, // the mid downs
-  { x: 425, z: 3300, r: 70 }, // Wickharbor's headland
-  { x: 492, z: 3255, r: 45 }, // the Old Beacon's head
-  { x: 448, z: 3462, r: 55 }, // the Shear's cliff tops
-  { x: 300, z: 3495, r: 58 }, // the Mirror Tarn plateau
-  { x: 355, z: 3560, r: 60 }, // the Wreckfields' back downs
-  { x: 380, z: 3420, r: 60 }, // the connective heart of the headland
-  { x: 240, z: 3450, r: 50 }, // the west downs above the border range
-  { x: 435, z: 3390, r: 45 }, // the cliff road's first shoulder
-  { x: 428, z: 3505, r: 48 }, // ...and its long run above the Shear
-  { x: 345, z: 3455, r: 42 }, // the tarn road's saddle
-  { x: 366, z: 3506, r: 40 }, // the wisp hollows
-  { x: 300, z: 3450, r: 42 }, // the upper downs west of the saddle
+  { x: 210, z: 2860, r: 48 }, // the Windway's shelf at the border
+  { x: 268, z: 2825, r: 55 }, // the road's rise onto the downs
+  { x: 290, z: 2760, r: 70 }, // the Howling Downs
+  { x: 340, z: 2800, r: 65 }, // the mid downs
+  { x: 425, z: 2780, r: 70 }, // Wickharbor's headland
+  { x: 492, z: 2735, r: 45 }, // the Old Beacon's head
+  { x: 448, z: 2942, r: 55 }, // the Shear's cliff tops
+  { x: 300, z: 2975, r: 58 }, // the Mirror Tarn plateau
+  { x: 355, z: 3040, r: 60 }, // the Wreckfields' back downs
+  { x: 380, z: 2900, r: 60 }, // the connective heart of the headland
+  { x: 240, z: 2930, r: 50 }, // the west downs above the border range
+  { x: 435, z: 2870, r: 45 }, // the cliff road's first shoulder
+  { x: 428, z: 2985, r: 48 }, // ...and its long run above the Shear
+  { x: 345, z: 2935, r: 42 }, // the tarn road's saddle
+  { x: 366, z: 2986, r: 40 }, // the wisp hollows
+  { x: 300, z: 2930, r: 42 }, // the upper downs west of the saddle
+  { x: 390, z: 3078, r: 44 }, // the Crowgate climb's south footing
+  { x: 388, z: 3112, r: 38 }, // the Crowgate climb's border footing
 ] as const;
 const GALE_BAYS = [
-  { x: 470, z: 3330, r: 24 }, // the harbor cove in Wickharbor's lee
-  { x: 530, z: 3540, r: 50 }, // the south sound
-  { x: 250, z: 3625, r: 45 }, // the north bight
-  { x: 535, z: 3150, r: 45 }, // the northeast water past the beacon
+  { x: 470, z: 2810, r: 24 }, // the harbor cove in Wickharbor's lee
+  { x: 530, z: 3020, r: 50 }, // the south sound
+  { x: 250, z: 3105, r: 45 }, // the north bight
+  { x: 535, z: 2630, r: 45 }, // the northeast water past the beacon
 ] as const;
 
 export function galeLandness(x: number, z: number): number {
@@ -822,37 +862,51 @@ function applyGaleCoast(x: number, z: number, h: number): number {
   const floor = WATER_LEVEL - 3.6 + (WATER_LEVEL - 1.2 - (WATER_LEVEL - 3.6)) * shelf;
   let out = floor + (h - floor) * t;
   // the Windway: flat pass floor across the column border
-  const passT = (1 - smoothstep(26, 52, Math.abs(z - 3380))) * (1 - smoothstep(230, 280, x));
+  const passT = (1 - smoothstep(26, 52, Math.abs(z - 2860))) * (1 - smoothstep(230, 280, x));
   if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  // ...and the Crowgate's south ramp, up into the haunted wood
+  const passN = (1 - smoothstep(26, 52, Math.abs(x - 390))) * smoothstep(3040, 3085, z);
+  if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
   return h + (out - h) * seam;
 }
 
-// The strait between the fen and the Galecrest: the seam blend of the two
-// coasts leaves the border line hovering at the waterline (a mushy mudflat
-// neither walkable nor swimmable); this carves it into honest water,
-// leaving the Windway corridor untouched.
-function applyWindwayStrait(x: number, z: number, h: number): number {
-  if (z <= GALE_ZMIN || z > GALE_ZMAX) return h;
-  const strait =
-    (1 - smoothstep(2, 12, Math.abs(x - STRIP_MAX_X))) * smoothstep(26, 52, Math.abs(z - 3380));
-  if (strait <= 0) return h;
-  const channel = Math.min(h, WATER_LEVEL - 2.5);
-  return h + (channel - h) * strait;
+// The straits between columns: the seam blend of two adjacent coasts leaves
+// each border line hovering at the waterline (a mushy mudflat neither
+// walkable nor swimmable); these carve every column border into honest
+// water, leaving each crossing's corridor untouched.
+const COLUMN_STRAITS = [
+  { borderX: STRIP_MAX_X, passZ: 2860, zLo: GALE_ZMIN, zHi: GALE_ZMAX }, // the Windway
+  { borderX: STRIP_MIN_X, passZ: 1700, zLo: 1440, zHi: 1960 }, // the Snowline
+  { borderX: STRIP_MAX_X, passZ: 3400, zLo: 3120, zHi: 3680 }, // the Dreamsedge
+  { borderX: STRIP_MIN_X, passZ: 3410, zLo: 3120, zHi: 3680 }, // the Tanglemouth
+] as const;
+function applyColumnStraits(x: number, z: number, h: number): number {
+  let out = h;
+  for (const st of COLUMN_STRAITS) {
+    if (z <= st.zLo || z > st.zHi) continue;
+    const strait =
+      (1 - smoothstep(2, 12, Math.abs(x - st.borderX))) *
+      smoothstep(26, 52, Math.abs(z - st.passZ));
+    if (strait <= 0) continue;
+    const channel = Math.min(out, WATER_LEVEL - 2.5);
+    out = out + (channel - out) * strait;
+  }
+  return out;
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
 function applyAmberCoast(x: number, z: number, h: number): number {
-  if (z <= FROST_ZMAX || z > AMBER_ZMAX + 2) return h;
+  if (z <= DRAKE_ZMAX || z > AMBER_ZMAX + 2) return h;
   const land = amberLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
   let out = floor + (h - floor) * t;
   // the Goldmelt: a flat pass floor across the border, the Wyrmgate recipe
-  const passT = (1 - smoothstep(26, 52, Math.abs(x - 10))) * (1 - smoothstep(2610, 2660, z));
+  const passT = (1 - smoothstep(26, 52, Math.abs(x + 10))) * (1 - smoothstep(2090, 2140, z));
   if (passT > 0 && out > 7) out = out + (7 + (out - 7) * 0.15 - out) * passT;
   // ...and the Amberfen Steps' south ramp, meeting the fen's pass cap
-  const passN = (1 - smoothstep(26, 52, Math.abs(x + 20))) * smoothstep(3060, 3105, z);
+  const passN = (1 - smoothstep(26, 52, Math.abs(x + 20))) * smoothstep(2540, 2585, z);
   if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
   return out;
 }
@@ -911,6 +965,9 @@ function applyHollowCoast(x: number, z: number, h: number): number {
 // simply runs down into the sea instead of being sunk by the coast.
 function applyEmberCoast(x: number, z: number, h: number): number {
   if (z < HOLLOW_ZMAX - 2 || z > DRAKE_ZMAX) return h;
+  // the Frostveil column keeps its own coast west of the border; cross-fade
+  const emberSeam = smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
+  if (emberSeam <= 0) return h;
   const land = emberLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
@@ -921,24 +978,30 @@ function applyEmberCoast(x: number, z: number, h: number): number {
   // at matching height and the land rises gradually into the gatewood.
   const capEase = 1 - smoothstep(1442, 1495, z);
   if (capEase > 0 && out > 6.5) out = out + (6.5 + (out - 6.5) * 0.12 - out) * capEase;
-  return out;
+  // ...and the Snowline's east ramp, meeting the Frostveil's pass cap at
+  // the column border (fire cooling into ice)
+  const passW = (1 - smoothstep(26, 52, Math.abs(z - 1700))) * (1 - smoothstep(-145, -100, x));
+  if (passW > 0) out = out + (6 + (out - 6) * 0.15 - out) * passW;
+  return h + (out - h) * emberSeam;
 }
 
 // The Frostveil's coast. Fades IN north of the sealed wall's footing for the
 // same reason (the wall crest sits at the band's south fringe).
 function applyFrostCoast(x: number, z: number, h: number): number {
-  if (z <= DRAKE_ZMAX || z > FROST_ZMAX + 2) return h;
+  if (z <= 1438 || z > FROST_ZMAX + 2) return h;
+  // the west column: cross-fade toward the Drakelands at the border
+  const seam = 1 - smoothstep(STRIP_MIN_X - 8, STRIP_MIN_X + 8, x);
+  if (seam <= 0) return h;
   const land = frostLandness(x, z);
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = HOLLOW_SEA_FLOOR + (WATER_LEVEL - 1.1 - HOLLOW_SEA_FLOOR) * shelf;
   let out = floor + (h - floor) * t;
-  // The Snowline pass: a flat valley floor through the border mountains, the
-  // Wyrmgate recipe again (hold a low cap over the corridor, easing off as
-  // the road climbs into the benches).
-  const passT = (1 - smoothstep(26, 52, Math.abs(x + 10))) * (1 - smoothstep(2090, 2150, z));
-  if (passT > 0 && out > 7) out = out + (7 + (out - 7) * 0.15 - out) * passT;
-  return out;
+  // The Snowline, turned sideways: a flat valley floor through the border
+  // at the fire and ice crossing, easing off as the road climbs the benches.
+  const passT = (1 - smoothstep(26, 52, Math.abs(z - 1700))) * smoothstep(-260, -215, x);
+  if (passT > 0) out = out + (7 + (out - 7) * 0.15 - out) * passT;
+  return h + (out - h) * seam;
 }
 
 // The Drakemaw's volcano cones: raised shields with crater dips. The caldera
@@ -950,6 +1013,8 @@ export const EMBER_VOLCANOES = [
   { x: 140, z: 1990, r: 36, h: 18, craterR: 7, craterD: 7 },
   { x: -42, z: 2012, r: 30, h: 14, craterR: 0, craterD: 0 },
 ] as const;
+// the Snowline crossing's drake-side footing (appended to the ember lobes
+// below via EMBER_GATE_LOBES; the fire road to the ice)
 
 // Open lava pools out in the wastes (shaped as shallow flat-floored basins;
 // the render lava surface sits just above each floor).
@@ -1015,18 +1080,19 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
 // steps its flanks into benched paths; the plateau tables are cut flat at
 // the end of terrainHeight (mesa-style, after the rims).
 const FROST_MASSIF = [
-  { x: -6, z: 2310, r: 46, h: 24 }, // the south spire, over the road fork
-  { x: -40, z: 2410, r: 46, h: 28 }, // the crown massif
-  { x: 30, z: 2470, r: 44, h: 22 }, // the north spire at the pass road
-  { x: 66, z: 2320, r: 40, h: 18 }, // the east shoulder above the tarn
+  { x: -366, z: 1710, r: 46, h: 24 }, // the south spire, over the road fork
+  { x: -400, z: 1810, r: 46, h: 28 }, // the crown massif
+  { x: -330, z: 1870, r: 44, h: 22 }, // the north spire at the pass road
+  { x: -294, z: 1720, r: 40, h: 18 }, // the east shoulder above the tarn
 ] as const;
 const FROST_PLATEAUS = [
-  { x: -18, z: 2352, r: 20, h: 12 }, // the low shelf
-  { x: -2, z: 2386, r: 15, h: 19 }, // the mid shelf
-  { x: -26, z: 2420, r: 12, h: 26 }, // the crown table
+  { x: -378, z: 1752, r: 20, h: 12 }, // the low shelf
+  { x: -362, z: 1786, r: 15, h: 19 }, // the mid shelf
+  { x: -386, z: 1820, r: 12, h: 26 }, // the crown table
 ] as const;
 function frostMassifOffset(x: number, z: number): number {
-  if (z < 2100 || z > FROST_ZMAX - 20) return 0;
+  if (z < 1500 || z > FROST_ZMAX - 20) return 0;
+  if (x > STRIP_MIN_X - 4) return 0; // the massif lives in the west column
   let dh = 0;
   for (const m of FROST_MASSIF) {
     const d = Math.hypot(x - m.x, z - m.z);
@@ -1040,12 +1106,12 @@ function frostMassifOffset(x: number, z: number): number {
 // The Golden Shelf: the Amberfall's raised northeast tableland, an amber
 // escarpment overlooking the Great Mere.
 const AMBER_SHELF = [
-  { x: 124, z: 2700, r: 55, h: 13 },
-  { x: 96, z: 2636, r: 42, h: 9 },
-  { x: 140, z: 2790, r: 48, h: 11 },
+  { x: 124, z: 2180, r: 55, h: 13 },
+  { x: 96, z: 2116, r: 42, h: 9 },
+  { x: 140, z: 2270, r: 48, h: 11 },
 ] as const;
 function amberShelfOffset(x: number, z: number): number {
-  if (z < 2600 || z > 2900) return 0;
+  if (z < 2080 || z > 2380) return 0;
   let dh = 0;
   for (const m of AMBER_SHELF) {
     const d = Math.hypot(x - m.x, z - m.z);
@@ -1059,7 +1125,7 @@ function amberShelfOffset(x: number, z: number): number {
 // notch entrance on its road-facing side, a sunken dream-meadow floor, and
 // a knoll at the very center.
 const BOWL_X = 60;
-const BOWL_Z = 3980;
+const BOWL_Z = 3460;
 function nightCalderaOffset(x: number, z: number): number {
   const d = Math.hypot(x - BOWL_X, z - BOWL_Z);
   if (d > 68) return 0;
@@ -1082,8 +1148,8 @@ function nightCalderaOffset(x: number, z: number): number {
 
 // The Firemount: the Palmreach's volcano, a climbable cone over the deep
 // jungle with a cupped summit crater.
-const CONE_X = 16;
-const CONE_Z = 5062;
+const CONE_X = -344;
+const CONE_Z = 3422;
 function palmConeOffset(x: number, z: number): number {
   const d = Math.hypot(x - CONE_X, z - CONE_Z);
   if (d > 36) return 0;
@@ -1099,19 +1165,19 @@ function palmConeOffset(x: number, z: number): number {
 // noise field; roads, the hub, camps (which flattened first), and the
 // border pass caps are all left dry.
 function applyFenBraids(x: number, z: number, h: number): number {
-  if (z < 3180 || z > 3560 || x < -20) return h;
+  if (z < 2660 || z > 3040 || x < -20 || x > STRIP_MAX_X - 4) return h;
   if (h < WATER_LEVEL + 0.5 || h > 5.5) return h;
   const ridge = Math.abs(fbm2(x * 0.021, z * 0.021, 9301, 3) - 0.5) * 2;
   let channel = 1 - smoothstep(0.05, 0.17, ridge);
   if (channel <= 0) return h;
   // feathered region edges: a hard gate would print a straight hillshade
   // seam across the fen
-  channel *= smoothstep(-20, 4, x);
-  channel *= smoothstep(3180, 3215, z) * (1 - smoothstep(3525, 3560, z));
+  channel *= smoothstep(-20, 4, x) * (1 - smoothstep(STRIP_MAX_X - 30, STRIP_MAX_X - 6, x));
+  channel *= smoothstep(2660, 2695, z) * (1 - smoothstep(3005, 3040, z));
   const roadGate = smoothstep(8, 15, roadDistance(x, z));
   let campGate = 1;
   for (const camp of CAMPS) {
-    if (camp.center.z < 3140 || camp.center.z > 3600) continue;
+    if (camp.center.z < 2620 || camp.center.z > 3080) continue;
     const d = Math.hypot(x - camp.center.x, z - camp.center.z);
     campGate = Math.min(campGate, smoothstep(camp.radius * 1.6, camp.radius * 2.4, d));
   }
@@ -1124,7 +1190,8 @@ function applyFenBraids(x: number, z: number, h: number): number {
 // near roads so every marked route stays climbable, and below the shore
 // line so beaches ease into the sea.
 function applyFrostTerraces(x: number, z: number, h: number): number {
-  if (z <= DRAKE_ZMAX + 20 || z > FROST_ZMAX) return h;
+  if (z <= 1460 || z > FROST_ZMAX) return h;
+  if (x > STRIP_MIN_X - 2) return h; // the benches belong to the west column
   if (h < WATER_LEVEL + 2) return h;
   const road = roadDistance(x, z);
   if (road < 5) return h;
@@ -1154,11 +1221,7 @@ export function inHollowOpenSea(x: number, z: number): boolean {
   }
   if (z <= DRAKE_ZMAX) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
-    return dEdge < 48 && emberLandness(x, z) < 0.02;
-  }
-  if (z <= FROST_ZMAX + 2) {
-    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
-    return dEdge < 48 && frostLandness(x, z) < 0.02;
+    return dEdge < 48 && Math.max(emberLandness(x, z), frostLandness(x, z)) < 0.02;
   }
   if (z <= AMBER_ZMAX + 2) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
@@ -1170,15 +1233,9 @@ export function inHollowOpenSea(x: number, z: number): boolean {
   }
   if (z <= NIGHT_ZMAX + 2) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
-    return dEdge < 48 && nightLandness(x, z) < 0.02;
-  }
-  if (z <= WOOD_ZMAX + 2) {
-    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
-    return dEdge < 48 && woodLandness(x, z) < 0.02;
-  }
-  if (z <= REACH_ZMAX + 2) {
-    const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
-    return dEdge < 48 && reachLandness(x, z) < 0.02;
+    return (
+      dEdge < 48 && Math.max(nightLandness(x, z), woodLandness(x, z), reachLandness(x, z)) < 0.02
+    );
   }
   if (z <= GARDEN_ZMAX + 2) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x, GARDEN_ZMAX - z);
@@ -1424,7 +1481,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyReachCoast(x, z, h);
   h = applyGardenCoast(x, z, h);
   h = applyGaleCoast(x, z, h);
-  h = applyWindwayStrait(x, z, h);
+  h = applyColumnStraits(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
@@ -1484,7 +1541,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // The Veilspires' plateau tables: level shelves cut into the massif at
   // rising heights (flattened after the rims and terraces, so each top is
   // a true plateau).
-  if (z > 2280 && z < 2480) {
+  if (z > 1680 && z < 1880 && x < STRIP_MIN_X - 4) {
     for (const p of FROST_PLATEAUS) {
       const dP = Math.hypot(x - p.x, z - p.z);
       if (dP < p.r) {
@@ -1495,8 +1552,8 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   }
   // The Huntsman's Bluff: the Pale Huntsman's clearing sits on a flat-top
   // rise; his road from Gallowmere climbs the blended rim as the ramp.
-  if (z > 4560 && z < 4690) {
-    const dBluff = Math.hypot(x - 20, z - 4620);
+  if (z > 3480 && z < 3610) {
+    const dBluff = Math.hypot(x - 380, z - 3540);
     if (dBluff < 32) {
       const t = smoothstep(17, 32, dBluff);
       h = h * t + 14 * (1 - t);

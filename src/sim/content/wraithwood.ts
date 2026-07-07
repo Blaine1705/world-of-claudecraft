@@ -26,25 +26,28 @@ import { emptyZoneProps } from '../types';
 export const WRAITHWOOD_ZONE: ZoneDef = {
   id: 'wraithwood',
   name: 'The Wraithwood',
-  zMin: 4200,
-  zMax: 4760,
+  zMin: 3120,
+  zMax: 3680,
+  xMin: 180,
+  xMax: 540,
   levelRange: [20, 20],
   biome: 'haunt',
-  southPassX: 30, // the Crowgate: where the dream road ducks under the eaves
-  hub: { x: 0, z: 4370, radius: 17, name: 'Gallowmere' },
-  graveyard: { x: 18, z: 4352 },
+  southPassX: 390, // the Crowgate: now the climb from the Galecrest's wrecks
+  westPassZ: 3400, // the Dreamsedge: where the nightmare leans on the dream
+  hub: { x: 360, z: 3290, radius: 17, name: 'Gallowmere' },
+  graveyard: { x: 378, z: 3272 },
   lakes: [
-    { x: -70, z: 4440, radius: 10 }, // the Black Looking-Glass
-    { x: -48, z: 4580, radius: 9 }, // the chapel tarn
-    { x: 92, z: 4384, radius: 11 }, // the Drowned Coppice
+    { x: 290, z: 3360, radius: 10 }, // the Black Looking-Glass
+    { x: 312, z: 3500, radius: 9 }, // the chapel tarn
+    { x: 452, z: 3304, radius: 11 }, // the Drowned Coppice
   ],
   pois: [
-    { x: 0, z: 4370, label: 'Gallowmere' },
-    { x: 30, z: 4232, label: 'The Crowgate' },
-    { x: -80, z: 4424, label: "Widow's Thicket" },
-    { x: 80, z: 4470, label: 'The Hanging Glade' },
-    { x: -60, z: 4560, label: 'The Mournstone Chapel' },
-    { x: 20, z: 4620, label: "The Huntsman's Clearing" },
+    { x: 360, z: 3290, label: 'Gallowmere' },
+    { x: 390, z: 3152, label: 'The Crowgate' },
+    { x: 280, z: 3344, label: "Widow's Thicket" },
+    { x: 440, z: 3390, label: 'The Hanging Glade' },
+    { x: 300, z: 3480, label: 'The Mournstone Chapel' },
+    { x: 380, z: 3540, label: "The Huntsman's Clearing" },
   ],
   welcome:
     'The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.',
@@ -52,41 +55,46 @@ export const WRAITHWOOD_ZONE: ZoneDef = {
 
 export const WRAITHWOOD_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 30, z: 4208 },
-    { x: 24, z: 4266 },
-    { x: 10, z: 4322 },
-    { x: 0, z: 4370 },
+    { x: 390, z: 3128 },
+    { x: 384, z: 3186 },
+    { x: 370, z: 3242 },
+    { x: 360, z: 3290 },
   ], // the Crowgate -> Gallowmere
   [
-    { x: 0, z: 4370 },
-    { x: -38, z: 4394 },
-    { x: -64, z: 4412 },
+    { x: 360, z: 3290 },
+    { x: 322, z: 3314 },
+    { x: 296, z: 3332 },
   ], // Gallowmere -> Widow's Thicket
   [
-    { x: 0, z: 4370 },
-    { x: 36, z: 4408 },
-    { x: 62, z: 4444 },
+    { x: 360, z: 3290 },
+    { x: 396, z: 3328 },
+    { x: 422, z: 3364 },
   ], // Gallowmere -> the Hanging Glade
   [
-    { x: 0, z: 4370 },
-    { x: -22, z: 4440 },
-    { x: -42, z: 4510 },
-    { x: -54, z: 4548 },
+    { x: 360, z: 3290 },
+    { x: 338, z: 3360 },
+    { x: 318, z: 3430 },
+    { x: 306, z: 3468 },
   ], // Gallowmere -> the Mournstone Chapel
   [
-    { x: 0, z: 4370 },
-    { x: 8, z: 4450 },
-    { x: 14, z: 4530 },
-    { x: 18, z: 4600 },
+    { x: 360, z: 3290 },
+    { x: 368, z: 3370 },
+    { x: 374, z: 3450 },
+    { x: 378, z: 3520 },
   ], // Gallowmere -> the Huntsman's Clearing
   [
-    { x: 0, z: 4370 },
-    { x: -28, z: 4460 },
-    { x: -33, z: 4560 },
-    { x: -34, z: 4600 },
-    { x: -48, z: 4660 },
-    { x: -60, z: 4752 },
+    { x: 360, z: 3290 },
+    { x: 332, z: 3380 },
+    { x: 327, z: 3480 },
+    { x: 326, z: 3520 },
+    { x: 312, z: 3580 },
+    { x: 300, z: 3672 },
   ], // Gallowmere -> east of the chapel tarn -> the Tanglemouth
+  [
+    { x: 296, z: 3332 },
+    { x: 244, z: 3368 },
+    { x: 184, z: 3400 },
+  ], // Widow's Thicket -> west to the Dreamsedge (out of the wood)
 ];
 
 // No portals: walked into under the Crowgate.
@@ -173,12 +181,12 @@ export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {};
 export const WRAITHWOOD_QUEST_ORDER: string[] = [];
 export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {};
 export const WRAITHWOOD_CAMPS: CampDef[] = [
-  { mobId: 'widowsilk_spinner', center: { x: -78, z: 4418 }, radius: 10, count: 3 },
-  { mobId: 'widowsilk_spinner', center: { x: 108, z: 4404 }, radius: 10, count: 3 },
-  { mobId: 'wood_wraith', center: { x: -54, z: 4556 }, radius: 9, count: 3 },
-  { mobId: 'wood_wraith', center: { x: 58, z: 4508 }, radius: 10, count: 3 },
-  { mobId: 'gravenbark_shambler', center: { x: 84, z: 4466 }, radius: 10, count: 2 },
-  { mobId: 'pale_huntsman', center: { x: 20, z: 4620 }, radius: 5, count: 1 },
+  { mobId: 'widowsilk_spinner', center: { x: 282, z: 3338 }, radius: 10, count: 3 },
+  { mobId: 'widowsilk_spinner', center: { x: 468, z: 3324 }, radius: 10, count: 3 },
+  { mobId: 'wood_wraith', center: { x: 306, z: 3476 }, radius: 9, count: 3 },
+  { mobId: 'wood_wraith', center: { x: 418, z: 3428 }, radius: 10, count: 3 },
+  { mobId: 'gravenbark_shambler', center: { x: 444, z: 3386 }, radius: 10, count: 2 },
+  { mobId: 'pale_huntsman', center: { x: 380, z: 3540 }, radius: 5, count: 1 },
 ];
 export const WRAITHWOOD_OBJECTS: GroundObjectDef[] = [];
 
@@ -186,50 +194,50 @@ export const WRAITHWOOD_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
   // Gallowmere: a shuttered hamlet under the eaves
   buildings: [
-    { kind: 'inn', x: -8, z: 4374, w: 6, d: 7, rot: 0.5 },
-    { kind: 'house', x: 8, z: 4366, w: 6, d: 6, rot: -1.2 },
-    { kind: 'house', x: -6, z: 4360, w: 5, d: 5, rot: 2.3 },
-    { kind: 'chapel', x: 5, z: 4380, w: 5, d: 7, rot: -2.2 },
+    { kind: 'inn', x: 352, z: 3294, w: 6, d: 7, rot: 0.5 },
+    { kind: 'house', x: 368, z: 3286, w: 6, d: 6, rot: -1.2 },
+    { kind: 'house', x: 354, z: 3280, w: 5, d: 5, rot: 2.3 },
+    { kind: 'chapel', x: 365, z: 3300, w: 5, d: 7, rot: -2.2 },
   ],
-  wells: [{ x: 0, z: 4372, r: 1.5 }],
-  stalls: [{ x: -4, z: 4366, rot: 0.6, r: 1.6 }],
+  wells: [{ x: 360, z: 3292, r: 1.5 }],
+  stalls: [{ x: 356, z: 3286, rot: 0.6, r: 1.6 }],
   crates: [
-    [-11, 4370],
-    [9, 4372],
+    [349, 3290],
+    [369, 3292],
   ],
   campfires: [
-    [0, 4368],
-    [29, 4220], // the Crowgate's waycamp
+    [360, 3288],
+    [389, 3140], // the Crowgate's waycamp
   ],
   fences: [
     // the hamlet huddles behind its fence line
-    { x1: -14, z1: 4356, x2: 14, z2: 4356 },
-    { x1: -14, z1: 4386, x2: 14, z2: 4386 },
+    { x1: 346, z1: 3276, x2: 374, z2: 3276 },
+    { x1: 346, z1: 3306, x2: 374, z2: 3306 },
   ],
   // the Mournstone Chapel ruin and the Huntsman's ring of broken columns
   ruinRings: [
-    { x: -60, z: 4560, ringR: 8, columns: 6 },
-    { x: 20, z: 4620, ringR: 9, columns: 5 },
+    { x: 300, z: 3480, ringR: 8, columns: 6 },
+    { x: 380, z: 3540, ringR: 9, columns: 5 },
   ],
   // grave fields: the wood buries its own
   graveyards: [
-    { x: -66, z: 4552 },
-    { x: 26, z: 4360 },
-    { x: 74, z: 4478 },
+    { x: 294, z: 3472 },
+    { x: 386, z: 3280 },
+    { x: 434, z: 3398 },
   ],
   // The giant overgrown trees the realm is named for: solid trunk colliders
   // in the sim (colliders.ts reads this record), giant canopies drawn by
   // render/haunt_features.ts from the same spots. Kept off every road.
   greatTrees: [
-    { x: -34, z: 4300, r: 2.6 },
-    { x: 44, z: 4330, r: 3.0 },
-    { x: -52, z: 4462, r: 2.8 },
-    { x: 34, z: 4470, r: 2.6 },
-    { x: -16, z: 4530, r: 3.2 },
-    { x: 96, z: 4520, r: 2.6 },
-    { x: -96, z: 4500, r: 2.8 },
-    { x: 52, z: 4576, r: 3.0 },
-    { x: -30, z: 4646, r: 2.6 },
-    { x: -110, z: 4380, r: 2.6 },
+    { x: 326, z: 3220, r: 2.6 },
+    { x: 404, z: 3250, r: 3.0 },
+    { x: 308, z: 3382, r: 2.8 },
+    { x: 394, z: 3390, r: 2.6 },
+    { x: 344, z: 3450, r: 3.2 },
+    { x: 456, z: 3440, r: 2.6 },
+    { x: 264, z: 3420, r: 2.8 },
+    { x: 412, z: 3496, r: 3.0 },
+    { x: 330, z: 3566, r: 2.6 },
+    { x: 250, z: 3300, r: 2.6 },
   ],
 };

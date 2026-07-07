@@ -122,16 +122,18 @@ describe('content referential integrity', () => {
 
   it('zones tile the grid and content sits inside its zone band', () => {
     // the strip column tiles south to north exactly as it always did
-    const strip = ZONES.filter((zn) => (zn.xMin ?? -180) <= -180);
+    const strip = ZONES.filter((zn) => (zn.xMin ?? -180) <= -180 && (zn.xMax ?? 180) >= 180);
     for (let i = 0; i + 1 < strip.length; i++) {
       expect(strip[i].zMax).toBe(strip[i + 1].zMin);
     }
     // every column zone occupies a band some strip row already defines
     for (const zn of ZONES) {
-      if ((zn.xMin ?? -180) <= -180) continue;
+      if ((zn.xMin ?? -180) <= -180 && (zn.xMax ?? 180) >= 180) continue;
+      // a column may be shorter than its row (open sea fills the rest), but
+      // it must sit fully inside SOME strip row so the crossings line up
       expect(
-        strip.some((row) => row.zMin === zn.zMin && row.zMax === zn.zMax),
-        `${zn.id} band matches a strip row`,
+        strip.some((row) => zn.zMin >= row.zMin && zn.zMax <= row.zMax),
+        `${zn.id} band sits inside a strip row`,
       ).toBe(true);
     }
     const problems: string[] = [];

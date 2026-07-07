@@ -560,10 +560,10 @@ export function zoneAt(x: number, z: number): ZoneDef {
 // in sideways via columnBlendAt. With no columns registered both are inert
 // and the world is byte-identical to the strip era.
 export const STRIP_ZONES: readonly ZoneDef[] = ZONES.filter(
-  (zn) => (zn.xMin ?? STRIP_MIN_X) <= STRIP_MIN_X,
+  (zn) => (zn.xMin ?? STRIP_MIN_X) <= STRIP_MIN_X && (zn.xMax ?? STRIP_MAX_X) >= STRIP_MAX_X,
 );
 export const COLUMN_ZONES: readonly ZoneDef[] = ZONES.filter(
-  (zn) => (zn.xMin ?? STRIP_MIN_X) > STRIP_MIN_X,
+  (zn) => (zn.xMin ?? STRIP_MIN_X) > STRIP_MIN_X || (zn.xMax ?? STRIP_MAX_X) < STRIP_MAX_X,
 );
 
 function sm01(raw: number): number {
