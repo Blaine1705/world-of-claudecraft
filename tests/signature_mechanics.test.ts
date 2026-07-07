@@ -422,4 +422,59 @@ describe('PR3 signature mechanics', () => {
     expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(false);
     expect(p.spellPower).toBe(spBefore);
   });
+
+  it('Bloodletting (bloodthirst) heals the caster for exactly 3% of maximum health', () => {
+    const { sim, p } = makeSim('warrior');
+    expect(sim.setSpec('fury')).toBe(true);
+    spawnTarget(sim, p);
+    sim.tick();
+
+    p.hp = Math.round(p.maxHp / 2);
+    const before = p.hp;
+    p.resource = p.maxResource;
+    sim.castAbility('bloodthirst');
+
+    expect(p.hp - before).toBe(Math.round(p.maxHp * 0.03));
+  });
+
+  it('Maiming Strike (mortal_strike) halves healing the victim receives for 10 sec', () => {
+    const { sim, p } = makeSim('warrior');
+    expect(sim.setSpec('arms')).toBe(true);
+    const mob = spawnTarget(sim, p);
+    sim.tick();
+    const heal = (
+      sim as unknown as {
+        applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
+      }
+    ).applyHeal.bind(sim);
+
+    mob.hp = 10000;
+    heal(p, mob, 1000, 'TestHeal');
+    const healedClean = mob.hp - 10000;
+    expect(healedClean).toBe(1000); // pins the non-crit baseline for this seed
+
+    p.resource = p.maxResource;
+    sim.castAbility('mortal_strike');
+    const wound = mob.auras.find((a) => a.kind === 'mortal_wound');
+    expect(wound).toBeTruthy();
+    expect(wound!.value).toBeCloseTo(0.5);
+    expect(wound!.duration).toBe(10);
+
+    mob.hp = 10000;
+    heal(p, mob, 1000, 'TestHeal');
+    const healedWounded = mob.hp - 10000;
+    expect(healedWounded).toBe(500);
+  });
+
+  it('Mortal Wound keeps its 0.5 multiplier under Arms talent damage scaling', () => {
+    // Sharpened Blades (arms mastery) is meleeDmgPct 0.10: rounding the
+    // multiplier-shaped debuff value (round(0.5 * 1.1) = 1) would suppress
+    // ALL healing, so mortal_wound must be exempt like buff_haste.
+    const { sim, p } = makeSim('warrior');
+    expect(sim.setSpec('arms')).toBe(true);
+    const ms = sim.resolvedAbility('mortal_strike', p.id);
+    const wound = ms?.effects.find((e) => e.type === 'buffTarget');
+    expect(wound && wound.type === 'buffTarget' ? wound.value : 0).toBeCloseTo(0.5);
+    expect(wound && wound.type === 'buffTarget' ? wound.kind : '').toBe('mortal_wound');
+  });
 });

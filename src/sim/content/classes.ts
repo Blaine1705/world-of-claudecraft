@@ -417,22 +417,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     exclusiveGroup: 'warrior_shout',
-    effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 20, duration: 120 }],
+    effects: [{ type: 'aoeAllyAttackPower', amount: 20, duration: 3600, radius: 40 }],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 10,
-        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 35, duration: 120 }],
+        effects: [{ type: 'aoeAllyAttackPower', amount: 35, duration: 3600, radius: 40 }],
       },
       {
         rank: 3,
         level: 20,
         cost: 10,
-        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 120 }],
+        effects: [{ type: 'aoeAllyAttackPower', amount: 50, duration: 3600, radius: 40 }],
       },
     ],
-    description: 'Increases your attack power by 20 for 2 min.',
+    description: 'Increases the attack power of you and nearby allies by 20 for 1 hour.',
   },
   commanding_shout: {
     id: 'commanding_shout',
@@ -3569,8 +3569,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     threat: { mult: 1.2 },
-    effects: [{ type: 'weaponStrike', bonus: 40 }],
-    description: 'A vicious strike dealing weapon damage plus $d. (Arms signature)',
+    effects: [
+      { type: 'weaponStrike', bonus: 40 },
+      { type: 'buffTarget', kind: 'mortal_wound', value: 0.5, duration: 10 },
+    ],
+    description:
+      'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. (Arms signature)',
   },
   bloodthirst: {
     id: 'bloodthirst',
@@ -3583,8 +3587,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 35, weaponMult: 0.6 }],
-    description: 'Instantly attack in a blood frenzy for $d. (Fury signature)',
+    effects: [
+      { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
+      { type: 'selfHealPctMax', pct: 0.03 },
+    ],
+    description:
+      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',
@@ -4322,10 +4330,16 @@ function scaleEffect(
     case 'buffTarget':
     case 'selfBuff':
       // MULTIPLIER-shaped buff values (haste 1.2 = +20% swing speed, fiesta
-      // scale/jump) must never take damage scaling: rounding a multiplier
-      // destroys it (round(1.2 * 1.1) = 1 = zero haste; round(1.4 * 1.1) = 2 =
-      // double speed). Only additive buff values (AP, armor, spellpower) scale.
-      if (eff.kind === 'buff_haste' || eff.kind === 'buff_scale' || eff.kind === 'buff_jump') {
+      // scale/jump, mortal_wound's 0.5 heal cut) must never take damage
+      // scaling: rounding a multiplier destroys it (round(1.2 * 1.1) = 1 =
+      // zero haste; round(0.5 * 1.1) = 1 = ALL healing suppressed). Only
+      // additive buff values (AP, armor, spellpower) scale.
+      if (
+        eff.kind === 'buff_haste' ||
+        eff.kind === 'buff_scale' ||
+        eff.kind === 'buff_jump' ||
+        eff.kind === 'mortal_wound'
+      ) {
         return eff;
       }
       return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
@@ -4366,14 +4380,16 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.bonusCharges) entry.charges = 1 + am.bonusCharges;
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
-    // Multiplier-shaped values (buff_haste/scale/jump) are exempt like in scaleEffect.
+    // Multiplier-shaped values (buff_haste/scale/jump/mortal_wound) are exempt like in
+    // scaleEffect.
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
         (e.type === 'selfBuff' || e.type === 'buffTarget') &&
         e.kind !== 'buff_haste' &&
         e.kind !== 'buff_scale' &&
-        e.kind !== 'buff_jump'
+        e.kind !== 'buff_jump' &&
+        e.kind !== 'mortal_wound'
           ? { ...e, value: Math.round(e.value * mul) }
           : e,
       );
