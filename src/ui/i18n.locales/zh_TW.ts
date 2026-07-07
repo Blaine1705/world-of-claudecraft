@@ -2042,6 +2042,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.red_harvest.name': '血色收割',
   'entities.abilities.red_harvest.description':
     '孤注一擲：三次兇猛的打擊，每次造成武器傷害外加 {damage} 點傷害。（狂怒）',
+  'entities.abilities.furious_mending.name': '狂怒癒合',
+  'entities.abilities.furious_mending.description':
+    '怒火癒合傷口：在 10 秒內為你恢復最大生命值的 20%，持續期間受到的傷害降低 20%。（狂怒）',
+  'entities.abilities.emboldening_roar.name': '振奮咆哮',
+  'entities.abilities.emboldening_roar.description':
+    '發出振奮的咆哮：你和 40 碼內的友方玩家獲得振奮效果，接下來的 3 個技能必定造成爆擊。（狂怒）',
   'entities.abilities.shield_slam.name': '碎盾擊',
   'entities.abilities.shield_slam.description':
     '用盾牌猛擊目標，造成 {damage} 點傷害並產生巨量威脅。（防護專精標誌技能）',

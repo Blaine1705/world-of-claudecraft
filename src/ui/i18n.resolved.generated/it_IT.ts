@@ -5247,6 +5247,14 @@ export const it_IT: EnTranslations = {
         "name": "Red Harvest",
         "description": "Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)"
       },
+      "furious_mending": {
+        "name": "Furious Mending",
+        "description": "Your fury knits your wounds: heal 20% of your maximum health over 10 sec and take 20% reduced damage while it mends. (Fury)"
+      },
+      "emboldening_roar": {
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
+      },
       "shield_slam": {
         "name": "Frantumascudo",
         "description": "Colpisce il bersaglio con lo scudo per {damage} e genera una minaccia enorme. (firma Protezione)"

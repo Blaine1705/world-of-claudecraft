@@ -69,11 +69,13 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'raging_gale',
       'pummel',
       'execute',
+      'furious_mending',
       'slam',
       'red_harvest',
       'heroic_leap',
       'cleave',
       'rallying_cry',
+      'emboldening_roar',
       'defensive_stance',
       'demoralizing_shout',
       'intimidating_shout',
@@ -724,6 +726,56 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Spend everything: three savage strikes for weapon damage plus {damage} each. (Fury)',
+  },
+  // Fury's defensive cooldown (operator design, Regeneracion Enfurecida): a
+  // standalone self-mend, both halves on one cast: a pct-of-max heal-over-time
+  // (the 'hot' aura kind Renew uses, via selfHotPctMax) plus a parameterized
+  // 20% damage-taken cut (the buff_dr aura read by combat/damage.ts).
+  furious_mending: {
+    id: 'furious_mending',
+    name: 'Furious Mending',
+    class: 'warrior',
+    learnLevel: 14,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfHotPctMax', pct: 0.2, duration: 10, interval: 2 },
+      {
+        type: 'selfBuff',
+        kind: 'buff_dr',
+        value: 0.2,
+        duration: 10,
+        auraId: 'furious_mending_dr',
+        auraName: 'Furious Mending',
+      },
+    ],
+    description:
+      'Your fury knits your wounds: heal 20% of your maximum health over 10 sec and take 20% reduced damage while it mends. (Fury)',
+  },
+  // Fury's support offensive cooldown (operator design, Grito Alentador): the
+  // caster and friendly players within 40 yd are Emboldened, their next 3
+  // damaging ability CASTS guaranteed critical strikes (aura kind 'sure_crit',
+  // overridden-not-skipped crit rolls; combat/sure_crit.ts).
+  emboldening_roar: {
+    id: 'emboldening_roar',
+    name: 'Emboldening Roar',
+    class: 'warrior',
+    learnLevel: 18,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
+    description:
+      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
   },
   cleave: {
     id: 'cleave',

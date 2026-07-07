@@ -60,6 +60,10 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   repositionToAim: 'other',
   aoeAllyAttackPower: 'other',
   aoeAllyMaxHp: 'other',
+  // Fury support cooldowns: the group guaranteed-crit buff and the self
+  // HoT are both pure utility, never an attack.
+  aoeAllySureCrit: 'other',
+  selfHotPctMax: 'other',
   selfBuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',

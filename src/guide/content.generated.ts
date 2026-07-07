@@ -185,6 +185,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Early Grave"
       },
       {
+        "id": "furious_mending",
+        "name": "Furious Mending"
+      },
+      {
         "id": "slam",
         "name": "Brute Swing"
       },
@@ -203,6 +207,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rallying_cry",
         "name": "Rallying Cry"
+      },
+      {
+        "id": "emboldening_roar",
+        "name": "Emboldening Roar"
       },
       {
         "id": "defensive_stance",

@@ -2177,6 +2177,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.red_harvest.name': 'Красная жатва',
   'entities.abilities.red_harvest.description':
     'Потратьте все: три свирепых удара, каждый наносит урон от оружия плюс {damage}. (ветка «Неистовство»)',
+  'entities.abilities.furious_mending.name': 'Яростное исцеление',
+  'entities.abilities.furious_mending.description':
+    'Ярость затягивает ваши раны: восполняет 20% вашего максимального здоровья за 10 сек, и все это время получаемый урон снижен на 20%. (ветка «Неистовство»)',
+  'entities.abilities.emboldening_roar.name': 'Ободряющий рев',
+  'entities.abilities.emboldening_roar.description':
+    'Вы издаете ободряющий рев: вы и дружественные игроки в радиусе 40 м получаете эффект «Воодушевление», и ваши следующие 3 способности наносят гарантированный критический удар. (ветка «Неистовство»)',
   'entities.abilities.shield_slam.name': 'Раскол щита',
   'entities.abilities.shield_slam.description':
     'Бьет цель щитом, нанося {damage} и создавая огромную угрозу. (ключевая способность ветки «Защита»)',

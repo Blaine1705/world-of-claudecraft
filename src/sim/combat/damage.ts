@@ -180,6 +180,16 @@ export function dealDamage(
     }
   }
 
+  // Parameterized damage-reduction buffs (buff_dr): the wearer takes `value`
+  // fraction less damage from any EXTERNAL source (Furious Mending's 20% cut).
+  // Summed across auras and floored at a zero multiplier, checked target-side
+  // beside the Die by the Sword cut above; self-damage is untouched.
+  if (source && source.id !== target.id && amount > 0) {
+    let drCut = 0;
+    for (const a of target.auras) if (a.kind === 'buff_dr') drCut += a.value;
+    if (drCut > 0) amount = Math.round(amount * Math.max(0, 1 - drCut));
+  }
+
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.

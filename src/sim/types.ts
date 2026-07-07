@@ -241,7 +241,19 @@ export type AuraKind =
   // the same resolved amounts. `charges` counts the remaining casts (the buff
   // badge shows it); armed by whirlwind's selfBuff, consumed once per cast by
   // combat/area_echo.ts after the cast actually dealt single-target damage.
-  | 'aoe_echo';
+  | 'aoe_echo'
+  // Emboldening Roar's 'Emboldened': the carrier's next `charges` damaging
+  // ability CASTS are guaranteed critical strikes. The normal crit rng is
+  // still drawn at every roll site exactly as before; combat/sure_crit.ts only
+  // OVERRIDES the outcome and spends ONE charge per cast (a multi-strike cast
+  // like Red Harvest crits every strike on one charge). Plain auto-attack
+  // swings neither benefit nor consume.
+  | 'sure_crit'
+  // Furious Mending's damage-reduction half: the wearer takes `value` fraction
+  // less damage from any external source while worn (summed across auras,
+  // floored at a zero multiplier; the cut lives in combat/damage.ts beside the
+  // Die by the Sword arm).
+  | 'buff_dr';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -261,7 +273,9 @@ export interface Aura {
   // damage before breaking (undefined = classic break on ANY damage).
   breakThreshold?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
-  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  // thorns: remaining reflect charges (Lightning Shield); aoe_echo/sure_crit:
+  // remaining ability CASTS. undefined => unlimited
+  charges?: number;
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
   leechPct?: number; // dot only: fraction of tick damage healed back to source
@@ -1267,6 +1281,14 @@ export type AbilityEffect =
   // An attack-power BUFF on the caster and party members within radius (the
   // friendly mirror of aoeAttackPower; PR #1348 harvest, Trueshot Aura).
   | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
+  // Emboldening Roar: the caster and friendly players within radius gain the
+  // sure_crit aura ('Emboldened'): their next `charges` damaging ability casts
+  // are guaranteed critical strikes (combat/sure_crit.ts).
+  | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
+  // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
+  // fraction of the caster's MAXIMUM health over the duration (the pct-of-max
+  // sibling of the flat 'hot' effect; carries no spell-power rider).
+  | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
   // Rallying Cry (owner rework): the caster and party members within radius
   // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
   // hp FRACTION, so current health rises and falls with the buff, WoW-style).

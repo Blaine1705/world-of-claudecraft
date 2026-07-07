@@ -4026,6 +4026,9 @@ export class Sim {
       threatFlat?: number;
       threatMult?: number;
       onDealt?: (amount: number) => void;
+      // Emboldened (combat/sure_crit.ts): override the connected swing's crit
+      // OUTCOME; the crit rng inside meleeSwing is still drawn as before.
+      forceCrit?: boolean;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
