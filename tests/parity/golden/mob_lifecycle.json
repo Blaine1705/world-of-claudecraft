@@ -1531,7 +1531,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 598,
-      "state": "40e90e63",
+      "state": "3217ab16",
       "events": "5587b09a",
       "rng": {
         "draws": 17,
@@ -1954,15 +1954,15 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 41.399945,
+          "fallStartY": 39.076105,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 597,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 700,
-            "y": 41.399945,
+            "x": 100100,
+            "y": 39.076105,
             "z": 300
           },
           "level": 5,
@@ -1979,15 +1979,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 700,
-            "y": 41.399945,
+            "x": 100100,
+            "y": 39.076105,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
-            "x": 700,
-            "y": 41.399945,
+            "x": 100100,
+            "y": 39.076105,
             "z": 300
           },
           "stats": {
@@ -2007,7 +2007,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 598,
-      "state": "40e90e63",
+      "state": "3217ab16",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -2430,15 +2430,15 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 41.399945,
+          "fallStartY": 39.076105,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 597,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 700,
-            "y": 41.399945,
+            "x": 100100,
+            "y": 39.076105,
             "z": 300
           },
           "level": 5,
@@ -2455,15 +2455,15 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 700,
-            "y": 41.399945,
+            "x": 100100,
+            "y": 39.076105,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
-            "x": 700,
-            "y": 41.399945,
+            "x": 100100,
+            "y": 39.076105,
             "z": 300
           },
           "stats": {

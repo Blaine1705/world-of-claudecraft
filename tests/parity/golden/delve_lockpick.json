@@ -102,7 +102,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 599,
-      "state": "bc501917",
+      "state": "7ef844af",
       "events": "cfc12bac",
       "rng": {
         "draws": 4,
@@ -113,7 +113,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 599,
-      "state": "12455b98",
+      "state": "c4554893",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -124,7 +124,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 599,
-      "state": "2d446c99",
+      "state": "19269442",
       "events": "bc48d6b7",
       "rng": {
         "draws": 6,
@@ -135,7 +135,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 601,
-      "state": "195ebe53",
+      "state": "1a5aa5db",
       "events": "bb2e1f42",
       "rng": {
         "draws": 9,
@@ -204,7 +204,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
@@ -253,12 +253,12 @@
           "ownerId": 589,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4801.5,
+            "x": 104201.5,
             "z": -1253
           },
           "stats": {
@@ -287,7 +287,7 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4798.303802,
+            "x": 104198.303802,
             "z": -1168.791812
           },
           "level": 9,
@@ -305,13 +305,13 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4798.303802,
+            "x": 104198.303802,
             "z": -1168.791812
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.6,
           "spawnPos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1170
           },
           "stats": {
@@ -347,13 +347,13 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "stats": {},
@@ -370,7 +370,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 601,
-      "state": "8da377f6",
+      "state": "c19a1d6a",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -381,7 +381,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 601,
-      "state": "8da377f6",
+      "state": "c19a1d6a",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -450,7 +450,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
@@ -499,12 +499,12 @@
           "ownerId": 589,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
-            "x": 4801.5,
+            "x": 104201.5,
             "z": -1253
           },
           "stats": {
@@ -533,7 +533,7 @@
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4798.303802,
+            "x": 104198.303802,
             "z": -1168.791812
           },
           "level": 9,
@@ -551,13 +551,13 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4798.303802,
+            "x": 104198.303802,
             "z": -1168.791812
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.5,
           "spawnPos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1170
           },
           "stats": {
@@ -593,13 +593,13 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
-            "x": 4800,
+            "x": 104200,
             "z": -1176
           },
           "stats": {},
