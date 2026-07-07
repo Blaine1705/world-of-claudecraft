@@ -52,7 +52,7 @@ import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
-import { buildDoorBody } from './door_portal';
+import { buildDoorBody, buildRiftGateBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
@@ -3287,7 +3287,12 @@ export class Renderer {
         e.templateId === 'rift_descent' ||
         e.templateId === 'rift_pylon' ||
         e.templateId === 'rift_pylon_lit';
-      const built = buildDoorBody(entering, e.dungeonId, this.lowGfx);
+      // Overworld ranked rift portals get the bespoke "gate" GLB; everything
+      // else (dungeon doors, in-rift descent/exit/pylons) keeps the procedural
+      // arch. The gate builder falls back to the arch if its asset is missing.
+      const built =
+        (e.templateId === 'rift_portal' ? buildRiftGateBody(this.lowGfx) : null) ??
+        buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
       height = 4.6;

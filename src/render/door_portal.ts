@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 // The dungeon door / exit-portal visual system, lifted out of renderer.ts so the
@@ -116,6 +119,77 @@ function doorPortalMaterial(entering: boolean, lowGfx: boolean): THREE.MeshBasic
 // is a bespoke invisible click-box instead (the visible arch is baked into that
 // dungeon's geometry). Returns the portal mesh separately so the renderer can
 // animate its swirl per frame.
+// The world-spawned ranked rift portal uses a bespoke "dimensional gate" GLB
+// (Solo Leveling style) instead of the procedural stone arch. Loaded once at
+// boot (preload gate), then cloned per portal view. Falls back to the arch if
+// the asset is missing.
+const RIFT_GATE_URL = '/models/props/rift_portal.glb';
+// Target world height (yards) the ~1.13-unit native model is scaled up to; the
+// gate looms taller than the old 5 yd arch to read from across the zone.
+const RIFT_GATE_HEIGHT = 6.0;
+let riftGateGltf: GLTF | null = null;
+
+if (typeof window !== 'undefined') {
+  registerPreload(
+    loadGltf(RIFT_GATE_URL)
+      .then((gltf) => {
+        // Per-portal views clone the scene but SHARE geometry/material refs with
+        // this cached original; mark them shared so the renderer's per-view
+        // disposal guard never frees them (interest churn would otherwise poison
+        // every later clone). Same contract as the procedural arch resources.
+        gltf.scene.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          markSharedGeometry(mesh.geometry);
+          const mat = mesh.material;
+          if (Array.isArray(mat)) mat.forEach(markSharedMaterial);
+          else markSharedMaterial(mat);
+        });
+        riftGateGltf = gltf;
+      })
+      .catch(() => {
+        // Missing/broken asset: buildRiftGateBody falls back to the arch.
+        riftGateGltf = null;
+      }),
+  );
+}
+
+/** The world-spawned rift gate body (bespoke GLB), normalized to xz-center +
+ * base at y=0 and scaled to RIFT_GATE_HEIGHT, with the portal shimmer filling
+ * its opening. Returns null when the asset has not loaded (caller falls back to
+ * the procedural arch). */
+export function buildRiftGateBody(
+  lowGfx: boolean,
+): { body: THREE.Group; portal?: THREE.Mesh } | null {
+  if (!riftGateGltf) return null;
+  const body = new THREE.Group();
+  const gate = riftGateGltf.scene.clone(true);
+  gate.updateMatrixWorld(true);
+  // Native model bounds (Meshy export): center xz, drop base to y=0, scale to
+  // the target height, keep the +z facing (the opening is thin in z).
+  const box = new THREE.Box3().setFromObject(gate);
+  const size = box.getSize(new THREE.Vector3());
+  const s = RIFT_GATE_HEIGHT / Math.max(size.y, 1e-3);
+  gate.scale.setScalar(s);
+  gate.position.set(
+    -((box.min.x + box.max.x) / 2) * s,
+    -box.min.y * s,
+    -((box.min.z + box.max.z) / 2) * s,
+  );
+  gate.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh) mesh.castShadow = true;
+  });
+  body.add(gate);
+  // Portal shimmer, sized/placed to fill the gate opening (taller + narrower
+  // than the arch's ellipse).
+  const portal = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(true, lowGfx));
+  portal.position.y = RIFT_GATE_HEIGHT * 0.5;
+  portal.scale.set(0.62, 1.15, 1);
+  body.add(portal);
+  return { body, portal };
+}
+
 export function buildDoorBody(
   entering: boolean,
   dungeonId: string | null | undefined,
