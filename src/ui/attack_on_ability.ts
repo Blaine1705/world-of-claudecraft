@@ -72,6 +72,11 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   selfHealPctMax: 'other',
   charge: 'other',
   sunder: 'other',
+  // Prot kit: the Iron Resolve absorb shield is pure utility; the Defiant
+  // Bellow aoe taunt already forces the mobs onto the caster, no swing needed
+  // to engage (mirrors the single-target 'taunt' classification).
+  absorbSpentResource: 'other',
+  aoeTaunt: 'other',
   taunt: 'other',
   tamePet: 'other',
   dismissPet: 'other',

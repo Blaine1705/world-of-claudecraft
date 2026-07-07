@@ -1153,6 +1153,26 @@ const classAbilityNamesEn = {
         'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
       ],
       [
+        'raised_guard',
+        'Raised Guard',
+        'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. (Protection)',
+      ],
+      [
+        'iron_resolve',
+        'Iron Resolve',
+        'Grit your teeth and ignore the pain: consumes all of your rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+      ],
+      [
+        'faultline',
+        'Faultline',
+        'Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)',
+      ],
+      [
+        'defiant_bellow',
+        'Defiant Bellow',
+        'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
+      ],
+      [
         'shield_slam',
         'Shieldcrack',
         'Slam the target with your shield for {damage} and massive threat. (Protection signature)',

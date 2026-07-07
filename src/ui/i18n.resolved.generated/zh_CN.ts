@@ -5255,6 +5255,22 @@ export const zh_CN: EnTranslations = {
         "name": "振奋咆哮",
         "description": "发出振奋的咆哮：你和 40 码内的友方玩家获得振奋效果，接下来的 3 个技能必定造成暴击。（狂怒）"
       },
+      "raised_guard": {
+        "name": "举盾格挡",
+        "description": "举盾自守：6 秒内受到的物理伤害降低 50%。（防护）"
+      },
+      "iron_resolve": {
+        "name": "无视疼痛",
+        "description": "咬牙硬撑，无视疼痛：消耗你的全部怒气（至少 20 点），每消耗 1 点怒气便吸收 4 点伤害，最多持续 10 秒。（防护）"
+      },
+      "faultline": {
+        "name": "震荡波",
+        "description": "向地面轰出一道震荡波：你面前 8 码内的敌人受到 {damage} 点伤害并被击晕 3 秒。（防护）"
+      },
+      "defiant_bellow": {
+        "name": "挑衅怒吼",
+        "description": "发出挑衅的怒吼：10 码内的所有敌人都被嘲讽，被迫攻击你，持续 3 秒。（防护）"
+      },
       "shield_slam": {
         "name": "碎盾击",
         "description": "用盾牌猛击目标，造成 {damage} 点伤害并产生巨量威胁。（防护专精标志技能）"

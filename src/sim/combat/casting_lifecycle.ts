@@ -779,6 +779,12 @@ function applyAbility(
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id))
     res = { ...res, cost: 0 };
+  // Spend-ALL abilities (Iron Resolve): the def's `cost` is only the MINIMUM
+  // gate (checked just above); the actual bill is the caster's entire bar,
+  // snapshotted into the resolved cost here so spendAbilityCost drains it and
+  // the effects read the true spent amount (the finisher path's spentCombo
+  // precedent, carried on the ResolvedAbility instead of the entity).
+  if (ability.spendsAllResource && !togglingOff) res = { ...res, cost: p.resource };
 
   // helpful spells never miss
   if (ability.targetType === 'friendly') {

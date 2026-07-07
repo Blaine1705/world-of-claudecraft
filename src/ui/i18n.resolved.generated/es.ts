@@ -5255,6 +5255,22 @@ export const es: EnTranslations = {
         "name": "Grito Alentador",
         "description": "Profieres un grito alentador: tú y los jugadores aliados en un radio de 40 yardas quedáis Envalentonados, y vuestras 3 próximas habilidades asestarán golpes críticos garantizados. (Furia)"
       },
+      "raised_guard": {
+        "name": "Bloquear con Escudo",
+        "description": "Te parapetas tras tu escudo: recibes un 50% menos de daño físico durante 6 s. (Protección)"
+      },
+      "iron_resolve": {
+        "name": "Ignorar Dolor",
+        "description": "Aprietas los dientes e ignoras el dolor: consumes toda tu ira (mínimo 20) para absorber 4 puntos de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)"
+      },
+      "faultline": {
+        "name": "Ola de Choque",
+        "description": "Envías una onda de choque por el suelo: los enemigos frente a ti en un radio de 8 yardas reciben {damage} de daño y quedan aturdidos durante 3 s. (Protección)"
+      },
+      "defiant_bellow": {
+        "name": "Grito Desafiante",
+        "description": "Un grito desafiante: provocas a los enemigos en un radio de 10 yardas y los obligas a atacarte durante 3 s. (Protección)"
+      },
       "shield_slam": {
         "name": "Quiebra de Escudo",
         "description": "Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)"

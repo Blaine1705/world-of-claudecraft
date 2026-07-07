@@ -32,12 +32,15 @@ import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
+  angleTo,
   armorReduction,
   DT,
   dist2d,
   FISHING_CAST_ID,
+  MELEE_ARC,
   MELEE_CLASSES,
   meleeMissChance,
+  normAngle,
   rageGenAuraMult,
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
@@ -757,6 +760,14 @@ export function runEffects(
         );
         for (const m of ctx.hostilesInRadius(p, aoeCenter, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
+          // Frontal-arc variant (Faultline): only enemies within the melee
+          // facing arc are hit, the same MELEE_ARC check castAbility's facing
+          // gate uses. A filtered enemy draws no rng (the skip happens before
+          // the damage roll), so the stream position is untouched for it.
+          if (eff.frontal) {
+            const facingDiff = Math.abs(normAngle(angleTo(p.pos, m.pos) - p.facing));
+            if (facingDiff > MELEE_ARC) continue;
+          }
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
@@ -773,6 +784,29 @@ export function runEffects(
             false,
             threatOpts,
           );
+          // Paired stun rider (Faultline): each enemy actually struck is also
+          // stunned, mirroring the single-target 'stun' case (shared PvP DR,
+          // no rng drawn; diminishedCrowdControlDuration is deterministic).
+          if (eff.stunSec !== undefined && !m.dead) {
+            const stunRemaining = ctx.diminishedCrowdControlDuration(
+              p,
+              m,
+              stunDrCategory(ability.id),
+              eff.stunSec,
+            );
+            if (stunRemaining !== null) {
+              ctx.applyAura(m, {
+                id: `${ability.id}_stun`,
+                name: ability.name,
+                kind: 'stun',
+                remaining: stunRemaining,
+                duration: stunRemaining,
+                value: 0,
+                sourceId: p.id,
+                school: ability.school,
+              });
+            }
+          }
         }
         break;
       }
@@ -1321,6 +1355,37 @@ export function runEffects(
         // sunder deals no damage: its threat is the flat value, stance-scaled
         addThreat(target, p.id, res.threatFlat * ctx.threatMod(p, 'physical'));
         ctx.enterCombat(p, target);
+        break;
+      }
+      case 'absorbSpentResource': {
+        // Iron Resolve: a damage-absorb shield (the priest-style 'absorb' aura
+        // kind dealDamage drains and the HUD absorb bar reads) sized from the
+        // resource ACTUALLY spent. applyAbility snapshotted the spend-all bill
+        // into res.cost (spendsAllResource), so the effect reads the true
+        // spend, the way finisherDamage reads its spentCombo.
+        const shield = Math.round(res.cost * eff.mult);
+        if (shield <= 0) break;
+        ctx.applyAura(p, {
+          id: ability.id,
+          name: ability.name,
+          kind: 'absorb',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: shield,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
+      case 'aoeTaunt': {
+        // Defiant Bellow: every hostile mob within radius is taunted through
+        // the SHARED applyTaunt entry point (threat lifted to the top of the
+        // table + forced attack), exactly the single-target 'taunt' case
+        // fanned out. Draws no rng; players cannot be taunted.
+        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+          if (m.kind !== 'mob' || m.dead) continue;
+          ctx.applyTaunt(p, m);
+        }
         break;
       }
       case 'taunt': {

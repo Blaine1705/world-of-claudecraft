@@ -2390,6 +2390,18 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // sanguine_aura's droplet-first layout)
   emboldening_roar: r('fury', 'gold', ['roar', { p: 'sunburst', ...TR }], ['glow']),
   furious_mending: r('blood', 'gold', ['heart', { p: 'droplet', ...BR }], ['glow']),
+  // prot kit: Raised Guard = a braced shield doubled by a small second shield
+  // (distinct from defensive_stance's bare shield + arcs and shield_slam's
+  // shield + mace); Iron Resolve = a shield guarding a heart on steel/gold
+  // (distinct from aura_buff_dr's blood bg and die_by_sword's shield + sword);
+  // Faultline = an earthen shock cracking the ground (distinct from
+  // heroic_leap's boot and earth_shock's lightning); Defiant Bellow = a shout
+  // raising a shield (distinct from rallying_cry's roar + heart and
+  // piercing_howl's roar + boot)
+  raised_guard: r('steel', 'steel', ['shield', { p: 'shield', ...TR }], ['glow']),
+  iron_resolve: r('steel', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
+  faultline: r('earth', 'earthBrown', [{ p: 'sunburst', ...BIG }, 'fist'], ['crack']),
+  defiant_bellow: r('steel', 'steel', ['roar', { p: 'shield', ...TR }], ['arcs']),
   // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
   pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
   heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact
@@ -2716,6 +2728,9 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Parameterized damage-reduction buffs (Furious Mending's 20% cut, aura id
   // 'furious_mending_dr')
   aura_buff_dr: r('blood', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // Physical-only damage-reduction buffs (Raised Guard's 50% cut, aura id
+  // 'raised_guard_dr'), mirroring aura_buff_dr on the steel palette
+  aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

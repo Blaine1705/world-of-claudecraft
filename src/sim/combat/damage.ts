@@ -190,6 +190,16 @@ export function dealDamage(
     if (drCut > 0) amount = Math.round(amount * Math.max(0, 1 - drCut));
   }
 
+  // Physical-only damage-reduction buffs (buff_dr_phys): Raised Guard's 50%
+  // cut applies only when the incoming school is physical; every other school
+  // passes untouched. Same fold shape as buff_dr above (summed, floored at a
+  // zero multiplier, external sources only), gated on the damage school.
+  if (source && source.id !== target.id && amount > 0 && school === 'physical') {
+    let physCut = 0;
+    for (const a of target.auras) if (a.kind === 'buff_dr_phys') physCut += a.value;
+    if (physCut > 0) amount = Math.round(amount * Math.max(0, 1 - physCut));
+  }
+
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.

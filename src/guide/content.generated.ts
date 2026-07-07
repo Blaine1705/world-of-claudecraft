@@ -177,6 +177,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Twinstrike"
       },
       {
+        "id": "raised_guard",
+        "name": "Raised Guard"
+      },
+      {
         "id": "pummel",
         "name": "Pummel"
       },
@@ -189,12 +193,20 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Furious Mending"
       },
       {
+        "id": "iron_resolve",
+        "name": "Iron Resolve"
+      },
+      {
         "id": "slam",
         "name": "Brute Swing"
       },
       {
         "id": "red_harvest",
         "name": "Red Harvest"
+      },
+      {
+        "id": "faultline",
+        "name": "Faultline"
       },
       {
         "id": "heroic_leap",
@@ -211,6 +223,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "emboldening_roar",
         "name": "Emboldening Roar"
+      },
+      {
+        "id": "defiant_bellow",
+        "name": "Defiant Bellow"
       },
       {
         "id": "defensive_stance",
