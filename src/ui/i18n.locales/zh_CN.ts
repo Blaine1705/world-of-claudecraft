@@ -767,6 +767,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'game.talents.title': '天赋',
   'game.talents.classTab': '职业',
   'game.talents.specTab': '专精',
+  'game.talents.choicesTab': '抉择',
+  'game.talents.rowUnlockToast': '新的天赋抉择已解锁！',
+  'game.talents.rowUnlocks': '在 {level} 级解锁',
   'game.talents.available': '可用',
   'game.talents.spent': '已用',
   'game.talents.pointSource':

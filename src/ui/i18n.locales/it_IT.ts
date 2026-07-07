@@ -1480,6 +1480,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'game.talents.title': 'Talenti',
   'game.talents.classTab': 'Classe',
   'game.talents.specTab': 'Specializzazione',
+  'game.talents.choicesTab': 'Scelte',
+  'game.talents.rowUnlockToast': 'Nuova scelta di talento disponibile!',
+  'game.talents.rowUnlocks': 'Si sblocca al livello {level}',
   'game.talents.available': 'Disponibili',
   'game.talents.spent': 'Spesi',
   'game.talents.pointSource':

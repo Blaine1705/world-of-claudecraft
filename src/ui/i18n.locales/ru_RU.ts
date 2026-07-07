@@ -808,6 +808,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.talents.title': 'Таланты',
   'game.talents.classTab': 'Класс',
   'game.talents.specTab': 'Специализация',
+  'game.talents.choicesTab': 'Варианты',
+  'game.talents.rowUnlockToast': 'Доступен новый выбор таланта!',
+  'game.talents.rowUnlocks': 'Открывается на {level} уровне',
   'game.talents.available': 'Доступно',
   'game.talents.spent': 'Потрачено',
   'game.talents.pointSource':

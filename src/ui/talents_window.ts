@@ -31,8 +31,8 @@ import {
   validateAllocation,
 } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
-import type { PlayerClass } from '../sim/types';
-import { SPEC_CARD_INFO } from './class_details_data';
+import { MAX_LEVEL, type PlayerClass } from '../sim/types';
+import { buildChoiceRowsView, hasChoiceRows } from './choice_rows_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -65,6 +65,7 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   setStage(stage: TalentAllocation | null): void;
   // World reads: the seed + the point economy + the saved loadouts. Read, not mutated.
   playerClass(): PlayerClass;
+  playerLevel(): number;
   totalPoints(): number;
   currentAllocation(): TalentAllocation;
   activeLoadout(): number;
@@ -174,7 +175,7 @@ function specIconHtml(cls: PlayerClass, sp: SpecDef): string {
 }
 
 export class TalentsWindow {
-  private tab: 'spec' | 'rows' = 'spec';
+  private tab: 'class' | 'spec' | 'choices' = 'class';
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
   // The document-level dismiss handler while the loadout menu is open (cleared
@@ -261,13 +262,16 @@ export class TalentsWindow {
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
       `<p class="ts-class-description">${esc(classDescription)}</p>` +
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
-      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span></div>` +
-      rowsTab +
+      `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
+      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +
+      (hasChoiceRows(cls)
+        ? `<div class="tal-tab${this.tab === 'choices' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'choices' ? '0' : '-1'}" aria-selected="${this.tab === 'choices'}" aria-controls="tal-body" data-tab="choices"><span class="tal-tab-label">${t('game.talents.choicesTab')}</span><span class="tt-pts">${Object.keys(stage.rows ?? {}).length}</span></div>`
+        : '') +
       `</div><div id="tal-body" role="tabpanel"></div>` +
       this.footerHtml(view);
 
     const switchTab = (tab: HTMLElement): void => {
-      this.tab = tab.dataset.tab as 'spec' | 'rows';
+      this.tab = tab.dataset.tab as 'class' | 'spec' | 'choices';
       this.render();
     };
     // WAI-ARIA tabs: roving arrow navigation (Left/Right/Home/End) plus Enter/Space.
@@ -294,23 +298,79 @@ export class TalentsWindow {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
 
     const body = el.querySelector('#tal-body') as HTMLElement;
-    if (this.tab === 'rows') {
-      paintTalentRowsTab(body, rowsVm, {
-        attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
-        pickRow: (rowIndex, optionId) => this.deps.pickRow(rowIndex, optionId),
-        // Repaint now (offline Sim applies instantly), then once more shortly
-        // after so the ONLINE mirror's authoritative tal snapshot lands too.
-        rerender: () => {
-          this.render();
-          window.setTimeout(() => {
-            if (this.deps.root().style.display === 'block' && this.tab === 'rows') this.render();
-          }, 300);
-        },
-      });
+    if (this.tab === 'class') {
+      const tree = document.createElement('div');
+      tree.className = 'tal-tree';
+      body.appendChild(tree);
+      this.paintTree(tree, view.classTree, stage);
+    } else if (this.tab === 'choices' && hasChoiceRows(cls)) {
+      this.paintChoiceRows(body, stage);
     } else {
       this.paintSpecTab(body, view, stage);
     }
     this.wireFooter(el, stage, total);
+  }
+
+  private paintChoiceRows(body: HTMLElement, stage: TalentAllocation): void {
+    const cls = this.deps.playerClass();
+    const level = this.deps.playerLevel();
+    const rowsView = buildChoiceRowsView(cls, level, stage.rows ?? {});
+    const wrap = document.createElement('div');
+    wrap.className = 'tal-rows';
+    for (const row of rowsView.rows) {
+      const rowEl = document.createElement('div');
+      rowEl.className = `tal-row${row.unlocked ? '' : ' locked'}`;
+      const head = document.createElement('div');
+      head.className = 'tal-row-head';
+      head.innerHTML =
+        `<span class="tal-row-lvl">${row.level}</span>` +
+        (row.unlocked
+          ? ''
+          : `<span class="tal-row-lock">${esc(
+              t('game.talents.rowUnlocks').replace('{level}', String(row.level)),
+            )}</span>`);
+      rowEl.appendChild(head);
+      const opts = document.createElement('div');
+      opts.className = 'tal-row-opts';
+      opts.setAttribute('role', 'radiogroup');
+      opts.setAttribute('aria-label', `${t('game.talents.choicesTab')} ${row.level}`);
+      for (const { option, picked } of row.options) {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `tal-row-opt${picked ? ' sel' : ''}`;
+        card.setAttribute('role', 'radio');
+        card.setAttribute('aria-checked', String(picked));
+        card.disabled = !row.unlocked;
+        const label = tTalent({ kind: 'talentChoice', choice: option, field: 'name' });
+        const description = tTalent({ kind: 'talentChoice', choice: option, field: 'description' });
+        card.innerHTML =
+          `<span class="tco-icon" style="background-image:url(${esc(
+            talentChoiceIconDataUrl(option),
+          )})"></span>` + `<span class="tal-row-opt-name">${esc(label)}</span>`;
+        this.deps.attachTooltip(card, () => {
+          let html = `<div class="tt-name">${esc(label)}</div>`;
+          html += `<div class="tt-desc">${esc(description)}</div>`;
+          if (!row.unlocked) {
+            html += `<div class="tt-sub" style="color:${TAL_COLOR.dormant}">${esc(
+              t('game.talents.rowUnlocks').replace('{level}', String(row.level)),
+            )}</div>`;
+          }
+          return html;
+        });
+        card.addEventListener('click', () => {
+          if (!row.unlocked || picked) return;
+          // Stage the pick; the footer Apply commits the whole allocation through the
+          // one authoritative path (the server re-validates every level gate).
+          stage.rows = { ...(stage.rows ?? {}), [row.level]: option.id };
+          this.deps.hideTooltip();
+          this.render();
+        });
+        opts.appendChild(card);
+      }
+      rowEl.appendChild(opts);
+      wrap.appendChild(rowEl);
+    }
+    body.appendChild(wrap);
   }
 
   private paintSpecTab(body: HTMLElement, view: TalentsView, stage: TalentAllocation): void {
@@ -450,15 +510,12 @@ export class TalentsWindow {
   }
 
   private wireFooter(el: HTMLElement, stage: TalentAllocation, total: number): void {
-    const btn = el.querySelector<HTMLButtonElement>('[data-act="loadout-menu"]');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-      const existing = el.querySelector('.tal-loadout-menu');
-      if (existing) {
-        this.closeLoadoutMenu(el);
-        return;
-      }
-      this.openLoadoutMenu(el, btn, stage, total);
+    const cls = this.deps.playerClass();
+    el.querySelector('[data-act="clear"]')?.addEventListener('click', () => {
+      stage.ranks = {};
+      stage.choices = {};
+      stage.rows = {};
+      this.render();
     });
   }
 

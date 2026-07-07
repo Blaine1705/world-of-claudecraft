@@ -797,6 +797,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'game.talents.title': 'タレント',
   'game.talents.classTab': 'クラス',
   'game.talents.specTab': '専門化',
+  'game.talents.choicesTab': '選択',
+  'game.talents.rowUnlockToast': '新しいタレント選択が解放されました!',
+  'game.talents.rowUnlocks': 'レベル{level}で解放',
   'game.talents.available': '使用可能',
   'game.talents.spent': '使用済み',
   'game.talents.pointSource':
