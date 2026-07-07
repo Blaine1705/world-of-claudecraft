@@ -41,7 +41,9 @@ describe('Veiled Hollow zone registration', () => {
     expect(ZONES[10].zMin).toBe(ZONES[9].zMax);
     expect(ZONES[11].id).toBe('evergarden');
     expect(ZONES[11].zMin).toBe(ZONES[10].zMax);
-    expect(WORLD_MAX_Z).toBe(ZONES[ZONES.length - 1].zMax);
+    // append order is rng-stream order, not stack order, since the grid:
+    // the world's north end is the MAX zMax over all zones
+    expect(WORLD_MAX_Z).toBe(Math.max(...ZONES.map((zn) => zn.zMax)));
     expect(zoneAt(0, 1000).id).toBe('veiled_hollow');
     expect(zoneAt(0, 899).id).toBe('thornpeak_heights');
     expect(zoneAt(0, 1500).id).toBe('drakelands');

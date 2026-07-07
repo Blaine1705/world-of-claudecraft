@@ -108,6 +108,12 @@ export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
     { x: -30, z: 3600 },
     { x: -30, z: 3648 },
   ], // Willowweep's shore -> the north fen -> the Nightgate
+  [
+    { x: 30, z: 3330 },
+    { x: 82, z: 3358 },
+    { x: 130, z: 3374 },
+    { x: 176, z: 3380 },
+  ], // the Drowsy Flats track -> east over the moors -> the Windway
 ];
 
 // No portals: walked into over the Amberfen Steps.

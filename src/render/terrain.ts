@@ -1,5 +1,13 @@
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { inGardenMaze, roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
@@ -202,6 +210,14 @@ const BIOME_PALETTE: Record<
     dirt: 0x8a7a5a,
     sand: 0xd8cca8,
   },
+  // gale: wind-dried sage downs over grey shingle
+  gale: {
+    grass: 0x6a9a62,
+    grassDark: 0x4c7a4e,
+    grassYellow: 0x9ab070,
+    dirt: 0x7a6e58,
+    sand: 0xd8d0b8,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -218,6 +234,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   haunt: 0.58,
   jungle: 0.6,
   garden: 0.6,
+  gale: 0.5, // the cliffs crag early
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
@@ -265,35 +282,52 @@ const zonePalettes = ZONES.map((zn) => {
   };
 });
 
-function paletteAt(z: number): void {
-  grassC.copy(zonePalettes[0].grass);
-  grassDarkC.copy(zonePalettes[0].grassDark);
-  grassYellowC.copy(zonePalettes[0].grassYellow);
-  dirtC.copy(zonePalettes[0].dirt);
-  sandC.copy(zonePalettes[0].sand);
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+function paletteAt(x: number, z: number): void {
+  const stripPalette = (zn: (typeof ZONES)[number]) =>
+    zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0];
+  grassC.copy(stripPalette(STRIP_ZONES[0]).grass);
+  grassDarkC.copy(stripPalette(STRIP_ZONES[0]).grassDark);
+  grassYellowC.copy(stripPalette(STRIP_ZONES[0]).grassYellow);
+  dirtC.copy(stripPalette(STRIP_ZONES[0]).dirt);
+  sandC.copy(stripPalette(STRIP_ZONES[0]).sand);
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    grassC.lerp(zonePalettes[i + 1].grass, tt);
-    grassDarkC.lerp(zonePalettes[i + 1].grassDark, tt);
-    grassYellowC.lerp(zonePalettes[i + 1].grassYellow, tt);
-    dirtC.lerp(zonePalettes[i + 1].dirt, tt);
-    sandC.lerp(zonePalettes[i + 1].sand, tt);
+    const next = stripPalette(STRIP_ZONES[i + 1]);
+    grassC.lerp(next.grass, tt);
+    grassDarkC.lerp(next.grassDark, tt);
+    grassYellowC.lerp(next.grassYellow, tt);
+    dirtC.lerp(next.dirt, tt);
+    sandC.lerp(next.sand, tt);
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t <= 0) continue;
+    const p = stripPalette(col);
+    grassC.lerp(p.grass, t);
+    grassDarkC.lerp(p.grassDark, t);
+    grassYellowC.lerp(p.grassYellow, t);
+    dirtC.lerp(p.dirt, t);
+    sandC.lerp(p.sand, t);
   }
 }
 
 // How "marsh" a given z is — mirrors the palette/heightfield blend windows so
 // the mud texture fades in exactly where the marsh palette does.
-function marshWeightAt(z: number): number {
-  let w = ZONES[0].biome === 'marsh' ? 1 : 0;
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+function marshWeightAt(x: number, z: number): number {
+  let w = STRIP_ZONES[0].biome === 'marsh' ? 1 : 0;
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    w += ((ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+    w += ((STRIP_ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t > 0) w += ((col.biome === 'marsh' ? 1 : 0) - w) * t;
   }
   return w;
 }
@@ -322,7 +356,7 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     -(hz / (2 * SLOPE_EPS)) * invLen,
   ];
 
-  paletteAt(z);
+  paletteAt(x, z);
   const biome = zoneBiomeAt(x, z);
   const w: [number, number, number, number] = [1, 0, 0, 0];
   const impact = impactCraterTerrainBlend(x, z);
@@ -468,7 +502,7 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     lerpSplat(w, 2, rim * 0.85);
   }
   // mud rides the dirt layer wherever the marsh palette is active
-  const mud = marshWeightAt(z);
+  const mud = marshWeightAt(x, z);
   if (GFX.lowPlus && !GFX.terrainSplat) {
     const ridge = clamp01((slope - 0.22) * 1.6);
     const lowland = clamp01((WATER_LEVEL + 7 - h) / 12);

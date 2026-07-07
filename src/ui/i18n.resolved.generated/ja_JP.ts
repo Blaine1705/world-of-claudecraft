@@ -5804,6 +5804,18 @@ export const ja_JP: EnTranslations = {
       "the_topiary_bull": {
         "name": "トピアリーの雄牛"
       },
+      "moor_ram": {
+        "name": "ムーアラム"
+      },
+      "gale_wisp": {
+        "name": "ゲイルウィスプ"
+      },
+      "shoal_scuttler": {
+        "name": "ショールスカトラー"
+      },
+      "the_wreck_warden": {
+        "name": "レックウォーデン"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -7349,6 +7361,33 @@ export const ja_JP: EnTranslations = {
           },
           "6": {
             "label": "噴水の中庭"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "ゲイルクレスト",
+        "welcome": "ここでは風が一度も止んだことがなく、オールドビーコンの火も一度も消えたことがない。ウィックハーバーの願いはただひとつ、宿の扉をきちんと閉めてくれることだ。",
+        "pois": {
+          "0": {
+            "label": "ウィックハーバー"
+          },
+          "1": {
+            "label": "ウィンドウェイ"
+          },
+          "2": {
+            "label": "ハウリングダウンズ"
+          },
+          "3": {
+            "label": "オールドビーコン"
+          },
+          "4": {
+            "label": "ザ・シアー"
+          },
+          "5": {
+            "label": "レックフィールズ"
+          },
+          "6": {
+            "label": "ミラーターン"
           }
         }
       }

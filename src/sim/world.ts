@@ -1,10 +1,13 @@
 import {
   CAMPS,
+  COLUMN_ZONES,
+  columnBlendAt,
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   ROADS,
   STRIP_MAX_X,
   STRIP_MIN_X,
+  STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -50,6 +53,8 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   jungle: { hill: 11, base: 1.2, hubHeight: 2 },
   // the Evergarden: groomed parkland, gentle as a lawn
   garden: { hill: 9, base: 1.8, hubHeight: 2 },
+  // the Galecrest: rolling wind-scoured headland downs over sea cliffs
+  gale: { hill: 14, base: 2.4, hubHeight: 2.5 },
 };
 
 // Ridge walls along every shared zone edge, each opened by a road pass. A
@@ -388,6 +393,9 @@ const FEN_LAND_LOBES = [
   { x: -30, z: 3600, r: 55 }, // the Nightgate's southern footing
   { x: -42, z: 3478, r: 40 }, // the north track's shoulder (organic-warp dip)
   { x: -30, z: 3634, r: 38 }, // the border footing right under the Nightgate
+  { x: 120, z: 3380, r: 45 }, // the Windway road's fen-side shoulder
+  { x: 160, z: 3380, r: 42 }, // ...carried right up to the column border
+  { x: 60, z: 3345, r: 42 }, // the east track's moor
 ] as const;
 const FEN_BAYS = [
   { x: 170, z: 3300, r: 55 }, // the east sound
@@ -403,6 +411,7 @@ export function fenLandness(x: number, z: number): number {
 // the other realms' (bog country, not sea cliffs).
 function applyFenCoast(x: number, z: number, h: number): number {
   if (z <= AMBER_ZMAX || z > FEN_ZMAX + 2) return h;
+  if (x > STRIP_MAX_X) return h; // the Galecrest column keeps its own coast
   const land = fenLandness(x, z);
   const t = smoothstep(0.02, 0.34, land);
   const shelf = smoothstep(-0.5, 0.06, land);
@@ -414,6 +423,10 @@ function applyFenCoast(x: number, z: number, h: number): number {
   // ...and the Nightgate's south ramp, meeting the night realm's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 30))) * smoothstep(3560, 3605, z);
   if (passN > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passN;
+  // ...and the Windway's west ramp, meeting the Galecrest's pass cap at the
+  // column border (the world's first sideways gate)
+  const passE = (1 - smoothstep(26, 52, Math.abs(z - 3380))) * smoothstep(100, 145, x);
+  if (passE > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passE;
   return out;
 }
 
@@ -753,6 +766,60 @@ function gardenMazeOffset(x: number, z: number): number {
   return MAZE_WALL_H * gardenMazeHedgeFactor(x, z);
 }
 
+// ---------------------------------------------------------------------------
+// The Galecrest: the world's first east-column realm, a wind-scoured
+// headland landmass in its own grid cell beside the Willowfen. Its west
+// border is the vertical ridge the border-edge machinery raises along the
+// shared column edge, opened at the Windway (westPassZ 3380).
+// ---------------------------------------------------------------------------
+const GALE_XMIN = 180; // keep in sync with GALECREST_ZONE.xMin
+const GALE_ZMIN = 3120;
+const GALE_ZMAX = 3640;
+const GALE_LAND_LOBES = [
+  { x: 210, z: 3380, r: 48 }, // the Windway's shelf at the border
+  { x: 268, z: 3345, r: 55 }, // the road's rise onto the downs
+  { x: 290, z: 3280, r: 70 }, // the Howling Downs
+  { x: 340, z: 3320, r: 65 }, // the mid downs
+  { x: 425, z: 3300, r: 70 }, // Wickharbor's headland
+  { x: 492, z: 3255, r: 45 }, // the Old Beacon's head
+  { x: 448, z: 3462, r: 55 }, // the Shear's cliff tops
+  { x: 300, z: 3495, r: 58 }, // the Mirror Tarn plateau
+  { x: 355, z: 3560, r: 60 }, // the Wreckfields' back downs
+  { x: 380, z: 3420, r: 60 }, // the connective heart of the headland
+  { x: 240, z: 3450, r: 50 }, // the west downs above the border range
+  { x: 435, z: 3390, r: 45 }, // the cliff road's first shoulder
+  { x: 428, z: 3505, r: 48 }, // ...and its long run above the Shear
+  { x: 345, z: 3455, r: 42 }, // the tarn road's saddle
+  { x: 366, z: 3506, r: 40 }, // the wisp hollows
+  { x: 300, z: 3450, r: 42 }, // the upper downs west of the saddle
+] as const;
+const GALE_BAYS = [
+  { x: 470, z: 3330, r: 24 }, // the harbor cove in Wickharbor's lee
+  { x: 530, z: 3540, r: 50 }, // the south sound
+  { x: 250, z: 3625, r: 45 }, // the north bight
+  { x: 535, z: 3150, r: 45 }, // the northeast water past the beacon
+] as const;
+
+export function galeLandness(x: number, z: number): number {
+  return metaballLandness(GALE_LAND_LOBES, GALE_BAYS, x, z);
+}
+
+// The headland coast: the fen recipe cut steeper (sea cliffs, not bog), a
+// flat pass floor at the Windway meeting the fen's east ramp.
+function applyGaleCoast(x: number, z: number, h: number): number {
+  if (z <= GALE_ZMIN - 2 || z > GALE_ZMAX + 2) return h;
+  if (x <= STRIP_MAX_X) return h; // west of the column border: the fen's coast
+  const land = galeLandness(x, z);
+  const t = smoothstep(0.02, 0.28, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = WATER_LEVEL - 3.6 + (WATER_LEVEL - 1.2 - (WATER_LEVEL - 3.6)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the Windway: flat pass floor across the column border
+  const passT = (1 - smoothstep(26, 52, Math.abs(z - 3380))) * (1 - smoothstep(230, 280, x));
+  if (passT > 0 && out > 6) out = out + (6 + (out - 6) * 0.15 - out) * passT;
+  return out;
+}
+
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
 function applyAmberCoast(x: number, z: number, h: number): number {
   if (z <= FROST_ZMAX || z > AMBER_ZMAX + 2) return h;
@@ -1079,7 +1146,7 @@ export function inHollowOpenSea(x: number, z: number): boolean {
   }
   if (z <= FEN_ZMAX + 2) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
-    return dEdge < 48 && fenLandness(x, z) < 0.02;
+    return dEdge < 48 && Math.max(fenLandness(x, z), galeLandness(x, z)) < 0.02;
   }
   if (z <= NIGHT_ZMAX + 2) {
     const dEdge = Math.min(x - seaXb.min, seaXb.max - x);
@@ -1184,23 +1251,33 @@ export function mirefenImpactCraterOffset(x: number, z: number): number {
   return bowl + rim;
 }
 
-// Blended biome shape at a given z. Zone interiors keep their exact shape;
-// blends happen across ±~35yd windows at the band boundaries.
-function shapeAt(z: number): { hill: number; base: number } {
-  let hill = BIOME_SHAPE[ZONES[0].biome].hill;
-  let base = BIOME_SHAPE[ZONES[0].biome].base;
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const boundary = ZONES[i].zMax;
+// Blended biome shape at a position. Zone interiors keep their exact shape;
+// blends happen across the same -30/+35yd windows at every border: the
+// strip's band boundaries cascade by z as they always did, and column zones
+// blend in sideways (columnBlendAt), so an east map's hills arrive across
+// its border pass exactly like a northern realm's do.
+function shapeAt(x: number, z: number): { hill: number; base: number } {
+  let hill = BIOME_SHAPE[STRIP_ZONES[0].biome].hill;
+  let base = BIOME_SHAPE[STRIP_ZONES[0].biome].base;
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const boundary = STRIP_ZONES[i].zMax;
     const t = smoothstep(boundary - 30, boundary + 35, z);
-    const next = BIOME_SHAPE[ZONES[i + 1].biome];
+    const next = BIOME_SHAPE[STRIP_ZONES[i + 1].biome];
     hill = lerp(hill, next.hill, t);
     base = lerp(base, next.base, t);
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t <= 0) continue;
+    const shape = BIOME_SHAPE[col.biome];
+    hill = lerp(hill, shape.hill, t);
+    base = lerp(base, shape.base, t);
   }
   return { hill, base };
 }
 
 function baseHeight(x: number, z: number, seed: number): number {
-  const shape = shapeAt(z);
+  const shape = shapeAt(x, z);
   let h =
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
@@ -1295,6 +1372,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
             woodLandness(x, z),
             reachLandness(x, z),
             gardenLandness(x, z),
+            galeLandness(x, z),
           ),
         );
       }
@@ -1325,6 +1403,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyWoodCoast(x, z, h);
   h = applyReachCoast(x, z, h);
   h = applyGardenCoast(x, z, h);
+  h = applyGaleCoast(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
@@ -1363,6 +1442,23 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   if (dMesaS < 26) {
     const t = smoothstep(11, 26, dMesaS);
     h = h * t + 30 * (1 - t);
+  }
+  // Beyond a row's own columns the world is open water: past the rim range
+  // the ground dives to the sea floor, so rows without an east or west
+  // column read as coast, not as an endless mountain shelf. Two gates keep
+  // it honest: it only exists where the world is genuinely wider than this
+  // row (inert in a one-column world), and never past the world bounds
+  // themselves (instance space far east keeps its untouched heights).
+  if (
+    (WORLD_MAX_X > xb.max || WORLD_MIN_X < xb.min) &&
+    x <= WORLD_MAX_X + 60 &&
+    x >= WORLD_MIN_X - 60
+  ) {
+    const beyond = Math.max(x - (xb.max + 26), xb.min - 26 - x);
+    if (beyond > 0) {
+      const t = smoothstep(0, 44, beyond);
+      h = h * (1 - t) + (WATER_LEVEL - 6) * t;
+    }
   }
   // The Veilspires' plateau tables: level shelves cut into the massif at
   // rising heights (flattened after the rims and terraces, so each top is
@@ -1531,15 +1627,19 @@ function isExcludedDecoration(x: number, z: number): boolean {
 }
 
 export function zoneBiomeAt(x: number, z: number): BiomeId {
-  let fallback: BiomeId | null = null;
+  let fallback: { biome: BiomeId; zMax: number } | null = null;
+  let northmost = ZONES[0];
   for (const zone of ZONES) {
+    if (zone.zMax > northmost.zMax) northmost = zone;
     if (z >= zone.zMax) continue;
-    if (fallback === null) fallback = zone.biome;
+    if (fallback === null || zone.zMax < fallback.zMax) {
+      fallback = { biome: zone.biome, zMax: zone.zMax }; // southmost band containing z
+    }
     const x0 = zone.xMin ?? STRIP_MIN_X;
     const x1 = zone.xMax ?? STRIP_MAX_X;
-    if (x >= x0 && x < x1) return zone.biome;
+    if (z >= zone.zMin && x >= x0 && x < x1) return zone.biome;
   }
-  return fallback ?? ZONES[ZONES.length - 1].biome;
+  return fallback ? fallback.biome : northmost.biome;
 }
 
 export function generateDecorations(seed: number): Decoration[] {
@@ -1602,10 +1702,24 @@ export function generateDecorations(seed: number): Decoration[] {
         if (inGardenMaze(gx, gz)) continue;
         if (r > 0.3) continue;
         kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
+      } else if (biome === 'gale') {
+        // wind-scoured downs: rock outcrops everywhere, trees almost never
+        // (what survives grows stunted in the render dressing)
+        if (r > 0.22) continue;
+        kind = r < 0.04 ? 'tree' : r < 0.07 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
       }
+      // grid cells outside every zone rect are open sea between columns
+      let inRect = false;
+      for (const zn of ZONES) {
+        if (gz < zn.zMin || gz >= zn.zMax) continue;
+        if (gx < (zn.xMin ?? STRIP_MIN_X) || gx >= (zn.xMax ?? STRIP_MAX_X)) continue;
+        inRect = true;
+        break;
+      }
+      if (!inRect) continue;
       const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
       const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
       const x = gx + ox,

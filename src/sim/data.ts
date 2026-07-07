@@ -83,6 +83,19 @@ import {
   FROSTVEIL_ROADS,
   FROSTVEIL_ZONE,
 } from './content/frostveil';
+import {
+  GALECREST_CAMPS,
+  GALECREST_ITEMS,
+  GALECREST_MOBS,
+  GALECREST_NPCS,
+  GALECREST_OBJECTS,
+  GALECREST_PORTALS,
+  GALECREST_PROPS,
+  GALECREST_QUEST_ORDER,
+  GALECREST_QUESTS,
+  GALECREST_ROADS,
+  GALECREST_ZONE,
+} from './content/galecrest';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
   NIGHTBLOOM_CAMPS,
@@ -263,6 +276,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WRAITHWOOD_ITEMS,
   PALMREACH_ITEMS,
   EVERGARDEN_ITEMS,
+  GALECREST_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -286,6 +300,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...WRAITHWOOD_MOBS,
   ...PALMREACH_MOBS,
   ...EVERGARDEN_MOBS,
+  ...GALECREST_MOBS,
 };
 
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
@@ -305,6 +320,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...WRAITHWOOD_NPCS,
   ...PALMREACH_NPCS,
   ...EVERGARDEN_NPCS,
+  ...GALECREST_NPCS,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -321,6 +337,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...WRAITHWOOD_QUESTS,
   ...PALMREACH_QUESTS,
   ...EVERGARDEN_QUESTS,
+  ...GALECREST_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -337,6 +354,7 @@ export const QUEST_ORDER: string[] = [
   ...WRAITHWOOD_QUEST_ORDER,
   ...PALMREACH_QUEST_ORDER,
   ...EVERGARDEN_QUEST_ORDER,
+  ...GALECREST_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -361,6 +379,7 @@ export const CAMPS: CampDef[] = [
   ...WRAITHWOOD_CAMPS,
   ...PALMREACH_CAMPS,
   ...EVERGARDEN_CAMPS,
+  ...GALECREST_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -377,6 +396,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...WRAITHWOOD_OBJECTS,
   ...PALMREACH_OBJECTS,
   ...EVERGARDEN_OBJECTS,
+  ...GALECREST_OBJECTS,
 ];
 
 export const ROADS: { x: number; z: number }[][] = [
@@ -392,6 +412,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...WRAITHWOOD_ROADS,
   ...PALMREACH_ROADS,
   ...EVERGARDEN_ROADS,
+  ...GALECREST_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -404,6 +425,7 @@ export const PORTALS: PortalDef[] = [
   ...WRAITHWOOD_PORTALS,
   ...PALMREACH_PORTALS,
   ...EVERGARDEN_PORTALS,
+  ...GALECREST_PORTALS,
 ];
 
 export const PROPS: ZonePropsDef = mergeProps([
@@ -420,6 +442,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   WRAITHWOOD_PROPS,
   PALMREACH_PROPS,
   EVERGARDEN_PROPS,
+  GALECREST_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -490,6 +513,7 @@ export const ZONES: ZoneDef[] = [
   WRAITHWOOD_ZONE,
   PALMREACH_ZONE,
   EVERGARDEN_ZONE,
+  GALECREST_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)
@@ -500,8 +524,12 @@ export const STRIP_MAX_X = WORLD_SIZE / 2;
 // strip, and they grow automatically when a column is added east or west.
 export const WORLD_MIN_X = Math.min(...ZONES.map((zn) => zn.xMin ?? STRIP_MIN_X));
 export const WORLD_MAX_X = Math.max(...ZONES.map((zn) => zn.xMax ?? STRIP_MAX_X));
-export const WORLD_MIN_Z = ZONES[0].zMin;
-export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
+// Like the x bounds: derived over ALL zone rects, not the array ends. A
+// column zone appends LAST for rng-stream stability regardless of where its
+// band sits, so "first/last entry" stopped meaning "south/north end" the
+// moment the world grew its second column.
+export const WORLD_MIN_Z = Math.min(...ZONES.map((zn) => zn.zMin));
+export const WORLD_MAX_Z = Math.max(...ZONES.map((zn) => zn.zMax));
 
 export const PLAYER_START = { x: 2, z: -2 };
 
@@ -510,16 +538,51 @@ export const PLAYER_START = { x: 2, z: -2 };
 // as always) and x picks the column within it. Every zone without an
 // explicit x-range spans the original full-width strip, so a one-column
 // world behaves exactly as before.
+// The world's northmost zone, for clamping beyond the north end (append
+// order stopped meaning stack order when the first column landed).
+const NORTHMOST_ZONE: ZoneDef = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+
 export function zoneAt(x: number, z: number): ZoneDef {
   let fallback: ZoneDef | null = null;
   for (const zone of ZONES) {
     if (z >= zone.zMax) continue;
-    if (fallback === null) fallback = zone; // southmost band containing z
+    if (fallback === null || zone.zMax < fallback.zMax) fallback = zone; // southmost band containing z
     const x0 = zone.xMin ?? STRIP_MIN_X;
     const x1 = zone.xMax ?? STRIP_MAX_X;
-    if (x >= x0 && x < x1) return zone;
+    if (z >= zone.zMin && x >= x0 && x < x1) return zone;
   }
-  return fallback ?? ZONES[ZONES.length - 1];
+  return fallback ?? NORTHMOST_ZONE;
+}
+
+// The original strip column and the east/west columns beside it. Sequential
+// band cascades (terrain shape, palettes, the sky crossfade) walk
+// STRIP_ZONES in stack order exactly as they always did; COLUMN_ZONES blend
+// in sideways via columnBlendAt. With no columns registered both are inert
+// and the world is byte-identical to the strip era.
+export const STRIP_ZONES: readonly ZoneDef[] = ZONES.filter(
+  (zn) => (zn.xMin ?? STRIP_MIN_X) <= STRIP_MIN_X,
+);
+export const COLUMN_ZONES: readonly ZoneDef[] = ZONES.filter(
+  (zn) => (zn.xMin ?? STRIP_MIN_X) > STRIP_MIN_X,
+);
+
+function sm01(raw: number): number {
+  const t = Math.max(0, Math.min(1, raw));
+  return t * t * (3 - 2 * t);
+}
+
+// Blend weight of a column zone at a position: 1 deep inside its rect,
+// easing to 0 across the same -30/+35yd window the band cascades use, so a
+// column's palette/shape/sky arrives at exactly the rate a band's does.
+export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
+  const x0 = zone.xMin ?? STRIP_MIN_X;
+  const x1 = zone.xMax ?? STRIP_MAX_X;
+  const xT =
+    x0 >= STRIP_MAX_X
+      ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
+      : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
+  const zT = sm01((z - (zone.zMin - 30)) / 65) * (1 - sm01((z - (zone.zMax - 30)) / 65));
+  return xT * zT;
 }
 
 // East-west extent of the world at a given z: the union of the zone rects

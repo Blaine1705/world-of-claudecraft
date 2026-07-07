@@ -1442,6 +1442,24 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Fountain Court"
     ],
     "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back."
+  },
+  {
+    "id": "galecrest",
+    "name": "The Galecrest",
+    "min": 20,
+    "max": 20,
+    "biome": "gale",
+    "hub": "Wickharbor",
+    "pois": [
+      "Wickharbor",
+      "The Windway",
+      "The Howling Downs",
+      "The Old Beacon",
+      "The Shear",
+      "The Wreckfields",
+      "The Mirror Tarn"
+    ],
+    "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you."
   }
 ];
 

@@ -33,6 +33,7 @@ const MOTE_TINT: Record<BiomeId, number> = {
   haunt: 0xc2d4b4, // drifting grave-pale spores
   jungle: 0xfff2b0, // sun-caught pollen and midges
   garden: 0xffccd8, // drifting rose petals
+  gale: 0xeef6ff, // wind-torn sea spray
 };
 
 const RADIUS = 26; // motes live within this ring of the player

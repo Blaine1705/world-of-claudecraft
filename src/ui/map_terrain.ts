@@ -45,6 +45,7 @@ const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = 
   haunt: 0.55, // the canopy is the realm
   jungle: 0.6, // wall-to-wall green
   garden: 0.34,
+  gale: 0.12, // near-treeless downs
 };
 
 const CONTOUR_STEP = 6; // height units between contour lines
@@ -192,6 +193,11 @@ export function paintTerrainRows(
         r = 82;
         g = 148;
         b = 72;
+      } else if (biome === 'gale') {
+        // wind-dried sage downs
+        r = 96;
+        g = 138;
+        b = 92;
       }
 
       // -- high ground overrides (crag/snow tints per biome, as before) --
@@ -233,6 +239,11 @@ export function paintTerrainRows(
         r = 40;
         g = 84;
         b = 42;
+      } else if (biome === 'gale' && h > 20) {
+        // salt-grey headland crags
+        r = 118;
+        g = 122;
+        b = 126;
       } else if (biome === 'frost' && h > 6) {
         r = 202;
         g = 212;

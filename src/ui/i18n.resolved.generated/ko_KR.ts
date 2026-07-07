@@ -5804,6 +5804,18 @@ export const ko_KR: EnTranslations = {
       "the_topiary_bull": {
         "name": "토피어리 황소"
       },
+      "moor_ram": {
+        "name": "황무지 숫양"
+      },
+      "gale_wisp": {
+        "name": "돌풍 정령"
+      },
+      "shoal_scuttler": {
+        "name": "여울 게"
+      },
+      "the_wreck_warden": {
+        "name": "난파선 감시자"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -7349,6 +7361,33 @@ export const ko_KR: EnTranslations = {
           },
           "6": {
             "label": "분수 안뜰"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "게일크레스트",
+        "welcome": "이곳의 바람은 단 한 번도 멈춘 적이 없고, 올드 비컨의 불도 단 한 번도 꺼진 적이 없다. 윅하버의 부탁은 하나뿐이다. 여관 문을 꼭 닫아 달라는 것.",
+        "pois": {
+          "0": {
+            "label": "윅하버"
+          },
+          "1": {
+            "label": "바람길"
+          },
+          "2": {
+            "label": "울부짖는 구릉"
+          },
+          "3": {
+            "label": "올드 비컨"
+          },
+          "4": {
+            "label": "절단 절벽"
+          },
+          "5": {
+            "label": "난파선 벌판"
+          },
+          "6": {
+            "label": "거울 호수"
           }
         }
       }

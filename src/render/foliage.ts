@@ -123,6 +123,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   haunt: 0x36443a, // dead dark needles
   jungle: 0x3f9450, // deep tropical green
   garden: 0x4a8a4e, // clipped evergreen
+  gale: 0x5a8a58, // wind-hardened scrub
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -137,6 +138,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   haunt: 0x424c38, // gnarled grey-green canopy
   jungle: 0x46b04e, // lush broadleaf canopy
   garden: 0x55a655, // specimen-tree green
+  gale: 0x669660, // stunted wind-bent crowns
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -151,6 +153,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   haunt: 0x565a50,
   jungle: 0x7e8a6a,
   garden: 0x9a9a92, // marble and pale stone
+  gale: 0x8a8e90, // salt-grey sea rock
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -165,6 +168,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   haunt: 0x9a948a, // grey weathered bark
   jungle: 0xd8c4a0,
   garden: 0xcfc4b0,
+  gale: 0x9a8a74,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -179,6 +183,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   haunt: 0x99a382, // sickly pale grass
   jungle: 0xc4ec96, // bright wet tropical grass
   garden: 0xd0eeb0, // mown lawn
+  gale: 0xb8d09a, // wind-silvered grass
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
@@ -192,6 +197,8 @@ const AMBER_BLOOM_TINTS = [0xffffff, 0xfaf6ec, 0xf4eedd];
 const NIGHT_BLOOM_TINTS = [0x9fdcff, 0xffffff, 0xc8a8ff, 0xa0ffd8];
 // the Evergarden blooms roses: crimson, blush, white, and tea
 const GARDEN_BLOOM_TINTS = [0xe84a6a, 0xf2a8c8, 0xffffff, 0xf2d0a0];
+// the Galecrest blooms sea thrift and campion: pink, white, pale violet
+const GALE_BLOOM_TINTS = [0xf29ab0, 0xffffff, 0xd8b0f2];
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0xaebf8e,
   marsh: 0x8d9865,
@@ -205,6 +212,7 @@ const DRESS_TINT: Record<BiomeId, number> = {
   haunt: 0x707a5e,
   jungle: 0x6cc064,
   garden: 0x8cc27a,
+  gale: 0x84a878,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
@@ -1156,6 +1164,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   haunt: 0.3,
   jungle: 0.5,
   garden: 0.4,
+  gale: 0.32,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -1228,6 +1237,13 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     if (r < 0.12) return 'bush';
     if (r < 0.52) return 'bushFlowers';
     if (r < 0.82) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'gale') {
+    // wind-flattened scrub and thrift clinging to the downs
+    if (r < 0.3) return 'bush';
+    if (r < 0.62) return 'bushFlowers';
+    if (r < 0.9) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';
@@ -1356,6 +1372,11 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
             // the roses take their tint raw too: a rose bed should read red
             const tint =
               GARDEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GARDEN_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'gale') {
+            // sea thrift takes its tint raw: pink heads over silver grass
+            const tint =
+              GALE_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GALE_BLOOM_TINTS.length)];
             im.setColorAt(i, c.set(tint));
           } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'dusk') {
             // the Hollow's flowering bushes bloom in several colors, not one

@@ -1,5 +1,12 @@
 import * as THREE from 'three';
-import { WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_ZONES,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { loadHdr, loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -55,6 +62,9 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   // the Evergarden borrows the vale's day until its own sky lands
   // (skies_in/evergarden.png)
   garden: { gain: 0.6, clamp: 2.6 },
+  // the Galecrest borrows the peaks' dawn until its own storm-light sky
+  // lands (skies_in/galecrest.png)
+  gale: { gain: 0.48, clamp: 1.7 },
 };
 
 // The three southern zones keep their Poly Haven photographs; the five realm
@@ -74,6 +84,7 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   haunt: '/env/wraithwood_gloom_2k.hdr',
   jungle: '/env/fen_day_2k.hdr',
   garden: '/env/vale_day_2k.hdr',
+  gale: '/env/peaks_dawn_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -89,6 +100,7 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   haunt: '/env/wraithwood_gloom_1k.hdr',
   jungle: '/env/fen_day_1k.hdr',
   garden: '/env/vale_day_1k.hdr',
+  gale: '/env/peaks_dawn_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -124,6 +136,7 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   haunt: '/env/marsh_backdrop.webp', // never shown: backdrop strength 0
   jungle: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
   garden: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
+  gale: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
 };
 
 const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
@@ -139,6 +152,7 @@ const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   haunt: '/env/marsh_backdrop_4k.webp',
   jungle: '/env/vale_backdrop_4k.webp',
   garden: '/env/vale_backdrop_4k.webp',
+  gale: '/env/vale_backdrop_4k.webp',
 };
 
 const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
@@ -154,6 +168,7 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   haunt: 0,
   jungle: 0,
   garden: 0,
+  gale: 0,
 };
 
 // How strongly the painted horizon backdrop shows per biome. The dusk realm
@@ -174,6 +189,7 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   haunt: 0,
   jungle: 0,
   garden: 0,
+  gale: 0,
 };
 
 // Lift masks a horizon band PHOTOGRAPHED into an HDRI (the dawn sky's red
@@ -193,6 +209,7 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   haunt: 0,
   jungle: 0,
   garden: 0,
+  gale: 0,
 };
 
 interface NetworkInformationLike {
@@ -256,6 +273,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   haunt: 0.282, // the storm sky's dying sun on the horizon
   jungle: 0.497, // shared with the fen's day sky while borrowed
   garden: 0.595, // shared with the vale's day sky while borrowed
+  gale: 0.631, // shared with the peaks' dawn sky while borrowed
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -276,6 +294,7 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   haunt: [1, 1, 1],
   jungle: [1, 1, 1],
   garden: [1, 1, 1],
+  gale: [1, 1, 1],
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
@@ -321,13 +340,13 @@ export function hasBackdropAssets(): boolean {
 export interface SkyView {
   dome: THREE.Mesh;
   /** cross-fades the HDRI pair toward the biome band the camera is over */
-  setCameraZ(z: number, dt: number): void;
+  setCameraPos(x: number, z: number, dt: number): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: BiomeId): THREE.DataTexture | null;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
   envRotationY(biome: BiomeId): number;
   /** biome cross-fade state at a given camera z (from -> to by t in [0,1]) */
-  biomeAt(z: number): BiomeBlend;
+  biomeAt(x: number, z: number): BiomeBlend;
 }
 
 export interface BiomeBlend {
@@ -426,23 +445,38 @@ const SKY_FRAG = /* glsl */ `
 `;
 
 // Cross-fade state across the same ±30/35u zone windows the terrain palette
-// uses, keyed by camera z. Boundaries are sequential, so two maps suffice.
-function biomeBlendAt(z: number): BiomeBlend {
-  let from: BiomeId = ZONES[0].biome;
-  let to: BiomeId = ZONES[0].biome;
+// uses, keyed by camera position. The strip's band boundaries cascade by z
+// as they always did; a column zone blends in sideways with the same window
+// shape, so its sky rises as you walk its border pass.
+function biomeBlendAt(x: number, z: number): BiomeBlend {
+  let from: BiomeId = STRIP_ZONES[0].biome;
+  let to: BiomeId = STRIP_ZONES[0].biome;
   let t = 0;
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const raw = Math.max(0, Math.min(1, (z - (b - 30)) / 65));
     const tt = raw * raw * (3 - 2 * raw);
     if (tt <= 0) break;
     if (tt >= 1) {
-      from = ZONES[i + 1].biome;
+      from = STRIP_ZONES[i + 1].biome;
       to = from;
       t = 0;
     } else {
-      to = ZONES[i + 1].biome;
+      to = STRIP_ZONES[i + 1].biome;
       t = tt;
+    }
+  }
+  for (const col of COLUMN_ZONES) {
+    const ct = columnBlendAt(col, x, z);
+    if (ct <= 0) continue;
+    if (ct >= 1) {
+      from = col.biome;
+      to = from;
+      t = 0;
+    } else {
+      from = t > 0 ? to : from;
+      to = col.biome;
+      t = ct;
     }
   }
   return { from, to, t };
@@ -468,7 +502,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     dome.renderOrder = -10;
     return {
       dome,
-      setCameraZ: () => {},
+      setCameraPos: () => {},
       envTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
@@ -482,7 +516,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   const tintVec = (b: BiomeId): THREE.Vector3 => new THREE.Vector3(...BIOME_TINT[b]);
   const backdropTex = (b: BiomeId): THREE.Texture =>
     (backdropsReady ? backdropStore[b] : hdriStore[b]) as THREE.Texture;
-  const start = biomeBlendAt(0);
+  const start = biomeBlendAt(0, 0);
   const uniforms = {
     uSkyA: { value: hdriStore[start.from] as THREE.Texture },
     uSkyB: { value: hdriStore[start.to] as THREE.Texture },
@@ -518,8 +552,8 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   let cur = start;
   return {
     dome,
-    setCameraZ(z: number, dt: number): void {
-      const next = biomeBlendAt(z);
+    setCameraPos(x: number, z: number, dt: number): void {
+      const next = biomeBlendAt(x, z);
       if (next.from !== cur.from || next.to !== cur.to) {
         uniforms.uSkyA.value = hdriStore[next.from] as THREE.Texture;
         uniforms.uSkyB.value = hdriStore[next.to] as THREE.Texture;

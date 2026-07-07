@@ -28,6 +28,7 @@ const ZONE_ALIASES: Record<string, string> = {
   wraithwood: 'wood',
   palmreach: 'palm',
   evergarden: 'garden',
+  galecrest: 'gale',
 };
 
 export function installDevTeleports(

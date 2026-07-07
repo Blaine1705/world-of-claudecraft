@@ -24,28 +24,44 @@ function zone(partial: Partial<ZoneDef> & { id: string; zMin: number; zMax: numb
   } as ZoneDef;
 }
 
-describe('the current world derives the classic border set', () => {
+describe('the two-column world derives the right border set', () => {
   const edges = computeBorderEdges(ZONES);
+  const strip = ZONES.filter((zn) => (zn.xMin ?? STRIP_MIN_X) <= STRIP_MIN_X);
 
-  it('has one full-row horizontal edge per band boundary, nothing else', () => {
-    expect(edges.length).toBe(ZONES.length - 1);
-    expect(edges.every((e) => e.kind === 'h')).toBe(true);
-    expect(edges.every((e) => e.fullRow)).toBe(true);
+  it('has a horizontal edge per band boundary plus the one column border', () => {
+    const h = edges.filter((e) => e.kind === 'h');
+    const v = edges.filter((e) => e.kind === 'v');
+    expect(h.length).toBe(strip.length - 1);
+    expect(v.length).toBe(1);
   });
 
-  it('keeps every crest, pass, and seal where the strip era put them', () => {
-    for (let i = 0; i + 1 < ZONES.length; i++) {
-      const sealed = ZONES[i + 1].sealedSouthBorder === true;
-      const edge = edges[i];
-      expect(edge.at).toBe(ZONES[i].zMax + (sealed ? 15 : 0));
-      expect(edge.passAt).toBe(ZONES[i + 1].southPassX ?? 0);
+  it('keeps every strip crest, pass, and seal where the strip era put them', () => {
+    const h = edges.filter((e) => e.kind === 'h');
+    for (let i = 0; i + 1 < strip.length; i++) {
+      const sealed = strip[i + 1].sealedSouthBorder === true;
+      const edge = h[i];
+      expect(edge.at).toBe(strip[i].zMax + (sealed ? 15 : 0));
+      expect(edge.passAt).toBe(strip[i + 1].southPassX ?? 0);
       expect(edge.sealed).toBe(sealed);
     }
   });
 
-  it('world x bounds are the strip everywhere, including beyond the ends', () => {
-    for (const z of [-500, -100, 0, 700, 1500, 3000, 5500, 9000]) {
+  it('derives the Windway column border exactly', () => {
+    const v = edges.find((e) => e.kind === 'v');
+    expect(v).toBeTruthy();
+    expect(v?.at).toBe(STRIP_MAX_X);
+    expect(v?.lo).toBe(3120);
+    expect(v?.hi).toBe(3640);
+    expect(v?.passAt).toBe(3380); // GALECREST_ZONE.westPassZ
+    expect(v?.fullRow).toBe(false);
+  });
+
+  it('only the fen row widens; every other row keeps the strip bounds', () => {
+    for (const z of [-500, -100, 0, 700, 1500, 3000, 4000, 5500, 9000]) {
       expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: STRIP_MAX_X });
+    }
+    for (const z of [3121, 3380, 3639]) {
+      expect(worldXBoundsAt(z)).toEqual({ min: STRIP_MIN_X, max: 540 });
     }
   });
 });

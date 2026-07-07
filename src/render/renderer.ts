@@ -61,6 +61,7 @@ import {
   type FoliageView,
 } from './foliage';
 import { buildFrostSky, type FrostSkyView } from './frost_sky';
+import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import {
   GFX,
@@ -848,6 +849,7 @@ export class Renderer {
   private hauntFeatures: HauntFeaturesView;
   private jungleFeatures: JungleFeaturesView;
   private gardenFeatures: GardenFeaturesView;
+  private galeFeatures: GaleFeaturesView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
@@ -1072,6 +1074,7 @@ export class Renderer {
         'haunt',
         'jungle',
         'garden',
+        'gale',
       ];
       for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
@@ -1302,6 +1305,10 @@ export class Renderer {
     setRenderCategory(this.gardenFeatures.group, 'props');
     this.scene.add(this.gardenFeatures.group);
     freezeStaticMatrices(this.gardenFeatures.group);
+    this.galeFeatures = buildGaleFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.galeFeatures.group, 'props');
+    this.scene.add(this.galeFeatures.group);
+    for (const light of this.galeFeatures.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -2115,7 +2122,7 @@ export class Renderer {
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
-      this.skyView.setCameraZ(this.camera.position.z, dt);
+      this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.updateEnvBiome(dt);
     }
     for (const sp of this.sunSprites) {
@@ -2760,7 +2767,7 @@ export class Renderer {
             .slice(0, this.lowGfx ? 3 : 8);
           for (const z of zs) {
             if (performance.now() >= deadline) break;
-            this.skyView.setCameraZ(z, 1 / 20);
+            this.skyView.setCameraPos(this.camera.position.x, z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
@@ -3611,6 +3618,8 @@ export class Renderer {
     jungle: { color: 0xd6efe2, near: 115, far: 400 },
     // the Evergarden: crystal parkland air with the faintest green cast
     garden: { color: 0xdcefdc, near: 120, far: 420 },
+    // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
+    gale: { color: 0xe2dee4, near: 118, far: 430 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3640,6 +3649,8 @@ export class Renderer {
     jungle: { hemiSky: 0xeafcff, hemiGround: 0x3a6a42, sun: 0xfff4d8 },
     // the Evergarden: soft perfect afternoon over clipped lawns
     garden: { hemiSky: 0xe8f8ff, hemiGround: 0x4a7a44, sun: 0xfff2d0 },
+    // the Galecrest: cool dawn light, sea-grey bounce off the downs
+    gale: { hemiSky: 0xe4e8f2, hemiGround: 0x4e6a52, sun: 0xffe8c8 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
@@ -3832,7 +3843,7 @@ export class Renderer {
   // brief intensity dip masks the hard texture swap, then eases back like fog.
   private updateEnvBiome(dt: number): void {
     if (this.lowGfx || this.envRTs.size < 2) return;
-    const blend = this.skyView.biomeAt(this.camera.position.z);
+    const blend = this.skyView.biomeAt(this.camera.position.x, this.camera.position.z);
     const dominant = blend.t < 0.5 ? blend.from : blend.to;
     if (dominant !== this.envBiome && this.envRTs.has(dominant)) {
       this.envBiome = dominant;
@@ -4586,6 +4597,7 @@ export class Renderer {
     this.hauntFeatures.update(this.time);
     this.jungleFeatures.update(this.time);
     this.gardenFeatures.update(this.time);
+    this.galeFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);
@@ -4603,7 +4615,7 @@ export class Renderer {
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
-      this.skyView.setCameraZ(this.camera.position.z, dt);
+      this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear

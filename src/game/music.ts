@@ -65,7 +65,8 @@ export function musicZoneForLocation(
     | 'night'
     | 'haunt'
     | 'jungle'
-    | 'garden',
+    | 'garden'
+    | 'gale',
   inHub: boolean,
   inDungeon: boolean,
   dungeonId: string | null = null,
@@ -80,7 +81,9 @@ export function musicZoneForLocation(
         ? 'marsh'
         : biome === 'jungle' || biome === 'garden'
           ? 'vale'
-          : biome;
+          : biome === 'gale'
+            ? 'peaks'
+            : biome;
   if (inHub) return TOWN_MUSIC[zoneId] ?? biomeLayer;
   return ZONE_MUSIC[zoneId] ?? biomeLayer;
 }

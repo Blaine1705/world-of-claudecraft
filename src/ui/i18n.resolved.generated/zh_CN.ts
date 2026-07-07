@@ -5804,6 +5804,18 @@ export const zh_CN: EnTranslations = {
       "the_topiary_bull": {
         "name": "绿雕公牛"
       },
+      "moor_ram": {
+        "name": "荒原羊"
+      },
+      "gale_wisp": {
+        "name": "疾风精"
+      },
+      "shoal_scuttler": {
+        "name": "浅滩蟹"
+      },
+      "the_wreck_warden": {
+        "name": "沉船守卫"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -7349,6 +7361,33 @@ export const zh_CN: EnTranslations = {
           },
           "6": {
             "label": "喷泉庭院"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "疾风崖",
+        "welcome": "这里的风从未停过，老灯塔的火也从未熄过。烛港只求你随手关上旅店的门。",
+        "pois": {
+          "0": {
+            "label": "烛港"
+          },
+          "1": {
+            "label": "风道"
+          },
+          "2": {
+            "label": "啸风丘陵"
+          },
+          "3": {
+            "label": "老灯塔"
+          },
+          "4": {
+            "label": "断崖"
+          },
+          "5": {
+            "label": "沉船滩"
+          },
+          "6": {
+            "label": "镜湖"
           }
         }
       }
