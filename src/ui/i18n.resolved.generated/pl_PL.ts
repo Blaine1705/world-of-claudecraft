@@ -6483,7 +6483,7 @@ export const pl_PL: EnTranslations = {
       },
       "innervate": {
         "name": "Życiodajna Soki",
-        "description": "Wysysa 70 twojego zdrowia, by przywrócić 90 twojego bieżącego zasobu: many, szału w Postaci Niedźwiedzia lub energii w Postaci Kota. (talent Druida)"
+        "description": "Żywe soki wzbierają w tobie przez 10 sek., przywracając falami 30 twojego bieżącego zasobu: many, szału lub energii; zmiana postaci ich nie przerywa. (talent Druida)"
       },
       "kick": {
         "name": "Kopniak",

@@ -6483,7 +6483,7 @@ export const nl_NL: EnTranslations = {
       },
       "innervate": {
         "name": "Levenssap",
-        "description": "Tapt 70 van je eigen gezondheid af om 90 van je huidige energiebron te herstellen: mana, woede in Berengedaante of energie in Kattengedaante. (Druïdetalent)"
+        "description": "Levend sap welt 10 sec in je op en herstelt in golven 30 van je huidige energiebron: mana, woede of energie; van gedaante wisselen onderbreekt het niet. (Druïdetalent)"
       },
       "kick": {
         "name": "Schop",

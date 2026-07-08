@@ -6483,7 +6483,7 @@ export const tr_TR: EnTranslations = {
       },
       "innervate": {
         "name": "Yaşam Özsuyu",
-        "description": "Kendi canından 70 emerek mevcut kaynağından 90 doldurur: mana, Ayı Formunda öfke veya Kedi Formunda enerji. (Druid yeteneği)"
+        "description": "Canlı özsu 10 sn boyunca içinde kabarır ve mevcut kaynağından dalgalar halinde 30 doldurur: mana, öfke veya enerji; form değiştirmek bunu bozmaz. (Druid yeteneği)"
       },
       "kick": {
         "name": "Tekme",

@@ -6483,7 +6483,7 @@ export const sv_SE: EnTranslations = {
       },
       "innervate": {
         "name": "Livssav",
-        "description": "Tappar 70 av din egen hälsa för att fylla 90 av din nuvarande resurs: mana, raseri i björnform eller energi i kattform. (Druidtalang)"
+        "description": "Levande sav väller upp i dig i 10 sek och återställer 30 av din nuvarande resurs i vågor: mana, raseri eller energi; att byta form avbryter den inte. (Druidtalang)"
       },
       "kick": {
         "name": "Spark",

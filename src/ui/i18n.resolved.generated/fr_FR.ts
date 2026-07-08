@@ -6483,7 +6483,7 @@ export const fr_FR: EnTranslations = {
       },
       "innervate": {
         "name": "Sève vitale",
-        "description": "Sacrifie 70 de votre propre vie pour restaurer 90 de votre ressource actuelle : mana, rage en forme d'ours ou énergie en forme féline. (talent de druide)"
+        "description": "La sève vivante afflue en vous pendant 10 s, restaurant 30 de votre ressource actuelle par vagues : mana, rage ou énergie ; changer de forme ne l'interrompt pas. (talent de druide)"
       },
       "kick": {
         "name": "Botte",

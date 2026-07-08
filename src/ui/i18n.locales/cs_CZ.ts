@@ -4584,7 +4584,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (kněžský talent)',
   'entities.abilities.innervate.name': 'Míza života',
   'entities.abilities.innervate.description':
-    'Vysaje 70 tvého zdraví a obnoví 90 tvého aktuálního zdroje: manu, zuřivost v medvědí podobě nebo energii v kočičí podobě. (druidský talent)',
+    'Živá míza v tobě 10 s vzlíná a ve vlnách obnovuje 30 tvého aktuálního zdroje: manu, zuřivost nebo energii; změna podoby ji nepřeruší. (druidský talent)',
   'entities.abilities.kick.name': 'Kopnutí',
   'entities.abilities.kick.description':
     'Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (lotrovský talent)',

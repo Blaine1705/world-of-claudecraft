@@ -6483,7 +6483,7 @@ export const da_DK: EnTranslations = {
       },
       "innervate": {
         "name": "Livssaft",
-        "description": "Tærer 70 af dit eget helbred for at fylde 90 af din nuværende ressource: mana, raseri i bjørneform eller energi i katteform. (Druidetalent)"
+        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 30 af din nuværende ressource i bølger: mana, raseri eller energi; formskifte afbryder den ikke. (Druidetalent)"
       },
       "kick": {
         "name": "Støvle",

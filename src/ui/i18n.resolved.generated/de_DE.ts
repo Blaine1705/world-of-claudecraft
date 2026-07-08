@@ -6483,7 +6483,7 @@ export const de_DE: EnTranslations = {
       },
       "innervate": {
         "name": "Lebenssaft",
-        "description": "Zehrt 70 Eurer eigenen Gesundheit, um 90 Eurer aktuellen Ressource aufwallen zu lassen: Mana, Wut in Bärengestalt oder Energie in Katzengestalt. (Druidentalent)"
+        "description": "Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 30 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie; Gestaltwandel unterbricht ihn nicht. (Druidentalent)"
       },
       "kick": {
         "name": "Stiefeltritt",

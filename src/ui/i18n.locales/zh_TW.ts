@@ -2606,7 +2606,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '使你的下一個法術不消耗法力。持續 60 秒。（牧師天賦）',
   'entities.abilities.innervate.name': '生命樹液',
-  'entities.abilities.innervate.description': '汲取自身70點生命值，湧回90點當前資源：施法形態為法力，熊形態為怒氣，獵豹形態為能量。（德魯伊天賦）',
+  'entities.abilities.innervate.description': '生命樹液在你體內湧動10秒，如波浪般恢復30點當前資源：法力、怒氣或能量，變形也不會中斷。（德魯伊天賦）',
   'entities.abilities.kick.name': '踢擊',
   'entities.abilities.kick.description': '打斷施法，並使該系法術在 4 秒內無法施放。（盜賊天賦）',
   'entities.abilities.last_stand.name': '第十一刻',

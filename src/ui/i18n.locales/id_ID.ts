@@ -2591,7 +2591,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 detik. (talenta priest)',
   'entities.abilities.innervate.name': 'Getah Hidup',
   'entities.abilities.innervate.description':
-    'Menyedot 70 nyawa Anda sendiri untuk memulihkan 90 sumber daya saat ini: mana, amarah dalam Wujud Beruang, atau energi dalam Wujud Kucing. (talenta Druid)',
+    'Getah hidup mengalir dalam dirimu selama 10 detik, memulihkan 30 sumber daya saat ini secara bergelombang: mana, amarah, atau energi; berganti wujud tidak memutusnya. (talenta Druid)',
   'entities.abilities.kick.name': 'Tendang',
   'entities.abilities.kick.description':
     'Menghentikan perapalan dan mencegah mantra sekolah itu selama 4 detik. (talenta rogue)',

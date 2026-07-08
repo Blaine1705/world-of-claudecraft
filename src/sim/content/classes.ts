@@ -5629,14 +5629,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 30,
+    cooldown: 90,
     range: 0,
     school: 'nature',
     requiresTarget: false,
     usableInForm: true,
-    effects: [{ type: 'lifeTap', hp: 70, mana: 90 }],
+    effects: [{ type: 'selfBuff', kind: 'resource_sap', value: 30, duration: 10 }],
     description:
-      'Saps 70 of your own health to surge 90 of your current resource: mana in caster form, Rage in Bruin Form, Energy in Cat Form. (Druid talent)',
+      'Living sap wells up in you for 10 sec, restoring 30 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. (Druid talent)',
   },
   kick: {
     id: 'kick',

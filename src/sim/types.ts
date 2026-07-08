@@ -290,6 +290,9 @@ export type AuraKind =
   | 'next_cast_instant'
   | 'next_cast_free'
   | 'next_cast_cheap'
+  // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
+  // any resource type, combat or not, carried across form shifts.
+  | 'resource_sap'
   | 'next_attack_crit'
   | 'heal_echo'
   | 'buff_spi'

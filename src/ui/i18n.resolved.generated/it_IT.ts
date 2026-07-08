@@ -6483,7 +6483,7 @@ export const it_IT: EnTranslations = {
       },
       "innervate": {
         "name": "Linfa Vitale",
-        "description": "Prosciuga 70 della tua salute per infondere 90 della tua risorsa attuale: mana, rabbia in Forma d'Orso o energia in Forma Felina. (talento del Druido)"
+        "description": "La linfa vivente sgorga in te per 10 sec, ripristinando 30 della tua risorsa attuale a ondate: mana, rabbia o energia; cambiare forma non la interrompe. (talento del Druido)"
       },
       "kick": {
         "name": "Pedata",

@@ -3380,7 +3380,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento da sacerdote)',
   'entities.abilities.innervate.name': 'Linfa Vitale',
   'entities.abilities.innervate.description':
-    "Prosciuga 70 della tua salute per infondere 90 della tua risorsa attuale: mana, rabbia in Forma d'Orso o energia in Forma Felina. (talento del Druido)",
+    'La linfa vivente sgorga in te per 10 sec, ripristinando 30 della tua risorsa attuale a ondate: mana, rabbia o energia; cambiare forma non la interrompe. (talento del Druido)',
   'entities.abilities.kick.name': 'Pedata',
   'entities.abilities.kick.description':
     'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da ladro)',
