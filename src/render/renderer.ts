@@ -46,8 +46,8 @@ import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
+import { currentDayNightPhase } from './day_night_clock';
 import {
-  cyclePhase,
   type DayNightGrade,
   dayNightGrade,
   effectiveDayness,
@@ -3752,7 +3752,7 @@ export class Renderer {
     // grade is per-realm, the player's biome deciding how far the global cycle
     // pulls its authored look (signature realms swing less, see day_night_core).
     const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
-    this.dnGrade = dayNightGrade(effectiveDayness(globalDayness(cyclePhase(Date.now())), biome));
+    this.dnGrade = dayNightGrade(effectiveDayness(globalDayness(currentDayNightPhase()), biome));
     if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isArenaPos(px)) {

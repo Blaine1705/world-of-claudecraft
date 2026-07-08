@@ -83,6 +83,7 @@ import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
+import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
@@ -1060,6 +1061,53 @@ async function startGame(
       autosizeChatInput();
     }
   });
+  // Dev-only chat command to scrub the world day/night cycle for testing:
+  //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
+  // Render-only: it just overrides the shared clock phase (day_night_clock), so
+  // the sky lighting and the minimap dial both jump to the chosen time of day.
+  // Returns true when it handled the input (so it is not also sent to chat).
+  const DAY_NIGHT_PRESETS: Record<string, number> = {
+    midnight: 0,
+    night: 0,
+    dawn: 0.25,
+    sunrise: 0.25,
+    morning: 0.375,
+    day: 0.5,
+    noon: 0.5,
+    midday: 0.5,
+    afternoon: 0.625,
+    dusk: 0.75,
+    sunset: 0.75,
+    evening: 0.8,
+  };
+  const tryDayNightDevCommand = (raw: string): boolean => {
+    const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
+    if (!m) return false;
+    const arg = m[1].trim().toLowerCase();
+    if (!arg) {
+      hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
+      return true;
+    }
+    if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
+      setDayNightPhaseOverride(null);
+      hud.log('[dev] day/night resumed (real UTC clock)', '#8fd0ff');
+      hud.refreshDayNightDial();
+      return true;
+    }
+    let phase: number | null = arg in DAY_NIGHT_PRESETS ? DAY_NIGHT_PRESETS[arg] : null;
+    if (phase === null) {
+      const n = Number.parseFloat(arg);
+      if (Number.isFinite(n)) phase = ((n % 1) + 1) % 1;
+    }
+    if (phase === null) {
+      hud.log(`[dev] unknown time "${arg}" - try night|dawn|day|dusk|<0..1>|auto`, '#ffcf6a');
+      return true;
+    }
+    setDayNightPhaseOverride(phase);
+    hud.log(`[dev] time of day set to ${arg} (phase ${phase.toFixed(2)})`, '#8fd0ff');
+    hud.refreshDayNightDial();
+    return true;
+  };
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
     // While the "!" command dropdown is open it owns Arrows/Enter/Tab/Escape.
@@ -1074,6 +1122,12 @@ async function startGame(
       // the active channel tab supplies the send prefix, so plain text goes to
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
+      // dev-only day/night scrub command, intercepted before the chat send path
+      if (import.meta.env.DEV && tryDayNightDevCommand(raw)) {
+        chatInput.value = '';
+        closeChat();
+        return;
+      }
       // "/share" links the selected quest into party chat; skip the normal send path.
       if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);

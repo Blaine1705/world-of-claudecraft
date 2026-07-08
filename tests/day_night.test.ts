@@ -9,6 +9,11 @@ import {
   REALM_DAYNIGHT_AMPLITUDE,
   skyTintForDayness,
 } from '../src/render/day_night_core';
+import {
+  currentDayNightPhase,
+  dayNightPhaseOverride,
+  setDayNightPhaseOverride,
+} from '../src/render/day_night_clock';
 import type { BiomeId } from '../src/sim/types';
 
 // The day_night_core: the pure clock-to-grade math of the world day/night cycle.
@@ -148,6 +153,27 @@ describe('dayNightGrade', () => {
 describe('fullDayGrade', () => {
   it('equals the e = 1 grade (the safe pre-first-frame default)', () => {
     expect(fullDayGrade()).toEqual(dayNightGrade(1));
+  });
+});
+
+describe('day/night clock override (the /daynight dev command)', () => {
+  it('returns the frozen phase while an override is set, then resumes', () => {
+    setDayNightPhaseOverride(0.5);
+    expect(dayNightPhaseOverride()).toBe(0.5);
+    expect(currentDayNightPhase()).toBe(0.5);
+    setDayNightPhaseOverride(null);
+    expect(dayNightPhaseOverride()).toBeNull();
+    const live = currentDayNightPhase();
+    expect(live).toBeGreaterThanOrEqual(0);
+    expect(live).toBeLessThan(1);
+  });
+
+  it('wraps an out-of-range override phase into [0, 1)', () => {
+    setDayNightPhaseOverride(1.25);
+    expect(currentDayNightPhase()).toBeCloseTo(0.25, 12);
+    setDayNightPhaseOverride(-0.25);
+    expect(currentDayNightPhase()).toBeCloseTo(0.75, 12);
+    setDayNightPhaseOverride(null); // do not leak override into other tests
   });
 });
 

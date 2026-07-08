@@ -22,7 +22,8 @@ import {
   playerPortraitDataUrl,
   visualPortraitDataUrl,
 } from '../render/characters/portrait';
-import { cyclePhase, globalDayness, skyTintForDayness } from '../render/day_night_core';
+import { currentDayNightPhase } from '../render/day_night_clock';
+import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import {
@@ -5828,6 +5829,12 @@ export class Hud {
     }
   }
 
+  /** Force the minimap day/night dial to redraw on the next tick (the /daynight
+   *  dev command calls this so an override shows without the ~1s throttle wait). */
+  refreshDayNightDial(): void {
+    this.lastDayNightDrawAt = 0;
+  }
+
   // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
   // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
   // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
@@ -5868,7 +5875,7 @@ export class Hud {
       ctx.stroke();
     }
 
-    const phaseNow = cyclePhase(now);
+    const phaseNow = currentDayNightPhase();
     const daynessNow = globalDayness(phaseNow);
     const skyNow = skyTintForDayness(daynessNow);
 
