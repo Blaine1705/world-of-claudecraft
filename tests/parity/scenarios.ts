@@ -1160,10 +1160,11 @@ function drownedLitany(): Scenario {
       'cantor phases + Final Bell + rite choose -> playback pulses',
     ],
     sampleEvery: 10,
-    // Seed 3132 (was 3131): the branch's Battle Trance per-swing roll shifted
-    // the shared stream so 3131's Blackwater Mark never landed inside the
-    // ride-out window; 3132 exercises every anchored mechanic again.
-    build: () => new Sim({ seed: 3132, playerClass: 'warrior', autoEquip: true }),
+    // Seed 3144 (was 3132, 3131): each warrior rage-cadence change shifts the
+    // shared stream so the old seed's Blackwater Mark no longer lands inside the
+    // ride-out window (3131->3132 was Battle Trance; 3132->3144 is Battle Stance's
+    // +10% rage generation). 3144 exercises every anchored mechanic again.
+    build: () => new Sim({ seed: 3144, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
       const def = DELVES.drowned_litany;
