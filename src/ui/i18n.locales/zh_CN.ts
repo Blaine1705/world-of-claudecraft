@@ -3396,6 +3396,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': '外观宝箱',
   'skinEvent.unavailable': '即将推出',
   'skinEvent.unequip': '卸下',
+  'hudChrome.paperdoll.offhand': '副手',
   'hudChrome.paperdoll.unequipAria': '卸下 {item}',
   'hudChrome.paperdoll.unequipHint': '点击 ×、右键点击或拖到背包以卸下',
   'skinEvent.unlocked': '外观已解锁！',

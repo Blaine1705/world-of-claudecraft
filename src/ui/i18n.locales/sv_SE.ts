@@ -5031,6 +5031,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Visa plånbok på karaktärsskärmen',
   'hudChrome.options.showWalletOnPlayerCard': 'Visa plånbok på spelarkortet',
   'hudChrome.options.uiScale': 'Gränssnittsskala',
+  'hudChrome.paperdoll.offhand': 'Bihand',
   'hudChrome.paperdoll.unequipAria': 'Ta av {item}',
   'hudChrome.paperdoll.unequipHint':
     'Klicka på ×, högerklicka, eller dra till väskor för att ta av',

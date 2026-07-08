@@ -801,6 +801,7 @@ export const pt_BR: EnTranslations = {
       "failed": "Não foi possível enviar o relatório de erro. Tente novamente."
     },
     "paperdoll": {
+      "offhand": "Mão secundária",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Clique em ×, clique direito ou arraste para as bolsas para desequipar"
     },

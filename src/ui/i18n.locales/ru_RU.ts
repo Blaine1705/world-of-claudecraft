@@ -3579,6 +3579,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': 'Косметический тайник',
   'skinEvent.unavailable': 'Скоро',
   'skinEvent.unequip': 'Снять',
+  'hudChrome.paperdoll.offhand': 'Левая рука',
   'hudChrome.paperdoll.unequipAria': 'Снять {item}',
   'hudChrome.paperdoll.unequipHint': 'Нажмите ×, ПКМ или перетащите в сумку, чтобы снять',
   'skinEvent.unlocked': 'Косметика разблокирована!',

@@ -3530,6 +3530,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': '장식 상자',
   'skinEvent.unavailable': '곧 출시',
   'skinEvent.unequip': '장착 해제',
+  'hudChrome.paperdoll.offhand': '보조 장비',
   'hudChrome.paperdoll.unequipAria': '{item} 장착 해제',
   'hudChrome.paperdoll.unequipHint': '× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제',
   'skinEvent.unlocked': '장식이 잠금 해제되었습니다!',

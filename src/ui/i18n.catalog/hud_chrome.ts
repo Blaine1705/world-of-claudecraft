@@ -938,6 +938,7 @@ export const hudChromeStrings = {
   },
   // Character window (paperdoll) controls.
   paperdoll: {
+    offhand: 'Off Hand',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
   },

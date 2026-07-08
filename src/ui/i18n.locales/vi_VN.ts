@@ -5077,6 +5077,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Hiện Ví Tiền Ở Màn Hình Nhân Vật',
   'hudChrome.options.showWalletOnPlayerCard': 'Hiện Ví Tiền Trên Thẻ Người Chơi',
   'hudChrome.options.uiScale': 'Tỷ Lệ Giao Diện',
+  'hudChrome.paperdoll.offhand': 'Tay phụ',
   'hudChrome.paperdoll.unequipAria': 'Tháo {item}',
   'hudChrome.paperdoll.unequipHint': 'Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị',
   'hudChrome.perf.badges.backgrounded': 'Chạy Nền',

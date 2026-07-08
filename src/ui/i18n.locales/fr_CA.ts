@@ -11,6 +11,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.offhand': 'Main gauche',
   'download.macCta': 'Telecharger la version macOS',
   'download.windowsPending': 'Version Windows a venir.',
   // Stat tooltips inherit the fr_FR base: none of these strings has a genuine
