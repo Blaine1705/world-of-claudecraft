@@ -28,9 +28,13 @@ const knownIds = (spec: string | null, level = 20): Set<string> =>
 // The locked gating table: ability id -> specs that keep it.
 const GATED: Record<string, string[]> = {
   defensive_stance: ['arms', 'prot'],
-  sunder_armor: ['arms', 'prot'],
+  sunder_armor: ['prot'], // Arms restructure 2026-07-08: Armor Shear is prot-only now
+  thunder_clap: ['prot'], // Quaking Blow gated to prot 2026-07-08 (was ungated)
   commanding_shout: ['prot'],
   demoralizing_shout: ['prot'],
+  // rend (Deep Gash) was retired from the warrior kit 2026-07-08; its ABILITIES def
+  // still carries specs ['arms'], but no warrior learns it (it is in no kit list), so
+  // it stays HIDDEN for every spec below.
   rend: ['arms'],
   overpower: ['arms'],
   slam: ['arms', 'prot'],
@@ -52,10 +56,11 @@ describe('spec-gated warrior base kit (content table)', () => {
     }
   });
 
-  it('Reaver Strike is excluded from prot via excludeSpecs, and Revenge is prot-only', () => {
-    // heroic_strike stays ungated (no `specs`) but drops out for committed prot.
+  it('Reaver Strike is excluded from prot AND arms via excludeSpecs, and Revenge is prot-only', () => {
+    // heroic_strike stays ungated (no `specs`) but drops out for committed prot AND
+    // arms (Arms restructure 2026-07-08: it leans on Maiming/Brute strikes instead).
     expect(ABILITIES.heroic_strike?.specs).toBeUndefined();
-    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot']);
+    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot', 'arms']);
     // revenge is the prot replacement.
     expect(ABILITIES.revenge?.specs).toEqual(['prot']);
     expect(ABILITIES.revenge?.excludeSpecs).toBeUndefined();
@@ -79,16 +84,25 @@ describe('abilitiesKnownAt spec filter', () => {
     expect(ids.has('bloodthirst')).toBe(true); // the signature grant is untouched
   });
 
-  it('arms keeps its exclusives (incl. the shared strikes) but not the prot-only kit', () => {
+  it('arms keeps its own exclusives but not the prot-only kit or the shared strikes', () => {
     const ids = knownIds('arms');
-    for (const id of ['defensive_stance', 'sunder_armor', 'rend', 'overpower', 'slam', 'cleave']) {
+    for (const id of ['defensive_stance', 'overpower', 'slam', 'cleave']) {
       expect(ids.has(id), id).toBe(true);
     }
-    for (const id of ['commanding_shout', 'demoralizing_shout', 'revenge']) {
+    // Armor Shear (sunder) and Quaking Blow (thunder_clap) are prot-only now; Deep
+    // Gash (rend) was retired from the kit; and Reaver Strike (heroic_strike) now
+    // excludes arms too (excludeSpecs ['prot','arms']).
+    for (const id of [
+      'commanding_shout',
+      'demoralizing_shout',
+      'revenge',
+      'sunder_armor',
+      'thunder_clap',
+      'rend',
+      'heroic_strike',
+    ]) {
       expect(ids.has(id), id).toBe(false);
     }
-    // Arms keeps Reaver Strike (only prot excludes it).
-    expect(ids.has('heroic_strike')).toBe(true);
     expect(ids.has('bloodrage')).toBe(true);
   });
 
@@ -97,6 +111,7 @@ describe('abilitiesKnownAt spec filter', () => {
     for (const id of [
       'defensive_stance',
       'sunder_armor',
+      'thunder_clap',
       'commanding_shout',
       'demoralizing_shout',
       'slam',
@@ -112,13 +127,18 @@ describe('abilitiesKnownAt spec filter', () => {
     }
   });
 
-  it('excludeSpecs: only committed prot swaps Reaver Strike for Revenge', () => {
-    // No spec, arms, and fury all keep Reaver Strike and none see Revenge.
-    for (const spec of [null, 'arms', 'fury'] as const) {
+  it('excludeSpecs: committed prot AND arms lack Reaver Strike; only prot gains Revenge', () => {
+    // No spec and fury keep Reaver Strike and neither sees Revenge.
+    for (const spec of [null, 'fury'] as const) {
       const ids = knownIds(spec);
       expect(ids.has('heroic_strike'), `${spec} heroic_strike`).toBe(true);
       expect(ids.has('revenge'), `${spec} revenge`).toBe(false);
     }
+    // Arms now excludes Reaver Strike too (excludeSpecs ['prot','arms']) but does
+    // NOT gain Revenge (that swap is prot-only).
+    const arms = knownIds('arms');
+    expect(arms.has('heroic_strike')).toBe(false);
+    expect(arms.has('revenge')).toBe(false);
     // Committed prot is the mirror image: Revenge in, Reaver Strike out.
     const prot = knownIds('prot');
     expect(prot.has('heroic_strike')).toBe(false);
@@ -135,22 +155,24 @@ describe('abilitiesKnownAt spec filter', () => {
 });
 
 describe('spec gating end to end in the sim', () => {
-  it('a no-spec warrior lacks Deep Gash; arms grants it in the known list and cast resolve, fury never does', () => {
+  it('a no-spec warrior lacks the arms-only Die by the Sword; arms grants it in the known list and cast resolve, fury never does', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    // No committed spec: the arms-only Deep Gash (rend) is hidden and unresolvable.
-    expect(sim.known.some((k) => k.def.id === 'rend')).toBe(false);
-    expect(sim.resolvedAbility('rend')).toBeNull();
+    // No committed spec: the arms-only Die by the Sword is hidden and unresolvable.
+    // (Deep Gash / rend was retired from the kit 2026-07-08, so this exercises the
+    // gating through a live arms-only ability instead.)
+    expect(sim.known.some((k) => k.def.id === 'die_by_sword')).toBe(false);
+    expect(sim.resolvedAbility('die_by_sword')).toBeNull();
     // Committing arms reveals it in the known list AND the cast resolve.
     expect(sim.setSpec('arms')).toBe(true);
-    expect(sim.known.some((k) => k.def.id === 'rend')).toBe(true);
-    expect(sim.resolvedAbility('rend')).not.toBeNull();
-    // Switching to fury drops it again (fury never keeps the arms-only bleed).
+    expect(sim.known.some((k) => k.def.id === 'die_by_sword')).toBe(true);
+    expect(sim.resolvedAbility('die_by_sword')).not.toBeNull();
+    // Switching to fury drops it again (fury never keeps the arms-only kit).
     expect(sim.setSpec('fury')).toBe(true);
-    expect(sim.known.some((k) => k.def.id === 'rend')).toBe(false);
-    expect(sim.resolvedAbility('rend')).toBeNull();
-    // Staples survive every spec choice.
-    expect(sim.known.some((k) => k.def.id === 'heroic_strike')).toBe(true);
+    expect(sim.known.some((k) => k.def.id === 'die_by_sword')).toBe(false);
+    expect(sim.resolvedAbility('die_by_sword')).toBeNull();
+    // Ungated staples survive every spec choice.
+    expect(sim.known.some((k) => k.def.id === 'battle_shout')).toBe(true);
   });
 
   it('choosing prot keeps the tank kit and stays deterministic', () => {

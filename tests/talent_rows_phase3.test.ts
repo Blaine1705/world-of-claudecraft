@@ -172,7 +172,10 @@ describe('Second Wind', () => {
 });
 
 describe('Die by the Sword', () => {
-  it('cuts damage taken 10%, doubled below 30% health', () => {
+  it('cuts damage taken a flat 30% at any health', () => {
+    // Arms restructure 2026-07-08: Die by the Sword now takes a flat 30% off incoming
+    // damage (DIE_BY_SWORD_CUT/LOW_CUT both 0.7) regardless of health, replacing the
+    // old 10% cut that doubled below 30% health.
     const sim = warriorAtCap(47);
     sim.pickRowTalent(1, 'war_row_die_by_the_sword');
     const p = sim.player;
@@ -182,11 +185,12 @@ describe('Die by the Sword', () => {
     p.hp = p.maxHp;
     const hp0 = p.hp;
     (sim as any).dealDamage(mob, p, 100, false, 'physical', null, 'hit', true);
-    expect(hp0 - p.hp).toBe(90);
+    expect(hp0 - p.hp).toBe(70);
+    // Below 30% health there is no longer any doubling: still a flat 30% cut.
     p.hp = Math.floor(p.maxHp * 0.2);
     const hp1 = p.hp;
     (sim as any).dealDamage(mob, p, 100, false, 'physical', null, 'hit', true);
-    expect(hp1 - p.hp).toBe(80);
+    expect(hp1 - p.hp).toBe(70);
   });
 });
 

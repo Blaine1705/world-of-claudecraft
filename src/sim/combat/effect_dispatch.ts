@@ -44,7 +44,13 @@ import {
   rageGenAuraMult,
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
-import { consumeAreaEchoCharge, echoAreaDamage } from './area_echo';
+import {
+  abilityQualifiesForAreaEcho,
+  consumeAreaEchoCharge,
+  echoAreaDamage,
+  hasSweepingStrikes,
+  sweepStrikeDamage,
+} from './area_echo';
 import { isRooted } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -179,6 +185,11 @@ export function runEffects(
   // actually dealt single-target hostile damage; gates the charge consumption
   // after the loop (a fully whiffed cast keeps its charge).
   let areaEchoDealt = false;
+  // Sweeping Strikes (Arms): a worn window makes each single-target strike clip
+  // one nearby enemy for 75%. Aura-driven (no charge), resolved once per cast
+  // like the echo. SWEEP_MULT is the reduced fraction.
+  const SWEEP_MULT = 0.75;
+  const sweeping = hasSweepingStrikes(p) && abilityQualifiesForAreaEcho(ability.effects);
   // Emboldened (combat/sure_crit.ts): resolved ONCE per cast, so a
   // multi-strike cast (Red Harvest) crits every strike and spends a single
   // charge below. Each crit-roll site still draws its rng exactly as before
@@ -232,31 +243,58 @@ export function runEffects(
       case 'weaponStrike': {
         if (!target) break;
         const strikeTarget = target;
+        // Redhand empowers the next Maiming Strike: consume the charge and
+        // amplify this strike (Arms restructure 2026-07-08).
+        let strikeMult = eff.weaponMult ?? 1;
+        if (ability.id === 'mortal_strike') {
+          const idx = p.auras.findIndex((a) => a.kind === 'overpower_charge');
+          if (idx >= 0) {
+            const charge = p.auras[idx];
+            strikeMult *= 1 + charge.value * (charge.stacks ?? 1);
+            p.auras.splice(idx, 1);
+            ctx.emit({ type: 'aura', targetId: p.id, name: charge.name, gained: false });
+          }
+        }
         const hit = ctx.meleeSwing(p, strikeTarget, eff.bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
-          weaponMult: eff.weaponMult ?? 1,
+          weaponMult: strikeMult,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
           // Emboldened: override the swing's crit outcome (its rng is still
           // drawn inside meleeSwing exactly as before).
           forceCrit: sureCrit,
-          // Bladed Echo: fan this swing's RESOLVED damage (post crit/armor, the
-          // exact number the primary dealDamage received) out to enemies near
-          // the primary target. No re-roll; a miss/dodge never fires this.
-          onDealt: opts?.areaEcho
-            ? (amount) => {
-                areaEchoDealt = true;
-                echoAreaDamage(
-                  ctx,
-                  p,
-                  strikeTarget,
-                  amount,
-                  ability.school,
-                  ability.name,
-                  threatOpts,
-                );
-              }
-            : undefined,
+          // Bladed Echo (charge) and Sweeping Strikes (window) both replay this
+          // swing's RESOLVED damage (post crit/armor) onto nearby enemies with
+          // no re-roll: the echo hits all for 100%, the sweep one for 75%.
+          onDealt:
+            opts?.areaEcho || sweeping
+              ? (amount) => {
+                  if (opts?.areaEcho) {
+                    areaEchoDealt = true;
+                    echoAreaDamage(
+                      ctx,
+                      p,
+                      strikeTarget,
+                      amount,
+                      ability.school,
+                      ability.name,
+                      threatOpts,
+                    );
+                  }
+                  if (sweeping) {
+                    sweepStrikeDamage(
+                      ctx,
+                      p,
+                      strikeTarget,
+                      amount,
+                      SWEEP_MULT,
+                      ability.school,
+                      ability.name,
+                      threatOpts,
+                    );
+                  }
+                }
+              : undefined,
         });
         // A connected swing rolled (and had overridden) its crit; a miss or
         // dodge never reached the crit roll, so it spends nothing.
@@ -305,6 +343,18 @@ export function runEffects(
         if (opts?.areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, Math.round(dmg), ability.school, ability.name, threatOpts);
+        }
+        if (sweeping) {
+          sweepStrikeDamage(
+            ctx,
+            p,
+            target,
+            Math.round(dmg),
+            SWEEP_MULT,
+            ability.school,
+            ability.name,
+            threatOpts,
+          );
         }
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -633,9 +683,10 @@ export function runEffects(
         const dotSp = !hybrid
           ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
           : 0;
+        const dotId = eff.auraId ?? ability.id;
         ctx.applyAura(target, {
-          id: ability.id,
-          name: ability.name,
+          id: dotId,
+          name: ABILITIES[dotId]?.name ?? ability.name,
           kind: 'dot',
           remaining: eff.duration,
           duration: eff.duration,

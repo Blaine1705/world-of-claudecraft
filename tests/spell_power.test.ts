@@ -115,27 +115,32 @@ describe('Spell Power balance band (cap)', () => {
     expect(share).toBeLessThan(0.45);
   });
 
-  it('a warrior bleed (Rend) folds melee Attack Power into each DoT tick', () => {
+  it('a warrior bleed (Maiming Strike / Deep Wounds) folds melee Attack Power into each DoT tick', () => {
     const { sim, pid, p } = leveled('warrior');
-    // Deep Gash (rend) is arms-gated base kit (2026-07-07): commit arms so it is
-    // known and castable, and resolve its def under arms.
+    // Deep Gash (rend) was retired 2026-07-08; the Arms bleed now rides Maiming
+    // Strike (mortal_strike), an Arms-granted signature. Commit arms so it is known
+    // and castable, and resolve its def (with the Deep Wounds dot) under arms.
     expect(sim.setSpec('arms', pid)).toBe(true);
     const dummy = spawnDummy(sim, p);
     p.targetId = dummy.id;
-    p.resource = 100; // rage to pay for Rend
+    p.resource = 100; // rage to pay for Maiming Strike
     const armsMods = computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' });
-    const rend = abilitiesKnownAt('warrior', MAX_LEVEL, armsMods).find((k) => k.def.id === 'rend')!;
-    const dot = rend.effects.find((e) => e.type === 'dot') as {
+    const ms = abilitiesKnownAt('warrior', MAX_LEVEL, armsMods).find(
+      (k) => k.def.id === 'mortal_strike',
+    )!;
+    const dot = ms.effects.find((e) => e.type === 'dot') as {
       total: number;
       duration: number;
       interval: number;
     };
-    sim.castAbility('rend', p.id);
+    sim.castAbility('mortal_strike', p.id);
     sim.tick();
-    const aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'rend')!;
+    // The bleed rides a distinct auraId ('deep_wounds') so it does not collide
+    // with Maiming Strike's mortal_wound healing debuff on the same cast.
+    const aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'deep_wounds')!;
     expect(aura).toBeDefined();
     const basePerTick = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
-    const bonusPerTick = dotTickBonus(p.attackPower, rend.def, dot.duration, dot.interval);
+    const bonusPerTick = dotTickBonus(p.attackPower, ms.def, dot.duration, dot.interval);
     expect(bonusPerTick).toBeGreaterThan(0);
     expect(aura.value).toBe(basePerTick + bonusPerTick);
   });

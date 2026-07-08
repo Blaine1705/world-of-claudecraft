@@ -182,9 +182,10 @@ describe('auraEffectDescriptor', () => {
   });
 
   it('describes Die by the Sword from the fixed damage-cut constants', () => {
+    // Arms restructure 2026-07-08: a flat 30% cut at any health (CUT/LOW_CUT both 0.7).
     expect(desc({ kind: 'die_by_sword', value: 0.1 })).toEqual({
       key: 'hudChrome.auraEffect.dieBySword',
-      nums: { pct: 10, lowPct: 20, hpPct: 30 },
+      nums: { pct: 30, lowPct: 30, hpPct: 30 },
     });
   });
 

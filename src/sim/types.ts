@@ -177,6 +177,12 @@ export type AuraKind =
   | 'form_shadow'
   | 'stealth'
   | 'defensive_stance'
+  // Arms restructure (owner 2026-07-08). `overpower_charge`: Redhand stacks it
+  // (up to 2); the next Maiming Strike consumes it for +value damage per stack.
+  // `sweeping_strikes`: while worn, a single-target damaging ability also strikes
+  // one nearby enemy for a reduced fraction (like a timed Bladed Echo).
+  | 'overpower_charge'
+  | 'sweeping_strikes'
   // Warrior combat stances (mutually exclusive, exclusiveGroup 'warrior_stance').
   // `battle_stance`: the offensive default for Arms/Prot/no-spec; its only effect
   // is +STANCE_RAGE_GEN rage generation, folded in rageGenAuraMult below.
@@ -1253,7 +1259,17 @@ export type AbilityEffect =
       auraName: string;
     }
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
-  | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
+  // `auraId` overrides the applied dot aura's id (default: the ability id) so a
+  // rider bleed does not collide with another same-id aura the same cast applies
+  // (Maiming Strike's Deep Wounds bleed vs its mortal_wound debuff).
+  | {
+      type: 'dot';
+      total: number;
+      duration: number;
+      interval: number;
+      leechPct?: number;
+      auraId?: string;
+    }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
@@ -2629,11 +2645,14 @@ export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
   'druid',
 ]);
 
-// Die by the Sword: the damage-taken multiplier tiers (10% cut, doubled below
-// the low-health threshold) and Second Wind's activation threshold.
-export const DIE_BY_SWORD_CUT = 0.9;
-export const DIE_BY_SWORD_LOW_CUT = 0.8;
+// Die by the Sword (Arms defensive, owner restructure 2026-07-08): a flat 30%
+// incoming-damage cut (take-fraction multiplier) plus a big dodge boost standing
+// in for its "+100% parry" (avoidance is modelled as dodge). Second Wind's
+// activation threshold rides alongside.
+export const DIE_BY_SWORD_CUT = 0.7;
+export const DIE_BY_SWORD_LOW_CUT = 0.7;
 export const DIE_BY_SWORD_LOW_HP = 0.3;
+export const DIE_BY_SWORD_DODGE = 0.3;
 export const SECOND_WIND_THRESHOLD = 0.35;
 // Avatar's colossus body-size multiplier while the buff_avatar aura is worn.
 export const AVATAR_SCALE = 1.15;

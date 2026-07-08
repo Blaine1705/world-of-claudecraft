@@ -62,7 +62,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'battle_shout',
       'commanding_shout',
       'charge',
-      'rend',
       'thunder_clap',
       'hamstring',
       'bloodrage',
@@ -90,6 +89,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'taunt',
       'measured_fury',
       'breachmaker',
+      // Arms restructure 2026-07-08: its own defensive cooldown, a cleave window,
+      // and the Deep Wounds bleed passive (replacing the retired Deep Gash).
+      'die_by_sword',
+      'sweeping_strikes',
+      'deep_wounds',
     ],
     color: 0xc79c6e,
   },
@@ -391,9 +395,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     onNextSwing: true,
     offGcd: true,
-    // Reaver Strike is the shared filler for every warrior EXCEPT committed
-    // Protection, which replaces it with Revenge (specs ['prot']).
-    excludeSpecs: ['prot'],
+    // Reaver Strike is the Fury / no-spec filler only: Protection replaces it
+    // with Revenge, and Arms (owner restructure 2026-07-08) leans on Maiming
+    // Strike + Brute Swing as its strike/filler pair.
+    excludeSpecs: ['prot', 'arms'],
     threat: { flat: 20 }, // classic per-rank values: 20/39/59/78
     effects: [{ type: 'weaponDamage', bonus: 11 }],
     ranks: [
@@ -542,6 +547,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Quaking Blow',
     class: 'warrior',
     learnLevel: 6,
+    // Protection-only now (owner restructure 2026-07-08): the seismic AoE belongs
+    // to the tank; Arms dropped it to declutter its bar.
+    specs: ['prot'],
     cost: 20,
     castTime: 0,
     cooldown: 4,
@@ -642,6 +650,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'weaponStrike', bonus: 5, cannotBeDodged: true },
       { type: 'gainResource', amount: 10 },
+      // Redhand empowers the next Maiming Strike (+20% per stack, up to 2):
+      // consumed in effect_dispatch's weaponStrike case (Arms restructure).
+      { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
     ],
     ranks: [
       {
@@ -651,11 +662,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
           { type: 'gainResource', amount: 10 },
+          { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
         ],
       },
     ],
     description:
-      'Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged.',
+      'Instant attack for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
   },
   // Fury's active rage builder (operator design, Arremetida Enfurecida): two
   // 60%-weapon hits so the pair lands slightly more than one signature
@@ -933,6 +945,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)',
   },
+  // Arms restructure 2026-07-08. Sweeping Strikes: a 12s window where your
+  // single-target strikes also clip one nearby enemy (75%). Deep Wounds: a
+  // passive marker; the bleed itself rides Maiming Strike's effects.
+  sweeping_strikes: {
+    id: 'sweeping_strikes',
+    name: 'Widening Arc',
+    class: 'warrior',
+    learnLevel: 16,
+    specs: ['arms'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 0.75, duration: 12 }],
+    description:
+      'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
+  },
+  deep_wounds: {
+    id: 'deep_wounds',
+    name: 'Gaping Wounds',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['arms'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)',
+  },
   cleave: {
     id: 'cleave',
     name: 'Reaping Arc',
@@ -1035,7 +1084,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Armor Shear',
     class: 'warrior',
     learnLevel: 10,
-    specs: ['arms', 'prot'],
+    // Protection-only now (owner restructure 2026-07-08): Arms dropped armor
+    // shred to declutter its bar.
+    specs: ['prot'],
     cost: 15,
     castTime: 0,
     cooldown: 0,
@@ -3903,9 +3954,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'weaponStrike', bonus: 40 },
       { type: 'buffTarget', kind: 'mortal_wound', value: 0.5, duration: 10 },
+      // Deep Wounds passive (Arms restructure 2026-07-08): Maiming Strike leaves
+      // a bleed. Arms-scoped naturally (mortal_strike is Arms-granted). A distinct
+      // auraId keeps it from overwriting the mortal_wound healing debuff above.
+      { type: 'dot', total: 24, duration: 6, interval: 3, auraId: 'deep_wounds' },
     ],
     description:
-      'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. (Arms signature)',
+      'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
   },
   bloodthirst: {
     id: 'bloodthirst',
@@ -4150,6 +4205,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Die by the Sword',
     class: 'warrior',
     learnLevel: 8,
+    // Arms base-kit defensive cooldown (owner restructure 2026-07-08): Arms had
+    // no defensive of its own. Also still reachable as a choice-row grant.
+    specs: ['arms'],
     cost: 0,
     castTime: 0,
     cooldown: 120,
@@ -4157,9 +4215,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0.1, duration: 8 }],
+    effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0.3, duration: 8 }],
     description:
-      'Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health.',
+      'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
   },
   recklessness: {
     id: 'recklessness',

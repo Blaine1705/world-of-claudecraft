@@ -64,6 +64,36 @@ export function echoAreaDamage(
   }
 }
 
+// Sweeping Strikes (Arms restructure 2026-07-08, aura kind 'sweeping_strikes'):
+// a 12s WINDOW (no charges) where each single-target strike also clips ONE
+// nearby enemy for a reduced fraction. Same determinism contract as the echo:
+// it replays the already-rolled amount (scaled), draws no rng, and routes
+// through ctx.dealDamage. Qualifies the same single-target casts as the echo.
+export function hasSweepingStrikes(e: Entity): boolean {
+  return e.auras.some((a) => a.kind === 'sweeping_strikes');
+}
+
+/** Clip ONE nearby hostile (the first in deterministic grid order) for
+ *  `amount * mult`, reusing the resolved primary-hit amount. No re-roll. */
+export function sweepStrikeDamage(
+  ctx: SimContext,
+  p: Entity,
+  primary: Entity,
+  amount: number,
+  mult: number,
+  school: AbilityDef['school'],
+  abilityName: string,
+  threatOpts: { flat?: number; mult?: number },
+): void {
+  const scaled = Math.max(1, Math.round(amount * mult));
+  for (const m of ctx.hostilesInRadius(p, primary.pos, AOE_ECHO_RADIUS)) {
+    if (m.id === primary.id) continue;
+    if (!ctx.hasLineOfSight(p, m)) continue;
+    ctx.dealDamage(p, m, scaled, false, school, abilityName, 'hit', false, threatOpts);
+    return; // one extra target only
+  }
+}
+
 /** Spend one echo charge after a qualifying cast dealt damage; the aura drops
  *  (with its fade event for the buff bar) when the last charge is spent. */
 export function consumeAreaEchoCharge(ctx: SimContext, e: Entity): void {
