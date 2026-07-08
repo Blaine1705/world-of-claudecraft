@@ -152,3 +152,34 @@ export function skyTintForDayness(dayness: number): [number, number, number] {
     ? lerp3(SKY_DIAL_NIGHT, SKY_DIAL_GLOW, d / 0.5)
     : lerp3(SKY_DIAL_GLOW, SKY_DIAL_DAY, (d - 0.5) / 0.5);
 }
+
+// The sun and moon ride a great circle tilted toward +z, so they cross the sky
+// rather than passing through the zenith (which would flatten shadows). The tilt
+// also keeps a little light bias to one side at noon for readable shading.
+const CELESTIAL_TILT_Z = 0.32;
+
+/** Unit direction toward the sun for a cycle phase: on the horizon at dawn
+ *  (0.25), highest at noon (0.5), back to the horizon at dusk (0.75), and below
+ *  the horizon through the night. The renderer places the key light and the sky
+ *  sun disc along this, and the HUD is unaffected. */
+export function sunDirection(phase: number): [number, number, number] {
+  const a = (phase - 0.25) * 2 * Math.PI; // dawn 0, noon PI/2, dusk PI, midnight -PI/2
+  const x = Math.cos(a);
+  const y = Math.sin(a);
+  const z = CELESTIAL_TILT_Z;
+  const len = Math.hypot(x, y, z);
+  return [x / len, y / len, z / len];
+}
+
+/** Unit direction toward the moon: the sun's antipode in the cycle, so it climbs
+ *  the sky through the night while the sun is down and sets around dawn. */
+export function moonDirection(phase: number): [number, number, number] {
+  return sunDirection(phase + 0.5);
+}
+
+/** How far above the horizon a body sits, 0 (at or below) to 1 (well up), from
+ *  its direction's y. Smooth, so the sun and moon fade in and out through dawn
+ *  and dusk instead of snapping on at the horizon line. */
+export function aboveHorizon(dirY: number): number {
+  return smoothstep((dirY + 0.1) / 0.25); // y <= -0.10 -> 0, y >= 0.15 -> 1
+}

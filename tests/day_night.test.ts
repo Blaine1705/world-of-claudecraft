@@ -1,19 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import {
+  currentDayNightPhase,
+  dayNightPhaseOverride,
+  setDayNightPhaseOverride,
+} from '../src/render/day_night_clock';
+import {
+  aboveHorizon,
   cyclePhase,
   DAY_NIGHT_CYCLE_MS,
   dayNightGrade,
   effectiveDayness,
   fullDayGrade,
   globalDayness,
+  moonDirection,
   REALM_DAYNIGHT_AMPLITUDE,
   skyTintForDayness,
+  sunDirection,
 } from '../src/render/day_night_core';
-import {
-  currentDayNightPhase,
-  dayNightPhaseOverride,
-  setDayNightPhaseOverride,
-} from '../src/render/day_night_clock';
 import type { BiomeId } from '../src/sim/types';
 
 // The day_night_core: the pure clock-to-grade math of the world day/night cycle.
@@ -174,6 +177,47 @@ describe('day/night clock override (the /daynight dev command)', () => {
     setDayNightPhaseOverride(-0.25);
     expect(currentDayNightPhase()).toBeCloseTo(0.75, 12);
     setDayNightPhaseOverride(null); // do not leak override into other tests
+  });
+});
+
+describe('sunDirection / moonDirection (the moving sun and moon)', () => {
+  const len = (v: [number, number, number]) => Math.hypot(v[0], v[1], v[2]);
+
+  it('returns unit vectors', () => {
+    for (const p of [0, 0.25, 0.5, 0.75, 0.9]) {
+      expect(len(sunDirection(p))).toBeCloseTo(1, 12);
+      expect(len(moonDirection(p))).toBeCloseTo(1, 12);
+    }
+  });
+
+  it('puts the sun on the horizon at dawn/dusk, highest at noon, below at night', () => {
+    expect(sunDirection(0.25)[1]).toBeCloseTo(0, 6); // dawn: y ~ 0
+    expect(sunDirection(0.75)[1]).toBeCloseTo(0, 6); // dusk: y ~ 0
+    expect(sunDirection(0.5)[1]).toBeGreaterThan(0.9); // noon: high
+    expect(sunDirection(0)[1]).toBeLessThan(-0.9); // midnight: below horizon
+  });
+
+  it('makes the moon the sun antipode, so it is up at midnight', () => {
+    expect(moonDirection(0)).toEqual(sunDirection(0.5));
+    expect(moonDirection(0)[1]).toBeGreaterThan(0.9); // moon high at midnight
+    expect(moonDirection(0.5)[1]).toBeLessThan(-0.9); // moon down at noon
+  });
+
+  it('sweeps east to west across the day (x flips sign dawn -> dusk)', () => {
+    expect(Math.sign(sunDirection(0.25)[0])).toBe(-Math.sign(sunDirection(0.75)[0]));
+  });
+});
+
+describe('aboveHorizon', () => {
+  it('is 0 well below, 1 well above, and rises monotonically', () => {
+    expect(aboveHorizon(-1)).toBe(0);
+    expect(aboveHorizon(1)).toBe(1);
+    let prev = -1;
+    for (let i = 0; i <= 20; i++) {
+      const v = aboveHorizon(-0.3 + (i / 20) * 0.6);
+      expect(v).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = v;
+    }
   });
 });
 

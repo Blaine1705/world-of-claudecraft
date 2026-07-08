@@ -48,11 +48,15 @@ import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { currentDayNightPhase } from './day_night_clock';
 import {
+  aboveHorizon,
   type DayNightGrade,
   dayNightGrade,
   effectiveDayness,
   fullDayGrade,
   globalDayness,
+  moonDirection,
+  REALM_DAYNIGHT_AMPLITUDE,
+  sunDirection,
 } from './day_night_core';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
@@ -235,6 +239,8 @@ const MOON_HEMI_SKY_COLOR = 0x8b9cd0; // cool sky bounce at deepest night
 const MOON_HEMI_GROUND_COLOR = 0x2b3350; // dark cool ground bounce at deepest night
 const NIGHT_SUN_COOL = 0.55; // how far the sun hue shifts to moonlight at full night
 const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
+// the moving sun/moon key light rides at the same distance the fixed anchor did
+const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
@@ -845,6 +851,12 @@ export class Renderer {
   private skyView!: SkyView;
   private sunSprites: THREE.Sprite[] = [];
   private sunDir = new THREE.Vector3();
+  // the moving moon direction plus how far above the horizon each body sits
+  // (0 down, 1 up); recomputed each frame in updateAmbience from the world clock
+  private moonDir = new THREE.Vector3(0, -1, 0);
+  private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
+  private sunUp = 1;
+  private moonUp = 0;
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
@@ -1184,6 +1196,9 @@ export class Renderer {
       setRenderCategory(sp, 'sky');
       sp.scale.set(scale, scale, 1);
       sp.renderOrder = -9;
+      // remember the shipped opacity so the sun disc can fade with sunUp (out at
+      // night) without losing the halo-vs-core opacity difference
+      sp.userData.baseOpacity = sp.material.opacity;
       this.sunSprites.push(sp);
       this.scene.add(sp);
     }
@@ -2138,19 +2153,20 @@ export class Renderer {
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
-      this.sun.target.position.set(pp.x, pp.y, pp.z);
+      this.updateKeyLight(pp);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
+      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp);
       this.updateEnvBiome(dt);
     }
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      sp.visible = this.fogState === 'outdoor' && this.sunUp > 0.02;
+      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
     }
     this.updateGodRays();
     this.nameplatePainter.update(true);
@@ -3752,7 +3768,19 @@ export class Renderer {
     // grade is per-realm, the player's biome deciding how far the global cycle
     // pulls its authored look (signature realms swing less, see day_night_core).
     const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
-    this.dnGrade = dayNightGrade(effectiveDayness(globalDayness(currentDayNightPhase()), biome));
+    const phase = currentDayNightPhase();
+    this.dnGrade = dayNightGrade(effectiveDayness(globalDayness(phase), biome));
+    // the sun and moon track the world clock; each disc/key-light strength is
+    // scaled by the realm's day/night amplitude so signature-sky realms (the
+    // Nightbloom, the Veiled Hollow, ...) keep their look instead of gaining a
+    // hard noon sun. The moon keeps a higher floor since it suits most realms.
+    const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
+    const sd = sunDirection(phase);
+    const md = moonDirection(phase);
+    this.sunDir.set(sd[0], sd[1], sd[2]);
+    this.moonDir.set(md[0], md[1], md[2]);
+    this.sunUp = aboveHorizon(sd[1]) * amp;
+    this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
     if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isArenaPos(px)) {
@@ -3912,6 +3940,29 @@ export class Renderer {
     const k = 1 - Math.exp(-dt * 1.5);
     this.scene.environmentIntensity +=
       (this.envOutdoorIntensity * this.dnGrade.lightScale - this.scene.environmentIntensity) * k;
+  }
+
+  // Aim the key light (sun by day, moon by night) at the player. On the low tier
+  // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
+  private updateKeyLight(pp: THREE.Vector3): void {
+    if (this.lowGfx) {
+      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+    } else {
+      // the key light hands off from the sun to the moon across the terminator.
+      // Blend the two directions smoothly (rather than a hard switch) as the sun
+      // sinks through the horizon, so the shadow direction glides instead of
+      // popping; the swap happens at dusk/dawn when the light is dim anyway.
+      let t = (0.05 - this.sunDir.y) / 0.2; // sunDir.y 0.05 -> sun, -0.15 -> moon
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const blend = t * t * (3 - 2 * t);
+      this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
+      this.sun.position.set(
+        pp.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
+        pp.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
+        pp.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
+      );
+    }
+    this.sun.target.position.set(pp.x, pp.y, pp.z);
   }
 
   // Drop the view of an entity that left the world / our interest area.
@@ -4665,8 +4716,7 @@ export class Renderer {
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
-      this.sun.target.position.set(pp.x, pp.y, pp.z);
+      this.updateKeyLight(pp);
     }
     worldStart = markWorldPhase('shadows', worldStart);
     // sky dome + sun disc ride along with the camera
@@ -4675,6 +4725,7 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
+      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp);
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear
@@ -4686,7 +4737,8 @@ export class Renderer {
     worldStart = markWorldPhase('sky', worldStart);
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      sp.visible = this.fogState === 'outdoor' && this.sunUp > 0.02;
+      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
     }
     worldStart = markWorldPhase('sunSprites', worldStart);
     this.updateGodRays();
@@ -4915,7 +4967,7 @@ export class Renderer {
         .addScaledVector(sunAzimuth, 48 + i * 26)
         .addScaledVector(side, (i - 1) * 30 + sway);
       sp.position.y = this.camera.position.y + 16 + i * 7;
-      sp.material.opacity = facing * facing * facing * (0.3 - i * 0.05);
+      sp.material.opacity = facing * facing * facing * (0.3 - i * 0.05) * this.sunUp;
     }
   }
 

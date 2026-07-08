@@ -343,6 +343,9 @@ export interface SkyView {
   setCameraPos(x: number, z: number, dt: number): void;
   /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
   setDayNight(mul: readonly [number, number, number]): void;
+  /** move the sun and moon discs and set how far above the horizon each sits
+   *  (0 = down/hidden, 1 = fully up); drives the day/night sky glow */
+  setCelestial(sunDir: THREE.Vector3, moonDir: THREE.Vector3, sunUp: number, moonUp: number): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: BiomeId): THREE.DataTexture | null;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
@@ -374,6 +377,9 @@ const SKY_FRAG = /* glsl */ `
   uniform vec2 uTuneA; // x: radiance gain, y: clamp (bloom economy)
   uniform vec2 uTuneB;
   uniform vec3 uSunDir;
+  uniform vec3 uMoonDir;
+  uniform float uSunUp;  // 0 sun below horizon / hidden, 1 fully up
+  uniform float uMoonUp; // 0 moon below horizon / hidden, 1 fully up
   uniform sampler2D uBackdropA;
   uniform sampler2D uBackdropB;
   uniform float uBackdropStrength;
@@ -438,10 +444,15 @@ const SKY_FRAG = /* glsl */ `
     c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     c *= mix(uTintA, uTintB, uMix); // biome grade before the warm sun glow
     float sunAmt = pow(max(dot(dir, uSunDir), 0.0), 8.0);
-    c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3;                        // warm glow around the anchor sun
+    c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3 * uSunUp;               // warm glow around the sun
     float sunCore = pow(max(dot(dir, uSunDir), 0.0), 90.0);
-    c += vec3(1.0, 0.92, 0.75) * sunCore * 0.5;                      // tighter bright core
+    c += vec3(1.0, 0.92, 0.75) * sunCore * 0.5 * uSunUp;             // tighter bright core
     c *= uDayNight;                                                  // world day/night grade, last
+    // the moon rides on top of the night-darkened sky so it stays legibly bright
+    float moonGlow = pow(max(dot(dir, uMoonDir), 0.0), 24.0);
+    c += vec3(0.5, 0.58, 0.8) * moonGlow * 0.1 * uMoonUp;            // cool halo
+    float moonCore = pow(max(dot(dir, uMoonDir), 0.0), 250.0);
+    c += vec3(0.92, 0.95, 1.0) * moonCore * 0.9 * uMoonUp;          // bright moon disc
     gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -508,6 +519,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
       dome,
       setCameraPos: () => {},
       setDayNight: () => {},
+      setCelestial: () => {},
       envTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
@@ -530,7 +542,10 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uOffB: { value: sunOffsetU(start.to, sun) },
     uTuneA: { value: tuneVec(start.from) },
     uTuneB: { value: tuneVec(start.to) },
-    uSunDir: { value: sun },
+    uSunDir: { value: sun.clone() },
+    uMoonDir: { value: new THREE.Vector3(0, -1, 0) },
+    uSunUp: { value: 1 },
+    uMoonUp: { value: 0 },
     uBackdropA: { value: backdropTex(start.from) },
     uBackdropB: { value: backdropTex(start.to) },
     uBackdropStrength: { value: backdropsReady ? 1 : 0 },
@@ -589,6 +604,17 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     },
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
+    },
+    setCelestial(
+      sunDir: THREE.Vector3,
+      moonDir: THREE.Vector3,
+      sunUp: number,
+      moonUp: number,
+    ): void {
+      uniforms.uSunDir.value.copy(sunDir);
+      uniforms.uMoonDir.value.copy(moonDir);
+      uniforms.uSunUp.value = sunUp;
+      uniforms.uMoonUp.value = moonUp;
     },
     envTexture(biome: BiomeId): THREE.DataTexture | null {
       return hdriStore[biome] ?? null;
