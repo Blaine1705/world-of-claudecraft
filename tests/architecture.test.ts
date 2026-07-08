@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
@@ -138,6 +138,7 @@ const UI_PURE_CORES = [
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/bags_view.ts',
+  'src/ui/bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
@@ -182,6 +183,7 @@ const UI_PURE_CORES = [
   'src/ui/discord_widget_view.ts',
   'src/ui/desktop_update_view.ts',
   'src/ui/corpse_harvest_view.ts',
+  'src/ui/town_focus_view.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));

@@ -2,6 +2,259 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.sport_boot.description':
+    'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
+  'entities.abilities.sport_boot.name': 'Cú Sút Lớn',
+  'entities.abilities.sport_dive.description':
+    'Lao người về phía điểm ngắm. Bóng bay ngang sẽ dính vào bạn.',
+  'entities.abilities.sport_dive.name': 'Bay Người',
+  'entities.abilities.sport_feint.description':
+    'Một cú lách người bứt tốc nhanh về phía điểm ngắm.',
+  'entities.abilities.sport_feint.name': 'Động Tác Giả',
+  'entities.abilities.sport_hoof.description': 'Nện bóng sệt và mạnh lên phía trên sân.',
+  'entities.abilities.sport_hoof.name': 'Phá Bóng',
+  'entities.abilities.sport_kick.description': 'Đẩy bóng lăn sệt trên mặt đất về phía điểm ngắm.',
+  'entities.abilities.sport_kick.name': 'Đá Bóng',
+  'entities.abilities.sport_pass.description':
+    'Chuyền sệt chắc chân cho đồng đội đang chọn, đón trước đường chạy của họ.',
+  'entities.abilities.sport_pass.name': 'Chuyền Bóng',
+  'entities.abilities.sport_punt.description': 'Cú phát bóng của thủ môn, cao và xa.',
+  'entities.abilities.sport_punt.name': 'Phát Bóng Dài',
+  'entities.abilities.sport_second_wind.description':
+    'Lấy lại đôi chân: di chuyển nhanh hơn 50% trong 4 giây.',
+  'entities.abilities.sport_second_wind.name': 'Đôi Chân Sung Sức',
+  'entities.abilities.sport_shoot.description':
+    'Giữ để dồn lực, thả để sút vào khung thành. Dồn lực quá tay bóng sẽ bay vọt xà.',
+  'entities.abilities.sport_shoot.name': 'Sút Bóng',
+  'entities.abilities.sport_shoulder.description':
+    'Một cú vai đúng luật hưu chiến mùa gặt. Khiến đối thủ ngã lăn khỏi bóng.',
+  'entities.abilities.sport_shoulder.name': 'Va Vai',
+  'entities.npcs.groundskeeper_bram.greeting':
+    'Lệnh hưu chiến vẫn giữ vững tại Sân Heo Nái, {className}: chỉ có sút bóng và va vai thôi. Muốn thi đấu vì Chiếc Xô Đồng chứ?',
+  'entities.npcs.groundskeeper_bram.name': 'Quản Sân Bram',
+  'entities.npcs.groundskeeper_bram.title': 'Người Trông Coi Sân Heo Nái',
+  'entities.zones.eastbrook_vale.pois.10.label': 'Sân Heo Nái',
+  'guide.nav.professions': 'Nghề Nghiệp',
+  'guide.nav.valeCup': 'Cúp Thung Lũng',
+  'guide.professions.archetypeChooseBody':
+    'Bạn tuyên bố hình mẫu đầu tiên của mình qua một nhiệm vụ cốt truyện sớm ở khu vực một, chính thức đón nhận bạn vào danh phận đó. Chừng nào chưa hoàn thành nhiệm vụ ấy, bạn vẫn chưa hề chọn hình mẫu nào.',
+  'guide.professions.archetypeChooseTitle': 'Chọn hình mẫu của bạn',
+  'guide.professions.archetypeIdentityBody':
+    'Hình mẫu đang mang là một lời tuyên bố về việc nhân vật của bạn là ai trong thế giới, được ghi nhận trong cách người khác và thế giới xưng gọi bạn. Những phần thưởng và sự công nhận cụ thể đi kèm vẫn đang được hoàn thiện; hãy quay lại xem khi hệ thống dần đầy đủ.',
+  'guide.professions.archetypeIdentityTitle': 'Hình mẫu của bạn có ý nghĩa gì',
+  'guide.professions.archetypeIntro':
+    'Mỗi nghề trong mười nghề chế tác cũng đại diện cho một hình mẫu, một danh phận rộng hơn mà bạn có thể khoác lên ngoài việc chỉ hành nghề. Hình mẫu đang mang là một lựa chọn duy nhất tại một thời điểm, không phải một danh sách cần hoàn thành: bạn mang một, và có thể đổi sang cái khác sau này nếu muốn.',
+  'guide.professions.archetypeSwitchBody':
+    'Đã từng tuyên bố một hình mẫu không có nghĩa bạn bị khóa vào nó mãi mãi. Đổi sang hình mẫu khác đòi hỏi trước hết hoàn thành một nhiệm vụ "chuộc lỗi" lặp lại được cho hình mẫu cũ, và mỗi lần bạn đổi, phần chuộc lỗi được kỳ vọng ở lần sau lại cao hơn một chút, để việc đổi luôn có ý nghĩa thay vì không mất gì.',
+  'guide.professions.archetypeSwitchTitle': 'Đổi ý',
+  'guide.professions.archetypeTitle': 'Mười hình mẫu',
+  'guide.professions.craftComboBody':
+    'Ngoài danh sách công thức của riêng từng nghề, bánh xe còn hỗ trợ các công thức kết hợp cần tới hai nghề kề nhau cùng lúc, tưởng thưởng cho nhân vật (hoặc một cặp bạn hàng trao đổi) đã đầu tư vào các nghề liền kề trên vòng thay vì một nghề đơn lẻ.',
+  'guide.professions.craftComboTitle': 'Công thức kết hợp',
+  'guide.professions.craftIntro':
+    'Mười nghề chế tác biến nguyên liệu thu thập thành trang bị và hàng hóa hoàn chỉnh: Chế Giáp, Rèn Vũ Khí và Kim Hoàn nhào nặn vật chất thô thành trang bị mặc được; Giả Kim và Cơ Khí vận hành bằng thử và sai; Nấu Ăn, Khắc Chữ và Phù Phép đều chạm tới sản phẩm của các nghề khác; May Vá và Thuộc Da làm việc theo những mẫu rập chính xác. Cùng nhau chúng tạo thành một bánh xe, mỗi nghề nằm cạnh hai nghề láng giềng và đối diện một nghề khác.',
+  'guide.professions.craftMasteryBody':
+    'Chế tác thành công sẽ tích lũy kỹ năng trong nghề đó, và những công thức phong phú hơn nằm sau ngưỡng kỹ năng cao hơn: công thức cơ bản mở cho tất cả mọi người, trong khi các công thức càng cao cấp càng đòi hỏi nhiều tinh thông hơn mới thử được. Nâng kỹ năng trong một nghề là con đường từ hàng nhập môn đơn giản tới những công thức tham vọng hơn của nghề ấy.',
+  'guide.professions.craftMasteryTitle': 'Kỹ năng và tinh thông',
+  'guide.professions.craftRecipesBody':
+    'Mỗi nghề có công thức riêng, mỗi công thức cần những nguyên liệu cụ thể bạn thu thập hoặc mua. Các công thức cơ bản nhất của mỗi nghề chỉ cần nguyên liệu thường và chế được ngay từ đầu, nên bạn có thể bắt tay vào nghề ngay khi nhận nó thay vì phải chờ mở khóa.',
+  'guide.professions.craftRecipesTitle': 'Công thức và nguyên liệu',
+  'guide.professions.craftRingBody':
+    'Mười nghề được xếp trên một vòng cố định, và vị trí của một nghề trên vòng đó rất quan trọng: các nghề kề nhau trên bánh xe có nhiều điểm chung với nhau hơn các nghề ở hai phía đối diện. Gắn bó với một nghề được thiết kế để giống như gia nhập một gia đình các nghề liên quan, chứ không phải chọn một kỹ năng đơn độc.',
+  'guide.professions.craftRingTitle': 'Bánh xe chuyên môn',
+  'guide.professions.craftTitle': 'Mười nghề chế tác',
+  'guide.professions.gatherIntro':
+    'Ba nghề thu thập cho bạn lấy nguyên liệu thô thẳng từ thế giới: Khai Khoáng đục quặng và đá từ mạch khoáng, Đốn Gỗ hạ cây lấy gỗ từ các cụm rừng, và Thảo Dược Học hái cây cỏ mọc hoang. Mỗi nghề được theo dõi riêng, nên làm nghề này không bao giờ làm chậm tiến độ nghề kia.',
+  'guide.professions.gatherProficiencyBody':
+    'Mỗi lần thu hoạch thành công đều tích lũy độ thành thạo trong nghề thu thập đó. Độ thành thạo cao hơn nghiêng thứ bạn lấy được từ một điểm tài nguyên về các phẩm cấp nguyên liệu hiếm hơn, từ mức thường trở lên, dù các phẩm cấp hiếm nhất vẫn hiếm kể cả ở độ thành thạo cao. Luyện tập thêm không bao giờ làm giảm cơ may của bạn, chỉ có thể cải thiện nó.',
+  'guide.professions.gatherProficiencyTitle': 'Độ thành thạo và phẩm chất nguyên liệu',
+  'guide.professions.gatherTitle': 'Thu thập: Khai Khoáng, Đốn Gỗ và Thảo Dược Học',
+  'guide.professions.gatherToolsBody':
+    'Thương nhân bán dụng cụ cơ bản cho từng nghề thu thập, và dụng cụ tốt hơn có thể được chế tác, nên việc khai thác một điểm tài nguyên được thiết kế để càng lúc càng thuần thục khi bạn sắm sửa cho nó thay vì đứng yên. Dụng cụ bậc cao hơn là con đường chính thống để mở lối tới những điểm tài nguyên giàu có hơn và khai thác chúng hiệu quả hơn trong một buổi dài.',
+  'guide.professions.gatherToolsTitle': 'Dụng cụ hành nghề',
+  'guide.professions.gatherWhatBody':
+    'Các mạch quặng, cụm gỗ và bãi thảo dược được đặt rải rác trong các khu vực như những điểm cố định hữu hình, không thuộc về ai. Đi tới và tương tác với chúng để thu hoạch những gì chúng chứa. Sau khi bạn thu hoạch một điểm, nó cần thời gian hồi phục trước khi chính bạn có thể thu hoạch lại, nhưng nó không bao giờ chặn người khác: một người chơi khác vẫn có thể thu hoạch chính điểm đó trong lúc ấy.',
+  'guide.professions.gatherWhatTitle': 'Điểm tài nguyên',
+  'guide.professions.intro':
+    'Ngoài chiến đấu và nhiệm vụ, thế giới còn tưởng thưởng cho bạn khi cày cuốc và rèn đúc: thu thập nguyên liệu thô, biến chúng thành trang bị tại các trạm chế tác của mười nghề khác nhau, và an cư trong một danh phận là một trong mười hình mẫu mà các nghề ấy đại diện.',
+  'guide.valeCupPage.heading': 'Cúp Thung Lũng',
+  'guide.valeCupPage.howHeading': 'Cách chơi',
+  'guide.valeCupPage.howMatch':
+    'Khi giao bóng, bộ kỹ năng lớp nhân vật của bạn được thay bằng bộ kỹ năng thể thao và được khôi phục nguyên vẹn sau trận. Cú đá nhắm vào hồng tâm dưới đất, bóng nảy bật khỏi ván chắn, còn dẫn bóng chỉ đơn giản là chạy cùng bóng. Ghi nhiều bàn hơn đối phương trước khi hết giờ; hòa sẽ bước vào bàn thắng vàng.',
+  'guide.valeCupPage.howQueue':
+    'Xếp hàng từ bất cứ đâu qua cửa sổ Cúp Thung Lũng, hoặc trò chuyện với Quản Sân Bram tại cổng Sân Heo Nái. Chọn hạng đấu từ một đấu một tới năm đấu năm, một quốc gia cờ hiệu, và một vai trò thi đấu; xếp hàng một mình hoặc dẫn theo tổ đội.',
+  'guide.valeCupPage.howTruce':
+    'Không ai đổ máu tại Sân Heo Nái: cú vai chỉ khiến bạn ngã lăn, chẳng có gì đau, còn thú cưng thì ngồi ngoài trận đấu.',
+  'guide.valeCupPage.intro':
+    'Bóng Heo Rừng tại Sân Heo Nái: chọn một cờ hiệu, chọn một vai trò, và sút tấm da heo rừng nhồi rơm qua tay thủ môn để giành Chiếc Xô Đồng. Không đổ máu, không chiến lợi phẩm, chỉ có tiếng gầm vang của khán đài.',
+  'guide.valeCupPage.loreHeading': 'Bóng Heo Rừng và lệnh hưu chiến mùa gặt',
+  'guide.valeCupPage.loreOldSow':
+    'Từ rất lâu trước khi người chết thức giấc, đám nông dân Đông Khê đã chơi bóng heo rừng trên những cánh đồng rạ sau mùa gặt: hai đám đông, một tấm da heo rừng nhồi rơm, và hai cánh cổng xe ngựa kéo về hai đầu bãi cỏ. Quả bóng đầu tiên, Heo Nái Già, được mạ đồng treo trên lò sưởi quán rượu.',
+  'guide.valeCupPage.loreTruce':
+    'Khi Đấu Trường Tro Tàn bắt đầu tổ chức các trò chơi chiến tranh, Cảnh Trưởng Redbrook đáp lại bằng một điều dịu dàng hơn: một lệnh hưu chiến mùa gặt thường trực trên bãi cỏ xưa. Cánh cổng xe ngựa trở thành cột gôn, bãi cỏ có thêm tường, khán đài và một cái tên, Sân Heo Nái, còn phần thưởng luôn là chiếc xô sữa móp méo mà đội thắng dùng để uống mừng: Chiếc Xô Đồng.',
+  'guide.valeCupPage.nationChoir':
+    'Xanh nhạt và bạc dưới quả chuông: kỳ dị, chuẩn xác, và rất lặng lẽ.',
+  'guide.valeCupPage.nationColiseum':
+    'Đỏ và đen với đôi kiếm chéo: họ chơi như thể đây vẫn là một trò chơi chiến tranh.',
+  'guide.valeCupPage.nationCopperdig':
+    'Màu đồng và nâu với chiếc cuốc chim: những thợ đào không bao giờ ngừng chạy.',
+  'guide.valeCupPage.nationMirefen':
+    'Xanh mòng két và xám dưới cánh diệc: kiên nhẫn, chân dài, không bao giờ vội.',
+  'guide.valeCupPage.nationMoon':
+    'Tím và bạc dưới vầng trăng khuyết: những cầu thủ của màn đêm, bước chân nhẹ nhàng.',
+  'guide.valeCupPage.nationOgre':
+    'Cam và nâu sẫm sau nắm đấm: lấy vai làm đầu và tự hào về điều đó.',
+  'guide.valeCupPage.nationThornpeak': 'Xanh băng và trắng dưới đỉnh núi: vững chân và lì lợm.',
+  'guide.valeCupPage.nationVale':
+    'Xanh lục và vàng kim, giương cao bó lúa mì: đội chủ nhà, nông dân chính hiệu tới tận xương tủy.',
+  'guide.valeCupPage.nationsBody':
+    'Mỗi đội thi đấu dưới một lá cờ. Đội trưởng chọn quốc gia, và nếu cả hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.',
+  'guide.valeCupPage.nationsHeading': 'Tám quốc gia cờ hiệu',
+  'guide.valeCupPage.rewardsBody':
+    'Luật hưu chiến nghĩa là không kinh nghiệm và không chiến lợi phẩm: một trận có kết quả được tính vào thành tích của bạn và bảng vô địch, kèm theo điểm phần thưởng hằng ngày. Bỏ trận sẽ khiến bạn bị treo lượt, và Quản Sân sẽ nhớ đấy.',
+  'guide.valeCupPage.rewardsHeading': 'Luật hưu chiến',
+  'guide.valeCupPage.rolesBody':
+    'Vai trò quyết định bộ kỹ năng bạn mang vào sân. Ai cũng đá được; phần còn lại là khí chất.',
+  'guide.valeCupPage.rolesHeading': 'Vai trò thi đấu',
+  'guide.valeCupPage.spectateBody':
+    'Mỗi lần chỉ có một trận diễn ra tại sân vận động, và bất kỳ ai cũng có thể tới xem từ khán đài.',
+  'hudChrome.keybinds.valecup': 'Cúp Thung Lũng',
+  'hudChrome.mobile.dailyRewards': 'Thưởng',
+  'hudChrome.perf.labels.predLead': 'Độ Sớm Dự Đoán',
+  'hudChrome.townFocus.budgetLabel': 'Điểm còn lại: {remaining} / {budget}',
+  'hudChrome.townFocus.decreaseAria': 'Giảm trọng tâm cho {component}',
+  'hudChrome.townFocus.hint':
+    'Điểm trọng tâm cộng thêm một khoản trên mức sản lượng cơ bản của từng hạng mục. Hạng mục không được dồn trọng tâm giữ nguyên mức cơ bản.',
+  'hudChrome.townFocus.increaseAria': 'Tăng trọng tâm cho {component}',
+  'hudChrome.townFocus.notInTownHint': 'Bạn phải ở trong thị trấn để đặt trọng tâm.',
+  'hudChrome.townFocus.saveButton': 'Lưu Trọng Tâm',
+  'hudChrome.townFocus.title': 'Trọng Tâm Thị Trấn',
+  'hudChrome.vcup.awayNote':
+    'Nếu hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.',
+  'hudChrome.vcup.bannerCountdown': 'Giao bóng sau {seconds}...',
+  'hudChrome.vcup.bannerDraw': 'Một trận hòa tại Sân Heo Nái.',
+  'hudChrome.vcup.bannerEnd': 'Hết giờ: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.bannerFound': 'Cúp Thung Lũng vẫy gọi: {nationA} đấu {nationB}!',
+  'hudChrome.vcup.bannerGoal': 'VÀO! {nation} ghi bàn!',
+  'hudChrome.vcup.bannerGolden': 'BÀN THẮNG VÀNG: bàn tiếp theo định đoạt trận đấu!',
+  'hudChrome.vcup.bannerKickoff': 'GIAO BÓNG!',
+  'hudChrome.vcup.bannerLoss': 'Thất bại tại Sân Heo Nái.',
+  'hudChrome.vcup.bannerSave': '{name} CẢN PHÁ!',
+  'hudChrome.vcup.bannerWin': 'Chiến thắng tại Sân Heo Nái!',
+  'hudChrome.vcup.bet.aria': 'Cá cược trận đấu Cúp Thung Lũng',
+  'hudChrome.vcup.bet.back': 'Cược cho {team}',
+  'hudChrome.vcup.bet.closed': 'Đã đóng cược',
+  'hudChrome.vcup.bet.closesIn': 'Đóng cược sau {seconds} giây',
+  'hudChrome.vcup.bet.collapse': 'Ẩn cược',
+  'hudChrome.vcup.bet.expand': 'Xem cược và đặt tiền',
+  'hudChrome.vcup.bet.form': '{wins}T-{losses}B',
+  'hudChrome.vcup.bet.lostLog': 'Cược Cúp Thung Lũng của bạn đã thua: {amount}.',
+  'hudChrome.vcup.bet.mine': 'Cược của bạn: {amount} cho {team}',
+  'hudChrome.vcup.bet.none': 'Bạn chưa đặt cược cho trận này.',
+  'hudChrome.vcup.bet.oddsLabel': 'Trả thưởng',
+  'hudChrome.vcup.bet.prize': 'Quỹ cược {amount}',
+  'hudChrome.vcup.bet.record': 'Thành tích cược: {wins}T-{losses}B, {sign}{net}',
+  'hudChrome.vcup.bet.refundLog': 'Cược bị hủy, {amount} tiền cược của bạn đã được hoàn lại.',
+  'hudChrome.vcup.bet.splitAria': 'Tỷ trọng quỹ cược đặt cho mỗi đội',
+  'hudChrome.vcup.bet.title': 'Cược Trận Đấu',
+  'hudChrome.vcup.bet.wonBanner': 'Cược của bạn thắng rồi!',
+  'hudChrome.vcup.bet.wonLog': 'Cược Cúp Thung Lũng của bạn đã thắng: nhận về {amount}.',
+  'hudChrome.vcup.blockNation': 'Hãy chọn một quốc gia cờ hiệu trước.',
+  'hudChrome.vcup.blockNotLeader': 'Chỉ trưởng nhóm mới có thể xếp hàng cho cả đội.',
+  'hudChrome.vcup.blockPartySize': 'Hạng đấu này cần một tổ đội nhỏ hơn.',
+  'hudChrome.vcup.boardEmpty': 'Chưa có nhà vô địch nào được ghi danh. Chiếc Xô Đồng vẫn đang chờ.',
+  'hudChrome.vcup.boardHeading': 'Bảng vô địch',
+  'hudChrome.vcup.boardWins': '{count} trận thắng',
+  'hudChrome.vcup.bracketLabel': '{n}v{n}',
+  'hudChrome.vcup.bracketsAria': 'Hạng đấu',
+  'hudChrome.vcup.briefing.bot': 'Máy',
+  'hudChrome.vcup.briefing.kitHeading': 'Bộ kỹ năng của bạn',
+  'hudChrome.vcup.briefing.kitNote':
+    'Các chiêu này thay thế kỹ năng lớp nhân vật của bạn trong trận đấu.',
+  'hudChrome.vcup.briefing.ready': 'Tôi sẵn sàng',
+  'hudChrome.vcup.briefing.readyAria': 'Sẵn sàng cho giờ giao bóng',
+  'hudChrome.vcup.briefing.readyCount': '{ready} trên {total} đã sẵn sàng',
+  'hudChrome.vcup.briefing.readyDone': 'Sẵn sàng',
+  'hudChrome.vcup.briefing.rosterHeading': 'Danh sách ra sân',
+  'hudChrome.vcup.briefing.rule1': 'Đá hoặc chuyền bóng vào khung thành đối phương để ghi bàn.',
+  'hudChrome.vcup.briefing.rule2':
+    'Đội đạt 5 bàn trước sẽ thắng, hoặc đội nhiều bàn hơn khi còi hết giờ vang lên.',
+  'hudChrome.vcup.briefing.rule3':
+    'Trận hòa khi hết giờ sẽ vào bàn thắng vàng: bàn tiếp theo định đoạt.',
+  'hudChrome.vcup.briefing.rule4':
+    'Cú vai chỉ khiến bạn ngã lăn. Không ai bị thương dưới lệnh hưu chiến mùa gặt.',
+  'hudChrome.vcup.briefing.rule5': 'Ai cũng có thể tới cổ vũ bạn từ trên khán đài.',
+  'hudChrome.vcup.briefing.rulesHeading': 'Cách chơi',
+  'hudChrome.vcup.briefing.subtitle': 'Họp trước trận',
+  'hudChrome.vcup.briefing.vs': 'đấu',
+  'hudChrome.vcup.briefing.waiting': 'Đang chờ phía bên kia sẵn sàng...',
+  'hudChrome.vcup.briefing.whistle': 'Tiếng còi vang lên sau {seconds} giây.',
+  'hudChrome.vcup.briefing.you': 'Bạn',
+  'hudChrome.vcup.clock': '{minutes}:{seconds}',
+  'hudChrome.vcup.close': 'Đóng cửa sổ Cúp Thung Lũng',
+  'hudChrome.vcup.deserterNote': 'Quản Sân sẽ nhớ đấy. Bạn có thể xếp hàng lại sau {seconds} giây.',
+  'hudChrome.vcup.enterAsGuild': 'Ra sân dưới cờ hiệu của {guild}',
+  'hudChrome.vcup.gossipOpen': 'Sổ lịch thi đấu',
+  'hudChrome.vcup.gossipOpenAria': 'Mở cửa sổ Cúp Thung Lũng',
+  'hudChrome.vcup.guildBoardEmpty': 'Chưa có bang hội nào ra sân. Hãy giương cao cờ hiệu của bạn!',
+  'hudChrome.vcup.guildBoardHeading': 'Cờ hiệu bang hội',
+  'hudChrome.vcup.guildBoardWl': '{wins} T, {losses} B',
+  'hudChrome.vcup.guildRecordLine': 'Thành tích bang hội của bạn: {wins} thắng, {losses} thua.',
+  'hudChrome.vcup.inMatchNote': 'Đội của bạn đang trên sân. Tiếp tục thi đấu!',
+  'hudChrome.vcup.indicatorLive': 'Cúp Thung Lũng',
+  'hudChrome.vcup.indicatorOpen': 'Mở cửa sổ Cúp Thung Lũng',
+  'hudChrome.vcup.indicatorQueued':
+    'Hàng chờ Cúp Thung Lũng: {bracket}, vị trí {position} trên {count}',
+  'hudChrome.vcup.leaveQueue': 'Rời Hàng Chờ',
+  'hudChrome.vcup.liveAria': 'Cúp Thung Lũng: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.liveHeading': 'Đang diễn ra tại Sân Heo Nái',
+  'hudChrome.vcup.logDraw': 'Trận đấu tại Sân Heo Nái kết thúc với tỷ số hòa.',
+  'hudChrome.vcup.logFound': 'Trận Cúp Thung Lũng của bạn đã sẵn sàng: {nationA} đấu {nationB}.',
+  'hudChrome.vcup.logGoal': '{name} ghi bàn cho {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': 'Bạn thua trận đấu tại Sân Heo Nái.',
+  'hudChrome.vcup.logQueued':
+    'Bạn tham gia hàng chờ Cúp Thung Lũng cho {bracket} (vị trí {position}).',
+  'hudChrome.vcup.logRoster': 'Phe của bạn: {allies}. Phe đối phương: {enemies}.',
+  'hudChrome.vcup.logSave': '{name} cản phá thành công!',
+  'hudChrome.vcup.logUnqueued': 'Bạn rời hàng chờ Cúp Thung Lũng.',
+  'hudChrome.vcup.logWin': 'Bạn thắng trận đấu tại Sân Heo Nái.',
+  'hudChrome.vcup.mobileLabel': 'Cúp',
+  'hudChrome.vcup.nation.choir': 'Hợp Ca Nhợt Nhạt',
+  'hudChrome.vcup.nation.coliseum': 'Đấu Trường Tro Tàn',
+  'hudChrome.vcup.nation.copperdig': 'Mỏ Đồng',
+  'hudChrome.vcup.nation.mirefen': 'Đầm Lầy Bùn Sâu',
+  'hudChrome.vcup.nation.moon': 'Trăng Nhợt',
+  'hudChrome.vcup.nation.ogre': 'Các Bộ Tộc Ogre',
+  'hudChrome.vcup.nation.thornpeak': 'Đỉnh Gai',
+  'hudChrome.vcup.nation.vale': 'Thung Lũng Đông Khê',
+  'hudChrome.vcup.nationsHeading': 'Quốc gia cờ hiệu',
+  'hudChrome.vcup.noLive': 'Sân bóng đang yên ắng. Không có trận nào diễn ra.',
+  'hudChrome.vcup.offlineNote': 'Sổ lịch thi đấu đã gấp lại. Cúp Thung Lũng hiện không mở.',
+  'hudChrome.vcup.phaseCountdown': 'Giao bóng sau {seconds}',
+  'hudChrome.vcup.phaseGoal': 'VÀO!',
+  'hudChrome.vcup.phaseGolden': 'BÀN THẮNG VÀNG',
+  'hudChrome.vcup.phaseOver': 'HẾT GIỜ',
+  'hudChrome.vcup.practice': 'Tập Luyện Với Máy',
+  'hudChrome.vcup.practiceNote': 'Bắt đầu ngay một trận riêng với máy trên sân tập của riêng bạn.',
+  'hudChrome.vcup.practicingNow': 'Đang tập luyện ({count}):',
+  'hudChrome.vcup.queue': 'Vào Hàng Chờ',
+  'hudChrome.vcup.queueNote': 'Xếp hàng từ bất cứ đâu; tiếng còi sẽ gọi bạn tới Sân Heo Nái.',
+  'hudChrome.vcup.queuedStatus': 'Đang chờ cho {bracket}: vị trí {position} trên {count}.',
+  'hudChrome.vcup.recordLine': 'Thành tích của bạn: {wins} thắng, {losses} thua, {draws} hòa.',
+  'hudChrome.vcup.role.allrounder.desc':
+    'Biết một chút mọi thứ: đá bóng, sút bổng, và một cú vai đúng luật.',
+  'hudChrome.vcup.role.allrounder.name': 'Toàn Năng',
+  'hudChrome.vcup.role.keeper.desc': 'Trấn giữ khung thành với bắt bóng, bay người và phát bóng.',
+  'hudChrome.vcup.role.keeper.name': 'Thủ Môn',
+  'hudChrome.vcup.role.striker.desc': 'Sống vì cú sút xa và pha lách người chớp nhoáng.',
+  'hudChrome.vcup.role.striker.name': 'Tiền Đạo',
+  'hudChrome.vcup.role.sweeper.desc': 'Húc văng đối thủ khỏi bóng và phá bóng lên.',
+  'hudChrome.vcup.role.sweeper.name': 'Hậu Vệ Quét',
+  'hudChrome.vcup.rolesHeading': 'Vai trò thi đấu',
+  'hudChrome.vcup.shootPower': 'LỰC SÚT',
+  'hudChrome.vcup.title': 'Cúp Thung Lũng',
+  'hudChrome.vcup.waitingCount': '{count} đang chờ',
+  'hudChrome.vcup.walkUp': 'Hãy đi tới Sân Heo Nái để xem từ khán đài.',
   'hudChrome.archetypeTitle.label': 'Danh hiệu',
   'hudChrome.archetypeTitle.none': 'Không có',
   'hudChrome.archetypeTitle.armorcrafting': 'Thợ Giáp',
@@ -1992,6 +2245,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_axe.name': 'Rìu Gỗ Cổ Thụ',
   'entities.items.goldleaf_sickle.name': 'Liềm Lá Vàng',
   'entities.items.sunpetal_sickle.name': 'Liềm Cánh Hoa Mặt Trời',
+  'entities.items.thorium_ore.name': 'Quặng Thori',
+  'entities.items.arcanite_bar.name': 'Thỏi Arcanite',
+  'entities.items.ashwood_log.name': 'Khúc Gỗ Tần Bì Tro',
+  'entities.items.elderwood_log.name': 'Khúc Gỗ Cơm Cháy Cổ',
+  'entities.items.goldleaf_herb.name': 'Thảo Dược Lá Vàng',
+  'entities.items.sunpetal_herb.name': 'Thảo Dược Cánh Mặt Trời',
   'entities.items.moongate_rubbing.name': 'Bản Rập Bùa Phòng Hộ',
   'entities.items.moonpale_scale.name': 'Vảy Trăng Nhợt',
   'entities.items.moonscale_saber.name': 'Mã Tấu Vảy Trăng',
@@ -4919,6 +5178,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.programs': 'Shader',
   'hudChrome.perf.labels.renderScale': 'Tỷ Lệ Kết Xuất',
   'hudChrome.perf.labels.snapshot': 'Tốc Độ Ảnh Chụp',
+  'hudChrome.perf.labels.serverTick': 'Tốc Độ Nhịp Máy Chủ',
   'hudChrome.perf.labels.textures': 'Vân Bề Mặt',
   'hudChrome.perf.labels.triangles': 'Tam Giác',
   'hudChrome.perf.opacity': 'Độ Mờ Nền',
@@ -5749,7 +6009,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'worldContent.dungeonInstanceBusy': 'Tất cả các phiên bản của {name} đang bận. Hãy thử lại sau.',
   'worldContent.dungeonPartyWarning':
     '{name} dành cho một nhóm đầy đủ {count} người. Hãy cẩn thận.',
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Gây {value} sát thương {school} mỗi {interval} giây',
   'hudChrome.auraEffect.hot': 'Hồi {value} máu mỗi {interval} giây',
   'hudChrome.auraEffect.absorb': 'Hấp thụ {value} sát thương',
@@ -6059,7 +6318,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
-  // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Bưu Quạ',
   'entities.letters.ravenpost_welcome.subject': 'Giờ đây bầy quạ bay vì bạn',
   'entities.letters.ravenpost_welcome.body':
@@ -6149,7 +6407,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.not_enabled': 'Xác thực hai yếu tố chưa được bật.',
   'apiError.two_factor.setup_required': 'Hãy bắt đầu thiết lập xác thực hai yếu tố trước.',
   'apiError.validation.failed': 'Một số trường không hợp lệ. Hãy kiểm tra biểu mẫu và thử lại.',
-  // Release v0.22.0 locale fill.
   'download.linuxCta': 'Tải xuống cho Linux',
   'download.linuxHint': 'AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.',
   'loading.reconnecting': 'Mất kết nối. Đang kết nối lại...',
@@ -6257,7 +6514,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Mục tiêu',
   'hudChrome.options.mobileCameraJoystick': 'Cần điều khiển máy ảnh',
   'hudChrome.options.mobileLeftHanded': 'Bố cục thuận tay trái',
-  // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Một nghề để gọi riêng của bạn',
   'entities.quests.q_archetype_acceptance.text':
     'Mỗi nghệ nhân của Eastbrook cuối cùng đều định cư trên một nghề thủ công riêng của họ. Hãy chứng tỏ bản thân bằng một hành động duy nhất, {playerName}, và tuyên bố con đường của bạn.',
@@ -6269,4 +6525,66 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_make_amends.completion':
     'Đã thực hiện sửa đổi; một con đường mới đang mở ra cho bạn.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Sói rừng bị giết',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Mọi thùng hàng, rương tiền, và món trang sức đều an toàn trong tay Két Sắt Mạ Vàng.',
+  'entities.npcs.bursar_aldous_crane.name': 'Thủ Quỹ Aldous Crane',
+  'entities.npcs.bursar_aldous_crane.title': 'Két Sắt Mạ Vàng',
+  'entities.npcs.bursar_fernando.greeting':
+    'Chào mừng đến với Két Sắt Mạ Vàng. Hàng hóa của ngươi nằm yên an toàn sau những ổ khóa của chúng tôi.',
+  'entities.npcs.bursar_fernando.name': 'Thủ Quỹ Fernando',
+  'entities.npcs.bursar_fernando.title': 'Két Sắt Mạ Vàng',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Két Sắt Mạ Vàng giữ sổ sách sạch sẽ và những kho két còn sạch sẽ hơn. Chúng tôi cất giữ gì cho ngươi đây?',
+  'entities.npcs.bursar_petra_vell.name': 'Thủ Quỹ Petra Vell',
+  'entities.npcs.bursar_petra_vell.title': 'Két Sắt Mạ Vàng',
+  'guide.economy.bankBody':
+    'Mỗi thị trấn trung tâm đều có một chi nhánh của Két Sắt Mạ Vàng, ngân hiệu của cả vương quốc. Hãy nói chuyện với thủ quỹ ở đó để mở kho két của bạn, một khoang chứa riêng ngoài túi đồ mà nhân vật của bạn giữ trọn đời. Bất cứ thứ gì bạn gửi lại đều chờ bạn an toàn, dù lần sau bạn ghé chi nhánh nào.',
+  'guide.economy.bankHow':
+    'Khi kho két đang mở, nhấp một vật phẩm trong túi để gửi vào và nhấp nó trong kho két để lấy lại. Kho két chỉ giữ hàng hóa, không bao giờ giữ tiền, và vật phẩm nhiệm vụ luôn ở lại bên bạn. Khi túi đầy giữa chuyến đi, một nút bấm sẽ quét toàn bộ nguyên liệu chế tác của bạn vào cùng một lúc.',
+  'guide.economy.bankSlots':
+    'Một kho két mới mở khởi đầu nhỏ bé và lớn dần cùng bạn. Thủ quỹ bán thêm ô với giá tiền vàng ngày một đắt hơn, và chơi trực tuyến còn mang lại chỗ chứa thưởng thêm, cho những việc như xác minh email, liên kết tài khoản, và những người bạn mà bạn đưa vào trò chơi.',
+  'guide.economy.bankTitle': 'Ngân Hàng',
+  'hudChrome.bank.bonusAdvertDiscord': 'Liên kết Discord của bạn để nhận 2 ô.',
+  'hudChrome.bank.bonusAdvertEmail': 'Xác minh email của bạn để nhận 2 ô.',
+  'hudChrome.bank.bonusAdvertWallet': 'Liên kết một ví để nhận 2 ô.',
+  'hudChrome.bank.bonusEarned': '+{count}',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Mời một người bạn: khi họ đạt cấp 10, cả bạn lẫn họ mỗi người nhận 2 ô, tối đa 5 người bạn.',
+  'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'hudChrome.bank.bonusSectionAria': 'Ô ngân hàng thưởng và cách kiếm thêm',
+  'hudChrome.bank.bonusSourceDiscord': 'Đã liên kết Discord',
+  'hudChrome.bank.bonusSourceEmail': 'Email đã xác minh',
+  'hudChrome.bank.bonusSourceReferral': 'Bạn bè được giới thiệu',
+  'hudChrome.bank.bonusSourceWallet': 'Đã liên kết ví',
+  'hudChrome.bank.bonusStatusEarned': '+{count}',
+  'hudChrome.bank.bonusTitle': 'Ô Thưởng',
+  'hudChrome.bank.buyConfirm': 'Mua thêm {count} ô ngân hàng với giá {price}?',
+  'hudChrome.bank.buyConfirmAccept': 'Mua',
+  'hudChrome.bank.buySlots': 'Mua {count} ô',
+  'hudChrome.bank.buySlotsMaxed': 'Đã mở rộng tối đa',
+  'hudChrome.bank.cannotDeposit': 'Không thể gửi vào ngân hàng',
+  'hudChrome.bank.capacity': '{used}/{total}',
+  'hudChrome.bank.capacityAria': 'Ô ngân hàng đã dùng: {used} trên {total}',
+  'hudChrome.bank.close': 'Đóng ngân hàng',
+  'hudChrome.bank.depositAll': 'Gửi tất cả nguyên liệu',
+  'hudChrome.bank.depositAllDone': 'Nguyên liệu đã gửi: {count}.',
+  'hudChrome.bank.depositAllFull': 'Nguyên liệu đã gửi: {count}. Ngân hàng hiện đã đầy.',
+  'hudChrome.bank.depositAllNone': 'Ngân hàng đầy: không gửi được gì.',
+  'hudChrome.bank.depositHint': 'Nhấp để gửi vào',
+  'hudChrome.bank.depositPartialHint': 'Shift-click để gửi vào một phần',
+  'hudChrome.bank.depositQuantityConfirm': 'Gửi Vào',
+  'hudChrome.bank.depositQuantityInput': 'Số lượng cần gửi',
+  'hudChrome.bank.depositQuantityTitle': 'Gửi {item}',
+  'hudChrome.bank.empty': 'Ngân hàng của bạn đang trống.',
+  'hudChrome.bank.filterGroupAria': 'Lọc ngân hàng theo danh mục',
+  'hudChrome.bank.searchAria': 'Tìm vật phẩm ngân hàng theo tên',
+  'hudChrome.bank.sortAria': 'Sắp xếp vật phẩm ngân hàng',
+  'hudChrome.bank.subtitle': 'Két Sắt Mạ Vàng',
+  'hudChrome.bank.title': 'Ngân Hàng',
+  'hudChrome.bank.tooFar': 'Bạn phải ở chỗ nhân viên ngân hàng mới xem được ngân hàng của mình.',
+  'hudChrome.bank.withdrawHint': 'Nhấp để rút ra',
+  'hudChrome.bank.withdrawPartialHint': 'Shift-click để rút ra một phần',
+  'hudChrome.bank.withdrawQuantityConfirm': 'Rút Ra',
+  'hudChrome.bank.withdrawQuantityInput': 'Số lượng cần rút',
+  'hudChrome.bank.withdrawQuantityTitle': 'Rút {item}',
 };

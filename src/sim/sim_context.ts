@@ -159,6 +159,11 @@ export interface SimContextPrimitives {
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
   readonly marketListings: MarketListing[];
+  // Bank system: the live array of every `banker: true` NPC id, seeded by
+  // the Sim ctor NPC loop. bank.ts reads it to gate deposit/withdraw/buy-slots on
+  // standing near a banker. Sim-owned, mutated only at construction (push), never
+  // reassigned, so a live read-only view like `marketListings`.
+  readonly bankerIds: number[];
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object on Sim
   // (queues/deserters/botPids mutated in place, the match slot reassigned INSIDE
   // the holder), so a read-only live view suffices. Consumed by the vale_cup
@@ -303,7 +308,10 @@ export interface SimContextCallbacks {
   // mana spend; C4a exports it as a sibling fn, not yet a ctx callback) and removeItem
   // (feedPet consumes the inventory hub; L2 dedupes when it adds the identical decl).
   spendResource(p: Entity, cost: number): void;
-  removeItem(itemId: string, count: number, pid?: number): void;
+  // Returns the `instance` payload of every instanced slot actually consumed
+  // (see sim.ts removeItem), so a caller needing to attribute an effect to
+  // the specific removed copy (not just any matching slot) can do so.
+  removeItem(itemId: string, count: number, pid?: number): ItemInstancePayload[];
   // Fungible-only removal (#1165), skips instanced slots; market.ts escrows with this.
   removeFungibleItem(itemId: string, count: number, pid?: number): void;
 
@@ -775,6 +783,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get marketListings() {
       return host.marketListings;
+    },
+    get bankerIds() {
+      return host.bankerIds;
     },
     get vcup() {
       return host.vcup;

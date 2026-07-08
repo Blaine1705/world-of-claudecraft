@@ -53,6 +53,7 @@ import {
 import {
   type AccountCosmetics,
   type ArenaInfo,
+  type BankInfo,
   type CharacterSearchResult,
   type ClientCommand,
   type CraftResultView,
@@ -981,6 +982,10 @@ export class ClientWorld implements IWorld {
   // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
   mailInfo: MailInfo | null = null;
   mailUnread = 0;
+  // --- IWorldBank: personal-bank contents view, mirrored from the snapshot self
+  // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
+  // server), so it only rides the wire while the player stands at a bursar. ---
+  bankInfo: BankInfo | null = null;
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -997,9 +1002,9 @@ export class ClientWorld implements IWorld {
   // all-zero default until the wheel/mass-conservation follow-up wires a self-snap
   // field the way `dmarks`/`dcomp` do for delveMarks/companionUpgrades above.
   craftSkills: Record<string, number> = emptyCraftSkills();
-  // Gathering profession proficiency (Mining/Logging/Herbalism). NOT mirrored over
-  // the wire (see professionsState below, the real read surface); this stub keeps
-  // ClientWorld structurally satisfying IWorldProgressionXp.gatheringProficiency.
+  // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
+  // from the `gprof` self-wire delta below (the real read surface; see
+  // professionsState below for crafting/secondary professions).
   gatheringProficiency: Record<string, number> = {};
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
@@ -1010,6 +1015,8 @@ export class ClientWorld implements IWorld {
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };
+  // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
+  townFocus: Record<string, number> = {};
   // Stub for #1121: per-node respawn state is server-authoritative and not yet
   // wired onto the snapshot (see src/sim/professions/CLAUDE.md), so the client
   // cannot know another player's, or even its own, real per-node timer yet.
@@ -1056,6 +1063,9 @@ export class ClientWorld implements IWorld {
   // snapshot interpolation
   lastSnapAt = 0;
   snapInterval = 50; // ms, adapts to measured cadence
+  // server-measured achieved sim tick rate (Hz), mirrored from the snap head;
+  // null until the server's meter warms up (perf overlay hides the row)
+  serverTickHz: number | null = null;
   // entity id -> performance.now() when it first went missing from a snapshot;
   // used for the despawn grace window (anti-flicker), cleared once it returns
   private missingSince = new Map<number, number>();
@@ -1475,6 +1485,11 @@ export class ClientWorld implements IWorld {
       if (gap > 5 && gap < 500) this.snapInterval = this.snapInterval * 0.9 + gap * 0.1;
     }
     this.lastSnapAt = now;
+    // Achieved server sim tick rate, measured server-side (snapshot ARRIVAL
+    // cadence undercounts sag: catch-up runs several sim ticks per broadcast).
+    if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
+      this.serverTickHz = snap.tickHz;
+    }
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -1849,6 +1864,10 @@ export class ClientWorld implements IWorld {
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
+      // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
+      // "no bank"); away from a banker the server encodes it as null. Never default
+      // to null/empty on omission, that would wipe an open bank window's mirror.
+      if (s.bank !== undefined) this.bankInfo = s.bank;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
@@ -1856,8 +1875,9 @@ export class ClientWorld implements IWorld {
       if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
-      if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
+      if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
+      if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -2028,6 +2048,9 @@ export class ClientWorld implements IWorld {
   }
   harvestCorpse(id: number, components?: string[]): void {
     this.cmd({ cmd: 'harvestCorpse', id, components });
+  }
+  setTownFocus(allocation: Record<string, number>): void {
+    this.cmd({ cmd: 'set_town_focus', allocation });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
@@ -2409,6 +2432,20 @@ export class ClientWorld implements IWorld {
   }
   mailMarkRead(mailId: number): void {
     this.cmd({ cmd: 'mail_read', id: mailId });
+  }
+  // --- IWorldBank: personal-bank deposit/withdraw/buy-slots (snake_case wire
+  // strings). bankInfo is a snapshot read (the mirror field above); the server
+  // re-validates banker proximity, capacity, and quest-item rules on every send. The
+  // slotIndex rides as `slot` and the optional partial count as `count`, matching the
+  // castAbilityBySlot/discard wire idiom. ---
+  bankDeposit(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'bank_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  bankWithdraw(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'bank_withdraw', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  bankBuySlots(): void {
+    this.cmd({ cmd: 'bank_buy_slots' });
   }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live

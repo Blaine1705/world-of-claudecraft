@@ -691,6 +691,7 @@ export const hudChromeStrings = {
       jitter: 'Jitter',
       predLead: 'Prediction Lead',
       snapshot: 'Snapshot Rate',
+      serverTick: 'Server Tick Rate',
       connection: 'Connection',
       drawCalls: 'Draw Calls',
       triangles: 'Triangles',
@@ -1061,6 +1062,18 @@ export const hudChromeStrings = {
       horn: 'Horn',
       tusk: 'Tusk',
     },
+  },
+  // #1143: persistent town focus allocation panel. Reuses the corpseHarvest
+  // component-name map above for consistency; only town-focus-specific copy
+  // lives here.
+  townFocus: {
+    title: 'Town Focus',
+    hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
+    budgetLabel: 'Points remaining: {remaining} / {budget}',
+    saveButton: 'Save Focus',
+    notInTownHint: 'You must be in town to set your focus.',
+    increaseAria: 'Increase focus on {component}',
+    decreaseAria: 'Decrease focus on {component}',
   },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
@@ -1513,6 +1526,62 @@ export const hudChromeStrings = {
       letterGone: 'That letter is no longer in your box.',
       takeParcelsFirst: 'Take the parcels out before discarding the letter.',
     },
+  },
+  // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
+  // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
+  // amount; the footer buys 6-slot expansion blocks. The withdraw-quantity and
+  // buy-confirm prompts reuse the generic vendor cancel key (itemUi.vendor.sellQuantityCancel).
+  bank: {
+    title: 'Bank',
+    subtitle: 'The Gilded Strongbox',
+    close: 'Close bank',
+    capacity: '{used}/{total}',
+    capacityAria: 'Bank slots used: {used} of {total}',
+    empty: 'Your bank is empty.',
+    tooFar: 'You must be at a banker to view your bank.',
+    buySlots: 'Buy {count} slots',
+    buySlotsMaxed: 'Fully expanded',
+    buyConfirm: 'Purchase {count} additional bank slots for {price}?',
+    buyConfirmAccept: 'Purchase',
+    withdrawHint: 'Click to withdraw',
+    withdrawPartialHint: 'Shift-click to withdraw a partial amount',
+    depositHint: 'Click to deposit',
+    depositPartialHint: 'Shift-click to deposit a partial amount',
+    cannotDeposit: 'Cannot be banked',
+    depositQuantityTitle: 'Deposit {item}',
+    depositQuantityInput: 'Quantity to deposit',
+    depositQuantityConfirm: 'Deposit',
+    withdrawQuantityTitle: 'Withdraw {item}',
+    withdrawQuantityInput: 'Quantity to withdraw',
+    withdrawQuantityConfirm: 'Withdraw',
+    // Search / category / sort toolbar. The category chip and sort option
+    // labels reuse the generic hudChrome.bags.* strings; only these bank-named aria
+    // labels are distinct from the bags wording.
+    filterGroupAria: 'Filter bank by category',
+    sortAria: 'Sort bank items',
+    searchAria: 'Search bank items by name',
+    // Deposit-all-materials button + its transient summary line. {count} is
+    // the number of material stacks moved.
+    depositAll: 'Deposit all materials',
+    depositAllDone: 'Materials deposited: {count}.',
+    depositAllFull: 'Materials deposited: {count}. Bank now full.',
+    depositAllNone: 'Bank full: nothing deposited.',
+    // Bonus-slot breakdown footer (online only): a header total plus one row
+    // per account source, advertising what linking earns. {count} is a slot count.
+    bonusTitle: 'Bonus slots',
+    bonusEarned: '+{count}',
+    bonusStatusEarned: '+{count}',
+    bonusSourceEmail: 'Verified email',
+    bonusSourceDiscord: 'Discord linked',
+    bonusSourceWallet: 'Wallet linked',
+    bonusSourceReferral: 'Referred friends',
+    bonusAdvertEmail: 'Verify your email to earn 2 slots.',
+    bonusAdvertDiscord: 'Link your Discord to earn 2 slots.',
+    bonusAdvertWallet: 'Link a wallet to earn 2 slots.',
+    bonusReferralProgress: '{count}/{cap}',
+    bonusReferralExplainer:
+      'Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.',
+    bonusSectionAria: 'Bonus bank slots and how to earn more',
   },
   // The event calendar window: recurring system events plus the guild lane
   // (booked by officers and the Guild Master, mirrored via socialInfo).
