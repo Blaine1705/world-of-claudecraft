@@ -5260,6 +5260,10 @@ export const it_IT: EnTranslations = {
         "name": "Ferite Aperte",
         "description": "Passiva: il tuo Colpo Mutilante fa sanguinare il bersaglio, infliggendo danni fisici in 6 sec. (Armi)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Salasso",
         "description": "Attacca istantaneamente in una frenesia sanguigna per {damage}. (firma Furia)"

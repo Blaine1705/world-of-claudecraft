@@ -2805,6 +2805,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Golpes de Barrido',
   'entities.abilities.sweeping_strikes.description':
     'Durante 12 sec tus ataques de un objetivo golpean también a 1 enemigo cercano al 75%. (Armas)',
+  'entities.abilities.enrage_passive.name': 'Enfurecer',
+  'entities.abilities.enrage_passive.description':
+    'Pasiva: mientras estás Enfurecido infliges un 11% más de daño, atacas un 25% más rápido y te mueves un 10% más rápido durante 4 s. Sangría tiene un 30% de probabilidad de Enfurecerte; Desenfreno siempre lo hace. (Furia)',
   'entities.abilities.deep_wounds.name': 'Heridas Profundas',
   'entities.abilities.deep_wounds.description':
     'Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)',

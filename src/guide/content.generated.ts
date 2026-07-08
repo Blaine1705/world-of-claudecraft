@@ -271,6 +271,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "deep_wounds",
         "name": "Gaping Wounds"
+      },
+      {
+        "id": "enrage_passive",
+        "name": "Enrage"
       }
     ],
     "model": "player_warrior",

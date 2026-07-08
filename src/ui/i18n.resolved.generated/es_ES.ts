@@ -5260,6 +5260,10 @@ export const es_ES: EnTranslations = {
         "name": "Heridas Profundas",
         "description": "Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)"
       },
+      "enrage_passive": {
+        "name": "Enfurecer",
+        "description": "Pasiva: mientras estás Enfurecido infliges un 11% más de daño, atacas un 25% más rápido y te mueves un 10% más rápido durante 4 s. Sangría tiene un 30% de probabilidad de Enfurecerte; Desenfreno siempre lo hace. (Furia)"
+      },
       "bloodthirst": {
         "name": "Sangría",
         "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. Tiene un 30% de probabilidad de Enfurecerte. (habilidad distintiva de Furia)"

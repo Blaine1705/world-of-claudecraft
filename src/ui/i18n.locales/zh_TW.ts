@@ -2045,6 +2045,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '擴展弧擊',
   'entities.abilities.sweeping_strikes.description':
     '持續 12 秒，你的單體攻擊還會對 1 個附近敵人造成 75% 的傷害。（武器）',
+  'entities.abilities.enrage_passive.name': '狂怒',
+  'entities.abilities.enrage_passive.description':
+    '被動：處於狂怒時，你造成的傷害提高11%，攻擊速度提高25%，移動速度提高10%，持續4秒。嗜血有30%機率觸發，浴血則必定觸發。（狂怒）',
   'entities.abilities.deep_wounds.name': '撕裂傷口',
   'entities.abilities.deep_wounds.description':
     '被動：你的致殘打擊使目標流血，在 6 秒內受到物理傷害。（武器）',

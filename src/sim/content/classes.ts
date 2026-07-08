@@ -93,6 +93,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'die_by_sword',
       'sweeping_strikes',
       'deep_wounds',
+      'enrage_passive',
     ],
     color: 0xc79c6e,
   },
@@ -757,6 +758,26 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Spend everything: strike three times in a frenzy for weapon damage plus {damage} each, always Enraging you. (Fury)',
+  },
+  // Spellbook-only passive trait (owner 2026-07-08): documents the Enrage buff
+  // that Bloodletting / Red Harvest apply (the actual mechanic is the enrageChance
+  // effect + the 'enrage' aura). No effects of its own; never castable.
+  enrage_passive: {
+    id: 'enrage_passive',
+    name: 'Enrage',
+    class: 'warrior',
+    learnLevel: 10,
+    specs: ['fury'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
   },
   // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
   // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by

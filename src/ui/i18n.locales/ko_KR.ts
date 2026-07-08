@@ -2142,6 +2142,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '넓어지는 호',
   'entities.abilities.sweeping_strikes.description':
     '12초 동안 단일 대상 공격이 근처의 적 1명에게도 75%의 피해를 입힙니다. (무기)',
+  'entities.abilities.enrage_passive.name': '격노',
+  'entities.abilities.enrage_passive.description':
+    '지속효과: 격노 상태에서 가하는 피해 11%, 공격 속도 25%, 이동 속도 10% 증가(4초). 피가르기는 30% 확률로, 붉은 수확은 항상 격노시킵니다. (분노)',
   'entities.abilities.deep_wounds.name': '찢어진 상처',
   'entities.abilities.deep_wounds.description':
     '지속 효과: 불구의 일격이 대상에게 출혈을 일으켜 6초에 걸쳐 물리 피해를 입힙니다. (무기)',

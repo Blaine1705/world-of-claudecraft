@@ -5260,6 +5260,10 @@ export const da_DK: EnTranslations = {
         "name": "Gabende Sår",
         "description": "Passiv: dit Lemlæstende Slag får målet til at bløde og påfører fysisk skade over 6 sek. (Våben)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Åreladning",
         "description": "Angrib øjeblikkeligt i et blodraseri for {damage}. (Furie-signatur)"

@@ -2390,6 +2390,9 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Berserker Rage: a fist wreathed in flame (enrage), distinct from taunt's
   // bare fist + arcs on the same fury/blood palette.
   berserker_rage: r('fury', 'blood', ['fist', { p: 'flame', ...TR }], ['glow']),
+  // Enrage (Fury passive): a raging flame engulfing a fist, glow + motion to read
+  // as an active fury state; distinct from Berserker Rage's small TR flame.
+  enrage_passive: r('fury', 'blood', ['flame', { p: 'fist', ...BIG }], ['glow', 'motion']),
   // fury-only kit: Twinstrike = two crossed blades mid-swing; Red Harvest = a
   // blood-soaked axe with a falling droplet (distinct from execute's bare axe)
   raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),

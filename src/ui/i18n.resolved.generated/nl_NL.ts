@@ -5260,6 +5260,10 @@ export const nl_NL: EnTranslations = {
         "name": "Gapende Wonden",
         "description": "Passief: je Verminkende Slag laat het doelwit bloeden en veroorzaakt fysieke schade gedurende 6 sec. (Wapens)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Aderlating",
         "description": "Val onmiddellijk aan in een bloedrazernij voor {damage}. (Razernij-kenmerk)"
