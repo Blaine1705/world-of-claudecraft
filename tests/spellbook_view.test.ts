@@ -149,6 +149,36 @@ describe('spec-gated kit filtering', () => {
     expect(arms).toContain('die_by_sword');
   });
 
+  it('hides Arms and Protection kit from a Fury warrior', () => {
+    const fury = rowIds('fury');
+    // Arms-only kit is hidden.
+    expect(fury).not.toContain('overpower');
+    expect(fury).not.toContain('sweeping_strikes');
+    expect(fury).not.toContain('die_by_sword');
+    // Protection-only kit is hidden.
+    expect(fury).not.toContain('thunder_clap');
+    expect(fury).not.toContain('sunder_armor');
+    // Fury keeps its own kit and the shared filler (Reaver Strike is not excluded
+    // for Fury) plus ungated staples.
+    expect(fury).toContain('raging_gale');
+    expect(fury).toContain('heroic_strike');
+    expect(fury).toContain('execute');
+  });
+
+  it('each spec sees only its own gated kit (no cross-spec leakage)', () => {
+    const arms = new Set(rowIds('arms'));
+    const fury = new Set(rowIds('fury'));
+    const prot = new Set(rowIds('prot'));
+    // A spec-exclusive lands in exactly the intended spec's book.
+    expect(arms.has('overpower') && !fury.has('overpower') && !prot.has('overpower')).toBe(true);
+    expect(fury.has('raging_gale') && !arms.has('raging_gale') && !prot.has('raging_gale')).toBe(
+      true,
+    );
+    expect(prot.has('sunder_armor') && !arms.has('sunder_armor') && !fury.has('sunder_armor')).toBe(
+      true,
+    );
+  });
+
   it('keeps the whole kit when no spec is committed', () => {
     const open = rowIds(null);
     expect(open).toContain('thunder_clap');
