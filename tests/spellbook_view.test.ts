@@ -129,3 +129,30 @@ describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
     expect(buildSpellbookView(i)).toEqual(buildSpellbookView(i));
   });
 });
+
+describe('spec-gated kit filtering', () => {
+  const warriorKit = CLASSES.warrior.abilities;
+  const rowIds = (spec: string | null): string[] =>
+    buildSpellbookView(
+      input({ classId: 'warrior' as PlayerClass, abilities: warriorKit, spec }),
+    ).rows.map((r) => r.abilityId);
+
+  it('hides abilities a committed spec can never learn', () => {
+    const arms = rowIds('arms');
+    // Protection-only kit is dropped for Arms (no dangling "Trainable at level X").
+    expect(arms).not.toContain('thunder_clap');
+    expect(arms).not.toContain('sunder_armor');
+    // Reaver Strike is excludeSpecs ['prot','arms'], so Arms does not see it.
+    expect(arms).not.toContain('heroic_strike');
+    // Arms' own kit stays.
+    expect(arms).toContain('overpower');
+    expect(arms).toContain('die_by_sword');
+  });
+
+  it('keeps the whole kit when no spec is committed', () => {
+    const open = rowIds(null);
+    expect(open).toContain('thunder_clap');
+    expect(open).toContain('heroic_strike');
+    expect(open).toContain('sunder_armor');
+  });
+});
