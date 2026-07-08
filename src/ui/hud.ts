@@ -89,6 +89,7 @@ import {
   type AbilityEffect,
   type AuraKind,
   CONSUME_DURATION,
+  FAERIE_FIRE_ARMOR_PCT,
   canPrestige,
   dist2d,
   type Entity,
@@ -100,6 +101,7 @@ import {
   MILESTONES,
   type RiteIntensity,
   type SimEvent,
+  SUNDER_ARMOR_PCT_PER_STACK,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -114,7 +116,15 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
-import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
+import {
+  type AbilityScaling,
+  abilityBuffValue,
+  abilityDamageBonus,
+  abilityDurationValue,
+  abilityOverTimeEffect,
+  abilityPrimaryEffect,
+  abilitySecondaryEffect,
+} from './ability_damage';
 import { ActionBarPainter, type ActionBarSlotElements } from './action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -254,6 +264,11 @@ import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
 import { LockpickWindow } from './lockpick_window';
 import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
+import {
+  computeLootRollStatusRows,
+  type LootRollStatusRow,
+  lootRollStatusFingerprint,
+} from './loot_roll_status_view';
 import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
@@ -389,6 +404,7 @@ import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
+import { YumiMatchPainter } from './yumi_match_painter';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -1104,6 +1120,16 @@ export class Hud {
   // later absence from the mirror means the server resolved them (retire), not
   // that the mirror simply has not caught up to a just-shown event yet.
   private confirmedLootRolls = new Set<number>();
+  // Group vote strip (the XLoot-style monitor): the authoritative per-candidate
+  // choices on every open roll, polled from IWorld.lootRollGroupStatus and
+  // re-rendered only when the fingerprint changes. A status row with no local
+  // prompt renders as a watch-only row, which is what keeps the roll frame up
+  // after the player answers until the server resolves the roll.
+  private lootRollStatusRows: LootRollStatusRow[] = [];
+  private lootRollStatusFp = '';
+  // rollId -> receivedAt for the watch-only rows' countdown bar (a prompt row
+  // keeps its own receivedAt; a watch row starts timing at first sight).
+  private lootRollWatchTimers = new Map<number, number>();
   // Master-loot assignment prompts, shown only to the master looter alongside
   // the loot-roll rail. Same lifetime/expiry as a need/greed roll.
   private activeMasterRolls = new Map<
@@ -3056,6 +3082,13 @@ export class Hud {
     },
   );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
+  // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
+  // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
+  // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
+  // band next to the fiesta HUD (values change at 1Hz).
+  private readonly yumiPainter = new YumiMatchPainter(this.writerFacet, () =>
+    document.getElementById('ui'),
+  );
   // Per-frame XP + swing painters. Each caches its element refs once and
   // routes every write through the same six-writer facet, so their --xp-fill /
   // .rested / swing writes share the one skip-rate.
@@ -3782,7 +3815,7 @@ export class Hud {
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
   // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
   // descriptor. Injected into the auras view so the i18n-free core never calls t().
-  private auraEffectTooltipHtml(a: AuraEffectInput): string {
+  private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
     const effect = auraEffectDescriptor(a);
     if (!effect) return '';
     const values: Record<string, string> = {};
@@ -3791,8 +3824,15 @@ export class Hud {
         values[k] = formatNumber(n, { maximumFractionDigits: 0 });
       }
     }
-    if (effect.school) {
-      values.school = t(`hudChrome.auraEffect.school.${effect.school}` as TranslationKey);
+    // Resolve the {school} placeholder in the dot/absorb/thorns summaries. Prefer
+    // the SOURCE ability's school: it is authoritative and always present
+    // client-side, unlike the aura's own school, which the ability-tooltip call
+    // site omits (only kind+value) and the online wire mirror drops. Without this
+    // a magic reflect like Lightning Shield read a raw "{school}" (ability tooltip)
+    // or the wrong "Physical" (online buff frame) instead of its real school.
+    const school = (a.id ? ABILITIES[a.id]?.school : undefined) ?? effect.school;
+    if (school) {
+      values.school = t(`hudChrome.auraEffect.school.${school}` as TranslationKey);
     }
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
@@ -4069,7 +4109,9 @@ export class Hud {
     for (const line of lines) {
       const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
       const triggerKey =
-        line.trigger === 'meleeHit'
+        // onMeleeHit is the legacy key id; its English reads the generic "Chance on
+        // hit", correct for a weaponHit proc that fires on melee AND hunter ranged.
+        line.trigger === 'weaponHit'
           ? 'hudChrome.itemProc.onMeleeHit'
           : line.trigger === 'spellDamage'
             ? 'hudChrome.itemProc.onSpellDamage'
@@ -4301,11 +4343,12 @@ export class Hud {
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
     const p = this.sim.player;
-    const damageText = abilityEffectText(res, {
+    const scaling: AbilityScaling = {
       spellPower: p.spellPower,
       rangedPower: p.rangedPower,
       attackPower: p.attackPower,
-    });
+    };
+    const damageText = abilityEffectText(res, scaling);
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
     const costLine: string[] = [];
@@ -4329,13 +4372,15 @@ export class Hud {
         t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(res.cooldown) }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(a, damageText))}</div>`;
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling))}</div>`;
     // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
     // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
     for (const eff of res.effects) {
       if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
-        html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value });
+        // Pass the ability id so the effect line can resolve its damage school
+        // (the {school} placeholder in the thorns/dot/absorb summaries).
+        html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value, id: a.id });
       }
     }
     const requirements = abilityRequirementLines(a);
@@ -6225,6 +6270,7 @@ export class Hud {
     this.lockpickWindow.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
+    this.reconcileLootRollStatus(now);
     this.updateLootRollTimers(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
@@ -6467,7 +6513,7 @@ export class Hud {
     // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
     this.renderPetBar();
     this.flushPendingProcAuraNotes();
-    if (this.spellbookWindow.isOpen) this.spellbookWindow.refreshHotbarControls();
+    if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
     );
@@ -6692,6 +6738,7 @@ export class Hud {
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();
+      this.yumiPainter.update(this.sim.arenaInfo);
       // Vale Cup surfaces (mediumHud like the arena/fiesta ones): the indicator
       // button, the in-match strip, and the open window redraw.
       this.vcupIndicator.update(buildVcupIndicatorView(this.sim.cupInfo));
@@ -7707,10 +7754,23 @@ export class Hud {
     // minimapMode (the minimap_markers core) is the single source of truth for the
     // delve-vs-overworld branch (the same isDelvePos + delveRun guard, lifted into the
     // core so hud and the painters never duplicate it).
-    if (minimapMode(this.sim) === 'delve') {
+    const mode = minimapMode(this.sim);
+    if (mode === 'delve') {
       // The delve painter owns the '#zone-label' text (written through the
       // write-elision facet) and the full minimap schematic render.
       this.delvePainter.paintMinimapDelve(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
+      return;
+    }
+    if (mode === 'yumiMaze') {
+      // Protect Yumi: the overworld marker set over the cached maze-wall
+      // raster; the strip title stands in for the zone label.
+      this.minimapPainter.paintYumiMaze(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        this.minimapZoom,
+        t('yumi.hud.title'),
+      );
       return;
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
@@ -7755,7 +7815,10 @@ export class Hud {
     const el = $('#arena-status');
     const a = this.sim.arenaInfo;
     const m = a?.match ?? null;
-    if (!m) {
+    // Protect Yumi carries its own strip (yumi_match_painter) at the same
+    // top-center anchor, so the generic VS banner would just overlap it;
+    // keep the banner only for the post-bout returning countdown.
+    if (!m || (m.yumi && m.state !== 'over')) {
       if (el.style.display !== 'none') el.style.display = 'none';
       this.lastArenaStatusSig = '';
       return;
@@ -8890,6 +8953,23 @@ export class Hud {
             }
             break;
           }
+          if (ev.format === 'yumi3' || ev.format === 'yumi5') {
+            // Unranked objective mode; sudden death guarantees no draws.
+            // Personal per participant: keep only the local player's copy
+            // (offline the sim hands every fighter's copy to the one HUD).
+            if (ev.pid !== undefined && ev.pid !== sim.playerId) break;
+            this.yumiPainter.reset();
+            if (ev.won) {
+              this.showBanner(t('yumi.end.win'));
+              this.combatLog(t('yumi.end.win'), '#7fdc4f');
+              audio.fiestaWave();
+            } else {
+              this.showBanner(t('yumi.end.loss'));
+              this.combatLog(t('yumi.end.loss'), '#ff7a6a');
+              audio.death();
+            }
+            break;
+          }
           const delta = ev.ratingAfter - ev.ratingBefore;
           const sign = delta >= 0 ? '+' : '';
           const ratingDelta = `${sign}${formatNumber(delta, { maximumFractionDigits: 0 })}`;
@@ -8940,6 +9020,36 @@ export class Hud {
               '#ff7a6a',
             );
             audio.death();
+          }
+          break;
+        }
+        // The yumi events are personal per participant; offline the sim hands
+        // EVERY player's copy to the one local HUD, so each arm keeps only the
+        // local player's (the same reason the renderer arm filters).
+        case 'yumiStatus':
+          if (ev.pid === sim.playerId) this.yumiPainter.onStatus(ev);
+          break;
+        case 'yumiDown':
+          if (ev.pid === sim.playerId) {
+            this.yumiPainter.onDown(ev.seconds);
+            audio.fiestaDown();
+          }
+          break;
+        case 'yumiSuddenDeath':
+          if (ev.pid === sim.playerId) {
+            this.showBanner(t('yumi.banner.sudden'));
+            this.combatLog(t('yumi.banner.sudden'), '#ff7a6a');
+            audio.fiestaWave();
+          }
+          break;
+        case 'yumiTeleport': {
+          if (ev.pid !== sim.playerId) break;
+          // Two events per relocation (one per cat); cue once, on my team's cat.
+          const y = this.sim.arenaInfo?.match?.yumi;
+          const myCat = y ? (y.team === 'A' ? y.yumiA.entityId : y.yumiB.entityId) : -1;
+          if (ev.catId === myCat) {
+            this.showBanner(t('yumi.banner.teleport'));
+            this.log(t('yumi.banner.teleport'), '#7fd7ff');
           }
           break;
         }
@@ -10663,8 +10773,37 @@ export class Hud {
     this.renderLootRolls();
   }
 
+  // Poll the authoritative group vote state and re-render the roll rail only
+  // when it actually changes (the view core's fingerprint). Also owns the watch
+  // timers: a watch-only row starts its countdown at first sight and is dropped
+  // the moment the server stops listing the roll (resolution/expiry).
+  private reconcileLootRollStatus(now: number): void {
+    const statuses = this.sim.lootRollGroupStatus();
+    if (statuses.length === 0 && this.lootRollStatusRows.length === 0) return;
+    const rows = computeLootRollStatusRows(
+      statuses,
+      [...this.activeLootRolls.keys()],
+      this.sim.playerId,
+    );
+    const fp = lootRollStatusFingerprint(rows);
+    if (fp === this.lootRollStatusFp) return;
+    this.lootRollStatusFp = fp;
+    this.lootRollStatusRows = rows;
+    const live = new Set(rows.map((row) => row.rollId));
+    for (const rollId of this.lootRollWatchTimers.keys())
+      if (!live.has(rollId)) this.lootRollWatchTimers.delete(rollId);
+    for (const row of rows)
+      if (!this.lootRollWatchTimers.has(row.rollId)) this.lootRollWatchTimers.set(row.rollId, now);
+    this.renderLootRolls();
+  }
+
   private updateLootRollTimers(now: number): void {
-    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) return;
+    if (
+      this.activeLootRolls.size === 0 &&
+      this.activeMasterRolls.size === 0 &&
+      this.lootRollStatusRows.length === 0
+    )
+      return;
     let changed = false;
     for (const [rollId, roll] of this.activeLootRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
@@ -10684,6 +10823,15 @@ export class Hud {
     if (!root) return;
     for (const row of root.querySelectorAll<HTMLElement>('.loot-roll')) {
       const rollId = Number(row.dataset.rollId);
+      if (row.dataset.watch) {
+        // Watch-only rows time against first sight; the row itself lives and
+        // dies with the server's group status, the bar is purely cosmetic.
+        const receivedAt = this.lootRollWatchTimers.get(rollId);
+        if (receivedAt === undefined) continue;
+        const remaining = Math.max(0, 1 - (now - receivedAt) / 60_000);
+        row.style.setProperty('--loot-roll-frac', remaining.toFixed(3));
+        continue;
+      }
       const roll = row.dataset.master
         ? this.activeMasterRolls.get(rollId)
         : this.activeLootRolls.get(rollId);
@@ -10712,15 +10860,49 @@ export class Hud {
     this.renderLootRolls();
   }
 
+  // The per-candidate vote strip (the XLoot-style monitor): one chip per
+  // candidate showing their live need/greed/pass choice, or an empty chip while
+  // they are still deciding, headed by an "N/M rolled" count so a full raid
+  // (RAID_MAX = 10) reads at a glance without scanning every chip. Roll numbers
+  // are never shown here; the sim broadcasts them as loot chat lines at
+  // resolution. The strip is aria-hidden: it re-renders on every vote, so
+  // leaving it in the #loot-rolls live region would spam a screen reader up to
+  // ten times per roll. The accessible surface is the prompt (announced once on
+  // show) plus the full per-roller reveal in the chat log at resolution.
+  private lootRollVotesHtml(status: LootRollStatusRow): string {
+    const votes = status.entries
+      .map(
+        (entry) => `
+        <span class="loot-roll-vote${entry.self ? ' self' : ''}">
+          <span class="loot-roll-vote-name">${esc(entry.name)}</span>
+          <span class="loot-roll-vote-chip ${entry.choice ?? 'undecided'}">${entry.choice ? esc(t(`itemUi.lootRoll.${entry.choice}`)) : ''}</span>
+        </span>`,
+      )
+      .join('');
+    const count = t('itemUi.lootRoll.rolled', {
+      answered: formatNumber(status.answered, { maximumFractionDigits: 0 }),
+      total: formatNumber(status.total, { maximumFractionDigits: 0 }),
+    });
+    return `<div class="loot-roll-votes" aria-hidden="true">
+      <div class="loot-roll-votes-count">${esc(count)}</div>
+      <div class="loot-roll-votes-list">${votes}</div>
+    </div>`;
+  }
+
   private renderLootRolls(): void {
     const root = this.lootRollRoot();
-    if (this.activeLootRolls.size === 0 && this.activeMasterRolls.size === 0) {
+    if (
+      this.activeLootRolls.size === 0 &&
+      this.activeMasterRolls.size === 0 &&
+      this.lootRollStatusRows.length === 0
+    ) {
       root.style.display = 'none';
       root.innerHTML = '';
       return;
     }
     root.style.display = 'flex';
     root.innerHTML = '';
+    const statusByRoll = new Map(this.lootRollStatusRows.map((row) => [row.rollId, row]));
     for (const [rollId, roll] of this.activeMasterRolls)
       this.renderMasterLootRow(root, rollId, roll.event);
     for (const [rollId, roll] of this.activeLootRolls) {
@@ -10728,6 +10910,7 @@ export class Hud {
       const item = ITEMS[ev.itemId];
       const itemName = item ? itemDisplayName(item) : ev.itemName;
       const quality = item?.quality ?? ev.quality ?? 'common';
+      const status = statusByRoll.get(rollId);
       const row = document.createElement('div');
       row.className = 'loot-roll panel';
       row.dataset.rollId = String(rollId);
@@ -10741,6 +10924,7 @@ export class Hud {
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
+        ${status ? this.lootRollVotesHtml(status) : ''}
         <div class="loot-roll-actions">
           <button type="button" class="loot-roll-btn need" data-choice="need">${esc(t('itemUi.lootRoll.need'))}</button>
           <button type="button" class="loot-roll-btn greed" data-choice="greed">${esc(t('itemUi.lootRoll.greed'))}</button>
@@ -10755,6 +10939,36 @@ export class Hud {
         btn.setAttribute('aria-label', t(`itemUi.lootRoll.${choice}Aria`, { item: itemName }));
         btn.addEventListener('click', () => this.submitLootRoll(rollId, choice));
       });
+      root.appendChild(row);
+    }
+    // Watch-only rows: open rolls this player is not (or no longer) answering,
+    // kept up so the whole group can follow the votes until the server resolves
+    // the roll and drops it from the group status.
+    for (const status of this.lootRollStatusRows) {
+      if (this.activeLootRolls.has(status.rollId) || this.activeMasterRolls.has(status.rollId))
+        continue;
+      const item = ITEMS[status.itemId];
+      const itemName = item ? itemDisplayName(item) : status.itemName;
+      const quality = item?.quality ?? status.quality ?? 'common';
+      const row = document.createElement('div');
+      row.className = 'loot-roll panel watch';
+      row.dataset.rollId = String(status.rollId);
+      row.dataset.watch = '1';
+      row.style.setProperty('--loot-roll-frac', '1');
+      row.innerHTML = `
+        <div class="loot-roll-item">
+          ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', status.itemId)}" alt="" draggable="false">`}
+          <div class="loot-roll-copy">
+            <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
+            <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
+          </div>
+        </div>
+        <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
+        ${this.lootRollVotesHtml(status)}`;
+      if (item)
+        this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
+          this.itemTooltip(item),
+        );
       root.appendChild(row);
     }
   }
@@ -13779,12 +13993,27 @@ function abilityDisplayName(def: AbilityDef): string {
   return tEntity({ kind: 'ability', id: def.id, field: 'name' });
 }
 
-function abilityDisplayDescription(def: AbilityDef, damageText: string): string {
+// Fills every description placeholder from the RESOLVED ability: {damage} ($d)
+// the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
+// first buff's value, {duration} ($t) the first timed effect's duration. All are
+// rank- and talent-resolved, so the prose can never drift from what a cast does.
+function abilityDisplayDescription(
+  res: ResolvedAbility,
+  damageText: string,
+  scaling?: AbilityScaling,
+): string {
+  const buff = abilityBuffValue(res);
+  const duration = abilityDurationValue(res);
   return tEntity({
     kind: 'ability',
-    id: def.id,
+    id: res.def.id,
     field: 'description',
-    values: { damage: damageText },
+    values: {
+      damage: damageText,
+      overTime: abilityOverTimeText(res, scaling),
+      buff: buff === null ? '' : formatAbilityNumber(buff),
+      duration: duration === null ? '' : formatAbilityNumber(duration),
+    },
   });
 }
 
@@ -13991,7 +14220,6 @@ function abilityRequirementLines(def: AbilityDef): string[] {
 // "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
 // Power adds, and watches it climb as gear changes.
 function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  const effects = res.effects;
   // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
   // omitted when there is none. Punctuation + formatted number only (no words).
   const suffix = (eff: AbilityEffect) => {
@@ -14000,19 +14228,9 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}`
       : '';
   };
-  const primary = effects.find(
-    (eff) =>
-      eff.type === 'directDamage' ||
-      eff.type === 'heal' ||
-      eff.type === 'weaponDamage' ||
-      eff.type === 'weaponStrike' ||
-      eff.type === 'aoeDamage' ||
-      eff.type === 'aoeHeal' ||
-      eff.type === 'aoeRoot' ||
-      eff.type === 'consumeAura' ||
-      eff.type === 'finisherDamage' ||
-      eff.type === 'drainTick',
-  );
+  // The pickers live in ability_damage.ts so the consistency guard test shares
+  // them; this function only formats the picked effect.
+  const primary = abilityPrimaryEffect(res);
   if (primary) {
     switch (primary.type) {
       case 'directDamage':
@@ -14020,6 +14238,7 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'aoeDamage':
       case 'aoeHeal':
       case 'aoeRoot':
+      case 'groundAoE':
       case 'drainTick':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'consumeAura':
@@ -14033,6 +14252,14 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);
+      case 'sunder':
+        return formatAbilityNumber(
+          SUNDER_ARMOR_PCT_PER_STACK * (primary.full ? primary.maxStacks : 1) * 100,
+        );
+      case 'faerieFire':
+        return formatAbilityNumber(FAERIE_FIRE_ARMOR_PCT * 100);
+      case 'lifeTap':
+        return formatAbilityNumber(primary.hp);
       case 'finisherDamage':
         return (
           t('abilityUi.tooltip.finisherDamage', {
@@ -14043,16 +14270,13 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
     }
   }
 
-  const secondary = effects.find(
-    (eff) =>
-      eff.type === 'dot' || eff.type === 'hot' || eff.type === 'absorb' || eff.type === 'imbue',
-  );
+  const secondary = abilitySecondaryEffect(res);
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
-      return formatAbilityNumber(secondary.total);
+      return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'absorb':
       return formatAbilityNumber(secondary.amount);
     case 'imbue':
@@ -14060,6 +14284,18 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
     default:
       return '';
   }
+}
+
+// Builds the `$o` over-time string (a hybrid's dot/hot TOTAL) the same way
+// abilityEffectText builds `$d`, including the "(+N)" scaling callout (which the
+// bonus helper zeroes for hybrid riders, matching combat's no-double-dip rule).
+function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): string {
+  const eff = abilityOverTimeEffect(res);
+  if (!eff) return '';
+  const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
+  const bonus =
+    b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
+  return formatAbilityNumber(eff.total) + bonus;
 }
 
 function abilityAmountRange(min: number, max: number): string {

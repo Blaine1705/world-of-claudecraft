@@ -107,6 +107,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
+    bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
     ownerId: null,
@@ -238,15 +239,21 @@ export function recalcPlayerStats(
   bonusSp += setEff.sp; // caster set 2-piece spell power (mirrors setEff.ap for melee)
   // Buff auras
   let bonusAp = setEff.ap;
-  let bonusApPct = 0;
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
   let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
+  // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
+  // Devotion Aura / Battle Shout / Blessing of Might). Accumulated as fractions here,
+  // then folded multiplicatively at the relevant derivation step below.
+  let allStatsPct = 0;
+  let intPct = 0;
+  let staPct = 0;
+  let buffArmorPct = 0;
+  let buffApPct = 0;
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
-    else if (a.kind === 'buff_ap_pct') bonusApPct += pctValue(a.value);
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
     // effectiveAttackPower; players bake it here, so without this arm the debuff
     // was a no-op versus enemy players (PvP).
@@ -278,6 +285,13 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
+    // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
+    // integer-rounding talent value multiplier; converted to a fraction here.
+    else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;
+    else if (a.kind === 'buff_int_pct') intPct += a.value / 100;
+    else if (a.kind === 'buff_sta_pct') staPct += a.value / 100;
+    else if (a.kind === 'buff_armor_pct') buffArmorPct += a.value / 100;
+    else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
     // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
@@ -307,6 +321,16 @@ export function recalcPlayerStats(
     if (m.intPct) s.int = Math.round(s.int * (1 + m.intPct));
     if (m.spiPct) s.spi = Math.round(s.spi * (1 + m.spiPct));
   }
+  // Percent stat raid buffs, folded multiplicatively on the computed (base + gear +
+  // flat + talent) primary stats so they feed every downstream derivation (AP from
+  // str/agi, Spell Power from int, HP from sta, crit/dodge from agi).
+  if (allStatsPct || intPct || staPct) {
+    s.str = Math.round(s.str * (1 + allStatsPct));
+    s.agi = Math.round(s.agi * (1 + allStatsPct));
+    s.sta = Math.round(s.sta * (1 + allStatsPct + staPct));
+    s.int = Math.round(s.int * (1 + allStatsPct + intPct));
+    s.spi = Math.round(s.spi * (1 + allStatsPct));
+  }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.
   s.agi = Math.max(0, s.agi);
@@ -323,6 +347,7 @@ export function recalcPlayerStats(
   // separate buff_spelldmg aura the form applies).
   if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
+  if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
   s.spi = Math.max(0, s.spi);
@@ -360,14 +385,15 @@ export function recalcPlayerStats(
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
+  // buffApPct (Battle Shout / Blessing of Might) folds into the same AP multiplier.
   e.attackPower = Math.max(
     0,
-    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + bonusApPct)),
+    Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)),
   );
   // Hunters: ranged AP = 2/agi (classic-era value)
   e.rangedPower =
     cls === 'hunter'
-      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + bonusApPct)))
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0) + buffApPct)))
       : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.

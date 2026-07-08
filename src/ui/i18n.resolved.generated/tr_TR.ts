@@ -1021,10 +1021,19 @@ export const tr_TR: EnTranslations = {
         "allStats": "Reduce todos los atributos en {value}"
       },
       "allStatsPctReduce": "Tüm nitelikleri %{pct} azaltır",
+      "increasePct": {
+        "ap": "Increases attack power by {pct}%",
+        "armor": "Increases armor by {pct}%",
+        "int": "Increases Intellect by {pct}%",
+        "sta": "Increases Stamina by {pct}%",
+        "allStats": "Increases all attributes by {pct}%"
+      },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
+      "armorPct": "Reduces armor by {pct}%",
+      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -2225,6 +2234,8 @@ export const tr_TR: EnTranslations = {
       "waveGoldBody": "Orta dalga: kurgunun şekillenmeye ve uyum tutturmaya başladığı iki yönlü kombolar.",
       "wavePrismaticTitle": "Prizmatik",
       "wavePrismaticBody": "Son dalga: kurguyu belirleyen, ekran eriten, en güzel anlamda saçma hissettirmesi amaçlanan sıçramalar.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Ringdeki takviyeler",
       "powerupsBody": "Parlayan küreler de dövüşün ortasında arenaya düşer, kim önce ulaşırsa onun olur. Bilerek abartılıdırlar ve yalnızca kısa bir süre dayanırlar: bir göz kırpımlık göz kamaştırıcı hız için Hız İblisi, hantal bir deve dönüşmek için Devasa, zıplayan, düşük yerçekimli bir sıçrama için Ay Botları, ve ani bir öfke dalgası için Cinnet.",
       "ladderHeading": "Merdiveni tırmanmak",
@@ -3654,6 +3665,45 @@ export const tr_TR: EnTranslations = {
       "flavor": "Ölüler ayırabildiklerini teslim etti."
     }
   },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "Join Protect Yumi!",
+    "queue": {
+      "join": "You join the Protect Yumi queue. Guard your familiar…",
+      "leave": "You leave the Protect Yumi queue.",
+      "teamLeave": "Your team leaves the Protect Yumi queue."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
+      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+    },
+    "log": {
+      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "Get ready…",
+      "teleportIn": "Yumis move in {s}",
+      "suddenDeath": "SUDDEN DEATH",
+      "yourYumi": "Your Yumi",
+      "enemyYumi": "Enemy Yumi",
+      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
+      "collapse": "Collapse the Protect Yumi bars",
+      "expand": "Expand the Protect Yumi bars"
+    },
+    "respawn": {
+      "title": "DOWNED!"
+    },
+    "banner": {
+      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
+      "teleport": "The Yumis teleport!"
+    },
+    "end": {
+      "win": "VICTORY! Yumi is safe!",
+      "loss": "DEFEAT! Your Yumi has fallen."
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "Fiesta'ya Katıl!",
@@ -4956,7 +5006,8 @@ export const tr_TR: EnTranslations = {
       "needAria": "{item} için ihtiyaç",
       "greedAria": "{item} için açgözlülük",
       "passAria": "{item} için pas geç",
-      "everyonePassed": "Herkes {item} için pas geçti."
+      "everyonePassed": "Herkes {item} için pas geçti.",
+      "rolled": "{answered}/{total} rolled"
     }
   },
   "entities": {
@@ -5007,19 +5058,19 @@ export const tr_TR: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Ateş Yağmuru",
-        "description": "Hedef alana ateş yağdırır ve düşmanları yakarak {damage} Ateş hasarı verir."
+        "description": "Hedef alana 4 saniye boyunca ateş yağdırır ve düşmanları her saniye {damage} Ateş hasarıyla yakar."
       },
       "volley": {
         "name": "Ok Yağmuru",
-        "description": "Hedef alana ok yağdırır ve içindeki düşmanlara {damage} hasar verir."
+        "description": "Hedef alana 3 saniye boyunca ok yağdırır ve içindeki düşmanlara her 0.5 saniyede bir {damage} hasar verir."
       },
       "hurricane": {
         "name": "Kasırga",
-        "description": "Hedef alana bir kasırga indirir ve düşmanlara {damage} Doğa hasarı verir."
+        "description": "Hedef alana 6 saniye boyunca bir kasırga indirir ve düşmanlara her saniye {damage} Doğa hasarı verir."
       },
       "earthquake": {
         "name": "Deprem",
-        "description": "Hedef alanı sarsar ve düşmanlara {damage} Doğa hasarı verir."
+        "description": "Hedef alanı 6 saniye boyunca sarsar ve düşmanları her 1.5 saniyede bir {damage} Doğa hasarıyla hırpalar."
       },
       "heroic_strike": {
         "name": "Yağmacı Darbesi",
@@ -5027,15 +5078,15 @@ export const tr_TR: EnTranslations = {
       },
       "battle_shout": {
         "name": "Demir Nara",
-        "description": "Saldırı gücünü 2 dakika boyunca 20 artırır."
+        "description": "Saldırı gücünü 2 dakika boyunca {buff} artırır."
       },
       "commanding_shout": {
         "name": "Güçlendiren Nara",
-        "description": "Dayanıklılığını 2 dakika boyunca 6 artırır."
+        "description": "Dayanıklılığını 2 dakika boyunca {buff} artırır."
       },
       "demoralizing_shout": {
         "name": "Vahim Uluma",
-        "description": "Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca 30 azaltır."
+        "description": "Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır."
       },
       "charge": {
         "name": "Atılım",
@@ -5043,7 +5094,7 @@ export const tr_TR: EnTranslations = {
       },
       "rend": {
         "name": "Derin Yarık",
-        "description": "Hedefi yaralar, 9 saniye boyunca {damage} kanama hasarı vermesine yol açar."
+        "description": "Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar."
       },
       "thunder_clap": {
         "name": "Sarsan Darbe",
@@ -5051,7 +5102,7 @@ export const tr_TR: EnTranslations = {
       },
       "hamstring": {
         "name": "Topallatan Kesik",
-        "description": "Düşmanı 5 hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır."
+        "description": "Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır."
       },
       "bloodrage": {
         "name": "Kan Bedeli",
@@ -5059,7 +5110,7 @@ export const tr_TR: EnTranslations = {
       },
       "overpower": {
         "name": "Kızıl El",
-        "description": "Silah hasarı +5 veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz."
+        "description": "Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz."
       },
       "execute": {
         "name": "Erken Mezar",
@@ -5079,7 +5130,7 @@ export const tr_TR: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Zırh Kesme",
-        "description": "Hedefin zırhını parçalar, her uygulamada {damage} azaltır. 5 kata kadar üst üste binebilir. Yüksek miktarda tehdit üretir."
+        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
       },
       "taunt": {
         "name": "Tahrik",
@@ -5091,11 +5142,11 @@ export const tr_TR: EnTranslations = {
       },
       "frost_armor": {
         "name": "Kırağı Pelerini",
-        "description": "Seni buzla sarar ve zırhını 30 dakika boyunca 30 artırır."
+        "description": "Seni buzla sarar ve zırhını 30 dakika boyunca {buff} artırır."
       },
       "arcane_intellect": {
         "name": "Aether Sezgisi",
-        "description": "Zekayı 30 dakika boyunca 2 artırır."
+        "description": "Zekayı 30 dakika boyunca {buff} artırır."
       },
       "frostbolt": {
         "name": "Ayaz Mızrağı",
@@ -5119,7 +5170,7 @@ export const tr_TR: EnTranslations = {
       },
       "polymorph": {
         "name": "Büyüleme",
-        "description": "Düşmanı 15 saniyeye kadar bir kurbağaya dönüştürür. Kurbağa başıboş dolaşır ve hızla iyileşir. Herhangi bir hasar etkiyi bozar. Yalnızca canavarlar ve insansılar."
+        "description": "Düşmanı {duration} saniyeye kadar bir kurbağaya dönüştürür. Kurbağa başıboş dolaşır ve hızla iyileşir. Herhangi bir hasar etkiyi bozar. Yalnızca canavarlar ve insansılar."
       },
       "frost_nova": {
         "name": "Buz Bağı",
@@ -5139,7 +5190,7 @@ export const tr_TR: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Buz Örtüsü",
-        "description": "Seni buzla kalkanlar ve 60 saniye boyunca 130 hasarı emer."
+        "description": "Seni buzla kalkanlar ve 60 saniye boyunca {damage} hasarı emer."
       },
       "sinister_strike": {
         "name": "Kötücül Kesik",
@@ -5147,7 +5198,7 @@ export const tr_TR: EnTranslations = {
       },
       "eviscerate": {
         "name": "Toprak Uykusu",
-        "description": "Her kombo puanı başına hasar veren bitirici hamle."
+        "description": "{damage} veren bitirici hamle."
       },
       "backstab": {
         "name": "Korkakça Saplama",
@@ -5155,7 +5206,7 @@ export const tr_TR: EnTranslations = {
       },
       "gouge": {
         "name": "Göz Dürtme",
-        "description": "Hedefe vurarak onu 4 saniye boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. 1 kombo puanı kazandırır."
+        "description": "Hedefe {damage} hasar vererek onu 4 saniye boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. 1 kombo puanı kazandırır."
       },
       "evasion": {
         "name": "Hayalet Ayak",
@@ -5187,11 +5238,11 @@ export const tr_TR: EnTranslations = {
       },
       "garrote": {
         "name": "Boğaz Teli",
-        "description": "Düşmanı boğarak hem anında hasar verir hem de 18 saniye boyunca {damage} kanama yaratır. Gizlenmiş olmalısın. 1 kombo puanı kazandırır."
+        "description": "Düşmanı boğarak anında {damage} hasar verir ve 18 saniye boyunca {overTime} kanama yaratır. Gizlenmiş olmalısın. 1 kombo puanı kazandırır."
       },
       "cheap_shot": {
         "name": "Mide Yumruğu",
-        "description": "Hedefe vurarak onu 4 saniye sersemletir. Gizlenmiş olmalısın. 2 kombo puanı kazandırır."
+        "description": "Hedefe {damage} hasar vererek onu 4 saniye sersemletir. Gizlenmiş olmalısın. 2 kombo puanı kazandırır."
       },
       "sap": {
         "name": "Bayıltma",
@@ -5203,7 +5254,7 @@ export const tr_TR: EnTranslations = {
       },
       "expose_armor": {
         "name": "Zırh Gediği",
-        "description": "Hedefi açığa düşüren ve zırhını azaltan bitirici hamle. Harcanan daha fazla kombo puanı daha derin bir kesik oluşturur."
+        "description": "Hedefi açığa düşüren, zırhını 30 saniye boyunca {damage} azaltan bitirici hamle."
       },
       "rupture": {
         "name": "Kan Kaybı",
@@ -5227,7 +5278,7 @@ export const tr_TR: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Yemin Damgası",
-        "description": "Seni 30 saniye boyunca Kutsal güçle doldurur; her yakın dövüş vuruşunun 4 ek Kutsal hasar vermesini sağlar. Verdict ile açığa çıkar."
+        "description": "Seni 30 saniye boyunca Kutsal güçle doldurur; her yakın dövüş vuruşunun {damage} ek Kutsal hasar vermesini sağlar. Verdict ile açığa çıkar."
       },
       "holy_light": {
         "name": "Onaran Işık",
@@ -5235,7 +5286,7 @@ export const tr_TR: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Sarsılmaz Aura",
-        "description": "Zırhını 30 dakika boyunca 40 artırır."
+        "description": "Zırhını 30 dakika boyunca {buff} artırır."
       },
       "judgement": {
         "name": "Hukum",
@@ -5243,19 +5294,19 @@ export const tr_TR: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Demir Yemini",
-        "description": "Dost bir hedefe bir Kutsama yerleştirir, saldırı gücünü 5 dakika boyunca 15 artırır."
+        "description": "Dost bir hedefe bir Kutsama yerleştirir, saldırı gücünü 5 dakika boyunca {buff} artırır."
       },
       "divine_protection": {
         "name": "İnanç Siperi",
-        "description": "Koruyucu bir siper 10 saniye boyunca 50 hasarı emer."
+        "description": "Koruyucu bir siper 10 saniye boyunca {damage} hasarı emer."
       },
       "hammer_of_justice": {
         "name": "Parçalayan Tokmak",
-        "description": "Hedefi 3 saniye boyunca sersemletir."
+        "description": "Hedefi {duration} saniye boyunca sersemletir."
       },
       "lay_on_hands": {
         "name": "Son Ayin",
-        "description": "Devasa bir iyileştirme dalgası: 250 can geri kazandırır. 10 dakika bekleme süresi."
+        "description": "Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi."
       },
       "flash_of_light": {
         "name": "Işık Şifası",
@@ -5267,7 +5318,7 @@ export const tr_TR: EnTranslations = {
       },
       "consecration": {
         "name": "Kutsal Toprak",
-        "description": "Altındaki zemini kutsar, yakındaki düşmanları {damage} Kutsal hasarla dağlar."
+        "description": "Altındaki zemini kutsar, yakındaki düşmanları 10 saniye boyunca her 2 saniyede bir {damage} Kutsal hasarla dağlar."
       },
       "righteous_fury": {
         "name": "Yanan Yemin",
@@ -5287,11 +5338,11 @@ export const tr_TR: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Deşen Darbe",
-        "description": "Hasarı 5 artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir."
+        "description": "Hasarı {damage} artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir."
       },
       "aspect_of_the_hawk": {
         "name": "Delice Sureti",
-        "description": "Delice suretine bürünerek saldırı gücünü 30 dakika boyunca 20 artırırsın."
+        "description": "Delice suretine bürünerek saldırı gücünü 30 dakika boyunca {buff} artırırsın."
       },
       "serpent_sting": {
         "name": "Zehir Dikeni",
@@ -5303,15 +5354,15 @@ export const tr_TR: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Sarsıcı Atış",
-        "description": "Hedefi sersemletir, hareketini 4 saniye boyunca %50 yavaşlatır."
+        "description": "Hedefi {damage} hasarla sersemletir, hareketini 4 saniye boyunca %50 yavaşlatır."
       },
       "mongoose_bite": {
         "name": "Karşı Diş",
-        "description": "Hedef sıyırma yaptıktan sonra silah hasarı artı 12 ile karşı saldırı. Sıyrılamaz."
+        "description": "Hedef sıyırma yaptıktan sonra silah hasarı artı {damage} ile karşı saldırı. Sıyrılamaz."
       },
       "wing_clip": {
         "name": "Prangalayan Kesik",
-        "description": "Düşmanı 10 saniye boyunca %40 yavaşlatan bir yara açar."
+        "description": "Düşmanı {damage} hasarla yaralar, 10 saniye boyunca %40 yavaşlatır."
       },
       "aspect_of_the_monkey": {
         "name": "Sansar Sureti",
@@ -5339,7 +5390,7 @@ export const tr_TR: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Azim Yakarışı",
-        "description": "Hedefin Dayanıklılığını 30 dakika boyunca 3 artırır."
+        "description": "Hedefin Dayanıklılığını 30 dakika boyunca {buff} artırır."
       },
       "shadow_word_pain": {
         "name": "Çürüme Ağıdı",
@@ -5347,7 +5398,7 @@ export const tr_TR: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Koruma Mezmuru",
-        "description": "Hedefi kalkanlar ve 30 saniye boyunca 48 hasarı emer."
+        "description": "Hedefi kalkanlar ve 30 saniye boyunca {damage} hasarı emer."
       },
       "renew": {
         "name": "Kalıcı Lütuf",
@@ -5375,7 +5426,7 @@ export const tr_TR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
-        "description": "Silahına taşın gazabını işler: her vuruş 5 dakika boyunca 5 ek hasar verir."
+        "description": "Silahına taşın gazabını işler: her vuruş 5 dakika boyunca {damage} ek hasar verir."
       },
       "healing_wave": {
         "name": "Onaran Sular",
@@ -5387,15 +5438,15 @@ export const tr_TR: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Gök Gürültüsü Siperi",
-        "description": "Seni çatırdayan yıldırımla sarar: yakın dövüş saldırganları 13 Doğa hasarı alır."
+        "description": "Seni çatırdayan yıldırımla sarar: yakın dövüş saldırganları {buff} Doğa hasarı alır, en fazla 3 yük ve en fazla 5 saniyede bir kez."
       },
       "flame_shock": {
         "name": "Köz Sarsıntısı",
-        "description": "Hedefi ateşle dağlar: 25 hasar artı 12 saniye boyunca {damage}."
+        "description": "Hedefi ateşle dağlar: {damage} hasar artı 12 saniye boyunca {overTime}."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Silahı",
-        "description": "Silahını element ateşiyle güçlendirir: her vuruş 5 dakika boyunca 8 ek Ateş hasarı verir."
+        "description": "Silahını element ateşiyle güçlendirir: her vuruş 5 dakika boyunca {damage} ek Ateş hasarı verir."
       },
       "frost_shock": {
         "name": "Ayaz Sarsıntısı",
@@ -5403,7 +5454,7 @@ export const tr_TR: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Rimebound Silahı",
-        "description": "Silahını kavrayan ayazla güçlendirir: her vuruş 5 dakika boyunca 8 ek hasar verir."
+        "description": "Silahını kavrayan ayazla güçlendirir: her vuruş 5 dakika boyunca {damage} ek hasar verir."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5419,11 +5470,11 @@ export const tr_TR: EnTranslations = {
       },
       "demon_skin": {
         "name": "İblis Derisi",
-        "description": "Şeytani deri zırhını 30 dakika boyunca 30 artırır."
+        "description": "Şeytani deri zırhını 30 dakika boyunca {buff} artırır."
       },
       "immolate": {
         "name": "Yanan Ahit",
-        "description": "Düşmanı 11 Ateş hasarıyla ve ek olarak 15 saniye boyunca {damage} ile yakar."
+        "description": "Düşmanı {damage} Ateş hasarıyla ve ek olarak 15 saniye boyunca {overTime} ile yakar."
       },
       "corruption": {
         "name": "Kara Çürüme",
@@ -5431,7 +5482,7 @@ export const tr_TR: EnTranslations = {
       },
       "life_tap": {
         "name": "Ağır Pazarlık",
-        "description": "30 canı 30 manaya dönüştürür."
+        "description": "{damage} canı {damage} manaya dönüştürür."
       },
       "curse_of_agony": {
         "name": "Izdırap Büyüsü",
@@ -5463,7 +5514,7 @@ export const tr_TR: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Dost bir hedefe Wildward'ı yerleştirir ve zırhını 30 dakika boyunca 25 artırır."
+        "description": "Dost bir hedefe Wildward'ı yerleştirir ve zırhını 30 dakika boyunca {buff} artırır."
       },
       "moonfire": {
         "name": "Ay Fırtınası",
@@ -5475,7 +5526,7 @@ export const tr_TR: EnTranslations = {
       },
       "thorns": {
         "name": "Diken Muhafızı",
-        "description": "Hedeften dikenler filizlenir: yakın dövüş saldırganları 3 Doğa hasarı alır."
+        "description": "Hedeften dikenler filizlenir: yakın dövüş saldırganları {buff} Doğa hasarı alır."
       },
       "entangling_roots": {
         "name": "Kavrayan Kökler",
@@ -5483,7 +5534,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%65, saldırı gücü +15, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%90, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",
@@ -5503,7 +5554,7 @@ export const tr_TR: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Kanlı Isırık",
-        "description": "Her kombo puanı başına hasar veren bitirici hamle. Yalnızca Kurt Formu."
+        "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
@@ -5535,7 +5586,7 @@ export const tr_TR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cadı Işığı",
-        "description": "Hedefin zırhını 40 saniye boyunca 35 azaltır."
+        "description": "Hedefin zırhını 30 saniye boyunca 35 azaltır."
       },
       "hibernate": {
         "name": "Derin Uyku",
@@ -5559,7 +5610,7 @@ export const tr_TR: EnTranslations = {
       },
       "rip": {
         "name": "Parçalama",
-        "description": "12 saniye boyunca kanama hasarı veren bitirici hamle. Kombo puanlarını tüketir. Yalnızca Kurt Formu."
+        "description": "12 saniye boyunca {damage} Kanama hasarı veren bitirici hamle. Kombo puanlarını tüketir. Yalnızca Kurt Formu."
       },
       "mortal_strike": {
         "name": "Sakatlayan Darbe",
@@ -5567,11 +5618,11 @@ export const tr_TR: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Kan Akıtma",
-        "description": "Bir kan çılgınlığıyla anında {damage} hasar veren bir saldırı yap. (Hiddet imzası)"
+        "description": "Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)"
       },
       "shield_slam": {
         "name": "Kalkan Kırma",
-        "description": "Hedefe kalkanınla {damage} hasar ve devasa tehdit için vurursun. (Koruma imzası)"
+        "description": "Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)"
       },
       "whirlwind": {
         "name": "Bıçaklı Girdap",
@@ -7238,6 +7289,9 @@ export const tr_TR: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "Orman Kurdu"
       },
@@ -7297,6 +7351,9 @@ export const tr_TR: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Diyakoz Voss"
+      },
+      "training_dummy": {
+        "name": "Training Dummy"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"

@@ -1021,10 +1021,19 @@ export const id_ID: EnTranslations = {
         "allStats": "Reduce todos los atributos en {value}"
       },
       "allStatsPctReduce": "Mengurangi semua atribut sebesar {pct}%",
+      "increasePct": {
+        "ap": "Increases attack power by {pct}%",
+        "armor": "Increases armor by {pct}%",
+        "int": "Increases Intellect by {pct}%",
+        "sta": "Increases Stamina by {pct}%",
+        "allStats": "Increases all attributes by {pct}%"
+      },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
+      "armorPct": "Reduces armor by {pct}%",
+      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -2225,6 +2234,8 @@ export const id_ID: EnTranslations = {
       "waveGoldBody": "Gelombang tengah: kombo bermata dua tempat rakitanmu mulai terbentuk dan berpadu.",
       "wavePrismaticTitle": "Prismatik",
       "wavePrismaticBody": "Gelombang terakhir: lonjakan penentu-rakitan yang melelehkan layar, dirancang terasa konyol dengan cara terbaik.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Penguat di dalam arena",
       "powerupsBody": "Bola bercahaya juga jatuh ke arena di tengah pertarungan, bebas bagi siapa pun yang meraihnya lebih dulu. Sengaja dibuat berlebihan dan hanya bertahan sebentar: Speed Demon untuk laju membutakan sekejap, Colossus untuk membengkak menjadi raksasa lamban, Moon Boots untuk lompatan memantul gravitasi rendah, dan Berserker untuk lonjakan amarah mendadak.",
       "ladderHeading": "Menaiki tangga peringkat",
@@ -3654,6 +3665,45 @@ export const id_ID: EnTranslations = {
       "flavor": "Para mati telah menyerahkan apa yang bisa mereka relakan."
     }
   },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "Join Protect Yumi!",
+    "queue": {
+      "join": "You join the Protect Yumi queue. Guard your familiar…",
+      "leave": "You leave the Protect Yumi queue.",
+      "teamLeave": "Your team leaves the Protect Yumi queue."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
+      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+    },
+    "log": {
+      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "Get ready…",
+      "teleportIn": "Yumis move in {s}",
+      "suddenDeath": "SUDDEN DEATH",
+      "yourYumi": "Your Yumi",
+      "enemyYumi": "Enemy Yumi",
+      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
+      "collapse": "Collapse the Protect Yumi bars",
+      "expand": "Expand the Protect Yumi bars"
+    },
+    "respawn": {
+      "title": "DOWNED!"
+    },
+    "banner": {
+      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
+      "teleport": "The Yumis teleport!"
+    },
+    "end": {
+      "win": "VICTORY! Yumi is safe!",
+      "loss": "DEFEAT! Your Yumi has fallen."
+    }
+  },
   "fiesta": {
     "bracket": "Fiesta",
     "enterQueue": "Gabung Fiesta!",
@@ -4956,7 +5006,8 @@ export const id_ID: EnTranslations = {
       "needAria": "Butuh untuk {item}",
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
-      "everyonePassed": "Semua orang melewatkan {item}."
+      "everyonePassed": "Semua orang melewatkan {item}.",
+      "rolled": "{answered}/{total} rolled"
     }
   },
   "entities": {
@@ -5007,19 +5058,19 @@ export const id_ID: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Hujan Api",
-        "description": "Menurunkan hujan api di area sasaran, membakar musuh sebesar {damage} kerusakan Api."
+        "description": "Menurunkan hujan api di area sasaran selama 4 detik, membakar musuh sebesar {damage} kerusakan Api setiap detik."
       },
       "volley": {
         "name": "Hujan Panah",
-        "description": "Menghujani area sasaran dengan panah, memberi {damage} kerusakan kepada musuh di dalamnya."
+        "description": "Menghujani area sasaran dengan panah selama 3 detik, memberi {damage} kerusakan setiap 0.5 detik kepada musuh di dalamnya."
       },
       "hurricane": {
         "name": "Badai",
-        "description": "Mendatangkan badai di area sasaran, menghantam musuh sebesar {damage} kerusakan Alam."
+        "description": "Mendatangkan badai di area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap detik."
       },
       "earthquake": {
         "name": "Gempa Bumi",
-        "description": "Mengguncang area sasaran, menghantam musuh sebesar {damage} kerusakan Alam."
+        "description": "Mengguncang area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap 1.5 detik."
       },
       "heroic_strike": {
         "name": "Serangan Perampas",
@@ -5027,15 +5078,15 @@ export const id_ID: EnTranslations = {
       },
       "battle_shout": {
         "name": "Raungan Besi",
-        "description": "Meningkatkan daya serangmu sebesar 20 selama 2 menit."
+        "description": "Meningkatkan daya serangmu sebesar {buff} selama 2 menit."
       },
       "commanding_shout": {
         "name": "Seruan Penguat",
-        "description": "Meningkatkan Staminamu sebesar 6 selama 2 menit."
+        "description": "Meningkatkan Staminamu sebesar {buff} selama 2 menit."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar 30 selama 30 detik."
+        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik."
       },
       "charge": {
         "name": "Serbuan",
@@ -5043,7 +5094,7 @@ export const id_ID: EnTranslations = {
       },
       "rend": {
         "name": "Sayatan Dalam",
-        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama 9 detik."
+        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik."
       },
       "thunder_clap": {
         "name": "Pukulan Gempa",
@@ -5051,7 +5102,7 @@ export const id_ID: EnTranslations = {
       },
       "hamstring": {
         "name": "Sayatan Pincang",
-        "description": "Melukai musuh sebesar 5 kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik."
+        "description": "Melukai musuh sebesar {damage} kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik."
       },
       "bloodrage": {
         "name": "Tumbal Darah",
@@ -5059,7 +5110,7 @@ export const id_ID: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Serangan seketika sebesar kerusakan senjata +5. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
+        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
       },
       "execute": {
         "name": "Ajal Dini",
@@ -5079,7 +5130,7 @@ export const id_ID: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Robek Zirah",
-        "description": "Membelah zirah target, menguranginya sebesar {damage} per penerapan. Bertumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah tinggi."
+        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
       },
       "taunt": {
         "name": "Hasutan",
@@ -5091,11 +5142,11 @@ export const id_ID: EnTranslations = {
       },
       "frost_armor": {
         "name": "Mantel Embun Beku",
-        "description": "Menyelubungimu dengan embun beku, meningkatkan zirah sebesar 30 selama 30 menit."
+        "description": "Menyelubungimu dengan embun beku, meningkatkan zirah sebesar {buff} selama 30 menit."
       },
       "arcane_intellect": {
         "name": "Wawasan Aether",
-        "description": "Meningkatkan Kecerdasan sebesar 2 selama 30 menit."
+        "description": "Meningkatkan Kecerdasan sebesar {buff} selama 30 menit."
       },
       "frostbolt": {
         "name": "Rimelance",
@@ -5119,7 +5170,7 @@ export const id_ID: EnTranslations = {
       },
       "polymorph": {
         "name": "Guna-guna",
-        "description": "Mengubah musuh menjadi katak hingga 15 detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid."
+        "description": "Mengubah musuh menjadi katak hingga {duration} detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid."
       },
       "frost_nova": {
         "name": "Icebind",
@@ -5139,7 +5190,7 @@ export const id_ID: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Selubung Beku",
-        "description": "Melindungimu dengan es, menyerap 130 kerusakan selama 60 detik."
+        "description": "Melindungimu dengan es, menyerap {damage} kerusakan selama 60 detik."
       },
       "sinister_strike": {
         "name": "Tebasan Keji",
@@ -5147,7 +5198,7 @@ export const id_ID: EnTranslations = {
       },
       "eviscerate": {
         "name": "Tidur Abadi",
-        "description": "Gerakan penutup yang menimbulkan kerusakan per poin kombo."
+        "description": "Gerakan penutup yang menyebabkan {damage}."
       },
       "backstab": {
         "name": "Tusukan Pengecut",
@@ -5155,7 +5206,7 @@ export const id_ID: EnTranslations = {
       },
       "gouge": {
         "name": "Colok Mata",
-        "description": "Menyerang target, melumpuhkannya selama 4 detik. Kerusakan apa pun mematahkan efeknya. Memberi 1 poin kombo."
+        "description": "Menyerang target sebesar {damage} kerusakan, melumpuhkannya selama 4 detik. Kerusakan apa pun mematahkan efeknya. Memberi 1 poin kombo."
       },
       "evasion": {
         "name": "Ghostfoot",
@@ -5187,11 +5238,11 @@ export const id_ID: EnTranslations = {
       },
       "garrote": {
         "name": "Kawat Leher",
-        "description": "Menjerat musuh, menimbulkan kerusakan sekarang dan membuatnya berdarah sebesar {damage} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo."
+        "description": "Menjerat musuh, menimbulkan {damage} kerusakan sekarang dan membuatnya berdarah sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo."
       },
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
-        "description": "Menyerang target, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo."
+        "description": "Menyerang target sebesar {damage} kerusakan, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo."
       },
       "sap": {
         "name": "Bius",
@@ -5199,11 +5250,11 @@ export const id_ID: EnTranslations = {
       },
       "crippling_poison": {
         "name": "Bisa Timah",
-        "description": "Menyerang target dengan bisa timah, menimbulkan {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik."
+        "description": "Menyerang target dengan bisa timah, memberi {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik."
       },
       "expose_armor": {
         "name": "Tembus Zirah",
-        "description": "Gerakan penutup yang menyingkap target, mengurangi zirahnya. Semakin banyak poin kombo yang dihabiskan, semakin dalam sayatannya."
+        "description": "Gerakan penutup yang menyingkap target, mengurangi zirahnya sebesar {damage} selama 30 detik."
       },
       "rupture": {
         "name": "Kehabisan Darah",
@@ -5227,7 +5278,7 @@ export const id_ID: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Oathbrand",
-        "description": "Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan 4 kerusakan Suci tambahan. Lepaskan dengan Vonis."
+        "description": "Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan {damage} kerusakan Suci tambahan. Lepaskan dengan Vonis."
       },
       "holy_light": {
         "name": "Cahaya Pemulih",
@@ -5235,7 +5286,7 @@ export const id_ID: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Aura Teguh",
-        "description": "Meningkatkan zirahmu sebesar 40 selama 30 menit."
+        "description": "Meningkatkan zirahmu sebesar {buff} selama 30 menit."
       },
       "judgement": {
         "name": "Vonis",
@@ -5243,19 +5294,19 @@ export const id_ID: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Sumpah Besi",
-        "description": "Menempatkan sebuah Berkah pada target sekutu, meningkatkan daya serang sebesar 15 selama 5 menit."
+        "description": "Menempatkan sebuah Berkah pada target sekutu, meningkatkan daya serang sebesar {buff} selama 5 menit."
       },
       "divine_protection": {
         "name": "Tameng Iman",
-        "description": "Perisai pelindung menyerap 50 kerusakan selama 10 detik."
+        "description": "Perisai suci menyerap {damage} kerusakan selama 10 detik."
       },
       "hammer_of_justice": {
         "name": "Palu Pembelah",
-        "description": "Membuat target terpana selama 3 detik."
+        "description": "Membuat target terpana selama {duration} detik."
       },
       "lay_on_hands": {
         "name": "Ritus Terakhir",
-        "description": "Lonjakan penyembuhan masif: memulihkan 250 kesehatan. Jeda 10 menit."
+        "description": "Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit."
       },
       "flash_of_light": {
         "name": "Lightmend",
@@ -5267,7 +5318,7 @@ export const id_ID: EnTranslations = {
       },
       "consecration": {
         "name": "Tanah Suci",
-        "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci."
+        "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik."
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
@@ -5287,11 +5338,11 @@ export const id_ID: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Serangan Cabik Perut",
-        "description": "Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar 5. Aktif pada ayunan berikutnya."
+        "description": "Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya."
       },
       "aspect_of_the_hawk": {
         "name": "Wujud Elang Penyambar",
-        "description": "Mengambil wujud elang penyambar, meningkatkan daya serang sebesar 20 selama 30 menit."
+        "description": "Mengambil wujud elang penyambar, meningkatkan daya serang sebesar {buff} selama 30 menit."
       },
       "serpent_sting": {
         "name": "Duri Bisa",
@@ -5303,15 +5354,15 @@ export const id_ID: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Tembakan Pengguncang",
-        "description": "Membuat target linglung, memperlambat gerakan sebesar 50% selama 4 detik."
+        "description": "Membuat target linglung sebesar {damage} kerusakan, memperlambat gerakan sebesar 50% selama 4 detik."
       },
       "mongoose_bite": {
         "name": "Counterfang",
-        "description": "Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah 12. Tidak dapat dielakkan."
+        "description": "Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan."
       },
       "wing_clip": {
         "name": "Tebasan Pembelenggu",
-        "description": "Menimbulkan luka yang memperlambat musuh sebesar 40% selama 10 detik."
+        "description": "Menimbulkan luka sebesar {damage} kerusakan, memperlambat musuh sebesar 40% selama 10 detik."
       },
       "aspect_of_the_monkey": {
         "name": "Wujud Musang",
@@ -5339,7 +5390,7 @@ export const id_ID: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Litani Ketabahan",
-        "description": "Meningkatkan Stamina target sebesar 3 selama 30 menit."
+        "description": "Meningkatkan Stamina target sebesar {buff} selama 30 menit."
       },
       "shadow_word_pain": {
         "name": "Ratapan Pembusukan",
@@ -5347,7 +5398,7 @@ export const id_ID: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Mazmur Penangkal",
-        "description": "Melindungi target, menyerap 48 kerusakan selama 30 detik."
+        "description": "Melindungi target, menyerap {damage} kerusakan selama 30 detik."
       },
       "renew": {
         "name": "Rahmat Berlanjut",
@@ -5375,7 +5426,7 @@ export const id_ID: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan 5 kerusakan tambahan selama 5 menit."
+        "description": "Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan {damage} kerusakan tambahan selama 5 menit."
       },
       "healing_wave": {
         "name": "Air Pemulih",
@@ -5387,15 +5438,15 @@ export const id_ID: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Tameng Guntur",
-        "description": "Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima 13 kerusakan Alam."
+        "description": "Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima {buff} kerusakan Alam, hingga 3 muatan dan paling sering sekali setiap 5 detik."
       },
       "flame_shock": {
         "name": "Sentakan Bara",
-        "description": "Membakar target dengan api sebesar 25 kerusakan ditambah {damage} selama 12 detik."
+        "description": "Membakar target dengan api sebesar {damage} kerusakan ditambah {overTime} selama 12 detik."
       },
       "flametongue_weapon": {
         "name": "Senjata Pyrebrand",
-        "description": "Mengisi senjatamu dengan api elemental: setiap ayunan memberi 8 kerusakan Api tambahan selama 5 menit."
+        "description": "Mengisi senjatamu dengan api elemental: setiap ayunan memberi {damage} kerusakan Api tambahan selama 5 menit."
       },
       "frost_shock": {
         "name": "Sentakan Beku",
@@ -5403,7 +5454,7 @@ export const id_ID: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Senjata Rimebound",
-        "description": "Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi 8 kerusakan tambahan selama 5 menit."
+        "description": "Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi {damage} kerusakan tambahan selama 5 menit."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5419,11 +5470,11 @@ export const id_ID: EnTranslations = {
       },
       "demon_skin": {
         "name": "Fiendhide",
-        "description": "Kulit iblis meningkatkan zirahmu sebesar 30 selama 30 menit."
+        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit."
       },
       "immolate": {
         "name": "Pakta Membara",
-        "description": "Membakar musuh sebesar 11 kerusakan Api dan tambahan {damage} selama 15 detik."
+        "description": "Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik."
       },
       "corruption": {
         "name": "Blackrot",
@@ -5431,7 +5482,7 @@ export const id_ID: EnTranslations = {
       },
       "life_tap": {
         "name": "Tawar Getir",
-        "description": "Mengubah 30 kesehatan menjadi 30 mana."
+        "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
       },
       "curse_of_agony": {
         "name": "Tenung Derita",
@@ -5463,7 +5514,7 @@ export const id_ID: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar 25 selama 30 menit."
+        "description": "Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar {buff} selama 30 menit."
       },
       "moonfire": {
         "name": "Badai Rembulan",
@@ -5475,7 +5526,7 @@ export const id_ID: EnTranslations = {
       },
       "thorns": {
         "name": "Briarguard",
-        "description": "Duri bertunas dari target: penyerang jarak dekat menerima 3 kerusakan Alam."
+        "description": "Duri bertunas dari target: penyerang jarak dekat menerima {buff} kerusakan Alam."
       },
       "entangling_roots": {
         "name": "Akar Cengkeram",
@@ -5483,7 +5534,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +65%, daya serang +15, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +90%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Bonecrush",
@@ -5503,7 +5554,7 @@ export const id_ID: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Gerakan penutup yang menimbulkan kerusakan per poin kombo. Hanya dalam Wujud Serigala."
+        "description": "Gerakan penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -5535,7 +5586,7 @@ export const id_ID: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Mengurangi zirah target sebesar 35 selama 40 detik."
+        "description": "Mengurangi zirah target sebesar 35 selama 30 detik."
       },
       "hibernate": {
         "name": "Lelap",
@@ -5559,7 +5610,7 @@ export const id_ID: EnTranslations = {
       },
       "rip": {
         "name": "Robekan",
-        "description": "Gerakan penutup yang menyebabkan kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala."
+        "description": "Gerakan penutup yang menyebabkan {damage} kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
@@ -5567,11 +5618,11 @@ export const id_ID: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Pertumpahan Darah",
-        "description": "Seketika menyerang dalam amukan darah untuk {damage}. (Penanda Fury)"
+        "description": "Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)"
       },
       "shield_slam": {
         "name": "Shieldcrack",
-        "description": "Menghantam target dengan perisaimu sebesar {damage} dan ancaman besar. (Ciri khas Perlindungan)"
+        "description": "Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)"
       },
       "whirlwind": {
         "name": "Pusaran Berpisau",
@@ -7238,6 +7289,9 @@ export const id_ID: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "Serigala Hutan"
       },
@@ -7297,6 +7351,9 @@ export const id_ID: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Diaken Voss"
+      },
+      "training_dummy": {
+        "name": "Training Dummy"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"

@@ -3308,7 +3308,16 @@ export class GameServer {
         break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
-        const fmt = msg.format === '2v2' ? '2v2' : msg.format === 'fiesta' ? 'fiesta' : '1v1';
+        const fmt =
+          msg.format === '2v2'
+            ? '2v2'
+            : msg.format === 'fiesta'
+              ? 'fiesta'
+              : msg.format === 'yumi3'
+                ? 'yumi3'
+                : msg.format === 'yumi5'
+                  ? 'yumi5'
+                  : '1v1';
         sim.arenaQueueJoin(pid, fmt);
         break;
       }
@@ -4032,15 +4041,16 @@ export class GameServer {
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
     maybe('lroll', this.sim.activeLootRolls(anchorSession.pid));
+    // group-visible choices on those rolls (who has answered need/greed/pass),
+    // so every party member's roll frame shows the live vote strip and stays up
+    // after they answer. Per-tick for the same reason as lroll.
+    maybe('lrollg', this.sim.lootRollGroupStatus(anchorSession.pid));
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
-    // Gathering profession proficiency (Mining/Logging/Herbalism), a small
-    // per-player map, so kept per-tick like the other small maps above.
-    maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
     // per-player read, so kept per-tick like the other small maps above. Wire
     // key `prof` and IWorld member `professionsState` are the settled names
     // for the professions facet (#1164, src/sim/professions/CLAUDE.md). `gprof`
@@ -4053,13 +4063,6 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // stats + weapon stay per-tick: recalcPlayerStats re-derives them on every
-    // stat-affecting aura gain/loss (Bear/Cat Form, shouts, debuffs, elixir
-    // wear-off, a buff cast on you by someone else), none of which mark this
-    // session dirty, gating them would lag the character sheet mid-fight. Both
-    // are tiny (a handful of numbers), so the per-tick diff is negligible.
-    maybe('stats', p.stats);
-    maybe('weapon', p.weapon);
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety

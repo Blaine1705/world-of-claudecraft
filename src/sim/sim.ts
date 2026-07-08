@@ -164,6 +164,7 @@ import type { Ante, PickAction } from './lockpick';
 import {
   activeLootRolls as activeLootRollsImpl,
   assignMasterLoot as assignMasterLootImpl,
+  lootRollGroupStatus as lootRollGroupStatusImpl,
   type PendingLootRoll,
   partyLootCandidatesForMob as partyLootCandidatesForMobImpl,
   resolveLootRoll as resolveLootRollImpl,
@@ -307,6 +308,9 @@ export { computeQuestState } from './quests/quest_commands';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
+// A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
+// via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
+import * as yumiMod from './social/yumi';
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts. Re-exported so the
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
@@ -360,6 +364,7 @@ import {
   type EquipSlot,
   type ErrorReason,
   emptyMoveInput,
+  FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
   GCD,
@@ -371,6 +376,7 @@ import {
   isQuestTurnInNpc,
   LEASH_DISTANCE,
   type LootRollChoice,
+  type LootRollGroupStatus,
   type LootRollPrompt,
   type LootStrategies,
   MAX_LEVEL,
@@ -393,6 +399,7 @@ import {
   type SkinRank,
   type SportRole,
   steadyAngleTo,
+  SUNDER_ARMOR_PCT_PER_STACK,
   swingMissChance,
   type VcBracket,
   type VcNationId,
@@ -625,6 +632,7 @@ export interface ArenaMatch {
   ratingB: number;
   defeated: Set<number>;
   fiesta?: FiestaState; // present only for format === 'fiesta'
+  yumi?: YumiMatchState; // present only for format 'yumi3' | 'yumi5'
 }
 
 // Everything that makes a Fiesta bout a fiesta. Lives on the ArenaMatch so it is
@@ -665,6 +673,25 @@ export interface FiestaPowerup {
   z: number;
   state: 'spawning' | 'ready';
   timer: number; // spawning: countdown to ready; ready: countdown to despawn
+}
+
+// Everything that makes a Protect Yumi bout (formats 'yumi3'/'yumi5'; the
+// system lives in social/yumi.ts). Lives on the ArenaMatch so it is torn down
+// with the match. Teleport picks + the last-resort tiebreak draw from the
+// per-match `rng` (fiesta's two-stream rule), never the shared sim stream.
+export interface YumiMatchState {
+  teamSize: 3 | 5;
+  yumiA: number; // entity id of team A's cat
+  yumiB: number;
+  nextTeleportAt: number; // active-timer (s) of the next simultaneous teleport
+  suddenDeath: boolean; // latched at YUMI_SUDDEN_AT: teleports freeze, the bleed ramps
+  respawn: Map<number, number>; // pid -> seconds until revive (absent = alive)
+  deaths: Map<number, number>; // pid -> times downed (scoreboard)
+  kills: Map<number, number>; // pid -> takedowns (scoreboard)
+  dmgToYumiA: number; // cumulative player damage dealt TO cat A (tiebreak)
+  dmgToYumiB: number;
+  lastStatusSecond: number; // last whole active-second a yumiStatus heartbeat went out
+  rng: Rng;
 }
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts; re-exported from the
@@ -1147,8 +1174,15 @@ export class Sim {
   arenaQueue1v1: number[] = [];
   arenaQueue2v2: ArenaQueueUnit[] = [];
   arenaQueueFiesta: ArenaQueueUnit[] = []; // 2v2 Fiesta (party mode) queue
+  arenaQueueYumi3: ArenaQueueUnit[] = []; // Protect Yumi 3v3 queue
+  arenaQueueYumi5: ArenaQueueUnit[] = []; // Protect Yumi 5v5 queue
   arenaMatches = new Map<number, ArenaMatch>(); // pid -> shared match (both pids)
   private arenaBusySlots = new Set<number>();
+  // Protect Yumi maze slots are their own pool (the maze band, not the pit);
+  // yumiCatMatches indexes cat entity id -> live match for the damage hub +
+  // hostility reads (both O(1) per attack).
+  private yumiBusySlots = new Set<number>();
+  private yumiCatMatches = new Map<number, ArenaMatch>();
   private nextArenaMatchId = 1;
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
@@ -1281,6 +1315,22 @@ export class Sim {
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
+        if (template.dummy) {
+          // A practice dummy is a fixed, deterministic prop (no scatter, fixed level,
+          // never wanders): spawn it WITHOUT drawing any RNG so adding one never
+          // perturbs the world's seed-stable spawns and rolls.
+          const safe = this.findSafePos(camp.center.x, camp.center.z, minHeight);
+          const mob = createMob(
+            this.nextId++,
+            template,
+            template.maxLevel,
+            this.groundPos(safe.x, safe.z),
+          );
+          mob.facing = 0;
+          mob.prevFacing = 0;
+          this.addEntity(mob);
+          continue;
+        }
         const ang = this.rng.range(0, Math.PI * 2);
         const r = Math.sqrt(this.rng.next()) * camp.radius;
         const safe = this.findSafePos(
@@ -2538,6 +2588,26 @@ export class Sim {
       get arenaBusySlots() {
         return sim.arenaBusySlots;
       },
+      // A4 Protect Yumi live views: the two format queues (reassigned by the
+      // matchmaker's prune filter), the maze slot pool, and the cat -> match index.
+      get arenaQueueYumi3() {
+        return sim.arenaQueueYumi3;
+      },
+      set arenaQueueYumi3(v) {
+        sim.arenaQueueYumi3 = v;
+      },
+      get arenaQueueYumi5() {
+        return sim.arenaQueueYumi5;
+      },
+      set arenaQueueYumi5(v) {
+        sim.arenaQueueYumi5 = v;
+      },
+      get yumiBusySlots() {
+        return sim.yumiBusySlots;
+      },
+      get yumiCatMatches() {
+        return sim.yumiCatMatches;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
@@ -2621,6 +2691,17 @@ export class Sim {
       endDuel: sim.endDuel.bind(sim),
       fiestaTakedown: sim.fiestaTakedown.bind(sim),
       fiestaDown: sim.fiestaDown.bind(sim),
+      // A4 Protect Yumi hooks: late-bound arrows into social/yumi.ts (the
+      // nythraxis style; no Sim facade methods needed, no foreign name resolves
+      // on Sim). updateArena drives matchmake/update/cleanup; the damage hub
+      // drives the cat + player-down arms.
+      matchmakeYumi: () => yumiMod.matchmakeYumi(sim.ctx),
+      updateYumiActive: (match) => yumiMod.updateYumiActive(sim.ctx, match),
+      yumiPlayerDown: (match, victim, killerPid) =>
+        yumiMod.yumiPlayerDown(sim.ctx, match, victim, killerPid),
+      yumiCatDamaged: (match, source, cat, amount, crit, school, ability, kind) =>
+        yumiMod.yumiCatDamaged(sim.ctx, match, source, cat, amount, crit, school, ability, kind),
+      cleanupYumiMatch: (match) => yumiMod.cleanupYumiMatch(sim.ctx, match),
       // A2: isArenaCrossTeam/arenaTeamOf/endArenaMatch/endDuel (above) now forward to
       // social/arena.ts + social/duel.ts via Sim's thin delegates. The block below is
       // what the moved code CONSUMES that stays on Sim (clearAurasFromSource has
@@ -3277,19 +3358,39 @@ export class Sim {
   // Sunder Armor stacks shave flat armor off the defender for physical hits.
   private effectiveArmor(e: Entity): number {
     let armor = e.stats.armor;
+    // Player/rogue armor debuffs are PERCENTAGES that do NOT stack with each other:
+    // Sunder Armor (2% per stack, up to 10% at 5 stacks) and Faerie Fire (a flat 10%)
+    // max-combine, so a fully-stacked Sunder and a Faerie Fire are redundant rather
+    // than additive. Mob corrosion (kind 'corrode') is a separate FLAT shred that
+    // subtracts value*stacks before the percent debuffs apply.
+    let reductionPct = 0;
+    const baseArmor = e.stats.armor;
     for (const a of e.auras) {
       if (e.kind !== 'player' && a.kind === 'buff_armor') armor += a.value;
-      if (a.kind === 'sunder') armor -= a.value * (a.stacks ?? 1);
+      // Percent armor raid buff (Devotion Aura) on a controlled pet; players fold it
+      // in recalcPlayerStats.
+      else if (e.kind !== 'player' && a.kind === 'buff_armor_pct')
+        armor += (baseArmor * a.value) / 100;
+      // Mob corrosion: flat, stacking armor shred (value per stack).
+      if (a.kind === 'corrode') armor -= a.value * (a.stacks ?? 1);
+      else if (a.kind === 'sunder')
+        reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
+      else if (a.kind === 'faerie_fire')
+        reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
     }
-    return Math.max(0, armor);
+    return Math.max(0, armor * (1 - reductionPct));
   }
 
   private effectiveAttackPower(e: Entity): number {
     let attackPower = e.attackPower;
     if (e.kind !== 'player') {
+      const base = e.attackPower;
       for (const a of e.auras) {
         if (a.kind === 'buff_ap') attackPower += a.value;
         else if (a.kind === 'debuff_ap') attackPower -= a.value;
+        // Percent attack-power raid buffs (Blessing of Might / Battle Shout) on a
+        // controlled pet: percent of the pet's base AP. Players fold this in recalc.
+        else if (a.kind === 'buff_ap_pct') attackPower += (base * a.value) / 100;
       }
     }
     return Math.max(0, attackPower);
@@ -4097,7 +4198,14 @@ export class Sim {
     b.inCombat = true;
     // players and their pets pull wild mobs; pets never run wild-mob AI
     const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
-    if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
+    if (
+      b.kind === 'mob' &&
+      b.ownerId === null &&
+      !b.dead &&
+      aAttacker &&
+      b.aiState !== 'evade' &&
+      !MOBS[b.templateId]?.dummy // a training dummy never retaliates
+    ) {
       if (b.aiState === 'idle') this.aggroMob(b, a, true);
       else if (b.aggroTargetId === null) b.aggroTargetId = a.id;
     }
@@ -4106,7 +4214,8 @@ export class Sim {
       a.ownerId === null &&
       !a.dead &&
       b.kind === 'player' &&
-      a.aiState === 'idle'
+      a.aiState === 'idle' &&
+      !MOBS[a.templateId]?.dummy // a training dummy never aggros
     ) {
       this.aggroMob(a, b, false);
     }
@@ -4152,6 +4261,10 @@ export class Sim {
 
   activeLootRolls(pid = this.playerId): LootRollPrompt[] {
     return activeLootRollsImpl(this.ctx, pid);
+  }
+
+  lootRollGroupStatus(pid = this.playerId): LootRollGroupStatus[] {
+    return lootRollGroupStatusImpl(this.ctx, pid);
   }
 
   submitLootRoll(rollId: number, choice: LootRollChoice, pid?: number): void {
@@ -4464,9 +4577,11 @@ export class Sim {
   }
 
   // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases
-  // straight through props — used to free a stuck evader, never for normal
-  // locomotion. Returns true on arrival.
+  // straight through props — used to free a stuck evader, and forced on for
+  // templates flagged `phasesThroughObstacles` (mountain-sized world bosses
+  // that must never wedge on a collider mid-chase). Returns true on arrival.
   private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {
+    if (!ignoreObstacles && MOBS[e.templateId]?.phasesThroughObstacles) ignoreObstacles = true;
     const d = dist2d(e.pos, dest);
     if (d < 0.3) return true;
     const desired = angleTo(e.pos, dest);
@@ -5476,6 +5591,9 @@ export class Sim {
   isHostileTo(attacker: Entity, target: Entity): boolean {
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
+      // A Protect Yumi cat is attackable only by the opposing team of its
+      // live match (social/yumi.ts owns the rule).
+      if (yumiMod.isYumiCat(target)) return yumiMod.yumiCatHostileTo(this.ctx, attacker, target);
       if (target.ownerId !== null) {
         const owner = this.entities.get(target.ownerId);
         return !!owner && owner.kind === 'player' && this.isHostileTo(attacker, owner);
@@ -5520,6 +5638,9 @@ export class Sim {
 
   private isFriendlyTo(caster: Entity, target: Entity): boolean {
     if (target.kind === 'player') return !this.isHostileTo(caster, target);
+    // A Protect Yumi cat is heal/shield-targetable only by its own team.
+    if (target.kind === 'mob' && yumiMod.isYumiCat(target))
+      return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);
@@ -6034,6 +6155,7 @@ export class Sim {
             enemies,
             returnIn: match.state === 'over' ? Math.max(0, Math.ceil(match.timer)) : undefined,
             fiesta: match.fiesta ? this.fiestaMatchInfo(match, pid, myTeam) : undefined,
+            yumi: match.yumi ? yumiMod.yumiMatchInfo(this.ctx, match, pid, myTeam) : undefined,
           };
         }
       }
@@ -6044,11 +6166,16 @@ export class Sim {
       // Fiesta is unranked party play — it keeps no standing of its own; mirror
       // 2v2 just to satisfy the bracket record (the Fiesta UI never reads it).
       fiesta: this.arenaStanding(meta, '2v2'),
+      // Protect Yumi is unranked too (same mirror-the-record trick).
+      yumi3: this.arenaStanding(meta, '2v2'),
+      yumi5: this.arenaStanding(meta, '2v2'),
     };
     const ladders: Record<ArenaFormat, import('../world_api').ArenaLadderEntry[]> = {
       '1v1': this.arenaLadder('1v1'),
       '2v2': this.arenaLadder('2v2'),
       fiesta: [],
+      yumi3: [],
+      yumi5: [],
     };
     const format = match?.format ?? queuedFmt;
     const readoutFormat = format ?? '1v1';
@@ -6057,11 +6184,15 @@ export class Sim {
     const queueSize =
       format === 'fiesta'
         ? playerCount(this.arenaQueueFiesta)
-        : format === '2v2'
-          ? playerCount(this.arenaQueue2v2)
-          : format === '1v1'
-            ? this.arenaQueue1v1.length
-            : 0;
+        : format === 'yumi3'
+          ? playerCount(this.arenaQueueYumi3)
+          : format === 'yumi5'
+            ? playerCount(this.arenaQueueYumi5)
+            : format === '2v2'
+              ? playerCount(this.arenaQueue2v2)
+              : format === '1v1'
+                ? this.arenaQueue1v1.length
+                : 0;
     return {
       rating: standing.rating,
       wins: standing.wins,

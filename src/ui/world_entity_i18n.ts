@@ -18,6 +18,7 @@ import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 // consumed, so this object carries only `en`.
 
 const MOB_IDS = [
+  'yumi_cat',
   'forest_wolf',
   'old_greyjaw',
   'wild_boar',
@@ -38,6 +39,7 @@ const MOB_IDS = [
   'gravecaller_summoner',
   'gravecaller_mender',
   'deacon_voss',
+  'training_dummy',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',

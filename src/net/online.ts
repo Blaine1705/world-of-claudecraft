@@ -38,6 +38,7 @@ import {
   emptyMoveInput,
   type InvSlot,
   type LootRollChoice,
+  type LootRollGroupStatus,
   type LootRollPrompt,
   type MasterLootThreshold,
   type MoveInput,
@@ -867,6 +868,7 @@ function blankEntity(id: number): Entity {
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
+    bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
     ownerId: null,
@@ -1058,6 +1060,8 @@ export class ClientWorld implements IWorld {
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
+  // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
+  private lootRollGroup: LootRollGroupStatus[] = [];
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
@@ -1871,6 +1875,7 @@ export class ClientWorld implements IWorld {
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
+      if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
       if (s.dmarks !== undefined) this.delveMarks = s.dmarks ?? 0;
@@ -2060,6 +2065,9 @@ export class ClientWorld implements IWorld {
   }
   activeLootRolls(): LootRollPrompt[] {
     return this.lootRollPrompts;
+  }
+  lootRollGroupStatus(): LootRollGroupStatus[] {
+    return this.lootRollGroup;
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });

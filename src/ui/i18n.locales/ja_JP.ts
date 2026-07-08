@@ -1781,33 +1781,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.greedAria': '{item}を強欲',
   'itemUi.lootRoll.passAria': '{item}をパス',
   'itemUi.lootRoll.everyonePassed': '全員が{item}をパスしました。',
+  'itemUi.lootRoll.rolled': '{answered}/{total} がロール済み',
   'entities.abilities.heroic_strike.name': '略奪者の一撃',
   'entities.abilities.heroic_strike.description':
     '強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。',
   'entities.abilities.battle_shout.name': '鉄の咆哮',
-  'entities.abilities.battle_shout.description': '2分間、攻撃力が20増加します。',
+  'entities.abilities.battle_shout.description': '2分間、攻撃力が{buff}増加します。',
   'entities.abilities.commanding_shout.name': '鼓舞の号令',
-  'entities.abilities.commanding_shout.description': '2分間、スタミナが6増加します。',
+  'entities.abilities.commanding_shout.description': '2分間、スタミナが{buff}増加します。',
   'entities.abilities.demoralizing_shout.name': '戦慄の遠吠え',
   'entities.abilities.demoralizing_shout.description':
-    '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を30低下させます。',
+    '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を{buff}低下させます。',
   'entities.abilities.charge.name': '突撃',
   'entities.abilities.charge.description':
     '敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。',
   'entities.abilities.rend.name': '深き裂傷',
   'entities.abilities.rend.description':
-    '対象を負傷させ、9秒間で {damage} の出血ダメージを与えます。',
+    '対象を負傷させ、{duration}秒かけて{damage}の出血ダメージを与えます。',
   'entities.abilities.thunder_clap.name': '震撼の一撃',
   'entities.abilities.thunder_clap.description':
     '周囲の敵に {damage} のダメージを与え、10秒間、攻撃速度を10%低下させます。',
   'entities.abilities.hamstring.name': '足萎えの斬撃',
   'entities.abilities.hamstring.description':
-    '敵を痛めつけて5ダメージを与え、15秒間、移動速度を50%低下させます。',
+    '敵を痛めつけて{damage}ダメージを与え、15秒間、移動速度を50%低下させます。',
   'entities.abilities.bloodrage.name': '血の代償',
   'entities.abilities.bloodrage.description': '体力を代償に怒りを10生成します。',
   'entities.abilities.overpower.name': '血染めの手',
   'entities.abilities.overpower.description':
-    '武器ダメージ +5 の即時攻撃です。対象が回避した後にのみ使用できます。回避されません。',
+    '武器ダメージに{damage}を加えた即時攻撃です。対象が回避した後にのみ使用できます。回避されません。',
   'entities.abilities.execute.name': '早すぎる墓',
   'entities.abilities.execute.description':
     '傷ついた敵をとどめようとして {damage} のダメージを与えます。体力が20%未満の敵にのみ使用できます。',
@@ -1822,32 +1823,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。再度使用するとスタンスを解除します。',
   'entities.abilities.sunder_armor.name': '装甲切断',
   'entities.abilities.sunder_armor.description':
-    '対象のアーマーを破壊し、1回ごとに {damage} 低下させます。最大5回まで重なります。大量の脅威を生成します。',
+    '対象のアーマーを破壊し、1回ごとに 2% 低下させます。最大5回まで重なります（最大で10%）。大量の脅威を生成します。',
   'entities.abilities.taunt.name': '挑発',
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
   'entities.abilities.fireball.name': '灰燼の矢',
   'entities.abilities.rain_of_fire.name': '火炎の雨',
   'entities.abilities.rain_of_fire.description':
-    '対象地点に火の雨を降らせ、敵に{damage}の火炎ダメージを与えます。',
+    '対象地点に4秒間、火の雨を降らせ、敵を焼いて毎秒{damage}の火炎ダメージを与えます。',
   'entities.abilities.volley.name': '乱射',
   'entities.abilities.volley.description':
-    '対象地点に矢を降らせ、範囲内の敵に{damage}のダメージを与えます。',
+    '対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。',
   'entities.abilities.hurricane.name': 'ハリケーン',
   'entities.abilities.hurricane.description':
-    '対象地点にハリケーンを呼び起こし、敵に{damage}の自然ダメージを与えます。',
+    '対象地点に6秒間、ハリケーンを呼び起こし、敵を打ちのめして毎秒{damage}の自然ダメージを与えます。',
   'entities.abilities.earthquake.name': '地震',
   'entities.abilities.earthquake.description':
-    '対象地点を揺るがし、敵に{damage}の自然ダメージを与えます。',
+    '対象地点を6秒間揺るがし、敵を打ちのめして1.5秒ごとに{damage}の自然ダメージを与えます。',
   'entities.abilities.flamestrike.name': 'フレイムストライク',
   'entities.abilities.flamestrike.description':
     '対象地点に炎の爆発を呼び出し、爆発に巻き込まれた敵に{damage}の火炎ダメージを与えます。',
   'entities.abilities.fireball.description':
     '炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
   'entities.abilities.frost_armor.name': '白霜の外套',
-  'entities.abilities.frost_armor.description': '霜で身を包み、30分間アーマーを30増加させます。',
+  'entities.abilities.frost_armor.description':
+    '霜で身を包み、30分間アーマーを{buff}増加させます。',
   'entities.abilities.arcane_intellect.name': 'エーテルの叡智',
-  'entities.abilities.arcane_intellect.description': '30分間、知力が2増加します。',
+  'entities.abilities.arcane_intellect.description': '30分間、知力が{buff}増加します。',
   'entities.abilities.frostbolt.name': '霧氷の槍',
   'entities.abilities.frostbolt.description':
     '氷の矢を放ち、{damage} の冷気ダメージを与え、移動速度を40%低下させます。',
@@ -1865,7 +1867,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵にエーテルダートを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。',
   'entities.abilities.polymorph.name': '呪化',
   'entities.abilities.polymorph.description':
-    '敵を最大15秒間ヒキガエルに変えます。ヒキガエルは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。',
+    '敵を最大{duration}秒間ヒキガエルに変えます。ヒキガエルは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。',
   'entities.abilities.frost_nova.name': '氷縛',
   'entities.abilities.frost_nova.description':
     '周囲の敵すべてを最大8秒間その場に凍結させ、{damage} の冷気ダメージを与えます。',
@@ -1879,19 +1881,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     '巨大な炎の岩塊を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
   'entities.abilities.ice_barrier.name': '氷の帳',
-  'entities.abilities.ice_barrier.description': '氷で身を守り、60秒間130ダメージを吸収します。',
+  'entities.abilities.ice_barrier.description':
+    '氷で身を守り、60秒間{damage}ダメージを吸収します。',
   'entities.abilities.sinister_strike.name': '邪悪な斬撃',
   'entities.abilities.sinister_strike.description':
     '武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。',
   'entities.abilities.eviscerate.name': '永の眠り',
-  'entities.abilities.eviscerate.description':
-    'コンボポイントに応じてダメージを与えるフィニッシュムーブです。',
+  'entities.abilities.eviscerate.description': '{damage}を与えるフィニッシュムーブです。',
   'entities.abilities.backstab.name': '卑劣な突き',
   'entities.abilities.backstab.description':
     '対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.gouge.name': '目潰し',
   'entities.abilities.gouge.description':
-    '対象を打って4秒間行動不能にします。ダメージを受けると効果が切れます。コンボポイントを1獲得します。',
+    '対象を打って{damage}ダメージを与え、4秒間行動不能にします。ダメージを受けると効果が切れます。コンボポイントを1獲得します。',
   'entities.abilities.evasion.name': '幻足',
   'entities.abilities.evasion.description': '15秒間、回避率が50%増加します。',
   'entities.abilities.slice_and_dice.name': '残忍な速攻',
@@ -1913,19 +1915,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '血が熱くなり、即座にエネルギーを60回復します。',
   'entities.abilities.garrote.name': '喉絞めの弦',
   'entities.abilities.garrote.description':
-    '敵を絞め、即座にダメージを与えるとともに、18秒かけて{damage}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。',
+    '敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。',
   'entities.abilities.cheap_shot.name': 'みぞおち強打',
   'entities.abilities.cheap_shot.description':
-    '対象を打って4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。',
+    '対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。',
   'entities.abilities.sap.name': 'サップ',
   'entities.abilities.sap.description':
     '対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',
   'entities.abilities.crippling_poison.name': '鉛の毒',
   'entities.abilities.crippling_poison.description':
-    '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、移動速度を12秒間50%低下させます。',
+    '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。',
   'entities.abilities.expose_armor.name': '装甲破り',
   'entities.abilities.expose_armor.description':
-    '対象の防御を崩し、アーマーを低下させるフィニッシュムーブです。消費したコンボポイントが多いほど、より深く切り込みます。',
+    '対象の防御を崩し、30秒間アーマーを{damage}低下させるフィニッシュムーブです。',
   'entities.abilities.rupture.name': '止まらぬ出血',
   'entities.abilities.rupture.description':
     '対象に傷を負わせ、16秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。',
@@ -1943,24 +1945,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を盲目にし、8秒間混乱してさまよわせます。ダメージを受けると効果が切れます。',
   'entities.abilities.seal_of_righteousness.name': '誓いの烙印',
   'entities.abilities.seal_of_righteousness.description':
-    '30秒間、聖なる力で満たされ、近接攻撃ごとに4の追加神聖ダメージを与えます。ヴァーディクトで解放します。',
+    '30秒間、聖なる力で満たされ、近接攻撃ごとに{damage}の追加神聖ダメージを与えます。ヴァーディクトで解放します。',
   'entities.abilities.holy_light.name': '癒しの光',
   'entities.abilities.holy_light.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.devotion_aura.name': '不動のオーラ',
-  'entities.abilities.devotion_aura.description': '30分間、アーマーが40増加します。',
+  'entities.abilities.devotion_aura.description': '30分間、アーマーが{buff}増加します。',
   'entities.abilities.judgement.name': 'ヴァーディクト',
   'entities.abilities.judgement.description':
     '有効なシールを敵に解放し、消費して蓄えた神聖ダメージを与えます。',
   'entities.abilities.blessing_of_might.name': '鉄の誓い',
   'entities.abilities.blessing_of_might.description':
-    '味方対象に祝福を与え、5分間、攻撃力を15増加させます。',
+    '味方対象に祝福を与え、5分間、攻撃力を{buff}増加させます。',
   'entities.abilities.divine_protection.name': '信仰の守り',
-  'entities.abilities.divine_protection.description': '守りの結界が10秒間50ダメージを吸収します。',
+  'entities.abilities.divine_protection.description':
+    '守りの結界が10秒間{damage}ダメージを吸収します。',
   'entities.abilities.hammer_of_justice.name': '断裂の裁き槌',
-  'entities.abilities.hammer_of_justice.description': '対象を3秒間スタンさせます。',
+  'entities.abilities.hammer_of_justice.description': '対象を{duration}秒間スタンさせます。',
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
   'entities.abilities.lay_on_hands.description':
-    '大きな癒やしの波で体力を250回復します。クールダウン10分。',
+    '大きな癒やしの波で体力を{damage}回復します。クールダウン10分。',
   'entities.abilities.flash_of_light.name': '光の癒し',
   'entities.abilities.flash_of_light.description':
     '素早く効率的な光の迸りで味方対象の体力を {damage} 回復します。',
@@ -1969,7 +1972,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖なる怒りで邪悪を退け、{damage} の神聖ダメージを与えます。',
   'entities.abilities.consecration.name': '聖なる大地',
   'entities.abilities.consecration.description':
-    '足元の地面を聖別し、周囲の敵を焼いて {damage} の神聖ダメージを与えます。',
+    '足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。',
   'entities.abilities.righteous_fury.name': 'バーニングオース',
   'entities.abilities.righteous_fury.description':
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
@@ -1983,10 +1986,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'ペットを野生へ帰します。',
   'entities.abilities.raptor_strike.name': '腹裂きの一撃',
   'entities.abilities.raptor_strike.description':
-    '強力な近接攻撃でダメージを5増加させます。次のスイングで発動します。',
+    '強力な近接攻撃でダメージを{damage}増加させます。次のスイングで発動します。',
   'entities.abilities.aspect_of_the_hawk.name': '猛禽の相',
   'entities.abilities.aspect_of_the_hawk.description':
-    '猛禽の相をまとい、30分間、攻撃力を20増加させます。',
+    '猛禽の相をまとい、30分間、攻撃力を{buff}増加させます。',
   'entities.abilities.serpent_sting.name': '毒の棘',
   'entities.abilities.serpent_sting.description':
     '対象を刺し、15秒間で {damage} の自然ダメージを与えます。',
@@ -1994,12 +1997,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_shot.description': '{damage} の秘術ダメージを与える即時射撃です。',
   'entities.abilities.concussive_shot.name': '動揺の射撃',
   'entities.abilities.concussive_shot.description':
-    '対象を朦朧とさせ、4秒間、移動速度を50%低下させます。',
+    '対象を朦朧とさせて{damage}ダメージを与え、4秒間、移動速度を50%低下させます。',
   'entities.abilities.mongoose_bite.name': '反撃の牙',
   'entities.abilities.mongoose_bite.description':
-    '対象が回避した後に反撃し、武器ダメージに12を加えたダメージを与えます。回避されません。',
+    '対象が回避した後に反撃し、武器ダメージに{damage}を加えたダメージを与えます。回避されません。',
   'entities.abilities.wing_clip.name': '足枷斬り',
-  'entities.abilities.wing_clip.description': '傷を負わせ、10秒間、敵の移動速度を40%低下させます。',
+  'entities.abilities.wing_clip.description':
+    '傷を負わせて{damage}ダメージを与え、10秒間、敵の移動速度を40%低下させます。',
   'entities.abilities.aspect_of_the_monkey.name': 'テンの相',
   'entities.abilities.aspect_of_the_monkey.description':
     'テンの相をまとい、30分間、回避率を8%増加させます。',
@@ -2016,12 +2020,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.name': '囁きの祈り',
   'entities.abilities.lesser_heal.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.power_word_fortitude.name': '決意の連祷',
-  'entities.abilities.power_word_fortitude.description': '30分間、対象のスタミナを3増加させます。',
+  'entities.abilities.power_word_fortitude.description':
+    '30分間、対象のスタミナを{buff}増加させます。',
   'entities.abilities.shadow_word_pain.name': '腐朽の葬送歌',
   'entities.abilities.shadow_word_pain.description':
     '闇の言葉で18秒間に {damage} の暗黒ダメージを与えます。',
   'entities.abilities.power_word_shield.name': '守りの聖歌',
-  'entities.abilities.power_word_shield.description': '対象を守り、30秒間48ダメージを吸収します。',
+  'entities.abilities.power_word_shield.description':
+    '対象を守り、30秒間{damage}ダメージを吸収します。',
   'entities.abilities.renew.name': '留まる恩寵',
   'entities.abilities.renew.description': '15秒間で対象の体力を {damage} 回復します。',
   'entities.abilities.mind_blast.name': '精神粉砕',
@@ -2040,7 +2046,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '稲妻の矢を放ち、{damage} の自然ダメージを与えます。',
   'entities.abilities.rockbiter_weapon.name': '石縛の武器',
   'entities.abilities.rockbiter_weapon.description':
-    '石の怒りを武器に込めます。5分間、各スイングが5の追加ダメージを与えます。',
+    '石の怒りを武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。',
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.chain_heal.name': 'チェインヒール',
@@ -2051,19 +2057,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
   'entities.abilities.lightning_shield.name': '雷の守り',
   'entities.abilities.lightning_shield.description':
-    '弾ける稲妻で身を包みます。近接攻撃者は13の自然ダメージを受けます。',
+    '弾ける稲妻で身を包みます。近接攻撃者は{buff}の自然ダメージを受けます。最大3チャージで、発動は5秒に1回までです。',
   'entities.abilities.flame_shock.name': '灰燼の衝撃',
   'entities.abilities.flame_shock.description':
-    '対象を炎で焼き、25ダメージに加えて12秒間で {damage} のダメージを与えます。',
+    '対象を炎で焼き、{damage}ダメージに加えて12秒間で{overTime}のダメージを与えます。',
   'entities.abilities.flametongue_weapon.name': '火焔烙印の武器',
   'entities.abilities.flametongue_weapon.description':
-    '元素の炎を武器に込めます。5分間、各スイングが8の追加火炎ダメージを与えます。',
+    '元素の炎を武器に込めます。5分間、各スイングが{damage}の追加火炎ダメージを与えます。',
   'entities.abilities.frost_shock.name': '霧氷の衝撃',
   'entities.abilities.frost_shock.description':
     '対象を冷気で即座に打ち、{damage} の冷気ダメージを与え、8秒間、移動速度を50%低下させます。',
   'entities.abilities.frostbrand_weapon.name': '霧氷縛の武器',
   'entities.abilities.frostbrand_weapon.description':
-    '刺すような冷気を武器に込めます。5分間、各スイングが8の追加ダメージを与えます。',
+    '刺すような冷気を武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。',
   'entities.abilities.ghost_wolf.name': 'シェイドウルフ',
   'entities.abilities.ghost_wolf.description':
     'シェイドウルフに変身し、10分間、移動速度が40%増加します。',
@@ -2074,15 +2080,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadow_bolt.description':
     '敵に影の矢を放ち、{damage} の暗黒ダメージを与えます。',
   'entities.abilities.demon_skin.name': '魔物の肌',
-  'entities.abilities.demon_skin.description': '悪魔の皮膚により、30分間アーマーが30増加します。',
+  'entities.abilities.demon_skin.description':
+    '悪魔の皮膚により、30分間アーマーが{buff}増加します。',
   'entities.abilities.immolate.name': '灼熱の契約',
   'entities.abilities.immolate.description':
-    '敵を燃やして11の火炎ダメージを与え、15秒間で追加の {damage} を与えます。',
+    '敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。',
   'entities.abilities.corruption.name': '黒腐れ',
   'entities.abilities.corruption.description':
     '対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。',
   'entities.abilities.life_tap.name': '過酷な取引',
-  'entities.abilities.life_tap.description': '体力30をマナ30に変換します。',
+  'entities.abilities.life_tap.description': '体力{damage}をマナ{damage}に変換します。',
   'entities.abilities.curse_of_agony.name': '苦悶の呪い',
   'entities.abilities.curse_of_agony.description':
     '対象に苦痛の呪いをかけ、24秒間で {damage} の暗黒ダメージを与えます。',
@@ -2105,7 +2112,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
   'entities.abilities.mark_of_the_wild.description':
-    '味方対象にワイルドワードを付与し、30分間アーマーを25増加させます。',
+    '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
   'entities.abilities.moonfire.name': '月の嵐',
   'entities.abilities.moonfire.description':
     '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。',
@@ -2113,12 +2120,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': '12秒間で対象の体力を {damage} 回復します。',
   'entities.abilities.thorns.name': '茨の守り',
   'entities.abilities.thorns.description':
-    '対象から棘が生えます。近接攻撃者は3の自然ダメージを受けます。',
+    '対象から棘が生えます。近接攻撃者は{buff}の自然ダメージを受けます。',
   'entities.abilities.entangling_roots.name': '締めつける根',
   'entities.abilities.entangling_roots.description': '対象を最大12秒間その場に根付かせます。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
-    '熊に変身します。アーマー +65%、攻撃力 +15、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
+    '熊に変身します。アーマー +90%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
     '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
@@ -2133,7 +2140,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ウルフフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
   'entities.abilities.ferocious_bite.description':
-    'コンボポイントに応じてダメージを与えるフィニッシュムーブです。ウルフフォーム専用。',
+    '{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。',
   'entities.abilities.swipe.name': '薙ぎ払う爪',
   'entities.abilities.swipe.description':
     '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。',
@@ -2154,7 +2161,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '脳震盪',
   'entities.abilities.bash.description': '対象を2秒間スタンさせます。ブルーインフォーム専用。',
   'entities.abilities.faerie_fire.name': '魔女火',
-  'entities.abilities.faerie_fire.description': '対象の防御力を40秒間35低下させます。',
+  'entities.abilities.faerie_fire.description': '対象のアーマーを30秒間35低下させます。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
     '対象を最大8秒間深い眠りに落とします。ダメージを受けると目を覚まします。',
@@ -2171,16 +2178,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description': '攻撃力を6秒間40上昇させます。ウルフフォーム専用。',
   'entities.abilities.rip.name': 'リップ',
   'entities.abilities.rip.description':
-    '12秒かけて出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。',
+    '12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
   'entities.abilities.mortal_strike.description':
     '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
   'entities.abilities.bloodthirst.name': '瀉血',
   'entities.abilities.bloodthirst.description':
-    '血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与えます。（狂怒シグネチャー）',
+    '血の狂乱に身を任せて即座に攻撃し、武器ダメージの60%に{damage}を加えたダメージを与えます。（狂怒シグネチャー）',
   'entities.abilities.shield_slam.name': '盾砕き',
   'entities.abilities.shield_slam.description':
-    '盾で対象を叩きつけ、{damage} のダメージと大量の脅威を与えます。（防御シグネチャー）',
+    '盾で対象を叩きつけ、武器ダメージの50%に{damage}を加えたダメージと大量の脅威を与えます。（防御シグネチャー）',
   'entities.abilities.whirlwind.name': '刃の旋風',
   'entities.abilities.whirlwind.description':
     '致命的な弧を描いて回転し、近くのすべての敵に {damage} のダメージを与えます。（狂怒タレント）',
@@ -2731,6 +2738,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_cultist.name': 'グレイブコーラーの信徒',
   'entities.mobs.gravecaller_summoner.name': 'グレイブコーラーの召喚師',
   'entities.mobs.deacon_voss.name': '助祭ヴォス',
+  'entities.mobs.training_dummy.name': '訓練用ダミー',
   'entities.mobs.ridge_stalker.name': '尾根の追跡者',
   'entities.mobs.deeprock_kobold.name': 'ディープロックの坑夫',
   'entities.mobs.thornpeak_ogre.name': 'ソーンピーク・オーガ',
@@ -5378,6 +5386,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dodgeReduce': '回避率を{pct}%低下させる',
   'hudChrome.auraEffect.armorFlat': '防御力を{value}低下させる',
   'hudChrome.auraEffect.armorFlatStacks': '防御力を{value}低下させる({stacks}スタック)',
+  'hudChrome.auraEffect.increasePct.ap': '攻撃力を{pct}%上昇させる',
+  'hudChrome.auraEffect.increasePct.armor': '防御力を{pct}%上昇させる',
+  'hudChrome.auraEffect.increasePct.int': '知力を{pct}%上昇させる',
+  'hudChrome.auraEffect.increasePct.sta': '耐久力を{pct}%上昇させる',
+  'hudChrome.auraEffect.increasePct.allStats': 'すべての能力値を{pct}%上昇させる',
+  'hudChrome.auraEffect.armorPct': '防御力を{pct}%低下させる',
+  'hudChrome.auraEffect.armorPctStacks': '防御力を{pct}%低下させる({stacks}スタック)',
   'hudChrome.auraEffect.physVuln': '受ける物理ダメージを{pct}%増加させる',
   'hudChrome.auraEffect.mortalWound': '受ける回復量を{pct}%低下させる',
   'hudChrome.auraEffect.vulnerability': '受けるダメージを{pct}%増加させる',
@@ -6378,6 +6393,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypeTitle.tailoring': '仕立て屋',
   'hudChrome.archetypeTitle.leatherworking': '皮革職人',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Protect Yumi locale fill (M16 wordy-key floor).
+  'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
+  'yumi.hud.expand': 'Protect Yumiのバーを展開する',
+  'guide.arenaPage.yumiHeading': 'Yumiを守れ',
+  'guide.arenaPage.yumiBody':
+    'Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。',
+  'yumi.queue.join': 'Protect Yumiのキューに参加しました。使い魔を守りましょう…',
+  'yumi.queue.leave': 'Protect Yumiのキューを離れました。',
+  'yumi.queue.teamLeave': 'チームがProtect Yumiのキューを離れました。',
+  'yumi.error.partyTooBig3': 'Protect Yumi 3v3のパーティは最大3人までです。',
+  'yumi.error.partyTooBig5': 'Protect Yumi 5v5のパーティは最大5人までです。',
+  'yumi.log.start': 'Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。',
+  'yumi.bracket3': 'Yumi 3v3',
+  'yumi.bracket5': 'Yumi 5v5',
+  'yumi.enterQueue': 'Protect Yumiに参加！',
+  'yumi.hud.title': 'PROTECT YUMI',
+  'yumi.hud.getReady': '準備して…',
+  'yumi.hud.teleportIn': 'Yumiの転移まで{s}秒',
+  'yumi.hud.suddenDeath': 'サドンデス',
+  'yumi.hud.yourYumi': '自軍のYumi',
+  'yumi.hud.enemyYumi': '敵軍のYumi',
+  'yumi.hud.aria': '自軍のYumiは体力{mine}/{max}、敵軍のYumiは{theirs}。',
+  'yumi.respawn.title': 'ダウン！',
+  'yumi.banner.sudden': 'サドンデス！Yumiはもう転移しない！',
+  'yumi.banner.teleport': 'Yumiが転移した！',
+  'yumi.end.win': '勝利！Yumiは無事だ！',
+  'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
   'hudChrome.mobile.actionPageIndicator': '{page}ページ',
