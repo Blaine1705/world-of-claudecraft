@@ -306,7 +306,9 @@ import {
   advanceRiftRollers as advanceRiftRollersImpl,
   enterRift as enterRiftImpl,
   leaveRift as leaveRiftImpl,
+  liftRiftEntities as liftRiftEntitiesImpl,
   riftInstanceAtPos,
+  riftPlayerLift as riftPlayerLiftImpl,
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
@@ -3207,6 +3209,7 @@ export class Sim {
     this.updateInstances();
     this.updateRiftInstances();
     advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
+    liftRiftEntitiesImpl(this.ctx); // stand rift mobs/objects on the raised tier
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
@@ -3518,6 +3521,12 @@ export class Sim {
   }
 
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
+    // Verticality: strip last tick's rift raised-tier lift so the movement kernel
+    // (and the charge/follow/fear paths) integrate jumps + gravity against the true
+    // flat rift floor; updateRiftTriggers re-applies it after the step. Zero outside
+    // a rift or on a single-level floor, so non-rift movement is byte-identical.
+    const preLift = riftPlayerLiftImpl(this.ctx, p);
+    if (preLift !== 0) p.pos.y -= preLift;
     // Any locomotion key counts as a deliberate action for the anti-AFK pet gate.
     const mv = meta.moveInput;
     if (

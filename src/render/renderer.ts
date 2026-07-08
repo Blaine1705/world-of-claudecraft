@@ -3897,6 +3897,7 @@ export class Renderer {
               hazards: floor.hazards,
               hazardStyle: 'lava',
               iceZone: floor.iceZone,
+              platform: floor.platform,
             });
           }
         }

@@ -86,6 +86,19 @@ export interface RiftRoller {
   phase: number;
 }
 
+/** A raised rear "sanctum" tier: the floor steps UP toward the dais over a full
+ * width staircase band, so the boss/descent stand on an elevated platform. It is a
+ * single-valued height field (a function of instance-local z only), applied as a
+ * post-movement Y lift to everything standing in the rift; the render builds a
+ * matching raised deck + stairs. `rampZ0` is where the stairs begin, `rampZ1` the
+ * top (platform floor), `height` the world-unit rise. Collision stays 2D; the
+ * stairs are a walkable ramp, so there is no edge to clip through. */
+export interface RiftPlatform {
+  rampZ0: number;
+  rampZ1: number;
+  height: number;
+}
+
 /** A fully-resolved floor: geometry + visual style + spawn plan + gate. */
 export interface RiftFloorPlan {
   seed: number;
@@ -112,6 +125,11 @@ export interface RiftFloorPlan {
   iceZone: { x: number; z: number; hw: number; hd: number } | null;
   /** Rolling-boulder hazard lanes (instance-local); empty on boss floors. */
   rollers: RiftRoller[];
+  /** A raised rear sanctum tier reached by a full-width staircase, or null for a
+   * single-level floor. Boss floors get one whenever the room is long enough (the
+   * giga-boss looms on the elevated sanctum); other floors ~30% (never with a
+   * rolling boulder, lava, or ice, so one headline mechanic reads at a time). */
+  platform: RiftPlatform | null;
 }
 
 /** Live per-instance state for an active rift (a Sim field, one per slot in the

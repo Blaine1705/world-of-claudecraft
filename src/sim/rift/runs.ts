@@ -13,6 +13,7 @@
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
+  DUNGEON_FLOOR_Y,
   isRiftPos,
   MOBS,
   RIFT_REGION_HALF_X,
@@ -24,7 +25,7 @@ import { createGroundObject, createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
-import { generateRiftFloor } from './rift_gen';
+import { generateRiftFloor, riftPlatformLift } from './rift_gen';
 import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
@@ -560,6 +561,11 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         });
       }
     }
+    // Verticality: stand the player on the raised sanctum tier. This is a
+    // post-movement Y lift; updatePlayerMovement stripped the prior tick's lift
+    // first, so the kernel integrated jumps/gravity against the true flat floor.
+    // Zero when the floor has no platform.
+    p.pos.y += riftPlatformLift(floor.platform, p.pos.z - origin.z);
     return;
   }
 
@@ -793,6 +799,39 @@ export function advanceRiftRollers(ctx: SimContext): void {
     const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
     if (floor.rollers.length === 0) continue;
     tickRiftRollers(ctx, inst, riftInstanceOrigin(inst.slot, inst.floorIndex), floor.rollers);
+  }
+}
+
+/** The raised-tier Y lift for a player at their current position (0 outside a rift
+ * or on a single-level floor). updatePlayerMovement strips this before the movement
+ * kernel runs, so jumps/gravity integrate against the flat floor; updateRiftTriggers
+ * re-applies it after. Both read the same pure height field, so they cancel. */
+export function riftPlayerLift(ctx: SimContext, p: Entity): number {
+  if (!isRiftPos(p.pos.x)) return 0;
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst) return 0;
+  const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  return riftPlatformLift(floor.platform, p.pos.z - origin.z);
+}
+
+/** Stand every rift MOB and OBJECT on the raised sanctum tier each tick (an absolute
+ * Y set from the flat floor; mobs/objects never jump, so no arc to preserve). Only
+ * floors with a platform do any work. Players are lifted in updateRiftTriggers. */
+export function liftRiftEntities(ctx: SimContext): void {
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null) continue;
+    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    if (!floor.platform) continue;
+    const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+    const lift = (id: number): void => {
+      const e = ctx.entities.get(id);
+      if (e) e.pos.y = DUNGEON_FLOOR_Y + riftPlatformLift(floor.platform, e.pos.z - origin.z);
+    };
+    for (const id of inst.mobIds) lift(id);
+    for (const id of inst.objectIds) lift(id);
+    if (inst.descentId !== null) lift(inst.descentId);
+    if (inst.exitId !== null) lift(inst.exitId);
   }
 }
 

@@ -662,6 +662,10 @@ export class DungeonInteriors {
       // Rift ice-slide zone (frictionless slick you skate across to the goal
       // sigil): a pale frost sheet over this rect, purely cosmetic.
       iceZone?: { x: number; z: number; hw: number; hd: number } | null;
+      // Rift raised "sanctum" tier: a full-width staircase (rampZ0 to rampZ1) up to
+      // a raised rear deck at `height`. The geometry matches the sim height field
+      // (riftPlatformLift), so the player stands exactly on the rendered deck.
+      platform?: { rampZ0: number; rampZ1: number; height: number } | null;
       moduleId?: DelveModuleId;
       // Procedural Rift re-grade: a generated palette layered over one of the four
       // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
@@ -714,6 +718,7 @@ export class DungeonInteriors {
       }
     }
     if (opts?.iceZone) this.placeIceSheet(group, opts.iceZone);
+    if (opts?.platform) this.placeRiftPlatform(group, layout, opts.platform);
     if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
       if (opts?.moduleId && isLitanyModuleId(opts.moduleId)) {
         // Dry islands render ON TOP of the pool overlays so the sim's
@@ -882,6 +887,37 @@ export class DungeonInteriors {
     );
     sheet.renderOrder = 2;
     group.add(sheet);
+  }
+
+  // The rift raised "sanctum" tier: a full-width staircase (rampZ0 to rampZ1) up to
+  // a raised rear deck at `height`. Built in instance-local space (the group is
+  // seated at the instance origin), and the deck top lands at y=height so it lines
+  // up with the sim height field (riftPlatformLift): the player stands ON it.
+  private placeRiftPlatform(
+    group: THREE.Group,
+    layout: DungeonLayout,
+    platform: { rampZ0: number; rampZ1: number; height: number },
+  ): void {
+    const { rampZ0, rampZ1, height } = platform;
+    const halfW = Math.min((layout.wallX ?? 18) - 1, 15);
+    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
+    // Raised rear deck: a solid riser from the floor up to the platform surface.
+    const deckDepth = Math.max(2, layout.zMax - rampZ1);
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, height, deckDepth), mat);
+    deck.position.set(0, height / 2, rampZ1 + deckDepth / 2);
+    deck.receiveShadow = true;
+    group.add(deck);
+    // Full-width staircase rising 0 to height; each step's top approximates the
+    // linear lift at its centre (the tiny sub-step mismatch is imperceptible).
+    const steps = 7;
+    const stepDepth = (rampZ1 - rampZ0) / steps;
+    for (let i = 0; i < steps; i++) {
+      const topY = (height * (i + 1)) / steps;
+      const step = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, topY, stepDepth + 0.05), mat);
+      step.position.set(0, topY / 2, rampZ0 + (i + 0.5) * stepDepth);
+      step.receiveShadow = true;
+      group.add(step);
+    }
   }
 
   private placeAquaticDressing(group: THREE.Group, layout: DungeonLayout): void {

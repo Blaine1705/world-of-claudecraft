@@ -24,6 +24,7 @@ import type {
   RiftFloorPlan,
   RiftObjectPlan,
   RiftPlan,
+  RiftPlatform,
   RiftPuzzle,
   RiftRoller,
   RiftSpawn,
@@ -574,6 +575,36 @@ function planRollers(
   return out;
 }
 
+/** Verticality: a raised rear "sanctum" tier reached by a full-width staircase.
+ * The floor steps UP toward the dais so the boss/descent stand elevated. Boss
+ * floors get one when the room is long enough; other floors ~30% (but never with a
+ * rolling boulder, lava, or ice, whose lane/zone would fight the stairs). The stair
+ * band sits just south of the dais so the dais + descent land on the platform. */
+function planPlatform(
+  rng: Rng,
+  geo: GeneratedGeometry,
+  isBoss: boolean,
+  hasOtherHazard: boolean,
+): RiftPlatform | null {
+  if (hasOtherHazard) return null;
+  if (!isBoss && !rng.chance(0.3)) return null;
+  const { layout } = geo;
+  const rampZ1 = Math.round(layout.dais.z - layout.dais.r - 4); // top of stairs, just south of the dais
+  const rampZ0 = rampZ1 - rng.int(8, 12); // stair band depth
+  if (rampZ0 <= layout.zMin + 26) return null; // keep a real nave in front of the stairs
+  const height = isBoss ? rng.range(2.6, 3.4) : rng.range(1.8, 2.6);
+  return { rampZ0, rampZ1, height };
+}
+
+/** The raised-tier Y lift at instance-local z (0 in the nave, ramps up the stairs,
+ * flat `height` on the rear platform). Pure + single-valued, so the authoritative
+ * Sim and the render regenerate identical verticality from the descriptor. */
+export function riftPlatformLift(platform: RiftPlatform | null, localZ: number): number {
+  if (!platform || localZ <= platform.rampZ0) return 0;
+  if (localZ >= platform.rampZ1) return platform.height;
+  return (platform.height * (localZ - platform.rampZ0)) / (platform.rampZ1 - platform.rampZ0);
+}
+
 // ---- Public generation ------------------------------------------------------
 
 const FLOOR_CACHE = new Map<string, RiftFloorPlan>();
@@ -625,6 +656,12 @@ export function generateRiftFloor(
   const objects = planObjects(rng, geo, isBoss, puzzle, iceZone);
   const hazards = planHazards(rng, geo, isBoss, iceZone !== null);
   const rollers = planRollers(rng, geo, isBoss, iceZone !== null, hazards.length > 0);
+  const platform = planPlatform(
+    rng,
+    geo,
+    isBoss,
+    rollers.length > 0 || iceZone !== null || hazards.length > 0,
+  );
 
   const plan: RiftFloorPlan = {
     seed: seed >>> 0,
@@ -643,6 +680,7 @@ export function generateRiftFloor(
     hazards,
     iceZone,
     rollers,
+    platform,
   };
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();

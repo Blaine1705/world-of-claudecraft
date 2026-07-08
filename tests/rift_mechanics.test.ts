@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { isRiftPos, riftInstanceOrigin } from '../src/sim/data';
-import { generateRiftFloor } from '../src/sim/rift/rift_gen';
+import { DUNGEON_FLOOR_Y, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import { generateRiftFloor, riftPlatformLift } from '../src/sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 
@@ -202,6 +202,54 @@ describe('rift mechanics: lava hazard', () => {
       sim.tick();
     }
     expect(sim.player.hp).toBeLessThan(sim.player.maxHp);
+  });
+});
+
+describe('rift mechanics: verticality (raised sanctum tier)', () => {
+  it('the platform lift is 0 in the nave, ramps up monotonically, and flattens at height', () => {
+    const seed = seedWithFloor0((f) => f.platform !== null);
+    const p = generateRiftFloor(seed, 20, 0).platform!;
+    expect(riftPlatformLift(p, p.rampZ0 - 5)).toBe(0); // nave: flat
+    expect(riftPlatformLift(p, p.rampZ0)).toBe(0); // stair foot
+    expect(riftPlatformLift(p, p.rampZ1)).toBeCloseTo(p.height); // stair top
+    expect(riftPlatformLift(p, p.rampZ1 + 20)).toBe(p.height); // deck: flat raised
+    const mid = riftPlatformLift(p, (p.rampZ0 + p.rampZ1) / 2);
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(p.height);
+  });
+
+  it('boss floors and some non-boss floors generate a raised platform', () => {
+    let bossWith = 0;
+    let nonBossWith = 0;
+    for (let s = 1; s <= 150; s++) {
+      const fc = generateRiftFloor(s, 20, 0).floorCount;
+      if (generateRiftFloor(s, 20, fc - 1).platform) bossWith++;
+      for (let fi = 0; fi < fc - 1; fi++) {
+        if (generateRiftFloor(s, 20, fi).platform) nonBossWith++;
+      }
+    }
+    expect(bossWith, 'boss floors get the grand sanctum').toBeGreaterThan(0);
+    expect(nonBossWith, 'some nave floors are raised too').toBeGreaterThan(0);
+  });
+
+  it('standing on the rear tier lifts the player Y; the nave stays flat', () => {
+    const seed = seedWithFloor0((f) => f.platform !== null);
+    const sim = enter(seed);
+    const inst = active(sim);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const plat = floor.platform!;
+    const origin = riftInstanceOrigin(inst.slot, 0);
+    // On the raised rear deck (north of the stairs): the post-motion lift raises Y.
+    // (Teleports land at the flat floor Y, like groundPos/knockback do in play.)
+    sim.player.pos = { x: origin.x, y: DUNGEON_FLOOR_Y, z: origin.z + plat.rampZ1 + 4 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(sim.player.pos.y).toBeCloseTo(DUNGEON_FLOOR_Y + plat.height, 1);
+    // Back down in the nave (south of the stairs): flat floor.
+    sim.player.pos = { x: origin.x, y: DUNGEON_FLOOR_Y, z: origin.z + plat.rampZ0 - 8 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(sim.player.pos.y).toBeCloseTo(DUNGEON_FLOOR_Y, 1);
   });
 });
 

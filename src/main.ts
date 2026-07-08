@@ -106,7 +106,7 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
+import { ITEMS, isDelvePos, isRiftPos, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -2493,7 +2493,12 @@ async function startGame(
             net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
-            !isDelvePos(pe.pos.x),
+            !isDelvePos(pe.pos.x) &&
+            // Rifts (like delves) are server-authoritative instanced content, and
+            // their raised sanctum tiers lift the player's Y server-side. The local
+            // kernel predicts a flat floor, so keep prediction off here and render
+            // the authoritative interpolated Y (no vertical jitter on the stairs).
+            !isRiftPos(pe.pos.x),
           moveInput: resolved.mi,
           displayFacing: netFacing ?? interpServerFacing,
           echoMs: onlineInputEchoMs,
