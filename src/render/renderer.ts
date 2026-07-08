@@ -220,7 +220,7 @@ const CAMERA_BASE_FOV = 60;
 const CAMERA_MAX_COMP_FOV = 98;
 const SELF_RENDER_SMOOTH_RATE = 30;
 const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
-const SUN_HALO_OPACITY = 0.35; // bloom now supplies most of the halo
+const SUN_HALO_OPACITY = 0.14; // faint: the sky-shader disc is the sun, bloom the glow
 // lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
 const HEMI_INTENSITY = 0.45;
 const SUN_INTENSITY = 2.8;
@@ -1181,8 +1181,8 @@ export class Renderer {
       return new THREE.CanvasTexture(c);
     };
     for (const [tex, scale] of [
-      [sunCanvas(true), 26],
-      [sunCanvas(false), 110],
+      [sunCanvas(true), 16],
+      [sunCanvas(false), 64],
     ] as const) {
       const sp = new THREE.Sprite(
         new THREE.SpriteMaterial({
@@ -1192,10 +1192,10 @@ export class Renderer {
           depthWrite: false,
           depthTest: false,
           blending: THREE.AdditiveBlending,
-          // the sky shader now draws the crisp round sun disc, so the sprites are
-          // just a smaller, softer glow: a dim core plus a low-opacity bloom halo
-          // (bloom supplies the rest of the halo on the composer path)
-          opacity: scale === 110 ? (LOW_GFX ? 1 : SUN_HALO_OPACITY) : 0.5,
+          // the sky shader now draws the bold round sun disc, so the sprites are
+          // only a faint bloom aid (a dim tiny core plus a very low-opacity halo),
+          // kept small so they never read as the sun themselves
+          opacity: scale === 64 ? (LOW_GFX ? 1 : SUN_HALO_OPACITY) : 0.2,
         }),
       );
       setRenderCategory(sp, 'sky');
@@ -2165,7 +2165,14 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp, this.starAmt);
+      this.skyView.setCelestial(
+        this.sunDir,
+        this.moonDir,
+        this.sunUp,
+        this.moonUp,
+        this.starAmt,
+        this.time,
+      );
       this.updateEnvBiome(dt);
     }
     for (const sp of this.sunSprites) {
@@ -4744,7 +4751,14 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp, this.starAmt);
+      this.skyView.setCelestial(
+        this.sunDir,
+        this.moonDir,
+        this.sunUp,
+        this.moonUp,
+        this.starAmt,
+        this.time,
+      );
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear

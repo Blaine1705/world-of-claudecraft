@@ -344,14 +344,15 @@ export interface SkyView {
   /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
   setDayNight(mul: readonly [number, number, number]): void;
   /** move the sun and moon discs, set how far above the horizon each sits
-   *  (0 = down/hidden, 1 = fully up), and set the star-field strength (0 day,
-   *  1 deep night); drives the day/night sky glow */
+   *  (0 = down/hidden, 1 = fully up), the star-field strength (0 day, 1 deep
+   *  night), and the current time in seconds (for star twinkle) */
   setCelestial(
     sunDir: THREE.Vector3,
     moonDir: THREE.Vector3,
     sunUp: number,
     moonUp: number,
     starAmt: number,
+    time: number,
   ): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: BiomeId): THREE.DataTexture | null;
@@ -388,6 +389,7 @@ const SKY_FRAG = /* glsl */ `
   uniform float uSunUp;  // 0 sun below horizon / hidden, 1 fully up
   uniform float uMoonUp; // 0 moon below horizon / hidden, 1 fully up
   uniform float uStarAmt; // 0 day, 1 deep night: star-field strength
+  uniform float uTime;    // seconds, for star twinkle
   uniform sampler2D uBackdropA;
   uniform sampler2D uBackdropB;
   uniform float uBackdropStrength;
@@ -451,29 +453,32 @@ const SKY_FRAG = /* glsl */ `
     vec3 backdrop = mix(backA, backB, uMix);
     c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
     c *= mix(uTintA, uTintB, uMix); // biome grade before the warm sun glow
-    // the sun: a crisp warm disc with a soft golden glow, so its round edge
-    // reads instead of a blown-out white blob
+    // the sun: a bold hard-edged warm disc so its round shape reads through
+    // bloom, with only a thin warm corona (no big soft glow blob)
     float sunDot = max(dot(dir, uSunDir), 0.0);
-    float sunGlow = pow(sunDot, 12.0);
-    c += vec3(1.0, 0.66, 0.36) * sunGlow * 0.18 * uSunUp;            // warm golden glow
-    float sunDisc = smoothstep(0.9991, 0.9997, sunDot);             // defined round disc
-    c += vec3(1.0, 0.83, 0.55) * sunDisc * 0.85 * uSunUp;           // the warm disc itself
+    float sunDisc = smoothstep(0.9987, 0.9992, sunDot);             // defined round disc (~2.5 deg)
+    float sunCorona = pow(sunDot, 50.0);                            // tight warm ring, not a blob
+    c += (vec3(1.0, 0.85, 0.58) * sunDisc * 0.9 + vec3(1.0, 0.6, 0.3) * sunCorona * 0.22) * uSunUp;
     c *= uDayNight;                                                  // world day/night grade, last
-    // the moon rides on top of the night-darkened sky so it stays legibly bright
-    float moonGlow = pow(max(dot(dir, uMoonDir), 0.0), 24.0);
-    c += vec3(0.5, 0.58, 0.8) * moonGlow * 0.1 * uMoonUp;            // cool halo
-    float moonCore = pow(max(dot(dir, uMoonDir), 0.0), 250.0);
-    c += vec3(0.92, 0.95, 1.0) * moonCore * 0.9 * uMoonUp;          // bright moon disc
-    // stars: a sparse procedural field, each a small point at a hash-jittered
-    // spot in its sky cell, fading in as the sky darkens and only above the horizon
+    // the moon: a bold defined disc with a soft cool glow, added on top of the
+    // night-darkened sky so it stays clearly visible (bigger + brighter than a
+    // pinpoint so it reads as a moon, not a star)
+    float moonDot = max(dot(dir, uMoonDir), 0.0);
+    float moonDisc = smoothstep(0.9982, 0.9989, moonDot);          // defined disc (~3 deg)
+    float moonHalo = pow(moonDot, 40.0);
+    c += (vec3(0.95, 0.97, 1.0) * moonDisc + vec3(0.55, 0.62, 0.82) * moonHalo * 0.14) * uMoonUp;
+    // stars: a fine field of small twinkling points at hash-jittered spots, only
+    // above the horizon, fading in as the sky darkens
     if (uStarAmt > 0.001) {
-      vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 48.0;
+      vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
       vec2 scell = floor(suv);
-      float present = step(0.94, hash12(scell));
+      float present = step(0.9, hash12(scell));
       vec2 sf = fract(suv) - vec2(hash12(scell + 7.0), hash12(scell + 13.0));
-      float star = present * smoothstep(0.025, 0.0, dot(sf, sf)) * (0.4 + 0.6 * hash12(scell + 41.0));
+      float point = smoothstep(0.012, 0.0, dot(sf, sf));            // small points
+      float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + hash12(scell + 3.0) * 3.5) + hash12(scell + 19.0) * 6.2832);
+      float star = present * point * (0.4 + 0.6 * hash12(scell + 41.0)) * twinkle;
       float upper = smoothstep(-0.02, 0.2, dir.y);                  // no stars below the horizon
-      c += vec3(0.85, 0.9, 1.0) * star * upper * uStarAmt;
+      c += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
     }
     gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
@@ -569,6 +574,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uSunUp: { value: 1 },
     uMoonUp: { value: 0 },
     uStarAmt: { value: 0 },
+    uTime: { value: 0 },
     uBackdropA: { value: backdropTex(start.from) },
     uBackdropB: { value: backdropTex(start.to) },
     uBackdropStrength: { value: backdropsReady ? 1 : 0 },
@@ -634,12 +640,14 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
       sunUp: number,
       moonUp: number,
       starAmt: number,
+      time: number,
     ): void {
       uniforms.uSunDir.value.copy(sunDir);
       uniforms.uMoonDir.value.copy(moonDir);
       uniforms.uSunUp.value = sunUp;
       uniforms.uMoonUp.value = moonUp;
       uniforms.uStarAmt.value = starAmt;
+      uniforms.uTime.value = time;
     },
     envTexture(biome: BiomeId): THREE.DataTexture | null {
       return hdriStore[biome] ?? null;
