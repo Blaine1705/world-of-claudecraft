@@ -3259,7 +3259,11 @@ export const es_ES: EnTranslations = {
       "portalOpens": "A {tier}-rank rift tears open in {zone}!",
       "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
       "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
-      "levelGate": "Only adventurers of level {level} or higher may enter this rift."
+      "levelGate": "Only adventurers of level {level} or higher may enter this rift.",
+      "iceGoalLit": "The frost sigil blazes. The way stirs.",
+      "socketsShut": "The sockets grind shut. The way stirs.",
+      "seqProgress": "The runes answer in turn ({step}/{total}).",
+      "seqReset": "The runes go dark. Begin again."
     },
     "delve": {
       "cannotEnterNow": "No puedes entrar en una Profundidad ahora mismo.",

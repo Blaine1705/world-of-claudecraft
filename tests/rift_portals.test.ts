@@ -166,6 +166,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
         }
       }
       inst.litPylons = new Set(inst.pylonIds);
+      inst.puzzleSolved = true;
       tickSeconds(sim, 1.2);
       if (inst.descentId === null) break;
       const desc = sim.entities.get(inst.descentId)!;

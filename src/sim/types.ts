@@ -1816,6 +1816,11 @@ export interface Entity {
   // does not auto-enter portals, so being returned near the entry portal can
   // never bounce them straight back in (clicking the portal still works).
   riftReentryGraceUntil?: number;
+  // Cooldown gate (sim time) between chained ice-slide pushes on a rift ice sheet.
+  riftIceUntil?: number;
+  // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
+  // shoves + chips once rather than every tick of overlap.
+  riftRollerUntil?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.

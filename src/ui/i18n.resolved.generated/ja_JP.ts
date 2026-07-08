@@ -3259,7 +3259,11 @@ export const ja_JP: EnTranslations = {
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
-      "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。"
+      "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。",
+      "iceGoalLit": "霜の紋章が燃え上がる。道が動き出す。",
+      "socketsShut": "台座が音を立てて閉じる。道が動き出す。",
+      "seqProgress": "ルーンが順に応える（{step}/{total}）。",
+      "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",

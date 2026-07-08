@@ -273,6 +273,133 @@ export function buildRiftGateBody(
   return { body, portal };
 }
 
+// Bespoke bodies for the in-rift puzzle props (boulders, sockets, the ice-slide
+// goal sigil, sequence runes, and the "way out" beacon). Kept procedural (no new
+// GLB) and small; the returned `portal` mesh, when present, is spun per frame by
+// the renderer so glowing nodes shimmer. templateId variants (`_lit`/`_placed`)
+// trigger a rebuild, so the lit/socketed states light up for free.
+function riftGlowMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
+  return new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+}
+
+export function buildRiftPuzzleProp(
+  templateId: string,
+  _lowGfx: boolean,
+): { body: THREE.Group; portal?: THREE.Mesh } {
+  const body = new THREE.Group();
+  const stone = doorStoneMaterial();
+  switch (templateId) {
+    case 'rift_boulder':
+    case 'rift_boulder_placed': {
+      const placed = templateId === 'rift_boulder_placed';
+      const rock = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(1.1, 0),
+        new THREE.MeshLambertMaterial({
+          color: placed ? 0x9a875f : 0x6a6a72,
+          emissive: placed ? 0x3a2a08 : 0x000000,
+        }),
+      );
+      rock.position.y = 1.0;
+      rock.castShadow = true;
+      body.add(rock);
+      return { body };
+    }
+    case 'rift_roller': {
+      // The rolling-boulder hazard: a big cracked boulder. Its rock is exposed on
+      // `userData.rollRock` so the renderer can spin it about X as the entity moves
+      // (rolling without slipping).
+      const rock = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(1.4, 0),
+        new THREE.MeshLambertMaterial({ color: 0x59565e, emissive: 0x120e08 }),
+      );
+      rock.position.y = 1.4;
+      rock.castShadow = true;
+      body.add(rock);
+      body.userData.rollRock = rock;
+      return { body };
+    }
+    case 'rift_boulder_pad': {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(1.3, 0.18, 8, 24),
+        riftGlowMaterial(0xffb24a, 0.8),
+      );
+      ring.rotation.x = Math.PI / 2;
+      ring.position.y = 0.08;
+      body.add(ring);
+      return { body };
+    }
+    case 'rift_ice_goal': {
+      const disc = new THREE.Mesh(
+        new THREE.CircleGeometry(1.7, 28),
+        riftGlowMaterial(0x9fe8ff, 0.85),
+      );
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.y = 0.06;
+      body.add(disc);
+      return { body, portal: disc };
+    }
+    case 'rift_seq_rune':
+    case 'rift_seq_rune_lit': {
+      const lit = templateId === 'rift_seq_rune_lit';
+      const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.6, 0.8), stone);
+      pillar.position.y = 0.8;
+      pillar.castShadow = true;
+      body.add(pillar);
+      const gem = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.42, 0),
+        riftGlowMaterial(lit ? 0x9fffc4 : 0x3a6a4a, lit ? 0.95 : 0.5),
+      );
+      gem.position.y = 1.95;
+      body.add(gem);
+      return { body, portal: lit ? gem : undefined };
+    }
+    case 'rift_beacon': {
+      const plinth = new THREE.Mesh(doorPlinthGeometry(), stone);
+      plinth.position.y = 0.35;
+      body.add(plinth);
+      const orb = new THREE.Mesh(
+        new THREE.CircleGeometry(1.0, 24),
+        riftGlowMaterial(0x88ccff, 0.9),
+      );
+      orb.position.y = 1.7;
+      body.add(orb);
+      return { body, portal: orb };
+    }
+    case 'rift_pylon':
+    case 'rift_pylon_lit': {
+      const lit = templateId === 'rift_pylon_lit';
+      // A tapered hex spire with a floating rune crystal that spins and pulses;
+      // the crystal blazes bright once the pylon is lit (walk-on toggles the id).
+      const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.72, 3.0, 6), stone);
+      spire.position.y = 1.5;
+      spire.castShadow = true;
+      body.add(spire);
+      const collar = new THREE.Mesh(
+        new THREE.TorusGeometry(0.5, 0.1, 6, 12),
+        riftGlowMaterial(lit ? 0x9fe8ff : 0x2a4a6a, lit ? 0.85 : 0.4),
+      );
+      collar.rotation.x = Math.PI / 2;
+      collar.position.y = 2.7;
+      body.add(collar);
+      const crystal = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.5, 0),
+        riftGlowMaterial(lit ? 0xbfe8ff : 0x2f5a7a, lit ? 0.95 : 0.5),
+      );
+      crystal.position.y = 3.5;
+      body.add(crystal);
+      return { body, portal: crystal };
+    }
+  }
+  return { body };
+}
+
 // Build a dungeon-door (entering) or dungeon-exit (leaving) body: a stone arch +
 // keystone + plinths framing an additive portal swirl. The Nythraxis crypt door
 // is a bespoke invisible click-box instead (the visible arch is baked into that

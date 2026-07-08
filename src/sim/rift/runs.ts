@@ -10,7 +10,7 @@
 // dev command + interaction click path; the per-tick drivers (updateRiftTriggers,
 // updateRiftInstances) are called from tick().
 
-import { clearRiftRegion, setRiftRegion } from '../colliders';
+import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import {
   isRiftPos,
@@ -22,13 +22,32 @@ import {
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, type Vec3 } from '../types';
+import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { generateRiftFloor } from './rift_gen';
-import type { RiftInstance } from './types';
+import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
 const PYLON_TRIGGER_RADIUS = 3.0; // walk this close to light a rune pylon
+const BEACON_TRIGGER_RADIUS = 2.0; // walk this close to the way-out beacon to leave
+const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
+const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
+const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
+const ICE_SLIDE_DIST = 70; // how far a slide travels before a wall stops it
+const ICE_SLIDE_COOLDOWN = 0.35; // seconds between chained slides (mid-ice re-push)
+const PLAYER_BODY_R = 0.6;
+const ROLLER_HIT_COOLDOWN = 0.6; // seconds between rolling-boulder hits on one player
+const ROLLER_KB_SIDE = 3.2; // sideways shove (to the aisle) when a boulder bowls you over
+const ROLLER_KB_FWD = 1.4; // forward nudge along the boulder's travel
+
+/** Whether an instance-local point sits on this floor's ice sheet. */
+function inIceZone(
+  ice: { x: number; z: number; hw: number; hd: number } | null,
+  lx: number,
+  lz: number,
+): boolean {
+  return ice !== null && Math.abs(lx - ice.x) <= ice.hw && Math.abs(lz - ice.z) <= ice.hd;
+}
 const RIFT_EMPTY_TIMEOUT = 60; // seconds with nobody inside before the slot frees
 
 // Deterministic per-channel colour jitter (server-side; the result rides the
@@ -96,6 +115,13 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.descentOpen = false;
   inst.descentAt = null;
   inst.pylonTotal = floor.puzzle.kind === 'rune_pylons' ? floor.puzzle.pylonCount : 0;
+  inst.puzzleSolved = floor.puzzle.kind === 'none';
+  inst.boulderIds = [];
+  inst.boulderPads = [];
+  inst.seqRuneIds = [];
+  inst.seqStep = 0;
+  inst.beaconId = null;
+  inst.rollerIds = [];
 
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
@@ -118,27 +144,56 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     if (spawn.boss) inst.bossId = mob.id;
   }
 
+  const spawnObj = (templateId: string, name: string, x: number, z: number): number => {
+    const o = createGroundObject(ctx.nextId++, '', name, ctx.groundPos(origin.x + x, origin.z + z));
+    o.templateId = templateId;
+    o.objectItemId = null;
+    o.lootable = false;
+    ctx.addEntity(o);
+    inst.objectIds.push(o.id);
+    return o.id;
+  };
+
   for (const obj of floor.objects) {
-    if (obj.kind === 'descent') {
-      // Spawned only once the floor is cleared (see updateRiftInstances).
-      inst.descentAt = { x: obj.x, z: obj.z };
-      continue;
+    switch (obj.kind) {
+      case 'descent':
+        // Spawned only once the floor is cleared (see updateRiftInstances).
+        inst.descentAt = { x: obj.x, z: obj.z };
+        break;
+      case 'rune_pylon':
+        inst.pylonIds.push(spawnObj('rift_pylon', obj.name, obj.x, obj.z));
+        break;
+      case 'ice_goal':
+        spawnObj('rift_ice_goal', obj.name, obj.x, obj.z);
+        break;
+      case 'seq_rune':
+        inst.seqRuneIds.push(spawnObj('rift_seq_rune', obj.name, obj.x, obj.z));
+        break;
+      case 'boulder':
+        inst.boulderIds.push(spawnObj('rift_boulder', obj.name, obj.x, obj.z));
+        break;
+      case 'boulder_pad':
+        inst.boulderPads.push({ x: obj.x, z: obj.z });
+        spawnObj('rift_boulder_pad', obj.name, obj.x, obj.z);
+        break;
+      // 'chest'/'exit' are placed on boss death (openExit).
     }
-    if (obj.kind === 'rune_pylon') {
-      const pylon = createGroundObject(
-        ctx.nextId++,
-        '',
-        obj.name,
-        ctx.groundPos(origin.x + obj.x, origin.z + obj.z),
-      );
-      pylon.templateId = 'rift_pylon';
-      pylon.objectItemId = null;
-      pylon.lootable = false;
-      ctx.addEntity(pylon);
-      inst.objectIds.push(pylon.id);
-      inst.pylonIds.push(pylon.id);
-    }
-    // 'chest'/'exit' are placed on boss death (openExitFloor).
+  }
+  // Sequence runes must be stepped south-to-north; keep the id list in that order.
+  if (inst.seqRuneIds.length > 1) {
+    inst.seqRuneIds.sort(
+      (a, b) => (ctx.entities.get(a)?.pos.z ?? 0) - (ctx.entities.get(b)?.pos.z ?? 0),
+    );
+  }
+
+  // The always-available "way out": a beacon at the floor entry. Walking onto it
+  // (or clicking it) returns you to the overworld, so a run is never a trap.
+  inst.beaconId = spawnObj('rift_beacon', 'Rift Beacon', floor.entry.x, floor.entry.z - 3);
+
+  // Rolling-boulder hazards: one entity per lane, staggered along it by `phase`.
+  for (const roller of floor.rollers) {
+    const z = roller.z0 + (roller.z1 - roller.z0) * roller.phase;
+    inst.rollerIds.push(spawnObj('rift_roller', 'Rolling Boulder', roller.x, z));
   }
 
   inst.emptyFor = 0;
@@ -171,6 +226,13 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.descentId = null;
   inst.exitId = null;
   inst.bossId = null;
+  inst.boulderIds = [];
+  inst.boulderPads = [];
+  inst.seqRuneIds = [];
+  inst.seqStep = 0;
+  inst.beaconId = null;
+  inst.rollerIds = [];
+  inst.puzzleSolved = false;
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
@@ -352,6 +414,18 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
   if (isRiftPos(p.pos.x)) {
     const inst = riftInstanceAtPos(ctx, p.pos);
     if (!inst) return;
+    const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+
+    // Way out: the entry beacon returns you to the overworld any time, so a run
+    // is never a dead end (too hard / stuck / lost).
+    if (inst.beaconId !== null) {
+      const beacon = ctx.entities.get(inst.beaconId);
+      if (beacon && dist2d(p.pos, beacon.pos) < BEACON_TRIGGER_RADIUS) {
+        leaveRift(ctx, p.id);
+        return;
+      }
+    }
     // Exit portal -> leave.
     if (inst.exitId !== null) {
       const exit = ctx.entities.get(inst.exitId);
@@ -368,6 +442,109 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         return;
       }
     }
+
+    // Ice slide (FFX / Pokemon): moving onto the frictionless sheet flings the
+    // player in their travel direction until a wall stops them (reuses the pure
+    // swept resolver, so it stops exactly where collision would).
+    if (floor.iceZone && inIceZone(floor.iceZone, p.pos.x - origin.x, p.pos.z - origin.z)) {
+      const dx = p.pos.x - p.prevPos.x;
+      const dz = p.pos.z - p.prevPos.z;
+      const moved = Math.hypot(dx, dz);
+      if (moved > 0.05 && ctx.time >= (p.riftIceUntil ?? 0)) {
+        p.riftIceUntil = ctx.time + ICE_SLIDE_COOLDOWN;
+        const inv = ICE_SLIDE_DIST / moved;
+        const dest = resolveMovement(
+          ctx.cfg.seed,
+          p.pos.x,
+          p.pos.z,
+          p.pos.x + dx * inv,
+          p.pos.z + dz * inv,
+          PLAYER_BODY_R,
+          false,
+          undefined,
+          ctx.riftCollisionToken,
+        );
+        p.pos = ctx.groundPos(dest.x, dest.z);
+        p.prevPos = { ...p.pos };
+        ctx.rebucket(p);
+      }
+    }
+    // Ice-slide goal: sliding onto the Frost Sigil solves the floor.
+    if (floor.puzzle.kind === 'ice_slide' && !inst.puzzleSolved) {
+      const goal = floor.objects.find((o) => o.kind === 'ice_goal');
+      if (goal && dist2d(p.pos, ctx.groundPos(origin.x + goal.x, origin.z + goal.z)) < 3) {
+        inst.puzzleSolved = true;
+        for (const pid of instancePlayerIds(ctx, inst)) {
+          ctx.emit({
+            type: 'log',
+            text: 'The frost sigil blazes. The way stirs.',
+            color: '#adf',
+            pid,
+          });
+        }
+      }
+    }
+
+    // Strength boulders: shove an adjacent boulder one heading-step onto its socket.
+    for (const id of inst.boulderIds) {
+      const b = ctx.entities.get(id);
+      if (!b || dist2d(p.pos, b.pos) >= BOULDER_PUSH_RADIUS) continue;
+      const mvx = p.pos.x - p.prevPos.x;
+      const mvz = p.pos.z - p.prevPos.z;
+      const dirx = b.pos.x - p.pos.x;
+      const dirz = b.pos.z - p.pos.z;
+      // Only push when actually walking INTO the boulder.
+      if (mvx * dirx + mvz * dirz <= 0.0001) continue;
+      const dd = Math.hypot(dirx, dirz) || 1;
+      const dest = resolveMovement(
+        ctx.cfg.seed,
+        b.pos.x,
+        b.pos.z,
+        b.pos.x + (dirx / dd) * 1.4,
+        b.pos.z + (dirz / dd) * 1.4,
+        1.0,
+        false,
+        undefined,
+        ctx.riftCollisionToken,
+      );
+      if (Math.hypot(dest.x - b.pos.x, dest.z - b.pos.z) > 0.05) {
+        b.pos = ctx.groundPos(dest.x, dest.z);
+        b.prevPos = { ...b.pos };
+        ctx.rebucket(b);
+      }
+    }
+
+    // Sequence: step the runes south-to-north; a wrong (skipped-ahead) step resets.
+    if (floor.puzzle.kind === 'sequence' && !inst.puzzleSolved) {
+      for (let i = 0; i < inst.seqRuneIds.length; i++) {
+        const rune = ctx.entities.get(inst.seqRuneIds[i]);
+        if (!rune || dist2d(p.pos, rune.pos) >= SEQ_TRIGGER_RADIUS) continue;
+        if (i === inst.seqStep) {
+          rune.templateId = 'rift_seq_rune_lit';
+          inst.seqStep++;
+          if (inst.seqStep >= inst.seqRuneIds.length) inst.puzzleSolved = true;
+          for (const pid of instancePlayerIds(ctx, inst)) {
+            ctx.emit({
+              type: 'log',
+              text: `The runes answer in turn (${inst.seqStep}/${inst.seqRuneIds.length}).`,
+              color: '#adf',
+              pid,
+            });
+          }
+        } else if (i > inst.seqStep) {
+          inst.seqStep = 0;
+          for (const rid of inst.seqRuneIds) {
+            const rr = ctx.entities.get(rid);
+            if (rr) rr.templateId = 'rift_seq_rune';
+          }
+          for (const pid of instancePlayerIds(ctx, inst)) {
+            ctx.emit({ type: 'log', text: 'The runes go dark. Begin again.', color: '#a9c', pid });
+          }
+        }
+        break;
+      }
+    }
+
     // Walk-on rune pylons.
     for (const id of inst.pylonIds) {
       if (inst.litPylons.has(id)) continue;
@@ -452,6 +629,10 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   exit.templateId = 'rift_exit';
   exit.objectItemId = null;
   exit.lootable = true;
+  // The way home renders as the ranked-portal gate; carry the run's tier so its
+  // colour matches the rift you cleared (dev-portal runs are tier-null, and the
+  // gate builder defaults those to A-rank).
+  exit.riftTier = inst.tier ?? undefined;
   ctx.addEntity(exit);
   inst.exitId = exit.id;
   for (const pid of instancePlayerIds(ctx, inst)) {
@@ -514,6 +695,107 @@ function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
   return out;
 }
 
+// Unblockable environmental damage to players standing in a hazard zone (lava),
+// skipped while airborne so a running jump clears the band. Modelled on the delve
+// blackwater tick; scales with max HP so it bites at any level. 1 Hz.
+function tickRiftHazards(
+  ctx: SimContext,
+  inst: RiftInstance,
+  origin: { x: number; z: number },
+  hazards: import('../types').DelveHazardZone[],
+): void {
+  for (const pid of instancePlayerIds(ctx, inst)) {
+    const p = ctx.entities.get(pid);
+    if (!p || p.dead || p.jumping) continue;
+    const lx = p.pos.x - origin.x;
+    const lz = p.pos.z - origin.z;
+    let tier: 'shallow' | 'deep' | null = null;
+    for (const h of hazards) {
+      const rx = h.rx ?? h.r;
+      const rz = h.rz ?? h.r;
+      const nx = (lx - h.x) / rx;
+      const nz = (lz - h.z) / rz;
+      if (nx * nx + nz * nz <= 1) {
+        if (h.tier === 'deep') {
+          tier = 'deep';
+          break;
+        }
+        tier = tier ?? 'shallow';
+      }
+    }
+    if (!tier) continue;
+    const dmg = Math.max(1, Math.round(p.maxHp * 0.06 * (tier === 'deep' ? 2 : 1)));
+    ctx.dealDamage(null, p, dmg, false, 'fire', 'Molten Rift', 'hit', true);
+  }
+}
+
+// Roll one lane's boulder forward a tick and bowl over anyone it overtakes.
+function tickRiftRollers(
+  ctx: SimContext,
+  inst: RiftInstance,
+  origin: { x: number; z: number },
+  rollers: RiftRoller[],
+): void {
+  for (let i = 0; i < inst.rollerIds.length && i < rollers.length; i++) {
+    const e = ctx.entities.get(inst.rollerIds[i]);
+    if (!e) continue;
+    const lane = rollers[i];
+    // Constant-speed roll down the lane; wrap back to the start (carry overshoot).
+    let lz = e.pos.z - origin.z + lane.speed * DT;
+    if (lz > lane.z1) lz = lane.z0 + (lz - lane.z1);
+    e.prevPos = { ...e.pos };
+    e.pos = ctx.groundPos(origin.x + lane.x, origin.z + lz);
+    e.facing = 0;
+    ctx.rebucket(e);
+    // Anyone (not airborne) it overtakes is shoved aisle-ward + a nudge forward
+    // and chipped; the cooldown makes one pass cost one hit, not one per tick.
+    for (const pid of instancePlayerIds(ctx, inst)) {
+      const p = ctx.entities.get(pid);
+      if (!p || p.dead || p.jumping) continue;
+      if (dist2d(p.pos, e.pos) >= lane.r + PLAYER_BODY_R) continue;
+      if (ctx.time < (p.riftRollerUntil ?? 0)) continue;
+      p.riftRollerUntil = ctx.time + ROLLER_HIT_COOLDOWN;
+      const side = p.pos.x - e.pos.x >= 0 ? 1 : -1;
+      const dest = resolveMovement(
+        ctx.cfg.seed,
+        p.pos.x,
+        p.pos.z,
+        p.pos.x + side * ROLLER_KB_SIDE,
+        p.pos.z + ROLLER_KB_FWD,
+        PLAYER_BODY_R,
+        false,
+        undefined,
+        ctx.riftCollisionToken,
+      );
+      p.pos = ctx.groundPos(dest.x, dest.z);
+      p.prevPos = { ...p.pos };
+      ctx.rebucket(p);
+      ctx.dealDamage(
+        null,
+        p,
+        Math.max(1, Math.round(p.maxHp * 0.07)),
+        false,
+        'physical',
+        'Rolling Boulder',
+        'hit',
+        true,
+      );
+    }
+  }
+}
+
+/** Advance every active rift's rolling boulders each tick (20 Hz, unlike the 1 Hz
+ * updateRiftInstances so the motion is smooth). Regenerating the floor is memoised,
+ * so this stays cheap even with many live rifts. */
+export function advanceRiftRollers(ctx: SimContext): void {
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null || inst.rollerIds.length === 0) continue;
+    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    if (floor.rollers.length === 0) continue;
+    tickRiftRollers(ctx, inst, riftInstanceOrigin(inst.slot, inst.floorIndex), floor.rollers);
+  }
+}
+
 export function updateRiftInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
@@ -522,6 +804,38 @@ export function updateRiftInstances(ctx: SimContext): void {
 
     // Gate progression.
     const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+
+    // Environmental hazards (lava/blackwater): unblockable damage to any player
+    // standing in a zone, skipped while airborne (jump across). 1 Hz, like delves.
+    if (floor.hazards.length) tickRiftHazards(ctx, inst, origin, floor.hazards);
+
+    // Strength boulders: a boulder counts once it rests on a socket pad; the floor
+    // solves when every boulder is placed.
+    if (floor.puzzle.kind === 'boulder_push' && !inst.puzzleSolved && inst.boulderPads.length) {
+      let allOn = true;
+      for (const id of inst.boulderIds) {
+        const b = ctx.entities.get(id);
+        const onPad =
+          !!b &&
+          inst.boulderPads.some(
+            (pad) => dist2d(b.pos, ctx.groundPos(origin.x + pad.x, origin.z + pad.z)) < PAD_RADIUS,
+          );
+        if (b) b.templateId = onPad ? 'rift_boulder_placed' : 'rift_boulder';
+        if (!onPad) allOn = false;
+      }
+      if (allOn) {
+        inst.puzzleSolved = true;
+        for (const pid of instancePlayerIds(ctx, inst)) {
+          ctx.emit({
+            type: 'log',
+            text: 'The sockets grind shut. The way stirs.',
+            color: '#adf',
+            pid,
+          });
+        }
+      }
+    }
+
     if (floor.isBoss) {
       const boss = inst.bossId !== null ? ctx.entities.get(inst.bossId) : null;
       if ((boss === null || boss === undefined || boss.dead) && inst.exitId === null) {
@@ -529,8 +843,11 @@ export function updateRiftInstances(ctx: SimContext): void {
         rewardRiftClear(ctx, inst, boss ?? null);
       }
     } else if (!inst.descentOpen) {
-      const pylonsDone = inst.litPylons.size >= inst.pylonTotal;
-      if (trashCleared(ctx, inst) && pylonsDone) openDescent(ctx, inst);
+      const puzzleDone =
+        floor.puzzle.kind === 'rune_pylons'
+          ? inst.litPylons.size >= inst.pylonTotal
+          : inst.puzzleSolved;
+      if (trashCleared(ctx, inst) && puzzleDone) openDescent(ctx, inst);
     }
 
     // Empty-slot cleanup.

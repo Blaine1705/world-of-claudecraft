@@ -20,7 +20,14 @@ import {
 } from '../dungeon_layout';
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
-import type { RiftFloorPlan, RiftObjectPlan, RiftPlan, RiftPuzzle, RiftSpawn } from './types';
+import type {
+  RiftFloorPlan,
+  RiftObjectPlan,
+  RiftPlan,
+  RiftPuzzle,
+  RiftRoller,
+  RiftSpawn,
+} from './types';
 
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
@@ -160,6 +167,7 @@ const ROOM_ARCHETYPES = [
   'hourglass',
   'chambers',
   'cavern',
+  'corridor', // thin winding passage (see makeProfile + baffle walls)
 ] as const;
 // Boss floors only use shapes that are WIDE at the back (where the boss + dais
 // sit), so the giant boss always has an open arena.
@@ -199,6 +207,8 @@ function makeProfile(rng: Rng, archetype: string, wMin: number, wMax: number): P
         return wMin + span * Math.max(0, Math.min(1, w));
       };
     }
+    case 'corridor': // a thin passage the whole way (baffle walls add the weave)
+      return () => wMin + Math.min(span, 3);
     default: // 'hall'
       return () => wMax;
   }
@@ -294,6 +304,26 @@ function buildLayout(rng: Rng, _floorIndex: number, isBoss: boolean): GeneratedG
     }
   }
 
+  // Baffle walls: alternating one-sided wall fins that reach in from the (possibly
+  // curved) wall to just past the spine, so the room reads as a winding corridor /
+  // maze you weave through, WITHOUT ever blocking the central walkable path (the
+  // inner edge stays at |x| = AISLE_HALF + margin, so x=0 is always clear and every
+  // floor stays completable + the playability test's spine check holds). Always on
+  // for the thin `corridor` archetype; an occasional garnish elsewhere.
+  if (!isBoss && (archetype === 'corridor' || rng.chance(0.35))) {
+    const gap = AISLE_HALF + 1.5;
+    const bafGap = rng.pick([12, 14, 16]);
+    let side = rng.chance(0.5) ? -1 : 1;
+    for (let z = zMin + rng.int(24, 32); z <= dais.z - 18; z += bafGap) {
+      const w = halfWidthAt(z);
+      const hw = (w - gap) / 2;
+      if (hw > 1) {
+        stubs.push({ x: side * ((w + gap) / 2), z, hw, hd: rng.pick([2, 3]) });
+      }
+      side = -side;
+    }
+  }
+
   // Floor clutter, scattered off-centre, inside the local width.
   const clutter: GridPoint[] = [];
   const clutterCount = rng.int(4, 10);
@@ -384,18 +414,39 @@ function planSpawns(
   return out;
 }
 
+// Every non-boss floor rolls a gate mechanic, layered on top of clearing the room.
+// Only kinds fully wired end-to-end (generator + runs.ts + render) are rolled.
+// `pylonCount` doubles as the node count for rune_pylons and sequence.
 function planPuzzle(rng: Rng, isBoss: boolean): RiftPuzzle {
-  if (isBoss) return { kind: 'none', pylonCount: 0 };
-  if (rng.chance(0.4)) return { kind: 'rune_pylons', pylonCount: rng.int(2, 3) };
-  return { kind: 'none', pylonCount: 0 };
+  const none: RiftPuzzle = { kind: 'none', pylonCount: 0 };
+  if (isBoss) return none;
+  const roll = rng.next();
+  if (roll < 0.18) return { kind: 'rune_pylons', pylonCount: rng.int(3, 4) };
+  if (roll < 0.36) return { kind: 'ice_slide', pylonCount: 0 };
+  if (roll < 0.54) return { kind: 'boulder_push', pylonCount: 0 };
+  if (roll < 0.72) return { kind: 'sequence', pylonCount: rng.int(3, 5) };
+  return none;
+}
+
+/** The frictionless ice sheet for an ice_slide floor: a wide box in the middle of
+ * the nave. The goal tile sits at the far (north) end on the centre spine, so a
+ * straight northward slide always solves it (harder attempts stop against pillars). */
+function iceZoneFor(geo: GeneratedGeometry): { x: number; z: number; hw: number; hd: number } {
+  const { layout } = geo;
+  const zC = (layout.zMin + layout.dais.z) / 2;
+  const hd = Math.max(10, (layout.dais.z - 20 - (layout.zMin + 16)) / 2);
+  const hw = Math.max(6, Math.min(layout.wallX ?? 20, geo.halfWidthAt(zC)) - 2);
+  return { x: 0, z: zC, hw, hd };
 }
 
 function planObjects(
+  rng: Rng,
   geo: GeneratedGeometry,
   isBoss: boolean,
   puzzle: RiftPuzzle,
+  iceZone: { x: number; z: number; hw: number; hd: number } | null,
 ): RiftObjectPlan[] {
-  const { layout, colliders } = geo;
+  const { layout, colliders, halfWidthAt } = geo;
   const out: RiftObjectPlan[] = [];
   if (isBoss) {
     // The reward chest sits on the dais; the exit portal is spawned by runs.ts
@@ -406,24 +457,119 @@ function planObjects(
       z: layout.dais.z + Math.round(layout.dais.r * 0.6),
       name: 'Rift Cache',
     });
-  } else {
-    // Descent portal centred just past the dais, always on the clear spine.
-    out.push({
-      kind: 'descent',
-      x: 0,
-      z: layout.dais.z + Math.round(layout.dais.r + 2),
-      name: 'Rift Descent',
-    });
-    if (puzzle.kind === 'rune_pylons') {
-      const zBase = layout.zMin + 40;
-      for (let i = 0; i < puzzle.pylonCount; i++) {
-        const side = i % 2 === 0 ? -1 : 1;
-        const z = zBase + i * 22;
-        const x = side * Math.max(AISLE_HALF + 2, geo.halfWidthAt(z) - 5);
-        const p = toClear(colliders, x, z);
-        out.push({ kind: 'rune_pylon', x: p.x, z: p.z, name: 'Rune Pylon' });
-      }
+    return out;
+  }
+
+  // Descent portal centred just past the dais, always on the clear spine.
+  out.push({
+    kind: 'descent',
+    x: 0,
+    z: layout.dais.z + Math.round(layout.dais.r + 2),
+    name: 'Rift Descent',
+  });
+
+  if (puzzle.kind === 'rune_pylons') {
+    // Fit the pylons BETWEEN the entry and the dais so none lands in the back wall.
+    const n = puzzle.pylonCount;
+    const z0 = layout.zMin + 40;
+    const z1 = Math.max(z0, layout.dais.z - 14);
+    for (let i = 0; i < n; i++) {
+      const side = i % 2 === 0 ? -1 : 1;
+      const z = n > 1 ? z0 + ((z1 - z0) * i) / (n - 1) : (z0 + z1) / 2;
+      const x = side * Math.max(AISLE_HALF + 2, halfWidthAt(z) - 5);
+      const p = toClear(colliders, x, z);
+      out.push({ kind: 'rune_pylon', x: p.x, z: p.z, name: 'Rune Pylon' });
     }
+  } else if (puzzle.kind === 'ice_slide' && iceZone) {
+    // Goal on the spine at the north edge of the sheet: a straight slide reaches it.
+    out.push({
+      kind: 'ice_goal',
+      x: 0,
+      z: Math.round(iceZone.z + iceZone.hd - 1.5),
+      name: 'Frost Sigil',
+    });
+  } else if (puzzle.kind === 'boulder_push') {
+    // Colinear boulder+pad pairs just off dead-centre (inside the always-clear
+    // spine, so always placeable + solvable): shove the boulder straight north
+    // onto its socket. x = +-3.5 leaves an x=0 gap so the descent path stays open.
+    const count = rng.int(1, 2);
+    for (let i = 0; i < count; i++) {
+      const bx = (i % 2 === 0 ? -1 : 1) * 3.5;
+      const bz = layout.zMin + 34 + i * 16;
+      const padZ = Math.min(bz + 10, layout.dais.z - 6);
+      if (padZ <= bz + 3) continue;
+      out.push({ kind: 'boulder_pad', x: bx, z: padZ, name: 'Socket' });
+      out.push({ kind: 'boulder', x: bx, z: bz, name: 'Heavy Boulder' });
+    }
+  } else if (puzzle.kind === 'sequence') {
+    // N runes spread across the nave; step them in south-to-north order (runs.ts
+    // sorts by z and enforces it; a wrong step resets). `slot` is the placement id.
+    const n = puzzle.pylonCount;
+    const zBase = layout.zMin + 34;
+    for (let i = 0; i < n; i++) {
+      const side = i % 2 === 0 ? -1 : 1;
+      const z = zBase + Math.floor(i / 2) * 16 + (i % 2) * 8;
+      const x = side * Math.max(AISLE_HALF + 2, halfWidthAt(z) - 6);
+      const p = toClear(colliders, x, z);
+      out.push({ kind: 'seq_rune', x: p.x, z: p.z, name: 'Sequence Rune', slot: i });
+    }
+  }
+  return out;
+}
+
+/** Lava/blackwater bands for a subset of floors, themed by kit tint. Never blocks
+ * completion (a hazard is not a collider: you can jump across, skirt the edge, or
+ * tank the damage). Placed as a band across the nave, off the entry/dais. */
+function planHazards(
+  rng: Rng,
+  geo: GeneratedGeometry,
+  isBoss: boolean,
+  hasIce: boolean,
+): import('../types').DelveHazardZone[] {
+  if (isBoss || hasIce) return []; // don't drown the boss arena or freeze+burn one floor
+  if (!rng.chance(0.34)) return [];
+  const { layout, halfWidthAt } = geo;
+  const out: import('../types').DelveHazardZone[] = [];
+  const bands = rng.int(1, 2);
+  for (let i = 0; i < bands; i++) {
+    const z = layout.zMin + 42 + i * rng.int(20, 30);
+    if (z > layout.dais.z - 16) break;
+    const hw = Math.max(5, halfWidthAt(z) - 1);
+    // A shallow band ~4yd deep along z: reachable by a running jump (apex clears it).
+    out.push({
+      x: 0,
+      z,
+      r: hw,
+      rx: hw,
+      rz: rng.range(3.5, 5),
+      tier: rng.chance(0.4) ? 'deep' : 'shallow',
+    });
+  }
+  return out;
+}
+
+/** Rolling-boulder lanes for a subset of non-boss floors that carry no lava/ice
+ * (one headline traversal hazard per floor, so a floor never reads as chaos). A
+ * boulder rolls down the always-clear central spine from near the entry to just
+ * shy of the dais, then wraps; the player dodges into the flanking aisle or jumps
+ * it. It is a moving ENTITY, never a collider, so it never blocks pathing. */
+function planRollers(
+  rng: Rng,
+  geo: GeneratedGeometry,
+  isBoss: boolean,
+  hasIce: boolean,
+  hasHazards: boolean,
+): RiftRoller[] {
+  if (isBoss || hasIce || hasHazards) return [];
+  if (!rng.chance(0.3)) return [];
+  const { layout } = geo;
+  const z0 = layout.zMin + 16;
+  const z1 = layout.dais.z - 4;
+  if (z1 - z0 < 24) return []; // too short a run to be fair or fun
+  const count = rng.int(1, 2);
+  const out: RiftRoller[] = [];
+  for (let i = 0; i < count; i++) {
+    out.push({ x: 0, z0, z1, r: 1.4, speed: rng.range(7, 10), phase: count > 1 ? i / count : 0 });
   }
   return out;
 }
@@ -474,8 +620,11 @@ export function generateRiftFloor(
   const style = buildStyle(rng, theme);
   const floorLevel = floorLevelFor(baseLevel, clampedIndex);
   const puzzle = planPuzzle(rng, isBoss);
+  const iceZone = puzzle.kind === 'ice_slide' ? iceZoneFor(geo) : null;
   const spawns = planSpawns(rng, theme, geo, floorLevel, isBoss);
-  const objects = planObjects(geo, isBoss, puzzle);
+  const objects = planObjects(rng, geo, isBoss, puzzle, iceZone);
+  const hazards = planHazards(rng, geo, isBoss, iceZone !== null);
+  const rollers = planRollers(rng, geo, isBoss, iceZone !== null, hazards.length > 0);
 
   const plan: RiftFloorPlan = {
     seed: seed >>> 0,
@@ -491,6 +640,9 @@ export function generateRiftFloor(
     spawns,
     objects,
     puzzle,
+    hazards,
+    iceZone,
+    rollers,
   };
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();

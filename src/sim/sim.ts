@@ -300,9 +300,10 @@ import {
   onInventoryChangedForQuests,
   onMobKilledForQuests,
 } from './quests/quest_credit';
-import { generateRiftFloor } from './rift/rift_gen';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
+import { generateRiftFloor } from './rift/rift_gen';
 import {
+  advanceRiftRollers as advanceRiftRollersImpl,
   enterRift as enterRiftImpl,
   leaveRift as leaveRiftImpl,
   riftInstanceAtPos,
@@ -1444,6 +1445,13 @@ export class Sim {
         pylonIds: [],
         litPylons: new Set(),
         pylonTotal: 0,
+        puzzleSolved: false,
+        boulderIds: [],
+        boulderPads: [],
+        seqRuneIds: [],
+        seqStep: 0,
+        beaconId: null,
+        rollerIds: [],
         returnPos: { x: 0, z: 0 },
         emptyFor: 0,
         tier: null,
@@ -3198,6 +3206,7 @@ export class Sim {
     lap?.('lootRolls');
     this.updateInstances();
     this.updateRiftInstances();
+    advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();

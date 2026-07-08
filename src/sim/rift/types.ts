@@ -8,7 +8,7 @@
 // Sim layer: no DOM/Three imports. This file is types only.
 
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
-import type { RiftTier } from '../types';
+import type { DelveHazardZone, RiftTier } from '../types';
 
 /** The whole wire/persistence footprint of a rift instance. Both hosts turn this
  * into identical content via rift_gen. `origin` is the instance-space anchor the
@@ -33,27 +33,57 @@ export interface RiftSpawn {
   scale?: number;
 }
 
-export type RiftObjectKind = 'descent' | 'exit' | 'rune_pylon' | 'chest';
+export type RiftObjectKind =
+  | 'descent'
+  | 'exit'
+  | 'rune_pylon'
+  | 'chest'
+  // Puzzle nodes:
+  | 'ice_goal' // ice-slide destination the party must slide onto
+  | 'boulder' // a pushable strength boulder
+  | 'boulder_pad' // the socket a boulder must be pushed onto
+  | 'seq_rune'; // a numbered rune in a Simon-style step-in-order sequence
 
 /** A placed interactable, instance-local. `descent` sinks the party to the next
- * floor; `exit` returns them to the overworld; `rune_pylon` is a puzzle node;
- * `chest` is the floor reward. */
+ * floor; `exit` returns them to the overworld; `chest` is the floor reward; the
+ * rest are puzzle nodes (see RiftPuzzleKind). `slot` orders sequence runes. */
 export interface RiftObjectPlan {
   kind: RiftObjectKind;
   x: number;
   z: number;
   name: string;
+  /** Ordering index for `seq_rune` (its position in the required sequence). */
+  slot?: number;
 }
 
-/** The floor's gate mechanic. `none` = clear-to-open (the descent unlocks once
- * every hostile on the floor is dead). `rune_pylons` = a light puzzle: every
- * pylon must be lit (walk-on) before the descent opens, on top of the clear. */
-export type RiftPuzzleKind = 'none' | 'rune_pylons';
+/** The floor's gate mechanic, layered ON TOP of the clear-the-room requirement.
+ * - `none`: clear-to-open.
+ * - `rune_pylons`: light every pylon (walk-on).
+ * - `ice_slide`: slide across the ice sheet and stop on the goal tile (FFX/Pokemon).
+ * - `boulder_push`: shove every strength boulder onto its socket pad (Pokemon Strength).
+ * - `sequence`: step the runes in the shown order (Simon / pattern memory). */
+export type RiftPuzzleKind = 'none' | 'rune_pylons' | 'ice_slide' | 'boulder_push' | 'sequence';
 
 export interface RiftPuzzle {
   kind: RiftPuzzleKind;
-  /** Pylon interactable count for `rune_pylons`; 0 otherwise. */
+  /** Pylon interactable count for `rune_pylons` (and the sequence-rune count for
+   * `sequence`); 0 otherwise. The `sequence` step order is not stored here: it is
+   * derived at spawn by z-sorting the placed runes south-to-north (see runs.ts). */
   pylonCount: number;
+}
+
+/** A rolling-boulder hazard lane (Indiana-Jones style): a boulder rolls down a
+ * fixed x lane from z0 to z1, wraps back to z0, and knocks back + damages anyone
+ * it overtakes (jumping clears it). Instance-local; purely a traversal hazard,
+ * it never blocks pathing (it is a moving entity, not a collider). `phase` staggers
+ * multiple rollers along the lane; `speed` is in world units per second. */
+export interface RiftRoller {
+  x: number;
+  z0: number;
+  z1: number;
+  r: number;
+  speed: number;
+  phase: number;
 }
 
 /** A fully-resolved floor: geometry + visual style + spawn plan + gate. */
@@ -74,6 +104,14 @@ export interface RiftFloorPlan {
   spawns: RiftSpawn[];
   objects: RiftObjectPlan[];
   puzzle: RiftPuzzle;
+  /** Environmental damage zones (lava/blackwater), instance-local. Standing in one
+   * ticks unblockable damage; jumping over it is safe. Same shape as delve hazards. */
+  hazards: DelveHazardZone[];
+  /** For an `ice_slide` floor: the frictionless sheet region (instance-local, an
+   * axis box) the player slides across until a wall stops them. */
+  iceZone: { x: number; z: number; hw: number; hd: number } | null;
+  /** Rolling-boulder hazard lanes (instance-local); empty on boss floors. */
+  rollers: RiftRoller[];
 }
 
 /** Live per-instance state for an active rift (a Sim field, one per slot in the
@@ -97,6 +135,22 @@ export interface RiftInstance {
   pylonIds: number[];
   litPylons: Set<number>;
   pylonTotal: number;
+  /** Extra-puzzle progress (ice/boulder/sequence). `puzzleSolved` gates the descent
+   * alongside the room clear, exactly like a full set of lit pylons. */
+  puzzleSolved: boolean;
+  /** Live pushable boulder entity ids + their target pad positions (instance-local)
+   * for `boulder_push`. A boulder counts when it sits within PAD_RADIUS of any pad. */
+  boulderIds: number[];
+  boulderPads: Array<{ x: number; z: number }>;
+  /** `sequence` progress: the ordered rune entity ids and how many are lit so far
+   * (a wrong step resets to 0). */
+  seqRuneIds: number[];
+  seqStep: number;
+  /** The always-available "way out" beacon entity id (spawned at the floor entry). */
+  beaconId: number | null;
+  /** Live rolling-boulder entity ids (one per lane in `floor.rollers`). Each rolls
+   * down its lane every tick; overlap knocks the player back and chips their HP. */
+  rollerIds: number[];
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
   emptyFor: number;

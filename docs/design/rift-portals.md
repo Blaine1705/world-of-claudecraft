@@ -23,8 +23,10 @@ tests that pin them.
 - `rift/rift_gen.ts` is a PURE generator. A floor is `generateRiftFloor(seed,
   baseLevel, floorIndex)`: room geometry (`shellPolygon` star-shaped rooms with a
   plain-hall fallback), an `InteriorStyle` colour/fog grade over one of the KayKit
-  kits, a spawn plan, a gate (clear-to-open or rune-pylons), and the boss on the
-  last floor. `generateRiftPlan(seed, baseLevel)` names the rift and gives its
+  kits, a spawn plan, a gate (clear-to-open, rune-pylons, ice-slide, boulder-push,
+  or a step-in-order sequence), optional lava / rolling-boulder hazards, an
+  always-available way-out beacon, and the boss on the last floor. See "Floor
+  variety" below. `generateRiftPlan(seed, baseLevel)` names the rift and gives its
   floor count.
 - **Determinism invariant.** The generator uses its OWN `Rng` seeded from the
   descriptor, NEVER the live sim rng, so generating a rift never perturbs the
@@ -49,9 +51,10 @@ command + interaction click paths.
   `RIFT_MIN_LEVEL` (20) with a localized denial line, in EVERY zone (the Eastbrook
   portal exists for low levels to see, but turns them away). The gate is applied on
   the portal path only; a direct programmatic `enterRift` (tests) is not gated.
-- **Descend:** clear the floor (kill trash and light any rune pylons) to open the
-  descent; walk onto it to regenerate the next floor in place and teleport the
-  whole party there.
+- **Descend:** clear the floor (kill the trash AND solve its puzzle: light the
+  pylons, slide onto the frost sigil, socket the boulders, or step the sequence) to
+  open the descent; walk onto it to regenerate the next floor in place and teleport
+  the whole party there. Stuck or overwhelmed? The entry beacon takes you home.
 - **Boss + exit:** the final floor's exit opens only when the boss dies.
 - **Leave / death:** walking into the exit returns you to the overworld return
   position; dying sends your spirit to the overworld cemetery nearest where you
@@ -62,6 +65,43 @@ command + interaction click paths.
   a per-`Sim` region registry in `colliders.ts` keyed by a per-instance
   `riftCollisionToken` (NOT the world seed, so two same-seed `Sim`s in one process
   stay isolated).
+
+## Floor variety: puzzles, hazards, and the way out (v3)
+
+Every non-boss floor layers ONE headline mechanic on top of the clear-the-room
+requirement, so an endless run never reads as the same corridor twice. All of it is
+generated from the floor descriptor (pure, deterministic) and placed on or around
+the always-clear central spine (`|x| <= AISLE_HALF`), so the entry-to-dais path is
+always walkable and every puzzle is solvable by construction.
+
+- **Layouts.** A `corridor` room archetype (thin winding passage) joins the shape
+  set, and other floors may grow one-sided baffle walls: alternating stubs that
+  force a serpentine path without ever crossing the spine.
+- **Puzzles** (`RiftPuzzleKind`, `planPuzzle`), each gating the descent exactly like
+  a full set of lit pylons (`puzzleSolved`):
+  - `rune_pylons`: walk onto every pylon to light it (pre-v3).
+  - `ice_slide` (FFX / Pokemon): the floor carries a frictionless `iceZone`; moving
+    onto it flings you along your heading until a wall stops you (reuses the swept
+    `resolveMovement` resolver). Stop on the Frost Sigil to solve it.
+  - `boulder_push` (Pokemon Strength): shove each heavy boulder one heading-step at a
+    time onto its socket pad; every socket filled solves it.
+  - `sequence` (Simon / pattern memory): step the runes south-to-north; a skipped
+    step goes dark and resets to the start.
+- **Hazards.** `planHazards` lays molten lava bands (the delve blackwater damage
+  model, `tickRiftHazards`, 1 Hz, jump to clear); `planRollers` sends a rolling
+  boulder down the spine (`advanceRiftRollers`, 20 Hz motion; overlap bowls you
+  aisle-ward and chips HP on a short cooldown; jump to clear). A floor carries at
+  most one of lava / roller / ice, never a pile-up.
+- **The way out.** A `rift_beacon` at the floor entry returns you to the overworld
+  any time (walk-on or click), so a run is never a dead end (too hard, stuck, lost).
+- **Victory gate.** The post-boss exit renders as the same "dimensional gate" GLB as
+  the overworld portal, tinted by the run's rank (`exit.riftTier`), so beating the
+  giga-boss tears the way home open rather than dropping a plain stone arch.
+- **Render.** Puzzle props (pylons, frost sigil, boulders + sockets, sequence runes,
+  the beacon, the roller) are procedural bodies in `buildRiftPuzzleProp`
+  (`src/render/door_portal.ts`); lit/placed states swap by `templateId` (the view
+  rebuilds on change), glowing nodes spin, and the roller rolls with its motion. The
+  lava/ice floor overlays are drawn by `buildInterior` (`src/render/dungeon.ts`).
 
 ## Ranks (C / B / A / S) and world portals (`src/sim/rift/portals.ts`)
 
@@ -125,6 +165,10 @@ LETTER is a game glyph (like item-quality colour), not translated.
 
 - `tests/rift_gen.test.ts`: generator determinism / variety / playability /
   balance, shape variety, boss-arena fit.
+- `tests/rift_mechanics.test.ts`: the v3 variety (generator surfaces every puzzle +
+  hazard kind, boss floors stay clean, ice-goal solve, boulder socketing, sequence
+  step + reset, the way-out beacon, lava damage, and the rolling boulder's motion +
+  knockback).
 - `tests/rift_sim.test.ts`: full enter/descend/boss/exit lifecycle, rotated-OBB
   clearance matching runtime `pushOut`, two-`Sim` collision isolation, the
   entry-zone graveyard on death, the client-sync `riftState` event, and the
@@ -147,3 +191,16 @@ LETTER is a game glyph (like item-quality colour), not translated.
   deferred: the design intent is to build a whole new zone around that mechanic
   (NPCs aware of the breaks, defend-the-town). The open/sealed/collapsed portal
   lifecycle here leaves the seam for it.
+- **Lockpicking** in rifts is deferred: the lockpick engine (`src/sim/lockpick.ts`)
+  is reusable, but its controller (`src/sim/delves/lockpick_controller.ts`) is bound
+  to the delve-run seam (`ctx.delveRunForPlayer`, the `locked_chest` interactable
+  state, the session stored on a `DelveRun`) plus its own wire + HUD sync. Reusing
+  it in rifts means generalizing that host, which is its own focused change.
+- **True multi-level verticality** (stacked floors with real stair collision) is
+  deferred: collision here is a single-valued height field sampled by
+  `groundHeight(x,z,seed)`, which cannot derive a rift's per-floor height field from
+  position alone (rifts sit at runtime-mapped dynamic origins, unlike the
+  fixed-location Vale Cup stand-lift). Changing that core seam touches all three
+  hosts and risks the determinism / parity invariant, so it warrants its own PR.
+  The v3 layouts get their "verticality" feel from mazes, baffles, and the raised
+  boss dais instead.

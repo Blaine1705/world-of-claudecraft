@@ -467,6 +467,10 @@ export const en = {
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
       levelGate: 'Only adventurers of level {level} or higher may enter this rift.',
+      iceGoalLit: 'The frost sigil blazes. The way stirs.',
+      socketsShut: 'The sockets grind shut. The way stirs.',
+      seqProgress: 'The runes answer in turn ({step}/{total}).',
+      seqReset: 'The runes go dark. Begin again.',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',

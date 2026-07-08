@@ -3259,7 +3259,11 @@ export const zh_CN: EnTranslations = {
       "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
       "portalSealed": "{zone}的{tier}级裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
-      "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。"
+      "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。",
+      "iceGoalLit": "霜之印记熊熊燃起。去路随之震动。",
+      "socketsShut": "凹槽隆隆合拢。去路随之震动。",
+      "seqProgress": "符文依次回应（{step}/{total}）。",
+      "seqReset": "符文尽数熄灭。从头再来。"
     },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",

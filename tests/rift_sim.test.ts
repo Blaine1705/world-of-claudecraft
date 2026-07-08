@@ -128,6 +128,7 @@ describe('rift sim: floor progression', () => {
     // Clear trash (and light any pylons) then tick: the descent opens.
     killTrash(sim);
     inst.litPylons = new Set(inst.pylonIds);
+    inst.puzzleSolved = true; // dedicated puzzle tests cover solving; force the gate here
     tickAlive(sim, 21);
     expect(inst.descentOpen).toBe(true);
     expect(inst.descentId).not.toBeNull();
@@ -149,6 +150,7 @@ describe('rift sim: floor progression', () => {
     for (let guard = 0; guard < 10 && inst.floorIndex < inst.floorCount - 1; guard++) {
       killTrash(sim);
       inst.litPylons = new Set(inst.pylonIds);
+      inst.puzzleSolved = true; // dedicated puzzle tests cover solving; force the gate here
       tickAlive(sim, 21);
       if (inst.descentId === null) break;
       const desc = sim.entities.get(inst.descentId)!;
@@ -192,6 +194,7 @@ describe('rift sim: leaving never bounces the player back in (regression)', () =
     for (let guard = 0; guard < 10 && inst.floorIndex < inst.floorCount - 1; guard++) {
       killTrash(sim);
       inst.litPylons = new Set(inst.pylonIds);
+      inst.puzzleSolved = true; // dedicated puzzle tests cover solving; force the gate here
       tickAlive(sim, 21);
       if (inst.descentId === null) break;
       const desc = sim.entities.get(inst.descentId)!;
@@ -300,6 +303,7 @@ describe('rift sim: giga bosses', () => {
         }
       }
       inst.litPylons = new Set(inst.pylonIds);
+      inst.puzzleSolved = true; // dedicated puzzle tests cover solving; force the gate here
       for (let i = 0; i < 21; i++) {
         sim.player.hp = sim.player.maxHp;
         sim.tick();

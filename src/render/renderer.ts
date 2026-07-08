@@ -52,7 +52,7 @@ import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
-import { buildDoorBody, buildRiftGateBody } from './door_portal';
+import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
@@ -3266,15 +3266,9 @@ export class Renderer {
     let portal: THREE.Mesh | undefined;
     // Rift portals reuse the dungeon-door arch+swirl body: the overworld entrance
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
-    // "leaving" portal; rune pylons render as small glowing portal pillars so the
-    // walk-on puzzle is visible.
-    const RIFT_PORTAL_IDS = new Set([
-      'rift_portal',
-      'rift_descent',
-      'rift_exit',
-      'rift_pylon',
-      'rift_pylon_lit',
-    ]);
+    // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
+    // bodies (handled in the next branch).
+    const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit']);
     if (
       e.kind === 'object' &&
       (e.templateId === 'dungeon_door' ||
@@ -3284,14 +3278,14 @@ export class Renderer {
       const entering =
         e.templateId === 'dungeon_door' ||
         e.templateId === 'rift_portal' ||
-        e.templateId === 'rift_descent' ||
-        e.templateId === 'rift_pylon' ||
-        e.templateId === 'rift_pylon_lit';
-      // Overworld ranked rift portals get the bespoke "gate" GLB; everything
-      // else (dungeon doors, in-rift descent/exit/pylons) keeps the procedural
-      // arch. The gate builder falls back to the arch if its asset is missing.
+        e.templateId === 'rift_descent';
+      // The overworld ranked portal AND the post-boss victory exit both get the
+      // bespoke "gate" GLB (the exit is literally the way home tearing open); the
+      // in-rift descent/pylons keep the procedural arch. Gate builder falls back to
+      // the arch if its asset is missing.
+      const asGate = e.templateId === 'rift_portal' || e.templateId === 'rift_exit';
       const built =
-        (e.templateId === 'rift_portal' ? buildRiftGateBody(this.lowGfx, e.riftTier) : null) ??
+        (asGate ? buildRiftGateBody(this.lowGfx, e.riftTier) : null) ??
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
@@ -3302,6 +3296,31 @@ export class Renderer {
       if (e.templateId === 'rift_portal' && e.riftTier) {
         body?.add(buildRiftRankBadge(e.riftTier));
       }
+    } else if (
+      e.kind === 'object' &&
+      (e.templateId === 'rift_beacon' ||
+        e.templateId === 'rift_ice_goal' ||
+        e.templateId === 'rift_boulder' ||
+        e.templateId === 'rift_boulder_placed' ||
+        e.templateId === 'rift_boulder_pad' ||
+        e.templateId === 'rift_seq_rune' ||
+        e.templateId === 'rift_seq_rune_lit' ||
+        e.templateId === 'rift_pylon' ||
+        e.templateId === 'rift_pylon_lit' ||
+        e.templateId === 'rift_roller')
+    ) {
+      // In-rift puzzle props (procedural; glowing ones spin via `portal`, the
+      // rolling boulder rolls via `userData.rollRock`).
+      const built = buildRiftPuzzleProp(e.templateId, this.lowGfx);
+      body = built.body;
+      portal = built.portal;
+      height =
+        e.templateId === 'rift_pylon' || e.templateId === 'rift_pylon_lit'
+          ? 4.0
+          : e.templateId === 'rift_roller'
+            ? 3.0
+            : 2.4;
+      objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
@@ -3875,6 +3894,9 @@ export class Renderer {
             void this.buildInterior(floor.style.kit, o.x, o.z, {
               layout: floor.layout,
               style: floor.style,
+              hazards: floor.hazards,
+              hazardStyle: 'lava',
+              iceZone: floor.iceZone,
             });
           }
         }
@@ -4390,6 +4412,12 @@ export class Renderer {
           v.portal.rotation.z = this.time * 1.4;
           (v.portal.material as THREE.MeshBasicMaterial).opacity =
             0.45 + Math.sin(this.time * 2.2 + e.id) * 0.15;
+        }
+        if (vis && e.templateId === 'rift_roller') {
+          // Roll the boulder about X in proportion to distance travelled (radius
+          // 1.4), so it appears to roll without slipping as its entity advances.
+          const rock = v.group.userData.rollRock as THREE.Object3D | undefined;
+          if (rock) rock.rotation.x = e.pos.z * 0.714;
         }
         if (vis && e.templateId === 'mailbox') {
           // The unread-mail votive: per-viewer beacon driven by the IWorld

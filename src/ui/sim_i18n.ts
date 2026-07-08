@@ -5393,6 +5393,13 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
   },
   { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  { re: /^The frost sigil blazes\. The way stirs\.$/, build: () => t('sim.rift.iceGoalLit') },
+  { re: /^The sockets grind shut\. The way stirs\.$/, build: () => t('sim.rift.socketsShut') },
+  {
+    re: /^The runes answer in turn \(([^/)]+)\/([^)]+)\)\.$/,
+    build: (m) => t('sim.rift.seqProgress', { step: m[1], total: m[2] }),
+  },
+  { re: /^The runes go dark\. Begin again\.$/, build: () => t('sim.rift.seqReset') },
   {
     re: /^A ([CBAS])-rank rift tears open in (.+)!$/,
     build: (m) => t('sim.rift.portalOpens', { tier: m[1], zone: locZone(m[2]) }),

@@ -656,6 +656,12 @@ export class DungeonInteriors {
         rz?: number;
         tier?: 'shallow' | 'deep';
       }>;
+      // Rift hazards render as molten lava instead of the delve's blackwater; the
+      // sim damage model is shared, only the palette differs.
+      hazardStyle?: 'blackwater' | 'lava';
+      // Rift ice-slide zone (frictionless slick you skate across to the goal
+      // sigil): a pale frost sheet over this rect, purely cosmetic.
+      iceZone?: { x: number; z: number; hw: number; hd: number } | null;
       moduleId?: DelveModuleId;
       // Procedural Rift re-grade: a generated palette layered over one of the four
       // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
@@ -704,9 +710,10 @@ export class DungeonInteriors {
           this.addTorchGlow(group, x, z, color, y, scale),
         );
       } else {
-        this.placeBlackwaterPools(group, opts.hazards);
+        this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'blackwater');
       }
     }
+    if (opts?.iceZone) this.placeIceSheet(group, opts.iceZone);
     if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
       if (opts?.moduleId && isLitanyModuleId(opts.moduleId)) {
         // Dry islands render ON TOP of the pool overlays so the sim's
@@ -783,25 +790,42 @@ export class DungeonInteriors {
   // rest of the interior.
   private placeBlackwaterPools(
     group: THREE.Group,
-    hazards: Array<{ x: number; z: number; r: number }>,
+    hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
+    style: 'blackwater' | 'lava' = 'blackwater',
   ): void {
+    // Rift lava reuses the delve blackwater overlay with a molten palette: the
+    // sim damage model (tickRiftHazards) mirrors tickDelveBlackwater, so the
+    // hazard reads identically, only the colour changes. Bands can be ellipses
+    // (rx/rz), so the disc is a unit circle scaled to match the sim footprint.
+    const pal =
+      style === 'lava'
+        ? { pool: 0xd83410, poolOpacity: 0.9, rim: 0xffca4a, glow: 0xff5a1e }
+        : { pool: 0x0a1a12, poolOpacity: 0.82, rim: 0x3fae5a, glow: 0x2f8f4f };
     for (const h of hazards) {
+      const rx = h.rx ?? h.r;
+      const rz = h.rz ?? h.r;
       const pool = new THREE.Mesh(
-        new THREE.CircleGeometry(h.r, 28).rotateX(-Math.PI / 2).translate(h.x, 0.12, h.z),
+        new THREE.CircleGeometry(1, 28)
+          .rotateX(-Math.PI / 2)
+          .scale(rx, 1, rz)
+          .translate(h.x, 0.12, h.z),
         new THREE.MeshBasicMaterial({
-          color: 0x0a1a12,
+          color: pal.pool,
           transparent: true,
-          opacity: 0.82,
+          opacity: pal.poolOpacity,
           depthWrite: false,
         }),
       );
       pool.renderOrder = 1; // floats over the floor tiles
       group.add(pool);
-      // Bog-green rim so the edge of the hazard is unmistakable.
+      // A hot/bog rim so the edge of the hazard is unmistakable.
       const rim = new THREE.Mesh(
-        new THREE.RingGeometry(h.r * 0.82, h.r, 32).rotateX(-Math.PI / 2).translate(h.x, 0.14, h.z),
+        new THREE.RingGeometry(0.82, 1, 32)
+          .rotateX(-Math.PI / 2)
+          .scale(rx, 1, rz)
+          .translate(h.x, 0.14, h.z),
         new THREE.MeshBasicMaterial({
-          color: 0x3fae5a,
+          color: pal.rim,
           transparent: true,
           opacity: 0.5,
           side: THREE.DoubleSide,
@@ -811,8 +835,53 @@ export class DungeonInteriors {
       );
       rim.renderOrder = 2;
       group.add(rim);
-      this.addTorchGlow(group, h.x, h.z, 0x2f8f4f, 0.3, h.r * 0.6);
+      this.addTorchGlow(
+        group,
+        h.x,
+        h.z,
+        pal.glow,
+        style === 'lava' ? 0.55 : 0.3,
+        Math.max(rx, rz) * 0.6,
+      );
     }
+  }
+
+  // The ice-slide slick: a pale, faintly glowing frost sheet the player skates
+  // across (the sim gives it near-zero friction). Cosmetic only; the slide is
+  // resolved server-side in updateRiftTriggers.
+  private placeIceSheet(
+    group: THREE.Group,
+    zone: { x: number; z: number; hw: number; hd: number },
+  ): void {
+    // A brighter frost margin peeks out around the inner sheet, giving the slick
+    // a clean glowing border so its edge (where you regain footing) reads.
+    const halo = new THREE.Mesh(
+      new THREE.PlaneGeometry(zone.hw * 2 + 1.4, zone.hd * 2 + 1.4)
+        .rotateX(-Math.PI / 2)
+        .translate(zone.x, 0.07, zone.z),
+      new THREE.MeshBasicMaterial({
+        color: 0x9fe8ff,
+        transparent: true,
+        opacity: 0.4,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    halo.renderOrder = 1;
+    group.add(halo);
+    const sheet = new THREE.Mesh(
+      new THREE.PlaneGeometry(zone.hw * 2, zone.hd * 2)
+        .rotateX(-Math.PI / 2)
+        .translate(zone.x, 0.09, zone.z),
+      new THREE.MeshBasicMaterial({
+        color: 0xdff6ff,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false,
+      }),
+    );
+    sheet.renderOrder = 2;
+    group.add(sheet);
   }
 
   private placeAquaticDressing(group: THREE.Group, layout: DungeonLayout): void {

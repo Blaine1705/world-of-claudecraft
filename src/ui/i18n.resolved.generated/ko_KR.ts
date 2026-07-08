@@ -3259,7 +3259,11 @@ export const ko_KR: EnTranslations = {
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
-      "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다."
+      "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.",
+      "iceGoalLit": "서리 문양이 타오릅니다. 길이 꿈틀거립니다.",
+      "socketsShut": "받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.",
+      "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
+      "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
