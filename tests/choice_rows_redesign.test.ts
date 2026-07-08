@@ -292,3 +292,44 @@ describe('paladin redesign', () => {
     expect(run()).toEqual(run());
   });
 });
+
+describe('druid Lifesap redesign', () => {
+  it('saps 70 health to surge 90 resource, refuses at low health, 30 sec rhythm', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+    const p = sim.player;
+    p.resource = Math.round(p.maxResource * 0.3);
+    const hpBefore = p.hp;
+    const manaBefore = p.resource;
+    sim.castAbility('innervate');
+    sim.tick();
+    expect(p.hp).toBe(hpBefore - 70);
+    expect(p.resource).toBe(Math.min(p.maxResource, manaBefore + 90));
+    expect(p.cooldowns.get('innervate')).toBeGreaterThan(20);
+    // refuses to sap a nearly dead druid
+    p.hp = 60;
+    p.cooldowns.clear();
+    p.gcdRemaining = 0;
+    const hpLow = p.hp;
+    sim.castAbility('innervate');
+    sim.tick();
+    expect(p.hp).toBe(hpLow);
+  });
+
+  it('surges Rage in Bruin Form (the form-resource twist)', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+    const p = sim.player;
+    sim.castAbility('bear_form');
+    for (let i = 0; i < 30; i++) sim.tick();
+    expect(p.resourceType).toBe('rage');
+    p.resource = 0;
+    p.gcdRemaining = 0;
+    p.cooldowns.clear();
+    sim.castAbility('innervate');
+    sim.tick();
+    expect(p.resource).toBe(Math.min(p.maxResource, 90));
+  });
+});

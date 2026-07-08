@@ -6483,7 +6483,7 @@ export const vi_VN: EnTranslations = {
       },
       "innervate": {
         "name": "Nhựa Sống",
-        "description": "Restaura al instante 200 de tu tài nguyên hiện tại. (thiên phú druid)"
+        "description": "Rút 70 máu của bạn để hồi 90 tài nguyên hiện tại: mana, nộ khí ở Dạng Gấu hoặc năng lượng ở Dạng Mèo. (thiên phú Druid)"
       },
       "kick": {
         "name": "Đá",

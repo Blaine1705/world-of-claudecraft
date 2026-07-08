@@ -2497,7 +2497,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talent kapłana)',
   'entities.abilities.innervate.name': 'Życiodajna Soki',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu obecny zasób. (talent druida)',
+    'Wysysa 70 twojego zdrowia, by przywrócić 90 twojego bieżącego zasobu: many, szału w Postaci Niedźwiedzia lub energii w Postaci Kota. (talent Druida)',
   'entities.abilities.kick.name': 'Kopniak',
   'entities.abilities.kick.description':
     'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent łotrzyka)',

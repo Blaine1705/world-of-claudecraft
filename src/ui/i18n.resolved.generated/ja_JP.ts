@@ -6483,7 +6483,7 @@ export const ja_JP: EnTranslations = {
       },
       "innervate": {
         "name": "生命の樹液",
-        "description": "現在のリソースを即座に 200 回復する。（ドルイドタレント）"
+        "description": "自身の体力を70削り、現在のリソースを90回復する。キャスター時はマナ、熊形態は怒り、猫形態はエナジー。(ドルイドの才能)"
       },
       "kick": {
         "name": "蹴り",

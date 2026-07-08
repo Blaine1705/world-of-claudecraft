@@ -6483,7 +6483,7 @@ export const es: EnTranslations = {
       },
       "innervate": {
         "name": "Savia Vital",
-        "description": "Restaura al instante 200 de tu recurso actual. (talento de druida)"
+        "description": "Drena 70 de tu propia salud para infundir 90 de tu recurso actual: maná, ira en Forma de Oso o energía en Forma Felina. (talento de Druida)"
       },
       "kick": {
         "name": "Patada",

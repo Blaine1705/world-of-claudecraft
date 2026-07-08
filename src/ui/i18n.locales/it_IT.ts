@@ -3380,7 +3380,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento da sacerdote)',
   'entities.abilities.innervate.name': 'Linfa Vitale',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu risorsa attuale. (talento da druido)',
+    "Prosciuga 70 della tua salute per infondere 90 della tua risorsa attuale: mana, rabbia in Forma d'Orso o energia in Forma Felina. (talento del Druido)",
   'entities.abilities.kick.name': 'Pedata',
   'entities.abilities.kick.description':
     'Interrompe il lancio e impedisce incantesimi di quella scuola per 4 s. (talento da ladro)',

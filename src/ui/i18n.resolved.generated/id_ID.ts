@@ -6483,7 +6483,7 @@ export const id_ID: EnTranslations = {
       },
       "innervate": {
         "name": "Getah Hidup",
-        "description": "Restaura al instante 200 de tu sumber daya saat ini. (talenta druid)"
+        "description": "Menyedot 70 nyawa Anda sendiri untuk memulihkan 90 sumber daya saat ini: mana, amarah dalam Wujud Beruang, atau energi dalam Wujud Kucing. (talenta Druid)"
       },
       "kick": {
         "name": "Tendang",

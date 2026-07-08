@@ -3772,7 +3772,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talent de prêtre)',
   'entities.abilities.innervate.name': 'Sève vitale',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu ressource actuelle. (talent de druide)',
+    "Sacrifie 70 de votre propre vie pour restaurer 90 de votre ressource actuelle : mana, rage en forme d'ours ou énergie en forme féline. (talent de druide)",
   'entities.abilities.kick.name': 'Botte',
   'entities.abilities.kick.description':
     'Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de voleur)',

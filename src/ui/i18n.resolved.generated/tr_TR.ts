@@ -6483,7 +6483,7 @@ export const tr_TR: EnTranslations = {
       },
       "innervate": {
         "name": "Yaşam Özsuyu",
-        "description": "Restaura al instante 200 de tu mevcut kaynağı. (druid yeteneği)"
+        "description": "Kendi canından 70 emerek mevcut kaynağından 90 doldurur: mana, Ayı Formunda öfke veya Kedi Formunda enerji. (Druid yeteneği)"
       },
       "kick": {
         "name": "Tekme",

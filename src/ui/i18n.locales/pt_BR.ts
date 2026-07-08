@@ -3368,7 +3368,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento de sacerdote)',
   'entities.abilities.innervate.name': 'Seiva Vital',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu recurso atual. (talento de druida)',
+    'Drena 70 da sua própria vida para infundir 90 do seu recurso atual: mana, ira na Forma de Urso ou energia na Forma Felina. (talento de Druida)',
   'entities.abilities.kick.name': 'Botada',
   'entities.abilities.kick.description':
     'Interrompe a conjuração e impede feitiços daquela escola por 4 s. (talento de ladino)',

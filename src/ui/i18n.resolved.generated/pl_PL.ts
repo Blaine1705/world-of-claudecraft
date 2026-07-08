@@ -6483,7 +6483,7 @@ export const pl_PL: EnTranslations = {
       },
       "innervate": {
         "name": "Życiodajna Soki",
-        "description": "Restaura al instante 200 de tu obecny zasób. (talent druida)"
+        "description": "Wysysa 70 twojego zdrowia, by przywrócić 90 twojego bieżącego zasobu: many, szału w Postaci Niedźwiedzia lub energii w Postaci Kota. (talent Druida)"
       },
       "kick": {
         "name": "Kopniak",

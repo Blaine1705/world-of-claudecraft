@@ -2477,7 +2477,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (præstetalent)',
   'entities.abilities.innervate.name': 'Livssaft',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu nuværende ressource. (druidentalent)',
+    'Tærer 70 af dit eget helbred for at fylde 90 af din nuværende ressource: mana, raseri i bjørneform eller energi i katteform. (Druidetalent)',
   'entities.abilities.kick.name': 'Støvle',
   'entities.abilities.kick.description':
     'Afbryder besværgelse og forhindrer magi fra den skole i 4 sek. (snigmordertalent)',

@@ -2564,7 +2564,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 giây. (thiên phú tu sĩ)',
   'entities.abilities.innervate.name': 'Nhựa Sống',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu tài nguyên hiện tại. (thiên phú druid)',
+    'Rút 70 máu của bạn để hồi 90 tài nguyên hiện tại: mana, nộ khí ở Dạng Gấu hoặc năng lượng ở Dạng Mèo. (thiên phú Druid)',
   'entities.abilities.kick.name': 'Đá',
   'entities.abilities.kick.description':
     'Ngắt niệm phép và chặn phép cùng hệ trong 4 giây. (thiên phú đạo tặc)',

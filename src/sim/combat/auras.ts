@@ -60,10 +60,6 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
 }
 
-function pctValue(value: number): number {
-  return value > 1 ? value / 100 : value;
-}
-
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   // Lifesap: living sap restores a flat amount of WHATEVER the current resource

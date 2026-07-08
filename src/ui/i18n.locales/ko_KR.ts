@@ -2708,7 +2708,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '다음 주문의 소모값을 없앱니다. 60초 동안 지속됩니다. (사제 특성)',
   'entities.abilities.innervate.name': '생명 수액',
-  'entities.abilities.innervate.description': '현재 자원을 즉시 200 회복합니다. (드루이드 특성)',
+  'entities.abilities.innervate.description': '자신의 생명력 70을 흡수하여 현재 자원 90을 회복합니다. 시전 형태는 마나, 곰 형태는 분노, 표범 형태는 기력입니다. (드루이드 특성)',
   'entities.abilities.kick.name': '발차기',
   'entities.abilities.kick.description':
     '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (도적 특성)',

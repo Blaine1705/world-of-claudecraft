@@ -3395,7 +3395,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 Sek.. (Priester-Talent)',
   'entities.abilities.innervate.name': 'Lebenssaft',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu aktuellen Ressource. (Druiden-Talent)',
+    'Zehrt 70 Eurer eigenen Gesundheit, um 90 Eurer aktuellen Ressource aufwallen zu lassen: Mana, Wut in Bärengestalt oder Energie in Katzengestalt. (Druidentalent)',
   'entities.abilities.kick.name': 'Stiefeltritt',
   'entities.abilities.kick.description':
     'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)',

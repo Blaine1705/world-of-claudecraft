@@ -3396,19 +3396,8 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
-    r.meta.talentMods = computeModifiersWithRows(
-      r.meta.cls,
-      r.meta.talents,
-      r.meta.rowPicks,
-      r.e.level,
-    );
-    recalcPlayerStats(
-      r.e,
-      r.meta.cls,
-      r.meta.equipment,
-      this.playerMods(r.meta),
-      r.meta.equipmentInstance,
-    );
+    r.meta.talentMods = computeTalentModifiers(r.meta.cls, r.meta.talents, r.e.level);
+    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, this.playerMods(r.meta));
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
@@ -3807,7 +3796,7 @@ export class Sim {
     if (e.ownerId === null) return 1;
     let mult = 1;
     for (const a of e.auras) {
-      if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+      if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
     }
     const ownerMeta = this.players.get(e.ownerId);
     if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;

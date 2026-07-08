@@ -6483,7 +6483,7 @@ export const de_DE: EnTranslations = {
       },
       "innervate": {
         "name": "Lebenssaft",
-        "description": "Restaura al instante 200 de tu aktuellen Ressource. (Druiden-Talent)"
+        "description": "Zehrt 70 Eurer eigenen Gesundheit, um 90 Eurer aktuellen Ressource aufwallen zu lassen: Mana, Wut in Bärengestalt oder Energie in Katzengestalt. (Druidentalent)"
       },
       "kick": {
         "name": "Stiefeltritt",

@@ -6483,7 +6483,7 @@ export const da_DK: EnTranslations = {
       },
       "innervate": {
         "name": "Livssaft",
-        "description": "Restaura al instante 200 de tu nuværende ressource. (druidentalent)"
+        "description": "Tærer 70 af dit eget helbred for at fylde 90 af din nuværende ressource: mana, raseri i bjørneform eller energi i katteform. (Druidetalent)"
       },
       "kick": {
         "name": "Støvle",

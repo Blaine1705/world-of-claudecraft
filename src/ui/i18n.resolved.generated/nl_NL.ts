@@ -6483,7 +6483,7 @@ export const nl_NL: EnTranslations = {
       },
       "innervate": {
         "name": "Levenssap",
-        "description": "Restaura al instante 200 de tu huidige grondstof. (druïdetalent)"
+        "description": "Tapt 70 van je eigen gezondheid af om 90 van je huidige energiebron te herstellen: mana, woede in Berengedaante of energie in Kattengedaante. (Druïdetalent)"
       },
       "kick": {
         "name": "Schop",

@@ -2603,7 +2603,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '使你的下一个法术不消耗法力。持续 60 秒。（牧师天赋）',
   'entities.abilities.innervate.name': '生命树液',
-  'entities.abilities.innervate.description': '立即恢复 200 点当前资源。（德鲁伊天赋）',
+  'entities.abilities.innervate.description': '汲取自身70点生命值，涌回90点当前资源：施法形态为法力，熊形态为怒气，猎豹形态为能量。（德鲁伊天赋）',
   'entities.abilities.kick.name': '踢击',
   'entities.abilities.kick.description': '打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）',
   'entities.abilities.last_stand.name': '第十一刻',

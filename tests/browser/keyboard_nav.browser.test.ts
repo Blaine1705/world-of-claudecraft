@@ -183,6 +183,7 @@ describe('keyboard-nav: TalentsWindow Choices row radios', () => {
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
+        buildDropdown: () => document.createElement('div'),
       }),
     );
     win.open();

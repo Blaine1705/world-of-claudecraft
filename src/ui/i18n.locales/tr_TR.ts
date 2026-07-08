@@ -2556,7 +2556,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 sn. (rahip yeteneği)',
   'entities.abilities.innervate.name': 'Yaşam Özsuyu',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu mevcut kaynağı. (druid yeteneği)',
+    'Kendi canından 70 emerek mevcut kaynağından 90 doldurur: mana, Ayı Formunda öfke veya Kedi Formunda enerji. (Druid yeteneği)',
   'entities.abilities.kick.name': 'Tekme',
   'entities.abilities.kick.description':
     'Büyü kullanımını keser ve o okuldan büyüleri 4 sn engeller. (haydut yeteneği)',

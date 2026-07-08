@@ -6483,7 +6483,7 @@ export const cs_CZ: EnTranslations = {
       },
       "innervate": {
         "name": "Míza života",
-        "description": "Restaura al instante 200 de tu aktuální zdroj. (druidský talent)"
+        "description": "Vysaje 70 tvého zdraví a obnoví 90 tvého aktuálního zdroje: manu, zuřivost v medvědí podobě nebo energii v kočičí podobě. (druidský talent)"
       },
       "kick": {
         "name": "Kopnutí",

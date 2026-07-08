@@ -215,7 +215,7 @@ function manaFromIntellect(int: number): number {
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
 }
 
-function pctValue(value: number): number {
+export function pctValue(value: number): number {
   return value > 1 ? value / 100 : value;
 }
 

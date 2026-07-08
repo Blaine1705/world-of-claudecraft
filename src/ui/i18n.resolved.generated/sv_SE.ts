@@ -6483,7 +6483,7 @@ export const sv_SE: EnTranslations = {
       },
       "innervate": {
         "name": "Livssav",
-        "description": "Restaura al instante 200 de tu nuvarande resurs. (druidtalang)"
+        "description": "Tappar 70 av din egen hälsa för att fylla 90 av din nuvarande resurs: mana, raseri i björnform eller energi i kattform. (Druidtalang)"
       },
       "kick": {
         "name": "Spark",

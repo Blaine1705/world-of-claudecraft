@@ -285,7 +285,7 @@ export class TalentsWindow {
     const rowsView = buildChoiceRowsView(cls, level, stage.rows ?? {});
     const wrap = document.createElement('div');
     wrap.className = 'tal-rows';
-    for (const row of rowsView.rows) {
+    for (const [rowIndex, row] of rowsView.rows.entries()) {
       const rowEl = document.createElement('div');
       rowEl.className = `tal-row${row.unlocked ? '' : ' locked'}`;
       const head = document.createElement('div');
@@ -302,11 +302,15 @@ export class TalentsWindow {
       opts.className = 'tal-row-opts';
       opts.setAttribute('role', 'radiogroup');
       opts.setAttribute('aria-label', `${t('game.talents.choicesTab')} ${row.level}`);
-      for (const { option, picked } of row.options) {
+      const rowOptCards: HTMLElement[] = [];
+      const pickedIndex = row.options.findIndex((opt) => opt.picked);
+      const rovingIndex = pickedIndex >= 0 ? pickedIndex : 0;
+      for (const [optionIndex, { option, picked }] of row.options.entries()) {
         const card = document.createElement('button');
         card.type = 'button';
         card.className = `tal-row-opt${picked ? ' sel' : ''}`;
         card.setAttribute('role', 'radio');
+        card.setAttribute('tabindex', row.unlocked && optionIndex === rovingIndex ? '0' : '-1');
         card.setAttribute('aria-checked', String(picked));
         card.disabled = !row.unlocked;
         const label = tTalent({ kind: 'talentChoice', choice: option, field: 'name' });
@@ -327,12 +331,26 @@ export class TalentsWindow {
         });
         card.addEventListener('click', () => {
           if (!row.unlocked || picked) return;
-          // Stage the pick; the footer Apply commits the whole allocation through the
-          // one authoritative path (the server re-validates every level gate).
-          stage.rows = { ...(stage.rows ?? {}), [row.level]: option.id };
-          this.deps.hideTooltip();
-          this.render();
+          this.pickRowChoice(stage, row.level, option.id);
         });
+        card.addEventListener('keydown', (e) => {
+          const ke = e as KeyboardEvent;
+          const i = rowOptCards.indexOf(card);
+          const next = rovingTarget(ke.key, i, rowOptCards.length, 'both');
+          if (next !== null) {
+            ke.preventDefault();
+            this.pickRowChoice(stage, row.level, row.options[next].option.id);
+            (
+              this.deps
+                .root()
+                .querySelectorAll('.tal-row-opts')
+                [rowIndex]?.querySelector('.tal-row-opt.sel') as HTMLElement | null
+            )?.focus();
+            return;
+          }
+          this.keyboardActivate(ke, () => this.pickRowChoice(stage, row.level, option.id));
+        });
+        rowOptCards.push(card);
         opts.appendChild(card);
       }
       rowEl.appendChild(opts);
@@ -402,6 +420,15 @@ export class TalentsWindow {
     // commit instantly via pickRow); committed row picks are class-wide and
     // spec-independent sim-side, so a spec switch never clears them.
     stage.spec = specId;
+    this.render();
+  }
+
+  private pickRowChoice(stage: TalentAllocation, level: number, optionId: string): void {
+    if (stage.rows?.[level] === optionId) return;
+    // Stage the pick; the footer Apply commits the whole allocation through the
+    // one authoritative path (the server re-validates every level gate).
+    stage.rows = { ...(stage.rows ?? {}), [level]: optionId };
+    this.deps.hideTooltip();
     this.render();
   }
 

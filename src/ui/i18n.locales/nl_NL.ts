@@ -2527,7 +2527,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 sec. (priestertalent)',
   'entities.abilities.innervate.name': 'Levenssap',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu huidige grondstof. (druïdetalent)',
+    'Tapt 70 van je eigen gezondheid af om 90 van je huidige energiebron te herstellen: mana, woede in Berengedaante of energie in Kattengedaante. (Druïdetalent)',
   'entities.abilities.kick.name': 'Schop',
   'entities.abilities.kick.description':
     'Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (schurkentalent)',

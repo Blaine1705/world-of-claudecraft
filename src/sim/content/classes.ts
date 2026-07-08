@@ -5629,12 +5629,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 30,
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'gainResource', amount: 200 }],
-    description: 'Instantly restores 200 of your current resource. (Druid talent)',
+    usableInForm: true,
+    effects: [{ type: 'lifeTap', hp: 70, mana: 90 }],
+    description:
+      'Saps 70 of your own health to surge 90 of your current resource: mana in caster form, Rage in Bruin Form, Energy in Cat Form. (Druid talent)',
   },
   kick: {
     id: 'kick',

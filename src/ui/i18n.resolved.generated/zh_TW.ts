@@ -6483,7 +6483,7 @@ export const zh_TW: EnTranslations = {
       },
       "innervate": {
         "name": "生命樹液",
-        "description": "立即恢復 200 點當前資源。（德魯伊天賦）"
+        "description": "汲取自身70點生命值，湧回90點當前資源：施法形態為法力，熊形態為怒氣，獵豹形態為能量。（德魯伊天賦）"
       },
       "kick": {
         "name": "踢擊",

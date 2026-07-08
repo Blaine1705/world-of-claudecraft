@@ -3417,7 +3417,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talento de sacerdote)',
   'entities.abilities.innervate.name': 'Savia Vital',
   'entities.abilities.innervate.description':
-    'Restaura al instante 200 de tu recurso actual. (talento de druida)',
+    'Drena 70 de tu propia salud para infundir 90 de tu recurso actual: maná, ira en Forma de Oso o energía en Forma Felina. (talento de Druida)',
   'entities.abilities.kick.name': 'Patada',
   'entities.abilities.kick.description':
     'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (talento de pícaro)',
