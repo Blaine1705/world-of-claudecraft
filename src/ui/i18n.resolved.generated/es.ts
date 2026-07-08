@@ -5243,7 +5243,7 @@ export const es: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Sangría",
-        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 10 de furia. (habilidad distintiva de Furia)"
+        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de furia. (habilidad distintiva de Furia)"
       },
       "raging_gale": {
         "name": "Arremetida Enfurecida",

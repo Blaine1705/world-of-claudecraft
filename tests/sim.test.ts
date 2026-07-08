@@ -140,15 +140,19 @@ describe('classic formulas', () => {
   it('rage conversion matches the vanilla constant', () => {
     expect(rageConversion(1)).toBeCloseTo(0.0091 + 3.23 + 4.27, 4);
     expect(rageConversion(10)).toBeCloseTo(0.91 + 32.3 + 4.27, 4);
-    // a 7.5-damage hit at level 1 generates ~7.5 rage
-    expect(rageFromDealing(7.51, 1)).toBeCloseTo(7.5, 1);
+    // The outgoing-damage rage constant is 18 (was 7.5). Feeding the level-1
+    // conversion divisor as the damage cancels it, isolating the constant
+    // exactly: a revert to 7.5 makes this 7.5 and the test fails.
+    expect(rageFromDealing(rageConversion(1), 1)).toBeCloseTo(18, 5);
   });
 
   it('rage from taking damage scales from attacker level', () => {
-    expect(rageFromTaking(90, 60)).toBeCloseTo(1, 5);
-    expect(rageFromTaking(450, 60)).toBeCloseTo(5, 5);
-    expect(rageFromTaking(900, 60)).toBeCloseTo(10, 5);
-    expect(rageFromTaking(30, 20)).toBeCloseTo(1, 5);
+    // damage / max(1, attackerLevel), no 1.5 divisor: re-adding *1.5 gives
+    // 1/5/10/1 and fails these pins.
+    expect(rageFromTaking(90, 60)).toBeCloseTo(1.5, 5);
+    expect(rageFromTaking(450, 60)).toBeCloseTo(7.5, 5);
+    expect(rageFromTaking(900, 60)).toBeCloseTo(15, 5);
+    expect(rageFromTaking(30, 20)).toBeCloseTo(1.5, 5);
   });
 
   it('mob xp follows the 45+5L rule with gray cutoffs', () => {
@@ -388,7 +392,8 @@ describe('combat', () => {
     wolf.level = 20;
     sim.player.resource = 0;
     (sim as any).dealDamage(wolf, sim.player, 30, false, 'physical', null, 'hit');
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // rageFromTaking(30, 20) = 30 / 20 = 1.5 (no 1.5 divisor anymore).
+    expect(sim.player.resource).toBeCloseTo(1.5, 5);
   });
 
   it('mob can kill the player; release rises as a ghost, healer resurrects', () => {

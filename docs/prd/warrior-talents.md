@@ -112,6 +112,23 @@ commit is still open, but deferred to ryze's #1614 engine (that UX is its territ
 - `cleave` (Reaping Arc): removed from prot -> `specs: ['arms']`.
 - `raised_guard` (Raised Guard / Bloquear con Escudo): add `maxCharges: 2`.
 
+## Rage economy (balance, 2026-07-08, operator-approved)
+A deterministic bench (level 20, same weapon, 60s vs a dummy that hits back, greedy rotation)
+showed the base warrior was badly rage-starved: signatures fired 1-3x/min (cap ~10), Desenfreno
+(red_harvest, 80 rage) was unreachable. Fix (applied, being finalized):
+- `rageFromDealing` (types.ts): the outgoing-damage rage constant 7.5 -> 18 (auto-attack rage x2.4).
+  Main lever; Arms/Prot rely on auto-attack rage.
+- `rageFromTaking` (types.ts): drop the *1.5 divisor (`damage / max(1, attackerLevel)`) so being hit
+  gives ~1.5x rage. Helps Prot (tank rage from being hit).
+- FURY = generator/spender model (operator: "las habilidades del fury dan ira; Desenfreno es el
+  spender"): `bloodthirst` (Sed de Sangre) is now a GENERATOR, cost 30 -> 0 and gainResource 10 -> 12
+  (plus its weapon strike + 3% heal). Twinstrike (+8) and Bladed Gyre (+5-10) also generate.
+  `red_harvest` (Desenfreno) is the sole spender, cost 80 (reverted from a 55 experiment), the
+  hardest hitter. Fallback if still too tight in play: lower Desenfreno's cost.
+- Validated result: all three specs healthy rage (~7-8/sec); signatures fire well (mortal_strike 7,
+  bloodthirst 10 as a generator, shield_slam 5); Desenfreno reaches ~4/min. DPS Fury 92 > Arms 73 >
+  Prot 39. OPEN for PTR tuning: the Fury(92)/Arms(73) DPS gap (nudge Arms up if desired).
+
 ## Naming (de-brand)
 New ability names must be original (not WoW). The locked rename table is `ip-refactor/NAME-MAP.md`.
 Known debt: 12 abilities still ship WoW names today (pummel, heroic_leap, rallying_cry, storm_bolt,
