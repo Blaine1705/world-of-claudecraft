@@ -18,7 +18,13 @@
 import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES, ZONES } from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import {
+  inHollowOpenSea,
+  roadDistance,
+  terrainHeight,
+  WATER_LEVEL,
+  zoneBiomeAt,
+} from '../sim/world';
 
 export interface MapRegion {
   minX: number;
@@ -208,15 +214,23 @@ export function paintTerrainRows(
         b = 48;
 
       if (h < WATER_LEVEL) {
-        // -- water: an EVEN depth-graded blend, light in the shallows (near
-        // shore and in lakes) easing to a dark deep-ocean blue in the death
-        // zones far out; a faint chop and the inked coastline over it. The ease
-        // (smoothstep) keeps the shore-to-deep transition gradual, not a ring.
+        // -- water: split by the SIM's death-zone predicate (inHollowOpenSea,
+        // the exact test swim-fatigue uses). The lethal open sea reads as a
+        // dark deep-ocean body (matching the out-of-bounds fill, so plate
+        // edges leave no seam); the safe water near shore, in lakes, and in the
+        // moats/channels reads a light blue easing only to a mid blue. Each is
+        // depth-graded with a smoothstep ease so neither is a flat slab.
         const t = Math.min(1, (WATER_LEVEL - h) / 8);
         const depth = t * t * (3 - 2 * t);
-        r = 96 + (20 - 96) * depth;
-        g = 160 + (44 - 160) * depth;
-        b = 198 + (84 - 198) * depth;
+        if (inHollowOpenSea(x, z)) {
+          r = 22 + (14 - 22) * depth;
+          g = 48 + (36 - 48) * depth;
+          b = 88 + (76 - 88) * depth;
+        } else {
+          r = 100 + (46 - 100) * depth;
+          g = 164 + (98 - 164) * depth;
+          b = 200 + (150 - 200) * depth;
+        }
         const chop = (hash2(Math.round(x * 0.6), Math.round(z * 0.6), seed + 811) - 0.5) * 3.5;
         r += chop;
         g += chop;
