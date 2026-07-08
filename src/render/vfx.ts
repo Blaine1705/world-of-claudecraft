@@ -539,7 +539,7 @@ export class Vfx {
     if (!at) return;
     const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(2.6));
     const soft = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(1.5));
-    const steps = this.scaledCount(26);
+    const steps = this.scaledCount(40);
     for (let i = 0; i < steps; i++) {
       const f = i / steps;
       const a = f * Math.PI * 4; // two full turns
@@ -553,15 +553,15 @@ export class Vfx {
           1.6 + f * 0.8,
           -Math.sin(a + phase) * 0.3,
           phase === 0 ? core : soft,
-          0.3,
-          0.45 + f * 0.25,
+          0.48,
+          0.6 + f * 0.35,
           -0.5,
           phase === 0 ? SPR.sparkle : SPR.glowSoft,
         );
       }
     }
     // the chest flash that sells the moment
-    this.spawn(at.x, at.y + 0.2, at.z, 0, 0.6, 0, core, 1.1, 0.35, 0, SPR.star);
+    this.spawn(at.x, at.y + 0.2, at.z, 0, 0.6, 0, core, 1.8, 0.5, 0, SPR.star);
   }
 
   // A ward appearing: an expanding translucent dome ring at chest height plus a
@@ -572,7 +572,7 @@ export class Vfx {
     if (!at) return;
     const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffdf80).multiplyScalar(hdr(2.2));
     const rim = new THREE.Color(0xfff6d8).multiplyScalar(hdr(1.6));
-    const ringN = this.scaledCount(22);
+    const ringN = this.scaledCount(34);
     for (let i = 0; i < ringN; i++) {
       const a = (i / ringN) * Math.PI * 2;
       // ring expands outward at the waist, drifting slightly up
@@ -584,8 +584,8 @@ export class Vfx {
         0.7,
         Math.sin(a) * 2.4,
         i % 2 === 0 ? core : rim,
-        0.4,
-        0.5,
+        0.62,
+        0.7,
         -0.6,
         SPR.ring,
       );
@@ -608,7 +608,7 @@ export class Vfx {
         SPR.sparkle,
       );
     }
-    this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 1.3, 0.3, 0, SPR.flash);
+    this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 2.2, 0.45, 0, SPR.flash);
   }
 
   // A stored heal-echo firing: a fountain of life-green motes bursting upward
@@ -618,7 +618,7 @@ export class Vfx {
     if (!at) return;
     const green = new THREE.Color(0x9cf58e).multiplyScalar(hdr(2.4));
     const gold = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(1.8));
-    const n = this.scaledCount(24);
+    const n = this.scaledCount(38);
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
       const up = 2.2 + Math.random() * 1.8;
@@ -631,13 +631,13 @@ export class Vfx {
         up,
         Math.sin(a) * out,
         i % 3 === 0 ? gold : green,
-        0.32,
-        0.55 + Math.random() * 0.25,
+        0.5,
+        0.7 + Math.random() * 0.3,
         -6.5, // strong gravity: the fountain collapses back down
         i % 2 === 0 ? SPR.sparkle : SPR.glowSoft,
       );
     }
-    this.spawn(at.x, at.y + 0.5, at.z, 0, 1.2, 0, green, 1.0, 0.3, 0, SPR.star);
+    this.spawn(at.x, at.y + 0.5, at.z, 0, 1.2, 0, green, 1.7, 0.45, 0, SPR.star);
   }
 
   // A DoT detonation (Earthen Jolt eating Cinder Jolt): a fast ground-level
@@ -647,7 +647,7 @@ export class Vfx {
     if (!at) return;
     const hot = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(2.8));
     const ember = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(1.6));
-    const ringN = this.scaledCount(18);
+    const ringN = this.scaledCount(28);
     for (let i = 0; i < ringN; i++) {
       const a = (i / ringN) * Math.PI * 2;
       this.spawn(
@@ -658,13 +658,13 @@ export class Vfx {
         0.3,
         Math.sin(a) * 5.5,
         hot,
-        0.38,
-        0.35,
+        0.6,
+        0.5,
         -0.8,
         SPR.ring,
       );
     }
-    const embers = this.scaledCount(16);
+    const embers = this.scaledCount(26);
     for (let i = 0; i < embers; i++) {
       const a = Math.random() * Math.PI * 2;
       const sp = 1.2 + Math.random() * 2.4;
@@ -682,7 +682,7 @@ export class Vfx {
         i % 2 === 0 ? SPR.firePuff : SPR.debris,
       );
     }
-    this.spawn(at.x, at.y + 0.4, at.z, 0, 0.8, 0, hot, 1.5, 0.28, 0, SPR.flash);
+    this.spawn(at.x, at.y + 0.4, at.z, 0, 0.8, 0, hot, 2.4, 0.42, 0, SPR.flash);
   }
 
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
