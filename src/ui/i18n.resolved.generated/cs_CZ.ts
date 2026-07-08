@@ -521,7 +521,8 @@ export const cs_CZ: EnTranslations = {
       "fromYour": "Z tvojí hodnoty {value} {stat}:",
       "names": {
         "spellPower": "Síla kouzel",
-        "haste": "Haste"
+        "haste": "Haste",
+        "parry": "Parry"
       },
       "desc": {
         "str": "Zvyšuje tvoji sílu útoku, takže údery zbraní dopadají tvrději.",
@@ -535,7 +536,8 @@ export const cs_CZ: EnTranslations = {
         "dps": "Odhadované poškození zbraně za sekundu, které kombinuje poškození a rychlost zbraně s tvojí silou útoku.",
         "critChance": "Tvoje šance, že útok zasáhne kriticky a způsobí dvojnásobné poškození.",
         "dodge": "Tvoje šance úplně se vyhnout příchozímu útoku na blízko a neutrpět poškození.",
-        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
       },
       "effects": {
         "attackPower": "+{value} síla útoku",
@@ -4022,6 +4024,7 @@ export const cs_CZ: EnTranslations = {
     "combat": {
       "floatingMiss": "Minutí",
       "floatingDodge": "Vyhnutí",
+      "floatingParry": "Parry",
       "floatingResist": "Odoláno",
       "cannotMove": "Nemůžeš se hýbat!",
       "attack": "útok",
@@ -4031,6 +4034,7 @@ export const cs_CZ: EnTranslations = {
       "damageTakenCrit": "{source} tě kriticky zasahuje za {amount}.",
       "miss": "Tvoje {ability} míjí {target}.",
       "dodged": "{target} se vyhýbá tvé schopnosti {ability}.",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "{target} odolává tvé schopnosti {ability}.",
       "healSelf": "Tvoje {ability} tě léčí za {amount}.",
       "healSelfCrit": "Tvoje {ability} tě kriticky léčí za {amount}.",

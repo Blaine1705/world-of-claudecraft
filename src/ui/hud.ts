@@ -3961,6 +3961,7 @@ export class Hud {
       critChance: p.critChance,
       dodgeChance: p.dodgeChance,
       haste: p.spellHaste,
+      parryChance: p.parryChance,
       dps: weaponDps(wpn?.weapon, p.attackPower),
       gear,
       buffs,
@@ -7374,11 +7375,16 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
-          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+          if (
+            ev.kind === 'miss' ||
+            ev.kind === 'dodge' ||
+            ev.kind === 'resist' ||
+            ev.kind === 'parry'
+          ) {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
-            // not miss).
+            // not miss). Parry reuses the dodge colour with its own word.
             const shape = fctSpawnShape({
               type: 'damage',
               damageKind: ev.kind,
@@ -7396,7 +7402,9 @@ export class Hud {
                       ? t('hud.combat.floatingMiss')
                       : ev.kind === 'dodge'
                         ? t('hud.combat.floatingDodge')
-                        : t('hud.combat.floatingResist'),
+                        : ev.kind === 'parry'
+                          ? t('hud.combat.floatingParry')
+                          : t('hud.combat.floatingResist'),
                   target: tgt,
                 },
                 now,
@@ -7412,7 +7420,9 @@ export class Hud {
                   ? 'hud.combat.miss'
                   : ev.kind === 'dodge'
                     ? 'hud.combat.dodged'
-                    : 'hud.combat.resisted';
+                    : ev.kind === 'parry'
+                      ? 'hud.combat.parried'
+                      : 'hud.combat.resisted';
               this.combatLog(
                 t(logKey, {
                   ability: combatAbilityName(ev.ability),

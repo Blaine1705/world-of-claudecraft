@@ -521,7 +521,8 @@ export const sv_SE: EnTranslations = {
       "fromYour": "Från dina {value} {stat}:",
       "names": {
         "spellPower": "Besvärjelsekraft",
-        "haste": "Haste"
+        "haste": "Haste",
+        "parry": "Parry"
       },
       "desc": {
         "str": "Ökar din attackstyrka, så att dina vapenslag landar hårdare.",
@@ -535,7 +536,8 @@ export const sv_SE: EnTranslations = {
         "dps": "Din uppskattade vapenskada per sekund, som kombinerar ditt vapens skada och hastighet med din attackstyrka.",
         "critChance": "Din chans att en attack träffar kritiskt och orsakar dubbel skada.",
         "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada.",
-        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
       },
       "effects": {
         "attackPower": "+{value} Attackstyrka",
@@ -4022,6 +4024,7 @@ export const sv_SE: EnTranslations = {
     "combat": {
       "floatingMiss": "Bom",
       "floatingDodge": "Undvek",
+      "floatingParry": "Parry",
       "floatingResist": "Motstod",
       "cannotMove": "Kan inte röra dig!",
       "attack": "anfall",
@@ -4031,6 +4034,7 @@ export const sv_SE: EnTranslations = {
       "damageTakenCrit": "{source} träffar dig kritiskt för {amount}.",
       "miss": "Din {ability} missar {target}.",
       "dodged": "Din {ability} undviks av {target}.",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "{target} motstår din {ability}.",
       "healSelf": "Din {ability} läker dig för {amount}.",
       "healSelfCrit": "Din {ability} läker dig kritiskt för {amount}.",

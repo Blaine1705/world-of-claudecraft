@@ -9,6 +9,9 @@ import {
   DIE_BY_SWORD_DODGE,
   ENRAGE_HASTE_PCT,
   EQUIP_SLOTS,
+  PARRY_BASE,
+  PARRY_CLASSES,
+  PARRY_STR_PER,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -47,6 +50,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     spellHaste: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
+    parryChance: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     moveSpeed: 7,
@@ -391,6 +395,9 @@ export function recalcPlayerStats(
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
+  // Parry: only weapon classes parry, strength-driven (mirrors dodge/agi). Pure
+  // casters keep 0. The FRONTAL gate is enforced at the swing (mobSwing), not here.
+  e.parryChance = PARRY_CLASSES.has(cls) ? Math.max(0, PARRY_BASE + s.str * PARRY_STR_PER) : 0;
 
   const hpFrac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);

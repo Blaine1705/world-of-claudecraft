@@ -521,7 +521,8 @@ export const es_ES: EnTranslations = {
       "fromYour": "De tu {value} de {stat}:",
       "names": {
         "spellPower": "Poder con hechizos",
-        "haste": "Celeridad"
+        "haste": "Celeridad",
+        "parry": "Parada"
       },
       "desc": {
         "str": "Aumenta tu poder de ataque, así que tus golpes con el arma impactan con más fuerza.",
@@ -535,7 +536,8 @@ export const es_ES: EnTranslations = {
         "dps": "El daño por segundo estimado de tu arma, combinando el daño y la velocidad de tu arma con tu poder de ataque.",
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
-        "haste": "Acelera tus golpes de arma y tus lanzamientos de hechizos. NO reduce el tiempo de reutilización global (GCD)."
+        "haste": "Acelera tus golpes de arma y tus lanzamientos de hechizos. NO reduce el tiempo de reutilización global (GCD).",
+        "parry": "Tu probabilidad de parar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede parar."
       },
       "effects": {
         "attackPower": "+{value} de poder de ataque",
@@ -4022,6 +4024,7 @@ export const es_ES: EnTranslations = {
     "combat": {
       "floatingMiss": "Fallo",
       "floatingDodge": "Esquiva",
+      "floatingParry": "Parada",
       "floatingResist": "Resistido",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
@@ -4031,6 +4034,7 @@ export const es_ES: EnTranslations = {
       "damageTakenCrit": "{source} te golpea críticamente por {amount}.",
       "miss": "Tu {ability} falla contra {target}.",
       "dodged": "{target} esquiva tu {ability}.",
+      "parried": "{target} para tu {ability}.",
       "resisted": "{target} resiste tu {ability}.",
       "healSelf": "Tu {ability} te sana {amount}.",
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",

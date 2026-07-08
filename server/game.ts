@@ -3604,6 +3604,7 @@ export class GameServer {
       sh: p.spellHaste,
       crit: p.critChance,
       dodge: p.dodgeChance,
+      parry: p.parryChance,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,

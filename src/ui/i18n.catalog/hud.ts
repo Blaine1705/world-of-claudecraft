@@ -265,6 +265,7 @@ const hudStringsEn = {
     combat: {
       floatingMiss: 'Miss',
       floatingDodge: 'Dodge',
+      floatingParry: 'Parry',
       floatingResist: 'Resist',
       cannotMove: "Can't move!",
       attack: 'attack',
@@ -274,6 +275,7 @@ const hudStringsEn = {
       damageTakenCrit: '{source} critically hits you for {amount}.',
       miss: 'Your {ability} misses {target}.',
       dodged: 'Your {ability} is dodged by {target}.',
+      parried: 'Your {ability} is parried by {target}.',
       resisted: 'Your {ability} is resisted by {target}.',
       healSelf: 'Your {ability} heals you for {amount}.',
       healSelfCrit: 'Your {ability} critically heals you for {amount}.',

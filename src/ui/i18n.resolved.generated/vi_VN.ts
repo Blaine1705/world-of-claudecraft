@@ -521,7 +521,8 @@ export const vi_VN: EnTranslations = {
       "fromYour": "Từ {value} {stat} của bạn:",
       "names": {
         "spellPower": "Sức Mạnh Phép Thuật",
-        "haste": "Haste"
+        "haste": "Haste",
+        "parry": "Parry"
       },
       "desc": {
         "str": "Tăng sức công kích, giúp đòn vũ khí của bạn đánh mạnh hơn.",
@@ -535,7 +536,8 @@ export const vi_VN: EnTranslations = {
         "dps": "Sát thương vũ khí ước tính mỗi giây của bạn, kết hợp sát thương và tốc độ vũ khí với sức công kích.",
         "critChance": "Tỉ lệ một đòn tấn công đánh chí mạng, gây sát thương gấp đôi.",
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
-        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
       },
       "effects": {
         "attackPower": "+{value} Công Kích",
@@ -4022,6 +4024,7 @@ export const vi_VN: EnTranslations = {
     "combat": {
       "floatingMiss": "Trượt",
       "floatingDodge": "Né",
+      "floatingParry": "Parry",
       "floatingResist": "Kháng",
       "cannotMove": "Không thể di chuyển!",
       "attack": "tấn công",
@@ -4031,6 +4034,7 @@ export const vi_VN: EnTranslations = {
       "damageTakenCrit": "{source} chí mạng bạn gây {amount}.",
       "miss": "{ability} của bạn trượt {target}.",
       "dodged": "{ability} của bạn bị {target} né.",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "{target} kháng lại {ability} của bạn.",
       "healSelf": "{ability} của bạn hồi {amount} máu cho bạn.",
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",

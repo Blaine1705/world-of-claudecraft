@@ -359,6 +359,7 @@ import {
   type MoveInput,
   normAngle,
   type OverheadEmoteId,
+  PARRY_FRONT_ARC,
   PARTY_MEMBER_AURA_CAP,
   type PetMode,
   type PlayerClass,
@@ -4399,9 +4400,22 @@ export class Sim {
     return true;
   }
 
+  // True when `attacker` sits inside the defender's frontal 180-degree arc. Parry
+  // uses this: you cannot parry a blow from behind. A defender facing its attacker
+  // (the normal combat stance) parries; something striking your back does not.
+  private attackerInFront(defender: Entity, attacker: Entity): boolean {
+    return (
+      Math.abs(normAngle(angleTo(defender.pos, attacker.pos) - defender.facing)) < PARRY_FRONT_ARC
+    );
+  }
+
   mobSwing(mob: Entity, target: Entity): void {
     const missChance = swingMissChance(mob, target);
     const dodgeChance = target.kind === 'player' ? target.dodgeChance : 0.05;
+    // Parry is frontal only: a blow from behind can never be parried. Non-players
+    // and non-parry classes carry 0, so their hit table is byte-identical.
+    const parryChance =
+      target.kind === 'player' && this.attackerInFront(target, mob) ? target.parryChance : 0;
     const roll = this.rng.next();
     if (roll < missChance) {
       this.emit({
@@ -4416,7 +4430,16 @@ export class Sim {
       });
       return;
     }
-    if (roll < missChance + dodgeChance) {
+    // Avoidance: dodge (any angle) then parry (frontal only). Both reuse the SAME
+    // roll (no extra rng draw) and fully negate the hit; a dodge OR a parry can
+    // proc the Protection Revenge reset.
+    const avoided =
+      roll < missChance + dodgeChance
+        ? ('dodge' as const)
+        : roll < missChance + dodgeChance + parryChance
+          ? ('parry' as const)
+          : null;
+    if (avoided) {
       this.emit({
         type: 'damage',
         sourceId: mob.id,
@@ -4425,7 +4448,7 @@ export class Sim {
         crit: false,
         school: 'physical',
         ability: null,
-        kind: 'dodge',
+        kind: avoided,
       });
       // Revenge proc (Protection): a dodge or parry against the warrior has a
       // chance to make the next Revenge cost no rage. Only a defender who KNOWS

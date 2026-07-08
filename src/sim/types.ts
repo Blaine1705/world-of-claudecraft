@@ -1756,6 +1756,7 @@ export interface Entity {
   spellHaste: number;
   critChance: number; // 0..1
   dodgeChance: number;
+  parryChance: number; // 0..1: chance to fully avoid a FRONTAL melee attack (parry classes only)
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
   moveSpeed: number;
@@ -2662,6 +2663,22 @@ export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
   'shaman',
   'druid',
 ]);
+
+// Parry (owner 2026-07-08): a chance to FULLY avoid a frontal melee attack, like
+// dodge but strength-driven and front-only (you cannot parry a blow from behind).
+// Only weapon classes parry; pure casters (mage/priest/warlock) never do. Hunter
+// is included (WoW hunters parry) even though it is not in MELEE_CLASSES.
+export const PARRY_CLASSES: ReadonlySet<PlayerClass> = new Set([
+  'warrior',
+  'paladin',
+  'rogue',
+  'hunter',
+  'shaman',
+  'druid',
+]);
+export const PARRY_BASE = 0.05; // base parry chance for a parry-capable class
+export const PARRY_STR_PER = 0.0005; // + per point of Strength (mirrors dodge/agi)
+export const PARRY_FRONT_ARC = Math.PI / 2; // half-arc: attacker within 180 deg front
 
 // Die by the Sword (Arms defensive, owner restructure 2026-07-08): a flat 30%
 // incoming-damage cut (take-fraction multiplier) plus a big dodge boost standing

@@ -220,6 +220,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.haste': '加速',
+  'hudChrome.statInfo.names.parry': '招架',
+  'hudChrome.statInfo.desc.parry':
+    '你完全招架正面近戰攻擊的機率，不受傷害。來自背後的攻擊無法招架。',
+  'hud.combat.floatingParry': '招架',
+  'hud.combat.parried': '{target} 招架了你的 {ability}。',
   'hudChrome.statInfo.desc.haste': '加快你的武器攻擊和法術施放速度。不會縮短全域冷卻時間（GCD）。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
@@ -4044,7 +4049,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.aspect_of_the_hawk': '持續維持的姿態，用來強化你的遠程攻擊強度。',
   'guide.abilityHook.backstab': '繞到目標背後以匕首給予一記重擊，是有力的連擊點累積技。',
   'guide.abilityHook.battle_shout': '鼓舞士氣的怒吼，提升隊伍的攻擊強度。',
-  'guide.abilityHook.revenge': '橫掃式的反擊，命中你面前的所有敵人；在你招架或閃避一次攻擊後，消耗更低。',
+  'guide.abilityHook.revenge':
+    '橫掃式的反擊，命中你面前的所有敵人；在你招架或閃避一次攻擊後，消耗更低。',
   'guide.abilityHook.blessing_of_might': '提升友方目標的攻擊強度，適合在開怪前施放。',
   'guide.abilityHook.charge': '衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。',
   'guide.abilityHook.cheap_shot': '從潛行中開場，造成昏迷並讓你預先取得連擊點。',

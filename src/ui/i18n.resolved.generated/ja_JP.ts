@@ -521,7 +521,8 @@ export const ja_JP: EnTranslations = {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
         "spellPower": "呪文威力",
-        "haste": "ヘイスト"
+        "haste": "ヘイスト",
+        "parry": "パリー"
       },
       "desc": {
         "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
@@ -535,7 +536,8 @@ export const ja_JP: EnTranslations = {
         "dps": "武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。",
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
-        "haste": "武器攻撃と呪文詠唱の速度を上げる。グローバルクールダウン（GCD）は短縮しない。"
+        "haste": "武器攻撃と呪文詠唱の速度を上げる。グローバルクールダウン（GCD）は短縮しない。",
+        "parry": "正面からの近接攻撃を完全にパリーする確率。ダメージを受けない。背後からの攻撃はパリーできない。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",
@@ -4022,6 +4024,7 @@ export const ja_JP: EnTranslations = {
     "combat": {
       "floatingMiss": "ミス",
       "floatingDodge": "回避",
+      "floatingParry": "パリー",
       "floatingResist": "抵抗",
       "cannotMove": "動けない！",
       "attack": "攻撃",
@@ -4031,6 +4034,7 @@ export const ja_JP: EnTranslations = {
       "damageTakenCrit": "{source}からクリティカルで{amount}のダメージを受けました。",
       "miss": "{ability}は{target}に外れました。",
       "dodged": "{target}は{ability}を回避しました。",
+      "parried": "{target} があなたの {ability} をパリーした。",
       "resisted": "{target}は{ability}に抵抗しました。",
       "healSelf": "{ability}が自分を{amount}回復しました。",
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",

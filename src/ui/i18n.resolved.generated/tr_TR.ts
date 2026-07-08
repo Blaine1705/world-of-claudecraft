@@ -521,7 +521,8 @@ export const tr_TR: EnTranslations = {
       "fromYour": "{value} {stat} değerinden:",
       "names": {
         "spellPower": "Büyü Gücü",
-        "haste": "Haste"
+        "haste": "Haste",
+        "parry": "Parry"
       },
       "desc": {
         "str": "Saldırı gücünü artırır, böylece silah darbelerin daha sert iner.",
@@ -535,7 +536,8 @@ export const tr_TR: EnTranslations = {
         "dps": "Silahının hasarını ve hızını saldırı gücünle birleştiren, saniye başına tahmini silah hasarın.",
         "critChance": "Bir saldırının kritik vurma ve çift hasar verme şansın.",
         "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.",
-        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
       },
       "effects": {
         "attackPower": "+{value} Saldırı Gücü",
@@ -4022,6 +4024,7 @@ export const tr_TR: EnTranslations = {
     "combat": {
       "floatingMiss": "Iskaladı",
       "floatingDodge": "Savuşturma",
+      "floatingParry": "Parry",
       "floatingResist": "Direnildi",
       "cannotMove": "Hareket edemezsin!",
       "attack": "saldırı",
@@ -4031,6 +4034,7 @@ export const tr_TR: EnTranslations = {
       "damageTakenCrit": "{source} sana kritik {amount} hasar vurdu.",
       "miss": "{ability} yeteneğin {target} hedefini ıskaladı.",
       "dodged": "{ability} yeteneğin {target} tarafından savuşturuldu.",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "{target}, {ability} yeteneğine direndi.",
       "healSelf": "{ability} yeteneğin seni {amount} iyileştirdi.",
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",

@@ -229,6 +229,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': 'От вашей характеристики ({value} {stat}):',
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
   'hudChrome.statInfo.names.haste': 'Скорость',
+  'hudChrome.statInfo.names.parry': 'Парирование',
+  'hudChrome.statInfo.desc.parry':
+    'Ваш шанс полностью парировать фронтальную атаку в ближнем бою, не получая урона. Удар со спины парировать нельзя.',
+  'hud.combat.floatingParry': 'Парировано',
+  'hud.combat.parried': '{target} парирует ваш {ability}.',
   'hudChrome.statInfo.desc.haste':
     'Ускоряет удары оружием и произнесение заклинаний. Не сокращает глобальное время восстановления (GCD).',
   'hudChrome.statInfo.desc.spellPower':
@@ -4315,7 +4320,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.backstab':
     'Зайдите цели за спину и нанесите кинжалом тяжелый удар, набирающий ресурс.',
   'guide.abilityHook.battle_shout': 'Боевой клич, повышающий силу атаки всей группы.',
-  'guide.abilityHook.revenge': 'Размашистая контратака, поражающая всех врагов перед вами; сразу после парирования или уклонения она обходится дешевле.',
+  'guide.abilityHook.revenge':
+    'Размашистая контратака, поражающая всех врагов перед вами; сразу после парирования или уклонения она обходится дешевле.',
   'guide.abilityHook.blessing_of_might':
     'Повышает силу атаки дружественной цели, удобно наложить перед началом боя.',
   'guide.abilityHook.charge': 'Рывок к далекому врагу, открывающий бой коротким оглушением.',
@@ -4404,7 +4410,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns':
     'Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе.',
   'guide.abilityHook.thunder_clap': 'Бьет по всем вокруг вас и замедляет их атаки.',
-  'guide.abilityHook.hamstring': 'Подрезает ноги цели, замедляя её, чтобы она не могла вас догнать.',
+  'guide.abilityHook.hamstring':
+    'Подрезает ноги цели, замедляя её, чтобы она не могла вас догнать.',
   'guide.abilityHook.wrath':
     'Удар силами природы, запущенный в цель с дистанции, ваш основной способ бить.',
   'guide.arenaPage.augmentsNote':

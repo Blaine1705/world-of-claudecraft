@@ -39,6 +39,7 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
     critChance: p.critChance,
     dodgeChance: p.dodgeChance,
     haste: p.spellHaste,
+    parryChance: p.parryChance,
     dps: 0,
   };
 }
@@ -300,6 +301,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       critChance: p.critChance,
       dodgeChance: p.dodgeChance,
       haste: p.spellHaste,
+      parryChance: p.parryChance,
       dps: 0,
       gear,
       buffs,

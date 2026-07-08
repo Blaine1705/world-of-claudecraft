@@ -786,6 +786,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.',
   'hudChrome.statInfo.names.spellPower': 'Poder con hechizos',
   'hudChrome.statInfo.names.haste': 'Celeridad',
+  'hudChrome.statInfo.names.parry': 'Parada',
+  'hudChrome.statInfo.desc.parry':
+    'Tu probabilidad de parar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede parar.',
+  'hud.combat.floatingParry': 'Parada',
+  'hud.combat.parried': '{target} para tu {ability}.',
   'hudChrome.statInfo.sources.attributes': 'De tus atributos: {value}',
   'hudChrome.statInfo.sources.base': 'Base: {value}',
   'hudChrome.statInfo.sources.buff': '{name}: {value}',

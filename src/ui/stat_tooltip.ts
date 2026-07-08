@@ -47,7 +47,8 @@ export type StatId =
   | 'dps'
   | 'critChance'
   | 'dodge'
-  | 'haste';
+  | 'haste'
+  | 'parry';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -143,6 +144,8 @@ export interface StatTooltipInput {
   dodgeChance: number;
   /** entity haste fraction (0.25 = 25% faster swings/casts), 0..1+. */
   haste: number;
+  /** entity.parryChance, 0..1 (chance to fully avoid a frontal melee attack). */
+  parryChance: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -330,6 +333,14 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = input.haste * 100;
       break;
     }
+    case 'parry': {
+      // Front-only avoidance, shown as a percent like dodge (a parry class starts
+      // at a base chance; casters stay at 0).
+      isPrimary = false;
+      statValue = input.parryChance * 100;
+      baseChanceNote = true;
+      break;
+    }
   }
 
   return {
@@ -476,6 +487,10 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // Haste comes straight off gear set bonuses + buffs (Enrage); the value plus
     // its description carries the meaning, so no per-source breakdown line.
     case 'haste':
+      return sources;
+    // Parry is a base chance plus Strength scaling; the value + description carry
+    // the meaning, so no per-source breakdown line for now.
+    case 'parry':
       return sources;
   }
 }

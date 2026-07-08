@@ -808,6 +808,7 @@ function blankEntity(id: number): Entity {
     spellHaste: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
+    parryChance: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
@@ -1727,6 +1728,7 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      e.parryChance = s.parry ?? 0;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
         ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }

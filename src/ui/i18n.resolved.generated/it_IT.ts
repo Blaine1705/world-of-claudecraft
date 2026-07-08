@@ -521,7 +521,8 @@ export const it_IT: EnTranslations = {
       "fromYour": "Dai tuoi {value} punti {stat}:",
       "names": {
         "spellPower": "Potere Magico",
-        "haste": "Haste"
+        "haste": "Haste",
+        "parry": "Parry"
       },
       "desc": {
         "str": "Aumenta la tua potenza d'attacco, così i colpi della tua arma sono più potenti.",
@@ -535,7 +536,8 @@ export const it_IT: EnTranslations = {
         "dps": "I danni al secondo stimati della tua arma, combinando i danni e la velocità della tua arma con la tua potenza d'attacco.",
         "critChance": "La tua probabilità che un attacco colpisca in modo critico, infliggendo danni doppi.",
         "dodge": "La tua probabilità di evitare completamente un attacco in mischia in arrivo, senza subire danni.",
-        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
       },
       "effects": {
         "attackPower": "+{value} Potenza d'attacco",
@@ -4022,6 +4024,7 @@ export const it_IT: EnTranslations = {
     "combat": {
       "floatingMiss": "Mancato",
       "floatingDodge": "Schivata",
+      "floatingParry": "Parry",
       "floatingResist": "Resistito",
       "cannotMove": "Non puoi muoverti!",
       "attack": "attacco",
@@ -4031,6 +4034,7 @@ export const it_IT: EnTranslations = {
       "damageTakenCrit": "{source} ti colpisce criticamente per {amount}.",
       "miss": "Il tuo {ability} manca {target}.",
       "dodged": "{target} schiva il tuo {ability}.",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "{target} resiste al tuo {ability}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",

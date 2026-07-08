@@ -521,7 +521,8 @@ export const zh_CN: EnTranslations = {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
         "spellPower": "法术强度",
-        "haste": "急速"
+        "haste": "急速",
+        "parry": "招架"
       },
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
@@ -535,7 +536,8 @@ export const zh_CN: EnTranslations = {
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
-        "haste": "加快你的武器攻击和法术施放速度。不会缩短全局冷却时间（GCD）。"
+        "haste": "加快你的武器攻击和法术施放速度。不会缩短全局冷却时间（GCD）。",
+        "parry": "你完全招架正面近战攻击的几率，不受伤害。来自背后的攻击无法招架。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -4022,6 +4024,7 @@ export const zh_CN: EnTranslations = {
     "combat": {
       "floatingMiss": "未命中",
       "floatingDodge": "闪避",
+      "floatingParry": "招架",
       "floatingResist": "抵抗",
       "cannotMove": "无法移动！",
       "attack": "攻击",
@@ -4031,6 +4034,7 @@ export const zh_CN: EnTranslations = {
       "damageTakenCrit": "{source}对你造成暴击，造成 {amount} 点伤害。",
       "miss": "你的{ability}未命中{target}。",
       "dodged": "{target}闪避了你的{ability}。",
+      "parried": "{target} 招架了你的 {ability}。",
       "resisted": "{target}抵抗了你的{ability}。",
       "healSelf": "你的{ability}为你恢复 {amount} 点生命。",
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",

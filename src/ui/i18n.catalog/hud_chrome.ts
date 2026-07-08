@@ -557,6 +557,7 @@ export const hudChromeStrings = {
     names: {
       spellPower: 'Spell Power',
       haste: 'Haste',
+      parry: 'Parry',
     },
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
@@ -574,6 +575,8 @@ export const hudChromeStrings = {
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       haste:
         'Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.',
+      parry:
+        'Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {

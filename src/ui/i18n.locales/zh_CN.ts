@@ -220,6 +220,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
   'hudChrome.statInfo.names.haste': '急速',
+  'hudChrome.statInfo.names.parry': '招架',
+  'hudChrome.statInfo.desc.parry':
+    '你完全招架正面近战攻击的几率，不受伤害。来自背后的攻击无法招架。',
+  'hud.combat.floatingParry': '招架',
+  'hud.combat.parried': '{target} 招架了你的 {ability}。',
   'hudChrome.statInfo.desc.haste': '加快你的武器攻击和法术施放速度。不会缩短全局冷却时间（GCD）。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。',
@@ -4043,7 +4048,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.aspect_of_the_hawk': '持续保持的姿态，强化你的远程攻击强度。',
   'guide.abilityHook.backstab': '绕到目标背后用匕首狠狠一击，连击点的强力起手技。',
   'guide.abilityHook.battle_shout': '一声号召呐喊，提升全队的攻击强度。',
-  'guide.abilityHook.revenge': '横扫式的反击，命中你面前的所有敌人；在你格挡或闪避一次攻击后，消耗更低。',
+  'guide.abilityHook.revenge':
+    '横扫式的反击，命中你面前的所有敌人；在你格挡或闪避一次攻击后，消耗更低。',
   'guide.abilityHook.blessing_of_might': '提升友方目标的攻击强度，开怪前施放正合适。',
   'guide.abilityHook.charge': '冲向远处的敌人，以一次短暂的昏迷开场。',
   'guide.abilityHook.cheap_shot': '从潜行中起手，眩晕目标并抢先积攒连击点。',
