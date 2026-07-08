@@ -262,7 +262,7 @@ export function paintTerrainRows(
         r = 60;
         g = 50;
         b = 72;
-      } else if (biome === 'dusk' && h > 11) {
+      } else if (biome === 'dusk' && h > 18) {
         r = 78;
         g = 68;
         b = 88;
@@ -425,7 +425,11 @@ export function paintTerrainRows(
       // ranges its highlands with, inked with a lit northwest face (and a
       // snow-white one on frozen ground). The garden's hedge walls live in
       // the same height band and are hedges, not peaks: no carets there --
-      if (h > 14 && !(biome === 'garden' && h <= 26)) {
+      // the dusk realm's low border humps read as land, not crags: only its
+      // real peaks carry caret glyphs, so the mountain ring is sparse and
+      // organic rather than a solid inked wall along the map edge
+      const caretMin = biome === 'dusk' ? 21 : 14;
+      if (h > caretMin && !(biome === 'garden' && h <= 26)) {
         const gx = Math.floor(x / 7);
         const gz = Math.floor(z / 7);
         if (hash2(gx, gz, seed + 431) < 0.85) {

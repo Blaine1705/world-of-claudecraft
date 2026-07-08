@@ -377,6 +377,7 @@ const FROST_LAND_LOBES = [
   { x: 44, z: 1962, r: 36 }, // ...and a second, so the north shore is lobed
   { x: -30, z: 1452, r: 46 }, // the south shore's rise east of the Wyrmgate
   { x: 70, z: 1450, r: 42 }, // ...and its east headland over the sound
+  { x: 52, z: 1974, r: 26 }, // a north-center headland east of the new cove
 ] as const;
 const FROST_BAYS = [
   { x: 165, z: 1660, r: 55 }, // the east sound
@@ -384,6 +385,7 @@ const FROST_BAYS = [
   { x: 60, z: 1945, r: 50 }, // the north cove
   { x: -108, z: 1952, r: 40 }, // ...and a second cove, west of the crown
   { x: 8, z: 1470, r: 40 }, // a south cove biting the shore east of the Wyrmgate
+  { x: 24, z: 1976, r: 34 }, // a cove splitting the flat north-center headland
 ] as const;
 
 export function frostLandness(x: number, z: number): number {
@@ -1727,26 +1729,38 @@ function hollowShapingOffset(x: number, z: number, seed: number): number {
   // irregular hollow instead of a rectangle. Heights stay gentle (max ~20
   // over ~26yd, slope well under the climb gate) so nothing is walled off;
   // the map painter's rock tint above h~26 does the visual work.
+  // Only the x-flanks carry the mountain ring: the north edge is the Reach's
+  // land border and the open bay (handled by the coast and border logic), so
+  // fringing it would only wall off that seam or leave marginal shore slivers
+  // at the frost border.
   const dW = x + 180;
   const dE = 180 - x;
-  // The Wyrmgate: the north fringe opens over the causeway head so the road
-  // can walk out of the band into the Drakelands (the old sealed gate cap).
-  const passOpen = 1 - smoothstep(12, 40, Math.abs(x - 44));
-  const dN = HOLLOW_ZMAX - z + passOpen * 80;
-  const dSide = Math.min(dW, dE, dN);
-  if (dSide < 54) {
-    // coarse lobes (wavelength ~80yd) bite 8..48yd into the band; height 34
-    // crosses the map painter's rock tint so the silhouette reads as an
-    // irregular mountain bowl instead of a frame. Content pockets near the
-    // border (the cave arrival, the Gleamstag clearing, the forgotten
-    // monument) damp the fringe so nothing gets buried.
-    let bite = 8 + fbm2(x * 0.012 + 7, z * 0.012 - 3, seed + 47, 2) * 40;
+  const dSide = Math.min(dW, dE);
+  if (dSide < 60) {
+    // The mountain ring sits SET BACK from the shore, so the flank is never a
+    // grey wall hugging the map edge: a low green shore runs at the very edge
+    // (dSide < ~8, an organic coast meeting the moat), then the crags rise
+    // BEHIND it and fade back into the interior. Their crest height 34 crosses
+    // the map painter's rock tint so the realm still reads as a mountain bowl,
+    // but a broken, natural one. A low-frequency swell along the ring's length
+    // (`along` runs down whichever edge is nearest) drops the crown to nothing
+    // in the saddles, so the crags read as discrete massifs, not a frame.
+    const along = z;
+    const swell = smoothstep(
+      0.42,
+      0.66,
+      0.5 * fbm2(along * 0.021, 41, seed + 53, 2) + 0.5 * fbm2(along * 0.044, 17, seed + 59, 2),
+    );
+    // a shore-set-back ridge profile: nothing in the beach band, a crown a
+    // little inland, fading into the interior
+    let ridge = smoothstep(7, 27, dSide) * (1 - smoothstep(36, 60, dSide));
+    // content pockets near the border (the cave arrival, the Gleamstag
+    // clearing, the forgotten monument) damp the crags so nothing gets buried
     for (const keep of HOLLOW_FRINGE_CLEARINGS) {
       const d = Math.hypot(x - keep.x, z - keep.z);
-      if (d < keep.r) bite = Math.min(bite, 8 + (d / keep.r) * 14);
+      if (d < keep.r) ridge *= smoothstep(keep.r * 0.4, keep.r, d);
     }
-    // gentler than the first cut: lower crowns rising over a longer run
-    dh += 24 * (1 - smoothstep(bite * 0.1, bite, dSide));
+    dh += 26 * swell * ridge;
   }
   return dh;
 }
@@ -2013,7 +2027,15 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const xb = worldXBoundsAt(z);
   let rimX = Math.max(smoothstep(xb.max - 30, xb.max, x), smoothstep(-xb.min - 30, -xb.min, -x));
   let rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
-  let rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
+  // The north rim (the Drakelands' Ashen Reach along the world's top edge)
+  // wanders and saddles so it reads as an organic mountain coast, not a ruled
+  // horizontal wall: its onset line meanders +-23yd in z with low-frequency
+  // noise along x, and its height swells and drops to near-nothing over long
+  // runs (broken massifs and passes, not a uniform berm).
+  const rimNWob = (fbm2(x * 0.008, 60.1, 9207, 2) - 0.5) * 46;
+  let rimN =
+    smoothstep(WORLD_MAX_Z - 30 + rimNWob, WORLD_MAX_Z + rimNWob, z) *
+    (0.32 + 0.68 * fbm2(x * 0.013, 60.2, 9209, 2));
   // the southern realms end in open coast, not a rim range: the vale, the
   // Farshore, the fen, the headlands, the jungle, and the lawns all meet
   // the sea at their outer edges, and swim fatigue does the containment

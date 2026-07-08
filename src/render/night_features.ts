@@ -1,10 +1,9 @@
-// The Nightbloom's dressing, render-only: dreambeams falling through the
-// lavender sky, fields of emissive lumen blossoms that carry the realm's
-// name, and glow lights at the two stone rings and the Moonwell. Same contract as the sibling realm modules: build once,
+// The Nightbloom's dressing, render-only: fields of emissive lumen blossoms
+// that carry the realm's name, and glow lights at the two stone rings and the
+// Moonwell. Same contract as the sibling realm modules: build once,
 // update(time) animates gently, glowLights join the renderer's rank-culled
-// fireLights budget.
+// fireLights budget. (The dreambeam shafts were removed at the user's request.)
 import * as THREE from 'three';
-import { NIGHTBLOOM_ZONE } from '../sim/content/nightbloom';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { GFX } from './gfx';
@@ -17,17 +16,6 @@ export interface NightFeaturesView {
 
 const NIGHT_ZMIN = 1260;
 const NIGHT_ZMAX = 1820;
-
-// Dreambeam fans: the aurora/sunbeam texture anatomy in pale violet. Each
-// plane's bright top edge is the cloud line the dream-light breaks through;
-// the columns fall as soft shafts over the meadows and the Moonwell.
-const BEAMS = [
-  { x: -300, z: 1382, rot: 0.3, w: 60, h: 105, phase: 0 }, // over the Moonwell
-  { x: -430, z: 1488, rot: -0.4, w: 70, h: 110, phase: 1.9 }, // Gloamfield
-  { x: -350, z: 1570, rot: 0.5, w: 55, h: 100, phase: 3.4 },
-  { x: -270, z: 1540, rot: -0.2, w: 50, h: 95, phase: 4.7 }, // the Vigil
-  { x: -380, z: 1660, rot: 0.15, w: 65, h: 115, phase: 2.6 }, // the Barrow
-] as const;
 
 // Lumen blossom clusters: patches of tall glowing flowers, thickest around
 // the pools and the flower downs (deterministic hash placement like the
@@ -42,67 +30,11 @@ const BLOSSOM_FIELDS = [
 
 const BLOSSOM_TINTS = [0x9fdcff, 0xe8f4ff, 0xc8a8ff, 0xa0ffd8];
 
-function beamTexture(): THREE.CanvasTexture | null {
-  if (typeof document === 'undefined') return null;
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 128;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-  const g = ctx.createLinearGradient(0, 0, 0, 128);
-  g.addColorStop(0, 'rgba(255,255,255,0.6)');
-  g.addColorStop(0.12, 'rgba(255,255,255,0.32)');
-  g.addColorStop(0.6, 'rgba(255,255,255,0.1)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 512, 128);
-  for (let i = 0; i < 36; i++) {
-    const sx = (i * 97 + ((i * i * 29) % 52)) % 512;
-    const w = 3 + ((i * 11) % 12);
-    const a = 0.08 + ((i * 31) % 12) / 36;
-    const reach = 0.5 + ((i * 43) % 50) / 100;
-    const ray = ctx.createLinearGradient(0, 0, 0, 128);
-    ray.addColorStop(0, `rgba(255,255,255,${a})`);
-    ray.addColorStop(Math.min(1, reach), 'rgba(255,255,255,0)');
-    ctx.fillStyle = ray;
-    ctx.fillRect(sx, 0, w, 128);
-  }
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.wrapS = THREE.RepeatWrapping;
-  return tex;
-}
-
 export function buildNightFeatures(seed: number): NightFeaturesView {
   const group = new THREE.Group();
   group.name = 'night-features';
   const glowLights: THREE.PointLight[] = [];
-  const beams: { mat: THREE.MeshBasicMaterial; phase: number }[] = [];
   const pulsing: { mat: THREE.MeshStandardMaterial | null; phase: number }[] = [];
-
-  // --- dreambeams: additive violet shafts, one light ---
-  const tex = beamTexture();
-  if (tex) {
-    for (const b of BEAMS) {
-      const mat = new THREE.MeshBasicMaterial({
-        map: tex,
-        color: 0xe4d2ff,
-        transparent: true,
-        opacity: 0.16,
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-        fog: false,
-      });
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(b.w, b.h), mat);
-      const groundY = terrainHeight(b.x, b.z, seed);
-      mesh.position.set(b.x, Math.max(groundY, -2) + b.h * 0.52, b.z);
-      mesh.rotation.y = b.rot;
-      mesh.rotation.z = 0.1; // one moon: every shaft leans the same way
-      mesh.renderOrder = 2;
-      beams.push({ mat, phase: b.phase });
-      group.add(mesh);
-    }
-  }
 
   // --- lumen blossoms: stem + emissive head, instanced per tint ---
   {
@@ -193,12 +125,7 @@ export function buildNightFeatures(seed: number): NightFeaturesView {
     group,
     glowLights,
     update(time: number): void {
-      // dreambeams breathe slowly out of phase, columns drifting like the
-      // aurora's; the blossom field pulses almost imperceptibly
-      for (const b of beams) {
-        b.mat.opacity = 0.18 * (0.55 + 0.45 * Math.sin(time * 0.11 + b.phase));
-        if (b.mat.map) b.mat.map.offset.x = (time * 0.003 + b.phase) % 1;
-      }
+      // the blossom field pulses almost imperceptibly
       for (const p of pulsing) {
         if (p.mat) p.mat.emissiveIntensity = 0.8 + 0.25 * Math.sin(time * 0.6 + p.phase);
       }
