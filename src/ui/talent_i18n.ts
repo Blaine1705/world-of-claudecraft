@@ -65,9 +65,11 @@ type DisplayGlobalKey = Exclude<
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
-  // label ("+10% Agility"), so locales don't repeat them here.
+  // label ("+10% Agility"), so locales don't repeat them here. armorFromStrPct is
+  // likewise excluded: it appears only in the Protection mastery, which carries its
+  // own written description, so no auto-generated stat label is ever needed for it.
   statLabels: Record<
-    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct'>
+    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct' | 'armorFromStrPct'>
     | DisplayGlobalKey
     | 'damage'
     | 'cost'

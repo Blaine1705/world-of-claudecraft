@@ -44,6 +44,9 @@ export interface StatModEffect {
   apPct?: number;
   staPct?: number;
   armorPct?: number;
+  // Bonus armor equal to this fraction of the wearer's Strength (Protection's
+  // Vanguard: 0.70 = +70% of Strength as armor), folded in recalcPlayerStats.
+  armorFromStrPct?: number;
   maxHpPct?: number;
   // Primary-attribute multipliers (0.10 = +10%). Applied to the fully-summed attribute
   // (base + per-level + gear + auras + flat talent bonuses) in recalcPlayerStats, so a
@@ -539,6 +542,7 @@ function zeroStats(): Required<StatModEffect> {
     apPct: 0,
     staPct: 0,
     armorPct: 0,
+    armorFromStrPct: 0,
     maxHpPct: 0,
     strPct: 0,
     agiPct: 0,
@@ -609,6 +613,7 @@ export function accumulate(
     s.apPct += (e.apPct ?? 0) * mult;
     s.staPct += (e.staPct ?? 0) * mult;
     s.armorPct += (e.armorPct ?? 0) * mult;
+    s.armorFromStrPct += (e.armorFromStrPct ?? 0) * mult;
     s.maxHpPct += (e.maxHpPct ?? 0) * mult;
     s.strPct += (e.strPct ?? 0) * mult;
     s.agiPct += (e.agiPct ?? 0) * mult;

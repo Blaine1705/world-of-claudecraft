@@ -326,6 +326,9 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
+  // Protection's Vanguard: bonus armor from Strength, added (on the fully-summed
+  // Strength) before the armor multiplier so armorPct amplifies it too.
+  if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
