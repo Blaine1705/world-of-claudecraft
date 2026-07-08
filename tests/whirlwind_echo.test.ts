@@ -32,6 +32,9 @@ function makeSim(seed = 31337): { sim: TestSim; p: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as unknown as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.applyTalents(furyWhirlwindAlloc())).toBe(true);
+  // A warrior spawns seeded in Battle Stance; one tick lets the stance reconcile
+  // swap it to Berserker (the Fury default) so rage mints carry no Battle bonus.
+  sim.tick();
   return { sim, p: sim.player };
 }
 

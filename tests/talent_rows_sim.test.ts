@@ -10,7 +10,7 @@ import { WARRIOR_ROWS } from '../src/sim/content/warrior_rows';
 import { recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { fiestaRestoreChar, fiestaStandardize } from '../src/sim/social/fiesta';
-import { dist2d, MAX_LEVEL, rageFromDealing } from '../src/sim/types';
+import { dist2d, MAX_LEVEL, rageFromDealing, STANCE_RAGE_GEN } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const CRUSH = 'war_row_crushing_charge';
@@ -161,8 +161,10 @@ describe('Anger Management (live option): rage generation', () => {
       sim.castAbility('charge');
       return sim.player.resource;
     };
-    expect(run(false)).toBeCloseTo(9);
-    expect(run(true)).toBeCloseTo(9 * 1.15);
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) multiplies
+    // the ability-rage mint on top of Anger Management's 1.15x when picked.
+    expect(run(false)).toBeCloseTo(9 * (1 + STANCE_RAGE_GEN));
+    expect(run(true)).toBeCloseTo(9 * 1.15 * (1 + STANCE_RAGE_GEN));
   });
 
   it('scales auto-attack rage by 1.25x', () => {
@@ -176,8 +178,10 @@ describe('Anger Management (live option): rage generation', () => {
       return sim.player.resource;
     };
     const base = rageFromDealing(50, MAX_LEVEL);
-    expect(run(false)).toBeCloseTo(base);
-    expect(run(true)).toBeCloseTo(base * 1.25);
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) multiplies
+    // the auto-attack mint on top of Anger Management's 1.25x when picked.
+    expect(run(false)).toBeCloseTo(base * (1 + STANCE_RAGE_GEN));
+    expect(run(true)).toBeCloseTo(base * 1.25 * (1 + STANCE_RAGE_GEN));
   });
 });
 

@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { freeCostAuraActive } from '../src/sim/combat/empower_next';
 import { MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { dist2d, MAX_LEVEL } from '../src/sim/types';
+import { dist2d, MAX_LEVEL, STANCE_RAGE_GEN } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 function warriorAtCap(seed = 7): Sim {
@@ -161,7 +161,8 @@ describe('Redhand (overpower): the active rage builder', () => {
     p.resource = 0;
     expect(p.overpowerUntil).toBeLessThan(sim.time); // no dodge window active
     sim.castAbility('overpower');
-    expect(p.resource).toBeCloseTo(10);
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) at the mint.
+    expect(p.resource).toBeCloseTo(10 * (1 + STANCE_RAGE_GEN));
     expect(p.cooldowns.get('overpower')).toBe(5);
   });
 
@@ -177,7 +178,9 @@ describe('Redhand (overpower): the active rage builder', () => {
     sim.targetEntity(mob.id);
     p.resource = 0;
     sim.castAbility('overpower');
-    expect(p.resource).toBeCloseTo(10 * 1.15);
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) on top of
+    // Anger Management's 1.15x ability-rage scaling (both mints multiply).
+    expect(p.resource).toBeCloseTo(10 * 1.15 * (1 + STANCE_RAGE_GEN));
   });
 });
 

@@ -292,6 +292,8 @@ export function formReadout(e: Entity): string {
       a.kind === 'form_moonkin' ||
       a.kind === 'form_shadow' ||
       a.kind === 'defensive_stance' ||
+      a.kind === 'battle_stance' ||
+      a.kind === 'berserker_stance' ||
       a.kind === 'stealth',
   );
   if (!form) return 'You are not in any form or stance.';

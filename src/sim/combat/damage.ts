@@ -31,6 +31,7 @@ import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
+  berserkerCritDamage,
   DIE_BY_SWORD_CUT,
   DIE_BY_SWORD_LOW_CUT,
   DIE_BY_SWORD_LOW_HP,
@@ -218,6 +219,13 @@ export function dealDamage(
   if (crit && amount > 0 && source && source.id !== target.id) {
     const bonus = ctx.critVulnBonus(target);
     if (bonus > 0) amount = Math.round(amount * (1 + bonus));
+  }
+
+  // Berserker Stance (Fury): the source's critical hits deal an extra fraction.
+  // Its crit-CHANCE half lives in recalcPlayerStats; this is the crit-DAMAGE half.
+  if (crit && amount > 0 && source && source.id !== target.id) {
+    const cd = berserkerCritDamage(source);
+    if (cd > 0) amount = Math.round(amount * (1 + cd));
   }
 
   // absorb shields soak damage first
