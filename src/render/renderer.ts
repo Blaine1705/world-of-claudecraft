@@ -46,6 +46,14 @@ import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
+import {
+  cyclePhase,
+  type DayNightGrade,
+  dayNightGrade,
+  effectiveDayness,
+  fullDayGrade,
+  globalDayness,
+} from './day_night_core';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
@@ -220,6 +228,13 @@ const DUNGEON_ENV_INTENSITY = 0.05;
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
+// day/night: at night the key sun and sky bounce cool toward moonlight. These
+// are the fully-night blend weights (scaled each frame by the grade's nightAmt).
+const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
+const MOON_HEMI_SKY_COLOR = 0x8b9cd0; // cool sky bounce at deepest night
+const MOON_HEMI_GROUND_COLOR = 0x2b3350; // dark cool ground bounce at deepest night
+const NIGHT_SUN_COOL = 0.55; // how far the sun hue shifts to moonlight at full night
+const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
@@ -851,6 +866,13 @@ export class Renderer {
   private gardenFeatures: GardenFeaturesView;
   private galeFeatures: GaleFeaturesView;
   private fogScratch = new THREE.Color();
+  // world day/night grade, recomputed each frame from the UTC-anchored clock in
+  // updateAmbience and consumed by the outdoor fog/light easing, the sky dome,
+  // and the IBL intensity. Defaults to full day for the frames before the first
+  // updateAmbience runs.
+  private dnGrade: DayNightGrade = fullDayGrade();
+  private dnColorScratch = new THREE.Color();
+  private dnMoonScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
   // Point lights owned by entity views (e.g. the quest-object glow). These stream
@@ -2123,6 +2145,7 @@ export class Renderer {
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
+      this.skyView.setDayNight(this.dnGrade.sky);
       this.updateEnvBiome(dt);
     }
     for (const sp of this.sunSprites) {
@@ -3724,6 +3747,12 @@ export class Renderer {
   private updateAmbience(px: number, camY: number, dt: number): void {
     const inside = px > DUNGEON_X_THRESHOLD;
     const pz = this.sim.player.pos.z;
+    // recompute the world day/night grade from the shared UTC-anchored clock.
+    // This is render-only, so the Date.now() read never touches sim parity; the
+    // grade is per-realm, the player's biome deciding how far the global cycle
+    // pulls its authored look (signature realms swing less, see day_night_core).
+    const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
+    this.dnGrade = dayNightGrade(effectiveDayness(globalDayness(cyclePhase(Date.now())), biome));
     if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isArenaPos(px)) {
@@ -3813,28 +3842,57 @@ export class Renderer {
           desired === 'temple' ||
           desired === 'nythraxis' ||
           desired === 'delve';
-        this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
-        this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
+        // returning outdoors restores full daylight rig scaled by the current
+        // day/night grade, so stepping out of a cave at night stays night
+        this.sun.intensity = underground
+          ? DUNGEON_SUN_INTENSITY
+          : SUN_INTENSITY * this.dnGrade.lightScale;
+        this.hemi.intensity = underground
+          ? DUNGEON_HEMI_INTENSITY
+          : HEMI_INTENSITY * this.dnGrade.lightScale;
         this.scene.environmentIntensity = underground
           ? DUNGEON_ENV_INTENSITY
-          : this.envOutdoorIntensity;
+          : this.envOutdoorIntensity * this.dnGrade.lightScale;
         sharedUniforms.uRimBoost.value = underground ? DUNGEON_RIM_BOOST : 1;
       }
       return;
     }
-    // outdoors: ease fog toward the current biome's preset (~2s)
+    // outdoors: ease fog toward the current biome's preset (~2s), then fold in
+    // the day/night grade so the world darkens and cools after dusk.
     if (desired === 'outdoor' && !this.lowGfx) {
+      const g = this.dnGrade;
       const preset = this.outdoorFogPreset();
       const k = 1 - Math.exp(-dt * 1.5);
-      fog.color.lerp(this.fogScratch.setHex(preset.color), k);
+      // fog color: the biome hue multiplied by the day/night color (a dark
+      // dusk-blue by night); far pulls in a little once it is dark
+      this.fogScratch.setHex(preset.color);
+      this.fogScratch.r *= g.fog[0];
+      this.fogScratch.g *= g.fog[1];
+      this.fogScratch.b *= g.fog[2];
+      fog.color.lerp(this.fogScratch, k);
       fog.near += (preset.near - fog.near) * k;
-      fog.far += (preset.far - fog.far) * k;
-      // ...and the light grade with it (the dusk realm's warm sun and rose
-      // sky bounce; a no-op elsewhere since the presets match the ctor hues)
-      const light = Renderer.BIOME_LIGHT[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
-      this.hemi.color.lerp(this.fogScratch.setHex(light.hemiSky), k);
-      this.hemi.groundColor.lerp(this.fogScratch.setHex(light.hemiGround), k);
-      this.sun.color.lerp(this.fogScratch.setHex(light.sun), k);
+      fog.far += (preset.far * g.farScale - fog.far) * k;
+      // ...and the light grade with it (the dusk realm's warm sun and rose sky
+      // bounce, a no-op elsewhere by day since the presets match the ctor hues):
+      // the sun and sky hues cool toward moonlight at night, and the sun + sky
+      // intensity scales down with the grade (the IBL follows in updateEnvBiome).
+      const light = Renderer.BIOME_LIGHT[biome];
+      this.dnColorScratch
+        .setHex(light.sun)
+        .lerp(this.dnMoonScratch.setHex(MOON_SUN_COLOR), g.nightAmt * NIGHT_SUN_COOL);
+      this.sun.color.lerp(this.dnColorScratch, k);
+      this.dnColorScratch
+        .setHex(light.hemiSky)
+        .lerp(this.dnMoonScratch.setHex(MOON_HEMI_SKY_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
+      this.hemi.color.lerp(this.dnColorScratch, k);
+      // the ground bounce cools with the sky side so night shading does not keep
+      // a warm daytime tint (its brightness still rides the hemi intensity above)
+      this.dnColorScratch
+        .setHex(light.hemiGround)
+        .lerp(this.dnMoonScratch.setHex(MOON_HEMI_GROUND_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
+      this.hemi.groundColor.lerp(this.dnColorScratch, k);
+      this.sun.intensity += (SUN_INTENSITY * g.lightScale - this.sun.intensity) * k;
+      this.hemi.intensity += (HEMI_INTENSITY * g.lightScale - this.hemi.intensity) * k;
     }
   }
 
@@ -3849,11 +3907,11 @@ export class Renderer {
       this.envBiome = dominant;
       this.scene.environment = this.envRTs.get(dominant)?.texture ?? null;
       this.scene.environmentRotation.y = this.skyView.envRotationY(dominant);
-      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4;
+      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4 * this.dnGrade.lightScale;
     }
     const k = 1 - Math.exp(-dt * 1.5);
     this.scene.environmentIntensity +=
-      (this.envOutdoorIntensity - this.scene.environmentIntensity) * k;
+      (this.envOutdoorIntensity * this.dnGrade.lightScale - this.scene.environmentIntensity) * k;
   }
 
   // Drop the view of an entity that left the world / our interest area.
@@ -4616,6 +4674,7 @@ export class Renderer {
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
+      this.skyView.setDayNight(this.dnGrade.sky);
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear

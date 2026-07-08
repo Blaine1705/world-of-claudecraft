@@ -171,10 +171,14 @@ const UI_PURE_CORES = [
 // cast_bar (the overhead cast/channel state) and nameplate_view (the per-entity
 // nameplate visibility / anchor / threat / combo model). Each emits state
 // from sim types with no Three import and no i18n, so a NameplatePainter /
-// cast_bar painter draws it and a Vitest drives it directly.
-const RENDER_PURE_CORES = ['src/render/cast_bar.ts', 'src/render/nameplate_view.ts'].map((rel) =>
-  join(repoRoot, rel),
-);
+// cast_bar painter draws it and a Vitest drives it directly. day_night_core is
+// the clock-to-grade math of the world day/night cycle (Date.now stays in the
+// renderer that calls it), so a Vitest can drive any moment of the cycle.
+const RENDER_PURE_CORES = [
+  'src/render/cast_bar.ts',
+  'src/render/nameplate_view.ts',
+  'src/render/day_night_core.ts',
+].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
 // whose basename does NOT end in _view / _core, so the onDiskCores() sweep's

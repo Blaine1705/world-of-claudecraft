@@ -341,6 +341,8 @@ export interface SkyView {
   dome: THREE.Mesh;
   /** cross-fades the HDRI pair toward the biome band the camera is over */
   setCameraPos(x: number, z: number, dt: number): void;
+  /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
+  setDayNight(mul: readonly [number, number, number]): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: BiomeId): THREE.DataTexture | null;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
@@ -381,6 +383,7 @@ const SKY_FRAG = /* glsl */ `
   uniform float uBackdropAmtB;
   uniform vec3 uTintA; // per-biome dome grade (white = untouched)
   uniform vec3 uTintB;
+  uniform vec3 uDayNight; // day/night grade (white = full day, dark blue = night)
   uniform float uLiftA; // 1 = mask the HDRI's photographed horizon hills
   uniform float uLiftB;
   varying vec3 vDir;
@@ -438,6 +441,7 @@ const SKY_FRAG = /* glsl */ `
     c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3;                        // warm glow around the anchor sun
     float sunCore = pow(max(dot(dir, uSunDir), 0.0), 90.0);
     c += vec3(1.0, 0.92, 0.75) * sunCore * 0.5;                      // tighter bright core
+    c *= uDayNight;                                                  // world day/night grade, last
     gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -503,6 +507,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     return {
       dome,
       setCameraPos: () => {},
+      setDayNight: () => {},
       envTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
@@ -535,6 +540,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uBackdropAmtB: { value: BIOME_BACKDROP_STRENGTH[start.to] },
     uTintA: { value: tintVec(start.from) },
     uTintB: { value: tintVec(start.to) },
+    uDayNight: { value: new THREE.Vector3(1, 1, 1) },
     uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
     uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
   };
@@ -580,6 +586,9 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
       const k = 1 - Math.exp(-dt * 3);
       uniforms.uMix.value += (next.t - uniforms.uMix.value) * k;
       cur = next;
+    },
+    setDayNight(mul: readonly [number, number, number]): void {
+      uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
     },
     envTexture(biome: BiomeId): THREE.DataTexture | null {
       return hdriStore[biome] ?? null;

@@ -1,0 +1,151 @@
+import { describe, expect, it } from 'vitest';
+import {
+  cyclePhase,
+  DAY_NIGHT_CYCLE_MS,
+  dayNightGrade,
+  effectiveDayness,
+  fullDayGrade,
+  globalDayness,
+  REALM_DAYNIGHT_AMPLITUDE,
+} from '../src/render/day_night_core';
+import type { BiomeId } from '../src/sim/types';
+
+// The day_night_core: the pure clock-to-grade math of the world day/night cycle.
+// The renderer supplies the wall-clock ms (Date.now) and applies the grade to the
+// sun/hemi/IBL/fog/sky; here we drive any moment of the cycle deterministically.
+
+describe('cyclePhase', () => {
+  it('maps epoch 0 to phase 0 and the half-cycle to 0.5', () => {
+    expect(cyclePhase(0)).toBe(0);
+    expect(cyclePhase(DAY_NIGHT_CYCLE_MS / 2)).toBeCloseTo(0.5, 12);
+  });
+
+  it('wraps to [0, 1) at a full cycle and beyond', () => {
+    expect(cyclePhase(DAY_NIGHT_CYCLE_MS)).toBeCloseTo(0, 12);
+    expect(cyclePhase(DAY_NIGHT_CYCLE_MS * 3.25)).toBeCloseTo(0.25, 12);
+  });
+
+  it('stays in range for a negative timestamp (defensive)', () => {
+    const p = cyclePhase(-DAY_NIGHT_CYCLE_MS / 4);
+    expect(p).toBeGreaterThanOrEqual(0);
+    expect(p).toBeLessThan(1);
+    expect(p).toBeCloseTo(0.75, 12);
+  });
+
+  it('is deterministic: same input, same output', () => {
+    const t = 1_700_000_000_000;
+    expect(cyclePhase(t)).toBe(cyclePhase(t));
+  });
+});
+
+describe('globalDayness', () => {
+  it('is darkest at midnight (phase 0) and brightest at noon (phase 0.5)', () => {
+    expect(globalDayness(0)).toBeCloseTo(0, 6);
+    expect(globalDayness(0.5)).toBeCloseTo(1, 6);
+    expect(globalDayness(1)).toBeCloseTo(0, 6);
+  });
+
+  it('is symmetric about noon', () => {
+    expect(globalDayness(0.25)).toBeCloseTo(globalDayness(0.75), 12);
+  });
+
+  it('rises monotonically from midnight to noon', () => {
+    let prev = -1;
+    for (let i = 0; i <= 50; i++) {
+      const v = globalDayness((i / 50) * 0.5);
+      expect(v).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = v;
+    }
+  });
+});
+
+describe('REALM_DAYNIGHT_AMPLITUDE', () => {
+  it('covers every biome with a weight in (0, 1]', () => {
+    for (const amp of Object.values(REALM_DAYNIGHT_AMPLITUDE)) {
+      expect(amp).toBeGreaterThan(0);
+      expect(amp).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('gives neutral daylight realms the full swing and signature realms less', () => {
+    // neutral realms take the whole day/night grade
+    for (const b of ['vale', 'marsh', 'peaks', 'fen', 'garden', 'gale'] as BiomeId[]) {
+      expect(REALM_DAYNIGHT_AMPLITUDE[b]).toBe(1);
+    }
+    // realms whose fixed time of day is their identity swing less than neutral
+    for (const b of ['night', 'dusk', 'ember', 'amber', 'frost', 'haunt'] as BiomeId[]) {
+      expect(REALM_DAYNIGHT_AMPLITUDE[b]).toBeLessThan(1);
+    }
+  });
+});
+
+describe('effectiveDayness', () => {
+  it('passes the global value through unchanged for a full-amplitude realm', () => {
+    for (const g of [0, 0.3, 0.5, 1]) {
+      expect(effectiveDayness(g, 'vale')).toBeCloseTo(g, 12);
+    }
+  });
+
+  it('compresses a signature realm toward its authored day look', () => {
+    // at global midnight the Nightbloom never reaches full night: it keeps a
+    // floor of (1 - amplitude), so it stays luminous
+    const amp = REALM_DAYNIGHT_AMPLITUDE.night;
+    expect(effectiveDayness(0, 'night')).toBeCloseTo(1 - amp, 12);
+    // and at global noon every realm sits at its full authored day
+    expect(effectiveDayness(1, 'night')).toBeCloseTo(1, 12);
+  });
+
+  it('clamps out-of-range global input', () => {
+    expect(effectiveDayness(-1, 'vale')).toBe(0);
+    expect(effectiveDayness(2, 'vale')).toBe(1);
+  });
+});
+
+describe('dayNightGrade', () => {
+  it('is the authored full-day look at e = 1 (no darkening, white multipliers)', () => {
+    const g = dayNightGrade(1);
+    expect(g.lightScale).toBeCloseTo(1, 12);
+    expect(g.sky).toEqual([1, 1, 1]);
+    expect(g.fog).toEqual([1, 1, 1]);
+    expect(g.farScale).toBeCloseTo(1, 12);
+    expect(g.nightAmt).toBeCloseTo(0, 12);
+  });
+
+  it('darkens, cools, and pulls sightlines in toward night (e = 0)', () => {
+    const g = dayNightGrade(0);
+    // moonlit, not black
+    expect(g.lightScale).toBeGreaterThan(0);
+    expect(g.lightScale).toBeLessThan(1);
+    // sky goes darker and bluer than fog (blue channel dominates, all < 1)
+    expect(g.sky[2]).toBeGreaterThan(g.sky[0]);
+    expect(Math.max(...g.sky)).toBeLessThan(1);
+    expect(Math.max(...g.fog)).toBeLessThan(1);
+    // fog stays lighter than the sky for readability
+    expect(g.fog[0]).toBeGreaterThan(g.sky[0]);
+    expect(g.farScale).toBeLessThan(1);
+    expect(g.nightAmt).toBeCloseTo(1, 12);
+  });
+
+  it('brightens monotonically from night to day', () => {
+    let prevLight = -1;
+    let prevSky = -1;
+    for (let i = 0; i <= 20; i++) {
+      const g = dayNightGrade(i / 20);
+      expect(g.lightScale).toBeGreaterThanOrEqual(prevLight - 1e-9);
+      expect(g.sky[2]).toBeGreaterThanOrEqual(prevSky - 1e-9);
+      prevLight = g.lightScale;
+      prevSky = g.sky[2];
+    }
+  });
+
+  it('clamps out-of-range e', () => {
+    expect(dayNightGrade(-5).lightScale).toBe(dayNightGrade(0).lightScale);
+    expect(dayNightGrade(5).lightScale).toBe(dayNightGrade(1).lightScale);
+  });
+});
+
+describe('fullDayGrade', () => {
+  it('equals the e = 1 grade (the safe pre-first-frame default)', () => {
+    expect(fullDayGrade()).toEqual(dayNightGrade(1));
+  });
+});
