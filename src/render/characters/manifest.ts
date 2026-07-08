@@ -18,8 +18,12 @@ export interface ClipMap {
   idle: string;
   walk: string;
   run: string;
-  /** one-shot swing clips, rotated per attack */
+  /** one-shot swing clips, rotated per attack (auto-attacks + un-mapped abilities) */
   attack: string[];
+  /** optional per-ability swing override (ability id -> clip name): a specific
+   *  attack ability plays its mapped clip instead of the round-robin. The clip
+   *  must exist in the model; missing keys/clips fall back to `attack`. */
+  attackByAbility?: Record<string, string>;
   death: string;
   /** hit-react one-shots (optional — spider/raptor rigs have none) */
   hit?: string[];
@@ -403,7 +407,34 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    // Auto-attacks rotate the two 1H swings; specific abilities override to a
+    // clip that fits their weight. knight.glb only ships 4 melee clips, so the
+    // heavy 2H chop stands in for finishers and the dual chop for fury flurries.
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByAbility: {
+        // Heavy finishers / big single hits: the two-handed overhead.
+        mortal_strike: '2H_Melee_Attack_Chop',
+        execute: '2H_Melee_Attack_Chop',
+        slam: '2H_Melee_Attack_Chop',
+        red_harvest: '2H_Melee_Attack_Chop',
+        breachmaker: '2H_Melee_Attack_Chop',
+        shield_slam: '2H_Melee_Attack_Chop',
+        // Fury multi-hits: the dual chop reads as a fast flurry.
+        raging_gale: 'Dualwield_Melee_Attack_Chop',
+        bloodthirst: 'Dualwield_Melee_Attack_Chop',
+        // Sweeping / downward strikes: the 1H overhead chop.
+        cleave: '1H_Melee_Attack_Chop',
+        thunder_clap: '1H_Melee_Attack_Chop',
+        faultline: '1H_Melee_Attack_Chop',
+        revenge: '1H_Melee_Attack_Chop',
+        // Quick strikes: the diagonal slice.
+        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
+        overpower: '1H_Melee_Attack_Slice_Diagonal',
+        rend: '1H_Melee_Attack_Slice_Diagonal',
+        hamstring: '1H_Melee_Attack_Slice_Diagonal',
+      },
+    },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],

@@ -104,6 +104,22 @@ import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 
+// Damage events carry the ability's English NAME (not its id); the per-ability
+// swing-animation override (VisualDef.attackByAbility) is keyed by id, so map
+// name -> id once at load to resolve a swing clip from a damage event.
+const ABILITY_ID_BY_NAME: Map<string, string> = new Map(
+  Object.entries(ABILITIES).map(([id, def]) => [def.name, id]),
+);
+function attackAbilityId(nameOrId: string | null): string | undefined {
+  if (!nameOrId) return undefined;
+  // A value that is already a known id wins; otherwise resolve the display name.
+  return ABILITIES[nameOrId] ? nameOrId : ABILITY_ID_BY_NAME.get(nameOrId);
+}
+
+// Instant melee abilities that animate as a one-shot self-spin (a little
+// tornado) instead of a normal swing. Bladestorm keeps its held channel spin.
+const SPIN_ATTACK_ABILITIES: ReadonlySet<string> = new Set(['whirlwind']);
+
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
 const ENTITY_DRAW_RANGE = 80;
@@ -2845,8 +2861,10 @@ export class Renderer {
         break;
       }
       case 'damage':
-        // every melee/ranged swing animates the attacker for all to see
-        if (ev.school === 'physical' && ev.sourceId !== -1) this.triggerAttack(ev.sourceId);
+        // every melee/ranged swing animates the attacker for all to see; a
+        // mapped ability picks its own swing clip (attackByAbility), else rotates
+        if (ev.school === 'physical' && ev.sourceId !== -1)
+          this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
@@ -3408,9 +3426,12 @@ export class Renderer {
     v.group.add(next.root);
   }
 
-  triggerAttack(entityId: number): void {
+  triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
-    if (v) this.activeVisual(v)?.playAttack();
+    const vis = v && this.activeVisual(v);
+    if (!vis) return;
+    if (abilityId && SPIN_ATTACK_ABILITIES.has(abilityId)) vis.playWhirl();
+    else vis.playAttack(abilityId);
   }
 
   triggerHit(entityId: number): void {
