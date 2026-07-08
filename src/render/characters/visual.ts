@@ -42,6 +42,11 @@ const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 // ~1.75) and the swing-loop speed.
 const SPIN_RATE = 14;
 const SPIN_ATTACK_TIMESCALE = 1.6;
+// Bladed Gyre (the INSTANT whirlwind): one quick self-spin rather than the held
+// Bladestorm channel. About 1.6 turns over the short duration reads as a snappy
+// little tornado, then the body snaps back to its facing.
+const SPIN_ONCE_DURATION = 0.55; // seconds
+const SPIN_ONCE_RATE = 18; // rad/sec
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
@@ -110,6 +115,7 @@ export class CharacterVisual {
   private pendingDt = 0;
   private swimPitch = 0;
   private spinAngle = 0;
+  private spinOnceTimer = 0;
 
   private shadowOn = true;
   private far = false;
@@ -263,6 +269,12 @@ export class CharacterVisual {
     // back to 0 the moment the channel ends so facing is authoritative again.
     if (s.spinning && !s.dead) {
       this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
+      this.spinOnceTimer = 0; // the held channel supersedes a one-shot whirl
+    } else if (this.spinOnceTimer > 0 && !s.dead) {
+      // Bladed Gyre: one quick spin, then snap the body back to its facing.
+      this.spinOnceTimer = Math.max(0, this.spinOnceTimer - dt);
+      this.spinAngle =
+        this.spinOnceTimer > 0 ? (this.spinAngle + dt * SPIN_ONCE_RATE) % (Math.PI * 2) : 0;
     } else {
       this.spinAngle = 0;
     }
@@ -308,12 +320,31 @@ export class CharacterVisual {
     return this.currentIsOneShot;
   }
 
-  playAttack(): void {
+  playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    // A mapped ability plays its specific swing clip (if the model has it);
+    // everything else rotates through the generic attack clips for variety.
+    const override = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    if (override && this.action(override)) {
+      this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
+      return;
+    }
     const clips = this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
     this.playOneShot(name, this.def.attackTimeScale ?? 1.3);
+  }
+
+  /** Instant whirlwind (Bladed Gyre): swing the blades fast while the body does
+   *  a single quick self-spin. Retriggering (each AoE target hit) just refreshes
+   *  the timer, so the whole spin holds for one duration. */
+  playWhirl(): void {
+    if (this.deadLock) return;
+    this.spinOnceTimer = SPIN_ONCE_DURATION;
+    const clips = this.def.clips.attack;
+    if (clips.length > 0) {
+      this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
+    }
   }
 
   playHit(): void {
@@ -763,6 +794,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.run,
     c.death,
     ...(c.attack ?? []),
+    ...Object.values(c.attackByAbility ?? {}),
     ...(c.hit ?? []),
     c.cast,
     c.sitDown,
