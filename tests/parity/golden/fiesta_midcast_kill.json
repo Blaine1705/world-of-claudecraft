@@ -31,8 +31,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 404,
-      "state": "b50f9ab9",
-      "events": "a1a98eff",
+      "state": "19412c04",
+      "events": "8fc7cad3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 404,
-      "state": "07a3e98b",
+      "state": "b164371b",
       "events": "6e60008d",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 404,
-      "state": "c15e0439",
+      "state": "49b00c5f",
       "events": "9b3dbf7d",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "9ec09ec3",
+      "state": "119cc668",
       "events": "e324e10d",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "20dffc20",
+      "state": "ebd28164",
       "events": "eac8ab97",
       "rng": {
         "draws": 300,
@@ -332,6 +332,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3595,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0995,
           "detonateTimer": "Infinity",
@@ -354,7 +365,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 12.412081,
+          "resource": 13.653289,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -534,7 +545,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "98710283",
+      "state": "9d2cf160",
       "events": "abc18e50",
       "rng": {
         "draws": 300,
@@ -791,6 +802,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3595,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0995,
           "detonateTimer": "Infinity",
@@ -813,7 +835,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 24.824162,
+          "resource": 27.306578,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -991,7 +1013,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "f8d77aff",
+      "state": "da6aa146",
       "events": "d24eb35d",
       "rng": {
         "draws": 300,
@@ -1250,6 +1272,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3595,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0995,
           "detonateTimer": "Infinity",
@@ -1272,7 +1305,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 24.824162,
+          "resource": 27.306578,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1450,7 +1483,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 404,
-      "state": "4e756d69",
+      "state": "9aa12224",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1461,7 +1494,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 404,
-      "state": "11cab991",
+      "state": "735b72a5",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1720,6 +1753,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3592.95,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.0995,
@@ -1743,7 +1787,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 24.824162,
+          "resource": 27.306578,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,

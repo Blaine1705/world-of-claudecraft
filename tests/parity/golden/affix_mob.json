@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "194fe20f",
+      "state": "9b01d8fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -126,7 +137,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 403,
-      "state": "d01ec5e6",
+      "state": "677cd29b",
       "events": "81a55ed7",
       "rng": {
         "draws": 14,
@@ -137,7 +148,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 403,
-      "state": "4cde55d0",
+      "state": "abfe883a",
       "events": "684ef1dc",
       "rng": {
         "draws": 28,
@@ -148,7 +159,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 403,
-      "state": "51e50735",
+      "state": "59f1b639",
       "events": "36a8ae1e",
       "rng": {
         "draws": 57,
@@ -212,6 +223,15 @@
           "attackPower": 94,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.5,
+              "school": "physical",
+              "sourceId": 400
+            },
+            {
               "duration": 9,
               "id": "bleed_ridge_stalker",
               "kind": "dot",
@@ -254,7 +274,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 18.038462,
+          "resource": 19.842308,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -399,7 +419,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 403,
-      "state": "21eae066",
+      "state": "5e2db776",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -463,6 +483,15 @@
           "attackPower": 94,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.3,
+              "school": "physical",
+              "sourceId": 400
+            },
+            {
               "duration": 9,
               "id": "bleed_ridge_stalker",
               "kind": "dot",
@@ -506,7 +535,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 18.038462,
+          "resource": 19.842308,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,

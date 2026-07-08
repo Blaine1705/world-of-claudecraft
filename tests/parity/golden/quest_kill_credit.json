@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "194fe20f",
+      "state": "9b01d8fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -126,7 +137,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "6041fc08",
+      "state": "a337dbf3",
       "events": "00bafcff",
       "rng": {
         "draws": 0,
@@ -197,6 +208,17 @@
         {
           "aiState": "idle",
           "attackPower": 82,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0645,
@@ -249,7 +271,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "2ab6ce01",
+      "state": "92efa9d3",
       "events": "d894ee18",
       "rng": {
         "draws": 40,
@@ -324,6 +346,17 @@
         {
           "aiState": "idle",
           "attackPower": 82,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.6,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 0.05,
           "comboUntil": -1,
           "critChance": 0.0645,
@@ -377,7 +410,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "c31b49dc",
+      "state": "257db5ce",
       "events": "272aafab",
       "rng": {
         "draws": 40,
@@ -447,6 +480,17 @@
         {
           "aiState": "idle",
           "attackPower": 82,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.6,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 0.05,
           "comboUntil": -1,
           "critChance": 0.0645,
@@ -500,7 +544,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "3dff6d74",
+      "state": "2f16a7bb",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -570,6 +614,17 @@
         {
           "aiState": "idle",
           "attackPower": 82,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.5,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 0.15,
           "comboUntil": -1,
           "critChance": 0.0645,

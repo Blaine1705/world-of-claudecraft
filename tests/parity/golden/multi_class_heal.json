@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "05b20b9d",
+      "state": "e60eefe2",
       "events": "36482172",
       "rng": {
         "draws": 6,
@@ -496,6 +496,15 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 404
+            },
+            {
               "duration": 60,
               "id": "absorb_big",
               "kind": "heal_absorb",
@@ -779,7 +788,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "696031b0",
+      "state": "28c6c3f3",
       "events": "730d9ac4",
       "rng": {
         "draws": 6,
@@ -1243,6 +1252,15 @@
           "attackPower": 46,
           "auras": [
             {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 404
+            },
+            {
               "duration": 60,
               "id": "absorb_big",
               "kind": "heal_absorb",
@@ -1544,7 +1562,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "861f619c",
+      "state": "fad4edfc",
       "events": "fb83a59d",
       "rng": {
         "draws": 10,
@@ -1555,7 +1573,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "a0d7736e",
+      "state": "772dd80e",
       "events": "fb83a59d",
       "rng": {
         "draws": 10,
@@ -2019,6 +2037,15 @@
           "aiState": "idle",
           "attackPower": 46,
           "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.6,
+              "school": "physical",
+              "sourceId": 404
+            },
             {
               "duration": 60,
               "id": "absorb_big",

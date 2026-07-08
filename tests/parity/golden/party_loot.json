@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 403,
-      "state": "770ce393",
+      "state": "078d30fe",
       "events": "e50fb0d8",
       "rng": {
         "draws": 2,
@@ -137,6 +137,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.85,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 99.15,
           "comboUntil": -1,
           "critChance": 0.06,

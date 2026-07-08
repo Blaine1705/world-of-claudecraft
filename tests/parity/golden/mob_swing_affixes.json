@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "194fe20f",
+      "state": "9b01d8fc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 400
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -127,7 +138,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "9062b9ad",
+      "state": "896b69a7",
       "events": "b215f456",
       "rng": {
         "draws": 54,
@@ -138,7 +149,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "54201160",
+      "state": "07afc4b3",
       "events": "04e020e2",
       "rng": {
         "draws": 95,
@@ -149,7 +160,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "105c2608",
+      "state": "69d1d6b9",
       "events": "96d8859c",
       "rng": {
         "draws": 224,
@@ -160,7 +171,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "77a9de56",
+      "state": "74e0d367",
       "events": "741638a5",
       "rng": {
         "draws": 224,
@@ -222,6 +233,15 @@
           "aiState": "idle",
           "attackPower": 106,
           "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597,
+              "school": "physical",
+              "sourceId": 400
+            },
             {
               "duration": 3,
               "id": "ensnare_webwood_spider",
@@ -287,7 +307,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 83.166667,
+          "resource": 91.483333,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -614,7 +634,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 407,
-      "state": "62d91f77",
+      "state": "f14c12d3",
       "events": "741638a5",
       "rng": {
         "draws": 244,
@@ -676,6 +696,15 @@
           "aiState": "idle",
           "attackPower": 106,
           "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3596.8,
+              "school": "physical",
+              "sourceId": 400
+            },
             {
               "duration": 3,
               "id": "ensnare_webwood_spider",
@@ -741,7 +770,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 83.166667,
+          "resource": 91.483333,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
