@@ -96,8 +96,8 @@ describe('spell_resist: cast outcome labeling', () => {
 
   it('a physical ability (sunder) still emits kind:"miss" when avoided', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
-    // Armor Shear (sunder_armor) is arms/prot-gated base kit (2026-07-07).
-    expect(sim.setSpec('arms')).toBe(true);
+    // Armor Shear (sunder_armor) is Protection-only base kit (2026-07-08).
+    expect(sim.setSpec('prot')).toBe(true);
     const mob = spawnTarget(sim, p, 60, 2);
     sim.rng.chance = () => true; // meleeMissChance roll -> miss
 

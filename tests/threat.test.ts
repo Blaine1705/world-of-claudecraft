@@ -450,16 +450,19 @@ describe('sunder armor', () => {
     expect(threat).toBeGreaterThanOrEqual(100 * applications);
   });
 
-  it('for Arms the flat tank threat is dropped (armor shred only); no-spec cannot sunder at all', () => {
-    // Arms keeps sunder as a plain armor-shred with NO tank-threat spike, so the
-    // only threat is the tiny combat-entry seed, well under one 100-flat sunder.
-    expect(sunderTwice('arms').threat).toBeLessThan(100);
-    // A no-spec warrior does not know Armor Shear at all (spec-gated, 2026-07-07),
-    // so there is no sunder to carry any threat, flat or otherwise.
-    const noSpec = makeSim('warrior');
-    noSpec.setPlayerLevel(10);
-    expect(noSpec.known.some((k) => k.def.id === 'sunder_armor')).toBe(false);
-    expect(noSpec.resolvedAbility('sunder_armor')).toBeNull();
+  it('only committed Protection can sunder; Arms and no-spec cannot (Armor Shear prot-only 2026-07-08)', () => {
+    // Arms restructure 2026-07-08: Armor Shear is Protection-only now, so neither a
+    // committed Arms warrior nor a no-spec warrior knows or can resolve it.
+    for (const spec of ['arms', null] as const) {
+      const sim = makeSim('warrior');
+      sim.setPlayerLevel(10);
+      if (spec) expect(sim.setSpec(spec)).toBe(true);
+      expect(
+        sim.known.some((k) => k.def.id === 'sunder_armor'),
+        `${spec} known`,
+      ).toBe(false);
+      expect(sim.resolvedAbility('sunder_armor'), `${spec} resolve`).toBeNull();
+    }
   });
 });
 

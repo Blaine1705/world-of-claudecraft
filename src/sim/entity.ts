@@ -3,7 +3,13 @@ import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
-import { AVATAR_SCALE, BERSERKER_CRIT_CHANCE, EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
+import {
+  AVATAR_SCALE,
+  BERSERKER_CRIT_CHANCE,
+  DIE_BY_SWORD_DODGE,
+  EQUIP_SLOTS,
+  SPELL_POWER_PER_INT,
+} from './types';
 
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
@@ -266,6 +272,8 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    // Die by the Sword: its "+100% parry" is modelled as a big dodge boost.
+    else if (a.kind === 'die_by_sword') bonusDodge += DIE_BY_SWORD_DODGE;
     // Choice-row talent buffs: additive crit chance while worn. buff_crit is the
     // generic kind; buff_reckless carries Recklessness' +20% crit half (its rage
     // half lives in rageGenAuraMult); a bloodbath aura's value is its per-stack

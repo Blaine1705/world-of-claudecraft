@@ -192,7 +192,9 @@ describe('classic formulas', () => {
     const armsMods = computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' });
     const w10 = abilitiesKnownAt('warrior', 10, armsMods);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
-    const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
+    // Reaver Strike (heroic_strike) now excludes arms too (2026-07-08), so read its
+    // rank via the no-spec kit which keeps it: rank 2 at level 10.
+    const hs10 = abilitiesKnownAt('warrior', 10).find((k) => k.def.id === 'heroic_strike')!;
     expect(hs10.rank).toBe(2);
     const m8 = abilitiesKnownAt('mage', 8).map((k) => k.def.id);
     expect(m8).toContain('polymorph');
@@ -1440,16 +1442,20 @@ describe('leveling', () => {
     expect(sim.player.level).toBe(5);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
-    // Deep Gash (rend) unlocks at level 5 but is arms-gated (2026-07-07): a
-    // no-spec warrior does not learn it (and a spec cannot be committed until
-    // level 10). Under arms its level-5 unlock is present.
+    // Deep Gash (rend) was retired from the warrior kit 2026-07-08: no warrior
+    // learns it now (its ABILITIES def survives but is in no kit list). The Arms
+    // level-5 unlock is instead Gaping Wounds (deep_wounds), an arms-gated passive:
+    // hidden with no spec (a spec cannot be committed until level 10) and present
+    // under arms.
     expect(sim.known.map((k) => k.def.id)).not.toContain('rend');
+    expect(sim.known.map((k) => k.def.id)).not.toContain('deep_wounds');
     const armsAt5 = abilitiesKnownAt(
       'warrior',
       5,
       computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' }),
     );
-    expect(armsAt5.map((k) => k.def.id)).toContain('rend');
+    expect(armsAt5.map((k) => k.def.id)).not.toContain('rend');
+    expect(armsAt5.map((k) => k.def.id)).toContain('deep_wounds');
   });
 
   it('caps at max level', () => {

@@ -19,9 +19,15 @@ export function consumeNextCastFree(ctx: SimContext, e: Entity): boolean {
 
 // Battle Trance (warrior baseline): the ability-SCOPED sibling of
 // next_cast_free. Connected auto swings arm the aura (auto_attack.ts); only
-// these two abilities may spend it. The action bar imports the same predicate
-// for its proc glow / usable state, so sim and UI can never disagree on scope.
-export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set(['heroic_strike', 'slam']);
+// these abilities may spend it. The action bar imports the same predicate for
+// its proc glow / usable state, so sim and UI can never disagree on scope.
+// Maiming Strike is Arms-granted, so it only participates for committed Arms
+// (its owner restructure 2026-07-08 free-proc), never for Fury / no-spec.
+export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set([
+  'heroic_strike',
+  'slam',
+  'mortal_strike',
+]);
 
 // Revenge free-cost proc (Protection): the dodge/parry-armed sibling of
 // battle_trance. Applied in mobSwing when the warrior dodges or parries; only
