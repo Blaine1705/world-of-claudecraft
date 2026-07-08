@@ -208,12 +208,16 @@ export function paintTerrainRows(
         b = 48;
 
       if (h < WATER_LEVEL) {
-        // -- water: depth-graded blue with a faint chop, coastline inked --
-        const depth = Math.min(1, (WATER_LEVEL - h) / 9);
-        r = 58 + (18 - 58) * depth;
-        g = 118 + (44 - 118) * depth;
-        b = 158 + (86 - 158) * depth;
-        const chop = (hash2(Math.round(x * 0.6), Math.round(z * 0.6), seed + 811) - 0.5) * 7;
+        // -- water: an EVEN depth-graded blend, light in the shallows (near
+        // shore and in lakes) easing to a dark deep-ocean blue in the death
+        // zones far out; a faint chop and the inked coastline over it. The ease
+        // (smoothstep) keeps the shore-to-deep transition gradual, not a ring.
+        const t = Math.min(1, (WATER_LEVEL - h) / 8);
+        const depth = t * t * (3 - 2 * t);
+        r = 96 + (20 - 96) * depth;
+        g = 160 + (44 - 160) * depth;
+        b = 198 + (84 - 198) * depth;
+        const chop = (hash2(Math.round(x * 0.6), Math.round(z * 0.6), seed + 811) - 0.5) * 3.5;
         r += chop;
         g += chop;
         b += chop;
