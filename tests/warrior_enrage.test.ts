@@ -69,7 +69,7 @@ describe('Fury Enrage: proc sources', () => {
     sim.targetEntity(mob.id);
     sim.castAbility('red_harvest');
     sim.tick();
-    const a = sim.player.auras.find((x) => x.id === 'enrage');
+    const a = sim.player.auras.find((x) => x.id === 'fury_enrage');
     expect(a?.kind).toBe('enrage');
     expect(a?.value).toBe(ENRAGE_DMG_DONE);
     expect(a?.duration).toBe(4);
@@ -103,7 +103,7 @@ describe('Fury Enrage: the buff carries all three halves', () => {
     const dropNoEnrage = mob.maxHp - mob.hp;
 
     p.auras.push({
-      id: 'enrage',
+      id: 'fury_enrage',
       name: 'Enraged',
       kind: 'enrage',
       remaining: 4,

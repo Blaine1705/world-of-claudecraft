@@ -409,7 +409,10 @@ export function runEffects(
         // (keeps the shared stream's order stable for the deterministic path).
         if (eff.chance < 1 && !ctx.rng.chance(eff.chance)) break;
         ctx.applyAura(p, {
-          id: 'enrage',
+          // NOT 'enrage': that id is the druid Enrage ability (Avivar), and the
+          // buff bar resolves an aura whose id is a known ability to that ability's
+          // name/icon. A distinct id keeps this the Fury self-buff 'Enraged'.
+          id: 'fury_enrage',
           name: 'Enraged',
           kind: 'enrage',
           remaining: eff.duration,
