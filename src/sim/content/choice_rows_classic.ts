@@ -1,8 +1,8 @@
 import type { ClassChoiceRows } from './choice_rows';
 
-const mageSpellCostMods = [
+const mageSpellAbilityIds = [
   // Any new mage spell with a mana cost must be listed here, or Mana Attunement
-  // will overstate its "all Mage spell costs" description.
+  // will overstate its "mana spell" description.
   'fireball',
   'frostbolt',
   'fire_blast',
@@ -29,7 +29,7 @@ const mageSpellCostMods = [
   'deep_freeze',
   'meteor',
   'evocation',
-].map((ability) => ({ ability, costPct: -0.1 }));
+];
 
 export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
@@ -226,9 +226,23 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r5_firestarter',
           name: 'Firestarter',
-          description: 'Scorch is castable while moving.',
+          description: 'Every 3rd Fireball makes your next Fire Blast within 8 sec free.',
           icon: 'scorch',
-          effect: { ability: [{ ability: 'scorch', castWhileMoving: true }] },
+          effect: {
+            proc: {
+              id: 'mag_firestarter',
+              name: 'Firestarter',
+              trigger: { on: 'castNth', n: 3, abilities: ['fireball'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['fire_blast'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r5_impulse',
@@ -240,9 +254,26 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r5_mana_attunement',
           name: 'Mana Attunement',
-          description: 'All spell costs reduced by 10%.',
+          description:
+            'Every 3rd mana spell restores 20 mana and makes your next spell within 8 sec cost 50% less.',
           icon: 'arcane_intellect',
-          effect: { ability: mageSpellCostMods },
+          effect: {
+            proc: {
+              id: 'mag_mana_attunement',
+              name: 'Mana Attunement',
+              trigger: { on: 'castNth', n: 3, abilities: mageSpellAbilityIds },
+              responses: [
+                { kind: 'resource', amount: 20 },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: mageSpellAbilityIds,
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -294,9 +325,16 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r11_permafrost',
           name: 'Deep Rime',
-          description: 'Ice Barrier absorb increased by 40%.',
+          description: 'Each Frost Nova grants you a shield absorbing 50 damage for 8 sec.',
           icon: 'ice_barrier',
-          effect: { ability: [{ ability: 'ice_barrier', dmgPct: 0.4 }] },
+          effect: {
+            proc: {
+              id: 'mag_deep_rime',
+              name: 'Deep Rime',
+              trigger: { on: 'castNth', n: 1, abilities: ['frost_nova'] },
+              responses: [{ kind: 'absorb', amount: 50, duration: 8, name: 'Deep Rime' }],
+            },
+          },
         },
       ],
     },
@@ -312,13 +350,30 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           effect: { grant: { ability: 'presence_of_mind' } },
         },
         {
-          // Placeholder until the S3 streak engine lands (fun-pass N1); then this
-          // option becomes the two-crits-empower-next behavior on the same id.
           id: 'mag_r14_hot_streak',
           name: 'Slow Burn',
-          description: 'Reduces the cast time of Pyroblast by 50%.',
+          description:
+            'Every 3rd Fire spell makes your next Fireball or Pyroblast within 8 sec instant.',
           icon: 'pyroblast',
-          effect: { ability: [{ ability: 'pyroblast', castPct: -0.5 }] },
+          effect: {
+            proc: {
+              id: 'mag_slow_burn',
+              name: 'Slow Burn',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['fireball', 'fire_blast', 'scorch', 'pyroblast'],
+              },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['fireball', 'pyroblast'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r14_netherwind',
@@ -343,16 +398,24 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r17_ice_block',
           name: 'Cold Coffin',
-          description: 'Grants Ice Block.',
+          description: 'Grants Cold Coffin.',
           icon: 'ice_block',
           effect: { grant: { ability: 'ice_block' } },
         },
         {
           id: 'mag_r17_battlemage_armor',
           name: 'Battlemage Armor',
-          description: 'Armor increased by 10% and maximum health increased by 5%.',
+          description:
+            'Taking a hit above 15% of your maximum health raises a ward absorbing 90 damage for 8 sec. 20 sec internal cooldown.',
           icon: 'frost_armor',
-          effect: { stats: { armorPct: 0.1, maxHpPct: 0.05 } },
+          effect: {
+            proc: {
+              id: 'mag_battlemage_armor',
+              name: 'Battlemage Armor',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [{ kind: 'absorb', amount: 90, duration: 8, name: 'Battlemage Armor' }],
+            },
+          },
         },
       ],
     },
@@ -608,9 +671,23 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r5_improved_serpent_sting',
           name: 'Improved Venom Barb',
-          description: 'Venom Barb deals 30% more damage.',
+          description: 'Every 3rd Venom Barb makes your next Fell Shot within 8 sec free.',
           icon: 'serpent_sting',
-          effect: { ability: [{ ability: 'serpent_sting', dmgPct: 0.3 }] },
+          effect: {
+            proc: {
+              id: 'hun_improved_venom_barb',
+              name: 'Improved Venom Barb',
+              trigger: { on: 'castNth', n: 3, abilities: ['serpent_sting'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_shot'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r5_quick_shots',
@@ -622,13 +699,36 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r5_aspect_mastery',
           name: 'Aspect Mastery',
-          description: "Harrier's Guise and Marten's Guise effects increased by 40%.",
+          description:
+            "Changing into Harrier's Guise or Marten's Guise makes your next shot within 8 sec cost 50% less.",
           icon: 'aspect_of_the_hawk',
           effect: {
-            ability: [
-              { ability: 'aspect_of_the_hawk', buffPct: 0.4 },
-              { ability: 'aspect_of_the_monkey', buffPct: 0.4 },
-            ],
+            proc: {
+              id: 'hun_aspect_mastery',
+              name: 'Aspect Mastery',
+              trigger: {
+                on: 'castNth',
+                n: 1,
+                abilities: ['aspect_of_the_hawk', 'aspect_of_the_monkey'],
+              },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: [
+                    'serpent_sting',
+                    'arcane_shot',
+                    'concussive_shot',
+                    'aimed_shot',
+                    'counter_shot',
+                    'multi_shot',
+                    'volley',
+                  ],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
           },
         },
       ],
@@ -674,26 +774,52 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r11_efficiency',
           name: 'Lean Quiver',
-          description: 'Hunter shots cost 15% less.',
+          description:
+            'Every 3rd ranged shot restores 20 mana and makes your next Long Draw within 8 sec instant.',
           icon: 'aimed_shot',
           effect: {
-            ability: [
-              { ability: 'serpent_sting', costPct: -0.15 },
-              { ability: 'arcane_shot', costPct: -0.15 },
-              { ability: 'concussive_shot', costPct: -0.15 },
-              { ability: 'aimed_shot', costPct: -0.15 },
-              { ability: 'counter_shot', costPct: -0.15 },
-              { ability: 'multi_shot', costPct: -0.15 },
-              { ability: 'volley', costPct: -0.15 },
-            ],
+            proc: {
+              id: 'hun_lean_quiver',
+              name: 'Lean Quiver',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: [
+                  'serpent_sting',
+                  'arcane_shot',
+                  'concussive_shot',
+                  'aimed_shot',
+                  'counter_shot',
+                  'multi_shot',
+                  'volley',
+                ],
+              },
+              responses: [
+                { kind: 'resource', amount: 20 },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['aimed_shot'],
+                  duration: 8,
+                },
+              ],
+            },
           },
         },
         {
           id: 'hun_r11_survival_instincts',
           name: 'Deathless Will',
-          description: 'Maximum health increased by 8% and dodge increased by 2%.',
+          description:
+            'Taking a hit above 30% of your maximum health grants a shield absorbing 80 damage for 8 sec. 30 sec internal cooldown.',
           icon: 'aspect_of_the_monkey',
-          effect: { stats: { maxHpPct: 0.08, dodge: 0.02 } },
+          effect: {
+            proc: {
+              id: 'hun_deathless_will',
+              name: 'Deathless Will',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.3, icd: 30 },
+              responses: [{ kind: 'absorb', amount: 80, duration: 8, name: 'Deathless Will' }],
+            },
+          },
         },
       ],
     },
@@ -711,9 +837,23 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r14_sniper_training',
           name: 'Sniper Training',
-          description: 'Long Draw cast time reduced by 30% and damage increased by 10%.',
+          description: 'Rattling Shot makes your next Fell Shot within 8 sec free.',
           icon: 'aimed_shot',
-          effect: { ability: [{ ability: 'aimed_shot', castPct: -0.3, dmgPct: 0.1 }] },
+          effect: {
+            proc: {
+              id: 'hun_sniper_training',
+              name: 'Sniper Training',
+              trigger: { on: 'castNth', n: 1, abilities: ['concussive_shot'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_shot'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r14_serpents_venom',
@@ -746,21 +886,39 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r17_master_tamer',
           name: 'Master Tamer',
-          description: 'Tame Beast and Revive Pet cast times reduced by 50%.',
+          description:
+            'When Patch Up runs its full 15 sec duration, the target gains a shield absorbing 60 damage for 8 sec.',
           icon: 'tame_beast',
           effect: {
-            ability: [
-              { ability: 'tame_beast', castPct: -0.5 },
-              { ability: 'revive_pet', castPct: -0.5 },
-            ],
+            proc: {
+              id: 'hun_master_tamer',
+              name: 'Master Tamer',
+              trigger: { on: 'hotExpired', ability: 'mend_pet' },
+              responses: [{ kind: 'absorb', amount: 60, duration: 8, name: 'Master Tamer' }],
+            },
           },
         },
         {
           id: 'hun_r17_thick_hide',
           name: 'Calloused Hide',
-          description: 'Armor increased by 10% and dodge increased by 2%.',
+          description:
+            'Taking a hit above 15% of your maximum health makes your next Rattling Shot within 8 sec free. 20 sec internal cooldown.',
           icon: 'aspect_of_the_monkey',
-          effect: { stats: { armorPct: 0.1, dodge: 0.02 } },
+          effect: {
+            proc: {
+              id: 'hun_calloused_hide',
+              name: 'Calloused Hide',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['concussive_shot'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -771,9 +929,23 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r20_improved_volley',
           name: 'Improved Volley',
-          description: 'Volley deals 30% more damage and costs 20% less.',
+          description: 'Volley makes your next Fell Shot or Splitshot within 8 sec free.',
           icon: 'volley',
-          effect: { ability: [{ ability: 'volley', dmgPct: 0.3, costPct: -0.2 }] },
+          effect: {
+            proc: {
+              id: 'hun_improved_volley',
+              name: 'Improved Volley',
+              trigger: { on: 'castNth', n: 1, abilities: ['volley'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_shot', 'multi_shot'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r20_rapid_killing',
@@ -810,9 +982,24 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r5_improved_backstab',
           name: 'Improved Backstab',
-          description: 'Backstab deals 25% more damage.',
+          description: 'Craven Thrust makes your next Dirt Nap within 6 sec cost 50% less energy.',
           icon: 'backstab',
-          effect: { ability: [{ ability: 'backstab', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'rog_improved_backstab',
+              name: 'Improved Backstab',
+              trigger: { on: 'castNth', n: 1, abilities: ['backstab'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['eviscerate'],
+                  duration: 6,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'rog_r5_opportunist',
@@ -849,9 +1036,16 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r8_improved_kidney_shot',
           name: 'Improved Low Blow',
-          description: 'Kidney Shot costs 25% less.',
+          description: 'Low Blow restores 15 energy when it lands.',
           icon: 'kidney_shot',
-          effect: { ability: [{ ability: 'kidney_shot', costPct: -0.25 }] },
+          effect: {
+            proc: {
+              id: 'rog_improved_low_blow',
+              name: 'Improved Low Blow',
+              trigger: { on: 'castNth', n: 1, abilities: ['kidney_shot'] },
+              responses: [{ kind: 'resource', amount: 15 }],
+            },
+          },
         },
       ],
     },
@@ -881,9 +1075,27 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r11_improved_slice_and_dice',
           name: 'Improved Cutthroat Tempo',
-          description: 'Slice and Dice effect increased by 25%.',
+          description: 'Every 3rd builder makes your next Cutthroat Tempo within 8 sec free.',
           icon: 'slice_and_dice',
-          effect: { ability: [{ ability: 'slice_and_dice', buffPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'rog_improved_cutthroat_tempo',
+              name: 'Improved Cutthroat Tempo',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['sinister_strike', 'backstab', 'gouge', 'ambush', 'garrote'],
+              },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['slice_and_dice'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -894,13 +1106,24 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r14_seal_fate',
           name: 'Final Notice',
-          description: 'Eviscerate and Rupture deal 20% more damage.',
+          description:
+            'Each Dirt Nap or Bleed Out makes your next builder within 8 sec cost 50% less energy.',
           icon: 'eviscerate',
           effect: {
-            ability: [
-              { ability: 'eviscerate', dmgPct: 0.2 },
-              { ability: 'rupture', dmgPct: 0.2 },
-            ],
+            proc: {
+              id: 'rog_final_notice',
+              name: 'Final Notice',
+              trigger: { on: 'castNth', n: 1, abilities: ['eviscerate', 'rupture'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['sinister_strike', 'backstab', 'gouge'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {
@@ -913,14 +1136,15 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r14_deadly_brew',
           name: 'Deadly Brew',
-          description: 'Poisons deal 30% more damage.',
+          description: 'Melee swings with an active poison restore 5 energy.',
           icon: 'deadly_poison',
           effect: {
-            ability: [
-              { ability: 'crippling_poison', dmgPct: 0.3 },
-              { ability: 'instant_poison', dmgPct: 0.3 },
-              { ability: 'deadly_poison', dmgPct: 0.3 },
-            ],
+            proc: {
+              id: 'rog_deadly_brew',
+              name: 'Deadly Brew',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+              responses: [{ kind: 'resource', amount: 5 }],
+            },
           },
         },
       ],
@@ -939,16 +1163,34 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r17_improved_evasion',
           name: 'Improved Evasion',
-          description: 'Evasion effect increased by 30% and cooldown reduced by 20%.',
+          description:
+            'Ghostfoot restores 30 energy and makes your next builder within 8 sec cost 50% less energy.',
           icon: 'evasion',
-          effect: { ability: [{ ability: 'evasion', buffPct: 0.3, cooldownPct: -0.2 }] },
+          effect: {
+            proc: {
+              id: 'rog_improved_evasion',
+              name: 'Improved Evasion',
+              trigger: { on: 'castNth', n: 1, abilities: ['evasion'] },
+              responses: [
+                { kind: 'resource', amount: 30 },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['sinister_strike', 'backstab', 'gouge'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'rog_r17_cheat_death',
           name: 'Cheat Death',
-          description: 'Maximum health increased by 10% and dodge increased by 3%.',
+          description:
+            'A blow that would kill you leaves you at 1 health instead. Once every 120 sec.',
           icon: 'vanish',
-          effect: { stats: { maxHpPct: 0.1, dodge: 0.03 } },
+          effect: { global: { cheatDeathIcd: 120 } },
         },
       ],
     },
@@ -973,21 +1215,20 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r20_master_assassin',
           name: 'Master Assassin',
-          description:
-            'Your spell critical strikes reset Earthen Jolt and make your next Earthen Jolt within 8 sec free.',
+          description: 'Each opener makes your next finisher within 6 sec cost 50% less energy.',
           icon: 'ambush',
           effect: {
             proc: {
-              id: 'sha_earthen_fury',
-              name: 'Earthen Fury',
-              trigger: { on: 'spellCrit' },
+              id: 'rog_master_assassin',
+              name: 'Master Assassin',
+              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
               responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
                 {
                   kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['earth_shock'],
-                  duration: 8,
+                  aura: 'next_cast_cheap',
+                  abilities: ['eviscerate', 'rupture', 'kidney_shot', 'slice_and_dice'],
+                  duration: 6,
+                  costPct: 0.5,
                 },
               ],
             },
@@ -1553,9 +1794,23 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r5_improved_immolate',
           name: 'Improved Immolate',
-          description: 'Immolate deals 25% more damage.',
+          description: 'Every 3rd Immolate makes your next Shadow Bolt within 8 sec instant.',
           icon: 'immolate',
-          effect: { ability: [{ ability: 'immolate', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'wlk_improved_immolate',
+              name: 'Improved Immolate',
+              trigger: { on: 'castNth', n: 3, abilities: ['immolate'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['shadow_bolt'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -1600,16 +1855,31 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r11_fel_concentration',
           name: 'Unbroken Focus',
-          description: 'Drain Life deals 25% more damage.',
+          description: 'Starting Drain Life restores 20 mana.',
           icon: 'drain_life',
-          effect: { ability: [{ ability: 'drain_life', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'wlk_unbroken_focus',
+              name: 'Unbroken Focus',
+              trigger: { on: 'castNth', n: 1, abilities: ['drain_life'] },
+              responses: [{ kind: 'resource', amount: 20 }],
+            },
+          },
         },
         {
           id: 'wlk_r11_demon_armor',
           name: 'Demon Armor',
-          description: 'Demon Skin armor increased by 40%.',
+          description:
+            'Taking a hit above 15% of your maximum health raises a ward absorbing 60 damage for 10 sec. 20 sec internal cooldown.',
           icon: 'demon_skin',
-          effect: { ability: [{ ability: 'demon_skin', buffPct: 0.4 }] },
+          effect: {
+            proc: {
+              id: 'wlk_demon_armor',
+              name: 'Demon Armor',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [{ kind: 'absorb', amount: 60, duration: 10, name: 'Demon Armor' }],
+            },
+          },
         },
       ],
     },
@@ -1620,28 +1890,52 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r14_amplify_curse',
           name: 'Deepened Hex',
-          description: 'Curse of Agony deals 25% more damage.',
+          description: 'Shadow Bolt deals 20% more damage to targets afflicted by your DoTs.',
           icon: 'curse_of_agony',
-          effect: { ability: [{ ability: 'curse_of_agony', dmgPct: 0.25 }] },
+          effect: { ability: [{ ability: 'shadow_bolt', dmgPctVsDotted: 0.2 }] },
         },
         {
           id: 'wlk_r14_ruin',
           name: 'Desolation',
-          description: 'Searing Pain and Shadowburn deal 20% more damage.',
+          description: 'Every 3rd Shadow Bolt makes your next Immolate within 8 sec instant.',
           icon: 'shadowburn',
           effect: {
-            ability: [
-              { ability: 'searing_pain', dmgPct: 0.2 },
-              { ability: 'shadowburn', dmgPct: 0.2 },
-            ],
+            proc: {
+              id: 'wlk_desolation',
+              name: 'Desolation',
+              trigger: { on: 'castNth', n: 3, abilities: ['shadow_bolt'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['immolate'],
+                  duration: 8,
+                },
+              ],
+            },
           },
         },
         {
           id: 'wlk_r14_shadow_mastery',
           name: 'Umbral Mastery',
-          description: 'Spell damage increased by 6%.',
+          description: 'Each Fire spell makes your next Shadow spell within 8 sec cost 50% less.',
           icon: 'shadow_bolt',
-          effect: { global: { spellDmgPct: 0.06 } },
+          effect: {
+            proc: {
+              id: 'wlk_umbral_mastery',
+              name: 'Umbral Mastery',
+              trigger: { on: 'castNth', n: 1, abilities: ['immolate', 'searing_pain'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['shadow_bolt', 'drain_life', 'curse_of_agony', 'corruption'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -1666,9 +1960,17 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r17_demonic_resilience',
           name: 'Unyielding Pact',
-          description: 'Maximum health increased by 10%.',
+          description:
+            'Taking a hit above 15% of your maximum health heals you for 50. 20 sec internal cooldown.',
           icon: 'demon_skin',
-          effect: { stats: { maxHpPct: 0.1 } },
+          effect: {
+            proc: {
+              id: 'wlk_unyielding_pact',
+              name: 'Unyielding Pact',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [{ kind: 'heal', amount: 50 }],
+            },
+          },
         },
       ],
     },
@@ -1686,20 +1988,53 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r20_grimoire_of_haste',
           name: 'Grimoire of Carnage',
-          description: 'Your demon deals 10% more damage.',
+          description:
+            'Every 3rd curse, Fire, or Shadow spell raises a demonic ward absorbing 120 damage for 10 sec.',
           icon: 'summon_felhound',
-          effect: { global: { petDmgPct: 0.1 } },
+          effect: {
+            proc: {
+              id: 'wlk_grimoire_of_carnage',
+              name: 'Grimoire of Carnage',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: [
+                  'corruption',
+                  'curse_of_agony',
+                  'immolate',
+                  'shadow_bolt',
+                  'drain_life',
+                  'searing_pain',
+                  'shadowburn',
+                  'chaos_bolt',
+                ],
+              },
+              responses: [
+                { kind: 'absorb', amount: 120, duration: 10, name: 'Grimoire of Carnage' },
+              ],
+            },
+          },
         },
         {
           id: 'wlk_r20_curse_mastery',
           name: 'Curse Mastery',
-          description: 'Corruption and Curse of Agony deal 20% more damage.',
+          description:
+            'Every 3rd Corruption or Curse of Agony makes your next Shadow Bolt within 8 sec instant.',
           icon: 'curse_of_agony',
           effect: {
-            ability: [
-              { ability: 'corruption', dmgPct: 0.2 },
-              { ability: 'curse_of_agony', dmgPct: 0.2 },
-            ],
+            proc: {
+              id: 'wlk_curse_mastery',
+              name: 'Curse Mastery',
+              trigger: { on: 'castNth', n: 3, abilities: ['corruption', 'curse_of_agony'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['shadow_bolt'],
+                  duration: 8,
+                },
+              ],
+            },
           },
         },
       ],
@@ -1716,28 +2051,60 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r5_improved_wrath',
           name: 'Improved Wildbolt',
-          description: 'Wrath casts 20% faster.',
+          description: 'Every 3rd Wrath makes your next Moonfire within 8 sec free.',
           icon: 'wrath',
-          effect: { ability: [{ ability: 'wrath', castPct: -0.2 }] },
+          effect: {
+            proc: {
+              id: 'dru_improved_wildbolt',
+              name: 'Improved Wildbolt',
+              trigger: { on: 'castNth', n: 3, abilities: ['wrath'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['moonfire'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r5_ferocity',
           name: 'Redmaw',
-          description: 'Claw and Rake cost 20% less.',
+          description:
+            'Shifting into Wolf Form makes your next Claw or Flense within 8 sec cost 50% less.',
           icon: 'claw',
           effect: {
-            ability: [
-              { ability: 'claw', costPct: -0.2 },
-              { ability: 'rake', costPct: -0.2 },
-            ],
+            proc: {
+              id: 'dru_redmaw',
+              name: 'Redmaw',
+              trigger: { on: 'castNth', n: 1, abilities: ['cat_form'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['claw', 'rake'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {
           id: 'dru_r5_natures_bounty',
           name: "Nature's Bounty",
-          description: 'Rejuvenation heals 25% more.',
+          description: 'When Rejuvenation runs its full duration, Swiftmend cooldown is reset.',
           icon: 'rejuvenation',
-          effect: { ability: [{ ability: 'rejuvenation', dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'dru_natures_bounty',
+              name: "Nature's Bounty",
+              trigger: { on: 'hotExpired', ability: 'rejuvenation' },
+              responses: [{ kind: 'cooldownRefund', ability: 'swiftmend', seconds: 'reset' }],
+            },
+          },
         },
       ],
     },
@@ -1762,9 +2129,19 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r8_brutal_bash',
           name: 'Brutal Bash',
-          description: 'Bash cooldown reduced by 30%.',
+          description: 'Concuss restores 15 rage and resets Feral Charge cooldown.',
           icon: 'bash',
-          effect: { ability: [{ ability: 'bash', cooldownPct: -0.3 }] },
+          effect: {
+            proc: {
+              id: 'dru_brutal_bash',
+              name: 'Brutal Bash',
+              trigger: { on: 'castNth', n: 1, abilities: ['bash'] },
+              responses: [
+                { kind: 'resource', amount: 15 },
+                { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 'reset' },
+              ],
+            },
+          },
         },
       ],
     },
@@ -1782,22 +2159,42 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r11_furor',
           name: 'Wildsurge',
-          description: 'Shapeshift costs reduced by 50%.',
+          description: 'Shapeshifting makes your next form attack within 8 sec cost 50% less.',
           icon: 'bear_form',
           effect: {
-            ability: [
-              { ability: 'bear_form', costPct: -0.5 },
-              { ability: 'cat_form', costPct: -0.5 },
-              { ability: 'travel_form', costPct: -0.5 },
-            ],
+            proc: {
+              id: 'dru_wildsurge',
+              name: 'Wildsurge',
+              trigger: {
+                on: 'castNth',
+                n: 1,
+                abilities: ['bear_form', 'cat_form', 'travel_form'],
+              },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['maul', 'swipe', 'claw', 'rake', 'ferocious_bite', 'rip'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {
           id: 'dru_r11_improved_mark',
           name: 'Improved Mark',
-          description: 'Mark of the Wild effect increased by 40%.',
+          description: 'Mark of the Wild also grants a shield absorbing 45 damage for 300 sec.',
           icon: 'mark_of_the_wild',
-          effect: { ability: [{ ability: 'mark_of_the_wild', buffPct: 0.4 }] },
+          effect: {
+            proc: {
+              id: 'dru_improved_mark',
+              name: 'Improved Mark',
+              trigger: { on: 'castNth', n: 1, abilities: ['mark_of_the_wild'] },
+              responses: [{ kind: 'absorb', amount: 45, duration: 300, name: 'Improved Mark' }],
+            },
+          },
         },
       ],
     },
@@ -1808,33 +2205,63 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r14_savage_fury',
           name: 'Savage Fury',
-          description: 'Ferocious Bite and Rip deal 20% more damage.',
+          description:
+            'Each Gorebite or Rip makes your next Claw or Flense within 8 sec cost 50% less.',
           icon: 'ferocious_bite',
           effect: {
-            ability: [
-              { ability: 'ferocious_bite', dmgPct: 0.2 },
-              { ability: 'rip', dmgPct: 0.2 },
-            ],
+            proc: {
+              id: 'dru_savage_fury',
+              name: 'Savage Fury',
+              trigger: { on: 'castNth', n: 1, abilities: ['ferocious_bite', 'rip'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['claw', 'rake'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {
           id: 'dru_r14_moonfury',
           name: 'Moonspite',
-          description: 'Starfire and Moonfire deal 15% more damage.',
+          description: 'Moonfire makes your next Starfire within 8 sec instant.',
           icon: 'moonfire',
           effect: {
-            ability: [
-              { ability: 'starfire', dmgPct: 0.15 },
-              { ability: 'moonfire', dmgPct: 0.15 },
-            ],
+            proc: {
+              id: 'dru_moonspite',
+              name: 'Moonspite',
+              trigger: { on: 'castNth', n: 1, abilities: ['moonfire'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['starfire'],
+                  duration: 8,
+                },
+              ],
+            },
           },
         },
         {
           id: 'dru_r14_empowered_touch',
           name: 'Empowered Touch',
-          description: 'Healing Touch heals 20% more and casts 10% faster.',
+          description:
+            'Healing Touch leaves a stored heal of 60 that triggers if the target falls below 35% health within 8 sec.',
           icon: 'healing_touch',
-          effect: { ability: [{ ability: 'healing_touch', dmgPct: 0.2, castPct: -0.1 }] },
+          effect: {
+            proc: {
+              id: 'dru_empowered_touch',
+              name: 'Empowered Touch',
+              trigger: { on: 'castNth', n: 1, abilities: ['healing_touch'] },
+              responses: [
+                { kind: 'echo', belowFrac: 0.35, window: 8, heal: 60, name: 'Empowered Touch' },
+              ],
+            },
+          },
         },
       ],
     },
@@ -1845,9 +2272,23 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r17_improved_barkskin',
           name: 'Improved Barkskin',
-          description: 'Barkskin armor increased by 40% and cooldown reduced by 25%.',
+          description: 'Oakhide makes your next cast within 8 sec instant.',
           icon: 'barkskin',
-          effect: { ability: [{ ability: 'barkskin', buffPct: 0.4, cooldownPct: -0.25 }] },
+          effect: {
+            proc: {
+              id: 'dru_improved_barkskin',
+              name: 'Improved Barkskin',
+              trigger: { on: 'castNth', n: 1, abilities: ['barkskin'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['wrath', 'starfire', 'healing_touch', 'regrowth'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r17_frenzied_regeneration',
@@ -1859,9 +2300,20 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r17_survival_of_the_fittest',
           name: 'Survival of the Fittest',
-          description: 'Armor increased by 10% and maximum health increased by 5%.',
+          description:
+            'Taking a hit above 20% of your maximum health restores 20 rage and refunds 30 sec of Savage Mending cooldown. 20 sec internal cooldown.',
           icon: 'bear_form',
-          effect: { stats: { armorPct: 0.1, maxHpPct: 0.05 } },
+          effect: {
+            proc: {
+              id: 'dru_survival_of_the_fittest',
+              name: 'Survival of the Fittest',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
+              responses: [
+                { kind: 'resource', amount: 20 },
+                { kind: 'cooldownRefund', ability: 'frenzied_regeneration', seconds: 30 },
+              ],
+            },
+          },
         },
       ],
     },
@@ -1872,9 +2324,25 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r20_improved_hurricane',
           name: 'Improved Hurricane',
-          description: 'Hurricane deals 30% more damage and costs 20% less.',
+          description:
+            'Hurricane refunds 4 sec of its cooldown and makes your next Moonfire within 8 sec free.',
           icon: 'hurricane',
-          effect: { ability: [{ ability: 'hurricane', dmgPct: 0.3, costPct: -0.2 }] },
+          effect: {
+            proc: {
+              id: 'dru_improved_hurricane',
+              name: 'Improved Hurricane',
+              trigger: { on: 'castNth', n: 1, abilities: ['hurricane'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'hurricane', seconds: 4 },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['moonfire'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r20_berserk',

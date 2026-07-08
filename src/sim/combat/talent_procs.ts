@@ -36,6 +36,8 @@ export type ProcResponse =
 export interface ProcDef {
   id: string; // stable id: the counter/icd key and the granted aura id
   name: string; // display name for granted auras (localized via sim_i18n)
+  // Visual school for the proc's spellfx moments (default holy).
+  school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];
 }
@@ -88,8 +90,16 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
           duration: r.duration,
           value: r.costPct !== undefined ? 1 - r.costPct : 0,
           sourceId: p.id,
-          school: 'holy',
+          school: def.school ?? 'holy',
           empowerAbilities: r.abilities,
+        });
+        // The arming moment: a visible surge so the player feels the rhythm hit.
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: def.school ?? 'holy',
+          fx: 'procSurge',
         });
       }
       break;
@@ -117,7 +127,14 @@ function fireOne(ctx: SimContext, p: Entity, def: ProcDef, subject: Entity, r: P
         duration: r.duration,
         value: r.amount,
         sourceId: p.id,
-        school: 'holy',
+        school: def.school ?? 'holy',
+      });
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: p.id,
+        targetId: subject.id,
+        school: def.school ?? 'holy',
+        fx: 'wardBloom',
       });
       break;
     case 'echo':

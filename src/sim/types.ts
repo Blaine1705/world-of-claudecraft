@@ -173,6 +173,7 @@ export type AuraKind =
   | 'dot'
   | 'slow'
   | 'stun'
+  | 'stasis'
   | 'root'
   | 'incapacitate'
   | 'polymorph'
@@ -2208,7 +2209,21 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
-      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning' | 'chainHeal';
+      fx:
+        | 'projectile'
+        | 'beam'
+        | 'tick'
+        | 'nova'
+        | 'windup'
+        | 'lightning'
+        | 'chainHeal'
+        // Talent-moment effects: a proc arming (procSurge), a ward appearing
+        // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
+        // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.
+        | 'procSurge'
+        | 'wardBloom'
+        | 'echoBurst'
+        | 'detonate';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

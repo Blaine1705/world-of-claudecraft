@@ -44,7 +44,7 @@ import {
   swingMissChance,
 } from '../types';
 import { spendResource } from './casting_lifecycle';
-import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
@@ -65,6 +65,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (!r) return;
   const p = r.e;
   if (p.dead) return;
+  if (isInStasis(p)) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead || !ctx.isHostileTo(p, t)) {
     ctx.error(p.id, 'Invalid attack target.');

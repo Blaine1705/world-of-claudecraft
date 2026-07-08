@@ -48,7 +48,7 @@ import {
   MELEE_RANGE,
   normAngle,
 } from '../types';
-import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   consumeNextAttackCrit,
   consumeNextCastCheap,
@@ -94,8 +94,24 @@ function isToggleBuff(ability: AbilityDef): boolean {
         e.kind === 'form_moonkin' ||
         e.kind === 'form_shadow' ||
         e.kind === 'defensive_stance' ||
-        e.kind === 'stealth'),
+        e.kind === 'stealth' ||
+        e.kind === 'stasis'),
   );
+}
+
+function isStasisToggle(ability: AbilityDef): boolean {
+  return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stasis');
+}
+
+function cancelStasisToggle(ctx: SimContext, p: Entity, ability: AbilityDef): boolean {
+  if (!isStasisToggle(ability) || !p.auras.some((a) => a.id === ability.id)) return false;
+  for (let i = p.auras.length - 1; i >= 0; i--) {
+    const aura = p.auras[i];
+    if (aura.id !== ability.id && aura.id !== `${ability.id}_absorb`) continue;
+    p.auras.splice(i, 1);
+    ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  }
+  return true;
 }
 
 function isShamanShock(abilityId: string): boolean {
@@ -221,6 +237,8 @@ export function castAbility(
   if (!res || p.dead) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  if (cancelStasisToggle(ctx, p, ability)) return;
+  if (isInStasis(p)) return;
   if (isStunned(p)) {
     ctx.error(p.id, 'You are stunned!');
     return;

@@ -37,7 +37,7 @@ import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
@@ -407,8 +407,11 @@ export function runEffects(
       }
       case 'absorb': {
         const shieldTarget = target ?? p;
+        const hasStasisSelfBuff = ability.effects.some(
+          (e) => e.type === 'selfBuff' && e.kind === 'stasis',
+        );
         ctx.applyAura(shieldTarget, {
-          id: ability.id,
+          id: hasStasisSelfBuff ? `${ability.id}_absorb` : ability.id,
           name: ability.name,
           kind: 'absorb',
           remaining: eff.duration,
@@ -494,6 +497,13 @@ export function runEffects(
         const remainingDmg = Math.round(dot.value * ticksLeft);
         target.auras.splice(di, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: target.id,
+          school: dot.school,
+          fx: 'detonate',
+        });
         if (remainingDmg > 0) {
           ctx.dealDamage(
             p,
@@ -1064,6 +1074,10 @@ export function runEffects(
             recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
             break;
           }
+        }
+        if (eff.kind === 'stasis') {
+          if (p.castingAbility) ctx.cancelCast(p);
+          p.autoAttack = false;
         }
         // shapeshifting out of one form into another (bear/cat/travel are exclusive)
         if (isFormKind) {
