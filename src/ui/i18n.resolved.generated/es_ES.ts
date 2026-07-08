@@ -4737,7 +4737,7 @@ export const es_ES: EnTranslations = {
       },
       "overpower": {
         "name": "Mano Roja",
-        "description": "Ataque instantáneo de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar."
+        "description": "Ataque instantáneo (2 cargas) de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar."
       },
       "execute": {
         "name": "Tumba Temprana",
