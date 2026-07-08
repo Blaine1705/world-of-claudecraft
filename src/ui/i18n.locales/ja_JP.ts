@@ -3502,6 +3502,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': '装いの宝箱',
   'skinEvent.unavailable': '近日公開',
   'skinEvent.unequip': '外す',
+  'hudChrome.paperdoll.offhand': 'オフハンド',
   'hudChrome.paperdoll.unequipAria': '{item}を外す',
   'hudChrome.paperdoll.unequipHint': '× をクリック、右クリック、またはバッグへドラッグで外す',
   'skinEvent.unlocked': '装いを解除しました！',

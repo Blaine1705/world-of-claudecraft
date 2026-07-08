@@ -11,6 +11,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const en_CA: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.offhand': 'Off Hand',
   'hudChrome.perf.textColor': 'Text Colour',
   'hudChrome.perf.bgColor': 'Background Colour',
   'hudChrome.perf.colorTheme': 'Colour Theme',

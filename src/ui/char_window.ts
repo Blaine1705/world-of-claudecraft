@@ -109,6 +109,8 @@ const GATHERING_PROFESSION_LABEL_KEY: Record<
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
 
+type CharDisplaySlot = EquipSlot | 'offhand';
+
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
 
@@ -179,6 +181,7 @@ export class CharWindow {
     const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
+    rightCol?.appendChild(this.buildSlotRow({ slot: 'offhand', item: null }));
 
     for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
@@ -206,7 +209,11 @@ export class CharWindow {
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
   }
 
-  private buildSlotRow(cell: PaperdollSlot): HTMLElement {
+  private slotLabel(slot: CharDisplaySlot): string {
+    return slot === 'offhand' ? t('hudChrome.paperdoll.offhand') : this.deps.slotName(slot);
+  }
+
+  private buildSlotRow(cell: { slot: CharDisplaySlot; item: PaperdollSlot['item'] }): HTMLElement {
     const { slot, item } = cell;
     const row = document.createElement('div');
     row.className = 'equip-slot';
@@ -221,8 +228,8 @@ export class CharWindow {
       ? this.deps.itemIcon(item)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}
-        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
-    if (item) {
+        <div><div class="slot-name">${esc(this.slotLabel(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    if (item && slot !== 'offhand') {
       this.deps.attachTooltip(
         row,
         () =>

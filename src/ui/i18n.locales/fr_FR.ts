@@ -4115,6 +4115,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': 'Cache cosmétique',
   'skinEvent.unavailable': 'Bientôt disponible',
   'skinEvent.unequip': 'Retirer',
+  'hudChrome.paperdoll.offhand': 'Main gauche',
   'hudChrome.paperdoll.unequipAria': 'Déséquiper {item}',
   'hudChrome.paperdoll.unequipHint':
     'Cliquez sur ×, faites un clic droit ou glissez vers les sacs pour déséquiper',

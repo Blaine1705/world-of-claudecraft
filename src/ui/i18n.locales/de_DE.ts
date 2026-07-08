@@ -4100,6 +4100,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': 'Kosmetik-Hort',
   'skinEvent.unavailable': 'Demnächst verfügbar',
   'skinEvent.unequip': 'Ablegen',
+  'hudChrome.paperdoll.offhand': 'Nebenhand',
   'hudChrome.paperdoll.unequipAria': '{item} ablegen',
   'hudChrome.paperdoll.unequipHint':
     'Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen',

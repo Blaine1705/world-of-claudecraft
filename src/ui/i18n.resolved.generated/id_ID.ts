@@ -644,6 +644,7 @@ export const id_ID: EnTranslations = {
       "failed": "Tidak dapat mengirim laporan bug. Silakan coba lagi."
     },
     "paperdoll": {
+      "offhand": "Tangan sekunder",
       "unequipAria": "Lepas {item}",
       "unequipHint": "Klik ×, klik kanan, atau seret ke tas untuk melepas"
     },

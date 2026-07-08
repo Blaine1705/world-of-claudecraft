@@ -644,6 +644,7 @@ export const zh_CN: EnTranslations = {
       "failed": "无法发送错误报告。请重试。"
     },
     "paperdoll": {
+      "offhand": "副手",
       "unequipAria": "卸下 {item}",
       "unequipHint": "点击 ×、右键点击或拖到背包以卸下"
     },

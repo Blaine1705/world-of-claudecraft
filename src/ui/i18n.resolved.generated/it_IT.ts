@@ -644,6 +644,7 @@ export const it_IT: EnTranslations = {
       "failed": "Impossibile inviare la segnalazione del bug. Riprova."
     },
     "paperdoll": {
+      "offhand": "Mano secondaria",
       "unequipAria": "Rimuovi {item}",
       "unequipHint": "Clicca su ×, clic destro o trascina nelle borse per rimuovere"
     },

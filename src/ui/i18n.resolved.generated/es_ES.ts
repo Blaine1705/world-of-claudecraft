@@ -644,6 +644,7 @@ export const es_ES: EnTranslations = {
       "failed": "No se pudo enviar el informe de error. Inténtalo de nuevo."
     },
     "paperdoll": {
+      "offhand": "Mano secundaria",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Haz clic en ×, clic derecho o arrastra a las bolsas para desequipar"
     },

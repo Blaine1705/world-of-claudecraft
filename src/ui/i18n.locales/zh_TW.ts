@@ -3355,6 +3355,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'skinEvent.title': '外觀寶箱',
   'skinEvent.unavailable': '即將推出',
   'skinEvent.unequip': '卸下',
+  'hudChrome.paperdoll.offhand': '副手',
   'hudChrome.paperdoll.unequipAria': '卸下 {item}',
   'hudChrome.paperdoll.unequipHint': '點擊 ×、右鍵點擊或拖曳至背包以卸下',
   'skinEvent.unlocked': '外觀已解鎖！',

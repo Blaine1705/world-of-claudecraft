@@ -4742,6 +4742,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Portemonnee tonen op personagescherm',
   'hudChrome.options.showWalletOnPlayerCard': 'Portemonnee tonen op spelerskaart',
   'hudChrome.options.uiScale': 'UI-schaal',
+  'hudChrome.paperdoll.offhand': 'Off-hand',
   'hudChrome.paperdoll.unequipAria': '{item} afdoen',
   'hudChrome.paperdoll.unequipHint':
     'Klik op ×, klik met rechts, of sleep naar tassen om af te doen',

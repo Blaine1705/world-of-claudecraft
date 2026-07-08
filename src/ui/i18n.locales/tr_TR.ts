@@ -4687,6 +4687,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Cüzdanı Karakter Ekranında Göster',
   'hudChrome.options.showWalletOnPlayerCard': 'Cüzdanı Oyuncu Kartında Göster',
   'hudChrome.options.uiScale': 'Arayüz Ölçeği',
+  'hudChrome.paperdoll.offhand': 'İkincil el',
   'hudChrome.paperdoll.unequipAria': '{item} eşyasını çıkar',
   'hudChrome.paperdoll.unequipHint':
     "Çıkarmak için ×'e tıklayın, sağ tıklayın ya da çantalara sürükleyin",

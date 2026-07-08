@@ -2871,6 +2871,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přepnout vysoce kontrastní pozadí: vypne pohyblivý trailer, aby text úvodní obrazovky zůstal čitelný',
   'hudChrome.nameplate.mob': '[{level}] {name}',
   'hudChrome.nameplate.mobElite': '[{level}+] {name}',
+  'hudChrome.paperdoll.offhand': 'Vedlejší ruka',
   'hudChrome.paperdoll.unequipAria': 'Sundat {item}',
   'hudChrome.paperdoll.unequipHint':
     'Klikni na x, pravé kliknutí, nebo přetáhni do batohů pro sundání',

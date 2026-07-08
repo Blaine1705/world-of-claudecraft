@@ -4712,6 +4712,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Pokaż sakiewkę na ekranie postaci',
   'hudChrome.options.showWalletOnPlayerCard': 'Pokaż sakiewkę na karcie gracza',
   'hudChrome.options.uiScale': 'Skala interfejsu',
+  'hudChrome.paperdoll.offhand': 'Broń pomocnicza',
   'hudChrome.paperdoll.unequipAria': 'Zdejmij {item}',
   'hudChrome.paperdoll.unequipHint':
     'Kliknij ×, kliknij prawym przyciskiem lub przeciągnij do toreb, aby zdjąć',

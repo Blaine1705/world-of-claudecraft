@@ -4684,6 +4684,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Vis pengepung på karakterskærm',
   'hudChrome.options.showWalletOnPlayerCard': 'Vis pengepung på spillerkort',
   'hudChrome.options.uiScale': 'UI-skala',
+  'hudChrome.paperdoll.offhand': 'Sekundær hånd',
   'hudChrome.paperdoll.unequipAria': 'Fjern {item}',
   'hudChrome.paperdoll.unequipHint':
     'Klik ×, højreklik, eller træk til tasker for at fjerne udstyr',

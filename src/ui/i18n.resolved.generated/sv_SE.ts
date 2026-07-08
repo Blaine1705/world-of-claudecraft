@@ -644,6 +644,7 @@ export const sv_SE: EnTranslations = {
       "failed": "Kunde inte skicka felrapporten. Försök igen."
     },
     "paperdoll": {
+      "offhand": "Bihand",
       "unequipAria": "Ta av {item}",
       "unequipHint": "Klicka på ×, högerklicka, eller dra till väskor för att ta av"
     },

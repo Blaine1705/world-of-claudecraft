@@ -4756,6 +4756,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Tampilkan Dompet di Layar Karakter',
   'hudChrome.options.showWalletOnPlayerCard': 'Tampilkan Dompet di Kartu Pemain',
   'hudChrome.options.uiScale': 'Skala UI',
+  'hudChrome.paperdoll.offhand': 'Tangan sekunder',
   'hudChrome.paperdoll.unequipAria': 'Lepas {item}',
   'hudChrome.paperdoll.unequipHint': 'Klik ×, klik kanan, atau seret ke tas untuk melepas',
   'hudChrome.perf.badges.backgrounded': 'Di Latar Belakang',

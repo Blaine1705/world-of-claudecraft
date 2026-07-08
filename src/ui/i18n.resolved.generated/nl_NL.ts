@@ -644,6 +644,7 @@ export const nl_NL: EnTranslations = {
       "failed": "Kon het bugrapport niet versturen. Probeer het opnieuw."
     },
     "paperdoll": {
+      "offhand": "Off-hand",
       "unequipAria": "{item} afdoen",
       "unequipHint": "Klik op ×, klik met rechts, of sleep naar tassen om af te doen"
     },
