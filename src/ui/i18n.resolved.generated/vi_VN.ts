@@ -520,7 +520,8 @@ export const vi_VN: EnTranslations = {
     "statInfo": {
       "fromYour": "Từ {value} {stat} của bạn:",
       "names": {
-        "spellPower": "Sức Mạnh Phép Thuật"
+        "spellPower": "Sức Mạnh Phép Thuật",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Tăng sức công kích, giúp đòn vũ khí của bạn đánh mạnh hơn.",
@@ -533,7 +534,8 @@ export const vi_VN: EnTranslations = {
         "spellPower": "Tăng sát thương của phép thuật và độ mạnh của khả năng trị liệu của bạn. Mỗi điểm Trí Tuệ ban thêm một chút Sức Mạnh Phép Thuật, cộng thêm phần từ trang bị hoặc hiệu ứng tăng cường.",
         "dps": "Sát thương vũ khí ước tính mỗi giây của bạn, kết hợp sát thương và tốc độ vũ khí với sức công kích.",
         "critChance": "Tỉ lệ một đòn tấn công đánh chí mạng, gây sát thương gấp đôi.",
-        "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương."
+        "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} Công Kích",

@@ -520,7 +520,8 @@ export const cs_CZ: EnTranslations = {
     "statInfo": {
       "fromYour": "Z tvojí hodnoty {value} {stat}:",
       "names": {
-        "spellPower": "Síla kouzel"
+        "spellPower": "Síla kouzel",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Zvyšuje tvoji sílu útoku, takže údery zbraní dopadají tvrději.",
@@ -533,7 +534,8 @@ export const cs_CZ: EnTranslations = {
         "spellPower": "Zvyšuje poškození tvých kouzel a sílu tvého léčení. Každý bod Intelektu dává trochu síly kouzel navíc k vybavení a buffům.",
         "dps": "Odhadované poškození zbraně za sekundu, které kombinuje poškození a rychlost zbraně s tvojí silou útoku.",
         "critChance": "Tvoje šance, že útok zasáhne kriticky a způsobí dvojnásobné poškození.",
-        "dodge": "Tvoje šance úplně se vyhnout příchozímu útoku na blízko a neutrpět poškození."
+        "dodge": "Tvoje šance úplně se vyhnout příchozímu útoku na blízko a neutrpět poškození.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} síla útoku",

@@ -72,13 +72,15 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
 // Crit and dodge are shown as percents (one decimal); every other stat's source
 // values are whole numbers.
 const isPercentStat = (model: StatTooltipModel) =>
-  model.stat === 'critChance' || model.stat === 'dodge';
+  model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'haste';
 
 /** The catalog key for a stat's display name. Most reuse the shared
- *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
- *  lives in the English-only HUD-chrome domain instead. */
+ *  itemUi.stats.* labels; Spell Power and Haste are character-sheet-only stats
+ *  whose labels live in the HUD-chrome domain instead (no item carries them). */
 export function statNameKey(stat: StatTooltipModel['stat']): string {
-  return stat === 'spellPower' ? 'hudChrome.statInfo.names.spellPower' : `itemUi.stats.${stat}`;
+  return stat === 'spellPower' || stat === 'haste'
+    ? `hudChrome.statInfo.names.${stat}`
+    : `itemUi.stats.${stat}`;
 }
 
 /** The localized text of one upstream source line: "Base: 40", "From Agility:
@@ -186,7 +188,7 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
  *  a one-decimal number for the dps estimate, otherwise a whole number. Sourced
  *  from model.statValue so the cell and the tooltip it opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  if (model.stat === 'critChance' || model.stat === 'dodge')
+  if (model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'haste')
     return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);
   return int0(deps, model.statValue);

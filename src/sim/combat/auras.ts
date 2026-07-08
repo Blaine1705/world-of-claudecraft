@@ -242,7 +242,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         a.kind.startsWith('buff') ||
         a.kind.startsWith('form') ||
         a.kind === 'debuff_ap' ||
-        a.kind === 'bloodbath'
+        a.kind === 'bloodbath' ||
+        // Fury Enrage folds +25% haste into meleeHaste/spellHaste, so its fade
+        // must re-run recalc or the haste would persist after the buff ends.
+        a.kind === 'enrage'
       )
         statsDirty = true;
     }

@@ -46,7 +46,8 @@ export type StatId =
   | 'spellPower'
   | 'dps'
   | 'critChance'
-  | 'dodge';
+  | 'dodge'
+  | 'haste';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -140,6 +141,8 @@ export interface StatTooltipInput {
   critChance: number;
   /** entity.dodgeChance, 0..1. */
   dodgeChance: number;
+  /** entity haste fraction (0.25 = 25% faster swings/casts), 0..1+. */
+  haste: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -320,6 +323,13 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       baseChanceNote = true;
       break;
     }
+    case 'haste': {
+      // Shown as a percent (25 = +25% faster swings/casts). No base-chance note:
+      // it starts at 0 and comes from gear set bonuses + buffs like Enrage.
+      isPrimary = false;
+      statValue = input.haste * 100;
+      break;
+    }
   }
 
   return {
@@ -462,6 +472,10 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // The dps cell is an estimate the panel computes from weapon + AP; it has no
     // clean per-source attribution, so it shows none (just its approximate note).
     case 'dps':
+      return sources;
+    // Haste comes straight off gear set bonuses + buffs (Enrage); the value plus
+    // its description carries the meaning, so no per-source breakdown line.
+    case 'haste':
       return sources;
   }
 }

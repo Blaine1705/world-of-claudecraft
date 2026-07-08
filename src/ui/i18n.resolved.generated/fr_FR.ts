@@ -520,7 +520,8 @@ export const fr_FR: EnTranslations = {
     "statInfo": {
       "fromYour": "Grâce à vos {value} en {stat} :",
       "names": {
-        "spellPower": "Puissance des sorts"
+        "spellPower": "Puissance des sorts",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Augmente votre puissance d'attaque, vos coups d'arme frappent donc plus fort.",
@@ -533,7 +534,8 @@ export const fr_FR: EnTranslations = {
         "spellPower": "Augmente les dégâts de vos sorts et la puissance de vos soins. Chaque point d'Intelligence confère un peu de Puissance des sorts, en plus de celle de l'équipement ou des améliorations.",
         "dps": "Vos dégâts par seconde estimés à l'arme, combinant les dégâts et la vitesse de votre arme avec votre puissance d'attaque.",
         "critChance": "Vos chances de porter un coup critique avec une attaque, infligeant le double des dégâts.",
-        "dodge": "Vos chances d'éviter complètement une attaque de mêlée, sans subir aucun dégât."
+        "dodge": "Vos chances d'éviter complètement une attaque de mêlée, sans subir aucun dégât.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} Puissance d'attaque",

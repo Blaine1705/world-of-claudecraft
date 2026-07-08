@@ -520,7 +520,8 @@ export const id_ID: EnTranslations = {
     "statInfo": {
       "fromYour": "Dari {value} {stat} Anda:",
       "names": {
-        "spellPower": "Kekuatan Mantra"
+        "spellPower": "Kekuatan Mantra",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Meningkatkan daya serang Anda, sehingga serangan senjata Anda menghantam lebih keras.",
@@ -533,7 +534,8 @@ export const id_ID: EnTranslations = {
         "spellPower": "Meningkatkan kerusakan mantra dan kekuatan penyembuhanmu. Setiap poin Kecerdasan memberi sedikit Kekuatan Mantra, di atas apa pun dari perlengkapan atau buff.",
         "dps": "Perkiraan kerusakan senjata Anda per detik, menggabungkan kerusakan dan kecepatan senjata dengan daya serang Anda.",
         "critChance": "Peluang serangan Anda menghantam secara kritis, memberikan kerusakan ganda.",
-        "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan."
+        "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} Daya Serang",

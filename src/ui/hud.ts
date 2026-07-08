@@ -3960,6 +3960,7 @@ export class Hud {
       spellPower: p.spellPower,
       critChance: p.critChance,
       dodgeChance: p.dodgeChance,
+      haste: p.spellHaste,
       dps: weaponDps(wpn?.weapon, p.attackPower),
       gear,
       buffs,

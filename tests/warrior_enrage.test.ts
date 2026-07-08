@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
-import { ENRAGE_DMG_DONE, ENRAGE_HASTE, ENRAGE_MOVE_MULT } from '../src/sim/types';
+import { ENRAGE_DMG_DONE, ENRAGE_HASTE_PCT, ENRAGE_MOVE_MULT } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-// Fury Enrage (owner 2026-07-08): a short self-buff (+11% damage, +25% attack
-// speed, +10% move speed) procced by Bloodletting (30%) and Desenfreno / Rampage
-// (always). One 'enrage' aura carries all three halves.
+// Fury Enrage (owner 2026-07-08): a short self-buff procced by Bloodletting (30%)
+// and Desenfreno / Rampage (always). +11% damage, +25% HASTE folded into the real
+// haste stat (faster swings AND casts, visible in the Haste stat, never touching
+// the GCD), and +10% move speed. The 'enrage' aura carries the damage + move
+// halves directly; the haste half rides meleeHaste/spellHaste via recalcPlayerStats.
 
 const makeFury = (seed = 42): Sim => {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -41,6 +43,32 @@ const approach = (sim: Sim, mob: Entity): void => {
   p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
 };
 
+// Put a Fury warrior in melee, give rage, and cast Desenfreno (always enrages).
+// One tick after resolves the cast and runs the recalc that folds the haste half.
+const enrageViaRedHarvest = (sim: Sim, mob: Entity): void => {
+  approach(sim, mob);
+  sim.player.resource = 80;
+  sim.player.gcdRemaining = 0;
+  sim.targetEntity(mob.id);
+  sim.castAbility('red_harvest');
+  sim.tick();
+};
+
+const dealPhysical = (sim: Sim, mob: Entity, amount: number): void => {
+  (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage(
+    sim.player,
+    mob,
+    amount,
+    false,
+    'physical',
+    null,
+    'hit',
+  );
+};
+
+const moveMult = (sim: Sim): number =>
+  (sim as unknown as { moveSpeedMult(e: Entity): number }).moveSpeedMult(sim.player);
+
 describe('Fury Enrage: proc sources', () => {
   it('Desenfreno (red_harvest) always Enrages for 4 sec', () => {
     expect(ABILITIES.red_harvest.effects).toContainEqual({
@@ -61,14 +89,9 @@ describe('Fury Enrage: proc sources', () => {
   it('casting Desenfreno applies the enrage buff (guaranteed proc)', () => {
     const sim = makeFury();
     const mob = nearestMob(sim);
-    mob.maxHp = 100000;
+    mob.maxHp = 100_000;
     mob.hp = mob.maxHp;
-    approach(sim, mob);
-    sim.player.resource = 80;
-    sim.player.gcdRemaining = 0;
-    sim.targetEntity(mob.id);
-    sim.castAbility('red_harvest');
-    sim.tick();
+    enrageViaRedHarvest(sim, mob);
     const a = sim.player.auras.find((x) => x.id === 'fury_enrage');
     expect(a?.kind).toBe('enrage');
     expect(a?.value).toBe(ENRAGE_DMG_DONE);
@@ -77,61 +100,48 @@ describe('Fury Enrage: proc sources', () => {
 });
 
 describe('Fury Enrage: the buff carries all three halves', () => {
-  it('gives +25% attack speed, +10% move speed and +11% outgoing damage', () => {
+  it('grants +25% real haste (melee AND spell), +10% move speed and +11% damage', () => {
     const sim = makeFury();
     const p = sim.player;
     const mob = nearestMob(sim);
     mob.maxHp = 1_000_000;
 
-    const baseSwing = (
-      sim as unknown as { swingIntervalMult(e: Entity): number }
-    ).swingIntervalMult(p);
-    const baseMove = (sim as unknown as { moveSpeedMult(e: Entity): number }).moveSpeedMult(p);
+    const baseHaste = p.spellHaste;
+    const baseMove = moveMult(sim);
 
     // Damage baseline (no enrage). Same armor DR applies to both deals, so the
     // ratio isolates the +11% amp.
     mob.hp = mob.maxHp;
-    (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage(
-      p,
-      mob,
-      1000,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
+    dealPhysical(sim, mob, 1000);
     const dropNoEnrage = mob.maxHp - mob.hp;
 
-    p.auras.push({
-      id: 'fury_enrage',
-      name: 'Enraged',
-      kind: 'enrage',
-      remaining: 4,
-      duration: 4,
-      value: ENRAGE_DMG_DONE,
-      sourceId: p.id,
-      school: 'physical',
-    });
+    enrageViaRedHarvest(sim, mob);
 
-    expect(
-      (sim as unknown as { swingIntervalMult(e: Entity): number }).swingIntervalMult(p),
-    ).toBeCloseTo(baseSwing / ENRAGE_HASTE, 5);
-    expect((sim as unknown as { moveSpeedMult(e: Entity): number }).moveSpeedMult(p)).toBeCloseTo(
-      baseMove * ENRAGE_MOVE_MULT,
-      5,
-    );
-
+    // Haste: +25% folded into the REAL haste stat (both channels), so it speeds
+    // swings and casts and shows in the Haste stat (never the GCD).
+    expect(p.spellHaste).toBeCloseTo(baseHaste + ENRAGE_HASTE_PCT, 5);
+    expect(p.meleeHaste).toBeCloseTo(baseHaste + ENRAGE_HASTE_PCT, 5);
+    // Move speed: +10% (non-stacking max).
+    expect(moveMult(sim)).toBeCloseTo(baseMove * ENRAGE_MOVE_MULT, 5);
+    // Outgoing damage: +11%.
     mob.hp = mob.maxHp;
-    (sim as unknown as { dealDamage: (...a: unknown[]) => void }).dealDamage(
-      p,
-      mob,
-      1000,
-      false,
-      'physical',
-      null,
-      'hit',
-    );
+    dealPhysical(sim, mob, 1000);
     const dropEnrage = mob.maxHp - mob.hp;
     expect(dropEnrage / dropNoEnrage).toBeCloseTo(1 + ENRAGE_DMG_DONE, 2);
+  });
+
+  it('the haste falls off when the enrage expires', () => {
+    const sim = makeFury();
+    const p = sim.player;
+    const mob = nearestMob(sim);
+    mob.maxHp = 100_000;
+    mob.hp = mob.maxHp;
+    const baseHaste = p.spellHaste;
+    enrageViaRedHarvest(sim, mob);
+    expect(p.spellHaste).toBeCloseTo(baseHaste + ENRAGE_HASTE_PCT, 5);
+    // Run past the 4 sec buff; the haste must return to baseline (recalc on fade).
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(sim.player.auras.some((x) => x.id === 'fury_enrage')).toBe(false);
+    expect(p.spellHaste).toBeCloseTo(baseHaste, 5);
   });
 });

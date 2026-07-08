@@ -520,7 +520,8 @@ export const en_CA: EnTranslations = {
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
       "names": {
-        "spellPower": "Spell Power"
+        "spellPower": "Spell Power",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Increases your attack power, so your weapon strikes land harder.",
@@ -533,7 +534,8 @@ export const en_CA: EnTranslations = {
         "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
-        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} Attack Power",

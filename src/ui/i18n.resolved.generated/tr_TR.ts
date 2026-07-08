@@ -520,7 +520,8 @@ export const tr_TR: EnTranslations = {
     "statInfo": {
       "fromYour": "{value} {stat} değerinden:",
       "names": {
-        "spellPower": "Büyü Gücü"
+        "spellPower": "Büyü Gücü",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Saldırı gücünü artırır, böylece silah darbelerin daha sert iner.",
@@ -533,7 +534,8 @@ export const tr_TR: EnTranslations = {
         "spellPower": "Büyülerinin hasarını ve iyileştirmelerinin gücünü artırır. Her Zeka puanı, teçhizat veya güçlendirmelerden gelenlere ek olarak biraz Büyü Gücü sağlar.",
         "dps": "Silahının hasarını ve hızını saldırı gücünle birleştiren, saniye başına tahmini silah hasarın.",
         "critChance": "Bir saldırının kritik vurma ve çift hasar verme şansın.",
-        "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın."
+        "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} Saldırı Gücü",

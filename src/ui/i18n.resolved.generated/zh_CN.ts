@@ -520,7 +520,8 @@ export const zh_CN: EnTranslations = {
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
-        "spellPower": "法术强度"
+        "spellPower": "法术强度",
+        "haste": "急速"
       },
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
@@ -533,7 +534,8 @@ export const zh_CN: EnTranslations = {
         "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
-        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。"
+        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
+        "haste": "加快你的武器攻击和法术施放速度。不会缩短全局冷却时间（GCD）。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
