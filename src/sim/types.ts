@@ -177,6 +177,14 @@ export type AuraKind =
   | 'form_shadow'
   | 'stealth'
   | 'defensive_stance'
+  // Warrior combat stances (mutually exclusive, exclusiveGroup 'warrior_stance').
+  // `battle_stance`: the offensive default for Arms/Prot/no-spec; its only effect
+  // is +STANCE_RAGE_GEN rage generation, folded in rageGenAuraMult below.
+  // `berserker_stance`: the Fury-only offensive default; a pure bonus with no
+  // downside: +BERSERKER_CRIT_CHANCE crit chance (folded in recalcPlayerStats)
+  // and +BERSERKER_CRIT_DAMAGE crit damage (folded once in combat/damage.ts).
+  | 'battle_stance'
+  | 'berserker_stance'
   | 'righteous_fury'
   | 'sunder'
   | 'mortal_wound'
@@ -2586,13 +2594,27 @@ export function rageFromTaking(damage: number, attackerLevel: number): number {
 // Recklessness enrage adds the fixed bonus; Battle Rhythm's empowered-cast
 // blink adds its buff_rage_gen value. 1 (a no-op) with no such aura worn.
 export const RECKLESSNESS_RAGE_GEN = 0.5;
+// Warrior stance tuning (owner-tunable, docs/prd/warrior-talents.md). Battle
+// Stance mints extra rage; Berserker Stance is a pure crit bonus for Fury.
+export const STANCE_RAGE_GEN = 0.1; // Battle Stance: +10% rage generation
+export const BERSERKER_CRIT_CHANCE = 0.03; // Berserker Stance: +3% crit chance
+export const BERSERKER_CRIT_DAMAGE = 0.03; // Berserker Stance: +3% crit damage
 export function rageGenAuraMult(e: Entity): number {
   let mult = 1;
   for (const a of e.auras) {
     if (a.kind === 'buff_rage_gen') mult += a.value;
     else if (a.kind === 'buff_reckless') mult += RECKLESSNESS_RAGE_GEN;
+    // Battle Stance's rage-generation bonus applies at every mint site.
+    else if (a.kind === 'battle_stance') mult += STANCE_RAGE_GEN;
   }
   return mult;
+}
+
+// Berserker Stance's crit-damage bonus: an extra fraction on a CRITICAL hit,
+// folded once in combat/damage.ts (mirroring the critVuln amp). 0 when the
+// source is not in Berserker Stance.
+export function berserkerCritDamage(e: Entity): number {
+  return e.auras.some((a) => a.kind === 'berserker_stance') ? BERSERKER_CRIT_DAMAGE : 0;
 }
 
 // Sanguine Aura's melee filter: the classes whose party members receive the

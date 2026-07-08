@@ -81,6 +81,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rallying_cry',
       'emboldening_roar',
       'defiant_bellow',
+      'battle_stance',
+      'berserker_stance',
       'defensive_stance',
       'demoralizing_shout',
       'intimidating_shout',
@@ -969,6 +971,47 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
   },
+  // Warrior combat stances. All three share exclusiveGroup 'warrior_stance', so
+  // casting one swaps the sibling and a warrior is never stanceless (the default
+  // for the spec is also auto-applied by combat/warrior_stances.ts). Gating:
+  // Battle is for Arms/Prot/no-spec (excludeSpecs Fury), Guarded for Arms/Prot,
+  // Berserker for Fury only.
+  battle_stance: {
+    id: 'battle_stance',
+    name: 'Battle Stance',
+    class: 'warrior',
+    learnLevel: 1,
+    excludeSpecs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 1,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    exclusiveGroup: 'warrior_stance',
+    effects: [{ type: 'selfBuff', kind: 'battle_stance', value: 0, duration: 3600 }],
+    description:
+      'An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection.',
+  },
+  berserker_stance: {
+    id: 'berserker_stance',
+    name: 'Berserker Stance',
+    class: 'warrior',
+    learnLevel: 1,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 1,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    exclusiveGroup: 'warrior_stance',
+    effects: [{ type: 'selfBuff', kind: 'berserker_stance', value: 0, duration: 3600 }],
+    description:
+      'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
+  },
   defensive_stance: {
     id: 'defensive_stance',
     name: 'Guarded Stance',
@@ -982,9 +1025,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
+    exclusiveGroup: 'warrior_stance',
     effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
     description:
-      'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
+      'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive.',
   },
   sunder_armor: {
     id: 'sunder_armor',

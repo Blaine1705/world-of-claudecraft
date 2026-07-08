@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
-import { dist2d, MAX_LEVEL } from '../src/sim/types';
+import { dist2d, MAX_LEVEL, STANCE_RAGE_GEN } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 function warriorAtCap(seed = 7): Sim {
@@ -74,7 +74,8 @@ describe('Pummel', () => {
     expect(lockout).toBeTruthy();
     expect(lockout.remaining).toBeCloseTo(4, 0);
     // The owner's incentive: stopping a cast GENERATES 10 rage.
-    expect(p.resource).toBeCloseTo(10);
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) at the mint.
+    expect(p.resource).toBeCloseTo(10 * (1 + STANCE_RAGE_GEN));
   });
 
   it('pays no rage on a whiff (the target was not casting)', () => {

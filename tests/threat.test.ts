@@ -73,15 +73,6 @@ function beefUp(mob: Entity) {
   mob.hp = 5000;
 }
 
-// Grant a spec-gated ability to a no-spec warrior for a base-mechanic test: the
-// grant bypasses the spec filter (spec-gating 2026-07-07) WITHOUT applying any
-// spec mastery, so the isolated threat number stays the pristine base value.
-function grantAbility(sim: Sim, abilityId: string, pid: number) {
-  const meta = (sim as any).players.get(pid);
-  meta.talentMods.grants.push({ ability: abilityId, rank: 1 });
-  (sim as any).refreshKnownAbilities(meta, false);
-}
-
 describe('threat from damage', () => {
   it('damage lands on the hate table 1:1 without modifiers (plus the aggro seed)', () => {
     const sim = makeSim('warrior');
@@ -95,10 +86,13 @@ describe('threat from damage', () => {
   it('defensive stance: -10% damage dealt, x1.3 threat on what lands', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
-    // Guarded Stance (defensive_stance) is arms/prot-gated base kit (2026-07-07).
-    // Grant it (no spec mastery) so the x1.3 stance threat is isolated: committing
-    // prot would stack its +30% Recompense threat mastery and skew the number.
-    grantAbility(sim, 'defensive_stance', sim.playerId);
+    // Guarded Stance (defensive_stance) is arms/prot-gated base kit (2026-07-07),
+    // and a warrior is always in a stance now, so a no-spec warrior is forced back
+    // to Battle Stance by the reconcile. Commit ARMS (not prot) so Guarded is a
+    // valid, kept stance: threatModifier reads only the aura, and Arms has no
+    // threat mastery, so the x1.3 stance threat stays isolated (prot's +30%
+    // Recompense would skew it).
+    sim.setSpec('arms');
     sim.castAbility('defensive_stance');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(true);
@@ -107,10 +101,11 @@ describe('threat from damage', () => {
     hit(sim, sim.player, wolf, 100);
     // 100 -> 90 actual damage, 90 * 1.3 threat + 1 seed
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(90 * DEFENSIVE_STANCE_THREAT_MULT + 1, 5);
-    // stance is a toggle
-    for (let i = 0; i < 30; i++) sim.tick();
-    sim.castAbility('defensive_stance');
+    // Stances swap (never toggle to nothing): casting Battle Stance drops Guarded.
+    sim.castAbility('battle_stance');
+    sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(false);
+    expect(sim.player.auras.some((a) => a.kind === 'battle_stance')).toBe(true);
   });
 
   it('bear form multiplies threat by 1.3', () => {

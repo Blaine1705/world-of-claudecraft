@@ -11,6 +11,7 @@ import {
   MELEE_CLASSES,
   RECKLESSNESS_RAGE_GEN,
   SECOND_WIND_THRESHOLD,
+  STANCE_RAGE_GEN,
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
@@ -84,12 +85,13 @@ describe('Blood Offering', () => {
       };
     };
     const base = run(false);
-    expect(base.rage).toBeCloseTo(10);
+    // The arms/prot warrior stands in Battle Stance, so every mint is +10%.
+    expect(base.rage).toBeCloseTo(10 * (1 + STANCE_RAGE_GEN));
     expect(base.cd).toBe(60);
     const talented = run(true);
     // Same health price (8% max), triple the rage, twice the availability.
     expect(talented.hpLost).toBe(Math.round(talented.maxHp * 0.08));
-    expect(talented.rage).toBeCloseTo(30);
+    expect(talented.rage).toBeCloseTo(30 * (1 + STANCE_RAGE_GEN));
     expect(talented.cd).toBe(30);
   });
 });
@@ -108,7 +110,8 @@ describe('Recklessness', () => {
     sim.targetEntity(mob.id);
     p.resource = 0;
     sim.castAbility('charge');
-    expect(p.resource).toBeCloseTo(9 * (1 + RECKLESSNESS_RAGE_GEN));
+    // Recklessness (+50%) and Battle Stance (+10%) both mint rage additively.
+    expect(p.resource).toBeCloseTo(9 * (1 + RECKLESSNESS_RAGE_GEN + STANCE_RAGE_GEN));
   });
 });
 
@@ -215,8 +218,10 @@ describe('Battle Rhythm', () => {
     for (let i = 0; i < 32; i++) sim.tick(); // clear the GCD
     sim.castAbility('demoralizing_shout'); // cast 2
     const before = p.resource;
-    sim.castAbility('charge'); // cast 3: empowered (+20% on its 9 rage)
-    expect(p.resource).toBeCloseTo(Math.min(100, before + 9 * 1.2));
+    sim.castAbility('charge'); // cast 3: empowered (+20% Battle Rhythm on its 9 rage)
+    // A prot warrior also stands in Battle Stance (+10% rage), so the mints stack
+    // additively in rageGenAuraMult: 9 * (1 + 0.2 + 0.1).
+    expect(p.resource).toBeCloseTo(Math.min(100, before + 9 * 1.3));
     // The damage half rides the same cast as a one-tick buff_dmg_done blink
     // (present right after the cast, gone on the next decay pass).
     expect(p.auras.some((a: any) => a.id === 'battle_rhythm' && a.kind === 'buff_dmg_done')).toBe(

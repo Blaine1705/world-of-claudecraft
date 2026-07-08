@@ -52,6 +52,7 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { isSpellResisted } from './combat/spell_resist';
+import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
@@ -2903,6 +2904,9 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
       if (!p.dead) {
+        // Warriors always live in a stance valid for their spec: apply/reconcile
+        // it before this tick's combat so the stance bonus is live (no rng).
+        ensureWarriorStance(this.ctx, p, meta);
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
         this.updateCasting(p, meta);

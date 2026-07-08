@@ -21,6 +21,7 @@ import {
   rageFromDealing,
   rageFromTaking,
   type SimEvent,
+  STANCE_RAGE_GEN,
   spellHitChance,
   xpForLevel,
 } from '../src/sim/types';
@@ -183,7 +184,9 @@ describe('classic formulas', () => {
 
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
-    expect(w1).toEqual(['heroic_strike']); // battle_shout now unlocks at level 7
+    // battle_shout now unlocks at level 7; Battle Stance is a level-1 baseline
+    // stance (excludeSpecs fury), so a no-spec warrior starts with it too.
+    expect(w1).toEqual(['heroic_strike', 'battle_stance']);
     // Redhand (overpower) is arms-gated base kit (2026-07-07): hidden with no
     // spec, so commit arms to confirm it unlocks (with the ungated staples) at 10.
     const armsMods = computeTalentModifiers('warrior', { ...emptyAllocation(), spec: 'arms' });
@@ -393,7 +396,8 @@ describe('combat', () => {
     sim.player.resource = 0;
     (sim as any).dealDamage(wolf, sim.player, 30, false, 'physical', null, 'hit');
     // rageFromTaking(30, 20) = 30 / 20 = 1.5 (no 1.5 divisor anymore).
-    expect(sim.player.resource).toBeCloseTo(1.5, 5);
+    // No-spec warrior stands in Battle Stance: +STANCE_RAGE_GEN (10%) at the mint.
+    expect(sim.player.resource).toBeCloseTo(1.5 * (1 + STANCE_RAGE_GEN), 5);
   });
 
   it('mob can kill the player; release rises as a ghost, healer resurrects', () => {
@@ -1427,8 +1431,9 @@ describe('food, drink, vendor', () => {
 describe('leveling', () => {
   it('levels up, heals to full, and learns new abilities', () => {
     const sim = makeSim('warrior');
-    // At level 1 only Reaver Strike is known: battle_shout unlocks at 7, rend at 5.
-    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike']);
+    // At level 1 a no-spec warrior knows Reaver Strike plus the level-1 Battle
+    // Stance: battle_shout unlocks at 7, rend at 5.
+    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike', 'battle_stance']);
     const _events: any[] = [];
     // to level 5: Onrush (charge) unlocks at 4, Deep Gash (rend) at 5
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + xpForLevel(4) + 10);

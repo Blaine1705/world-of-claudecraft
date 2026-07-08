@@ -1,8 +1,9 @@
+import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
-import { AVATAR_SCALE, EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
+import { AVATAR_SCALE, BERSERKER_CRIT_CHANCE, EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
@@ -146,6 +147,15 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
   e.level = 1;
   e.resourceType = def.resourceType;
   e.color = def.color;
+  // A warrior is born in Battle Stance (the spec-agnostic offensive default); the
+  // per-tick reconcile (combat/warrior_stances.ensureWarriorStance) swaps it to
+  // Berserker once Fury is committed. Seeding it at creation, not on the first
+  // live tick, keeps a caller's post-spawn stat pokes (e.g. an inflated maxHp in
+  // a test) from being wiped by a tick-1 stance recalcPlayerStats.
+  if (cls === 'warrior') {
+    const stance = buildStanceAura(BATTLE_STANCE, id);
+    if (stance) e.auras.push(stance);
+  }
   return e;
 }
 
@@ -263,6 +273,9 @@ export function recalcPlayerStats(
     // statsDirty pass in combat/auras.ts, so each bonus falls off with its aura.
     else if (a.kind === 'buff_crit' || a.kind === 'buff_reckless' || a.kind === 'bloodbath')
       bonusCrit += a.value;
+    // Berserker Stance (Fury): a flat additive crit-chance bonus while worn. Its
+    // crit-DAMAGE half lives in combat/damage.ts (berserkerCritDamage).
+    else if (a.kind === 'berserker_stance') bonusCrit += BERSERKER_CRIT_CHANCE;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Avatar: the colossus transform grows the body by the fixed scale (its
     // aura value carries the damage amp, consumed in dealDamage).

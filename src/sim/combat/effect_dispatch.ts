@@ -1250,13 +1250,12 @@ export function runEffects(
         break;
       }
       case 'selfBuff': {
-        // forms, stances and stealth are toggles: casting again cancels
+        // forms and stealth are toggles: casting again cancels. Warrior stances
+        // are NOT toggles: they belong to the exclusiveGroup 'warrior_stance', so
+        // casting one SWAPS the sibling (a warrior is never stanceless); re-casting
+        // the active stance just refreshes it below.
         const isFormKind = isFormAuraKind(eff.kind);
-        const isToggle =
-          isFormKind ||
-          eff.kind === 'defensive_stance' ||
-          eff.kind === 'stealth' ||
-          ability.id === 'ghost_wolf';
+        const isToggle = isFormKind || eff.kind === 'stealth' || ability.id === 'ghost_wolf';
         if (isToggle) {
           const existing = p.auras.findIndex((a) => a.id === ability.id);
           if (existing >= 0) {

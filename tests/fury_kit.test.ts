@@ -30,6 +30,9 @@ function makeSim(seed = 31337, level = 20): { sim: TestSim; p: Entity } {
   // no-spec warrior's hidden kit does not swallow them (spec-gating design,
   // 2026-07-07). The "live sim drops both on an arms choice" test re-specs.
   expect(sim.setSpec('fury')).toBe(true);
+  // A warrior spawns seeded in Battle Stance; one tick lets the stance reconcile
+  // swap it to Berserker (the Fury default) so rage mints carry no Battle bonus.
+  sim.tick();
   return { sim, p: sim.player };
 }
 
