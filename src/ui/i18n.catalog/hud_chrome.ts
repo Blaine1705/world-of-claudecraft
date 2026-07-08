@@ -977,6 +977,8 @@ export const hudChromeStrings = {
     formCat: 'Cat Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
+    battleStance: 'Battle Stance: 10% more rage generation',
+    berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',

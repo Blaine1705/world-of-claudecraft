@@ -1230,8 +1230,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 14 extra naturskada.',
   'entities.abilities.deadly_poison.name': 'Varande gift',
   'entities.abilities.defensive_stance.description':
-    'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
+    'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta Stridsställning för att återgå till offensiven.',
   'entities.abilities.defensive_stance.name': 'Gardställning',
+  'entities.abilities.battle_stance.name': 'Stridsställning',
+  'entities.abilities.battle_stance.description':
+    'En aggressiv stridsställning: du genererar 10 % mer raseri. Standardställningen för Vapen och Skydd.',
+  'entities.abilities.berserker_stance.name': 'Bärsärkarställning',
+  'entities.abilities.berserker_stance.description':
+    'En hänsynslös stridsställning: dina kritiska träffar sker 3 % oftare och slår 3 % hårdare. Raseri-krigaren strider alltid i denna ställning.',
   'entities.abilities.demon_skin.description': 'Demonisk hud ökar din rustning med 30 i 30 min.',
   'entities.abilities.demon_skin.name': 'Djävulshud',
   'entities.abilities.demoralizing_roar.description':
@@ -5595,6 +5601,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleetform: förflyttningshastighet ökad med {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Gardställning: minskad mottagen skada, mer hot',
+  'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',
+  'hudChrome.auraEffect.berserkerStance':
+    'Bärsärkarställning: kritiska träffar 3% oftare och 3% hårdare',
   'hudChrome.auraEffect.righteousFury': 'Brinnande ed: kraftigt ökat hot från helig skada',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',
   'hudChrome.auraEffect.jump': 'Sprunghöhe um {pct}% erhöht',

@@ -866,6 +866,8 @@ export const da_DK: EnTranslations = {
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleet-form: bevægelseshastighed øget med {pct}%",
       "defensiveStance": "Værgende Stilling: mindre modtaget skade, mere trussel",
+      "battleStance": "Kampstilling: 10% mere raserigenerering",
+      "berserkerStance": "Bersærkerstilling: kritiske træf 3% oftere og 3% hårdere",
       "righteousFury": "Brændende Ed: stærkt øget trussel fra Hellig skade",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -4751,7 +4753,15 @@ export const da_DK: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Værgende Stilling",
-        "description": "En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér igen for at forlade stillingen."
+        "description": "En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér Kampstilling for at vende tilbage til offensiven."
+      },
+      "battle_stance": {
+        "name": "Kampstilling",
+        "description": "En aggressiv kampstilling: du skaber 10% mere raseri. Standardstillingen for Våben og Beskyttelse."
+      },
+      "berserker_stance": {
+        "name": "Bersærkerstilling",
+        "description": "En hensynsløs kampstilling: dine kritiske træf sker 3% oftere og rammer 3% hårdere. Raseri-krigeren kæmper altid i denne stilling."
       },
       "sunder_armor": {
         "name": "Rustningsskær",

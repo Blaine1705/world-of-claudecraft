@@ -866,6 +866,8 @@ export const sv_SE: EnTranslations = {
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "defensiveStance": "Gardställning: minskad mottagen skada, mer hot",
+      "battleStance": "Stridsställning: 10% mer raserigenerering",
+      "berserkerStance": "Bärsärkarställning: kritiska träffar 3% oftare och 3% hårdare",
       "righteousFury": "Brinnande ed: kraftigt ökat hot från helig skada",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -4751,7 +4753,15 @@ export const sv_SE: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Gardställning",
-        "description": "En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen."
+        "description": "En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta Stridsställning för att återgå till offensiven."
+      },
+      "battle_stance": {
+        "name": "Stridsställning",
+        "description": "En aggressiv stridsställning: du genererar 10 % mer raseri. Standardställningen för Vapen och Skydd."
+      },
+      "berserker_stance": {
+        "name": "Bärsärkarställning",
+        "description": "En hänsynslös stridsställning: dina kritiska träffar sker 3 % oftare och slår 3 % hårdare. Raseri-krigaren strider alltid i denna ställning."
       },
       "sunder_armor": {
         "name": "Rustningsklipp",

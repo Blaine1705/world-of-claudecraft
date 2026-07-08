@@ -1788,7 +1788,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '大きく薙ぎ払い、前方のすべての敵に {damage} のダメージを与えます。',
   'entities.abilities.defensive_stance.name': 'ガーデッドスタンス',
   'entities.abilities.defensive_stance.description':
-    '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。再度使用するとスタンスを解除します。',
+    '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。バトルスタンスを使用すると攻撃態勢に戻ります。',
+  'entities.abilities.battle_stance.name': 'バトルスタンス',
+  'entities.abilities.battle_stance.description':
+    '攻撃的な戦闘スタンスです。怒りの生成が10%増加します。武器と防御の既定スタンスです。',
+  'entities.abilities.berserker_stance.name': 'バーサーカースタンス',
+  'entities.abilities.berserker_stance.description':
+    '無謀な戦闘スタンスです。クリティカル発生率が3%上昇し、クリティカルダメージが3%増加します。フュリーの戦士は常にこのスタンスで戦います。',
   'entities.abilities.sunder_armor.name': '装甲切断',
   'entities.abilities.sunder_armor.description':
     '対象のアーマーを破壊し、1回ごとに {damage} 低下させます。最大5回まで重なります。大量の脅威を生成します。',
@@ -5116,6 +5122,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': 'フリートフォーム: 移動速度が{pct}%上昇',
   'hudChrome.auraEffect.defensiveStance':
     'ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇',
+  'hudChrome.auraEffect.battleStance': '戦闘スタンス: 怒りの生成が10%増加',
+  'hudChrome.auraEffect.berserkerStance': 'バーサーカースタンス: クリティカルが3%増え、3%強く命中',
   'hudChrome.auraEffect.righteousFury': 'バーニングオース: 神聖ダメージによる脅威度が大幅に上昇',
   'hudChrome.auraEffect.scale': 'サイズが{pct}%増加',
   'hudChrome.auraEffect.jump': 'ジャンプの高さが{pct}%増加',

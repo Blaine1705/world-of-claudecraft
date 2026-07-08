@@ -866,6 +866,8 @@ export const it_IT: EnTranslations = {
       "formCat": "Forma felina: danni in mischia ed energia",
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "defensiveStance": "Posizione Guardinga: danni subiti ridotti, più minaccia",
+      "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
+      "berserkerStance": "Posizione Berserker: critici il 3% più spesso e il 3% più forti",
       "righteousFury": "Giuramento Ardente: minaccia da danni Sacri molto aumentata",
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
@@ -4751,7 +4753,15 @@ export const it_IT: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Posizione Guardinga",
-        "description": "Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lanciala di nuovo per uscire dalla posizione."
+        "description": "Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lancia Posizione di Battaglia per tornare all'offensiva."
+      },
+      "battle_stance": {
+        "name": "Posizione di Battaglia",
+        "description": "Posizione di combattimento aggressiva: generi il 10% di rabbia in più. La posizione predefinita per Armi e Protezione."
+      },
+      "berserker_stance": {
+        "name": "Posizione Berserker",
+        "description": "Posizione di combattimento sconsiderata: i tuoi colpi critici avvengono il 3% più spesso e infliggono il 3% di danni in più. Il guerriero Furia combatte sempre in questa posizione."
       },
       "sunder_armor": {
         "name": "Trancia Armatura",

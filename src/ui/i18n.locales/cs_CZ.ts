@@ -2259,6 +2259,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.costTax': 'Zvyšuje cenu schopností o {pct} %',
   'hudChrome.auraEffect.critVuln': 'Zvyšuje šanci na obdržený kritický zásah o {pct} %',
   'hudChrome.auraEffect.defensiveStance': 'Obranný postoj: nižší obdržené poškození, větší hrozba',
+  'hudChrome.auraEffect.battleStance': 'Bojový postoj: o 10% vyšší tvorba vzteku',
+  'hudChrome.auraEffect.berserkerStance':
+    'Zuřivý postoj: kritické zásahy o 3% častěji a o 3% silněji',
   'hudChrome.auraEffect.disarm': 'Odzbrojení: nelze používat útoky zbraní',
   'hudChrome.auraEffect.dodge': 'Zvyšuje šanci na vyhnutí o {pct} %',
   'hudChrome.auraEffect.dodgeReduce': 'Snižuje šanci na vyhnutí o {pct} %',
@@ -3383,8 +3386,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 14 dodatečného přírodního poškození.',
   'entities.abilities.deadly_poison.name': 'Hnisavý jed',
   'entities.abilities.defensive_stance.description':
-    'Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Sesláním znovu postoj opustíš.',
+    'Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Seslej Bojový postoj, aby ses vrátil do ofenzivy.',
   'entities.abilities.defensive_stance.name': 'Krytý postoj',
+  'entities.abilities.battle_stance.name': 'Bojový postoj',
+  'entities.abilities.battle_stance.description':
+    'Agresivní bojový postoj: vytváříš o 10 % více vzteku. Výchozí postoj pro Zbraně a Ochranu.',
+  'entities.abilities.berserker_stance.name': 'Zuřivý postoj',
+  'entities.abilities.berserker_stance.description':
+    'Bezohledný bojový postoj: tvé kritické zásahy nastávají o 3 % častěji a zasahují o 3 % silněji. Válečník Zuřivosti vždy bojuje v tomto postoji.',
   'entities.abilities.demon_skin.description': 'Démonická kůže zvýší tvoji zbroj o 30 na 30 min.',
   'entities.abilities.demon_skin.name': 'Kůže běsa',
   'entities.abilities.demoralizing_roar.description':

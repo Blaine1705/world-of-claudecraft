@@ -1245,8 +1245,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 14 sát thương Tự Nhiên.',
   'entities.abilities.deadly_poison.name': 'Nọc Độc Ung Mủ',
   'entities.abilities.defensive_stance.description':
-    'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng.',
+    'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển Thế Chiến để trở lại tấn công.',
   'entities.abilities.defensive_stance.name': 'Thế Thủ',
+  'entities.abilities.battle_stance.name': 'Thế Chiến',
+  'entities.abilities.battle_stance.description':
+    'Thế đứng tấn công: bạn tạo ra nhiều hơn 10% nộ khí. Thế đứng mặc định cho Vũ Khí và Phòng Thủ.',
+  'entities.abilities.berserker_stance.name': 'Thế Cuồng Nộ',
+  'entities.abilities.berserker_stance.description':
+    'Thế đứng liều lĩnh: đòn chí mạng của bạn xảy ra thường xuyên hơn 3% và mạnh hơn 3%. Chiến binh Cuồng Nộ luôn chiến đấu trong thế đứng này.',
   'entities.abilities.demon_skin.description':
     'Lớp da quỷ tăng giáp của bạn thêm 30 trong 30 phút.',
   'entities.abilities.demon_skin.name': 'Da Ác Quỷ',
@@ -5628,6 +5634,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Fleet Form: tốc độ di chuyển tăng {pct}%.',
   'hudChrome.auraEffect.defensiveStance': 'Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.',
+  'hudChrome.auraEffect.battleStance': 'Thế Chiến: tăng 10% tạo nộ khí.',
+  'hudChrome.auraEffect.berserkerStance':
+    'Thế Cuồng Nộ: chí mạng thường xuyên hơn 3% và mạnh hơn 3%.',
   'hudChrome.auraEffect.righteousFury': 'Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.',
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',
   'hudChrome.auraEffect.jump': 'Altura de salto aumentada un {pct}%',

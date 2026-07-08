@@ -866,6 +866,8 @@ export const fr_CA: EnTranslations = {
       "formCat": "Forme féline : dégâts de mêlée et énergie",
       "formTravel": "Forme de Fleet : vitesse de déplacement accrue de {pct}%",
       "defensiveStance": "Guarded Stance : dégâts encaissés réduits, menace accrue",
+      "battleStance": "Battle Stance : 10% de génération de rage en plus",
+      "berserkerStance": "Berserker Stance : critiques 3% plus souvent et 3% plus forts",
       "righteousFury": "Burning Oath : menace générée par les dégâts Sacrés fortement accrue",
       "scale": "Gabarit augmentée de {pct}%",
       "jump": "Saut augmentée de {pct}%",
@@ -4751,7 +4753,15 @@ export const fr_CA: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Posture de garde",
-        "description": "Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Relancez pour quitter la posture."
+        "description": "Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l'offensive."
+      },
+      "battle_stance": {
+        "name": "Posture de combat",
+        "description": "Posture de combat agressive: vous générez 10% de rage en plus. La posture par défaut pour Armes et Protection."
+      },
+      "berserker_stance": {
+        "name": "Posture berserker",
+        "description": "Posture de combat téméraire: vos coups critiques surviennent 3% plus souvent et infligent 3% de dégâts en plus. Le guerrier Fureur combat toujours dans cette posture."
       },
       "sunder_armor": {
         "name": "Cisaillement d'armure",

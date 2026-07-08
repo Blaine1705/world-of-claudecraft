@@ -1772,7 +1772,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description': '전방의 모든 적을 휩쓸어 {damage}의 피해를 입힙니다.',
   'entities.abilities.defensive_stance.name': '방어 태세',
   'entities.abilities.defensive_stance.description':
-    '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 다시 시전하면 태세를 해제합니다.',
+    '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 전투 태세를 시전하면 공세로 돌아갑니다.',
+  'entities.abilities.battle_stance.name': '전투 태세',
+  'entities.abilities.battle_stance.description':
+    '공격적인 전투 태세입니다. 분노를 10% 더 생성합니다. 무기와 방어 전문화의 기본 태세입니다.',
+  'entities.abilities.berserker_stance.name': '광폭 태세',
+  'entities.abilities.berserker_stance.description':
+    '무모한 전투 태세입니다. 치명타 확률이 3% 증가하고 치명타 피해가 3% 증가합니다. 분노 전사는 항상 이 태세로 싸웁니다.',
   'entities.abilities.sunder_armor.name': '방어구 절단',
   'entities.abilities.sunder_armor.description':
     '대상의 방어구를 가르고 적용마다 {damage}만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다.',
@@ -5124,6 +5130,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': '표범 변신: 근접 피해와 기력',
   'hudChrome.auraEffect.formTravel': '쾌속 형태: 이동 속도가 {pct}% 증가합니다',
   'hudChrome.auraEffect.defensiveStance': '방어 태세: 받는 피해 감소, 위협 수준 증가',
+  'hudChrome.auraEffect.battleStance': '전투 태세: 분노 생성 10% 증가',
+  'hudChrome.auraEffect.berserkerStance': '광폭 태세: 치명타 3% 더 자주 발생, 3% 더 강하게 적중',
   'hudChrome.auraEffect.righteousFury': '불타는 맹세: 신성 피해로 인한 위협 수준이 크게 증가합니다',
   'hudChrome.auraEffect.scale': '크기가 {pct}% 증가합니다',
   'hudChrome.auraEffect.jump': '도약 높이가 {pct}% 증가합니다',

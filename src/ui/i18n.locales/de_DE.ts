@@ -2435,7 +2435,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein weiter Hieb, der alle Gegner vor euch für {damage} Schaden trifft.',
   'entities.abilities.defensive_stance.name': 'Wehrhafte Haltung',
   'entities.abilities.defensive_stance.description':
-    'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen.',
+    'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Wirkt Kampfhaltung, um in die Offensive zurückzukehren.',
+  'entities.abilities.battle_stance.name': 'Kampfhaltung',
+  'entities.abilities.battle_stance.description':
+    'Aggressive Kampfhaltung: Ihr erzeugt 10% mehr Wut. Die Standardhaltung für Waffen und Schutz.',
+  'entities.abilities.berserker_stance.name': 'Berserkerhaltung',
+  'entities.abilities.berserker_stance.description':
+    'Rücksichtslose Kampfhaltung: Eure kritischen Treffer landen 3% häufiger und verursachen 3% mehr Schaden. Der Furor-Krieger kämpft stets in dieser Haltung.',
   'entities.abilities.sunder_armor.name': 'Rüstungsspalter',
   'entities.abilities.sunder_armor.description':
     'Zerreißt die Rüstung des Ziels und verringert sie pro Anwendung um {damage}. Bis zu 5-mal stapelbar. Erzeugt viel Bedrohung.',
@@ -5725,6 +5731,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': 'Fleet Form: Bewegungstempo um {pct}% erhöht',
   'hudChrome.auraEffect.defensiveStance':
     'Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung',
+  'hudChrome.auraEffect.battleStance': 'Kampfhaltung: 10% mehr Wuterzeugung',
+  'hudChrome.auraEffect.berserkerStance':
+    'Berserkerhaltung: kritische Treffer 3% häufiger und 3% stärker',
   'hudChrome.auraEffect.righteousFury':
     'Brennender Eid: stark erhöhte Bedrohung durch Heiligschaden',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',

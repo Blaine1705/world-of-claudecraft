@@ -1227,8 +1227,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 14 dodatkowych obrażeń od natury.',
   'entities.abilities.deadly_poison.name': 'Jątrzący jad',
   'entities.abilities.defensive_stance.description':
-    'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
+    'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć Postawę bojową, aby wrócić do ofensywy.',
   'entities.abilities.defensive_stance.name': 'Czujna postawa',
+  'entities.abilities.battle_stance.name': 'Postawa bojowa',
+  'entities.abilities.battle_stance.description':
+    'Agresywna postawa bojowa: generujesz o 10% więcej wściekłości. Domyślna postawa dla Broni i Ochrony.',
+  'entities.abilities.berserker_stance.name': 'Postawa berserkera',
+  'entities.abilities.berserker_stance.description':
+    'Lekkomyślna postawa bojowa: twoje trafienia krytyczne zdarzają się o 3% częściej i zadają o 3% więcej obrażeń. Wojownik Furii zawsze walczy w tej postawie.',
   'entities.abilities.demon_skin.description':
     'Demoniczna skóra zwiększa twój pancerz o 30 na 30 min.',
   'entities.abilities.demon_skin.name': 'Skóra plugawca',
@@ -5630,6 +5636,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': 'Postać Fleet: prędkość ruchu zwiększona o {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Czujna postawa: mniej otrzymywanych obrażeń, większe zagrożenie',
+  'hudChrome.auraEffect.battleStance': 'Postawa bojowa: 10% więcej generowanej wściekłości',
+  'hudChrome.auraEffect.berserkerStance':
+    'Postawa berserkera: trafienia krytyczne 3% częściej i 3% mocniej',
   'hudChrome.auraEffect.righteousFury':
     'Płonąca przysięga: znacznie zwiększone zagrożenie od obrażeń od Świętości',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',

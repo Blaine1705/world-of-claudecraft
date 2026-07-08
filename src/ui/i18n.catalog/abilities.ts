@@ -668,7 +668,17 @@ const classAbilityNamesEn = {
       [
         'defensive_stance',
         'Guarded Stance',
-        'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
+        'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive.',
+      ],
+      [
+        'battle_stance',
+        'Battle Stance',
+        'An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection.',
+      ],
+      [
+        'berserker_stance',
+        'Berserker Stance',
+        'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
       ],
       [
         'sunder_armor',
@@ -1483,7 +1493,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Actitud defensiva',
-          'Actitud de combate defensiva: generas un 30% más de amenaza, pero infliges y recibes un 10% menos de daño. Lánzala de nuevo para salir de la actitud.',
+          'Una postura de combate defensiva: generas un 30% mas de amenaza pero infliges y recibes un 10% menos de dano. Lanza Actitud de Batalla para volver a la ofensiva.',
+        ],
+        [
+          'battle_stance',
+          'Actitud de Batalla',
+          'Una postura de combate agresiva: generas un 10% mas de ira. La postura por defecto de Armas y Proteccion.',
+        ],
+        [
+          'berserker_stance',
+          'Actitud Berserker',
+          'Una postura de combate temeraria: tus golpes criticos suceden un 3% mas a menudo y golpean un 3% mas fuerte. El guerrero de Furia siempre lucha en esta postura.',
         ],
         [
           'sunder_armor',
@@ -2302,7 +2322,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Posture défensive',
-          'Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Relancez pour quitter la posture.',
+          'Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l\'offensive.',
+        ],
+        [
+          'battle_stance',
+          'Posture de combat',
+          'Posture de combat agressive: vous générez 10% de rage en plus. La posture par défaut pour Armes et Protection.',
+        ],
+        [
+          'berserker_stance',
+          'Posture berserker',
+          'Posture de combat téméraire: vos coups critiques surviennent 3% plus souvent et infligent 3% de dégâts en plus. Le guerrier Fureur combat toujours dans cette posture.',
         ],
         [
           'sunder_armor',
@@ -3164,7 +3194,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Posizione Difensiva',
-          'Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lanciala di nuovo per uscire dalla posizione.',
+          'Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lancia Posizione di Battaglia per tornare all\'offensiva.',
+        ],
+        [
+          'battle_stance',
+          'Posizione di Battaglia',
+          'Posizione di combattimento aggressiva: generi il 10% di rabbia in più. La posizione predefinita per Armi e Protezione.',
+        ],
+        [
+          'berserker_stance',
+          'Posizione Berserker',
+          'Posizione di combattimento sconsiderata: i tuoi colpi critici avvengono il 3% più spesso e infliggono il 3% di danni in più. Il guerriero Furia combatte sempre in questa posizione.',
         ],
         [
           'sunder_armor',
@@ -3958,7 +3998,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Verteidigungshaltung',
-          'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen.',
+          'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Wirkt Kampfhaltung, um in die Offensive zurückzukehren.',
+        ],
+        [
+          'battle_stance',
+          'Kampfhaltung',
+          'Aggressive Kampfhaltung: Ihr erzeugt 10% mehr Wut. Die Standardhaltung für Waffen und Schutz.',
+        ],
+        [
+          'berserker_stance',
+          'Berserkerhaltung',
+          'Rücksichtslose Kampfhaltung: Eure kritischen Treffer landen 3% häufiger und verursachen 3% mehr Schaden. Der Furor-Krieger kämpft stets in dieser Haltung.',
         ],
         [
           'sunder_armor',
@@ -4740,7 +4790,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           '防御姿态',
-          '防御战斗姿态：你产生的威胁值提高 30%，但造成和受到的伤害降低 10%。再次施放可离开该姿态。',
+          '防御战斗姿态：你产生的威胁值提高 30%，但造成和受到的伤害降低 10%。施放战斗姿态可回到进攻状态。',
+        ],
+        [
+          'battle_stance',
+          '战斗姿态',
+          '具有攻击性的战斗姿态：你的怒气生成提高 10%。这是武器和防护的默认姿态。',
+        ],
+        [
+          'berserker_stance',
+          '狂暴姿态',
+          '鲁莽的战斗姿态：你的暴击几率提高 3%，暴击伤害提高 3%。狂怒战士始终以这种姿态战斗。',
         ],
         [
           'sunder_armor',
@@ -5198,7 +5258,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           '防禦姿態',
-          '防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。再次施放可離開該姿態。',
+          '防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。施放戰鬥姿態可回到進攻狀態。',
+        ],
+        [
+          'battle_stance',
+          '戰鬥姿態',
+          '具有攻擊性的戰鬥姿態：你的怒氣生成提高 10%。這是武器和防護的預設姿態。',
+        ],
+        [
+          'berserker_stance',
+          '狂暴姿態',
+          '魯莽的戰鬥姿態：你的爆擊機率提高 3%，爆擊傷害提高 3%。狂怒戰士始終以這種姿態戰鬥。',
         ],
         [
           'sunder_armor',
@@ -5664,7 +5734,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           '방어 태세',
-          '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 다시 시전하면 태세를 해제합니다.',
+          '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 전투 태세를 시전하면 공세로 돌아갑니다.',
+        ],
+        [
+          'battle_stance',
+          '전투 태세',
+          '공격적인 전투 태세입니다. 분노를 10% 더 생성합니다. 무기와 방어 전문화의 기본 태세입니다.',
+        ],
+        [
+          'berserker_stance',
+          '광폭 태세',
+          '무모한 전투 태세입니다. 치명타 확률이 3% 증가하고 치명타 피해가 3% 증가합니다. 분노 전사는 항상 이 태세로 싸웁니다.',
         ],
         [
           'sunder_armor',
@@ -6358,7 +6438,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           '防御スタンス',
-          '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。再度使用するとスタンスを解除します。',
+          '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。戦闘スタンスを使用すると攻撃態勢に戻ります。',
+        ],
+        [
+          'battle_stance',
+          '戦闘スタンス',
+          '攻撃的な戦闘スタンスです。怒りの生成が10%増加します。武器と防御の既定スタンスです。',
+        ],
+        [
+          'berserker_stance',
+          'バーサーカースタンス',
+          '無謀な戦闘スタンスです。クリティカル発生率が3%上昇し、クリティカルダメージが3%増加します。フュリーの戦士は常にこのスタンスで戦います。',
         ],
         [
           'sunder_armor',
@@ -7092,7 +7182,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Postura Defensiva',
-          'Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance de novo para sair da postura.',
+          'Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance Postura de Batalha para voltar à ofensiva.',
+        ],
+        [
+          'battle_stance',
+          'Postura de Batalha',
+          'Postura de combate agressiva: você gera 10% mais de raiva. A postura padrão para Armas e Proteção.',
+        ],
+        [
+          'berserker_stance',
+          'Postura Berserker',
+          'Postura de combate imprudente: seus acertos críticos ocorrem 3% mais vezes e causam 3% mais dano. O guerreiro de Fúria sempre luta nesta postura.',
         ],
         [
           'sunder_armor',
@@ -7870,7 +7970,17 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Оборонительная стойка',
-          'Оборонительная боевая стойка: вы создаете на 30% больше угрозы, но наносите и получаете на 10% меньше урона. Примените снова, чтобы выйти из стойки.',
+          'Оборонительная боевая стойка: вы создаете на 30% больше угрозы, но наносите и получаете на 10% меньше урона. Примените Боевую стойку, чтобы вернуться в наступление.',
+        ],
+        [
+          'battle_stance',
+          'Боевая стойка',
+          'Агрессивная боевая стойка: вы создаете на 10% больше ярости. Стойка по умолчанию для Оружия и Защиты.',
+        ],
+        [
+          'berserker_stance',
+          'Стойка берсерка',
+          'Безрассудная боевая стойка: ваши критические удары происходят на 3% чаще и наносят на 3% больше урона. Воин Неистовства всегда сражается в этой стойке.',
         ],
         [
           'sunder_armor',

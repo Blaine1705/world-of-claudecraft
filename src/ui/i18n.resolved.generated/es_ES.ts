@@ -866,6 +866,8 @@ export const es_ES: EnTranslations = {
       "formCat": "Forma felina, daño cuerpo a cuerpo y energía",
       "formTravel": "Forma Fleet: velocidad de desplazamiento aumentada un {pct}%",
       "defensiveStance": "Guarded Stance: menos daño recibido, más amenaza",
+      "battleStance": "Actitud de batalla: 10% más de generación de ira",
+      "berserkerStance": "Actitud Berserker: críticos un 3% más frecuentes y un 3% más fuertes",
       "righteousFury": "Burning Oath: amenaza por daño Sagrado enormemente aumentada",
       "scale": "Talla aumentado un {pct}%",
       "jump": "Salto aumentada un {pct}%",
@@ -4751,7 +4753,15 @@ export const es_ES: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Actitud en Guardia",
-        "description": "Actitud de combate defensiva: generas un 30% más de amenaza, pero infliges y recibes un 10% menos de daño. Lánzala de nuevo para salir de la actitud."
+        "description": "Una postura de combate defensiva: generas un 30% mas de amenaza pero infliges y recibes un 10% menos de dano. Lanza Actitud de Batalla para volver a la ofensiva."
+      },
+      "battle_stance": {
+        "name": "Actitud de Batalla",
+        "description": "Una postura de combate agresiva: generas un 10% mas de ira. La postura por defecto de Armas y Proteccion."
+      },
+      "berserker_stance": {
+        "name": "Actitud Berserker",
+        "description": "Una postura de combate temeraria: tus golpes criticos suceden un 3% mas a menudo y golpean un 3% mas fuerte. El guerrero de Furia siempre lucha en esta postura."
       },
       "sunder_armor": {
         "name": "Cizalla de Armadura",

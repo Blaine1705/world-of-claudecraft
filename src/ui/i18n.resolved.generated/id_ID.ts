@@ -866,6 +866,8 @@ export const id_ID: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "defensiveStance": "Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah",
+      "battleStance": "Kuda-kuda Tempur: pembangkitan amarah 10% lebih banyak",
+      "berserkerStance": "Kuda-kuda Berserker: kritikal 3% lebih sering dan 3% lebih keras",
       "righteousFury": "Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
@@ -4751,7 +4753,15 @@ export const id_ID: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Kuda-kuda Waspada",
-        "description": "Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini."
+        "description": "Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal Kuda-kuda Tempur untuk kembali menyerang."
+      },
+      "battle_stance": {
+        "name": "Kuda-kuda Tempur",
+        "description": "Kuda-kuda tempur agresif: kamu menghasilkan 10% lebih banyak amarah. Kuda-kuda bawaan untuk Senjata dan Perlindungan."
+      },
+      "berserker_stance": {
+        "name": "Kuda-kuda Berserker",
+        "description": "Kuda-kuda tempur nekat: serangan kritismu terjadi 3% lebih sering dan menghantam 3% lebih keras. Prajurit Amukan selalu bertarung dalam kuda-kuda ini."
       },
       "sunder_armor": {
         "name": "Robek Zirah",

@@ -2409,7 +2409,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um golpe amplo que atinge todos os inimigos à sua frente com {damage} de dano.',
   'entities.abilities.defensive_stance.name': 'Postura de Guarda',
   'entities.abilities.defensive_stance.description':
-    'Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance de novo para sair da postura.',
+    'Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance Postura de Batalha para voltar à ofensiva.',
+  'entities.abilities.battle_stance.name': 'Postura de Batalha',
+  'entities.abilities.battle_stance.description':
+    'Postura de combate agressiva: você gera 10% mais de raiva. A postura padrão para Armas e Proteção.',
+  'entities.abilities.berserker_stance.name': 'Postura Berserker',
+  'entities.abilities.berserker_stance.description':
+    'Postura de combate imprudente: seus acertos críticos ocorrem 3% mais vezes e causam 3% mais dano. O guerreiro de Fúria sempre luta nesta postura.',
   'entities.abilities.sunder_armor.name': 'Retalhar Armadura',
   'entities.abilities.sunder_armor.description':
     'Fende a armadura do alvo, reduzindo-a em {damage} por aplicação. Acumula até 5 vezes. Gera muita ameaça.',
@@ -5668,6 +5674,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Forma de Fleet: velocidade de movimento aumentada em {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Postura de Guarda: dano recebido reduzido, mais ameaça',
+  'hudChrome.auraEffect.battleStance': 'Postura de Batalha: 10% mais de geração de raiva',
+  'hudChrome.auraEffect.berserkerStance':
+    'Postura Berserker: críticos 3% mais frequentes e 3% mais fortes',
   'hudChrome.auraEffect.righteousFury': 'Juramento Ardente: ameaça de dano Sagrado muito aumentada',
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',
   'hudChrome.auraEffect.jump': 'Altura de salto aumentada un {pct}%',

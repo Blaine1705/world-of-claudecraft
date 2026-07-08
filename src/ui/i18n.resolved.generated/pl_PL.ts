@@ -866,6 +866,8 @@ export const pl_PL: EnTranslations = {
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Postać Fleet: prędkość ruchu zwiększona o {pct}%",
       "defensiveStance": "Czujna postawa: mniej otrzymywanych obrażeń, większe zagrożenie",
+      "battleStance": "Postawa bojowa: 10% więcej generowanej wściekłości",
+      "berserkerStance": "Postawa berserkera: trafienia krytyczne 3% częściej i 3% mocniej",
       "righteousFury": "Płonąca przysięga: znacznie zwiększone zagrożenie od obrażeń od Świętości",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -4751,7 +4753,15 @@ export const pl_PL: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Czujna postawa",
-        "description": "Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę."
+        "description": "Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć Postawę bojową, aby wrócić do ofensywy."
+      },
+      "battle_stance": {
+        "name": "Postawa bojowa",
+        "description": "Agresywna postawa bojowa: generujesz o 10% więcej wściekłości. Domyślna postawa dla Broni i Ochrony."
+      },
+      "berserker_stance": {
+        "name": "Postawa berserkera",
+        "description": "Lekkomyślna postawa bojowa: twoje trafienia krytyczne zdarzają się o 3% częściej i zadają o 3% więcej obrażeń. Wojownik Furii zawsze walczy w tej postawie."
       },
       "sunder_armor": {
         "name": "Rozdarcie pancerza",

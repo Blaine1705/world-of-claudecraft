@@ -866,6 +866,8 @@ export const nl_NL: EnTranslations = {
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
       "defensiveStance": "Bewaakte Houding: minder ontvangen schade, meer dreiging",
+      "battleStance": "Strijdhouding: 10% meer woede-opwekking",
+      "berserkerStance": "Berserkerhouding: crits 3% vaker en 3% harder",
       "righteousFury": "Brandende Eed: sterk verhoogde dreiging door Heilige schade",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -4751,7 +4753,15 @@ export const nl_NL: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Bewaakte Houding",
-        "description": "Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten."
+        "description": "Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer Strijdhouding om terug te keren naar de aanval."
+      },
+      "battle_stance": {
+        "name": "Strijdhouding",
+        "description": "Een agressieve gevechtshouding: je genereert 10% meer woede. De standaardhouding voor Wapens en Bescherming."
+      },
+      "berserker_stance": {
+        "name": "Berserkerhouding",
+        "description": "Een roekeloze gevechtshouding: je kritieke treffers komen 3% vaker voor en raken 3% harder. De Razernij-krijger vecht altijd in deze houding."
       },
       "sunder_armor": {
         "name": "Pantserscheur",

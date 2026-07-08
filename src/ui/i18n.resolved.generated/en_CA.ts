@@ -866,6 +866,8 @@ export const en_CA: EnTranslations = {
       "formCat": "Cat Form: melee damage and energy",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "defensiveStance": "Guarded Stance: reduced damage taken, more threat",
+      "battleStance": "Battle Stance: 10% more rage generation",
+      "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
@@ -4751,7 +4753,15 @@ export const en_CA: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Guarded Stance",
-        "description": "A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance."
+        "description": "A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive."
+      },
+      "battle_stance": {
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
+      },
+      "berserker_stance": {
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sunder_armor": {
         "name": "Armor Shear",

@@ -866,6 +866,8 @@ export const vi_VN: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
       "defensiveStance": "Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.",
+      "battleStance": "Thế Chiến: tăng 10% tạo nộ khí.",
+      "berserkerStance": "Thế Cuồng Nộ: chí mạng thường xuyên hơn 3% và mạnh hơn 3%.",
       "righteousFury": "Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
@@ -4751,7 +4753,15 @@ export const vi_VN: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Thế Thủ",
-        "description": "Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng."
+        "description": "Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển Thế Chiến để trở lại tấn công."
+      },
+      "battle_stance": {
+        "name": "Thế Chiến",
+        "description": "Thế đứng tấn công: bạn tạo ra nhiều hơn 10% nộ khí. Thế đứng mặc định cho Vũ Khí và Phòng Thủ."
+      },
+      "berserker_stance": {
+        "name": "Thế Cuồng Nộ",
+        "description": "Thế đứng liều lĩnh: đòn chí mạng của bạn xảy ra thường xuyên hơn 3% và mạnh hơn 3%. Chiến binh Cuồng Nộ luôn chiến đấu trong thế đứng này."
       },
       "sunder_armor": {
         "name": "Xẻ Giáp",

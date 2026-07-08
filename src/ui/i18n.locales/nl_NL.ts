@@ -1250,8 +1250,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 14 extra Natuurschade toebrengt.',
   'entities.abilities.deadly_poison.name': 'Etterend Gif',
   'entities.abilities.defensive_stance.description':
-    'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten.',
+    'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer Strijdhouding om terug te keren naar de aanval.',
   'entities.abilities.defensive_stance.name': 'Bewaakte Houding',
+  'entities.abilities.battle_stance.name': 'Strijdhouding',
+  'entities.abilities.battle_stance.description':
+    'Een agressieve gevechtshouding: je genereert 10% meer woede. De standaardhouding voor Wapens en Bescherming.',
+  'entities.abilities.berserker_stance.name': 'Berserkerhouding',
+  'entities.abilities.berserker_stance.description':
+    'Een roekeloze gevechtshouding: je kritieke treffers komen 3% vaker voor en raken 3% harder. De Razernij-krijger vecht altijd in deze houding.',
   'entities.abilities.demon_skin.description':
     'Demonenhuid verhoogt je pantser met 30 gedurende 30 min.',
   'entities.abilities.demon_skin.name': 'Duivelshuid',
@@ -5661,6 +5667,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': 'Fleetgedaante: bewegingssnelheid verhoogd met {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Bewaakte Houding: minder ontvangen schade, meer dreiging',
+  'hudChrome.auraEffect.battleStance': 'Strijdhouding: 10% meer woede-opwekking',
+  'hudChrome.auraEffect.berserkerStance':
+    'Berserkerhouding: crits 3% vaker en 3% harder',
   'hudChrome.auraEffect.righteousFury':
     'Brandende Eed: sterk verhoogde dreiging door Heilige schade',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',

@@ -866,6 +866,8 @@ export const cs_CZ: EnTranslations = {
       "formCat": "Vlčí podoba: poškození na blízko a energie",
       "formTravel": "Cestovní podoba: rychlost pohybu zvýšena o {pct} %",
       "defensiveStance": "Obranný postoj: nižší obdržené poškození, větší hrozba",
+      "battleStance": "Bojový postoj: o 10% vyšší tvorba vzteku",
+      "berserkerStance": "Zuřivý postoj: kritické zásahy o 3% častěji a o 3% silněji",
       "righteousFury": "Hořící přísaha: výrazně zvýšená hrozba ze svatého poškození",
       "scale": "Velikost zvýšena o {pct} %",
       "jump": "Výška skoku zvýšena o {pct} %",
@@ -4751,7 +4753,15 @@ export const cs_CZ: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Krytý postoj",
-        "description": "Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Sesláním znovu postoj opustíš."
+        "description": "Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Seslej Bojový postoj, aby ses vrátil do ofenzivy."
+      },
+      "battle_stance": {
+        "name": "Bojový postoj",
+        "description": "Agresivní bojový postoj: vytváříš o 10 % více vzteku. Výchozí postoj pro Zbraně a Ochranu."
+      },
+      "berserker_stance": {
+        "name": "Zuřivý postoj",
+        "description": "Bezohledný bojový postoj: tvé kritické zásahy nastávají o 3 % častěji a zasahují o 3 % silněji. Válečník Zuřivosti vždy bojuje v tomto postoji."
       },
       "sunder_armor": {
         "name": "Seřezání zbroje",

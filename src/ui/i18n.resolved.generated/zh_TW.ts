@@ -866,6 +866,8 @@ export const zh_TW: EnTranslations = {
       "formCat": "貓形態：近戰傷害與能量",
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
+      "battleStance": "戰鬥姿態：怒氣生成提高 10%",
+      "berserkerStance": "狂暴姿態：爆擊機率提高 3%，爆擊傷害提高 3%",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
@@ -4751,7 +4753,15 @@ export const zh_TW: EnTranslations = {
       },
       "defensive_stance": {
         "name": "戒備姿態",
-        "description": "防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。再次施放可離開該姿態。"
+        "description": "防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。施放戰鬥姿態可回到進攻狀態。"
+      },
+      "battle_stance": {
+        "name": "戰鬥姿態",
+        "description": "具有攻擊性的戰鬥姿態：你的怒氣生成提高 10%。這是武器和防護的預設姿態。"
+      },
+      "berserker_stance": {
+        "name": "狂暴姿態",
+        "description": "魯莽的戰鬥姿態：你的爆擊機率提高 3%，爆擊傷害提高 3%。狂怒戰士始終以這種姿態戰鬥。"
       },
       "sunder_armor": {
         "name": "削甲",

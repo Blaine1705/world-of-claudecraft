@@ -2374,6 +2374,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   execute: r('blood', 'blood', ['axe'], ['glow']),
   slam: r('fury', 'steel', ['mace'], ['motion']),
   cleave: r('fury', 'steel', ['axe'], ['arcs']),
+  // Warrior stances: Battle = an offensive sword on gold; Berserker = a reckless
+  // blood-red skull; Guarded (defensive) keeps its braced shield + arcs.
+  battle_stance: r('fury', 'gold', ['sword'], ['arcs']),
+  berserker_stance: r('blood', 'blood', ['skull'], ['glow']),
   defensive_stance: r('steel', 'steel', ['shield'], ['arcs']),
   sunder_armor: r('steel', 'steel', ['chestplate', { p: 'mace', ...BR }]),
   taunt: r('fury', 'blood', ['fist'], ['arcs']),

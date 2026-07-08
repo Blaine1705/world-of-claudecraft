@@ -1706,7 +1706,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description': '横扫一击，对你前方所有敌人造成 {damage} 点伤害。',
   'entities.abilities.defensive_stance.name': '戒备姿态',
   'entities.abilities.defensive_stance.description':
-    '防御战斗姿态：你产生的威胁值提高 30%，但造成和受到的伤害降低 10%。再次施放可离开该姿态。',
+    '防御战斗姿态：你产生的威胁值提高 30%，但造成和受到的伤害降低 10%。施放战斗姿态可回到进攻状态。',
+  'entities.abilities.battle_stance.name': '战斗姿态',
+  'entities.abilities.battle_stance.description':
+    '具有攻击性的战斗姿态：你的怒气生成提高 10%。这是武器和防护的默认姿态。',
+  'entities.abilities.berserker_stance.name': '狂暴姿态',
+  'entities.abilities.berserker_stance.description':
+    '鲁莽的战斗姿态：你的暴击几率提高 3%，暴击伤害提高 3%。狂怒战士始终以这种姿态战斗。',
   'entities.abilities.sunder_armor.name': '削甲',
   'entities.abilities.sunder_armor.description':
     '撕裂目标的护甲，每次使其降低 {damage}。最多叠加 5 次。产生大量威胁值。',
@@ -4858,6 +4864,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': '猫形态：近战伤害与能量',
   'hudChrome.auraEffect.formTravel': '迅捷形态：移动速度提高 {pct}%',
   'hudChrome.auraEffect.defensiveStance': '戒备姿态：受到的伤害降低，威胁值提高',
+  'hudChrome.auraEffect.battleStance': '战斗姿态：怒气生成提高 10%',
+  'hudChrome.auraEffect.berserkerStance': '狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%',
   'hudChrome.auraEffect.righteousFury': '炽燃誓约：神圣伤害产生的威胁值大幅提高',
   'hudChrome.auraEffect.scale': '体型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳跃高度提高 {pct}%',

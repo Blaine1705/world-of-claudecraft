@@ -866,6 +866,8 @@ export const pt_BR: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Forma de Fleet: velocidade de movimento aumentada em {pct}%",
       "defensiveStance": "Postura de Guarda: dano recebido reduzido, mais ameaça",
+      "battleStance": "Postura de Batalha: 10% mais de geração de raiva",
+      "berserkerStance": "Postura Berserker: críticos 3% mais frequentes e 3% mais fortes",
       "righteousFury": "Juramento Ardente: ameaça de dano Sagrado muito aumentada",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
@@ -4751,7 +4753,15 @@ export const pt_BR: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Postura de Guarda",
-        "description": "Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance de novo para sair da postura."
+        "description": "Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance Postura de Batalha para voltar à ofensiva."
+      },
+      "battle_stance": {
+        "name": "Postura de Batalha",
+        "description": "Postura de combate agressiva: você gera 10% mais de raiva. A postura padrão para Armas e Proteção."
+      },
+      "berserker_stance": {
+        "name": "Postura Berserker",
+        "description": "Postura de combate imprudente: seus acertos críticos ocorrem 3% mais vezes e causam 3% mais dano. O guerreiro de Fúria sempre luta nesta postura."
       },
       "sunder_armor": {
         "name": "Retalhar Armadura",
