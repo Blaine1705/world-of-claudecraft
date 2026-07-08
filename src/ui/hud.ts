@@ -5915,13 +5915,22 @@ export class Hud {
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
-    // '#zone-label' through the write-elision facet.
+    // '#zone-label' through the write-elision facet. It blits the current zone's
+    // high-res map background sharp over the coarse whole-world fallback, so the
+    // player's surroundings are crisp instead of a handful of upscaled pixels.
+    // The zone bg is only PEEKED from the cache (never rendered here: a 10Hz
+    // sync terrain render would hitch); the idle prewarm normally has it ready,
+    // and the coarse fallback covers the gap until then.
+    const p = this.sim.player;
+    const zone = ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z);
+    const cachedZoneBg = this.mapBgCache.get(zone.id);
     this.minimapPainter.paintOverworld(
       ctx,
       this.sim,
       $('#zone-label'),
       this.minimapBg,
       this.minimapZoom,
+      cachedZoneBg ? { canvas: cachedZoneBg, region: this.mapZoneRegion(zone) } : null,
     );
   }
 
