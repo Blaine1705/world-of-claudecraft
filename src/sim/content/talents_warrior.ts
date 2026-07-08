@@ -216,7 +216,7 @@ const SPECS: SpecDef[] = [
     id: 'prot', class: 'warrior', name: 'Ironguard', role: 'tank', icon: '🛡',
     description: 'An immovable wall who holds the enemy’s attention and shields allies.',
     signature: 'shield_slam',
-    mastery: { name: 'Recompense', description: 'Increases all threat you generate by 30% and your armor by 10%.', effect: { global: { threatPct: 0.30 }, stats: { armorPct: 0.10 } } },
+    mastery: { name: 'Recompense', description: 'Increases all threat you generate by 30% and your armor by 10%. Vanguard: your Stamina is increased by 40% and you gain armor equal to 70% of your Strength.', effect: { global: { threatPct: 0.30 }, stats: { armorPct: 0.10, staPct: 0.40, armorFromStrPct: 0.70 } } },
   },
 ];
 
