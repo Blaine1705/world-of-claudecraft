@@ -2217,6 +2217,8 @@ export const zh_CN: EnTranslations = {
       "waveGoldBody": "中段一波：双刃组合，你的构筑在此开始成型、绽放光彩。",
       "wavePrismaticTitle": "棱彩",
       "wavePrismaticBody": "最后一波：足以定义构筑、炸裂屏幕的爆发，意在以最酣畅淋漓的方式让你直呼离谱。",
+      "yumiHeading": "守护Yumi",
+      "yumiBody": "Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。",
       "powerupsTitle": "竞技场中的强化道具",
       "powerupsBody": "激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。",
       "ladderHeading": "攀登天梯",
@@ -3644,6 +3646,45 @@ export const zh_CN: EnTranslations = {
     },
     "chest": {
       "flavor": "亡者交出了他们尚能割舍之物。"
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "加入Protect Yumi！",
+    "queue": {
+      "join": "你加入了Protect Yumi队列。守好你的使魔……",
+      "leave": "你离开了Protect Yumi队列。",
+      "teamLeave": "你的队伍离开了Protect Yumi队列。"
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3最多允许三人小队。",
+      "partyTooBig5": "Protect Yumi 5v5最多允许五人小队。"
+    },
+    "log": {
+      "start": "Protect Yumi！保卫你的使魔，猎杀敌方的使魔。"
+    },
+    "hud": {
+      "title": "守护YUMI",
+      "getReady": "做好准备……",
+      "teleportIn": "Yumi将在{s}秒后传送",
+      "suddenDeath": "骤死战",
+      "yourYumi": "我方Yumi",
+      "enemyYumi": "敌方Yumi",
+      "aria": "我方Yumi生命值{mine}/{max}，敌方Yumi生命值{theirs}。",
+      "collapse": "折叠Protect Yumi血条",
+      "expand": "展开Protect Yumi血条"
+    },
+    "respawn": {
+      "title": "倒下了！"
+    },
+    "banner": {
+      "sudden": "骤死战！Yumi不再传送！",
+      "teleport": "Yumi传送了！"
+    },
+    "end": {
+      "win": "胜利！Yumi安全了！",
+      "loss": "战败！你的Yumi倒下了。"
     }
   },
   "fiesta": {
@@ -7022,6 +7063,9 @@ export const zh_CN: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "森林狼"
       },

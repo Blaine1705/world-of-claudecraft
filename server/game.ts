@@ -3314,7 +3314,16 @@ export class GameServer {
         break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
-        const fmt = msg.format === '2v2' ? '2v2' : msg.format === 'fiesta' ? 'fiesta' : '1v1';
+        const fmt =
+          msg.format === '2v2'
+            ? '2v2'
+            : msg.format === 'fiesta'
+              ? 'fiesta'
+              : msg.format === 'yumi3'
+                ? 'yumi3'
+                : msg.format === 'yumi5'
+                  ? 'yumi5'
+                  : '1v1';
         sim.arenaQueueJoin(pid, fmt);
         break;
       }

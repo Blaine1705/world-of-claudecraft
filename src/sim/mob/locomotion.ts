@@ -27,6 +27,7 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
+import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
@@ -120,6 +121,19 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // rng inside golden-scenario ticks), no evade-home, and the hostility safety
   // net below must not re-hostile it. Bell pattern, verbatim.
   if (mob.templateId === VALE_CUP_BALL_TEMPLATE_ID) {
+    mob.hostile = false;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    return;
+  }
+
+  // Protect Yumi cats are inert objectives: moved only by the match's teleport
+  // driver (social/yumi.ts); no aggro, no wander, no evade-home, and the
+  // hostility safety net below must not re-hostile them (team hostility lives
+  // in the isHostileTo/isFriendlyTo yumi arms).
+  if (mob.templateId === YUMI_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;

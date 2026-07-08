@@ -591,6 +591,25 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
+  // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
+  // clip, the block: mapped as the HIT reaction so she blocks when struck
+  // (playHit rides every landed damage event). No idle/walk clips on
+  // purpose: the objective never moves on its own, and baseAction falls back
+  // to the authored rest pose when a slot's clip is absent. Painted texture,
+  // so no entity tint.
+  mob_yumi_cat: {
+    url: `${CREATURES}/yumi_cat.glb`,
+    height: HUMANOID_H * 1.2, // the objective reads over player heads
+    clips: {
+      idle: 'None',
+      walk: 'None',
+      run: 'None',
+      attack: [],
+      death: 'None',
+      hit: ['Armature|Block5|baselayer'],
+    },
+  },
   mob_stag: {
     url: `${CREATURES}/stag.glb`,
     height: 1.9,
@@ -991,6 +1010,9 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Protect Yumi objective cat: the dedicated Meshy familiar
+  // (docs/prd/protect-yumi-assets.md item 1, delivered).
+  yumi_cat: 'mob_yumi_cat',
   emberkin: 'mob_demon',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',

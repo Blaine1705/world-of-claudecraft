@@ -2217,6 +2217,8 @@ export const ja_JP: EnTranslations = {
       "waveGoldBody": "中盤のウェーブ。両刃の組み合わせが並び、あなたのビルドが形を成して輝き始めます。",
       "wavePrismaticTitle": "プリズマティック",
       "wavePrismaticBody": "最後のウェーブ。ビルドを決定づける、画面を溶かすほどのスパイク。最高の意味でばかげていると感じられるよう作られています。",
+      "yumiHeading": "Yumiを守れ",
+      "yumiBody": "Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。",
       "powerupsTitle": "リングのパワーアップ",
       "powerupsBody": "戦いの最中、光り輝くオーブがアリーナに落ちてきます。先に取った者の自由になり、しかも狙い通りに度を越していて、効果はほんの一瞬だけ。スピードデーモンは目もくらむ速さへ、コロッサスはのっそりと歩く巨人へ、ムーンブーツは低重力で跳ね回るジャンプへ、バーサーカーは突如あふれる怒りへとあなたを変えます。",
       "ladderHeading": "ラダーを駆け上がる",
@@ -3644,6 +3646,45 @@ export const ja_JP: EnTranslations = {
     },
     "chest": {
       "flavor": "死者たちが、譲れるものを差し出した。"
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "Protect Yumiに参加！",
+    "queue": {
+      "join": "Protect Yumiのキューに参加しました。使い魔を守りましょう…",
+      "leave": "Protect Yumiのキューを離れました。",
+      "teamLeave": "チームがProtect Yumiのキューを離れました。"
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3のパーティは最大3人までです。",
+      "partyTooBig5": "Protect Yumi 5v5のパーティは最大5人までです。"
+    },
+    "log": {
+      "start": "Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。"
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "準備して…",
+      "teleportIn": "Yumiの転移まで{s}秒",
+      "suddenDeath": "サドンデス",
+      "yourYumi": "自軍のYumi",
+      "enemyYumi": "敵軍のYumi",
+      "aria": "自軍のYumiは体力{mine}/{max}、敵軍のYumiは{theirs}。",
+      "collapse": "Protect Yumiのバーを折りたたむ",
+      "expand": "Protect Yumiのバーを展開する"
+    },
+    "respawn": {
+      "title": "ダウン！"
+    },
+    "banner": {
+      "sudden": "サドンデス！Yumiはもう転移しない！",
+      "teleport": "Yumiが転移した！"
+    },
+    "end": {
+      "win": "勝利！Yumiは無事だ！",
+      "loss": "敗北！Yumiが倒れてしまった。"
     }
   },
   "fiesta": {
@@ -7022,6 +7063,9 @@ export const ja_JP: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "森の狼"
       },

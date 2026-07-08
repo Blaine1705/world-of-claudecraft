@@ -266,11 +266,38 @@ export function dealDamage(
     }
   }
 
+  // Protect Yumi downs bench the victim on a flat respawn timer, like Fiesta:
+  // never the permanent ranked elimination below. MUST stay above that arm.
+  if (
+    match?.yumi &&
+    match.state === 'active' &&
+    sourcePlayer &&
+    ctx.isArenaCrossTeam(match, sourcePlayer.id, target.id)
+  ) {
+    if (target.hp - amount <= 0) {
+      amount = Math.max(0, target.hp);
+      target.hp = 0;
+      ctx.emit({
+        type: 'damage',
+        sourceId: source?.id ?? -1,
+        targetId: target.id,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+      });
+      ctx.yumiPlayerDown(match, target, sourcePlayer.id);
+      return;
+    }
+  }
+
   // Ranked arena eliminations use normal death state so clients and combat
   // logic see a real 0 HP defeat. The return timer revives everyone after.
   if (
     match &&
     !match.fiesta &&
+    !match.yumi &&
     match.state === 'active' &&
     sourcePlayer &&
     ctx.isArenaCrossTeam(match, sourcePlayer.id, target.id)
@@ -295,6 +322,17 @@ export function dealDamage(
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
       }
+      return;
+    }
+  }
+
+  // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
+  // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
+  // absorb shields already resolved above, so a shielded cat soaks first.
+  if (target.kind === 'mob') {
+    const ymatch = ctx.yumiCatMatches.get(target.id);
+    if (ymatch) {
+      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
       return;
     }
   }
@@ -418,6 +456,10 @@ export function dealDamage(
     const fmatch = target.kind === 'player' ? ctx.arenaMatches.get(target.id) : undefined;
     if (fmatch?.fiesta && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
       ctx.fiestaDown(fmatch, target, null);
+    } else if (fmatch?.yumi && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
+      // Same non-takedown bottom-out safety for Protect Yumi: bench, never
+      // the permanent death + graveyard flow.
+      ctx.yumiPlayerDown(fmatch, target, null);
     } else {
       handleDeath(ctx, target, source);
     }

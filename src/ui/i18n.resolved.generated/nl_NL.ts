@@ -2217,6 +2217,8 @@ export const nl_NL: EnTranslations = {
       "waveGoldBody": "De middelste golf: tweesnijdende combo's waar je build vorm begint te krijgen en gaat zingen.",
       "wavePrismaticTitle": "Prismatisch",
       "wavePrismaticBody": "De laatste golf: build-bepalende, schermversmeltende pieken bedoeld om belachelijk aan te voelen op de beste manier.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Power-ups in de ring",
       "powerupsBody": "Gloeiende bollen vallen ook middenin het gevecht in de arena, gratis voor wie ze als eerste bereikt. Ze zijn opzettelijk over de top en duren maar even: Speed Demon voor een flits van verblindend tempo, Colossus om uit te dijen tot een logge reus, Moon Boots voor een stuiterende sprong met lage zwaartekracht, en Berserker voor een plotselinge golf van razernij.",
       "ladderHeading": "De ladder beklimmen",
@@ -3644,6 +3646,45 @@ export const nl_NL: EnTranslations = {
     },
     "chest": {
       "flavor": "De doden hebben afgestaan wat ze kunnen missen."
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "Join Protect Yumi!",
+    "queue": {
+      "join": "You join the Protect Yumi queue. Guard your familiar…",
+      "leave": "You leave the Protect Yumi queue.",
+      "teamLeave": "Your team leaves the Protect Yumi queue."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
+      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+    },
+    "log": {
+      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "Get ready…",
+      "teleportIn": "Yumis move in {s}",
+      "suddenDeath": "SUDDEN DEATH",
+      "yourYumi": "Your Yumi",
+      "enemyYumi": "Enemy Yumi",
+      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
+      "collapse": "Collapse the Protect Yumi bars",
+      "expand": "Expand the Protect Yumi bars"
+    },
+    "respawn": {
+      "title": "DOWNED!"
+    },
+    "banner": {
+      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
+      "teleport": "The Yumis teleport!"
+    },
+    "end": {
+      "win": "VICTORY! Yumi is safe!",
+      "loss": "DEFEAT! Your Yumi has fallen."
     }
   },
   "fiesta": {
@@ -7022,6 +7063,9 @@ export const nl_NL: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "Boswolf"
       },

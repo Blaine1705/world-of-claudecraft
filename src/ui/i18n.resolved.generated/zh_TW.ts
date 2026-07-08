@@ -2217,6 +2217,8 @@ export const zh_TW: EnTranslations = {
       "waveGoldBody": "中段那波：雙刃般的搭配組合，你的配套在此開始成形，奏出旋律。",
       "wavePrismaticTitle": "彩虹",
       "wavePrismaticBody": "最後那波：足以定義整套配套、能融化整個畫面的爆發，刻意設計得荒謬到讓人拍案叫絕。",
+      "yumiHeading": "守護Yumi",
+      "yumiBody": "Protect Yumi是一種在迷宮中進行的團隊目標模式：每隊守護自己的貓咪使魔，同時獵殺對方的。兩隻貓咪會不時閃現到迷宮的新角落，戰鬥在防守、追獵與尋回之間不斷搖擺。可選擇3對3或5對5排隊；陣亡只會讓你短暫離場。",
       "powerupsTitle": "鬥技場中的能量道具",
       "powerupsBody": "戰鬥進行到一半，發光的能量球也會落入競技場，誰先搶到就歸誰。它們刻意設計得誇張過火，且只持續短短一陣子：速度惡魔讓你瞬間飆出令人目眩的步伐，巨像讓你脹大成笨重的巨人，月靴帶來低重力的彈跳躍動，狂戰士則是一股突如其來的暴怒之潮。",
       "ladderHeading": "在天梯上攀升",
@@ -3644,6 +3646,45 @@ export const zh_TW: EnTranslations = {
     },
     "chest": {
       "flavor": "亡者已交出他們所能割捨之物。"
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "加入Protect Yumi！",
+    "queue": {
+      "join": "你加入了Protect Yumi佇列。守好你的使魔……",
+      "leave": "你離開了Protect Yumi佇列。",
+      "teamLeave": "你的隊伍離開了Protect Yumi佇列。"
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3最多允許三人隊伍。",
+      "partyTooBig5": "Protect Yumi 5v5最多允許五人隊伍。"
+    },
+    "log": {
+      "start": "Protect Yumi！保衛你的使魔，獵殺敵方的使魔。"
+    },
+    "hud": {
+      "title": "守護YUMI",
+      "getReady": "做好準備……",
+      "teleportIn": "Yumi將在{s}秒後傳送",
+      "suddenDeath": "驟死戰",
+      "yourYumi": "我方Yumi",
+      "enemyYumi": "敵方Yumi",
+      "aria": "我方Yumi生命值{mine}/{max}，敵方Yumi生命值{theirs}。",
+      "collapse": "摺疊Protect Yumi血條",
+      "expand": "展開Protect Yumi血條"
+    },
+    "respawn": {
+      "title": "倒下了！"
+    },
+    "banner": {
+      "sudden": "驟死戰！Yumi不再傳送！",
+      "teleport": "Yumi傳送了！"
+    },
+    "end": {
+      "win": "勝利！Yumi安全了！",
+      "loss": "戰敗！你的Yumi倒下了。"
     }
   },
   "fiesta": {
@@ -7022,6 +7063,9 @@ export const zh_TW: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "森林狼"
       },

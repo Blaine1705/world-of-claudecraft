@@ -7095,6 +7095,206 @@
     filter: brightness(1.08);
   }
 
+  /* ---------- yumi match hud ---------- */
+  /* Protect Yumi: the top objective strip (both cat HP bars flanking the mode
+     title + teleport/sudden-death readout) and the center bench-respawn
+     overlay. Team identity rides the --color-team-* tokens (tokens.css); the
+     painter (src/ui/yumi_match_painter.ts) only toggles classes and writes
+     widths/text through the elided writers. Actionable info: never tier-gated. */
+  .yumi-hud {
+    position: absolute;
+    top: 46px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 14px;
+    background: rgba(8, 8, 13, 0.82);
+    border: 1px solid var(--color-primary-dim);
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 30;
+    max-width: min(92%, 720px);
+  }
+  .yh-side {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .yh-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-friendly);
+    white-space: nowrap;
+  }
+  .yh-side.theirs .yh-name {
+    color: var(--color-hostile);
+  }
+  .yh-track {
+    width: 150px;
+    height: 12px;
+    background: var(--color-bg-dark);
+    border: 1px solid var(--color-primary-dim);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .yh-fill {
+    height: 100%;
+    width: 0;
+  }
+  .yh-side.team-blue .yh-fill {
+    background: var(--color-team-blue);
+  }
+  .yh-side.team-red .yh-fill {
+    background: var(--color-team-red);
+  }
+  .yh-num {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: #dcd6c8;
+    white-space: nowrap;
+  }
+  .yh-mid {
+    text-align: center;
+  }
+  .yh-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+  }
+  .yh-timer {
+    font-size: 13px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: #f0ead9;
+  }
+  .yh-timer.sudden {
+    color: var(--color-hostile);
+    letter-spacing: 0.06em;
+  }
+  .yh-sub {
+    font-size: 11px;
+    color: #cfc9bb;
+  }
+  /* Collapse toggle: the one interactive element on the strip (the root is
+     pointer-events none). CSS chevron, no glyph text; 40px touch floor on
+     coarse pointers; steady token-colored focus ring. */
+  .yh-toggle {
+    pointer-events: auto;
+    position: relative;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    background: transparent;
+    border: 1px solid var(--color-primary-dim);
+    border-radius: 5px;
+    cursor: var(--cursor-point);
+  }
+  .yh-toggle::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-left: 2px solid var(--color-primary);
+    border-top: 2px solid var(--color-primary);
+    transform: translate(-50%, -30%) rotate(45deg);
+  }
+  .yumi-hud.collapsed .yh-toggle::before {
+    transform: translate(-50%, -70%) rotate(225deg);
+  }
+  .yh-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+  @media (pointer: coarse) {
+    .yh-toggle {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  .yumi-hud.collapsed .yh-side,
+  .yumi-hud.collapsed .yh-timer,
+  .yumi-hud.collapsed .yh-sub {
+    display: none;
+  }
+  .yumi-respawn {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 28px;
+    background: rgba(8, 8, 13, 0.88);
+    border: 1px solid var(--color-hostile);
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 40;
+  }
+  .yr-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--color-hostile);
+  }
+  .yr-count {
+    font-size: 30px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+  @media (max-width: 700px) {
+    .yumi-hud {
+      gap: 8px;
+      padding: 4px 8px;
+      top: 40px;
+    }
+    .yh-track {
+      width: 88px;
+    }
+    .yh-name {
+      display: none;
+    }
+    .yh-num {
+      font-size: 10px;
+    }
+  }
+  /* Phone portrait: the mid block takes its own top row and the two bars
+     share the second row with fluid tracks, so nothing clips or overlaps
+     the frames below. Same content on every device, only the layout flows. */
+  @media (max-width: 480px) {
+    .yumi-hud {
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      max-width: 96%;
+      row-gap: 4px;
+    }
+    .yh-mid {
+      order: -1;
+      width: calc(100% - 48px);
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .yh-side {
+      flex: 1 1 40%;
+      min-width: 0;
+    }
+    .yh-track {
+      width: auto;
+      flex: 1 1 50px;
+      min-width: 40px;
+    }
+  }
+
   /* ── Discord in-game panel (#discord-window) + widget ─────────────────── */
   /* Shared by BOTH game entries (index.html and play.html): the panel the U key
      and the mobile More tray Discord button open. Relocated from index.extra.css

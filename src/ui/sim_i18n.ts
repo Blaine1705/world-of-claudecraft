@@ -5860,6 +5860,27 @@ const RULES: Rule[] = [
     re: /^FIESTA OVER! What a party\. Returning to the world[.…]{1,3}$/,
     build: () => t('fiesta.log.over'),
   },
+  // Protect Yumi (social/arena.ts queue arms + social/yumi.ts match start).
+  // The leader-only error rides the fiesta wildcard rule above (label
+  // 'Protect Yumi'); the rest are exact.
+  {
+    re: /^You join the Protect Yumi queue\. Guard your familiar[.…]{1,3}$/,
+    build: () => t('yumi.queue.join'),
+  },
+  { re: /^You leave the Protect Yumi queue\.$/, build: () => t('yumi.queue.leave') },
+  { re: /^Your team leaves the Protect Yumi queue\.$/, build: () => t('yumi.queue.teamLeave') },
+  {
+    re: /^Protect Yumi 3v3 allows a party of up to three\.$/,
+    build: () => t('yumi.error.partyTooBig3'),
+  },
+  {
+    re: /^Protect Yumi 5v5 allows a party of up to five\.$/,
+    build: () => t('yumi.error.partyTooBig5'),
+  },
+  {
+    re: /^Protect Yumi! Defend your familiar and hunt theirs\.$/,
+    build: () => t('yumi.log.start'),
+  },
   // Boss/mob mechanic broadcast. Broad (two open captures), so it MUST stay last -
   // after every more-specific "{X} {verb}!" rule above (awakens, enraged, calls for aid).
   {

@@ -124,6 +124,14 @@ export interface SimContextPrimitives {
   arenaQueueFiesta: ArenaQueueUnit[];
   readonly arenaBusySlots: Set<number>;
   nextArenaMatchId: number;
+  // A4 Protect Yumi state. The two format queues are REASSIGNED by the
+  // matchmaker's prune filter (read-write, like the arena queues); the maze
+  // slot pool and the cat-entity -> live-match index are mutated in place.
+  // Backing fields stay on Sim.
+  arenaQueueYumi3: ArenaQueueUnit[];
+  arenaQueueYumi5: ArenaQueueUnit[];
+  readonly yumiBusySlots: Set<number>;
+  readonly yumiCatMatches: Map<number, ArenaMatch>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -261,6 +269,23 @@ export interface SimContextCallbacks {
   arenaAllPids(match: ArenaMatch): number[];
   fiestaTakedown(match: ArenaMatch, killerPid: number, victim: Entity): void;
   fiestaDown(match: ArenaMatch, victim: Entity, killerPid: number | null): void;
+  // A4 Protect Yumi hooks (social/yumi.ts owns every body; Sim binds late-bound
+  // arrows). updateArena drives the first two + cleanup; the damage hub drives
+  // the cat-damage and player-down arms.
+  matchmakeYumi(): void;
+  updateYumiActive(match: ArenaMatch): void;
+  yumiPlayerDown(match: ArenaMatch, victim: Entity, killerPid: number | null): void;
+  yumiCatDamaged(
+    match: ArenaMatch,
+    source: Entity | null,
+    cat: Entity,
+    amount: number,
+    crit: boolean,
+    school: string,
+    ability: string | null,
+    kind: 'hit' | 'miss' | 'dodge',
+  ): void;
+  cleanupYumiMatch(match: ArenaMatch): void;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
   // World-boss personal loot: an independent roll of the boss's loot table per
   // contributor (gated once-per-day per boss). Owned by world_boss.ts.
@@ -742,6 +767,24 @@ export function createSimContext(host: SimContextHost): SimContext {
     get arenaBusySlots() {
       return host.arenaBusySlots;
     },
+    get arenaQueueYumi3() {
+      return host.arenaQueueYumi3;
+    },
+    set arenaQueueYumi3(v) {
+      host.arenaQueueYumi3 = v;
+    },
+    get arenaQueueYumi5() {
+      return host.arenaQueueYumi5;
+    },
+    set arenaQueueYumi5(v) {
+      host.arenaQueueYumi5 = v;
+    },
+    get yumiBusySlots() {
+      return host.yumiBusySlots;
+    },
+    get yumiCatMatches() {
+      return host.yumiCatMatches;
+    },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;
     },
@@ -828,6 +871,11 @@ export function createSimContext(host: SimContextHost): SimContext {
     arenaAllPids: host.arenaAllPids,
     fiestaTakedown: host.fiestaTakedown,
     fiestaDown: host.fiestaDown,
+    matchmakeYumi: host.matchmakeYumi,
+    updateYumiActive: host.updateYumiActive,
+    yumiPlayerDown: host.yumiPlayerDown,
+    yumiCatDamaged: host.yumiCatDamaged,
+    cleanupYumiMatch: host.cleanupYumiMatch,
     rollLoot: host.rollLoot,
     rollWorldBossLoot: host.rollWorldBossLoot,
     applyHeal: host.applyHeal,

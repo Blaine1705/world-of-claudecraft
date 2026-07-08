@@ -95,8 +95,9 @@ export function isPetClass(cls: PlayerClass): boolean {
 }
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
-// ring) — see docs/design and the Fiesta region of sim.ts.
-export type ArenaFormat = '1v1' | '2v2' | 'fiesta';
+// ring); see docs/design and the Fiesta region of sim.ts. yumi3/yumi5 are the
+// Protect Yumi maze objective brackets (3v3 / 5v5, unranked; social/yumi.ts).
+export type ArenaFormat = '1v1' | '2v2' | 'fiesta' | 'yumi3' | 'yumi5';
 
 export type DungeonDifficulty = 'normal' | 'heroic';
 
@@ -495,12 +496,15 @@ export interface WeaponItemDef extends BaseItemDef {
 }
 
 // A legendary weapon proc: a "chance on action" effect that rolls when the wielder
-// performs the trigger action (lands a melee swing, lands a damaging spell, or lands
+// performs the trigger action (lands a weapon strike, lands a damaging spell, or lands
 // a heal) and, on success, fires its effects. Handled by
 // src/sim/combat/equip_procs.ts. The proc's rng roll is gated on the wielder actually
 // carrying a proc weapon, so ordinary gear draws no extra rng and the deterministic
 // draw order (and every parity golden that equips no legendary) is unchanged.
-export type WeaponProcTrigger = 'meleeHit' | 'spellDamage' | 'heal';
+// `weaponHit` covers ANY weapon strike with the equipped mainhand: a melee swing OR a
+// hunter's Auto Shot (which fires with that same weapon). Caster wand bolts, which do
+// not swing the mainhand, never roll it.
+export type WeaponProcTrigger = 'weaponHit' | 'spellDamage' | 'heal';
 
 export type WeaponProcEffect =
   // Thunderfury-style arc: a bolt that strikes the primary target and then jumps to
@@ -2115,6 +2119,28 @@ export type SimEvent = { pid?: number } & (
       n?: number;
     }
   | { type: 'fiestaDown'; seconds: number }
+  // Protect Yumi maze objective mode (social/yumi.ts). `yumiTeleport` is a
+  // world-visible relocation cue (renderer snap + VFX at both ends);
+  // `yumiDown` is your personal 10s bench countdown; `yumiSuddenDeath` fires
+  // once when teleports freeze and the bleed ramp starts; `yumiStatus` is the
+  // once-per-second personal scoreboard heartbeat (the arena wire field is
+  // rate-limited and the enemy cat can sit outside interest range, so the
+  // live bars ride the event queue like fiesta's dynamics do).
+  | { type: 'yumiTeleport'; catId: number; fromX: number; fromZ: number; toX: number; toZ: number }
+  | { type: 'yumiDown'; seconds: number }
+  | { type: 'yumiSuddenDeath' }
+  | {
+      type: 'yumiStatus';
+      myHp: number;
+      myMax: number;
+      enemyHp: number;
+      enemyMax: number;
+      teleportIn: number;
+      suddenDeathIn: number;
+      suddenDeath: boolean;
+      mult: number;
+      team: 'A' | 'B';
+    }
   | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
   | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }
   // A fighter grabbed a ring power-up (world event so everyone sees the glow).

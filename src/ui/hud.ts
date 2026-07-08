@@ -385,6 +385,7 @@ import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
+import { YumiMatchPainter } from './yumi_match_painter';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -3049,6 +3050,13 @@ export class Hud {
     },
   );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
+  // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
+  // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
+  // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
+  // band next to the fiesta HUD (values change at 1Hz).
+  private readonly yumiPainter = new YumiMatchPainter(this.writerFacet, () =>
+    document.getElementById('ui'),
+  );
   // Per-frame XP + swing painters. Each caches its element refs once and
   // routes every write through the same six-writer facet, so their --xp-fill /
   // .rested / swing writes share the one skip-rate.
@@ -4062,7 +4070,9 @@ export class Hud {
     for (const line of lines) {
       const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
       const triggerKey =
-        line.trigger === 'meleeHit'
+        // onMeleeHit is the legacy key id; its English reads the generic "Chance on
+        // hit", correct for a weaponHit proc that fires on melee AND hunter ranged.
+        line.trigger === 'weaponHit'
           ? 'hudChrome.itemProc.onMeleeHit'
           : line.trigger === 'spellDamage'
             ? 'hudChrome.itemProc.onSpellDamage'
@@ -6684,6 +6694,7 @@ export class Hud {
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();
+      this.yumiPainter.update(this.sim.arenaInfo);
       // Vale Cup surfaces (mediumHud like the arena/fiesta ones): the indicator
       // button, the in-match strip, and the open window redraw.
       this.vcupIndicator.update(buildVcupIndicatorView(this.sim.cupInfo));
@@ -7699,10 +7710,23 @@ export class Hud {
     // minimapMode (the minimap_markers core) is the single source of truth for the
     // delve-vs-overworld branch (the same isDelvePos + delveRun guard, lifted into the
     // core so hud and the painters never duplicate it).
-    if (minimapMode(this.sim) === 'delve') {
+    const mode = minimapMode(this.sim);
+    if (mode === 'delve') {
       // The delve painter owns the '#zone-label' text (written through the
       // write-elision facet) and the full minimap schematic render.
       this.delvePainter.paintMinimapDelve(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
+      return;
+    }
+    if (mode === 'yumiMaze') {
+      // Protect Yumi: the overworld marker set over the cached maze-wall
+      // raster; the strip title stands in for the zone label.
+      this.minimapPainter.paintYumiMaze(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        this.minimapZoom,
+        t('yumi.hud.title'),
+      );
       return;
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
@@ -7747,7 +7771,10 @@ export class Hud {
     const el = $('#arena-status');
     const a = this.sim.arenaInfo;
     const m = a?.match ?? null;
-    if (!m) {
+    // Protect Yumi carries its own strip (yumi_match_painter) at the same
+    // top-center anchor, so the generic VS banner would just overlap it;
+    // keep the banner only for the post-bout returning countdown.
+    if (!m || (m.yumi && m.state !== 'over')) {
       if (el.style.display !== 'none') el.style.display = 'none';
       this.lastArenaStatusSig = '';
       return;
@@ -8863,6 +8890,23 @@ export class Hud {
             }
             break;
           }
+          if (ev.format === 'yumi3' || ev.format === 'yumi5') {
+            // Unranked objective mode; sudden death guarantees no draws.
+            // Personal per participant: keep only the local player's copy
+            // (offline the sim hands every fighter's copy to the one HUD).
+            if (ev.pid !== undefined && ev.pid !== sim.playerId) break;
+            this.yumiPainter.reset();
+            if (ev.won) {
+              this.showBanner(t('yumi.end.win'));
+              this.combatLog(t('yumi.end.win'), '#7fdc4f');
+              audio.fiestaWave();
+            } else {
+              this.showBanner(t('yumi.end.loss'));
+              this.combatLog(t('yumi.end.loss'), '#ff7a6a');
+              audio.death();
+            }
+            break;
+          }
           const delta = ev.ratingAfter - ev.ratingBefore;
           const sign = delta >= 0 ? '+' : '';
           const ratingDelta = `${sign}${formatNumber(delta, { maximumFractionDigits: 0 })}`;
@@ -8913,6 +8957,36 @@ export class Hud {
               '#ff7a6a',
             );
             audio.death();
+          }
+          break;
+        }
+        // The yumi events are personal per participant; offline the sim hands
+        // EVERY player's copy to the one local HUD, so each arm keeps only the
+        // local player's (the same reason the renderer arm filters).
+        case 'yumiStatus':
+          if (ev.pid === sim.playerId) this.yumiPainter.onStatus(ev);
+          break;
+        case 'yumiDown':
+          if (ev.pid === sim.playerId) {
+            this.yumiPainter.onDown(ev.seconds);
+            audio.fiestaDown();
+          }
+          break;
+        case 'yumiSuddenDeath':
+          if (ev.pid === sim.playerId) {
+            this.showBanner(t('yumi.banner.sudden'));
+            this.combatLog(t('yumi.banner.sudden'), '#ff7a6a');
+            audio.fiestaWave();
+          }
+          break;
+        case 'yumiTeleport': {
+          if (ev.pid !== sim.playerId) break;
+          // Two events per relocation (one per cat); cue once, on my team's cat.
+          const y = this.sim.arenaInfo?.match?.yumi;
+          const myCat = y ? (y.team === 'A' ? y.yumiA.entityId : y.yumiB.entityId) : -1;
+          if (ev.catId === myCat) {
+            this.showBanner(t('yumi.banner.teleport'));
+            this.log(t('yumi.banner.teleport'), '#7fd7ff');
           }
           break;
         }

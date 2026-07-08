@@ -729,6 +729,10 @@ export class DailyRewardService {
       completedAt?: Date;
     },
   ): Promise<number> {
+    // Protect Yumi (yumi3/yumi5) is an unranked objective mode: its bouts do
+    // not count toward the arena daily-reward task (maintainer decision;
+    // fiesta keeps its historical counting behavior).
+    if (result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);

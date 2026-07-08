@@ -2217,6 +2217,8 @@ export const ko_KR: EnTranslations = {
       "waveGoldBody": "중반 웨이브: 양날의 조합으로, 이 무렵부터 당신의 빌드가 모습을 갖추고 노래하기 시작합니다.",
       "wavePrismaticTitle": "프리즘",
       "wavePrismaticBody": "마지막 웨이브: 빌드를 결정짓고 화면을 녹여 버리는 폭발적인 한 방으로, 더없이 통쾌하게 터무니없는 느낌을 주려는 것입니다.",
+      "yumiHeading": "Yumi를 지켜라",
+      "yumiBody": "Protect Yumi는 미로에서 펼쳐지는 팀 목표 모드입니다. 각 팀은 아군 고양이 소환수를 지키면서 상대의 소환수를 사냥합니다. 두 고양이는 이따금 미로의 새 구석으로 순간이동하므로 전투는 수비, 추격, 수색 사이를 오갑니다. 3대3 또는 5대5로 참가할 수 있으며, 쓰러져도 잠시 벤치에 앉을 뿐입니다.",
       "powerupsTitle": "원형 안의 강화 효과",
       "powerupsBody": "빛나는 구슬이 전투 도중 투기장 안으로 떨어지기도 하며, 먼저 닿는 사람이 임자입니다. 일부러 과장되게 만들어졌고 효과는 잠깐뿐입니다. 눈이 멀 듯한 속도를 주는 스피드 데몬, 굼뜬 거인으로 부풀어 오르는 콜로서스, 저중력으로 통통 튀어 오르게 하는 문 부츠, 그리고 분노가 한순간에 폭발하는 버서커가 있습니다.",
       "ladderHeading": "순위 올리기",
@@ -3644,6 +3646,45 @@ export const ko_KR: EnTranslations = {
     },
     "chest": {
       "flavor": "죽은 자들이 내어줄 수 있는 것을 내놓았습니다."
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3대3",
+    "bracket5": "Yumi 5대5",
+    "enterQueue": "Protect Yumi 참가!",
+    "queue": {
+      "join": "Protect Yumi 대기열에 참가했습니다. 소환수를 지키세요…",
+      "leave": "Protect Yumi 대기열에서 나갑니다.",
+      "teamLeave": "팀이 Protect Yumi 대기열에서 나갑니다."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3대3은 최대 3인 파티까지 참가할 수 있습니다.",
+      "partyTooBig5": "Protect Yumi 5대5는 최대 5인 파티까지 참가할 수 있습니다."
+    },
+    "log": {
+      "start": "Protect Yumi! 아군 소환수를 지키고 적의 소환수를 사냥하세요."
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "준비하세요…",
+      "teleportIn": "Yumi 이동까지 {s}초",
+      "suddenDeath": "서든 데스",
+      "yourYumi": "아군 Yumi",
+      "enemyYumi": "적군 Yumi",
+      "aria": "아군 Yumi 생명력 {mine}/{max}, 적군 Yumi {theirs}.",
+      "collapse": "Protect Yumi 게이지 접기",
+      "expand": "Protect Yumi 게이지 펼치기"
+    },
+    "respawn": {
+      "title": "쓰러졌습니다!"
+    },
+    "banner": {
+      "sudden": "서든 데스! Yumi가 더는 이동하지 않습니다!",
+      "teleport": "Yumi가 순간이동했습니다!"
+    },
+    "end": {
+      "win": "승리! Yumi를 지켜냈습니다!",
+      "loss": "패배! 아군 Yumi가 쓰러졌습니다."
     }
   },
   "fiesta": {
@@ -7022,6 +7063,9 @@ export const ko_KR: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "숲늑대"
       },
