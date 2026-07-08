@@ -460,7 +460,7 @@
       "tick": 16,
       "time": 0.8,
       "nextId": 403,
-      "state": "2abc3dd3",
+      "state": "edeb3a8e",
       "events": "e663739a",
       "rng": {
         "draws": 5,
@@ -583,7 +583,7 @@
             "z": 54.896638
           },
           "potionCooldownUntil": -1,
-          "resource": 35,
+          "resource": 50,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -767,7 +767,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 403,
-      "state": "93d3b16e",
+      "state": "8bd16d34",
       "events": "2bf486d3",
       "rng": {
         "draws": 9,
@@ -778,7 +778,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 403,
-      "state": "e5e694df",
+      "state": "1a1cd7c5",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -789,7 +789,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 405,
-      "state": "c1ff95cb",
+      "state": "e776a691",
       "events": "4507dc4f",
       "rng": {
         "draws": 18,
@@ -908,7 +908,7 @@
             "z": 54.896638
           },
           "potionCooldownUntil": -1,
-          "resource": 40.18825,
+          "resource": 55.18825,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
