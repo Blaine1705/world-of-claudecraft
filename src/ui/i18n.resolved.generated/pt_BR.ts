@@ -520,7 +520,8 @@ export const pt_BR: EnTranslations = {
     "statInfo": {
       "fromYour": "Do seu {value} de {stat}:",
       "names": {
-        "spellPower": "Poder Mágico"
+        "spellPower": "Poder Mágico",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Aumenta seu poder de ataque, de modo que seus golpes com armas atinjam com mais força.",
@@ -533,7 +534,8 @@ export const pt_BR: EnTranslations = {
         "spellPower": "Aumenta o dano das suas magias e a força das suas curas. Cada ponto de Intelecto concede um pouco de Poder Mágico, além do que vem de equipamentos ou benefícios.",
         "dps": "Seu dano por segundo estimado com armas, combinando o dano e a velocidade da sua arma com seu poder de ataque.",
         "critChance": "Sua chance de um ataque atingir criticamente, causando dano dobrado.",
-        "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano."
+        "dodge": "Sua chance de esquivar completamente de um ataque corpo a corpo recebido, sem sofrer dano.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} de Poder de ataque",

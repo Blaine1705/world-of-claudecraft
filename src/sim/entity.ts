@@ -7,6 +7,7 @@ import {
   AVATAR_SCALE,
   BERSERKER_CRIT_CHANCE,
   DIE_BY_SWORD_DODGE,
+  ENRAGE_HASTE_PCT,
   EQUIP_SLOTS,
   SPELL_POWER_PER_INT,
 } from './types';
@@ -237,6 +238,7 @@ export function recalcPlayerStats(
   let bonusAp = setEff.ap;
   let bonusDodge = 0;
   let bonusCrit = 0;
+  let bonusHaste = 0; // Fury Enrage folds +25% haste here (real haste: swings + casts)
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
@@ -284,6 +286,9 @@ export function recalcPlayerStats(
     // Berserker Stance (Fury): a flat additive crit-chance bonus while worn. Its
     // crit-DAMAGE half lives in combat/damage.ts (berserkerCritDamage).
     else if (a.kind === 'berserker_stance') bonusCrit += BERSERKER_CRIT_CHANCE;
+    // Fury Enrage: +25% haste while worn, folded into the real haste stat below so
+    // it speeds swings AND casts and shows in the Haste stat (never touches GCD).
+    else if (a.kind === 'enrage') bonusHaste += ENRAGE_HASTE_PCT;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Avatar: the colossus transform grows the body by the fixed scale (its
     // aura value carries the damage amp, consumed in dealDamage).
@@ -377,9 +382,9 @@ export function recalcPlayerStats(
   // Haste from item-set bonuses (the only haste-gear source). ONE aggregated
   // stat drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  e.meleeHaste = setEff.haste;
-  e.rangedHaste = setEff.haste;
-  e.spellHaste = setEff.haste;
+  e.meleeHaste = setEff.haste + bonusHaste;
+  e.rangedHaste = setEff.haste + bonusHaste;
+  e.spellHaste = setEff.haste + bonusHaste;
   // Crit: ~1% per 20 agi at low level (+ buff_crit auras summed above)
   e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit + bonusCrit;
   e.castPushbackReduction = setEff.castPushbackReduction;

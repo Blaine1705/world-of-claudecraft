@@ -520,7 +520,8 @@ export const ja_JP: EnTranslations = {
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
-        "spellPower": "呪文威力"
+        "spellPower": "呪文威力",
+        "haste": "ヘイスト"
       },
       "desc": {
         "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
@@ -533,7 +534,8 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。",
         "dps": "武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。",
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
-        "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。"
+        "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
+        "haste": "武器攻撃と呪文詠唱の速度を上げる。グローバルクールダウン（GCD）は短縮しない。"
       },
       "effects": {
         "attackPower": "攻撃力 +{value}",

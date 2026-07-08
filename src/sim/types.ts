@@ -232,10 +232,10 @@ export type AuraKind =
   // additive crit chance (0.20); the rage-generation bonus is the fixed
   // RECKLESSNESS_RAGE_GEN read by rageGenAuraMult.
   | 'buff_reckless'
-  // Fury Enrage: one self-buff carrying all three halves. value = the additive
-  // outgoing-damage fraction (ENRAGE_DMG_DONE, summed in dealDamage beside
-  // buff_dmg_done); the attack-speed and move-speed halves are the fixed
-  // ENRAGE_HASTE / ENRAGE_MOVE_MULT read in swingIntervalMult and moveSpeedMult.
+  // Fury Enrage: one self-buff. value = the additive outgoing-damage fraction
+  // (ENRAGE_DMG_DONE, summed in dealDamage beside buff_dmg_done). The +25% HASTE
+  // half is folded into meleeHaste/spellHaste in recalcPlayerStats (ENRAGE_HASTE_PCT),
+  // and the +10% move-speed half is ENRAGE_MOVE_MULT read in moveSpeedMult.
   // Procced by Bloodletting (30% chance) and Desenfreno / Rampage (always).
   | 'enrage'
   // Bloodbath: the on-kill stacking buff. value = per-stack fraction times the
@@ -2625,10 +2625,12 @@ export const BERSERKER_CRIT_DAMAGE = 0.03; // Berserker Stance: +3% crit damage
 
 // Fury Enrage: a short self-buff (Bloodletting has a 30% chance, Desenfreno /
 // Rampage always). One 'enrage' aura carries all three halves: outgoing damage
-// +11% (the aura's value, summed in dealDamage), attack speed +25% (the swing
-// interval is divided by ENRAGE_HASTE), and move speed +10% (ENRAGE_MOVE_MULT).
+// +11% (the aura's value, summed in dealDamage), +25% HASTE (ENRAGE_HASTE_PCT is
+// folded into meleeHaste/rangedHaste/spellHaste in recalcPlayerStats, so it reads
+// as real haste: faster swings AND casts, and it shows in the Haste stat), and
+// move speed +10% (ENRAGE_MOVE_MULT). Note: haste never shortens the GCD here.
 export const ENRAGE_DMG_DONE = 0.11;
-export const ENRAGE_HASTE = 1.25;
+export const ENRAGE_HASTE_PCT = 0.25;
 export const ENRAGE_MOVE_MULT = 1.1;
 export const ENRAGE_DURATION = 4; // seconds
 export function rageGenAuraMult(e: Entity): number {

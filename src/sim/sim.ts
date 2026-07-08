@@ -335,7 +335,6 @@ import {
   DT,
   DUNGEON_LEASH_DISTANCE,
   dist2d,
-  ENRAGE_HASTE,
   ENRAGE_MOVE_MULT,
   type Entity,
   type EquipSlot,
@@ -3149,8 +3148,10 @@ export class Sim {
       // rides value2, read in dealDamage).
       if (a.kind === 'attackspeed' || a.kind === 'sanguine') m *= a.value;
       if (a.kind === 'buff_haste') m /= a.value;
-      // Fury Enrage: +25% attack speed (divides the swing interval like buff_haste).
-      if (a.kind === 'enrage') m /= ENRAGE_HASTE;
+      // Note: Fury Enrage's +25% haste is NOT applied here. It is folded into the
+      // real haste stat (meleeHaste/spellHaste) in recalcPlayerStats, so the swing
+      // timer's `/ (1 + meleeHaste)` divisor already carries it (and it shows in
+      // the Haste stat + speeds casts), instead of a bespoke swing-only divisor.
     }
     // Enrage frenzy: an enraged mob swings faster (mirrors the inline dmgMult
     // applied in mobSwing). Composes with any slow/haste auras above.
@@ -5686,7 +5687,8 @@ export class Sim {
       if (a.sourceId !== sourceId) continue;
       target.auras.splice(i, 1);
       this.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form')) statsDirty = true;
+      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'enrage')
+        statsDirty = true;
     }
     if (statsDirty && target.kind === 'player') {
       const meta = this.players.get(target.id);

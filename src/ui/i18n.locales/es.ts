@@ -785,6 +785,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.spellPower':
     'Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.',
   'hudChrome.statInfo.names.spellPower': 'Poder con hechizos',
+  'hudChrome.statInfo.names.haste': 'Celeridad',
   'hudChrome.statInfo.sources.attributes': 'De tus atributos: {value}',
   'hudChrome.statInfo.sources.base': 'Base: {value}',
   'hudChrome.statInfo.sources.buff': '{name}: {value}',
@@ -933,6 +934,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.',
   'hudChrome.statInfo.desc.dodge':
     'Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.',
+  'hudChrome.statInfo.desc.haste':
+    'Acelera tus golpes de arma y tus lanzamientos de hechizos. NO reduce el tiempo de reutilización global (GCD).',
   'hudChrome.statInfo.effects.attackPower': '+{value} de poder de ataque',
   'hudChrome.statInfo.effects.rangedAttackPower': '+{value} de poder de ataque a distancia',
   'hudChrome.statInfo.effects.critPct': '+{value}% de golpe crítico',

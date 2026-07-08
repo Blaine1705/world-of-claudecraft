@@ -219,6 +219,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '自动会根据你的设备选择桌面或触控操作。选择桌面可强制使用键盘和鼠标（适合带键盘的平板），选择触控则使用屏幕上的操作控件。',
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
+  'hudChrome.statInfo.names.haste': '急速',
+  'hudChrome.statInfo.desc.haste': '加快你的武器攻击和法术施放速度。不会缩短全局冷却时间（GCD）。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。',
   'hudChrome.statInfo.sources.header': '构成：',

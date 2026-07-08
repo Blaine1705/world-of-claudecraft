@@ -520,7 +520,8 @@ export const es: EnTranslations = {
     "statInfo": {
       "fromYour": "De tu {value} de {stat}:",
       "names": {
-        "spellPower": "Poder con hechizos"
+        "spellPower": "Poder con hechizos",
+        "haste": "Celeridad"
       },
       "desc": {
         "str": "Aumenta tu poder de ataque, así que tus golpes con el arma impactan con más fuerza.",
@@ -533,7 +534,8 @@ export const es: EnTranslations = {
         "spellPower": "Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.",
         "dps": "El daño por segundo estimado de tu arma, combinando el daño y la velocidad de tu arma con tu poder de ataque.",
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
-        "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño."
+        "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
+        "haste": "Acelera tus golpes de arma y tus lanzamientos de hechizos. NO reduce el tiempo de reutilización global (GCD)."
       },
       "effects": {
         "attackPower": "+{value} de poder de ataque",

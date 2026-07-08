@@ -227,6 +227,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.',
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
+  'hudChrome.statInfo.names.haste': '가속',
+  'hudChrome.statInfo.desc.haste':
+    '무기 공격과 주문 시전 속도를 높입니다. 전역 재사용 대기시간(GCD)은 줄이지 않습니다.',
   'hudChrome.statInfo.desc.spellPower':
     '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
   'hudChrome.statInfo.sources.header': '구성:',

@@ -229,6 +229,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。',
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
+  'hudChrome.statInfo.names.haste': 'ヘイスト',
+  'hudChrome.statInfo.desc.haste':
+    '武器攻撃と呪文詠唱の速度を上げる。グローバルクールダウン（GCD）は短縮しない。',
   'hudChrome.statInfo.desc.spellPower':
     '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
   'hudChrome.statInfo.sources.header': '内訳:',

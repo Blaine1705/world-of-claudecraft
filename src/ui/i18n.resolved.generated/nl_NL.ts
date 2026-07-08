@@ -520,7 +520,8 @@ export const nl_NL: EnTranslations = {
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
       "names": {
-        "spellPower": "Spreukkracht"
+        "spellPower": "Spreukkracht",
+        "haste": "Haste"
       },
       "desc": {
         "str": "Verhoogt je aanvalskracht, zodat je wapenslagen harder aankomen.",
@@ -533,7 +534,8 @@ export const nl_NL: EnTranslations = {
         "spellPower": "Verhoogt de schade van je spreuken en de kracht van je genezingen. Elk punt Intellect verleent een beetje Spreukkracht, bovenop wat je krijgt van uitrusting of buffs.",
         "dps": "Je geschatte wapenschade per seconde, een combinatie van de schade en snelheid van je wapen met je aanvalskracht.",
         "critChance": "Je kans dat een aanval kritiek raakt en dubbele schade aanricht.",
-        "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen."
+        "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen.",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown."
       },
       "effects": {
         "attackPower": "+{value} Aanvalskracht",
