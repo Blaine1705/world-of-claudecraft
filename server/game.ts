@@ -621,6 +621,9 @@ interface WireAura {
   // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
   // information a graphics preset could hide, so it rides the wire unconditionally when present.
   charges?: number;
+  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
+  // eligible cast just like the sim helper.
+  emp?: string[];
   // The caster's entity id, so the client's target strip can lead with and enlarge the
   // viewer's OWN dots/hots (auras_view ownFirst). A shared per-entity value (never
   // per-viewer), so the per-entity dyn cache keeps eliding; an old client ignores it and
@@ -749,6 +752,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
         // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
         // buff icon can badge the count online exactly as offline; undefined for every other aura.
         ...(a.charges !== undefined ? { charges: a.charges } : {}),
+        ...(a.empowerAbilities !== undefined ? { emp: a.empowerAbilities } : {}),
         // The caster's entity id, for the client's own-aura prominence on the target strip
         // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
         ...(a.sourceId ? { src: a.sourceId } : {}),

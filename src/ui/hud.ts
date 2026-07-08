@@ -87,6 +87,7 @@ import type {
 } from '../sim/types';
 import {
   type AbilityEffect,
+  type AuraKind,
   CONSUME_DURATION,
   canPrestige,
   dist2d,
@@ -129,6 +130,7 @@ import {
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
 } from './attack_on_ability';
+import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
@@ -319,6 +321,7 @@ import {
 } from './player_card_share';
 import { chatPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { QuestProgressBanner } from './quest_progress_banner';
@@ -328,6 +331,7 @@ import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { restView } from './rest_indicator';
 import { RiteWindow } from './rite_window';
+import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
@@ -344,7 +348,7 @@ import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tool
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
-import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
+import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -792,6 +796,8 @@ function yellVoiceKey(text: string): string {
     .slice(0, 60)}`;
 }
 
+const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
+
 export class Hud {
   // Ability slots across both rows: 1..11 on the primary bar, 12..22 on the
   // secondary bar (slot 0 is the fixed Attack toggle on the primary bar). The
@@ -848,6 +854,7 @@ export class Hud {
   // attack handler then falls back to the plain castSlot(0) toggle.
   onMobileAttackNearest: (() => void) | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
+  private readonly pendingProcAuraNotes = new Set<string>();
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
   private activeHotbarForm: HotbarForm = 'normal';
@@ -6459,6 +6466,7 @@ export class Hud {
     // routes through the elided writer facet; the aria-label keeps its per-frame t()
     // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
     this.renderPetBar();
+    this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.refreshHotbarControls();
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
@@ -8038,6 +8046,7 @@ export class Hud {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
         const tp = tgt.pos;
+        if ((ev.absorbed ?? 0) > 0) this.combat('combat_block', tp.x, tp.y, tp.z, 0.55);
         if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
           this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
@@ -8226,6 +8235,20 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
+          if (isPlayerTarget && (ev.absorbed ?? 0) > 0) {
+            const absorbShape = fctSpawnShape({ type: 'absorb' });
+            if (absorbShape)
+              this.fctPainter.spawn(
+                {
+                  ...absorbShape,
+                  text: t('hudChrome.fct.absorbed', {
+                    amount: formatNumber(ev.absorbed ?? 0, { maximumFractionDigits: 0 }),
+                  }),
+                  target: tgt,
+                },
+                now,
+              );
+          }
           if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
@@ -8375,6 +8398,10 @@ export class Hud {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
+          if (isTalentRowUnlockLevel(ev.level)) {
+            this.showBanner(t('game.talents.rowUnlockToast'));
+            sfx.playUi('quest_ready', { gain: 4.5 });
+          }
           if (ev.level === 5) {
             const characterId = (this.sim as unknown as { characterId?: number }).characterId;
             trackMetaPixel(
@@ -9158,6 +9185,7 @@ export class Hud {
         case 'log': {
           const text = this.localizeSystemText(ev.text);
           this.log(text, ev.color ?? '#ccc');
+          if (ev.text === CHEAT_DEATH_SAVE_TEXT) audio.fiestaRevive();
           const isNythraxisVisionLine = [
             'My king was a good man.',
             'I swore my blade to him.',
@@ -9208,6 +9236,8 @@ export class Hud {
           const auraName = auraDisplayNameFromSource(ev.name);
           if (ev.name === 'Polymorph' && ev.gained) audio.sheep();
           if (ev.targetId === sim.playerId) {
+            if (ev.gained) this.noteProcAuraGain(ev.name);
+            else this.noteProcAuraConsume(ev.auraKind);
             this.combatLog(
               t(ev.gained ? 'hud.combat.auraGain' : 'hud.combat.auraFade', { name: auraName }),
               '#d8a0d8',
@@ -9226,6 +9256,33 @@ export class Hud {
 
   log(text: string, color = '#ccc'): void {
     this.appendLog(this.chatLogEl, text, color, true, 'system');
+  }
+
+  private noteProcAuraGain(name: string): void {
+    const aura = this.sim.player.auras.find((a) => a.name === name);
+    if (aura) {
+      const text = procAuraGainSelfNoteText(name, aura.kind);
+      if (text) this.showSelfNote(text);
+      return;
+    }
+    if (this.pendingProcAuraNotes.size > 16) this.pendingProcAuraNotes.clear();
+    this.pendingProcAuraNotes.add(name);
+  }
+
+  private flushPendingProcAuraNotes(): void {
+    if (this.pendingProcAuraNotes.size === 0) return;
+    for (const name of Array.from(this.pendingProcAuraNotes)) {
+      const aura = this.sim.player.auras.find((a) => a.name === name);
+      if (!aura) continue;
+      this.pendingProcAuraNotes.delete(name);
+      const text = procAuraGainSelfNoteText(name, aura.kind);
+      if (text) this.showSelfNote(text);
+    }
+  }
+
+  private noteProcAuraConsume(kind: AuraKind | undefined): void {
+    const text = procAuraConsumeSelfNoteText(kind);
+    if (text) this.showSelfNote(text);
   }
 
   // Prepend a dim bracketed wall-clock prefix to a chat line when the "Show
@@ -13815,16 +13872,6 @@ function abilityDisplayNameFromSource(name: string): string {
   if (ability) return abilityDisplayName(ability);
   // Boss/mob mechanic names (War Stomp, etc.) surface as a damage-log ability label but
   // are not in ABILITIES; route them through the shared sim aura/mechanic localizer.
-  return localizeSimAuraName(name) ?? name;
-}
-
-// Localize an aura/buff name that surfaces by its raw English name (buff frame tooltip,
-// combat-log gain/fade). Most auras are granted by an ability or talent and have a
-// localized title already; a few are pure flavor (e.g. a hunter's "Tamed" pet buff) and
-// live in sim_i18n. Falls back to the English name only if nothing matches.
-function auraDisplayNameFromSource(name: string): string {
-  const viaTitle = localizeTalentTitle(name);
-  if (viaTitle !== name) return viaTitle;
   return localizeSimAuraName(name) ?? name;
 }
 

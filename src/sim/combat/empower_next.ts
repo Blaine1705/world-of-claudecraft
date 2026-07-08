@@ -17,7 +17,7 @@ function consumeAuraKind(
   const idx = e.auras.findIndex((a) => a.kind === kind && matches(a, abilityId));
   if (idx < 0) return null;
   const [aura] = e.auras.splice(idx, 1);
-  ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+  ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false, auraKind: aura.kind });
   return aura;
 }
 

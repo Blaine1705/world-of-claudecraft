@@ -2011,6 +2011,7 @@ export type SimEvent = { pid?: number } & (
       school: string;
       ability: string | null;
       kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      absorbed?: number;
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -2045,7 +2046,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questProgress'; questId: string; text: string }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
-  | { type: 'aura'; targetId: number; name: string; gained: boolean }
+  | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
   | { type: 'castStart'; entityId: number; ability: string; time: number }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }

@@ -161,6 +161,7 @@ export function dealDamage(
   }
 
   // absorb shields soak damage first
+  let totalAbsorbed = 0;
   if (amount > 0) {
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
@@ -168,6 +169,7 @@ export function dealDamage(
       const soaked = Math.min(a.value, amount);
       a.value -= soaked;
       amount -= soaked;
+      totalAbsorbed += soaked;
       if (a.value <= 0) {
         target.auras.splice(i, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
@@ -223,6 +225,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        absorbed: totalAbsorbed || undefined,
       });
       ctx.endDuel(duel, sourcePlayer.id);
       return;
@@ -265,6 +268,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        absorbed: totalAbsorbed || undefined,
       });
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
@@ -294,6 +298,7 @@ export function dealDamage(
         school,
         ability,
         kind,
+        absorbed: totalAbsorbed || undefined,
       });
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
@@ -322,6 +327,12 @@ export function dealDamage(
           school: 'holy',
           fx: 'wardBloom',
         });
+        ctx.emit({
+          type: 'log',
+          pid: target.id,
+          text: 'Cheat Death saves you!',
+          color: '#ffd100',
+        });
       }
     }
   }
@@ -335,6 +346,7 @@ export function dealDamage(
     school,
     ability,
     kind,
+    absorbed: totalAbsorbed || undefined,
   });
 
   if (amount > 0) {

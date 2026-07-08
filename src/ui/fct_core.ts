@@ -32,6 +32,7 @@ export type FctKind =
   | 'damage-done-ability'
   | 'damage-done-auto'
   | 'damage-taken'
+  | 'absorb'
   | 'heal'
   | 'xp'
   | 'rested-xp'
@@ -70,6 +71,7 @@ export type FctColorToken =
   | 'damage-done-ability'
   | 'damage-done-auto'
   | 'damage-taken'
+  | 'absorb'
   | 'heal'
   | 'xp'
   | 'rested-xp'
@@ -159,7 +161,7 @@ function colorToken(kind: FctKind, isSelf: boolean): FctColorToken {
       // (self grey / other white) so it needs no new CSS class.
       return isSelf ? 'miss-self' : 'miss-other';
     default:
-      // The seven non-avoidance kinds are their own color token 1:1; isSelf never
+      // The non-avoidance kinds are their own color token 1:1; isSelf never
       // changes their color in the live fct(), so it is ignored here.
       return kind;
   }

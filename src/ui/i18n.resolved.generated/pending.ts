@@ -12,33 +12,45 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "es_ES": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "fr_FR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "fr_CA": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "de_DE": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -47,7 +59,9 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "game.talents.readout.rowsSummary"
+    "game.talents.readout.rowsSummary",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -108,7 +122,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "nl_NL": [
     "entities.abilities.chain_heal.description",
@@ -116,7 +132,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "pl_PL": [
     "entities.abilities.chain_heal.description",
@@ -124,7 +142,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "id_ID": [
     "entities.abilities.chain_heal.description",
@@ -132,7 +152,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "tr_TR": [
     "entities.abilities.chain_heal.description",
@@ -140,7 +162,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "sv_SE": [
     "entities.abilities.chain_heal.description",
@@ -148,7 +172,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "vi_VN": [
     "entities.abilities.chain_heal.description",
@@ -156,7 +182,9 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ],
   "da_DK": [
     "entities.abilities.chain_heal.description",
@@ -164,6 +192,8 @@ export const pending: Record<string, readonly string[]> = {
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
-    "game.talents.rowUnlocks"
+    "game.talents.rowUnlocks",
+    "hudChrome.fct.absorbed",
+    "hudChrome.fct.cheap"
   ]
 };

@@ -1682,6 +1682,7 @@ export class ClientWorld implements IWorld {
           // sends it only when defined (server/game.ts), so an ordinary aura or an old server
           // decodes to undefined and the badge falls back to the stacks path, exactly as before.
           rec.charges = a.charges;
+          rec.empowerAbilities = a.emp;
           // The caster's entity id, for the target strip's own-aura prominence
           // (auras_view ownFirst). An old server omits it; 0 matches no player id.
           rec.sourceId = a.src ?? 0;
@@ -1701,6 +1702,7 @@ export class ClientWorld implements IWorld {
           school: a.school ?? 'physical',
           stacks: a.stacks,
           charges: a.charges,
+          empowerAbilities: a.emp,
         }));
       }
       e.loot = w.lootList ?? null;
