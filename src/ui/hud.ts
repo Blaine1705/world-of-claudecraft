@@ -4345,6 +4345,9 @@ export class Hud {
       // A passive (Measured Fury) is known but never castable, so it never
       // auto-places on the action bar (a manual drag would be a dead slot too).
       if (ABILITIES[id]?.passive) return;
+      // Warrior stances live on the dedicated #stancebar, never the action bar,
+      // so learning one on level-up must not consume an action slot.
+      if (ABILITIES[id]?.exclusiveGroup === WARRIOR_STANCE_GROUP) return;
       if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);
     };
     if (this.knownAbilityIdsAtLastSlotSync === null) {

@@ -96,6 +96,30 @@ describe('Arms restructure: the fused strike', () => {
     expect(sim.player.auras.some((a) => a.kind === 'overpower_charge')).toBe(false);
   });
 
+  it('Redhand stacks its empower up to 2', () => {
+    const sim = makeArms();
+    const mob = nearestMob(sim);
+    mob.maxHp = 100000;
+    mob.hp = mob.maxHp;
+    approach(sim, mob);
+    sim.player.resource = 100;
+    sim.targetEntity(mob.id);
+    sim.castAbility('overpower');
+    sim.tick();
+    sim.player.cooldowns.delete('overpower');
+    sim.player.gcdRemaining = 0; // skip cd + gcd for the test
+    sim.castAbility('overpower');
+    sim.tick();
+    const charge = sim.player.auras.find((a) => a.kind === 'overpower_charge');
+    expect(charge?.stacks).toBe(2);
+    // A third cast never exceeds the cap.
+    sim.player.cooldowns.delete('overpower');
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('overpower');
+    sim.tick();
+    expect(sim.player.auras.find((a) => a.kind === 'overpower_charge')?.stacks).toBe(2);
+  });
+
   it('Maiming Strike leaves the Deep Wounds bleed on the target', () => {
     const sim = makeArms();
     const mob = nearestMob(sim);
