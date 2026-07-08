@@ -5082,7 +5082,7 @@ export const en_XA: EnTranslations = {
       },
       "commanding_shout": {
         "name": "[Ɓóļšţéŕíñĝ Çŕý]",
-        "description": "[Íñçŕéášéš ýóúŕ Šţáɱíñá ƀý 6 ƒóŕ 2 ɱíñ.]"
+        "description": "[Íñçŕéášéš ýóúŕ Šţáɱíñá ƀý {buff} ƒóŕ 2 ɱíñ.]"
       },
       "demoralizing_shout": {
         "name": "[Ðíŕéĥóŵļ]",
