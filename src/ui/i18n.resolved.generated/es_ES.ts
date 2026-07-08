@@ -5262,7 +5262,7 @@ export const es_ES: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Sangría",
-        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. (habilidad distintiva de Furia)"
+        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. Tiene un 30% de probabilidad de Enfurecerte. (habilidad distintiva de Furia)"
       },
       "raging_gale": {
         "name": "Arremetida Enfurecida",
@@ -5270,7 +5270,7 @@ export const es_ES: EnTranslations = {
       },
       "red_harvest": {
         "name": "Desenfreno",
-        "description": "Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)"
+        "description": "Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno, y siempre te Enfurece. (Furia)"
       },
       "furious_mending": {
         "name": "Regeneración Enfurecida",

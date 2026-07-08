@@ -174,7 +174,12 @@ export function dealDamage(
   if (source && source.id !== target.id && amount > 0) {
     let dmgAmp = 0;
     for (const a of source.auras) {
-      if (a.kind === 'buff_dmg_done' || a.kind === 'bloodbath' || a.kind === 'buff_avatar')
+      if (
+        a.kind === 'buff_dmg_done' ||
+        a.kind === 'bloodbath' ||
+        a.kind === 'buff_avatar' ||
+        a.kind === 'enrage' // Fury Enrage's +11% outgoing (value = ENRAGE_DMG_DONE)
+      )
         dmgAmp += a.value;
       // Sanguine Aura's damage half rides value2 (value is its swing mult).
       if (a.kind === 'sanguine') dmgAmp += a.value2 ?? 0;

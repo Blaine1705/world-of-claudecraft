@@ -335,6 +335,8 @@ import {
   DT,
   DUNGEON_LEASH_DISTANCE,
   dist2d,
+  ENRAGE_HASTE,
+  ENRAGE_MOVE_MULT,
   type Entity,
   type EquipSlot,
   type ErrorReason,
@@ -3058,6 +3060,8 @@ export class Sim {
       if (a.kind === 'slow' || a.kind === 'stealth') slow = Math.min(slow, a.value);
       // buff_speed and form_travel both carry a 1+fraction multiplier (1.4 = +40%).
       if (a.kind === 'buff_speed' || a.kind === 'form_travel') speed = Math.max(speed, a.value);
+      // Fury Enrage: +10% move speed (non-stacking with other speed buffs).
+      if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
     }
     // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
     if (e.kind === 'player') {
@@ -3145,6 +3149,8 @@ export class Sim {
       // rides value2, read in dealDamage).
       if (a.kind === 'attackspeed' || a.kind === 'sanguine') m *= a.value;
       if (a.kind === 'buff_haste') m /= a.value;
+      // Fury Enrage: +25% attack speed (divides the swing interval like buff_haste).
+      if (a.kind === 'enrage') m /= ENRAGE_HASTE;
     }
     // Enrage frenzy: an enraged mob swings faster (mirrors the inline dmgMult
     // applied in mobSwing). Composes with any slow/haste auras above.

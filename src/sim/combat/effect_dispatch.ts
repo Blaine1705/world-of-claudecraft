@@ -30,12 +30,14 @@ import {
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
-import type { AbilityDef, Entity } from '../types';
 import {
+  type AbilityDef,
   angleTo,
   armorReduction,
   DT,
   dist2d,
+  ENRAGE_DMG_DONE,
+  type Entity,
   FISHING_CAST_ID,
   MELEE_ARC,
   MELEE_CLASSES,
@@ -396,6 +398,23 @@ export function runEffects(
           remaining: eff.basedur + eff.perCombo * spentCombo,
           duration: eff.basedur + eff.perCombo * spentCombo,
           value: eff.mult,
+          sourceId: p.id,
+          school: 'physical',
+        });
+        break;
+      }
+      case 'enrageChance': {
+        // Fury Enrage: Bloodletting has a 30% chance, Desenfreno / Rampage always.
+        // Draw only when it is NOT guaranteed, so the always-case adds no rng draw
+        // (keeps the shared stream's order stable for the deterministic path).
+        if (eff.chance < 1 && !ctx.rng.chance(eff.chance)) break;
+        ctx.applyAura(p, {
+          id: 'enrage',
+          name: 'Enraged',
+          kind: 'enrage',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: ENRAGE_DMG_DONE,
           sourceId: p.id,
           school: 'physical',
         });

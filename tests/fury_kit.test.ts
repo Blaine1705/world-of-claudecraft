@@ -100,16 +100,18 @@ describe('fury kit content defs', () => {
     expect(def.specs).toEqual(['fury']);
     // Red Harvest is the hardest-hitting warrior ability: three weapon strikes
     // each carrying a +55 bonus, above every other warrior hit including
-    // Maiming Strike's single wpn+40.
+    // Maiming Strike's single wpn+40. Plus it always Enrages (owner 2026-07-08).
     expect(def.effects).toEqual([
       { type: 'weaponStrike', bonus: 55 },
       { type: 'weaponStrike', bonus: 55 },
       { type: 'weaponStrike', bonus: 55 },
+      { type: 'enrageChance', chance: 1, duration: 4 },
     ]);
     const mortal = ABILITIES.mortal_strike.effects.find((e) => e.type === 'weaponStrike');
     expect(mortal?.type === 'weaponStrike' && mortal.bonus).toBe(40);
     for (const eff of def.effects) {
-      expect(eff.type === 'weaponStrike' && eff.bonus).toBeGreaterThan(40);
+      if (eff.type !== 'weaponStrike') continue;
+      expect(eff.bonus).toBeGreaterThan(40);
     }
   });
 });

@@ -752,9 +752,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'weaponStrike', bonus: 55 },
       { type: 'weaponStrike', bonus: 55 },
       { type: 'weaponStrike', bonus: 55 },
+      // Always Enrages for 4 sec (Rampage / Desenfreno, the guaranteed proc).
+      { type: 'enrageChance', chance: 1, duration: 4 },
     ],
     description:
-      'Spend everything: strike three times in a frenzy for weapon damage plus {damage} each. (Fury)',
+      'Spend everything: strike three times in a frenzy for weapon damage plus {damage} each, always Enraging you. (Fury)',
   },
   // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
   // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
@@ -3982,9 +3984,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
       { type: 'selfHealPctMax', pct: 0.03 },
       { type: 'gainResource', amount: 12 },
+      // 30% chance to Enrage for 4 sec (the classic Bloodthirst proc).
+      { type: 'enrageChance', chance: 0.3, duration: 4 },
     ],
     description:
-      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 12 rage. (Fury signature)',
+      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 12 rage. Has a 30% chance to Enrage you. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',
