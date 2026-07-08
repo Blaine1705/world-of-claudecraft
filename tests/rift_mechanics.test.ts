@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DUNGEON_FLOOR_Y, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import { solveLockActions } from '../src/sim/lockpick';
 import { generateRiftFloor, riftPlatformLift } from '../src/sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
@@ -250,6 +251,88 @@ describe('rift mechanics: verticality (raised sanctum tier)', () => {
     sim.player.prevPos = { ...sim.player.pos };
     sim.tick();
     expect(sim.player.pos.y).toBeCloseTo(DUNGEON_FLOOR_Y, 1);
+  });
+});
+
+describe('rift mechanics: sealed cache lockpicking', () => {
+  // Descend to the boss floor and kill everything, so openExit drops the cache.
+  function toClearedBoss(sim: Sim) {
+    const inst = active(sim);
+    for (let g = 0; g < 12 && inst.floorIndex < inst.floorCount - 1; g++) {
+      for (const id of inst.mobIds) {
+        if (id === inst.bossId) continue;
+        const e = sim.entities.get(id);
+        if (e) {
+          e.hp = 0;
+          e.dead = true;
+        }
+      }
+      inst.litPylons = new Set(inst.pylonIds);
+      inst.puzzleSolved = true;
+      for (let i = 0; i < 21; i++) {
+        sim.player.hp = sim.player.maxHp;
+        sim.tick();
+      }
+      if (inst.descentId === null) break;
+      const desc = sim.entities.get(inst.descentId)!;
+      sim.player.pos = { ...desc.pos };
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    for (const id of inst.mobIds) {
+      const e = sim.entities.get(id);
+      if (e) {
+        e.hp = 0;
+        e.dead = true;
+      }
+    }
+    for (let i = 0; i < 21; i++) {
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+    }
+    return inst;
+  }
+
+  it('the giga-boss drops a sealed cache; picking its lock opens it and pays spoils', () => {
+    const sim = enter(4242);
+    const inst = toClearedBoss(sim);
+    expect(inst.cacheId).not.toBeNull();
+    const cache = sim.entities.get(inst.cacheId!)!;
+    expect(cache.templateId).toBe('rift_locked_chest');
+
+    sim.player.pos = { ...cache.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    const meta = sim.players.get(sim.player.id)!;
+    const before = meta.copper;
+    sim.lockpickEngage(inst.cacheId!, 3, sim.player.id); // ante 3 = a single board
+    expect(inst.lockpick).not.toBeNull();
+
+    // Drive the engine's own winning action sequence for each page.
+    let guard = 0;
+    while (inst.lockpick && guard++ < 40) {
+      const s = inst.lockpick;
+      const actions = solveLockActions(s.pages[s.pageIndex]);
+      if (!actions) break;
+      for (const a of actions) {
+        if (!inst.lockpick) break;
+        sim.lockpickAction(a, sim.player.id);
+      }
+    }
+    expect(inst.lockpick).toBeNull();
+    expect(sim.entities.get(inst.cacheId!)?.templateId).toBe('rift_chest_open');
+    expect(meta.copper).toBeGreaterThan(before);
+  });
+
+  it('aborting a pick preserves the cache for another attempt', () => {
+    const sim = enter(4242);
+    const inst = toClearedBoss(sim);
+    const cacheId = inst.cacheId!;
+    sim.player.pos = { ...sim.entities.get(cacheId)!.pos };
+    sim.lockpickEngage(cacheId, 2, sim.player.id);
+    expect(inst.lockpick).not.toBeNull();
+    sim.lockpickAbort(sim.player.id);
+    expect(inst.lockpick).toBeNull();
+    expect(sim.entities.get(cacheId)?.templateId).toBe('rift_locked_chest');
   });
 });
 

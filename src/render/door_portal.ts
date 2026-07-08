@@ -325,6 +325,46 @@ export function buildRiftPuzzleProp(
       body.userData.rollRock = rock;
       return { body };
     }
+    case 'rift_locked_chest':
+    case 'rift_chest_open':
+    case 'rift_chest_jammed': {
+      // The giga-boss's sealed reward cache. A banded wooden chest with a glowing
+      // keyhole (cyan while pickable, red when jammed) that pulses via `portal`;
+      // the lid swings open once solved.
+      const opened = templateId === 'rift_chest_open';
+      const jammed = templateId === 'rift_chest_jammed';
+      const wood = new THREE.MeshLambertMaterial({
+        color: 0x5a4a3a,
+        emissive: opened ? 0x1a1206 : 0x000000,
+      });
+      const band = new THREE.MeshLambertMaterial({ color: 0x8a8a92 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.7, 0.9), wood);
+      base.position.y = 0.35;
+      base.castShadow = true;
+      body.add(base);
+      const lid = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.34, 0.9), wood);
+      if (opened) {
+        lid.position.set(0, 0.72, -0.45);
+        lid.rotation.x = -1.15;
+      } else {
+        lid.position.set(0, 0.72, 0);
+      }
+      lid.castShadow = true;
+      body.add(lid);
+      const strap = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.95, 0.04), band);
+      strap.position.set(0, 0.5, 0.46);
+      body.add(strap);
+      if (!opened) {
+        const lock = new THREE.Mesh(
+          new THREE.CircleGeometry(0.17, 16),
+          riftGlowMaterial(jammed ? 0xff5a4a : 0x9fe8ff, jammed ? 0.7 : 0.95),
+        );
+        lock.position.set(0, 0.5, 0.48);
+        body.add(lock);
+        return { body, portal: jammed ? undefined : lock };
+      }
+      return { body };
+    }
     case 'rift_boulder_pad': {
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(1.3, 0.18, 8, 24),

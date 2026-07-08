@@ -26,6 +26,7 @@ import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { generateRiftFloor, riftPlatformLift } from './rift_gen';
+import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
@@ -123,6 +124,8 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.seqStep = 0;
   inst.beaconId = null;
   inst.rollerIds = [];
+  inst.cacheId = null;
+  inst.lockpick = null;
 
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
@@ -218,6 +221,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   dropObjects(ctx, inst.objectIds);
   if (inst.descentId !== null) dropObjects(ctx, [inst.descentId]);
   if (inst.exitId !== null) dropObjects(ctx, [inst.exitId]);
+  if (inst.cacheId !== null) dropObjects(ctx, [inst.cacheId]);
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   clearRiftRegion(ctx.riftCollisionToken, origin.x, origin.z);
   inst.mobIds = [];
@@ -233,6 +237,8 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.seqStep = 0;
   inst.beaconId = null;
   inst.rollerIds = [];
+  inst.cacheId = null;
+  inst.lockpick = null;
   inst.puzzleSolved = false;
 }
 
@@ -388,6 +394,8 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   // player is not in one, do nothing rather than yanking them to the world origin.
   const inst = riftInstanceAtPos(ctx, r.e.pos);
   if (!inst) return;
+  // Tear down any lock attempt in progress so a half-picked cache doesn't linger.
+  if (inst.lockpick) riftLockpickAbort(ctx, inst, r.meta.entityId);
   const dest = inst.returnPos;
   const p = r.e;
   // Walk-in grace so the overworld portal cannot re-swallow the player the
@@ -641,6 +649,20 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   exit.riftTier = inst.tier ?? undefined;
   ctx.addEntity(exit);
   inst.exitId = exit.id;
+  // Beside the way home, the giga-boss leaves a SEALED reward cache: pick its lock
+  // (the shared Tumbler's Path minigame) for bonus spoils. Lootable so the interact
+  // scan targets it; the pick, not a grab, opens it (see interaction.ts + rift_lockpick).
+  const cache = createGroundObject(
+    ctx.nextId++,
+    '',
+    'Sealed Rift Cache',
+    ctx.groundPos(origin.x + pos.x - 4, origin.z + pos.z),
+  );
+  cache.templateId = 'rift_locked_chest';
+  cache.objectItemId = null;
+  cache.lootable = true;
+  ctx.addEntity(cache);
+  inst.cacheId = cache.id;
   for (const pid of instancePlayerIds(ctx, inst)) {
     ctx.emit({
       type: 'log',
@@ -832,6 +854,16 @@ export function liftRiftEntities(ctx: SimContext): void {
     for (const id of inst.objectIds) lift(id);
     if (inst.descentId !== null) lift(inst.descentId);
     if (inst.exitId !== null) lift(inst.exitId);
+    if (inst.cacheId !== null) lift(inst.cacheId);
+  }
+}
+
+/** Per-tick step-clock for any active rift-cache lockpick attempt (mirrors the
+ * delve controller's per-tick tickLockpickTimeout). Cheap: only instances with a
+ * live session do any work. */
+export function tickRiftLockpicks(ctx: SimContext): void {
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey !== null && inst.lockpick) tickRiftLockpick(ctx, inst);
   }
 }
 

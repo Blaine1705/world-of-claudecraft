@@ -55,7 +55,8 @@ command + interaction click paths.
   pylons, slide onto the frost sigil, socket the boulders, or step the sequence) to
   open the descent; walk onto it to regenerate the next floor in place and teleport
   the whole party there. Stuck or overwhelmed? The entry beacon takes you home.
-- **Boss + exit:** the final floor's exit opens only when the boss dies.
+- **Boss + exit:** the final floor's exit (the way home) opens only when the boss
+  dies, alongside a sealed reward cache to lockpick for bonus spoils.
 - **Leave / death:** walking into the exit returns you to the overworld return
   position; dying sends your spirit to the overworld cemetery nearest where you
   entered. The return position is pushed clear of the portal's walk-in radius and
@@ -97,11 +98,27 @@ always walkable and every puzzle is solvable by construction.
 - **Victory gate.** The post-boss exit renders as the same "dimensional gate" GLB as
   the overworld portal, tinted by the run's rank (`exit.riftTier`), so beating the
   giga-boss tears the way home open rather than dropping a plain stone arch.
+- **Verticality** (`RiftPlatform`, `planPlatform`): a floor can step UP toward the
+  dais over a full-width staircase to a raised rear "sanctum", so it has two walkable
+  levels. `riftPlatformLift(platform, localZ)` is a single-valued height field (pure
+  function of local depth) applied as a POST-movement Y lift to everything in the
+  rift; the movement kernel (`player_motion.ts`) is never touched, and the online
+  client's self-prediction is gated off in rifts so it renders the authoritative Y
+  with no stair jitter. Boss floors raise when the room is long enough; ~30% of other
+  floors do too, never with a roller/lava/ice. See "Verticality" note below.
+- **Sealed cache + lockpicking** (`rift/rift_lockpick.ts`): the giga-boss also drops a
+  `rift_locked_chest` the party can pick for bonus copper spoils, REUSING the pure
+  "Tumbler's Path" engine (`sim/lockpick.ts`) and the SAME client HUD + wire
+  (`lockpickOffer`/`Session`/`Step`/`End`/`Bonus`) as the delve chests. The session
+  lives on `RiftInstance` (never a `DelveRun`), so the delve lockpick controller is
+  untouched; `Sim.lockpick*` dispatches to the rift driver when the player is in a
+  rift, else the delve one. The lid swings open + the keyhole pulses on solve.
 - **Render.** Puzzle props (pylons, frost sigil, boulders + sockets, sequence runes,
-  the beacon, the roller) are procedural bodies in `buildRiftPuzzleProp`
-  (`src/render/door_portal.ts`); lit/placed states swap by `templateId` (the view
+  the beacon, the roller, the cache) are procedural bodies in `buildRiftPuzzleProp`
+  (`src/render/door_portal.ts`); lit/placed/open states swap by `templateId` (the view
   rebuilds on change), glowing nodes spin, and the roller rolls with its motion. The
-  lava/ice floor overlays are drawn by `buildInterior` (`src/render/dungeon.ts`).
+  lava/ice overlays and the raised deck + staircase are drawn by `buildInterior`
+  (`src/render/dungeon.ts`).
 
 ## Ranks (C / B / A / S) and world portals (`src/sim/rift/portals.ts`)
 
@@ -167,8 +184,8 @@ LETTER is a game glyph (like item-quality colour), not translated.
   balance, shape variety, boss-arena fit.
 - `tests/rift_mechanics.test.ts`: the v3 variety (generator surfaces every puzzle +
   hazard kind, boss floors stay clean, ice-goal solve, boulder socketing, sequence
-  step + reset, the way-out beacon, lava damage, and the rolling boulder's motion +
-  knockback).
+  step + reset, the way-out beacon, lava damage, the rolling boulder's motion +
+  knockback, the raised-tier lift, and the boss-cache lockpick solve + abort).
 - `tests/rift_sim.test.ts`: full enter/descend/boss/exit lifecycle, rotated-OBB
   clearance matching runtime `pushOut`, two-`Sim` collision isolation, the
   entry-zone graveyard on death, the client-sync `riftState` event, and the
@@ -191,16 +208,7 @@ LETTER is a game glyph (like item-quality colour), not translated.
   deferred: the design intent is to build a whole new zone around that mechanic
   (NPCs aware of the breaks, defend-the-town). The open/sealed/collapsed portal
   lifecycle here leaves the seam for it.
-- **Lockpicking** in rifts is deferred: the lockpick engine (`src/sim/lockpick.ts`)
-  is reusable, but its controller (`src/sim/delves/lockpick_controller.ts`) is bound
-  to the delve-run seam (`ctx.delveRunForPlayer`, the `locked_chest` interactable
-  state, the session stored on a `DelveRun`) plus its own wire + HUD sync. Reusing
-  it in rifts means generalizing that host, which is its own focused change.
-- **True multi-level verticality** (stacked floors with real stair collision) is
-  deferred: collision here is a single-valued height field sampled by
-  `groundHeight(x,z,seed)`, which cannot derive a rift's per-floor height field from
-  position alone (rifts sit at runtime-mapped dynamic origins, unlike the
-  fixed-location Vale Cup stand-lift). Changing that core seam touches all three
-  hosts and risks the determinism / parity invariant, so it warrants its own PR.
-  The v3 layouts get their "verticality" feel from mazes, baffles, and the raised
-  boss dais instead.
+- **Verticality is single-valued** by design (a height field, not stacked floors):
+  you can climb a staircase to a raised tier, but not walk UNDER it. This is the only
+  form the shared `groundHeight`/2D-collision model allows; true stacked geometry
+  would need a second collision layer across all three hosts and is out of scope.

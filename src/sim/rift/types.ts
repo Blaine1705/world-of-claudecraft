@@ -8,6 +8,7 @@
 // Sim layer: no DOM/Three imports. This file is types only.
 
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
+import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
 
 /** The whole wire/persistence footprint of a rift instance. Both hosts turn this
@@ -181,6 +182,13 @@ export interface RiftInstance {
   /** True once the final boss kill has paid out (marks + seal), so a slot that
    * lingers after the kill never double-pays. */
   rewarded: boolean;
+  /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
+   * the shared lockpicking minigame; null until the boss falls. */
+  cacheId: number | null;
+  /** The in-progress lockpick attempt on this rift's cache (reuses the pure
+   * `lockpick` engine + the shared HUD/wire), or null. Rift-hosted, so the delve
+   * lockpick controller stays untouched. */
+  lockpick: LockSession | null;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

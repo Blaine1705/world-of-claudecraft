@@ -309,9 +309,16 @@ import {
   liftRiftEntities as liftRiftEntitiesImpl,
   riftInstanceAtPos,
   riftPlayerLift as riftPlayerLiftImpl,
+  tickRiftLockpicks as tickRiftLockpicksImpl,
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
+import {
+  riftLockpickAbort as riftLockpickAbortImpl,
+  riftLockpickAction as riftLockpickActionImpl,
+  riftLockpickEngage as riftLockpickEngageImpl,
+  riftLockpickViewFor as riftLockpickViewForImpl,
+} from './rift/rift_lockpick';
 import type { RiftInstance } from './rift/types';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
@@ -1454,6 +1461,8 @@ export class Sim {
         seqStep: 0,
         beaconId: null,
         rollerIds: [],
+        cacheId: null,
+        lockpick: null,
         returnPos: { x: 0, z: 0 },
         emptyFor: 0,
         tier: null,
@@ -3210,6 +3219,7 @@ export class Sim {
     this.updateRiftInstances();
     advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
     liftRiftEntitiesImpl(this.ctx); // stand rift mobs/objects on the raised tier
+    tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
@@ -6825,17 +6835,31 @@ export class Sim {
   // never serialized, only visibleCells() inside the fog window is emitted.
   // -------------------------------------------------------------------------
 
+  /** The rift instance the acting player is standing in, or null. Lockpick ops
+   * route to the rift-cache driver when in a rift, else the delve controller (a
+   * player is never in both), so the shared engine/HUD/commands serve both. */
+  private riftInstForPid(pid?: number) {
+    const r = this.ctx.resolve(pid);
+    return r ? riftInstanceAtPos(this.ctx, r.e.pos) : null;
+  }
+
   /** Start a lockpicking attempt: commit an ante (1/2/3 lives = loot tier). */
   lockpickEngage(objectId: number, ante: Ante, pid?: number): void {
+    const inst = this.riftInstForPid(pid);
+    if (inst) return riftLockpickEngageImpl(this.ctx, inst, objectId, ante, pid);
     lockpickMod.lockpickEngage(this.ctx, objectId, ante, pid);
   }
 
   /** Submit one pick action on the player's active attempt (server-authoritative). */
   lockpickAction(action: PickAction, pid?: number, sessionId?: string): void {
+    const inst = this.riftInstForPid(pid);
+    if (inst) return riftLockpickActionImpl(this.ctx, inst, action, pid, sessionId);
     lockpickMod.lockpickAction(this.ctx, action, pid, sessionId);
   }
 
   lockpickAbort(pid?: number, sessionId?: string): void {
+    const inst = this.riftInstForPid(pid);
+    if (inst) return riftLockpickAbortImpl(this.ctx, inst, pid, sessionId);
     lockpickMod.lockpickAbort(this.ctx, pid, sessionId);
   }
 
@@ -6851,6 +6875,8 @@ export class Sim {
 
   /** Read-only projection of the active lockpick attempt for IWorld (offline). */
   lockpickViewFor(pid?: number): LockpickView | null {
+    const inst = this.riftInstForPid(pid);
+    if (inst) return riftLockpickViewForImpl(this.ctx, inst, pid);
     return lockpickMod.lockpickViewFor(this.ctx, pid);
   }
 

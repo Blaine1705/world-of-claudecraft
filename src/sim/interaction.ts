@@ -399,6 +399,11 @@ export function interact(ctx: SimContext, pid?: number): void {
           ctx.leaveRift(p.id);
           return;
         }
+        if (target.templateId === 'rift_locked_chest') {
+          // Offer the ante selector; the pick itself runs via lockpick_engage.
+          ctx.emit({ type: 'lockpickOffer', objectId: target.id, bountiful: false, pid: p.id });
+          return;
+        }
         if (target.templateId === 'mailbox') {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
@@ -456,6 +461,10 @@ export function interact(ctx: SimContext, pid?: number): void {
     }
     if (obj.templateId === 'rift_exit') {
       ctx.leaveRift(p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_locked_chest') {
+      ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
       return;
     }
     if (obj.templateId === 'mailbox') {
