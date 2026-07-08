@@ -402,7 +402,7 @@ export const zh_TW: EnTranslations = {
     },
     "vcup": {
       "title": "溪谷盃",
-      "shootPower": "POWER",
+      "shootPower": "力道",
       "close": "關閉溪谷盃視窗",
       "offlineNote": "賽程簿已闔上。溪谷盃目前無法使用。",
       "recordLine": "你的戰績：{wins} 勝，{losses} 敗，{draws} 平。",
@@ -460,7 +460,7 @@ export const zh_TW: EnTranslations = {
       "guildRecordLine": "你的公會戰績：{wins} 勝，{losses} 敗。",
       "guildBoardHeading": "公會旗幟榜",
       "guildBoardEmpty": "還沒有公會上場。揚起你的旗幟吧！",
-      "guildBoardWl": "{wins} W, {losses} L",
+      "guildBoardWl": "{wins} 勝，{losses} 敗",
       "practice": "與機器人練習賽",
       "practiceNote": "立即在母豬場開始一場完整的機器人比賽。",
       "practicingNow": "正在練習（{count}）：",
@@ -626,6 +626,7 @@ export const zh_TW: EnTranslations = {
         "jitter": "抖動",
         "predLead": "預測提前量",
         "snapshot": "快照速率",
+        "serverTick": "伺服器刻率",
         "connection": "連線",
         "drawCalls": "繪製呼叫",
         "triangles": "三角形",
@@ -1309,6 +1310,50 @@ export const zh_TW: EnTranslations = {
         "letterGone": "那封信已不在你的郵箱裡。",
         "takeParcelsFirst": "請先取出包裹再丟棄信件。"
       }
+    },
+    "bank": {
+      "title": "銀行",
+      "subtitle": "鍍金保險箱",
+      "close": "關閉銀行",
+      "capacity": "{used}/{total}",
+      "capacityAria": "銀行格已用：{used}/{total}",
+      "empty": "你的銀行是空的。",
+      "tooFar": "你必須站在銀行家旁才能查看銀行。",
+      "buySlots": "購買 {count} 個格子",
+      "buySlotsMaxed": "已完全擴展",
+      "buyConfirm": "花費 {price} 購買 {count} 個額外的銀行格子嗎？",
+      "buyConfirmAccept": "購買",
+      "withdrawHint": "點擊取出",
+      "withdrawPartialHint": "Shift+點擊取出部分數量",
+      "depositHint": "點擊存入",
+      "depositPartialHint": "Shift+點擊存入部分數量",
+      "cannotDeposit": "無法存入銀行",
+      "depositQuantityTitle": "存入 {item}",
+      "depositQuantityInput": "要存入的數量",
+      "depositQuantityConfirm": "存入",
+      "withdrawQuantityTitle": "取出 {item}",
+      "withdrawQuantityInput": "要取出的數量",
+      "withdrawQuantityConfirm": "取出",
+      "filterGroupAria": "依類別篩選銀行",
+      "sortAria": "排序銀行物品",
+      "searchAria": "依名稱搜尋銀行物品",
+      "depositAll": "存入所有材料",
+      "depositAllDone": "已存入材料：{count}。",
+      "depositAllFull": "已存入材料：{count}。銀行已滿。",
+      "depositAllNone": "銀行已滿：未存入任何物品。",
+      "bonusTitle": "獎勵格子",
+      "bonusEarned": "+{count}",
+      "bonusStatusEarned": "+{count}",
+      "bonusSourceEmail": "已驗證電子郵件",
+      "bonusSourceDiscord": "已連結 Discord",
+      "bonusSourceWallet": "已連結錢包",
+      "bonusSourceReferral": "已推薦的好友",
+      "bonusAdvertEmail": "驗證電子郵件可獲得 2 個格子。",
+      "bonusAdvertDiscord": "連結 Discord 可獲得 2 個格子。",
+      "bonusAdvertWallet": "連結錢包可獲得 2 個格子。",
+      "bonusReferralProgress": "{count}/{cap}",
+      "bonusReferralExplainer": "邀請好友：當好友升到 10 級，你們各獲得 2 個格子，最多 5 位好友。",
+      "bonusSectionAria": "獎勵銀行格子及獲取方式"
     },
     "calendar": {
       "title": "活動日曆",
@@ -2328,6 +2373,10 @@ export const zh_TW: EnTranslations = {
       "vendorsBody": "城鎮與哨站裡到處是商人，各有各的生意。補給商備有食物與飲品，武器匠與盔甲匠出售裝備，軍需官則準備實用的旅行用品。走到他們面前，便能看到他們在賣什麼。",
       "marksTitle": "第二種貨幣：秘探印記",
       "marksBody": "錢幣並非你唯一能積攢的東西。秘探會給予秘探印記，這是一種獨立的貨幣，只能在秘探看守人處花用，用於同伴升級以及在別處找不到的裝備。它們絕不會與你的錢幣混在一起。",
+      "bankTitle": "銀行",
+      "bankBody": "每座主城都設有鍍金保險箱的分號，它是這片大陸的銀行商號。與那裡的司庫交談即可打開你的保險庫：一處背包之外的私人儲物空間，伴隨角色終身。無論你下次造訪哪家分號，寄存的物品都會安然等候。",
+      "bankHow": "保險庫打開後，點擊背包中的物品即可存入，點擊保險庫中的物品即可取回。保險庫只存放物品，不存放錢幣，任務物品也會留在你身上。旅途中背包裝滿時，還有一個按鈕可將全部製造材料一鍵存入。",
+      "bankSlots": "新開的保險庫空間不大，但會隨你一同成長。司庫出售更多格位，價格逐級走高；線上遊玩還能獲得額外空間，例如驗證信箱、連結帳號，以及引薦好友加入遊戲。",
       "buyingTitle": "買與賣",
       "buyingBody": "站在商人附近即可開啟他的視窗。只要你負擔得起，便能買下他所販售的任何商品，也能將背包裡大部分的東西換成錢幣。若你不小心賣錯了東西，商人會為你保留近期的售出物，讓你能買回來。",
       "junkTitle": "清理雜物",
@@ -6469,6 +6518,24 @@ export const zh_TW: EnTranslations = {
       "sunpetal_sickle": {
         "name": "陽瓣鐮刀"
       },
+      "thorium_ore": {
+        "name": "瑟銀礦石"
+      },
+      "arcanite_bar": {
+        "name": "秘銀錠"
+      },
+      "ashwood_log": {
+        "name": "灰木原木"
+      },
+      "elderwood_log": {
+        "name": "古老接骨木原木"
+      },
+      "goldleaf_herb": {
+        "name": "金葉草"
+      },
+      "sunpetal_herb": {
+        "name": "陽瓣草"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯戰錘"
       },
@@ -7612,6 +7679,21 @@ export const zh_TW: EnTranslations = {
         "name": "拍賣師沃斯",
         "title": "世界市場守護者",
         "greeting": "世界市場在此亦可使用，{className}。從王國各地的冒險者手中購買，或出售你自己的貨物。"
+      },
+      "bursar_fernando": {
+        "name": "司庫費爾南多",
+        "title": "鍍金保險箱",
+        "greeting": "歡迎來到鍍金保險箱。你的財物在我們的鎖後安然無恙。"
+      },
+      "bursar_petra_vell": {
+        "name": "司庫佩特拉·維爾",
+        "title": "鍍金保險箱",
+        "greeting": "鍍金保險箱帳目清晰，金庫更是一塵不染。想讓我們為你存放些什麼？"
+      },
+      "bursar_aldous_crane": {
+        "name": "司庫奧爾多斯·克萊恩",
+        "title": "鍍金保險箱",
+        "greeting": "每一只木箱、每一個錢櫃、每一件飾物，交給鍍金保險箱都萬無一失。"
       },
       "brother_aldric_raid": {
         "name": "奧德里克修士",

@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "f697be40",
+      "nextId": 405,
+      "state": "12229410",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,13 +36,14 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 404,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -75,7 +76,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 401,
+          "id": 404,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -118,9 +119,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 423,
-      "state": "10066c84",
-      "events": "c3a484d1",
+      "nextId": 426,
+      "state": "23c33522",
+      "events": "832e25fd",
       "rng": {
         "draws": 1,
         "digest": "5eb1ea5d"
@@ -129,8 +130,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 423,
-      "state": "4b117d6e",
+      "nextId": 426,
+      "state": "7cc70e98",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -150,13 +151,14 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 404,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -189,7 +191,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 401,
+          "id": 404,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -231,9 +233,9 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 423,
-      "state": "f9ff2918",
-      "events": "62e6ce51",
+      "nextId": 426,
+      "state": "41195aa6",
+      "events": "cade1dbf",
       "rng": {
         "draws": 3,
         "digest": "e3485a8b"
@@ -252,6 +254,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2
@@ -264,7 +267,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 401,
+          "entityId": 404,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -298,7 +301,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 338,
-          "id": 401,
+          "id": 404,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -340,8 +343,8 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 423,
-      "state": "7f123e4a",
+      "nextId": 426,
+      "state": "3c7f55bc",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -361,6 +364,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {
             "companion_tessa": 2
@@ -373,7 +377,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 401,
+          "entityId": 404,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -407,7 +411,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 338,
-          "id": 401,
+          "id": 404,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

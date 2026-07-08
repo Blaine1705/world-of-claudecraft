@@ -1,5 +1,6 @@
 import type {
   AccountCosmetics,
+  BankBonusSource,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
   DailyRewardSpinResult,
@@ -11,6 +12,8 @@ import type {
 } from '../world_api';
 import * as bagsMod from './bags';
 import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
+import * as bankMod from './bank';
+import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import {
@@ -754,6 +757,15 @@ export interface PlayerMeta {
   // The 4 equippable bag sockets (itemId of a kind:'bag' item, or null). The
   // 16-slot backpack is implicit; capacity math lives in bags.ts. Persisted.
   bags: (string | null)[];
+  // The per-character bank: a second pooled item store with its own copper-bought
+  // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
+  // character save, exactly like inventory/bags).
+  bank: BankState;
+  // The per-source breakdown behind bank.bonusSlots, stamped by the host at join
+  // alongside the total (addPlayer's bankBonus opt). Display-only session state:
+  // never persisted, never sim-mutated, always [] offline; capacity itself rides
+  // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
+  bankBonusSources: BankBonusSource[];
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -854,16 +866,16 @@ export interface PlayerMeta {
   // Session-only: name of the last player who whispered us, for "/r" replies.
   // Never persisted — a fresh login starts with no reply target.
   lastWhisperFrom?: string;
-  // Session-only World Market browse query: the search string, the type / subtype /
-  // rarity filters, and the page index. The server filters + paginates against this,
-  // so the player can page through and filter the WHOLE market a window at a time.
-  // Never persisted, resets on login.
-  marketQuery: MarketQuery;
   // Session-only World Market browse filter. The market is capped at
   // MARKET_WIRE_LIMIT listings per snapshot to bound wire cost, so this
   // server-side substring filter (matched against item names) is how a player
   // reaches goods past the cap. Never persisted: resets on login.
   marketFilter: string;
+  // Session-only World Market browse query: the search string, the type / subtype /
+  // rarity filters, and the page index. The server filters + paginates against this,
+  // so the player can page through and filter the WHOLE market a window at a time.
+  // Never persisted, resets on login.
+  marketQuery: MarketQuery;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -901,8 +913,8 @@ export interface AwayStatus {
 }
 
 // ---------------------------------------------------------------------------
-// The World Market — a single shared, server-authoritative auction house run by
-// the Merchant NPC — moved to market.ts (L2). Its types (MarketListing,
+// The World Market (a single shared, server-authoritative auction house run by
+// the Merchant NPC) moved to market.ts (L2). Its types (MarketListing,
 // MarketCollection, MarketSave) and the MARKET_* consts live there now; MarketSave
 // is re-exported from this module (above) for server/db.ts.
 // ---------------------------------------------------------------------------
@@ -941,6 +953,10 @@ export interface CharacterState {
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
   bags?: (string | null)[];
+  // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
+  // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
+  // load path (never destroys items; tolerates an over-capacity inventory).
+  bank?: BankState;
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
@@ -1162,6 +1178,12 @@ export class Sim {
   // book, the id counter, and the mailbox entity ids; Sim keeps thin delegates
   // (the market shape). Constructed in the ctor after the SimContext.
   postOffice!: PostOffice;
+  // Entity ids of every NPC with `banker: true`, assigned by the ctor NPC loop.
+  // The bank is per-character self-storage (state on PlayerMeta.bank), so unlike
+  // the shared World Market there is no bank instance: this anchor list is all the
+  // sim needs, and any banker is a valid place to stand and use the bank. Exposed
+  // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
+  bankerIds: number[] = [];
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   private pendingMobRespawns: PendingMobRespawn[] = [];
@@ -1247,6 +1269,7 @@ export class Sim {
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
+      if (npcDef.banker) this.bankerIds.push(npc.id); // every bursar is a place to use the bank
     }
     this.market.seed();
 
@@ -1519,7 +1542,18 @@ export class Sim {
   addPlayer(
     cls: PlayerClass,
     name: string,
-    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number },
+    opts?: {
+      autoEquip?: boolean;
+      state?: CharacterState;
+      characterId?: number;
+      // Server-stamped bank bonus slots, recomputed from account facts at every
+      // join (email/Discord/wallet/referrals). Overrides the persisted value so
+      // unlinking lowers capacity at the next login; a shrink below the used slot
+      // count leaves the bank over-capacity in the tolerated bags.ts sense (new
+      // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
+      // stays the sanitized save value, [] breakdown).
+      bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+    },
   ): number {
     const savedState = opts?.state ? sanitizeRemovedZone1Content(opts.state).state : undefined;
     // Characters saved inside a dungeon instance rejoin at its entrance —
@@ -1568,6 +1602,8 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
+      bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
+      bankBonusSources: [],
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
@@ -1612,11 +1648,11 @@ export class Sim {
       activeLoadout: -1,
       raidLockouts: new Map(),
       away: null,
-      marketQuery: defaultMarketQuery(),
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
-      archetype: emptyArchetypeState(),
+      marketQuery: defaultMarketQuery(),
       mailWelcomed: false,
+      archetype: emptyArchetypeState(),
       delveMarks: 0,
       delveClears: {},
       companionUpgrades: {},
@@ -1678,6 +1714,9 @@ export class Sim {
         }
       }
       meta.vendorBuyback = (s.vendorBuyback ?? []).map(cloneInvSlot);
+      // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
+      // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
+      meta.bank = sanitizeBankState(s.bank);
       for (const q of s.questLog) {
         if (q.state !== 'done')
           meta.questLog.set(q.questId, {
@@ -1732,6 +1771,15 @@ export class Sim {
       if (s.heroicDaily) {
         meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
       }
+    }
+
+    // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
+    // saved-state and brand-new-character arms: a first-ever join can already have
+    // earned account bonuses. Values are host-trusted but clamped to the registry
+    // ceiling anyway; the breakdown rows are cloned at this write boundary.
+    if (opts?.bankBonus) {
+      meta.bank.bonusSlots = clampBonusSlots(opts.bankBonus.bonusSlots);
+      meta.bankBonusSources = opts.bankBonus.sources.map((s) => ({ ...s }));
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -1950,6 +1998,11 @@ export class Sim {
       equipment: { ...meta.equipment },
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
+      bank: {
+        inventory: meta.bank.inventory.map(cloneInvSlot),
+        purchasedSlots: meta.bank.purchasedSlots,
+        bonusSlots: meta.bank.bonusSlots,
+      },
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -2533,6 +2586,11 @@ export class Sim {
       },
       get marketListings() {
         return sim.marketListings;
+      },
+      // Banker anchor list (bank system): the live array of every banker
+      // NPC id, read by bank.ts's proximity gate. Sim-owned, never reassigned.
+      get bankerIds() {
+        return sim.bankerIds;
       },
       // The Vale Cup holder (queues/deserters/botPids mutated in place; the
       // match slot reassigned inside the holder, so no setter is needed).
@@ -3446,9 +3504,10 @@ export class Sim {
     if (this.updateFearMovement(p)) return;
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
-    // player_motion.ts (MV1); playerMotionDeps binds the live Sim callbacks
-    // (fiesta-aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/
-    // dealDamage) so behavior and the rng draw order are unchanged.
+    // player_motion.ts (MV1), which also eases the body off terrain walls at the
+    // end (the standoff); playerMotionDeps binds the live Sim callbacks (fiesta-
+    // aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/dealDamage)
+    // so behavior and the rng draw order are unchanged.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
   }
 
@@ -4903,19 +4962,27 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
-  removeItem(itemId: string, count: number, pid?: number): void {
+  // Returns the `instance` payload of every instanced slot actually consumed
+  // (highest-index/most-recently-added slot first, matching the removal
+  // order below), so a caller that needs to attribute an effect to the
+  // SPECIFIC copy removed (e.g. #1149 Battlefield Experience) never guesses
+  // at a different slot than the one this call actually took from.
+  removeItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
+    const consumedInstances: ItemInstancePayload[] = [];
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return consumedInstances;
     const { meta } = r;
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId) continue;
+      if (s.instance) consumedInstances.push(s.instance);
       const take = Math.min(s.count, count);
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
+    return consumedInstances;
   }
 
   // Fungible-only removal (#1165): skips instanced slots entirely, so a market
@@ -6050,6 +6117,31 @@ export class Sim {
   }
 
   // -------------------------------------------------------------------------
+  // The Bank: the per-character deposit box
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the bank free functions (bank.ts). The bank state lives on
+  // PlayerMeta.bank and serializes inside the character save; server/game.ts and
+  // the IWorld surface call these unchanged, reaching the inventory hub through
+  // the SimContext. Each op has one entry point, gated on banker proximity (nearBanker).
+
+  bankDeposit(slotIndex: number, count?: number, pid?: number): void {
+    bankMod.bankDeposit(this.ctx, slotIndex, count, pid);
+  }
+
+  bankWithdraw(slotIndex: number, count?: number, pid?: number): void {
+    bankMod.bankWithdraw(this.ctx, slotIndex, count, pid);
+  }
+
+  bankBuySlots(pid?: number): void {
+    bankMod.bankBuySlots(this.ctx, pid);
+  }
+
+  bankInfoFor(pid: number): import('../world_api').BankInfo | null {
+    return bankMod.bankInfoFor(this.ctx, pid);
+  }
+
+  // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
   // -------------------------------------------------------------------------
 
@@ -6334,6 +6426,10 @@ export class Sim {
 
   get mailUnread(): number {
     return this.primaryId === -1 ? 0 : this.mailUnreadFor(this.primaryId);
+  }
+
+  get bankInfo(): import('../world_api').BankInfo | null {
+    return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {
