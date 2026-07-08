@@ -42,6 +42,21 @@ const ROLLER_HIT_COOLDOWN = 0.6; // seconds between rolling-boulder hits on one 
 const ROLLER_KB_SIDE = 3.2; // sideways shove (to the aisle) when a boulder bowls you over
 const ROLLER_KB_FWD = 1.4; // forward nudge along the boulder's travel
 
+/** Play a themed impact VFX at a WORLD spot for every interactive rift moment (the
+ * ice-slide launch, a boulder shove, a rune flare, a lava burn, a roller wallop). It
+ * reuses the already-wired `spellfxAt` world event, so it interest-scopes to everyone
+ * in the instance and renders on all three hosts with no new event/wire surface. It
+ * is render-only (draws no rng, touches no sim state), so it is determinism-safe. */
+function riftFx(
+  ctx: SimContext,
+  x: number,
+  z: number,
+  school: string,
+  fx: 'burst' | 'nova' = 'burst',
+): void {
+  ctx.emit({ type: 'spellfxAt', x, z, school, fx });
+}
+
 /** Whether an instance-local point sits on this floor's ice sheet. */
 function inIceZone(
   ice: { x: number; z: number; hw: number; hd: number } | null,
@@ -461,6 +476,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
       const moved = Math.hypot(dx, dz);
       if (moved > 0.05 && ctx.time >= (p.riftIceUntil ?? 0)) {
         p.riftIceUntil = ctx.time + ICE_SLIDE_COOLDOWN;
+        riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // frost spray kicks up as you launch
         const inv = ICE_SLIDE_DIST / moved;
         const dest = resolveMovement(
           ctx.cfg.seed,
@@ -476,6 +492,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         p.pos = ctx.groundPos(dest.x, dest.z);
         p.prevPos = { ...p.pos };
         ctx.rebucket(p);
+        riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // and again where the wall stops you
       }
     }
     // Ice-slide goal: sliding onto the Frost Sigil solves the floor.
@@ -483,6 +500,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
       const goal = floor.objects.find((o) => o.kind === 'ice_goal');
       if (goal && dist2d(p.pos, ctx.groundPos(origin.x + goal.x, origin.z + goal.z)) < 3) {
         inst.puzzleSolved = true;
+        riftFx(ctx, origin.x + goal.x, origin.z + goal.z, 'frost', 'nova'); // the sigil blazes
         for (const pid of instancePlayerIds(ctx, inst)) {
           ctx.emit({
             type: 'log',
@@ -520,6 +538,9 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         b.pos = ctx.groundPos(dest.x, dest.z);
         b.prevPos = { ...b.pos };
         ctx.rebucket(b);
+        // Grinding dust as the boulder scrapes forward (throttled: it can move every
+        // tick while you lean on it, so cap the puffs to ~4/sec, deterministically).
+        if (ctx.tickCount % 5 === 0) riftFx(ctx, b.pos.x, b.pos.z, 'physical');
       }
     }
 
@@ -531,7 +552,10 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         if (i === inst.seqStep) {
           rune.templateId = 'rift_seq_rune_lit';
           inst.seqStep++;
-          if (inst.seqStep >= inst.seqRuneIds.length) inst.puzzleSolved = true;
+          // A correct rune flares arcane; the last one blazes into a bright payoff.
+          const solved = inst.seqStep >= inst.seqRuneIds.length;
+          if (solved) inst.puzzleSolved = true;
+          riftFx(ctx, rune.pos.x, rune.pos.z, solved ? 'holy' : 'arcane', 'nova');
           for (const pid of instancePlayerIds(ctx, inst)) {
             ctx.emit({
               type: 'log',
@@ -546,6 +570,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
             const rr = ctx.entities.get(rid);
             if (rr) rr.templateId = 'rift_seq_rune';
           }
+          riftFx(ctx, rune.pos.x, rune.pos.z, 'shadow'); // the runes snuff out
           for (const pid of instancePlayerIds(ctx, inst)) {
             ctx.emit({ type: 'log', text: 'The runes go dark. Begin again.', color: '#a9c', pid });
           }
@@ -561,6 +586,9 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
       if (pylon && dist2d(p.pos, pylon.pos) < PYLON_TRIGGER_RADIUS) {
         inst.litPylons.add(id);
         pylon.templateId = 'rift_pylon_lit';
+        // The pylon flares as it lights; the last one blazes the brighter payoff.
+        const all = inst.litPylons.size >= inst.pylonTotal;
+        riftFx(ctx, pylon.pos.x, pylon.pos.z, all ? 'holy' : 'arcane', 'nova');
         ctx.emit({
           type: 'log',
           text: `A rune pylon flares to life (${inst.litPylons.size}/${inst.pylonTotal}).`,
@@ -754,6 +782,7 @@ function tickRiftHazards(
     if (!tier) continue;
     const dmg = Math.max(1, Math.round(p.maxHp * 0.06 * (tier === 'deep' ? 2 : 1)));
     ctx.dealDamage(null, p, dmg, false, 'fire', 'Molten Rift', 'hit', true);
+    riftFx(ctx, p.pos.x, p.pos.z, 'fire'); // flames lick up as the lava sears you (1 Hz)
   }
 }
 
@@ -808,6 +837,7 @@ function tickRiftRollers(
         'hit',
         true,
       );
+      riftFx(ctx, p.pos.x, p.pos.z, 'physical', 'nova'); // a heavy dusty wallop as it bowls you
     }
   }
 }
@@ -896,6 +926,10 @@ export function updateRiftInstances(ctx: SimContext): void {
       }
       if (allOn) {
         inst.puzzleSolved = true;
+        // Each seated socket flares as the mechanism locks home.
+        for (const pad of inst.boulderPads) {
+          riftFx(ctx, origin.x + pad.x, origin.z + pad.z, 'holy', 'nova');
+        }
         for (const pid of instancePlayerIds(ctx, inst)) {
           ctx.emit({
             type: 'log',

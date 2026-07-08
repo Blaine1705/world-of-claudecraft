@@ -172,6 +172,44 @@ describe('rift mechanics: sequence runes', () => {
   });
 });
 
+describe('rift mechanics: interaction VFX (animated feedback)', () => {
+  // Each interactive moment (slide launch, boulder shove, rune flare, lava burn,
+  // roller wallop) emits a `spellfxAt` the renderer turns into a themed burst/nova.
+  // Reuses the already-wired world-fx event, so it renders on all three hosts.
+  it('stepping a sequence rune emits a spellfxAt flare', () => {
+    const seed = seedWithFloor0(
+      (f) =>
+        f.puzzle.kind === 'sequence' && f.objects.filter((o) => o.kind === 'seq_rune').length >= 3,
+    );
+    const sim = enter(seed);
+    const inst = active(sim);
+    const rune = sim.entities.get(inst.seqRuneIds[0])!;
+    sim.player.pos = { ...rune.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    const events = sim.tick();
+    const fx = events.filter((e) => e.type === 'spellfxAt');
+    expect(fx.length).toBeGreaterThan(0);
+    expect(inst.seqStep).toBe(1); // and it actually advanced the puzzle
+  });
+
+  it('a lava burn emits a fire spellfxAt at the player', () => {
+    const seed = seedWithFloor0((f) => f.hazards.length > 0);
+    const sim = enter(seed, { god: false });
+    const inst = active(sim);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const hz = floor.hazards[0];
+    const origin = riftInstanceOrigin(inst.slot, 0);
+    let sawFire = false;
+    for (let i = 0; i < 21 && !sawFire; i++) {
+      sim.player.pos = { ...sim.player.pos, x: origin.x + hz.x, z: origin.z + hz.z };
+      sim.player.jumping = false;
+      const events = sim.tick();
+      if (events.some((e) => e.type === 'spellfxAt' && e.school === 'fire')) sawFire = true;
+    }
+    expect(sawFire).toBe(true);
+  });
+});
+
 describe('rift mechanics: way-out beacon', () => {
   it('walking onto the beacon returns the player to the overworld', () => {
     const sim = enter(4242);

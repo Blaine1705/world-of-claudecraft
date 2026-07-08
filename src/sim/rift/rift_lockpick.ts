@@ -255,6 +255,8 @@ function riftLockpickSucceed(ctx: SimContext, inst: RiftInstance, session: LockS
     cache.name = 'Opened Cache';
     cache.templateId = 'rift_chest_open';
     cache.lootable = false;
+    // A bright burst of spoils as the lid springs open.
+    ctx.emit({ type: 'spellfxAt', x: cache.pos.x, z: cache.pos.z, school: 'holy', fx: 'nova' });
   }
   // Spoils scale with the run depth and the ante's loot tier. Copper goes straight
   // to the picker's purse (Heroic Marks are the boss-kill reward, not this cache).
@@ -286,6 +288,8 @@ function riftLockpickFail(ctx: SimContext, inst: RiftInstance, session: LockSess
     cache.name = 'Jammed Cache';
     cache.templateId = 'rift_chest_jammed';
     cache.lootable = false;
+    // A dark puff as the last pick snaps and the lock seizes.
+    ctx.emit({ type: 'spellfxAt', x: cache.pos.x, z: cache.pos.z, school: 'shadow', fx: 'burst' });
   }
   ctx.emit({
     type: 'lockpickEnd',

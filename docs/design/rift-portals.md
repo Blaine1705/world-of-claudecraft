@@ -119,6 +119,15 @@ always walkable and every puzzle is solvable by construction.
   rebuilds on change), glowing nodes spin, and the roller rolls with its motion. The
   lava/ice overlays and the raised deck + staircase are drawn by `buildInterior`
   (`src/render/dungeon.ts`).
+- **Interaction VFX.** Every interactive MOMENT punches a themed effect via the
+  already-wired `spellfxAt` world event (a `riftFx` helper in `rift/runs.ts`), so the
+  slide, shove, flare, burn, and wallop read on all three hosts with no new wire:
+  frost spray on an ice-slide launch + a nova on the frost sigil; grinding dust as a
+  boulder scrapes forward (deterministically throttled) + a nova per socket on solve;
+  an arcane flare per sequence/pylon light, a bright holy nova on the final one, a
+  shadow puff on a sequence reset; fire licking up on a lava burn; a heavy dusty nova
+  when the roller bowls you; a spoils burst / dark puff on a cache pick success/fail.
+  All render-only (no rng, no sim state), so determinism holds.
 
 ## Ranks (C / B / A / S) and world portals (`src/sim/rift/portals.ts`)
 
