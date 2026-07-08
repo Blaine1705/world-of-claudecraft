@@ -1339,6 +1339,17 @@ export function runEffects(
           p.auras.splice(i, 1);
           ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
         }
+        // Overpower charge (Arms): Redhand STACKS its empower up to 2 rather than
+        // refreshing to a single stack, so a second Redhand grows the buff.
+        if (eff.kind === 'overpower_charge') {
+          const existing = p.auras.find((a) => a.kind === 'overpower_charge');
+          if (existing) {
+            existing.stacks = Math.min(2, (existing.stacks ?? 1) + 1);
+            existing.remaining = eff.duration;
+            existing.duration = eff.duration;
+            break;
+          }
+        }
         ctx.applyAura(p, {
           // A selfBuff may carry its own buff identity (aoe_echo: Bladed Gyre
           // arms 'Bladed Echo' under id 'bladed_echo', so the HUD names the
@@ -1349,6 +1360,8 @@ export function runEffects(
           remaining: eff.duration,
           duration: eff.duration,
           value: eff.value,
+          // Overpower charge opens at one stack; a second Redhand grows it above.
+          stacks: eff.kind === 'overpower_charge' ? 1 : undefined,
           sourceId: p.id,
           school: ability.school,
           // charge-limited thorns (Lightning Shield): cap reflects and gate them

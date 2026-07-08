@@ -2417,7 +2417,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // (distinct from whirlwind's sword+arcs and faultline's sunburst+fist);
   // Measured Fury = a calm steel helm shielding a steady heart (a passive; a
   // composed steel look distinct from iron_resolve's shield+heart)
-  breachmaker: r('earth', 'steel', ['sword', { p: 'sunburst', ...TR }], ['crack']),
+  breachmaker: r('fury', 'gold', ['sword', { p: 'sunburst', ...BIG }], ['crack', 'glow']),
   measured_fury: r('steel', 'steel', ['helm', { p: 'heart', ...BR }], ['glow']),
   // Arms restructure 2026-07-08: Sweeping Strikes = a wide arcing slash (hitting
   // an extra target); Deep Wounds = a bleeding gash on blood.
@@ -2439,7 +2439,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ),
   victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']), // strike that heals
   piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']), // howl slowing feet
-  die_by_sword: r('steel', 'steel', ['shield', { p: 'sword', ...TR }], ['glow']), // defensive parry
+  die_by_sword: r('steel', 'gold', ['shield', { p: 'sword', ...TR }], ['glow', 'arcs']), // defensive parry
   recklessness: r('fury', 'blood', ['axe', { p: 'sunburst', ...TL }], ['glow']), // berserk crits
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']), // stone colossus
   sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
