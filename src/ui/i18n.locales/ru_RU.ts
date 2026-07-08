@@ -4398,6 +4398,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns':
     'Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе.',
   'guide.abilityHook.thunder_clap': 'Бьет по всем вокруг вас и замедляет их атаки.',
+  'guide.abilityHook.hamstring': 'Подрезает ноги цели, замедляя её, чтобы она не могла вас догнать.',
   'guide.abilityHook.wrath':
     'Удар силами природы, запущенный в цель с дистанции, ваш основной способ бить.',
   'guide.arenaPage.augmentsNote':

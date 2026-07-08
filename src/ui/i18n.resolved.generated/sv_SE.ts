@@ -1727,6 +1727,7 @@ export const sv_SE: EnTranslations = {
       "charge": "Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.",
       "rend": "Öppnar en blödning som sliter ner målet över tid.",
       "thunder_clap": "Slår allt runt omkring dig och saktar ner deras attacker.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Besjälar dina sving med helig skada, förbruka den sedan med Verdict.",
       "holy_light": "En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.",
       "devotion_aura": "En varaktig självförstärkning som höjer rustningen så slag landar mjukare.",

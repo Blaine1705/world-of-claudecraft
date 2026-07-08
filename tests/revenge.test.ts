@@ -76,10 +76,11 @@ describe('(a) Revenge content def + Reaver Strike exclusion', () => {
     ]);
   });
 
-  it('Reaver Strike stays ungated but carries excludeSpecs ["prot","arms"]', () => {
+  it('Reaver Strike stays ungated but carries excludeSpecs ["prot","arms","fury"]', () => {
     expect(ABILITIES.heroic_strike.specs).toBeUndefined();
-    // Arms restructure 2026-07-08: Reaver Strike is now excluded for arms too.
-    expect(ABILITIES.heroic_strike.excludeSpecs).toEqual(['prot', 'arms']);
+    // 2026-07-08: Reaver Strike is now excluded for every committed spec (arms and
+    // fury dropped it too); only no-spec keeps it.
+    expect(ABILITIES.heroic_strike.excludeSpecs).toEqual(['prot', 'arms', 'fury']);
   });
 });
 
@@ -92,10 +93,10 @@ describe('(b) excludeSpecs / spec gating', () => {
       const ids = knownIds(spec);
       expect(ids.has('revenge'), `${spec} revenge`).toBe(false);
     }
-    // Reaver Strike now drops for committed arms too (excludeSpecs ['prot','arms']),
-    // so only no-spec and fury keep it.
+    // Reaver Strike now drops for every committed spec (excludeSpecs
+    // ['prot','arms','fury']), so only no-spec keeps it.
     expect(knownIds(null).has('heroic_strike')).toBe(true);
-    expect(knownIds('fury').has('heroic_strike')).toBe(true);
+    expect(knownIds('fury').has('heroic_strike')).toBe(false);
     expect(knownIds('arms').has('heroic_strike')).toBe(false);
   });
 });

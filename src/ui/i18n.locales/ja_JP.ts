@@ -4309,6 +4309,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp': '遠距離から敵にファイアボルトを放つエンバーキンを呼び出します。',
   'guide.abilityHook.thorns': '味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。',
   'guide.abilityHook.thunder_clap': '周囲のすべてに当たり、相手の攻撃を遅くします。',
+  'guide.abilityHook.hamstring': '相手の脚を切りつけて減速させ、追いつかれないようにします。',
   'guide.abilityHook.wrath': '遠距離から標的に放つネイチャーのボルト。主力の火力です。',
   'guide.arenaPage.augmentsNote':
     'オーグメントやパワーアップはそのマッチの間だけ続きます。持続的な強さではなく、その場で組む遊び心のあるビルドが目的なので、課金で勝ちを買えるわけではありません。',

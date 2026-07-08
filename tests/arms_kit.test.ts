@@ -190,19 +190,21 @@ describe('(c) Measured Fury: 10% cheaper rage abilities, arms only, never castab
     expect(arms.known.some((k) => k.def.id === 'measured_fury')).toBe(true);
     expect(fury.known.some((k) => k.def.id === 'measured_fury')).toBe(false);
 
-    // Same ungated staple (execute), known to both: arms pays 10% less, fury full.
-    const base = fury.resolvedAbility('execute')!.cost;
-    expect(arms.resolvedAbility('execute')!.cost).toBe(Math.max(0, Math.round(base * 0.9)));
+    // Same ungated staple (Hobbling Cut / hamstring, 10 rage), known to both: arms
+    // pays 10% less, fury full. (Execute can no longer serve here: Fury's Early
+    // Grave became a free rage builder 2026-07-08, so it shows no cost to discount.)
+    const base = fury.resolvedAbility('hamstring')!.cost;
+    expect(base).toBe(10);
+    expect(arms.resolvedAbility('hamstring')!.cost).toBe(Math.max(0, Math.round(base * 0.9)));
 
     // The task's concrete example: Maiming Strike is 30 rage, 27 under the passive.
     expect(ABILITIES.mortal_strike.cost).toBe(30);
     expect(arms.resolvedAbility('mortal_strike')!.cost).toBe(27);
     // Fury lacks the passive, so the shared staple stays at its full, undiscounted
-    // cost for it (its own signature Bloodletting is now a free generator, so a
-    // rage discount can no longer be observed there). Arms pays 10% less.
-    expect(fury.resolvedAbility('execute')!.cost).toBe(ABILITIES.execute.cost);
-    expect(fury.resolvedAbility('execute')!.cost).toBeGreaterThan(
-      arms.resolvedAbility('execute')!.cost,
+    // cost for it. Arms pays 10% less.
+    expect(fury.resolvedAbility('hamstring')!.cost).toBe(10);
+    expect(fury.resolvedAbility('hamstring')!.cost).toBeGreaterThan(
+      arms.resolvedAbility('hamstring')!.cost,
     );
 
     // Casting the passive is a silent no-op: no GCD, no resource change, no events.

@@ -1727,6 +1727,7 @@ export const it_IT: EnTranslations = {
       "charge": "Si scaglia su un nemico distante per aprire lo scontro con un breve stordimento.",
       "rend": "Apre un'emorragia che logora il bersaglio nel tempo.",
       "thunder_clap": "Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Imbeve i tuoi colpi di danno Sacro, poi spendilo con Verdict.",
       "holy_light": "Una cura costante e di buona entità per rimettere in piedi un alleato o te stesso.",
       "devotion_aura": "Un potenziamento personale duraturo che aumenta la corazza, così i colpi feriscono meno.",

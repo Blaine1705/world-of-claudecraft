@@ -1727,6 +1727,7 @@ export const pl_PL: EnTranslations = {
       "charge": "Szarżujesz na odległego wroga, otwierając walkę krótkim ogłuszeniem.",
       "rend": "Otwiera krwawienie, które z czasem wyczerpuje cel.",
       "thunder_clap": "Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Nasyca twoje ciosy świętymi obrażeniami, które potem zużywasz Verdictem.",
       "holy_light": "Stabilne, pokaźne leczenie do uzupełnienia zdrowia sojusznika lub własnego.",
       "devotion_aura": "Trwałe wzmocnienie, które zwiększa pancerz, by ciosy mniej bolały.",

@@ -1727,6 +1727,7 @@ export const en: EnTranslations = {
       "charge": "Rushes a distant enemy to open the fight with a brief stun.",
       "rend": "Opens a bleed that wears the target down over time.",
       "thunder_clap": "Hits everything around you and slows their attacks.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Verdict.",
       "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
       "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",

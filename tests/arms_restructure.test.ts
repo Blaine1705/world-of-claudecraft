@@ -67,7 +67,7 @@ describe('Arms restructure: gating (a cleaner bar)', () => {
     expect(ABILITIES.rend).toBeTruthy(); // def survives for internal reuse
     expect(ABILITIES.sunder_armor?.specs).toEqual(['prot']);
     expect(ABILITIES.thunder_clap?.specs).toEqual(['prot']);
-    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot', 'arms']);
+    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot', 'arms', 'fury']);
     expect(ABILITIES.die_by_sword?.specs).toEqual(['arms']);
   });
 });

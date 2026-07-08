@@ -123,16 +123,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Iron Bellow"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
-      },
-      {
         "id": "charge",
         "name": "Onrush"
       },
       {
         "id": "thunder_clap",
         "name": "Quaking Blow"
+      },
+      {
+        "id": "hamstring",
+        "name": "Hobbling Cut"
       }
     ],
     "abilities": [
@@ -147,10 +147,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "battle_shout",
         "name": "Iron Bellow"
-      },
-      {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
       },
       {
         "id": "charge",

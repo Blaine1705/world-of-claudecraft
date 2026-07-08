@@ -1727,6 +1727,7 @@ export const nl_NL: EnTranslations = {
       "charge": "Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.",
       "rend": "Opent een bloeding die het doelwit na verloop van tijd uitput.",
       "thunder_clap": "Raakt alles om je heen en vertraagt hun aanvallen.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Doordringt je uithalen met Heilige schade, besteed het daarna met Verdict.",
       "holy_light": "Een gestage, flinke genezing om een bondgenoot of jezelf aan te vullen.",
       "devotion_aura": "Een blijvende zelfbuff die pantser verhoogt zodat klappen zachter aankomen.",

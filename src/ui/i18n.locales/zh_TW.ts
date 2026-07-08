@@ -4088,6 +4088,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp': '召喚一隻燼裔，從遠處朝敵人投擲火焰箭。',
   'guide.abilityHook.thorns': '守護友方，讓近戰攻擊者每次出手都會傷到自己。',
   'guide.abilityHook.thunder_clap': '打擊你周遭的一切並降低它們的攻擊速度。',
+  'guide.abilityHook.hamstring': '割裂目標的雙腿使其減速，讓它無法追上你。',
   'guide.abilityHook.wrath': '從遠處朝目標擲出一道自然箭矢，是你慣用的核彈。',
   'guide.arenaPage.augmentsNote':
     '強化與增益只在該場對戰中有效。它們著重於即興、好玩的搭配，而非長久的力量，所以沒有人能花錢買到勝利。',

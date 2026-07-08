@@ -158,10 +158,10 @@ describe('spec-gated kit filtering', () => {
     // Protection-only kit is hidden.
     expect(fury).not.toContain('thunder_clap');
     expect(fury).not.toContain('sunder_armor');
-    // Fury keeps its own kit and the shared filler (Reaver Strike is not excluded
-    // for Fury) plus ungated staples.
+    // Reaver Strike is now excluded for Fury too (owner 2026-07-08).
+    expect(fury).not.toContain('heroic_strike');
+    // Fury keeps its own kit (Twinstrike) plus ungated staples (execute).
     expect(fury).toContain('raging_gale');
-    expect(fury).toContain('heroic_strike');
     expect(fury).toContain('execute');
   });
 
