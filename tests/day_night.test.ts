@@ -13,6 +13,7 @@ import {
   fullDayGrade,
   globalDayness,
   moonDirection,
+  nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
   skyTintForDayness,
   sunDirection,
@@ -218,6 +219,18 @@ describe('aboveHorizon', () => {
       expect(v).toBeGreaterThanOrEqual(prev - 1e-9);
       prev = v;
     }
+  });
+});
+
+describe('nightStarAmount', () => {
+  it('is off by day, full at deep night, and rises as it darkens', () => {
+    expect(nightStarAmount(1)).toBe(0); // full day
+    expect(nightStarAmount(0.5)).toBe(0); // still daytime
+    expect(nightStarAmount(0)).toBe(1); // deep night
+    expect(nightStarAmount(0.2)).toBeGreaterThan(0);
+    expect(nightStarAmount(0.2)).toBeLessThan(1);
+    // more stars the darker it gets
+    expect(nightStarAmount(0.1)).toBeGreaterThan(nightStarAmount(0.3));
   });
 });
 

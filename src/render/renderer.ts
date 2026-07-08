@@ -55,6 +55,7 @@ import {
   fullDayGrade,
   globalDayness,
   moonDirection,
+  nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
   sunDirection,
 } from './day_night_core';
@@ -239,6 +240,8 @@ const MOON_HEMI_SKY_COLOR = 0x8b9cd0; // cool sky bounce at deepest night
 const MOON_HEMI_GROUND_COLOR = 0x2b3350; // dark cool ground bounce at deepest night
 const NIGHT_SUN_COOL = 0.55; // how far the sun hue shifts to moonlight at full night
 const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
+// golden tone the sun light warms toward, strongest as the sun nears the horizon
+const WARM_SUN_COLOR = 0xff8a3a;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
@@ -857,6 +860,7 @@ export class Renderer {
   private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
   private sunUp = 1;
   private moonUp = 0;
+  private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
@@ -1177,8 +1181,8 @@ export class Renderer {
       return new THREE.CanvasTexture(c);
     };
     for (const [tex, scale] of [
-      [sunCanvas(true), 60],
-      [sunCanvas(false), 190],
+      [sunCanvas(true), 26],
+      [sunCanvas(false), 110],
     ] as const) {
       const sp = new THREE.Sprite(
         new THREE.SpriteMaterial({
@@ -1188,9 +1192,10 @@ export class Renderer {
           depthWrite: false,
           depthTest: false,
           blending: THREE.AdditiveBlending,
-          // bloom supplies the big halo on the composer path; the painted one
-          // would double up and wash out the sky
-          opacity: scale === 190 && !LOW_GFX ? SUN_HALO_OPACITY : 1,
+          // the sky shader now draws the crisp round sun disc, so the sprites are
+          // just a smaller, softer glow: a dim core plus a low-opacity bloom halo
+          // (bloom supplies the rest of the halo on the composer path)
+          opacity: scale === 110 ? (LOW_GFX ? 1 : SUN_HALO_OPACITY) : 0.5,
         }),
       );
       setRenderCategory(sp, 'sky');
@@ -2160,7 +2165,7 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp);
+      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp, this.starAmt);
       this.updateEnvBiome(dt);
     }
     for (const sp of this.sunSprites) {
@@ -3769,7 +3774,8 @@ export class Renderer {
     // pulls its authored look (signature realms swing less, see day_night_core).
     const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
     const phase = currentDayNightPhase();
-    this.dnGrade = dayNightGrade(effectiveDayness(globalDayness(phase), biome));
+    const gday = globalDayness(phase);
+    this.dnGrade = dayNightGrade(effectiveDayness(gday, biome));
     // the sun and moon track the world clock; each disc/key-light strength is
     // scaled by the realm's day/night amplitude so signature-sky realms (the
     // Nightbloom, the Veiled Hollow, ...) keep their look instead of gaining a
@@ -3781,6 +3787,8 @@ export class Renderer {
     this.moonDir.set(md[0], md[1], md[2]);
     this.sunUp = aboveHorizon(sd[1]) * amp;
     this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
+    // stars follow the global cycle (not per-realm), fading in past dusk
+    this.starAmt = nightStarAmount(gday);
     if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isArenaPos(px)) {
@@ -3905,9 +3913,20 @@ export class Renderer {
       // the sun and sky hues cool toward moonlight at night, and the sun + sky
       // intensity scales down with the grade (the IBL follows in updateEnvBiome).
       const light = Renderer.BIOME_LIGHT[biome];
-      this.dnColorScratch
-        .setHex(light.sun)
-        .lerp(this.dnMoonScratch.setHex(MOON_SUN_COLOR), g.nightAmt * NIGHT_SUN_COOL);
+      // the sun light warms toward gold, gently by day and strongly as it nears
+      // the horizon (a golden hour), then cools toward moonlight deep at night.
+      // The warm blend is gated by aboveHorizon so it never tints the moonlight.
+      const sunElev = this.sunDir.y;
+      let hi = (sunElev - 0.08) / 0.5;
+      hi = hi < 0 ? 0 : hi > 1 ? 1 : hi;
+      const lowness = 1 - hi * hi * (3 - 2 * hi);
+      const warmAmt = aboveHorizon(sunElev) * (0.22 + lowness * 0.45);
+      this.dnColorScratch.setHex(light.sun);
+      this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
+      this.dnColorScratch.lerp(
+        this.dnMoonScratch.setHex(MOON_SUN_COLOR),
+        g.nightAmt * NIGHT_SUN_COOL,
+      );
       this.sun.color.lerp(this.dnColorScratch, k);
       this.dnColorScratch
         .setHex(light.hemiSky)
@@ -4725,7 +4744,7 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp);
+      this.skyView.setCelestial(this.sunDir, this.moonDir, this.sunUp, this.moonUp, this.starAmt);
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear

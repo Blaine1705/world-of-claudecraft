@@ -37,12 +37,13 @@ export interface DayNightGrade {
   nightAmt: number;
 }
 
-// Night targets. The floor is intentionally moonlit, not black: a neutral realm
-// at deepest night still reads at ~a third of its daytime light so the world
-// stays playable. The sky goes a deep cool blue and the fog a lighter dusk blue.
-const NIGHT_LIGHT_FLOOR = 0.36;
-const NIGHT_SKY: [number, number, number] = [0.2, 0.24, 0.42];
-const NIGHT_FOG: [number, number, number] = [0.34, 0.4, 0.6];
+// Night targets. The floor stays moonlit, not black, so a neutral realm at
+// deepest night still reads and stays playable, but the sky itself goes a deep
+// dark blue so the moon and stars stand out against it; the fog is a touch
+// lighter than the sky for readability.
+const NIGHT_LIGHT_FLOOR = 0.3;
+const NIGHT_SKY: [number, number, number] = [0.09, 0.12, 0.26];
+const NIGHT_FOG: [number, number, number] = [0.24, 0.3, 0.48];
 const NIGHT_FAR_SCALE = 0.82;
 const DAY_WHITE: [number, number, number] = [1, 1, 1];
 
@@ -182,4 +183,11 @@ export function moonDirection(phase: number): [number, number, number] {
  *  and dusk instead of snapping on at the horizon line. */
 export function aboveHorizon(dirY: number): number {
   return smoothstep((dirY + 0.1) / 0.25); // y <= -0.10 -> 0, y >= 0.15 -> 1
+}
+
+/** How strongly the star field shows, 0 (day) to 1 (deep night), from the global
+ *  daylight amount. Stars start appearing as it dims past dusk and are full by
+ *  the dark of night. */
+export function nightStarAmount(dayness: number): number {
+  return smoothstep((0.35 - clamp01(dayness)) / 0.3); // dayness >= 0.35 -> 0, <= 0.05 -> 1
 }
