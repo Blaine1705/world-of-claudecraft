@@ -12,7 +12,7 @@
 // the open()->trap and close()->return-to-opener integration is driven, not just source-scanned.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type TalentAllocation, type TalentNode, talentsFor } from '../../src/sim/content/talents';
+import type { TalentAllocation } from '../../src/sim/content/talents';
 import { FocusManager } from '../../src/ui/focus_manager';
 import { MarketWindow } from '../../src/ui/market_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -159,6 +159,54 @@ describe('keyboard-nav: a REAL window painter through the captureFocus bridge', 
     // defers the restore a tick.
     win.close();
     await vi.waitFor(() => expect(document.activeElement).toBe(opener));
+  });
+});
+
+describe('keyboard-nav: TalentsWindow Choices row radios', () => {
+  it('keeps one tab stop per row and ArrowRight moves the checked choice', () => {
+    const root = host('talents-window');
+    root.style.display = 'none';
+    let stage: TalentAllocation | null = null;
+    const win = new TalentsWindow(
+      stubDeps({
+        root: () => root,
+        captureFocus: () => null,
+        restoreFocus: () => undefined,
+        getStage: () => stage,
+        setStage: (s: TalentAllocation | null) => {
+          stage = s;
+        },
+        playerClass: () => 'warrior',
+        playerLevel: () => 20,
+        currentAllocation: () =>
+          ({ spec: 'arms', ranks: {}, choices: {}, rows: {} }) as TalentAllocation,
+        activeLoadout: () => -1,
+        loadouts: () => [],
+        currentBar: () => [],
+        buildDropdown: () => document.createElement('div'),
+      }),
+    );
+    win.open();
+
+    const group = req(root.querySelector<HTMLElement>('.tal-row-opts'), 'first choice row');
+    const opts = Array.from(group.querySelectorAll<HTMLElement>('.tal-row-opt'));
+    expect(opts.length).toBeGreaterThan(1);
+    expect(opts.map((opt) => opt.getAttribute('tabindex'))).toEqual(['0', '-1', '-1']);
+    opts[0].focus();
+    const ev = key('ArrowRight');
+    opts[0].dispatchEvent(ev);
+    expect(ev.defaultPrevented).toBe(true);
+
+    const rerenderedGroup = req(
+      root.querySelector<HTMLElement>('.tal-row-opts'),
+      'rerendered first choice row',
+    );
+    const rerenderedOpts = Array.from(
+      rerenderedGroup.querySelectorAll<HTMLElement>('.tal-row-opt'),
+    );
+    expect(rerenderedOpts.map((opt) => opt.getAttribute('tabindex'))).toEqual(['-1', '0', '-1']);
+    expect(rerenderedOpts[1].getAttribute('aria-checked')).toBe('true');
+    expect(document.activeElement).toBe(rerenderedOpts[1]);
   });
 });
 

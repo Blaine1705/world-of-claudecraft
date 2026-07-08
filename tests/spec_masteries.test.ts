@@ -222,6 +222,24 @@ describe('spec masteries', () => {
     expect(at20).toBeGreaterThan(at10);
   });
 
+  it('re-bakes mastery-scaled passive stats when setPlayerLevel jumps without a respec', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(10);
+    sim.setSpec('fire');
+
+    const noSpec10 = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
+    noSpec10.setPlayerLevel(10);
+    const at10MasteryCrit = sim.player.critChance - noSpec10.player.critChance;
+    expect(at10MasteryCrit).toBeCloseTo(0.02 * (10 / 20), 10);
+
+    sim.setPlayerLevel(20);
+    const noSpec20 = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
+    noSpec20.setPlayerLevel(20);
+    const at20MasteryCrit = sim.player.critChance - noSpec20.player.critChance;
+    expect(at20MasteryCrit).toBeCloseTo(0.02, 10);
+    expect(at20MasteryCrit).toBeGreaterThan(at10MasteryCrit);
+  });
+
   it('every spec ships its designated mastery-rating axis (PRD: Mastery rating readiness)', () => {
     // The future mastery stat (item rating, unimplemented) scales exactly one axis per
     // spec. This pins that the shipped mastery DATA carries that axis, so the rating PR

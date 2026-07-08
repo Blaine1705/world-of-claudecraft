@@ -28,7 +28,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { recalcPlayerStats } from '../entity';
+import { pctValue, recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
@@ -58,10 +58,6 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
 
 export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
-}
-
-function pctValue(value: number): number {
-  return value > 1 ? value / 100 : value;
 }
 
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {

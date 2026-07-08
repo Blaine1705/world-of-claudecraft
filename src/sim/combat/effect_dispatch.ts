@@ -637,11 +637,19 @@ export function runEffects(
           targetId: p.id,
           amount: eff.hp,
           crit: false,
-          school: 'shadow',
+          school: ability.school,
           ability: ability.name,
           kind: 'hit',
         });
         p.resource = Math.min(p.maxResource, p.resource + eff.mana);
+        // The sap is a MOMENT: the life-fountain burst sells health becoming power.
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'echoBurst',
+        });
         break;
       }
       case 'drainTick':

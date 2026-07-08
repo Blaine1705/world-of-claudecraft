@@ -2152,7 +2152,8 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r11_innervate',
           name: 'Lifesap',
-          description: 'Grants Innervate.',
+          description:
+            'Grants Lifesap: sap your own health to surge your current resource, in any form.',
           icon: 'innervate',
           effect: { grant: { ability: 'innervate' } },
         },

@@ -32,6 +32,7 @@
 
 import { lineOfSightClear } from '../colliders';
 import { MOBS } from '../data';
+import { pctValue } from '../entity';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
@@ -216,7 +217,7 @@ function petDamageMult(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId === null) return 1;
   let mult = 1;
   for (const a of pet.auras) {
-    if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+    if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
   }
   const ownerMeta = ctx.players.get(pet.ownerId);
   if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
