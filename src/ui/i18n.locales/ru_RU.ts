@@ -1806,7 +1806,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Широкий удар, поражающий всех врагов перед вами на {damage} ед. урона.',
   'entities.abilities.defensive_stance.name': 'Стойка стража',
   'entities.abilities.defensive_stance.description':
-    'Оборонительная боевая стойка: вы создаете на 30% больше угрозы, но наносите и получаете на 10% меньше урона. Примените снова, чтобы выйти из стойки.',
+    'Оборонительная боевая стойка: вы создаете на 30% больше угрозы, но наносите и получаете на 10% меньше урона. Примените Боевую стойку, чтобы вернуться в наступление.',
+  'entities.abilities.battle_stance.name': 'Боевая стойка',
+  'entities.abilities.battle_stance.description':
+    'Агрессивная боевая стойка: вы создаете на 10% больше ярости. Стойка по умолчанию для Оружия и Защиты.',
+  'entities.abilities.berserker_stance.name': 'Стойка берсерка',
+  'entities.abilities.berserker_stance.description':
+    'Безрассудная боевая стойка: ваши критические удары происходят на 3% чаще и наносят на 3% больше урона. Воин Неистовства всегда сражается в этой стойке.',
   'entities.abilities.sunder_armor.name': 'Срез брони',
   'entities.abilities.sunder_armor.description':
     'Раскалывает броню цели, снижая ее на {damage} за применение. Суммируется до 5 раз. Создает большое количество угрозы.',
@@ -5218,6 +5224,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Облик кошки: урон в ближнем бою и энергия',
   'hudChrome.auraEffect.formTravel': 'Форма скорохода: скорость передвижения повышена на {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Стойка стража: сниженный получаемый урон, больше угрозы',
+  'hudChrome.auraEffect.battleStance': 'Боевая стойка: генерация ярости больше на 10%',
+  'hudChrome.auraEffect.berserkerStance':
+    'Стойка берсерка: критические удары на 3% чаще и на 3% сильнее',
   'hudChrome.auraEffect.righteousFury':
     'Пылающая клятва: значительно повышенная угроза от урона Святой школы',
   'hudChrome.auraEffect.scale': 'Размер увеличен на {pct}%',

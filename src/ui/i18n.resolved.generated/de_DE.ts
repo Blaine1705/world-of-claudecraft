@@ -866,6 +866,8 @@ export const de_DE: EnTranslations = {
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleet Form: Bewegungstempo um {pct}% erhöht",
       "defensiveStance": "Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung",
+      "battleStance": "Kampfhaltung: 10% mehr Wuterzeugung",
+      "berserkerStance": "Berserkerhaltung: kritische Treffer 3% häufiger und 3% stärker",
       "righteousFury": "Brennender Eid: stark erhöhte Bedrohung durch Heiligschaden",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
@@ -4751,7 +4753,15 @@ export const de_DE: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Wehrhafte Haltung",
-        "description": "Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen."
+        "description": "Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Wirkt Kampfhaltung, um in die Offensive zurückzukehren."
+      },
+      "battle_stance": {
+        "name": "Kampfhaltung",
+        "description": "Aggressive Kampfhaltung: Ihr erzeugt 10% mehr Wut. Die Standardhaltung für Waffen und Schutz."
+      },
+      "berserker_stance": {
+        "name": "Berserkerhaltung",
+        "description": "Rücksichtslose Kampfhaltung: Eure kritischen Treffer landen 3% häufiger und verursachen 3% mehr Schaden. Der Furor-Krieger kämpft stets in dieser Haltung."
       },
       "sunder_armor": {
         "name": "Rüstungsspalter",

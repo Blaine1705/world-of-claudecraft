@@ -1245,8 +1245,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 14 ek Doğa hasarı verir.',
   'entities.abilities.deadly_poison.name': 'İrinli Zehir',
   'entities.abilities.defensive_stance.description':
-    'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
+    'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Saldırıya dönmek için Savaş Duruşu kullan.',
   'entities.abilities.defensive_stance.name': 'Korumali Durus',
+  'entities.abilities.battle_stance.name': 'Savaş Duruşu',
+  'entities.abilities.battle_stance.description':
+    'Saldırgan bir dövüş duruşu: %10 daha fazla öfke üretirsin. Silah ve Koruma için varsayılan duruş.',
+  'entities.abilities.berserker_stance.name': 'Berserker Duruşu',
+  'entities.abilities.berserker_stance.description':
+    'Pervasız bir dövüş duruşu: kritik vuruşların %3 daha sık gerçekleşir ve %3 daha sert vurur. Öfke savaşçısı her zaman bu duruşta savaşır.',
   'entities.abilities.demon_skin.description': 'Şeytani deri zırhını 30 dakika boyunca 30 artırır.',
   'entities.abilities.demon_skin.name': 'İblis Derisi',
   'entities.abilities.demoralizing_roar.description':
@@ -5595,6 +5601,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina: daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Fleet Formu: hareket hızı %{pct} artar',
   'hudChrome.auraEffect.defensiveStance': 'Korumali Durus: alınan hasar azalır, daha fazla tehdit',
+  'hudChrome.auraEffect.battleStance': 'Savaş Duruşu: %10 daha fazla öfke üretimi',
+  'hudChrome.auraEffect.berserkerStance':
+    'Berserker Duruşu: kritikler %3 daha sık ve %3 daha sert vurur',
   'hudChrome.auraEffect.righteousFury':
     'Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar',
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',

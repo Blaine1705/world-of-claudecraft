@@ -233,6 +233,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Defiant Bellow"
       },
       {
+        "id": "battle_stance",
+        "name": "Battle Stance"
+      },
+      {
+        "id": "berserker_stance",
+        "name": "Berserker Stance"
+      },
+      {
         "id": "defensive_stance",
         "name": "Guarded Stance"
       },

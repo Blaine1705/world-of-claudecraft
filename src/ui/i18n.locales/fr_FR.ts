@@ -2449,7 +2449,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Une frappe circulaire qui touche tous les ennemis devant vous pour {damage} points de dégâts.',
   'entities.abilities.defensive_stance.name': 'Posture de garde',
   'entities.abilities.defensive_stance.description':
-    'Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Relancez pour quitter la posture.',
+    'Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l\'offensive.',
+  'entities.abilities.battle_stance.name': 'Posture de combat',
+  'entities.abilities.battle_stance.description':
+    'Posture de combat agressive: vous générez 10% de rage en plus. La posture par défaut pour Armes et Protection.',
+  'entities.abilities.berserker_stance.name': 'Posture berserker',
+  'entities.abilities.berserker_stance.description':
+    'Posture de combat téméraire: vos coups critiques surviennent 3% plus souvent et infligent 3% de dégâts en plus. Le guerrier Fureur combat toujours dans cette posture.',
   'entities.abilities.sunder_armor.name': "Cisaillement d'armure",
   'entities.abilities.sunder_armor.description':
     "Fracasse l'armure de la cible et la réduit de {damage} par application. Cumulable jusqu'à 5 fois. Génère beaucoup de menace.",
@@ -5743,6 +5749,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forme de félin : dégâts de mêlée et énergie',
   'hudChrome.auraEffect.formTravel': 'Forme de Fleet : vitesse de déplacement augmentée de {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Posture de garde : dégâts subis réduits, menace accrue',
+  'hudChrome.auraEffect.battleStance': 'Posture de combat : 10% de génération de rage en plus',
+  'hudChrome.auraEffect.berserkerStance':
+    'Posture berserker : critiques 3% plus souvent et 3% plus forts',
   'hudChrome.auraEffect.righteousFury':
     'Serment ardent : menace des dégâts Sacré fortement augmentée',
   'hudChrome.auraEffect.scale': 'Taille augmentée de {pct}%',

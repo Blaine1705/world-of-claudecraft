@@ -866,6 +866,8 @@ export const tr_TR: EnTranslations = {
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Formu: hareket hızı %{pct} artar",
       "defensiveStance": "Korumali Durus: alınan hasar azalır, daha fazla tehdit",
+      "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
+      "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık ve %3 daha sert vurur",
       "righteousFury": "Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
@@ -4751,7 +4753,15 @@ export const tr_TR: EnTranslations = {
       },
       "defensive_stance": {
         "name": "Korumali Durus",
-        "description": "Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan."
+        "description": "Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Saldırıya dönmek için Savaş Duruşu kullan."
+      },
+      "battle_stance": {
+        "name": "Savaş Duruşu",
+        "description": "Saldırgan bir dövüş duruşu: %10 daha fazla öfke üretirsin. Silah ve Koruma için varsayılan duruş."
+      },
+      "berserker_stance": {
+        "name": "Berserker Duruşu",
+        "description": "Pervasız bir dövüş duruşu: kritik vuruşların %3 daha sık gerçekleşir ve %3 daha sert vurur. Öfke savaşçısı her zaman bu duruşta savaşır."
       },
       "sunder_armor": {
         "name": "Zırh Kesme",

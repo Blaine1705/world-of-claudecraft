@@ -1265,8 +1265,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melapisi senjatamu selama 30 menit, membuat setiap ayunan jarak dekatmu memberi 14 kerusakan Alam tambahan.',
   'entities.abilities.deadly_poison.name': 'Bisa Membusuk',
   'entities.abilities.defensive_stance.description':
-    'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini.',
+    'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal Kuda-kuda Tempur untuk kembali menyerang.',
   'entities.abilities.defensive_stance.name': 'Kuda-kuda Waspada',
+  'entities.abilities.battle_stance.name': 'Kuda-kuda Tempur',
+  'entities.abilities.battle_stance.description':
+    'Kuda-kuda tempur agresif: kamu menghasilkan 10% lebih banyak amarah. Kuda-kuda bawaan untuk Senjata dan Perlindungan.',
+  'entities.abilities.berserker_stance.name': 'Kuda-kuda Berserker',
+  'entities.abilities.berserker_stance.description':
+    'Kuda-kuda tempur nekat: serangan kritismu terjadi 3% lebih sering dan menghantam 3% lebih keras. Prajurit Amukan selalu bertarung dalam kuda-kuda ini.',
   'entities.abilities.demon_skin.description':
     'Kulit iblis meningkatkan zirahmu sebesar 30 selama 30 menit.',
   'entities.abilities.demon_skin.name': 'Fiendhide',
@@ -5674,6 +5680,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': 'Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah',
+  'hudChrome.auraEffect.battleStance': 'Kuda-kuda Tempur: pembangkitan amarah 10% lebih banyak',
+  'hudChrome.auraEffect.berserkerStance':
+    'Kuda-kuda Berserker: kritikal 3% lebih sering dan 3% lebih keras',
   'hudChrome.auraEffect.righteousFury':
     'Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat',
   'hudChrome.auraEffect.scale': 'Tamaño aumentado un {pct}%',

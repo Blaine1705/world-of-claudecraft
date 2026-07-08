@@ -1222,8 +1222,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Smører dit våben i 30 min, så hvert af dine nærkampshug volder 14 ekstra naturskade.',
   'entities.abilities.deadly_poison.name': 'Betændt Gift',
   'entities.abilities.defensive_stance.description':
-    'En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér igen for at forlade stillingen.',
+    'En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér Kampstilling for at vende tilbage til offensiven.',
   'entities.abilities.defensive_stance.name': 'Værgende Stilling',
+  'entities.abilities.battle_stance.name': 'Kampstilling',
+  'entities.abilities.battle_stance.description':
+    'En aggressiv kampstilling: du skaber 10% mere raseri. Standardstillingen for Våben og Beskyttelse.',
+  'entities.abilities.berserker_stance.name': 'Bersærkerstilling',
+  'entities.abilities.berserker_stance.description':
+    'En hensynsløs kampstilling: dine kritiske træf sker 3% oftere og rammer 3% hårdere. Raseri-krigeren kæmper altid i denne stilling.',
   'entities.abilities.demon_skin.description': 'Dæmonisk hud øger din rustning med 30 i 30 min.',
   'entities.abilities.demon_skin.name': 'Djævlehud',
   'entities.abilities.demoralizing_roar.description':
@@ -5589,6 +5595,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleet-form: bevægelseshastighed øget med {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Værgende Stilling: mindre modtaget skade, mere trussel',
+  'hudChrome.auraEffect.battleStance': 'Kampstilling: 10% mere raserigenerering',
+  'hudChrome.auraEffect.berserkerStance':
+    'Bersærkerstilling: kritiske træf 3% oftere og 3% hårdere',
   'hudChrome.auraEffect.righteousFury': 'Brændende Ed: stærkt øget trussel fra Hellig skade',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',
   'hudChrome.auraEffect.jump': 'Sprunghöhe um {pct}% erhöht',

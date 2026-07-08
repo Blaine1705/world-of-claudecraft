@@ -271,6 +271,9 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina, daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Forma Fleet: velocidad de desplazamiento aumentada un {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Guarded Stance: menos daño recibido, más amenaza',
+  'hudChrome.auraEffect.battleStance': 'Actitud de batalla: 10% más de generación de ira',
+  'hudChrome.auraEffect.berserkerStance':
+    'Actitud Berserker: críticos un 3% más frecuentes y un 3% más fuertes',
   'hudChrome.auraEffect.righteousFury':
     'Burning Oath: amenaza por daño Sagrado enormemente aumentada',
   'hudChrome.auraEffect.scale': 'Talla aumentado un {pct}%',
