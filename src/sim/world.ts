@@ -1250,6 +1250,55 @@ function applyNorthBay(x: number, z: number, h: number): number {
   return h + (sea - h) * t;
 }
 
+// The northern grid's outer edges are OPEN OCEAN. After all land shaping and
+// the rims, a sea margin is carved around the true world perimeter (the
+// columns' outer x-flanks and the north cap) so no realm's land hugs the map
+// edge. The margin's inner shoreline wanders with fixed-seed noise, so land
+// meets the sea as a natural coast, never a ruled edge with land on one side
+// and water on the other. The playable world only (instance space past |x|560
+// keeps its own containment); the starter/mid realms south of z1250 already
+// end in open coast, so they are left to their own appliers.
+function applyWorldEdgeSea(x: number, z: number, h: number): number {
+  if (z <= 1250 || Math.abs(x) > 560) return h;
+  const xb = worldXBoundsAt(z);
+  const dEdge = Math.min(x - xb.min, xb.max - x, WORLD_MAX_Z - z);
+  if (dEdge > 100) return h;
+  // two octaves of fixed-seed noise bend the shoreline into deep coves and
+  // headlands so the ocean margin reads as a natural coast, not a ruled band
+  const wob =
+    (fbm2(x * 0.015, z * 0.015, 9311, 3) - 0.5) * 54 +
+    (fbm2(x * 0.044, z * 0.044, 9313, 2) - 0.5) * 18;
+  const band = 50 + wob;
+  const seaT = 1 - smoothstep(band - 34, band, dEdge);
+  if (seaT <= 0) return h;
+  const floor = Math.min(h, WATER_LEVEL - 6);
+  return h + (floor - h) * seaT;
+}
+
+// The strip's flanks (the Hollow and the Reach beside the moat) are NATURAL
+// COAST, not walls: pull their land back from the x=+-180 boundary with a wavy
+// shoreline so the moat reads as a sound the land slopes into, never a ruled
+// edge with land one side and water the other. Confined to the strip side and
+// gated to low ground (a lowGate) so it only widens the near-shore into the
+// moat, never cuts a marginal sliver out of interior land or the Tablecrag;
+// the isthmus crossings at z1890 are left as land bridges.
+function applyStripFlankCoast(x: number, z: number, h: number): number {
+  if (z < 940 || z > 1925) return h;
+  const ax = Math.abs(x);
+  if (ax > 180 || ax < 132) return h;
+  const dEdge = 180 - ax;
+  const nearPass = 1 - smoothstep(20, 48, Math.abs(z - 1890));
+  const wob =
+    (fbm2(z * 0.02, Math.sign(x) * 70, 9321, 3) - 0.5) * 34 +
+    (fbm2(z * 0.05, Math.sign(x) * 31, 9323, 2) - 0.5) * 12;
+  const band = 28 + wob;
+  const lowGate = 1 - smoothstep(6, 22, h);
+  const seaT = (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate;
+  if (seaT <= 0) return h;
+  const floor = Math.min(h, WATER_LEVEL - 5);
+  return h + (floor - h) * seaT;
+}
+
 // The green seams: along the marsh and peaks rows the columns join the
 // strip as dry rolling land (the sketch's land borders). The coast
 // appliers stand down inside the seam band so no shoreline forms there,
@@ -1707,16 +1756,7 @@ export function inHollowOpenSea(x: number, z: number): boolean {
 }
 
 // Border pockets the mountain fringe must not swallow.
-const HOLLOW_FRINGE_CLEARINGS = [
-  { x: -140, z: 960, r: 34 }, // the Duskfall cave arrival and its road
-  { x: -145, z: 1100, r: 30 }, // the Gleamstag's hidden clearing
-  { x: 160, z: 1228, r: 26 }, // the forgotten monument
-  { x: 46, z: 1380, r: 40 }, // the Pale Causeway's upper spine
-  { x: 44, z: 1430, r: 42 }, // ...and its northern head
-  { x: 168, z: 1078, r: 46 }, // the Westway corridor and the Mirrorshallow shore
-] as const;
-
-function hollowShapingOffset(x: number, z: number, seed: number): number {
+function hollowShapingOffset(x: number, z: number, _seed: number): number {
   if (z < 905 || z > HOLLOW_ZMAX) return 0;
   if (x < STRIP_MIN_X - 20 || x > STRIP_MAX_X + 20) return 0; // strip only
   let dh = 0;
@@ -1724,44 +1764,10 @@ function hollowShapingOffset(x: number, z: number, seed: number): number {
     const d = Math.hypot(x - f.x, z - f.z);
     if (d < f.r) dh += f.h * (1 - smoothstep(f.r * 0.35, f.r, d));
   }
-  // An organic mountain fringe: noise modulates how deep the border hills
-  // bite into the band, so the walkable realm (and its map silhouette) is an
-  // irregular hollow instead of a rectangle. Heights stay gentle (max ~20
-  // over ~26yd, slope well under the climb gate) so nothing is walled off;
-  // the map painter's rock tint above h~26 does the visual work.
-  // Only the x-flanks carry the mountain ring: the north edge is the Reach's
-  // land border and the open bay (handled by the coast and border logic), so
-  // fringing it would only wall off that seam or leave marginal shore slivers
-  // at the frost border.
-  const dW = x + 180;
-  const dE = 180 - x;
-  const dSide = Math.min(dW, dE);
-  if (dSide < 60) {
-    // The mountain ring sits SET BACK from the shore, so the flank is never a
-    // grey wall hugging the map edge: a low green shore runs at the very edge
-    // (dSide < ~8, an organic coast meeting the moat), then the crags rise
-    // BEHIND it and fade back into the interior. Their crest height 34 crosses
-    // the map painter's rock tint so the realm still reads as a mountain bowl,
-    // but a broken, natural one. A low-frequency swell along the ring's length
-    // (`along` runs down whichever edge is nearest) drops the crown to nothing
-    // in the saddles, so the crags read as discrete massifs, not a frame.
-    const along = z;
-    const swell = smoothstep(
-      0.42,
-      0.66,
-      0.5 * fbm2(along * 0.021, 41, seed + 53, 2) + 0.5 * fbm2(along * 0.044, 17, seed + 59, 2),
-    );
-    // a shore-set-back ridge profile: nothing in the beach band, a crown a
-    // little inland, fading into the interior
-    let ridge = smoothstep(7, 27, dSide) * (1 - smoothstep(36, 60, dSide));
-    // content pockets near the border (the cave arrival, the Gleamstag
-    // clearing, the forgotten monument) damp the crags so nothing gets buried
-    for (const keep of HOLLOW_FRINGE_CLEARINGS) {
-      const d = Math.hypot(x - keep.x, z - keep.z);
-      if (d < keep.r) ridge *= smoothstep(keep.r * 0.4, keep.r, d);
-    }
-    dh += 26 * swell * ridge;
-  }
+  // The x-flanks are natural coast now, not a mountain ring: the Hollow's land
+  // simply slopes into the moat (the coast applier and the moat's scalloped
+  // banks do the shaping), so its shores read as an organic coastline rather
+  // than a walled bowl. Only the interior HOLLOW_SHAPING landforms remain.
   return dh;
 }
 
@@ -2010,6 +2016,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyCauseway(x, z, h);
   h = applyStarterMoat(x, z, h);
   h = applyColumnStraits(x, z, h);
+  h = applyStripFlankCoast(x, z, h);
   h = applyRowMeres(x, z, h);
   h = applyNorthBay(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
@@ -2047,6 +2054,13 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   if (inHollowOpenSea(x, z)) {
     // no ranges over the open sea: the flanks read as water to the map edge
     // (swim fatigue, not a wall, turns swimmers back out there)
+    rimX = 0;
+    rimN = 0;
+  }
+  // the northern grid's outer edges are open ocean (applyWorldEdgeSea carves
+  // them below), so no rim range rises there; instance space past |x|560 keeps
+  // its containment wall
+  if (z > 1250 && Math.abs(x) <= 560) {
     rimX = 0;
     rimN = 0;
   }
@@ -2117,6 +2131,9 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       h = h * t + 14 * (1 - t);
     }
   }
+  // Last: the northern grid's outer edges dive to open ocean with a wavy
+  // coast, after every land-raising pass, so no realm's land hugs the map edge.
+  h = applyWorldEdgeSea(x, z, h);
   return h;
 }
 
