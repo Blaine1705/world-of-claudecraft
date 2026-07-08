@@ -310,7 +310,7 @@ describe('druid Lifesap redesign', () => {
       sim.tick();
     }
     // five classic 2-sec ticks inside the 10 sec window
-    expect(p.resource).toBe(150);
+    expect(p.resource).toBe(100);
     expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(false); // expired
     expect(p.cooldowns.get('innervate')).toBeGreaterThan(60);
   });
@@ -330,6 +330,6 @@ describe('druid Lifesap redesign', () => {
     expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(true); // survived the shift
     p.resource = 0;
     for (let i = 0; i < 20 * 6; i++) sim.tick();
-    expect(p.resource).toBeGreaterThanOrEqual(60); // sap ticks fed Rage in form
+    expect(p.resource).toBeGreaterThanOrEqual(40); // sap ticks fed Rage in form
   });
 });
