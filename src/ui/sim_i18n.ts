@@ -240,6 +240,7 @@ const baseEnTable = {
   'aura.resurrectionSickness': "The Keeper's Toll",
   'aura.bladedEcho': 'Bladed Echo',
   'aura.emboldened': 'Emboldened',
+  'aura.enraged': 'Enraged',
 } as const;
 
 const petEnTable = {
@@ -3832,6 +3833,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // Emboldening Roar's armed guaranteed-crit buff (the aoeAllySureCrit case in
   // src/sim/combat/effect_dispatch.ts); shown on the buff bar and combat log.
   Emboldened: 'aura.emboldened',
+  // Fury Enrage buff (the enrageChance case in src/sim/combat/effect_dispatch.ts),
+  // procced by Bloodletting and Desenfreno / Rampage; shown on the buff bar.
+  Enraged: 'aura.enraged',
 };
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];

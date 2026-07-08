@@ -232,6 +232,12 @@ export type AuraKind =
   // additive crit chance (0.20); the rage-generation bonus is the fixed
   // RECKLESSNESS_RAGE_GEN read by rageGenAuraMult.
   | 'buff_reckless'
+  // Fury Enrage: one self-buff carrying all three halves. value = the additive
+  // outgoing-damage fraction (ENRAGE_DMG_DONE, summed in dealDamage beside
+  // buff_dmg_done); the attack-speed and move-speed halves are the fixed
+  // ENRAGE_HASTE / ENRAGE_MOVE_MULT read in swingIntervalMult and moveSpeedMult.
+  // Procced by Bloodletting (30% chance) and Desenfreno / Rampage (always).
+  | 'enrage'
   // Bloodbath: the on-kill stacking buff. value = per-stack fraction times the
   // current stacks (crit AND damage-dealt share the same number); `stacks`
   // carries the count for the buff-icon badge.
@@ -1335,6 +1341,7 @@ export type AbilityEffect =
       auraName?: string;
     }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
+  | { type: 'enrageChance'; chance: number; duration: number } // Fury Enrage (Bloodletting / Rampage)
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
@@ -2615,6 +2622,15 @@ export const RECKLESSNESS_RAGE_GEN = 0.5;
 export const STANCE_RAGE_GEN = 0.1; // Battle Stance: +10% rage generation
 export const BERSERKER_CRIT_CHANCE = 0.03; // Berserker Stance: +3% crit chance
 export const BERSERKER_CRIT_DAMAGE = 0.03; // Berserker Stance: +3% crit damage
+
+// Fury Enrage: a short self-buff (Bloodletting has a 30% chance, Desenfreno /
+// Rampage always). One 'enrage' aura carries all three halves: outgoing damage
+// +11% (the aura's value, summed in dealDamage), attack speed +25% (the swing
+// interval is divided by ENRAGE_HASTE), and move speed +10% (ENRAGE_MOVE_MULT).
+export const ENRAGE_DMG_DONE = 0.11;
+export const ENRAGE_HASTE = 1.25;
+export const ENRAGE_MOVE_MULT = 1.1;
+export const ENRAGE_DURATION = 4; // seconds
 export function rageGenAuraMult(e: Entity): number {
   let mult = 1;
   for (const a of e.auras) {

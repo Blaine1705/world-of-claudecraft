@@ -2810,13 +2810,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)',
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
-    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. (habilidad distintiva de Furia)',
+    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. Tiene un 30% de probabilidad de Enfurecerte. (habilidad distintiva de Furia)',
   'entities.abilities.raging_gale.name': 'Arremetida Enfurecida',
   'entities.abilities.raging_gale.description':
     'Golpeas al instante dos veces con tu arma; cada golpe inflige un 60% del daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)',
   'entities.abilities.red_harvest.name': 'Desenfreno',
   'entities.abilities.red_harvest.description':
-    'Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno. (Furia)',
+    'Vacías toda tu ira: tres golpes salvajes que infligen el daño del arma más {damage} cada uno, y siempre te Enfurece. (Furia)',
   'entities.abilities.furious_mending.name': 'Regeneración Enfurecida',
   'entities.abilities.furious_mending.description':
     'Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te cura un 20% de tu salud máxima. (Furia)',

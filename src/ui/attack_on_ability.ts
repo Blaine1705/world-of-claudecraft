@@ -70,6 +70,9 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   selfBuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
+  // Fury Enrage proc: a pure self-buff, never itself an attack (the ability's
+  // weaponStrikes classify it).
+  enrageChance: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
   selfHealPctMax: 'other',
