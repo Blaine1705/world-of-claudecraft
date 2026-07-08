@@ -1727,6 +1727,7 @@ export const tr_TR: EnTranslations = {
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
       "rend": "Hedefi zamanla yıpratan bir kanama açar.",
       "thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.",
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
       "devotion_aura": "Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.",

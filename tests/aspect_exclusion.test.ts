@@ -82,8 +82,8 @@ describe('classic self-buff mutual exclusion groups', () => {
     expect(ABILITIES.devotion_aura.exclusiveGroup).toBe('paladin_aura');
     expect(ABILITIES.retribution_aura.exclusiveGroup).toBe('paladin_aura');
     expect(ABILITIES.battle_shout.exclusiveGroup).toBe('warrior_shout');
-    // Bolstering Cry (commanding_shout) LEFT the warrior_shout group (Batch
-    // 2026-07-08) so the two shouts now coexist: it carries no exclusive group.
+    // Bolstering Cry (commanding_shout) was RETIRED from the kit 2026-07-08; its
+    // dormant def carries no exclusive group.
     expect(ABILITIES.commanding_shout.exclusiveGroup).toBeUndefined();
   });
 
@@ -102,28 +102,7 @@ describe('classic self-buff mutual exclusion groups', () => {
     ]);
   });
 
-  it('lets the two warrior shouts coexist (Bolstering Cry left the exclusive group)', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
-    sim.setPlayerLevel(14); // battle(7) + commanding(14) known
-    // Bolstering Cry (commanding_shout) is prot-gated base kit (2026-07-07).
-    expect(sim.setSpec('prot')).toBe(true);
-    const baseAp = sim.player.attackPower;
-
-    sim.player.resource = 100;
-    castSelfBuff(sim, 'battle_shout');
-    // Iron Bellow is a group AP buff (aura id 'battle_shout_ap') that includes
-    // the caster, so it raises the caster's own attack power.
-    expect(sim.player.attackPower).toBeGreaterThan(baseAp);
-    const apWithBellow = sim.player.attackPower;
-
-    sim.player.resource = 100;
-    castSelfBuff(sim, 'commanding_shout');
-    // Bolstering Cry (the stamina self-buff, aura id 'commanding_shout') no longer
-    // shares an exclusive group with Iron Bellow, so casting it does NOT cancel the
-    // AP buff: both auras are present and Iron Bellow's attack power survives.
-    const shoutAuras = sim.player.auras.map((a) => a.id).filter((id) => id.includes('shout'));
-    expect(shoutAuras).toContain('battle_shout_ap');
-    expect(shoutAuras).toContain('commanding_shout');
-    expect(sim.player.attackPower).toBe(apWithBellow);
-  });
+  // The "two warrior shouts coexist" test was removed 2026-07-08: Bolstering Cry
+  // (commanding_shout) was retired from the warrior kit, leaving Iron Bellow as the
+  // only warrior shout with an exclusive group, so there is nothing left to pair.
 });

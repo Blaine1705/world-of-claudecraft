@@ -1727,6 +1727,7 @@ export const vi_VN: EnTranslations = {
       "charge": "Lao tới kẻ địch ở xa để mở màn trận đấu bằng một cú choáng ngắn.",
       "rend": "Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian.",
       "thunder_clap": "Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Phù chú đòn vung của bạn với sát thương Thánh, rồi giải phóng bằng Verdict.",
       "holy_light": "Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.",
       "devotion_aura": "Một buff bản thân lâu dài giúp tăng giáp để đòn đánh giảm uy lực.",

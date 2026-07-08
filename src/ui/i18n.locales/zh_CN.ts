@@ -4088,6 +4088,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp': '召唤一只烬裔，从远处向敌人投掷火焰箭。',
   'guide.abilityHook.thorns': '守护盟友，让近战攻击者在打击时反伤自己。',
   'guide.abilityHook.thunder_clap': '打击你周围的一切，并减缓它们的攻击速度。',
+  'guide.abilityHook.hamstring': '割裂目标的双腿使其减速，让它无法追上你。',
   'guide.abilityHook.wrath': '从远处向目标投出一道自然箭矢，是你的常用输出。',
   'guide.arenaPage.augmentsNote':
     '增幅和强化只在本场比赛中有效。它们关乎的是趣味、即兴的临场构筑，而非长久的强势，因此没人能靠花钱赢得胜利。',

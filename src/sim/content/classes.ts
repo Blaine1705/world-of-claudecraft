@@ -60,7 +60,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'heroic_strike',
       'revenge',
       'battle_shout',
-      'commanding_shout',
       'charge',
       'thunder_clap',
       'hamstring',
@@ -395,10 +394,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     onNextSwing: true,
     offGcd: true,
-    // Reaver Strike is the Fury / no-spec filler only: Protection replaces it
-    // with Revenge, and Arms (owner restructure 2026-07-08) leans on Maiming
-    // Strike + Brute Swing as its strike/filler pair.
-    excludeSpecs: ['prot', 'arms'],
+    // Reaver Strike is the NO-SPEC (pre-specialization) filler only: Protection
+    // replaces it with Revenge, Arms (owner restructure 2026-07-08) leans on
+    // Maiming Strike + Brute Swing, and Fury (owner 2026-07-08) dropped it too
+    // in favour of Bloodletting / Twinstrike. All three committed specs exclude it.
+    excludeSpecs: ['prot', 'arms', 'fury'],
     threat: { flat: 20 }, // classic per-rank values: 20/39/59/78
     effects: [{ type: 'weaponDamage', bonus: 11 }],
     ranks: [
@@ -719,7 +719,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Brute Swing',
     class: 'warrior',
     learnLevel: 16,
-    specs: ['arms', 'prot'],
+    // Arms-only (owner 2026-07-08): Protection dropped Brute Swing since Revenge
+    // is already its filler; a generic mandoble adds nothing for a tank.
+    specs: ['arms'],
     cost: 15,
     // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
     // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
@@ -3989,16 +3991,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Shieldcrack',
     class: 'warrior',
     learnLevel: 10,
-    cost: 20,
+    // Protection's active rage BUILDER (owner 2026-07-08): no cost, and it
+    // GENERATES 15 rage on a short cooldown, so the tank loop is take-hits +
+    // Shieldcrack to build, then spend on Revenge / Armor Shear. Prot-only
+    // (spec signature), so no per-spec gate is needed on the rage grant.
+    cost: 0,
     castTime: 0,
     cooldown: 6,
     range: 0,
     school: 'physical',
     requiresTarget: true,
     threat: { flat: 110 },
-    effects: [{ type: 'weaponStrike', bonus: 30, weaponMult: 0.5 }],
+    effects: [
+      { type: 'weaponStrike', bonus: 30, weaponMult: 0.5 },
+      { type: 'gainResource', amount: 15 },
+    ],
     description:
-      'Slam the target with your shield for $d and massive threat. (Protection signature)',
+      'Slam the target with your shield for $d and massive threat, generating 15 rage. (Protection signature)',
   },
   whirlwind: {
     id: 'whirlwind',
@@ -4102,7 +4111,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // health), 40yd (the classic raid-buff reach).
     effects: [{ type: 'aoeAllyMaxHp', pct: 0.2, duration: 10, radius: 40 }],
     description:
-      'Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec.',
+      'Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration.',
   },
   // ------ Choice-row talents (warrior_rows.ts grants; numbers are the owner's
   // design draft, tune VALUE not SHAPE) ------
@@ -4129,7 +4138,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Intimidating Shout',
     class: 'warrior',
     learnLevel: 14,
-    cost: 15,
+    // Free in every spec (owner 2026-07-08): the panic/CC horn should never be
+    // gated behind rage you may not have when you need to break off.
+    cost: 0,
     castTime: 0,
     cooldown: 120,
     range: 0,
@@ -4862,6 +4873,16 @@ export function abilitiesKnownAt(
         if (r.castTime !== undefined) castTime = r.castTime;
         if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
       }
+    }
+    // Fury's Early Grave is a rage BUILDER, not a spender (owner 2026-07-08):
+    // for a committed Fury warrior it costs nothing and MINTS 20 rage instead of
+    // the shared 15-rage finisher cost. Arms, Protection and no-spec keep the
+    // classic rage-costing execute. Resolved here (not via a talent mod) so the
+    // cast-time cost gate sees 0 and the appended gainResource flows through the
+    // normal dispatch scaling (abilityRagePct / rage-gen auras).
+    if (id === 'execute' && mods?.spec === 'fury') {
+      cost = 0;
+      effects = [...effects, { type: 'gainResource', amount: 20 }];
     }
     const entry: KnownAbility = {
       def,

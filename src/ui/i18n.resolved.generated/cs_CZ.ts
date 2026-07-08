@@ -1727,6 +1727,7 @@ export const cs_CZ: EnTranslations = {
       "charge": "Vyrazí k vzdálenému nepříteli a otevře boj krátkým omráčením.",
       "rend": "Otevře krvácení, které cíl postupně opotřebuje.",
       "thunder_clap": "Zasáhne vše kolem tebe a zpomalí jejich útoky.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Naplní tvé švihy svatým poškozením, které potom utratíš Verdiktem.",
       "holy_light": "Stabilní, výrazné léčení pro doléčení spojence nebo sebe.",
       "devotion_aura": "Trvalý self-buff zvedající zbroj, takže zásahy dopadají měkčeji.",

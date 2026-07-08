@@ -2810,7 +2810,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)',
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
-    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de furia. (habilidad distintiva de Furia)',
+    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. (habilidad distintiva de Furia)',
   'entities.abilities.raging_gale.name': 'Arremetida Enfurecida',
   'entities.abilities.raging_gale.description':
     'Golpeas al instante dos veces con tu arma; cada golpe inflige un 60% del daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)',
@@ -2843,7 +2843,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)',
   'entities.abilities.shield_slam.name': 'Quiebra de Escudo',
   'entities.abilities.shield_slam.description':
-    'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',
+    'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme, obteniendo 15 de ira. (habilidad distintiva de Protección)',
   'entities.abilities.whirlwind.name': 'Remolino de Cuchillas',
   'entities.abilities.whirlwind.description':
     'Giras en un arco letal y golpeas a todos los enemigos cercanos por {damage}, generando ira por cada enemigo alcanzado en lugar de costarla. Tus 2 próximas habilidades de un solo objetivo también golpean a los enemigos cercanos a tu objetivo. (talento de Furia)',
@@ -4860,6 +4860,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns':
     'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
   'guide.abilityHook.thunder_clap': 'Golpea a los enemigos a tu alrededor y ralentiza sus ataques.',
+  'guide.abilityHook.hamstring':
+    'Corta las piernas del objetivo para ralentizarlo y que no pueda darte alcance.',
   'guide.abilityHook.wrath':
     'Una descarga de naturaleza lanzada a un objetivo a distancia, tu hechizo de ataque habitual.',
   'guide.arenaPage.augmentsNote':
@@ -6266,7 +6268,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Saltas a la zona objetivo e infliges {damage} de daño a los enemigos cercanos.',
   'entities.abilities.rallying_cry.name': 'Grito de guerra',
   'entities.abilities.rallying_cry.description':
-    'Profieres un grito de guerra que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s.',
+    'Profieres un grito de guerra que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s. Protección: además reciben un 5% menos de daño mientras dura.',
   'entities.abilities.chain_heal.name': 'Sanación en cadena',
   'entities.abilities.chain_heal.description':
     'Sana al objetivo por {damage} y salta hasta a 2 aliados cercanos, sanando cada salto la mitad que el anterior.',

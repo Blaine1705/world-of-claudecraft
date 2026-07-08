@@ -1727,6 +1727,7 @@ export const es_ES: EnTranslations = {
       "charge": "Embiste a un enemigo lejano para abrir el combate con un breve aturdimiento.",
       "rend": "Abre una hemorragia que va desgastando al objetivo con el tiempo.",
       "thunder_clap": "Golpea a los enemigos a tu alrededor y ralentiza sus ataques.",
+      "hamstring": "Corta las piernas del objetivo para ralentizarlo y que no pueda darte alcance.",
       "seal_of_righteousness": "Imbuye tus golpes con daño Sagrado, que luego gastas con Verdict.",
       "holy_light": "Una sanación constante y considerable para reponer a un aliado o a ti mismo.",
       "devotion_aura": "Una mejora propia y duradera que aumenta la armadura para que los golpes hagan menos daño.",
@@ -5261,7 +5262,7 @@ export const es_ES: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Sangría",
-        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de furia. (habilidad distintiva de Furia)"
+        "description": "Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de ira. (habilidad distintiva de Furia)"
       },
       "raging_gale": {
         "name": "Arremetida Enfurecida",
@@ -5305,7 +5306,7 @@ export const es_ES: EnTranslations = {
       },
       "shield_slam": {
         "name": "Quiebra de Escudo",
-        "description": "Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)"
+        "description": "Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme, obteniendo 15 de ira. (habilidad distintiva de Protección)"
       },
       "whirlwind": {
         "name": "Remolino de Cuchillas",
@@ -5457,7 +5458,7 @@ export const es_ES: EnTranslations = {
       },
       "rallying_cry": {
         "name": "Grito de guerra",
-        "description": "Profieres un grito de guerra que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s."
+        "description": "Profieres un grito de guerra que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s. Protección: además reciben un 5% menos de daño mientras dura."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",

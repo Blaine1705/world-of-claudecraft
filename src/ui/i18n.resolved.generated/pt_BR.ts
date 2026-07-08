@@ -1727,6 +1727,7 @@ export const pt_BR: EnTranslations = {
       "charge": "Avança contra um inimigo distante para abrir a luta com um breve atordoamento.",
       "rend": "Abre um sangramento que desgasta o alvo ao longo do tempo.",
       "thunder_clap": "Atinge tudo ao seu redor e reduz a velocidade dos ataques deles.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Imbui seus golpes com dano Sagrado; depois gaste-o com Verdict.",
       "holy_light": "Uma cura firme e considerável para recuperar um aliado ou você mesmo.",
       "devotion_aura": "Um aprimoramento próprio duradouro que aumenta a armadura para os golpes doerem menos.",

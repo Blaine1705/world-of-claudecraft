@@ -1727,6 +1727,7 @@ export const zh_TW: EnTranslations = {
       "charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
       "rend": "施加流血，隨時間慢慢磨耗目標。",
       "thunder_clap": "打擊你周遭的一切並降低它們的攻擊速度。",
+      "hamstring": "割裂目標的雙腿使其減速，讓它無法追上你。",
       "seal_of_righteousness": "為你的攻擊附加神聖傷害，再以裁決將其釋放消耗。",
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
       "devotion_aura": "持續的自我增益，提升護甲讓敵人的攻擊更不痛。",

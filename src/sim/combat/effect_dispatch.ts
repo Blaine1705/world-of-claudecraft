@@ -1162,6 +1162,11 @@ export function runEffects(
         // with the buff and drops it back (never overflowing) on expiry.
         const rallyParty = ctx.partyOf(p.id);
         const rallyIds = rallyParty ? rallyParty.members : [p.id];
+        // Protection reinforces the horn (owner 2026-07-08): on top of the temp
+        // max-health, a committed Protection warrior's Rallying Cry also grants
+        // every affected ally a 5% damage-taken reduction (buff_dr) for the same
+        // duration. Arms / Fury / no-spec give the health buff only.
+        const rallyProt = ctx.playerMods(meta).spec === 'prot';
         for (const pid of rallyIds) {
           const mE = ctx.entities.get(pid);
           if (!mE || mE.dead) continue;
@@ -1176,6 +1181,18 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
           });
+          if (rallyProt) {
+            ctx.applyAura(mE, {
+              id: `${ability.id}_dr`,
+              name: ability.name,
+              kind: 'buff_dr',
+              remaining: eff.duration,
+              duration: eff.duration,
+              value: 0.05,
+              sourceId: p.id,
+              school: ability.school,
+            });
+          }
         }
         break;
       }

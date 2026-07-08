@@ -1727,6 +1727,7 @@ export const fr_CA: EnTranslations = {
       "charge": "Fonce sur un ennemi lointain pour ouvrir le combat avec un bref étourdissement.",
       "rend": "Ouvre un saignement qui use la cible dans la durée.",
       "thunder_clap": "Frappe tout autour de vous et ralentit les attaques des ennemis.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Imprègne vos coups de dégâts sacrés, à dépenser ensuite avec Verdict.",
       "holy_light": "Un soin régulier et conséquent pour remettre d'aplomb un allié ou vous-même.",
       "devotion_aura": "Une amélioration personnelle durable qui augmente l'armure pour amortir les coups.",

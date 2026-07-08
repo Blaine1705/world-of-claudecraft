@@ -1727,6 +1727,7 @@ export const de_DE: EnTranslations = {
       "charge": "Stürmt auf einen entfernten Gegner zu und eröffnet den Kampf mit einer kurzen Betäubung.",
       "rend": "Eröffnet eine Blutung, die das Ziel über Zeit zermürbt.",
       "thunder_clap": "Trifft alles um dich herum und verlangsamt deren Angriffe.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Verzaubert deine Schwünge mit heiligem Schaden, den du dann mit Verdict verbrauchst.",
       "holy_light": "Eine stetige, ansehnliche Heilung, um einen Verbündeten oder dich selbst aufzufüllen.",
       "devotion_aura": "Eine anhaltende Selbststärkung, die die Rüstung erhöht, sodass Treffer sanfter ankommen.",

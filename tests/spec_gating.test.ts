@@ -30,6 +30,9 @@ const GATED: Record<string, string[]> = {
   defensive_stance: ['arms', 'prot'],
   sunder_armor: ['prot'], // Arms restructure 2026-07-08: Armor Shear is prot-only now
   thunder_clap: ['prot'], // Quaking Blow gated to prot 2026-07-08 (was ungated)
+  // commanding_shout (Bolstering Cry) was RETIRED from the warrior kit 2026-07-08
+  // like rend: its def still carries specs ['prot'], but no warrior learns it (it
+  // is in no kit list), so it stays HIDDEN for every spec below (incl. prot).
   commanding_shout: ['prot'],
   demoralizing_shout: ['prot'],
   // rend (Deep Gash) was retired from the warrior kit 2026-07-08; its ABILITIES def
@@ -37,7 +40,7 @@ const GATED: Record<string, string[]> = {
   // it stays HIDDEN for every spec below.
   rend: ['arms'],
   overpower: ['arms'],
-  slam: ['arms', 'prot'],
+  slam: ['arms'], // Brute Swing dropped from prot 2026-07-08 (prot uses Revenge)
   cleave: ['arms'], // removed from prot 2026-07-08; prot uses Revenge
   revenge: ['prot'], // prot-only, replaces Reaver Strike (heroic_strike) for prot
   bloodrage: ['arms', 'prot'], // Fury replaces it with its signature (Bloodletting)
@@ -56,11 +59,12 @@ describe('spec-gated warrior base kit (content table)', () => {
     }
   });
 
-  it('Reaver Strike is excluded from prot AND arms via excludeSpecs, and Revenge is prot-only', () => {
-    // heroic_strike stays ungated (no `specs`) but drops out for committed prot AND
-    // arms (Arms restructure 2026-07-08: it leans on Maiming/Brute strikes instead).
+  it('Reaver Strike is excluded from all three committed specs via excludeSpecs, and Revenge is prot-only', () => {
+    // heroic_strike stays ungated (no `specs`) but drops out for EVERY committed
+    // spec: prot uses Revenge, arms leans on Maiming/Brute strikes, and fury (owner
+    // 2026-07-08) dropped it for Bloodletting/Twinstrike. Only no-spec keeps it.
     expect(ABILITIES.heroic_strike?.specs).toBeUndefined();
-    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot', 'arms']);
+    expect(ABILITIES.heroic_strike?.excludeSpecs).toEqual(['prot', 'arms', 'fury']);
     // revenge is the prot replacement.
     expect(ABILITIES.revenge?.specs).toEqual(['prot']);
     expect(ABILITIES.revenge?.excludeSpecs).toBeUndefined();
@@ -77,10 +81,11 @@ describe('abilitiesKnownAt spec filter', () => {
     }
   });
 
-  it('fury loses every arms/prot exclusive (incl. Blood Toll, replaced by its signature)', () => {
+  it('fury loses every arms/prot exclusive (incl. Blood Toll, replaced by its signature) and Reaver Strike', () => {
     const ids = knownIds('fury');
     for (const id of Object.keys(GATED)) expect(ids.has(id), id).toBe(false);
-    expect(ids.has('heroic_strike')).toBe(true);
+    // Reaver Strike (heroic_strike) now excludes fury too (owner 2026-07-08).
+    expect(ids.has('heroic_strike')).toBe(false);
     expect(ids.has('bloodthirst')).toBe(true); // the signature grant is untouched
   });
 
@@ -106,43 +111,39 @@ describe('abilitiesKnownAt spec filter', () => {
     expect(ids.has('bloodrage')).toBe(true);
   });
 
-  it('prot keeps tank staples and Revenge but not Reaver Strike, Reaping Arc, or arms strikes', () => {
+  it('prot keeps tank staples and Revenge but not Reaver Strike, Reaping Arc, retired/arms strikes', () => {
     const ids = knownIds('prot');
     for (const id of [
       'defensive_stance',
       'sunder_armor',
       'thunder_clap',
-      'commanding_shout',
       'demoralizing_shout',
-      'slam',
       'revenge',
       'bloodrage',
     ]) {
       expect(ids.has(id), id).toBe(true);
     }
-    // Reaver Strike (excludeSpecs prot), Reaping Arc (arms-only now), and the
-    // arms-only strikes all drop out for committed prot.
-    for (const id of ['heroic_strike', 'cleave', 'rend', 'overpower']) {
+    // Reaver Strike (excludeSpecs prot), Reaping Arc (arms-only now), the arms-only
+    // strikes, plus Bolstering Cry (commanding_shout) and Brute Swing (slam) which
+    // prot dropped 2026-07-08, all stay out for committed prot.
+    for (const id of ['heroic_strike', 'cleave', 'rend', 'overpower', 'commanding_shout', 'slam']) {
       expect(ids.has(id), id).toBe(false);
     }
   });
 
-  it('excludeSpecs: committed prot AND arms lack Reaver Strike; only prot gains Revenge', () => {
-    // No spec and fury keep Reaver Strike and neither sees Revenge.
-    for (const spec of [null, 'fury'] as const) {
-      const ids = knownIds(spec);
-      expect(ids.has('heroic_strike'), `${spec} heroic_strike`).toBe(true);
-      expect(ids.has('revenge'), `${spec} revenge`).toBe(false);
+  it('excludeSpecs: only no-spec keeps Reaver Strike; every committed spec lacks it, and only prot gains Revenge', () => {
+    // No spec keeps Reaver Strike and does not see Revenge.
+    const nospec = knownIds(null);
+    expect(nospec.has('heroic_strike')).toBe(true);
+    expect(nospec.has('revenge')).toBe(false);
+    // Every committed spec now excludes Reaver Strike (excludeSpecs ['prot','arms','fury']).
+    for (const spec of ['arms', 'fury', 'prot'] as const) {
+      expect(knownIds(spec).has('heroic_strike'), `${spec} heroic_strike`).toBe(false);
     }
-    // Arms now excludes Reaver Strike too (excludeSpecs ['prot','arms']) but does
-    // NOT gain Revenge (that swap is prot-only).
-    const arms = knownIds('arms');
-    expect(arms.has('heroic_strike')).toBe(false);
-    expect(arms.has('revenge')).toBe(false);
-    // Committed prot is the mirror image: Revenge in, Reaver Strike out.
-    const prot = knownIds('prot');
-    expect(prot.has('heroic_strike')).toBe(false);
-    expect(prot.has('revenge')).toBe(true);
+    // Revenge is prot-only: arms and fury do not gain it; prot does.
+    expect(knownIds('arms').has('revenge')).toBe(false);
+    expect(knownIds('fury').has('revenge')).toBe(false);
+    expect(knownIds('prot').has('revenge')).toBe(true);
   });
 
   it('a talent grant bypasses the spec filter (grants are already spec-scoped)', () => {
@@ -184,7 +185,10 @@ describe('spec gating end to end in the sim', () => {
       return sim.known.map((k) => k.def.id).join(',');
     };
     const a = run();
-    expect(a).toContain('commanding_shout');
+    // Tank staple present; retired Bolstering Cry (commanding_shout) and arms-only
+    // Redhand (overpower) both absent for committed prot.
+    expect(a).toContain('shield_slam');
+    expect(a).not.toContain('commanding_shout');
     expect(a).not.toContain('overpower');
     expect(run()).toBe(a);
   });

@@ -1727,6 +1727,7 @@ export const da_DK: EnTranslations = {
       "charge": "Stormer mod en fjern fjende for at åbne kampen med en kort lammelse.",
       "rend": "Åbner en blødning der nedslider målet over tid.",
       "thunder_clap": "Rammer alt omkring dig og sløver deres angreb.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Gennemtrænger dine sving med Hellig skade, brug den så med Dom.",
       "holy_light": "En stabil, anselig helbredelse til at fylde en allieret eller dig selv op.",
       "devotion_aura": "En vedvarende selvforstærkning der hæver rustningen så slag rammer blødere.",

@@ -1727,6 +1727,7 @@ export const id_ID: EnTranslations = {
       "charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
       "rend": "Membuka pendarahan yang menggerus sasaran seiring waktu.",
       "thunder_clap": "Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Mengisi ayunanmu dengan kerusakan Suci, lalu habiskan dengan Vonis.",
       "holy_light": "Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.",
       "devotion_aura": "Penguat-diri tahan lama yang menaikkan zirah sehingga pukulan terasa lebih ringan.",

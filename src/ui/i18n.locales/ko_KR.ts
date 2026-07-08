@@ -4313,6 +4313,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.summon_imp': '원거리에서 적에게 화염 화살을 날리는 불씨족을 불러냅니다.',
   'guide.abilityHook.thorns': '아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다.',
   'guide.abilityHook.thunder_clap': '주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.',
+  'guide.abilityHook.hamstring': '대상의 다리를 베어 이동 속도를 늦춰 추격하지 못하게 합니다.',
   'guide.abilityHook.wrath': '원거리에서 대상에게 던지는 자연 화살로, 주력 공격기입니다.',
   'guide.arenaPage.augmentsNote':
     '증강과 강화 효과는 해당 경기 동안에만 유지됩니다. 지속적인 힘이 아니라 그 자리에서 재미있게 빌드를 짜는 것이 목적이므로, 돈으로 승리를 사는 일은 없습니다.',

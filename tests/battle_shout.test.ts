@@ -73,40 +73,9 @@ describe('Iron Bellow (battle_shout) group buff', () => {
     expect(shoutAura(far)).toBeUndefined();
   });
 
-  it('coexists with Bolstering Cry: both shouts stay up at once (no exclusive group)', () => {
-    const sim = makeWarrior();
-    sim.setPlayerLevel(14); // battle(1) + commanding(14) known
-    // Bolstering Cry (commanding_shout) is prot-gated base kit (2026-07-07), so a
-    // no-spec warrior no longer knows it: commit prot to cast it here.
-    expect(sim.setSpec('prot')).toBe(true);
-    const p = sim.player;
-    const baseAp = p.attackPower;
-    const baseMaxHp = p.maxHp;
-
-    p.resource = 100;
-    sim.castAbility('battle_shout');
-    expect(shoutAura(p)).toBeTruthy();
-    expect(p.attackPower).toBeGreaterThan(baseAp);
-    const apWithShout = p.attackPower;
-    settleGcd(sim);
-
-    // Bolstering Cry (selfBuff) must NOT cancel the group shout: both auras and
-    // both stat boosts (AP + stamina/health) stack.
-    p.resource = 100;
-    sim.castAbility('commanding_shout');
-    expect(shoutAura(p)).toBeTruthy(); // Iron Bellow's AP aura survives
-    expect(p.auras.some((a) => a.id === 'commanding_shout')).toBe(true);
-    expect(p.attackPower).toBe(apWithShout); // AP buff still applied, unchanged
-    expect(p.maxHp).toBeGreaterThan(baseMaxHp); // stamina buff also applied
-    settleGcd(sim);
-
-    // And re-casting Iron Bellow leaves Bolstering Cry in place.
-    p.resource = 100;
-    sim.castAbility('battle_shout');
-    expect(p.auras.some((a) => a.id === 'commanding_shout')).toBe(true);
-    expect(shoutAura(p)).toBeTruthy();
-    expect(p.maxHp).toBeGreaterThan(baseMaxHp);
-  });
+  // The Bolstering Cry (commanding_shout) coexistence test was removed 2026-07-08:
+  // that shout was retired from the warrior kit, so there is no second warrior
+  // self-buff left to test against Iron Bellow's exclusive group.
 
   it('is deterministic for a fixed seed', () => {
     const run = () => {
