@@ -22,6 +22,7 @@ import {
   playerPortraitDataUrl,
   visualPortraitDataUrl,
 } from '../render/characters/portrait';
+import { cyclePhase, globalDayness, skyTintForDayness } from '../render/day_night_core';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import {
@@ -818,6 +819,8 @@ export class Hud {
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
+  private dayNightCtx: CanvasRenderingContext2D | null = null;
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; the 12h cycle barely moves
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -1145,6 +1148,10 @@ export class Hud {
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
     this.clockEl = $('#minimap-clock');
+    // day/night dial on the minimap rim: a decorative canvas showing the 12h
+    // world cycle. Same UI-only wall-clock allowance as the clock above.
+    const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
+    this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
     // lists the player's raid lockouts (the unlock countdown). Always visible;
     // it lights up (.locked) while any raid is on cooldown. attachTooltip already
@@ -5032,6 +5039,7 @@ export class Hud {
         this.updateMinimap();
       }
       this.updateClock();
+      this.updateDayNightDial();
       this.updateMinimapCoords();
       this.updateCompass();
     }
@@ -5818,6 +5826,92 @@ export class Hud {
       this.lastClockText = text;
       this.clockEl.textContent = text;
     }
+  }
+
+  // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
+  // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
+  // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
+  // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
+  // current time of day and how far the marker sits from the coming day or night.
+  private updateDayNightDial(): void {
+    const ctx = this.dayNightCtx;
+    if (!ctx) return;
+    const now = Date.now();
+    if (now - this.lastDayNightDrawAt < 1000) return; // the 12h cycle crawls; ~1Hz is ample
+    this.lastDayNightDrawAt = now;
+
+    const S = 60; // backing resolution (CSS shows it at 30px, so 2x for crispness)
+    const cx = S / 2;
+    const cy = S / 2;
+    const rMid = 23; // ring centreline radius
+    const ringW = 8;
+    const rInner = rMid - ringW / 2 - 2; // centre disc radius
+    // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
+    // clockwise once per 12h. angle = pi/2 + phase*2pi (canvas y is down).
+    const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
+    const rgb = (c: readonly [number, number, number]): string =>
+      `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
+
+    ctx.clearRect(0, 0, S, S);
+
+    // the ring: sample the cycle in segments, each an arc of its sky color. The
+    // small angular overlap hides seams between the butt-capped arc segments.
+    const SEG = 60;
+    ctx.lineWidth = ringW;
+    ctx.lineCap = 'butt';
+    for (let i = 0; i < SEG; i++) {
+      const p0 = i / SEG;
+      const p1 = (i + 1) / SEG;
+      ctx.strokeStyle = rgb(skyTintForDayness(globalDayness((p0 + p1) / 2)));
+      ctx.beginPath();
+      ctx.arc(cx, cy, rMid, angleForPhase(p0), angleForPhase(p1) + 0.02);
+      ctx.stroke();
+    }
+
+    const phaseNow = cyclePhase(now);
+    const daynessNow = globalDayness(phaseNow);
+    const skyNow = skyTintForDayness(daynessNow);
+
+    // centre disc tinted to the current sky, with a sun by day or a moon by night
+    ctx.fillStyle = rgb(skyNow);
+    ctx.beginPath();
+    ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+    ctx.fill();
+    if (daynessNow >= 0.5) {
+      ctx.fillStyle = '#ffd45a';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffd45a';
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
+        ctx.lineTo(cx + Math.cos(a) * 10.5, cy + Math.sin(a) * 10.5);
+        ctx.stroke();
+      }
+    } else {
+      // crescent: a pale disc minus an offset disc repainted in the sky color
+      ctx.fillStyle = '#e2e8f6';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = rgb(skyNow);
+      ctx.beginPath();
+      ctx.arc(cx + 3, cy - 2.2, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // the "now" marker: a bright pip riding the ring at the current phase
+    const am = angleForPhase(phaseNow);
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 3.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
   }
 
   // Classic-style coordinate readout pinned under the minimap. Reads only the

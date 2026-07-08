@@ -136,3 +136,19 @@ export function dayNightGrade(e: number): DayNightGrade {
 export function fullDayGrade(): DayNightGrade {
   return dayNightGrade(1);
 }
+
+// The minimap day/night dial paints the 12h cycle as a ring of sky colors and
+// a "now" marker; SKY_DIAL_* are the stops it lerps between.
+const SKY_DIAL_NIGHT: [number, number, number] = [0.11, 0.13, 0.26]; // deep navy
+const SKY_DIAL_GLOW: [number, number, number] = [0.86, 0.52, 0.3]; // dawn/dusk warm
+const SKY_DIAL_DAY: [number, number, number] = [0.46, 0.72, 0.98]; // bright day blue
+
+/** A representative sky color (0..1 rgb) for a daylight amount, for the minimap
+ *  day/night dial: deep navy at night, a warm dawn/dusk glow through the middle
+ *  (dayness is symmetric, so both dawn and dusk land here), bright blue by day. */
+export function skyTintForDayness(dayness: number): [number, number, number] {
+  const d = clamp01(dayness);
+  return d < 0.5
+    ? lerp3(SKY_DIAL_NIGHT, SKY_DIAL_GLOW, d / 0.5)
+    : lerp3(SKY_DIAL_GLOW, SKY_DIAL_DAY, (d - 0.5) / 0.5);
+}

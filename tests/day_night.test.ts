@@ -7,6 +7,7 @@ import {
   fullDayGrade,
   globalDayness,
   REALM_DAYNIGHT_AMPLITUDE,
+  skyTintForDayness,
 } from '../src/render/day_night_core';
 import type { BiomeId } from '../src/sim/types';
 
@@ -147,5 +148,38 @@ describe('dayNightGrade', () => {
 describe('fullDayGrade', () => {
   it('equals the e = 1 grade (the safe pre-first-frame default)', () => {
     expect(fullDayGrade()).toEqual(dayNightGrade(1));
+  });
+});
+
+describe('skyTintForDayness (minimap dial ring colors)', () => {
+  it('is deep navy at night, a warm glow at the transition, day-blue at noon', () => {
+    const night = skyTintForDayness(0);
+    const glow = skyTintForDayness(0.5);
+    const day = skyTintForDayness(1);
+    // night: dark and blue-dominant
+    expect(Math.max(...night)).toBeLessThan(0.3);
+    expect(night[2]).toBeGreaterThan(night[0]);
+    // dawn/dusk glow: warm, red-dominant
+    expect(glow[0]).toBeGreaterThan(glow[2]);
+    // day: bright and blue-dominant
+    expect(day[2]).toBeGreaterThan(0.8);
+    expect(day[2]).toBeGreaterThan(day[0]);
+  });
+
+  it('brightens overall from night to day', () => {
+    const lum = (c: [number, number, number]) => c[0] + c[1] + c[2];
+    expect(lum(skyTintForDayness(1))).toBeGreaterThan(lum(skyTintForDayness(0)));
+    expect(lum(skyTintForDayness(0.5))).toBeGreaterThan(lum(skyTintForDayness(0)));
+  });
+
+  it('returns channels in [0, 1] and clamps out-of-range input', () => {
+    for (const d of [-1, 0, 0.25, 0.5, 0.75, 1, 2]) {
+      for (const ch of skyTintForDayness(d)) {
+        expect(ch).toBeGreaterThanOrEqual(0);
+        expect(ch).toBeLessThanOrEqual(1);
+      }
+    }
+    expect(skyTintForDayness(-1)).toEqual(skyTintForDayness(0));
+    expect(skyTintForDayness(5)).toEqual(skyTintForDayness(1));
   });
 });
