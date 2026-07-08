@@ -17,6 +17,7 @@ const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 
 const MAP_COLOR_TOKENS = [
+  '--color-map-ocean',
   '--color-map-label',
   '--color-map-outline',
   '--color-map-portal-dot',
@@ -79,12 +80,14 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('this.mapPainter.paintOverworld(ctx, this.sim, {');
   });
 
-  it('blits the Hud-owned cached terrain background rather than rebuilding it', () => {
-    // The painter receives the cached bg and only drawImages it (no terrain build).
+  it('composites the Hud-owned cached realm backgrounds rather than rebuilding them', () => {
+    // The painter receives the cached bgs and only drawImages them (no terrain build).
     expect(code).toContain('ctx.drawImage(');
     expect(code).not.toContain('paintTerrainRows');
     expect(code).not.toContain('renderTerrainCanvas');
-    // Hud keeps the bg cache + prewarm and passes the cached canvas in each redraw.
-    expect(hud).toContain('bg: this.mapZoneBg(zone)');
+    // Hud keeps the bg cache + prewarm and passes the cached canvases (world map
+    // composites every cached realm; the current realm is forced ready).
+    expect(hud).toContain('this.mapBgCache.get(zn.id)');
+    expect(hud).toContain('prewarmAllZones');
   });
 });

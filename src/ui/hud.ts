@@ -230,7 +230,7 @@ import { lowResourceView } from './low_resource';
 import { onMapArtReady } from './map_art';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
-import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
+import { MAP_MAX_ZOOM, MAP_OPEN_ZOOM, mapWindowMode } from './map_window_view';
 import { MarketWindow } from './market_window';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
@@ -5781,10 +5781,32 @@ export class Hud {
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
+      this.pumpPrewarmQueue(); // start the next queued realm's background, if any
       return;
     }
     this.scheduleMapPrewarm();
   };
+
+  // Queue every realm's map background to prewarm during idle, so the
+  // world-relative map has the whole continent to composite when zoomed out.
+  // One realm renders at a time (the existing single-job prewarm), chained via
+  // pumpPrewarmQueue as each completes, so it never blocks a frame.
+  private mapPrewarmQueue: string[] = [];
+  private prewarmAllZones(): void {
+    for (const z of ZONES) {
+      if (this.mapBgCache.has(z.id)) continue;
+      if (this.mapPrewarm?.zoneId === z.id) continue;
+      if (!this.mapPrewarmQueue.includes(z.id)) this.mapPrewarmQueue.push(z.id);
+    }
+    this.pumpPrewarmQueue();
+  }
+
+  private pumpPrewarmQueue(): void {
+    if (this.mapPrewarm) return; // a prewarm is already in flight
+    let next = this.mapPrewarmQueue.shift();
+    while (next && this.mapBgCache.has(next)) next = this.mapPrewarmQueue.shift();
+    if (next) this.prewarmMapBg(next);
+  }
 
   // Refresh the minimap clock to the current real local time. Cheap to call
   // every frame: the formatted string only changes once a minute, and we skip
@@ -6003,7 +6025,7 @@ export class Hud {
       return;
     }
     this.closeOtherWindows('#map-window');
-    this.mapZoom = 1; // always open at the full-zone view, following the player
+    this.mapZoom = MAP_OPEN_ZOOM; // open on ~4 realms, following the player
     this.mapCenter = null;
     el.style.display = 'block';
     this.updateMapWindow();
@@ -6051,9 +6073,19 @@ export class Hud {
     const zone: ZoneDef = dungeon
       ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
       : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
+    // The world-relative map composites every cached realm background. Force the
+    // focused realm ready (sync only if its prewarm has not landed), and queue
+    // all the others so the continent fills in during idle.
+    this.mapZoneBg(zone);
+    this.prewarmAllZones();
+    const zoneBgs: { canvas: HTMLCanvasElement; region: MapRegion }[] = [];
+    for (const zn of ZONES) {
+      const cached = this.mapBgCache.get(zn.id);
+      if (cached) zoneBgs.push({ canvas: cached, region: this.mapZoneRegion(zn) });
+    }
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
-      bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
+      zoneBgs,
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
