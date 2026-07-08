@@ -521,7 +521,8 @@ export const ko_KR: EnTranslations = {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
-        "haste": "가속"
+        "haste": "가속",
+        "parry": "무기 막기"
       },
       "desc": {
         "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
@@ -535,7 +536,8 @@ export const ko_KR: EnTranslations = {
         "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
-        "haste": "무기 공격과 주문 시전 속도를 높입니다. 전역 재사용 대기시간(GCD)은 줄이지 않습니다."
+        "haste": "무기 공격과 주문 시전 속도를 높입니다. 전역 재사용 대기시간(GCD)은 줄이지 않습니다.",
+        "parry": "정면 근접 공격을 완전히 막아 피해를 받지 않을 확률입니다. 뒤에서 오는 공격은 막을 수 없습니다."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -4022,6 +4024,7 @@ export const ko_KR: EnTranslations = {
     "combat": {
       "floatingMiss": "빗나감",
       "floatingDodge": "회피",
+      "floatingParry": "막기",
       "floatingResist": "저항",
       "cannotMove": "이동 불가!",
       "attack": "공격",
@@ -4031,6 +4034,7 @@ export const ko_KR: EnTranslations = {
       "damageTakenCrit": "{source}에게 치명타로 {amount}의 피해를 받았습니다.",
       "miss": "{ability}이 {target}에게 빗나갔습니다.",
       "dodged": "{target}이 {ability}을 회피했습니다.",
+      "parried": "{target}이(가) 당신의 {ability}을(를) 막았습니다.",
       "resisted": "{target}이 {ability}을 저항했습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",

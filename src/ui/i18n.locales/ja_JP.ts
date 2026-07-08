@@ -230,6 +230,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.haste': 'ヘイスト',
+  'hudChrome.statInfo.names.parry': 'パリー',
+  'hudChrome.statInfo.desc.parry':
+    '正面からの近接攻撃を完全にパリーする確率。ダメージを受けない。背後からの攻撃はパリーできない。',
+  'hud.combat.floatingParry': 'パリー',
+  'hud.combat.parried': '{target} があなたの {ability} をパリーした。',
   'hudChrome.statInfo.desc.haste':
     '武器攻撃と呪文詠唱の速度を上げる。グローバルクールダウン（GCD）は短縮しない。',
   'hudChrome.statInfo.desc.spellPower':
@@ -4252,7 +4257,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.backstab':
     'ダガーで標的の背後に回り込み、コンボポイントを稼ぐ強力な一撃です。',
   'guide.abilityHook.battle_shout': 'パーティの攻撃力を高める鼓舞の雄叫びです。',
-  'guide.abilityHook.revenge': '前方のすべての敵をなぎ払う反撃で、攻撃を受け流すか回避した直後はコストが下がります。',
+  'guide.abilityHook.revenge':
+    '前方のすべての敵をなぎ払う反撃で、攻撃を受け流すか回避した直後はコストが下がります。',
   'guide.abilityHook.blessing_of_might':
     '味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。',
   'guide.abilityHook.charge': '離れた敵に突進し、短いスタンで戦闘の口火を切ります。',

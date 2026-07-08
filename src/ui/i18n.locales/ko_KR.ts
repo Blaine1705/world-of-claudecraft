@@ -228,6 +228,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.haste': '가속',
+  'hudChrome.statInfo.names.parry': '무기 막기',
+  'hudChrome.statInfo.desc.parry':
+    '정면 근접 공격을 완전히 막아 피해를 받지 않을 확률입니다. 뒤에서 오는 공격은 막을 수 없습니다.',
+  'hud.combat.floatingParry': '막기',
+  'hud.combat.parried': '{target}이(가) 당신의 {ability}을(를) 막았습니다.',
   'hudChrome.statInfo.desc.haste':
     '무기 공격과 주문 시전 속도를 높입니다. 전역 재사용 대기시간(GCD)은 줄이지 않습니다.',
   'hudChrome.statInfo.desc.spellPower':
@@ -4254,7 +4259,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.aspect_of_the_hawk': '유지해 두면 원거리 공격력을 높여 주는 상입니다.',
   'guide.abilityHook.backstab': '단검을 들고 대상 뒤로 파고들어 강하게 내리치는 연계 기술입니다.',
   'guide.abilityHook.battle_shout': '파티 전체의 공격력을 높여 주는 사기를 북돋우는 외침입니다.',
-  'guide.abilityHook.revenge': '전방의 모든 적을 휩쓰는 반격으로, 공격을 막거나 회피한 직후에는 소모가 줄어듭니다.',
+  'guide.abilityHook.revenge':
+    '전방의 모든 적을 휩쓰는 반격으로, 공격을 막거나 회피한 직후에는 소모가 줄어듭니다.',
   'guide.abilityHook.blessing_of_might':
     '아군 대상의 공격력을 높여 주며, 전투를 시작하기 전에 시전하면 좋습니다.',
   'guide.abilityHook.charge': '멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.',

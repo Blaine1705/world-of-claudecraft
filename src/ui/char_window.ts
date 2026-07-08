@@ -57,6 +57,7 @@ const STAT_GRID: readonly StatId[] = [
   'critChance',
   'spi',
   'dodge',
+  'parry',
   'spellPower',
   'haste',
 ];
