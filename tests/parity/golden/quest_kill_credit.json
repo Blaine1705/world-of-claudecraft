@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "9b01d8fc",
+      "state": "beb82328",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -102,6 +102,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -137,7 +138,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "a337dbf3",
+      "state": "72b2fd39",
       "events": "00bafcff",
       "rng": {
         "draws": 0,
@@ -236,6 +237,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0705,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -271,7 +273,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "92efa9d3",
+      "state": "43366f1b",
       "events": "d894ee18",
       "rng": {
         "draws": 40,
@@ -375,6 +377,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0705,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -410,7 +413,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "257db5ce",
+      "state": "f8e06bc6",
       "events": "272aafab",
       "rng": {
         "draws": 40,
@@ -509,6 +512,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0705,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -544,7 +548,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "2f16a7bb",
+      "state": "38f604fd",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -643,6 +647,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0705,
           "petMode": "defensive",
           "pos": {
             "x": 4,

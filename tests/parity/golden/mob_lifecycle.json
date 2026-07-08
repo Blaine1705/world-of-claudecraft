@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 405,
-      "state": "0471c495",
+      "state": "bce779a1",
       "events": "afc1696f",
       "rng": {
         "draws": 5,
@@ -122,6 +122,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -386,7 +387,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "af9a2cc1",
+      "state": "809af2ed",
       "events": "6ff1c8ee",
       "rng": {
         "draws": 8,
@@ -477,6 +478,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -794,7 +796,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "96bc5b9e",
+      "state": "125367e4",
       "events": "e7eb4dcc",
       "rng": {
         "draws": 9,
@@ -886,6 +888,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1204,7 +1207,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "f7bf14db",
+      "state": "cf3550d5",
       "events": "70ed87d1",
       "rng": {
         "draws": 15,
@@ -1296,6 +1299,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1657,7 +1661,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "ed7d76c6",
+      "state": "0dc76de8",
       "events": "d9e22721",
       "rng": {
         "draws": 20,
@@ -1749,6 +1753,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2171,7 +2176,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "ed7d76c6",
+      "state": "0dc76de8",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2263,6 +2268,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,

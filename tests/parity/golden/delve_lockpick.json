@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "c504724a",
+      "state": "fa88c3e8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -91,6 +91,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -128,7 +129,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 414,
-      "state": "fbde2b66",
+      "state": "1aefceb8",
       "events": "a8af5cb6",
       "rng": {
         "draws": 4,
@@ -139,7 +140,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 414,
-      "state": "06488b6b",
+      "state": "0ebcc7dd",
       "events": "b93c7dc5",
       "rng": {
         "draws": 4,
@@ -150,7 +151,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 414,
-      "state": "ac90757e",
+      "state": "99735dfc",
       "events": "0b43bbc3",
       "rng": {
         "draws": 5,
@@ -161,7 +162,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 416,
-      "state": "295976fd",
+      "state": "4d3b9889",
       "events": "6c6bd0f2",
       "rng": {
         "draws": 8,
@@ -254,6 +255,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 4800,
@@ -429,7 +431,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "56612d82",
+      "state": "0a5d001c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -440,7 +442,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "56612d82",
+      "state": "0a5d001c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -533,6 +535,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 4800,
