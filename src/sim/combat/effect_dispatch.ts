@@ -39,7 +39,7 @@ import { groundHeight, WATER_LEVEL } from '../world';
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 // repositionToAim sweep tuning (harvested from PR #1348): the leap walks the
@@ -764,6 +764,13 @@ export function runEffects(
         const remainingDmg = Math.round(dot.value * ticksLeft);
         target.auras.splice(di, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: target.id,
+          school: dot.school,
+          fx: 'detonate',
+        });
         if (remainingDmg > 0) {
           ctx.dealDamage(
             p,

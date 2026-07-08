@@ -96,7 +96,6 @@ import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
-import { buildJailScene } from './jail_scene';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import {
@@ -977,11 +976,6 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
-  private frozenOrbFx!: FrozenOrbFx;
-  private mageGroundFx!: MageGroundFx;
-  private ringOfFrostVisuals!: RingOfFrostVisuals;
-  private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
-  private glacialFrontVisual!: GlacialFrontVisual;
   private lightPulses!: LightPulses;
   private pulseAt!: (id: number, school: string, intensity: number, duration: number) => void;
   private weather: Weather;
@@ -1540,25 +1534,6 @@ export class Renderer {
 
     // particle system: projectiles, impacts, heal glows, ambience
     this.lightPulses = new LightPulses(this.scene);
-    // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
-    // 'orb' release event (see src/render/frozen_orb_fx.ts).
-    this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
-    this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
-    );
-    // Meteor falls + Rune of Power circles (see src/render/mage_ground_fx.ts);
-    // a landing meteor detonates with the same burst an aimed blast uses.
-    this.mageGroundFx = new MageGroundFx(
-      this.scene,
-      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
-      (x, z) => {
-        const gy = groundHeight(x, z, this.sim.cfg.seed);
-        this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
-      },
-    );
-    this.ringOfFrostVisuals = new RingOfFrostVisuals(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
-    );
     this.vfx = new Vfx(this.scene, (id, frac) => {
       const v = this.views.get(id);
       if (!v) return null;
@@ -2227,12 +2202,6 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
-    this.frozenOrbFx.update(dt);
-    this.mageGroundFx.update(dt);
-    this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
-    this.ringOfFrostVisuals.update(dt);
-    this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
-    this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
     const pv = this.views.get(p.id);
     if (pv) {
@@ -3049,7 +3018,19 @@ export class Renderer {
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
-        else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
+        else if (ev.fx === 'procSurge') {
+          this.vfx.procSurge(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 5, 0.4);
+        } else if (ev.fx === 'wardBloom') {
+          this.vfx.wardBloom(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 7, 0.55);
+        } else if (ev.fx === 'echoBurst') {
+          this.vfx.echoBurst(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, 'nature', 6, 0.5);
+        } else if (ev.fx === 'detonate') {
+          this.vfx.detonate(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 9, 0.5);
+        } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock
@@ -5138,12 +5119,6 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
-    this.frozenOrbFx.update(dt);
-    this.mageGroundFx.update(dt);
-    this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
-    this.ringOfFrostVisuals.update(dt);
-    this.glacialFrontVisual.updateCharge(p, dt, groundHeight(p.pos.x, p.pos.z, this.sim.cfg.seed));
-    this.glacialFrontVisual.update(dt);
     this.lightPulses.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);

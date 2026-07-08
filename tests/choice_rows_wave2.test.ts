@@ -74,8 +74,33 @@ function expireHot(sim: Sim, ability: string, target: Entity): void {
   );
 }
 
-// The mage tree was replaced wholesale by the owner's design (2026-07-11);
-// its coverage lives in tests/mage_choice_rows.test.ts.
+describe('mage wave 2 choice rows', () => {
+  it('Mana Attunement and Slow Burn create visible next-cast decisions', () => {
+    const { sim, p } = rig('mage', 20, {
+      5: 'mag_r5_mana_attunement',
+      14: 'mag_r14_hot_streak',
+    });
+    p.resource = p.maxResource - 100;
+    for (let i = 0; i < 3; i++) completeCast(sim, 'fireball');
+    expect(p.auras.some((a) => a.id === 'mag_mana_attunement')).toBe(true);
+    expect(p.resource).toBe(p.maxResource - 80);
+    expect(p.auras.some((a) => a.id === 'mag_slow_burn')).toBe(true);
+    expect(p.auras.find((a) => a.id === 'mag_slow_burn')?.kind).toBe('next_cast_instant');
+  });
+
+  it('Deep Rime and Battlemage Armor apply shields from their triggers', () => {
+    const { sim, p } = rig('mage', 20, {
+      11: 'mag_r11_permafrost',
+      17: 'mag_r17_battlemage_armor',
+    });
+    addTargetMob(sim, 100000, 3);
+    castAndSettle(sim, 'frost_nova', 2);
+    expect(p.auras.some((a) => a.id === 'mag_deep_rime' && a.kind === 'absorb')).toBe(true);
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.2));
+    expect(p.auras.some((a) => a.id === 'mag_battlemage_armor')).toBe(true);
+  });
+});
+
 describe('hunter wave 2 choice rows', () => {
   it('shot rhythm procs grant free or instant followups', () => {
     const { sim, p } = rig('hunter', 20, {

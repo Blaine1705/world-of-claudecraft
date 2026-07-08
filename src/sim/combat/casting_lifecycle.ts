@@ -51,7 +51,6 @@ import {
   MIN_GCD,
   normAngle,
 } from '../types';
-import { abilityQualifiesForAreaEcho, hasAreaEchoAura } from './area_echo';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   ARCANE_SURGE_ID,
@@ -434,24 +433,18 @@ export function castAbility(
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
   if (cancelStasisToggle(ctx, p, ability)) return;
-  // Ice Block (usableWhileControlled) ignores control: it may be pressed while
-  // stunned, polymorphed, incapacitated, silenced, or locked out, so it always frees
-  // the caster (its cleanseSelf effect then strips the debuffs). Its own stasis is the
-  // one control it still respects, but the recast toggle above already handles that.
-  if (!ability.usableWhileControlled) {
-    if (isInStasis(p)) return;
-    if (isStunned(p)) {
-      ctx.error(p.id, 'You are stunned!');
-      return;
-    }
-    if (ability.school !== 'physical' && isSilenced(p)) {
-      ctx.error(p.id, 'You are silenced!');
-      return;
-    }
-    if (ability.school !== 'physical' && isLockedOut(p, ability.school)) {
-      ctx.error(p.id, 'You are silenced!');
-      return;
-    }
+  if (isInStasis(p)) return;
+  if (isStunned(p)) {
+    ctx.error(p.id, 'You are stunned!');
+    return;
+  }
+  if (ability.school !== 'physical' && isSilenced(p)) {
+    ctx.error(p.id, 'You are silenced!');
+    return;
+  }
+  if (ability.school !== 'physical' && isLockedOut(p, ability.school)) {
+    ctx.error(p.id, 'You are silenced!');
+    return;
   }
   // Blink While Casting (mage choice row): Flickerstep slips through the busy
   // guard AND the GCD, an escape button that never touches the cast in

@@ -481,6 +481,14 @@ export function dealDamage(
       if (target.procState.icds.cheat_death === undefined) {
         target.procState.icds.cheat_death = icd;
         amount = Math.max(0, target.hp - 1);
+        // The save is a MOMENT: a golden ward bloom on the survivor.
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: target.id,
+          targetId: target.id,
+          school: 'holy',
+          fx: 'wardBloom',
+        });
       }
     }
   }
@@ -544,7 +552,16 @@ export function dealDamage(
       target.auras.splice(i, 1);
       ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
       const healer = ctx.entities.get(a.sourceId);
-      if (healer && !healer.dead) ctx.applyHeal(healer, target, a.value, a.name);
+      if (healer && !healer.dead) {
+        ctx.applyHeal(healer, target, a.value, a.name);
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: a.sourceId,
+          targetId: target.id,
+          school: a.school,
+          fx: 'echoBurst',
+        });
+      }
     }
   }
 

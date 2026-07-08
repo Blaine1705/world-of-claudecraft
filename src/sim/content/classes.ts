@@ -5601,9 +5601,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [{ type: 'absorb', amount: 5000, duration: 8 }],
+    effects: [
+      { type: 'absorb', amount: 600, duration: 8 },
+      { type: 'selfBuff', kind: 'stasis', value: 0, duration: 8 },
+    ],
     description:
-      'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
+      'Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)',
   },
   inner_focus: {
     id: 'inner_focus',

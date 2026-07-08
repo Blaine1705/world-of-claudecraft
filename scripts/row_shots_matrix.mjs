@@ -181,20 +181,8 @@ async function startOffline(page, cls, name) {
   page.on('pageerror', (err) => report.pageErrors.push(`${cls}: ${err.message}`));
   await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 180000 });
   await page.waitForSelector('#btn-offline', { timeout: 120000 });
-  // #btn-offline is a static hidden compat trigger in index.html, so it exists BEFORE
-  // main.ts wires its click handler. Click-and-poll until the offline panel actually
-  // opens instead of clicking once into a not-yet-hydrated page.
-  let offlineOpen = false;
-  for (let i = 0; i < 60 && !offlineOpen; i += 1) {
-    await page.evaluate(() => document.querySelector('#btn-offline')?.click());
-    try {
-      await page.waitForSelector('#char-name', { visible: true, timeout: 2000 });
-      offlineOpen = true;
-    } catch {
-      /* client still booting; click again */
-    }
-  }
-  if (!offlineOpen) throw new Error('offline panel (#char-name) never opened');
+  await page.evaluate(() => document.querySelector('#btn-offline')?.click());
+  await page.waitForSelector('#char-name', { timeout: 30000 });
   await page.type('#char-name', name);
   await page.evaluate((klass) => {
     document.querySelector(`#offline-select .mini-class[data-class="${klass}"]`)?.click();
@@ -269,7 +257,8 @@ async function readRows(page) {
     const rows = [...document.querySelectorAll('#talents-window .tal-row')].map((row) => ({
       level: row.querySelector('.tal-row-lvl')?.textContent?.trim() ?? '',
       locked: row.classList.contains('locked'),
-      picked: row.querySelector('.tal-row-opt.sel .tal-row-opt-name')?.textContent?.trim() ?? '',
+      picked:
+        row.querySelector('.tal-row-opt.sel .tal-row-opt-name')?.textContent?.trim() ?? '',
     }));
     return {
       activeTab: document.querySelector('#talents-window .tal-tab.active')?.textContent?.trim(),
@@ -418,16 +407,9 @@ async function classFlow(browser, cls) {
     if (!pickerOk) entry.notes.push('picker: FAILED after 3 attempts (captured diagnostic shot)');
 
     // ---- moment shot ----
-    // Close the talents window so the combat scene is visible, dismiss the tutorial
-    // hint, and close the Game Menu (#options-menu): the Escape presses used to
-    // normalize window state OPEN it when no window was up, and it covers the scene.
+    // Close the talents window first so the combat scene is visible.
     await page.evaluate(() => {
       document.querySelector('#talents-window [data-close]')?.click();
-      document.querySelector('#tutorial-hint .btn, #tutorial-hint button')?.click();
-      const menu = document.querySelector('#options-menu');
-      if (menu && getComputedStyle(menu).display !== 'none') {
-        window.__game.hud.toggleOptionsMenu();
-      }
     });
     await sleep(300);
     const target = await setupTarget(page);
