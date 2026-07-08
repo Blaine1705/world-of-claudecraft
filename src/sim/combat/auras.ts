@@ -62,6 +62,12 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  // Lifesap: living sap restores a flat amount of WHATEVER the current resource
+  // is, every classic tick, in combat and across form shifts.
+  for (const a of p.auras) {
+    if (a.kind === 'resource_sap')
+      p.resource = Math.min(p.maxResource, p.resource + Math.round(a.value));
+  }
   if (p.resourceType === 'mana') {
     if (p.fiveSecondRule >= 5) {
       // out-of-combat mana regen: faster than before and scales with spirit
