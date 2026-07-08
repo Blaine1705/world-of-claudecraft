@@ -171,6 +171,10 @@ export const fr_CA: EnTranslations = {
       "resurrectAtHealer": "Le Veilleur pâle (Glas du Veilleur)",
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Saluer de la main",
       "laugh": "MDR",

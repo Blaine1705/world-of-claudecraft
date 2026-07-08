@@ -171,6 +171,10 @@ export const ko_KR: EnTranslations = {
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다."
     },
+    "fct": {
+      "absorbed": "{amount} 흡수",
+      "cheap": "비용 감소!"
+    },
     "emotes": {
       "wave": "손인사",
       "laugh": "ㅋㅋ",

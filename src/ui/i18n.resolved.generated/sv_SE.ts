@@ -171,6 +171,10 @@ export const sv_SE: EnTranslations = {
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
       "spiritHealerAlive": "Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Vinka",
       "laugh": "LOL",

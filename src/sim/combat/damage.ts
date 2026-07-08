@@ -489,6 +489,12 @@ export function dealDamage(
           school: 'holy',
           fx: 'wardBloom',
         });
+        ctx.emit({
+          type: 'log',
+          pid: target.id,
+          text: 'Cheat Death saves you!',
+          color: '#ffd100',
+        });
       }
     }
   }

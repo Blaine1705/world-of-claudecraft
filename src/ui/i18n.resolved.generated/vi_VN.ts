@@ -171,6 +171,10 @@ export const vi_VN: EnTranslations = {
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Vẫy Tay",
       "laugh": "Cười Lớn",

@@ -171,6 +171,10 @@ export const zh_CN: EnTranslations = {
       "resurrectAtHealer": "灵魂医者（复活后遗症）",
       "spiritHealerAlive": "灵魂医者只看护逝者。你仍是生者。"
     },
+    "fct": {
+      "absorbed": "吸收 {amount}",
+      "cheap": "费用降低!"
+    },
     "emotes": {
       "wave": "挥手",
       "laugh": "大笑",

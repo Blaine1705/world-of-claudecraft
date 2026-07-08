@@ -817,7 +817,37 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (e.auras.length > 0) {
-    out.auras = e.auras.map(wireAura);
+    out.auras = e.auras.map(
+      (a): WireAura => ({
+        id: a.id,
+        name: a.name,
+        kind: a.kind,
+        rem: round2(a.remaining),
+        dur: a.duration,
+        // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
+        // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
+        // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
+        // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
+        // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and
+        // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
+        // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
+        ...(a.value !== 0 ? { value: a.value } : {}),
+        // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
+        // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+        ...(a.value2 !== undefined ? { value2: a.value2 } : {}),
+        ...(a.value3 !== undefined ? { value3: a.value3 } : {}),
+        ...(a.tickInterval !== undefined ? { tickInterval: a.tickInterval } : {}),
+        ...(a.school !== 'physical' ? { school: a.school } : {}),
+        ...(a.stacks && a.stacks > 1 ? { stacks: a.stacks } : {}),
+        // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
+        // buff icon can badge the count online exactly as offline; undefined for every other aura.
+        ...(a.charges !== undefined ? { charges: a.charges } : {}),
+        ...(a.empowerAbilities !== undefined ? { emp: a.empowerAbilities } : {}),
+        // The caster's entity id, for the client's own-aura prominence on the target strip
+        // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
+        ...(a.sourceId ? { src: a.sourceId } : {}),
+      }),
+    );
   }
   if (e.kind === 'mob' && e.lootable && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };

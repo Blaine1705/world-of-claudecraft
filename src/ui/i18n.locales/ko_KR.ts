@@ -1814,6 +1814,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.range': '사정거리 {range}미터',
   'abilityUi.tooltip.rangeWithMin': '사정거리 {min}-{max}미터',
   'abilityUi.tooltip.instant': '즉시 시전',
+  'hudChrome.fct.absorbed': '{amount} 흡수',
+  'hudChrome.fct.cheap': '비용 감소!',
   'abilityUi.tooltip.castSeconds': '{seconds}초 시전',
   'abilityUi.tooltip.channeledSeconds': '정신 집중 ({seconds}초)',
   'abilityUi.tooltip.cooldownSeconds': '재사용 대기시간 {seconds}초',
@@ -2708,7 +2710,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '다음 주문의 소모값을 없앱니다. 60초 동안 지속됩니다. (사제 특성)',
   'entities.abilities.innervate.name': '생명 수액',
-  'entities.abilities.innervate.description': '생명의 수액이 10초 동안 차올라 현재 자원을 파도처럼 20씩 회복합니다. 마나, 분노, 기력 모두에 적용되며 변신해도 끊기지 않습니다. (드루이드 특성)',
+  'entities.abilities.innervate.description':
+    '생명의 수액이 10초 동안 차올라 현재 자원을 파도처럼 20씩 회복합니다. 마나, 분노, 기력 모두에 적용되며 변신해도 끊기지 않습니다. (드루이드 특성)',
   'entities.abilities.kick.name': '발차기',
   'entities.abilities.kick.description':
     '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (도적 특성)',

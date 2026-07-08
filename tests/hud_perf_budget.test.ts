@@ -472,7 +472,6 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           usable: true,
           outOfRange: false,
           queued: false,
-          procGlow: false,
           empowered: false,
           ariaLabel: 'A',
           keybindLabel: 'K',

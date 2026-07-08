@@ -171,6 +171,10 @@ export const tr_TR: EnTranslations = {
       "resurrectAtHealer": "Solgun Bekçi (Bekçinin Bedeli)",
       "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "El Salla",
       "laugh": "LOL",

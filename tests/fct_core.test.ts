@@ -232,7 +232,6 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
       'heal',
       'xp',
       'rested-xp',
-      'honor',
       'self-note',
     ];
     for (const kind of nonDamage) expect(isDamageFctKind(kind)).toBe(false);

@@ -100,7 +100,7 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
   });
 });
 
-describe('fctSpawnShape: heal / xp / rested-xp / honor / self-note', () => {
+describe('fctSpawnShape: heal / xp / rested-xp / self-note', () => {
   it('absorb is an informational self floater', () => {
     expect(fctSpawnShape({ type: 'absorb' })).toEqual<FctSpawnShape>({
       kind: 'absorb',

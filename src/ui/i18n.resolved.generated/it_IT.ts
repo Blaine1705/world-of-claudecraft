@@ -171,6 +171,10 @@ export const it_IT: EnTranslations = {
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
       "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Saluta",
       "laugh": "Ridi",

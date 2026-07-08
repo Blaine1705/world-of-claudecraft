@@ -171,6 +171,10 @@ export const cs_CZ: EnTranslations = {
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Zamávání",
       "laugh": "Smích",

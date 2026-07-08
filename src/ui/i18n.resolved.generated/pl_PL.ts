@@ -171,6 +171,10 @@ export const pl_PL: EnTranslations = {
       "resurrectAtHealer": "Blady Strażnik (Myto Strażnika)",
       "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Pomachaj",
       "laugh": "Hehe",

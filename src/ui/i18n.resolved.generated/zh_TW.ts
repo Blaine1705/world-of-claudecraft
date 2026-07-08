@@ -171,6 +171,10 @@ export const zh_TW: EnTranslations = {
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
       "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
     },
+    "fct": {
+      "absorbed": "吸收 {amount}",
+      "cheap": "費用降低!"
+    },
     "emotes": {
       "wave": "揮手",
       "laugh": "大笑",

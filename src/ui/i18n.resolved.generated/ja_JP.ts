@@ -171,6 +171,10 @@ export const ja_JP: EnTranslations = {
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
     },
+    "fct": {
+      "absorbed": "{amount} 吸収",
+      "cheap": "低コスト!"
+    },
     "emotes": {
       "wave": "手を振る",
       "laugh": "大笑い",

@@ -171,6 +171,10 @@ export const da_DK: EnTranslations = {
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Vink",
       "laugh": "LOL",

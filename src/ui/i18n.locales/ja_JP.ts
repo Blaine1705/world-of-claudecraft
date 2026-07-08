@@ -1832,6 +1832,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.range': '射程{range}ヤード',
   'abilityUi.tooltip.rangeWithMin': '射程{min}-{max}ヤード',
   'abilityUi.tooltip.instant': '即時',
+  'hudChrome.fct.absorbed': '{amount} 吸収',
+  'hudChrome.fct.cheap': '低コスト!',
   'abilityUi.tooltip.castSeconds': '{seconds}秒詠唱',
   'abilityUi.tooltip.channeledSeconds': 'チャネル ({seconds}秒)',
   'abilityUi.tooltip.cooldownSeconds': '{seconds}秒クールダウン',

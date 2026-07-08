@@ -1854,6 +1854,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.range': 'Дальность {range} м',
   'abilityUi.tooltip.rangeWithMin': 'Дальность {min}-{max} м',
   'abilityUi.tooltip.instant': 'Мгновенно',
+  'hudChrome.fct.absorbed': 'Поглощено {amount}',
+  'hudChrome.fct.cheap': 'Дешевле!',
   'abilityUi.tooltip.castSeconds': '{seconds} сек. применения',
   'abilityUi.tooltip.channeledSeconds': 'Поддерживаемое ({seconds} сек.)',
   'abilityUi.tooltip.cooldownSeconds': '{seconds} сек. восстановления',

@@ -171,6 +171,10 @@ export const ru_RU: EnTranslations = {
       "resurrectAtHealer": "Целитель душ (болезнь воскрешения)",
       "spiritHealerAlive": "Целитель душ оберегает мёртвых. Вы всё ещё среди живых."
     },
+    "fct": {
+      "absorbed": "Поглощено {amount}",
+      "cheap": "Дешевле!"
+    },
     "emotes": {
       "wave": "Помахать",
       "laugh": "Смех",

@@ -343,15 +343,6 @@ import {
 import { chatPlayerContextActions, selfPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
-import { buildProcOverlay } from './proc_overlay_dom';
-import { attachOverlayDrag } from './proc_overlay_drag';
-import { ProcOverlayPainter } from './proc_overlay_painter';
-import {
-  chronoOverlayCharges,
-  combustionOverlayActive,
-  frostOverlayCharges,
-  procOverlayState,
-} from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { QuestProgressBanner } from './quest_progress_banner';
@@ -7236,9 +7227,8 @@ export class Hud {
     // routes through the elided writer facet; the aria-label keeps its per-frame t()
     // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
     this.renderPetBar();
-    this.renderStanceBar();
     this.flushPendingProcAuraNotes();
-    if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
+    if (this.spellbookWindow.isOpen) this.spellbookWindow.refreshHotbarControls();
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
     );
@@ -8985,12 +8975,7 @@ export class Hud {
                 now,
               );
           }
-          if (
-            ev.kind === 'miss' ||
-            ev.kind === 'dodge' ||
-            ev.kind === 'resist' ||
-            ev.kind === 'parry'
-          ) {
+          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,

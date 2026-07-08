@@ -171,6 +171,10 @@ export const es: EnTranslations = {
       "resurrectAtHealer": "El Guardián Pálido (Tañido del Guardián)",
       "spiritHealerAlive": "El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Saludar",
       "laugh": "Reír",

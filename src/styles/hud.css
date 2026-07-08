@@ -1526,28 +1526,6 @@
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
   }
-  /* Free-cost proc glow (Battle Trance): the classic pulsing gold rim on the
-     covered abilities. Actionable info: never gated by a graphics tier; the
-     pulse (motion only) stops under reduced motion, the steady glow stays. */
-  .action-btn.proc {
-    border-color: #ffd97a;
-    box-shadow:
-      0 0 12px #ffcf40e6,
-      inset 0 0 6px #ffcf4066;
-    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
-  }
-  @keyframes abtn-proc-pulse {
-    from {
-      box-shadow:
-        0 0 7px #ffcf40b0,
-        inset 0 0 4px #ffcf4044;
-    }
-    to {
-      box-shadow:
-        0 0 15px #ffcf40f0,
-        inset 0 0 7px #ffcf4088;
-    }
-  }
   .action-btn.empowered {
     border-color: var(--gold);
     box-shadow:
@@ -1572,7 +1550,6 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .action-btn.proc,
     .action-btn.empowered {
       animation: none;
     }

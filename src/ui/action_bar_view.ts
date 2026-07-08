@@ -90,6 +90,12 @@ export interface ActionBarAuraInput {
   stacks?: number;
 }
 
+export interface ActionBarAuraInput {
+  kind: AuraKind;
+  value?: number;
+  empowerAbilities?: readonly string[];
+}
+
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
  *  slot's current binding and keybind label. NO element refs (those live on the
  *  painter descriptor); NO per-frame allocation (the accessors return existing refs
@@ -146,17 +152,7 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
-  /** The player's worn auras: the free-cost proc read (Battle Trance /
-   *  next_cast_free) that drives the slot glow and usable state, the kill-window
-   *  gate, and the next-cast empowerment read. Both worlds expose the live aura
-   *  list. */
-  auras: readonly ActionBarAuraInput[];
-  /** Charge-limited abilities' spent counts (Double Charge); the recharge
-   *  timer itself rides `cooldowns`. Optional: absent when nothing is spent. */
-  charges?: { get(id: string): { spent: number } | undefined };
-  /** Live charges on the abilityCharges recharge model (Frost's second Ice Block):
-   *  the current count per ability id. Optional: absent when nothing uses it. */
-  abilityCharges?: { [id: string]: { charges: number } | undefined };
+  auras?: readonly ActionBarAuraInput[];
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -188,10 +184,6 @@ export interface ActionBarSlotState {
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
-  /** A free-cost proc (Battle Trance) covers this ability right now: the
-   *  painter renders the classic gold proc glow. Actionable info, so it is
-   *  NEVER shed by a graphics tier. */
-  procGlow: boolean;
   empowered: boolean;
   ariaLabel: string;
   keybindLabel: string;
@@ -223,7 +215,6 @@ function makeSlotState(): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
-    procGlow: false,
     empowered: false,
     ariaLabel: '',
     keybindLabel: '',
@@ -318,7 +309,6 @@ export function createActionBarView(
           slot.usable = true;
           slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
           slot.queued = player.autoAttack;
-          slot.procGlow = false;
           slot.empowered = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
@@ -344,7 +334,6 @@ export function createActionBarView(
           slot.usable = true;
           slot.outOfRange = false;
           slot.queued = false;
-          slot.procGlow = false;
           slot.empowered = false;
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
           slot.keybindLabel = sd.keybindLabel();
@@ -376,7 +365,6 @@ export function createActionBarView(
           slot.usable = !(count <= 0 || player.dead);
           slot.outOfRange = false;
           slot.queued = false;
-          slot.procGlow = false;
           slot.empowered = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
@@ -458,10 +446,6 @@ export function createActionBarView(
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
-        // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
-        // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
-        // sim predicate idiom as freeCostAuraActive above).
-        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
         slot.empowered = hasEmpoweringAura(player.auras, ability);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,

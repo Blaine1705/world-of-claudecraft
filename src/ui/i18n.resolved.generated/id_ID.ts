@@ -171,6 +171,10 @@ export const id_ID: EnTranslations = {
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Melambai",
       "laugh": "LOL",

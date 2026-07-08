@@ -171,6 +171,10 @@ export const de_DE: EnTranslations = {
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Winken",
       "laugh": "Lachen",

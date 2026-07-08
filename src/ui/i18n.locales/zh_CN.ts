@@ -1750,6 +1750,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.range': '{range} 码范围',
   'abilityUi.tooltip.rangeWithMin': '{min}-{max} 码范围',
   'abilityUi.tooltip.instant': '瞬发',
+  'hudChrome.fct.absorbed': '吸收 {amount}',
+  'hudChrome.fct.cheap': '费用降低!',
   'abilityUi.tooltip.castSeconds': '{seconds} 秒施法',
   'abilityUi.tooltip.channeledSeconds': '引导（{seconds} 秒）',
   'abilityUi.tooltip.cooldownSeconds': '{seconds} 秒冷却',
@@ -2603,7 +2605,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.inner_focus.description':
     '使你的下一个法术不消耗法力。持续 60 秒。（牧师天赋）',
   'entities.abilities.innervate.name': '生命树液',
-  'entities.abilities.innervate.description': '生命树液在你体内涌动10秒，如波浪般恢复20点当前资源：法力、怒气或能量，变形也不会中断。（德鲁伊天赋）',
+  'entities.abilities.innervate.description':
+    '生命树液在你体内涌动10秒，如波浪般恢复20点当前资源：法力、怒气或能量，变形也不会中断。（德鲁伊天赋）',
   'entities.abilities.kick.name': '踢击',
   'entities.abilities.kick.description': '打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）',
   'entities.abilities.last_stand.name': '第十一刻',

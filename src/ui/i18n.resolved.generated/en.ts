@@ -171,6 +171,10 @@ export const en: EnTranslations = {
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
       "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Wave",
       "laugh": "LOL",

@@ -171,6 +171,10 @@ export const nl_NL: EnTranslations = {
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden."
     },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
+    },
     "emotes": {
       "wave": "Zwaaien",
       "laugh": "LOL",

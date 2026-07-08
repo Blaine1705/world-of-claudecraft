@@ -171,6 +171,10 @@ export const en_XA: EnTranslations = {
       "resurrectAtHealer": "[Ţĥé Þáļé Ķééþéŕ (Ķééþéŕ'š Ţóļļ)]",
       "spiritHealerAlive": "[Ţĥé Þáļé Ķééþéŕ ŵáţçĥéš óʋéŕ ţĥé ðéáð. Ýóú áŕé šţíļļ áɱóñĝ ţĥé ļíʋíñĝ.]"
     },
+    "fct": {
+      "absorbed": "[Áƀšóŕƀéð {amount}]",
+      "cheap": "[Çĥéáþ!]"
+    },
     "emotes": {
       "wave": "[Ŵáʋé]",
       "laugh": "[ĻÓĻ]",
