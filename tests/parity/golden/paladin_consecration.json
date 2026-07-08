@@ -8,14 +8,14 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 932,
-  "drawDigest": "34d01e34",
+  "draws": 922,
+  "drawDigest": "2223edd7",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "b4ef0809",
+      "state": "cc890d46",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -94,6 +94,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.061,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -130,7 +131,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 402,
-      "state": "eca5b344",
+      "state": "27353ff2",
       "events": "e12ec889",
       "rng": {
         "draws": 4,
@@ -141,7 +142,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 402,
-      "state": "79fb7953",
+      "state": "5aae957f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -152,7 +153,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 402,
-      "state": "916d6aa1",
+      "state": "da745b4d",
       "events": "9c2aab97",
       "rng": {
         "draws": 80,
@@ -163,7 +164,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 402,
-      "state": "dea43a9c",
+      "state": "ec0e6232",
       "events": "741638a5",
       "rng": {
         "draws": 170,
@@ -174,7 +175,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 402,
-      "state": "1ae008c2",
+      "state": "0e8dce7e",
       "events": "0fafa7a2",
       "rng": {
         "draws": 270,
@@ -185,7 +186,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 402,
-      "state": "aca009c5",
+      "state": "559d06ff",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -196,7 +197,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 402,
-      "state": "307b20d1",
+      "state": "e1d62a63",
       "events": "ae361e7a",
       "rng": {
         "draws": 501,
@@ -207,7 +208,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 402,
-      "state": "535e12ab",
+      "state": "cd9e88af",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -218,33 +219,33 @@
       "tick": 180,
       "time": 9,
       "nextId": 402,
-      "state": "d0bcd3e9",
-      "events": "8c880780",
+      "state": "c16e139d",
+      "events": "266d340d",
       "rng": {
-        "draws": 765,
-        "digest": "84d7375c"
+        "draws": 762,
+        "digest": "29ec1562"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 402,
-      "state": "ac39c81a",
+      "state": "892032aa",
       "events": "741638a5",
       "rng": {
-        "draws": 931,
-        "digest": "5764acf5"
+        "draws": 922,
+        "digest": "2223edd7"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 402,
-      "state": "e98ad828",
+      "state": "271ffa22",
       "events": "741638a5",
       "rng": {
-        "draws": 932,
-        "digest": "34d01e34"
+        "draws": 922,
+        "digest": "2223edd7"
       },
       "label": "final",
       "players": [
@@ -264,7 +265,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 164,
-            "damageTaken": 22
+            "damageTaken": 14
           },
           "craftSkills": {},
           "delveClears": {},
@@ -306,14 +307,14 @@
         {
           "aiState": "idle",
           "attackPower": 120,
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.068,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49978,
+          "hp": 49986,
           "id": 400,
           "inCombat": true,
           "kind": "player",
@@ -324,6 +325,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -358,7 +360,7 @@
         {
           "aggroTargetId": 400,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

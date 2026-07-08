@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "e45e0ef7",
+      "state": "b2b5decd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -94,6 +94,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.057,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -131,7 +132,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 404,
-      "state": "e6961aa7",
+      "state": "98400d3e",
       "events": "d01fe473",
       "rng": {
         "draws": 6,
@@ -142,7 +143,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 404,
-      "state": "a9f8923b",
+      "state": "9a3acbde",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -153,7 +154,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 404,
-      "state": "2cd416d9",
+      "state": "eda2cafc",
       "events": "e02f37be",
       "rng": {
         "draws": 96,
@@ -164,7 +165,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 404,
-      "state": "a80ce005",
+      "state": "085b739c",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -175,7 +176,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "4a8a46ef",
+      "state": "0aeb3cfe",
       "events": "4468bb01",
       "rng": {
         "draws": 294,
@@ -186,7 +187,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 404,
-      "state": "2a3aced7",
+      "state": "ce6eb462",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -197,7 +198,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 404,
-      "state": "2a3aced7",
+      "state": "ce6eb462",
       "events": "741638a5",
       "rng": {
         "draws": 398,
@@ -279,6 +280,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,

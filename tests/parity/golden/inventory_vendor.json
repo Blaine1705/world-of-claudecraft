@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "654eebdb",
+      "state": "758ebcd7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -121,6 +121,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -156,7 +157,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "82b8a591",
+      "state": "6054913d",
       "events": "531aebc5",
       "rng": {
         "draws": 0,
@@ -250,6 +251,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -285,7 +287,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "196fe77d",
+      "state": "584aa7a1",
       "events": "a6017c57",
       "rng": {
         "draws": 0,
@@ -384,6 +386,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -419,7 +422,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7ed2345d",
+      "state": "9e6c5315",
       "events": "6eca1d53",
       "rng": {
         "draws": 0,
@@ -518,6 +521,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -553,7 +557,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "4383769b",
+      "state": "4f1317c7",
       "events": "695c81aa",
       "rng": {
         "draws": 0,
@@ -655,6 +659,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -690,7 +695,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "35035d89",
+      "state": "59ebe353",
       "events": "1df0a44d",
       "rng": {
         "draws": 0,
@@ -804,6 +809,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -840,7 +846,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "4b780ff6",
+      "state": "02bebd20",
       "events": "fdae55a8",
       "rng": {
         "draws": 0,
@@ -950,6 +956,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -986,7 +993,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "f5f0ed6f",
+      "state": "94cba6d1",
       "events": "4b948de8",
       "rng": {
         "draws": 0,
@@ -1106,6 +1113,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1142,7 +1150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "5a870d4b",
+      "state": "db393c51",
       "events": "3efe81a4",
       "rng": {
         "draws": 0,
@@ -1266,6 +1274,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1302,7 +1311,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "061434b0",
+      "state": "469623ca",
       "events": "fc57ebc8",
       "rng": {
         "draws": 0,
@@ -1432,6 +1441,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1468,7 +1478,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "db88a449",
+      "state": "342888cb",
       "events": "7c2d5847",
       "rng": {
         "draws": 0,
@@ -1598,6 +1608,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1634,7 +1645,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d62168bb",
+      "state": "9f998401",
       "events": "daa824d5",
       "rng": {
         "draws": 0,
@@ -1768,6 +1779,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1804,7 +1816,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d62168bb",
+      "state": "9f998401",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1938,6 +1950,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,

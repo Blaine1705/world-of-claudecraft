@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 403,
-      "state": "078d30fe",
+      "state": "d61a90b4",
       "events": "e50fb0d8",
       "rng": {
         "draws": 2,
@@ -165,6 +165,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 20,

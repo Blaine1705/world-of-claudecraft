@@ -8,14 +8,14 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 143,
-  "drawDigest": "9dafb67b",
+  "draws": 142,
+  "drawDigest": "254e4212",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "c504724a",
+      "state": "fa88c3e8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -90,6 +90,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -127,30 +128,30 @@
       "tick": 20,
       "time": 1,
       "nextId": 402,
-      "state": "282ae260",
-      "events": "aba0e338",
+      "state": "56615839",
+      "events": "0a05b7ba",
       "rng": {
-        "draws": 9,
-        "digest": "8ecad8de"
+        "draws": 7,
+        "digest": "14806c1c"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 402,
-      "state": "a872f2e4",
+      "state": "62ff952d",
       "events": "60422bb3",
       "rng": {
-        "draws": 15,
-        "digest": "843b3bf7"
+        "draws": 13,
+        "digest": "3fc203d8"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 402,
-      "state": "afb58d64",
-      "events": "811b3577",
+      "state": "1bb7326f",
+      "events": "5e117f03",
       "rng": {
         "draws": 90,
         "digest": "0f3d4b16"
@@ -160,11 +161,11 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 402,
-      "state": "b605aeb0",
+      "state": "1e8173bb",
       "events": "741638a5",
       "rng": {
-        "draws": 143,
-        "digest": "9dafb67b"
+        "draws": 142,
+        "digest": "254e4212"
       },
       "label": "final",
       "players": [
@@ -184,7 +185,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 79,
-            "damageTaken": 9
+            "damageTaken": 13
           },
           "craftSkills": {},
           "delveClears": {},
@@ -232,7 +233,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49991,
+          "hp": 49987,
           "id": 400,
           "inCombat": true,
           "kind": "player",
@@ -243,6 +244,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.063,
           "petMode": "defensive",
           "pos": {
             "x": 2.5,
