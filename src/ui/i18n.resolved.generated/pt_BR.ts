@@ -6191,7 +6191,7 @@ export const pt_BR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luz Bruxa",
-        "description": "Reduz a armadura do alvo em {damage}% por 40 s. Não acumula com Retalhar Armadura."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Sono Profundo",

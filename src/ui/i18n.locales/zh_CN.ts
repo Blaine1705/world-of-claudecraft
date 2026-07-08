@@ -2385,7 +2385,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': '昏迷目标 2 秒。仅限巨熊形态。',
   'entities.abilities.faerie_fire.name': '巫光',
   'entities.abilities.faerie_fire.description':
-    '使目标的护甲降低 {damage}%，持续 40 秒。无法与削甲叠加。',
+    '使目标的护甲降低 {damage}%，持续 40 秒。不与削甲叠加。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目标陷入深度睡眠，最多持续 8 秒。任何伤害都会将其唤醒。',

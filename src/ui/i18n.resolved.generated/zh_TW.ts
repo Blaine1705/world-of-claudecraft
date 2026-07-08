@@ -6191,7 +6191,7 @@ export const zh_TW: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。"
+        "description": "使目標的護甲降低 {damage}%，持續 40 秒。不會與削甲疊加。"
       },
       "hibernate": {
         "name": "沉眠",

@@ -6191,7 +6191,7 @@ export const es_ES: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Fuego Fatuo",
-        "description": "Reduce la armadura del objetivo en un {damage}% durante 40 s. No se acumula con Cizalla de Armadura."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Letargo",

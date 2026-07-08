@@ -12,6 +12,10 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -19,6 +23,10 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -26,6 +34,10 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -33,6 +45,10 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -41,6 +57,10 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -48,6 +68,10 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -59,6 +83,10 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.readout.rowsSummary",
     "hudChrome.fct.absorbed",
     "hudChrome.fct.cheap"
@@ -84,6 +112,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.crusader_strike.name",
     "entities.abilities.elemental_mastery.description",
     "entities.abilities.elemental_mastery.name",
+    "entities.abilities.faerie_fire.description",
     "entities.abilities.feral_charge.description",
     "entities.abilities.feral_charge.name",
     "entities.abilities.hemorrhage.description",
@@ -124,7 +153,10 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
@@ -135,7 +167,10 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
@@ -146,7 +181,10 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
@@ -157,7 +195,10 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
@@ -168,7 +209,10 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
@@ -179,7 +223,10 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",
@@ -190,7 +237,10 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "entities.abilities.chain_heal.description",
     "entities.abilities.chain_heal.name",
-    "entities.itemSets.necromancers.bonus4",
+    "entities.abilities.faerie_fire.description",
+    "entities.abilities.sunder_armor.description",
+    "entities.mobs.training_dummy.name",
+    "entities.mobs.yumi_cat.name",
     "game.talents.choicesTab",
     "game.talents.readout.rowsSummary",
     "game.talents.rowUnlockToast",

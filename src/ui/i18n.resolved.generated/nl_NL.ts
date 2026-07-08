@@ -6191,7 +6191,7 @@ export const nl_NL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Heksenlicht",
-        "description": "Verlaagt het pantser van het doelwit met {damage}% gedurende 40 sec. Stapelt niet met Pantserscheur."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Sluimer",

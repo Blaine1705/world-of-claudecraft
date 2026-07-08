@@ -6191,7 +6191,7 @@ export const fr_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Diminue l'armure de la cible de {damage}% pendant 40 s. Ne se cumule pas avec Cisaillement d'armure."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Sommeil",

@@ -6191,7 +6191,7 @@ export const tr_TR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cadı Işığı",
-        "description": "Hedefin zırhını 40 saniye boyunca %{damage} azaltır. Zırh Kesme ile birlikte istiflenmez."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Derin Uyku",

@@ -6191,7 +6191,7 @@ export const da_DK: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hekselys",
-        "description": "Sænker målets rustning med {damage}% i 40 sek. Stakker ikke med Rustningsskær."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Slummer",

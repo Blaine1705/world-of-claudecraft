@@ -6191,7 +6191,7 @@ export const cs_CZ: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Čarodějné světlo",
-        "description": "Sníží zbroj cíle o {damage}% na 40 s. Nesčítá se se Seřezáním zbroje."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Dřímota",

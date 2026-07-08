@@ -6191,7 +6191,7 @@ export const pl_PL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Wiedźmie światło",
-        "description": "Zmniejsza pancerz celu o {damage}% na 40 sek. Nie kumuluje się z Rozdarciem pancerza."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
       },
       "hibernate": {
         "name": "Uśpienie",
