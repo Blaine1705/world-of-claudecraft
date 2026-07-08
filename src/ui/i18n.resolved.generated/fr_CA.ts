@@ -5260,6 +5260,10 @@ export const fr_CA: EnTranslations = {
         "name": "Plaies béantes",
         "description": "Passif : votre Frappe mutilante fait saigner la cible, infligeant des dégâts physiques sur 6 s. (Armes)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Saignée",
         "description": "Attaque instantanément dans une frénésie sanguinaire pour {damage}. (signature Fureur)"

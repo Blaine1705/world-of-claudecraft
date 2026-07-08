@@ -5260,6 +5260,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Zející rány",
         "description": "Pasivní: váš Mrzačící úder způsobí cíli krvácení a po dobu 6 s uděluje fyzické poškození. (Zbraně)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Pouštění žilou",
         "description": "Okamžitě zaútočíš v krvavém šílenství za {damage}. (Hlavní schopnost Fury)"

@@ -5260,6 +5260,10 @@ export const zh_CN: EnTranslations = {
         "name": "撕裂伤口",
         "description": "被动：你的致残打击使目标流血，在 6 秒内受到物理伤害。（武器）"
       },
+      "enrage_passive": {
+        "name": "狂怒",
+        "description": "被动：处于狂怒时，你造成的伤害提高11%，攻击速度提高25%，移动速度提高10%，持续4秒。嗜血有30%几率触发，浴血则必定触发。（狂怒）"
+      },
       "bloodthirst": {
         "name": "放血",
         "description": "在鲜血狂怒中立即攻击，造成 {damage} 点伤害，恢复你最大生命值的 3%，并产生 10 点怒气。（狂怒专精标志技能）"

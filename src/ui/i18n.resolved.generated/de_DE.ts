@@ -5260,6 +5260,10 @@ export const de_DE: EnTranslations = {
         "name": "Klaffende Wunden",
         "description": "Passiv: Euer Verstümmelnder Hieb lässt das Ziel bluten und verursacht über 6 Sek. physischen Schaden. (Waffen)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Aderlass",
         "description": "Greift sofort in blutiger Raserei an und verursacht {damage}. (Furor-Signatur)"

@@ -2150,6 +2150,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': '拡がる弧',
   'entities.abilities.sweeping_strikes.description':
     '12秒間、単体攻撃が近くの敵1体にも75%のダメージを与えます。（アームズ）',
+  'entities.abilities.enrage_passive.name': '激昂',
+  'entities.abilities.enrage_passive.description':
+    'パッシブ：激昂中は与ダメージ11%、攻撃速度25%、移動速度10%上昇（4秒）。ブラッドレットは30%の確率で、レッドハーヴェストは必ず激昂させる。（フューリー）',
   'entities.abilities.deep_wounds.name': '深い傷',
   'entities.abilities.deep_wounds.description':
     'パッシブ：重傷の一撃が対象に出血を与え、6秒かけて物理ダメージを与えます。（アームズ）',

@@ -2180,6 +2180,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sweeping_strikes.name': 'Расширяющаяся дуга',
   'entities.abilities.sweeping_strikes.description':
     'В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага, нанося 75% урона. (Оружие)',
+  'entities.abilities.enrage_passive.name': 'Ярость',
+  'entities.abilities.enrage_passive.description':
+    'Пассивно: в Ярости вы наносите на 11% больше урона, атакуете на 25% быстрее и двигаетесь на 10% быстрее в течение 4 сек. Кровопускание даёт 30% шанс, а Красная жатва всегда вызывает Ярость. (Неистовство)',
   'entities.abilities.deep_wounds.name': 'Зияющие раны',
   'entities.abilities.deep_wounds.description':
     'Пассивно: ваш Калечащий удар вызывает у цели кровотечение, нанося физический урон в течение 6 сек. (Оружие)',

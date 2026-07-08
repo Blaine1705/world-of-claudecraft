@@ -5260,6 +5260,10 @@ export const vi_VN: EnTranslations = {
         "name": "Vết Thương Hở",
         "description": "Bị động: Đòn Tàn Phế của bạn khiến mục tiêu chảy máu, gây sát thương vật lý trong 6 giây. (Vũ Khí)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Trích Huyết",
         "description": "Tấn công tức thời trong cơn cuồng huyết gây {damage}. (Tuyệt chiêu Cuồng Nộ)"

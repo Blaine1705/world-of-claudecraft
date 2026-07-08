@@ -5260,6 +5260,10 @@ export const en: EnTranslations = {
         "name": "Gaping Wounds",
         "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Bloodletting",
         "description": "Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health and generating 12 rage. (Fury signature)"

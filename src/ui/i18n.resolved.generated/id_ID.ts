@@ -5260,6 +5260,10 @@ export const id_ID: EnTranslations = {
         "name": "Luka Menganga",
         "description": "Pasif: Serangan Pelukaimu membuat target berdarah, memberikan kerusakan fisik selama 6 dtk. (Senjata)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Pertumpahan Darah",
         "description": "Seketika menyerang dalam amukan darah untuk {damage}. (Penanda Fury)"

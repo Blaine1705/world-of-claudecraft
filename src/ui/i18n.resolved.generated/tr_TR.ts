@@ -5260,6 +5260,10 @@ export const tr_TR: EnTranslations = {
         "name": "Açık Yaralar",
         "description": "Pasif: Sakatlayan Darbeniz hedefi kanatarak 6 sn boyunca fiziksel hasar verir. (Silah)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Kan Akıtma",
         "description": "Bir kan çılgınlığıyla anında {damage} hasar veren bir saldırı yap. (Hiddet imzası)"

@@ -5260,6 +5260,10 @@ export const sv_SE: EnTranslations = {
         "name": "Gapande sår",
         "description": "Passiv: ditt Stympande hugg får målet att blöda och orsakar fysisk skada under 6 sek. (Vapen)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Åderlåtning",
         "description": "Attackera omedelbart i ett blodsraseri för {damage}. (Fury-signatur)"

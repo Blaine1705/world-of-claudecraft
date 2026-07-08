@@ -5260,6 +5260,10 @@ export const pl_PL: EnTranslations = {
         "name": "Ziejące rany",
         "description": "Pasywne: twoje Okaleczające uderzenie powoduje krwawienie celu, zadając obrażenia fizyczne przez 6 s. (Broń)"
       },
+      "enrage_passive": {
+        "name": "Enrage",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "Upust krwi",
         "description": "Natychmiast atakuj w krwawym szale, zadając {damage}. (Sygnatura furii)"
