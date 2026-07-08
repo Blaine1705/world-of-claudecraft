@@ -3244,15 +3244,48 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'hamstring',
   'bloodrage',
   'overpower',
+  'raging_gale',
   'execute',
   'slam',
+  'red_harvest',
   'cleave',
+  'battle_stance',
   'defensive_stance',
   'demoralizing_shout',
+  'intimidating_shout',
   'sunder_armor',
   'mortal_strike',
   'bloodthirst',
   'shield_slam',
+  'furious_mending',
+  'emboldening_roar',
+  'raised_guard',
+  'iron_resolve',
+  'faultline',
+  'defiant_bellow',
+  'revenge',
+  'rallying_cry',
+  'berserker_stance',
+  'die_by_sword',
+  'storm_bolt',
+  'victory_rush',
+  'piercing_howl',
+  'bladestorm',
+  'colossal_might',
+  'second_wind',
+  'pursuit',
+  'lingering_dread',
+  'anger_management',
+  'battle_rhythm',
+  'recklessness',
+  'avatar',
+  'bloodbath',
+  'sanguine_aura',
+  'pummel',
+  'sweeping_strikes',
+  'breachmaker',
+  'heroic_leap',
+  'attack',
   'whirlwind',
   'berserker_rage',
   // mage (CraftPix premium pyromancer/cryomancer/lightning-mage packs — fire/frost/arcane;
@@ -3338,7 +3371,18 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
-  const cls = ABILITIES[id]?.class;
+  const cls =
+    ABILITIES[id]?.class ??
+    (id === 'bloodbath' ||
+    id === 'colossal_might' ||
+    id === 'second_wind' ||
+    id === 'pursuit' ||
+    id === 'lingering_dread' ||
+    id === 'anger_management' ||
+    id === 'battle_rhythm' ||
+    id === 'attack'
+      ? 'warrior'
+      : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
