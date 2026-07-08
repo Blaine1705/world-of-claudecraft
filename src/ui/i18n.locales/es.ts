@@ -2417,7 +2417,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Genera {rage} de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Mano Roja',
   'entities.abilities.overpower.description':
-    'Ataque instantáneo de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar.',
+    'Ataque instantáneo (2 cargas) de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar.',
   'entities.abilities.execute.name': 'Tumba Temprana',
   'entities.abilities.execute.description':
     'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',

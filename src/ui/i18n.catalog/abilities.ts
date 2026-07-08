@@ -652,7 +652,7 @@ const classAbilityNamesEn = {
       [
         'overpower',
         'Redhand',
-        'Instant attack for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
+        'Instant attack (2 charges) for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
       ],
       [
         'execute',

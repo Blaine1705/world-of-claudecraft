@@ -641,6 +641,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 0,
     castTime: 0,
     cooldown: 5,
+    // Two charges (owner 2026-07-08, like Twinstrike): usable twice back to back,
+    // each charge recharging on the cooldown, and each use stacking its empower.
+    maxCharges: 2,
     range: 0,
     school: 'physical',
     requiresTarget: true,
@@ -667,7 +670,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Instant attack for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
+      'Instant attack (2 charges) for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
   },
   // Fury's active rage builder (operator design, Arremetida Enfurecida): two
   // 60%-weapon hits so the pair lands slightly more than one signature

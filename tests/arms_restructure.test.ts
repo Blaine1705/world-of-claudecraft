@@ -96,7 +96,7 @@ describe('Arms restructure: the fused strike', () => {
     expect(sim.player.auras.some((a) => a.kind === 'overpower_charge')).toBe(false);
   });
 
-  it('Redhand stacks its empower up to 2', () => {
+  it('Redhand has 2 charges (used twice back to back) and stacks its empower to 2', () => {
     const sim = makeArms();
     const mob = nearestMob(sim);
     mob.maxHp = 100000;
@@ -104,16 +104,16 @@ describe('Arms restructure: the fused strike', () => {
     approach(sim, mob);
     sim.player.resource = 100;
     sim.targetEntity(mob.id);
+    // Two charges: both casts land back to back with only the GCD between them,
+    // no cooldown wait. Each use stacks the empower.
     sim.castAbility('overpower');
     sim.tick();
-    sim.player.cooldowns.delete('overpower');
-    sim.player.gcdRemaining = 0; // skip cd + gcd for the test
+    sim.player.gcdRemaining = 0;
     sim.castAbility('overpower');
     sim.tick();
-    const charge = sim.player.auras.find((a) => a.kind === 'overpower_charge');
-    expect(charge?.stacks).toBe(2);
-    // A third cast never exceeds the cap.
-    sim.player.cooldowns.delete('overpower');
+    expect(sim.player.auras.find((a) => a.kind === 'overpower_charge')?.stacks).toBe(2);
+    // Both charges spent now; a third cast is blocked until one recharges, so the
+    // stack stays capped at 2.
     sim.player.gcdRemaining = 0;
     sim.castAbility('overpower');
     sim.tick();
