@@ -48,6 +48,8 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'attackspeed',
   'sunder',
   'bleed_vuln',
+  'corrode',
+  'faerie_fire',
   'spellvuln',
   'vulnerability',
   'tongues',
