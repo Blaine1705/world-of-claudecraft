@@ -4737,7 +4737,7 @@ export const cs_CZ: EnTranslations = {
       },
       "overpower": {
         "name": "Rudá ruka",
-        "description": "Okamžitý útok za poškození zbraně plus {damage}, který vygeneruje {rage} vzteku. Nelze mu uhnout."
+        "description": "Okamžitý útok za poškození zbraně plus {damage}, který vygeneruje {rage} vzteku a posílí váš příští Mrzačící úder o 20% (skládá se dvakrát). Nelze mu uhnout."
       },
       "execute": {
         "name": "Předčasný hrob",
@@ -5249,7 +5249,15 @@ export const cs_CZ: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Mrzačící úder",
-        "description": "Zákeřný úder, který způsobí poškození zbraně plus {damage}. (Hlavní schopnost Arms)"
+        "description": "Zákeřný úder za poškození zbraně plus {damage}, který sníží léčení cíle o 50% po dobu 10 s. Uděluje Zející rány (krvácení). (charakteristická schopnost Zbraní)"
+      },
+      "sweeping_strikes": {
+        "name": "Rozšiřující se oblouk",
+        "description": "Po dobu 12 s vaše útoky na jeden cíl zasáhnou také 1 nepřítele poblíž za 75% poškození. (Zbraně)"
+      },
+      "deep_wounds": {
+        "name": "Zející rány",
+        "description": "Pasivní: váš Mrzačící úder způsobí cíli krvácení a po dobu 6 s uděluje fyzické poškození. (Zbraně)"
       },
       "bloodthirst": {
         "name": "Pouštění žilou",
@@ -5413,7 +5421,7 @@ export const cs_CZ: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

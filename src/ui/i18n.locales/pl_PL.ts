@@ -1414,10 +1414,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Spala wroga księżycowym ogniem, zadając {damage} obrażeń arkanicznych oraz obrażenia w czasie.',
   'entities.abilities.moonfire.name': 'Księżycowa nawałnica',
   'entities.abilities.mortal_strike.description':
-    'Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)',
+    'Zajadłe uderzenie zadające obrażenia broni plus {damage} i zmniejszające leczenie otrzymywane przez cel o 50% przez 10 s. Nakłada Ziejące rany (krwawienie). (znak firmowy Broni)',
   'entities.abilities.mortal_strike.name': 'Okaleczające uderzenie',
+  'entities.abilities.sweeping_strikes.name': 'Poszerzający się łuk',
+  'entities.abilities.sweeping_strikes.description':
+    'Przez 12 s twoje ataki na jeden cel trafiają także 1 pobliskiego wroga, zadając 75% obrażeń. (Broń)',
+  'entities.abilities.deep_wounds.name': 'Ziejące rany',
+  'entities.abilities.deep_wounds.description':
+    'Pasywne: twoje Okaleczające uderzenie powoduje krwawienie celu, zadając obrażenia fizyczne przez 6 s. (Broń)',
   'entities.abilities.overpower.description':
-    'Natychmiastowy atak zadający obrażenia broni plus {damage}, generujący {rage} wściekłości. Nie można go uniknąć.',
+    'Natychmiastowy atak zadający obrażenia broni plus {damage}, generujący {rage} wściekłości i wzmacniający twoje następne Okaleczające uderzenie o 20% (kumuluje się dwukrotnie). Nie można go uniknąć.',
   'entities.abilities.overpower.name': 'Krwawa ręka',
   'entities.abilities.polymorph.description':
     'Przemienia wroga w ropuchę na nawet 15 sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy.',

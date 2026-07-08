@@ -1432,10 +1432,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thiêu đốt kẻ địch bằng nguyệt hỏa gây {damage} sát thương Bí Thuật cùng sát thương theo thời gian.',
   'entities.abilities.moonfire.name': 'Bão Tố Nguyệt',
   'entities.abilities.mortal_strike.description':
-    'Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)',
+    'Một đòn hiểm gây sát thương vũ khí cộng {damage} và giảm 50% lượng hồi máu mà mục tiêu nhận được trong 10 giây. Áp dụng Vết Thương Hở (chảy máu). (đòn đặc trưng của Vũ Khí)',
   'entities.abilities.mortal_strike.name': 'Đòn Tàn Phế',
+  'entities.abilities.sweeping_strikes.name': 'Cung Mở Rộng',
+  'entities.abilities.sweeping_strikes.description':
+    'Trong 12 giây, các đòn đánh đơn mục tiêu của bạn cũng gây 75% sát thương lên 1 kẻ địch gần đó. (Vũ Khí)',
+  'entities.abilities.deep_wounds.name': 'Vết Thương Hở',
+  'entities.abilities.deep_wounds.description':
+    'Bị động: Đòn Tàn Phế của bạn khiến mục tiêu chảy máu, gây sát thương vật lý trong 6 giây. (Vũ Khí)',
   'entities.abilities.overpower.description':
-    'Đòn tấn công tức thời gây sát thương vũ khí cộng {damage}, tạo {rage} nộ khí. Không thể né tránh.',
+    'Đòn tấn công tức thời gây sát thương vũ khí cộng {damage}, tạo {rage} nộ khí và tăng cường Đòn Tàn Phế kế tiếp thêm 20% (cộng dồn hai lần). Không thể né tránh.',
   'entities.abilities.overpower.name': 'Bàn Tay Đẫm Máu',
   'entities.abilities.polymorph.description':
     'Biến kẻ địch thành một con cóc trong tối đa 15 giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình.',

@@ -4737,7 +4737,7 @@ export const it_IT: EnTranslations = {
       },
       "overpower": {
         "name": "Mano Rossa",
-        "description": "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia. Non può essere schivato."
+        "description": "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia e potenzia il tuo prossimo Colpo Mutilante del 20% (si accumula due volte). Non può essere schivato."
       },
       "execute": {
         "name": "Tomba Prematura",
@@ -5249,7 +5249,15 @@ export const it_IT: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Colpo Mutilante",
-        "description": "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)"
+        "description": "Un colpo feroce che infligge danni dell'arma più {damage} e riduce del 50% le cure ricevute dal bersaglio per 10 sec. Applica Ferite Aperte (sanguinamento). (firma Armi)"
+      },
+      "sweeping_strikes": {
+        "name": "Arco Ampliato",
+        "description": "Per 12 sec i tuoi attacchi a bersaglio singolo colpiscono anche 1 nemico vicino per il 75% dei danni. (Armi)"
+      },
+      "deep_wounds": {
+        "name": "Ferite Aperte",
+        "description": "Passiva: il tuo Colpo Mutilante fa sanguinare il bersaglio, infliggendo danni fisici in 6 sec. (Armi)"
       },
       "bloodthirst": {
         "name": "Salasso",
@@ -5413,7 +5421,7 @@ export const it_IT: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Morire di Spada",
-        "description": "Recupero difensivo: subisci il 10% di danni in meno per 8 sec, il 20% sotto il 30% di salute."
+        "description": "Recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
       },
       "recklessness": {
         "name": "Temerarietà",

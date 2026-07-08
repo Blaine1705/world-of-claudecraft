@@ -4737,7 +4737,7 @@ export const da_DK: EnTranslations = {
       },
       "overpower": {
         "name": "Rødhånd",
-        "description": "Øjeblikkeligt angreb for våbenskade plus {damage}, der genererer {rage} raseri. Kan ikke undviges."
+        "description": "Øjeblikkeligt angreb for våbenskade plus {damage}, der genererer {rage} raseri og forstærker dit næste Lemlæstende Slag med 20% (stakker to gange). Kan ikke undviges."
       },
       "execute": {
         "name": "Tidlig Grav",
@@ -5249,7 +5249,15 @@ export const da_DK: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Lemlæstende Slag",
-        "description": "Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)"
+        "description": "Et ondsindet slag, der giver våbenskade plus {damage} og reducerer den helbredelse, målet modtager, med 50% i 10 sek. Påfører Gabende Sår (blødning). (Våben-signatur)"
+      },
+      "sweeping_strikes": {
+        "name": "Udvidende Bue",
+        "description": "I 12 sek. rammer dine enkeltmålsangreb også 1 fjende i nærheden for 75% skade. (Våben)"
+      },
+      "deep_wounds": {
+        "name": "Gabende Sår",
+        "description": "Passiv: dit Lemlæstende Slag får målet til at bløde og påfører fysisk skade over 6 sek. (Våben)"
       },
       "bloodthirst": {
         "name": "Åreladning",
@@ -5413,7 +5421,7 @@ export const da_DK: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

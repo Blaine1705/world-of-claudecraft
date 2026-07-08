@@ -1427,10 +1427,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı ay ateşiyle {damage} Gizemli hasar ve zamana yayılı hasar ile yakar.',
   'entities.abilities.moonfire.name': 'Ay Fırtınası',
   'entities.abilities.mortal_strike.description':
-    'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
+    'Silah hasarına {damage} ekleyen acımasız bir darbe, hedefin aldığı iyileştirmeyi 10 sn boyunca %50 azaltır. Açık Yaralar (kanama) uygular. (Silah imza yeteneği)',
   'entities.abilities.mortal_strike.name': 'Sakatlayan Darbe',
+  'entities.abilities.sweeping_strikes.name': 'Genişleyen Yay',
+  'entities.abilities.sweeping_strikes.description':
+    '12 sn boyunca tek hedefli saldırılarınız yakındaki 1 düşmana da %75 hasar verir. (Silah)',
+  'entities.abilities.deep_wounds.name': 'Açık Yaralar',
+  'entities.abilities.deep_wounds.description':
+    'Pasif: Sakatlayan Darbeniz hedefi kanatarak 6 sn boyunca fiziksel hasar verir. (Silah)',
   'entities.abilities.overpower.description':
-    'Silah hasarına {damage} ekleyen anında saldırı, {rage} öfke üretir. Kaçınılamaz.',
+    'Silah hasarına {damage} ekleyen anında saldırı, {rage} öfke üretir ve bir sonraki Sakatlayan Darbenizi %20 güçlendirir (iki kez birikir). Kaçınılamaz.',
   'entities.abilities.overpower.name': 'Kızıl El',
   'entities.abilities.polymorph.description':
     'Düşmanı 15 saniyeye kadar bir kurbağaya dönüştürür. Kurbağa başıboş dolaşır ve hızla iyileşir. Herhangi bir hasar etkiyi bozar. Yalnızca canavarlar ve insansılar.',

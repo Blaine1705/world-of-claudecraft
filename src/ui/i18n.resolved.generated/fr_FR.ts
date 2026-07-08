@@ -4737,7 +4737,7 @@ export const fr_FR: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage. Ne peut pas être esquivée."
+        "description": "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage, et renforçant votre prochaine Frappe mutilante de 20% (cumulable deux fois). Ne peut pas être esquivée."
       },
       "execute": {
         "name": "Tombe précoce",
@@ -5249,7 +5249,15 @@ export const fr_FR: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Frappe mutilante",
-        "description": "Frappe vicieuse infligeant les dégâts de l'arme plus {damage}. (signature Armes)"
+        "description": "Une frappe vicieuse infligeant les dégâts de l'arme plus {damage} et réduisant de 50% les soins reçus par la cible pendant 10 s. Applique Plaies béantes (saignement). (signature Armes)"
+      },
+      "sweeping_strikes": {
+        "name": "Arc élargi",
+        "description": "Pendant 12 s, vos attaques monocibles frappent aussi 1 ennemi proche pour 75% des dégâts. (Armes)"
+      },
+      "deep_wounds": {
+        "name": "Plaies béantes",
+        "description": "Passif : votre Frappe mutilante fait saigner la cible, infligeant des dégâts physiques sur 6 s. (Armes)"
       },
       "bloodthirst": {
         "name": "Saignée",
@@ -5413,7 +5421,7 @@ export const fr_FR: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Périr par l'épée",
-        "description": "Recours défensif : vous subissez 10% de dégâts en moins pendant 8 s, 20% en moins sous 30% de vie."
+        "description": "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques."
       },
       "recklessness": {
         "name": "Témérité",

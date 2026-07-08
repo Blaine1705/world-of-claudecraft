@@ -1404,10 +1404,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Brænder fjenden med måneild for {damage} arkan skade plus skade over tid.',
   'entities.abilities.moonfire.name': 'Månestorm',
   'entities.abilities.mortal_strike.description':
-    'Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)',
+    'Et ondsindet slag, der giver våbenskade plus {damage} og reducerer den helbredelse, målet modtager, med 50% i 10 sek. Påfører Gabende Sår (blødning). (Våben-signatur)',
   'entities.abilities.mortal_strike.name': 'Lemlæstende Slag',
+  'entities.abilities.sweeping_strikes.name': 'Udvidende Bue',
+  'entities.abilities.sweeping_strikes.description':
+    'I 12 sek. rammer dine enkeltmålsangreb også 1 fjende i nærheden for 75% skade. (Våben)',
+  'entities.abilities.deep_wounds.name': 'Gabende Sår',
+  'entities.abilities.deep_wounds.description':
+    'Passiv: dit Lemlæstende Slag får målet til at bløde og påfører fysisk skade over 6 sek. (Våben)',
   'entities.abilities.overpower.description':
-    'Øjeblikkeligt angreb for våbenskade plus {damage}, der genererer {rage} raseri. Kan ikke undviges.',
+    'Øjeblikkeligt angreb for våbenskade plus {damage}, der genererer {rage} raseri og forstærker dit næste Lemlæstende Slag med 20% (stakker to gange). Kan ikke undviges.',
   'entities.abilities.overpower.name': 'Rødhånd',
   'entities.abilities.polymorph.description':
     'Forvandler fjenden til en tudse i op til 15 sek. Tudsen vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider.',

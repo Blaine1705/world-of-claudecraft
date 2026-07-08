@@ -4737,7 +4737,7 @@ export const tr_TR: EnTranslations = {
       },
       "overpower": {
         "name": "Kızıl El",
-        "description": "Silah hasarına {damage} ekleyen anında saldırı, {rage} öfke üretir. Kaçınılamaz."
+        "description": "Silah hasarına {damage} ekleyen anında saldırı, {rage} öfke üretir ve bir sonraki Sakatlayan Darbenizi %20 güçlendirir (iki kez birikir). Kaçınılamaz."
       },
       "execute": {
         "name": "Erken Mezar",
@@ -5249,7 +5249,15 @@ export const tr_TR: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Sakatlayan Darbe",
-        "description": "Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)"
+        "description": "Silah hasarına {damage} ekleyen acımasız bir darbe, hedefin aldığı iyileştirmeyi 10 sn boyunca %50 azaltır. Açık Yaralar (kanama) uygular. (Silah imza yeteneği)"
+      },
+      "sweeping_strikes": {
+        "name": "Genişleyen Yay",
+        "description": "12 sn boyunca tek hedefli saldırılarınız yakındaki 1 düşmana da %75 hasar verir. (Silah)"
+      },
+      "deep_wounds": {
+        "name": "Açık Yaralar",
+        "description": "Pasif: Sakatlayan Darbeniz hedefi kanatarak 6 sn boyunca fiziksel hasar verir. (Silah)"
       },
       "bloodthirst": {
         "name": "Kan Akıtma",
@@ -5413,7 +5421,7 @@ export const tr_TR: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

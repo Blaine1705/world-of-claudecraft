@@ -4737,7 +4737,7 @@ export const pl_PL: EnTranslations = {
       },
       "overpower": {
         "name": "Krwawa ręka",
-        "description": "Natychmiastowy atak zadający obrażenia broni plus {damage}, generujący {rage} wściekłości. Nie można go uniknąć."
+        "description": "Natychmiastowy atak zadający obrażenia broni plus {damage}, generujący {rage} wściekłości i wzmacniający twoje następne Okaleczające uderzenie o 20% (kumuluje się dwukrotnie). Nie można go uniknąć."
       },
       "execute": {
         "name": "Przedwczesny grób",
@@ -5249,7 +5249,15 @@ export const pl_PL: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Okaleczające uderzenie",
-        "description": "Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)"
+        "description": "Zajadłe uderzenie zadające obrażenia broni plus {damage} i zmniejszające leczenie otrzymywane przez cel o 50% przez 10 s. Nakłada Ziejące rany (krwawienie). (znak firmowy Broni)"
+      },
+      "sweeping_strikes": {
+        "name": "Poszerzający się łuk",
+        "description": "Przez 12 s twoje ataki na jeden cel trafiają także 1 pobliskiego wroga, zadając 75% obrażeń. (Broń)"
+      },
+      "deep_wounds": {
+        "name": "Ziejące rany",
+        "description": "Pasywne: twoje Okaleczające uderzenie powoduje krwawienie celu, zadając obrażenia fizyczne przez 6 s. (Broń)"
       },
       "bloodthirst": {
         "name": "Upust krwi",
@@ -5413,7 +5421,7 @@ export const pl_PL: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

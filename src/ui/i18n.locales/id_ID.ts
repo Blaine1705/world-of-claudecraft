@@ -1456,10 +1456,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Membakar musuh dengan api bulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.',
   'entities.abilities.moonfire.name': 'Badai Rembulan',
   'entities.abilities.mortal_strike.description':
-    'Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)',
+    'Serangan kejam yang memberikan kerusakan senjata plus {damage} dan mengurangi penyembuhan yang diterima target sebesar 50% selama 10 dtk. Menerapkan Luka Menganga (pendarahan). (ciri khas Senjata)',
   'entities.abilities.mortal_strike.name': 'Serangan Pelukai',
+  'entities.abilities.sweeping_strikes.name': 'Busur Melebar',
+  'entities.abilities.sweeping_strikes.description':
+    'Selama 12 dtk serangan target tunggalmu juga mengenai 1 musuh di dekatmu sebesar 75% kerusakan. (Senjata)',
+  'entities.abilities.deep_wounds.name': 'Luka Menganga',
+  'entities.abilities.deep_wounds.description':
+    'Pasif: Serangan Pelukaimu membuat target berdarah, memberikan kerusakan fisik selama 6 dtk. (Senjata)',
   'entities.abilities.overpower.description':
-    'Serangan instan dengan kerusakan senjata plus {damage} yang menghasilkan {rage} amarah. Tidak dapat dihindari.',
+    'Serangan instan dengan kerusakan senjata plus {damage} yang menghasilkan {rage} amarah dan memperkuat Serangan Pelukai berikutnya sebesar 20% (menumpuk dua kali). Tidak dapat dihindari.',
   'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.polymorph.description':
     'Mengubah musuh menjadi katak hingga 15 detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid.',

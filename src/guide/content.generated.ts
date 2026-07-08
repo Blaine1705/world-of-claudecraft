@@ -131,8 +131,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Onrush"
       },
       {
-        "id": "rend",
-        "name": "Deep Gash"
+        "id": "thunder_clap",
+        "name": "Quaking Blow"
       }
     ],
     "abilities": [
@@ -155,10 +155,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "charge",
         "name": "Onrush"
-      },
-      {
-        "id": "rend",
-        "name": "Deep Gash"
       },
       {
         "id": "thunder_clap",
@@ -267,6 +263,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "breachmaker",
         "name": "Breachmaker"
+      },
+      {
+        "id": "die_by_sword",
+        "name": "Die by the Sword"
+      },
+      {
+        "id": "sweeping_strikes",
+        "name": "Widening Arc"
+      },
+      {
+        "id": "deep_wounds",
+        "name": "Gaping Wounds"
       }
     ],
     "model": "player_warrior",

@@ -4737,7 +4737,7 @@ export const vi_VN: EnTranslations = {
       },
       "overpower": {
         "name": "Bàn Tay Đẫm Máu",
-        "description": "Đòn tấn công tức thời gây sát thương vũ khí cộng {damage}, tạo {rage} nộ khí. Không thể né tránh."
+        "description": "Đòn tấn công tức thời gây sát thương vũ khí cộng {damage}, tạo {rage} nộ khí và tăng cường Đòn Tàn Phế kế tiếp thêm 20% (cộng dồn hai lần). Không thể né tránh."
       },
       "execute": {
         "name": "Nấm Mồ Sớm",
@@ -5249,7 +5249,15 @@ export const vi_VN: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Đòn Tàn Phế",
-        "description": "Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)"
+        "description": "Một đòn hiểm gây sát thương vũ khí cộng {damage} và giảm 50% lượng hồi máu mà mục tiêu nhận được trong 10 giây. Áp dụng Vết Thương Hở (chảy máu). (đòn đặc trưng của Vũ Khí)"
+      },
+      "sweeping_strikes": {
+        "name": "Cung Mở Rộng",
+        "description": "Trong 12 giây, các đòn đánh đơn mục tiêu của bạn cũng gây 75% sát thương lên 1 kẻ địch gần đó. (Vũ Khí)"
+      },
+      "deep_wounds": {
+        "name": "Vết Thương Hở",
+        "description": "Bị động: Đòn Tàn Phế của bạn khiến mục tiêu chảy máu, gây sát thương vật lý trong 6 giây. (Vũ Khí)"
       },
       "bloodthirst": {
         "name": "Trích Huyết",
@@ -5413,7 +5421,7 @@ export const vi_VN: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

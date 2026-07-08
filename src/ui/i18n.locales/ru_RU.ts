@@ -1795,7 +1795,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Дает {rage} ед. ярости ценой здоровья.',
   'entities.abilities.overpower.name': 'Кровавая рука',
   'entities.abilities.overpower.description':
-    'Мгновенная атака, наносящая урон оружием плюс {damage} и дающая {rage} ед. ярости. От нее нельзя уклониться.',
+    'Мгновенная атака, наносящая урон оружием плюс {damage} и дающая {rage} ед. ярости, усиливает ваш следующий Калечащий удар на 20% (до двух зарядов). От нее нельзя уклониться.',
   'entities.abilities.execute.name': 'Ранняя могила',
   'entities.abilities.execute.description':
     'Попытка добить раненого врага, нанося {damage} ед. урона. Можно использовать только против врагов с менее чем 20% здоровья.',
@@ -2176,7 +2176,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Завершающий прием, наносящий урон от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка.',
   'entities.abilities.mortal_strike.name': 'Калечащий удар',
   'entities.abilities.mortal_strike.description':
-    'Жестокий удар, наносящий урон оружием плюс {damage}. (ключевая способность ветки «Оружие»)',
+    'Жестокий удар, наносящий урон оружием плюс {damage} и снижающий получаемое целью исцеление на 50% на 10 сек. Накладывает Зияющие раны (кровотечение). (фирменная способность Оружия)',
+  'entities.abilities.sweeping_strikes.name': 'Расширяющаяся дуга',
+  'entities.abilities.sweeping_strikes.description':
+    'В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага, нанося 75% урона. (Оружие)',
+  'entities.abilities.deep_wounds.name': 'Зияющие раны',
+  'entities.abilities.deep_wounds.description':
+    'Пассивно: ваш Калечащий удар вызывает у цели кровотечение, нанося физический урон в течение 6 сек. (Оружие)',
   'entities.abilities.bloodthirst.name': 'Кровопускание',
   'entities.abilities.bloodthirst.description':
     'Мгновенно атакует в кровавом исступлении, нанося {damage}, восполняя 3% максимального здоровья и генерируя 10 ярости. (ключевая способность ветки «Неистовство»)',
@@ -6155,7 +6161,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пронзительный крик, замедляющий всех противников в радиусе 15 м на 50% на 8 сек.',
   'entities.abilities.die_by_sword.name': 'Смерть от меча',
   'entities.abilities.die_by_sword.description':
-    'Защитная способность: получаемый урон снижен на 10% на 8 сек, при здоровье ниже 30% - на 20%.',
+    'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
   'entities.abilities.recklessness.name': 'Безрассудство',
   'entities.abilities.recklessness.description':
     'Исступление: накопление ярости увеличено на 50%, а вероятность критического удара на 20% на 12 сек.',

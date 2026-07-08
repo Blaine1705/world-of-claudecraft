@@ -2437,7 +2437,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Génère {rage} rage au prix de vos points de vie.',
   'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.overpower.description':
-    "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage. Ne peut pas être esquivée.",
+    "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage, et renforçant votre prochaine Frappe mutilante de 20% (cumulable deux fois). Ne peut pas être esquivée.",
   'entities.abilities.execute.name': 'Tombe précoce',
   'entities.abilities.execute.description':
     "Tente d'achever un ennemi blessé et inflige {damage} points de dégâts. Utilisable seulement sur les ennemis sous 20% de points de vie.",
@@ -2822,7 +2822,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Coup de grâce qui inflige des dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement.',
   'entities.abilities.mortal_strike.name': 'Frappe mutilante',
   'entities.abilities.mortal_strike.description':
-    "Frappe vicieuse infligeant les dégâts de l'arme plus {damage}. (signature Armes)",
+    "Une frappe vicieuse infligeant les dégâts de l'arme plus {damage} et réduisant de 50% les soins reçus par la cible pendant 10 s. Applique Plaies béantes (saignement). (signature Armes)",
+  'entities.abilities.sweeping_strikes.name': 'Arc élargi',
+  'entities.abilities.sweeping_strikes.description':
+    'Pendant 12 s, vos attaques monocibles frappent aussi 1 ennemi proche pour 75% des dégâts. (Armes)',
+  'entities.abilities.deep_wounds.name': 'Plaies béantes',
+  'entities.abilities.deep_wounds.description':
+    'Passif : votre Frappe mutilante fait saigner la cible, infligeant des dégâts physiques sur 6 s. (Armes)',
   'entities.abilities.bloodthirst.name': 'Saignée',
   'entities.abilities.bloodthirst.description':
     'Attaque instantanément dans une frénésie sanguinaire pour {damage}. (signature Fureur)',
@@ -6243,7 +6249,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un cri perçant qui ralentit de 50% tous les ennemis dans un rayon de 15 mètres pendant 8 s.',
   'entities.abilities.die_by_sword.name': "Périr par l'épée",
   'entities.abilities.die_by_sword.description':
-    'Recours défensif : vous subissez 10% de dégâts en moins pendant 8 s, 20% en moins sous 30% de vie.',
+    "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques.",
   'entities.abilities.recklessness.name': 'Témérité',
   'entities.abilities.recklessness.description':
     'Enrage : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s.',

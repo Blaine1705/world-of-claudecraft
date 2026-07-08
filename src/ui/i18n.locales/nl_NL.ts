@@ -1438,10 +1438,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbrandt de vijand met maanvuur voor {damage} Arcane schade plus schade over tijd.',
   'entities.abilities.moonfire.name': 'Maanstorm',
   'entities.abilities.mortal_strike.description':
-    'Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)',
+    'Een venijnige slag die wapenschade plus {damage} toebrengt en de genezing die het doelwit ontvangt met 50% verlaagt gedurende 10 sec. Past Gapende Wonden toe (bloeding). (kenmerkende Wapens-vaardigheid)',
   'entities.abilities.mortal_strike.name': 'Verminkende Slag',
+  'entities.abilities.sweeping_strikes.name': 'Verbredende Boog',
+  'entities.abilities.sweeping_strikes.description':
+    'Gedurende 12 sec raken je enkeldoelaanvallen ook 1 vijand in de buurt voor 75% schade. (Wapens)',
+  'entities.abilities.deep_wounds.name': 'Gapende Wonden',
+  'entities.abilities.deep_wounds.description':
+    'Passief: je Verminkende Slag laat het doelwit bloeden en veroorzaakt fysieke schade gedurende 6 sec. (Wapens)',
   'entities.abilities.overpower.description':
-    'Directe aanval voor wapenschade plus {damage} die {rage} woede genereert. Kan niet ontweken worden.',
+    'Directe aanval voor wapenschade plus {damage} die {rage} woede genereert en je volgende Verminkende Slag met 20% versterkt (stapelt tweemaal). Kan niet ontweken worden.',
   'entities.abilities.overpower.name': 'Roodhand',
   'entities.abilities.polymorph.description':
     'Verandert de vijand in een pad gedurende maximaal 15 sec. De pad dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',

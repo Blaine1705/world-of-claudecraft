@@ -652,7 +652,7 @@ const classAbilityNamesEn = {
       [
         'overpower',
         'Redhand',
-        'Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged.',
+        'Instant attack for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
       ],
       [
         'execute',
@@ -1140,7 +1140,17 @@ const classAbilityNamesEn = {
       [
         'mortal_strike',
         'Maiming Strike',
-        'A vicious strike dealing weapon damage plus {damage} and reducing healing the target receives by 50% for 10 sec. (Arms signature)',
+        'A vicious strike dealing weapon damage plus {damage} and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
+      ],
+      [
+        'sweeping_strikes',
+        'Widening Arc',
+        'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
+      ],
+      [
+        'deep_wounds',
+        'Gaping Wounds',
+        'Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)',
       ],
       [
         'bloodthirst',
@@ -1345,7 +1355,7 @@ const classAbilityNamesEn = {
       [
         'die_by_sword',
         'Die by the Sword',
-        'Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health.',
+        'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
       ],
       [
         'recklessness',
@@ -1477,7 +1487,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Abrumar',
-          'Ataque instantáneo que inflige daño de arma más {damage} y genera {rage} de ira. No puede esquivarse.',
+          'Ataque instantáneo de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar.',
         ],
         [
           'execute',
@@ -2037,7 +2047,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           'Golpe mortal',
-          'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
+          'Un golpe feroz que inflige daño de arma más {damage} y reduce un 50% la sanación que recibe el objetivo durante 10 sec. Aplica Heridas Profundas (sangrado). (firma de Armas)',
+        ],
+        [
+          'sweeping_strikes',
+          'Golpes de Barrido',
+          'Durante 12 sec tus ataques de un objetivo golpean también a 1 enemigo cercano al 75%. (Armas)',
+        ],
+        [
+          'deep_wounds',
+          'Heridas Profundas',
+          'Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)',
         ],
         [
           'bloodthirst',
@@ -2192,7 +2212,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           'Morir matando',
-          'Recurso defensivo: recibes un 10% menos de daño durante 8 s, y un 20% menos por debajo del 30% de salud.',
+          'Cooldown defensivo: durante 8 sec recibes un 30% menos de daño y esquivas muchos más ataques.',
         ],
         [
           'recklessness',
@@ -2306,7 +2326,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Fulmination',
-          "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage. Ne peut pas être esquivée.",
+          "Attaque instantanée infligeant les dégâts de l'arme plus {damage} et générant {rage} points de rage, et renforçant votre prochaine Frappe mutilante de 20% (cumulable deux fois). Ne peut pas être esquivée.",
         ],
         [
           'execute',
@@ -2916,7 +2936,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           'Frappe mortelle',
-          "Frappe vicieuse infligeant les dégâts de l'arme plus {damage}. (signature Armes)",
+          "Une frappe vicieuse infligeant les dégâts de l'arme plus {damage} et réduisant de 50% les soins reçus par la cible pendant 10 s. Applique Plaies béantes (saignement). (signature Armes)",
+        ],
+        [
+          'sweeping_strikes',
+          'Arc élargi',
+          'Pendant 12 s, vos attaques monocibles frappent aussi 1 ennemi proche pour 75% des dégâts. (Armes)',
+        ],
+        [
+          'deep_wounds',
+          'Plaies béantes',
+          'Passif : votre Frappe mutilante fait saigner la cible, infligeant des dégâts physiques sur 6 s. (Armes)',
         ],
         [
           'bloodthirst',
@@ -3071,7 +3101,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           "Périr par l'épée",
-          'Recours défensif : vous subissez 10% de dégâts en moins pendant 8 s, 20% en moins sous 30% de vie.',
+          "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques.",
         ],
         [
           'recklessness',
@@ -3178,7 +3208,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Sopraffazione',
-          "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia. Non può essere schivato.",
+          "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia e potenzia il tuo prossimo Colpo Mutilante del 20% (si accumula due volte). Non può essere schivato.",
         ],
         [
           'execute',
@@ -3718,7 +3748,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           'Colpo Mortale',
-          "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)",
+          "Un colpo feroce che infligge danni dell'arma più {damage} e riduce del 50% le cure ricevute dal bersaglio per 10 sec. Applica Ferite Aperte (sanguinamento). (firma Armi)",
+        ],
+        [
+          'sweeping_strikes',
+          'Arco Ampliato',
+          'Per 12 sec i tuoi attacchi a bersaglio singolo colpiscono anche 1 nemico vicino per il 75% dei danni. (Armi)',
+        ],
+        [
+          'deep_wounds',
+          'Ferite Aperte',
+          'Passiva: il tuo Colpo Mutilante fa sanguinare il bersaglio, infliggendo danni fisici in 6 sec. (Armi)',
         ],
         [
           'bloodthirst',
@@ -3873,7 +3913,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           'Morire di Spada',
-          'Recupero difensivo: subisci il 10% di danni in meno per 8 sec, il 20% sotto il 30% di salute.',
+          'Recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi.',
         ],
         [
           'recklessness',
@@ -3982,7 +4022,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Überwältigen',
-          'Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt. Kann nicht ausgewichen werden.',
+          'Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt und Euren nächsten Verstümmelnden Hieb um 20% verstärkt (zweifach stapelbar). Kann nicht ausgewichen werden.',
         ],
         [
           'execute',
@@ -4526,7 +4566,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           'Tödlicher Stoß',
-          'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
+          'Ein brutaler Hieb, der Waffenschaden plus {damage} verursacht und die Heilung des Ziels 10 Sek. lang um 50% verringert. Wendet Klaffende Wunden an (Blutung). (Waffen-Spezialität)',
+        ],
+        [
+          'sweeping_strikes',
+          'Weiter Bogen',
+          '12 Sek. lang treffen Eure Einzelzielangriffe auch 1 nahen Gegner für 75% Schaden. (Waffen)',
+        ],
+        [
+          'deep_wounds',
+          'Klaffende Wunden',
+          'Passiv: Euer Verstümmelnder Hieb lässt das Ziel bluten und verursacht über 6 Sek. physischen Schaden. (Waffen)',
         ],
         [
           'bloodthirst',
@@ -4681,7 +4731,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           'Tod durch das Schwert',
-          'Defensive Abklingzeit: Ihr erleidet 8 Sek. lang 10% weniger Schaden, unter 30% Gesundheit 20% weniger.',
+          'Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus.',
         ],
         [
           'recklessness',
@@ -4778,7 +4828,7 @@ export const classAbilityNames = {
         [
           'overpower',
           '压制',
-          '立即攻击，造成武器伤害加 {damage}，并产生 {rage} 点怒气。无法被躲闪。',
+          '立即攻击，造成武器伤害加 {damage}，并产生 {rage} 点怒气，使你的下一次致残打击效果提高 20%（可叠加两次）。无法被躲闪。',
         ],
         [
           'execute',
@@ -5050,7 +5100,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           '致死打击',
-          '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
+          '凶狠的一击，造成武器伤害加 {damage}，并使目标受到的治疗降低 50%，持续 10 秒。施加撕裂伤口（流血）。（武器专精标志技能）',
+        ],
+        [
+          'sweeping_strikes',
+          '扩展弧击',
+          '持续 12 秒，你的单体攻击还会对 1 个附近敌人造成 75% 的伤害。（武器）',
+        ],
+        [
+          'deep_wounds',
+          '撕裂伤口',
+          '被动：你的致残打击使目标流血，在 6 秒内受到物理伤害。（武器）',
         ],
         ['bloodthirst', '嗜血', '在鲜血狂怒中立即攻击，造成 {damage} 点伤害。（狂怒专精标志技能）'],
         [
@@ -5161,7 +5221,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           '剑在人在',
-          '防御技能：受到的伤害降低 10%，持续 8 秒；生命值低于 30% 时降低 20%。',
+          '防御性冷却：持续 8 秒，你受到的伤害降低 30%，并能躲闪更多攻击。',
         ],
         ['recklessness', '鲁莽', '激怒：怒气获取提高 50%，暴击几率提高 20%，持续 12 秒。'],
         [
@@ -5246,7 +5306,7 @@ export const classAbilityNames = {
         [
           'overpower',
           '壓制',
-          '立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣。無法被閃躲。',
+          '立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣，使你的下一次致殘打擊效果提高 20%（可疊加兩次）。無法被閃躲。',
         ],
         [
           'execute',
@@ -5518,7 +5578,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           '致死打擊',
-          '凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）',
+          '凶狠的一擊，造成武器傷害加 {damage}，並使目標受到的治療降低 50%，持續 10 秒。施加撕裂傷口（流血）。（武器專精標誌技能）',
+        ],
+        [
+          'sweeping_strikes',
+          '擴展弧擊',
+          '持續 12 秒，你的單體攻擊還會對 1 個附近敵人造成 75% 的傷害。（武器）',
+        ],
+        [
+          'deep_wounds',
+          '撕裂傷口',
+          '被動：你的致殘打擊使目標流血，在 6 秒內受到物理傷害。（武器）',
         ],
         ['bloodthirst', '嗜血', '在鮮血狂怒中立即攻擊，造成 {damage} 點傷害。（狂怒專精標誌技能）'],
         [
@@ -5629,7 +5699,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           '劍在人在',
-          '防禦技能：受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時降低 20%。',
+          '防禦性冷卻：持續 8 秒，你受到的傷害降低 30%，並能閃躲更多攻擊。',
         ],
         ['recklessness', '魯莽', '激怒：怒氣獲取提高 50%，爆擊機率提高 20%，持續 12 秒。'],
         [
@@ -5722,7 +5792,7 @@ export const classAbilityNames = {
         [
           'overpower',
           '제압',
-          '무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성합니다. 회피할 수 없습니다.',
+          '무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성하며, 다음 불구의 일격의 효과를 20% 강화합니다(2회 중첩). 회피할 수 없습니다.',
         ],
         [
           'execute',
@@ -6166,7 +6236,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           '죽음의 일격',
-          '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
+          '무기 피해에 {damage}를 더한 피해를 입히는 흉포한 일격으로, 10초 동안 대상이 받는 치유량을 50% 감소시킵니다. 찢어진 상처(출혈)를 적용합니다. (무기 대표 기술)',
+        ],
+        [
+          'sweeping_strikes',
+          '넓어지는 호',
+          '12초 동안 단일 대상 공격이 근처의 적 1명에게도 75%의 피해를 입힙니다. (무기)',
+        ],
+        [
+          'deep_wounds',
+          '찢어진 상처',
+          '지속 효과: 불구의 일격이 대상에게 출혈을 일으켜 6초에 걸쳐 물리 피해를 입힙니다. (무기)',
         ],
         [
           'bloodthirst',
@@ -6321,7 +6401,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           '투사의 혼',
-          '방어 기술: 8초 동안 받는 피해가 10% 감소하며, 생명력이 30% 미만이면 20% 감소합니다.',
+          '방어 재사용 대기시간: 8초 동안 받는 피해가 30% 감소하고 훨씬 더 많은 공격을 회피합니다.',
         ],
         [
           'recklessness',
@@ -6422,7 +6502,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'オーバーパワー',
-          '武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成します。回避されません。',
+          '武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成し、次の重傷の一撃の効果を20%高めます（2回まで累積）。回避されません。',
         ],
         [
           'execute',
@@ -6906,7 +6986,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           '致死打撃',
-          '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
+          '武器ダメージ +{damage} を与える凶悪な一撃で、10秒間、対象が受ける回復量を50%減少させます。深い傷（出血）を付与します。（アームズの代表技）',
+        ],
+        [
+          'sweeping_strikes',
+          '拡がる弧',
+          '12秒間、単体攻撃が近くの敵1体にも75%のダメージを与えます。（アームズ）',
+        ],
+        [
+          'deep_wounds',
+          '深い傷',
+          'パッシブ：重傷の一撃が対象に出血を与え、6秒かけて物理ダメージを与えます。（アームズ）',
         ],
         [
           'bloodthirst',
@@ -7061,7 +7151,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           'ダイ・バイ・ザ・ソード',
-          '防御用クールダウン：8秒間、受けるダメージが10%減少します。体力が30%未満の間は20%減少します。',
+          '防御用クールダウン：8秒間、受けるダメージが30%減少し、はるかに多くの攻撃を回避します。',
         ],
         [
           'recklessness',
@@ -7166,7 +7256,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Sobrepujar',
-          'Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva. Não pode ser esquivado.',
+          'Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva e fortalece seu próximo Golpe Mutilador em 20% (acumula duas vezes). Não pode ser esquivado.',
         ],
         [
           'execute',
@@ -7690,7 +7780,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           'Golpe Mortal',
-          'Um golpe cruel que causa dano da arma mais {damage}. (assinatura de Armas)',
+          'Um golpe cruel que causa dano de arma mais {damage} e reduz em 50% a cura recebida pelo alvo por 10 seg. Aplica Feridas Abertas (sangramento). (marca das Armas)',
+        ],
+        [
+          'sweeping_strikes',
+          'Arco Ampliado',
+          'Por 12 seg seus ataques de alvo único também atingem 1 inimigo próximo causando 75% do dano. (Armas)',
+        ],
+        [
+          'deep_wounds',
+          'Feridas Abertas',
+          'Passiva: seu Golpe Mutilador faz o alvo sangrar, causando dano físico ao longo de 6 seg. (Armas)',
         ],
         [
           'bloodthirst',
@@ -7845,7 +7945,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           'Morrer pela Espada',
-          'Recurso defensivo: você sofre 10% menos dano por 8 seg, e 20% menos abaixo de 30% de vida.',
+          'Recurso defensivo: por 8 seg você sofre 30% menos dano e esquiva de muito mais ataques.',
         ],
         [
           'recklessness',
@@ -7954,7 +8054,7 @@ export const classAbilityNames = {
         [
           'overpower',
           'Превосходство',
-          'Мгновенная атака, наносящая урон оружием плюс {damage} и дающая {rage} ед. ярости. От нее нельзя уклониться.',
+          'Мгновенная атака, наносящая урон оружием плюс {damage} и дающая {rage} ед. ярости, усиливает ваш следующий Калечащий удар на 20% (до двух зарядов). От нее нельзя уклониться.',
         ],
         [
           'execute',
@@ -8498,7 +8598,17 @@ export const classAbilityNames = {
         [
           'mortal_strike',
           'Смертельный удар',
-          'Жестокий удар, наносящий урон оружием плюс {damage}. (ключевая способность ветки «Оружие»)',
+          'Жестокий удар, наносящий урон оружием плюс {damage} и снижающий получаемое целью исцеление на 50% на 10 сек. Накладывает Зияющие раны (кровотечение). (фирменная способность Оружия)',
+        ],
+        [
+          'sweeping_strikes',
+          'Расширяющаяся дуга',
+          'В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага, нанося 75% урона. (Оружие)',
+        ],
+        [
+          'deep_wounds',
+          'Зияющие раны',
+          'Пассивно: ваш Калечащий удар вызывает у цели кровотечение, нанося физический урон в течение 6 сек. (Оружие)',
         ],
         [
           'bloodthirst',
@@ -8649,7 +8759,7 @@ export const classAbilityNames = {
         [
           'die_by_sword',
           'Смерть от меча',
-          'Защитная способность: получаемый урон снижен на 10% на 8 сек, при здоровье ниже 30% - на 20%.',
+          'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
         ],
         [
           'recklessness',

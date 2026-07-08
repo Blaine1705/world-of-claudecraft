@@ -1698,7 +1698,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': '以生命值為代價產生 {rage} 點怒氣。',
   'entities.abilities.overpower.name': '血手',
   'entities.abilities.overpower.description':
-    '立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣。無法被閃躲。',
+    '立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣，使你的下一次致殘打擊效果提高 20%（可疊加兩次）。無法被閃躲。',
   'entities.abilities.execute.name': '提早入土',
   'entities.abilities.execute.description':
     '嘗試終結受傷的敵人，造成 {damage} 點傷害。只能對生命值低於 20% 的敵人使用。',
@@ -2041,7 +2041,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rip.description': '終結技，在 12 秒內造成流血傷害。消耗連擊點。僅限狼形態。',
   'entities.abilities.mortal_strike.name': '致殘打擊',
   'entities.abilities.mortal_strike.description':
-    '凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）',
+    '凶狠的一擊，造成武器傷害加 {damage}，並使目標受到的治療降低 50%，持續 10 秒。施加撕裂傷口（流血）。（武器專精標誌技能）',
+  'entities.abilities.sweeping_strikes.name': '擴展弧擊',
+  'entities.abilities.sweeping_strikes.description':
+    '持續 12 秒，你的單體攻擊還會對 1 個附近敵人造成 75% 的傷害。（武器）',
+  'entities.abilities.deep_wounds.name': '撕裂傷口',
+  'entities.abilities.deep_wounds.description':
+    '被動：你的致殘打擊使目標流血，在 6 秒內受到物理傷害。（武器）',
   'entities.abilities.bloodthirst.name': '放血',
   'entities.abilities.bloodthirst.description':
     '在鮮血狂怒中立即攻擊，造成 {damage} 點傷害，恢復你最大生命值的 3%，並產生 10 點怒氣。（狂怒專精標誌技能）',
@@ -5708,7 +5714,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '發出刺耳的吼聲，使 15 碼內所有敵人減速 50%，持續 8 秒。',
   'entities.abilities.die_by_sword.name': '劍在人在',
   'entities.abilities.die_by_sword.description':
-    '防禦技能：受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時降低 20%。',
+    '防禦性冷卻：持續 8 秒，你受到的傷害降低 30%，並能閃躲更多攻擊。',
   'entities.abilities.recklessness.name': '魯莽',
   'entities.abilities.recklessness.description':
     '激怒：怒氣獲取提高 50%，爆擊機率提高 20%，持續 12 秒。',

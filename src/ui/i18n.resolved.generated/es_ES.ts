@@ -4737,7 +4737,7 @@ export const es_ES: EnTranslations = {
       },
       "overpower": {
         "name": "Mano Roja",
-        "description": "Ataque instantáneo que inflige daño de arma más {damage} y genera {rage} de ira. No puede esquivarse."
+        "description": "Ataque instantáneo de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar."
       },
       "execute": {
         "name": "Tumba Temprana",
@@ -5249,7 +5249,15 @@ export const es_ES: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
-        "description": "Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)"
+        "description": "Un golpe feroz que inflige daño de arma más {damage} y reduce un 50% la sanación que recibe el objetivo durante 10 sec. Aplica Heridas Profundas (sangrado). (firma de Armas)"
+      },
+      "sweeping_strikes": {
+        "name": "Golpes de Barrido",
+        "description": "Durante 12 sec tus ataques de un objetivo golpean también a 1 enemigo cercano al 75%. (Armas)"
+      },
+      "deep_wounds": {
+        "name": "Heridas Profundas",
+        "description": "Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)"
       },
       "bloodthirst": {
         "name": "Sangría",
@@ -5413,7 +5421,7 @@ export const es_ES: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Morir matando",
-        "description": "Recurso defensivo: recibes un 10% menos de daño durante 8 s, y un 20% menos por debajo del 30% de salud."
+        "description": "Cooldown defensivo: durante 8 sec recibes un 30% menos de daño y esquivas muchos más ataques."
       },
       "recklessness": {
         "name": "Temeridad",

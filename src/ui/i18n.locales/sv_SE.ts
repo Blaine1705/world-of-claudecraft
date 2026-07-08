@@ -1413,10 +1413,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bränner fienden med måneld för {damage} arkanskada plus skada över tid.',
   'entities.abilities.moonfire.name': 'Månstorm',
   'entities.abilities.mortal_strike.description':
-    'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
+    'Ett elakartat hugg som ger vapenskada plus {damage} och minskar helandet målet tar emot med 50% under 10 sek. Applicerar Gapande sår (blödning). (Vapen-signatur)',
   'entities.abilities.mortal_strike.name': 'Stympande hugg',
+  'entities.abilities.sweeping_strikes.name': 'Vidgande båge',
+  'entities.abilities.sweeping_strikes.description':
+    'Under 12 sek träffar dina enkelmålsattacker även 1 närliggande fiende för 75% skada. (Vapen)',
+  'entities.abilities.deep_wounds.name': 'Gapande sår',
+  'entities.abilities.deep_wounds.description':
+    'Passiv: ditt Stympande hugg får målet att blöda och orsakar fysisk skada under 6 sek. (Vapen)',
   'entities.abilities.overpower.description':
-    'Omedelbar attack för vapenskada plus {damage} som genererar {rage} raseri. Kan inte undvikas.',
+    'Omedelbar attack för vapenskada plus {damage} som genererar {rage} raseri och förstärker ditt nästa Stympande hugg med 20% (staplas två gånger). Kan inte undvikas.',
   'entities.abilities.overpower.name': 'Rödhand',
   'entities.abilities.polymorph.description':
     'Förvandlar fienden till en padda i upp till 15 sek. Paddan vandrar omkring och läks snabbt. All skada bryter effekten. Endast bestar och humanoider.',
