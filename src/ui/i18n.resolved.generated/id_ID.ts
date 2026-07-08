@@ -6483,7 +6483,7 @@ export const id_ID: EnTranslations = {
       },
       "innervate": {
         "name": "Getah Hidup",
-        "description": "Getah hidup mengalir dalam dirimu selama 10 detik, memulihkan 30 sumber daya saat ini secara bergelombang: mana, amarah, atau energi; berganti wujud tidak memutusnya. (talenta Druid)"
+        "description": "Getah hidup mengalir dalam dirimu selama 10 detik, memulihkan 20 sumber daya saat ini secara bergelombang: mana, amarah, atau energi; berganti wujud tidak memutusnya. (talenta Druid)"
       },
       "kick": {
         "name": "Tendang",

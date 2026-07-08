@@ -6483,7 +6483,7 @@ export const pt_BR: EnTranslations = {
       },
       "innervate": {
         "name": "Seiva Vital",
-        "description": "A seiva viva brota em você por 10 s, restaurando 30 do seu recurso atual em ondas: mana, ira ou energia; trocar de forma não a interrompe. (talento de Druida)"
+        "description": "A seiva viva brota em você por 10 s, restaurando 20 do seu recurso atual em ondas: mana, ira ou energia; trocar de forma não a interrompe. (talento de Druida)"
       },
       "kick": {
         "name": "Botada",

@@ -2186,14 +2186,14 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r11_improved_mark',
           name: 'Improved Mark',
-          description: 'Mark of the Wild also grants a shield absorbing 45 damage for 300 sec.',
+          description: 'Mark of the Wild also grants a shield absorbing 90 damage for 300 sec.',
           icon: 'mark_of_the_wild',
           effect: {
             proc: {
               id: 'dru_improved_mark',
               name: 'Improved Mark',
               trigger: { on: 'castNth', n: 1, abilities: ['mark_of_the_wild'] },
-              responses: [{ kind: 'absorb', amount: 45, duration: 300, name: 'Improved Mark' }],
+              responses: [{ kind: 'absorb', amount: 90, duration: 300, name: 'Improved Mark' }],
             },
           },
         },

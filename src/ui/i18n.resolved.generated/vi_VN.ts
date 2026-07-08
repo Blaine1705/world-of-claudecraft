@@ -6483,7 +6483,7 @@ export const vi_VN: EnTranslations = {
       },
       "innervate": {
         "name": "Nhựa Sống",
-        "description": "Nhựa sống trào dâng trong bạn trong 10 giây, hồi 30 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng; biến hình không làm gián đoạn. (thiên phú Druid)"
+        "description": "Nhựa sống trào dâng trong bạn trong 10 giây, hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng; biến hình không làm gián đoạn. (thiên phú Druid)"
       },
       "kick": {
         "name": "Đá",

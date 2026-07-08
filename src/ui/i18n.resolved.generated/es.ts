@@ -6483,7 +6483,7 @@ export const es: EnTranslations = {
       },
       "innervate": {
         "name": "Savia Vital",
-        "description": "La savia viva brota en ti durante 10 s, restaurando 30 de tu recurso actual en oleadas: maná, ira o energía; cambiar de forma no la interrumpe. (talento de Druida)"
+        "description": "La savia viva brota en ti durante 10 s, restaurando 20 de tu recurso actual en oleadas: maná, ira o energía; cambiar de forma no la interrumpe. (talento de Druida)"
       },
       "kick": {
         "name": "Patada",

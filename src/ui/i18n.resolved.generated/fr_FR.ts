@@ -6483,7 +6483,7 @@ export const fr_FR: EnTranslations = {
       },
       "innervate": {
         "name": "Sève vitale",
-        "description": "La sève vivante afflue en vous pendant 10 s, restaurant 30 de votre ressource actuelle par vagues : mana, rage ou énergie ; changer de forme ne l'interrompt pas. (talent de druide)"
+        "description": "La sève vivante afflue en vous pendant 10 s, restaurant 20 de votre ressource actuelle par vagues : mana, rage ou énergie ; changer de forme ne l'interrompt pas. (talent de druide)"
       },
       "kick": {
         "name": "Botte",

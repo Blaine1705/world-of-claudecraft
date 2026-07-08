@@ -6483,7 +6483,7 @@ export const da_DK: EnTranslations = {
       },
       "innervate": {
         "name": "Livssaft",
-        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 30 af din nuværende ressource i bølger: mana, raseri eller energi; formskifte afbryder den ikke. (Druidetalent)"
+        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 20 af din nuværende ressource i bølger: mana, raseri eller energi; formskifte afbryder den ikke. (Druidetalent)"
       },
       "kick": {
         "name": "Støvle",

@@ -6483,7 +6483,7 @@ export const pl_PL: EnTranslations = {
       },
       "innervate": {
         "name": "Życiodajna Soki",
-        "description": "Żywe soki wzbierają w tobie przez 10 sek., przywracając falami 30 twojego bieżącego zasobu: many, szału lub energii; zmiana postaci ich nie przerywa. (talent Druida)"
+        "description": "Żywe soki wzbierają w tobie przez 10 sek., przywracając falami 20 twojego bieżącego zasobu: many, szału lub energii; zmiana postaci ich nie przerywa. (talent Druida)"
       },
       "kick": {
         "name": "Kopniak",

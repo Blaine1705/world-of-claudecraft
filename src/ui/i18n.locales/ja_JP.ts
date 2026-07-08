@@ -2728,7 +2728,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の呪文のコストを無料にする。効果時間 60 秒。（プリーストタレント）',
   'entities.abilities.innervate.name': '生命の樹液',
   'entities.abilities.innervate.description':
-    '生命の樹液が10秒間あふれ、現在のリソースを波状に30ずつ回復する。マナ、怒り、エナジーのいずれにも作用し、変身しても途切れない。(ドルイドの才能)',
+    '生命の樹液が10秒間あふれ、現在のリソースを波状に20ずつ回復する。マナ、怒り、エナジーのいずれにも作用し、変身しても途切れない。(ドルイドの才能)',
   'entities.abilities.kick.name': '蹴り',
   'entities.abilities.kick.description':
     '詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ローグタレント）',

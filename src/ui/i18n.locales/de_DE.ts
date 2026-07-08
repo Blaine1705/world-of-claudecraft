@@ -3395,7 +3395,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 Sek.. (Priester-Talent)',
   'entities.abilities.innervate.name': 'Lebenssaft',
   'entities.abilities.innervate.description':
-    'Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 30 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie; Gestaltwandel unterbricht ihn nicht. (Druidentalent)',
+    'Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 20 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie; Gestaltwandel unterbricht ihn nicht. (Druidentalent)',
   'entities.abilities.kick.name': 'Stiefeltritt',
   'entities.abilities.kick.description':
     'Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)',

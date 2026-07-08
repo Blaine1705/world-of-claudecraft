@@ -6483,7 +6483,7 @@ export const nl_NL: EnTranslations = {
       },
       "innervate": {
         "name": "Levenssap",
-        "description": "Levend sap welt 10 sec in je op en herstelt in golven 30 van je huidige energiebron: mana, woede of energie; van gedaante wisselen onderbreekt het niet. (Druïdetalent)"
+        "description": "Levend sap welt 10 sec in je op en herstelt in golven 20 van je huidige energiebron: mana, woede of energie; van gedaante wisselen onderbreekt het niet. (Druïdetalent)"
       },
       "kick": {
         "name": "Schop",

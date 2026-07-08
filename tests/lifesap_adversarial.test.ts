@@ -169,7 +169,7 @@ describe('Lifesap adversarial balance checks', () => {
     expect(rage).toBe(100);
   });
 
-  it('provides at least 20x the rage from five real same-level mob swings', () => {
+  it('dwarfs same-window warrior rage from five real same-level mob swings', () => {
     const warrior = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: true });
     warrior.setPlayerLevel(20);
     const p = warrior.player;
@@ -180,7 +180,7 @@ describe('Lifesap adversarial balance checks', () => {
     for (let i = 0; i < 5; i++) (warrior as unknown as SimInternals).mobSwing(wolf, p);
 
     expect(p.resource).toBeGreaterThan(0);
-    expect(measureLifesapPotential('bear_form')).toBeGreaterThanOrEqual(p.resource * 20);
+    expect(measureLifesapPotential('bear_form')).toBeGreaterThan(p.resource * 20);
   });
 
   it('makes cat energy generation 2x baseline (tuned down from the 2.5x exploit finding)', () => {

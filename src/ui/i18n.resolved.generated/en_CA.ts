@@ -6483,7 +6483,7 @@ export const en_CA: EnTranslations = {
       },
       "innervate": {
         "name": "Lifesap",
-        "description": "Instantly restores 200 of your current resource. (Druid talent)"
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "kick": {
         "name": "Boot",

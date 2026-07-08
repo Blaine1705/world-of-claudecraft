@@ -2497,7 +2497,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talent kapłana)',
   'entities.abilities.innervate.name': 'Życiodajna Soki',
   'entities.abilities.innervate.description':
-    'Żywe soki wzbierają w tobie przez 10 sek., przywracając falami 30 twojego bieżącego zasobu: many, szału lub energii; zmiana postaci ich nie przerywa. (talent Druida)',
+    'Żywe soki wzbierają w tobie przez 10 sek., przywracając falami 20 twojego bieżącego zasobu: many, szału lub energii; zmiana postaci ich nie przerywa. (talent Druida)',
   'entities.abilities.kick.name': 'Kopniak',
   'entities.abilities.kick.description':
     'Przerywa rzucanie i blokuje zaklęcia tej szkoły na 4 s. (talent łotrzyka)',

@@ -6483,7 +6483,7 @@ export const cs_CZ: EnTranslations = {
       },
       "innervate": {
         "name": "Míza života",
-        "description": "Živá míza v tobě 10 s vzlíná a ve vlnách obnovuje 30 tvého aktuálního zdroje: manu, zuřivost nebo energii; změna podoby ji nepřeruší. (druidský talent)"
+        "description": "Živá míza v tobě 10 s vzlíná a ve vlnách obnovuje 20 tvého aktuálního zdroje: manu, zuřivost nebo energii; změna podoby ji nepřeruší. (druidský talent)"
       },
       "kick": {
         "name": "Kopnutí",

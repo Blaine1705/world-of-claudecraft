@@ -1626,7 +1626,11 @@ const classAbilityNamesEn = {
         'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
       ],
       ['inner_focus', 'Stilled Mind', 'Makes your next spell free. Lasts 60 sec. (Priest talent)'],
-      ['innervate', 'Lifesap', 'Instantly restores 200 of your current resource. (Druid talent)'],
+      [
+        'innervate',
+        'Lifesap',
+        'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
+      ],
       [
         'kick',
         'Boot',

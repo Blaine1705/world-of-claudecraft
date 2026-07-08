@@ -5634,9 +5634,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     usableInForm: true,
-    effects: [{ type: 'selfBuff', kind: 'resource_sap', value: 30, duration: 10 }],
+    effects: [{ type: 'selfBuff', kind: 'resource_sap', value: 20, duration: 10 }],
     description:
-      'Living sap wells up in you for 10 sec, restoring 30 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. (Druid talent)',
+      'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
   },
   kick: {
     id: 'kick',
