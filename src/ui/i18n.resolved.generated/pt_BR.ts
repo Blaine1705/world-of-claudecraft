@@ -4737,7 +4737,7 @@ export const pt_BR: EnTranslations = {
       },
       "overpower": {
         "name": "Mão Vermelha",
-        "description": "Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva. Não pode ser esquivado."
+        "description": "Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva e fortalece seu próximo Golpe Mutilador em 20% (acumula duas vezes). Não pode ser esquivado."
       },
       "execute": {
         "name": "Cova Prematura",
@@ -5249,7 +5249,15 @@ export const pt_BR: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
-        "description": "Um golpe cruel que causa dano da arma mais {damage}. (assinatura de Armas)"
+        "description": "Um golpe cruel que causa dano de arma mais {damage} e reduz em 50% a cura recebida pelo alvo por 10 seg. Aplica Feridas Abertas (sangramento). (marca das Armas)"
+      },
+      "sweeping_strikes": {
+        "name": "Arco Ampliado",
+        "description": "Por 12 seg seus ataques de alvo único também atingem 1 inimigo próximo causando 75% do dano. (Armas)"
+      },
+      "deep_wounds": {
+        "name": "Feridas Abertas",
+        "description": "Passiva: seu Golpe Mutilador faz o alvo sangrar, causando dano físico ao longo de 6 seg. (Armas)"
       },
       "bloodthirst": {
         "name": "Sangria",
@@ -5413,7 +5421,7 @@ export const pt_BR: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Morrer pela Espada",
-        "description": "Recurso defensivo: você sofre 10% menos dano por 8 seg, e 20% menos abaixo de 30% de vida."
+        "description": "Recurso defensivo: por 8 seg você sofre 30% menos dano e esquiva de muito mais ataques."
       },
       "recklessness": {
         "name": "Imprudência",

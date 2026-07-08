@@ -2423,7 +2423,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Erzeugt {rage} Wut auf Kosten von Gesundheit.',
   'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.overpower.description':
-    'Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt. Kann nicht ausgewichen werden.',
+    'Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt und Euren nächsten Verstümmelnden Hieb um 20% verstärkt (zweifach stapelbar). Kann nicht ausgewichen werden.',
   'entities.abilities.execute.name': 'Frühes Grab',
   'entities.abilities.execute.description':
     'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',
@@ -2805,7 +2805,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Finishing-Move, der über 12 Sek. Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
-    'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
+    'Ein brutaler Hieb, der Waffenschaden plus {damage} verursacht und die Heilung des Ziels 10 Sek. lang um 50% verringert. Wendet Klaffende Wunden an (Blutung). (Waffen-Spezialität)',
+  'entities.abilities.sweeping_strikes.name': 'Weiter Bogen',
+  'entities.abilities.sweeping_strikes.description':
+    '12 Sek. lang treffen Eure Einzelzielangriffe auch 1 nahen Gegner für 75% Schaden. (Waffen)',
+  'entities.abilities.deep_wounds.name': 'Klaffende Wunden',
+  'entities.abilities.deep_wounds.description':
+    'Passiv: Euer Verstümmelnder Hieb lässt das Ziel bluten und verursacht über 6 Sek. physischen Schaden. (Waffen)',
   'entities.abilities.bloodthirst.name': 'Aderlass',
   'entities.abilities.bloodthirst.description':
     'Greift sofort in blutiger Raserei an und verursacht {damage}. (Furor-Signatur)',
@@ -6218,7 +6224,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein durchdringender Schrei, der alle Gegner im Umkreis von 15 Metern 8 Sek. lang um 50% verlangsamt.',
   'entities.abilities.die_by_sword.name': 'Tod durch das Schwert',
   'entities.abilities.die_by_sword.description':
-    'Defensive Abklingzeit: Ihr erleidet 8 Sek. lang 10% weniger Schaden, unter 30% Gesundheit 20% weniger.',
+    'Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus.',
   'entities.abilities.recklessness.name': 'Tollkühnheit',
   'entities.abilities.recklessness.description':
     'Wutanfall: Eure Wuterzeugung steigt 12 Sek. lang um 50% und Eure kritische Trefferchance um 20%.',

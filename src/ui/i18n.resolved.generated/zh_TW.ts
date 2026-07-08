@@ -4737,7 +4737,7 @@ export const zh_TW: EnTranslations = {
       },
       "overpower": {
         "name": "血手",
-        "description": "立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣。無法被閃躲。"
+        "description": "立即攻擊，造成武器傷害加 {damage}，並產生 {rage} 點怒氣，使你的下一次致殘打擊效果提高 20%（可疊加兩次）。無法被閃躲。"
       },
       "execute": {
         "name": "提早入土",
@@ -5249,7 +5249,15 @@ export const zh_TW: EnTranslations = {
       },
       "mortal_strike": {
         "name": "致殘打擊",
-        "description": "凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）"
+        "description": "凶狠的一擊，造成武器傷害加 {damage}，並使目標受到的治療降低 50%，持續 10 秒。施加撕裂傷口（流血）。（武器專精標誌技能）"
+      },
+      "sweeping_strikes": {
+        "name": "擴展弧擊",
+        "description": "持續 12 秒，你的單體攻擊還會對 1 個附近敵人造成 75% 的傷害。（武器）"
+      },
+      "deep_wounds": {
+        "name": "撕裂傷口",
+        "description": "被動：你的致殘打擊使目標流血，在 6 秒內受到物理傷害。（武器）"
       },
       "bloodthirst": {
         "name": "放血",
@@ -5413,7 +5421,7 @@ export const zh_TW: EnTranslations = {
       },
       "die_by_sword": {
         "name": "劍在人在",
-        "description": "防禦技能：受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時降低 20%。"
+        "description": "防禦性冷卻：持續 8 秒，你受到的傷害降低 30%，並能閃躲更多攻擊。"
       },
       "recklessness": {
         "name": "魯莽",

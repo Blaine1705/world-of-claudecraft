@@ -4737,7 +4737,7 @@ export const nl_NL: EnTranslations = {
       },
       "overpower": {
         "name": "Roodhand",
-        "description": "Directe aanval voor wapenschade plus {damage} die {rage} woede genereert. Kan niet ontweken worden."
+        "description": "Directe aanval voor wapenschade plus {damage} die {rage} woede genereert en je volgende Verminkende Slag met 20% versterkt (stapelt tweemaal). Kan niet ontweken worden."
       },
       "execute": {
         "name": "Vroeg Graf",
@@ -5249,7 +5249,15 @@ export const nl_NL: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Verminkende Slag",
-        "description": "Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)"
+        "description": "Een venijnige slag die wapenschade plus {damage} toebrengt en de genezing die het doelwit ontvangt met 50% verlaagt gedurende 10 sec. Past Gapende Wonden toe (bloeding). (kenmerkende Wapens-vaardigheid)"
+      },
+      "sweeping_strikes": {
+        "name": "Verbredende Boog",
+        "description": "Gedurende 12 sec raken je enkeldoelaanvallen ook 1 vijand in de buurt voor 75% schade. (Wapens)"
+      },
+      "deep_wounds": {
+        "name": "Gapende Wonden",
+        "description": "Passief: je Verminkende Slag laat het doelwit bloeden en veroorzaakt fysieke schade gedurende 6 sec. (Wapens)"
       },
       "bloodthirst": {
         "name": "Aderlating",
@@ -5413,7 +5421,7 @@ export const nl_NL: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

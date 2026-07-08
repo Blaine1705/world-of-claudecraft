@@ -4737,7 +4737,7 @@ export const ja_JP: EnTranslations = {
       },
       "overpower": {
         "name": "血染めの手",
-        "description": "武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成します。回避されません。"
+        "description": "武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成し、次の重傷の一撃の効果を20%高めます（2回まで累積）。回避されません。"
       },
       "execute": {
         "name": "早すぎる墓",
@@ -5249,7 +5249,15 @@ export const ja_JP: EnTranslations = {
       },
       "mortal_strike": {
         "name": "重傷の一撃",
-        "description": "凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）"
+        "description": "武器ダメージ +{damage} を与える凶悪な一撃で、10秒間、対象が受ける回復量を50%減少させます。深い傷（出血）を付与します。（アームズの代表技）"
+      },
+      "sweeping_strikes": {
+        "name": "拡がる弧",
+        "description": "12秒間、単体攻撃が近くの敵1体にも75%のダメージを与えます。（アームズ）"
+      },
+      "deep_wounds": {
+        "name": "深い傷",
+        "description": "パッシブ：重傷の一撃が対象に出血を与え、6秒かけて物理ダメージを与えます。（アームズ）"
       },
       "bloodthirst": {
         "name": "瀉血",
@@ -5413,7 +5421,7 @@ export const ja_JP: EnTranslations = {
       },
       "die_by_sword": {
         "name": "ダイ・バイ・ザ・ソード",
-        "description": "防御用クールダウン：8秒間、受けるダメージが10%減少します。体力が30%未満の間は20%減少します。"
+        "description": "防御用クールダウン：8秒間、受けるダメージが30%減少し、はるかに多くの攻撃を回避します。"
       },
       "recklessness": {
         "name": "レックレスネス",

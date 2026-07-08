@@ -1776,7 +1776,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': '体力を代償に怒りを{rage}生成します。',
   'entities.abilities.overpower.name': '血染めの手',
   'entities.abilities.overpower.description':
-    '武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成します。回避されません。',
+    '武器ダメージ +{damage} の即時攻撃で、怒りを{rage}生成し、次の重傷の一撃の効果を20%高めます（2回まで累積）。回避されません。',
   'entities.abilities.execute.name': '早すぎる墓',
   'entities.abilities.execute.description':
     '傷ついた敵をとどめようとして {damage} のダメージを与えます。体力が20%未満の敵にのみ使用できます。',
@@ -2146,7 +2146,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '12秒かけて出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
   'entities.abilities.mortal_strike.description':
-    '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
+    '武器ダメージ +{damage} を与える凶悪な一撃で、10秒間、対象が受ける回復量を50%減少させます。深い傷（出血）を付与します。（アームズの代表技）',
+  'entities.abilities.sweeping_strikes.name': '拡がる弧',
+  'entities.abilities.sweeping_strikes.description':
+    '12秒間、単体攻撃が近くの敵1体にも75%のダメージを与えます。（アームズ）',
+  'entities.abilities.deep_wounds.name': '深い傷',
+  'entities.abilities.deep_wounds.description':
+    'パッシブ：重傷の一撃が対象に出血を与え、6秒かけて物理ダメージを与えます。（アームズ）',
   'entities.abilities.bloodthirst.name': '瀉血',
   'entities.abilities.bloodthirst.description':
     '血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与え、最大体力の3%を回復し、怒りを10得ます。（狂怒シグネチャー）',
@@ -6038,7 +6044,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '鋭い咆哮を上げ、15ヤード以内の敵全員を8秒間50%減速させます。',
   'entities.abilities.die_by_sword.name': 'ダイ・バイ・ザ・ソード',
   'entities.abilities.die_by_sword.description':
-    '防御用クールダウン：8秒間、受けるダメージが10%減少します。体力が30%未満の間は20%減少します。',
+    '防御用クールダウン：8秒間、受けるダメージが30%減少し、はるかに多くの攻撃を回避します。',
   'entities.abilities.recklessness.name': 'レックレスネス',
   'entities.abilities.recklessness.description':
     '激怒：12秒間、怒りの生成が50%、クリティカル率が20%増加します。',

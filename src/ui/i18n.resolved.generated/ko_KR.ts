@@ -4737,7 +4737,7 @@ export const ko_KR: EnTranslations = {
       },
       "overpower": {
         "name": "붉은 손",
-        "description": "무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성합니다. 회피할 수 없습니다."
+        "description": "무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성하며, 다음 불구의 일격의 효과를 20% 강화합니다(2회 중첩). 회피할 수 없습니다."
       },
       "execute": {
         "name": "이른 무덤",
@@ -5249,7 +5249,15 @@ export const ko_KR: EnTranslations = {
       },
       "mortal_strike": {
         "name": "불구의 일격",
-        "description": "잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)"
+        "description": "무기 피해에 {damage}를 더한 피해를 입히는 흉포한 일격으로, 10초 동안 대상이 받는 치유량을 50% 감소시킵니다. 찢어진 상처(출혈)를 적용합니다. (무기 대표 기술)"
+      },
+      "sweeping_strikes": {
+        "name": "넓어지는 호",
+        "description": "12초 동안 단일 대상 공격이 근처의 적 1명에게도 75%의 피해를 입힙니다. (무기)"
+      },
+      "deep_wounds": {
+        "name": "찢어진 상처",
+        "description": "지속 효과: 불구의 일격이 대상에게 출혈을 일으켜 6초에 걸쳐 물리 피해를 입힙니다. (무기)"
       },
       "bloodthirst": {
         "name": "사혈",
@@ -5413,7 +5421,7 @@ export const ko_KR: EnTranslations = {
       },
       "die_by_sword": {
         "name": "투사의 혼",
-        "description": "방어 기술: 8초 동안 받는 피해가 10% 감소하며, 생명력이 30% 미만이면 20% 감소합니다."
+        "description": "방어 재사용 대기시간: 8초 동안 받는 피해가 30% 감소하고 훨씬 더 많은 공격을 회피합니다."
       },
       "recklessness": {
         "name": "무모한 희생",

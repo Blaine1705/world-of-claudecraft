@@ -4737,7 +4737,7 @@ export const id_ID: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Serangan instan dengan kerusakan senjata plus {damage} yang menghasilkan {rage} amarah. Tidak dapat dihindari."
+        "description": "Serangan instan dengan kerusakan senjata plus {damage} yang menghasilkan {rage} amarah dan memperkuat Serangan Pelukai berikutnya sebesar 20% (menumpuk dua kali). Tidak dapat dihindari."
       },
       "execute": {
         "name": "Ajal Dini",
@@ -5249,7 +5249,15 @@ export const id_ID: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
-        "description": "Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)"
+        "description": "Serangan kejam yang memberikan kerusakan senjata plus {damage} dan mengurangi penyembuhan yang diterima target sebesar 50% selama 10 dtk. Menerapkan Luka Menganga (pendarahan). (ciri khas Senjata)"
+      },
+      "sweeping_strikes": {
+        "name": "Busur Melebar",
+        "description": "Selama 12 dtk serangan target tunggalmu juga mengenai 1 musuh di dekatmu sebesar 75% kerusakan. (Senjata)"
+      },
+      "deep_wounds": {
+        "name": "Luka Menganga",
+        "description": "Pasif: Serangan Pelukaimu membuat target berdarah, memberikan kerusakan fisik selama 6 dtk. (Senjata)"
       },
       "bloodthirst": {
         "name": "Pertumpahan Darah",
@@ -5413,7 +5421,7 @@ export const id_ID: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

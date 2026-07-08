@@ -4737,7 +4737,7 @@ export const de_DE: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt. Kann nicht ausgewichen werden."
+        "description": "Sofortiger Angriff mit Waffenschaden plus {damage}, der {rage} Wut erzeugt und Euren nächsten Verstümmelnden Hieb um 20% verstärkt (zweifach stapelbar). Kann nicht ausgewichen werden."
       },
       "execute": {
         "name": "Frühes Grab",
@@ -5249,7 +5249,15 @@ export const de_DE: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Verstümmelnder Hieb",
-        "description": "Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)"
+        "description": "Ein brutaler Hieb, der Waffenschaden plus {damage} verursacht und die Heilung des Ziels 10 Sek. lang um 50% verringert. Wendet Klaffende Wunden an (Blutung). (Waffen-Spezialität)"
+      },
+      "sweeping_strikes": {
+        "name": "Weiter Bogen",
+        "description": "12 Sek. lang treffen Eure Einzelzielangriffe auch 1 nahen Gegner für 75% Schaden. (Waffen)"
+      },
+      "deep_wounds": {
+        "name": "Klaffende Wunden",
+        "description": "Passiv: Euer Verstümmelnder Hieb lässt das Ziel bluten und verursacht über 6 Sek. physischen Schaden. (Waffen)"
       },
       "bloodthirst": {
         "name": "Aderlass",
@@ -5413,7 +5421,7 @@ export const de_DE: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Tod durch das Schwert",
-        "description": "Defensive Abklingzeit: Ihr erleidet 8 Sek. lang 10% weniger Schaden, unter 30% Gesundheit 20% weniger."
+        "description": "Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus."
       },
       "recklessness": {
         "name": "Tollkühnheit",

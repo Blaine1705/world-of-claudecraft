@@ -1762,7 +1762,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': '생명력을 희생하여 분노 {rage}을(를) 생성합니다.',
   'entities.abilities.overpower.name': '붉은 손',
   'entities.abilities.overpower.description':
-    '무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성합니다. 회피할 수 없습니다.',
+    '무기 피해에 {damage}를 더한 피해를 즉시 입히고 분노 {rage}을(를) 생성하며, 다음 불구의 일격의 효과를 20% 강화합니다(2회 중첩). 회피할 수 없습니다.',
   'entities.abilities.execute.name': '이른 무덤',
   'entities.abilities.execute.description':
     '상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다.',
@@ -2138,7 +2138,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용.',
   'entities.abilities.mortal_strike.name': '불구의 일격',
   'entities.abilities.mortal_strike.description':
-    '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
+    '무기 피해에 {damage}를 더한 피해를 입히는 흉포한 일격으로, 10초 동안 대상이 받는 치유량을 50% 감소시킵니다. 찢어진 상처(출혈)를 적용합니다. (무기 대표 기술)',
+  'entities.abilities.sweeping_strikes.name': '넓어지는 호',
+  'entities.abilities.sweeping_strikes.description':
+    '12초 동안 단일 대상 공격이 근처의 적 1명에게도 75%의 피해를 입힙니다. (무기)',
+  'entities.abilities.deep_wounds.name': '찢어진 상처',
+  'entities.abilities.deep_wounds.description':
+    '지속 효과: 불구의 일격이 대상에게 출혈을 일으켜 6초에 걸쳐 물리 피해를 입힙니다. (무기)',
   'entities.abilities.bloodthirst.name': '사혈',
   'entities.abilities.bloodthirst.description':
     '피의 광란으로 즉시 공격하여 {damage}의 피해를 주고, 최대 생명력의 3%를 회복하며, 분노를 10 생성합니다. (분노 특화 대표 기술)',
@@ -6028,7 +6034,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '날카로운 고함을 질러 15미터 내 모든 적의 이동 속도를 8초 동안 50% 감소시킵니다.',
   'entities.abilities.die_by_sword.name': '투사의 혼',
   'entities.abilities.die_by_sword.description':
-    '방어 기술: 8초 동안 받는 피해가 10% 감소하며, 생명력이 30% 미만이면 20% 감소합니다.',
+    '방어 재사용 대기시간: 8초 동안 받는 피해가 30% 감소하고 훨씬 더 많은 공격을 회피합니다.',
   'entities.abilities.recklessness.name': '무모한 희생',
   'entities.abilities.recklessness.description':
     '격노: 12초 동안 분노 생성량이 50%, 치명타 확률이 20% 증가합니다.',

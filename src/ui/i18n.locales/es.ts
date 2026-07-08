@@ -2417,7 +2417,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Genera {rage} de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Mano Roja',
   'entities.abilities.overpower.description':
-    'Ataque instantáneo que inflige daño de arma más {damage} y genera {rage} de ira. No puede esquivarse.',
+    'Ataque instantáneo de daño de arma más {damage} que genera {rage} de ira y potencia tu siguiente Golpe Mutilador un 20% (se acumula dos veces). No se puede esquivar.',
   'entities.abilities.execute.name': 'Tumba Temprana',
   'entities.abilities.execute.description':
     'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',
@@ -2801,7 +2801,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Remate que causa daño de sangrado durante 12 s. Consume puntos de combo. Solo en Forma de lobo.',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
-    'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
+    'Un golpe feroz que inflige daño de arma más {damage} y reduce un 50% la sanación que recibe el objetivo durante 10 sec. Aplica Heridas Profundas (sangrado). (firma de Armas)',
+  'entities.abilities.sweeping_strikes.name': 'Golpes de Barrido',
+  'entities.abilities.sweeping_strikes.description':
+    'Durante 12 sec tus ataques de un objetivo golpean también a 1 enemigo cercano al 75%. (Armas)',
+  'entities.abilities.deep_wounds.name': 'Heridas Profundas',
+  'entities.abilities.deep_wounds.description':
+    'Pasiva: tu Golpe Mutilador deja al objetivo sangrando daño físico durante 6 sec. (Armas)',
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
     'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de furia. (habilidad distintiva de Furia)',
@@ -6233,7 +6239,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un grito desgarrador que ralentiza un 50% a todos los enemigos en un radio de 15 yardas durante 8 s.',
   'entities.abilities.die_by_sword.name': 'Morir matando',
   'entities.abilities.die_by_sword.description':
-    'Recurso defensivo: recibes un 10% menos de daño durante 8 s, y un 20% menos por debajo del 30% de salud.',
+    'Cooldown defensivo: durante 8 sec recibes un 30% menos de daño y esquivas muchos más ataques.',
   'entities.abilities.recklessness.name': 'Temeridad',
   'entities.abilities.recklessness.description':
     'Enfurecer: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s.',

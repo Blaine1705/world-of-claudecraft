@@ -2398,7 +2398,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Gera {rage} de raiva ao custo de vida.',
   'entities.abilities.overpower.name': 'Mão Vermelha',
   'entities.abilities.overpower.description':
-    'Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva. Não pode ser esquivado.',
+    'Ataque instantâneo com dano de arma mais {damage} que gera {rage} de raiva e fortalece seu próximo Golpe Mutilador em 20% (acumula duas vezes). Não pode ser esquivado.',
   'entities.abilities.execute.name': 'Cova Prematura',
   'entities.abilities.execute.description':
     'Tenta finalizar um inimigo ferido, causando {damage} de dano. Só pode ser usado em inimigos com menos de 20% de vida.',
@@ -2776,7 +2776,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Golpe final que causa dano de sangramento ao longo de 12 s. Consome pontos de combo. Apenas Forma de Lobo.',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
-    'Um golpe cruel que causa dano da arma mais {damage}. (assinatura de Armas)',
+    'Um golpe cruel que causa dano de arma mais {damage} e reduz em 50% a cura recebida pelo alvo por 10 seg. Aplica Feridas Abertas (sangramento). (marca das Armas)',
+  'entities.abilities.sweeping_strikes.name': 'Arco Ampliado',
+  'entities.abilities.sweeping_strikes.description':
+    'Por 12 seg seus ataques de alvo único também atingem 1 inimigo próximo causando 75% do dano. (Armas)',
+  'entities.abilities.deep_wounds.name': 'Feridas Abertas',
+  'entities.abilities.deep_wounds.description':
+    'Passiva: seu Golpe Mutilador faz o alvo sangrar, causando dano físico ao longo de 6 seg. (Armas)',
   'entities.abilities.bloodthirst.name': 'Sangria',
   'entities.abilities.bloodthirst.description':
     'Ataca instantaneamente em frenesi sangrento, causando {damage}. (assinatura de Fúria)',
@@ -6156,7 +6162,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um grito penetrante que reduz em 50% a velocidade de todos os inimigos num raio de 15 metros por 8 seg.',
   'entities.abilities.die_by_sword.name': 'Morrer pela Espada',
   'entities.abilities.die_by_sword.description':
-    'Recurso defensivo: você sofre 10% menos dano por 8 seg, e 20% menos abaixo de 30% de vida.',
+    'Recurso defensivo: por 8 seg você sofre 30% menos dano e esquiva de muito mais ataques.',
   'entities.abilities.recklessness.name': 'Imprudência',
   'entities.abilities.recklessness.description':
     'Fúria: sua geração de raiva aumenta em 50% e sua chance de acerto crítico em 20% por 12 seg.',

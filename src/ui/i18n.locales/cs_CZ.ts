@@ -3563,10 +3563,16 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase.',
   'entities.abilities.moonfire.name': 'Měsíční bouře',
   'entities.abilities.mortal_strike.description':
-    'Zákeřný úder, který způsobí poškození zbraně plus {damage}. (Hlavní schopnost Arms)',
+    'Zákeřný úder za poškození zbraně plus {damage}, který sníží léčení cíle o 50% po dobu 10 s. Uděluje Zející rány (krvácení). (charakteristická schopnost Zbraní)',
   'entities.abilities.mortal_strike.name': 'Mrzačící úder',
+  'entities.abilities.sweeping_strikes.name': 'Rozšiřující se oblouk',
+  'entities.abilities.sweeping_strikes.description':
+    'Po dobu 12 s vaše útoky na jeden cíl zasáhnou také 1 nepřítele poblíž za 75% poškození. (Zbraně)',
+  'entities.abilities.deep_wounds.name': 'Zející rány',
+  'entities.abilities.deep_wounds.description':
+    'Pasivní: váš Mrzačící úder způsobí cíli krvácení a po dobu 6 s uděluje fyzické poškození. (Zbraně)',
   'entities.abilities.overpower.description':
-    'Okamžitý útok za poškození zbraně plus {damage}, který vygeneruje {rage} vzteku. Nelze mu uhnout.',
+    'Okamžitý útok za poškození zbraně plus {damage}, který vygeneruje {rage} vzteku a posílí váš příští Mrzačící úder o 20% (skládá se dvakrát). Nelze mu uhnout.',
   'entities.abilities.overpower.name': 'Rudá ruka',
   'entities.abilities.polymorph.description':
     'Promění nepřítele v ropuchu až na 15 s. Ropucha bloudí a rychle se léčí. Jakékoli poškození efekt přeruší. Jen bestie a humanoidi.',

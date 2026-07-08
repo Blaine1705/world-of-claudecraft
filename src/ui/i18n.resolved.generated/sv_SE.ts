@@ -4737,7 +4737,7 @@ export const sv_SE: EnTranslations = {
       },
       "overpower": {
         "name": "Rödhand",
-        "description": "Omedelbar attack för vapenskada plus {damage} som genererar {rage} raseri. Kan inte undvikas."
+        "description": "Omedelbar attack för vapenskada plus {damage} som genererar {rage} raseri och förstärker ditt nästa Stympande hugg med 20% (staplas två gånger). Kan inte undvikas."
       },
       "execute": {
         "name": "Tidig grav",
@@ -5249,7 +5249,15 @@ export const sv_SE: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Stympande hugg",
-        "description": "Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)"
+        "description": "Ett elakartat hugg som ger vapenskada plus {damage} och minskar helandet målet tar emot med 50% under 10 sek. Applicerar Gapande sår (blödning). (Vapen-signatur)"
+      },
+      "sweeping_strikes": {
+        "name": "Vidgande båge",
+        "description": "Under 12 sek träffar dina enkelmålsattacker även 1 närliggande fiende för 75% skada. (Vapen)"
+      },
+      "deep_wounds": {
+        "name": "Gapande sår",
+        "description": "Passiv: ditt Stympande hugg får målet att blöda och orsakar fysisk skada under 6 sek. (Vapen)"
       },
       "bloodthirst": {
         "name": "Åderlåtning",
@@ -5413,7 +5421,7 @@ export const sv_SE: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

@@ -2404,7 +2404,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Genera {rage} rabbia al costo di salute.',
   'entities.abilities.overpower.name': 'Mano Rossa',
   'entities.abilities.overpower.description':
-    "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia. Non può essere schivato.",
+    "Attacco istantaneo per danni dell'arma più {damage} che genera {rage} rabbia e potenzia il tuo prossimo Colpo Mutilante del 20% (si accumula due volte). Non può essere schivato.",
   'entities.abilities.execute.name': 'Tomba Prematura',
   'entities.abilities.execute.description':
     'Tenta di finire un nemico ferito, infliggendo {damage} danni. Utilizzabile solo sui nemici sotto il 20% di salute.',
@@ -2788,7 +2788,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Mossa finale che infligge danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
   'entities.abilities.mortal_strike.name': 'Colpo Mutilante',
   'entities.abilities.mortal_strike.description':
-    "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)",
+    "Un colpo feroce che infligge danni dell'arma più {damage} e riduce del 50% le cure ricevute dal bersaglio per 10 sec. Applica Ferite Aperte (sanguinamento). (firma Armi)",
+  'entities.abilities.sweeping_strikes.name': 'Arco Ampliato',
+  'entities.abilities.sweeping_strikes.description':
+    'Per 12 sec i tuoi attacchi a bersaglio singolo colpiscono anche 1 nemico vicino per il 75% dei danni. (Armi)',
+  'entities.abilities.deep_wounds.name': 'Ferite Aperte',
+  'entities.abilities.deep_wounds.description':
+    'Passiva: il tuo Colpo Mutilante fa sanguinare il bersaglio, infliggendo danni fisici in 6 sec. (Armi)',
   'entities.abilities.bloodthirst.name': 'Salasso',
   'entities.abilities.bloodthirst.description':
     'Attacca istantaneamente in una frenesia sanguigna per {damage}. (firma Furia)',
@@ -6182,7 +6188,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un urlo lacerante che rallenta del 50% tutti i nemici entro 15 metri per 8 sec.',
   'entities.abilities.die_by_sword.name': 'Morire di Spada',
   'entities.abilities.die_by_sword.description':
-    'Recupero difensivo: subisci il 10% di danni in meno per 8 sec, il 20% sotto il 30% di salute.',
+    'Recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi.',
   'entities.abilities.recklessness.name': 'Temerarietà',
   'entities.abilities.recklessness.description':
     'Ira: la generazione di rabbia aumenta del 50% e la probabilità di colpo critico del 20% per 12 sec.',

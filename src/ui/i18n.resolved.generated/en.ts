@@ -4737,7 +4737,7 @@ export const en: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Instant attack for weapon damage plus {damage} that generates {rage} rage. Cannot be dodged."
+        "description": "Instant attack for weapon damage plus {damage} that generates {rage} rage and empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged."
       },
       "execute": {
         "name": "Early Grave",
@@ -5249,7 +5249,15 @@ export const en: EnTranslations = {
       },
       "mortal_strike": {
         "name": "Maiming Strike",
-        "description": "A vicious strike dealing weapon damage plus {damage} and reducing healing the target receives by 50% for 10 sec. (Arms signature)"
+        "description": "A vicious strike dealing weapon damage plus {damage} and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)"
+      },
+      "sweeping_strikes": {
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)"
+      },
+      "deep_wounds": {
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "bloodthirst": {
         "name": "Bloodletting",
@@ -5413,7 +5421,7 @@ export const en: EnTranslations = {
       },
       "die_by_sword": {
         "name": "Die by the Sword",
-        "description": "Defensive cooldown: take 10% less damage for 8 sec, doubled to 20% while below 30% health."
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
         "name": "Recklessness",

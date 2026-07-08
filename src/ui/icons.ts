@@ -2384,8 +2384,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   mortal_strike: r('blood', 'blood', ['sword', { p: 'claw_slash', ...BR }]),
   bloodthirst: r('blood', 'blood', ['heart', { p: 'dagger', ...BR }], ['drips']),
   shield_slam: r('steel', 'steel', ['shield', { p: 'mace', ...BR }]),
-  whirlwind: r('fury', 'steel', ['sword'], ['arcs']),
-  berserker_rage: r('fury', 'blood', ['fist'], ['glow']),
+  // Bladed Gyre (whirlwind): a spin, so a sweeping slash-arc rings the blade,
+  // distinct from heroic_strike's bare sword + glow.
+  whirlwind: r('fury', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['motion']),
+  // Berserker Rage: a fist wreathed in flame (enrage), distinct from taunt's
+  // bare fist + arcs on the same fury/blood palette.
+  berserker_rage: r('fury', 'blood', ['fist', { p: 'flame', ...TR }], ['glow']),
   // fury-only kit: Twinstrike = two crossed blades mid-swing; Red Harvest = a
   // blood-soaked axe with a falling droplet (distinct from execute's bare axe)
   raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),
@@ -2415,13 +2419,24 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // composed steel look distinct from iron_resolve's shield+heart)
   breachmaker: r('earth', 'steel', ['sword', { p: 'sunburst', ...TR }], ['crack']),
   measured_fury: r('steel', 'steel', ['helm', { p: 'heart', ...BR }], ['glow']),
+  // Arms restructure 2026-07-08: Sweeping Strikes = a wide arcing slash (hitting
+  // an extra target); Deep Wounds = a bleeding gash on blood.
+  sweeping_strikes: r('fury', 'steel', ['claw_slash', { p: 'sword', ...BR }], ['arcs', 'motion']),
+  deep_wounds: r('blood', 'blood', ['claw_slash', { p: 'droplet', ...BR }], ['drips']),
   // warrior (Talents 2.0 rows): each hints the mechanic with an existing primitive combo
   pummel: r('steel', 'steel', ['fist', { p: 'bolt', ...BR }], ['arcs']), // fist smashing a cast
   heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']), // downward impact
   rallying_cry: r('fury', 'gold', ['roar', { p: 'heart', ...BR }], ['arcs']), // shout granting health
   storm_bolt: r('storm', 'steel', ['mace', { p: 'lightning', ...TR }], ['motion']), // thrown hammer
   intimidating_shout: r('shadow', 'blood', ['roar', { p: 'skull', ...TR }], ['arcs']), // fear shout
-  bladestorm: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI * 0.5 }], ['arcs', 'motion']),
+  // Bladestorm: a whole STORM of blades, so a storm-blue background sets it apart
+  // from raging_gale's fury-red crossed swords on the action bar.
+  bladestorm: r(
+    'storm',
+    'steel',
+    ['sword', { p: 'sword', rot: Math.PI * 0.5 }],
+    ['arcs', 'motion'],
+  ),
   victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']), // strike that heals
   piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']), // howl slowing feet
   die_by_sword: r('steel', 'steel', ['shield', { p: 'sword', ...TR }], ['glow']), // defensive parry
