@@ -5243,7 +5243,7 @@ export const en: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Bloodletting",
-        "description": "Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health and generating 10 rage. (Fury signature)"
+        "description": "Instantly attack in a blood frenzy for {damage}, healing you for 3% of your maximum health and generating 12 rage. (Fury signature)"
       },
       "raging_gale": {
         "name": "Twinstrike",

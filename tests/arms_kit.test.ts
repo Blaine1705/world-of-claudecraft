@@ -197,8 +197,13 @@ describe('(c) Measured Fury: 10% cheaper rage abilities, arms only, never castab
     // The task's concrete example: Maiming Strike is 30 rage, 27 under the passive.
     expect(ABILITIES.mortal_strike.cost).toBe(30);
     expect(arms.resolvedAbility('mortal_strike')!.cost).toBe(27);
-    // Fury pays full for its own rage signature (no passive known).
-    expect(fury.resolvedAbility('bloodthirst')!.cost).toBe(30);
+    // Fury lacks the passive, so the shared staple stays at its full, undiscounted
+    // cost for it (its own signature Bloodletting is now a free generator, so a
+    // rage discount can no longer be observed there). Arms pays 10% less.
+    expect(fury.resolvedAbility('execute')!.cost).toBe(ABILITIES.execute.cost);
+    expect(fury.resolvedAbility('execute')!.cost).toBeGreaterThan(
+      arms.resolvedAbility('execute')!.cost,
+    );
 
     // Casting the passive is a silent no-op: no GCD, no resource change, no events.
     const armsP = arms.player;

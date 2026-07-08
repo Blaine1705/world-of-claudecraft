@@ -2798,7 +2798,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
-    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 10 de furia. (habilidad distintiva de Furia)',
+    'Atacas al instante en un frenesí sangriento por {damage}, recuperando un 3% de tu salud máxima y generando 12 de furia. (habilidad distintiva de Furia)',
   'entities.abilities.raging_gale.name': 'Arremetida Enfurecida',
   'entities.abilities.raging_gale.description':
     'Golpeas al instante dos veces con tu arma; cada golpe inflige un 60% del daño de arma más {damage}, y generas {rage} de ira. Almacena hasta 2 cargas. (Furia)',

@@ -3868,7 +3868,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Bloodletting',
     class: 'warrior',
     learnLevel: 10,
-    cost: 30,
+    cost: 0,
     castTime: 0,
     cooldown: 6,
     range: 0,
@@ -3877,10 +3877,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
       { type: 'selfHealPctMax', pct: 0.03 },
-      { type: 'gainResource', amount: 10 },
+      { type: 'gainResource', amount: 12 },
     ],
     description:
-      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 10 rage. (Fury signature)',
+      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 12 rage. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',

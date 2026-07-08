@@ -1039,7 +1039,8 @@ describe('druid forms', () => {
 
     hit(sim, wolf, sim.player, 30);
 
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // rageFromTaking(30, 20) = 30 / 20 = 1.5 (the *1.5 divisor was dropped).
+    expect(sim.player.resource).toBeCloseTo(1.5, 5);
   });
 
   it('bear charge is learned with Bruin Form and only works while shifted', () => {

@@ -2571,13 +2571,13 @@ export function rageConversion(level: number): number {
 
 // Rage from dealing damage uses the classic outgoing-damage scale.
 export function rageFromDealing(damage: number, level: number): number {
-  return (7.5 * damage) / rageConversion(level);
+  return (18 * damage) / rageConversion(level);
 }
 
 // Rage from taking damage scales with the attacker's level so dungeon tanks get
 // useful rage from being hit without hard-coding the current level cap.
 export function rageFromTaking(damage: number, attackerLevel: number): number {
-  return damage / (Math.max(1, attackerLevel) * 1.5);
+  return damage / Math.max(1, attackerLevel);
 }
 
 // Choice-row warrior talents: aura-driven rage-generation multiplier, applied
