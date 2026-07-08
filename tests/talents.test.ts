@@ -23,6 +23,7 @@ import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, dist2d, MAX_LEVEL } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { talentChoiceIconRef, talentNodeIconRef } from '../src/ui/talent_icons';
+import { WARRIOR_ROWS } from '../src/sim/content/warrior_rows';
 
 const alloc = (over: Partial<TalentAllocation> = {}): TalentAllocation => ({
   ...emptyAllocation(),
@@ -142,6 +143,39 @@ describe('talent tree validation (load-time)', () => {
         }
       }
     }
+  });
+
+  it('maps the warrior Bloodbath row to its custom image-backed icon id', () => {
+    const choice = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_bloodbath');
+    expect(choice).toBeTruthy();
+    expect(talentChoiceIconRef(choice as any)).toEqual({ kind: 'ability', id: 'bloodbath' });
+  });
+
+  it('maps the warrior global-only row talents to their custom image-backed icon ids', () => {
+    const secondWind = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_second_wind');
+    const colossalMight = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_colossal_might');
+    const pursuit = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_pursuit');
+    const lingeringDread = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_lingering_dread');
+    const angerManagement = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_anger_management');
+    const battleRhythm = WARRIOR_ROWS.flatMap((row) => row.options).find((opt) => opt.id === 'war_row_battle_rhythm');
+    expect(secondWind).toBeTruthy();
+    expect(colossalMight).toBeTruthy();
+    expect(pursuit).toBeTruthy();
+    expect(lingeringDread).toBeTruthy();
+    expect(angerManagement).toBeTruthy();
+    expect(battleRhythm).toBeTruthy();
+    expect(talentChoiceIconRef(secondWind as any)).toEqual({ kind: 'ability', id: 'second_wind' });
+    expect(talentChoiceIconRef(colossalMight as any)).toEqual({ kind: 'ability', id: 'colossal_might' });
+    expect(talentChoiceIconRef(pursuit as any)).toEqual({ kind: 'ability', id: 'pursuit' });
+    expect(talentChoiceIconRef(lingeringDread as any)).toEqual({
+      kind: 'ability',
+      id: 'lingering_dread',
+    });
+    expect(talentChoiceIconRef(angerManagement as any)).toEqual({
+      kind: 'ability',
+      id: 'anger_management',
+    });
+    expect(talentChoiceIconRef(battleRhythm as any)).toEqual({ kind: 'ability', id: 'battle_rhythm' });
   });
 
   it('detects cycles in the requires graph', () => {
