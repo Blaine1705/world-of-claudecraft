@@ -4423,6 +4423,32 @@ export class Renderer {
           const rock = v.group.userData.rollRock as THREE.Object3D | undefined;
           if (rock) rock.rotation.x = e.pos.z * 0.714;
         }
+        // Rift prop ambience: orbiting shards spin + bob; glowing veins/beams pulse.
+        // Cheap (a handful of meshes on a few props per floor) and only when visible.
+        if (vis) {
+          const orbiters = v.group.userData.riftOrbiters as THREE.Object3D[] | undefined;
+          if (orbiters) {
+            for (let oi = 0; oi < orbiters.length; oi++) {
+              const pv = orbiters[oi];
+              pv.rotation.y = this.time * 1.1 + oi * 2.1;
+              pv.position.y = 3.6 + Math.sin(this.time * 2 + oi * 1.7) * 0.18;
+            }
+          }
+          const pulse = v.group.userData.riftPulse as THREE.Mesh[] | undefined;
+          if (pulse) {
+            const k = 0.7 + Math.sin(this.time * 3 + e.id) * 0.3;
+            for (const m of pulse) {
+              const mat = m.material as THREE.MeshBasicMaterial;
+              if (mat.userData.baseOpacity === undefined) mat.userData.baseOpacity = mat.opacity;
+              mat.opacity = (mat.userData.baseOpacity as number) * k;
+            }
+          }
+          // Continuous particle ambience via the real VFX system (like the Nythraxis
+          // wardstone above): a lit pylon fizzes arcane motes; the rolling boulder
+          // trails embers. Rate-scaled by dt, skipped on low-gfx by the emitter.
+          if (e.templateId === 'rift_pylon_lit') this.vfx.castSparkle(e.id, 'arcane', dt * 2.2);
+          else if (e.templateId === 'rift_roller') this.vfx.castSparkle(e.id, 'fire', dt * 2.4);
+        }
         if (vis && e.templateId === 'mailbox') {
           // The unread-mail votive: per-viewer beacon driven by the IWorld
           // mirror (a cheap field online, a small filter offline; <=4 pillars).

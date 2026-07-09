@@ -202,6 +202,61 @@ const RIFT_GATE_URL = '/models/props/rift_portal.glb';
 const RIFT_GATE_HEIGHT = 6.0;
 let riftGateGltf: GLTF | null = null;
 
+// The rift boulder / rolling boulder reuse a real detailed rock mesh (a shipped
+// KayKit-style prop) instead of a bare dodecahedron, so they read as proper craggy
+// stone; the procedural glow veins layer on top. Zero-cost asset reuse (the
+// `--model-file` import lane's spirit): no new GLB, no Tripo credits. Cached +
+// shared like the gate; buildRiftPuzzleProp falls back to a dodecahedron if absent.
+const RIFT_ROCK_URL = '/models/props/rock_large_f.glb';
+let riftRockGltf: GLTF | null = null;
+
+function markGltfShared(gltf: GLTF): void {
+  gltf.scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    markSharedGeometry(mesh.geometry);
+    const mat = mesh.material;
+    if (Array.isArray(mat)) mat.forEach(markSharedMaterial);
+    else markSharedMaterial(mat);
+  });
+}
+
+/** Clone a preloaded prop GLB, center it on xz, drop its base to y=0, and scale it
+ * to `height` world units (matches buildRiftGateBody's fit). `stone` recolors every
+ * mesh to a dark rift material (the shipped rocks carry outdoor moss/grass that
+ * clashes with the rift's void/fire mood; the craggy geometry is what we want).
+ * Recolor allocates a NEW per-clone material (the cached original stays shared and
+ * untouched), disposed with the view like the procedural props. */
+function fittedPropClone(
+  gltf: GLTF,
+  height: number,
+  stone?: { color: number; emissive: number },
+): THREE.Group {
+  const g = new THREE.Group();
+  const model = gltf.scene.clone(true);
+  model.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const s = height / Math.max(size.y, 1e-3);
+  model.scale.setScalar(s);
+  model.position.set(
+    -((box.min.x + box.max.x) / 2) * s,
+    -box.min.y * s,
+    -((box.min.z + box.max.z) / 2) * s,
+  );
+  const mat = stone
+    ? new THREE.MeshLambertMaterial({ color: stone.color, emissive: stone.emissive })
+    : null;
+  model.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    mesh.castShadow = true;
+    if (mat) mesh.material = mat;
+  });
+  g.add(model);
+  return g;
+}
+
 if (typeof window !== 'undefined') {
   registerPreload(
     loadGltf(RIFT_GATE_URL)
@@ -210,19 +265,22 @@ if (typeof window !== 'undefined') {
         // this cached original; mark them shared so the renderer's per-view
         // disposal guard never frees them (interest churn would otherwise poison
         // every later clone). Same contract as the procedural arch resources.
-        gltf.scene.traverse((o) => {
-          const mesh = o as THREE.Mesh;
-          if (!mesh.isMesh) return;
-          markSharedGeometry(mesh.geometry);
-          const mat = mesh.material;
-          if (Array.isArray(mat)) mat.forEach(markSharedMaterial);
-          else markSharedMaterial(mat);
-        });
+        markGltfShared(gltf);
         riftGateGltf = gltf;
       })
       .catch(() => {
         // Missing/broken asset: buildRiftGateBody falls back to the arch.
         riftGateGltf = null;
+      }),
+  );
+  registerPreload(
+    loadGltf(RIFT_ROCK_URL)
+      .then((gltf) => {
+        markGltfShared(gltf);
+        riftRockGltf = gltf;
+      })
+      .catch(() => {
+        riftRockGltf = null;
       }),
   );
 }
@@ -299,30 +357,81 @@ export function buildRiftPuzzleProp(
     case 'rift_boulder':
     case 'rift_boulder_placed': {
       const placed = templateId === 'rift_boulder_placed';
-      const rock = new THREE.Mesh(
-        new THREE.DodecahedronGeometry(1.1, 0),
-        new THREE.MeshLambertMaterial({
-          color: placed ? 0x9a875f : 0x6a6a72,
-          emissive: placed ? 0x3a2a08 : 0x000000,
-        }),
-      );
-      rock.position.y = 1.0;
-      rock.castShadow = true;
-      body.add(rock);
+      // A cracked rune-boulder: a real craggy rock mesh (or a dodecahedron if the
+      // asset is still loading) girdled by glowing veins that pulse (dim cyan loose,
+      // hot gold once socketed), with a golden halo when placed.
+      if (riftRockGltf) {
+        const stone = placed
+          ? { color: 0x8a7550, emissive: 0x2a1c04 } // warm, gold-lit once socketed
+          : { color: 0x5f5c66, emissive: 0x0a0a12 }; // cold dark rift stone
+        body.add(fittedPropClone(riftRockGltf, 2.1, stone));
+      } else {
+        const rock = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(1.1, 0),
+          new THREE.MeshLambertMaterial({
+            color: placed ? 0x8a7550 : 0x5f5c66,
+            emissive: placed ? 0x2a1c04 : 0x0a0a12,
+          }),
+        );
+        rock.position.y = 1.0;
+        rock.castShadow = true;
+        body.add(rock);
+      }
+      const veinColor = placed ? 0xffc24a : 0x6fa8d8;
+      const veins: THREE.Object3D[] = [];
+      for (let i = 0; i < 3; i++) {
+        const vein = new THREE.Mesh(
+          new THREE.TorusGeometry(1.03, 0.05, 6, 20),
+          riftGlowMaterial(veinColor, placed ? 0.85 : 0.42),
+        );
+        vein.position.y = 1.0;
+        vein.rotation.set((i * Math.PI) / 3, (i * Math.PI) / 5, 0);
+        body.add(vein);
+        veins.push(vein);
+      }
+      body.userData.riftPulse = veins;
+      if (placed) {
+        const halo = new THREE.Mesh(
+          new THREE.RingGeometry(1.2, 1.7, 22),
+          riftGlowMaterial(0xffc24a, 0.5),
+        );
+        halo.rotation.x = -Math.PI / 2;
+        halo.position.y = 0.06;
+        body.add(halo);
+      }
       return { body };
     }
     case 'rift_roller': {
-      // The rolling-boulder hazard: a big cracked boulder. Its rock is exposed on
-      // `userData.rollRock` so the renderer can spin it about X as the entity moves
-      // (rolling without slipping).
-      const rock = new THREE.Mesh(
-        new THREE.DodecahedronGeometry(1.4, 0),
-        new THREE.MeshLambertMaterial({ color: 0x59565e, emissive: 0x120e08 }),
-      );
-      rock.position.y = 1.4;
-      rock.castShadow = true;
-      body.add(rock);
-      body.userData.rollRock = rock;
+      // The rolling-boulder hazard: a big craggy rock (real mesh, or a dodecahedron
+      // fallback) veined with molten embers. The whole roller group is exposed on
+      // `userData.rollRock`; the renderer spins it about X as the entity advances
+      // (rolling without slipping). It pivots about its CENTER (group origin at
+      // y=1.4), and the ember veins ride along as children.
+      const roller = new THREE.Group();
+      if (riftRockGltf) {
+        // Dark, ember-lit rift stone (strip the shipped rock's outdoor moss).
+        const rock = fittedPropClone(riftRockGltf, 2.8, { color: 0x4a4650, emissive: 0x1a0a06 });
+        rock.position.y = -1.4; // drop so the rock's center sits at the group origin
+        roller.add(rock);
+      } else {
+        const rock = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(1.4, 0),
+          new THREE.MeshLambertMaterial({ color: 0x4a4650, emissive: 0x1a0a06 }),
+        );
+        rock.castShadow = true;
+        roller.add(rock);
+      }
+      for (let i = 0; i < 3; i++) {
+        const vein = new THREE.Mesh(
+          new THREE.TorusGeometry(1.32, 0.07, 6, 20),
+          riftGlowMaterial(0xff6a2a, 0.7),
+        );
+        vein.rotation.set((i * Math.PI) / 3, (i * Math.PI) / 4, 0);
+        roller.add(vein);
+      }
+      roller.position.y = 1.4; // sit the roller on the ground
+      body.add(roller);
+      body.userData.rollRock = roller;
       return { body };
     }
     case 'rift_locked_chest':
@@ -415,25 +524,67 @@ export function buildRiftPuzzleProp(
     case 'rift_pylon':
     case 'rift_pylon_lit': {
       const lit = templateId === 'rift_pylon_lit';
-      // A tapered hex spire with a floating rune crystal that spins and pulses;
-      // the crystal blazes bright once the pylon is lit (walk-on toggles the id).
-      const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.72, 3.0, 6), stone);
-      spire.position.y = 1.5;
-      spire.castShadow = true;
-      body.add(spire);
-      const collar = new THREE.Mesh(
-        new THREE.TorusGeometry(0.5, 0.1, 6, 12),
-        riftGlowMaterial(lit ? 0x9fe8ff : 0x2a4a6a, lit ? 0.85 : 0.4),
-      );
-      collar.rotation.x = Math.PI / 2;
-      collar.position.y = 2.7;
-      body.add(collar);
+      const accent = lit ? 0x9fe8ff : 0x2a4a6a;
+      // A faceted crystalline obelisk: a flared stone base + a tapered hex shaft,
+      // girdled by glowing collar rings, crowned by a floating rune crystal with
+      // orbiting shards. Lit, a pulsing energy column erupts from the crown.
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.92, 1.1, 6), stone);
+      base.position.y = 0.55;
+      base.castShadow = true;
+      body.add(base);
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.5, 2.3, 6), stone);
+      shaft.position.y = 2.0;
+      shaft.castShadow = true;
+      body.add(shaft);
+      for (const y of [1.35, 2.05, 2.75]) {
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(0.44, 0.07, 6, 16),
+          riftGlowMaterial(accent, lit ? 0.85 : 0.38),
+        );
+        ring.rotation.x = Math.PI / 2;
+        ring.position.y = y;
+        body.add(ring);
+      }
       const crystal = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.5, 0),
-        riftGlowMaterial(lit ? 0xbfe8ff : 0x2f5a7a, lit ? 0.95 : 0.5),
+        new THREE.OctahedronGeometry(0.55, 0),
+        riftGlowMaterial(lit ? 0xbfe8ff : 0x2f5a7a, lit ? 0.98 : 0.5),
       );
-      crystal.position.y = 3.5;
+      crystal.position.y = 3.6;
       body.add(crystal);
+      // Orbiting shards (renderer spins each pivot about Y + bobs it).
+      const orbiters: THREE.Object3D[] = [];
+      const shardCount = lit ? 3 : 2;
+      for (let i = 0; i < shardCount; i++) {
+        const pivot = new THREE.Object3D();
+        pivot.position.y = 3.6;
+        pivot.rotation.y = (i / shardCount) * Math.PI * 2;
+        const shard = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.15, 0),
+          riftGlowMaterial(accent, lit ? 0.9 : 0.5),
+        );
+        shard.position.set(0.85, 0, 0);
+        pivot.add(shard);
+        body.add(pivot);
+        orbiters.push(pivot);
+      }
+      body.userData.riftOrbiters = orbiters;
+      if (lit) {
+        // A tall additive beam column of energy (open-ended cylinder) that pulses.
+        const beam = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.16, 0.34, 5.6, 12, 1, true),
+          riftGlowMaterial(0xbfe8ff, 0.26),
+        );
+        beam.position.y = 3.1;
+        body.add(beam);
+        body.userData.riftPulse = [beam];
+      }
+      const ground = new THREE.Mesh(
+        new THREE.RingGeometry(0.7, 1.3, 20),
+        riftGlowMaterial(accent, lit ? 0.5 : 0.2),
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = 0.05;
+      body.add(ground);
       return { body, portal: crystal };
     }
   }
