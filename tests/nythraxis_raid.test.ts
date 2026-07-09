@@ -181,6 +181,31 @@ describe('Nythraxis raid encounter', () => {
     expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(11.4);
     expect(MOBS.nythraxis_skeleton_warrior.dmgBase).toBeCloseTo(26);
     expect(MOBS.nythraxis_skeleton_warrior.dmgPerLevel).toBeCloseTo(5.6);
+    expect(MOBS.nythraxis_heroic_warrior_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: true,
+      minLevel: 20,
+      maxLevel: 20,
+      dmgBase: 26,
+      dmgPerLevel: 5.6,
+    });
+    expect(MOBS.nythraxis_heroic_priest_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: true,
+      minLevel: 20,
+      maxLevel: 20,
+      wardAllies: expect.objectContaining({ radius: 35, every: 8 }),
+    });
+    expect(MOBS.nythraxis_heroic_rogue_add).toMatchObject({
+      family: 'undead',
+      elite: true,
+      ccImmune: true,
+      minLevel: 20,
+      maxLevel: 20,
+      ignoreTaunt: true,
+    });
 
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Tank');
@@ -191,6 +216,15 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.weapon.min).toBe(325);
     expect(boss.weapon.max).toBe(507);
     expect(visualKeyFor(boss)).toBe('skel_golem');
+    expect(
+      visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),
+    ).toBe('skel_warrior');
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_priest_add' } as Entity)).toBe(
+      'skel_necromancer',
+    );
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_rogue_add' } as Entity)).toBe(
+      'skel_rogue',
+    );
     expect(boss.scale).toBeGreaterThanOrEqual(3);
     expect(boss.facing).toBe(Math.PI);
     const wards = objects(sim, 'bastion_ward_stone', origin);
