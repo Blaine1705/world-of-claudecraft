@@ -6803,11 +6803,23 @@ export const en_XA: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "[Ðéáţĥļéšš Ŵáŕĝúáŕð Ļéĝɱáíļ]"
       },
+      "deathless_warguard_gauntlets": {
+        "name": "[Ðéáţĥļéšš Ŵáŕĝúáŕð Ĝáúñţļéţš]"
+      },
       "soulrend_diadem": {
         "name": "[Šóúļŕéñð Ðíáðéɱ]"
       },
+      "soulrend_handwraps": {
+        "name": "[Šóúļŕéñð Ĥáñðŵŕáþš]"
+      },
       "scourgehide_carapace": {
         "name": "[Šçóúŕĝéĥíðé Çáŕáþáçé]"
+      },
+      "scourgehide_grips": {
+        "name": "[Šçóúŕĝéĥíðé Ĝŕíþš]"
+      },
+      "soulforged_gauntlets": {
+        "name": "[Šóúļƒóŕĝéð Ĝáúñţļéţš]"
       },
       "cryptplate_helm": {
         "name": "[Çŕýþţþļáţé Ĥéļɱ]"

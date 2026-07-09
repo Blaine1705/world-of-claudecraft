@@ -6803,11 +6803,23 @@ export const vi_VN: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "Giáp Chân Lưới Vệ Chiến Bất Tử"
       },
+      "deathless_warguard_gauntlets": {
+        "name": "Deathless Warguard Gauntlets"
+      },
       "soulrend_diadem": {
         "name": "Vương Miện Xé Hồn"
       },
+      "soulrend_handwraps": {
+        "name": "Soulrend Handwraps"
+      },
       "scourgehide_carapace": {
         "name": "Giáp Mai Da Tai Ương"
+      },
+      "scourgehide_grips": {
+        "name": "Scourgehide Grips"
+      },
+      "soulforged_gauntlets": {
+        "name": "Soulforged Gauntlets"
       },
       "cryptplate_helm": {
         "name": "Mũ Giáp Tấm Hầm Mộ"

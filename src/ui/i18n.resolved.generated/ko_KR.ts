@@ -6803,11 +6803,23 @@ export const ko_KR: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "불사 전쟁수호 다리갑옷"
       },
+      "deathless_warguard_gauntlets": {
+        "name": "불사 전쟁수호 건틀릿"
+      },
       "soulrend_diadem": {
         "name": "영혼분열 왕관"
       },
+      "soulrend_handwraps": {
+        "name": "영혼분열 손싸개"
+      },
       "scourgehide_carapace": {
         "name": "재앙가죽 갑각"
+      },
+      "scourgehide_grips": {
+        "name": "재앙가죽 손아귀"
+      },
+      "soulforged_gauntlets": {
+        "name": "혼주조 건틀릿"
       },
       "cryptplate_helm": {
         "name": "묘지판금 투구"
