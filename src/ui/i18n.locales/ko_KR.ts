@@ -115,6 +115,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': '시',
   'hudChrome.unitFrame.durationUnitDays': '일',
   'hudChrome.unitFrame.partyLabel': '내 파티',
+  'hudChrome.unitFrame.partyChip': '파티',
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
   'hudChrome.unitFrame.targetAnnounce': '대상: {name}',
   'hudChrome.unitFrame.targetLabel': '내 대상',
@@ -1027,6 +1028,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': '소셜',
   'hud.core.mobileArena': '투기장',
   'hud.core.mobileMenu': '메뉴',
+  'hud.core.mobileSettings': '설정',
   'hud.core.mobileUse': '사용',
   'hud.core.mobileMeters': '미터',
   'hud.core.mobileMap': '지도',
@@ -1498,6 +1500,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '공용 재사용 대기시간 없음',
   'abilityUi.tooltip.friendlyTarget': '아군 대상',
   'abilityUi.tooltip.enemyTarget': '적 대상',
+  'abilityUi.tooltip.selfOnly': '자신에게만',
   'abilityUi.tooltip.damageRange': '{min}에서 {max}',
   'abilityUi.tooltip.finisherDamage': '기본 {base}, 연계 점수당 {perCombo}',
   'abilityUi.resources.mana': '마나',
@@ -1761,33 +1764,34 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.greedAria': '{item} 탐욕',
   'itemUi.lootRoll.passAria': '{item} 포기',
   'itemUi.lootRoll.everyonePassed': '모두 {item}을(를) 포기했습니다.',
+  'itemUi.lootRoll.rolled': '{answered}/{total} 굴림 완료',
   'entities.abilities.heroic_strike.name': '약탈자의 일격',
   'entities.abilities.heroic_strike.description':
     '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
   'entities.abilities.battle_shout.name': '강철의 외침',
-  'entities.abilities.battle_shout.description': '2분 동안 전투력이 20만큼 증가합니다.',
+  'entities.abilities.battle_shout.description': '2분 동안 전투력이 {buff}만큼 증가합니다.',
   'entities.abilities.commanding_shout.name': '북돋는 외침',
-  'entities.abilities.commanding_shout.description': '2분 동안 체력이 6만큼 증가합니다.',
+  'entities.abilities.commanding_shout.description': '2분 동안 체력이 {buff}만큼 증가합니다.',
   'entities.abilities.demoralizing_shout.name': '흉포한 울부짖음',
   'entities.abilities.demoralizing_shout.description':
-    '무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 30만큼 감소시킵니다.',
+    '무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 {buff}만큼 감소시킵니다.',
   'entities.abilities.charge.name': '쇄도',
   'entities.abilities.charge.description':
     '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd.',
   'entities.abilities.rend.name': '깊은 상처',
   'entities.abilities.rend.description':
-    '대상을 상처 입혀 9초에 걸쳐 {damage}의 출혈 피해를 입힙니다.',
+    '대상을 상처 입혀 {duration}초에 걸쳐 {damage}의 출혈 피해를 입힙니다.',
   'entities.abilities.thunder_clap.name': '진동의 일격',
   'entities.abilities.thunder_clap.description':
     '주위 적에게 {damage}의 피해를 입히고 10초 동안 공격 속도를 10%만큼 늦춥니다.',
   'entities.abilities.hamstring.name': '절뚝이는 베기',
   'entities.abilities.hamstring.description':
-    '적에게 5의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다.',
+    '적에게 {damage}의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.bloodrage.name': '피의 대가',
   'entities.abilities.bloodrage.description': '생명력을 희생하여 분노 10을 생성합니다.',
   'entities.abilities.overpower.name': '붉은 손',
   'entities.abilities.overpower.description':
-    '무기 피해 +5를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다.',
+    '무기 피해에 {damage}를 더한 피해를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다.',
   'entities.abilities.execute.name': '이른 무덤',
   'entities.abilities.execute.description':
     '상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다.',
@@ -1800,23 +1804,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '방어 전투 태세입니다. 위협 수준을 30% 더 생성하지만, 주고받는 피해가 10% 감소합니다. 다시 시전하면 태세를 해제합니다.',
   'entities.abilities.sunder_armor.name': '방어구 절단',
   'entities.abilities.sunder_armor.description':
-    '대상의 방어구를 가르고 적용마다 2%만큼 감소시킵니다. 최대 5번 중첩됩니다(최대 중첩 시 10%). 많은 위협 수준을 생성합니다.',
+    '대상의 방어구를 가르고 적용마다 {damage}%만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다.',
   'entities.abilities.taunt.name': '부추김',
   'entities.abilities.taunt.description':
     '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
   'entities.abilities.fireball.name': '잉걸 화살',
   'entities.abilities.rain_of_fire.name': '불의 비',
   'entities.abilities.rain_of_fire.description':
-    '지정한 지역에 불의 비를 내려 적을 불태우고 {damage}의 화염 피해를 입힙니다.',
+    '지정한 지역에 4초 동안 불의 비를 내려 매초 적에게 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.volley.name': '일제 사격',
   'entities.abilities.volley.description':
-    '지정한 지역에 화살을 쏟아부어 그 안의 적에게 {damage}의 피해를 입힙니다.',
+    '지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다.',
   'entities.abilities.hurricane.name': '폭풍우',
   'entities.abilities.hurricane.description':
-    '지정한 지역에 폭풍우를 일으켜 적을 강타하고 {damage}의 자연 피해를 입힙니다.',
+    '지정한 지역에 6초 동안 폭풍우를 일으켜 매초 적에게 {damage}의 자연 피해를 입힙니다.',
   'entities.abilities.earthquake.name': '지진',
   'entities.abilities.earthquake.description':
-    '지정한 지역을 뒤흔들어 적을 강타하고 {damage}의 자연 피해를 입힙니다.',
+    '지정한 지역을 6초 동안 뒤흔들어 1.5초마다 적에게 {damage}의 자연 피해를 입힙니다.',
   'entities.abilities.flamestrike.name': '화염 폭발',
   'entities.abilities.flamestrike.description':
     '지정한 지역에 화염 폭발을 일으켜 폭발 범위 안의 적에게 {damage}의 화염 피해를 입힙니다.',
@@ -1824,9 +1828,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
   'entities.abilities.frost_armor.name': '서리 망토',
   'entities.abilities.frost_armor.description':
-    '자신을 냉기로 감싸 30분 동안 방어도를 30만큼 증가시킵니다.',
+    '자신을 냉기로 감싸 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.arcane_intellect.name': '에테르 통찰',
-  'entities.abilities.arcane_intellect.description': '30분 동안 지능이 2만큼 증가합니다.',
+  'entities.abilities.arcane_intellect.description': '30분 동안 지능이 {buff}만큼 증가합니다.',
   'entities.abilities.frostbolt.name': '서리 창',
   'entities.abilities.frostbolt.description':
     '냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다.',
@@ -1844,7 +1848,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 에테르 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다.',
   'entities.abilities.polymorph.name': '홀리기',
   'entities.abilities.polymorph.description':
-    '적을 최대 15초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',
+    '적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',
   'entities.abilities.frost_nova.name': '얼음 속박',
   'entities.abilities.frost_nova.description':
     '주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다.',
@@ -1859,18 +1863,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
   'entities.abilities.ice_barrier.name': '서리 장막',
   'entities.abilities.ice_barrier.description':
-    '얼음으로 자신을 보호해 60초 동안 130의 피해를 흡수합니다.',
+    '얼음으로 자신을 보호해 60초 동안 {damage}의 피해를 흡수합니다.',
   'entities.abilities.sinister_strike.name': '사악한 베기',
   'entities.abilities.sinister_strike.description':
     '즉시 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.eviscerate.name': '영면',
-  'entities.abilities.eviscerate.description': '연계 점수당 피해를 입히는 결정타입니다.',
+  'entities.abilities.eviscerate.description': '결정타로 {damage}의 피해를 입힙니다.',
   'entities.abilities.backstab.name': '비겁한 찌르기',
   'entities.abilities.backstab.description':
     '대상을 등 뒤에서 찔러 무기 피해의 150%에 {damage}를 더한 피해를 입힙니다. 대상 뒤에 있어야 합니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.gouge.name': '눈 찌르기',
   'entities.abilities.gouge.description':
-    '대상을 가격해 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. 연계 점수 1점을 얻습니다.',
+    '대상을 가격해 {damage}의 피해를 입히고 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.evasion.name': '유령 걸음',
   'entities.abilities.evasion.description': '15초 동안 회피 확률이 50%만큼 증가합니다.',
   'entities.abilities.slice_and_dice.name': '살수의 박자',
@@ -1891,19 +1895,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.adrenaline_rush.description': '피가 끓어올라 즉시 기력 60을 회복합니다.',
   'entities.abilities.garrote.name': '철사 목조르기',
   'entities.abilities.garrote.description':
-    '적의 목을 졸라 즉시 피해를 입히고 18초에 걸쳐 {damage}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다.',
+    '적의 목을 졸라 즉시 {damage}의 피해를 입히고 18초에 걸쳐 {overTime}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다.',
   'entities.abilities.cheap_shot.name': '명치 가격',
   'entities.abilities.cheap_shot.description':
-    '대상을 가격해 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.',
+    '대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.',
   'entities.abilities.sap.name': '관자놀이 가격',
   'entities.abilities.sap.description':
     '대상을 8초 동안 무력화합니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.crippling_poison.name': '둔중한 독',
   'entities.abilities.crippling_poison.description':
-    '대상을 둔중한 독으로 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다.',
+    '둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.expose_armor.name': '방어구 돌파',
   'entities.abilities.expose_armor.description':
-    '대상의 약점을 드러내 방어도를 감소시키는 결정타입니다. 연계 점수를 많이 소모할수록 더 깊게 베어 들어갑니다.',
+    '대상의 약점을 드러내 30초 동안 방어도를 {damage}만큼 감소시키는 결정타입니다.',
   'entities.abilities.rupture.name': '과다출혈',
   'entities.abilities.rupture.description':
     '대상에게 상처를 입혀 16초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다.',
@@ -1921,25 +1925,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상의 눈을 멀게 해 8초 동안 방향을 잃고 헤매게 만듭니다. 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.seal_of_righteousness.name': '맹세의 낙인',
   'entities.abilities.seal_of_righteousness.description':
-    '30초 동안 신성한 힘으로 가득 차 근접 공격마다 4의 추가 신성 피해를 입힙니다. 선고로 해방할 수 있습니다.',
+    '30초 동안 신성한 힘으로 가득 차 근접 공격마다 {damage}의 추가 신성 피해를 입힙니다. 선고로 해방할 수 있습니다.',
   'entities.abilities.holy_light.name': '치유의 빛',
   'entities.abilities.holy_light.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.devotion_aura.name': '굳건함의 오라',
-  'entities.abilities.devotion_aura.description': '30분 동안 방어도가 40만큼 증가합니다.',
+  'entities.abilities.devotion_aura.description': '30분 동안 방어도가 {buff}만큼 증가합니다.',
   'entities.abilities.judgement.name': '선고',
   'entities.abilities.judgement.description':
     '활성화된 문장을 적에게 해방하고 소모하여 축적된 신성 피해를 입힙니다.',
   'entities.abilities.blessing_of_might.name': '강철의 맹세',
   'entities.abilities.blessing_of_might.description':
-    '아군 대상에게 축복을 내려 5분 동안 전투력을 15만큼 증가시킵니다.',
+    '아군 대상에게 축복을 내려 5분 동안 전투력을 {buff}만큼 증가시킵니다.',
   'entities.abilities.divine_protection.name': '신념의 결계',
   'entities.abilities.divine_protection.description':
-    '보호의 결계가 10초 동안 50의 피해를 흡수합니다.',
+    '보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다.',
   'entities.abilities.hammer_of_justice.name': '분쇄의 망치',
-  'entities.abilities.hammer_of_justice.description': '대상을 3초 동안 기절시킵니다.',
+  'entities.abilities.hammer_of_justice.description': '대상을 {duration}초 동안 기절시킵니다.',
   'entities.abilities.lay_on_hands.name': '마지막 의식',
   'entities.abilities.lay_on_hands.description':
-    '막대한 치유의 힘으로 생명력 250을 회복시킵니다. 재사용 대기시간 10분.',
+    '막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분.',
   'entities.abilities.flash_of_light.name': '빛의 치유',
   'entities.abilities.flash_of_light.description':
     '빠르고 효율적인 빛줄기로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
@@ -1948,7 +1952,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '신성한 분노로 악을 몰아내 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.consecration.name': '신성한 땅',
   'entities.abilities.consecration.description':
-    '발밑의 땅을 신성화하여 주위 적에게 {damage}의 신성 피해를 입힙니다.',
+    '발밑의 땅을 신성화하여 10초 동안 2초마다 주위 적에게 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.righteous_fury.name': '불타는 맹세',
   'entities.abilities.righteous_fury.description':
     '30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다.',
@@ -1962,10 +1966,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': '소환수를 야생으로 돌려보냅니다.',
   'entities.abilities.raptor_strike.name': '내장 가르기',
   'entities.abilities.raptor_strike.description':
-    '강력한 근접 공격으로 피해가 5만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
+    '강력한 근접 공격으로 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
   'entities.abilities.aspect_of_the_hawk.name': '새매의 상',
   'entities.abilities.aspect_of_the_hawk.description':
-    '새매의 상을 취해 30분 동안 전투력이 20만큼 증가합니다.',
+    '새매의 상을 취해 30분 동안 전투력이 {buff}만큼 증가합니다.',
   'entities.abilities.serpent_sting.name': '독 미늘',
   'entities.abilities.serpent_sting.description':
     '대상을 쏘아 15초에 걸쳐 {damage}의 자연 피해를 입힙니다.',
@@ -1973,13 +1977,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_shot.description': '즉시 사격하여 {damage}의 비전 피해를 입힙니다.',
   'entities.abilities.concussive_shot.name': '뒤흔드는 사격',
   'entities.abilities.concussive_shot.description':
-    '대상을 멍하게 만들어 4초 동안 이동 속도를 50%만큼 감소시킵니다.',
+    '대상을 멍하게 만들어 {damage}의 피해를 입히고 4초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.mongoose_bite.name': '반격의 송곳니',
   'entities.abilities.mongoose_bite.description':
-    '대상이 회피한 후 반격하여 무기 피해에 12를 더한 피해를 입힙니다. 회피할 수 없습니다.',
+    '대상이 회피한 후 반격하여 무기 피해에 {damage}를 더한 피해를 입힙니다. 회피할 수 없습니다.',
   'entities.abilities.wing_clip.name': '족쇄 베기',
   'entities.abilities.wing_clip.description':
-    '상처를 내어 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다.',
+    '상처를 내어 {damage}의 피해를 입히고 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다.',
   'entities.abilities.aspect_of_the_monkey.name': '담비의 상',
   'entities.abilities.aspect_of_the_monkey.description':
     '담비의 상을 취해 30분 동안 회피 확률이 8%만큼 증가합니다.',
@@ -1997,13 +2001,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.power_word_fortitude.name': '결의의 연도',
   'entities.abilities.power_word_fortitude.description':
-    '30분 동안 대상의 체력이 3만큼 증가합니다.',
+    '30분 동안 대상의 체력이 {buff}만큼 증가합니다.',
   'entities.abilities.shadow_word_pain.name': '부패의 만가',
   'entities.abilities.shadow_word_pain.description':
     '어둠의 말로 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.power_word_shield.name': '수호의 성가',
   'entities.abilities.power_word_shield.description':
-    '대상을 보호하여 30초 동안 48의 피해를 흡수합니다.',
+    '대상을 보호하여 30초 동안 {damage}의 피해를 흡수합니다.',
   'entities.abilities.renew.name': '지속되는 은총',
   'entities.abilities.renew.description': '15초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mind_blast.name': '정신 파열',
@@ -2023,7 +2027,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '번개 화살을 던져 {damage}의 자연 피해를 입힙니다.',
   'entities.abilities.rockbiter_weapon.name': '바위결속 무기',
   'entities.abilities.rockbiter_weapon.description':
-    '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 5의 추가 피해를 입힙니다.',
+    '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.chain_heal.name': '연쇄 치유',
@@ -2034,19 +2038,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
   'entities.abilities.lightning_shield.name': '천둥 결계',
   'entities.abilities.lightning_shield.description':
-    '자신을 번개로 감싸 근접 공격자가 13의 자연 피해를 받게 합니다.',
+    '자신을 번개로 감싸 근접 공격자가 {buff}의 자연 피해를 받게 합니다. 최대 3회 충전되며 5초에 한 번만 발동합니다.',
   'entities.abilities.flame_shock.name': '잉걸 충격',
   'entities.abilities.flame_shock.description':
-    '대상을 불태워 25의 피해를 입히고 12초에 걸쳐 추가로 {damage}의 피해를 입힙니다.',
+    '대상을 불태워 {damage}의 피해를 입히고 12초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',
   'entities.abilities.flametongue_weapon.name': '화염낙인 무기',
   'entities.abilities.flametongue_weapon.description':
-    '원소의 불꽃으로 무기를 강화합니다. 5분 동안 매 공격마다 8의 추가 화염 피해를 입힙니다.',
+    '원소의 불꽃으로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 화염 피해를 입힙니다.',
   'entities.abilities.frost_shock.name': '서리 충격',
   'entities.abilities.frost_shock.description':
     '대상을 즉시 냉기로 강타해 {damage}의 냉기 피해를 입히고 8초 동안 이동 속도를 50%만큼 감소시킵니다.',
   'entities.abilities.frostbrand_weapon.name': '서리결속 무기',
   'entities.abilities.frostbrand_weapon.description':
-    '살을 에는 냉기로 무기를 강화합니다. 5분 동안 매 공격마다 8의 추가 피해를 입힙니다.',
+    '살을 에는 냉기로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다.',
   'entities.abilities.ghost_wolf.name': '그림자늑대',
   'entities.abilities.ghost_wolf.description':
     '그림자늑대로 변신하여 10분 동안 이동 속도가 40%만큼 증가합니다.',
@@ -2058,15 +2062,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.demon_skin.name': '마귀 가죽',
   'entities.abilities.demon_skin.description':
-    '악마의 피부가 30분 동안 방어도를 30만큼 증가시킵니다.',
+    '악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.immolate.name': '불타는 계약',
   'entities.abilities.immolate.description':
-    '적을 불태워 11의 화염 피해를 입히고 15초에 걸쳐 추가로 {damage}의 피해를 입힙니다.',
+    '적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다.',
   'entities.abilities.corruption.name': '검은 부패',
   'entities.abilities.corruption.description':
     '대상을 부패시켜 18초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.life_tap.name': '가혹한 거래',
-  'entities.abilities.life_tap.description': '생명력 30을 마나 30으로 전환합니다.',
+  'entities.abilities.life_tap.description': '생명력 {damage}을 마나 {damage}으로 전환합니다.',
   'entities.abilities.curse_of_agony.name': '고뇌의 저주',
   'entities.abilities.curse_of_agony.description':
     '대상에게 고통의 저주를 걸어 24초에 걸쳐 {damage}의 암흑 피해를 입힙니다.',
@@ -2089,7 +2093,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mark_of_the_wild.name': '야생의 수호',
   'entities.abilities.mark_of_the_wild.description':
-    '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 25만큼 증가시킵니다.',
+    '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.moonfire.name': '달빛 폭풍',
   'entities.abilities.moonfire.description':
     '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다.',
@@ -2098,12 +2102,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.thorns.name': '가시 수호',
   'entities.abilities.thorns.description':
-    '대상에게 가시가 돋아 근접 공격자가 3의 자연 피해를 받습니다.',
+    '대상에게 가시가 돋아 근접 공격자가 {buff}의 자연 피해를 받습니다.',
   'entities.abilities.entangling_roots.name': '옥죄는 뿌리',
   'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    '곰으로 변신합니다. 방어도 +65%, 전투력 +15, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
+    '곰으로 변신합니다. 방어도 +90%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
     '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
@@ -2118,7 +2122,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용.',
   'entities.abilities.ferocious_bite.name': '유혈 물어뜯기',
   'entities.abilities.ferocious_bite.description':
-    '연계 점수당 피해를 입히는 결정타입니다. 늑대 변신 전용.',
+    '결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용.',
   'entities.abilities.swipe.name': '휩쓰는 발톱',
   'entities.abilities.swipe.description':
     '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용.',
@@ -2139,7 +2143,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '뇌진탕',
   'entities.abilities.bash.description': '대상을 2초 동안 기절시킵니다. 큰곰 변신 전용.',
   'entities.abilities.faerie_fire.name': '마녀불빛',
-  'entities.abilities.faerie_fire.description': '대상의 방어도를 40초 동안 35만큼 감소시킵니다.',
+  'entities.abilities.faerie_fire.description':
+    '대상의 방어도를 40초 동안 {damage}%만큼 감소시킵니다. 방어구 절단과 중첩되지 않습니다.',
   'entities.abilities.hibernate.name': '깊은 잠',
   'entities.abilities.hibernate.description':
     '대상을 최대 8초 동안 깊은 잠에 빠뜨립니다. 피해를 입으면 깨어납니다.',
@@ -2157,16 +2162,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전투력을 6초 동안 40만큼 증가시킵니다. 늑대 변신 전용.',
   'entities.abilities.rip.name': '찢기',
   'entities.abilities.rip.description':
-    '12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용.',
+    '12초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용.',
   'entities.abilities.mortal_strike.name': '불구의 일격',
   'entities.abilities.mortal_strike.description':
     '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
   'entities.abilities.bloodthirst.name': '사혈',
   'entities.abilities.bloodthirst.description':
-    '피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)',
+    '피의 광란으로 즉시 공격하여 무기 피해의 60%에 {damage}를 더한 피해를 줍니다. (분노 특화 대표 기술)',
   'entities.abilities.shield_slam.name': '방패 강타',
   'entities.abilities.shield_slam.description':
-    '방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',
+    '방패로 대상을 강타해 무기 피해의 50%에 {damage}를 더한 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)',
   'entities.abilities.whirlwind.name': '칼날 회오리',
   'entities.abilities.whirlwind.description':
     '치명적인 호를 그리며 돌아 주변 모든 적에게 {damage}의 피해를 줍니다. (분노 특성)',
@@ -2565,6 +2570,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_cultist.name': '무덤부름 교단원',
   'entities.mobs.gravecaller_summoner.name': '무덤부름 소환사',
   'entities.mobs.deacon_voss.name': '부제 보스',
+  'entities.mobs.training_dummy.name': '훈련용 허수아비',
   'entities.mobs.ridge_stalker.name': '산등성이 추적자',
   'entities.mobs.deeprock_kobold.name': '깊은바위 굴꾼',
   'entities.mobs.thornpeak_ogre.name': '쏜피크 오우거',
@@ -6206,6 +6212,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
+  'hudChrome.archetypeTitle.hobbyLabel': '취미',
   'hudChrome.archetypeTitle.armorcrafting': '방어구 장인',
   'hudChrome.archetypeTitle.weaponcrafting': '무기 장인',
   'hudChrome.archetypeTitle.jewelcrafting': '보석 세공사',
@@ -6246,8 +6253,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '패배! 아군 Yumi가 쓰러졌습니다.',
   'hudChrome.crafting.comboRequirementUnmet':
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
+  'hudChrome.crafting.notAtHub': '그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.',
+  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
   'hudChrome.mobile.actionPageIndicator': '{page}페이지',
   'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
+  'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
+  'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.vcup.title': '베일 컵',
   'hudChrome.vcup.close': '베일 컵 창 닫기',
@@ -6497,4 +6510,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.',
   'hudChrome.bank.bonusSectionAria': '보너스 은행 칸과 획득 방법',
+  'entities.mobs.yumi_cat.name': '유미',
 };

@@ -291,6 +291,7 @@ export const da_DK: EnTranslations = {
       "targetLabel": "Dit mål",
       "targetAnnounce": "Markér {name}",
       "partyLabel": "Dit følge",
+      "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -320,7 +321,9 @@ export const da_DK: EnTranslations = {
       "actionPageIndicator": "Side {page}",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
-      "spellbookPageLabel": "Side {page}"
+      "spellbookPageLabel": "Side {page}",
+      "hideKeyboard": "Skjul tastatur",
+      "chatPlaceholder": "Sig noget..."
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -1014,18 +1017,18 @@ export const da_DK: EnTranslations = {
       },
       "allStatsPctReduce": "Reducerer alle attributter med {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Øger angrebskraft med {pct}%",
+        "armor": "Øger rustning med {pct}%",
+        "int": "Øger Intellekt med {pct}%",
+        "sta": "Øger Udholdenhed med {pct}%",
+        "allStats": "Øger alle attributter med {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Reducerer rustning med {pct}%",
+      "armorPctStacks": "Reducerer rustning med {pct}% ({stacks} stakke)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1431,6 +1434,7 @@ export const da_DK: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Ingen",
+      "hobbyLabel": "Fritid",
       "armorcrafting": "Rustningssmed",
       "weaponcrafting": "Våbensmed",
       "jewelcrafting": "Juveler",
@@ -1453,7 +1457,10 @@ export const da_DK: EnTranslations = {
       "craftedToast": "Udformet: {name}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
       "unknownRecipe": "Den opskrift findes ikke.",
-      "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift."
+      "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
+      "notAtHub": "Du skal være ved håndværksstationen og på det krævede niveau for at lave det.",
+      "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
+      "recipeNotLearned": "Du har ikke lært den opskrift endnu."
     }
   },
   "apiError": {
@@ -2226,8 +2233,8 @@ export const da_DK: EnTranslations = {
       "waveGoldBody": "Den midterste bølge: tveæggede kombinationer hvor din build begynder at tage form og synge.",
       "wavePrismaticTitle": "Prismatisk",
       "wavePrismaticBody": "Den sidste bølge: build-definerende, skærm-smeltende spidser der skal føles latterlige på den bedste måde.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Beskyt Yumi",
+      "yumiBody": "Beskyt Yumi er en holdbaseret måltilstand, der spilles i en labyrint: hver side vogter sin egen katfølgesvend, mens den jager modstanderens. Med jævne mellemrum blinker begge katte til nye hjørner af labyrinten, så kampen svinger mellem at forsvare, jage og kapløbet om at finde dem igen. Stil op som tre mod tre eller fem mod fem; at falde i kamp sætter dig kun på bænken et øjeblik.",
       "powerupsTitle": "Power-ups i ringen",
       "powerupsBody": "Glødende kugler falder også ned i arenaen midt i kampen, gratis for den der når dem først. De er bevidst overdrevne og varer kun et kort øjeblik: Speed Demon for et glimt af blændende fart, Colossus for at svulme op til en kluntet kæmpe, Moon Boots for et hoppende, lavtyngdekrafts-hop, og Berserker for et pludseligt udbrud af raseri.",
       "ladderHeading": "At klatre op ad rangstigen",
@@ -3658,42 +3665,42 @@ export const da_DK: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 mod 3",
+    "bracket5": "Yumi 5 mod 5",
+    "enterQueue": "Tilmeld dig Beskyt Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Du stiller dig i Beskyt Yumi-køen. Vogt din følgesvend…",
+      "leave": "Du forlader Beskyt Yumi-køen.",
+      "teamLeave": "Dit hold forlader Beskyt Yumi-køen."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Beskyt Yumi 3 mod 3 tillader en gruppe på op til tre.",
+      "partyTooBig5": "Beskyt Yumi 5 mod 5 tillader en gruppe på op til fem."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Beskyt Yumi! Forsvar din følgesvend, og jag deres."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "BESKYT YUMI",
+      "getReady": "Gør dig klar…",
+      "teleportIn": "Yumierne flytter sig om {s}",
+      "suddenDeath": "PLUDSELIG DØD",
+      "yourYumi": "Din Yumi",
+      "enemyYumi": "Fjendens Yumi",
+      "aria": "Din Yumi på {mine} af {max} helbred, fjendens Yumi på {theirs}.",
+      "collapse": "Skjul Beskyt Yumi-bjælkerne",
+      "expand": "Vis Beskyt Yumi-bjælkerne"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "SLÅET NED!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "PLUDSELIG DØD! Yumierne holder stand!",
+      "teleport": "Yumierne teleporterer!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "SEJR! Yumi er i sikkerhed!",
+      "loss": "NEDERLAG! Din Yumi er faldet."
     }
   },
   "fiesta": {
@@ -4142,6 +4149,7 @@ export const da_DK: EnTranslations = {
       "mobileSocial": "Socialt",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Indstillinger",
       "mobileUse": "Brug",
       "mobileMeters": "Målere",
       "mobileMap": "Kort",
@@ -4690,6 +4698,7 @@ export const da_DK: EnTranslations = {
       "offGlobalCooldown": "Uden for den globale nedkøling",
       "friendlyTarget": "Venligt mål",
       "enemyTarget": "Fjendtligt mål",
+      "selfOnly": "Kun på dig selv",
       "damageRange": "{min} til {max}",
       "finisherDamage": "{base} plus {perCombo} per combopoint"
     },
@@ -4998,7 +5007,8 @@ export const da_DK: EnTranslations = {
       "needAria": "Behov for {item}",
       "greedAria": "Grådighed efter {item}",
       "passAria": "Stå over {item}",
-      "everyonePassed": "Alle stod over {item}."
+      "everyonePassed": "Alle stod over {item}.",
+      "rolled": "{answered}/{total} har slået"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const da_DK: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Ildregn",
-        "description": "Nedkalder en ildregn over målområdet og brænder fjender for {damage} Ildskade."
+        "description": "Nedkalder en ildregn over målområdet i 4 sek og brænder fjender for {damage} Ildskade hvert sekund."
       },
       "volley": {
         "name": "Pileregn",
-        "description": "Nedkalder en regn af pile over målområdet og påfører {damage} skade på fjender i det."
+        "description": "Nedkalder en regn af pile over målområdet i 3 sek og påfører {damage} skade hvert 0,5 sek på fjender fanget i det."
       },
       "hurricane": {
         "name": "Orkan",
-        "description": "Slipper en orkan løs over målområdet og rammer fjender for {damage} Naturskade."
+        "description": "Slipper en orkan løs over målområdet i 6 sek og rammer fjender for {damage} Naturskade hvert sekund."
       },
       "earthquake": {
         "name": "Jordskælv",
-        "description": "Ryster målområdet og rammer fjender for {damage} Naturskade."
+        "description": "Ryster målområdet i 6 sek og rammer fjender for {damage} Naturskade hvert 1,5 sek."
       },
       "heroic_strike": {
         "name": "Plyndrerslag",
@@ -5069,15 +5079,15 @@ export const da_DK: EnTranslations = {
       },
       "battle_shout": {
         "name": "Jernbrøl",
-        "description": "Øger din angrebskraft med 20 i 2 min."
+        "description": "Øger din angrebskraft med {buff} i 2 min."
       },
       "commanding_shout": {
         "name": "Styrkende Råb",
-        "description": "Øger din Udholdenhed med 6 i 2 min."
+        "description": "Øger din Udholdenhed med {buff} i 2 min."
       },
       "demoralizing_shout": {
         "name": "Rædselshyl",
-        "description": "Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med 30 i 30 sek."
+        "description": "Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med {buff} i 30 sek."
       },
       "charge": {
         "name": "Fremstorm",
@@ -5085,7 +5095,7 @@ export const da_DK: EnTranslations = {
       },
       "rend": {
         "name": "Dyb Flænge",
-        "description": "Sårer målet og får det til at bløde for {damage} skade over 9 sek."
+        "description": "Sårer målet og får det til at bløde for {damage} skade over {duration} sek."
       },
       "thunder_clap": {
         "name": "Rystende Slag",
@@ -5093,7 +5103,7 @@ export const da_DK: EnTranslations = {
       },
       "hamstring": {
         "name": "Lammende Snit",
-        "description": "Lemlæster fjenden for 5 skade og sænker dens bevægelse med 50% i 15 sek."
+        "description": "Lemlæster fjenden for {damage} skade og sænker dens bevægelse med 50% i 15 sek."
       },
       "bloodrage": {
         "name": "Blodtold",
@@ -5101,7 +5111,7 @@ export const da_DK: EnTranslations = {
       },
       "overpower": {
         "name": "Rødhånd",
-        "description": "Øjeblikkeligt angreb for våbenskade +5. Kan kun bruges efter målet undviger. Kan ikke undviges."
+        "description": "Øjeblikkeligt angreb for våbenskade plus {damage}. Kan kun bruges efter målet undviger. Kan ikke undviges."
       },
       "execute": {
         "name": "Tidlig Grav",
@@ -5121,7 +5131,7 @@ export const da_DK: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rustningsskær",
-        "description": "Sunders the target's armor, reducing it by 2% per application. Stacks up to 5 times (10% at full stacks). Generates a high amount of threat."
+        "description": "Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel."
       },
       "taunt": {
         "name": "Ægge",
@@ -5133,11 +5143,11 @@ export const da_DK: EnTranslations = {
       },
       "frost_armor": {
         "name": "Rimfrost-Kappe",
-        "description": "Indhyller dig i frost og øger rustningen med 30 i 30 min."
+        "description": "Indhyller dig i frost og øger rustningen med {buff} i 30 min."
       },
       "arcane_intellect": {
         "name": "Æterindsigt",
-        "description": "Øger Intellekt med 2 i 30 min."
+        "description": "Øger Intellekt med {buff} i 30 min."
       },
       "frostbolt": {
         "name": "Rimlanse",
@@ -5161,7 +5171,7 @@ export const da_DK: EnTranslations = {
       },
       "polymorph": {
         "name": "Forheks",
-        "description": "Forvandler fjenden til en tudse i op til 15 sek. Tudsen vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider."
+        "description": "Forvandler fjenden til en tudse i op til {duration} sek. Tudsen vandrer omkring og helbredes hurtigt. Enhver skade bryder effekten. Kun bæster og humanoider."
       },
       "frost_nova": {
         "name": "Isbinding",
@@ -5181,7 +5191,7 @@ export const da_DK: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Frostslør",
-        "description": "Beskytter dig med is og opsuger 130 skade i 60 sek."
+        "description": "Beskytter dig med is og opsuger {damage} skade i 60 sek."
       },
       "sinister_strike": {
         "name": "Ondsindet Hug",
@@ -5189,7 +5199,7 @@ export const da_DK: EnTranslations = {
       },
       "eviscerate": {
         "name": "Gravsøvn",
-        "description": "Afslutningstræk der volder skade pr. kombopoint."
+        "description": "Afslutningstræk der volder {damage}."
       },
       "backstab": {
         "name": "Fejt Stød",
@@ -5197,7 +5207,7 @@ export const da_DK: EnTranslations = {
       },
       "gouge": {
         "name": "Øjenstik",
-        "description": "Rammer målet og sætter det ud af spillet i 4 sek. Enhver skade bryder effekten. Giver 1 kombopoint."
+        "description": "Rammer målet for {damage} skade og sætter det ud af spillet i 4 sek. Enhver skade bryder effekten. Giver 1 kombopoint."
       },
       "evasion": {
         "name": "Spøgelsesfod",
@@ -5229,11 +5239,11 @@ export const da_DK: EnTranslations = {
       },
       "garrote": {
         "name": "Strubetråd",
-        "description": "Garrotterer fjenden, hvilket volder skade nu og får den til at bløde for {damage} over 18 sek. Du skal være sneget. Giver 1 kombopoint."
+        "description": "Garrotterer fjenden, hvilket volder {damage} skade nu og får den til at bløde for {overTime} over 18 sek. Du skal være sneget. Giver 1 kombopoint."
       },
       "cheap_shot": {
         "name": "Maveslag",
-        "description": "Slå målet, og bedøv det i 4 sek. Skal være sneget. Giver 2 kombopoint."
+        "description": "Slå målet for {damage} skade, og bedøv det i 4 sek. Skal være sneget. Giver 2 kombopoint."
       },
       "sap": {
         "name": "Bedøvelse",
@@ -5241,11 +5251,11 @@ export const da_DK: EnTranslations = {
       },
       "crippling_poison": {
         "name": "Blytung Gift",
-        "description": "Rammer målet med en blytung gift, der giver {damage} Natur-skade og nedsætter dets bevægelseshastighed med 50% i 12 sek."
+        "description": "Slår målet med en blytung gift, der giver {damage} Natur-skade og nedsætter dets bevægelseshastighed med 50% i 12 sek."
       },
       "expose_armor": {
         "name": "Rustningsbrud",
-        "description": "Afslutningstræk der blotlægger målet og sænker dets rustning. Flere brugte kombopoint giver et dybere snit."
+        "description": "Afslutningstræk der blotlægger målet og sænker dets rustning med {damage} i 30 sek."
       },
       "rupture": {
         "name": "Forblødning",
@@ -5269,7 +5279,7 @@ export const da_DK: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Edsbrand",
-        "description": "Fylder dig med Hellig kraft i 30 sek, så hvert af dine nærkampshug tilføjer 4 ekstra Hellig skade. Udløs med Dom."
+        "description": "Fylder dig med Hellig kraft i 30 sek, så hvert af dine nærkampshug tilføjer {damage} ekstra Hellig skade. Udløs med Dom."
       },
       "holy_light": {
         "name": "Lægende Lys",
@@ -5277,7 +5287,7 @@ export const da_DK: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Standhaftig Aura",
-        "description": "Øger din rustning med 40 i 30 min."
+        "description": "Øger din rustning med {buff} i 30 min."
       },
       "judgement": {
         "name": "Dom",
@@ -5285,19 +5295,19 @@ export const da_DK: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Jernets Ed",
-        "description": "Lægger en Velsignelse på et venligt mål, og øger angrebskraften med 15 i 5 min."
+        "description": "Lægger en Velsignelse på et venligt mål, og øger angrebskraften med {buff} i 5 min."
       },
       "divine_protection": {
         "name": "Troens Værn",
-        "description": "Et beskyttende værn opsuger 50 skade i 10 sek."
+        "description": "Et helligt værn opsuger {damage} skade i 10 sek."
       },
       "hammer_of_justice": {
         "name": "Splintrende Dommerhammer",
-        "description": "Bedøver målet i 3 sek."
+        "description": "Bedøver målet i {duration} sek."
       },
       "lay_on_hands": {
         "name": "Sidste Rite",
-        "description": "En massiv bølge af helbredelse: genopretter 250 helbred. 10 min afkøling."
+        "description": "En massiv bølge af helbredelse: genopretter {damage} helbred. 10 min afkøling."
       },
       "flash_of_light": {
         "name": "Lyslægning",
@@ -5309,7 +5319,7 @@ export const da_DK: EnTranslations = {
       },
       "consecration": {
         "name": "Hellig Jord",
-        "description": "Indvier jorden under dig, og svider nærliggende fjender for {damage} Hellig skade."
+        "description": "Indvier jorden under dig, og svider nærliggende fjender for {damage} Hellig skade hvert 2. sek i 10 sek."
       },
       "righteous_fury": {
         "name": "Brændende Ed",
@@ -5329,11 +5339,11 @@ export const da_DK: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Sprættende Slag",
-        "description": "Et stærkt nærkampsangreb, der øger skaden med 5. Aktiveres ved dit næste hug."
+        "description": "Et stærkt nærkampsangreb, der øger skaden med {damage}. Aktiveres ved dit næste hug."
       },
       "aspect_of_the_hawk": {
         "name": "Kærhøgens Skikkelse",
-        "description": "Antag kærhøgens skikkelse, og øg angrebskraften med 20 i 30 min."
+        "description": "Antag kærhøgens skikkelse, og øg angrebskraften med {buff} i 30 min."
       },
       "serpent_sting": {
         "name": "Giftbrod",
@@ -5345,15 +5355,15 @@ export const da_DK: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Rystende Skud",
-        "description": "Lammer målet, og nedsætter bevægelse med 50% i 4 sek."
+        "description": "Lammer målet for {damage} skade og nedsætter bevægelse med 50% i 4 sek."
       },
       "mongoose_bite": {
         "name": "Modbid",
-        "description": "Modangreb efter målet undviger for våbenskade plus 12. Kan ikke undviges."
+        "description": "Modangreb efter målet undviger for våbenskade plus {damage}. Kan ikke undviges."
       },
       "wing_clip": {
         "name": "Lænkende Snit",
-        "description": "Påfører et sår der sløver fjenden med 40 % i 10 sek."
+        "description": "Påfører et sår for {damage} skade, der sløver fjenden med 40% i 10 sek."
       },
       "aspect_of_the_monkey": {
         "name": "Mårens Skikkelse",
@@ -5381,7 +5391,7 @@ export const da_DK: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Beslutsomhedens Litani",
-        "description": "Øger målets Udholdenhed med 3 i 30 min."
+        "description": "Øger målets Udholdenhed med {buff} i 30 min."
       },
       "shadow_word_pain": {
         "name": "Forfaldets Klagesang",
@@ -5389,7 +5399,7 @@ export const da_DK: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Værnets Salme",
-        "description": "Beskytter målet og opsuger 48 skade i 30 sek."
+        "description": "Beskytter målet og opsuger {damage} skade i 30 sek."
       },
       "renew": {
         "name": "Dvælende Nåde",
@@ -5417,7 +5427,7 @@ export const da_DK: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet Våben",
-        "description": "Gennemstrømmer dit våben med stenets vrede: hvert hug tilføjer 5 ekstra skade i 5 min."
+        "description": "Gennemstrømmer dit våben med stenets vrede: hvert hug tilføjer {damage} ekstra skade i 5 min."
       },
       "healing_wave": {
         "name": "Lægende Vande",
@@ -5429,15 +5439,15 @@ export const da_DK: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Tordenværn",
-        "description": "Omgiver dig med knitrende lyn: nærkampsangribere tager 13 naturskade."
+        "description": "Omgiver dig med knitrende lyn: nærkampsangribere tager {buff} Naturskade, op til 3 ladninger og højst én gang hvert 5. sekund."
       },
       "flame_shock": {
         "name": "Glødstød",
-        "description": "Svider målet med ild for 25 skade plus {damage} over 12 sek."
+        "description": "Svider målet med ild for {damage} skade plus {overTime} over 12 sek."
       },
       "flametongue_weapon": {
         "name": "Bålbrand-Våben",
-        "description": "Gennemtrænger dit våben med elementær ild: hvert hug volder 8 ekstra ildskade i 5 min."
+        "description": "Gennemtrænger dit våben med elementær ild: hvert hug volder {damage} ekstra Ildskade i 5 min."
       },
       "frost_shock": {
         "name": "Rimstød",
@@ -5445,7 +5455,7 @@ export const da_DK: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Rimbundet Våben",
-        "description": "Gennemtrænger dit våben med bidende frost: hvert hug volder 8 ekstra skade i 5 min."
+        "description": "Gennemtrænger dit våben med bidende frost: hvert hug volder {damage} ekstra skade i 5 min."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5461,11 +5471,11 @@ export const da_DK: EnTranslations = {
       },
       "demon_skin": {
         "name": "Djævlehud",
-        "description": "Dæmonisk hud øger din rustning med 30 i 30 min."
+        "description": "Dæmonisk hud øger din rustning med {buff} i 30 min."
       },
       "immolate": {
         "name": "Brændende Pagt",
-        "description": "Brænder fjenden for 11 ildskade og yderligere {damage} over 15 sek."
+        "description": "Brænder fjenden for {damage} Ildskade og yderligere {overTime} over 15 sek."
       },
       "corruption": {
         "name": "Sortråd",
@@ -5473,7 +5483,7 @@ export const da_DK: EnTranslations = {
       },
       "life_tap": {
         "name": "Hård Handel",
-        "description": "Omdanner 30 helbred til 30 mana."
+        "description": "Omdanner {damage} helbred til {damage} mana."
       },
       "curse_of_agony": {
         "name": "Kvalens Forgørelse",
@@ -5505,7 +5515,7 @@ export const da_DK: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Anbringer Wildward på et venligt mål og øger rustningen med 25 i 30 min."
+        "description": "Anbringer Wildward på et venligt mål og øger rustningen med {buff} i 30 min."
       },
       "moonfire": {
         "name": "Månestorm",
@@ -5517,7 +5527,7 @@ export const da_DK: EnTranslations = {
       },
       "thorns": {
         "name": "Torneværn",
-        "description": "Torne spirer frem fra målet: nærkampsangribere tager 3 Natur skade."
+        "description": "Torne spirer frem fra målet: nærkampsangribere tager {buff} Natur skade."
       },
       "entangling_roots": {
         "name": "Gribende Rødder",
@@ -5525,7 +5535,7 @@ export const da_DK: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin-form",
-        "description": "Forvandl dig til en bjørn: rustning +65%, angrebskraft +15, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
+        "description": "Forvandl dig til en bjørn: rustning +90%, stærkt øget angrebskraft, dine angreb opbygger raseri og genererer 30% mere trussel. Kast igen for at vende tilbage til besværgerform."
       },
       "maul": {
         "name": "Knogleknus",
@@ -5545,7 +5555,7 @@ export const da_DK: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Blodbid",
-        "description": "Afslutningstræk der volder skade pr. kombopoint. Kun i Ulveform."
+        "description": "Afslutningstræk der volder {damage}. Kun i Ulveform."
       },
       "swipe": {
         "name": "Fejende Kløer",
@@ -5577,7 +5587,7 @@ export const da_DK: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hekselys",
-        "description": "Sænker målets rustning med 35 i 40 sek."
+        "description": "Sænker målets rustning med {damage}% i 40 sek. Stakker ikke med Rustningsskær."
       },
       "hibernate": {
         "name": "Slummer",
@@ -5601,7 +5611,7 @@ export const da_DK: EnTranslations = {
       },
       "rip": {
         "name": "Sønderriv",
-        "description": "Afslutningsangreb der forårsager blødningsskade over 12 sek. Forbruger kombopoint. Kun i Ulveform."
+        "description": "Afslutningsangreb der forårsager {damage} Blødningsskade over 12 sek. Forbruger kombopoint. Kun i Ulveform."
       },
       "mortal_strike": {
         "name": "Lemlæstende Slag",
@@ -5609,11 +5619,11 @@ export const da_DK: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Åreladning",
-        "description": "Angrib øjeblikkeligt i et blodraseri for {damage}. (Furie-signatur)"
+        "description": "Angrib øjeblikkeligt i et blodraseri for 60% våbenskade plus {damage}. (Furie-signatur)"
       },
       "shield_slam": {
         "name": "Skjoldknæk",
-        "description": "Slå målet med dit skjold for {damage} og enorm trussel. (Beskyttelses-kendetegn)"
+        "description": "Slå målet med dit skjold for 50% våbenskade plus {damage} og enorm trussel. (Beskyttelses-kendetegn)"
       },
       "whirlwind": {
         "name": "Klingehvirvel",
@@ -7134,6 +7144,9 @@ export const da_DK: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Diakon Voss"
+      },
+      "training_dummy": {
+        "name": "Træningsdukke"
       },
       "ridge_stalker": {
         "name": "Bjergkamssniger"

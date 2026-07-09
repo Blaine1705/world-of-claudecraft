@@ -2021,6 +2021,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Soziales',
   'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menü',
+  'hud.core.mobileSettings': 'Einstellungen',
   'hud.core.mobileUse': 'Benutzen',
   'hud.core.mobileMeters': 'Anzeigen',
   'hud.core.mobileMap': 'Karte',
@@ -2769,29 +2770,29 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
   'entities.abilities.battle_shout.name': 'Eisernes Gebrüll',
-  'entities.abilities.battle_shout.description': 'Erhöht eure Angriffskraft 2 Min. lang um 20.',
+  'entities.abilities.battle_shout.description': 'Erhöht eure Angriffskraft 2 Min. lang um {buff}.',
   'entities.abilities.commanding_shout.name': 'Stärkender Ruf',
-  'entities.abilities.commanding_shout.description': 'Erhöht eure Ausdauer 2 Min. lang um 6.',
+  'entities.abilities.commanding_shout.description': 'Erhöht eure Ausdauer 2 Min. lang um {buff}.',
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
-    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um 30.',
+    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}.',
   'entities.abilities.charge.name': 'Vorpreschen',
   'entities.abilities.charge.description':
     'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',
   'entities.abilities.rend.name': 'Tiefe Wunde',
   'entities.abilities.rend.description':
-    'Verwundet das Ziel und lässt es über 9 Sek. für {damage} Schaden bluten.',
+    'Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten.',
   'entities.abilities.thunder_clap.name': 'Bebender Schlag',
   'entities.abilities.thunder_clap.description':
     'Trifft nahe Gegner für {damage} Schaden und verlangsamt ihre Angriffe 10 Sek. lang um 10%.',
   'entities.abilities.hamstring.name': 'Lähmender Schnitt',
   'entities.abilities.hamstring.description':
-    'Verkrüppelt den Gegner für 5 Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
+    'Verkrüppelt den Gegner für {damage} Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
   'entities.abilities.bloodrage.name': 'Blutzoll',
   'entities.abilities.bloodrage.description': 'Erzeugt 10 Wut auf Kosten von Gesundheit.',
   'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.overpower.description':
-    'Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
+    'Sofortiger Angriff mit Waffenschaden plus {damage}. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
   'entities.abilities.execute.name': 'Frühes Grab',
   'entities.abilities.execute.description':
     'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',
@@ -2811,16 +2812,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Feuerball',
   'entities.abilities.rain_of_fire.name': 'Feuerregen',
   'entities.abilities.rain_of_fire.description':
-    'Lässt einen Feuerregen auf den Zielbereich niedergehen, der Gegner verbrennt und {damage} Feuerschaden verursacht.',
+    'Lässt 4 Sek. lang einen Feuerregen auf den Zielbereich niedergehen, der Gegner jede Sekunde für {damage} Feuerschaden verbrennt.',
   'entities.abilities.volley.name': 'Pfeilhagel',
   'entities.abilities.volley.description':
-    'Lässt einen Pfeilhagel auf den Zielbereich niedergehen und verursacht {damage} Schaden an den Gegnern darin.',
+    'Lässt 3 Sek. lang Pfeile auf den Zielbereich niedergehen und verursacht alle 0.5 Sek. {damage} Schaden an Gegnern darin.',
   'entities.abilities.hurricane.name': 'Wirbelsturm',
   'entities.abilities.hurricane.description':
-    'Entfesselt einen Wirbelsturm über dem Zielbereich, der Gegner trifft und {damage} Naturschaden verursacht.',
+    'Entfesselt 6 Sek. lang einen Wirbelsturm über dem Zielbereich, der Gegner jede Sekunde für {damage} Naturschaden trifft.',
   'entities.abilities.earthquake.name': 'Erdbeben',
   'entities.abilities.earthquake.description':
-    'Lässt den Zielbereich erbeben, trifft Gegner und verursacht {damage} Naturschaden.',
+    'Lässt den Zielbereich 6 Sek. lang erbeben und trifft Gegner alle 1.5 Sek. für {damage} Naturschaden.',
   'entities.abilities.flamestrike.name': 'Flammenschlag',
   'entities.abilities.flamestrike.description':
     'Lässt am Zielort eine Feuerexplosion niedergehen, die allen Gegnern im Wirkungsbereich {damage} Feuerschaden zufügt.',
@@ -2828,9 +2829,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
   'entities.abilities.frost_armor.name': 'Raureifmantel',
   'entities.abilities.frost_armor.description':
-    'Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um 30.',
+    'Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.arcane_intellect.name': 'Aether-Einsicht',
-  'entities.abilities.arcane_intellect.description': 'Erhöht die Intelligenz 30 Min. lang um 2.',
+  'entities.abilities.arcane_intellect.description':
+    'Erhöht die Intelligenz 30 Min. lang um {buff}.',
   'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbolt.description':
     'Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%.',
@@ -2848,7 +2850,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert Aether-Pfeile auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
   'entities.abilities.polymorph.name': 'Behexen',
   'entities.abilities.polymorph.description':
-    'Verwandelt den Gegner bis zu 15 Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
+    'Verwandelt den Gegner bis zu {duration} Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
   'entities.abilities.frost_nova.name': 'Icebind',
   'entities.abilities.frost_nova.description':
     'Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden.',
@@ -2863,19 +2865,18 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
   'entities.abilities.ice_barrier.name': 'Frostschleier',
   'entities.abilities.ice_barrier.description':
-    'Schützt euch mit Eis und absorbiert 60 Sek. lang 130 Schaden.',
+    'Schützt euch mit Eis und absorbiert 60 Sek. lang {damage} Schaden.',
   'entities.abilities.sinister_strike.name': 'Boshafter Hieb',
   'entities.abilities.sinister_strike.description':
     'Sofortiger Hieb für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
   'entities.abilities.eviscerate.name': 'Grabesschlaf',
-  'entities.abilities.eviscerate.description':
-    'Finishing-Move, der Schaden pro Combopunkt verursacht.',
+  'entities.abilities.eviscerate.description': 'Finishing-Move, der {damage} verursacht.',
   'entities.abilities.backstab.name': 'Feiger Stoß',
   'entities.abilities.backstab.description':
     'Meuchelt das Ziel für 150% Waffenschaden plus {damage}. Ihr müsst hinter dem Ziel stehen. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.gouge.name': 'Augenstich',
   'entities.abilities.gouge.description':
-    'Trifft das Ziel und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
+    'Trifft das Ziel für {damage} Schaden und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
   'entities.abilities.evasion.name': 'Ghostfoot',
   'entities.abilities.evasion.description': 'Erhöht eure Ausweichchance 15 Sek. lang um 50%.',
   'entities.abilities.slice_and_dice.name': 'Mörderisches Tempo',
@@ -2897,19 +2898,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
   'entities.abilities.garrote.name': 'Kehldraht',
   'entities.abilities.garrote.description':
-    'Erwürgt den Gegner, verursacht sofort Schaden und lässt ihn 18 Sek. lang um {damage} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
+    'Erwürgt den Gegner, verursacht sofort {damage} Schaden und lässt ihn über 18 Sek. für {overTime} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
   'entities.abilities.cheap_shot.name': 'Magenhieb',
   'entities.abilities.cheap_shot.description':
-    'Trifft das Ziel und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
+    'Trifft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
   'entities.abilities.sap.name': 'Kopfnuss',
   'entities.abilities.sap.description':
     'Macht das Ziel 8 Sek. lang handlungsunfähig. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt.',
   'entities.abilities.crippling_poison.name': 'Bleiernes Gift',
   'entities.abilities.crippling_poison.description':
-    'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verringert sein Bewegungstempo 12 Sek. lang um 50%.',
+    'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verlangsamt sein Bewegungstempo 12 Sek. lang um 50%.',
   'entities.abilities.expose_armor.name': 'Rüstungsbruch',
   'entities.abilities.expose_armor.description':
-    'Finishing-Move, der das Ziel entblößt und seine Rüstung verringert. Mehr eingesetzte Combopunkte führen zu einem tieferen Schnitt.',
+    'Finishing-Move, der das Ziel entblößt und seine Rüstung 30 Sek. lang um {damage} verringert.',
   'entities.abilities.rupture.name': 'Ausbluten',
   'entities.abilities.rupture.description':
     'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
@@ -2927,25 +2928,25 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Blendet das Ziel, sodass es 8 Sek. lang desorientiert umherirrt. Jeder Schaden bricht den Effekt.',
   'entities.abilities.seal_of_righteousness.name': 'Oathbrand',
   'entities.abilities.seal_of_righteousness.description':
-    'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung 4 zusätzlichen Heiligschaden verursacht. Mit Verdict entfesseln.',
+    'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung {damage} zusätzlichen Heiligschaden verursacht. Mit Verdict entfesseln.',
   'entities.abilities.holy_light.name': 'Mending Light',
   'entities.abilities.holy_light.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.devotion_aura.name': 'Standhafte Aura',
-  'entities.abilities.devotion_aura.description': 'Erhöht eure Rüstung 30 Min. lang um 40.',
+  'entities.abilities.devotion_aura.description': 'Erhöht eure Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.judgement.name': 'Verdict',
   'entities.abilities.judgement.description':
     'Entfesselt euer aktives Siegel auf den Gegner, verbraucht es und verursacht seinen gespeicherten Heiligschaden.',
   'entities.abilities.blessing_of_might.name': 'Eid des Eisens',
   'entities.abilities.blessing_of_might.description':
-    'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um 15.',
+    'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um {buff}.',
   'entities.abilities.divine_protection.name': 'Bannschild des Glaubens',
   'entities.abilities.divine_protection.description':
-    'Ein schützender Bannschild absorbiert 10 Sek. lang 50 Schaden.',
+    'Ein schützender Bannschild absorbiert 10 Sek. lang {damage} Schaden.',
   'entities.abilities.hammer_of_justice.name': 'Spaltender Richthammer',
-  'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel 3 Sek. lang.',
+  'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel {duration} Sek. lang.',
   'entities.abilities.lay_on_hands.name': 'Letzte Ölung',
   'entities.abilities.lay_on_hands.description':
-    'Ein gewaltiger Heilungsstoß: Stellt 250 Gesundheit wieder her. 10 Min. Abklingzeit.',
+    'Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit.',
   'entities.abilities.flash_of_light.name': 'Lightmend',
   'entities.abilities.flash_of_light.description':
     'Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt.',
@@ -2954,7 +2955,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Bannt das Böse mit Heiligem Zorn und verursacht {damage} Heiligschaden.',
   'entities.abilities.consecration.name': 'Heiliger Boden',
   'entities.abilities.consecration.description':
-    'Weiht den Boden unter euch und versengt nahe Gegner für {damage} Heiligschaden.',
+    'Weiht den Boden unter euch und versengt nahe Gegner 10 Sek. lang alle 2 Sek. für {damage} Heiligschaden.',
   'entities.abilities.righteous_fury.name': 'Brennender Eid',
   'entities.abilities.righteous_fury.description':
     'Erhöht die durch euren Heiligschaden erzeugte Bedrohung 30 Min. lang um 60%. Der Grundpfeiler des Tank-Paladins.',
@@ -2968,10 +2969,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Entlässt euren Begleiter zurück in die Wildnis.',
   'entities.abilities.raptor_strike.name': 'Ausweidender Hieb',
   'entities.abilities.raptor_strike.description':
-    'Starker Nahkampfangriff, der den Schaden um 5 erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
+    'Starker Nahkampfangriff, der den Schaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
   'entities.abilities.aspect_of_the_hawk.name': 'Gestalt der Weihe',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Nehmt die Gestalt der Weihe an und erhöht die Angriffskraft 30 Min. lang um 20.',
+    'Nehmt die Gestalt der Weihe an und erhöht die Angriffskraft 30 Min. lang um {buff}.',
   'entities.abilities.serpent_sting.name': 'Giftstachel',
   'entities.abilities.serpent_sting.description':
     'Sticht das Ziel und verursacht über 15 Sek. {damage} Naturschaden.',
@@ -2980,13 +2981,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sofortiger Schuss, der {damage} Arkanschaden verursacht.',
   'entities.abilities.concussive_shot.name': 'Rasselnder Schuss',
   'entities.abilities.concussive_shot.description':
-    'Macht das Ziel benommen und verringert sein Bewegungstempo 4 Sek. lang um 50%.',
+    'Macht das Ziel für {damage} Schaden benommen und verringert sein Bewegungstempo 4 Sek. lang um 50%.',
   'entities.abilities.mongoose_bite.name': 'Counterfang',
   'entities.abilities.mongoose_bite.description':
-    'Kontert, nachdem das Ziel ausgewichen ist, für Waffenschaden plus 12. Kann nicht ausgewichen werden.',
+    'Kontert, nachdem das Ziel ausgewichen ist, für Waffenschaden plus {damage}. Kann nicht ausgewichen werden.',
   'entities.abilities.wing_clip.name': 'Fesselnder Hieb',
   'entities.abilities.wing_clip.description':
-    'Verursacht eine Wunde, die den Gegner 10 Sek. lang um 40% verlangsamt.',
+    'Verursacht eine Wunde für {damage} Schaden, die den Gegner 10 Sek. lang um 40% verlangsamt.',
   'entities.abilities.aspect_of_the_monkey.name': 'Gestalt des Marders',
   'entities.abilities.aspect_of_the_monkey.description':
     'Nehmt die Gestalt des Marders an und erhöht eure Ausweichchance 30 Min. lang um 8%.',
@@ -3004,13 +3005,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.power_word_fortitude.name': 'Litanei der Entschlossenheit',
   'entities.abilities.power_word_fortitude.description':
-    'Erhöht die Ausdauer des Ziels 30 Min. lang um 3.',
+    'Erhöht die Ausdauer des Ziels 30 Min. lang um {buff}.',
   'entities.abilities.shadow_word_pain.name': 'Klagelied des Verfalls',
   'entities.abilities.shadow_word_pain.description':
     'Ein Wort der Dunkelheit verursacht über 18 Sek. {damage} Schattenschaden.',
   'entities.abilities.power_word_shield.name': 'Psalm der Abschirmung',
   'entities.abilities.power_word_shield.description':
-    'Schützt das Ziel und absorbiert 30 Sek. lang 48 Schaden.',
+    'Schützt das Ziel und absorbiert 30 Sek. lang {damage} Schaden.',
   'entities.abilities.renew.name': 'Anhaltende Gnade',
   'entities.abilities.renew.description': 'Heilt das Ziel über 15 Sek. um {damage}.',
   'entities.abilities.mind_blast.name': 'Mindfracture',
@@ -3030,7 +3031,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen Blitz für {damage} Naturschaden.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound-Waffe',
   'entities.abilities.rockbiter_weapon.description':
-    'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 zusätzlichen Schaden für 5 Min.',
+    'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Schaden.',
   'entities.abilities.healing_wave.name': 'Heilende Wasser',
   'entities.abilities.healing_wave.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.earth_shock.name': 'Erdstoß',
@@ -3038,19 +3039,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schockt das Ziel sofort mit erschütternder Kraft für {damage} Naturschaden.',
   'entities.abilities.lightning_shield.name': 'Donnerschild',
   'entities.abilities.lightning_shield.description':
-    'Umhüllt euch mit knisternden Blitzen: Nahkampfangreifer erleiden 13 Naturschaden.',
+    'Umhüllt euch mit knisternden Blitzen: Nahkampfangreifer erleiden {buff} Naturschaden, bis zu 3 Aufladungen und höchstens einmal alle 5 Sekunden.',
   'entities.abilities.flame_shock.name': 'Cinder-Stoß',
   'entities.abilities.flame_shock.description':
-    'Versengt das Ziel mit Feuer für 25 Schaden plus {damage} über 12 Sek.',
+    'Versengt das Ziel mit Feuer für {damage} Schaden plus {overTime} über 12 Sek.',
   'entities.abilities.flametongue_weapon.name': 'Pyrebrand-Waffe',
   'entities.abilities.flametongue_weapon.description':
-    'Erfüllt eure Waffe mit elementarem Feuer: Jeder Schlag verursacht 8 zusätzlichen Feuerschaden für 5 Min.',
+    'Erfüllt eure Waffe mit elementarem Feuer: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Feuerschaden.',
   'entities.abilities.frost_shock.name': 'Rime-Stoß',
   'entities.abilities.frost_shock.description':
     'Schockt das Ziel sofort mit Frost für {damage} Frostschaden und verlangsamt seine Bewegung 8 Sek. lang um 50%.',
   'entities.abilities.frostbrand_weapon.name': 'Rimebound-Waffe',
   'entities.abilities.frostbrand_weapon.description':
-    'Verzaubert Eure Waffe mit beißendem Frost: Jeder Schlag verursacht 8 zusätzlichen Schaden für 5 Min.',
+    'Verzaubert Eure Waffe mit beißendem Frost: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Schaden.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.ghost_wolf.description':
     'Verwandelt euch in einen Shadewolf und erhöht euer Bewegungstempo 10 Min. lang um 40%.',
@@ -3062,15 +3063,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden.',
   'entities.abilities.demon_skin.name': 'Fiendhide',
   'entities.abilities.demon_skin.description':
-    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um 30.',
+    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
-    'Verbrennt den Gegner für 11 Feuerschaden und zusätzlich {damage} über 15 Sek.',
+    'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',
   'entities.abilities.corruption.name': 'Blackrot',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
   'entities.abilities.life_tap.name': 'Harter Handel',
-  'entities.abilities.life_tap.description': 'Wandelt 30 Gesundheit in 30 Mana um.',
+  'entities.abilities.life_tap.description': 'Wandelt {damage} Gesundheit in {damage} Mana um.',
   'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
   'entities.abilities.curse_of_agony.description':
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
@@ -3093,7 +3094,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.mark_of_the_wild.description':
-    'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um 25.',
+    'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
   'entities.abilities.moonfire.description':
     'Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
@@ -3101,13 +3102,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
   'entities.abilities.thorns.name': 'Briarguard',
   'entities.abilities.thorns.description':
-    'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden 3 Naturschaden.',
+    'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
   'entities.abilities.entangling_roots.name': 'Greifende Wurzeln',
   'entities.abilities.entangling_roots.description':
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
   'entities.abilities.bear_form.name': 'Bruin Form',
   'entities.abilities.bear_form.description':
-    'Verwandelt euch in einen Bären: Rüstung +65%, Angriffskraft +15, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Bären: Rüstung +90%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Bonecrush',
   'entities.abilities.maul.description':
     'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
@@ -3122,7 +3123,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.ferocious_bite.name': 'Gorebite',
   'entities.abilities.ferocious_bite.description':
-    'Finishing-Move, der Schaden pro Combopunkt verursacht. Nur in Wolfsgestalt.',
+    'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
   'entities.abilities.swipe.name': 'Fegende Klauen',
   'entities.abilities.swipe.description':
     'Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin Form.',
@@ -3144,7 +3145,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bruin Form.',
   'entities.abilities.faerie_fire.name': 'Witchlight',
   'entities.abilities.faerie_fire.description':
-    'Verringert die Rüstung des Ziels 40 Sek. lang um 35.',
+    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar.',
   'entities.abilities.hibernate.name': 'Schlummer',
   'entities.abilities.hibernate.description':
     'Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf.',
@@ -3162,16 +3163,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht die Angriffskraft 6 Sek. lang um 40. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
   'entities.abilities.rip.description':
-    'Finishing-Move, der über 12 Sek. Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
+    'Finishing-Move, der über 12 Sek. {damage} Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
     'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
   'entities.abilities.bloodthirst.name': 'Aderlass',
   'entities.abilities.bloodthirst.description':
-    'Greift sofort in blutiger Raserei an und verursacht {damage}. (Furor-Signatur)',
+    'Greift sofort in blutiger Raserei an und verursacht 60% Waffenschaden plus {damage}. (Furor-Signatur)',
   'entities.abilities.shield_slam.name': 'Shieldcrack',
   'entities.abilities.shield_slam.description':
-    'Schlägt das Ziel mit eurem Schild für {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
+    'Schlägt das Ziel mit eurem Schild für 50% Waffenschaden plus {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
   'entities.abilities.whirlwind.name': 'Klingenwirbel',
   'entities.abilities.whirlwind.description':
     'Dreht euch in einem tödlichen Bogen und trefft alle nahen Gegner für {damage}. (Furor-Talent)',
@@ -6709,4 +6710,55 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Entnehmen',
   'hudChrome.bank.withdrawQuantityInput': 'Zu entnehmende Menge',
   'hudChrome.bank.withdrawQuantityTitle': '{item} entnehmen',
+  'abilityUi.tooltip.selfOnly': 'Nur auf Euch selbst',
+  'itemUi.lootRoll.rolled': '{answered}/{total} gewürfelt',
+  'entities.abilities.sunder_armor.description':
+    'Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung.',
+  'entities.mobs.training_dummy.name': 'Trainingspuppe',
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.',
+  'guide.arenaPage.yumiHeading': 'Yumi beschützen',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
+  'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
+  'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
+  'hudChrome.auraEffect.increasePct.allStats': 'Erhöht alle Attribute um {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Erhöht Angriffskraft um {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': 'Erhöht Rüstung um {pct}%',
+  'hudChrome.auraEffect.increasePct.int': 'Erhöht Intelligenz um {pct}%',
+  'hudChrome.auraEffect.increasePct.sta': 'Erhöht Ausdauer um {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Ihr müsst Euch am Handwerksplatz und auf der erforderlichen Stufe befinden, um das herzustellen.',
+  'hudChrome.crafting.recipeNotLearned': 'Ihr habt dieses Rezept noch nicht erlernt.',
+  'hudChrome.crafting.throttled':
+    'Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.',
+  'hudChrome.mobile.chatPlaceholder': 'Sag etwas...',
+  'hudChrome.mobile.hideKeyboard': 'Tastatur ausblenden',
+  'hudChrome.unitFrame.partyChip': 'Gruppe',
+  'yumi.banner.sudden': 'PLÖTZLICHER TOD! Die Yumis halten die Stellung!',
+  'yumi.banner.teleport': 'Die Yumis teleportieren!',
+  'yumi.bracket3': 'Yumi 3 gegen 3',
+  'yumi.bracket5': 'Yumi 5 gegen 5',
+  'yumi.end.loss': 'NIEDERLAGE! Eure Yumi ist gefallen.',
+  'yumi.end.win': 'SIEG! Yumi ist in Sicherheit!',
+  'yumi.enterQueue': 'Yumi beschützen beitreten!',
+  'yumi.error.partyTooBig3':
+    'Bei Yumi beschützen 3 gegen 3 ist eine Gruppe von bis zu drei Spielern erlaubt.',
+  'yumi.error.partyTooBig5':
+    'Bei Yumi beschützen 5 gegen 5 ist eine Gruppe von bis zu fünf Spielern erlaubt.',
+  'yumi.hud.aria': 'Eure Yumi bei {mine} von {max} Gesundheit, gegnerische Yumi bei {theirs}.',
+  'yumi.hud.collapse': 'Die Yumi-beschützen-Leisten einklappen',
+  'yumi.hud.enemyYumi': 'Gegnerische Yumi',
+  'yumi.hud.expand': 'Die Yumi-beschützen-Leisten ausklappen',
+  'yumi.hud.getReady': 'Macht Euch bereit…',
+  'yumi.hud.suddenDeath': 'PLÖTZLICHER TOD',
+  'yumi.hud.teleportIn': 'Yumis teleportieren in {s}',
+  'yumi.hud.title': 'YUMI BESCHÜTZEN',
+  'yumi.hud.yourYumi': 'Eure Yumi',
+  'yumi.log.start': 'Yumi beschützen! Verteidigt Euren Begleiter und jagt ihren.',
+  'yumi.queue.join':
+    'Ihr tretet der Warteschlange für Yumi beschützen bei. Bewacht Euren Begleiter…',
+  'yumi.queue.leave': 'Ihr verlasst die Warteschlange für Yumi beschützen.',
+  'yumi.queue.teamLeave': 'Euer Team verlässt die Warteschlange für Yumi beschützen.',
+  'yumi.respawn.title': 'AM BODEN!',
 };

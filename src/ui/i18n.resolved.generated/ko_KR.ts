@@ -291,6 +291,7 @@ export const ko_KR: EnTranslations = {
       "targetLabel": "내 대상",
       "targetAnnounce": "대상: {name}",
       "partyLabel": "내 파티",
+      "partyChip": "파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
@@ -320,7 +321,9 @@ export const ko_KR: EnTranslations = {
       "actionPageIndicator": "{page}페이지",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
-      "spellbookPageLabel": "페이지 {page}"
+      "spellbookPageLabel": "페이지 {page}",
+      "hideKeyboard": "키보드 숨기기",
+      "chatPlaceholder": "메시지 입력..."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -1431,6 +1434,7 @@ export const ko_KR: EnTranslations = {
     "archetypeTitle": {
       "label": "칭호",
       "none": "없음",
+      "hobbyLabel": "취미",
       "armorcrafting": "방어구 장인",
       "weaponcrafting": "무기 장인",
       "jewelcrafting": "보석 세공사",
@@ -1453,7 +1457,10 @@ export const ko_KR: EnTranslations = {
       "craftedToast": "제작 완료:{name}",
       "insufficientMaterials": "재료가 부족합니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
-      "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다."
+      "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
+      "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
+      "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
+      "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const ko_KR: EnTranslations = {
       "mobileSocial": "소셜",
       "mobileArena": "투기장",
       "mobileMenu": "메뉴",
+      "mobileSettings": "설정",
       "mobileUse": "사용",
       "mobileMeters": "미터",
       "mobileMap": "지도",
@@ -4690,6 +4698,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
     },
@@ -4998,7 +5007,8 @@ export const ko_KR: EnTranslations = {
       "needAria": "{item} 필요",
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
-      "everyonePassed": "모두 {item}을(를) 포기했습니다."
+      "everyonePassed": "모두 {item}을(를) 포기했습니다.",
+      "rolled": "{answered}/{total} 굴림 완료"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const ko_KR: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "불의 비",
-        "description": "지정한 지역에 불의 비를 내려 적을 불태우고 {damage}의 화염 피해를 입힙니다."
+        "description": "지정한 지역에 4초 동안 불의 비를 내려 매초 적에게 {damage}의 화염 피해를 입힙니다."
       },
       "volley": {
         "name": "일제 사격",
-        "description": "지정한 지역에 화살을 쏟아부어 그 안의 적에게 {damage}의 피해를 입힙니다."
+        "description": "지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다."
       },
       "hurricane": {
         "name": "폭풍우",
-        "description": "지정한 지역에 폭풍우를 일으켜 적을 강타하고 {damage}의 자연 피해를 입힙니다."
+        "description": "지정한 지역에 6초 동안 폭풍우를 일으켜 매초 적에게 {damage}의 자연 피해를 입힙니다."
       },
       "earthquake": {
         "name": "지진",
-        "description": "지정한 지역을 뒤흔들어 적을 강타하고 {damage}의 자연 피해를 입힙니다."
+        "description": "지정한 지역을 6초 동안 뒤흔들어 1.5초마다 적에게 {damage}의 자연 피해를 입힙니다."
       },
       "heroic_strike": {
         "name": "약탈자의 일격",
@@ -5069,15 +5079,15 @@ export const ko_KR: EnTranslations = {
       },
       "battle_shout": {
         "name": "강철의 외침",
-        "description": "2분 동안 전투력이 20만큼 증가합니다."
+        "description": "2분 동안 전투력이 {buff}만큼 증가합니다."
       },
       "commanding_shout": {
         "name": "북돋는 외침",
-        "description": "2분 동안 체력이 6만큼 증가합니다."
+        "description": "2분 동안 체력이 {buff}만큼 증가합니다."
       },
       "demoralizing_shout": {
         "name": "흉포한 울부짖음",
-        "description": "무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 30만큼 감소시킵니다."
+        "description": "무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 {buff}만큼 감소시킵니다."
       },
       "charge": {
         "name": "쇄도",
@@ -5085,7 +5095,7 @@ export const ko_KR: EnTranslations = {
       },
       "rend": {
         "name": "깊은 상처",
-        "description": "대상을 상처 입혀 9초에 걸쳐 {damage}의 출혈 피해를 입힙니다."
+        "description": "대상을 상처 입혀 {duration}초에 걸쳐 {damage}의 출혈 피해를 입힙니다."
       },
       "thunder_clap": {
         "name": "진동의 일격",
@@ -5093,7 +5103,7 @@ export const ko_KR: EnTranslations = {
       },
       "hamstring": {
         "name": "절뚝이는 베기",
-        "description": "적에게 5의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다."
+        "description": "적에게 {damage}의 피해를 입히고 15초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "bloodrage": {
         "name": "피의 대가",
@@ -5101,7 +5111,7 @@ export const ko_KR: EnTranslations = {
       },
       "overpower": {
         "name": "붉은 손",
-        "description": "무기 피해 +5를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다."
+        "description": "무기 피해에 {damage}를 더한 피해를 즉시 입힙니다. 대상이 회피한 후에만 사용할 수 있습니다. 회피할 수 없습니다."
       },
       "execute": {
         "name": "이른 무덤",
@@ -5121,7 +5131,7 @@ export const ko_KR: EnTranslations = {
       },
       "sunder_armor": {
         "name": "방어구 절단",
-        "description": "대상의 방어구를 가르고 적용마다 2%만큼 감소시킵니다. 최대 5번 중첩됩니다(최대 중첩 시 10%). 많은 위협 수준을 생성합니다."
+        "description": "대상의 방어구를 가르고 적용마다 {damage}%만큼 감소시킵니다. 최대 5번 중첩됩니다. 많은 위협 수준을 생성합니다."
       },
       "taunt": {
         "name": "부추김",
@@ -5133,11 +5143,11 @@ export const ko_KR: EnTranslations = {
       },
       "frost_armor": {
         "name": "서리 망토",
-        "description": "자신을 냉기로 감싸 30분 동안 방어도를 30만큼 증가시킵니다."
+        "description": "자신을 냉기로 감싸 30분 동안 방어도를 {buff}만큼 증가시킵니다."
       },
       "arcane_intellect": {
         "name": "에테르 통찰",
-        "description": "30분 동안 지능이 2만큼 증가합니다."
+        "description": "30분 동안 지능이 {buff}만큼 증가합니다."
       },
       "frostbolt": {
         "name": "서리 창",
@@ -5161,7 +5171,7 @@ export const ko_KR: EnTranslations = {
       },
       "polymorph": {
         "name": "홀리기",
-        "description": "적을 최대 15초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다."
+        "description": "적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다."
       },
       "frost_nova": {
         "name": "얼음 속박",
@@ -5181,7 +5191,7 @@ export const ko_KR: EnTranslations = {
       },
       "ice_barrier": {
         "name": "서리 장막",
-        "description": "얼음으로 자신을 보호해 60초 동안 130의 피해를 흡수합니다."
+        "description": "얼음으로 자신을 보호해 60초 동안 {damage}의 피해를 흡수합니다."
       },
       "sinister_strike": {
         "name": "사악한 베기",
@@ -5189,7 +5199,7 @@ export const ko_KR: EnTranslations = {
       },
       "eviscerate": {
         "name": "영면",
-        "description": "연계 점수당 피해를 입히는 결정타입니다."
+        "description": "결정타로 {damage}의 피해를 입힙니다."
       },
       "backstab": {
         "name": "비겁한 찌르기",
@@ -5197,7 +5207,7 @@ export const ko_KR: EnTranslations = {
       },
       "gouge": {
         "name": "눈 찌르기",
-        "description": "대상을 가격해 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. 연계 점수 1점을 얻습니다."
+        "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 행동 불가 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. 연계 점수 1점을 얻습니다."
       },
       "evasion": {
         "name": "유령 걸음",
@@ -5229,11 +5239,11 @@ export const ko_KR: EnTranslations = {
       },
       "garrote": {
         "name": "철사 목조르기",
-        "description": "적의 목을 졸라 즉시 피해를 입히고 18초에 걸쳐 {damage}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다."
+        "description": "적의 목을 졸라 즉시 {damage}의 피해를 입히고 18초에 걸쳐 {overTime}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다."
       },
       "cheap_shot": {
         "name": "명치 가격",
-        "description": "대상을 가격해 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다."
+        "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다."
       },
       "sap": {
         "name": "관자놀이 가격",
@@ -5241,11 +5251,11 @@ export const ko_KR: EnTranslations = {
       },
       "crippling_poison": {
         "name": "둔중한 독",
-        "description": "대상을 둔중한 독으로 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
+        "description": "둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",
-        "description": "대상의 약점을 드러내 방어도를 감소시키는 결정타입니다. 연계 점수를 많이 소모할수록 더 깊게 베어 들어갑니다."
+        "description": "대상의 약점을 드러내 30초 동안 방어도를 {damage}만큼 감소시키는 결정타입니다."
       },
       "rupture": {
         "name": "과다출혈",
@@ -5269,7 +5279,7 @@ export const ko_KR: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "맹세의 낙인",
-        "description": "30초 동안 신성한 힘으로 가득 차 근접 공격마다 4의 추가 신성 피해를 입힙니다. 선고로 해방할 수 있습니다."
+        "description": "30초 동안 신성한 힘으로 가득 차 근접 공격마다 {damage}의 추가 신성 피해를 입힙니다. 선고로 해방할 수 있습니다."
       },
       "holy_light": {
         "name": "치유의 빛",
@@ -5277,7 +5287,7 @@ export const ko_KR: EnTranslations = {
       },
       "devotion_aura": {
         "name": "굳건함의 오라",
-        "description": "30분 동안 방어도가 40만큼 증가합니다."
+        "description": "30분 동안 방어도가 {buff}만큼 증가합니다."
       },
       "judgement": {
         "name": "선고",
@@ -5285,19 +5295,19 @@ export const ko_KR: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "강철의 맹세",
-        "description": "아군 대상에게 축복을 내려 5분 동안 전투력을 15만큼 증가시킵니다."
+        "description": "아군 대상에게 축복을 내려 5분 동안 전투력을 {buff}만큼 증가시킵니다."
       },
       "divine_protection": {
         "name": "신념의 결계",
-        "description": "보호의 결계가 10초 동안 50의 피해를 흡수합니다."
+        "description": "보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다."
       },
       "hammer_of_justice": {
         "name": "분쇄의 망치",
-        "description": "대상을 3초 동안 기절시킵니다."
+        "description": "대상을 {duration}초 동안 기절시킵니다."
       },
       "lay_on_hands": {
         "name": "마지막 의식",
-        "description": "막대한 치유의 힘으로 생명력 250을 회복시킵니다. 재사용 대기시간 10분."
+        "description": "막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분."
       },
       "flash_of_light": {
         "name": "빛의 치유",
@@ -5309,7 +5319,7 @@ export const ko_KR: EnTranslations = {
       },
       "consecration": {
         "name": "신성한 땅",
-        "description": "발밑의 땅을 신성화하여 주위 적에게 {damage}의 신성 피해를 입힙니다."
+        "description": "발밑의 땅을 신성화하여 10초 동안 2초마다 주위 적에게 {damage}의 신성 피해를 입힙니다."
       },
       "righteous_fury": {
         "name": "불타는 맹세",
@@ -5329,11 +5339,11 @@ export const ko_KR: EnTranslations = {
       },
       "raptor_strike": {
         "name": "내장 가르기",
-        "description": "강력한 근접 공격으로 피해가 5만큼 증가합니다. 다음 무기 공격 시 발동됩니다."
+        "description": "강력한 근접 공격으로 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다."
       },
       "aspect_of_the_hawk": {
         "name": "새매의 상",
-        "description": "새매의 상을 취해 30분 동안 전투력이 20만큼 증가합니다."
+        "description": "새매의 상을 취해 30분 동안 전투력이 {buff}만큼 증가합니다."
       },
       "serpent_sting": {
         "name": "독 미늘",
@@ -5345,15 +5355,15 @@ export const ko_KR: EnTranslations = {
       },
       "concussive_shot": {
         "name": "뒤흔드는 사격",
-        "description": "대상을 멍하게 만들어 4초 동안 이동 속도를 50%만큼 감소시킵니다."
+        "description": "대상을 멍하게 만들어 {damage}의 피해를 입히고 4초 동안 이동 속도를 50%만큼 감소시킵니다."
       },
       "mongoose_bite": {
         "name": "반격의 송곳니",
-        "description": "대상이 회피한 후 반격하여 무기 피해에 12를 더한 피해를 입힙니다. 회피할 수 없습니다."
+        "description": "대상이 회피한 후 반격하여 무기 피해에 {damage}를 더한 피해를 입힙니다. 회피할 수 없습니다."
       },
       "wing_clip": {
         "name": "족쇄 베기",
-        "description": "상처를 내어 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다."
+        "description": "상처를 내어 {damage}의 피해를 입히고 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다."
       },
       "aspect_of_the_monkey": {
         "name": "담비의 상",
@@ -5381,7 +5391,7 @@ export const ko_KR: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "결의의 연도",
-        "description": "30분 동안 대상의 체력이 3만큼 증가합니다."
+        "description": "30분 동안 대상의 체력이 {buff}만큼 증가합니다."
       },
       "shadow_word_pain": {
         "name": "부패의 만가",
@@ -5389,7 +5399,7 @@ export const ko_KR: EnTranslations = {
       },
       "power_word_shield": {
         "name": "수호의 성가",
-        "description": "대상을 보호하여 30초 동안 48의 피해를 흡수합니다."
+        "description": "대상을 보호하여 30초 동안 {damage}의 피해를 흡수합니다."
       },
       "renew": {
         "name": "지속되는 은총",
@@ -5417,7 +5427,7 @@ export const ko_KR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
-        "description": "바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 5의 추가 피해를 입힙니다."
+        "description": "바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다."
       },
       "healing_wave": {
         "name": "치유의 물결",
@@ -5429,15 +5439,15 @@ export const ko_KR: EnTranslations = {
       },
       "lightning_shield": {
         "name": "천둥 결계",
-        "description": "자신을 번개로 감싸 근접 공격자가 13의 자연 피해를 받게 합니다."
+        "description": "자신을 번개로 감싸 근접 공격자가 {buff}의 자연 피해를 받게 합니다. 최대 3회 충전되며 5초에 한 번만 발동합니다."
       },
       "flame_shock": {
         "name": "잉걸 충격",
-        "description": "대상을 불태워 25의 피해를 입히고 12초에 걸쳐 추가로 {damage}의 피해를 입힙니다."
+        "description": "대상을 불태워 {damage}의 피해를 입히고 12초에 걸쳐 추가로 {overTime}의 피해를 입힙니다."
       },
       "flametongue_weapon": {
         "name": "화염낙인 무기",
-        "description": "원소의 불꽃으로 무기를 강화합니다. 5분 동안 매 공격마다 8의 추가 화염 피해를 입힙니다."
+        "description": "원소의 불꽃으로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 화염 피해를 입힙니다."
       },
       "frost_shock": {
         "name": "서리 충격",
@@ -5445,7 +5455,7 @@ export const ko_KR: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "서리결속 무기",
-        "description": "살을 에는 냉기로 무기를 강화합니다. 5분 동안 매 공격마다 8의 추가 피해를 입힙니다."
+        "description": "살을 에는 냉기로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다."
       },
       "ghost_wolf": {
         "name": "그림자늑대",
@@ -5461,11 +5471,11 @@ export const ko_KR: EnTranslations = {
       },
       "demon_skin": {
         "name": "마귀 가죽",
-        "description": "악마의 피부가 30분 동안 방어도를 30만큼 증가시킵니다."
+        "description": "악마의 피부가 30분 동안 방어도를 {buff}만큼 증가시킵니다."
       },
       "immolate": {
         "name": "불타는 계약",
-        "description": "적을 불태워 11의 화염 피해를 입히고 15초에 걸쳐 추가로 {damage}의 피해를 입힙니다."
+        "description": "적을 불태워 {damage}의 화염 피해를 입히고 15초에 걸쳐 추가로 {overTime}의 피해를 입힙니다."
       },
       "corruption": {
         "name": "검은 부패",
@@ -5473,7 +5483,7 @@ export const ko_KR: EnTranslations = {
       },
       "life_tap": {
         "name": "가혹한 거래",
-        "description": "생명력 30을 마나 30으로 전환합니다."
+        "description": "생명력 {damage}을 마나 {damage}으로 전환합니다."
       },
       "curse_of_agony": {
         "name": "고뇌의 저주",
@@ -5505,7 +5515,7 @@ export const ko_KR: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "야생의 수호",
-        "description": "아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 25만큼 증가시킵니다."
+        "description": "아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다."
       },
       "moonfire": {
         "name": "달빛 폭풍",
@@ -5517,7 +5527,7 @@ export const ko_KR: EnTranslations = {
       },
       "thorns": {
         "name": "가시 수호",
-        "description": "대상에게 가시가 돋아 근접 공격자가 3의 자연 피해를 받습니다."
+        "description": "대상에게 가시가 돋아 근접 공격자가 {buff}의 자연 피해를 받습니다."
       },
       "entangling_roots": {
         "name": "옥죄는 뿌리",
@@ -5525,7 +5535,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +65%, 전투력 +15, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +90%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",
@@ -5545,7 +5555,7 @@ export const ko_KR: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
-        "description": "연계 점수당 피해를 입히는 결정타입니다. 늑대 변신 전용."
+        "description": "결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용."
       },
       "swipe": {
         "name": "휩쓰는 발톱",
@@ -5577,7 +5587,7 @@ export const ko_KR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "마녀불빛",
-        "description": "대상의 방어도를 40초 동안 35만큼 감소시킵니다."
+        "description": "대상의 방어도를 40초 동안 {damage}%만큼 감소시킵니다. 방어구 절단과 중첩되지 않습니다."
       },
       "hibernate": {
         "name": "깊은 잠",
@@ -5601,7 +5611,7 @@ export const ko_KR: EnTranslations = {
       },
       "rip": {
         "name": "찢기",
-        "description": "12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용."
+        "description": "12초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용."
       },
       "mortal_strike": {
         "name": "불구의 일격",
@@ -5609,11 +5619,11 @@ export const ko_KR: EnTranslations = {
       },
       "bloodthirst": {
         "name": "사혈",
-        "description": "피의 광란으로 즉시 공격하여 {damage}의 피해를 줍니다. (분노 특화 대표 기술)"
+        "description": "피의 광란으로 즉시 공격하여 무기 피해의 60%에 {damage}를 더한 피해를 줍니다. (분노 특화 대표 기술)"
       },
       "shield_slam": {
         "name": "방패 강타",
-        "description": "방패로 대상을 강타해 {damage}의 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)"
+        "description": "방패로 대상을 강타해 무기 피해의 50%에 {damage}를 더한 피해를 주고 막대한 위협을 생성합니다. (방어 특화 대표 기술)"
       },
       "whirlwind": {
         "name": "칼날 회오리",
@@ -7073,7 +7083,7 @@ export const ko_KR: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "유미"
       },
       "forest_wolf": {
         "name": "숲늑대"
@@ -7134,6 +7144,9 @@ export const ko_KR: EnTranslations = {
       },
       "deacon_voss": {
         "name": "부제 보스"
+      },
+      "training_dummy": {
+        "name": "훈련용 허수아비"
       },
       "ridge_stalker": {
         "name": "산등성이 추적자"

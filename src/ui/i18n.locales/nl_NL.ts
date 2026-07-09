@@ -1516,7 +1516,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_explosion.description':
     'Een uitbarsting van Arcane energie raakt alle nabije vijanden voor {damage} Arcane schade.',
   'entities.abilities.arcane_explosion.name': 'Aetherbarst',
-  'entities.abilities.arcane_intellect.description': 'Verhoogt Intellect met 2 gedurende 30 min.',
+  'entities.abilities.arcane_intellect.description':
+    'Verhoogt Intellect met {buff} gedurende 30 min.',
   'entities.abilities.arcane_intellect.name': 'Aether-inzicht',
   'entities.abilities.arcane_missiles.description':
     'Lanceert Aetherpijlen op de vijand en veroorzaakt elke seconde {damage} Arcane schade gedurende 3 sec.',
@@ -1528,7 +1529,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Neem de gedaante van de renner aan, waardoor je bewegingssnelheid met 30% toeneemt gedurende 30 min.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Gedaante van de Renner',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Neem de gedaante van de kiekendief aan, waardoor je aanvalskracht met 20 toeneemt gedurende 30 min.',
+    'Neem de gedaante van de kiekendief aan, waardoor je aanvalskracht met {buff} toeneemt gedurende 30 min.',
   'entities.abilities.aspect_of_the_hawk.name': 'Gedaante van de Kiekendief',
   'entities.abilities.aspect_of_the_monkey.description':
     'Neem de gedaante van de marter aan, waardoor je ontwijkkans met 8% toeneemt gedurende 30 min.',
@@ -1543,19 +1544,19 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verdooft het doelwit gedurende 2 sec. Alleen in Bruingedaante.',
   'entities.abilities.bash.name': 'Bedwelmen',
   'entities.abilities.battle_shout.description':
-    'Verhoogt je aanvalskracht met 20 gedurende 2 min.',
+    'Verhoogt je aanvalskracht met {buff} gedurende 2 min.',
   'entities.abilities.battle_shout.name': 'IJzeren Gebrul',
   'entities.abilities.bear_charge.description':
     'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Bereik 8-25 m. Alleen in Bruingedaante.',
   'entities.abilities.bear_charge.name': 'Bruin-stormloop',
   'entities.abilities.bear_form.description':
-    'Verander in een beer: pantser +65%, aanvalskracht +15, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
+    'Verander in een beer: pantser +90%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
   'entities.abilities.bear_form.name': 'Bruingedaante',
   'entities.abilities.berserker_rage.description':
     'Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)',
   'entities.abilities.berserker_rage.name': 'Kolkende Woede',
   'entities.abilities.blessing_of_might.description':
-    'Plaatst een Zegen op een bevriend doelwit, waardoor de aanvalskracht met 15 toeneemt gedurende 5 min.',
+    'Plaatst een Zegen op een bevriend doelwit, waardoor de aanvalskracht met {buff} toeneemt gedurende 5 min.',
   'entities.abilities.blessing_of_might.name': 'Eed van IJzer',
   'entities.abilities.blind.description':
     'Verblindt het doelwit, waardoor het 8 sec gedesoriënteerd ronddwaalt. Elke schade verbreekt het effect.',
@@ -1563,7 +1564,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Genereert 10 woede ten koste van levenskracht.',
   'entities.abilities.bloodrage.name': 'Bloedtol',
   'entities.abilities.bloodthirst.description':
-    'Val onmiddellijk aan in een bloedrazernij voor {damage}. (Razernij-kenmerk)',
+    'Val onmiddellijk aan in een bloedrazernij voor 60% wapenschade plus {damage}. (Razernij-kenmerk)',
   'entities.abilities.bloodthirst.name': 'Aderlating',
   'entities.abilities.cat_form.description':
     'Verander in een wolf: aanvalskracht stijgt met je niveau, je aanvallen gebruiken energie en combopunten, en je genereert 29% minder dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
@@ -1572,7 +1573,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m.',
   'entities.abilities.charge.name': 'Bestorming',
   'entities.abilities.cheap_shot.description':
-    'Sla het doelwit en verdoof het gedurende 4 sec. Je moet onzichtbaar zijn. Levert 2 combopunten op.',
+    'Sla het doelwit voor {damage} schade en verdoof het gedurende 4 sec. Je moet onzichtbaar zijn. Levert 2 combopunten op.',
   'entities.abilities.cheap_shot.name': 'Buikstoot',
   'entities.abilities.claw.description':
     'Klauw de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
@@ -1581,10 +1582,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een vegende slag die alle vijanden voor je raakt voor {damage} schade.',
   'entities.abilities.cleave.name': 'Maaiboog',
   'entities.abilities.commanding_shout.description':
-    'Verhoogt je Uithoudingsvermogen met 6 gedurende 2 min.',
+    'Verhoogt je Uithoudingsvermogen met {buff} gedurende 2 min.',
   'entities.abilities.commanding_shout.name': 'Versterkende Kreet',
   'entities.abilities.concussive_shot.description':
-    'Versuft het doelwit, waardoor de beweging met 50% wordt vertraagd gedurende 4 sec.',
+    'Versuft het doelwit voor {damage} schade, waardoor de beweging met 50% wordt vertraagd gedurende 4 sec.',
   'entities.abilities.concussive_shot.name': 'Ratelend Schot',
   'entities.abilities.conjure_food.description':
     'Roept 2 porties brood op die levenskracht herstellen wanneer ze worden gegeten. Hogere rangen roepen voedzamere kost op.',
@@ -1593,13 +1594,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Roept 2 flessen water op die mana herstellen wanneer ze worden gedronken. Hogere rangen roepen zuiverder water op.',
   'entities.abilities.conjure_water.name': 'Waterbinding',
   'entities.abilities.consecration.description':
-    'Wijdt de grond onder je en schroeit nabije vijanden voor {damage} Heilige schade.',
+    'Wijdt de grond onder je en schroeit nabije vijanden elke 2 sec voor {damage} Heilige schade gedurende 10 sec.',
   'entities.abilities.consecration.name': 'Heilige Grond',
   'entities.abilities.corruption.description':
     'Bederft het doelwit en veroorzaakt {damage} Schaduwschade gedurende 18 sec.',
   'entities.abilities.corruption.name': 'Zwartrot',
   'entities.abilities.crippling_poison.description':
-    'Treft het doelwit met een loodzwaar gif, brengt {damage} Natuurschade toe en vertraagt zijn bewegingssnelheid met 50% gedurende 12 sec.',
+    'Treft het doelwit met een loodzwaar gif, brengt {damage} Natuurschade toe en vertraagt de bewegingssnelheid met 50% gedurende 12 sec.',
   'entities.abilities.crippling_poison.name': 'Loodzwaar Gif',
   'entities.abilities.curse_of_agony.description':
     'Vervloekt het doelwit met pijn: {damage} Schaduwschade gedurende 24 sec.',
@@ -1614,20 +1615,21 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten.',
   'entities.abilities.defensive_stance.name': 'Bewaakte Houding',
   'entities.abilities.demon_skin.description':
-    'Demonenhuid verhoogt je pantser met 30 gedurende 30 min.',
+    'Demonenhuid verhoogt je pantser met {buff} gedurende 30 min.',
   'entities.abilities.demon_skin.name': 'Duivelshuid',
   'entities.abilities.demoralizing_roar.description':
     'Demoraliseert nabije vijanden en verlaagt hun aanvalskracht met 20 gedurende 20 sec. Alleen in Bruingedaante.',
   'entities.abilities.demoralizing_roar.name': 'Laf Gebrul',
   'entities.abilities.demoralizing_shout.description':
-    'Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met 30 verlaagt gedurende 30 sec.',
+    'Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec.',
   'entities.abilities.demoralizing_shout.name': 'Grimmig Gehuil',
-  'entities.abilities.devotion_aura.description': 'Verhoogt je pantser met 40 gedurende 30 min.',
+  'entities.abilities.devotion_aura.description':
+    'Verhoogt je pantser met {buff} gedurende 30 min.',
   'entities.abilities.devotion_aura.name': 'Standvastige Aura',
   'entities.abilities.dismiss_pet.description': 'Laat je huisdier terug de wildernis in gaan.',
   'entities.abilities.dismiss_pet.name': 'Metgezel Vrijlaten',
   'entities.abilities.divine_protection.description':
-    'Een beschermende wering absorbeert 50 schade gedurende 10 sec.',
+    'Een beschermende wering absorbeert {damage} schade gedurende 10 sec.',
   'entities.abilities.divine_protection.name': 'Wering van Geloof',
   'entities.abilities.drain_life.description':
     'Tapt het leven van het doelwit af en draagt elke seconde {damage} levenskracht naar je over gedurende 5 sec.',
@@ -1643,7 +1645,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Grijpende Wortels',
   'entities.abilities.evasion.description': 'Verhoogt je ontwijkkans met 50% gedurende 15 sec.',
   'entities.abilities.evasion.name': 'Spookvoet',
-  'entities.abilities.eviscerate.description': 'Afmaakzet die schade toebrengt per combopunt.',
+  'entities.abilities.eviscerate.description': 'Afmaakzet die {damage} veroorzaakt.',
   'entities.abilities.eviscerate.name': 'Zandslaap',
   'entities.abilities.execute.description':
     'Poging om een gewonde vijand af te maken voor {damage} schade. Alleen bruikbaar op vijanden met minder dan 20% levenskracht.',
@@ -1652,16 +1654,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbant de verdorvene met heilige toorn voor {damage} Heilige schade.',
   'entities.abilities.exorcism.name': 'Rite van Uitdrijving',
   'entities.abilities.expose_armor.description':
-    'Afmaakzet die het doelwit blootlegt en zijn pantser verlaagt. Meer bestede combopunten leiden tot een diepere snede.',
+    'Afmaakzet die het doelwit blootlegt en zijn pantser met {damage} verlaagt gedurende 30 sec.',
   'entities.abilities.expose_armor.name': 'Pantserbres',
   'entities.abilities.faerie_fire.description':
-    'Verlaagt het pantser van het doelwit met 35 gedurende 40 sec.',
+    'Verlaagt het pantser van het doelwit met {damage}% gedurende 40 sec. Stapelt niet met Pantserscheur.',
   'entities.abilities.faerie_fire.name': 'Heksenlicht',
   'entities.abilities.fear.description':
     'Jaagt de vijand de stuipen op het lijf, waardoor het maximaal 8 sec ineenkrimpt. Elke schade verbreekt het effect.',
   'entities.abilities.fear.name': 'Teisteren',
   'entities.abilities.ferocious_bite.description':
-    'Afmaakzet die schade toebrengt per combopunt. Alleen in Wolfsgedaante.',
+    'Afmaakzet die {damage} veroorzaakt. Alleen in Wolfsgedaante.',
   'entities.abilities.ferocious_bite.name': 'Bloedbeet',
   'entities.abilities.fire_blast.description':
     'Treft de vijand voor {damage} Vuurschade. Ogenblikkelijk.',
@@ -1671,24 +1673,24 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Sintelbout',
   'entities.abilities.rain_of_fire.name': 'Vuurregen',
   'entities.abilities.rain_of_fire.description':
-    'Laat een vuurregen neerdalen op het doelgebied en verbrandt vijanden voor {damage} Vuurschade.',
+    'Laat gedurende 4 sec een vuurregen neerdalen op het doelgebied en verbrandt vijanden elke seconde voor {damage} Vuurschade.',
   'entities.abilities.volley.name': 'Pijlenregen',
   'entities.abilities.volley.description':
-    'Laat een pijlenregen neerdalen op het doelgebied en richt {damage} schade aan bij vijanden erin.',
+    'Laat gedurende 3 sec een pijlenregen neerdalen op het doelgebied en richt elke 0.5 sec {damage} schade aan bij vijanden erin.',
   'entities.abilities.hurricane.name': 'Orkaan',
   'entities.abilities.hurricane.description':
-    'Ontketent een orkaan boven het doelgebied en treft vijanden voor {damage} Natuurschade.',
+    'Ontketent gedurende 6 sec een orkaan boven het doelgebied en treft vijanden elke seconde voor {damage} Natuurschade.',
   'entities.abilities.earthquake.name': 'Aardbeving',
   'entities.abilities.earthquake.description':
-    'Laat het doelgebied beven, treft vijanden voor {damage} Natuurschade.',
+    'Laat het doelgebied 6 sec beven en treft vijanden elke 1.5 sec voor {damage} Natuurschade.',
   'entities.abilities.flamestrike.name': 'Vlammenslag',
   'entities.abilities.flamestrike.description':
     'Roept een vuurexplosie op in het doelgebied die vijanden in de explosie {damage} Vuurschade toebrengt.',
   'entities.abilities.flame_shock.description':
-    'Schroeit het doelwit met vuur voor 25 schade plus {damage} gedurende 12 sec.',
+    'Schroeit het doelwit met vuur voor {damage} schade plus {overTime} gedurende 12 sec.',
   'entities.abilities.flame_shock.name': 'Sintelschok',
   'entities.abilities.flametongue_weapon.description':
-    'Doordringt je wapen met elementair vuur: elke slag brengt 8 extra Vuurschade toe gedurende 5 min.',
+    'Doordringt je wapen met elementair vuur: elke slag brengt {damage} extra Vuurschade toe gedurende 5 min.',
   'entities.abilities.flametongue_weapon.name': 'Vuurbrand-Wapen',
   'entities.abilities.flash_heal.description':
     'Een snel gebed dat een bevriend doelwit voor {damage} geneest.',
@@ -1697,7 +1699,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een snelle, doeltreffende uitbarsting van Licht die een bevriend doelwit voor {damage} geneest.',
   'entities.abilities.flash_of_light.name': 'Lichtheling',
   'entities.abilities.frost_armor.description':
-    'Omhult je in vorst en verhoogt het pantser met 30 gedurende 30 min.',
+    'Omhult je in vorst en verhoogt het pantser met {buff} gedurende 30 min.',
   'entities.abilities.frost_armor.name': 'Rijpmantel',
   'entities.abilities.frost_nova.description':
     'Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe.',
@@ -1709,24 +1711,25 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Lanceert een bout van vorst die {damage} Vorstschade toebrengt en de beweging met 40% vertraagt.',
   'entities.abilities.frostbolt.name': 'Rijplans',
   'entities.abilities.frostbrand_weapon.description':
-    'Doordringt je wapen met bijtende vorst: elke slag brengt 8 extra schade toe gedurende 5 min.',
+    'Doordringt je wapen met bijtende vorst: elke slag brengt {damage} extra schade toe gedurende 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Rijpgebonden Wapen',
   'entities.abilities.garrote.description':
-    'Wurgt de vijand, brengt nu schade toe en laat het bloeden voor {damage} gedurende 18 sec. Vereist sluiptocht. Levert 1 combopunt op.',
+    'Wurgt de vijand, brengt nu {damage} schade toe en laat het bloeden voor {overTime} gedurende 18 sec. Vereist sluiptocht. Levert 1 combopunt op.',
   'entities.abilities.garrote.name': 'Keeldraad',
   'entities.abilities.ghost_wolf.description':
     'Verandert je in een Shadewolf en verhoogt de bewegingssnelheid met 40% gedurende 10 min.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.gouge.description':
-    'Treft het doelwit en maakt het 4 sec strijdongeschikt. Elke schade verbreekt het effect. Levert 1 combopunt op.',
+    'Treft het doelwit voor {damage} schade en maakt het 4 sec strijdongeschikt. Elke schade verbreekt het effect. Levert 1 combopunt op.',
   'entities.abilities.gouge.name': 'Oogstoot',
   'entities.abilities.growl.description':
     'Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante.',
   'entities.abilities.growl.name': 'Bedreigen',
-  'entities.abilities.hammer_of_justice.description': 'Verdooft het doelwit gedurende 3 sec.',
+  'entities.abilities.hammer_of_justice.description':
+    'Verdooft het doelwit gedurende {duration} sec.',
   'entities.abilities.hammer_of_justice.name': 'Splijtende Rechtershamer',
   'entities.abilities.hamstring.description':
-    'Verminkt de vijand voor 5 schade en vertraagt zijn beweging met 50% gedurende 15 sec.',
+    'Verminkt de vijand voor {damage} schade en vertraagt zijn beweging met 50% gedurende 15 sec.',
   'entities.abilities.hamstring.name': 'Kreupelsnede',
   'entities.abilities.heal.description':
     'Een traag maar krachtig gebed dat een bevriend doelwit voor {damage} geneest.',
@@ -1744,10 +1747,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_light.description': 'Geneest een bevriend doelwit voor {damage}.',
   'entities.abilities.holy_light.name': 'Helend Licht',
   'entities.abilities.ice_barrier.description':
-    'Schermt je af met ijs en absorbeert 130 schade gedurende 60 sec.',
+    'Schermt je af met ijs en absorbeert {damage} schade gedurende 60 sec.',
   'entities.abilities.ice_barrier.name': 'Vorstsluier',
   'entities.abilities.immolate.description':
-    'Verbrandt de vijand voor 11 Vuurschade en nog eens {damage} gedurende 15 sec.',
+    'Verbrandt de vijand voor {damage} Vuurschade en nog eens {overTime} gedurende 15 sec.',
   'entities.abilities.immolate.name': 'Brandpact',
   'entities.abilities.insect_swarm.description':
     'De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec.',
@@ -1762,20 +1765,20 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Afmaakzet die het doelwit verdooft. Duurt 1 sec langer per combopunt.',
   'entities.abilities.kidney_shot.name': 'Lage Stoot',
   'entities.abilities.lay_on_hands.description':
-    'Een enorme golf van genezing: herstelt 250 levenskracht. 10 min hersteltijd.',
+    'Een enorme golf van genezing: herstelt {damage} levenskracht. 10 min hersteltijd.',
   'entities.abilities.lay_on_hands.name': 'Laatste Rite',
   'entities.abilities.lesser_heal.description': 'Geneest een bevriend doelwit voor {damage}.',
   'entities.abilities.lesser_heal.name': 'Gefluisterd Gebed',
-  'entities.abilities.life_tap.description': 'Zet 30 levenskracht om in 30 mana.',
+  'entities.abilities.life_tap.description': 'Zet {damage} levenskracht om in {damage} mana.',
   'entities.abilities.life_tap.name': 'Zware Koop',
   'entities.abilities.lightning_bolt.description':
     'Werpt een bliksemschicht voor {damage} Natuurschade.',
   'entities.abilities.lightning_bolt.name': 'Boogbliksem',
   'entities.abilities.lightning_shield.description':
-    'Omringt je met knetterende bliksem: aanvallers van dichtbij lijden 13 Natuurschade.',
+    'Omringt je met knetterende bliksem: aanvallers van dichtbij lijden {buff} Natuurschade, tot 3 ladingen en maximaal eens per 5 seconden.',
   'entities.abilities.lightning_shield.name': 'Donderwering',
   'entities.abilities.mark_of_the_wild.description':
-    'Plaatst de Wildward op een bevriend doelwit en verhoogt het pantser met 25 gedurende 30 min.',
+    'Plaatst de Wildward op een bevriend doelwit en verhoogt het pantser met {buff} gedurende 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Wildwering',
   'entities.abilities.maul.description':
     'Een verscheurende aanval die de slagschade met {damage} verhoogt en veel dreiging veroorzaakt. Activeert bij je volgende slag. Alleen in Bruingedaante.',
@@ -1787,7 +1790,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec.',
   'entities.abilities.mind_flay.name': 'Litanie van Leed',
   'entities.abilities.mongoose_bite.description':
-    'Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus 12. Kan niet worden ontweken.',
+    'Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus {damage}. Kan niet worden ontweken.',
   'entities.abilities.mongoose_bite.name': 'Tegenbeet',
   'entities.abilities.moonfire.description':
     'Verbrandt de vijand met maanvuur voor {damage} Arcane schade plus schade over tijd.',
@@ -1796,19 +1799,19 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)',
   'entities.abilities.mortal_strike.name': 'Verminkende Slag',
   'entities.abilities.overpower.description':
-    'Ogenblikkelijke aanval voor wapenschade +5. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken.',
+    'Ogenblikkelijke aanval voor wapenschade plus {damage}. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken.',
   'entities.abilities.overpower.name': 'Roodhand',
   'entities.abilities.polymorph.description':
-    'Verandert de vijand in een pad gedurende maximaal 15 sec. De pad dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',
+    'Verandert de vijand in een pad gedurende maximaal {duration} sec. De pad dwaalt rond en geneest snel. Elke schade verbreekt het effect. Alleen beesten en humanoïden.',
   'entities.abilities.polymorph.name': 'Beheksen',
   'entities.abilities.pounce.description':
     'Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
   'entities.abilities.pounce.name': 'Sluipslag',
   'entities.abilities.power_word_fortitude.description':
-    'Verhoogt de Weerbaarheid van het doelwit met 3 gedurende 30 min.',
+    'Verhoogt de Weerbaarheid van het doelwit met {buff} gedurende 30 min.',
   'entities.abilities.power_word_fortitude.name': 'Litanie van Vastberadenheid',
   'entities.abilities.power_word_shield.description':
-    'Schermt het doelwit af en absorbeert 48 schade gedurende 30 sec.',
+    'Schermt het doelwit af en absorbeert {damage} schade gedurende 30 sec.',
   'entities.abilities.power_word_shield.name': 'Psalm van Bescherming',
   'entities.abilities.prowl.description':
     'Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt.',
@@ -1823,7 +1826,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt je aanvalssnelheid met 40% gedurende 15 sec.',
   'entities.abilities.rapid_fire.name': 'Koortsige Trek',
   'entities.abilities.raptor_strike.description':
-    'Een sterke slagaanval die de schade met 5 verhoogt. Activeert bij je volgende slag.',
+    'Een sterke slagaanval die de schade met {damage} verhoogt. Activeert bij je volgende slag.',
   'entities.abilities.raptor_strike.name': 'Ontweiende Slag',
   'entities.abilities.regrowth.description':
     'Geneest een bevriend doelwit voor {damage} plus een extra hoeveelheid gedurende 21 sec.',
@@ -1832,7 +1835,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Geneest het doelwit voor {damage} gedurende 12 sec.',
   'entities.abilities.rejuvenation.name': 'Wildbloei',
   'entities.abilities.rend.description':
-    'Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende 9 sec.',
+    'Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec.',
   'entities.abilities.rend.name': 'Diepe Snee',
   'entities.abilities.renew.description': 'Geneest het doelwit voor {damage} gedurende 15 sec.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
@@ -1846,10 +1849,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt de dreiging die je Heilige schade opwekt met 60% gedurende 30 min. De hoeksteen van de tankende paladijn.',
   'entities.abilities.righteous_fury.name': 'Brandende Eed',
   'entities.abilities.rip.description':
-    'Afmaakzet die bloedschade toebrengt gedurende 12 sec. Verbruikt combopunten. Alleen in Wolfsgedaante.',
+    'Afmaakzet die {damage} Bloedschade toebrengt gedurende 12 sec. Verbruikt combopunten. Alleen in Wolfsgedaante.',
   'entities.abilities.rip.name': 'Verscheuren',
   'entities.abilities.rockbiter_weapon.description':
-    'Doordrenkt je wapen met de woede van steen: elke zwaai brengt 5 extra schade toe gedurende 5 min.',
+    'Doordrenkt je wapen met de woede van steen: elke zwaai brengt {damage} extra schade toe gedurende 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Steengebonden Wapen',
   'entities.abilities.rupture.description':
     'Afmaakzet die het doelwit verwondt, waardoor het {damage} bloedt gedurende 16 sec.',
@@ -1861,7 +1864,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Schroeit de vijand voor {damage} Vuurschade. Snel te bezweren.',
   'entities.abilities.scorch.name': 'Blakeren',
   'entities.abilities.seal_of_righteousness.description':
-    'Vult je 30 sec lang met Heilige kracht, waardoor elk van je melee-zwaaien 4 extra Heilige schade toebrengt. Ontketen met Verdict.',
+    'Vult je 30 sec lang met Heilige kracht, waardoor elk van je melee-zwaaien {damage} extra Heilige schade toebrengt. Ontketen met Verdict.',
   'entities.abilities.seal_of_righteousness.name': 'Eedmerk',
   'entities.abilities.searing_pain.description':
     'Verschroeit de vijand met kwellend vuur voor {damage} Vuurschade. Snel te bezweren.',
@@ -1879,7 +1882,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft het doelwit ogenblikkelijk met verzengende schaduw voor {damage} Schaduwschade.',
   'entities.abilities.shadowburn.name': 'Schemervuur',
   'entities.abilities.shield_slam.description':
-    'Sla het doelwit met je schild voor {damage} en enorme dreiging. (Protectie-kenmerk)',
+    'Sla het doelwit met je schild voor 50% wapenschade plus {damage} en enorme dreiging. (Protectie-kenmerk)',
   'entities.abilities.shield_slam.name': 'Schildbreuk',
   'entities.abilities.sinister_strike.description':
     'Een ogenblikkelijke slag voor wapenschade plus {damage}. Levert 1 combopunt op.',
@@ -1936,7 +1939,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Provoceert het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt 3 sec lang gedwongen jou aan te vallen.',
   'entities.abilities.taunt.name': 'Provoceren',
   'entities.abilities.thorns.description':
-    'Doornen schieten op uit het doelwit: melee-aanvallers lopen 3 Natuurschade op.',
+    'Doornen schieten op uit het doelwit: melee-aanvallers lopen {buff} Natuurschade op.',
   'entities.abilities.thorns.name': 'Doornwacht',
   'entities.abilities.thunder_clap.description':
     'Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec.',
@@ -1954,7 +1957,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Draai in een dodelijke boog en tref alle nabije vijanden voor {damage}. (Razernij-talent)',
   'entities.abilities.whirlwind.name': 'Snijdende Wenteling',
   'entities.abilities.wing_clip.description':
-    'Brengt een wond toe die de vijand 40% vertraagt gedurende 10 sec.',
+    'Brengt een wond toe voor {damage} schade die de vijand 40% vertraagt gedurende 10 sec.',
   'entities.abilities.wing_clip.name': 'Kluisterende Houw',
   'entities.abilities.wrath.description':
     'Slingert een bout van natuurenergie voor {damage} Natuurschade.',
@@ -4520,6 +4523,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileControls': 'Mobiele besturing',
   'hud.core.mobileMap': 'Kaart',
   'hud.core.mobileMenu': 'Menu',
+  'hud.core.mobileSettings': 'Instellingen',
   'hud.core.mobileMeters': 'Meters',
   'hud.core.mobileMore': 'Meer',
   'hud.core.mobileMoreAria': "Meer menu's tonen",
@@ -6646,4 +6650,51 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Opnemen',
   'hudChrome.bank.withdrawQuantityInput': 'Aantal om op te nemen',
   'hudChrome.bank.withdrawQuantityTitle': '{item} opnemen',
+  'abilityUi.tooltip.selfOnly': 'Alleen jezelf',
+  'itemUi.lootRoll.rolled': '{answered}/{total} geworpen',
+  'entities.abilities.sunder_armor.description':
+    'Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging.',
+  'entities.mobs.training_dummy.name': 'Oefenpop',
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Bescherm Yumi is een teamdoelspel dat in een doolhof wordt gespeeld: elke kant bewaakt zijn eigen kattenmetgezel terwijl hij die van de ander bejaagt. Zo nu en dan flitsen beide katten naar nieuwe hoeken van het doolhof, zodat het gevecht heen en weer gaat tussen verdedigen, jagen en de race om ze opnieuw te vinden. Sluit aan als drie tegen drie of vijf tegen vijf; sneuvelen in de strijd zet je maar even op de bank.',
+  'guide.arenaPage.yumiHeading': 'Bescherm Yumi',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Liefhebberij',
+  'hudChrome.auraEffect.armorPct': 'Vermindert pantser met {pct}%',
+  'hudChrome.auraEffect.armorPctStacks': 'Vermindert pantser met {pct}% ({stacks} stapels)',
+  'hudChrome.auraEffect.increasePct.allStats': 'Verhoogt alle statistieken met {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Verhoogt aanvalskracht met {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': 'Verhoogt pantser met {pct}%',
+  'hudChrome.auraEffect.increasePct.int': 'Verhoogt Intellect met {pct}%',
+  'hudChrome.auraEffect.increasePct.sta': 'Verhoogt Uithoudingsvermogen met {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Je moet bij de werkbank zijn, op het vereiste niveau, om dat te maken.',
+  'hudChrome.crafting.recipeNotLearned': 'Je hebt dat recept nog niet geleerd.',
+  'hudChrome.crafting.throttled': 'Je maakt te snel. Wacht even en probeer het opnieuw.',
+  'hudChrome.mobile.chatPlaceholder': 'Zeg iets...',
+  'hudChrome.mobile.hideKeyboard': 'Toetsenbord verbergen',
+  'hudChrome.unitFrame.partyChip': 'Groep',
+  'yumi.banner.sudden': "PLOTSELINGE DOOD! De Yumi's houden stand!",
+  'yumi.banner.teleport': "De Yumi's teleporteren!",
+  'yumi.bracket3': 'Bescherm Yumi 3v3',
+  'yumi.bracket5': 'Bescherm Yumi 5v5',
+  'yumi.end.loss': 'NEDERLAAG! Jouw Yumi is gevallen.',
+  'yumi.end.win': 'OVERWINNING! Yumi is veilig!',
+  'yumi.enterQueue': 'Doe mee met Bescherm Yumi!',
+  'yumi.error.partyTooBig3': 'Bescherm Yumi 3v3 staat een groep van maximaal drie toe.',
+  'yumi.error.partyTooBig5': 'Bescherm Yumi 5v5 staat een groep van maximaal vijf toe.',
+  'yumi.hud.aria': 'Jouw Yumi op {mine} van {max} gezondheid, vijandige Yumi op {theirs}.',
+  'yumi.hud.collapse': 'De Bescherm Yumi-balken inklappen',
+  'yumi.hud.enemyYumi': 'Vijandige Yumi',
+  'yumi.hud.expand': 'De Bescherm Yumi-balken uitklappen',
+  'yumi.hud.getReady': 'Maak je klaar…',
+  'yumi.hud.suddenDeath': 'PLOTSELINGE DOOD',
+  'yumi.hud.teleportIn': "Yumi's verplaatsen zich over {s}",
+  'yumi.hud.title': 'BESCHERM YUMI',
+  'yumi.hud.yourYumi': 'Jouw Yumi',
+  'yumi.log.start': 'Bescherm Yumi! Verdedig je metgezel en bejaag die van hen.',
+  'yumi.queue.join': 'Je sluit je aan bij de Bescherm Yumi-wachtrij. Bewaak je metgezel…',
+  'yumi.queue.leave': 'Je verlaat de Bescherm Yumi-wachtrij.',
+  'yumi.queue.teamLeave': 'Je team verlaat de Bescherm Yumi-wachtrij.',
+  'yumi.respawn.title': 'NEERGEHAALD!',
 };

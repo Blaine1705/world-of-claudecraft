@@ -291,6 +291,7 @@ export const en_CA: EnTranslations = {
       "targetLabel": "Your Mark",
       "targetAnnounce": "Mark {name}",
       "partyLabel": "Your Band",
+      "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -305,7 +306,7 @@ export const en_CA: EnTranslations = {
       "chat": "Skip to Chat"
     },
     "mobile": {
-      "autorun": "Autorun",
+      "autorun": "Auto",
       "jump": "Jump",
       "leaderboard": "Ranks",
       "dailyRewards": "Rewards",
@@ -320,7 +321,9 @@ export const en_CA: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "Swap target",
       "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "Page {page}",
+      "hideKeyboard": "Hide keyboard",
+      "chatPlaceholder": "Say something..."
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -1431,6 +1434,7 @@ export const en_CA: EnTranslations = {
     "archetypeTitle": {
       "label": "Title",
       "none": "None",
+      "hobbyLabel": "Hobby",
       "armorcrafting": "Armorer",
       "weaponcrafting": "Weaponsmith",
       "jewelcrafting": "Jeweler",
@@ -1453,7 +1457,10 @@ export const en_CA: EnTranslations = {
       "craftedToast": "Crafted: {name}",
       "insufficientMaterials": "You do not have the materials for that.",
       "unknownRecipe": "That recipe does not exist.",
-      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
+      "notAtHub": "You must be at the crafting hub, at the required level, to craft that.",
+      "throttled": "You are crafting too quickly. Wait a moment and try again.",
+      "recipeNotLearned": "You have not learned that recipe yet."
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const en_CA: EnTranslations = {
       "mobileSocial": "Social",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Settings",
       "mobileUse": "Interact",
       "mobileMeters": "Meters",
       "mobileMap": "Map",
@@ -4690,6 +4698,7 @@ export const en_CA: EnTranslations = {
       "offGlobalCooldown": "Off the global cooldown",
       "friendlyTarget": "Friendly target",
       "enemyTarget": "Enemy target",
+      "selfOnly": "Self only",
       "damageRange": "{min} to {max}",
       "finisherDamage": "{base} plus {perCombo} per combo point"
     },
@@ -4998,7 +5007,8 @@ export const en_CA: EnTranslations = {
       "needAria": "Need for {item}",
       "greedAria": "Greed for {item}",
       "passAria": "Pass on {item}",
-      "everyonePassed": "Everyone passed on {item}."
+      "everyonePassed": "Everyone passed on {item}.",
+      "rolled": "{answered}/{total} rolled"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const en_CA: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Rain of Fire",
-        "description": "Calls a rain of fire onto the target area, burning enemies for {damage} Fire damage."
+        "description": "Calls a rain of fire onto the target area for 4 sec, burning enemies for {damage} Fire damage each second."
       },
       "volley": {
         "name": "Volley",
-        "description": "Rains arrows on the target area, dealing {damage} damage to enemies caught in it."
+        "description": "Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it."
       },
       "hurricane": {
         "name": "Hurricane",
-        "description": "Calls a hurricane onto the target area, battering enemies for {damage} Nature damage."
+        "description": "Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second."
       },
       "earthquake": {
         "name": "Earthquake",
-        "description": "Shakes the target area, battering enemies for {damage} Nature damage."
+        "description": "Shakes the target area for 6 sec, battering enemies for {damage} Nature damage every 1.5 sec."
       },
       "heroic_strike": {
         "name": "Reaver Strike",
@@ -5069,15 +5079,15 @@ export const en_CA: EnTranslations = {
       },
       "battle_shout": {
         "name": "Iron Bellow",
-        "description": "A shout that increases the attack power of all party members by 10% for 2 min."
+        "description": "A shout that increases the attack power of all party members by {buff}% for 2 min."
       },
       "commanding_shout": {
         "name": "Bolstering Cry",
-        "description": "Increases your Stamina by 6 for 2 min."
+        "description": "Increases your Stamina by {buff} for 2 min."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Lets out a fearsome shout, reducing the attack power of all nearby enemies by 30 for 30 sec."
+        "description": "Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec."
       },
       "charge": {
         "name": "Onrush",
@@ -5085,7 +5095,7 @@ export const en_CA: EnTranslations = {
       },
       "rend": {
         "name": "Deep Gash",
-        "description": "Wounds the target, causing them to bleed for {damage} damage over 9 sec."
+        "description": "Wounds the target, causing them to bleed for {damage} damage over {duration} sec."
       },
       "thunder_clap": {
         "name": "Quaking Blow",
@@ -5093,7 +5103,7 @@ export const en_CA: EnTranslations = {
       },
       "hamstring": {
         "name": "Hobbling Cut",
-        "description": "Maims the enemy for 5 damage, slowing its movement by 50% for 15 sec."
+        "description": "Maims the enemy for {damage} damage, slowing its movement by 50% for 15 sec."
       },
       "bloodrage": {
         "name": "Blood Toll",
@@ -5101,7 +5111,7 @@ export const en_CA: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged."
+        "description": "Instant attack for weapon damage plus {damage}. Only usable after the target dodges. Cannot be dodged."
       },
       "execute": {
         "name": "Early Grave",
@@ -5121,7 +5131,7 @@ export const en_CA: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Armor Shear",
-        "description": "Sunders the target's armor, reducing it by 2% per application. Stacks up to 5 times (10% at full stacks). Generates a high amount of threat."
+        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
       },
       "taunt": {
         "name": "Goad",
@@ -5133,11 +5143,11 @@ export const en_CA: EnTranslations = {
       },
       "frost_armor": {
         "name": "Hoarfrost Mantle",
-        "description": "Encases you in frost, increasing armor by 30 for 30 min."
+        "description": "Encases you in frost, increasing armor by {buff} for 30 min."
       },
       "arcane_intellect": {
         "name": "Aether Insight",
-        "description": "Increases the Intellect of all party members by 5% for 30 min."
+        "description": "Increases the Intellect of all party members by {buff}% for 30 min."
       },
       "frostbolt": {
         "name": "Rimelance",
@@ -5161,7 +5171,7 @@ export const en_CA: EnTranslations = {
       },
       "polymorph": {
         "name": "Bewitch",
-        "description": "Transforms the enemy into a toad for up to 15 sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only."
+        "description": "Transforms the enemy into a toad for up to {duration} sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only."
       },
       "frost_nova": {
         "name": "Icebind",
@@ -5181,7 +5191,7 @@ export const en_CA: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Frostveil",
-        "description": "Shields you in ice, absorbing 130 damage for 60 sec."
+        "description": "Shields you in ice, absorbing {damage} damage for 60 sec."
       },
       "sinister_strike": {
         "name": "Wicked Slash",
@@ -5189,7 +5199,7 @@ export const en_CA: EnTranslations = {
       },
       "eviscerate": {
         "name": "Dirt Nap",
-        "description": "Finishing move that causes damage per combo point."
+        "description": "Finishing move that causes {damage}."
       },
       "backstab": {
         "name": "Craven Thrust",
@@ -5197,7 +5207,7 @@ export const en_CA: EnTranslations = {
       },
       "gouge": {
         "name": "Eye Jab",
-        "description": "Strikes the target, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
+        "description": "Strikes the target for {damage} damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
       },
       "evasion": {
         "name": "Ghostfoot",
@@ -5229,11 +5239,11 @@ export const en_CA: EnTranslations = {
       },
       "garrote": {
         "name": "Throat Wire",
-        "description": "Garrote the enemy, causing damage now and bleeding it for {damage} over 18 sec. Must be stealthed. Awards 1 combo point."
+        "description": "Garrote the enemy, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point."
       },
       "cheap_shot": {
         "name": "Gut Punch",
-        "description": "Strike the target, stunning it for 4 sec. Must be stealthed. Awards 2 combo points."
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points."
       },
       "sap": {
         "name": "Sap",
@@ -5245,7 +5255,7 @@ export const en_CA: EnTranslations = {
       },
       "expose_armor": {
         "name": "Armor Breach",
-        "description": "Finishing move that exposes the target, reducing its armor by 10% for 30 sec."
+        "description": "Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec."
       },
       "rupture": {
         "name": "Bleed Out",
@@ -5269,7 +5279,7 @@ export const en_CA: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Oathbrand",
-        "description": "Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Verdict."
+        "description": "Fills you with Holy power for 30 sec, causing each of your melee swings to deal {damage} additional Holy damage. Unleash with Verdict."
       },
       "holy_light": {
         "name": "Mending Light",
@@ -5277,7 +5287,7 @@ export const en_CA: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Steadfast Aura",
-        "description": "Increases the armor of all party members by 10%."
+        "description": "Increases the armor of all party members by {buff}% for 30 min."
       },
       "judgement": {
         "name": "Verdict",
@@ -5285,19 +5295,19 @@ export const en_CA: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Oath of Iron",
-        "description": "Blesses the party, increasing the attack power of all party members by 10% for 30 min."
+        "description": "Blesses the party, increasing the attack power of all party members by {buff}% for 30 min."
       },
       "divine_protection": {
         "name": "Ward of Faith",
-        "description": "A protective ward absorbs 50 damage for 10 sec."
+        "description": "A protective ward absorbs {damage} damage for 10 sec."
       },
       "hammer_of_justice": {
         "name": "Sundering Gavel",
-        "description": "Stuns the target for 3 sec."
+        "description": "Stuns the target for {duration} sec."
       },
       "lay_on_hands": {
         "name": "Last Rite",
-        "description": "A massive surge of healing: restores 250 health. 10 min cooldown."
+        "description": "A massive surge of healing: restores {damage} health. 10 min cooldown."
       },
       "flash_of_light": {
         "name": "Lightmend",
@@ -5309,7 +5319,7 @@ export const en_CA: EnTranslations = {
       },
       "consecration": {
         "name": "Holy Ground",
-        "description": "Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage."
+        "description": "Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage every 2 sec for 10 sec."
       },
       "righteous_fury": {
         "name": "Burning Oath",
@@ -5329,11 +5339,11 @@ export const en_CA: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Gutting Strike",
-        "description": "A strong melee attack that increases damage by 5. Activates on your next swing."
+        "description": "A strong melee attack that increases damage by {damage}. Activates on your next swing."
       },
       "aspect_of_the_hawk": {
         "name": "Harrier's Guise",
-        "description": "Take on the harrier's guise, increasing attack power by 20 for 30 min."
+        "description": "Take on the harrier's guise, increasing attack power by {buff} for 30 min."
       },
       "serpent_sting": {
         "name": "Venom Barb",
@@ -5345,15 +5355,15 @@ export const en_CA: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Rattling Shot",
-        "description": "Dazes the target, slowing movement by 50% for 4 sec."
+        "description": "Dazes the target for {damage} damage, slowing movement by 50% for 4 sec."
       },
       "mongoose_bite": {
         "name": "Counterfang",
-        "description": "Counterattack after the target dodges for weapon damage plus 12. Cannot be dodged."
+        "description": "Counterattack after the target dodges for weapon damage plus {damage}. Cannot be dodged."
       },
       "wing_clip": {
         "name": "Fettering Slash",
-        "description": "Inflicts a wound that slows the enemy by 40% for 10 sec."
+        "description": "Inflicts a wound for {damage} damage, slowing the enemy by 40% for 10 sec."
       },
       "aspect_of_the_monkey": {
         "name": "Marten's Guise",
@@ -5381,7 +5391,7 @@ export const en_CA: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Litany of Resolve",
-        "description": "Increases the Stamina of all party members by 5% for 30 min."
+        "description": "Increases the Stamina of all party members by {buff}% for 30 min."
       },
       "shadow_word_pain": {
         "name": "Dirge of Decay",
@@ -5389,7 +5399,7 @@ export const en_CA: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Psalm of Warding",
-        "description": "Shields the target, absorbing 48 damage for 30 sec."
+        "description": "Shields the target, absorbing {damage} damage for 30 sec."
       },
       "renew": {
         "name": "Lingering Grace",
@@ -5417,7 +5427,7 @@ export const en_CA: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Weapon",
-        "description": "Imbues your weapon with the fury of stone: each swing deals 5 additional damage for 5 min."
+        "description": "Imbues your weapon with the fury of stone: each swing deals {damage} additional damage for 5 min."
       },
       "healing_wave": {
         "name": "Mending Waters",
@@ -5429,15 +5439,15 @@ export const en_CA: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Thunder Ward",
-        "description": "Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds."
+        "description": "Surrounds you with crackling lightning: melee attackers take {buff} Nature damage, up to 3 charges and at most once every 5 seconds."
       },
       "flame_shock": {
         "name": "Cinder Jolt",
-        "description": "Sears the target with fire for 25 damage plus {damage} over 12 sec."
+        "description": "Sears the target with fire for {damage} damage plus {overTime} over 12 sec."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",
-        "description": "Imbues your weapon with elemental fire: each swing deals 8 additional Fire damage for 5 min."
+        "description": "Imbues your weapon with elemental fire: each swing deals {damage} additional Fire damage for 5 min."
       },
       "frost_shock": {
         "name": "Rime Jolt",
@@ -5445,7 +5455,7 @@ export const en_CA: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Rimebound Weapon",
-        "description": "Imbues your weapon with biting frost: each swing deals 8 additional damage for 5 min."
+        "description": "Imbues your weapon with biting frost: each swing deals {damage} additional damage for 5 min."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5461,11 +5471,11 @@ export const en_CA: EnTranslations = {
       },
       "demon_skin": {
         "name": "Fiendhide",
-        "description": "Demonic skin increases your armor by 30 for 30 min."
+        "description": "Demonic skin increases your armor by {buff} for 30 min."
       },
       "immolate": {
         "name": "Burning Pact",
-        "description": "Burns the enemy for 11 Fire damage and an additional {damage} over 15 sec."
+        "description": "Burns the enemy for {damage} Fire damage and an additional {overTime} over 15 sec."
       },
       "corruption": {
         "name": "Blackrot",
@@ -5473,7 +5483,7 @@ export const en_CA: EnTranslations = {
       },
       "life_tap": {
         "name": "Hard Bargain",
-        "description": "Converts 30 health into 30 mana."
+        "description": "Converts {damage} health into {damage} mana."
       },
       "curse_of_agony": {
         "name": "Hex of Anguish",
@@ -5505,7 +5515,7 @@ export const en_CA: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Places the Wildward on the party, increasing all attributes of all party members by 5% for 30 min."
+        "description": "Places the Wildward on the party, increasing all attributes of all party members by {buff}% for 30 min."
       },
       "moonfire": {
         "name": "Lunar Tempest",
@@ -5517,7 +5527,7 @@ export const en_CA: EnTranslations = {
       },
       "thorns": {
         "name": "Briarguard",
-        "description": "Thorns sprout from the target: melee attackers take 3 Nature damage."
+        "description": "Thorns sprout from the target: melee attackers take {buff} Nature damage."
       },
       "entangling_roots": {
         "name": "Gripping Roots",
@@ -5525,7 +5535,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +65%, attack power +15, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
@@ -5545,7 +5555,7 @@ export const en_CA: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Finishing move that causes damage per combo point. Wolf Form only."
+        "description": "Finishing move that causes {damage}. Wolf Form only."
       },
       "swipe": {
         "name": "Sweeping Claws",
@@ -5577,7 +5587,7 @@ export const en_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by 10% for 40 sec. Does not stack with Sunder Armor."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear."
       },
       "hibernate": {
         "name": "Slumber",
@@ -5601,7 +5611,7 @@ export const en_CA: EnTranslations = {
       },
       "rip": {
         "name": "Rip",
-        "description": "Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only."
+        "description": "Finishing move that causes {damage} Bleed damage over 12 sec. Consumes combo points. Wolf Form only."
       },
       "mortal_strike": {
         "name": "Maiming Strike",
@@ -5609,11 +5619,11 @@ export const en_CA: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Bloodletting",
-        "description": "Instantly attack in a blood frenzy for {damage}. (Fury signature)"
+        "description": "Instantly attack in a blood frenzy for 60% weapon damage plus {damage}. (Fury signature)"
       },
       "shield_slam": {
         "name": "Shieldcrack",
-        "description": "Slam the target with your shield for {damage} and massive threat. (Protection signature)"
+        "description": "Slam the target with your shield for 50% weapon damage plus {damage} and massive threat. (Protection signature)"
       },
       "whirlwind": {
         "name": "Bladed Gyre",
@@ -7134,6 +7144,9 @@ export const en_CA: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Deacon Voss"
+      },
+      "training_dummy": {
+        "name": "Training Dummy"
       },
       "ridge_stalker": {
         "name": "Ridge Stalker"

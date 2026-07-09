@@ -111,6 +111,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': '时',
   'hudChrome.unitFrame.durationUnitDays': '天',
   'hudChrome.unitFrame.partyLabel': '你的队伍',
+  'hudChrome.unitFrame.partyChip': '小队',
   'hudChrome.unitFrame.playerLabel': '你的角色',
   'hudChrome.unitFrame.targetAnnounce': '目标：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目标',
@@ -978,6 +979,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': '社交',
   'hud.core.mobileArena': '竞技场',
   'hud.core.mobileMenu': '菜单',
+  'hud.core.mobileSettings': '设置',
   'hud.core.mobileUse': '使用',
   'hud.core.mobileMeters': '统计',
   'hud.core.mobileMap': '地图',
@@ -1440,6 +1442,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '不触发公共冷却',
   'abilityUi.tooltip.friendlyTarget': '友方目标',
   'abilityUi.tooltip.enemyTarget': '敌方目标',
+  'abilityUi.tooltip.selfOnly': '仅对自己',
   'abilityUi.tooltip.damageRange': '{min} 到 {max}',
   'abilityUi.tooltip.finisherDamage': '{base} 加每个连击点 {perCombo}',
   'abilityUi.resources.mana': '法力',
@@ -1696,32 +1699,34 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.greedAria': '贪婪 {item}',
   'itemUi.lootRoll.passAria': '放弃 {item}',
   'itemUi.lootRoll.everyonePassed': '所有人都放弃了 {item}。',
+  'itemUi.lootRoll.rolled': '{answered}/{total} 已投骰',
   'entities.abilities.heroic_strike.name': '劫掠打击',
   'entities.abilities.heroic_strike.description':
     '一次强力攻击，使近战伤害提高 {damage}。在你的下一次挥击时触发。',
   'entities.abilities.battle_shout.name': '铁血怒吼',
-  'entities.abilities.battle_shout.description': '使你的攻击强度提高 20，持续 2 分钟。',
+  'entities.abilities.battle_shout.description': '使你的攻击强度提高 {buff}，持续 2 分钟。',
   'entities.abilities.commanding_shout.name': '鼓舞呐喊',
-  'entities.abilities.commanding_shout.description': '使你的耐力提高 6，持续 2 分钟。',
+  'entities.abilities.commanding_shout.description': '使你的耐力提高 {buff}，持续 2 分钟。',
   'entities.abilities.demoralizing_shout.name': '恐怖嚎叫',
   'entities.abilities.demoralizing_shout.description':
-    '发出可怕的怒吼，使附近所有敌人的攻击强度降低 30，持续 30 秒。',
+    '发出可怕的怒吼，使附近所有敌人的攻击强度降低 {buff}，持续 30 秒。',
   'entities.abilities.charge.name': '突进',
   'entities.abilities.charge.description':
     '向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。',
   'entities.abilities.rend.name': '深创',
-  'entities.abilities.rend.description': '撕裂目标，使其在 9 秒内流血并受到 {damage} 点伤害。',
+  'entities.abilities.rend.description':
+    '撕裂目标，使其流血，在 {duration} 秒内受到 {damage} 点伤害。',
   'entities.abilities.thunder_clap.name': '震地一击',
   'entities.abilities.thunder_clap.description':
     '轰击附近敌人，造成 {damage} 点伤害，并使其攻击速度降低 10%，持续 10 秒。',
   'entities.abilities.hamstring.name': '致跛斩',
   'entities.abilities.hamstring.description':
-    '重创敌人，造成 5 点伤害，并使其移动速度降低 50%，持续 15 秒。',
+    '重创敌人，造成 {damage} 点伤害，并使其移动速度降低 50%，持续 15 秒。',
   'entities.abilities.bloodrage.name': '血之代价',
   'entities.abilities.bloodrage.description': '以生命值为代价产生 10 点怒气。',
   'entities.abilities.overpower.name': '血手',
   'entities.abilities.overpower.description':
-    '立即攻击，造成武器伤害 +5。只能在目标躲闪后使用。无法被躲闪。',
+    '立即攻击，造成武器伤害加 {damage}。只能在目标躲闪后使用。无法被躲闪。',
   'entities.abilities.execute.name': '早赴黄泉',
   'entities.abilities.execute.description':
     '尝试终结受伤的敌人，造成 {damage} 点伤害。只能对生命值低于 20% 的敌人使用。',
@@ -1734,30 +1739,32 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '防御战斗姿态：你产生的威胁值提高 30%，但造成和受到的伤害降低 10%。再次施放可离开该姿态。',
   'entities.abilities.sunder_armor.name': '削甲',
   'entities.abilities.sunder_armor.description':
-    '撕裂目标的护甲，每次使其降低 2%。最多叠加 5 次（叠满时降低 10%）。产生大量威胁值。',
+    '撕裂目标的护甲，每次使其降低 {damage}%。最多叠加 5 次。产生大量威胁值。',
   'entities.abilities.taunt.name': '挑衅',
   'entities.abilities.taunt.description':
     '嘲讽目标：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。',
   'entities.abilities.fireball.name': '余烬弹',
   'entities.abilities.rain_of_fire.name': '烈火之雨',
   'entities.abilities.rain_of_fire.description':
-    '在目标区域降下烈火之雨，灼烧敌人，造成 {damage} 点火焰伤害。',
+    '在目标区域降下烈火之雨，持续 4 秒，每秒灼烧敌人并造成 {damage} 点火焰伤害。',
   'entities.abilities.volley.name': '乱射',
-  'entities.abilities.volley.description': '向目标区域射出箭雨，对其中的敌人造成 {damage} 点伤害。',
+  'entities.abilities.volley.description':
+    '向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。',
   'entities.abilities.hurricane.name': '飓风',
   'entities.abilities.hurricane.description':
-    '在目标区域召唤飓风，重击敌人，造成 {damage} 点自然伤害。',
+    '在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。',
   'entities.abilities.earthquake.name': '地震',
-  'entities.abilities.earthquake.description': '撼动目标区域，重击敌人，造成 {damage} 点自然伤害。',
+  'entities.abilities.earthquake.description':
+    '撼动目标区域，持续 6 秒，每 1.5 秒重击敌人并造成 {damage} 点自然伤害。',
   'entities.abilities.flamestrike.name': '烈焰风暴',
   'entities.abilities.flamestrike.description':
     '在目标区域召唤一次烈焰爆发，对爆炸范围内的敌人造成 {damage} 点火焰伤害。',
   'entities.abilities.fireball.description':
     '投掷一团火球，造成 {damage} 点火焰伤害，并附加持续伤害。',
   'entities.abilities.frost_armor.name': '白霜护罩',
-  'entities.abilities.frost_armor.description': '以寒霜包裹自身，使护甲提高 30，持续 30 分钟。',
+  'entities.abilities.frost_armor.description': '以寒霜包裹自身，使护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.arcane_intellect.name': '以太睿智',
-  'entities.abilities.arcane_intellect.description': '使智力提高 2，持续 30 分钟。',
+  'entities.abilities.arcane_intellect.description': '使智力提高 {buff}，持续 30 分钟。',
   'entities.abilities.frostbolt.name': '凛霜之矛',
   'entities.abilities.frostbolt.description':
     '发射一支寒冰箭，造成 {damage} 点冰霜伤害，并使移动速度降低 40%。',
@@ -1774,7 +1781,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '向敌人发射以太飞镖，持续 3 秒，每秒造成 {damage} 点奥术伤害。',
   'entities.abilities.polymorph.name': '蛊惑',
   'entities.abilities.polymorph.description':
-    '将敌人变成蟾蜍，最多持续 15 秒。蟾蜍会四处游荡并快速恢复。任何伤害都会打破效果。仅限野兽和人型生物。',
+    '将敌人变成蟾蜍，最多持续 {duration} 秒。蟾蜍会四处游荡并快速恢复。任何伤害都会打破效果。仅限野兽和人型生物。',
   'entities.abilities.frost_nova.name': '冰缚',
   'entities.abilities.frost_nova.description':
     '将附近所有敌人冻结在原地，最多持续 8 秒，并造成 {damage} 点冰霜伤害。',
@@ -1787,18 +1794,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     '投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在一段时间内造成额外伤害。',
   'entities.abilities.ice_barrier.name': '霜帷',
-  'entities.abilities.ice_barrier.description': '以冰霜护盾保护你，吸收 130 点伤害，持续 60 秒。',
+  'entities.abilities.ice_barrier.description':
+    '以冰霜护盾保护你，吸收 {damage} 点伤害，持续 60 秒。',
   'entities.abilities.sinister_strike.name': '邪恶斩击',
   'entities.abilities.sinister_strike.description':
     '立即攻击，造成武器伤害加 {damage}。奖励 1 个连击点。',
   'entities.abilities.eviscerate.name': '长眠',
-  'entities.abilities.eviscerate.description': '终结技，根据连击点数造成伤害。',
+  'entities.abilities.eviscerate.description': '终结技，造成 {damage}。',
   'entities.abilities.backstab.name': '卑劣突刺',
   'entities.abilities.backstab.description':
     '背刺目标，造成 150% 武器伤害加 {damage}。必须位于目标背后。需要匕首。奖励 1 个连击点。',
   'entities.abilities.gouge.name': '戳眼',
   'entities.abilities.gouge.description':
-    '攻击目标，使其瘫痪 4 秒。任何伤害都会打破效果。奖励 1 个连击点。',
+    '攻击目标，造成 {damage} 点伤害，并使其瘫痪 4 秒。任何伤害都会打破效果。奖励 1 个连击点。',
   'entities.abilities.evasion.name': '鬼步',
   'entities.abilities.evasion.description': '使你的躲闪几率提高 50%，持续 15 秒。',
   'entities.abilities.slice_and_dice.name': '割喉节奏',
@@ -1819,19 +1827,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.adrenaline_rush.description': '热血沸腾，立即恢复 60 点能量。',
   'entities.abilities.garrote.name': '绞喉线',
   'entities.abilities.garrote.description':
-    '勒住敌人的喉咙，立即造成伤害，并使其流血，在 18 秒内受到 {damage} 点伤害。必须处于潜行状态。奖励 1 个连击点。',
+    '勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。',
   'entities.abilities.cheap_shot.name': '击腹拳',
   'entities.abilities.cheap_shot.description':
-    '攻击目标，使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。',
+    '攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。',
   'entities.abilities.sap.name': '闷棍',
   'entities.abilities.sap.description':
     '使目标无法行动，持续 8 秒。必须处于潜行状态且不在战斗中。任何伤害都会打破效果。',
   'entities.abilities.crippling_poison.name': '沉铅毒液',
   'entities.abilities.crippling_poison.description':
-    '以沉铅毒液攻击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
+    '以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。',
   'entities.abilities.expose_armor.name': '护甲突破',
   'entities.abilities.expose_armor.description':
-    '终结技，使目标护甲值降低。消耗的连击点越多，削减得越深。',
+    '终结技，暴露目标，使其护甲降低 {damage}，持续 30 秒。',
   'entities.abilities.rupture.name': '血流不止',
   'entities.abilities.rupture.description':
     '终结技，撕裂目标，使其流血，在 16 秒内受到 {damage} 点伤害。',
@@ -1849,24 +1857,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使目标失明，导致其神志不清地四处游荡，持续 8 秒。任何伤害都会打破效果。',
   'entities.abilities.seal_of_righteousness.name': '誓约烙印',
   'entities.abilities.seal_of_righteousness.description':
-    '使你充满神圣能量，持续 30 秒，使每次近战挥击造成 4 点额外神圣伤害。可用裁决释放。',
+    '使你充满神圣能量，持续 30 秒，使每次近战挥击造成 {damage} 点额外神圣伤害。可用裁决释放。',
   'entities.abilities.holy_light.name': '愈疗之光',
   'entities.abilities.holy_light.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.devotion_aura.name': '坚定光环',
-  'entities.abilities.devotion_aura.description': '使你的护甲提高 40，持续 30 分钟。',
+  'entities.abilities.devotion_aura.description': '使你的护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.judgement.name': '裁决',
   'entities.abilities.judgement.description':
     '对敌人释放你当前的圣印，将其消耗以造成它所储存的神圣伤害。',
   'entities.abilities.blessing_of_might.name': '钢铁誓约',
   'entities.abilities.blessing_of_might.description':
-    '为一个友方目标施加祝福，使攻击强度提高 15，持续 5 分钟。',
+    '为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。',
   'entities.abilities.divine_protection.name': '信仰守护',
-  'entities.abilities.divine_protection.description': '一道守护结界吸收 50 点伤害，持续 10 秒。',
+  'entities.abilities.divine_protection.description':
+    '一道守护结界吸收 {damage} 点伤害，持续 10 秒。',
   'entities.abilities.hammer_of_justice.name': '碎裂法槌',
-  'entities.abilities.hammer_of_justice.description': '使目标昏迷 3 秒。',
+  'entities.abilities.hammer_of_justice.description': '使目标昏迷 {duration} 秒。',
   'entities.abilities.lay_on_hands.name': '临终圣礼',
   'entities.abilities.lay_on_hands.description':
-    '巨大的治疗涌流：恢复 250 点生命值。10 分钟冷却时间。',
+    '巨大的治疗涌流：恢复 {damage} 点生命值。10 分钟冷却时间。',
   'entities.abilities.flash_of_light.name': '圣光愈合',
   'entities.abilities.flash_of_light.description':
     '一道快速而高效的圣光爆发，为一个友方目标恢复 {damage} 点生命值。',
@@ -1874,7 +1883,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description': '以神圣怒火驱逐邪恶，造成 {damage} 点神圣伤害。',
   'entities.abilities.consecration.name': '神圣领域',
   'entities.abilities.consecration.description':
-    '奉献你脚下的土地，灼烧附近敌人，造成 {damage} 点神圣伤害。',
+    '奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。',
   'entities.abilities.righteous_fury.name': '炽燃誓约',
   'entities.abilities.righteous_fury.description':
     '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
@@ -1888,21 +1897,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': '将你的宠物放归野外。',
   'entities.abilities.raptor_strike.name': '剖膛一击',
   'entities.abilities.raptor_strike.description':
-    '一次强力近战攻击，使伤害提高 5。在你的下一次挥击时触发。',
+    '一次强力近战攻击，使伤害提高 {damage}。在你的下一次挥击时触发。',
   'entities.abilities.aspect_of_the_hawk.name': '鹞鹰之姿',
   'entities.abilities.aspect_of_the_hawk.description':
-    '化为鹞鹰之姿，使攻击强度提高 20，持续 30 分钟。',
+    '化为鹞鹰之姿，使攻击强度提高 {buff}，持续 30 分钟。',
   'entities.abilities.serpent_sting.name': '毒液倒刺',
   'entities.abilities.serpent_sting.description': '钉刺目标，在 15 秒内造成 {damage} 点自然伤害。',
   'entities.abilities.arcane_shot.name': '凶邪射击',
   'entities.abilities.arcane_shot.description': '瞬发射击，造成 {damage} 点奥术伤害。',
   'entities.abilities.concussive_shot.name': '震颤射击',
-  'entities.abilities.concussive_shot.description': '使目标眩晕迟缓，移动速度降低 50%，持续 4 秒。',
+  'entities.abilities.concussive_shot.description':
+    '使目标眩晕迟缓，造成 {damage} 点伤害，并使移动速度降低 50%，持续 4 秒。',
   'entities.abilities.mongoose_bite.name': '反噬獠牙',
   'entities.abilities.mongoose_bite.description':
-    '在目标躲闪后反击，造成武器伤害加 12。无法被躲闪。',
+    '在目标躲闪后反击，造成武器伤害加 {damage}。无法被躲闪。',
   'entities.abilities.wing_clip.name': '束缚斩',
-  'entities.abilities.wing_clip.description': '造成伤口，使敌人移动速度降低 40%，持续 10 秒。',
+  'entities.abilities.wing_clip.description':
+    '造成伤口，造成 {damage} 点伤害，并使敌人移动速度降低 40%，持续 10 秒。',
   'entities.abilities.aspect_of_the_monkey.name': '松貂之姿',
   'entities.abilities.aspect_of_the_monkey.description':
     '化为松貂之姿，使躲闪几率提高 8%，持续 30 分钟。',
@@ -1918,11 +1929,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.name': '低语祈祷',
   'entities.abilities.lesser_heal.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.power_word_fortitude.name': '坚毅连祷',
-  'entities.abilities.power_word_fortitude.description': '使目标的耐力提高 3，持续 30 分钟。',
+  'entities.abilities.power_word_fortitude.description': '使目标的耐力提高 {buff}，持续 30 分钟。',
   'entities.abilities.shadow_word_pain.name': '腐朽挽歌',
   'entities.abilities.shadow_word_pain.description': '黑暗之语在 18 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.power_word_shield.name': '守护圣咏',
-  'entities.abilities.power_word_shield.description': '保护目标，吸收 48 点伤害，持续 30 秒。',
+  'entities.abilities.power_word_shield.description':
+    '保护目标，吸收 {damage} 点伤害，持续 30 秒。',
   'entities.abilities.renew.name': '萦绕恩泽',
   'entities.abilities.renew.description': '在 15 秒内为目标恢复 {damage} 点生命值。',
   'entities.abilities.mind_blast.name': '碎心术',
@@ -1938,7 +1950,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_bolt.description': '投掷一道闪电，造成 {damage} 点自然伤害。',
   'entities.abilities.rockbiter_weapon.name': '缚石武器',
   'entities.abilities.rockbiter_weapon.description':
-    '以大地之怒灌注你的武器：每次挥击额外造成 5 点伤害，持续 5 分钟。',
+    '以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.chain_heal.name': '治疗链',
@@ -1949,19 +1961,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
   'entities.abilities.lightning_shield.name': '雷霆护罩',
   'entities.abilities.lightning_shield.description':
-    '以爆裂闪电环绕自身：近战攻击者会受到 13 点自然伤害。',
+    '以爆裂闪电环绕自身：近战攻击者会受到 {buff} 点自然伤害，最多 3 次充能且每 5 秒最多触发一次。',
   'entities.abilities.flame_shock.name': '余烬震击',
   'entities.abilities.flame_shock.description':
-    '用火焰灼烧目标，造成 25 点伤害，并在 12 秒内额外造成 {damage}。',
+    '用火焰灼烧目标，造成 {damage} 点伤害，并在 12 秒内额外造成 {overTime}。',
   'entities.abilities.flametongue_weapon.name': '焰烙武器',
   'entities.abilities.flametongue_weapon.description':
-    '用元素之火灌注你的武器：每次挥击额外造成 8 点火焰伤害，持续 5 分钟。',
+    '用元素之火灌注你的武器：每次挥击额外造成 {damage} 点火焰伤害，持续 5 分钟。',
   'entities.abilities.frost_shock.name': '凛霜震击',
   'entities.abilities.frost_shock.description':
     '立即以冰霜冲击目标，造成 {damage} 点冰霜伤害，并使其移动速度降低 50%，持续 8 秒。',
   'entities.abilities.frostbrand_weapon.name': '缚霜武器',
   'entities.abilities.frostbrand_weapon.description':
-    '为你的武器附上刺骨寒霜：每次挥击额外造成 8 点伤害，持续 5 分钟。',
+    '为你的武器附上刺骨寒霜：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
   'entities.abilities.ghost_wolf.name': '影狼',
   'entities.abilities.ghost_wolf.description': '化身为影狼，使移动速度提高 40%，持续 10 分钟。',
   'entities.abilities.stormstrike.name': '先祖打击',
@@ -1970,14 +1982,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敌人发射暗影箭，造成 {damage} 点暗影伤害。',
   'entities.abilities.demon_skin.name': '邪魔硬皮',
-  'entities.abilities.demon_skin.description': '恶魔皮肤使你的护甲提高 30，持续 30 分钟。',
+  'entities.abilities.demon_skin.description': '恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.immolate.name': '燃烧契约',
   'entities.abilities.immolate.description':
-    '灼烧敌人，造成 11 点火焰伤害，并在 15 秒内额外造成 {damage}。',
+    '灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。',
   'entities.abilities.corruption.name': '黑腐术',
   'entities.abilities.corruption.description': '腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。',
   'entities.abilities.life_tap.name': '苛酷交易',
-  'entities.abilities.life_tap.description': '将 30 点生命值转化为 30 点法力值。',
+  'entities.abilities.life_tap.description': '将 {damage} 点生命值转化为 {damage} 点法力值。',
   'entities.abilities.curse_of_agony.name': '苦楚妖术',
   'entities.abilities.curse_of_agony.description':
     '以痛苦诅咒目标：在 24 秒内造成 {damage} 点暗影伤害。',
@@ -1998,19 +2010,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.mark_of_the_wild.name': '野性守护',
   'entities.abilities.mark_of_the_wild.description':
-    '为一个友方目标施加野性守护，使护甲提高 25，持续 30 分钟。',
+    '为一个友方目标施加野性守护，使护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.moonfire.name': '月光风暴',
   'entities.abilities.moonfire.description':
     '以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。',
   'entities.abilities.rejuvenation.name': '野性绽放',
   'entities.abilities.rejuvenation.description': '在 12 秒内为目标恢复 {damage} 点生命值。',
   'entities.abilities.thorns.name': '荆棘守护',
-  'entities.abilities.thorns.description': '目标身上长出荆棘：近战攻击者受到 3 点自然伤害。',
+  'entities.abilities.thorns.description': '目标身上长出荆棘：近战攻击者受到 {buff} 点自然伤害。',
   'entities.abilities.entangling_roots.name': '缠握根须',
   'entities.abilities.entangling_roots.description': '将目标缠绕在原地，最多持续 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
-    '变形为熊：护甲 +65%，攻击强度 +15，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
+    '变形为熊：护甲 +90%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
@@ -2024,7 +2036,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.description':
     '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。',
   'entities.abilities.ferocious_bite.name': '血噬',
-  'entities.abilities.ferocious_bite.description': '终结技，根据连击点数造成伤害。仅限狼形态。',
+  'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限狼形态。',
   'entities.abilities.swipe.name': '横扫利爪',
   'entities.abilities.swipe.description':
     '横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。仅限巨熊形态。',
@@ -2043,7 +2055,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震荡击',
   'entities.abilities.bash.description': '昏迷目标 2 秒。仅限巨熊形态。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description': '使目标的护甲降低 35，持续 40 秒。',
+  'entities.abilities.faerie_fire.description':
+    '使目标的护甲降低 {damage}%，持续 40 秒。无法与削甲叠加。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目标陷入深度睡眠，最多持续 8 秒。任何伤害都会将其唤醒。',
@@ -2058,16 +2071,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '狼血',
   'entities.abilities.tigers_fury.description': '使攻击强度提高 40，持续 6 秒。仅限狼形态。',
   'entities.abilities.rip.name': '割裂',
-  'entities.abilities.rip.description': '终结技，在 12 秒内造成流血伤害。消耗连击点。仅限狼形态。',
+  'entities.abilities.rip.description':
+    '终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
   'entities.abilities.mortal_strike.description':
     '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
   'entities.abilities.bloodthirst.name': '放血',
   'entities.abilities.bloodthirst.description':
-    '在鲜血狂怒中立即攻击，造成 {damage} 点伤害。（狂怒专精标志技能）',
+    '在鲜血狂怒中立即攻击，造成 60% 武器伤害加 {damage}。（狂怒专精标志技能）',
   'entities.abilities.shield_slam.name': '碎盾击',
   'entities.abilities.shield_slam.description':
-    '用盾牌猛击目标，造成 {damage} 点伤害并产生巨量威胁。（防护专精标志技能）',
+    '用盾牌猛击目标，造成 50% 武器伤害加 {damage} 并产生巨量威胁。（防护专精标志技能）',
   'entities.abilities.whirlwind.name': '利刃回旋',
   'entities.abilities.whirlwind.description':
     '以致命弧线旋转，打击附近所有敌人，造成 {damage} 点伤害。（狂怒天赋）',
@@ -2464,6 +2478,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_cultist.name': '唤墓者教徒',
   'entities.mobs.gravecaller_summoner.name': '唤墓者召唤师',
   'entities.mobs.deacon_voss.name': '执事沃斯',
+  'entities.mobs.training_dummy.name': '训练假人',
   'entities.mobs.ridge_stalker.name': '山脊潜猎者',
   'entities.mobs.deeprock_kobold.name': '深岩掘地者',
   'entities.mobs.thornpeak_ogre.name': '荆峰食人魔',
@@ -5886,6 +5901,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '草药学',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': '无',
+  'hudChrome.archetypeTitle.hobbyLabel': '爱好',
   'hudChrome.archetypeTitle.armorcrafting': '锻甲师',
   'hudChrome.archetypeTitle.weaponcrafting': '武器匠',
   'hudChrome.archetypeTitle.jewelcrafting': '珠宝匠',
@@ -5925,8 +5941,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'yumi.end.win': '胜利！Yumi安全了！',
   'yumi.end.loss': '战败！你的Yumi倒下了。',
   'hudChrome.crafting.comboRequirementUnmet': '你没有达到该配方所需组合的两项制造技能等级。',
+  'hudChrome.crafting.notAtHub': '必须达到所需等级并位于制作站，才能制作该物品。',
+  'hudChrome.crafting.throttled': '你制作得太快了，请稍等片刻后再试。',
+  'hudChrome.crafting.recipeNotLearned': '你还没有学会这个配方。',
   'hudChrome.mobile.actionPageIndicator': '第{page}页',
   'hudChrome.mobile.spellbookPageLabel': '页{page}',
+  'hudChrome.mobile.hideKeyboard': '隐藏键盘',
+  'hudChrome.mobile.chatPlaceholder': '说点什么...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.vcup.title': '溪谷杯',
   'hudChrome.vcup.close': '关闭溪谷杯窗口',
@@ -6164,4 +6186,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '奖励银行格子及获取方式',
+  'entities.mobs.yumi_cat.name': '由美',
 };

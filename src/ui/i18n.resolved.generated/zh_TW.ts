@@ -291,6 +291,7 @@ export const zh_TW: EnTranslations = {
       "targetLabel": "你的目標",
       "targetAnnounce": "目標：{name}",
       "partyLabel": "你的隊伍",
+      "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
@@ -320,7 +321,9 @@ export const zh_TW: EnTranslations = {
       "actionPageIndicator": "第{page}頁",
       "targetCycle": "切換目標",
       "targetCycleShort": "目標",
-      "spellbookPageLabel": "頁{page}"
+      "spellbookPageLabel": "頁{page}",
+      "hideKeyboard": "隱藏鍵盤",
+      "chatPlaceholder": "說點什麼..."
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -1431,6 +1434,7 @@ export const zh_TW: EnTranslations = {
     "archetypeTitle": {
       "label": "稱號",
       "none": "無",
+      "hobbyLabel": "愛好",
       "armorcrafting": "鍛甲師",
       "weaponcrafting": "武器匠",
       "jewelcrafting": "珠寶匠",
@@ -1453,7 +1457,10 @@ export const zh_TW: EnTranslations = {
       "craftedToast": "已製作:{name}",
       "insufficientMaterials": "你沒有足夠的材料。",
       "unknownRecipe": "該配方不存在。",
-      "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。"
+      "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。",
+      "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
+      "throttled": "你製作得太快了，請稍等片刻後再試。",
+      "recipeNotLearned": "你還沒有學會這個配方。"
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const zh_TW: EnTranslations = {
       "mobileSocial": "社交",
       "mobileArena": "競技場",
       "mobileMenu": "選單",
+      "mobileSettings": "設定",
       "mobileUse": "使用",
       "mobileMeters": "統計",
       "mobileMap": "地圖",
@@ -4690,6 +4698,7 @@ export const zh_TW: EnTranslations = {
       "offGlobalCooldown": "不觸發公共冷卻",
       "friendlyTarget": "友方目標",
       "enemyTarget": "敵方目標",
+      "selfOnly": "僅對自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每個連擊點 {perCombo}"
     },
@@ -4998,7 +5007,8 @@ export const zh_TW: EnTranslations = {
       "needAria": "需求 {item}",
       "greedAria": "貪婪 {item}",
       "passAria": "放棄 {item}",
-      "everyonePassed": "所有人都放棄了 {item}。"
+      "everyonePassed": "所有人都放棄了 {item}。",
+      "rolled": "{answered}/{total} 已擲骰"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const zh_TW: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "烈火之雨",
-        "description": "在目標區域降下烈火之雨，灼燒敵人，造成 {damage} 點火焰傷害。"
+        "description": "在目標區域降下烈火之雨，持續 4 秒，每秒灼燒敵人造成 {damage} 點火焰傷害。"
       },
       "volley": {
         "name": "亂射",
-        "description": "向目標區域射出箭雨，對其中的敵人造成 {damage} 點傷害。"
+        "description": "向目標區域射出箭雨，持續 3 秒，每 0.5 秒對其中的敵人造成 {damage} 點傷害。"
       },
       "hurricane": {
         "name": "颶風",
-        "description": "在目標區域召喚颶風，重擊敵人，造成 {damage} 點自然傷害。"
+        "description": "在目標區域召喚颶風，持續 6 秒，每秒重擊敵人造成 {damage} 點自然傷害。"
       },
       "earthquake": {
         "name": "地震",
-        "description": "撼動目標區域，重擊敵人，造成 {damage} 點自然傷害。"
+        "description": "撼動目標區域，持續 6 秒，每 1.5 秒重擊敵人造成 {damage} 點自然傷害。"
       },
       "heroic_strike": {
         "name": "劫掠打擊",
@@ -5069,15 +5079,15 @@ export const zh_TW: EnTranslations = {
       },
       "battle_shout": {
         "name": "鐵嗓怒吼",
-        "description": "使你的攻擊強度提高 20，持續 2 分鐘。"
+        "description": "使你的攻擊強度提高 {buff}，持續 2 分鐘。"
       },
       "commanding_shout": {
         "name": "激勵吶喊",
-        "description": "使你的耐力提高 6，持續 2 分鐘。"
+        "description": "使你的耐力提高 {buff}，持續 2 分鐘。"
       },
       "demoralizing_shout": {
         "name": "厲嚎",
-        "description": "發出可怕的怒吼，使附近所有敵人的攻擊強度降低 30，持續 30 秒。"
+        "description": "發出可怕的怒吼，使附近所有敵人的攻擊強度降低 {buff}，持續 30 秒。"
       },
       "charge": {
         "name": "猛衝",
@@ -5085,7 +5095,7 @@ export const zh_TW: EnTranslations = {
       },
       "rend": {
         "name": "深切裂傷",
-        "description": "撕裂目標，使其在 9 秒內流血並受到 {damage} 點傷害。"
+        "description": "撕裂目標，使其在 {duration} 秒內流血並受到 {damage} 點傷害。"
       },
       "thunder_clap": {
         "name": "撼地一擊",
@@ -5093,7 +5103,7 @@ export const zh_TW: EnTranslations = {
       },
       "hamstring": {
         "name": "跛行斬",
-        "description": "重創敵人，造成 5 點傷害，並使其移動速度降低 50%，持續 15 秒。"
+        "description": "重創敵人，造成 {damage} 點傷害，並使其移動速度降低 50%，持續 15 秒。"
       },
       "bloodrage": {
         "name": "血之代價",
@@ -5101,7 +5111,7 @@ export const zh_TW: EnTranslations = {
       },
       "overpower": {
         "name": "血手",
-        "description": "立即攻擊，造成武器傷害 +5。只能在目標閃躲後使用。無法被閃躲。"
+        "description": "立即攻擊，造成武器傷害加 {damage}。只能在目標閃躲後使用。無法被閃躲。"
       },
       "execute": {
         "name": "提早入土",
@@ -5121,7 +5131,7 @@ export const zh_TW: EnTranslations = {
       },
       "sunder_armor": {
         "name": "削甲",
-        "description": "撕裂目標的護甲，每次使其降低 2%。最多疊加 5 次（疊滿時降低 10%）。產生大量威脅值。"
+        "description": "撕裂目標的護甲，每次使其降低 {damage}%。最多疊加 5 次。產生大量威脅值。"
       },
       "taunt": {
         "name": "挑釁",
@@ -5133,11 +5143,11 @@ export const zh_TW: EnTranslations = {
       },
       "frost_armor": {
         "name": "白霜披風",
-        "description": "以寒霜包裹自身，使護甲提高 30，持續 30 分鐘。"
+        "description": "以寒霜包裹自身，使護甲提高 {buff}，持續 30 分鐘。"
       },
       "arcane_intellect": {
         "name": "乙太洞察",
-        "description": "使智力提高 2，持續 30 分鐘。"
+        "description": "使智力提高 {buff}，持續 30 分鐘。"
       },
       "frostbolt": {
         "name": "凜霜矛",
@@ -5161,7 +5171,7 @@ export const zh_TW: EnTranslations = {
       },
       "polymorph": {
         "name": "蠱惑術",
-        "description": "將敵人變成蟾蜍，最多持續 15 秒。蟾蜍會四處遊蕩並快速恢復。任何傷害都會打破效果。僅限野獸和人型生物。"
+        "description": "將敵人變成蟾蜍，最多持續 {duration} 秒。蟾蜍會四處遊蕩並快速恢復。任何傷害都會打破效果。僅限野獸和人型生物。"
       },
       "frost_nova": {
         "name": "縛冰術",
@@ -5181,7 +5191,7 @@ export const zh_TW: EnTranslations = {
       },
       "ice_barrier": {
         "name": "冰霜帷幕",
-        "description": "以冰霜護盾保護你，吸收 130 點傷害，持續 60 秒。"
+        "description": "以冰霜護盾保護你，吸收 {damage} 點傷害，持續 60 秒。"
       },
       "sinister_strike": {
         "name": "邪惡揮斬",
@@ -5189,7 +5199,7 @@ export const zh_TW: EnTranslations = {
       },
       "eviscerate": {
         "name": "入土長眠",
-        "description": "終結技，根據連擊點數造成傷害。"
+        "description": "終結技，造成 {damage}。"
       },
       "backstab": {
         "name": "怯懦突刺",
@@ -5197,7 +5207,7 @@ export const zh_TW: EnTranslations = {
       },
       "gouge": {
         "name": "戳眼一擊",
-        "description": "攻擊目標，使其癱瘓 4 秒。任何傷害都會打破效果。獎勵 1 個連擊點。"
+        "description": "攻擊目標，造成 {damage} 點傷害，使其癱瘓 4 秒。任何傷害都會打破效果。獎勵 1 個連擊點。"
       },
       "evasion": {
         "name": "鬼影步",
@@ -5229,11 +5239,11 @@ export const zh_TW: EnTranslations = {
       },
       "garrote": {
         "name": "勒喉鋼絲",
-        "description": "勒住敵人的咽喉，立即造成傷害，並使其在 18 秒內流血損失 {damage} 點生命。必須處於潛行狀態。獎勵 1 個連擊點。"
+        "description": "勒住敵人的咽喉，立即造成 {damage} 點傷害，並使其在 18 秒內流血損失 {overTime}。必須處於潛行狀態。獎勵 1 個連擊點。"
       },
       "cheap_shot": {
         "name": "掏腹重擊",
-        "description": "攻擊目標，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。"
+        "description": "攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。必須處於潛行狀態。獎勵 2 個連擊點。"
       },
       "sap": {
         "name": "悶棍",
@@ -5241,11 +5251,11 @@ export const zh_TW: EnTranslations = {
       },
       "crippling_poison": {
         "name": "沉鉛之毒",
-        "description": "以沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。"
+        "description": "用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。"
       },
       "expose_armor": {
         "name": "裂甲",
-        "description": "終結技，使目標破綻盡露，降低其護甲。消耗越多連擊點，撕裂得越深。"
+        "description": "終結技，使目標破綻盡露，使其護甲降低 {damage}，持續 30 秒。"
       },
       "rupture": {
         "name": "血竭",
@@ -5269,7 +5279,7 @@ export const zh_TW: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "誓約烙印",
-        "description": "使你充滿神聖能量，持續 30 秒，使每次近戰揮擊造成 4 點額外神聖傷害。可用裁決釋放。"
+        "description": "使你充滿神聖能量，持續 30 秒，使每次近戰揮擊造成 {damage} 點額外神聖傷害。可用裁決釋放。"
       },
       "holy_light": {
         "name": "療癒聖光",
@@ -5277,7 +5287,7 @@ export const zh_TW: EnTranslations = {
       },
       "devotion_aura": {
         "name": "堅定光環",
-        "description": "使你的護甲提高 40，持續 30 分鐘。"
+        "description": "使你的護甲提高 {buff}，持續 30 分鐘。"
       },
       "judgement": {
         "name": "裁決",
@@ -5285,19 +5295,19 @@ export const zh_TW: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "鋼鐵誓約",
-        "description": "為一個友方目標施加祝福，使攻擊強度提高 15，持續 5 分鐘。"
+        "description": "為一個友方目標施加祝福，使攻擊強度提高 {buff}，持續 5 分鐘。"
       },
       "divine_protection": {
         "name": "信仰守護",
-        "description": "一道守護結界吸收 50 點傷害，持續 10 秒。"
+        "description": "一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。"
       },
       "hammer_of_justice": {
         "name": "裂碎法槌",
-        "description": "使目標昏迷 3 秒。"
+        "description": "使目標昏迷 {duration} 秒。"
       },
       "lay_on_hands": {
         "name": "臨終聖禮",
-        "description": "巨大的治療湧流：恢復 250 點生命值。10 分鐘冷卻時間。"
+        "description": "巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。"
       },
       "flash_of_light": {
         "name": "光癒術",
@@ -5309,7 +5319,7 @@ export const zh_TW: EnTranslations = {
       },
       "consecration": {
         "name": "聖化之地",
-        "description": "奉獻你腳下的土地，灼燒附近敵人，造成 {damage} 點神聖傷害。"
+        "description": "奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。"
       },
       "righteous_fury": {
         "name": "燃燒誓言",
@@ -5329,11 +5339,11 @@ export const zh_TW: EnTranslations = {
       },
       "raptor_strike": {
         "name": "剖膛打擊",
-        "description": "一次強力近戰攻擊，使傷害提高 5。在你的下一次揮擊時觸發。"
+        "description": "一次強力近戰攻擊，使傷害提高 {damage}。在你的下一次揮擊時觸發。"
       },
       "aspect_of_the_hawk": {
         "name": "獵鷂之姿",
-        "description": "化為獵鷂之姿，使攻擊強度提高 20，持續 30 分鐘。"
+        "description": "化為獵鷂之姿，使攻擊強度提高 {buff}，持續 30 分鐘。"
       },
       "serpent_sting": {
         "name": "毒液倒刺",
@@ -5345,15 +5355,15 @@ export const zh_TW: EnTranslations = {
       },
       "concussive_shot": {
         "name": "震顫射擊",
-        "description": "使目標暈眩遲緩，移動速度降低 50%，持續 4 秒。"
+        "description": "使目標暈眩遲緩，造成 {damage} 點傷害，並使移動速度降低 50%，持續 4 秒。"
       },
       "mongoose_bite": {
         "name": "反噬獠牙",
-        "description": "在目標閃躲後反擊，造成武器傷害加 12。無法被閃躲。"
+        "description": "在目標閃躲後反擊，造成武器傷害加 {damage}。無法被閃躲。"
       },
       "wing_clip": {
         "name": "桎梏斬",
-        "description": "造成傷口，使敵人移動速度降低 40%，持續 10 秒。"
+        "description": "造成傷口，造成 {damage} 點傷害，並使敵人移動速度降低 40%，持續 10 秒。"
       },
       "aspect_of_the_monkey": {
         "name": "靈貂之姿",
@@ -5381,7 +5391,7 @@ export const zh_TW: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "堅毅連禱",
-        "description": "使目標的耐力提高 3，持續 30 分鐘。"
+        "description": "使目標的耐力提高 {buff}，持續 30 分鐘。"
       },
       "shadow_word_pain": {
         "name": "腐朽輓歌",
@@ -5389,7 +5399,7 @@ export const zh_TW: EnTranslations = {
       },
       "power_word_shield": {
         "name": "守護聖詠",
-        "description": "保護目標，吸收 48 點傷害，持續 30 秒。"
+        "description": "保護目標，吸收 {damage} 點傷害，持續 30 秒。"
       },
       "renew": {
         "name": "綿延恩典",
@@ -5417,7 +5427,7 @@ export const zh_TW: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "縛石武器",
-        "description": "以大地之怒灌注你的武器：每次揮擊額外造成 5 點傷害，持續 5 分鐘。"
+        "description": "以大地之怒灌注你的武器：每次揮擊額外造成 {damage} 點傷害，持續 5 分鐘。"
       },
       "healing_wave": {
         "name": "療癒之水",
@@ -5429,15 +5439,15 @@ export const zh_TW: EnTranslations = {
       },
       "lightning_shield": {
         "name": "雷霆守護",
-        "description": "以爆裂閃電環繞自身：近戰攻擊者會受到 13 點自然傷害。"
+        "description": "以爆裂閃電環繞自身：近戰攻擊者會受到 {buff} 點自然傷害，最多 3 次充能，且每 5 秒最多觸發一次。"
       },
       "flame_shock": {
         "name": "燼焰震擊",
-        "description": "用火焰灼燒目標，造成 25 點傷害，並在 12 秒內額外造成 {damage}。"
+        "description": "用火焰灼燒目標，造成 {damage} 點傷害，並在 12 秒內額外造成 {overTime}。"
       },
       "flametongue_weapon": {
         "name": "焰烙武器",
-        "description": "用元素之火灌注你的武器：每次揮擊額外造成 8 點火焰傷害，持續 5 分鐘。"
+        "description": "用元素之火灌注你的武器：每次揮擊額外造成 {damage} 點火焰傷害，持續 5 分鐘。"
       },
       "frost_shock": {
         "name": "凜霜震擊",
@@ -5445,7 +5455,7 @@ export const zh_TW: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "凜霜束縛武器",
-        "description": "為你的武器附上刺骨寒霜：每次揮擊額外造成 8 點傷害，持續 5 分鐘。"
+        "description": "為你的武器附上刺骨寒霜：每次揮擊額外造成 {damage} 點傷害，持續 5 分鐘。"
       },
       "ghost_wolf": {
         "name": "幽影狼",
@@ -5461,11 +5471,11 @@ export const zh_TW: EnTranslations = {
       },
       "demon_skin": {
         "name": "邪魔之皮",
-        "description": "惡魔皮膚使你的護甲提高 30，持續 30 分鐘。"
+        "description": "惡魔皮膚使你的護甲提高 {buff}，持續 30 分鐘。"
       },
       "immolate": {
         "name": "燃燒契約",
-        "description": "灼燒敵人，造成 11 點火焰傷害，並在 15 秒內額外造成 {damage}。"
+        "description": "灼燒敵人，造成 {damage} 點火焰傷害，並在 15 秒內額外造成 {overTime}。"
       },
       "corruption": {
         "name": "黑腐術",
@@ -5473,7 +5483,7 @@ export const zh_TW: EnTranslations = {
       },
       "life_tap": {
         "name": "苛刻交易",
-        "description": "將 30 點生命值轉化為 30 點法力值。"
+        "description": "將 {damage} 點生命值轉化為 {damage} 點法力值。"
       },
       "curse_of_agony": {
         "name": "苦楚邪咒",
@@ -5505,7 +5515,7 @@ export const zh_TW: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "野性守護",
-        "description": "為一個友方目標施加野性守護，使護甲提高 25，持續 30 分鐘。"
+        "description": "為一個友方目標施加野性守護，使護甲提高 {buff}，持續 30 分鐘。"
       },
       "moonfire": {
         "name": "月光風暴",
@@ -5517,7 +5527,7 @@ export const zh_TW: EnTranslations = {
       },
       "thorns": {
         "name": "荊棘守衛",
-        "description": "目標身上長出荊棘：近戰攻擊者受到 3 點自然傷害。"
+        "description": "目標身上長出荊棘：近戰攻擊者受到 {buff} 點自然傷害。"
       },
       "entangling_roots": {
         "name": "攫纏根鬚",
@@ -5525,7 +5535,7 @@ export const zh_TW: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形態",
-        "description": "變形為熊：護甲 +65%，攻擊強度 +15，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
+        "description": "變形為熊：護甲 +90%，攻擊強度大幅提高，你的攻擊會產生怒氣並額外產生 30% 威脅值。再次施放可返回施法者形態。"
       },
       "maul": {
         "name": "碎骨擊",
@@ -5545,7 +5555,7 @@ export const zh_TW: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "血噬",
-        "description": "終結技，根據連擊點數造成傷害。僅限狼形態。"
+        "description": "終結技，造成 {damage}。僅限狼形態。"
       },
       "swipe": {
         "name": "橫掃利爪",
@@ -5577,7 +5587,7 @@ export const zh_TW: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目標的護甲降低 35，持續 40 秒。"
+        "description": "使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。"
       },
       "hibernate": {
         "name": "沉眠",
@@ -5601,7 +5611,7 @@ export const zh_TW: EnTranslations = {
       },
       "rip": {
         "name": "割裂",
-        "description": "終結技，在 12 秒內造成流血傷害。消耗連擊點。僅限狼形態。"
+        "description": "終結技，在 12 秒內造成 {damage} 點流血傷害。消耗連擊點。僅限狼形態。"
       },
       "mortal_strike": {
         "name": "致殘打擊",
@@ -5609,11 +5619,11 @@ export const zh_TW: EnTranslations = {
       },
       "bloodthirst": {
         "name": "放血",
-        "description": "在鮮血狂怒中立即攻擊，造成 {damage} 點傷害。（狂怒專精標誌技能）"
+        "description": "在鮮血狂怒中立即攻擊，造成 60% 武器傷害加 {damage}。（狂怒專精標誌技能）"
       },
       "shield_slam": {
         "name": "碎盾擊",
-        "description": "用盾牌猛擊目標，造成 {damage} 點傷害並產生巨量威脅。（防護專精標誌技能）"
+        "description": "用盾牌猛擊目標，造成 50% 武器傷害加 {damage} 並產生巨量威脅。（防護專精標誌技能）"
       },
       "whirlwind": {
         "name": "利刃迴旋",
@@ -7073,7 +7083,7 @@ export const zh_TW: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "由美"
       },
       "forest_wolf": {
         "name": "森林狼"
@@ -7134,6 +7144,9 @@ export const zh_TW: EnTranslations = {
       },
       "deacon_voss": {
         "name": "執事沃斯"
+      },
+      "training_dummy": {
+        "name": "訓練假人"
       },
       "ridge_stalker": {
         "name": "山脊潛獵者"

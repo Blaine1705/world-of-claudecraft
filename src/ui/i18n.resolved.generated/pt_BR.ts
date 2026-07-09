@@ -291,6 +291,7 @@ export const pt_BR: EnTranslations = {
       "targetLabel": "Seu alvo",
       "targetAnnounce": "Alvo: {name}",
       "partyLabel": "Seu grupo",
+      "partyChip": "Grupo",
       "partyGroup": "Grupo {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -320,7 +321,9 @@ export const pt_BR: EnTranslations = {
       "actionPageIndicator": "Pág. {page}",
       "targetCycle": "Trocar alvo",
       "targetCycleShort": "Alvo",
-      "spellbookPageLabel": "Página {page}"
+      "spellbookPageLabel": "Página {page}",
+      "hideKeyboard": "Ocultar teclado",
+      "chatPlaceholder": "Diga algo..."
     },
     "tutorial": {
       "moveBodyTouch": "Use o analógico de movimento para se mover e arraste a tela para olhar ao redor. Dê alguns passos para começar.",
@@ -1014,18 +1017,18 @@ export const pt_BR: EnTranslations = {
       },
       "allStatsPctReduce": "Reduz todos os atributos em {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Aumenta o poder de ataque em {pct}%",
+        "armor": "Aumenta a armadura em {pct}%",
+        "int": "Aumenta o Intelecto em {pct}%",
+        "sta": "Aumenta o Vigor em {pct}%",
+        "allStats": "Aumenta todos os atributos em {pct}%"
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Reduz a armadura em {pct}%",
+      "armorPctStacks": "Reduz a armadura em {pct}% ({stacks} acúmulos)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -1431,6 +1434,7 @@ export const pt_BR: EnTranslations = {
     "archetypeTitle": {
       "label": "Título",
       "none": "Nenhum",
+      "hobbyLabel": "Passatempo",
       "armorcrafting": "Armeiro",
       "weaponcrafting": "Forjador de armas",
       "jewelcrafting": "Joalheiro",
@@ -1453,7 +1457,10 @@ export const pt_BR: EnTranslations = {
       "craftedToast": "Feito: {name}",
       "insufficientMaterials": "Você não tem os materiais para isso.",
       "unknownRecipe": "Essa receita não existe.",
-      "comboRequirementUnmet": "Você não possui os dois ofícios exigidos no nível necessário para essa receita."
+      "comboRequirementUnmet": "Você não possui os dois ofícios exigidos no nível necessário para essa receita.",
+      "notAtHub": "Você precisa estar no posto de criação, no nível exigido, para criar isso.",
+      "throttled": "Você está criando rápido demais. Espere um momento e tente de novo.",
+      "recipeNotLearned": "Você ainda não aprendeu essa receita."
     }
   },
   "apiError": {
@@ -2226,8 +2233,8 @@ export const pt_BR: EnTranslations = {
       "waveGoldBody": "A onda do meio: combos de dois gumes onde sua build começa a tomar forma e a brilhar.",
       "wavePrismaticTitle": "Prismático",
       "wavePrismaticBody": "A onda final: picos que definem a build e derretem a tela, feitos para parecer ridículos no melhor sentido.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Proteja a Yumi",
+      "yumiBody": "Proteja a Yumi é um modo de objetivo em equipe disputado em um labirinto: cada lado protege a própria gata familiar enquanto caça a do inimigo. De tempos em tempos, as duas gatas saltam para novos cantos do labirinto, então a luta alterna entre defender, caçar e correr para reencontrá-las. Entre na fila em três contra três ou cinco contra cinco; cair em combate só o afasta por um instante.",
       "powerupsTitle": "Power-ups na arena",
       "powerupsBody": "Orbes brilhantes também caem na arena no meio da luta, livres para quem alcançá-los primeiro. Eles são deliberadamente exagerados e duram só um instante: Demônio da Velocidade para um lampejo de ritmo alucinante, Colosso para inchar até virar um gigante pesado, Botas Lunares para um salto saltitante de baixa gravidade, e Berserker para uma súbita explosão de fúria.",
       "ladderHeading": "Subindo no ranking",
@@ -3658,42 +3665,42 @@ export const pt_BR: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3x3",
+    "bracket5": "Yumi 5x5",
+    "enterQueue": "Entre no Proteja a Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Você entra na fila do Proteja a Yumi. Proteja a sua gata…",
+      "leave": "Você sai da fila do Proteja a Yumi.",
+      "teamLeave": "Sua equipe sai da fila do Proteja a Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "O Proteja a Yumi 3x3 permite um grupo de até três.",
+      "partyTooBig5": "O Proteja a Yumi 5x5 permite um grupo de até cinco."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Proteja a Yumi! Defenda a sua gata e cace a do inimigo."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "PROTEJA A YUMI",
+      "getReady": "Prepare-se…",
+      "teleportIn": "As Yumis se movem em {s}",
+      "suddenDeath": "MORTE SÚBITA",
+      "yourYumi": "Sua Yumi",
+      "enemyYumi": "Yumi inimiga",
+      "aria": "Sua Yumi com {mine} de {max} de vida, Yumi inimiga com {theirs}.",
+      "collapse": "Recolher as barras do Proteja a Yumi",
+      "expand": "Expandir as barras do Proteja a Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "ABATIDO!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "MORTE SÚBITA! As Yumis resistem!",
+      "teleport": "As Yumis se teleportam!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "VITÓRIA! Sua Yumi está a salvo!",
+      "loss": "DERROTA! Sua Yumi caiu."
     }
   },
   "fiesta": {
@@ -4142,6 +4149,7 @@ export const pt_BR: EnTranslations = {
       "mobileSocial": "Comunidade",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Configurações",
       "mobileUse": "Usar",
       "mobileMeters": "Medidores",
       "mobileMap": "Mapa",
@@ -4690,6 +4698,7 @@ export const pt_BR: EnTranslations = {
       "offGlobalCooldown": "Fora da recarga global",
       "friendlyTarget": "Alvo aliado",
       "enemyTarget": "Alvo inimigo",
+      "selfOnly": "Apenas em si mesmo",
       "damageRange": "{min} a {max}",
       "finisherDamage": "{base} mais {perCombo} por ponto de combo"
     },
@@ -4998,7 +5007,8 @@ export const pt_BR: EnTranslations = {
       "needAria": "Necessidade por {item}",
       "greedAria": "Ganância por {item}",
       "passAria": "Passar em {item}",
-      "everyonePassed": "Todos passaram em {item}."
+      "everyonePassed": "Todos passaram em {item}.",
+      "rolled": "{answered}/{total} rolaram"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const pt_BR: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Chuva de Fogo",
-        "description": "Faz cair uma chuva de fogo na área-alvo, queimando os inimigos e causando {damage} de dano de Fogo."
+        "description": "Faz cair uma chuva de fogo na área-alvo por 4 s, queimando os inimigos e causando {damage} de dano de Fogo a cada segundo."
       },
       "volley": {
         "name": "Saraivada",
-        "description": "Dispara uma chuva de flechas na área-alvo, causando {damage} de dano aos inimigos atingidos."
+        "description": "Dispara uma chuva de flechas na área-alvo por 3 s, causando {damage} de dano a cada 0,5 s aos inimigos atingidos."
       },
       "hurricane": {
         "name": "Furacão",
-        "description": "Desencadeia um furacão na área-alvo, atingindo os inimigos e causando {damage} de dano de Natureza."
+        "description": "Desencadeia um furacão na área-alvo por 6 s, atingindo os inimigos e causando {damage} de dano de Natureza a cada segundo."
       },
       "earthquake": {
         "name": "Terremoto",
-        "description": "Sacode a área-alvo, atingindo os inimigos e causando {damage} de dano de Natureza."
+        "description": "Sacode a área-alvo por 6 s, atingindo os inimigos e causando {damage} de dano de Natureza a cada 1,5 s."
       },
       "heroic_strike": {
         "name": "Golpe do Saqueador",
@@ -5069,15 +5079,15 @@ export const pt_BR: EnTranslations = {
       },
       "battle_shout": {
         "name": "Brado de Ferro",
-        "description": "Aumenta seu poder de ataque em 20 por 2 min."
+        "description": "Aumenta seu poder de ataque em {buff} por 2 min."
       },
       "commanding_shout": {
         "name": "Brado Encorajador",
-        "description": "Aumenta seu Vigor em 6 por 2 min."
+        "description": "Aumenta seu Vigor em {buff} por 2 min."
       },
       "demoralizing_shout": {
         "name": "Uivo Sinistro",
-        "description": "Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em 30 por 30 s."
+        "description": "Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em {buff} por 30 s."
       },
       "charge": {
         "name": "Arremetida",
@@ -5085,7 +5095,7 @@ export const pt_BR: EnTranslations = {
       },
       "rend": {
         "name": "Corte Profundo",
-        "description": "Fere o alvo, fazendo-o sangrar por {damage} de dano ao longo de 9 s."
+        "description": "Fere o alvo, fazendo-o sangrar por {damage} de dano ao longo de {duration} s."
       },
       "thunder_clap": {
         "name": "Golpe Sísmico",
@@ -5093,7 +5103,7 @@ export const pt_BR: EnTranslations = {
       },
       "hamstring": {
         "name": "Corte Manquejante",
-        "description": "Mutila o inimigo, causando 5 de dano e reduzindo sua velocidade de movimento em 50% por 15 s."
+        "description": "Mutila o inimigo, causando {damage} de dano e reduzindo sua velocidade de movimento em 50% por 15 s."
       },
       "bloodrage": {
         "name": "Tributo de Sangue",
@@ -5101,7 +5111,7 @@ export const pt_BR: EnTranslations = {
       },
       "overpower": {
         "name": "Mão Vermelha",
-        "description": "Ataque instantâneo com dano de arma +5. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado."
+        "description": "Ataque instantâneo com dano de arma mais {damage}. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado."
       },
       "execute": {
         "name": "Cova Prematura",
@@ -5121,7 +5131,7 @@ export const pt_BR: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Retalhar Armadura",
-        "description": "Sunders the target's armor, reducing it by 2% per application. Stacks up to 5 times (10% at full stacks). Generates a high amount of threat."
+        "description": "Retalha a armadura do alvo, reduzindo-a em {damage}% por aplicação. Acumula até 5 vezes. Gera uma grande quantidade de ameaça."
       },
       "taunt": {
         "name": "Provocar",
@@ -5133,11 +5143,11 @@ export const pt_BR: EnTranslations = {
       },
       "frost_armor": {
         "name": "Manto de Geada",
-        "description": "Envolve você em gelo, aumentando a armadura em 30 por 30 min."
+        "description": "Envolve você em gelo, aumentando a armadura em {buff} por 30 min."
       },
       "arcane_intellect": {
         "name": "Perspicácia Etérea",
-        "description": "Aumenta o Intelecto em 2 por 30 min."
+        "description": "Aumenta o Intelecto em {buff} por 30 min."
       },
       "frostbolt": {
         "name": "Lança de Geada",
@@ -5161,7 +5171,7 @@ export const pt_BR: EnTranslations = {
       },
       "polymorph": {
         "name": "Enfeitiçar",
-        "description": "Transforma o inimigo em sapo por até 15 s. O sapo vagueia e se cura rapidamente. Qualquer dano quebra o efeito. Apenas feras e humanoides."
+        "description": "Transforma o inimigo em sapo por até {duration} s. O sapo vagueia e se cura rapidamente. Qualquer dano quebra o efeito. Apenas feras e humanoides."
       },
       "frost_nova": {
         "name": "Grilhão de Gelo",
@@ -5181,7 +5191,7 @@ export const pt_BR: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Véu de Gelo",
-        "description": "Protege você em gelo, absorvendo 130 de dano por 60 s."
+        "description": "Protege você em gelo, absorvendo {damage} de dano por 60 s."
       },
       "sinister_strike": {
         "name": "Talho Perverso",
@@ -5189,7 +5199,7 @@ export const pt_BR: EnTranslations = {
       },
       "eviscerate": {
         "name": "Sono Eterno",
-        "description": "Golpe final que causa dano por ponto de combo."
+        "description": "Golpe final que causa {damage}."
       },
       "backstab": {
         "name": "Estocada Covarde",
@@ -5197,7 +5207,7 @@ export const pt_BR: EnTranslations = {
       },
       "gouge": {
         "name": "Golpe no Olho",
-        "description": "Atinge o alvo, incapacitando-o por 4 s. Qualquer dano quebra o efeito. Concede 1 ponto de combo."
+        "description": "Atinge o alvo com {damage} de dano, incapacitando-o por 4 s. Qualquer dano quebra o efeito. Concede 1 ponto de combo."
       },
       "evasion": {
         "name": "Passo Espectral",
@@ -5229,11 +5239,11 @@ export const pt_BR: EnTranslations = {
       },
       "garrote": {
         "name": "Fio na Garganta",
-        "description": "Garroteia o inimigo, causando dano imediato e fazendo-o sangrar por {damage} ao longo de 18 s. Requer modo furtivo. Concede 1 ponto de combo."
+        "description": "Garroteia o inimigo, causando {damage} de dano imediato e fazendo-o sangrar por {overTime} ao longo de 18 s. Requer modo furtivo. Concede 1 ponto de combo."
       },
       "cheap_shot": {
         "name": "Soco no Estômago",
-        "description": "Atinge o alvo, atordoando-o por 4 s. Requer modo furtivo. Concede 2 pontos de combo."
+        "description": "Atinge o alvo com {damage} de dano, atordoando-o por 4 s. Requer modo furtivo. Concede 2 pontos de combo."
       },
       "sap": {
         "name": "Nocaute",
@@ -5241,11 +5251,11 @@ export const pt_BR: EnTranslations = {
       },
       "crippling_poison": {
         "name": "Veneno Plúmbeo",
-        "description": "Atinge o alvo com um veneno plúmbeo, causando {damage} de dano da Natureza e reduzindo sua velocidade de movimento em 50% por 12 s."
+        "description": "Atinge o alvo com um veneno plúmbeo, causando {damage} de dano de Natureza e reduzindo sua velocidade de movimento em 50% por 12 s."
       },
       "expose_armor": {
         "name": "Brecha na Armadura",
-        "description": "Golpe final que expõe o alvo, reduzindo sua armadura. Mais pontos de combo gastos aprofundam o corte."
+        "description": "Golpe final que expõe o alvo, reduzindo sua armadura em {damage} por 30 s."
       },
       "rupture": {
         "name": "Hemorragia",
@@ -5269,7 +5279,7 @@ export const pt_BR: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Marca do Juramento",
-        "description": "Enche você de poder Sagrado por 30 s, fazendo cada golpe corpo a corpo causar 4 de dano Sagrado adicional. Libere com Verdict."
+        "description": "Enche você de poder Sagrado por 30 s, fazendo cada golpe corpo a corpo causar {damage} de dano Sagrado adicional. Libere com Verdict."
       },
       "holy_light": {
         "name": "Luz Restauradora",
@@ -5277,7 +5287,7 @@ export const pt_BR: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Aura Inabalável",
-        "description": "Aumenta sua armadura em 40 por 30 min."
+        "description": "Aumenta sua armadura em {buff} por 30 min."
       },
       "judgement": {
         "name": "Verdict",
@@ -5285,19 +5295,19 @@ export const pt_BR: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Juramento de Ferro",
-        "description": "Coloca uma Bênção em um alvo aliado, aumentando o poder de ataque em 15 por 5 min."
+        "description": "Coloca uma Bênção em um alvo aliado, aumentando o poder de ataque em {buff} por 5 min."
       },
       "divine_protection": {
         "name": "Salvaguarda da Fé",
-        "description": "Uma salvaguarda protetora absorve 50 de dano por 10 s."
+        "description": "Uma salvaguarda protetora absorve {damage} de dano por 10 s."
       },
       "hammer_of_justice": {
         "name": "Malho Dilacerante",
-        "description": "Atordoa o alvo por 3 s."
+        "description": "Atordoa o alvo por {duration} s."
       },
       "lay_on_hands": {
         "name": "Extrema-Unção",
-        "description": "Uma onda massiva de cura: restaura 250 de vida. Recarga de 10 min."
+        "description": "Uma onda massiva de cura: restaura {damage} de vida. Recarga de 10 min."
       },
       "flash_of_light": {
         "name": "Cura Luminosa",
@@ -5309,7 +5319,7 @@ export const pt_BR: EnTranslations = {
       },
       "consecration": {
         "name": "Solo Sagrado",
-        "description": "Consagra o chão sob você, queimando inimigos próximos com {damage} de dano Sagrado."
+        "description": "Consagra o chão sob você, queimando inimigos próximos com {damage} de dano Sagrado a cada 2 s por 10 s."
       },
       "righteous_fury": {
         "name": "Juramento Ardente",
@@ -5329,11 +5339,11 @@ export const pt_BR: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Golpe Estripador",
-        "description": "Ataque corpo a corpo forte que aumenta o dano em 5. Ativa no seu próximo golpe."
+        "description": "Ataque corpo a corpo forte que aumenta o dano em {damage}. Ativa no seu próximo golpe."
       },
       "aspect_of_the_hawk": {
         "name": "Forma do Gavião",
-        "description": "Assume a forma do gavião, aumentando o poder de ataque em 20 por 30 min."
+        "description": "Assume a forma do gavião, aumentando o poder de ataque em {buff} por 30 min."
       },
       "serpent_sting": {
         "name": "Farpa Venenosa",
@@ -5345,15 +5355,15 @@ export const pt_BR: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Tiro Desnorteante",
-        "description": "Atordoa levemente o alvo, reduzindo a velocidade de movimento em 50% por 4 s."
+        "description": "Atordoa levemente o alvo com {damage} de dano, reduzindo a velocidade de movimento em 50% por 4 s."
       },
       "mongoose_bite": {
         "name": "Contra-Presa",
-        "description": "Contra-ataca depois que o alvo esquiva, causando dano de arma mais 12. Não pode ser esquivado."
+        "description": "Contra-ataca depois que o alvo esquiva, causando dano de arma mais {damage}. Não pode ser esquivado."
       },
       "wing_clip": {
         "name": "Talho Aprisionador",
-        "description": "Inflige um ferimento que reduz a velocidade do inimigo em 40% por 10 s."
+        "description": "Inflige um ferimento com {damage} de dano que reduz a velocidade do inimigo em 40% por 10 s."
       },
       "aspect_of_the_monkey": {
         "name": "Forma da Marta",
@@ -5381,7 +5391,7 @@ export const pt_BR: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Litania da Resolução",
-        "description": "Aumenta o Vigor do alvo em 3 por 30 min."
+        "description": "Aumenta o Vigor do alvo em {buff} por 30 min."
       },
       "shadow_word_pain": {
         "name": "Réquiem da Ruína",
@@ -5389,7 +5399,7 @@ export const pt_BR: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Salmo de Proteção",
-        "description": "Protege o alvo, absorvendo 48 de dano por 30 s."
+        "description": "Protege o alvo, absorvendo {damage} de dano por 30 s."
       },
       "renew": {
         "name": "Graça Persistente",
@@ -5417,7 +5427,7 @@ export const pt_BR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
-        "description": "Imbui sua arma com a fúria da pedra: cada golpe causa 5 de dano adicional por 5 min."
+        "description": "Imbui sua arma com a fúria da pedra: cada golpe causa {damage} de dano adicional por 5 min."
       },
       "healing_wave": {
         "name": "Águas Restauradoras",
@@ -5429,15 +5439,15 @@ export const pt_BR: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Salvaguarda do Trovão",
-        "description": "Cerca você de raios crepitantes: atacantes corpo a corpo sofrem 13 de dano de Natureza."
+        "description": "Cerca você de raios crepitantes: atacantes corpo a corpo sofrem {buff} de dano de Natureza, até 3 cargas e no máximo uma vez a cada 5 segundos."
       },
       "flame_shock": {
         "name": "Abalo de Brasa",
-        "description": "Queima o alvo com fogo, causando 25 de dano mais {damage} ao longo de 12 s."
+        "description": "Queima o alvo com fogo, causando {damage} de dano mais {overTime} ao longo de 12 s."
       },
       "flametongue_weapon": {
         "name": "Arma Flamígera",
-        "description": "Imbui sua arma com fogo elemental: cada golpe causa 8 de dano adicional de Fogo por 5 min."
+        "description": "Imbui sua arma com fogo elemental: cada golpe causa {damage} de dano adicional de Fogo por 5 min."
       },
       "frost_shock": {
         "name": "Abalo de Geada",
@@ -5445,7 +5455,7 @@ export const pt_BR: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Arma Gélida",
-        "description": "Imbui sua arma com gelo cortante: cada golpe causa 8 de dano adicional por 5 min."
+        "description": "Imbui sua arma com gelo cortante: cada golpe causa {damage} de dano adicional por 5 min."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5461,11 +5471,11 @@ export const pt_BR: EnTranslations = {
       },
       "demon_skin": {
         "name": "Couro Demoníaco",
-        "description": "Pele demoníaca aumenta sua armadura em 30 por 30 min."
+        "description": "Pele demoníaca aumenta sua armadura em {buff} por 30 min."
       },
       "immolate": {
         "name": "Pacto Ardente",
-        "description": "Queima o inimigo com 11 de dano de Fogo e mais {damage} ao longo de 15 s."
+        "description": "Queima o inimigo com {damage} de dano de Fogo e mais {overTime} ao longo de 15 s."
       },
       "corruption": {
         "name": "Podridão Negra",
@@ -5473,7 +5483,7 @@ export const pt_BR: EnTranslations = {
       },
       "life_tap": {
         "name": "Barganha Amarga",
-        "description": "Converte 30 de vida em 30 de mana."
+        "description": "Converte {damage} de vida em {damage} de mana."
       },
       "curse_of_agony": {
         "name": "Praga da Angústia",
@@ -5505,7 +5515,7 @@ export const pt_BR: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Coloca o Wildward em um alvo aliado, aumentando a armadura em 25 por 30 min."
+        "description": "Coloca o Wildward em um alvo aliado, aumentando a armadura em {buff} por 30 min."
       },
       "moonfire": {
         "name": "Tempestade Lunar",
@@ -5517,7 +5527,7 @@ export const pt_BR: EnTranslations = {
       },
       "thorns": {
         "name": "Guarda de Espinhos",
-        "description": "Espinhos brotam do alvo: atacantes corpo a corpo sofrem 3 de dano de Natureza."
+        "description": "Espinhos brotam do alvo: atacantes corpo a corpo sofrem {buff} de dano de Natureza."
       },
       "entangling_roots": {
         "name": "Raízes Agarradoras",
@@ -5525,7 +5535,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +65%, poder de ataque +15, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +90%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",
@@ -5545,7 +5555,7 @@ export const pt_BR: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Mordida Sanguinária",
-        "description": "Golpe final que causa dano por ponto de combo. Apenas Forma de Lobo."
+        "description": "Golpe final que causa {damage}. Apenas Forma de Lobo."
       },
       "swipe": {
         "name": "Garras Varredoras",
@@ -5577,7 +5587,7 @@ export const pt_BR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luz Bruxa",
-        "description": "Reduz a armadura do alvo em 35 por 40 s."
+        "description": "Reduz a armadura do alvo em {damage}% por 40 s. Não acumula com Retalhar Armadura."
       },
       "hibernate": {
         "name": "Sono Profundo",
@@ -5601,7 +5611,7 @@ export const pt_BR: EnTranslations = {
       },
       "rip": {
         "name": "Rasgar",
-        "description": "Golpe final que causa dano de sangramento ao longo de 12 s. Consome pontos de combo. Apenas Forma de Lobo."
+        "description": "Golpe final que causa {damage} de dano de Sangramento ao longo de 12 s. Consome pontos de combo. Apenas Forma de Lobo."
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
@@ -5609,11 +5619,11 @@ export const pt_BR: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Sangria",
-        "description": "Ataca instantaneamente em frenesi sangrento, causando {damage}. (assinatura de Fúria)"
+        "description": "Ataca instantaneamente em frenesi sangrento, causando 60% do dano de arma mais {damage}. (assinatura de Fúria)"
       },
       "shield_slam": {
         "name": "Estrondo de Escudo",
-        "description": "Golpeia o alvo com seu escudo, causando {damage} e muita ameaça. (assinatura de Proteção)"
+        "description": "Golpeia o alvo com seu escudo, causando 50% do dano de arma mais {damage} e muita ameaça. (assinatura de Proteção)"
       },
       "whirlwind": {
         "name": "Redemoinho de Lâminas",
@@ -7134,6 +7144,9 @@ export const pt_BR: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Diácono Voss"
+      },
+      "training_dummy": {
+        "name": "Boneco de Treino"
       },
       "ridge_stalker": {
         "name": "Rastreador da crista"

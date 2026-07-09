@@ -393,7 +393,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade/bank); all 35 of them
+    // first snapshot (even the null-valued ones like party/trade/bank); all 36 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -1976,9 +1976,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 35 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 36 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 36th unregistered delta key reddens this gate.
+// 37th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -1999,6 +1999,7 @@ const ALL_DELTA_KEYS = [
   'inv',
   'lockouts',
   'lroll',
+  'lrollg',
   'mail',
   'mailU',
   'market',
@@ -2042,6 +2043,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   inv: 'inventory',
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
+  lrollg: 'lootRollGroup',
   lxp: 'lifetimeXp',
   mail: 'mailInfo',
   mailU: 'mailUnread',
@@ -2182,6 +2184,7 @@ function dirtyEveryDeltaField(): {
     quality: 'common',
     expiresAt: 9999,
     candidates: [lp],
+    partyMembers: [lp, mp],
     choices: new Map(),
   });
 
@@ -2247,6 +2250,17 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
+    // lrollg -> lootRollGroup, via the lootRollGroupStatus() accessor
+    expect(client.lootRollGroupStatus()).toEqual([
+      {
+        rollId: 1,
+        itemId: 'baked_bread',
+        itemName: 'Baked Bread',
+        quality: 'common',
+        expiresAt: 9999,
+        entries: [{ pid: leader.pid, name: 'Alld', choice: null }],
+      },
+    ]);
     expect(client.delveRun).not.toBeNull(); // drun -> delveRun
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
@@ -2309,9 +2323,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 35 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(35);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(35);
+  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(36);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2323,7 +2337,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(35);
+    expect(scraped.size).toBe(36);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

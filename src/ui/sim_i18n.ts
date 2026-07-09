@@ -159,6 +159,8 @@ const baseEnTable = {
   'log.partyLeft': '{name} has left the party.',
   'log.partyRemoved': '{name} has been removed from the party.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
+  'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
+  'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
   'loot.marketSellerBought':
     '{buyer} bought your {item} for {price} - collect {proceeds} from the Merchant.',
   'log.learnedAbility': 'You have learned a new ability: {name}.',
@@ -401,6 +403,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} has left the party.',
     'log.partyRemoved': '{name} has been removed from the party.',
     'loot.rollWin': '{winner} wins {item} ({roll})',
+    'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
+    'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
     'loot.marketSellerBought':
       '{buyer} bought your {item} for {price} - collect {proceeds} from the Merchant.',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
@@ -702,6 +706,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} ha abandonado el grupo.',
     'log.partyRemoved': '{name} ha sido expulsado del grupo.',
     'loot.rollWin': '{winner} gana {item} ({roll})',
+    'loot.rollNeed': 'Tirada de necesidad - {roll} por {item} de {name}',
+    'loot.rollGreed': 'Tirada de codicia - {roll} por {item} de {name}',
     'loot.marketSellerBought':
       '{buyer} compró tu {item} por {price}; cobra {proceeds} del Mercader.',
     'aura.tamed': 'Domado',
@@ -945,6 +951,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} ha abandonado el grupo.',
     'log.partyRemoved': '{name} ha sido expulsado del grupo.',
     'loot.rollWin': '{winner} gana {item} ({roll})',
+    'loot.rollNeed': 'Tirada de necesidad - {roll} por {item} de {name}',
+    'loot.rollGreed': 'Tirada de codicia - {roll} por {item} de {name}',
     'loot.marketSellerBought':
       '{buyer} compró tu {item} por {price}; cobra {proceeds} del Mercader.',
     'aura.tamed': 'Domado',
@@ -1190,6 +1198,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} a quitté le groupe.',
     'log.partyRemoved': '{name} a été retiré du groupe.',
     'loot.rollWin': '{winner} remporte {item} ({roll})',
+    'loot.rollNeed': 'Jet de besoin - {roll} pour {item} par {name}',
+    'loot.rollGreed': 'Jet de cupidité - {roll} pour {item} par {name}',
     'loot.marketSellerBought':
       '{buyer} a acheté votre {item} pour {price}; récupérez {proceeds} auprès du marchand.',
     'aura.tamed': 'Apprivoisé',
@@ -1435,6 +1445,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} a quitté le groupe.',
     'log.partyRemoved': '{name} a été retiré du groupe.',
     'loot.rollWin': '{winner} remporte {item} ({roll})',
+    'loot.rollNeed': 'Jet de besoin - {roll} pour {item} par {name}',
+    'loot.rollGreed': 'Jet de cupidité - {roll} pour {item} par {name}',
     'loot.marketSellerBought':
       '{buyer} a acheté votre {item} pour {price}; récupérez {proceeds} auprès du marchand.',
     'aura.tamed': 'Apprivoisé',
@@ -1623,6 +1635,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} has left the party.',
     'log.partyRemoved': '{name} has been removed from the party.',
     'loot.rollWin': '{winner} wins {item} ({roll})',
+    'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
+    'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
     'loot.marketSellerBought':
       '{buyer} bought your {item} for {price} - collect {proceeds} from the Merchant.',
     'aura.tamed': 'Tamed',
@@ -1841,6 +1855,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} ha abbandonato il gruppo.',
     'log.partyRemoved': '{name} è stato rimosso dal gruppo.',
     'loot.rollWin': '{winner} vince {item} ({roll})',
+    'loot.rollNeed': 'Tiro per bisogno - {roll} per {item} di {name}',
+    'loot.rollGreed': 'Tiro per brama - {roll} per {item} di {name}',
     'loot.marketSellerBought':
       '{buyer} ha comprato il tuo {item} per {price}; ritira {proceeds} dal mercante.',
     'aura.tamed': 'Addomesticato',
@@ -2083,6 +2099,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} hat die Gruppe verlassen.',
     'log.partyRemoved': '{name} wurde aus der Gruppe entfernt.',
     'loot.rollWin': '{winner} gewinnt {item} ({roll})',
+    'loot.rollNeed': 'Bedarfswurf - {roll} für {item} von {name}',
+    'loot.rollGreed': 'Gierwurf - {roll} für {item} von {name}',
     'loot.marketSellerBought':
       '{buyer} hat dein {item} für {price} gekauft; hol {proceeds} beim Händler ab.',
     'aura.tamed': 'Gezähmt',
@@ -2327,6 +2345,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name}已离开队伍。',
     'log.partyRemoved': '{name}已被移出队伍。',
     'loot.rollWin': '{winner}赢得了{item}（{roll}）',
+    'loot.rollNeed': '{name}对{item}的需求掷骰：{roll}',
+    'loot.rollGreed': '{name}对{item}的贪婪掷骰：{roll}',
     'loot.marketSellerBought': '{buyer}以{price}购买了你的{item}；向商人领取{proceeds}。',
     'aura.tamed': '已驯服',
     'aura.causticSpores': '腐蚀孢子',
@@ -2556,6 +2576,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} 已離開隊伍。',
     'log.partyRemoved': '{name} 已被移出隊伍。',
     'loot.rollWin': '{winner} 擲骰獲得 {item}（{roll}）',
+    'loot.rollNeed': '{name}對{item}的需求擲骰：{roll}',
+    'loot.rollGreed': '{name}對{item}的貪婪擲骰：{roll}',
     'loot.marketSellerBought': '{buyer}以{price}購買了你的{item}；向商人領取{proceeds}。',
     'aura.tamed': '馴服',
     'aura.causticSpores': '腐蝕孢子',
@@ -2790,6 +2812,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name}님이 파티를 떠났습니다.',
     'log.partyRemoved': '{name}님이 파티에서 제외되었습니다.',
     'loot.rollWin': '{winner}님이 {item}을(를) 획득했습니다 ({roll})',
+    'loot.rollNeed': '{name}님의 {item} 필요 주사위: {roll}',
+    'loot.rollGreed': '{name}님의 {item} 탐욕 주사위: {roll}',
     'loot.marketSellerBought':
       '{buyer}님이 당신의 {item}을(를) {price}에 샀습니다. 상인에게서 {proceeds}을(를) 수령하세요.',
     'aura.tamed': '길들여짐',
@@ -3032,6 +3056,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name}がパーティーを離れました。',
     'log.partyRemoved': '{name}がパーティーから除外されました。',
     'loot.rollWin': '{winner}が{item}を獲得しました（{roll}）',
+    'loot.rollNeed': '{name}の{item}への必要ロール：{roll}',
+    'loot.rollGreed': '{name}の{item}への強欲ロール：{roll}',
     'loot.marketSellerBought':
       '{buyer}があなたの{item}を{price}で購入しました。商人から{proceeds}を受け取ってください。',
     'aura.tamed': 'テイム',
@@ -3261,6 +3287,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} saiu do grupo.',
     'log.partyRemoved': '{name} foi removido do grupo.',
     'loot.rollWin': '{winner} vence {item} ({roll})',
+    'loot.rollNeed': 'Rolagem de necessidade - {roll} por {item} de {name}',
+    'loot.rollGreed': 'Rolagem de ganância - {roll} por {item} de {name}',
     'loot.marketSellerBought':
       '{buyer} comprou seu {item} por {price}; colete {proceeds} com o comerciante.',
     'aura.tamed': 'Domado',
@@ -3516,6 +3544,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.partyLeft': '{name} покинул(а) группу.',
     'log.partyRemoved': '{name} исключён(а) из группы.',
     'loot.rollWin': '{winner} выигрывает {item} ({roll})',
+    'loot.rollNeed': 'Бросок «Нужно» - {roll} за {item} от {name}',
+    'loot.rollGreed': 'Бросок «Жадность» - {roll} за {item} от {name}',
     'loot.marketSellerBought':
       '{buyer} купил ваш предмет {item} за {price}; заберите {proceeds} у торговца.',
     'aura.tamed': 'Приручён',
@@ -5448,6 +5478,15 @@ const RULES: Rule[] = [
   { re: /^Equipped (?!\()(.+)\.$/, build: (m) => tSim('log.equipped', { item: locItem(m[1]) }) },
   { re: /^Unequipped (.+)\.$/, build: (m) => tSim('log.unequipped', { item: locItem(m[1]) }) },
   { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
+  {
+    re: /^(Need|Greed) Roll - (\d+) for (.+) by (.+)$/,
+    build: (m) =>
+      tSim(m[1] === 'Need' ? 'loot.rollNeed' : 'loot.rollGreed', {
+        roll: m[2],
+        item: m[3],
+        name: m[4],
+      }),
+  },
   {
     re: /^(.+) wins (.+) \((\d+)\)$/,
     build: (m) => tSim('loot.rollWin', { winner: m[1], item: m[2], roll: m[3] }),

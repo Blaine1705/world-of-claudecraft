@@ -2012,6 +2012,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Sociale',
   'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menu',
+  'hud.core.mobileSettings': 'Impostazioni',
   'hud.core.mobileUse': 'Usa',
   'hud.core.mobileMeters': 'Misuratori',
   'hud.core.mobileMap': 'Mappa',
@@ -2752,29 +2753,29 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo.',
   'entities.abilities.battle_shout.name': 'Urlo di Ferro',
   'entities.abilities.battle_shout.description':
-    "Aumenta la tua potenza d'attacco di 20 per 2 min.",
+    "Aumenta la tua potenza d'attacco di {buff} per 2 min.",
   'entities.abilities.commanding_shout.name': 'Grido Rincuorante',
-  'entities.abilities.commanding_shout.description': 'Aumenta la tua Tempra di 6 per 2 min.',
+  'entities.abilities.commanding_shout.description': 'Aumenta la tua Tempra di {buff} per 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Ululato Sinistro',
   'entities.abilities.demoralizing_shout.description':
-    "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di 30 per 30 sec.",
+    "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di {buff} per 30 sec.",
   'entities.abilities.charge.name': 'Irruzione',
   'entities.abilities.charge.description':
     'Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m.',
   'entities.abilities.rend.name': 'Squarcio Profondo',
   'entities.abilities.rend.description':
-    'Ferisce il bersaglio e lo fa sanguinare per {damage} danni in 9 s.',
+    'Ferisce il bersaglio e lo fa sanguinare per {damage} danni in {duration} sec.',
   'entities.abilities.thunder_clap.name': 'Colpo Sismico',
   'entities.abilities.thunder_clap.description':
     'Colpisce i nemici vicini per {damage} danni e rallenta i loro attacchi del 10% per 10 s.',
   'entities.abilities.hamstring.name': 'Taglio Azzoppante',
   'entities.abilities.hamstring.description':
-    'Menoma il nemico per 5 danni, riducendo la sua velocità di movimento del 50% per 15 s.',
+    'Menoma il nemico per {damage} danni, riducendo la sua velocità di movimento del 50% per 15 sec.',
   'entities.abilities.bloodrage.name': 'Tributo di Sangue',
   'entities.abilities.bloodrage.description': 'Genera 10 rabbia al costo di salute.',
   'entities.abilities.overpower.name': 'Mano Rossa',
   'entities.abilities.overpower.description':
-    "Attacco istantaneo per danni dell'arma +5. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",
+    "Attacco istantaneo per danni dell'arma più {damage}. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",
   'entities.abilities.execute.name': 'Tomba Prematura',
   'entities.abilities.execute.description':
     'Tenta di finire un nemico ferito, infliggendo {damage} danni. Utilizzabile solo sui nemici sotto il 20% di salute.',
@@ -2793,16 +2794,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Dardo di Braci',
   'entities.abilities.rain_of_fire.name': 'Pioggia di Fuoco',
   'entities.abilities.rain_of_fire.description':
-    'Fa piovere fuoco sulla zona bersaglio, bruciando i nemici per {damage} danni da Fuoco.',
+    'Fa piovere fuoco sulla zona bersaglio per 4 sec, bruciando i nemici per {damage} danni da Fuoco ogni secondo.',
   'entities.abilities.volley.name': 'Scarica di Frecce',
   'entities.abilities.volley.description':
-    'Fa piovere frecce sulla zona bersaglio, infliggendo {damage} danni ai nemici colpiti.',
+    'Fa piovere frecce sulla zona bersaglio per 3 sec, infliggendo {damage} danni ogni 0.5 sec ai nemici colpiti.',
   'entities.abilities.hurricane.name': 'Uragano',
   'entities.abilities.hurricane.description':
-    'Scatena un uragano sulla zona bersaglio, colpendo i nemici per {damage} danni della Natura.',
+    'Scatena un uragano sulla zona bersaglio per 6 sec, colpendo i nemici per {damage} danni della Natura ogni secondo.',
   'entities.abilities.earthquake.name': 'Terremoto',
   'entities.abilities.earthquake.description':
-    'Scuote la zona bersaglio, colpendo i nemici per {damage} danni della Natura.',
+    'Scuote la zona bersaglio per 6 sec, colpendo i nemici per {damage} danni della Natura ogni 1.5 sec.',
   'entities.abilities.flamestrike.name': 'Ondata di Fiamme',
   'entities.abilities.flamestrike.description':
     "Evoca un'esplosione di fiamme sulla zona bersaglio, infliggendo {damage} danni da Fuoco ai nemici investiti dalla deflagrazione.",
@@ -2810,9 +2811,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia una palla infuocata che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo.',
   'entities.abilities.frost_armor.name': 'Manto di Brina',
   'entities.abilities.frost_armor.description':
-    "Ti avvolge nel gelo, aumentando l'armatura di 30 per 30 min.",
+    "Ti avvolge nel gelo, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.arcane_intellect.name': "Intuito d'Etere",
-  'entities.abilities.arcane_intellect.description': "Aumenta l'Intelletto di 2 per 30 min.",
+  'entities.abilities.arcane_intellect.description': "Aumenta l'Intelletto di {buff} per 30 min.",
   'entities.abilities.frostbolt.name': 'Lancia di Brina',
   'entities.abilities.frostbolt.description':
     'Lancia un dardo di gelo, infliggendo {damage} danni da Gelo e rallentando il movimento del 40%.',
@@ -2830,7 +2831,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Lancia Dardi d'Etere contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s.",
   'entities.abilities.polymorph.name': 'Ammaliare',
   'entities.abilities.polymorph.description':
-    "Trasforma il nemico in un rospo per un massimo di 15 s. Il rospo vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
+    "Trasforma il nemico in un rospo per un massimo di {duration} sec. Il rospo vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
   'entities.abilities.frost_nova.name': 'Vincolo di Ghiaccio',
   'entities.abilities.frost_nova.description':
     'Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo.',
@@ -2845,18 +2846,18 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo.',
   'entities.abilities.ice_barrier.name': 'Velo di Gelo',
   'entities.abilities.ice_barrier.description':
-    'Ti protegge nel ghiaccio, assorbendo 130 danni per 60 s.',
+    'Ti protegge nel ghiaccio, assorbendo {damage} danni per 60 sec.',
   'entities.abilities.sinister_strike.name': 'Fendente Malvagio',
   'entities.abilities.sinister_strike.description':
     "Colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
   'entities.abilities.eviscerate.name': 'Sonno Eterno',
-  'entities.abilities.eviscerate.description': 'Mossa finale che infligge danni per punto combo.',
+  'entities.abilities.eviscerate.description': 'Mossa finale che infligge {damage}.',
   'entities.abilities.backstab.name': 'Affondo Codardo',
   'entities.abilities.backstab.description':
     "Pugnala il bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
   'entities.abilities.gouge.name': "Colpo all'Occhio",
   'entities.abilities.gouge.description':
-    "Colpisce il bersaglio e lo incapacita per 4 s. Qualsiasi danno interrompe l'effetto. Conferisce 1 punto combo.",
+    "Colpisce il bersaglio per {damage} danni e lo incapacita per 4 sec. Qualsiasi danno interrompe l'effetto. Conferisce 1 punto combo.",
   'entities.abilities.evasion.name': 'Passo Spettrale',
   'entities.abilities.evasion.description':
     'Aumenta la tua probabilità di schivata del 50% per 15 s.',
@@ -2879,10 +2880,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il sangue ti ribolle e ripristina istantaneamente 60 energia.',
   'entities.abilities.garrote.name': 'Filo alla Gola',
   'entities.abilities.garrote.description':
-    'Garrota il nemico, infliggendo danni immediati e provocando sanguinamento per {damage} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.',
+    'Garrota il nemico, infliggendo {damage} danni immediati e provocando sanguinamento per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.',
   'entities.abilities.cheap_shot.name': 'Pugno allo Stomaco',
   'entities.abilities.cheap_shot.description':
-    'Colpisce il bersaglio, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.',
+    'Colpisce il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.',
   'entities.abilities.sap.name': 'Tramortimento',
   'entities.abilities.sap.description':
     "Incapacita il bersaglio per 8 sec. Devi essere furtivo e fuori dal combattimento. Qualsiasi danno interrompe l'effetto.",
@@ -2891,7 +2892,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisce il bersaglio con un veleno plumbeo, infliggendo {damage} danni della Natura e rallentando la sua velocità di movimento del 50% per 12 sec.',
   'entities.abilities.expose_armor.name': "Breccia nell'Armatura",
   'entities.abilities.expose_armor.description':
-    'Mossa finale che espone il bersaglio, riducendone la corazza. Più punti combo spesi approfondiscono il taglio.',
+    'Mossa finale che espone il bersaglio, riducendone la corazza di {damage} per 30 sec.',
   'entities.abilities.rupture.name': 'Dissanguamento',
   'entities.abilities.rupture.description':
     'Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec.',
@@ -2909,25 +2910,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Acceca il bersaglio, facendolo vagare disorientato per 8 sec. Qualsiasi danno interrompe l'effetto.",
   'entities.abilities.seal_of_righteousness.name': 'Marchio del Giuramento',
   'entities.abilities.seal_of_righteousness.description':
-    'Ti riempie di potere Sacro per 30 s, facendo infliggere 4 danni Sacri aggiuntivi a ogni tuo colpo in mischia. Scatenalo con Verdict.',
+    'Ti riempie di potere Sacro per 30 sec, facendo infliggere {damage} danni Sacri aggiuntivi a ogni tuo colpo in mischia. Scatenalo con Verdict.',
   'entities.abilities.holy_light.name': 'Luce Risanatrice',
   'entities.abilities.holy_light.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.devotion_aura.name': 'Aura Incrollabile',
-  'entities.abilities.devotion_aura.description': 'Aumenta la tua armatura di 40 per 30 min.',
+  'entities.abilities.devotion_aura.description': 'Aumenta la tua armatura di {buff} per 30 min.',
   'entities.abilities.judgement.name': 'Verdict',
   'entities.abilities.judgement.description':
     'Scatena il tuo Sigillo attivo sul nemico, consumandolo per infliggere i suoi danni Sacri accumulati.',
   'entities.abilities.blessing_of_might.name': 'Giuramento di Ferro',
   'entities.abilities.blessing_of_might.description':
-    "Pone una Benedizione su un bersaglio alleato, aumentando la potenza d'attacco di 15 per 5 min.",
+    "Pone una Benedizione su un bersaglio alleato, aumentando la potenza d'attacco di {buff} per 5 min.",
   'entities.abilities.divine_protection.name': 'Barriera della Fede',
   'entities.abilities.divine_protection.description':
-    'Una barriera protettiva assorbe 50 danni per 10 s.',
+    'Una barriera protettiva assorbe {damage} danni per 10 sec.',
   'entities.abilities.hammer_of_justice.name': 'Maglio Frantumante',
-  'entities.abilities.hammer_of_justice.description': 'Stordisce il bersaglio per 3 s.',
+  'entities.abilities.hammer_of_justice.description': 'Stordisce il bersaglio per {duration} sec.',
   'entities.abilities.lay_on_hands.name': 'Ultimo Rito',
   'entities.abilities.lay_on_hands.description':
-    'Una grande ondata di guarigione: ripristina 250 salute. Tempo di recupero di 10 min.',
+    'Una grande ondata di guarigione: ripristina {damage} salute. Tempo di recupero di 10 min.',
   'entities.abilities.flash_of_light.name': 'Rammendo di Luce',
   'entities.abilities.flash_of_light.description':
     'Un rapido ed efficiente sprazzo di Luce che cura un bersaglio alleato di {damage}.',
@@ -2936,7 +2937,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaccia i malvagi con ira Sacra, infliggendo {damage} danni Sacri.',
   'entities.abilities.consecration.name': 'Terra Consacrata',
   'entities.abilities.consecration.description':
-    'Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri.',
+    'Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri ogni 2 sec per 10 sec.',
   'entities.abilities.righteous_fury.name': 'Giuramento Ardente',
   'entities.abilities.righteous_fury.description':
     'Aumenta del 60% la minaccia generata dai tuoi danni Sacri per 30 min. Il cardine del paladino difensore.',
@@ -2951,10 +2952,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Libera il tuo famiglio e lo rimanda nelle terre selvagge.',
   'entities.abilities.raptor_strike.name': 'Colpo Sventratore',
   'entities.abilities.raptor_strike.description':
-    'Forte attacco in mischia che aumenta i danni di 5. Si attiva al tuo prossimo colpo.',
+    'Forte attacco in mischia che aumenta i danni di {damage}. Si attiva al tuo prossimo colpo.',
   'entities.abilities.aspect_of_the_hawk.name': "Sembianze dell'Albanella",
   'entities.abilities.aspect_of_the_hawk.description':
-    "Assumi le sembianze dell'albanella, aumentando la potenza d'attacco di 20 per 30 min.",
+    "Assumi le sembianze dell'albanella, aumentando la potenza d'attacco di {buff} per 30 min.",
   'entities.abilities.serpent_sting.name': 'Aculeo Velenoso',
   'entities.abilities.serpent_sting.description':
     'Punzecchia il bersaglio, infliggendo {damage} danni da Natura in 15 s.',
@@ -2963,13 +2964,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tiro istantaneo che infligge {damage} danni Arcani.',
   'entities.abilities.concussive_shot.name': 'Tiro Scuotente',
   'entities.abilities.concussive_shot.description':
-    'Stordisce leggermente il bersaglio, rallentandone il movimento del 50% per 4 s.',
+    'Stordisce leggermente il bersaglio per {damage} danni, rallentandone il movimento del 50% per 4 sec.',
   'entities.abilities.mongoose_bite.name': 'Controzanna',
   'entities.abilities.mongoose_bite.description':
-    "Contrattacca dopo che il bersaglio schiva, infliggendo danni dell'arma più 12. Non può essere schivato.",
+    "Contrattacca dopo che il bersaglio schiva, infliggendo danni dell'arma più {damage}. Non può essere schivato.",
   'entities.abilities.wing_clip.name': 'Fendente Immobilizzante',
   'entities.abilities.wing_clip.description':
-    'Infligge una ferita che rallenta il nemico del 40% per 10 s.',
+    'Infligge una ferita per {damage} danni, rallentando il nemico del 40% per 10 sec.',
   'entities.abilities.aspect_of_the_monkey.name': 'Sembianze della Martora',
   'entities.abilities.aspect_of_the_monkey.description':
     "Assumi le sembianze della martora, aumentando la tua probabilità di schivata dell'8% per 30 min.",
@@ -2988,13 +2989,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.power_word_fortitude.name': 'Litania della Fermezza',
   'entities.abilities.power_word_fortitude.description':
-    'Aumenta la Tempra del bersaglio di 3 per 30 min.',
+    'Aumenta la Tempra del bersaglio di {buff} per 30 min.',
   'entities.abilities.shadow_word_pain.name': 'Canto Funebre della Putrefazione',
   'entities.abilities.shadow_word_pain.description':
     "Una parola d'oscurità infligge {damage} danni da Ombra in 18 s.",
   'entities.abilities.power_word_shield.name': 'Salmo di Protezione',
   'entities.abilities.power_word_shield.description':
-    'Protegge il bersaglio, assorbendo 48 danni per 30 s.',
+    'Protegge il bersaglio, assorbendo {damage} danni per 30 sec.',
   'entities.abilities.renew.name': 'Grazia Persistente',
   'entities.abilities.renew.description': 'Cura il bersaglio di {damage} in 15 s.',
   'entities.abilities.mind_blast.name': 'Frattura Mentale',
@@ -3014,7 +3015,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia un fulmine per {damage} danni da Natura.',
   'entities.abilities.rockbiter_weapon.name': 'Arma Legapietra',
   'entities.abilities.rockbiter_weapon.description':
-    'Imbeve la tua arma con la furia della pietra: ogni colpo infligge 5 danni aggiuntivi per 5 min.',
+    'Imbeve la tua arma con la furia della pietra: ogni colpo infligge {damage} danni aggiuntivi per 5 min.',
   'entities.abilities.healing_wave.name': 'Acque Risananti',
   'entities.abilities.healing_wave.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.earth_shock.name': 'Scossa Tellurica',
@@ -3022,19 +3023,19 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scuote istantaneamente il bersaglio con forza dirompente per {damage} danni da Natura.',
   'entities.abilities.lightning_shield.name': 'Barriera di Tuono',
   'entities.abilities.lightning_shield.description':
-    'Ti circonda di fulmini crepitanti: gli assalitori in mischia subiscono 13 danni da Natura.',
+    'Ti circonda di fulmini crepitanti: gli assalitori in mischia subiscono {buff} danni da Natura, fino a 3 cariche e al massimo una volta ogni 5 secondi.',
   'entities.abilities.flame_shock.name': 'Scossa di Braci',
   'entities.abilities.flame_shock.description':
-    'Brucia il bersaglio con il fuoco per 25 danni più {damage} in 12 s.',
+    'Brucia il bersaglio con il fuoco per {damage} danni più {overTime} in 12 sec.',
   'entities.abilities.flametongue_weapon.name': 'Arma Marchiofuoco',
   'entities.abilities.flametongue_weapon.description':
-    'Imbeve la tua arma con fuoco elementale: ogni colpo infligge 8 danni da Fuoco aggiuntivi per 5 min.',
+    'Imbeve la tua arma con fuoco elementale: ogni colpo infligge {damage} danni da Fuoco aggiuntivi per 5 min.',
   'entities.abilities.frost_shock.name': 'Scossa di Brina',
   'entities.abilities.frost_shock.description':
     'Scuote istantaneamente il bersaglio col gelo per {damage} danni da Gelo e rallenta il movimento del 50% per 8 s.',
   'entities.abilities.frostbrand_weapon.name': 'Arma Legabrina',
   'entities.abilities.frostbrand_weapon.description':
-    'Imbeve la tua arma con gelo pungente: ogni colpo infligge 8 danni aggiuntivi per 5 min.',
+    'Imbeve la tua arma con gelo pungente: ogni colpo infligge {damage} danni aggiuntivi per 5 min.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.ghost_wolf.description':
     'Ti trasforma in un Shadewolf, aumentando la velocità di movimento del 40% per 10 min.',
@@ -3046,15 +3047,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Invia un dardo oscuro contro il nemico per {damage} danni da Ombra.',
   'entities.abilities.demon_skin.name': 'Pelle di Demone',
   'entities.abilities.demon_skin.description':
-    'La pelle demoniaca aumenta la tua armatura di 30 per 30 min.',
+    'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min.',
   'entities.abilities.immolate.name': 'Patto Ardente',
   'entities.abilities.immolate.description':
-    'Brucia il nemico per 11 danni da Fuoco e altri {damage} in 15 s.',
+    'Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec.',
   'entities.abilities.corruption.name': 'Marciume Nero',
   'entities.abilities.corruption.description':
     'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
   'entities.abilities.life_tap.name': 'Patto Amaro',
-  'entities.abilities.life_tap.description': 'Converte 30 salute in 30 mana.',
+  'entities.abilities.life_tap.description': 'Converte {damage} salute in {damage} mana.',
   'entities.abilities.curse_of_agony.name': "Maleficio dell'Angoscia",
   'entities.abilities.curse_of_agony.description':
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
@@ -3077,7 +3078,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.mark_of_the_wild.description':
-    "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di 25 per 30 min.",
+    "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
   'entities.abilities.moonfire.description':
     'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
@@ -3085,13 +3086,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
-    'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono 3 danni da Natura.',
+    'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
   'entities.abilities.entangling_roots.name': 'Radici Avvinghianti',
   'entities.abilities.entangling_roots.description':
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +65%, potenza d'attacco +15, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +90%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.maul.description':
     'Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin.',
@@ -3106,7 +3107,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
   'entities.abilities.ferocious_bite.name': 'Morso Cruento',
   'entities.abilities.ferocious_bite.description':
-    'Mossa finale che infligge danni per punto combo. Solo Forma del Lupo.',
+    'Mossa finale che infligge {damage}. Solo Forma del Lupo.',
   'entities.abilities.swipe.name': 'Artigli Falcianti',
   'entities.abilities.swipe.description':
     'Falcia i nemici vicini per {damage} danni. Genera minaccia extra. Solo in Forma di Bruin.',
@@ -3129,7 +3130,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description':
     'Stordisce il bersaglio per 2 sec. Solo in Forma di Bruin.',
   'entities.abilities.faerie_fire.name': 'Luce Stregata',
-  'entities.abilities.faerie_fire.description': "Riduce l'armatura del bersaglio di 35 per 40 sec.",
+  'entities.abilities.faerie_fire.description':
+    "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura.",
   'entities.abilities.hibernate.name': 'Sopore',
   'entities.abilities.hibernate.description':
     'Costringe il bersaglio in un sonno profondo per un massimo di 8 sec. Qualsiasi danno lo risveglia.',
@@ -3147,16 +3149,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Aumenta la potenza d'attacco di 40 per 6 sec. Solo Forma del Lupo.",
   'entities.abilities.rip.name': 'Squartare',
   'entities.abilities.rip.description':
-    'Mossa finale che infligge danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
+    'Mossa finale che infligge {damage} danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
   'entities.abilities.mortal_strike.name': 'Colpo Mutilante',
   'entities.abilities.mortal_strike.description':
     "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)",
   'entities.abilities.bloodthirst.name': 'Salasso',
   'entities.abilities.bloodthirst.description':
-    'Attacca istantaneamente in una frenesia sanguigna per {damage}. (firma Furia)',
+    "Attacca istantaneamente in una frenesia sanguigna per il 60% dei danni dell'arma più {damage}. (firma Furia)",
   'entities.abilities.shield_slam.name': 'Frantumascudo',
   'entities.abilities.shield_slam.description':
-    'Colpisce il bersaglio con lo scudo per {damage} e genera una minaccia enorme. (firma Protezione)',
+    "Colpisce il bersaglio con lo scudo per il 50% dei danni dell'arma più {damage} e genera una minaccia enorme. (firma Protezione)",
   'entities.abilities.whirlwind.name': 'Vortice di Lame',
   'entities.abilities.whirlwind.description':
     'Ruoti in un arco letale, colpendo tutti i nemici vicini per {damage}. (talento Furia)',
@@ -6675,4 +6677,52 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Invita un amico: quando raggiunge il livello 10 guadagnate 2 spazi ciascuno, fino a 5 amici.',
   'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'abilityUi.tooltip.selfOnly': 'Solo su di sé',
+  'itemUi.lootRoll.rolled': '{answered}/{total} hanno tirato',
+  'entities.abilities.sunder_armor.description':
+    "Lacera l'armatura del bersaglio, riducendola del {damage}% per applicazione. Si accumula fino a 5 volte. Genera una grande quantità di minaccia.",
+  'entities.mobs.training_dummy.name': "Manichino d'allenamento",
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.',
+  'guide.arenaPage.yumiHeading': 'Proteggi Yumi',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Passatempo',
+  'hudChrome.auraEffect.armorPct': "Riduce l'armatura del {pct}%",
+  'hudChrome.auraEffect.armorPctStacks': "Riduce l'armatura del {pct}% ({stacks} accumuli)",
+  'hudChrome.auraEffect.increasePct.allStats': 'Aumenta tutti gli attributi del {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Aumenta la potenza di attacco del {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': "Aumenta l'armatura del {pct}%",
+  'hudChrome.auraEffect.increasePct.int': "Aumenta l'intelletto del {pct}%",
+  'hudChrome.auraEffect.increasePct.sta': 'Aumenta la tempra del {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Devi trovarti alla postazione artigiana, al livello richiesto, per fabbricarlo.',
+  'hudChrome.crafting.recipeNotLearned': 'Non hai ancora imparato quella ricetta.',
+  'hudChrome.crafting.throttled':
+    'Stai fabbricando troppo in fretta. Aspetta un momento e riprova.',
+  'hudChrome.mobile.chatPlaceholder': 'Scrivi qualcosa...',
+  'hudChrome.mobile.hideKeyboard': 'Nascondi tastiera',
+  'hudChrome.unitFrame.partyChip': 'Gruppo',
+  'yumi.banner.sudden': 'MORTE IMPROVVISA! Gli Yumi tengono la posizione!',
+  'yumi.banner.teleport': 'Gli Yumi si teletrasportano!',
+  'yumi.bracket3': 'Yumi 3c3',
+  'yumi.bracket5': 'Yumi 5c5',
+  'yumi.end.loss': 'SCONFITTA! Il tuo Yumi è caduto.',
+  'yumi.end.win': 'VITTORIA! Yumi è al sicuro!',
+  'yumi.enterQueue': 'Unisciti a Proteggi Yumi!',
+  'yumi.error.partyTooBig3': 'Proteggi Yumi 3c3 ammette un gruppo di massimo tre giocatori.',
+  'yumi.error.partyTooBig5': 'Proteggi Yumi 5c5 ammette un gruppo di massimo cinque giocatori.',
+  'yumi.hud.aria': 'Il tuo Yumi a {mine} di {max} salute, Yumi nemico a {theirs}.',
+  'yumi.hud.collapse': 'Comprimi le barre di Proteggi Yumi',
+  'yumi.hud.enemyYumi': 'Yumi nemico',
+  'yumi.hud.expand': 'Espandi le barre di Proteggi Yumi',
+  'yumi.hud.getReady': 'Preparati…',
+  'yumi.hud.suddenDeath': 'MORTE IMPROVVISA',
+  'yumi.hud.teleportIn': 'Gli Yumi si spostano tra {s}',
+  'yumi.hud.title': 'PROTEGGI YUMI',
+  'yumi.hud.yourYumi': 'Il tuo Yumi',
+  'yumi.log.start': 'Proteggi Yumi! Difendi il tuo famiglio e dai la caccia a quello nemico.',
+  'yumi.queue.join': 'Ti unisci alla coda di Proteggi Yumi. Proteggi il tuo famiglio…',
+  'yumi.queue.leave': 'Lasci la coda di Proteggi Yumi.',
+  'yumi.queue.teamLeave': 'La tua squadra lascia la coda di Proteggi Yumi.',
+  'yumi.respawn.title': 'ABBATTUTO!',
 };

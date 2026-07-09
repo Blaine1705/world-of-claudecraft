@@ -46,7 +46,7 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
-import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
+import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -403,6 +403,16 @@ export function dealDamage(
     else if (source.ownerId !== null) target.tappedById = source.ownerId;
   }
 
+  // World-boss loot roster: every player (or pet owner) who lands a hit on a world
+  // boss becomes a permanent loot contributor. Unlike the hate table above, this set
+  // is NEVER pruned when they die, release their spirit, or drop off threat, so a
+  // raider who died to the boss still gets their personal drop. Read at death by
+  // worldBossLootContributors. Only world-boss templates ever populate it.
+  if (source && amount > 0 && MOBS[target.templateId]?.worldBoss) {
+    const contributorId = source.kind === 'player' ? source.id : source.ownerId;
+    if (contributorId !== null) target.bossDamagers.add(contributorId);
+  }
+
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
@@ -583,6 +593,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
+    e.queuedCastAbility = null;
+    e.queuedCastAim = null;
     e.comboPoints = 0;
     e.eating = null;
     e.drinking = null;
@@ -637,7 +649,14 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
-    e.respawnTimer = ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    e.respawnTimer =
+      template?.respawnSeconds ??
+      ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // A fixed respawn also caps corpse decay so the mob returns on schedule whether
+    // or not its loot was looted (training dummy: 10s).
+    if (template?.respawnSeconds !== undefined) {
+      e.corpseTimer = Math.min(e.corpseTimer, template.respawnSeconds);
+    }
     // World bosses: snapshot the contributor set from the hate table BEFORE it is
     // cleared below, keep a long lootable-corpse window so every contributor can
     // loot, and never auto-respawn in place: the world-boss scheduler is the sole
@@ -645,7 +664,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // collapse with the boss: leaving them alive would harass looters for the
     // whole window, and a slain add's in-place respawn timer would revive it
     // mid-window (only fires for worldBoss templates, so no parity rng change).
-    const worldBossContribs = template?.worldBoss ? worldBossContributors(ctx, e) : null;
+    const worldBossContribs = template?.worldBoss ? worldBossLootContributors(ctx, e) : null;
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;

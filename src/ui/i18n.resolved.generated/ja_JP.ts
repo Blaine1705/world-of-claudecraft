@@ -291,6 +291,7 @@ export const ja_JP: EnTranslations = {
       "targetLabel": "あなたのターゲット",
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
+      "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
@@ -320,7 +321,9 @@ export const ja_JP: EnTranslations = {
       "actionPageIndicator": "{page}ページ",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
-      "spellbookPageLabel": "ページ{page}"
+      "spellbookPageLabel": "ページ{page}",
+      "hideKeyboard": "キーボードを隠す",
+      "chatPlaceholder": "発言する..."
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -1431,6 +1434,7 @@ export const ja_JP: EnTranslations = {
     "archetypeTitle": {
       "label": "称号",
       "none": "なし",
+      "hobbyLabel": "趣味",
       "armorcrafting": "防具鍛冶師",
       "weaponcrafting": "武器鍛冶師",
       "jewelcrafting": "宝石職人",
@@ -1453,7 +1457,10 @@ export const ja_JP: EnTranslations = {
       "craftedToast": "製作しました:{name}",
       "insufficientMaterials": "材料が不足しています。",
       "unknownRecipe": "そのレシピは存在しません。",
-      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。"
+      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
+      "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
+      "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
+      "recipeNotLearned": "そのレシピはまだ習得していません。"
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const ja_JP: EnTranslations = {
       "mobileSocial": "ソーシャル",
       "mobileArena": "アリーナ",
       "mobileMenu": "メニュー",
+      "mobileSettings": "設定",
       "mobileUse": "使用",
       "mobileMeters": "メーター",
       "mobileMap": "マップ",
@@ -4690,6 +4698,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
+      "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
     },
@@ -4998,7 +5007,8 @@ export const ja_JP: EnTranslations = {
       "needAria": "{item}を必要",
       "greedAria": "{item}を強欲",
       "passAria": "{item}をパス",
-      "everyonePassed": "全員が{item}をパスしました。"
+      "everyonePassed": "全員が{item}をパスしました。",
+      "rolled": "{answered}/{total} がロール済み"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const ja_JP: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "火炎の雨",
-        "description": "対象地点に火の雨を降らせ、敵に{damage}の火炎ダメージを与えます。"
+        "description": "対象地点に4秒間、火の雨を降らせ、敵を焼いて毎秒{damage}の火炎ダメージを与えます。"
       },
       "volley": {
         "name": "乱射",
-        "description": "対象地点に矢を降らせ、範囲内の敵に{damage}のダメージを与えます。"
+        "description": "対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。"
       },
       "hurricane": {
         "name": "ハリケーン",
-        "description": "対象地点にハリケーンを呼び起こし、敵に{damage}の自然ダメージを与えます。"
+        "description": "対象地点に6秒間、ハリケーンを呼び起こし、敵を打ちのめして毎秒{damage}の自然ダメージを与えます。"
       },
       "earthquake": {
         "name": "地震",
-        "description": "対象地点を揺るがし、敵に{damage}の自然ダメージを与えます。"
+        "description": "対象地点を6秒間揺るがし、敵を打ちのめして1.5秒ごとに{damage}の自然ダメージを与えます。"
       },
       "heroic_strike": {
         "name": "略奪者の一撃",
@@ -5069,15 +5079,15 @@ export const ja_JP: EnTranslations = {
       },
       "battle_shout": {
         "name": "鉄の咆哮",
-        "description": "2分間、攻撃力が20増加します。"
+        "description": "2分間、攻撃力が{buff}増加します。"
       },
       "commanding_shout": {
         "name": "鼓舞の号令",
-        "description": "2分間、スタミナが6増加します。"
+        "description": "2分間、スタミナが{buff}増加します。"
       },
       "demoralizing_shout": {
         "name": "戦慄の遠吠え",
-        "description": "恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を30低下させます。"
+        "description": "恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を{buff}低下させます。"
       },
       "charge": {
         "name": "突撃",
@@ -5085,7 +5095,7 @@ export const ja_JP: EnTranslations = {
       },
       "rend": {
         "name": "深き裂傷",
-        "description": "対象を負傷させ、9秒間で {damage} の出血ダメージを与えます。"
+        "description": "対象を負傷させ、{duration}秒かけて{damage}の出血ダメージを与えます。"
       },
       "thunder_clap": {
         "name": "震撼の一撃",
@@ -5093,7 +5103,7 @@ export const ja_JP: EnTranslations = {
       },
       "hamstring": {
         "name": "足萎えの斬撃",
-        "description": "敵を痛めつけて5ダメージを与え、15秒間、移動速度を50%低下させます。"
+        "description": "敵を痛めつけて{damage}ダメージを与え、15秒間、移動速度を50%低下させます。"
       },
       "bloodrage": {
         "name": "血の代償",
@@ -5101,7 +5111,7 @@ export const ja_JP: EnTranslations = {
       },
       "overpower": {
         "name": "血染めの手",
-        "description": "武器ダメージ +5 の即時攻撃です。対象が回避した後にのみ使用できます。回避されません。"
+        "description": "武器ダメージに{damage}を加えた即時攻撃です。対象が回避した後にのみ使用できます。回避されません。"
       },
       "execute": {
         "name": "早すぎる墓",
@@ -5121,7 +5131,7 @@ export const ja_JP: EnTranslations = {
       },
       "sunder_armor": {
         "name": "装甲切断",
-        "description": "対象のアーマーを破壊し、1回ごとに 2% 低下させます。最大5回まで重なります（最大で10%）。大量の脅威を生成します。"
+        "description": "対象のアーマーを破壊し、1回ごとに{damage}%低下させます。最大5回まで重なります。大量の脅威を生成します。"
       },
       "taunt": {
         "name": "挑発",
@@ -5133,11 +5143,11 @@ export const ja_JP: EnTranslations = {
       },
       "frost_armor": {
         "name": "白霜の外套",
-        "description": "霜で身を包み、30分間アーマーを30増加させます。"
+        "description": "霜で身を包み、30分間アーマーを{buff}増加させます。"
       },
       "arcane_intellect": {
         "name": "エーテルの叡智",
-        "description": "30分間、知力が2増加します。"
+        "description": "30分間、知力が{buff}増加します。"
       },
       "frostbolt": {
         "name": "霧氷の槍",
@@ -5161,7 +5171,7 @@ export const ja_JP: EnTranslations = {
       },
       "polymorph": {
         "name": "呪化",
-        "description": "敵を最大15秒間ヒキガエルに変えます。ヒキガエルは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。"
+        "description": "敵を最大{duration}秒間ヒキガエルに変えます。ヒキガエルは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。"
       },
       "frost_nova": {
         "name": "氷縛",
@@ -5181,7 +5191,7 @@ export const ja_JP: EnTranslations = {
       },
       "ice_barrier": {
         "name": "氷の帳",
-        "description": "氷で身を守り、60秒間130ダメージを吸収します。"
+        "description": "氷で身を守り、60秒間{damage}ダメージを吸収します。"
       },
       "sinister_strike": {
         "name": "邪悪な斬撃",
@@ -5189,7 +5199,7 @@ export const ja_JP: EnTranslations = {
       },
       "eviscerate": {
         "name": "永の眠り",
-        "description": "コンボポイントに応じてダメージを与えるフィニッシュムーブです。"
+        "description": "{damage}を与えるフィニッシュムーブです。"
       },
       "backstab": {
         "name": "卑劣な突き",
@@ -5197,7 +5207,7 @@ export const ja_JP: EnTranslations = {
       },
       "gouge": {
         "name": "目潰し",
-        "description": "対象を打って4秒間行動不能にします。ダメージを受けると効果が切れます。コンボポイントを1獲得します。"
+        "description": "対象を打って{damage}ダメージを与え、4秒間行動不能にします。ダメージを受けると効果が切れます。コンボポイントを1獲得します。"
       },
       "evasion": {
         "name": "幻足",
@@ -5229,11 +5239,11 @@ export const ja_JP: EnTranslations = {
       },
       "garrote": {
         "name": "喉絞めの弦",
-        "description": "敵を絞め、即座にダメージを与えるとともに、18秒かけて{damage}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。"
+        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。"
       },
       "cheap_shot": {
         "name": "みぞおち強打",
-        "description": "対象を打って4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。"
+        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。"
       },
       "sap": {
         "name": "サップ",
@@ -5241,11 +5251,11 @@ export const ja_JP: EnTranslations = {
       },
       "crippling_poison": {
         "name": "鉛の毒",
-        "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、移動速度を12秒間50%低下させます。"
+        "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。"
       },
       "expose_armor": {
         "name": "装甲破り",
-        "description": "対象の防御を崩し、アーマーを低下させるフィニッシュムーブです。消費したコンボポイントが多いほど、より深く切り込みます。"
+        "description": "対象の防御を崩し、30秒間アーマーを{damage}低下させるフィニッシュムーブです。"
       },
       "rupture": {
         "name": "止まらぬ出血",
@@ -5269,7 +5279,7 @@ export const ja_JP: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "誓いの烙印",
-        "description": "30秒間、聖なる力で満たされ、近接攻撃ごとに4の追加神聖ダメージを与えます。ヴァーディクトで解放します。"
+        "description": "30秒間、聖なる力で満たされ、近接攻撃ごとに{damage}の追加神聖ダメージを与えます。ヴァーディクトで解放します。"
       },
       "holy_light": {
         "name": "癒しの光",
@@ -5277,7 +5287,7 @@ export const ja_JP: EnTranslations = {
       },
       "devotion_aura": {
         "name": "不動のオーラ",
-        "description": "30分間、アーマーが40増加します。"
+        "description": "30分間、アーマーが{buff}増加します。"
       },
       "judgement": {
         "name": "ヴァーディクト",
@@ -5285,19 +5295,19 @@ export const ja_JP: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "鉄の誓い",
-        "description": "味方対象に祝福を与え、5分間、攻撃力を15増加させます。"
+        "description": "味方対象に祝福を与え、5分間、攻撃力を{buff}増加させます。"
       },
       "divine_protection": {
         "name": "信仰の守り",
-        "description": "守りの結界が10秒間50ダメージを吸収します。"
+        "description": "守りの結界が10秒間{damage}ダメージを吸収します。"
       },
       "hammer_of_justice": {
         "name": "断裂の裁き槌",
-        "description": "対象を3秒間スタンさせます。"
+        "description": "対象を{duration}秒間スタンさせます。"
       },
       "lay_on_hands": {
         "name": "最後の秘跡",
-        "description": "大きな癒やしの波で体力を250回復します。クールダウン10分。"
+        "description": "大きな癒やしの波で体力を{damage}回復します。クールダウン10分。"
       },
       "flash_of_light": {
         "name": "光の癒し",
@@ -5309,7 +5319,7 @@ export const ja_JP: EnTranslations = {
       },
       "consecration": {
         "name": "聖なる大地",
-        "description": "足元の地面を聖別し、周囲の敵を焼いて {damage} の神聖ダメージを与えます。"
+        "description": "足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。"
       },
       "righteous_fury": {
         "name": "バーニングオース",
@@ -5329,11 +5339,11 @@ export const ja_JP: EnTranslations = {
       },
       "raptor_strike": {
         "name": "腹裂きの一撃",
-        "description": "強力な近接攻撃でダメージを5増加させます。次のスイングで発動します。"
+        "description": "強力な近接攻撃でダメージを{damage}増加させます。次のスイングで発動します。"
       },
       "aspect_of_the_hawk": {
         "name": "猛禽の相",
-        "description": "猛禽の相をまとい、30分間、攻撃力を20増加させます。"
+        "description": "猛禽の相をまとい、30分間、攻撃力を{buff}増加させます。"
       },
       "serpent_sting": {
         "name": "毒の棘",
@@ -5345,15 +5355,15 @@ export const ja_JP: EnTranslations = {
       },
       "concussive_shot": {
         "name": "動揺の射撃",
-        "description": "対象を朦朧とさせ、4秒間、移動速度を50%低下させます。"
+        "description": "対象を朦朧とさせて{damage}ダメージを与え、4秒間、移動速度を50%低下させます。"
       },
       "mongoose_bite": {
         "name": "反撃の牙",
-        "description": "対象が回避した後に反撃し、武器ダメージに12を加えたダメージを与えます。回避されません。"
+        "description": "対象が回避した後に反撃し、武器ダメージに{damage}を加えたダメージを与えます。回避されません。"
       },
       "wing_clip": {
         "name": "足枷斬り",
-        "description": "傷を負わせ、10秒間、敵の移動速度を40%低下させます。"
+        "description": "傷を負わせて{damage}ダメージを与え、10秒間、敵の移動速度を40%低下させます。"
       },
       "aspect_of_the_monkey": {
         "name": "テンの相",
@@ -5381,7 +5391,7 @@ export const ja_JP: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "決意の連祷",
-        "description": "30分間、対象のスタミナを3増加させます。"
+        "description": "30分間、対象のスタミナを{buff}増加させます。"
       },
       "shadow_word_pain": {
         "name": "腐朽の葬送歌",
@@ -5389,7 +5399,7 @@ export const ja_JP: EnTranslations = {
       },
       "power_word_shield": {
         "name": "守りの聖歌",
-        "description": "対象を守り、30秒間48ダメージを吸収します。"
+        "description": "対象を守り、30秒間{damage}ダメージを吸収します。"
       },
       "renew": {
         "name": "留まる恩寵",
@@ -5417,7 +5427,7 @@ export const ja_JP: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
-        "description": "石の怒りを武器に込めます。5分間、各スイングが5の追加ダメージを与えます。"
+        "description": "石の怒りを武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。"
       },
       "healing_wave": {
         "name": "癒しの水流",
@@ -5429,15 +5439,15 @@ export const ja_JP: EnTranslations = {
       },
       "lightning_shield": {
         "name": "雷の守り",
-        "description": "弾ける稲妻で身を包みます。近接攻撃者は13の自然ダメージを受けます。"
+        "description": "弾ける稲妻で身を包みます。近接攻撃者は{buff}の自然ダメージを受けます。最大3チャージで、発動は5秒に1回までです。"
       },
       "flame_shock": {
         "name": "灰燼の衝撃",
-        "description": "対象を炎で焼き、25ダメージに加えて12秒間で {damage} のダメージを与えます。"
+        "description": "対象を炎で焼き、{damage}ダメージに加えて12秒間で{overTime}のダメージを与えます。"
       },
       "flametongue_weapon": {
         "name": "火焔烙印の武器",
-        "description": "元素の炎を武器に込めます。5分間、各スイングが8の追加火炎ダメージを与えます。"
+        "description": "元素の炎を武器に込めます。5分間、各スイングが{damage}の追加火炎ダメージを与えます。"
       },
       "frost_shock": {
         "name": "霧氷の衝撃",
@@ -5445,7 +5455,7 @@ export const ja_JP: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "霧氷縛の武器",
-        "description": "刺すような冷気を武器に込めます。5分間、各スイングが8の追加ダメージを与えます。"
+        "description": "刺すような冷気を武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。"
       },
       "ghost_wolf": {
         "name": "シェイドウルフ",
@@ -5461,11 +5471,11 @@ export const ja_JP: EnTranslations = {
       },
       "demon_skin": {
         "name": "魔物の肌",
-        "description": "悪魔の皮膚により、30分間アーマーが30増加します。"
+        "description": "悪魔の皮膚により、30分間アーマーが{buff}増加します。"
       },
       "immolate": {
         "name": "灼熱の契約",
-        "description": "敵を燃やして11の火炎ダメージを与え、15秒間で追加の {damage} を与えます。"
+        "description": "敵を燃やして{damage}の火炎ダメージを与え、15秒間で追加の{overTime}を与えます。"
       },
       "corruption": {
         "name": "黒腐れ",
@@ -5473,7 +5483,7 @@ export const ja_JP: EnTranslations = {
       },
       "life_tap": {
         "name": "過酷な取引",
-        "description": "体力30をマナ30に変換します。"
+        "description": "体力{damage}をマナ{damage}に変換します。"
       },
       "curse_of_agony": {
         "name": "苦悶の呪い",
@@ -5505,7 +5515,7 @@ export const ja_JP: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "ワイルドワード",
-        "description": "味方対象にワイルドワードを付与し、30分間アーマーを25増加させます。"
+        "description": "味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。"
       },
       "moonfire": {
         "name": "月の嵐",
@@ -5517,7 +5527,7 @@ export const ja_JP: EnTranslations = {
       },
       "thorns": {
         "name": "茨の守り",
-        "description": "対象から棘が生えます。近接攻撃者は3の自然ダメージを受けます。"
+        "description": "対象から棘が生えます。近接攻撃者は{buff}の自然ダメージを受けます。"
       },
       "entangling_roots": {
         "name": "締めつける根",
@@ -5525,7 +5535,7 @@ export const ja_JP: EnTranslations = {
       },
       "bear_form": {
         "name": "ブルーインフォーム",
-        "description": "熊に変身します。アーマー +65%、攻撃力 +15、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
+        "description": "熊に変身します。アーマー +90%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
       },
       "maul": {
         "name": "骨砕き",
@@ -5545,7 +5555,7 @@ export const ja_JP: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "血噛み",
-        "description": "コンボポイントに応じてダメージを与えるフィニッシュムーブです。ウルフフォーム専用。"
+        "description": "{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。"
       },
       "swipe": {
         "name": "薙ぎ払う爪",
@@ -5577,7 +5587,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "対象の防御力を40秒間35低下させます。"
+        "description": "対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。"
       },
       "hibernate": {
         "name": "微睡み",
@@ -5601,7 +5611,7 @@ export const ja_JP: EnTranslations = {
       },
       "rip": {
         "name": "リップ",
-        "description": "12秒かけて出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。"
+        "description": "12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。"
       },
       "mortal_strike": {
         "name": "重傷の一撃",
@@ -5609,11 +5619,11 @@ export const ja_JP: EnTranslations = {
       },
       "bloodthirst": {
         "name": "瀉血",
-        "description": "血の狂乱に身を任せて即座に攻撃し、{damage} のダメージを与えます。（狂怒シグネチャー）"
+        "description": "血の狂乱に身を任せて即座に攻撃し、武器ダメージの60%に{damage}を加えたダメージを与えます。（狂怒シグネチャー）"
       },
       "shield_slam": {
         "name": "盾砕き",
-        "description": "盾で対象を叩きつけ、{damage} のダメージと大量の脅威を与えます。（防御シグネチャー）"
+        "description": "盾で対象を叩きつけ、武器ダメージの50%に{damage}を加えたダメージと大量の脅威を与えます。（防御シグネチャー）"
       },
       "whirlwind": {
         "name": "刃の旋風",
@@ -7073,7 +7083,7 @@ export const ja_JP: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "ユミ"
       },
       "forest_wolf": {
         "name": "森の狼"
@@ -7134,6 +7144,9 @@ export const ja_JP: EnTranslations = {
       },
       "deacon_voss": {
         "name": "助祭ヴォス"
+      },
+      "training_dummy": {
+        "name": "訓練用ダミー"
       },
       "ridge_stalker": {
         "name": "尾根の追跡者"

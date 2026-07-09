@@ -114,6 +114,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': 'ч',
   'hudChrome.unitFrame.durationUnitDays': 'д',
   'hudChrome.unitFrame.partyLabel': 'Ваша группа',
+  'hudChrome.unitFrame.partyChip': 'Группа',
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
   'hudChrome.unitFrame.targetAnnounce': 'Цель: {name}',
   'hudChrome.unitFrame.targetLabel': 'Ваша цель',
@@ -1055,6 +1056,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Общение',
   'hud.core.mobileArena': 'Арена',
   'hud.core.mobileMenu': 'Меню',
+  'hud.core.mobileSettings': 'Настройки',
   'hud.core.mobileUse': 'Использовать',
   'hud.core.mobileMeters': 'Счетчики',
   'hud.core.mobileMap': 'Карта',
@@ -1532,6 +1534,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'Вне глобального восстановления',
   'abilityUi.tooltip.friendlyTarget': 'Дружественная цель',
   'abilityUi.tooltip.enemyTarget': 'Вражеская цель',
+  'abilityUi.tooltip.selfOnly': 'Только на себя',
   'abilityUi.tooltip.damageRange': 'от {min} до {max}',
   'abilityUi.tooltip.finisherDamage': '{base} плюс {perCombo} за прием серии',
   'abilityUi.resources.mana': 'маны',
@@ -1794,33 +1797,35 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.greedAria': 'Жадность: {item}',
   'itemUi.lootRoll.passAria': 'Пас: {item}',
   'itemUi.lootRoll.everyonePassed': 'Все отказались от {item}.',
+  'itemUi.lootRoll.rolled': '{answered}/{total} бросили',
   'entities.abilities.heroic_strike.name': 'Удар разорителя',
   'entities.abilities.heroic_strike.description':
     'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
   'entities.abilities.battle_shout.name': 'Железный рёв',
-  'entities.abilities.battle_shout.description': 'Повышает вашу силу атаки на 20 на 2 мин.',
+  'entities.abilities.battle_shout.description': 'Повышает вашу силу атаки на {buff} на 2 мин.',
   'entities.abilities.commanding_shout.name': 'Ободряющий клич',
-  'entities.abilities.commanding_shout.description': 'Повышает вашу выносливость на 6 на 2 мин.',
+  'entities.abilities.commanding_shout.description':
+    'Повышает вашу выносливость на {buff} на 2 мин.',
   'entities.abilities.demoralizing_shout.name': 'Зловещий вой',
   'entities.abilities.demoralizing_shout.description':
-    'Издает устрашающий крик, снижая силу атаки всех противников поблизости на 30 на 30 сек.',
+    'Издает устрашающий крик, снижая силу атаки всех противников поблизости на {buff} на 30 сек.',
   'entities.abilities.charge.name': 'Натиск',
   'entities.abilities.charge.description':
     'Вы бросаетесь к врагу, накапливаете 9 ярости и оглушаете его на 1 сек. Дальность 8-25 м.',
   'entities.abilities.rend.name': 'Глубокий разрез',
   'entities.abilities.rend.description':
-    'Ранит цель, вызывая кровотечение на {damage} ед. урона за 9 сек.',
+    'Ранит цель, вызывая кровотечение на {damage} ед. урона за {duration} сек.',
   'entities.abilities.thunder_clap.name': 'Сотрясающий удар',
   'entities.abilities.thunder_clap.description':
     'Поражает ближайших врагов на {damage} ед. урона и замедляет их атаки на 10% на 10 сек.',
   'entities.abilities.hamstring.name': 'Калечащий надрез',
   'entities.abilities.hamstring.description':
-    'Калечит врага, нанося 5 ед. урона и снижая его скорость передвижения на 50% на 15 сек.',
+    'Калечит врага, нанося {damage} ед. урона и снижая его скорость передвижения на 50% на 15 сек.',
   'entities.abilities.bloodrage.name': 'Кровавая дань',
   'entities.abilities.bloodrage.description': 'Дает 10 ед. ярости ценой здоровья.',
   'entities.abilities.overpower.name': 'Кровавая рука',
   'entities.abilities.overpower.description':
-    'Мгновенная атака, наносящая урон оружием +5. Можно использовать только после уклонения цели. От нее нельзя уклониться.',
+    'Мгновенная атака, наносящая урон оружием плюс {damage}. Можно использовать только после уклонения цели. От нее нельзя уклониться.',
   'entities.abilities.execute.name': 'Ранняя могила',
   'entities.abilities.execute.description':
     'Попытка добить раненого врага, нанося {damage} ед. урона. Можно использовать только против врагов с менее чем 20% здоровья.',
@@ -1834,23 +1839,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оборонительная боевая стойка: вы создаете на 30% больше угрозы, но наносите и получаете на 10% меньше урона. Примените снова, чтобы выйти из стойки.',
   'entities.abilities.sunder_armor.name': 'Срез брони',
   'entities.abilities.sunder_armor.description':
-    'Раскалывает броню цели, снижая ее на 2% за применение. Суммируется до 5 раз (10% при полном стаке). Создает большое количество угрозы.',
+    'Раскалывает броню цели, снижая ее на {damage}% за применение. Суммируется до 5 раз. Создает большое количество угрозы.',
   'entities.abilities.taunt.name': 'Подстрекательство',
   'entities.abilities.taunt.description':
     'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
   'entities.abilities.fireball.name': 'Пепельная стрела',
   'entities.abilities.rain_of_fire.name': 'Огненный дождь',
   'entities.abilities.rain_of_fire.description':
-    'Обрушивает огненный дождь на указанную область, сжигая врагов и нанося {damage} ед. урона от огня.',
+    'Обрушивает огненный дождь на указанную область на 4 сек., сжигая врагов и нанося {damage} ед. урона от огня каждую секунду.',
   'entities.abilities.volley.name': 'Залп',
   'entities.abilities.volley.description':
-    'Осыпает указанную область стрелами, нанося {damage} ед. урона врагам в ней.',
+    'Осыпает указанную область стрелами в течение 3 сек., нанося {damage} ед. урона каждые 0.5 сек. врагам в ней.',
   'entities.abilities.hurricane.name': 'Ураган',
   'entities.abilities.hurricane.description':
-    'Обрушивает ураган на указанную область, нанося врагам {damage} ед. урона силами природы.',
+    'Обрушивает ураган на указанную область на 6 сек., нанося врагам {damage} ед. урона силами природы каждую секунду.',
   'entities.abilities.earthquake.name': 'Землетрясение',
   'entities.abilities.earthquake.description':
-    'Сотрясает указанную область, нанося врагам {damage} ед. урона силами природы.',
+    'Сотрясает указанную область в течение 6 сек., нанося врагам {damage} ед. урона силами природы каждые 1.5 сек.',
   'entities.abilities.flamestrike.name': 'Огненный удар',
   'entities.abilities.flamestrike.description':
     'Обрушивает огненный взрыв на указанную область, нанося {damage} ед. урона от огня врагам в зоне взрыва.',
@@ -1858,9 +1863,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Бросает огненный шар, наносящий {damage} ед. урона от огня и дополнительный периодический урон.',
   'entities.abilities.frost_armor.name': 'Мантия инея',
   'entities.abilities.frost_armor.description':
-    'Окутывает вас морозом, повышая броню на 30 на 30 мин.',
+    'Окутывает вас морозом, повышая броню на {buff} на 30 мин.',
   'entities.abilities.arcane_intellect.name': 'Постижение эфира',
-  'entities.abilities.arcane_intellect.description': 'Повышает интеллект на 2 на 30 мин.',
+  'entities.abilities.arcane_intellect.description': 'Повышает интеллект на {buff} на 30 мин.',
   'entities.abilities.frostbolt.name': 'Копьё изморози',
   'entities.abilities.frostbolt.description':
     'Выпускает ледяную стрелу, наносящую {damage} ед. урона от магии льда и замедляющую передвижение на 40%.',
@@ -1878,7 +1883,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Выпускает в противника Стрелы эфира, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек.',
   'entities.abilities.polymorph.name': 'Чары',
   'entities.abilities.polymorph.description':
-    'Превращает врага в жабу на срок до 15 сек. Жаба бродит и быстро восстанавливается. Любой урон прерывает эффект. Только звери и гуманоиды.',
+    'Превращает врага в жабу на срок до {duration} сек. Жаба бродит и быстро восстанавливается. Любой урон прерывает эффект. Только звери и гуманоиды.',
   'entities.abilities.frost_nova.name': 'Ледяные оковы',
   'entities.abilities.frost_nova.description':
     'Примораживает всех ближайших врагов на месте на срок до 8 сек. и наносит {damage} ед. урона от магии льда.',
@@ -1893,19 +1898,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обрушивает на врага громадный пылающий камень, наносящий {damage} ед. урона от огня и дополнительный урон с течением времени.',
   'entities.abilities.ice_barrier.name': 'Морозная завеса',
   'entities.abilities.ice_barrier.description':
-    'Защищает вас льдом, поглощая 130 ед. урона в течение 60 сек.',
+    'Защищает вас льдом, поглощая {damage} ед. урона в течение 60 сек.',
   'entities.abilities.sinister_strike.name': 'Злодейский разрез',
   'entities.abilities.sinister_strike.description':
     'Мгновенный удар, наносящий урон оружием плюс {damage}. Дает 1 прием серии.',
   'entities.abilities.eviscerate.name': 'Вечный сон',
-  'entities.abilities.eviscerate.description':
-    'Завершающий прием, наносящий урон за каждый прием серии.',
+  'entities.abilities.eviscerate.description': 'Завершающий прием, наносящий {damage}.',
   'entities.abilities.backstab.name': 'Трусливый выпад',
   'entities.abilities.backstab.description':
     'Бьет цель в спину, нанося 150% урона оружием плюс {damage}. Нужно находиться позади цели. Требуется кинжал. Дает 1 прием серии.',
   'entities.abilities.gouge.name': 'Тычок в глаз',
   'entities.abilities.gouge.description':
-    'Поражает цель и выводит ее из строя на 4 сек. Любой урон прерывает эффект. Дает 1 прием серии.',
+    'Поражает цель, нанося {damage} ед. урона, и выводит ее из строя на 4 сек. Любой урон прерывает эффект. Дает 1 прием серии.',
   'entities.abilities.evasion.name': 'Призрачная поступь',
   'entities.abilities.evasion.description': 'Повышает вероятность уклонения на 50% на 15 сек.',
   'entities.abilities.slice_and_dice.name': 'Ритм головореза',
@@ -1927,19 +1931,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Кровь закипает, мгновенно восстанавливая 60 энергии.',
   'entities.abilities.garrote.name': 'Удавка',
   'entities.abilities.garrote.description':
-    'Душит врага гарротой, нанося урон сразу и {damage} от кровотечения в течение 18 сек. Требуется незаметность. Дает 1 очко серии.',
+    'Душит врага гарротой, нанося {damage} ед. урона сразу и {overTime} от кровотечения в течение 18 сек. Требуется незаметность. Дает 1 очко серии.',
   'entities.abilities.cheap_shot.name': 'Удар под дых',
   'entities.abilities.cheap_shot.description':
-    'Бьет цель, оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.',
+    'Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.',
   'entities.abilities.sap.name': 'Ошеломление',
   'entities.abilities.sap.description':
     'Выводит цель из строя на 8 сек. Требуется незаметность и нахождение вне боя. Любой урон прерывает эффект.',
   'entities.abilities.crippling_poison.name': 'Свинцовый яд',
   'entities.abilities.crippling_poison.description':
-    'Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя её скорость передвижения на 50% в течение 12 сек.',
+    'Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек.',
   'entities.abilities.expose_armor.name': 'Пролом брони',
   'entities.abilities.expose_armor.description':
-    'Завершающий прием, который оголяет цель, снижая ее броню. Чем больше затрачено очков серии, тем глубже разрез.',
+    'Завершающий прием, который оголяет цель, снижая ее броню на {damage} на 30 сек.',
   'entities.abilities.rupture.name': 'Истечение кровью',
   'entities.abilities.rupture.description':
     'Завершающий прием, который ранит цель, вызывая кровотечение на {damage} в течение 16 сек.',
@@ -1957,25 +1961,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ослепляет цель, заставляя ее дезориентированно бродить в течение 8 сек. Любой урон прерывает эффект.',
   'entities.abilities.seal_of_righteousness.name': 'Клеймо клятвы',
   'entities.abilities.seal_of_righteousness.description':
-    'Наполняет вас силой Света на 30 сек., заставляя каждый удар в ближнем бою наносить 4 ед. дополнительного урона от светлой магии. Высвобождается Приговором.',
+    'Наполняет вас силой Света на 30 сек., заставляя каждый удар в ближнем бою наносить {damage} ед. дополнительного урона от светлой магии. Высвобождается Приговором.',
   'entities.abilities.holy_light.name': 'Целительный Свет',
   'entities.abilities.holy_light.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.devotion_aura.name': 'Аура стойкости',
-  'entities.abilities.devotion_aura.description': 'Повышает вашу броню на 40 на 30 мин.',
+  'entities.abilities.devotion_aura.description': 'Повышает вашу броню на {buff} на 30 мин.',
   'entities.abilities.judgement.name': 'Приговор',
   'entities.abilities.judgement.description':
     'Высвобождает вашу активную Печать на врага, расходуя её и нанося накопленный урон Святой школы.',
   'entities.abilities.blessing_of_might.name': 'Клятва железа',
   'entities.abilities.blessing_of_might.description':
-    'Накладывает Благословение на дружественную цель, повышая силу атаки на 15 на 5 мин.',
+    'Накладывает Благословение на дружественную цель, повышая силу атаки на {buff} на 5 мин.',
   'entities.abilities.divine_protection.name': 'Оберег веры',
   'entities.abilities.divine_protection.description':
-    'Защитный оберег поглощает 50 ед. урона в течение 10 сек.',
+    'Защитный оберег поглощает {damage} ед. урона в течение 10 сек.',
   'entities.abilities.hammer_of_justice.name': 'Раскалывающий молот',
-  'entities.abilities.hammer_of_justice.description': 'Оглушает цель на 3 сек.',
+  'entities.abilities.hammer_of_justice.description': 'Оглушает цель на {duration} сек.',
   'entities.abilities.lay_on_hands.name': 'Последний обряд',
   'entities.abilities.lay_on_hands.description':
-    'Мощный поток исцеления: восстанавливает 250 здоровья. Время восстановления 10 мин.',
+    'Мощный поток исцеления: восстанавливает {damage} здоровья. Время восстановления 10 мин.',
   'entities.abilities.flash_of_light.name': 'Заживление Светом',
   'entities.abilities.flash_of_light.description':
     'Быстрая и действенная вспышка Света, исцеляющая дружественную цель на {damage}.',
@@ -1984,7 +1988,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Изгоняет нечестивых священным гневом, нанося {damage} ед. урона от светлой магии.',
   'entities.abilities.consecration.name': 'Святая земля',
   'entities.abilities.consecration.description':
-    'Освящает землю под вами, обжигая ближайших врагов на {damage} ед. урона от светлой магии.',
+    'Освящает землю под вами, обжигая ближайших врагов на {damage} ед. урона от светлой магии каждые 2 сек. в течение 10 сек.',
   'entities.abilities.righteous_fury.name': 'Пылающая клятва',
   'entities.abilities.righteous_fury.description':
     'Повышает угрозу от вашего урона светлой магией на 60% на 30 мин. Основа паладина-танка.',
@@ -1998,10 +2002,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Отпускает вашего питомца обратно в дикую природу.',
   'entities.abilities.raptor_strike.name': 'Потрошащий удар',
   'entities.abilities.raptor_strike.description':
-    'Сильная атака в ближнем бою, увеличивающая урон на 5. Срабатывает при следующем взмахе оружием.',
+    'Сильная атака в ближнем бою, увеличивающая урон на {damage}. Срабатывает при следующем взмахе оружием.',
   'entities.abilities.aspect_of_the_hawk.name': 'Облик луня',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Вы принимаете облик луня, повышая силу атаки на 20 на 30 мин.',
+    'Вы принимаете облик луня, повышая силу атаки на {buff} на 30 мин.',
   'entities.abilities.serpent_sting.name': 'Ядовитое жало',
   'entities.abilities.serpent_sting.description':
     'Жалит цель, нанося {damage} ед. урона от сил природы за 15 сек.',
@@ -2010,12 +2014,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенный выстрел, наносящий {damage} ед. урона от тайной магии.',
   'entities.abilities.concussive_shot.name': 'Сотрясающий выстрел',
   'entities.abilities.concussive_shot.description':
-    'Ошеломляет цель, снижая скорость передвижения на 50% на 4 сек.',
+    'Ошеломляет цель, нанося {damage} ед. урона и снижая скорость передвижения на 50% на 4 сек.',
   'entities.abilities.mongoose_bite.name': 'Ответный клык',
   'entities.abilities.mongoose_bite.description':
-    'Контратака после уклонения цели, наносящая урон оружием плюс 12. От нее нельзя уклониться.',
+    'Контратака после уклонения цели, наносящая урон оружием плюс {damage}. От нее нельзя уклониться.',
   'entities.abilities.wing_clip.name': 'Сковывающий разрез',
-  'entities.abilities.wing_clip.description': 'Наносит рану, замедляющую врага на 40% на 10 сек.',
+  'entities.abilities.wing_clip.description':
+    'Наносит рану, нанося {damage} ед. урона и замедляя врага на 40% на 10 сек.',
   'entities.abilities.aspect_of_the_monkey.name': 'Облик куницы',
   'entities.abilities.aspect_of_the_monkey.description':
     'Вы принимаете облик куницы, повышая вероятность уклонения на 8% на 30 мин.',
@@ -2034,13 +2039,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.power_word_fortitude.name': 'Литания стойкости',
   'entities.abilities.power_word_fortitude.description':
-    'Повышает выносливость цели на 3 на 30 мин.',
+    'Повышает выносливость цели на {buff} на 30 мин.',
   'entities.abilities.shadow_word_pain.name': 'Панихида распада',
   'entities.abilities.shadow_word_pain.description':
     'Слово тьмы наносит {damage} ед. урона от темной магии за 18 сек.',
   'entities.abilities.power_word_shield.name': 'Псалом ограждения',
   'entities.abilities.power_word_shield.description':
-    'Защищает цель, поглощая 48 ед. урона в течение 30 сек.',
+    'Защищает цель, поглощая {damage} ед. урона в течение 30 сек.',
   'entities.abilities.renew.name': 'Длящаяся благодать',
   'entities.abilities.renew.description': 'Исцеляет цель на {damage} за 15 сек.',
   'entities.abilities.mind_blast.name': 'Раскол разума',
@@ -2060,7 +2065,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Метает разряд молнии, нанося {damage} ед. урона от сил природы.',
   'entities.abilities.rockbiter_weapon.name': 'Оружие каменных уз',
   'entities.abilities.rockbiter_weapon.description':
-    'Насыщает ваше оружие яростью камня: каждый удар наносит 5 ед. дополнительного урона в течение 5 мин.',
+    'Насыщает ваше оружие яростью камня: каждый удар наносит {damage} ед. дополнительного урона в течение 5 мин.',
   'entities.abilities.healing_wave.name': 'Целебные воды',
   'entities.abilities.healing_wave.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.chain_heal.name': 'Цепное исцеление',
@@ -2071,19 +2076,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенно поражает цель ударной силой, нанося {damage} ед. урона от сил природы.',
   'entities.abilities.lightning_shield.name': 'Громовой оберег',
   'entities.abilities.lightning_shield.description':
-    'Окружает вас потрескивающей молнией: атакующие в ближнем бою получают 13 ед. урона от сил природы.',
+    'Окружает вас потрескивающей молнией: атакующие в ближнем бою получают {buff} ед. урона от сил природы, до 3 зарядов и не чаще одного раза в 5 секунд.',
   'entities.abilities.flame_shock.name': 'Пепельный толчок',
   'entities.abilities.flame_shock.description':
-    'Обжигает цель огнем, нанося 25 ед. урона и еще {damage} за 12 сек.',
+    'Обжигает цель огнем, нанося {damage} ед. урона и еще {overTime} за 12 сек.',
   'entities.abilities.flametongue_weapon.name': 'Оружие пламенного клейма',
   'entities.abilities.flametongue_weapon.description':
-    'Насыщает ваше оружие стихийным огнем: каждый удар наносит 8 ед. дополнительного урона от огня в течение 5 мин.',
+    'Насыщает ваше оружие стихийным огнем: каждый удар наносит {damage} ед. дополнительного урона от огня в течение 5 мин.',
   'entities.abilities.frost_shock.name': 'Толчок изморози',
   'entities.abilities.frost_shock.description':
     'Мгновенно поражает цель льдом, нанося {damage} ед. урона от магии льда и снижая скорость передвижения на 50% на 8 сек.',
   'entities.abilities.frostbrand_weapon.name': 'Оружие изморози',
   'entities.abilities.frostbrand_weapon.description':
-    'Насыщает ваше оружие кусающим холодом: каждый удар наносит 8 ед. дополнительного урона в течение 5 мин.',
+    'Насыщает ваше оружие кусающим холодом: каждый удар наносит {damage} ед. дополнительного урона в течение 5 мин.',
   'entities.abilities.ghost_wolf.name': 'Сумрачный волк',
   'entities.abilities.ghost_wolf.description':
     'Превращает вас в сумрачного волка, повышая скорость передвижения на 40% на 10 мин.',
@@ -2095,15 +2100,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Посылает во врага темную стрелу, нанося {damage} ед. урона от темной магии.',
   'entities.abilities.demon_skin.name': 'Шкура беса',
   'entities.abilities.demon_skin.description':
-    'Демоническая кожа повышает вашу броню на 30 на 30 мин.',
+    'Демоническая кожа повышает вашу броню на {buff} на 30 мин.',
   'entities.abilities.immolate.name': 'Пылающий договор',
   'entities.abilities.immolate.description':
-    'Сжигает врага, нанося 11 ед. урона от огня и еще {damage} за 15 сек.',
+    'Сжигает врага, нанося {damage} ед. урона от огня и еще {overTime} за 15 сек.',
   'entities.abilities.corruption.name': 'Чёрная гниль',
   'entities.abilities.corruption.description':
     'Поражает цель порчей, нанося {damage} ед. урона от темной магии за 18 сек.',
   'entities.abilities.life_tap.name': 'Тяжёлая сделка',
-  'entities.abilities.life_tap.description': 'Преобразует 30 здоровья в 30 маны.',
+  'entities.abilities.life_tap.description': 'Преобразует {damage} здоровья в {damage} маны.',
   'entities.abilities.curse_of_agony.name': 'Порча муки',
   'entities.abilities.curse_of_agony.description':
     'Проклинает цель агонией: {damage} ед. урона от темной магии за 24 сек.',
@@ -2126,7 +2131,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Оберег дикой природы',
   'entities.abilities.mark_of_the_wild.description':
-    'Накладывает Оберег дикой природы на дружественную цель, повышая броню на 25 на 30 мин.',
+    'Накладывает Оберег дикой природы на дружественную цель, повышая броню на {buff} на 30 мин.',
   'entities.abilities.moonfire.name': 'Лунная буря',
   'entities.abilities.moonfire.description':
     'Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.',
@@ -2134,13 +2139,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Исцеляет цель на {damage} за 12 сек.',
   'entities.abilities.thorns.name': 'Терновая защита',
   'entities.abilities.thorns.description':
-    'Из цели вырастают шипы: атакующие в ближнем бою получают 3 ед. урона от сил природы.',
+    'Из цели вырастают шипы: атакующие в ближнем бою получают {buff} ед. урона от сил природы.',
   'entities.abilities.entangling_roots.name': 'Хватающие корни',
   'entities.abilities.entangling_roots.description':
     'Оплетает цель корнями на месте на срок до 12 сек.',
   'entities.abilities.bear_form.name': 'Облик бурого',
   'entities.abilities.bear_form.description':
-    'Вы принимаете облик медведя: броня +65%, сила атаки +15, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
+    'Вы принимаете облик медведя: броня +90%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя.',
   'entities.abilities.maul.name': 'Костолом',
   'entities.abilities.maul.description':
     'Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.',
@@ -2155,7 +2160,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике волка.',
   'entities.abilities.ferocious_bite.name': 'Кровавый укус',
   'entities.abilities.ferocious_bite.description':
-    'Завершающий прием, наносящий урон за каждый прием серии. Только в облике волка.',
+    'Завершающий прием, наносящий {damage}. Только в облике волка.',
   'entities.abilities.swipe.name': 'Разящие когти',
   'entities.abilities.swipe.description':
     'Размахивает по ближайшим врагам, нанося {damage} ед. урона. Создает дополнительную угрозу. Только в облике бурого.',
@@ -2177,7 +2182,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Контузия',
   'entities.abilities.bash.description': 'Оглушает цель на 2 сек. Только в облике бурого.',
   'entities.abilities.faerie_fire.name': 'Ведьмин огонь',
-  'entities.abilities.faerie_fire.description': 'Снижает броню цели на 35 на 40 сек.',
+  'entities.abilities.faerie_fire.description':
+    'Снижает броню цели на {damage}% на 40 сек. Не суммируется со Срезом брони.',
   'entities.abilities.hibernate.name': 'Дремота',
   'entities.abilities.hibernate.description':
     'Погружает цель в глубокий сон на срок до 8 сек. Любой урон пробуждает ее.',
@@ -2195,16 +2201,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Повышает силу атаки на 40 на 6 сек. Только в облике волка.',
   'entities.abilities.rip.name': 'Разрывание',
   'entities.abilities.rip.description':
-    'Завершающий прием, наносящий урон от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка.',
+    'Завершающий прием, наносящий {damage} ед. урона от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка.',
   'entities.abilities.mortal_strike.name': 'Калечащий удар',
   'entities.abilities.mortal_strike.description':
     'Жестокий удар, наносящий урон оружием плюс {damage}. (ключевая способность ветки «Оружие»)',
   'entities.abilities.bloodthirst.name': 'Кровопускание',
   'entities.abilities.bloodthirst.description':
-    'Мгновенно атакует в кровавом исступлении, нанося {damage}. (ключевая способность ветки «Неистовство»)',
+    'Мгновенно атакует в кровавом исступлении, нанося 60% урона оружием плюс {damage}. (ключевая способность ветки «Неистовство»)',
   'entities.abilities.shield_slam.name': 'Раскол щита',
   'entities.abilities.shield_slam.description':
-    'Бьет цель щитом, нанося {damage} и создавая огромную угрозу. (ключевая способность ветки «Защита»)',
+    'Бьет цель щитом, нанося 50% урона оружием плюс {damage} и создавая огромную угрозу. (ключевая способность ветки «Защита»)',
   'entities.abilities.whirlwind.name': 'Клинковый вихрь',
   'entities.abilities.whirlwind.description':
     'Кружится смертельной дугой, поражая всех ближайших врагов на {damage}. (талант ветки «Неистовство»)',
@@ -2604,6 +2610,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_cultist.name': 'Культист Могильного Зова',
   'entities.mobs.gravecaller_summoner.name': 'Призыватель Могильного Зова',
   'entities.mobs.deacon_voss.name': 'Дьякон Восс',
+  'entities.mobs.training_dummy.name': 'Тренировочный манекен',
   'entities.mobs.ridge_stalker.name': 'Хребтовый охотник',
   'entities.mobs.deeprock_kobold.name': 'Глубокоскальный туннельщик',
   'entities.mobs.thornpeak_ogre.name': 'Огр Терновых Пиков',
@@ -6333,6 +6340,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Травничество',
   'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
   'hudChrome.archetypeTitle.armorcrafting': 'Бронник',
   'hudChrome.archetypeTitle.weaponcrafting': 'Оружейник',
   'hudChrome.archetypeTitle.jewelcrafting': 'Ювелир',
@@ -6373,8 +6381,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': 'ПОРАЖЕНИЕ! Ваша Yumi пала.',
   'hudChrome.crafting.comboRequirementUnmet':
     'У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.',
+  'hudChrome.crafting.notAtHub':
+    'Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.',
+  'hudChrome.crafting.throttled':
+    'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
+  'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
   'hudChrome.mobile.actionPageIndicator': 'Стр. {page}',
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
+  'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
+  'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.vcup.title': 'Кубок Долины',
   'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
@@ -6632,4 +6648,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
+  'entities.mobs.yumi_cat.name': 'Юми',
 };

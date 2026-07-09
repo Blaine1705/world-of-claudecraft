@@ -291,6 +291,7 @@ export const vi_VN: EnTranslations = {
       "targetLabel": "Mục Tiêu Của Bạn",
       "targetAnnounce": "Đánh Dấu {name}",
       "partyLabel": "Đội Của Bạn",
+      "partyChip": "Tổ Đội",
       "partyGroup": "Nhóm {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "ph",
@@ -320,7 +321,9 @@ export const vi_VN: EnTranslations = {
       "actionPageIndicator": "Trang {page}",
       "targetCycle": "Hoán đổi mục tiêu",
       "targetCycleShort": "Mục tiêu",
-      "spellbookPageLabel": "Trang {page}"
+      "spellbookPageLabel": "Trang {page}",
+      "hideKeyboard": "Ẩn bàn phím",
+      "chatPlaceholder": "Nói gì đó..."
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -1014,18 +1017,18 @@ export const vi_VN: EnTranslations = {
       },
       "allStatsPctReduce": "Giảm tất cả thuộc tính đi {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Tăng sức mạnh tấn công thêm {pct}%",
+        "armor": "Tăng giáp thêm {pct}%",
+        "int": "Tăng Trí Tuệ thêm {pct}%",
+        "sta": "Tăng Thể Lực thêm {pct}%",
+        "allStats": "Tăng tất cả thuộc tính thêm {pct}%"
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Giảm giáp đi {pct}%",
+      "armorPctStacks": "Giảm giáp đi {pct}% ({stacks} tích trữ)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -1431,6 +1434,7 @@ export const vi_VN: EnTranslations = {
     "archetypeTitle": {
       "label": "Danh hiệu",
       "none": "Không có",
+      "hobbyLabel": "Sở Thích",
       "armorcrafting": "Thợ Giáp",
       "weaponcrafting": "Thợ Rèn Vũ Khí",
       "jewelcrafting": "Thợ Kim Hoàn",
@@ -1453,7 +1457,10 @@ export const vi_VN: EnTranslations = {
       "craftedToast": "Đã chế tác: {name}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
-      "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó."
+      "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
+      "notAtHub": "Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.",
+      "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
+      "recipeNotLearned": "Bạn chưa học công thức đó."
     }
   },
   "apiError": {
@@ -2226,8 +2233,8 @@ export const vi_VN: EnTranslations = {
       "waveGoldBody": "Đợt giữa: những tổ hợp hai mặt nơi lối xây dựng của bạn bắt đầu thành hình và phát huy.",
       "wavePrismaticTitle": "Lăng Kính",
       "wavePrismaticBody": "Đợt cuối cùng: những đòn bùng phát định hình lối chơi, làm tan chảy màn hình, được tạo ra để cảm thấy lố bịch theo cách tuyệt vời nhất.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Bảo Vệ Yumi",
+      "yumiBody": "Bảo Vệ Yumi là chế độ tranh mục tiêu theo đội chơi trong một mê cung: mỗi bên canh giữ linh thú mèo của mình trong khi săn lùng con của đối phương. Thỉnh thoảng cả hai chú mèo lại chớp dịch tới những góc mới của mê cung, nên trận đấu xoay vần giữa việc phòng thủ, săn lùng và chạy đua đi tìm lại chúng. Xếp hàng chờ theo dạng ba đấu ba hoặc năm đấu năm; gục ngã trong trận chỉ khiến bạn phải ngồi ngoài trong chốc lát.",
       "powerupsTitle": "Tăng lực trong vòng đấu",
       "powerupsBody": "Những quả cầu phát sáng cũng rơi vào đấu trường giữa trận, miễn phí cho ai chạm tới đầu tiên. Chúng được thiết kế phóng đại có chủ đích và chỉ kéo dài trong chốc lát: Quỷ Tốc cho một thoáng vận tốc chói lóa, Khổng Lồ để phình to thành gã khổng lồ nặng nề, Giày Mặt Trăng cho một cú nhảy nảy bật trọng lực thấp, và Cuồng Bạo cho một đợt phẫn nộ dâng trào đột ngột.",
       "ladderHeading": "Leo Bảng Xếp Hạng",
@@ -3658,42 +3665,42 @@ export const vi_VN: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 đấu 3",
+    "bracket5": "Yumi 5 đấu 5",
+    "enterQueue": "Tham Gia Bảo Vệ Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Bạn vào hàng chờ Bảo Vệ Yumi. Hãy canh giữ linh thú của bạn…",
+      "leave": "Bạn rời hàng chờ Bảo Vệ Yumi.",
+      "teamLeave": "Đội của bạn rời hàng chờ Bảo Vệ Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Bảo Vệ Yumi 3 đấu 3 chỉ cho phép tổ đội tối đa ba người.",
+      "partyTooBig5": "Bảo Vệ Yumi 5 đấu 5 chỉ cho phép tổ đội tối đa năm người."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Bảo Vệ Yumi! Bảo vệ linh thú của bạn và săn lùng linh thú của đối phương."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "BẢO VỆ YUMI",
+      "getReady": "Sẵn sàng…",
+      "teleportIn": "Các Yumi dịch chuyển sau {s}",
+      "suddenDeath": "ĐỘT TỬ",
+      "yourYumi": "Yumi Của Bạn",
+      "enemyYumi": "Yumi Địch",
+      "aria": "Yumi của bạn còn {mine} trên {max} máu, Yumi địch còn {theirs}.",
+      "collapse": "Thu gọn thanh Bảo Vệ Yumi",
+      "expand": "Mở rộng thanh Bảo Vệ Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "GỤC NGÃ!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "ĐỘT TỬ! Các Yumi vẫn trụ vững!",
+      "teleport": "Các Yumi dịch chuyển tức thời!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "CHIẾN THẮNG! Yumi đã an toàn!",
+      "loss": "THẤT BẠI! Yumi của bạn đã gục ngã."
     }
   },
   "fiesta": {
@@ -4142,6 +4149,7 @@ export const vi_VN: EnTranslations = {
       "mobileSocial": "Xã Hội",
       "mobileArena": "Đấu Trường",
       "mobileMenu": "Menu",
+      "mobileSettings": "Cài Đặt",
       "mobileUse": "Dùng",
       "mobileMeters": "Đồng Hồ",
       "mobileMap": "Bản Đồ",
@@ -4690,6 +4698,7 @@ export const vi_VN: EnTranslations = {
       "offGlobalCooldown": "Không tính vào hồi chiêu toàn cục",
       "friendlyTarget": "Mục tiêu đồng minh",
       "enemyTarget": "Mục tiêu địch",
+      "selfOnly": "Chỉ bản thân",
       "damageRange": "{min} đến {max}",
       "finisherDamage": "{base} cộng {perCombo} mỗi điểm combo"
     },
@@ -4998,7 +5007,8 @@ export const vi_VN: EnTranslations = {
       "needAria": "Cần Dùng {item}",
       "greedAria": "Tham Lam giành {item}",
       "passAria": "Bỏ qua {item}",
-      "everyonePassed": "Mọi người đều bỏ qua {item}."
+      "everyonePassed": "Mọi người đều bỏ qua {item}.",
+      "rolled": "Đã tung {answered}/{total}"
     }
   },
   "entities": {
@@ -5049,19 +5059,19 @@ export const vi_VN: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Mưa Lửa",
-        "description": "Trút một cơn mưa lửa xuống khu vực mục tiêu, thiêu đốt kẻ địch gây {damage} sát thương Lửa."
+        "description": "Trút một cơn mưa lửa xuống khu vực mục tiêu trong 4 giây, thiêu đốt kẻ địch gây {damage} sát thương Lửa mỗi giây."
       },
       "volley": {
         "name": "Loạt Tên",
-        "description": "Trút mưa tên xuống khu vực mục tiêu, gây {damage} sát thương cho kẻ địch bên trong."
+        "description": "Trút mưa tên xuống khu vực mục tiêu trong 3 giây, gây {damage} sát thương mỗi 0.5 giây cho kẻ địch bên trong."
       },
       "hurricane": {
         "name": "Cuồng Phong",
-        "description": "Triệu hồi cuồng phong xuống khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên."
+        "description": "Triệu hồi cuồng phong xuống khu vực mục tiêu trong 6 giây, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên mỗi giây."
       },
       "earthquake": {
         "name": "Động Đất",
-        "description": "Làm rung chuyển khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên."
+        "description": "Làm rung chuyển khu vực mục tiêu trong 6 giây, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên mỗi 1.5 giây."
       },
       "heroic_strike": {
         "name": "Đòn Cướp Phá",
@@ -5069,15 +5079,15 @@ export const vi_VN: EnTranslations = {
       },
       "battle_shout": {
         "name": "Tiếng Gầm Thép",
-        "description": "Tăng sức mạnh tấn công của ngươi thêm 20 trong 2 phút."
+        "description": "Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút."
       },
       "commanding_shout": {
         "name": "Tiếng Hô Trợ Uy",
-        "description": "Tăng Thể Lực của ngươi thêm 6 trong 2 phút."
+        "description": "Tăng Thể Lực của ngươi thêm {buff} trong 2 phút."
       },
       "demoralizing_shout": {
         "name": "Tiếng Hú Hung Hiểm",
-        "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi 30 trong 30 giây."
+        "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây."
       },
       "charge": {
         "name": "Xông Tới",
@@ -5085,7 +5095,7 @@ export const vi_VN: EnTranslations = {
       },
       "rend": {
         "name": "Vết Rạch Sâu",
-        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong 9 giây."
+        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây."
       },
       "thunder_clap": {
         "name": "Đòn Chấn Rung",
@@ -5093,7 +5103,7 @@ export const vi_VN: EnTranslations = {
       },
       "hamstring": {
         "name": "Nhát Cắt Què Chân",
-        "description": "Làm bị thương kẻ địch 5 sát thương, làm chậm di chuyển của nó 50% trong 15 giây."
+        "description": "Làm bị thương kẻ địch gây {damage} sát thương, làm chậm di chuyển của nó 50% trong 15 giây."
       },
       "bloodrage": {
         "name": "Giá Máu",
@@ -5101,7 +5111,7 @@ export const vi_VN: EnTranslations = {
       },
       "overpower": {
         "name": "Bàn Tay Đẫm Máu",
-        "description": "Đòn tấn công tức thời gây sát thương vũ khí +5. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né."
+        "description": "Đòn tấn công tức thời gây sát thương vũ khí cộng thêm {damage}. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né."
       },
       "execute": {
         "name": "Nấm Mồ Sớm",
@@ -5121,7 +5131,7 @@ export const vi_VN: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Xẻ Giáp",
-        "description": "Sunders the target's armor, reducing it by 2% per application. Stacks up to 5 times (10% at full stacks). Generates a high amount of threat."
+        "description": "Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn."
       },
       "taunt": {
         "name": "Chọc Tức",
@@ -5133,11 +5143,11 @@ export const vi_VN: EnTranslations = {
       },
       "frost_armor": {
         "name": "Áo Choàng Sương Giá",
-        "description": "Bao bọc bạn trong băng giá, tăng giáp thêm 30 trong 30 phút."
+        "description": "Bao bọc bạn trong băng giá, tăng giáp thêm {buff} trong 30 phút."
       },
       "arcane_intellect": {
         "name": "Tuệ Giác Ê-te",
-        "description": "Tăng 2 Trí Tuệ trong 30 phút."
+        "description": "Tăng Trí Tuệ thêm {buff} trong 30 phút."
       },
       "frostbolt": {
         "name": "Thương Băng Giá",
@@ -5161,7 +5171,7 @@ export const vi_VN: EnTranslations = {
       },
       "polymorph": {
         "name": "Mê Hoặc",
-        "description": "Biến kẻ địch thành một con cóc trong tối đa 15 giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình."
+        "description": "Biến kẻ địch thành một con cóc trong tối đa {duration} giây. Con cóc đi lang thang và hồi máu rất nhanh. Mọi sát thương sẽ phá vỡ hiệu ứng. Chỉ với quái thú và nhân hình."
       },
       "frost_nova": {
         "name": "Trói Băng",
@@ -5181,7 +5191,7 @@ export const vi_VN: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Màn Băng",
-        "description": "Che chắn bạn trong băng, hấp thụ 130 sát thương trong 60 giây."
+        "description": "Che chắn bạn trong băng, hấp thụ {damage} sát thương trong 60 giây."
       },
       "sinister_strike": {
         "name": "Nhát Chém Gian Tà",
@@ -5189,7 +5199,7 @@ export const vi_VN: EnTranslations = {
       },
       "eviscerate": {
         "name": "Giấc Ngủ Vùi Đất",
-        "description": "Đòn kết liễu gây sát thương theo mỗi điểm liên hoàn."
+        "description": "Đòn kết liễu gây {damage}."
       },
       "backstab": {
         "name": "Đòn Đâm Hèn Hạ",
@@ -5197,7 +5207,7 @@ export const vi_VN: EnTranslations = {
       },
       "gouge": {
         "name": "Thọc Mắt",
-        "description": "Đâm vào mục tiêu, khiến nó bất lực trong 4 giây. Mọi sát thương sẽ phá vỡ hiệu ứng. Tặng 1 điểm liên hoàn."
+        "description": "Đâm vào mục tiêu gây {damage} sát thương, khiến nó bất lực trong 4 giây. Mọi sát thương sẽ phá vỡ hiệu ứng. Tặng 1 điểm liên hoàn."
       },
       "evasion": {
         "name": "Bước Chân Ma",
@@ -5229,11 +5239,11 @@ export const vi_VN: EnTranslations = {
       },
       "garrote": {
         "name": "Dây Siết Cổ",
-        "description": "Siết cổ kẻ địch, gây sát thương ngay lập tức và khiến nó chảy máu {damage} trong 18 giây. Phải đang ẩn thân. Tặng 1 điểm liên hoàn."
+        "description": "Siết cổ kẻ địch, gây {damage} sát thương ngay lập tức và khiến nó chảy máu {overTime} trong 18 giây. Phải đang ẩn thân. Tặng 1 điểm liên hoàn."
       },
       "cheap_shot": {
         "name": "Thụi Bụng",
-        "description": "Đánh mục tiêu, làm choáng nó trong 4 giây. Phải đang ẩn thân. Thưởng 2 điểm liên hoàn."
+        "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Thưởng 2 điểm liên hoàn."
       },
       "sap": {
         "name": "Đánh Lén Mê",
@@ -5241,11 +5251,11 @@ export const vi_VN: EnTranslations = {
       },
       "crippling_poison": {
         "name": "Nọc Độc Chì",
-        "description": "Tẩm vào mục tiêu một loại nọc độc nặng như chì, gây {damage} sát thương Tự Nhiên và giảm 50% tốc độ di chuyển của nó trong 12 giây."
+        "description": "Đánh mục tiêu bằng một loại nọc độc nặng như chì, gây {damage} sát thương Tự Nhiên và giảm 50% tốc độ di chuyển của nó trong 12 giây."
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",
-        "description": "Đòn kết liễu phơi bày mục tiêu, giảm giáp của chúng. Càng nhiều điểm liên hoàn được dùng thì vết cắt càng sâu."
+        "description": "Đòn kết liễu phơi bày mục tiêu, giảm giáp của chúng đi {damage} trong 30 giây."
       },
       "rupture": {
         "name": "Rỉ Máu Chí Tử",
@@ -5269,7 +5279,7 @@ export const vi_VN: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Ấn Khắc Lời Thề",
-        "description": "Tràn đầy sức mạnh Thánh trong 30 giây, khiến mỗi cú vung cận chiến của bạn gây thêm 4 sát thương Thánh. Giải phóng bằng Verdict."
+        "description": "Tràn đầy sức mạnh Thánh trong 30 giây, khiến mỗi cú vung cận chiến của bạn gây thêm {damage} sát thương Thánh. Giải phóng bằng Verdict."
       },
       "holy_light": {
         "name": "Thánh Quang Chữa Lành",
@@ -5277,7 +5287,7 @@ export const vi_VN: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Hào Quang Kiên Định",
-        "description": "Tăng giáp của bạn thêm 40 trong 30 phút."
+        "description": "Tăng giáp của bạn thêm {buff} trong 30 phút."
       },
       "judgement": {
         "name": "Verdict",
@@ -5285,19 +5295,19 @@ export const vi_VN: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Lời Thề Sắt Thép",
-        "description": "Ban một Phúc Lành lên mục tiêu thân thiện, tăng sức mạnh tấn công thêm 15 trong 5 phút."
+        "description": "Ban một Phúc Lành lên mục tiêu thân thiện, tăng sức mạnh tấn công thêm {buff} trong 5 phút."
       },
       "divine_protection": {
         "name": "Bùa Hộ Đức Tin",
-        "description": "Một tấm bùa hộ mệnh hấp thụ 50 sát thương trong 10 giây."
+        "description": "Một tấm bùa hộ mệnh hấp thụ {damage} sát thương trong 10 giây."
       },
       "hammer_of_justice": {
         "name": "Búa Phán Nứt Vỡ",
-        "description": "Làm choáng mục tiêu trong 3 giây."
+        "description": "Làm choáng mục tiêu trong {duration} giây."
       },
       "lay_on_hands": {
         "name": "Nghi Thức Cuối Cùng",
-        "description": "Một luồng trị liệu khổng lồ: hồi phục 250 máu. Hồi chiêu 10 phút."
+        "description": "Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút."
       },
       "flash_of_light": {
         "name": "Ánh Quang Hàn Gắn",
@@ -5309,7 +5319,7 @@ export const vi_VN: EnTranslations = {
       },
       "consecration": {
         "name": "Thánh Địa",
-        "description": "Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh."
+        "description": "Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây."
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
@@ -5329,11 +5339,11 @@ export const vi_VN: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Đòn Moi Ruột",
-        "description": "Một đòn cận chiến mạnh tăng sát thương thêm 5. Kích hoạt ở đòn đánh tiếp theo của bạn."
+        "description": "Một đòn cận chiến mạnh tăng sát thương thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn."
       },
       "aspect_of_the_hawk": {
         "name": "Lốt Diều Hâu",
-        "description": "Khoác lên lốt diều hâu, tăng 20 sức mạnh tấn công trong 30 phút."
+        "description": "Khoác lên lốt diều hâu, tăng sức mạnh tấn công thêm {buff} trong 30 phút."
       },
       "serpent_sting": {
         "name": "Ngạnh Nọc Độc",
@@ -5345,15 +5355,15 @@ export const vi_VN: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Bắn Rúng Động",
-        "description": "Làm choáng váng mục tiêu, giảm 50% tốc độ di chuyển trong 4 giây."
+        "description": "Làm choáng váng mục tiêu gây {damage} sát thương, giảm 50% tốc độ di chuyển trong 4 giây."
       },
       "mongoose_bite": {
         "name": "Phản Nanh",
-        "description": "Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm 12. Không thể bị né."
+        "description": "Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm {damage}. Không thể bị né."
       },
       "wing_clip": {
         "name": "Nhát Chém Xiềng Xích",
-        "description": "Gây một vết thương làm chậm kẻ địch 40% trong 10 giây."
+        "description": "Gây một vết thương với {damage} sát thương, làm chậm kẻ địch 40% trong 10 giây."
       },
       "aspect_of_the_monkey": {
         "name": "Lốt Chồn",
@@ -5381,7 +5391,7 @@ export const vi_VN: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Kinh Cầu Kiên Định",
-        "description": "Tăng Thể Lực của mục tiêu thêm 3 trong 30 phút."
+        "description": "Tăng Thể Lực của mục tiêu thêm {buff} trong 30 phút."
       },
       "shadow_word_pain": {
         "name": "Ai Ca Mục Rữa",
@@ -5389,7 +5399,7 @@ export const vi_VN: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Thánh Thi Hộ Mệnh",
-        "description": "Che chắn mục tiêu, hấp thụ 48 sát thương trong 30 giây."
+        "description": "Che chắn mục tiêu, hấp thụ {damage} sát thương trong 30 giây."
       },
       "renew": {
         "name": "Ân Điển Vương Vấn",
@@ -5417,7 +5427,7 @@ export const vi_VN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Vũ Khí Khắc Đá",
-        "description": "Phù phép vũ khí với cơn cuồng nộ của đá: mỗi cú vung gây thêm 5 sát thương trong 5 phút."
+        "description": "Phù phép vũ khí với cơn cuồng nộ của đá: mỗi cú vung gây thêm {damage} sát thương trong 5 phút."
       },
       "healing_wave": {
         "name": "Dòng Nước Hàn Gắn",
@@ -5429,15 +5439,15 @@ export const vi_VN: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Bùa Hộ Sấm Sét",
-        "description": "Bao quanh bạn bằng sét lốp bốp: kẻ tấn công cận chiến nhận 13 sát thương Tự Nhiên."
+        "description": "Bao quanh bạn bằng sét lốp bốp: kẻ tấn công cận chiến nhận {buff} sát thương Tự Nhiên, tối đa 3 tích trữ và nhiều nhất một lần mỗi 5 giây."
       },
       "flame_shock": {
         "name": "Giật Tàn Lửa",
-        "description": "Thiêu đốt mục tiêu bằng lửa gây 25 sát thương cộng thêm {damage} trong 12 giây."
+        "description": "Thiêu đốt mục tiêu bằng lửa gây {damage} sát thương cộng thêm {overTime} trong 12 giây."
       },
       "flametongue_weapon": {
         "name": "Vũ Khí Khắc Hỏa",
-        "description": "Phù phép vũ khí của bạn bằng lửa nguyên tố: mỗi đòn đánh gây thêm 8 sát thương Hỏa trong 5 phút."
+        "description": "Phù phép vũ khí của bạn bằng lửa nguyên tố: mỗi đòn đánh gây thêm {damage} sát thương Hỏa trong 5 phút."
       },
       "frost_shock": {
         "name": "Giật Băng Giá",
@@ -5445,7 +5455,7 @@ export const vi_VN: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Vũ Khí Khắc Băng",
-        "description": "Phù phép vũ khí của bạn bằng băng giá buốt lạnh: mỗi đòn đánh gây thêm 8 sát thương trong 5 phút."
+        "description": "Phù phép vũ khí của bạn bằng băng giá buốt lạnh: mỗi đòn đánh gây thêm {damage} sát thương trong 5 phút."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5461,11 +5471,11 @@ export const vi_VN: EnTranslations = {
       },
       "demon_skin": {
         "name": "Da Ác Quỷ",
-        "description": "Lớp da quỷ tăng giáp của bạn thêm 30 trong 30 phút."
+        "description": "Lớp da quỷ tăng giáp của bạn thêm {buff} trong 30 phút."
       },
       "immolate": {
         "name": "Khế Ước Rực Cháy",
-        "description": "Thiêu đốt kẻ địch 11 sát thương Hỏa cùng thêm {damage} trong 15 giây."
+        "description": "Thiêu đốt kẻ địch gây {damage} sát thương Hỏa cùng thêm {overTime} trong 15 giây."
       },
       "corruption": {
         "name": "Hắc Hủ",
@@ -5473,7 +5483,7 @@ export const vi_VN: EnTranslations = {
       },
       "life_tap": {
         "name": "Mặc Cả Nghiệt Ngã",
-        "description": "Chuyển hóa 30 máu thành 30 mana."
+        "description": "Chuyển hóa {damage} máu thành {damage} mana."
       },
       "curse_of_agony": {
         "name": "Tà Chú Thống Khổ",
@@ -5505,7 +5515,7 @@ export const vi_VN: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Đặt Wildward lên một đồng minh, tăng giáp thêm 25 trong 30 phút."
+        "description": "Đặt Wildward lên một đồng minh, tăng giáp thêm {buff} trong 30 phút."
       },
       "moonfire": {
         "name": "Bão Tố Nguyệt",
@@ -5517,7 +5527,7 @@ export const vi_VN: EnTranslations = {
       },
       "thorns": {
         "name": "Bụi Gai Hộ Thân",
-        "description": "Gai nhọn mọc ra từ mục tiêu: kẻ tấn công cận chiến nhận 3 sát thương Tự Nhiên."
+        "description": "Gai nhọn mọc ra từ mục tiêu: kẻ tấn công cận chiến nhận {buff} sát thương Tự Nhiên."
       },
       "entangling_roots": {
         "name": "Rễ Siết Chặt",
@@ -5525,7 +5535,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Biến hình thành gấu: giáp +65%, sức mạnh tấn công +15, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
+        "description": "Biến hình thành gấu: giáp +90%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
       },
       "maul": {
         "name": "Nghiền Xương",
@@ -5545,7 +5555,7 @@ export const vi_VN: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
-        "description": "Đòn kết liễu gây sát thương theo mỗi điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+        "description": "Đòn kết liễu gây {damage}. Chỉ dùng được ở Hình Sói."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -5577,7 +5587,7 @@ export const vi_VN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ánh Ma Trơi",
-        "description": "Giảm giáp của mục tiêu đi 35 trong 40 giây."
+        "description": "Giảm giáp của mục tiêu đi {damage}% trong 40 giây. Không cộng dồn với Xẻ Giáp."
       },
       "hibernate": {
         "name": "Giấc Ngủ Sâu",
@@ -5601,7 +5611,7 @@ export const vi_VN: EnTranslations = {
       },
       "rip": {
         "name": "Xé Rách",
-        "description": "Đòn kết liễu gây sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+        "description": "Đòn kết liễu gây {damage} sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói."
       },
       "mortal_strike": {
         "name": "Đòn Tàn Phế",
@@ -5609,11 +5619,11 @@ export const vi_VN: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Trích Huyết",
-        "description": "Tấn công tức thời trong cơn cuồng huyết gây {damage}. (Tuyệt chiêu Cuồng Nộ)"
+        "description": "Tấn công tức thời trong cơn cuồng huyết gây 60% sát thương vũ khí cộng thêm {damage}. (Tuyệt chiêu Cuồng Nộ)"
       },
       "shield_slam": {
         "name": "Giáng Nứt Khiên",
-        "description": "Giáng khiên vào mục tiêu gây {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)"
+        "description": "Giáng khiên vào mục tiêu gây 50% sát thương vũ khí cộng thêm {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)"
       },
       "whirlwind": {
         "name": "Vòng Xoáy Lưỡi Kiếm",
@@ -7134,6 +7144,9 @@ export const vi_VN: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Chấp Sự Voss"
+      },
+      "training_dummy": {
+        "name": "Hình Nộm Tập Luyện"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"

@@ -2012,6 +2012,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Comunidad',
   'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menú',
+  'hud.core.mobileSettings': 'Ajustes',
   'hud.core.mobileUse': 'Usar',
   'hud.core.mobileMeters': 'Medidores',
   'hud.core.mobileMap': 'Mapa',
@@ -2760,29 +2761,30 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe.',
   'entities.abilities.battle_shout.name': 'Bramido de Hierro',
-  'entities.abilities.battle_shout.description': 'Aumenta tu poder de ataque en 20 durante 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Aumenta tu poder de ataque en {buff} durante 2 min.',
   'entities.abilities.commanding_shout.name': 'Grito Alentador',
-  'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en 6 durante 2 min.',
+  'entities.abilities.commanding_shout.description': 'Aumenta tu Aguante en {buff} durante 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Aullido Pavoroso',
   'entities.abilities.demoralizing_shout.description':
-    'Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en 30 durante 30 s.',
+    'Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s.',
   'entities.abilities.charge.name': 'Arremetida',
   'entities.abilities.charge.description':
     'Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m.',
   'entities.abilities.rend.name': 'Tajo Profundo',
   'entities.abilities.rend.description':
-    'Hiere al objetivo y le hace sangrar por {damage} de daño durante 9 s.',
+    'Hiere al objetivo y le hace sangrar por {damage} de daño durante {duration} s.',
   'entities.abilities.thunder_clap.name': 'Golpe Sísmico',
   'entities.abilities.thunder_clap.description':
     'Golpea a los enemigos cercanos por {damage} de daño y ralentiza sus ataques un 10% durante 10 s.',
   'entities.abilities.hamstring.name': 'Corte Paralizante',
   'entities.abilities.hamstring.description':
-    'Mutila al enemigo por 5 de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
+    'Mutila al enemigo por {damage} de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
   'entities.abilities.bloodrage.name': 'Tributo de Sangre',
   'entities.abilities.bloodrage.description': 'Genera 10 de ira a costa de salud.',
   'entities.abilities.overpower.name': 'Mano Roja',
   'entities.abilities.overpower.description':
-    'Ataque instantáneo que inflige daño de arma +5. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
+    'Ataque instantáneo que inflige daño de arma más {damage}. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
   'entities.abilities.execute.name': 'Tumba Temprana',
   'entities.abilities.execute.description':
     'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',
@@ -2801,16 +2803,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Descarga de Ascuas',
   'entities.abilities.rain_of_fire.name': 'Lluvia de Fuego',
   'entities.abilities.rain_of_fire.description':
-    'Hace caer una lluvia de fuego sobre el área objetivo, quemando a los enemigos e infligiendo {damage} de daño de Fuego.',
+    'Hace caer una lluvia de fuego sobre el área objetivo durante 4 s, quemando a los enemigos e infligiendo {damage} de daño de Fuego cada segundo.',
   'entities.abilities.volley.name': 'Andanada',
   'entities.abilities.volley.description':
-    'Lanza una lluvia de flechas sobre el área objetivo, infligiendo {damage} de daño a los enemigos atrapados.',
+    'Lanza una lluvia de flechas sobre el área objetivo durante 3 s, infligiendo {damage} de daño cada 0.5 s a los enemigos atrapados.',
   'entities.abilities.hurricane.name': 'Huracán',
   'entities.abilities.hurricane.description':
-    'Desata un huracán sobre el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza.',
+    'Desata un huracán sobre el área objetivo durante 6 s, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza cada segundo.',
   'entities.abilities.earthquake.name': 'Terremoto',
   'entities.abilities.earthquake.description':
-    'Sacude el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza.',
+    'Sacude el área objetivo durante 6 s, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza cada 1.5 s.',
   'entities.abilities.flamestrike.name': 'Llamarada',
   'entities.abilities.flamestrike.description':
     'Invoca un estallido de fuego en el área objetivo que inflige {damage} de daño de Fuego a los enemigos alcanzados por la explosión.',
@@ -2818,9 +2820,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza una bola ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
   'entities.abilities.frost_armor.name': 'Manto de Escarcha',
   'entities.abilities.frost_armor.description':
-    'Te envuelve en escarcha y aumenta la armadura en 30 durante 30 min.',
+    'Te envuelve en escarcha y aumenta la armadura en {buff} durante 30 min.',
   'entities.abilities.arcane_intellect.name': 'Intelecto de Éter',
-  'entities.abilities.arcane_intellect.description': 'Aumenta el Intelecto en 2 durante 30 min.',
+  'entities.abilities.arcane_intellect.description':
+    'Aumenta el Intelecto en {buff} durante 30 min.',
   'entities.abilities.frostbolt.name': 'Lanza de Escarcha',
   'entities.abilities.frostbolt.description':
     'Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%.',
@@ -2838,7 +2841,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza Dardos de Éter al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
   'entities.abilities.polymorph.name': 'Embrujar',
   'entities.abilities.polymorph.description':
-    'Transforma al enemigo en sapo durante hasta 15 s. El sapo deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
+    'Transforma al enemigo en sapo durante hasta {duration} s. El sapo deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
   'entities.abilities.frost_nova.name': 'Atadura de Hielo',
   'entities.abilities.frost_nova.description':
     'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha.',
@@ -2853,18 +2856,18 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
   'entities.abilities.ice_barrier.name': 'Velo de Escarcha',
   'entities.abilities.ice_barrier.description':
-    'Te protege con hielo y absorbe 130 de daño durante 60 s.',
+    'Te protege con hielo y absorbe {damage} de daño durante 60 s.',
   'entities.abilities.sinister_strike.name': 'Tajo Perverso',
   'entities.abilities.sinister_strike.description':
     'Golpe instantáneo que inflige daño de arma más {damage}. Otorga 1 punto de combo.',
   'entities.abilities.eviscerate.name': 'Descanso Eterno',
-  'entities.abilities.eviscerate.description': 'Remate que causa daño por punto de combo.',
+  'entities.abilities.eviscerate.description': 'Remate que causa {damage}.',
   'entities.abilities.backstab.name': 'Estocada Cobarde',
   'entities.abilities.backstab.description':
     'Apuñala al objetivo por un 150% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.',
   'entities.abilities.gouge.name': 'Golpe al Ojo',
   'entities.abilities.gouge.description':
-    'Golpea al objetivo y lo incapacita durante 4 s. Cualquier daño rompe el efecto. Otorga 1 punto de combo.',
+    'Golpea al objetivo por {damage} de daño y lo incapacita durante 4 s. Cualquier daño rompe el efecto. Otorga 1 punto de combo.',
   'entities.abilities.evasion.name': 'Pie Espectral',
   'entities.abilities.evasion.description':
     'Aumenta tu probabilidad de esquivar un 50% durante 15 s.',
@@ -2888,10 +2891,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu sangre se enciende y restaura al instante 60 de energía.',
   'entities.abilities.garrote.name': 'Alambre al Cuello',
   'entities.abilities.garrote.description':
-    'Estrangula al enemigo con un garrote, infligiendo daño de inmediato y haciéndolo sangrar {damage} durante 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
+    'Estrangula al enemigo con un garrote, infligiendo {damage} de daño de inmediato y haciéndolo sangrar {overTime} durante 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.cheap_shot.name': 'Golpe al Vientre',
   'entities.abilities.cheap_shot.description':
-    'Golpea al objetivo, aturdiéndolo durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.',
+    'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.',
   'entities.abilities.sap.name': 'Pasmar',
   'entities.abilities.sap.description':
     'Incapacita al objetivo durante 8 s. Debes estar en sigilo y fuera de combate. Cualquier daño rompe el efecto.',
@@ -2900,7 +2903,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpea al objetivo con un veneno plúmbeo, infligiendo {damage} de daño de Naturaleza y reduciendo su velocidad de movimiento un 50% durante 12 s.',
   'entities.abilities.expose_armor.name': 'Brecha en la Armadura',
   'entities.abilities.expose_armor.description':
-    'Movimiento final que deja al descubierto al objetivo, reduciendo su armadura. Cuantos más puntos de combo se gasten, más profundo es el corte.',
+    'Movimiento final que deja al descubierto al objetivo y reduce su armadura en {damage} durante 30 s.',
   'entities.abilities.rupture.name': 'Desangramiento',
   'entities.abilities.rupture.description':
     'Movimiento final que hiere al objetivo, haciéndolo sangrar {damage} durante 16 s.',
@@ -2918,25 +2921,25 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Ciega al objetivo, haciéndolo deambular desorientado durante 8 s. Cualquier daño rompe el efecto.',
   'entities.abilities.seal_of_righteousness.name': 'Marca de Juramento',
   'entities.abilities.seal_of_righteousness.description':
-    'Te llena de poder Sagrado durante 30 s, haciendo que cada golpe cuerpo a cuerpo inflija 4 de daño Sagrado adicional. Desátalo con Verdict.',
+    'Te llena de poder Sagrado durante 30 s, haciendo que cada golpe cuerpo a cuerpo inflija {damage} de daño Sagrado adicional. Desátalo con Verdict.',
   'entities.abilities.holy_light.name': 'Luz Reparadora',
   'entities.abilities.holy_light.description': 'Sana a un objetivo amistoso por {damage}.',
   'entities.abilities.devotion_aura.name': 'Aura Inquebrantable',
-  'entities.abilities.devotion_aura.description': 'Aumenta tu armadura en 40 durante 30 min.',
+  'entities.abilities.devotion_aura.description': 'Aumenta tu armadura en {buff} durante 30 min.',
   'entities.abilities.judgement.name': 'Verdict',
   'entities.abilities.judgement.description':
     'Desata tu Sello activo sobre el enemigo, lo consume y causa su daño Sagrado acumulado.',
   'entities.abilities.blessing_of_might.name': 'Juramento de Hierro',
   'entities.abilities.blessing_of_might.description':
-    'Coloca una Bendición sobre un objetivo amistoso y aumenta su poder de ataque en 15 durante 5 min.',
+    'Coloca una Bendición sobre un objetivo amistoso y aumenta su poder de ataque en {buff} durante 5 min.',
   'entities.abilities.divine_protection.name': 'Égida de Fe',
   'entities.abilities.divine_protection.description':
-    'Una égida protectora absorbe 50 de daño durante 10 s.',
+    'Una égida protectora absorbe {damage} de daño durante 10 s.',
   'entities.abilities.hammer_of_justice.name': 'Mazo Demoledor',
-  'entities.abilities.hammer_of_justice.description': 'Aturde al objetivo durante 3 s.',
+  'entities.abilities.hammer_of_justice.description': 'Aturde al objetivo durante {duration} s.',
   'entities.abilities.lay_on_hands.name': 'Último Rito',
   'entities.abilities.lay_on_hands.description':
-    'Una enorme oleada de sanación: restaura 250 de salud. Tiempo de reutilización de 10 min.',
+    'Una enorme oleada de sanación: restaura {damage} de salud. Tiempo de reutilización de 10 min.',
   'entities.abilities.flash_of_light.name': 'Reparación de Luz',
   'entities.abilities.flash_of_light.description':
     'Un estallido de Luz rápido y eficiente que sana a un objetivo amistoso por {damage}.',
@@ -2945,7 +2948,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Expulsa a los malvados con cólera Sagrada y causa {damage} de daño Sagrado.',
   'entities.abilities.consecration.name': 'Tierra Sagrada',
   'entities.abilities.consecration.description':
-    'Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado.',
+    'Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado cada 2 s durante 10 s.',
   'entities.abilities.righteous_fury.name': 'Juramento Ardiente',
   'entities.abilities.righteous_fury.description':
     'Aumenta un 60% la amenaza generada por tu daño Sagrado durante 30 min. La piedra angular del paladín tanque.',
@@ -2959,10 +2962,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Devuelve tu mascota a la naturaleza.',
   'entities.abilities.raptor_strike.name': 'Golpe Destripador',
   'entities.abilities.raptor_strike.description':
-    'Ataque cuerpo a cuerpo fuerte que aumenta el daño en 5. Se activa en tu siguiente golpe.',
+    'Ataque cuerpo a cuerpo fuerte que aumenta el daño en {damage}. Se activa en tu siguiente golpe.',
   'entities.abilities.aspect_of_the_hawk.name': 'Aspecto del Aguilucho',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Adoptas el aspecto del aguilucho y aumentas el poder de ataque en 20 durante 30 min.',
+    'Adoptas el aspecto del aguilucho y aumentas el poder de ataque en {buff} durante 30 min.',
   'entities.abilities.serpent_sting.name': 'Púa Venenosa',
   'entities.abilities.serpent_sting.description':
     'Pica al objetivo y causa {damage} de daño de Naturaleza durante 15 s.',
@@ -2971,13 +2974,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Disparo instantáneo que inflige {damage} de daño Arcano.',
   'entities.abilities.concussive_shot.name': 'Disparo Aturdidor',
   'entities.abilities.concussive_shot.description':
-    'Aturde levemente al objetivo y reduce su velocidad de movimiento un 50% durante 4 s.',
+    'Aturde levemente al objetivo por {damage} de daño y reduce su velocidad de movimiento un 50% durante 4 s.',
   'entities.abilities.mongoose_bite.name': 'Contracolmillo',
   'entities.abilities.mongoose_bite.description':
-    'Contraataca después de que el objetivo esquive e inflige daño de arma más 12. No puede esquivarse.',
+    'Contraataca después de que el objetivo esquive e inflige daño de arma más {damage}. No puede esquivarse.',
   'entities.abilities.wing_clip.name': 'Tajo Aprisionante',
   'entities.abilities.wing_clip.description':
-    'Inflige una herida que ralentiza al enemigo un 40% durante 10 s.',
+    'Inflige una herida por {damage} de daño que ralentiza al enemigo un 40% durante 10 s.',
   'entities.abilities.aspect_of_the_monkey.name': 'Aspecto de la Marta',
   'entities.abilities.aspect_of_the_monkey.description':
     'Adoptas el aspecto de la marta y aumentas tu probabilidad de esquivar un 8% durante 30 min.',
@@ -2996,13 +2999,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': 'Sana a un objetivo amistoso por {damage}.',
   'entities.abilities.power_word_fortitude.name': 'Letanía de Entereza',
   'entities.abilities.power_word_fortitude.description':
-    'Aumenta el Aguante del objetivo en 3 durante 30 min.',
+    'Aumenta el Aguante del objetivo en {buff} durante 30 min.',
   'entities.abilities.shadow_word_pain.name': 'Endecha de Descomposición',
   'entities.abilities.shadow_word_pain.description':
     'Una palabra de oscuridad causa {damage} de daño de las Sombras durante 18 s.',
   'entities.abilities.power_word_shield.name': 'Salmo de Protección',
   'entities.abilities.power_word_shield.description':
-    'Protege al objetivo y absorbe 48 de daño durante 30 s.',
+    'Protege al objetivo y absorbe {damage} de daño durante 30 s.',
   'entities.abilities.renew.name': 'Gracia Persistente',
   'entities.abilities.renew.description': 'Sana al objetivo por {damage} durante 15 s.',
   'entities.abilities.mind_blast.name': 'Fractura Mental',
@@ -3022,7 +3025,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza un rayo que inflige {damage} de daño de Naturaleza.',
   'entities.abilities.rockbiter_weapon.name': 'Arma Pétrea',
   'entities.abilities.rockbiter_weapon.description':
-    'Imbuye tu arma con la furia de la piedra: cada golpe inflige 5 de daño adicional durante 5 min.',
+    'Imbuye tu arma con la furia de la piedra: cada golpe inflige {damage} de daño adicional durante 5 min.',
   'entities.abilities.healing_wave.name': 'Aguas Reparadoras',
   'entities.abilities.healing_wave.description': 'Sana a un objetivo amistoso por {damage}.',
   'entities.abilities.earth_shock.name': 'Sacudida Terrestre',
@@ -3030,19 +3033,19 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Sacude al objetivo al instante con fuerza contundente por {damage} de daño de Naturaleza.',
   'entities.abilities.lightning_shield.name': 'Égida de Truenos',
   'entities.abilities.lightning_shield.description':
-    'Te rodea de relámpagos crepitantes: los atacantes cuerpo a cuerpo reciben 13 de daño de Naturaleza.',
+    'Te rodea de relámpagos crepitantes: los atacantes cuerpo a cuerpo reciben {buff} de daño de Naturaleza, hasta 3 cargas y como máximo una vez cada 5 segundos.',
   'entities.abilities.flame_shock.name': 'Sacudida de Ascuas',
   'entities.abilities.flame_shock.description':
-    'Abrasa al objetivo con fuego por 25 de daño más {damage} durante 12 s.',
+    'Abrasa al objetivo con fuego por {damage} de daño más {overTime} durante 12 s.',
   'entities.abilities.flametongue_weapon.name': 'Arma Tizón Ígneo',
   'entities.abilities.flametongue_weapon.description':
-    'Imbuye tu arma con fuego elemental: cada golpe inflige 8 de daño de Fuego adicional durante 5 min.',
+    'Imbuye tu arma con fuego elemental: cada golpe inflige {damage} de daño de Fuego adicional durante 5 min.',
   'entities.abilities.frost_shock.name': 'Sacudida de Escarcha',
   'entities.abilities.frost_shock.description':
     'Golpea al objetivo al instante con escarcha por {damage} de daño de Escarcha y reduce su velocidad de movimiento un 50% durante 8 s.',
   'entities.abilities.frostbrand_weapon.name': 'Arma Escarchada',
   'entities.abilities.frostbrand_weapon.description':
-    'Imbuye tu arma con escarcha mordiente: cada golpe inflige 8 de daño adicional durante 5 min.',
+    'Imbuye tu arma con escarcha mordiente: cada golpe inflige {damage} de daño adicional durante 5 min.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.ghost_wolf.description':
     'Te transforma en Shadewolf y aumenta tu velocidad de movimiento un 40% durante 10 min.',
@@ -3054,15 +3057,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Envía una descarga sombría al enemigo por {damage} de daño de las Sombras.',
   'entities.abilities.demon_skin.name': 'Piel de Engendro',
   'entities.abilities.demon_skin.description':
-    'La piel demoníaca aumenta tu armadura en 30 durante 30 min.',
+    'La piel demoníaca aumenta tu armadura en {buff} durante 30 min.',
   'entities.abilities.immolate.name': 'Pacto Ardiente',
   'entities.abilities.immolate.description':
-    'Quema al enemigo por 11 de daño de Fuego y {damage} adicionales durante 15 s.',
+    'Quema al enemigo por {damage} de daño de Fuego y {overTime} adicionales durante 15 s.',
   'entities.abilities.corruption.name': 'Putrefacción Negra',
   'entities.abilities.corruption.description':
     'Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s.',
   'entities.abilities.life_tap.name': 'Trato Amargo',
-  'entities.abilities.life_tap.description': 'Convierte 30 de salud en 30 de maná.',
+  'entities.abilities.life_tap.description': 'Convierte {damage} de salud en {damage} de maná.',
   'entities.abilities.curse_of_agony.name': 'Sortilegio de Angustia',
   'entities.abilities.curse_of_agony.description':
     'Maldice al objetivo con agonía: {damage} de daño de las Sombras durante 24 s.',
@@ -3085,7 +3088,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': 'Sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.mark_of_the_wild.description':
-    'Coloca la Wildward sobre un objetivo amistoso y aumenta su armadura en 25 durante 30 min.',
+    'Coloca la Wildward sobre un objetivo amistoso y aumenta su armadura en {buff} durante 30 min.',
   'entities.abilities.moonfire.name': 'Tempestad Lunar',
   'entities.abilities.moonfire.description':
     'Quema al enemigo con fuego lunar por {damage} de daño Arcano y daño en el tiempo.',
@@ -3093,13 +3096,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Sana al objetivo por {damage} durante 12 s.',
   'entities.abilities.thorns.name': 'Guardia de Zarzas',
   'entities.abilities.thorns.description':
-    'Brotan espinas del objetivo: los atacantes cuerpo a cuerpo reciben 3 de daño de Naturaleza.',
+    'Brotan espinas del objetivo: los atacantes cuerpo a cuerpo reciben {buff} de daño de Naturaleza.',
   'entities.abilities.entangling_roots.name': 'Raíces Aferradoras',
   'entities.abilities.entangling_roots.description':
     'Enraíza al objetivo en el sitio durante hasta 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Cambias a forma de oso: armadura +65%, poder de ataque +15, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
+    'Cambias a forma de oso: armadura +90%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
   'entities.abilities.maul.name': 'Rompehuesos',
   'entities.abilities.maul.description':
     'Ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa mucha amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.',
@@ -3114,7 +3117,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.ferocious_bite.name': 'Mordisco Sangriento',
   'entities.abilities.ferocious_bite.description':
-    'Remate que causa daño por punto de combo. Solo en Forma de lobo.',
+    'Remate que causa {damage}. Solo en Forma de lobo.',
   'entities.abilities.swipe.name': 'Zarpas Barredoras',
   'entities.abilities.swipe.description':
     'Golpea a los enemigos cercanos por {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.',
@@ -3137,7 +3140,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': 'Aturde al objetivo durante 2 s. Solo en forma de Bruin.',
   'entities.abilities.faerie_fire.name': 'Fuego Fatuo',
   'entities.abilities.faerie_fire.description':
-    'Reduce la armadura del objetivo en 35 durante 40 s.',
+    'Reduce la armadura del objetivo en un {damage}% durante 40 s. No se acumula con Cizalla de Armadura.',
   'entities.abilities.hibernate.name': 'Letargo',
   'entities.abilities.hibernate.description':
     'Sume al objetivo en un sueño profundo de hasta 8 s. Cualquier daño lo despertará.',
@@ -3155,16 +3158,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta el poder de ataque en 40 durante 6 s. Solo en Forma de lobo.',
   'entities.abilities.rip.name': 'Desgarrar',
   'entities.abilities.rip.description':
-    'Remate que causa daño de sangrado durante 12 s. Consume puntos de combo. Solo en Forma de lobo.',
+    'Remate que causa {damage} de daño de sangrado durante 12 s. Consume puntos de combo. Solo en Forma de lobo.',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
     'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
   'entities.abilities.bloodthirst.name': 'Sangría',
   'entities.abilities.bloodthirst.description':
-    'Atacas al instante en un frenesí sangriento por {damage}. (habilidad distintiva de Furia)',
+    'Atacas al instante en un frenesí sangriento por un 60% de daño de arma más {damage}. (habilidad distintiva de Furia)',
   'entities.abilities.shield_slam.name': 'Quiebra de Escudo',
   'entities.abilities.shield_slam.description':
-    'Golpeas al objetivo con tu escudo por {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',
+    'Golpeas al objetivo con tu escudo por un 50% de daño de arma más {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',
   'entities.abilities.whirlwind.name': 'Remolino de Cuchillas',
   'entities.abilities.whirlwind.description':
     'Giras en un arco letal y golpeas a todos los enemigos cercanos por {damage}. (talento de Furia)',
@@ -6689,4 +6692,52 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Retirar',
   'hudChrome.bank.withdrawQuantityInput': 'Cantidad a retirar',
   'hudChrome.bank.withdrawQuantityTitle': 'Retirar {item}',
+  'abilityUi.tooltip.selfOnly': 'Solo en ti mismo',
+  'itemUi.lootRoll.rolled': '{answered}/{total} han tirado',
+  'entities.abilities.sunder_armor.description':
+    'Cizalla la armadura del objetivo y la reduce un {damage}% por aplicación. Se acumula hasta 5 veces. Genera una gran cantidad de amenaza.',
+  'entities.mobs.training_dummy.name': 'Muñeco de entrenamiento',
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Protege a Yumi es un modo de objetivos por equipos que se juega en un laberinto: cada bando protege a su propio familiar felino mientras da caza al del rival. Cada cierto tiempo ambos gatos se teletransportan a nuevos rincones del laberinto, así que el combate oscila entre defender, cazar y correr para volver a encontrarlos. Entra en cola como tres contra tres o cinco contra cinco; caer en batalla solo te deja en el banquillo un instante.',
+  'guide.arenaPage.yumiHeading': 'Protege a Yumi',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Pasatiempo',
+  'hudChrome.auraEffect.armorPct': 'Reduce la armadura un {pct}%',
+  'hudChrome.auraEffect.armorPctStacks': 'Reduce la armadura un {pct}% ({stacks} acumulaciones)',
+  'hudChrome.auraEffect.increasePct.allStats': 'Aumenta todos los atributos un {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Aumenta el poder de ataque un {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': 'Aumenta la armadura un {pct}%',
+  'hudChrome.auraEffect.increasePct.int': 'Aumenta el Intelecto un {pct}%',
+  'hudChrome.auraEffect.increasePct.sta': 'Aumenta el Aguante un {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Debes estar en el centro de elaboración, con el nivel requerido, para elaborar eso.',
+  'hudChrome.crafting.recipeNotLearned': 'Aún no has aprendido esa receta.',
+  'hudChrome.crafting.throttled':
+    'Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.',
+  'hudChrome.mobile.chatPlaceholder': 'Di algo...',
+  'hudChrome.mobile.hideKeyboard': 'Ocultar teclado',
+  'hudChrome.unitFrame.partyChip': 'Grupo',
+  'yumi.banner.sudden': '¡MUERTE SÚBITA! ¡Los Yumis resisten!',
+  'yumi.banner.teleport': '¡Los Yumis se teletransportan!',
+  'yumi.bracket3': 'Yumi 3c3',
+  'yumi.bracket5': 'Yumi 5c5',
+  'yumi.end.loss': '¡DERROTA! Tu Yumi ha caído.',
+  'yumi.end.win': '¡VICTORIA! ¡Yumi está a salvo!',
+  'yumi.enterQueue': '¡Únete a Protege a Yumi!',
+  'yumi.error.partyTooBig3': 'Protege a Yumi 3c3 permite un grupo de hasta tres.',
+  'yumi.error.partyTooBig5': 'Protege a Yumi 5c5 permite un grupo de hasta cinco.',
+  'yumi.hud.aria': 'Tu Yumi con {mine} de {max} de salud; Yumi enemigo con {theirs}.',
+  'yumi.hud.collapse': 'Contraer las barras de Protege a Yumi',
+  'yumi.hud.enemyYumi': 'Yumi enemigo',
+  'yumi.hud.expand': 'Expandir las barras de Protege a Yumi',
+  'yumi.hud.getReady': 'Prepárate…',
+  'yumi.hud.suddenDeath': 'MUERTE SÚBITA',
+  'yumi.hud.teleportIn': 'Los Yumis se mueven en {s}',
+  'yumi.hud.title': 'PROTEGE A YUMI',
+  'yumi.hud.yourYumi': 'Tu Yumi',
+  'yumi.log.start': '¡Protege a Yumi! Defiende a tu familiar y da caza al del rival.',
+  'yumi.queue.join': 'Entras en la cola de Protege a Yumi. Protege a tu familiar…',
+  'yumi.queue.leave': 'Sales de la cola de Protege a Yumi.',
+  'yumi.queue.teamLeave': 'Tu equipo sale de la cola de Protege a Yumi.',
+  'yumi.respawn.title': '¡ABATIDO!',
 };
