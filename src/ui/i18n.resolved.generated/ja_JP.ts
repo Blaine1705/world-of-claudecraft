@@ -3265,9 +3265,9 @@ export const ja_JP: EnTranslations = {
       "seqProgress": "ルーンが順に応える（{step}/{total}）。",
       "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。",
       "gateOpen": "門が音を立てて開いた。",
-      "orbSealed": "The orb is sealed by the ritual below.",
-      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
-      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
+      "orbSealed": "宝珠は下層の儀式によって封じられている。",
+      "orbWakes": "五芒星の炎が消えた。祭壇で何かが目覚める。",
+      "orbOpensGate": "血の宝珠が輝く。神殿の門が音を立てて開いた。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
@@ -7193,16 +7193,16 @@ export const ja_JP: EnTranslations = {
         "name": "深淵の顎"
       },
       "rift_hellguard": {
-        "name": "Hellguard"
+        "name": "ヘルガード"
       },
       "rift_pact_acolyte": {
-        "name": "Pact Acolyte"
+        "name": "契約の侍祭"
       },
       "rift_boss_ritualist": {
-        "name": "Magus Vel'Kor the Pactbound"
+        "name": "契約に縛られし魔導士ヴェルコル"
       },
       "rift_boss_pitlord": {
-        "name": "Azgorath, Lord of the Pit"
+        "name": "奈落の王アズゴラス"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"

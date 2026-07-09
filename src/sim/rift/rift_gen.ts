@@ -12,8 +12,8 @@
 import type { Collider } from '../colliders';
 import {
   buildInfernalCitadelFloor,
-  INFERNAL_NOUNS,
   INFERNAL_THEME_ID,
+  infernalCitadelName,
 } from '../content/rift/infernal_citadel';
 import { RIFT_THEMES, type RiftTheme } from '../content/rift/themes';
 import {
@@ -685,12 +685,10 @@ function floorLevelFor(baseLevel: number, floorIndex: number): number {
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */
 export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
   if (isSetPieceSeed(seed)) {
-    const nameRng = new Rng(mixSeed(seed, 0x9a3e));
-    const noun = nameRng.pick(INFERNAL_NOUNS as unknown as string[]);
     return {
       seed,
       baseLevel,
-      name: noun === 'Infernal' ? 'The Infernal Citadel' : `The ${noun} Citadel`,
+      name: infernalCitadelName(seed),
       themeId: INFERNAL_THEME_ID,
       floorCount: 1,
     };

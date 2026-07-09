@@ -11,7 +11,6 @@ import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5174';
 const OUT = process.env.SHOT_DIR ?? 'tmp/citadel';
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(OUT, { recursive: true });
 
 const errors = [];
@@ -69,12 +68,7 @@ async function shoot(label, lx, lz, facing = 0) {
   await page.evaluate(
     (x, z, f) => {
       const w = window.__game.world;
-      const inst = w.riftInstances.find((i) => i.partyKey !== null);
-      const o = w.riftOriginFor
-        ? w.riftOriginFor(inst.slot, inst.floorIndex)
-        : { x: w.player.pos.x - 0, z: w.player.pos.z - 0 };
-      // Instance origin: derive it from the sim helper the sim already exposes.
-      const origin = window.__riftOrigin ?? o;
+      const origin = window.__riftOrigin;
       w.player.pos = { x: origin.x + x, y: w.player.pos.y, z: origin.z + z };
       w.player.prevPos = { ...w.player.pos };
       w.player.facing = f;
@@ -92,9 +86,8 @@ async function shoot(label, lx, lz, facing = 0) {
 // Publish the instance origin once so `shoot` can work in instance-local coords.
 await page.evaluate(() => {
   const w = window.__game.world;
-  const inst = w.riftInstances.find((i) => i.partyKey !== null);
   // The player spawned at the floor's entry (0, -11): origin = pos - entry.
-  window.__riftOrigin = { x: w.player.pos.x - 0, z: w.player.pos.z - -11 };
+  window.__riftOrigin = { x: w.player.pos.x, z: w.player.pos.z + 11 };
 });
 
 await shoot('01_entrance', 0, -14, 0);

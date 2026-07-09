@@ -5,6 +5,7 @@
 // portcullis -> giga-boss -> exit), and the guarantee that adding the set-piece
 // left every procedural seed byte-identical.
 
+import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { Collider } from '../src/sim/colliders';
 import {
@@ -16,7 +17,12 @@ import { RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z, riftInstanceOrigin } from '../s
 import { layoutColliders } from '../src/sim/dungeon_layout';
 import { authoredWallSegments, inAnyRoom, roomAt } from '../src/sim/rift/authored';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
-import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from '../src/sim/rift/rift_gen';
+import {
+  generateRiftFloor,
+  generateRiftPlan,
+  isSetPieceSeed,
+  riftFloorCount,
+} from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -98,6 +104,31 @@ describe('infernal citadel: seed selection', () => {
       checked++;
     }
     expect(checked).toBeGreaterThan(200);
+  });
+
+  // The set-piece landed alongside an extraction of `mix`/`jitterColor`/`buildStyle`
+  // out of rift_gen and into rift/style.ts. Nothing in the parity gate enters a rift,
+  // so a mistyped constant in that move (or any later edit to the generator's draw
+  // ORDER) would silently reshape every procedural rift with every other test green.
+  // This digest was captured on the BASE branch, before the set-piece existed: it must
+  // never change unless procedural rift geometry is deliberately re-tuned.
+  it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
+    // Hand-picked on the base branch, so the seed list itself cannot drift with the
+    // set-piece roll.
+    const SEEDS = [
+      1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 42, 101, 202, 12345,
+    ];
+    for (const s of SEEDS) expect(isSetPieceSeed(s), `seed ${s} must stay procedural`).toBe(false);
+    const h = createHash('sha256');
+    for (const s of SEEDS) {
+      h.update(`${s}:${riftFloorCount(s)}`);
+      for (let f = 0; f < riftFloorCount(s); f++) {
+        h.update(JSON.stringify(generateRiftFloor(s, 20, f)));
+      }
+    }
+    expect(h.digest('hex')).toBe(
+      '592d530c3c35c9c621513460fb5b1d6ee94e6fc9bd6e83f4b259bc444bc06c71',
+    );
   });
 });
 
@@ -350,6 +381,25 @@ describe('infernal citadel: lifecycle', () => {
     expect(player().pos.z - o.z).toBeLessThan(gate.z); // shoved back south of it
   });
 
+  it('never clamps a player who is legitimately in a side room', () => {
+    const floor = generateRiftFloor(seed, 22, 0);
+    const gate = floor.gate as NonNullable<typeof floor.gate>;
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    const o = riftInstanceOrigin(i.slot, i.floorIndex);
+    killTrash();
+    // The west gallery and the forge both sit NORTH of the gate line but outside its
+    // span, so the closed portcullis must leave them alone (it spans |x| < 18).
+    for (const [x, z, room] of [
+      [-25, 60, 'gallery'],
+      [-26, 84, 'bonepit'],
+    ] as const) {
+      teleport(x, z);
+      sim.tick();
+      expect(i.gateOpen).toBe(false);
+      expect(roomAt(INFERNAL_ROOMS, player().pos.x - o.x, player().pos.z - o.z)?.id).toBe(room);
+    }
+  });
+
   it('refuses the dormant orb, then opens the gate once the miniboss falls', () => {
     const floor = generateRiftFloor(seed, 22, 0);
     const orb = floor.objects.find((o) => o.kind === 'infernal_orb') as { x: number; z: number };
@@ -419,6 +469,29 @@ describe('infernal citadel: lifecycle', () => {
     sim.tick();
     expect(Math.abs(player().pos.x)).toBeLessThan(RIFT_REGION_HALF_X * 2); // back overworld
     expect(inst()?.floorIndex ?? 0).toBe(0);
+  });
+
+  it('lets /dev portal pick the dungeon type by searching for a seed of that kind', () => {
+    const chat = (text: string) => sim.chat(text, pid);
+    // The dev command forces the kind by finding a seed whose pure roll matches, so no
+    // wire field is needed. Assert the SPAWNED portal's seed, not just the log line.
+    const portalSeeds = (): number[] => {
+      const out: number[] = [];
+      for (const e of sim.entities.values()) {
+        if (e.templateId === 'rift_portal' && e.riftSeed !== undefined) out.push(e.riftSeed);
+      }
+      return out;
+    };
+    const before = portalSeeds().length;
+    chat('/dev portal 1 22 A infernal');
+    const afterInfernal = portalSeeds();
+    expect(afterInfernal.length).toBe(before + 1);
+    expect(isSetPieceSeed(afterInfernal[afterInfernal.length - 1])).toBe(true);
+
+    chat('/dev portal 5 22 A random');
+    const afterRandom = portalSeeds();
+    expect(afterRandom.length).toBe(before + 2);
+    expect(isSetPieceSeed(afterRandom[afterRandom.length - 1])).toBe(false);
   });
 
   it('kills nothing on entry: every mob spawns clear of the walls it fights in', () => {

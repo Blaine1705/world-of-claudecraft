@@ -3265,9 +3265,9 @@ export const ko_KR: EnTranslations = {
       "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
       "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요.",
       "gateOpen": "문이 삐걱거리며 열립니다.",
-      "orbSealed": "The orb is sealed by the ritual below.",
-      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
-      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
+      "orbSealed": "구슬은 아래의 의식에 봉인되어 있습니다.",
+      "orbWakes": "펜타그램의 불꽃이 꺼집니다. 제단에서 무언가가 깨어납니다.",
+      "orbOpensGate": "피의 구슬이 타오릅니다. 신전의 문이 삐걱거리며 열립니다."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
@@ -7193,16 +7193,16 @@ export const ko_KR: EnTranslations = {
         "name": "심연의 아가리"
       },
       "rift_hellguard": {
-        "name": "Hellguard"
+        "name": "지옥 수호병"
       },
       "rift_pact_acolyte": {
-        "name": "Pact Acolyte"
+        "name": "계약의 수련사제"
       },
       "rift_boss_ritualist": {
-        "name": "Magus Vel'Kor the Pactbound"
+        "name": "서약에 묶인 마구스 벨코르"
       },
       "rift_boss_pitlord": {
-        "name": "Azgorath, Lord of the Pit"
+        "name": "구렁의 군주 아즈고라스"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"

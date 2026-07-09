@@ -1553,56 +1553,28 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "zh_CN": [
-    "entities.mobs.rift_boss_pitlord.name",
-    "entities.mobs.rift_boss_ritualist.name",
-    "entities.mobs.rift_hellguard.name",
-    "entities.mobs.rift_pact_acolyte.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.vcup.guildBoardWl",
-    "hudChrome.vcup.shootPower",
-    "sim.rift.orbOpensGate",
-    "sim.rift.orbSealed",
-    "sim.rift.orbWakes"
+    "hudChrome.vcup.shootPower"
   ],
   "zh_TW": [
-    "entities.mobs.rift_boss_pitlord.name",
-    "entities.mobs.rift_boss_ritualist.name",
-    "entities.mobs.rift_hellguard.name",
-    "entities.mobs.rift_pact_acolyte.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.vcup.guildBoardWl",
-    "hudChrome.vcup.shootPower",
-    "sim.rift.orbOpensGate",
-    "sim.rift.orbSealed",
-    "sim.rift.orbWakes"
+    "hudChrome.vcup.shootPower"
   ],
   "ko_KR": [
-    "entities.mobs.rift_boss_pitlord.name",
-    "entities.mobs.rift_boss_ritualist.name",
-    "entities.mobs.rift_hellguard.name",
-    "entities.mobs.rift_pact_acolyte.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.vcup.guildBoardWl",
-    "hudChrome.vcup.shootPower",
-    "sim.rift.orbOpensGate",
-    "sim.rift.orbSealed",
-    "sim.rift.orbWakes"
+    "hudChrome.vcup.shootPower"
   ],
   "ja_JP": [
-    "entities.mobs.rift_boss_pitlord.name",
-    "entities.mobs.rift_boss_ritualist.name",
-    "entities.mobs.rift_hellguard.name",
-    "entities.mobs.rift_pact_acolyte.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.vcup.guildBoardWl",
-    "hudChrome.vcup.shootPower",
-    "sim.rift.orbOpensGate",
-    "sim.rift.orbSealed",
-    "sim.rift.orbWakes"
+    "hudChrome.vcup.shootPower"
   ],
   "pt_BR": [
     "entities.abilities.sport_boot.description",
@@ -1862,17 +1834,10 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "ru_RU": [
-    "entities.mobs.rift_boss_pitlord.name",
-    "entities.mobs.rift_boss_ritualist.name",
-    "entities.mobs.rift_hellguard.name",
-    "entities.mobs.rift_pact_acolyte.name",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
     "hudChrome.vcup.guildBoardWl",
-    "hudChrome.vcup.shootPower",
-    "sim.rift.orbOpensGate",
-    "sim.rift.orbSealed",
-    "sim.rift.orbWakes"
+    "hudChrome.vcup.shootPower"
   ],
   "cs_CZ": [
     "entities.abilities.sport_boot.description",

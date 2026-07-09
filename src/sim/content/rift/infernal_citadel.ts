@@ -32,6 +32,13 @@ export const INFERNAL_NOUNS = ['Infernal', 'Brimstone', 'Hellfire', 'Pactbound']
 export const INFERNAL_THEME_ID = 'infernal';
 export const INFERNAL_THEME_NAME = 'Infernal Citadel';
 
+/** The rift's proper name for this seed. ONE source, so the portal tooltip, the
+ * rift tracker, and the "you step through" line never disagree. */
+export function infernalCitadelName(seed: number): string {
+  const noun = new Rng(mixSeed(seed, 0x9a3e)).pick(INFERNAL_NOUNS as unknown as string[]);
+  return noun === 'Infernal' ? 'The Infernal Citadel' : `The ${noun} Citadel`;
+}
+
 /** The citadel's colour grade. Deliberately blood-red and dim, NOT the amber forge
  * glow of the procedural `ember` theme, so the two never read as the same place. */
 export const INFERNAL_STYLE: StyleSource = {
@@ -273,7 +280,7 @@ export function buildInfernalCitadelFloor(
     floorCount: 1,
     isBoss: true,
     authored: true,
-    name: 'The Infernal Citadel',
+    name: infernalCitadelName(seed),
     themeName: INFERNAL_THEME_NAME,
     layout,
     style: buildStyle(rng, INFERNAL_STYLE),
