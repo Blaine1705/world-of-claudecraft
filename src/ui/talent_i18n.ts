@@ -9323,170 +9323,11 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
-// Base (rank-1, no player scaling) values for a granted ability's description
-// placeholders, so a grant tooltip on the planning screen resolves {damage}/
-// {buff}/{duration} instead of showing raw braces. 37 of 54 granted abilities
-// have static descriptions and skip this; the 17 with placeholders use it.
-export function grantAbilityValues(id: string): InterpolationValues {
-  const def = ABILITIES[id];
-  const effs = def?.effects ?? [];
-  const values: Record<string, string> = {};
-  const damageEff = effs.find((e) =>
-    ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(e.type),
-  ) as { min?: number; max?: number } | undefined;
-  const absorbEff = effs.find((e) => e.type === 'absorb') as { amount?: number } | undefined;
-  const dotEff = effs.find((e) => e.type === 'dot' || e.type === 'hot') as
-    | { total?: number }
-    | undefined;
-  const buffEff = effs.find((e) => e.type === 'selfBuff' || e.type === 'buffTarget') as
-    | { value?: number }
-    | undefined;
-  const durEff = effs.find(
-    (e) => 'duration' in e && typeof (e as { duration?: number }).duration === 'number',
-  ) as { duration?: number } | undefined;
-  if (damageEff?.min !== undefined) {
-    values.damage =
-      damageEff.min === damageEff.max
-        ? String(damageEff.min)
-        : `${damageEff.min} to ${damageEff.max}`;
-  } else if (absorbEff?.amount !== undefined) values.damage = String(absorbEff.amount);
-  else if (dotEff?.total !== undefined) values.damage = String(dotEff.total);
-  if (buffEff?.value !== undefined) values.buff = String(buffEff.value);
-  if (durEff?.duration !== undefined) values.duration = String(durEff.duration);
-  return values;
-}
-
 // The granted ability's own description, so a grant option's tooltip tells the
 // player what the spell DOES instead of a dead-end "Grants X." Localized by
-// tEntity; placeholders resolve to base values (grantAbilityValues).
+// tEntity, so grant tooltips read correctly in every locale.
 function abilityDescription(id: string): string {
-  return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) });
-}
-
-function seconds(value: number, lang: SupportedLanguage): string {
-  return `${formatNumber(value, lang)} s`;
-}
-
-function abilityList(ids: readonly string[] | undefined): string {
-  return ids && ids.length > 0 ? ids.map(abilityName).join(' / ') : '*';
-}
-
-// Proc and rider tooltips use compact mechanical notation instead of authored prose.
-// The words that remain are resolved locale labels and localized ability names; ASCII
-// operators keep the description equally precise for every language without maintaining
-// a second, drift-prone translation corpus for declarative combat data.
-function procTriggerDescription(
-  proc: ProcDef,
-  lang: SupportedLanguage,
-  text: TalentLocaleText,
-): string {
-  const trigger = proc.trigger;
-  switch (trigger.on) {
-    case 'castNth':
-      return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
-    case 'spellCrit':
-      return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
-    case 'shieldConsumed':
-      return `${abilityName(trigger.ability)}: ${t('hudChrome.auraEffect.absorb', { value: '0' })}`;
-    case 'hotExpired':
-      return `${abilityName(trigger.ability)}: 0 s`;
-    case 'bigHitTaken':
-      return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
-    case 'meleeSwingWhile':
-      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
-    case 'thornsReflect':
-      return `${translateTitle(proc.name, lang)}: ${t('guide.abilityHook.thorns')}`;
-  }
-}
-
-function procResponseDescription(
-  response: ProcDef['responses'][number],
-  lang: SupportedLanguage,
-  text: TalentLocaleText,
-): string {
-  switch (response.kind) {
-    case 'empowerNext': {
-      const name = abilityList(response.abilities);
-      const window = `(${seconds(response.duration, lang)})`;
-      if (response.aura === 'next_cast_instant') {
-        return `${name}: -${formatPercent(1, lang)} ${text.statLabels.castTime} ${window}`;
-      }
-      const reduction = response.aura === 'next_cast_free' ? 1 : (response.costPct ?? 0);
-      return `${name}: -${formatPercent(reduction, lang)} ${text.statLabels.cost} ${window}`;
-    }
-    case 'cooldownRefund':
-      return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
-    case 'resource':
-      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
-    case 'heal':
-      return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
-    case 'absorb':
-      return `${t('hudChrome.auraEffect.absorb', { value: formatNumber(response.amount, lang) })} (${seconds(response.duration, lang)})`;
-    case 'echo':
-      return `+${formatNumber(response.heal, lang)} ${t('hud.meters.healing')} @ <= ${formatPercent(response.belowFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(response.window, lang)})`;
-  }
-}
-
-function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLocaleText): string {
-  const trigger = procTriggerDescription(proc, lang, text);
-  const responses = proc.responses
-    .map((response) => procResponseDescription(response, lang, text))
-    .join('; ');
-  return `${trigger} -> ${responses}.`;
-}
-
-type DescribedAddedEffect = Extract<
-  AbilityEffect,
-  {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
-  }
->;
-
-function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is DescribedAddedEffect {
-  if (
-    effect.type !== 'root' &&
-    effect.type !== 'aoeRoot' &&
-    effect.type !== 'slow' &&
-    effect.type !== 'absorb' &&
-    effect.type !== 'dot' &&
-    effect.type !== 'extendDot' &&
-    effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
-  ) {
-    throw new Error(`Unsupported talent rider effect: ${effect.type}`);
-  }
-}
-
-function addedEffectDescription(
-  sourceAbility: string,
-  effect: AbilityEffect,
-  lang: SupportedLanguage,
-  text: TalentLocaleText,
-): string {
-  assertDescribedAddedEffect(effect);
-  const name = abilityName(sourceAbility);
-  switch (effect.type) {
-    case 'root':
-      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}).`;
-    case 'aoeRoot':
-      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}; r=${formatNumber(effect.radius, lang)}).`;
-    case 'slow':
-      return `${name}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber((1 - effect.mult) * 100, lang) })} (${seconds(effect.duration, lang)}).`;
-    case 'absorb':
-      return `${name}: ${t('hudChrome.auraEffect.absorb', { value: formatNumber(effect.amount, lang) })} (${seconds(effect.duration, lang)}).`;
-    case 'dot': {
-      const leech = effect.leechPct
-        ? `; +${formatPercent(effect.leechPct, lang)} ${t('hud.meters.healing')}`
-        : '';
-      return `${name}: ${formatNumber(effect.total, lang)} ${text.statLabels.damage} / ${seconds(effect.duration, lang)} (${seconds(effect.interval, lang)}${leech}).`;
-    }
-    case 'extendDot':
-      return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
-    case 'interrupt':
-      return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
-    case 'consumeDot':
-      return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
-  }
+  return tEntity({ kind: 'ability', id, field: 'description' });
 }
 
 // True when a talent title has an explicit per-locale translation override. The
@@ -9664,7 +9505,18 @@ export function tTalent(request: TalentTranslationRequest): string {
         ? request.spec.name
         : `${request.spec.description} Signature: ${abilityName(request.spec.signature)}.`;
     }
-    if (request.kind === 'talentChoice') return request.choice[request.field];
+    if (request.kind === 'talentChoice') {
+      if (request.field === 'name') return request.choice.name;
+      // A grant option's authored description is a bare "Grants X."; append the
+      // granted ability's own description so the tooltip tells the player what
+      // the spell actually does.
+      const grantId = request.choice.effect.grant?.ability;
+      if (grantId) {
+        const gd = abilityDescription(grantId);
+        return gd ? `${request.choice.description} ${gd}` : request.choice.description;
+      }
+      return request.choice.description;
+    }
     const exhaustive: never = request;
     return exhaustive;
   }

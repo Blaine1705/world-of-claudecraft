@@ -117,21 +117,13 @@ function legitNumbers(effect: unknown): Set<number> {
     }
   };
   walk(effect);
-  // A grant option's tooltip appends the granted ability's own description with
-  // its base (rank-1) values resolved, so every number the granted ability
-  // produces (damage min/max, buff, duration, absorb amount, dot total) is
-  // legitimate, not a contradiction. Walk the granted ability's effects too.
+  // A grant option's tooltip appends the granted ability's own description, so
+  // every number in that description (the ability's damage, duration, etc.) is
+  // legitimate, not a contradiction.
   const grantId = (effect as { grant?: { ability?: string } })?.grant?.ability;
-  if (grantId && ABILITIES[grantId]) {
-    // Render the granted ability description exactly as the tooltip does (base
-    // values), so every number it actually shows counts as legitimate.
+  if (grantId) {
     const { pcts, bare } = descriptionNumbers(
-      tEntity({
-        kind: 'ability',
-        id: grantId,
-        field: 'description',
-        values: grantAbilityValues(grantId),
-      }),
+      tEntity({ kind: 'ability', id: grantId, field: 'description' }),
     );
     for (const n of pcts) out.add(n);
     for (const n of bare) out.add(n);
