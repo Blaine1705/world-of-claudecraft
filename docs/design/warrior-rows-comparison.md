@@ -29,3 +29,35 @@ IP-safe shipped coinages where the port replaced verbatim names.
 No warrior slot kept the old flip option as the recommended winner. The only old content retained is
 the existing IP-safe ability shell for Colossus and Steel Cyclone, updated or reused to carry Blaine's
 mechanics.
+
+## Blind panel re-evaluation (2026-07-10) — the real best-of-both
+
+The first pass above defaulted to Blaine's content ("because his tuning was
+playtested"). That biased the result to 6-0. A blind re-run corrected it: both
+row sets were anonymized (provenance + Blaine's giveaway prefix stripped, all
+grants equally expanded, 6 options per level shuffled), and a 3-judge panel
+scored every option 1-10 on merit with no knowledge of authorship.
+
+Result: **Blaine 4 rows, flip 2 rows** (not 6-0).
+
+| Level | Flip avg | Blaine avg | Winner |
+|---|---:|---:|---|
+| 5 | 6.0 | 7.0 | Blaine |
+| 8 | 7.2 | 5.0 | Flip |
+| 11 | 4.3 | 7.0 | Blaine |
+| 14 | 7.0 | 5.0 | Flip |
+| 17 | 5.2 | 7.6 | Blaine |
+| 20 | 6.1 | 6.7 | Blaine |
+
+The panel rewarded behavior-changing options and punished flat passives
+regardless of author. Blaine's two most-cited "playtested" options scored the
+LOWEST in the whole set: Rallying Breath (1.5%/sec regen) and Rage Discipline
+(+25% rage) both averaged 3, as invisible passives. The flip's level-8 Jawcrack
+interrupt tied for the single best option overall (8.0).
+
+**Final shipped set (the merge the blind numbers support):** Blaine's rows
+5/11/17/20 + the flip's rows 8 (Jawcrack interrupt / Crippling Strikes 70% slow
+/ Concussive Clap root) and 14 (Executioner / Bladed Gyre / Crippling Blows).
+Every option in the final set is behavior-changing or an active; no flat
+passive survives. Blaine's row-8 mechanics (secondWind regen, triumph_rush,
+swordguard) are now orphaned defs, kept for possible reuse.

@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "08417bde",
+      "state": "f8c92f3b",
       "events": "11fa1beb",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "3e26a1e6",
+      "state": "ad5bc523",
       "events": "90b217f1",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "755351a2",
+      "state": "3a713a47",
       "events": "d13b86f9",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "65f73c0e",
+      "state": "f3477c6b",
       "events": "669c1069",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "05878eb8",
+      "state": "1b1c57d4",
       "events": "1d077d66",
       "rng": {
         "draws": 300,
@@ -128,9 +128,9 @@
           "talents": {
             "rows": {
               "5": "war_r5_twin_onrush",
-              "8": "war_r8_rallying_breath",
+              "8": "war_r8_pummel",
               "11": "war_r11_razor_howl",
-              "14": "war_r14_rage_discipline",
+              "14": "war_r14_crippling_blows",
               "17": "war_r17_reckless_vow",
               "20": "war_r20_giants_momentum"
             },
@@ -335,7 +335,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 6,
+          "resource": 5,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -520,7 +520,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "d3f0f15c",
+      "state": "7558d85f",
       "events": "f8fba87c",
       "rng": {
         "draws": 300,
@@ -573,9 +573,9 @@
           "talents": {
             "rows": {
               "5": "war_r5_twin_onrush",
-              "8": "war_r8_rallying_breath",
+              "8": "war_r8_pummel",
               "11": "war_r11_razor_howl",
-              "14": "war_r14_rage_discipline",
+              "14": "war_r14_crippling_blows",
               "17": "war_r17_reckless_vow",
               "20": "war_r20_giants_momentum"
             },
@@ -780,7 +780,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 12,
+          "resource": 10,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -963,7 +963,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "fbb94ff2",
+      "state": "b3000993",
       "events": "a6f8a49c",
       "rng": {
         "draws": 300,
@@ -1017,9 +1017,9 @@
           "talents": {
             "rows": {
               "5": "war_r5_twin_onrush",
-              "8": "war_r8_rallying_breath",
+              "8": "war_r8_pummel",
               "11": "war_r11_razor_howl",
-              "14": "war_r14_rage_discipline",
+              "14": "war_r14_crippling_blows",
               "17": "war_r17_reckless_vow",
               "20": "war_r20_giants_momentum"
             },
@@ -1225,7 +1225,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 12,
+          "resource": 10,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1408,7 +1408,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "e8a17814",
+      "state": "9dd1f8bd",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1419,7 +1419,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 409,
-      "state": "80b9cf50",
+      "state": "8b451d41",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1473,9 +1473,9 @@
           "talents": {
             "rows": {
               "5": "war_r5_twin_onrush",
-              "8": "war_r8_rallying_breath",
+              "8": "war_r8_pummel",
               "11": "war_r11_razor_howl",
-              "14": "war_r14_rage_discipline",
+              "14": "war_r14_crippling_blows",
               "17": "war_r17_reckless_vow",
               "20": "war_r20_giants_momentum"
             },
@@ -1682,7 +1682,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 12,
+          "resource": 10,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
