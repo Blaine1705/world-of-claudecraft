@@ -22,8 +22,7 @@ item level 33) and add difficulty via three summoned adds and four mechanics.
 | F | Summon channel after a successful pillar pop | Not started |
 | G | Tank-swap stacking curse (both phases) | Not started |
 | H | Voss taunt-immune caster-seeking threat AI | Not started |
-| I | Heroic versions of the two legendary weapons (ilvl 37) | Not started |
-| J | Heroic set pieces share normal set ids (mix for bonuses) | Not started |
+| I | Heroic versions of the two legendary weapons (ilvl 35) | Not started |
 
 Commit so far: `feat(loot): Heroic Nythraxis drops 5 ilvl-33 raid epics, no normal gear`
 
@@ -130,34 +129,31 @@ Confirmed decisions:
 - `[HEROIC]` tag: new `ItemDef.heroic` flag, set on the 7 raid items, rendered on
   the tooltip type line ("Epic Armor [HEROIC]"), tag localized across all locales.
 
-## Tier rule: heroic is +4 item levels above normal
+## Part I: heroic legendary weapons (item level 35)
 
-The whole heroic Nythraxis set is +4 item levels above its normal counterpart:
-
-- Normal epics are item level 29 (level 20 + epic 6 + raid 3); heroic epics are
-  33 (already committed in Part A).
-- Normal legendaries are item level 33 (level 20 + legendary 10 + raid 3); heroic
-  legendaries are 37 (Part I).
-
-## Part I: heroic legendary weapons (item level 37)
-
-Heroic versions of both Nythraxis legendaries, +4 above the normal pair.
+The two normal Nythraxis legendaries are already item level 33 (source level 20 +
+legendary bonus 10 + raid bonus 3). Their heroic versions get the same +2 the
+epics did, landing at item level 35, so they stay the aspirational top of the
+raid tier.
 
 New items (mirror the normal legendaries, keep the same weapon procs and
 requiredClass, add the `heroic: true` flag from Part D):
 
-| Heroic id | Base | Slot | Legendary budget @ ilvl 37 |
+| Heroic id | Base | Slot | Legendary budget @ ilvl 35 |
 |---|---|---|---|
-| `deathless_heartwood_heroic` | Heartwood of the Deathless Crown | mainhand | 49 (spi/sta/int, keep ratio) |
-| `kingsbane_last_oath_heroic` | Thronebane, Last Oath of Thornpeak | mainhand | 49 (str/agi/sta, keep ratio) |
+| `deathless_heartwood_heroic` | Heartwood of the Deathless Crown | mainhand | 47 (spi/sta/int, keep ratio) |
+| `kingsbane_last_oath_heroic` | Thronebane, Last Oath of Thornpeak | mainhand | 47 (str/agi/sta, keep ratio) |
 
-Item level: put them in the raid heroic table so they register at
-`NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL` (27); legendary quality (+10) gives item level
-37 with no special-casing. Budget math: `round(37 * 1.9 * 1.0 * 0.7) = 49`
-(legendary mult 1.9, mainhand mult 1.0). The current legendaries carry 44 at
-ilvl 33; use `normalizePrimaryStats(base.stats, 49)` to redistribute on the same
-ratio. Add a legendary case to the `tests/item_level.test.ts` heroic sweep (it
-only checks epics today).
+Budget math: `round(35 * 1.9 * 1.0 * 0.7) = 47` (legendary quality mult 1.9,
+mainhand slot mult 1.0). The current legendaries carry 44 at ilvl 33; use
+`normalizePrimaryStats(base.stats, 47)` to redistribute on the same ratio.
+
+Item level: they need to read 35, not the 37 they'd get from the epic raid
+source level (27 + legendary 10). Simplest is a per-id source override or a
+dedicated `NYTHRAXIS_RAID_LEGENDARY_SOURCE_LEVEL = 22` (22 + 10 + raid 3 = 35),
+whichever the item_level index supports most cleanly. Confirm against
+`tests/item_level.test.ts` (the heroic sweep only checks epics today, so add a
+legendary case).
 
 Drop wiring: keep the raid at FIVE drops. Fold each heroic legendary into one of
 the existing five roll groups as a low-chance entry (mirror the normal table,
@@ -169,31 +165,3 @@ i18n: two new legendary weapon names need translation in every locale (item name
 are not English-only; the coverage test fails otherwise). The `[HEROIC]` tag from
 Part D still comes from its own localized key, so the names themselves just need
 the base translation.
-
-## Part J: set bonuses mix across normal and heroic
-
-Set bonuses are counted purely by the `set` string on each equipped item
-(`src/sim/entity.ts`: `setCounts.set(item.set, count + 1)`), so a heroic piece
-carrying the same `set` id as its normal counterpart counts toward the same
-bonus. Goal: wearing e.g. 2 normal + 2 heroic pieces of a set completes it.
-
-The normal Nythraxis sets are `crownforged` (mail, str, warrior/paladin),
-`nighttalon` (leather, agi, rogue/hunter/druid), `soulflame` (cloth, caster), and
-`stormcallers` (mail, shaman caster). Assign each heroic ARMOR piece the matching
-set id by armor type + class archetype, so the heroic pieces extend those sets
-into new slots (normal covers head/shoulder + a 3rd; heroic adds chest/legs):
-
-| Heroic item | Slot / type / classes | Set |
-|---|---|---|
-| `deathless_warguard_legmail` | legs, mail, war/pal/sham | `crownforged` |
-| `scourgehide_carapace` | chest, leather, rogue/hunter/druid | `nighttalon` |
-| `soulrend_diadem` | helmet, cloth, casters | `soulflame` |
-| `soulforged_warplate` | chest, mail, pal/sham | `stormcallers` |
-
-The three weapons (`scepter_of_the_deathless_court`, `deathless_greatblade`,
-`stormcallers_focus`) stay setless (weapons are not part of these armor sets).
-Adding the `set` field is the whole change; the counting mechanic already mixes
-tiers. Add a test: equip 2 normal + 2 heroic pieces of one set and assert the
-set-count threshold fires. Flag the exact set assignment for owner review (class
-archetypes are close but not identical, e.g. `stormcallers` is shaman-only
-normally while `soulforged_warplate` is paladin/shaman).
