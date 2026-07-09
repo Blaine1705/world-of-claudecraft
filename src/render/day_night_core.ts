@@ -42,6 +42,9 @@ export interface DayNightGrade {
 // dark blue so the moon and stars stand out against it; the fog is a touch
 // lighter than the sky for readability.
 const NIGHT_LIGHT_FLOOR = 0.3;
+// Peak daytime light scale. Held a touch under 1 so full day (and, by the same
+// lerp, dusk) reads a little darker without touching the night floor.
+const DAY_LIGHT_CAP = 0.9;
 const NIGHT_SKY: [number, number, number] = [0.09, 0.12, 0.26];
 const NIGHT_FOG: [number, number, number] = [0.24, 0.3, 0.48];
 const NIGHT_FAR_SCALE = 0.82;
@@ -125,7 +128,7 @@ export function effectiveDayness(global: number, biome: BiomeId): number {
 export function dayNightGrade(e: number): DayNightGrade {
   const c = clamp01(e);
   return {
-    lightScale: lerp(NIGHT_LIGHT_FLOOR, 1, c),
+    lightScale: lerp(NIGHT_LIGHT_FLOOR, DAY_LIGHT_CAP, c),
     sky: lerp3(NIGHT_SKY, DAY_WHITE, c),
     fog: lerp3(NIGHT_FOG, DAY_WHITE, c),
     farScale: lerp(NIGHT_FAR_SCALE, 1, c),

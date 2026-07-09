@@ -112,9 +112,9 @@ describe('effectiveDayness', () => {
 });
 
 describe('dayNightGrade', () => {
-  it('is the authored full-day look at e = 1 (no darkening, white multipliers)', () => {
+  it('is the authored full-day look at e = 1 (capped light, white color multipliers)', () => {
     const g = dayNightGrade(1);
-    expect(g.lightScale).toBeCloseTo(1, 12);
+    expect(g.lightScale).toBeCloseTo(0.9, 12); // peak day held a touch under full
     expect(g.sky).toEqual([1, 1, 1]);
     expect(g.fog).toEqual([1, 1, 1]);
     expect(g.farScale).toBeCloseTo(1, 12);
