@@ -112,11 +112,13 @@ describe('effectiveDayness', () => {
 });
 
 describe('dayNightGrade', () => {
-  it('is the authored full-day look at e = 1 (capped light, white color multipliers)', () => {
+  it('is the brightest grade at e = 1, but a calm capped daylight (not blown-out white)', () => {
     const g = dayNightGrade(1);
-    expect(g.lightScale).toBeCloseTo(0.9, 12); // peak day held a touch under full
-    expect(g.sky).toEqual([1, 1, 1]);
-    expect(g.fog).toEqual([1, 1, 1]);
+    expect(g.lightScale).toBeCloseTo(0.65, 12); // peak day held well under full
+    // the day sky/fog are bright but capped under white so the HDRI does not bloom out
+    expect(Math.min(...g.sky)).toBeGreaterThan(0.5);
+    expect(Math.max(...g.sky)).toBeLessThan(1);
+    expect(Math.max(...g.fog)).toBeLessThan(1);
     expect(g.farScale).toBeCloseTo(1, 12);
     expect(g.nightAmt).toBeCloseTo(0, 12);
   });
