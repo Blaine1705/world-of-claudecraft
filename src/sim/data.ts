@@ -181,7 +181,6 @@ import {
 } from './content/temple';
 import { VALE_CUP_BALL_MOB, VALE_CUP_BALL_TEMPLATE_ID } from './content/vale_cup';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
-import { YUMI_MOBS } from './content/yumi';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -208,6 +207,7 @@ import {
   WRAITHWOOD_ROADS,
   WRAITHWOOD_ZONE,
 } from './content/wraithwood';
+import { YUMI_MOBS } from './content/yumi';
 import {
   GRAVEYARD_POS,
   LAKE,
