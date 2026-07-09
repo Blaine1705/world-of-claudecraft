@@ -1255,6 +1255,7 @@ export class Renderer {
       scale: number,
       opacity: number,
       blending: THREE.Blending = THREE.AdditiveBlending,
+      renderOrder = -9,
     ): THREE.Sprite => {
       const sp = new THREE.Sprite(
         new THREE.SpriteMaterial({
@@ -1269,7 +1270,7 @@ export class Renderer {
       );
       setRenderCategory(sp, 'sky');
       sp.scale.set(scale, scale, 1);
-      sp.renderOrder = -9;
+      sp.renderOrder = renderOrder;
       sp.frustumCulled = false; // rides the camera at a fixed offset; never cull it
       sp.userData.baseOpacity = opacity;
       this.scene.add(sp);
@@ -1282,9 +1283,12 @@ export class Renderer {
     ];
     // moon: a bright cratered face (normal-blended so the maria read as dark)
     // under a soft cool additive glow kept modest so it does not wash the face
+    // the disc renders AFTER the glow (higher renderOrder) so the additive glow
+    // stays a halo behind it and never adds onto the face (which would push the
+    // moon back over the bloom threshold and wash the craters out)
     this.moonSprites = [
-      makeCelestialSprite(glowTex(160, 178, 226), 126, 0.2),
-      makeCelestialSprite(moonTex(), 52, 1, THREE.NormalBlending),
+      makeCelestialSprite(glowTex(160, 178, 226), 126, 0.2, THREE.AdditiveBlending, -9),
+      makeCelestialSprite(moonTex(), 52, 1, THREE.NormalBlending, -8),
     ];
 
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
