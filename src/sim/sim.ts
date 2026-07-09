@@ -2543,6 +2543,7 @@ export class Sim {
       syncPetLevel: sim.syncPetLevel.bind(sim),
       // M2 mob locomotion seam (all still on Sim; owners flip points-at later).
       moveToward: sim.moveToward.bind(sim),
+      attackerInFront: sim.attackerInFront.bind(sim),
       mobSwing: sim.mobSwing.bind(sim),
       updateRangedPetAttack: sim.updateRangedPetAttack.bind(sim),
       fleeMoveSpeed: sim.fleeMoveSpeed.bind(sim),
@@ -4416,6 +4417,10 @@ export class Sim {
     // and non-parry classes carry 0, so their hit table is byte-identical.
     const parryChance =
       target.kind === 'player' && this.attackerInFront(target, mob) ? target.parryChance : 0;
+    const blockChance =
+      target.kind === 'player' && this.attackerInFront(target, mob) && target.blockValue > 0
+        ? target.blockChance
+        : 0;
     const roll = this.rng.next();
     if (roll < missChance) {
       this.emit({
@@ -4484,6 +4489,9 @@ export class Sim {
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
+    if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+      dmg = Math.max(1, dmg - target.blockValue);
+    }
     const dealt = Math.max(1, Math.round(dmg));
     this.dealDamage(mob, target, dealt, crit, 'physical', null, 'hit');
     runMobSwingAffixes(this.ctx, mob, target, { dealt, crit, rawDmg });

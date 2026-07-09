@@ -25,6 +25,9 @@ Status legend: DONE = implemented and green on `integration`; PENDING = not yet 
   - Protection: one-handed mainhand + shield offhand, no dual wield in the first pass
 - The first offhand pass keeps warrior weapon abilities on `mainhand`; offhand weapon gameplay is
   auto-attack only until a later change says otherwise.
+- Protection's shield block follows the cross-system spec in
+  [offhand-dual-wield.md](C:/Users/joseg/Desktop/world-of-claudecraft/docs/prd/offhand-dual-wield.md):
+  passive Classic-style frontal melee mitigation, no visible block meter or HUD resource.
 
 ## Base-kit changes (DONE)
 - `battle_shout` "Iron Bellow": GROUP attack-power buff (caster + friendlies within 40 yd),

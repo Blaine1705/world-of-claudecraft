@@ -2900,6 +2900,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     name: 'Highwatch Wallshield',
     kind: 'shield',
     slot: 'offhand',
+    blockValue: 14,
     quality: 'common',
     stats: { armor: 112, sta: 2 },
     sellValue: 560,

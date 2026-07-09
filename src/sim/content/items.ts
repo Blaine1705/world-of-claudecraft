@@ -858,6 +858,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Eastbrook Buckler',
     kind: 'shield',
     slot: 'offhand',
+    blockValue: 6,
     quality: 'common',
     stats: { armor: 34, sta: 1 },
     sellValue: 130,

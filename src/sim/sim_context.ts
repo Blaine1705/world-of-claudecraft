@@ -381,6 +381,7 @@ export interface SimContextCallbacks {
   // on Sim (or a shared module); the eventual owners flip points-at, never rename.
   // --- shared movement/combat entry points (STAY on Sim, exposed here) ---
   moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles?: boolean): boolean;
+  attackerInFront(defender: Entity, attacker: Entity): boolean;
   mobSwing(mob: Entity, target: Entity): void;
   updateRangedPetAttack(
     pet: Entity,
@@ -845,6 +846,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     syncPetLevel: host.syncPetLevel,
     // M2 mob locomotion seam.
     moveToward: host.moveToward,
+    attackerInFront: host.attackerInFront,
     mobSwing: host.mobSwing,
     updateRangedPetAttack: host.updateRangedPetAttack,
     fleeMoveSpeed: host.fleeMoveSpeed,
