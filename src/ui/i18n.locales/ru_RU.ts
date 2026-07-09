@@ -6394,7 +6394,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_ember.name': 'Тиран Пепельной Кузни',
   'entities.mobs.rift_hellguard.name': 'Адский страж',
   'entities.mobs.rift_pact_acolyte.name': 'Послушник договора',
-  'entities.mobs.rift_boss_ritualist.name': 'Магус Вель\'Кор Связанный Договором',
+  'entities.mobs.rift_boss_ritualist.name': "Магус Вель'Кор Связанный Договором",
   'entities.mobs.rift_boss_pitlord.name': 'Азгорат, Владыка Бездны',
   'entities.mobs.rift_boss_venom.name': 'Прародительница Висска',
   'entities.mobs.rift_boss_necro.name': 'Костяной Владыка Ксаррет',
