@@ -7855,23 +7855,11 @@ export const pt_BR: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "Malha de Pernas Imortal da Guarda de Guerra"
       },
-      "deathless_warguard_gauntlets": {
-        "name": "Deathless Warguard Gauntlets"
-      },
       "soulrend_diadem": {
         "name": "Diadema Dilacera-Almas"
       },
-      "soulrend_handwraps": {
-        "name": "Soulrend Handwraps"
-      },
       "scourgehide_carapace": {
         "name": "Carapaça de Couro do Flagelo"
-      },
-      "scourgehide_grips": {
-        "name": "Scourgehide Grips"
-      },
-      "soulforged_gauntlets": {
-        "name": "Soulforged Gauntlets"
       },
       "cryptplate_helm": {
         "name": "Elmo de Placas da Cripta"

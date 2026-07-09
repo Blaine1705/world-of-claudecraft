@@ -11,7 +11,7 @@ import {
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
-import { ITEMS, MOBS } from '../src/sim/data';
+import { MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
@@ -135,46 +135,6 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       const expected = pieces.length === 1 ? '3' : '2,3,4';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
-  });
-});
-
-describe('set bonuses mix normal and heroic Nythraxis pieces', () => {
-  // 2 normal (head + shoulder) + 2 heroic (legs + gloves) crownforged pieces
-  // must complete the 4-piece bonus: heroic pieces carry the same `set` id, and
-  // the four occupy four distinct slots so they all count.
-  const CROWNFORGED_2N_2H = [
-    'crownforged_dreadhelm', // normal, helmet
-    'crownforged_warspaulders', // normal, shoulder
-    'deathless_warguard_legmail', // heroic, legs
-    'deathless_warguard_gauntlets', // heroic, gloves
-  ];
-
-  it('the two heroic crownforged pieces share the normal set id and are heroic', () => {
-    for (const id of CROWNFORGED_2N_2H) {
-      expect(ITEMS[id]?.set, id).toBe(SET_CROWNFORGED);
-    }
-    expect(ITEMS.crownforged_dreadhelm.heroic ?? false).toBe(false);
-    expect(ITEMS.crownforged_warspaulders.heroic ?? false).toBe(false);
-    expect(ITEMS.deathless_warguard_legmail.heroic).toBe(true);
-    expect(ITEMS.deathless_warguard_gauntlets.heroic).toBe(true);
-    // four distinct slots, so equipping all four counts as four set pieces.
-    expect(new Set(CROWNFORGED_2N_2H.map((id) => ITEMS[id]?.slot)).size).toBe(4);
-  });
-
-  it('equipping 2 normal + 2 heroic completes the crownforged 4-piece bonus', () => {
-    const equipment: Record<string, string> = {};
-    for (const id of CROWNFORGED_2N_2H) equipment[ITEMS[id].slot as string] = id;
-    // A warrior can use every crownforged piece; recalc drives the same setCounts
-    // path the live game uses.
-    const geared = statsFor('warrior', 20, equipment);
-    expect(geared).toBeTruthy();
-    // The 4-piece tier (a proc) is only reachable at four pieces, which the mix
-    // achieves. The pure resolver confirms the tier for the same count.
-    const eff = aggregateSetBonuses(counts({ [SET_CROWNFORGED]: 4 }));
-    expect(eff.procs.map((p) => p.id)).toContain('set_bonesplinter');
-    // three pieces does not yet grant the 4-piece proc.
-    const three = aggregateSetBonuses(counts({ [SET_CROWNFORGED]: 3 }));
-    expect(three.procs.map((p) => p.id)).not.toContain('set_bonesplinter');
   });
 });
 

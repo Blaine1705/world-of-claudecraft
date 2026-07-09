@@ -7855,23 +7855,11 @@ export const en_CA: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "Deathless Warguard Legmail"
       },
-      "deathless_warguard_gauntlets": {
-        "name": "Deathless Warguard Gauntlets"
-      },
       "soulrend_diadem": {
         "name": "Soulrend Diadem"
       },
-      "soulrend_handwraps": {
-        "name": "Soulrend Handwraps"
-      },
       "scourgehide_carapace": {
         "name": "Scourgehide Carapace"
-      },
-      "scourgehide_grips": {
-        "name": "Scourgehide Grips"
-      },
-      "soulforged_gauntlets": {
-        "name": "Soulforged Gauntlets"
       },
       "cryptplate_helm": {
         "name": "Cryptplate Helm"
