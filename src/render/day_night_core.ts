@@ -158,6 +158,10 @@ export function skyTintForDayness(dayness: number): [number, number, number] {
 // rather than passing through the zenith (which would flatten shadows). The tilt
 // also keeps a little light bias to one side at noon for readable shading.
 const CELESTIAL_TILT_Z = 0.32;
+// Caps how high the sun and moon climb: at noon/midnight the peak lands around
+// 40 degrees rather than near the zenith, so the bodies stay inside the player's
+// (downward-looking) view band and cast readable medium-angle shadows.
+const CELESTIAL_ARC_HEIGHT = 0.28;
 
 /** Unit direction toward the sun for a cycle phase: on the horizon at dawn
  *  (0.25), highest at noon (0.5), back to the horizon at dusk (0.75), and below
@@ -166,7 +170,7 @@ const CELESTIAL_TILT_Z = 0.32;
 export function sunDirection(phase: number): [number, number, number] {
   const a = (phase - 0.25) * 2 * Math.PI; // dawn 0, noon PI/2, dusk PI, midnight -PI/2
   const x = Math.cos(a);
-  const y = Math.sin(a);
+  const y = Math.sin(a) * CELESTIAL_ARC_HEIGHT; // capped peak so it stays in view
   const z = CELESTIAL_TILT_Z;
   const len = Math.hypot(x, y, z);
   return [x / len, y / len, z / len];

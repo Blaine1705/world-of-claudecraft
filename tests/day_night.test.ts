@@ -191,17 +191,19 @@ describe('sunDirection / moonDirection (the moving sun and moon)', () => {
     }
   });
 
-  it('puts the sun on the horizon at dawn/dusk, highest at noon, below at night', () => {
+  it('puts the sun on the horizon at dawn/dusk, up at noon, below at night', () => {
     expect(sunDirection(0.25)[1]).toBeCloseTo(0, 6); // dawn: y ~ 0
     expect(sunDirection(0.75)[1]).toBeCloseTo(0, 6); // dusk: y ~ 0
-    expect(sunDirection(0.5)[1]).toBeGreaterThan(0.9); // noon: high
-    expect(sunDirection(0)[1]).toBeLessThan(-0.9); // midnight: below horizon
+    // noon peak is capped (~40 deg) so the sun stays in view, not overhead
+    expect(sunDirection(0.5)[1]).toBeGreaterThan(0.5);
+    expect(sunDirection(0.5)[1]).toBeLessThan(0.85);
+    expect(sunDirection(0)[1]).toBeLessThan(-0.5); // midnight: below horizon
   });
 
   it('makes the moon the sun antipode, so it is up at midnight', () => {
     expect(moonDirection(0)).toEqual(sunDirection(0.5));
-    expect(moonDirection(0)[1]).toBeGreaterThan(0.9); // moon high at midnight
-    expect(moonDirection(0.5)[1]).toBeLessThan(-0.9); // moon down at noon
+    expect(moonDirection(0)[1]).toBeGreaterThan(0.5); // moon up at midnight
+    expect(moonDirection(0.5)[1]).toBeLessThan(-0.5); // moon down at noon
   });
 
   it('sweeps east to west across the day (x flips sign dawn -> dusk)', () => {

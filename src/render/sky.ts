@@ -447,7 +447,6 @@ const SKY_FRAG = /* glsl */ `
     // stars: a fine field of small twinkling points at hash-jittered spots, only
     // above the horizon, fading in as the sky darkens
     if (uStarAmt > 0.001) {
-    if (uStarAmt > 0.001) {
       vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
       vec2 scell = floor(suv);
       float present = step(0.9, hash12(scell));

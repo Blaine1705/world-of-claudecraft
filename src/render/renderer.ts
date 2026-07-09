@@ -1210,6 +1210,7 @@ export class Renderer {
       setRenderCategory(sp, 'sky');
       sp.scale.set(scale, scale, 1);
       sp.renderOrder = -9;
+      sp.frustumCulled = false; // rides the camera at a fixed offset; never cull it
       sp.userData.baseOpacity = opacity;
       this.scene.add(sp);
       return sp;
