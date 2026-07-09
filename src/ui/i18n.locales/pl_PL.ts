@@ -2023,6 +2023,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.deacon_reliquary_helm.name': 'Relikwiarzowy hełm diakona',
   'entities.items.deacons_cleaver.name': 'Tasak diakona',
   'entities.items.deathless_heartwood.name': 'Twardziel Nieśmiertelnej Korony',
+  'entities.items.deathless_heartwood_heroic.name': 'Twardziel Nieśmiertelnej Korony',
   'entities.items.deathlord_legguards.name': 'Nagolenniki Barrowlorda',
   'entities.items.deathlord_sabatons.name': 'Buty płytowe Barrowlorda',
   'entities.items.deathlord_warplate.name': 'Płyta bojowa Barrowlorda',
@@ -2113,6 +2114,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.keen_dirk.name': 'Ostry sztylet',
   'entities.items.kings_signet.name': 'Sygnet króla',
   'entities.items.kingsbane_last_oath.name': 'Thronebane, Ostatnia Przysięga Ciernistego Szczytu',
+  'entities.items.kingsbane_last_oath_heroic.name':
+    'Thronebane, Ostatnia Przysięga Ciernistego Szczytu',
   'entities.items.knight_commanders_greaves.name': 'Nagolenniki rycerza-dowódcy',
   'entities.items.korgaths_chainwraps.name': 'Kolcze owijki Korgatha',
   'entities.items.lesser_healing_potion.name': 'Słabsza mikstura lecznicza',

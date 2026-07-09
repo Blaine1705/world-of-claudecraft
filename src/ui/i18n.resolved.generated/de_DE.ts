@@ -151,6 +151,7 @@ export const de_DE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "{name} wird beobachtet"
     },
@@ -6886,7 +6887,13 @@ export const de_DE: EnTranslations = {
       "deathless_heartwood": {
         "name": "Herzholz der todlosen Krone"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Herzholz der todlosen Krone"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, letzter Eid von Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, letzter Eid von Thornpeak"
       },
       "crownforged_dreadhelm": {
@@ -7160,6 +7167,15 @@ export const de_DE: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Auferstandene Königswache"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"

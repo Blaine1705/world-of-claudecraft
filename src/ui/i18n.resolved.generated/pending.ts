@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "es_ES": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "fr_FR": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "fr_CA": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "de_DE": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "nl_NL": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "pl_PL": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "id_ID": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "tr_TR": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "sv_SE": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "vi_VN": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ],
+  "da_DK": [
+    "entities.mobs.nythraxis_heroic_priest_add.name",
+    "entities.mobs.nythraxis_heroic_rogue_add.name",
+    "entities.mobs.nythraxis_heroic_warrior_add.name",
+    "hudChrome.itemHeroicTag"
+  ]
 };

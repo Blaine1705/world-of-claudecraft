@@ -151,6 +151,7 @@ export const it_IT: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Stai osservando {name}"
     },
@@ -6886,7 +6887,13 @@ export const it_IT: EnTranslations = {
       "deathless_heartwood": {
         "name": "Cuorlegno della Corona immortale"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Cuorlegno della Corona immortale"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, ultimo giuramento di Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, ultimo giuramento di Thornpeak"
       },
       "crownforged_dreadhelm": {
@@ -7160,6 +7167,15 @@ export const it_IT: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Guardia reale risorta"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagello di Thornpeak"

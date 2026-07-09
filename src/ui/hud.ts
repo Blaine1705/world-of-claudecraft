@@ -4224,12 +4224,12 @@ export class Hud {
   private itemTooltip(item: ItemDef, compare = true): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
-    html += `<div class="tt-sub">${esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind),
-      }),
-    )}</div>`;
+    const qualityKind = t('itemUi.tooltip.qualityKind', {
+      quality: itemQualityLabel(item.quality),
+      kind: itemKindLabel(item.kind),
+    });
+    const heroicTag = item.heroic ? ` ${t('hudChrome.itemHeroicTag')}` : '';
+    html += `<div class="tt-sub">${esc(`${qualityKind}${heroicTag}`)}</div>`;
     if (item.slot) {
       // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
       // right-aligned on the same line so it is clear which classes the gear suits.

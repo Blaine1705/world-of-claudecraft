@@ -151,6 +151,7 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[英雄]",
     "spectate": {
       "banner": "正在观察 {name}"
     },
@@ -6886,7 +6887,13 @@ export const zh_CN: EnTranslations = {
       "deathless_heartwood": {
         "name": "不朽王冠之心木"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不朽王冠之心木"
+      },
       "kingsbane_last_oath": {
+        "name": "弑座者，荆峰的最后誓言"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "弑座者，荆峰的最后誓言"
       },
       "crownforged_dreadhelm": {
@@ -7160,6 +7167,15 @@ export const zh_CN: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "复苏王室卫兵"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "奥德伦，亡魂战卫"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "马尔里克，亡魂大祭司"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "沃斯，亡魂之刃"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"

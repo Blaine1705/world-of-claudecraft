@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.itemHeroicTag': '[英雄]',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝 {losses} 敗',
   'hudChrome.vcup.shootPower': 'パワー',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
@@ -3402,6 +3403,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldleaf_herb.name': 'ゴールドリーフ草',
   'entities.items.sunpetal_herb.name': 'サンペタル草',
   'entities.mobs.nythraxis_skeleton_warrior.name': '蘇った王家の衛兵',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': '死なずの戦衛オルドレン',
+  'entities.mobs.nythraxis_heroic_priest_add.name': '死なずの司祭長マルリック',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': '死なずの刃ヴォス',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'ナイスラクシス、ソーンピークの災厄',
   'hud.core.chatChannels.add': 'チャットチャンネルを追加',
   'hud.core.chatChannels.addTitle': 'チャンネルを追加',
@@ -3681,7 +3685,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '依頼は完了しました。レッドブルック元帥のもとへ戻り、{interactKey} を押して納品しましょう。',
   'itemUi.quality.legendary': '伝説',
   'entities.items.deathless_heartwood.name': '不死王冠の心材',
+  'entities.items.deathless_heartwood_heroic.name': '不死王冠の心材',
   'entities.items.kingsbane_last_oath.name': 'スロウンベイン、ソーンピーク最後の誓い',
+  'entities.items.kingsbane_last_oath_heroic.name': 'スロウンベイン、ソーンピーク最後の誓い',
   'entities.items.crownforged_dreadhelm.name': 'ボーンロートの恐怖兜',
   'entities.items.crownforged_warspaulders.name': 'ボーンロートの戦肩当て',
   'entities.items.nighttalon_crown.name': 'ダイアファングの冠',

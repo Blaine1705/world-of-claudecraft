@@ -151,6 +151,7 @@ export const tr_TR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "{name} izleniyor"
     },
@@ -6886,7 +6887,13 @@ export const tr_TR: EnTranslations = {
       "deathless_heartwood": {
         "name": "Ölümsüz Taç'ın Öz Odunu"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Ölümsüz Taç'ın Öz Odunu"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Dikenzirve'nin Son Yemini"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Dikenzirve'nin Son Yemini"
       },
       "crownforged_dreadhelm": {
@@ -7160,6 +7167,15 @@ export const tr_TR: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Dirilen Kraliyet Muhafızı"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"

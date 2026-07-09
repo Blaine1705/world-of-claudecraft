@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКИЙ]',
   'hudChrome.vcup.guildBoardWl': '{wins} побед, {losses} поражений',
   'hudChrome.vcup.shootPower': 'СИЛА',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',
@@ -3720,10 +3721,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnBody':
     'Задание выполнено. Вернитесь к маршалу Редбруку и нажмите {interactKey}, чтобы сдать его.',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Восставший королевский страж',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Олдрен, бессмертный страж',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Малрик, бессмертный иерофант',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Восс, бессмертный клинок',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Нитраксис, Бич Торнпика',
   'itemUi.quality.legendary': 'Легендарное',
   'entities.items.deathless_heartwood.name': 'Сердцевина бессмертной короны',
+  'entities.items.deathless_heartwood_heroic.name': 'Сердцевина бессмертной короны',
   'entities.items.kingsbane_last_oath.name': 'Погибель Трона, последняя клятва Торнпика',
+  'entities.items.kingsbane_last_oath_heroic.name': 'Погибель Трона, последняя клятва Торнпика',
   'entities.items.crownforged_dreadhelm.name': 'Костокованый шлем ужаса',
   'entities.items.crownforged_warspaulders.name': 'Костокованые боевые наплечники',
   'entities.items.nighttalon_crown.name': 'Корона Лютого Клыка',

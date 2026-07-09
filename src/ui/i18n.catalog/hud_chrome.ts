@@ -8,6 +8,7 @@
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
 export const hudChromeStrings = {
+  itemHeroicTag: '[HEROIC]',
   spectate: {
     banner: 'Spectating {name}',
   },

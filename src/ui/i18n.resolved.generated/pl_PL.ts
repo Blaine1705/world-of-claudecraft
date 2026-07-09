@@ -151,6 +151,7 @@ export const pl_PL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Obserwujesz {name}"
     },
@@ -6886,7 +6887,13 @@ export const pl_PL: EnTranslations = {
       "deathless_heartwood": {
         "name": "Twardziel Nieśmiertelnej Korony"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Twardziel Nieśmiertelnej Korony"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Ostatnia Przysięga Ciernistego Szczytu"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Ostatnia Przysięga Ciernistego Szczytu"
       },
       "crownforged_dreadhelm": {
@@ -7160,6 +7167,15 @@ export const pl_PL: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Powstały Strażnik Królewski"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Plaga Ciernistego Szczytu"

@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.itemHeroicTag': '[영웅]',
   'hudChrome.vcup.guildBoardWl': '{wins}승 {losses}패',
   'hudChrome.vcup.shootPower': '파워',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
@@ -3675,10 +3676,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnBody':
     '임무를 마쳤습니다. 레드브룩 원수에게 돌아가 {interactKey} 키를 눌러 완료하세요.',
   'entities.mobs.nythraxis_skeleton_warrior.name': '되살아난 왕실 근위병',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': '죽지 않는 전쟁수호병 알드렌',
+  'entities.mobs.nythraxis_heroic_priest_add.name': '죽지 않는 대사제 말릭',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': '죽지 않는 칼날 보스',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': '나이트락시스, 손피크의 재앙',
   'itemUi.quality.legendary': '전설',
   'entities.items.deathless_heartwood.name': '죽지 않는 왕관의 심재',
+  'entities.items.deathless_heartwood_heroic.name': '죽지 않는 왕관의 심재',
   'entities.items.kingsbane_last_oath.name': '왕좌살해자, 손피크의 마지막 맹세',
+  'entities.items.kingsbane_last_oath_heroic.name': '왕좌살해자, 손피크의 마지막 맹세',
   'entities.items.crownforged_dreadhelm.name': '뼈벼림 공포투구',
   'entities.items.crownforged_warspaulders.name': '뼈벼림 전쟁 어깨갑옷',
   'entities.items.nighttalon_crown.name': '흉포송곳니 왕관',

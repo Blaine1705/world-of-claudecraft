@@ -151,6 +151,7 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[영웅]",
     "spectate": {
       "banner": "{name} 관전 중"
     },
@@ -6886,7 +6887,13 @@ export const ko_KR: EnTranslations = {
       "deathless_heartwood": {
         "name": "죽지 않는 왕관의 심재"
       },
+      "deathless_heartwood_heroic": {
+        "name": "죽지 않는 왕관의 심재"
+      },
       "kingsbane_last_oath": {
+        "name": "왕좌살해자, 손피크의 마지막 맹세"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "왕좌살해자, 손피크의 마지막 맹세"
       },
       "crownforged_dreadhelm": {
@@ -7160,6 +7167,15 @@ export const ko_KR: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "되살아난 왕실 근위병"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "죽지 않는 전쟁수호병 알드렌"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "죽지 않는 대사제 말릭"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "죽지 않는 칼날 보스"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"

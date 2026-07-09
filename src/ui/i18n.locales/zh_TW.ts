@@ -14,6 +14,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.itemHeroicTag': '[英雄]',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝，{losses} 敗',
   'hudChrome.vcup.shootPower': '力道',
   'hudChrome.discord.roleTag.coredevs': '核心開發者',
@@ -3528,10 +3529,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnTitle': '領取獎勵',
   'hud.tutorial.returnBody': '任務已完成。返回雷德布魯克元帥處並按 {interactKey} 繳交任務。',
   'entities.mobs.nythraxis_skeleton_warrior.name': '復甦王室衛兵',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': '奧德倫，亡魂戰衛',
+  'entities.mobs.nythraxis_heroic_priest_add.name': '馬爾里克，亡魂大祭司',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': '沃斯，亡魂之刃',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': '尼思拉克西斯，荊峰之災',
   'itemUi.quality.legendary': '傳說',
   'entities.items.deathless_heartwood.name': '不朽王冠之心木',
+  'entities.items.deathless_heartwood_heroic.name': '不朽王冠之心木',
   'entities.items.kingsbane_last_oath.name': '弒座者，荊峰的最後誓言',
+  'entities.items.kingsbane_last_oath_heroic.name': '弒座者，荊峰的最後誓言',
   'entities.items.crownforged_dreadhelm.name': '骨鑄恐懼頭盔',
   'entities.items.crownforged_warspaulders.name': '骨鑄戰肩甲',
   'entities.items.nighttalon_crown.name': '厲牙之冠',
