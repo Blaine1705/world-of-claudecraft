@@ -645,12 +645,6 @@ export interface SimContextCallbacks {
   spawnDevBot(name: string): number;
   // /dev vendor: spawn the free-epic dev vendor next to the caller. Returns id or -1.
   spawnDevVendor(pid?: number): number;
-  // /dev cascade: set up the controlled Cascada temporal playtest scenario (dummy +
-  // raid allies at known distances) and start the per-cast metrics session. Stays on Sim.
-  startCascadePlaytest(pid?: number): void;
-  // /dev sandbox: a generic practice scenario (dummy + regen-frozen raid bots at a 10k
-  // pool). Returns the number of allies spawned. Stays on Sim.
-  startDevSandbox(pid?: number): number;
 
   // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
   // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
@@ -1075,8 +1069,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
     spawnDevVendor: host.spawnDevVendor,
-    startCascadePlaytest: host.startCascadePlaytest,
-    startDevSandbox: host.startDevSandbox,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,

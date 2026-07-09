@@ -1086,7 +1086,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev cascade, /dev sandbox, /dev god, /dev raid [heroic|normal|reset], /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev kill',
     );
     return null;
   }

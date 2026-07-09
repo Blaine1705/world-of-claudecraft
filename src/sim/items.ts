@@ -331,19 +331,9 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     return;
   }
   // Dev free-epic vendor: on a dev-command realm this vendor sells its whole
-  // epic stock for free, bypassing the price requirement below.
+  // epic stock for free, bypassing the buyValue requirement below.
   const freeVendor = ctx.devCommands && npc.devVendor === true;
-  const copperUnitPrice =
-    def?.buyValue !== undefined && Number.isFinite(def.buyValue) && def.buyValue > 0
-      ? def.buyValue
-      : 0;
-  const honorPrice =
-    def?.priceHonor !== undefined && Number.isFinite(def.priceHonor) && def.priceHonor > 0
-      ? Math.floor(def.priceHonor)
-      : 0;
-  const hasCopperPrice = copperUnitPrice > 0;
-  const hasHonorPrice = honorPrice > 0;
-  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice)) {
+  if (!freeVendor && !def?.buyValue) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -361,9 +351,8 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
   const qty = vendorStackSize(def);
-  const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
-  const honorCost = freeVendor ? 0 : honorPrice;
-  if (meta.copper < copperCost) {
+  const cost = freeVendor ? 0 : (def.buyValue ?? 0) * qty;
+  if (meta.copper < cost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
