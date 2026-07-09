@@ -650,14 +650,16 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // The raid drops FIVE heroic epics per kill (five rollGroups, each summing to
   // 1.0 so exactly one item drops per group), against the five-mans' two. On a
   // heroic Nythraxis claim loot_roll.ts also suppresses the boss's normal
-  // (item-level-26) table, so every drop is a [HEROIC] ilvl-33 piece. Groups are
-  // organized by archetype: str plate/mail, heal-mail, and the three
-  // single-piece caster/agile slots.
+  // (item-level-26) table, so every epic drop is a [HEROIC] ilvl-33 piece.
+  // Low-chance heroic legendary variants replace an epic inside two groups,
+  // keeping the total at five drops.
   nythraxis_scourge_of_thornpeak: [
-    { itemId: 'deathless_warguard_legmail', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
-    { itemId: 'deathless_greatblade', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
-    { itemId: 'soulforged_warplate', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
-    { itemId: 'stormcallers_focus', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'kingsbane_last_oath_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'deathless_warguard_legmail', chance: 0.485, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'deathless_greatblade', chance: 0.485, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'deathless_heartwood_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'soulforged_warplate', chance: 0.485, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'stormcallers_focus', chance: 0.485, rollGroup: 'nythraxis_heroic_2' },
     { itemId: 'scepter_of_the_deathless_court', chance: 1, rollGroup: 'nythraxis_heroic_3' },
     { itemId: 'soulrend_diadem', chance: 1, rollGroup: 'nythraxis_heroic_4' },
     { itemId: 'scourgehide_carapace', chance: 1, rollGroup: 'nythraxis_heroic_5' },

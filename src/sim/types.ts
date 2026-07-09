@@ -616,14 +616,7 @@ interface BaseItemDef {
   requiredLevel?: number;
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
   set?: string;
-  // Heroic upgraded variant: the base item id this "Heroic X" copy was generated
-  // from (content/heroic_variants.ts). Set only on the generated variants, which
-  // drop in place of their base from a heroic dungeon's normal loot table. The
-  // client composes the display name as "Heroic {base name}" from this (see
-  // itemDisplayName), so a variant carries no translated name key of its own.
-  heroicOf?: string;
-  // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
-  // tooltip chrome; these keep their own name key, unlike heroicOf variants.
+  /** Marks a heroic-tier variant for tooltip chrome. */
   heroic?: boolean;
 }
 
