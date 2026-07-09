@@ -428,6 +428,15 @@ export const cs_CZ: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Ovladač",
       "enable": "Zapnout ovladač",
@@ -644,6 +653,7 @@ export const cs_CZ: EnTranslations = {
       "failed": "Hlášení chyby se nepodařilo odeslat. Zkus to prosím znovu."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Sundat {item}",
       "unequipHint": "Klikni na x, pravé kliknutí, nebo přetáhni do batohů pro sundání"
     },

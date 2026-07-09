@@ -3206,6 +3206,10 @@ export class Hud {
     currentAllocation: () => this.sim.talents,
     activeLoadout: () => this.sim.activeLoadout,
     loadouts: () => this.sim.loadouts,
+    abilityTooltip: (id) => {
+      const res = this.previewResolvedAbility(id);
+      return res ? this.abilityTooltip(res) : null;
+    },
     rowPicks: () => this.sim.rowPicks,
     playerLevel: () => this.sim.player.level,
     pickRow: (rowIndex, optionId) => this.sim.pickRowTalent(rowIndex, optionId),
@@ -4032,6 +4036,34 @@ export class Hud {
     } else {
       this.renderGossip(npc);
     }
+  }
+
+  // Resolve an ability id to a ResolvedAbility for tooltip PREVIEW (the spec
+  // screen's example abilities, which are cross-spec and often not yet learned).
+  // Prefers the live resolved entry when the player already knows it (rank +
+  // talent mods reflected), else rebuilds a base resolve picking the highest rank
+  // at the player's level, mirroring abilitiesKnownAt's rank walk.
+  private previewResolvedAbility(id: string): ResolvedAbility | null {
+    const known = this.sim.known.find((k) => k.def.id === id);
+    if (known) return known;
+    const def = ABILITIES[id];
+    if (!def) return null;
+    let rank = 1;
+    let cost = def.cost;
+    let castTime = def.castTime;
+    let effects = def.effects;
+    let threatFlat = def.threat?.flat ?? 0;
+    const threatMult = def.threat?.mult ?? 1;
+    for (const r of def.ranks ?? []) {
+      if (r.level <= this.sim.player.level) {
+        rank = r.rank;
+        cost = r.cost;
+        effects = r.effects;
+        if (r.castTime !== undefined) castTime = r.castTime;
+        if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
+      }
+    }
+    return { def, rank, cost, castTime, cooldown: def.cooldown, effects, threatFlat, threatMult };
   }
 
   private abilityTooltip(res: ResolvedAbility): string {

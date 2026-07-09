@@ -428,6 +428,15 @@ export const sv_SE: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Handkontroll",
       "enable": "Aktivera handkontroll",
@@ -644,6 +653,7 @@ export const sv_SE: EnTranslations = {
       "failed": "Kunde inte skicka felrapporten. Försök igen."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Ta av {item}",
       "unequipHint": "Klicka på ×, högerklicka, eller dra till väskor för att ta av"
     },

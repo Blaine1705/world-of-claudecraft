@@ -428,6 +428,15 @@ export const id_ID: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Kontroler",
       "enable": "Aktifkan Kontroler",
@@ -644,6 +653,7 @@ export const id_ID: EnTranslations = {
       "failed": "Tidak dapat mengirim laporan bug. Silakan coba lagi."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Lepas {item}",
       "unequipHint": "Klik ×, klik kanan, atau seret ke tas untuk melepas"
     },

@@ -428,6 +428,15 @@ export const zh_TW: EnTranslations = {
       "defaultLoadout": "預設配置",
       "comingSoon": "即將推出"
     },
+    "specPanel": {
+      "primaryAttr": "主屬性",
+      "complexity": "複雜度",
+      "complexityLow": "低",
+      "complexityMedium": "中",
+      "complexityHigh": "高",
+      "exampleAbilities": "範例技能",
+      "viewTalents": "查看天賦"
+    },
     "controller": {
       "title": "手把",
       "enable": "啟用手把",
@@ -644,6 +653,7 @@ export const zh_TW: EnTranslations = {
       "failed": "無法傳送錯誤回報。請重試。"
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "卸下 {item}",
       "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下"
     },

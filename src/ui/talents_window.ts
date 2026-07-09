@@ -33,10 +33,12 @@ import {
 } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
 import { MAX_LEVEL, type PlayerClass } from '../sim/types';
+import { SPEC_CARD_INFO } from './class_details_data';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { t } from './i18n';
+import { t, type TranslationKey } from './i18n';
+import { iconDataUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';
 import { roleLabel, tTalent } from './talent_i18n';
@@ -69,6 +71,13 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   currentAllocation(): TalentAllocation;
   activeLoadout(): number;
   loadouts(): readonly SavedLoadout[];
+  /**
+   * Rich tooltip HTML for an ability id (name, cost/range, cast/cooldown,
+   * resolved description), reusing the HUD's shared ability tooltip. Used by the
+   * spec preview so a new player can read what each example ability does before
+   * committing. Returns null for an unknown id.
+   */
+  abilityTooltip(abilityId: string): string | null;
   // Choice-row talents (the Pandaria-style rows tab): live picks + level reads,
   // and the server-validated pick command (IWorld.pickRowTalent).
   rowPicks(): RowPicks;
@@ -120,10 +129,26 @@ const TAL_COLOR = {
   dormant: 'var(--color-talent-dormant)',
 } as const;
 
+const SPEC_ICON_DIR = '/ui/specs';
+
+function specIconUrl(cls: PlayerClass, specId: string): string | null {
+  if (cls === 'warrior' && (specId === 'arms' || specId === 'fury' || specId === 'prot')) {
+    return `${SPEC_ICON_DIR}/${cls}/${specId}.webp`;
+  }
+  return null;
+}
+
 function signatureName(abilityId: string): string {
   return ABILITIES[abilityId]
     ? tEntity({ kind: 'ability', id: abilityId, field: 'name' })
     : abilityId;
+}
+
+function specIconHtml(cls: PlayerClass, specId: string, fallbackIcon: string): string {
+  const url = specIconUrl(cls, specId);
+  return url
+    ? `<div class="ts-icon ts-icon-art" style="background-image:url(${url})" aria-hidden="true"></div>`
+    : `<div class="ts-icon">${esc(fallbackIcon)}</div>`;
 }
 
 export class TalentsWindow {
@@ -200,13 +225,21 @@ export class TalentsWindow {
       ? `<div class="tal-tab${this.tab === 'rows' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'rows' ? '0' : '-1'}" aria-selected="${this.tab === 'rows'}" aria-controls="tal-body" data-tab="rows"><span class="tal-tab-label">${t('hudChrome.talentRows.tab')}</span><span class="tt-pts">${rowsVm.pickedCount}</span></div>`
       : '';
 
+    // The point-economy header + help line matter on the point-spending tabs
+    // (Class, Choices) but are noise on the Specialization tab, which only PICKS a
+    // spec now. Hide them there and give that space back to the spec panels. The
+    // spec tab likewise drops its count badge (you never spend points on it).
+    const isSpecTab = this.tab === 'spec';
+    const headHtml = isSpecTab
+      ? ''
+      : `<div class="tal-head"><span>${t('game.talents.available')}: <b>${view.available}</b> / ${view.total}</span><span>${t('game.talents.spent')}: <b>${view.spent}</b></span></div>` +
+        `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>`;
     el.innerHTML =
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
-      `<div class="tal-head"><span>${t('game.talents.available')}: <b>${view.available}</b> / ${view.total}</span><span>${t('game.talents.spent')}: <b>${view.spent}</b></span></div>` +
-      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
+      headHtml +
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
       `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
-      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +
+      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span></div>` +
       rowsTab +
       `</div><div id="tal-body" role="tabpanel"></div>` +
       this.footerHtml(view);
@@ -264,67 +297,96 @@ export class TalentsWindow {
   }
 
   private paintSpecTab(body: HTMLElement, view: TalentsView, stage: TalentAllocation): void {
-    const picker = document.createElement('div');
-    picker.className = 'tal-specs';
-    picker.setAttribute('role', 'radiogroup');
-    picker.setAttribute('aria-label', t('game.talents.specTab'));
-    // WAI-ARIA radiogroup: arrow keys move focus among the spec radios and select on
-    // move (setSpec re-renders; the root persists, so focus the new selected card).
-    const specCards: { el: HTMLElement; id: string }[] = [];
+    const cls = this.deps.playerClass();
+    // All specs shown at once as full side-by-side panels (WoW-style spec screen):
+    // every spec's icon, role, description, primary attribute, complexity, and
+    // example abilities are visible without clicking; a click selects the spec and
+    // the selected one gets the View talents button (jumps to the Choices tab).
+    const grid = document.createElement('div');
+    grid.className = 'ts-specs-grid';
+    grid.setAttribute('role', 'radiogroup');
+    grid.setAttribute('aria-label', t('game.talents.specTab'));
+    const panels: { el: HTMLElement; id: string }[] = [];
     for (const specVM of view.specs) {
       const sp = specVM.spec;
-      const card = document.createElement('div');
       const selected = specVM.selected;
-      card.className = `tal-spec${selected ? ' sel' : ''}`;
-      card.setAttribute('role', 'radio');
-      card.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
-      card.setAttribute('aria-checked', String(selected));
+      const info = SPEC_CARD_INFO[sp.id];
       const specName = tTalent({ kind: 'talentSpec', spec: sp, field: 'name' });
-      const specDescription = tTalent({ kind: 'talentSpec', spec: sp, field: 'description' });
+      const specDesc = tTalent({ kind: 'talentSpec', spec: sp, field: 'description' });
       const masteryName = tTalent({ kind: 'talentMastery', spec: sp, field: 'name' });
-      const masteryDescription = tTalent({ kind: 'talentMastery', spec: sp, field: 'description' });
-      card.setAttribute('aria-label', `${specName}, ${roleLabel(specVM.role)}`);
-      card.innerHTML = `<div class="ts-icon">${esc(sp.icon)}</div><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(specVM.role)}</div>`;
-      this.deps.attachTooltip(
-        card,
-        () =>
-          `<div class="tt-title">${esc(specName)}</div><div class="tt-sub">${esc(specDescription)}</div>` +
-          `<div class="tt-sub" style="color:${TAL_COLOR.signature}">${t('game.talents.signature')}: ${esc(signatureName(sp.signature))}</div>` +
-          `<div class="tt-sub">${t('game.talents.mastery')}: ${esc(masteryName)} - ${esc(masteryDescription)}</div>`,
-      );
-      card.addEventListener('click', () => this.setSpec(stage, sp.id));
-      card.addEventListener('keydown', (e) => {
+      const masteryDesc = tTalent({ kind: 'talentMastery', spec: sp, field: 'description' });
+      const panel = document.createElement('div');
+      panel.className = `ts-panel${selected ? ' sel' : ''}`;
+      panel.setAttribute('role', 'radio');
+      panel.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
+      panel.setAttribute('aria-checked', String(selected));
+      panel.setAttribute('aria-label', `${specName}, ${roleLabel(specVM.role)}`);
+      let html =
+        `<div class="ts-panel-head">${specIconHtml(cls, sp.id, sp.icon)}` +
+        `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(specVM.role)}</div></div></div>` +
+        `<div class="ts-det-desc">${esc(specDesc)}</div>`;
+      if (info) {
+        const statLabel = t(`itemUi.stats.${info.primaryStat}` as TranslationKey);
+        const cxKey = (
+          info.complexity === 'low'
+            ? 'hudChrome.specPanel.complexityLow'
+            : info.complexity === 'high'
+              ? 'hudChrome.specPanel.complexityHigh'
+              : 'hudChrome.specPanel.complexityMedium'
+        ) as TranslationKey;
+        html +=
+          `<div class="ts-det-row"><span class="ts-det-label">${t('hudChrome.specPanel.primaryAttr')}</span><span class="ts-det-val">${esc(statLabel)}</span></div>` +
+          `<div class="ts-det-row"><span class="ts-det-label">${t('hudChrome.specPanel.complexity')}</span><span class="ts-det-val ts-cx-${info.complexity}">${t(cxKey)}</span></div>`;
+      }
+      html += `<div class="ts-det-mastery"><b>${esc(masteryName)}</b> - ${esc(masteryDesc)}</div>`;
+      if (info?.examples.length) {
+        html += `<div class="ts-det-label">${t('hudChrome.specPanel.exampleAbilities')}</div><div class="ts-ex-list">`;
+        for (const id of info.examples) {
+          const name = signatureName(id);
+          html += `<div class="ts-ex" tabindex="0" data-ability="${esc(id)}"><span class="ts-ex-icon" style="background-image:url(${iconDataUrl('ability', id)})" aria-hidden="true"></span><span class="ts-ex-name">${esc(name)}</span></div>`;
+        }
+        html += '</div>';
+      }
+      panel.innerHTML = html;
+      // Hover/focus tooltip per example ability: reuse the HUD's rich ability
+      // tooltip so a new player can read what each does before committing.
+      for (const exEl of Array.from(panel.querySelectorAll<HTMLElement>('.ts-ex'))) {
+        const id = exEl.dataset.ability ?? '';
+        exEl.setAttribute('aria-label', signatureName(id));
+        this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
+      }
+      // Every panel gets a View talents button: clicking it SELECTS that spec (it
+      // stages the choice, exactly like clicking the panel) and jumps to the
+      // Choices tab, so a new player picks a spec and lands on its talents in one
+      // click. The selected spec's button reads as the primary action.
+      const viewBtn = document.createElement('button');
+      viewBtn.type = 'button';
+      viewBtn.className = `btn ts-view-talents${selected ? ' primary' : ''}`;
+      viewBtn.textContent = t('hudChrome.specPanel.viewTalents');
+      viewBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (stage.spec !== sp.id) this.setSpec(stage, sp.id);
+        this.tab = 'rows';
+        this.render();
+      });
+      panel.appendChild(viewBtn);
+      panel.addEventListener('click', () => this.setSpec(stage, sp.id));
+      panel.addEventListener('keydown', (e) => {
         const ke = e as KeyboardEvent;
-        const i = specCards.findIndex((c) => c.el === card);
-        const next = rovingTarget(ke.key, i, specCards.length, 'both');
+        const i = panels.findIndex((c) => c.el === panel);
+        const next = rovingTarget(ke.key, i, panels.length, 'both');
         if (next !== null) {
           ke.preventDefault();
-          this.setSpec(stage, specCards[next].id);
-          (this.deps.root().querySelector('.tal-spec.sel') as HTMLElement | null)?.focus();
+          this.setSpec(stage, panels[next].id);
+          (this.deps.root().querySelector('.ts-panel.sel') as HTMLElement | null)?.focus();
           return;
         }
         this.keyboardActivate(ke, () => this.setSpec(stage, sp.id));
       });
-      specCards.push({ el: card, id: sp.id });
-      picker.appendChild(card);
+      panels.push({ el: panel, id: sp.id });
+      grid.appendChild(panel);
     }
-    body.appendChild(picker);
-    const sp = view.selectedSpec;
-    if (!sp) {
-      const e = document.createElement('div');
-      e.className = 'tal-empty';
-      e.textContent = t('game.talents.chooseSpec');
-      body.appendChild(e);
-      return;
-    }
-    const m = document.createElement('div');
-    m.className = 'tal-mastery';
-    m.innerHTML = `<b>${t('game.talents.mastery')}: ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> - ${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}`;
-    body.appendChild(m);
-    const tree = document.createElement('div');
-    tree.className = 'tal-tree';
-    body.appendChild(tree);
-    if (view.specTree) this.paintTree(tree, view.specTree, stage);
+    body.appendChild(grid);
   }
 
   private paintTree(host: HTMLElement, treeVM: TalentTreeVM, stage: TalentAllocation): void {

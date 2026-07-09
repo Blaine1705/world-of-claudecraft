@@ -428,6 +428,15 @@ export const ja_JP: EnTranslations = {
       "defaultLoadout": "デフォルト構成",
       "comingSoon": "近日実装"
     },
+    "specPanel": {
+      "primaryAttr": "主要ステータス",
+      "complexity": "複雑さ",
+      "complexityLow": "低",
+      "complexityMedium": "中",
+      "complexityHigh": "高",
+      "exampleAbilities": "代表的なアビリティ",
+      "viewTalents": "タレントを見る"
+    },
     "controller": {
       "title": "コントローラー",
       "enable": "コントローラーを有効化",
@@ -644,6 +653,7 @@ export const ja_JP: EnTranslations = {
       "failed": "バグ報告を送信できませんでした。もう一度お試しください。"
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "{item}を外す",
       "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す"
     },

@@ -428,6 +428,15 @@ export const pt_BR: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Controle",
       "enable": "Ativar Controle",
@@ -644,6 +653,7 @@ export const pt_BR: EnTranslations = {
       "failed": "Não foi possível enviar o relatório de erro. Tente novamente."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Clique em ×, clique direito ou arraste para as bolsas para desequipar"
     },

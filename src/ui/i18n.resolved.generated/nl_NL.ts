@@ -428,6 +428,15 @@ export const nl_NL: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Controller",
       "enable": "Controller inschakelen",
@@ -644,6 +653,7 @@ export const nl_NL: EnTranslations = {
       "failed": "Kon het bugrapport niet versturen. Probeer het opnieuw."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "{item} afdoen",
       "unequipHint": "Klik op ×, klik met rechts, of sleep naar tassen om af te doen"
     },

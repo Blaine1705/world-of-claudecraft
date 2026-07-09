@@ -428,6 +428,15 @@ export const en: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Controller",
       "enable": "Enable Controller",
@@ -644,6 +653,7 @@ export const en: EnTranslations = {
       "failed": "Could not send the bug report. Please try again."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Unequip {item}",
       "unequipHint": "Click ×, right-click, or drag to bags to unequip"
     },

@@ -428,6 +428,15 @@ export const tr_TR: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Oyun Kolu",
       "enable": "Oyun Kolunu Etkinleştir",
@@ -644,6 +653,7 @@ export const tr_TR: EnTranslations = {
       "failed": "Hata bildirimi gönderilemedi. Lütfen tekrar deneyin."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "{item} eşyasını çıkar",
       "unequipHint": "Çıkarmak için ×'e tıklayın, sağ tıklayın ya da çantalara sürükleyin"
     },

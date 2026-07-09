@@ -229,6 +229,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。',
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
+  'hudChrome.specPanel.primaryAttr': '主要ステータス',
+  'hudChrome.specPanel.complexity': '複雑さ',
+  'hudChrome.specPanel.complexityLow': '低',
+  'hudChrome.specPanel.complexityMedium': '中',
+  'hudChrome.specPanel.complexityHigh': '高',
+  'hudChrome.specPanel.exampleAbilities': '代表的なアビリティ',
+  'hudChrome.specPanel.viewTalents': 'タレントを見る',
   'hudChrome.statInfo.names.haste': 'ヘイスト',
   'hudChrome.statInfo.names.parry': 'パリー',
   'hudChrome.statInfo.desc.parry':

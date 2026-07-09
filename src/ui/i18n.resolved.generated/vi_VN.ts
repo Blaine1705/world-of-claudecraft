@@ -428,6 +428,15 @@ export const vi_VN: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Tay Cầm",
       "enable": "Bật Tay Cầm",
@@ -644,6 +653,7 @@ export const vi_VN: EnTranslations = {
       "failed": "Không thể gửi báo cáo lỗi. Vui lòng thử lại."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Tháo {item}",
       "unequipHint": "Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị"
     },

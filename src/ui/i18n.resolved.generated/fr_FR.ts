@@ -428,6 +428,15 @@ export const fr_FR: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Manette",
       "enable": "Activer la manette",
@@ -644,6 +653,7 @@ export const fr_FR: EnTranslations = {
       "failed": "Impossible d'envoyer le rapport de bug. Veuillez réessayer."
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "Déséquiper {item}",
       "unequipHint": "Cliquez sur ×, faites un clic droit ou glissez vers les sacs pour déséquiper"
     },

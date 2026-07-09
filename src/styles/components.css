@@ -2239,6 +2239,85 @@
     z-index: 4;
     box-shadow: 0 1px 4px #000a;
   }
+  /* WoW-style specialization grid: all specs shown at once as full panels. */
+  .ts-specs-grid {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+    align-items: stretch;
+    /* Fill the tall talents body so the panels stretch to it instead of
+       leaving dead space below. The Specialization tab hides the point header +
+       help line, so the panels reclaim that room and run taller here. */
+    min-height: min(56vh, 560px);
+  }
+  .ts-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    border: 1px solid #463a1c;
+    border-radius: 8px;
+    background: #1a1409;
+    cursor: var(--cursor-point);
+  }
+  .ts-panel.sel {
+    border-color: #ffd100;
+    background: #2c2410;
+    box-shadow:
+      inset 0 0 0 1px #ffd10055,
+      0 0 12px #b8902a55;
+  }
+  .ts-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+  }
+  .ts-panel .ts-icon {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #15110a;
+    color: #fff;
+    border: 1px solid #5a4a22;
+    font:
+      30px / 1 "Apple Color Emoji",
+      "Segoe UI Emoji",
+      var(--body-font);
+    text-shadow: 0 1px 2px #000;
+  }
+  .ts-panel .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: transparent;
+    font-size: 0;
+    text-shadow: none;
+  }
+  .ts-panel.sel .ts-icon {
+    border-color: #ffd100;
+    box-shadow: 0 0 8px #ffd10066;
+  }
+  .ts-panel-title {
+    text-align: left;
+    min-width: 0;
+  }
+  .ts-panel .ts-name {
+    font-size: 15px;
+    color: #fff;
+    font-family: var(--title-font);
+  }
+  .ts-panel .ts-role {
+    font-size: 10px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
   .tal-specs {
     display: flex;
     gap: 8px;
@@ -2294,6 +2373,14 @@
       var(--body-font);
     text-shadow: 0 1px 2px #000;
   }
+  .tal-spec .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: transparent;
+    font-size: 0;
+    text-shadow: none;
+  }
   .tal-spec.sel .ts-icon {
     border-color: #ffd100;
     box-shadow: 0 0 8px #ffd10066;
@@ -2309,6 +2396,121 @@
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.4px;
+  }
+  /* Specialization detail panel (under the selected spec's card). */
+  .ts-details {
+    margin: 2px 2px 4px;
+  }
+  .ts-det-desc {
+    font-size: 12px;
+    color: #d8c9a0;
+    line-height: 1.45;
+    margin-bottom: 8px;
+  }
+  .ts-det-rows {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .ts-det-row {
+    flex: 1;
+    min-width: 120px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 5px;
+    padding: 7px 10px;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    background: #14100a;
+  }
+  .ts-det-label {
+    font-size: 12px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .ts-det-val {
+    font-size: 14px;
+    color: #fff;
+    font-weight: 600;
+  }
+  .ts-det-val.ts-cx-low {
+    color: #7fc77f;
+  }
+  .ts-det-val.ts-cx-medium {
+    color: var(--gold);
+  }
+  .ts-det-val.ts-cx-high {
+    color: #e07a5a;
+  }
+  .ts-det-mastery {
+    font-size: 11px;
+    color: #c8b888;
+    margin: 0 0 8px;
+    padding: 6px 8px;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    background: #14100a;
+  }
+  .ts-det-mastery b {
+    color: var(--gold);
+  }
+  .ts-ex-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  .ts-ex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 64px;
+    gap: 3px;
+    cursor: var(--cursor-point);
+    border-radius: 6px;
+    outline: none;
+  }
+  .ts-ex:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
+  .ts-ex-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #5a4a22;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #15110a;
+  }
+  .ts-ex:hover .ts-ex-icon,
+  .ts-ex:focus-visible .ts-ex-icon {
+    border-color: var(--gold);
+  }
+  .ts-ex:hover .ts-ex-name {
+    color: #fff;
+  }
+  .ts-ex-name {
+    font-size: 9px;
+    color: #b8a878;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .ts-view-talents {
+    display: block;
+    width: 100%;
+    margin-top: auto;
+    margin-right: 0;
+  }
+  /* The currently-selected spec's button reads as the primary/committed action. */
+  .ts-view-talents.primary {
+    background: linear-gradient(#b8902a, #8a6a1c 55%, #6a4f12);
+    color: #fff;
+    border-color: #ffd100;
   }
   .tal-mastery {
     font-size: 11px;
