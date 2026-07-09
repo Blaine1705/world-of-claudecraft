@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
 import { TALENTS } from '../src/sim/content/talents';
+import { tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { tTalent } from '../src/ui/talent_i18n';
 
@@ -101,6 +102,17 @@ function legitNumbers(effect: unknown): Set<number> {
     }
   };
   walk(effect);
+  // A grant option's tooltip appends the granted ability's own description, so
+  // every number in that description (the ability's damage, duration, etc.) is
+  // legitimate, not a contradiction.
+  const grantId = (effect as { grant?: { ability?: string } })?.grant?.ability;
+  if (grantId) {
+    const { pcts, bare } = descriptionNumbers(
+      tEntity({ kind: 'ability', id: grantId, field: 'description' }),
+    );
+    for (const n of pcts) out.add(n);
+    for (const n of bare) out.add(n);
+  }
   return out;
 }
 

@@ -8451,6 +8451,13 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
+// The granted ability's own description, so a grant option's tooltip tells the
+// player what the spell DOES instead of a dead-end "Grants X." Localized by
+// tEntity, so grant tooltips read correctly in every locale.
+function abilityDescription(id: string): string {
+  return tEntity({ kind: 'ability', id, field: 'description' });
+}
+
 // True when a talent title has an explicit per-locale translation override. The
 // coverage test uses this to tell a deliberately-kept cognate (e.g. French
 // "Riposte", Spanish "Vigor") apart from a name that leaks English by accident
@@ -8480,7 +8487,11 @@ function effectDescription(
   const perRank = maxRank > 1 ? text.perRank : '';
   const parts: string[] = [];
 
-  if (effect.grant) parts.push(text.grant(abilityName(effect.grant.ability)));
+  if (effect.grant) {
+    parts.push(text.grant(abilityName(effect.grant.ability)));
+    const granted = abilityDescription(effect.grant.ability);
+    if (granted) parts.push(granted);
+  }
 
   const stats = effect.stats ?? {};
   const PRIMARY_PCT: Partial<Record<StatKey, 'str' | 'agi' | 'int' | 'spi'>> = {
@@ -8575,7 +8586,18 @@ export function tTalent(request: TalentTranslationRequest): string {
         ? request.spec.name
         : `${request.spec.description} Signature: ${abilityName(request.spec.signature)}.`;
     }
-    if (request.kind === 'talentChoice') return request.choice[request.field];
+    if (request.kind === 'talentChoice') {
+      if (request.field === 'name') return request.choice.name;
+      // A grant option's authored description is a bare "Grants X."; append the
+      // granted ability's own description so the tooltip tells the player what
+      // the spell actually does.
+      const grantId = request.choice.effect.grant?.ability;
+      if (grantId) {
+        const gd = abilityDescription(grantId);
+        return gd ? `${request.choice.description} ${gd}` : request.choice.description;
+      }
+      return request.choice.description;
+    }
     const exhaustive: never = request;
     return exhaustive;
   }
