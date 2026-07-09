@@ -19,6 +19,8 @@ export interface RiftFloorView {
   floorCount: number;
   name: string;
   themeName: string;
+  /** C/B/A/S rank of the run (null for dev-portal runs), for the minimap label. */
+  tier: import('../sim/types').RiftTier | null;
 }
 
 export interface IWorldDungeons {

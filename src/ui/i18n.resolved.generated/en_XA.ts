@@ -4021,6 +4021,8 @@ export const en_XA: EnTranslations = {
       "secondsRemaining": "[{seconds} šéçóñðš ŕéɱáíñíñĝ]",
       "enteringZone": "[Éñţéŕíñĝ {zone}.]",
       "welcomeZone": "[Ŵéļçóɱé ţó {zone}!]",
+      "riftLabel": "[{name}]",
+      "riftLabelRanked": "[{name} ({rank})]",
       "levelBanner": "[Ļéʋéļ {level}!]",
       "levelLog": "[Ýóú ĥáʋé ŕéáçĥéð ļéʋéļ {level}!]",
       "xpGain": "[Ýóú ĝáíñ {amount} éẋþéŕíéñçé.]",

@@ -4021,6 +4021,8 @@ export const vi_VN: EnTranslations = {
       "secondsRemaining": "còn {seconds} giây",
       "enteringZone": "Đang vào {zone}.",
       "welcomeZone": "Chào mừng đến {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Cấp {level}!",
       "levelLog": "Bạn đã đạt cấp {level}!",
       "xpGain": "Bạn nhận được {amount} kinh nghiệm.",

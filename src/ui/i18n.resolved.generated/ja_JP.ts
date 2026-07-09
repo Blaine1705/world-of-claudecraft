@@ -4021,6 +4021,8 @@ export const ja_JP: EnTranslations = {
       "secondsRemaining": "残り {seconds} 秒",
       "enteringZone": "{zone}に入りました。",
       "welcomeZone": "{zone}へようこそ！",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "レベル {level}！",
       "levelLog": "レベル {level}になりました！",
       "xpGain": "{amount}の経験値を獲得しました。",

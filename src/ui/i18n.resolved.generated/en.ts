@@ -4021,6 +4021,8 @@ export const en: EnTranslations = {
       "secondsRemaining": "{seconds} seconds remaining",
       "enteringZone": "Entering {zone}.",
       "welcomeZone": "Welcome to {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Level {level}!",
       "levelLog": "You have reached level {level}!",
       "xpGain": "You gain {amount} experience.",

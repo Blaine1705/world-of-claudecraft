@@ -110,6 +110,7 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
     floorCount: inst.floorCount,
     name: floor.name,
     themeName: floor.themeName,
+    tier: inst.tier,
   });
 }
 

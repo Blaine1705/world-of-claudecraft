@@ -510,16 +510,31 @@ export function buildRiftPuzzleProp(
       return { body, portal: lit ? gem : undefined };
     }
     case 'rift_beacon': {
-      const plinth = new THREE.Mesh(doorPlinthGeometry(), stone);
-      plinth.position.y = 0.35;
-      body.add(plinth);
-      const orb = new THREE.Mesh(
-        new THREE.CircleGeometry(1.0, 24),
-        riftGlowMaterial(0x88ccff, 0.9),
+      // The always-available "way home": a real upright return portal, not a floor
+      // decal. A stone base + a standing stone ring framing a swirling teal disc
+      // (spun per frame via `portal`), with a soft floor glow marking the trigger.
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.45, 0.35, 18), stone);
+      base.position.y = 0.17;
+      base.receiveShadow = true;
+      body.add(base);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.2, 10, 30), stone);
+      ring.position.y = 1.7;
+      ring.castShadow = true;
+      body.add(ring);
+      // Vertical swirling membrane filling the ring (teal = the calm way home).
+      const swirl = new THREE.Mesh(doorPortalGeometry(), riftGlowMaterial(0x7fe0ff, 0.8));
+      swirl.position.y = 1.7;
+      swirl.scale.setScalar(1.28 / 1.55);
+      body.add(swirl);
+      const glow = new THREE.Mesh(
+        new THREE.RingGeometry(1.4, 2.1, 26),
+        riftGlowMaterial(0x7fe0ff, 0.4),
       );
-      orb.position.y = 1.7;
-      body.add(orb);
-      return { body, portal: orb };
+      glow.rotation.x = -Math.PI / 2;
+      glow.position.y = 0.06;
+      body.add(glow);
+      body.userData.riftPulse = [glow];
+      return { body, portal: swirl };
     }
     case 'rift_pylon':
     case 'rift_pylon_lit': {

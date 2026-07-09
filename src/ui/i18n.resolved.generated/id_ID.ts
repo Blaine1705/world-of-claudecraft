@@ -4021,6 +4021,8 @@ export const id_ID: EnTranslations = {
       "secondsRemaining": "{seconds} detik tersisa",
       "enteringZone": "Memasuki {zone}.",
       "welcomeZone": "Selamat datang di {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Level {level}!",
       "levelLog": "Kamu telah mencapai level {level}!",
       "xpGain": "Kamu memperoleh {amount} pengalaman.",

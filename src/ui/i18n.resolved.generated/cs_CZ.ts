@@ -4021,6 +4021,8 @@ export const cs_CZ: EnTranslations = {
       "secondsRemaining": "Zbývá {seconds} sekund",
       "enteringZone": "Vstupuješ do {zone}.",
       "welcomeZone": "Vítej v {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Úroveň {level}!",
       "levelLog": "Dosáhl(a) jsi úrovně {level}!",
       "xpGain": "Získáváš {amount} zkušeností.",

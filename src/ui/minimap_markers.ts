@@ -93,6 +93,9 @@ export type MinimapMarker =
 export interface MinimapModel {
   markers: MinimapMarker[];
   zoneId: string;
+  /** When the player is inside a rift, its floor name + C/B/A/S rank (rank null for
+   *  dev-portal runs). The painter shows this instead of the overworld zone name. */
+  rift: { name: string; rank: string | null } | null;
 }
 
 export interface MinimapMarkers {
@@ -118,7 +121,7 @@ export function minimapMode(world: IWorld): MinimapMode {
  */
 export function createMinimapMarkers(): MinimapMarkers {
   const markers: MinimapMarker[] = [];
-  const model: MinimapModel = { markers, zoneId: '' };
+  const model: MinimapModel = { markers, zoneId: '', rift: null };
 
   return {
     build(world: IWorld, S: number, pxPerYard: number): MinimapModel {
@@ -128,6 +131,10 @@ export function createMinimapMarkers(): MinimapMarkers {
       const rim2 = rim * rim;
       markers.length = 0;
       model.zoneId = zoneAt(p.pos.z).id;
+      // Inside a rift the overworld zone (zoneAt reads z, rifts displace on x) is
+      // the wrong label; surface the generated rift floor name + rank instead.
+      const rf = world.riftFloor;
+      model.rift = rf ? { name: rf.name, rank: rf.tier } : null;
 
       // friend/guild lookup for colouring nearby allies; party members are drawn by the
       // party loop below, so the entity loop skips them (avoiding double dots). Built

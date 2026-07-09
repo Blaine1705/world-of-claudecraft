@@ -3272,8 +3272,14 @@ export class Hud {
   // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
   // discs/arrows; zoneDisplayName localizes the '#zone-label' it writes via setText.
-  private readonly minimapPainter = new MinimapPainter(this.writerFacet, classCss, (zoneId) =>
-    zoneDisplayName(zoneId),
+  private readonly minimapPainter = new MinimapPainter(
+    this.writerFacet,
+    classCss,
+    (zoneId) => zoneDisplayName(zoneId),
+    (name, rank) =>
+      rank
+        ? t('hud.core.riftLabelRanked', { name, rank })
+        : t('hud.core.riftLabel', { name }),
   );
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),

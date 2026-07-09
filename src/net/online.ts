@@ -2505,6 +2505,7 @@ export class ClientWorld implements IWorld {
           floorCount: ev.floorCount,
           name: ev.name,
           themeName: ev.themeName,
+          tier: ev.tier,
         }
       : null;
   }

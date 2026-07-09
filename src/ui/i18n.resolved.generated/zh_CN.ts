@@ -4021,6 +4021,8 @@ export const zh_CN: EnTranslations = {
       "secondsRemaining": "剩余 {seconds} 秒",
       "enteringZone": "进入 {zone}。",
       "welcomeZone": "欢迎来到 {zone}！",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 级！",
       "levelLog": "你已达到 {level} 级！",
       "xpGain": "你获得 {amount} 点经验。",

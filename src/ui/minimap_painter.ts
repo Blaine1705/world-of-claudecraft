@@ -147,6 +147,7 @@ export class MinimapPainter {
     private readonly writers: PainterHostWriters,
     private readonly classColor: (cls: string) => string,
     private readonly localizeZone: (zoneId: string) => string,
+    private readonly localizeRift: (name: string, rank: string | null) => string,
   ) {}
 
   /** Resolve the minimap color tokens in one getComputedStyle pass (a 2D
@@ -183,7 +184,13 @@ export class MinimapPainter {
     const pxPerYard = MINIMAP_BASE_SCALE * zoom;
     const model = this.markers.build(world, S, pxPerYard);
     // The one DOM write this Canvas painter routes through the write-elision facet.
-    this.writers.setText(zoneLabelEl, this.localizeZone(model.zoneId));
+    // In a rift, show the generated floor name + rank instead of the overworld zone.
+    this.writers.setText(
+      zoneLabelEl,
+      model.rift
+        ? this.localizeRift(model.rift.name, model.rift.rank)
+        : this.localizeZone(model.zoneId),
+    );
     const colors = this.resolveColors();
     const p = world.player;
 

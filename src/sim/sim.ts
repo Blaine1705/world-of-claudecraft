@@ -6947,6 +6947,7 @@ export class Sim {
       floorCount: inst.floorCount,
       name: floor.name,
       themeName: floor.themeName,
+      tier: inst.tier,
     };
   }
 

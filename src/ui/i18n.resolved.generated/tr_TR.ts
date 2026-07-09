@@ -4021,6 +4021,8 @@ export const tr_TR: EnTranslations = {
       "secondsRemaining": "{seconds} saniye kaldı",
       "enteringZone": "{zone} bölgesine giriliyor.",
       "welcomeZone": "{zone} bölgesine hoş geldin!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Seviye {level}!",
       "levelLog": "{level}. seviyeye ulaştın!",
       "xpGain": "{amount} deneyim kazandın.",

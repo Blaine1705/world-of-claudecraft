@@ -4021,6 +4021,8 @@ export const sv_SE: EnTranslations = {
       "secondsRemaining": "{seconds} sekunder kvar",
       "enteringZone": "Träder in i {zone}.",
       "welcomeZone": "Välkommen till {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Nivå {level}!",
       "levelLog": "Du har nått nivå {level}!",
       "xpGain": "Du får {amount} erfarenhet.",

@@ -30,7 +30,7 @@ import {
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import { generateRiftFloor } from '../sim/rift/rift_gen';
+import { generateRiftFloor, riftPlatformLift } from '../sim/rift/rift_gen';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
@@ -4591,12 +4591,22 @@ export class Renderer {
       // hitches transiently lift the sampled pose off the terrain, and a
       // single-frame false positive flips the base state to `jump` and back,
       // replaying the jump clip's crouch (the world-entry anim glitch).
-      if (
-        e.kind === 'player' &&
-        e.onGround &&
-        !swimming &&
-        ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS
-      ) {
+      // In a rift, the raised-tier height field lifts a standing player's Y above
+      // the flat dungeon floor; without accounting for it the foot-height heuristic
+      // (and the self predictor's kernel) read the lift as airborne and freeze the
+      // jump pose, and stairs never animate as walking. Add the platform lift to the
+      // ground reference (regenerated from the floor descriptor, memoised) so the
+      // raised tier reads as solid floor. Also force the heuristic path over the
+      // predictor's onGround inside a rift (the predictor samples the same flat
+      // ground, so it would still report airborne on the platform).
+      const inRift = isRiftPos(ax) && this.sim.riftFloor !== null;
+      let effGround = groundHeight(ax, az, this.sim.cfg.seed);
+      if (inRift) {
+        const rf = this.sim.riftFloor!;
+        const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex);
+        effGround += riftPlatformLift(floor.platform, az - riftOriginAt(az).z);
+      }
+      if (e.kind === 'player' && e.onGround && !swimming && ay - effGround > AIRBORNE_EPS) {
         v.airborneHeurFrames++;
       } else {
         v.airborneHeurFrames = 0;
@@ -4604,7 +4614,7 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfMotionPredictor
+        (animFromDisplay && this.selfMotionPredictor && !inRift
           ? !this.selfMotionPredictor.onGround
           : !e.onGround || v.airborneHeurFrames >= 2);
       const st = this.animScratch;

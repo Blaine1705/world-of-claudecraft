@@ -4021,6 +4021,8 @@ export const ru_RU: EnTranslations = {
       "secondsRemaining": "Осталось {seconds} сек.",
       "enteringZone": "Вход в {zone}.",
       "welcomeZone": "Добро пожаловать в {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Уровень {level}!",
       "levelLog": "Вы достигли уровня {level}!",
       "xpGain": "Вы получаете {amount} опыта.",

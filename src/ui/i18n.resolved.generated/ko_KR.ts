@@ -4021,6 +4021,8 @@ export const ko_KR: EnTranslations = {
       "secondsRemaining": "{seconds}초 남음",
       "enteringZone": "{zone}에 진입합니다.",
       "welcomeZone": "{zone}에 오신 것을 환영합니다!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 레벨!",
       "levelLog": "{level} 레벨이 되었습니다!",
       "xpGain": "경험치 {amount}을 획득했습니다.",

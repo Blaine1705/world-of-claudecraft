@@ -4021,6 +4021,8 @@ export const da_DK: EnTranslations = {
       "secondsRemaining": "{seconds} sekunder tilbage",
       "enteringZone": "Træder ind i {zone}.",
       "welcomeZone": "Velkommen til {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Niveau {level}!",
       "levelLog": "Du har nået niveau {level}!",
       "xpGain": "Du får {amount} erfaring.",

@@ -2281,6 +2281,7 @@ export type SimEvent = { pid?: number } & (
       floorCount: number;
       name: string;
       themeName: string;
+      tier: RiftTier | null;
     }
 );
 
