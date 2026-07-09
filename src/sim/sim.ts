@@ -306,6 +306,12 @@ import {
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import { generateRiftFloor } from './rift/rift_gen';
 import {
+  riftLockpickAbort as riftLockpickAbortImpl,
+  riftLockpickAction as riftLockpickActionImpl,
+  riftLockpickEngage as riftLockpickEngageImpl,
+  riftLockpickViewFor as riftLockpickViewForImpl,
+} from './rift/rift_lockpick';
+import {
   advanceRiftRollers as advanceRiftRollersImpl,
   enterRift as enterRiftImpl,
   leaveRift as leaveRiftImpl,
@@ -317,12 +323,6 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
-import {
-  riftLockpickAbort as riftLockpickAbortImpl,
-  riftLockpickAction as riftLockpickActionImpl,
-  riftLockpickEngage as riftLockpickEngageImpl,
-  riftLockpickViewFor as riftLockpickViewForImpl,
-} from './rift/rift_lockpick';
 import type { RiftInstance } from './rift/types';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
@@ -6864,20 +6864,29 @@ export class Sim {
   /** Start a lockpicking attempt: commit an ante (1/2/3 lives = loot tier). */
   lockpickEngage(objectId: number, ante: Ante, pid?: number): void {
     const inst = this.riftInstForPid(pid);
-    if (inst) return riftLockpickEngageImpl(this.ctx, inst, objectId, ante, pid);
+    if (inst) {
+      riftLockpickEngageImpl(this.ctx, inst, objectId, ante, pid);
+      return;
+    }
     lockpickMod.lockpickEngage(this.ctx, objectId, ante, pid);
   }
 
   /** Submit one pick action on the player's active attempt (server-authoritative). */
   lockpickAction(action: PickAction, pid?: number, sessionId?: string): void {
     const inst = this.riftInstForPid(pid);
-    if (inst) return riftLockpickActionImpl(this.ctx, inst, action, pid, sessionId);
+    if (inst) {
+      riftLockpickActionImpl(this.ctx, inst, action, pid, sessionId);
+      return;
+    }
     lockpickMod.lockpickAction(this.ctx, action, pid, sessionId);
   }
 
   lockpickAbort(pid?: number, sessionId?: string): void {
     const inst = this.riftInstForPid(pid);
-    if (inst) return riftLockpickAbortImpl(this.ctx, inst, pid, sessionId);
+    if (inst) {
+      riftLockpickAbortImpl(this.ctx, inst, pid, sessionId);
+      return;
+    }
     lockpickMod.lockpickAbort(this.ctx, pid, sessionId);
   }
 

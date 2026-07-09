@@ -3281,28 +3281,35 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.6.label': '거울 호수',
   'entities.npcs.warden_coalfast.name': '숯불 워든',
   'entities.npcs.warden_coalfast.title': '보루 지휘관',
-  'entities.npcs.warden_coalfast.greeting': '균열은 걸헤이븐이 작은 마을이라는 걸 신경 쓰지 않는다네, {className}. 우리가 이 해안을 지키거나, 아니면 지킬 해안조차 남지 않을 걸세. 우리 곁에 서 주게. 그러면 나는 그 은혜를 잊지 않겠네.',
+  'entities.npcs.warden_coalfast.greeting':
+    '균열은 걸헤이븐이 작은 마을이라는 걸 신경 쓰지 않는다네, {className}. 우리가 이 해안을 지키거나, 아니면 지킬 해안조차 남지 않을 걸세. 우리 곁에 서 주게. 그러면 나는 그 은혜를 잊지 않겠네.',
   'entities.npcs.riftwatch_ollun.name': '균열감시자 올룬',
   'entities.npcs.riftwatch_ollun.title': '균열 학자',
-  'entities.npcs.riftwatch_ollun.greeting': '모든 균열은 열리기 전에 노래하지, 귀를 기울일 줄만 안다면 말일세. 지금 이 섬에서 셋이 꿈틀대는 소리가 들리는데, 그중 하나는 아주 가깝다네.',
+  'entities.npcs.riftwatch_ollun.greeting':
+    '모든 균열은 열리기 전에 노래하지, 귀를 기울일 줄만 안다면 말일세. 지금 이 섬에서 셋이 꿈틀대는 소리가 들리는데, 그중 하나는 아주 가깝다네.',
   'entities.npcs.quartermaster_edda.name': '병참관 에다',
   'entities.npcs.quartermaster_edda.title': '보루 무기담당',
-  'entities.npcs.quartermaster_edda.greeting': '강철과 소금뿐이야, {className}. 내가 나눠 줄 수 있는 건 이제 그게 전부라네. 이걸 받아서, 균열들이 내 손 닿는 곳에서 열린 걸 후회하게 만들어 주게.',
+  'entities.npcs.quartermaster_edda.greeting':
+    '강철과 소금뿐이야, {className}. 내가 나눠 줄 수 있는 건 이제 그게 전부라네. 이걸 받아서, 균열들이 내 손 닿는 곳에서 열린 걸 후회하게 만들어 주게.',
   'entities.npcs.mender_saul.name': '치료사 사울',
   'entities.npcs.mender_saul.title': '야전 군의관',
-  'entities.npcs.mender_saul.greeting': '지난 한 달 동안 맞춘 뼈가, 십 년간 고깃배 사고를 치료하며 맞춘 것보다 많다네. 균열은 앗아간 것을 온전히 남겨 두지 않지. 할 수 있거든, 성한 몸으로 돌아와 주게.',
+  'entities.npcs.mender_saul.greeting':
+    '지난 한 달 동안 맞춘 뼈가, 십 년간 고깃배 사고를 치료하며 맞춘 것보다 많다네. 균열은 앗아간 것을 온전히 남겨 두지 않지. 할 수 있거든, 성한 몸으로 돌아와 주게.',
   'entities.npcs.bellkeeper_tam.name': '종지기 탐',
   'entities.npcs.bellkeeper_tam.title': '경종지기',
-  'entities.npcs.bellkeeper_tam.greeting': '이 종이야말로 균열이 우리에게 주는 유일한 경고라오, {className}. 한 번 울리면 들판, 두 번이면 절벽, 세 번 울리면 이미 코앞이라 달아나도 소용없을 만큼 가까이 온 것이오. 늘 귀를 기울이시오, 그리하면 종이 그대를 온전히 지켜 줄지도 모르니.',
+  'entities.npcs.bellkeeper_tam.greeting':
+    '이 종이야말로 균열이 우리에게 주는 유일한 경고라오, {className}. 한 번 울리면 들판, 두 번이면 절벽, 세 번 울리면 이미 코앞이라 달아나도 소용없을 만큼 가까이 온 것이오. 늘 귀를 기울이시오, 그리하면 종이 그대를 온전히 지켜 줄지도 모르니.',
   'entities.npcs.fisher_nell.name': '겁먹은 넬',
   'entities.npcs.fisher_nell.title': '걸헤이븐 어부',
-  'entities.npcs.fisher_nell.greeting': '그물을 말리던 바로 그 자리에서 열렸어요. 바로 거기, 제가 평생 매일 아침 서 있던 그 자리에서요. 이제 저는 해안으로 내려가지 않아요. 이제는 어디로도 잘 가지 않는답니다.',
+  'entities.npcs.fisher_nell.greeting':
+    '그물을 말리던 바로 그 자리에서 열렸어요. 바로 거기, 제가 평생 매일 아침 서 있던 그 자리에서요. 이제 저는 해안으로 내려가지 않아요. 이제는 어디로도 잘 가지 않는답니다.',
   'entities.mobs.riftspawn.name': '균열의 산물',
   'entities.mobs.breach_wretch.name': '균열의 비루한 것',
   'entities.mobs.void_stalker.name': '공허 추적자',
   'entities.mobs.sundered_horror.name': '찢겨진 공포',
   'entities.zones.farshore_isle.name': '먼바다 해안',
-  'entities.zones.farshore_isle.welcome': '모래톱을 건너면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.',
+  'entities.zones.farshore_isle.welcome':
+    '모래톱을 건너면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.',
   'entities.zones.farshore_isle.pois.0.label': '걸헤이븐',
   'entities.zones.farshore_isle.pois.1.label': '선착장',
   'entities.zones.farshore_isle.pois.2.label': '감시 초원',

@@ -28,8 +28,12 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 function startFiesta(classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest']) {
   const sim = makeWorld();
   const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
-  pids.forEach((p, i) => teleport(sim, p, i * 4, -40));
-  pids.forEach((p) => sim.arenaQueueJoin(p, 'fiesta'));
+  pids.forEach((p, i) => {
+    teleport(sim, p, i * 4, -40);
+  });
+  pids.forEach((p) => {
+    sim.arenaQueueJoin(p, 'fiesta');
+  });
   sim.tick(); // matchmake
   for (let i = 0; i < 20 * 8; i++) {
     sim.tick();
@@ -197,8 +201,12 @@ describe('fiesta: augments', () => {
     );
     // Pretend everyone walked in at level 8.
     for (const p of pids) sim.setPlayerLevel(8, p);
-    pids.forEach((p) => teleport(sim, p, pids.indexOf(p) * 4, -40));
-    pids.forEach((p) => sim.arenaQueueJoin(p, 'fiesta'));
+    pids.forEach((p) => {
+      teleport(sim, p, pids.indexOf(p) * 4, -40);
+    });
+    pids.forEach((p) => {
+      sim.arenaQueueJoin(p, 'fiesta');
+    });
     sim.tick();
     for (const p of pids) expect(sim.entities.get(p)!.level).toBe(20);
     // Persistence safety: serialize must report the ORIGINAL level, not 20.

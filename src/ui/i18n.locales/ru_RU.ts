@@ -3319,28 +3319,35 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.6.label': 'Зеркальное Озеро',
   'entities.npcs.warden_coalfast.name': 'Смотритель Хладоуголь',
   'entities.npcs.warden_coalfast.title': 'Комендант редута',
-  'entities.npcs.warden_coalfast.greeting': 'Прорывам нет дела до того, что Чаячья Гавань мала, {className}. Мы удержим этот берег — или удерживать будет уже нечего. Встань с нами, и я этого не забуду.',
+  'entities.npcs.warden_coalfast.greeting':
+    'Прорывам нет дела до того, что Чаячья Гавань мала, {className}. Мы удержим этот берег — или удерживать будет уже нечего. Встань с нами, и я этого не забуду.',
   'entities.npcs.riftwatch_ollun.name': 'Стражеразлома Оллун',
   'entities.npcs.riftwatch_ollun.title': 'Учёный по прорывам',
-  'entities.npcs.riftwatch_ollun.greeting': 'Каждый прорыв поёт, прежде чем раскрыться, — если есть слух для этого. Прямо сейчас я слышу, как трое из них ворочаются на острове, и один совсем близко.',
+  'entities.npcs.riftwatch_ollun.greeting':
+    'Каждый прорыв поёт, прежде чем раскрыться, — если есть слух для этого. Прямо сейчас я слышу, как трое из них ворочаются на острове, и один совсем близко.',
   'entities.npcs.quartermaster_edda.name': 'Интендант Эдда',
   'entities.npcs.quartermaster_edda.title': 'Оружейница редута',
-  'entities.npcs.quartermaster_edda.greeting': 'Сталь да соль, {className}, — вот и всё, что мне осталось раздавать. Бери и заставь прорывы пожалеть, что они раскрылись там, куда я смогла дотянуться.',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Сталь да соль, {className}, — вот и всё, что мне осталось раздавать. Бери и заставь прорывы пожалеть, что они раскрылись там, куда я смогла дотянуться.',
   'entities.npcs.mender_saul.name': 'Врачеватель Саул',
   'entities.npcs.mender_saul.title': 'Полевой хирург',
-  'entities.npcs.mender_saul.greeting': 'За один этот месяц я вправил больше костей, чем за десять лет лечения рыбацких увечий. Прорывы мало что оставляют от того, что забирают. Возвращайся ко мне целым, если сумеешь.',
+  'entities.npcs.mender_saul.greeting':
+    'За один этот месяц я вправил больше костей, чем за десять лет лечения рыбацких увечий. Прорывы мало что оставляют от того, что забирают. Возвращайся ко мне целым, если сумеешь.',
   'entities.npcs.bellkeeper_tam.name': 'Звонарь Там',
   'entities.npcs.bellkeeper_tam.title': 'Смотритель сигнального колокола',
-  'entities.npcs.bellkeeper_tam.greeting': 'Колокол — единственное предупреждение, что даёт нам прорыв, {className}. Один удар — за поля, два — за утёсы, три — когда он уже так близко, что бежать без толку. Держи ухо востро, и он, глядишь, сбережёт тебя целым.',
+  'entities.npcs.bellkeeper_tam.greeting':
+    'Колокол — единственное предупреждение, что даёт нам прорыв, {className}. Один удар — за поля, два — за утёсы, три — когда он уже так близко, что бежать без толку. Держи ухо востро, и он, глядишь, сбережёт тебя целым.',
   'entities.npcs.fisher_nell.name': 'Испуганная Нелл',
   'entities.npcs.fisher_nell.title': 'Рыбачка Чаячьей Гавани',
-  'entities.npcs.fisher_nell.greeting': 'Он раскрылся прямо там, где сушат сети. Прямо там, где я стояла каждое утро всей своей жизни. Я больше не спускаюсь к берегу. Я вообще почти никуда больше не хожу.',
+  'entities.npcs.fisher_nell.greeting':
+    'Он раскрылся прямо там, где сушат сети. Прямо там, где я стояла каждое утро всей своей жизни. Я больше не спускаюсь к берегу. Я вообще почти никуда больше не хожу.',
   'entities.mobs.riftspawn.name': 'Порождение разлома',
   'entities.mobs.breach_wretch.name': 'Отродье прорыва',
   'entities.mobs.void_stalker.name': 'Охотник Пустоты',
   'entities.mobs.sundered_horror.name': 'Расколотый Ужас',
   'entities.zones.farshore_isle.name': 'Дальний Берег',
-  'entities.zones.farshore_isle.welcome': 'Пройди по песчаной косе, и колокол Чаячьей Гавани отыщет тебя раньше, чем сам город. Прорыв разверзается без предупреждения, и редут держит свой берег против всего, что через него хлещет. Они уже давно ждут кого-то вроде тебя.',
+  'entities.zones.farshore_isle.welcome':
+    'Пройди по песчаной косе, и колокол Чаячьей Гавани отыщет тебя раньше, чем сам город. Прорыв разверзается без предупреждения, и редут держит свой берег против всего, что через него хлещет. Они уже давно ждут кого-то вроде тебя.',
   'entities.zones.farshore_isle.pois.0.label': 'Чаячья Гавань',
   'entities.zones.farshore_isle.pois.1.label': 'Пристань',
   'entities.zones.farshore_isle.pois.2.label': 'Дозорный Луг',
@@ -6255,7 +6262,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.rift.enterFloor': 'Вы проходите сквозь разлом и попадаете в {name}.',
   'sim.rift.exitOpens': 'Разлом содрогается. Позади павших разверзается путь домой.',
   'sim.rift.iceGoalLit': 'Морозная печать вспыхивает. Путь пробуждается.',
-  'sim.rift.levelGate': 'Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.',
+  'sim.rift.levelGate':
+    'Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.',
   'sim.rift.portalCollapses': 'Разлом ранга {tier} в {zone} обрушился.',
   'sim.rift.portalOpens': 'В {zone} разверзся разлом ранга {tier}!',
   'sim.rift.portalSealed': 'Разлом ранга {tier} в {zone} запечатан.',

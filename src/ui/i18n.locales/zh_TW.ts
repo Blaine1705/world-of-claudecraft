@@ -3147,28 +3147,35 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.6.label': '鏡湖',
   'entities.npcs.warden_coalfast.name': '守望者 煤堅',
   'entities.npcs.warden_coalfast.title': '堡壘指揮官',
-  'entities.npcs.warden_coalfast.greeting': '裂隙可不管鷗港有多小，{className}。我們守住這片海岸，否則便再無海岸可守。與我們並肩而戰，我絕不會忘記。',
+  'entities.npcs.warden_coalfast.greeting':
+    '裂隙可不管鷗港有多小，{className}。我們守住這片海岸，否則便再無海岸可守。與我們並肩而戰，我絕不會忘記。',
   'entities.npcs.riftwatch_ollun.name': '裂隙守望 歐倫',
   'entities.npcs.riftwatch_ollun.title': '裂隙學者',
-  'entities.npcs.riftwatch_ollun.greeting': '若你聽得出那聲響，每道裂隙開啟之前都會歌唱。此刻我聽見島上有三道正在騷動，其中一道就在近旁。',
+  'entities.npcs.riftwatch_ollun.greeting':
+    '若你聽得出那聲響，每道裂隙開啟之前都會歌唱。此刻我聽見島上有三道正在騷動，其中一道就在近旁。',
   'entities.npcs.quartermaster_edda.name': '軍需官 艾妲',
   'entities.npcs.quartermaster_edda.title': '堡壘軍械師',
-  'entities.npcs.quartermaster_edda.greeting': '鋼與鹽，{className}，這便是我僅剩能發放的一切了。收下它，讓那些裂隙後悔開在我搆得著的地方。',
+  'entities.npcs.quartermaster_edda.greeting':
+    '鋼與鹽，{className}，這便是我僅剩能發放的一切了。收下它，讓那些裂隙後悔開在我搆得著的地方。',
   'entities.npcs.mender_saul.name': '療者 索爾',
   'entities.npcs.mender_saul.title': '戰地外科醫',
-  'entities.npcs.mender_saul.greeting': '這一個月裡我接的斷骨，比十年來替漁人跌傷接的還要多。裂隙奪走的東西，鮮少留下什麼。若你能辦到，就完好無缺地回到我身邊吧。',
+  'entities.npcs.mender_saul.greeting':
+    '這一個月裡我接的斷骨，比十年來替漁人跌傷接的還要多。裂隙奪走的東西，鮮少留下什麼。若你能辦到，就完好無缺地回到我身邊吧。',
   'entities.npcs.bellkeeper_tam.name': '守鐘人 塔姆',
   'entities.npcs.bellkeeper_tam.title': '守望鐘司',
-  'entities.npcs.bellkeeper_tam.greeting': '這口鐘是裂隙唯一給我們的警訊，{className}。一響是田野有變，兩響是崖壁告急，三響時它已近得再怎麼奔逃也無濟於事。留心聽著它，它或許便能保你周全。',
+  'entities.npcs.bellkeeper_tam.greeting':
+    '這口鐘是裂隙唯一給我們的警訊，{className}。一響是田野有變，兩響是崖壁告急，三響時它已近得再怎麼奔逃也無濟於事。留心聽著它，它或許便能保你周全。',
   'entities.npcs.fisher_nell.name': '受驚的 奈兒',
   'entities.npcs.fisher_nell.title': '鷗港漁人',
-  'entities.npcs.fisher_nell.greeting': '它就開在曬網的地方。就在那裡，就在我這輩子每天清晨站立的地方。我再也不下海岸了。如今哪兒我都幾乎不再去了。',
+  'entities.npcs.fisher_nell.greeting':
+    '它就開在曬網的地方。就在那裡，就在我這輩子每天清晨站立的地方。我再也不下海岸了。如今哪兒我都幾乎不再去了。',
   'entities.mobs.riftspawn.name': '裂隙孽生',
   'entities.mobs.breach_wretch.name': '裂口惡徒',
   'entities.mobs.void_stalker.name': '虛空潛獵者',
   'entities.mobs.sundered_horror.name': '碎裂之恐怖',
   'entities.zones.farshore_isle.name': '遠岸',
-  'entities.zones.farshore_isle.welcome': '越過那道沙洲，鷗港的鐘聲會先於城鎮尋著你。裂隙無預警地撕裂而開，這座據點便死守著自己的海岸，抵擋一切從中傾湧而出之物。他們已等候像你這樣的人許久了。',
+  'entities.zones.farshore_isle.welcome':
+    '越過那道沙洲，鷗港的鐘聲會先於城鎮尋著你。裂隙無預警地撕裂而開，這座據點便死守著自己的海岸，抵擋一切從中傾湧而出之物。他們已等候像你這樣的人許久了。',
   'entities.zones.farshore_isle.pois.0.label': '鷗港',
   'entities.zones.farshore_isle.pois.1.label': '登岸碼頭',
   'entities.zones.farshore_isle.pois.2.label': '守望草原',

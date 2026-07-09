@@ -3287,28 +3287,35 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.6.label': 'ミラーターン',
   'entities.npcs.warden_coalfast.name': '守将コールファスト',
   'entities.npcs.warden_coalfast.title': '要塞司令官',
-  'entities.npcs.warden_coalfast.greeting': '裂け目は、カモメ港が小さいことなど気にもかけぬ、{className}。この岸を守り抜くか、さもなくば守るべき岸そのものが失われるかだ。我らと共に立て、そうすれば私はその恩を忘れはせぬ。',
+  'entities.npcs.warden_coalfast.greeting':
+    '裂け目は、カモメ港が小さいことなど気にもかけぬ、{className}。この岸を守り抜くか、さもなくば守るべき岸そのものが失われるかだ。我らと共に立て、そうすれば私はその恩を忘れはせぬ。',
   'entities.npcs.riftwatch_ollun.name': '裂け目監視のオルン',
   'entities.npcs.riftwatch_ollun.title': '破れの学者',
-  'entities.npcs.riftwatch_ollun.greeting': '裂け目はどれも、開く前に歌うのだ――耳を傾ける術さえあればな。いま島では三つが蠢いているのが聞こえる。そのうち一つは、すぐ近くだ。',
+  'entities.npcs.riftwatch_ollun.greeting':
+    '裂け目はどれも、開く前に歌うのだ――耳を傾ける術さえあればな。いま島では三つが蠢いているのが聞こえる。そのうち一つは、すぐ近くだ。',
   'entities.npcs.quartermaster_edda.name': '補給将校エッダ',
   'entities.npcs.quartermaster_edda.title': '要塞武具方',
-  'entities.npcs.quartermaster_edda.greeting': '鋼と塩、それが手渡せる残り物のすべてさ、{className}。持って行きな。私の手が届くところで開いたことを、裂け目に後悔させてやれ。',
+  'entities.npcs.quartermaster_edda.greeting':
+    '鋼と塩、それが手渡せる残り物のすべてさ、{className}。持って行きな。私の手が届くところで開いたことを、裂け目に後悔させてやれ。',
   'entities.npcs.mender_saul.name': '癒し手サウル',
   'entities.npcs.mender_saul.title': '従軍外科医',
-  'entities.npcs.mender_saul.greeting': '漁の転落を手当てした十年よりも、この一月のほうが多くの骨を接いだ。裂け目は、奪ったものをろくに残しはせぬ。できることなら、五体満足で戻ってきてくれ。',
+  'entities.npcs.mender_saul.greeting':
+    '漁の転落を手当てした十年よりも、この一月のほうが多くの骨を接いだ。裂け目は、奪ったものをろくに残しはせぬ。できることなら、五体満足で戻ってきてくれ。',
   'entities.npcs.bellkeeper_tam.name': '鐘守タム',
   'entities.npcs.bellkeeper_tam.title': '警鐘守り',
-  'entities.npcs.bellkeeper_tam.greeting': '裂け目が我らに寄越す唯一の報せ、それがこの鐘だ、{className}。一打ちなら畑、二打ちなら崖、三打ちともなれば、もう逃げても間に合わぬほど近いということ。耳を離すな。さすれば鐘が、お前を五体満足のままにしてくれよう。',
+  'entities.npcs.bellkeeper_tam.greeting':
+    '裂け目が我らに寄越す唯一の報せ、それがこの鐘だ、{className}。一打ちなら畑、二打ちなら崖、三打ちともなれば、もう逃げても間に合わぬほど近いということ。耳を離すな。さすれば鐘が、お前を五体満足のままにしてくれよう。',
   'entities.npcs.fisher_nell.name': '怯えるネル',
   'entities.npcs.fisher_nell.title': 'カモメ港の漁師',
-  'entities.npcs.fisher_nell.greeting': '網を干す、まさにあの場所で開いたんだ。あそこだよ、私が生まれてからずっと毎朝立っていた場所さ。もう岸へは下りない。もう、どこへもろくに行かなくなっちまった。',
+  'entities.npcs.fisher_nell.greeting':
+    '網を干す、まさにあの場所で開いたんだ。あそこだよ、私が生まれてからずっと毎朝立っていた場所さ。もう岸へは下りない。もう、どこへもろくに行かなくなっちまった。',
   'entities.mobs.riftspawn.name': '裂け目の落とし子',
   'entities.mobs.breach_wretch.name': '破れの成れの果て',
   'entities.mobs.void_stalker.name': '虚無の忍び寄り',
   'entities.mobs.sundered_horror.name': '引き裂かれし恐怖',
   'entities.zones.farshore_isle.name': '遠つ岸',
-  'entities.zones.farshore_isle.welcome': '砂州を渡れば、町に着くより先にカモメ港の鐘があなたを見つけるだろう。裂け目は前触れもなく口を開き、この砦は流れ出るものすべてから己の岸を守り続けている。あなたのような者を、ここでは長らく待ちわびていたのだ。',
+  'entities.zones.farshore_isle.welcome':
+    '砂州を渡れば、町に着くより先にカモメ港の鐘があなたを見つけるだろう。裂け目は前触れもなく口を開き、この砦は流れ出るものすべてから己の岸を守り続けている。あなたのような者を、ここでは長らく待ちわびていたのだ。',
   'entities.zones.farshore_isle.pois.0.label': 'カモメ港',
   'entities.zones.farshore_isle.pois.1.label': '船着き場',
   'entities.zones.farshore_isle.pois.2.label': '見張りの草原',

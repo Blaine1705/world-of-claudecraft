@@ -3299,9 +3299,7 @@ export class Hud {
     classCss,
     (zoneId) => zoneDisplayName(zoneId),
     (name, rank) =>
-      rank
-        ? t('hud.core.riftLabelRanked', { name, rank })
-        : t('hud.core.riftLabel', { name }),
+      rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name }),
   );
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
