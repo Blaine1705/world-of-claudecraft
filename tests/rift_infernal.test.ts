@@ -1,0 +1,435 @@
+// The Infernal Citadel: the hand-authored set-piece rift floor.
+//
+// Covers what the procedural rift tests cannot: the authored room graph (walls,
+// doorways, reachability), the two-boss gating chain (miniboss -> Blood Orb ->
+// portcullis -> giga-boss -> exit), and the guarantee that adding the set-piece
+// left every procedural seed byte-identical.
+
+import { beforeEach, describe, expect, it } from 'vitest';
+import type { Collider } from '../src/sim/colliders';
+import {
+  buildInfernalCitadelFloor,
+  INFERNAL_DOORS,
+  INFERNAL_ROOMS,
+} from '../src/sim/content/rift/infernal_citadel';
+import { RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z, riftInstanceOrigin } from '../src/sim/data';
+import { layoutColliders } from '../src/sim/dungeon_layout';
+import { authoredWallSegments, inAnyRoom, roomAt } from '../src/sim/rift/authored';
+import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
+import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from '../src/sim/rift/rift_gen';
+import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
+
+const BODY_R = 0.6;
+
+/** The first `count` seeds that open the citadel (used across the lifecycle tests). */
+function setPieceSeeds(count: number): number[] {
+  const out: number[] = [];
+  for (let s = 1; out.length < count && s < 100_000; s++) {
+    if (isSetPieceSeed(s)) out.push(s);
+  }
+  expect(out.length).toBe(count);
+  return out;
+}
+
+function clears(colliders: readonly Collider[], x: number, z: number, r = BODY_R): boolean {
+  for (const c of colliders) {
+    if (c.type === 'circle') {
+      const dx = x - c.x;
+      const dz = z - c.z;
+      if (dx * dx + dz * dz < (c.r + r) * (c.r + r)) return false;
+    } else {
+      const dx = x - c.x;
+      const dz = z - c.z;
+      const cos = Math.cos(c.rot);
+      const sin = Math.sin(c.rot);
+      const lx = dx * cos - dz * sin;
+      const lz = dx * sin + dz * cos;
+      if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return false;
+    }
+  }
+  return true;
+}
+
+describe('infernal citadel: seed selection', () => {
+  it('is a pure function of the seed (stable across calls)', () => {
+    for (let s = 1; s < 200; s++) {
+      expect(isSetPieceSeed(s)).toBe(isSetPieceSeed(s));
+    }
+  });
+
+  it('fires on a sane fraction of seeds (roughly the tuned 15%)', () => {
+    let hits = 0;
+    for (let s = 1; s <= 4000; s++) if (isSetPieceSeed(s)) hits++;
+    const pct = hits / 4000;
+    expect(pct).toBeGreaterThan(0.08);
+    expect(pct).toBeLessThan(0.22);
+  });
+
+  it('is independent of rank: every tier baseLevel builds the same citadel layout', () => {
+    const seed = setPieceSeeds(1)[0];
+    const layouts = (['C', 'B', 'A', 'S'] as const).map((tier) =>
+      JSON.stringify(generateRiftFloor(seed, RIFT_TIER_INFO[tier].baseLevel, 0).layout),
+    );
+    expect(new Set(layouts).size).toBe(1);
+    // Only the mob level scales with the rank.
+    const cLvl = generateRiftFloor(seed, RIFT_TIER_INFO.C.baseLevel, 0).spawns[0].level;
+    const sLvl = generateRiftFloor(seed, RIFT_TIER_INFO.S.baseLevel, 0).spawns[0].level;
+    expect(sLvl).toBeGreaterThan(cLvl);
+  });
+
+  it('names the rift a Citadel and gives it exactly one floor', () => {
+    for (const seed of setPieceSeeds(5)) {
+      const plan = generateRiftPlan(seed, 22);
+      expect(plan.floorCount).toBe(1);
+      expect(plan.themeId).toBe('infernal');
+      expect(plan.name).toMatch(/Citadel$/);
+    }
+  });
+
+  it('leaves procedural seeds untouched (no set-piece, still multi-floor)', () => {
+    let checked = 0;
+    for (let s = 1; s < 400; s++) {
+      if (isSetPieceSeed(s)) continue;
+      const floor = generateRiftFloor(s, 20, 0);
+      expect(floor.authored).toBeUndefined();
+      expect(floor.layout.rooms).toBeUndefined();
+      expect(generateRiftPlan(s, 20).floorCount).toBeGreaterThanOrEqual(3);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(200);
+  });
+});
+
+describe('infernal citadel: determinism', () => {
+  it('regenerates byte-identically from the same descriptor', () => {
+    const seed = setPieceSeeds(1)[0];
+    const a = JSON.stringify(buildInfernalCitadelFloor(seed, 22, 22));
+    const b = JSON.stringify(buildInfernalCitadelFloor(seed, 22, 22));
+    expect(a).toBe(b);
+  });
+
+  it('draws no randomness from the live sim rng', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const before = sim.rng.next();
+    const sim2 = new Sim({ seed: 7, playerClass: 'warrior' });
+    buildInfernalCitadelFloor(setPieceSeeds(1)[0], 22, 22);
+    generateRiftFloor(setPieceSeeds(1)[0], 22, 0);
+    const after = sim2.rng.next();
+    expect(after).toBe(before);
+  });
+
+  it('grades differently per seed (the colour jitter is seeded)', () => {
+    const seeds = setPieceSeeds(4);
+    const fogs = seeds.map((s) => buildInfernalCitadelFloor(s, 22, 22).style.fog.color);
+    expect(new Set(fogs).size).toBeGreaterThan(1);
+  });
+});
+
+describe('infernal citadel: authored geometry', () => {
+  const floor = buildInfernalCitadelFloor(setPieceSeeds(1)[0], 22, 22);
+  const colliders = layoutColliders(floor.layout);
+
+  it('stays inside the rift region bounds', () => {
+    for (const r of INFERNAL_ROOMS) {
+      expect(Math.abs(r.x0)).toBeLessThan(RIFT_REGION_HALF_X);
+      expect(Math.abs(r.x1)).toBeLessThan(RIFT_REGION_HALF_X);
+      expect(Math.abs(r.z0)).toBeLessThan(RIFT_REGION_HALF_Z);
+      expect(Math.abs(r.z1)).toBeLessThan(RIFT_REGION_HALF_Z);
+    }
+  });
+
+  it('has 8 rooms joined by 7 doorways, none overlapping', () => {
+    expect(INFERNAL_ROOMS.length).toBe(8);
+    expect(INFERNAL_DOORS.length).toBe(7);
+    for (let i = 0; i < INFERNAL_ROOMS.length; i++) {
+      for (let j = i + 1; j < INFERNAL_ROOMS.length; j++) {
+        const a = INFERNAL_ROOMS[i];
+        const b = INFERNAL_ROOMS[j];
+        const overlap = a.x0 < b.x1 && b.x0 < a.x1 && a.z0 < b.z1 && b.z0 < a.z1;
+        expect(overlap, `${a.id} overlaps ${b.id}`).toBe(false);
+      }
+    }
+  });
+
+  it('walls seal the shell: no segment crosses a doorway centre', () => {
+    const segs = authoredWallSegments(INFERNAL_ROOMS, INFERNAL_DOORS);
+    expect(segs.length).toBeGreaterThan(10);
+    for (const d of INFERNAL_DOORS) {
+      expect(clears(colliders, d.x, d.z), `doorway (${d.x},${d.z}) is walled shut`).toBe(true);
+    }
+  });
+
+  it('every doorway is walkable and joins two DIFFERENT rooms', () => {
+    for (const d of INFERNAL_DOORS) {
+      // A step to either side of the door line lands in a room, and they differ.
+      const along = d.hw > d.hd ? { dx: 0, dz: 1 } : { dx: 1, dz: 0 };
+      const step = 2.0;
+      const a = roomAt(INFERNAL_ROOMS, d.x - along.dx * step, d.z - along.dz * step);
+      const b = roomAt(INFERNAL_ROOMS, d.x + along.dx * step, d.z + along.dz * step);
+      expect(a, `no room south/west of door (${d.x},${d.z})`).not.toBeNull();
+      expect(b, `no room north/east of door (${d.x},${d.z})`).not.toBeNull();
+      expect(a?.id).not.toBe(b?.id);
+    }
+  });
+
+  it('connects every room to the entrance through the door graph', () => {
+    // Build the adjacency the doors define, then BFS from the entry room.
+    const adj = new Map<string, string[]>(INFERNAL_ROOMS.map((r) => [r.id, []]));
+    for (const d of INFERNAL_DOORS) {
+      const along = d.hw > d.hd ? { dx: 0, dz: 1 } : { dx: 1, dz: 0 };
+      const a = roomAt(INFERNAL_ROOMS, d.x - along.dx * 2, d.z - along.dz * 2);
+      const b = roomAt(INFERNAL_ROOMS, d.x + along.dx * 2, d.z + along.dz * 2);
+      if (!a || !b) continue;
+      adj.get(a.id)?.push(b.id);
+      adj.get(b.id)?.push(a.id);
+    }
+    const seen = new Set(['entry']);
+    const queue = ['entry'];
+    while (queue.length) {
+      for (const n of adj.get(queue.shift() as string) ?? []) {
+        if (seen.has(n)) continue;
+        seen.add(n);
+        queue.push(n);
+      }
+    }
+    expect(
+      seen.size,
+      `unreachable rooms: ${INFERNAL_ROOMS.filter((r) => !seen.has(r.id)).map((r) => r.id)}`,
+    ).toBe(INFERNAL_ROOMS.length);
+  });
+
+  it('places the player entry, every spawn, and every object on clear ground inside a room', () => {
+    expect(inAnyRoom(INFERNAL_ROOMS, floor.entry.x, floor.entry.z)).toBe(true);
+    expect(clears(colliders, floor.entry.x, floor.entry.z)).toBe(true);
+    for (const s of floor.spawns) {
+      expect(inAnyRoom(INFERNAL_ROOMS, s.x, s.z), `${s.templateId} outside every room`).toBe(true);
+      expect(clears(colliders, s.x, s.z), `${s.templateId} spawns inside a collider`).toBe(true);
+    }
+    for (const o of floor.objects) {
+      // The portcullis deliberately stands ON the shared wall line it bars; every
+      // other object sits strictly inside a room.
+      if (o.kind === 'gate') {
+        expect(INFERNAL_DOORS.some((d) => d.x === o.x && d.z === o.z)).toBe(true);
+        continue;
+      }
+      expect(inAnyRoom(INFERNAL_ROOMS, o.x, o.z), `${o.kind} outside every room`).toBe(true);
+    }
+  });
+
+  it('leaves the Blood Orb reachable past its altar collider', () => {
+    const orb = floor.objects.find((o) => o.kind === 'infernal_orb');
+    expect(orb).toBeDefined();
+    // Stand just south of the altar: clear ground, and within the 3.2yd orb trigger.
+    const standZ = (orb as { z: number }).z - 2.2;
+    expect(clears(colliders, 0, standZ)).toBe(true);
+    expect(Math.hypot(0, (orb as { z: number }).z - standZ)).toBeLessThan(3.2);
+  });
+
+  it('gives the illusion wall no collider (you walk through to the cache)', () => {
+    const panel = floor.layout.illusionWalls?.[0];
+    expect(panel).toBeDefined();
+    const p = panel as { x: number; z: number };
+    expect(clears(colliders, p.x, p.z, 0.1)).toBe(true);
+    const cache = floor.objects.find((o) => o.kind === 'treasure' && o.x > 30);
+    expect(cache).toBeDefined();
+    expect(clears(colliders, (cache as { x: number }).x, (cache as { z: number }).z)).toBe(true);
+  });
+});
+
+describe('infernal citadel: content', () => {
+  const floor = buildInfernalCitadelFloor(setPieceSeeds(1)[0], 22, 22);
+
+  it('fields exactly one giga-boss and one miniboss', () => {
+    const bosses = floor.spawns.filter((s) => s.boss);
+    const minis = floor.spawns.filter((s) => s.miniboss);
+    expect(bosses.length).toBe(1);
+    expect(bosses[0].templateId).toBe('rift_boss_pitlord');
+    expect(minis.length).toBe(1);
+    expect(minis[0].templateId).toBe('rift_boss_ritualist');
+    // The miniboss is NOT the floor boss: only the pit lord opens the way home.
+    expect(minis[0].boss).toBeUndefined();
+  });
+
+  it('draws trash only from the citadel roster', () => {
+    const trash = floor.spawns.filter((s) => !s.boss && !s.miniboss);
+    expect(trash.length).toBeGreaterThan(15);
+    for (const s of trash) {
+      expect(['rift_hellguard', 'rift_pact_acolyte']).toContain(s.templateId);
+    }
+  });
+
+  it('is a single boss floor with an orb-opened gate and no descent', () => {
+    expect(floor.isBoss).toBe(true);
+    expect(floor.authored).toBe(true);
+    expect(floor.floorCount).toBe(1);
+    expect(floor.gate?.openOnOrb).toBe(true);
+    expect(floor.objects.some((o) => o.kind === 'descent')).toBe(false);
+    expect(floor.objects.some((o) => o.kind === 'switch')).toBe(false);
+    expect(floor.objects.filter((o) => o.kind === 'chest').length).toBe(1);
+    expect(floor.objects.filter((o) => o.kind === 'treasure').length).toBe(2);
+    expect(floor.puzzle.kind).toBe('none');
+    expect(floor.rollers).toEqual([]);
+    expect(floor.iceZone).toBeNull();
+    expect(floor.hazards.length).toBe(1); // the west gallery's lava band
+  });
+
+  it('bars the temple: the closed gate spans the shared wall, the boss sits behind it', () => {
+    const gate = floor.gate as NonNullable<typeof floor.gate>;
+    const boss = floor.spawns.find((s) => s.boss) as { z: number };
+    const orb = floor.objects.find((o) => o.kind === 'infernal_orb') as { z: number };
+    expect(orb.z).toBeLessThan(gate.z); // the orb is reached BEFORE the gate
+    expect(boss.z).toBeGreaterThan(gate.z); // the boss waits behind it
+  });
+});
+
+describe('infernal citadel: lifecycle', () => {
+  let sim: Sim;
+  let pid: number;
+  let seed: number;
+
+  const inst = () => sim.riftInstances.find((i) => i.partyKey !== null);
+  const player = (): Entity => sim.entities.get(pid) as Entity;
+  const tickSeconds = (s: number) => {
+    for (let i = 0; i < s * 20; i++) sim.tick();
+  };
+  const localPos = (x: number, z: number) => {
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    const o = riftInstanceOrigin(i.slot, i.floorIndex);
+    return { x: o.x + x, z: o.z + z };
+  };
+  const teleport = (x: number, z: number) => {
+    const p = localPos(x, z);
+    const e = player();
+    e.prevPos = { ...e.pos };
+    e.pos = sim.groundPos(p.x, p.z);
+    sim.rebucket(e);
+  };
+  /** Clear the citadel's trash (the bosses live on). Standing at the altar with six
+   * level-22 elites awake kills the test player before the orb can be touched. */
+  const killTrash = () => {
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    for (const id of i.mobIds) {
+      if (id === i.bossId || id === i.minibossId) continue;
+      const m = sim.entities.get(id);
+      if (!m) continue;
+      m.hp = 0;
+      m.dead = true;
+    }
+  };
+
+  beforeEach(() => {
+    seed = setPieceSeeds(1)[0];
+    sim = new Sim({ seed: 99, playerClass: 'warrior', autoEquip: true, devCommands: true });
+    pid = sim.player.id;
+    sim.player.level = 22;
+    sim.enterRift(seed, 22, pid);
+  });
+
+  it('drops the party into the entrance corridor of a one-floor citadel', () => {
+    const i = inst();
+    expect(i).toBeDefined();
+    expect(i?.floorCount).toBe(1);
+    expect(i?.minibossId).not.toBeNull();
+    expect(i?.orbId).not.toBeNull();
+    expect(i?.orbActive).toBe(false);
+    expect(i?.gateOpen).toBe(false);
+    const e = player();
+    const o = riftInstanceOrigin((i as NonNullable<typeof i>).slot, 0);
+    expect(inAnyRoom(INFERNAL_ROOMS, e.pos.x - o.x, e.pos.z - o.z)).toBe(true);
+    expect(roomAt(INFERNAL_ROOMS, e.pos.x - o.x, e.pos.z - o.z)?.id).toBe('entry');
+  });
+
+  it('keeps the closed gate impassable (a runtime clamp, never a collider)', () => {
+    const floor = generateRiftFloor(seed, 22, 0);
+    const gate = floor.gate as NonNullable<typeof floor.gate>;
+    teleport(0, gate.z + 6); // try to stand INSIDE the temple
+    sim.tick();
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    const o = riftInstanceOrigin(i.slot, i.floorIndex);
+    expect(player().pos.z - o.z).toBeLessThan(gate.z); // shoved back south of it
+  });
+
+  it('refuses the dormant orb, then opens the gate once the miniboss falls', () => {
+    const floor = generateRiftFloor(seed, 22, 0);
+    const orb = floor.objects.find((o) => o.kind === 'infernal_orb') as { x: number; z: number };
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    killTrash();
+
+    // Touching the sealed orb does nothing but warn.
+    teleport(orb.x, orb.z - 2.2);
+    sim.tick();
+    expect(i.gateOpen).toBe(false);
+    expect(sim.entities.get(i.orbId as number)?.templateId).toBe('rift_infernal_orb');
+
+    // Kill the ritualist away in the rotunda; the 1 Hz driver arms the orb. Step
+    // back down the hall first, so arming alone (not a touch) is what is measured.
+    teleport(0, 12);
+    const mini = sim.entities.get(i.minibossId as number) as Entity;
+    mini.hp = 0;
+    mini.dead = true;
+    tickSeconds(1.1);
+    expect(i.orbActive).toBe(true);
+    expect(sim.entities.get(i.orbId as number)?.templateId).toBe('rift_infernal_orb_active');
+    expect(i.gateOpen).toBe(false); // still shut until someone touches it
+
+    // Touch it: the portcullis grinds open and stays open.
+    teleport(orb.x, orb.z - 2.2);
+    sim.tick();
+    expect(i.gateOpen).toBe(true);
+    expect(sim.entities.get(i.gateId as number)?.templateId).toBe('rift_gate_open');
+
+    // Now the temple is passable.
+    const gate = floor.gate as NonNullable<typeof floor.gate>;
+    teleport(0, gate.z + 6);
+    sim.tick();
+    const o = riftInstanceOrigin(i.slot, i.floorIndex);
+    expect(player().pos.z - o.z).toBeGreaterThan(gate.z);
+  });
+
+  it('opens the way home and the sealed cache only when the pit lord dies', () => {
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    killTrash();
+    tickSeconds(1.1);
+    expect(i.exitId).toBeNull();
+    expect(i.cacheId).toBeNull();
+
+    const boss = sim.entities.get(i.bossId as number) as Entity;
+    expect(boss.name).toContain('Azgorath');
+    boss.hp = 0;
+    boss.dead = true;
+    tickSeconds(1.1);
+    expect(i.exitId).not.toBeNull();
+    expect(i.cacheId).not.toBeNull();
+    expect(sim.entities.get(i.cacheId as number)?.templateId).toBe('rift_locked_chest');
+  });
+
+  it('leaves the citadel through the exit and does not bounce back in', () => {
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    killTrash();
+    const boss = sim.entities.get(i.bossId as number) as Entity;
+    boss.hp = 0;
+    boss.dead = true;
+    tickSeconds(1.1);
+    const exit = sim.entities.get(i.exitId as number) as Entity;
+    const e = player();
+    e.prevPos = { ...e.pos };
+    e.pos = sim.groundPos(exit.pos.x, exit.pos.z);
+    sim.rebucket(e);
+    sim.tick();
+    expect(Math.abs(player().pos.x)).toBeLessThan(RIFT_REGION_HALF_X * 2); // back overworld
+    expect(inst()?.floorIndex ?? 0).toBe(0);
+  });
+
+  it('kills nothing on entry: every mob spawns clear of the walls it fights in', () => {
+    const i = inst() as NonNullable<ReturnType<typeof inst>>;
+    const floor = generateRiftFloor(seed, 22, 0);
+    const colliders = layoutColliders(floor.layout);
+    const o = riftInstanceOrigin(i.slot, i.floorIndex);
+    expect(i.mobIds.length).toBe(floor.spawns.length);
+    for (const id of i.mobIds) {
+      const m = sim.entities.get(id) as Entity;
+      expect(clears(colliders, m.pos.x - o.x, m.pos.z - o.z, 0.4), `${m.name} embedded`).toBe(true);
+    }
+  });
+});

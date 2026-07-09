@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEON_FLOOR_Y, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
 import { layoutColliders } from '../src/sim/dungeon_layout';
 import { solveLockActions } from '../src/sim/lockpick';
-import { generateRiftFloor, riftPlatformLift } from '../src/sim/rift/rift_gen';
+import { generateRiftFloor, isSetPieceSeed, riftPlatformLift } from '../src/sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 
@@ -74,6 +74,10 @@ describe('rift mechanics: generator variety', () => {
   it('boss floors never carry a puzzle, hazard, ice sheet, or roller', () => {
     let checked = 0;
     for (let s = 1; s <= 150; s++) {
+      // The authored citadel is a boss floor by construction and DOES carry a lava
+      // band (a hand-placed one, not a rolled hazard); it is pinned separately in
+      // tests/rift_infernal.test.ts.
+      if (isSetPieceSeed(s)) continue;
       const fc = generateRiftFloor(s, 20, 0).floorCount;
       const boss = generateRiftFloor(s, 20, fc - 1);
       expect(boss.isBoss).toBe(true);
@@ -224,6 +228,9 @@ describe('rift mechanics: switch-gate', () => {
   it('a closed gate blocks northward passage until the switch is thrown', () => {
     let seed = -1;
     for (let s = 1; s < 400 && seed < 0; s++) {
+      // The citadel's gate has no pressure plate (the Blood Orb opens it), so it is
+      // not a switch-gate floor; its own suite covers it.
+      if (isSetPieceSeed(s)) continue;
       if (generateRiftFloor(s, 20, 0).gate) seed = s;
     }
     expect(seed, 'found a floor-0 gate').toBeGreaterThan(0);

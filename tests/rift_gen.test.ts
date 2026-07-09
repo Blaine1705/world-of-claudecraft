@@ -5,6 +5,7 @@ import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import {
   generateRiftFloor,
   generateRiftPlan,
+  isSetPieceSeed,
   riftFloorColliders,
   riftFloorCount,
 } from '../src/sim/rift/rift_gen';
@@ -53,6 +54,12 @@ describe('rift generator: determinism', () => {
 
   it('floor count is stable and within bounds', () => {
     for (let s = 0; s < 300; s++) {
+      // The authored set-piece citadel is deliberately a single self-contained
+      // floor; the procedural bounds below only describe generated descents.
+      if (isSetPieceSeed(s)) {
+        expect(riftFloorCount(s)).toBe(1);
+        continue;
+      }
       const n = riftFloorCount(s);
       expect(n).toBeGreaterThanOrEqual(3);
       expect(n).toBeLessThanOrEqual(6);
@@ -67,6 +74,7 @@ describe('rift generator: variety', () => {
     const themes = new Set<string>();
     const bossThemes = new Set<string>();
     for (let s = 0; s < 200; s++) {
+      if (isSetPieceSeed(s)) continue; // the citadel has its own name + theme
       const plan = generateRiftPlan(s, 15);
       names.add(plan.name);
       bossThemes.add(plan.themeId);
@@ -148,8 +156,12 @@ describe('rift generator: variety', () => {
 });
 
 describe('rift generator: playability', () => {
+  // The procedural invariants below (one nave, a clear central spine, a dais at the
+  // far end) describe GENERATED floors. The authored citadel is a room graph with
+  // no spine; tests/rift_infernal.test.ts pins its own walkability.
   const cases: Array<[number, number, number]> = [];
   for (let s = 0; s < 60; s++) {
+    if (isSetPieceSeed(s)) continue;
     const n = riftFloorCount(s);
     for (let f = 0; f < n; f++) cases.push([s, 15, f]);
   }

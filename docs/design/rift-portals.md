@@ -169,6 +169,43 @@ A second polish pass, all still descriptor-driven and within the region bounds
   the `riftState` event) instead of the overworld zone. The **way-home beacon** is a
   real upright swirling portal, not a flat decal.
 
+## Set-piece floors: The Infernal Citadel
+
+Roughly one seed in seven (`isSetPieceSeed`, `Rng(mix(seed, 0x1f3e)).chance(0.15)`) opens a
+HAND-AUTHORED dungeon instead of a procedural descent: a single, fixed, seven-room infernal
+citadel with two bosses. Because the theme is chosen by the SEED and the rank only sets
+`baseLevel` (marks/loot), the citadel can headline a C-rank or an S-rank portal alike; there is
+nothing to gate.
+
+- **The authored-layout seam** (`src/sim/rift/authored.ts`). `DungeonLayout` gained optional
+  `rooms` / `doors` / `decor`. `authoredWallSegments(rooms, doors)` unions every coincident room
+  edge and subtracts the doorways; BOTH `layoutColliders` (collision) and
+  `dungeon.ts placeAuthoredWalls` (render) build from those same segments, so a wall you see is a
+  wall you bump into. The single-nave, clear-central-spine invariants of the procedural generator
+  do NOT apply to an authored floor (`RiftFloorPlan.authored`); the procedural playability tests
+  skip set-piece seeds and `tests/rift_infernal.test.ts` pins the room graph instead
+  (reachability BFS over the door graph, spawn/decor clearance, region bounds).
+- **The content** (`src/sim/content/rift/infernal_citadel.ts`, data-as-code). Entrance corridor,
+  Sacrificial Hall (altar + Blood Orb), Relic Gallery (gibbets, a cache behind an illusion wall),
+  West Gallery (a lava band), Pentagram Rotunda, Bone Chamber, Great Temple, Hell Forge.
+- **The gating chain.** Kill **Magus Vel'Kor the Pactbound** on the pentagram; the Blood Orb on
+  the altar wakes (`orbActive`, a templateId swap like a lit pylon). Touch the woken orb and the
+  temple portcullis grinds open: it is a `RiftGate` with `openOnOrb`, so it places NO pressure
+  plate and reuses the existing runtime clamp (never a static collider). Behind it, the giga-boss
+  **Azgorath, Lord of the Pit** drops the usual exit + sealed cache + rank-scaled Heroic Marks.
+  Both bosses reuse existing rigs (`mob_demonalt`, `skel_necromancer`) re-tinted by their
+  templates; the miniboss rides `RiftSpawn.miniboss` so `bossId` (and the payout) stay the pit
+  lord's.
+- **Assets.** Seven Tripo-generated props (brazier, altar, demon idol, hell forge, hanging cage,
+  bone pile, obsidian fang; see CREDITS.md), placed by `src/render/rift_decor.ts` with the
+  footprints MEASURED from the built GLBs, so decor collision matches the models. The pentagram
+  sigil and the processional rugs are procedural (a generated mesh of a flat sigil reads as a
+  lumpy disc).
+- **Dev command.** `/dev portal [seed] [level] [C|B|A|S] [infernal|random]` forces the dungeon
+  type. The kind is NOT a wire field: it searches for a seed of the requested kind (the roll is a
+  pure function of the seed), so the descriptor stays `{seed, baseLevel, floorIndex, origin}` and
+  every client regenerates the same dungeon from it.
+
 ## Ranks (C / B / A / S) and world portals (`src/sim/rift/portals.ts`)
 
 A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus the
@@ -239,6 +276,9 @@ LETTER is a game glyph (like item-quality colour), not translated.
   clearance matching runtime `pushOut`, two-`Sim` collision isolation, the
   entry-zone graveyard on death, the client-sync `riftState` event, and the
   leave-does-not-bounce-back-in regression.
+- `tests/rift_infernal.test.ts`: the authored set-piece (seed selection + rank
+  independence, determinism, the room-graph geometry and door reachability, the
+  two-boss content, and the full miniboss -> orb -> gate -> giga-boss lifecycle).
 - `tests/rift_portals.test.ts`: zone->rank mapping, monotonic rank tuning, the
   scheduler (cadence + world announce + determinism + collapse), the level-20
   gate (deny + admit + rank stamping), and sealing paying rank-scaled Heroic Marks
