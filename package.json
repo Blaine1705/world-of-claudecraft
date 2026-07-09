@@ -3,10 +3,7 @@
   "version": "0.23.0",
   "private": true,
   "license": "MIT",
-  "author": {
-    "name": "Levy Street",
-    "email": "woc@levystreet.com"
-  },
+  "author": "levy-street",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
