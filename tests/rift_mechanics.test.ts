@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DUNGEON_FLOOR_Y, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import { layoutColliders } from '../src/sim/dungeon_layout';
 import { solveLockActions } from '../src/sim/lockpick';
 import { generateRiftFloor, riftPlatformLift } from '../src/sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
@@ -165,6 +166,24 @@ describe('rift mechanics: off-path treasure behind an illusion wall', () => {
     expect(withTreasure, 'some floors hide a treasure').toBeGreaterThan(0);
     // Every treasure floor also gets its concealing illusion wall.
     expect(withIllusion).toBe(withTreasure);
+  });
+
+  it('illusion walls are render-only: no collider backs them, so they are walk-through', () => {
+    const seed = seedWithFloor0((f) => (f.layout.illusionWalls?.length ?? 0) > 0);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const wall = floor.layout.illusionWalls![0];
+    const colliders = layoutColliders(floor.layout);
+    // The fake wall's centre must be clear (a regression that pushed illusionWalls
+    // into layoutColliders would wall the treasure off while passing every other test).
+    const covered = colliders.some((c) => {
+      if (c.type === 'circle') return Math.hypot(wall.x - c.x, wall.z - c.z) < c.r;
+      const dx = wall.x - c.x;
+      const dz = wall.z - c.z;
+      const cos = Math.cos(c.rot);
+      const sin = Math.sin(c.rot);
+      return Math.abs(dx * cos - dz * sin) < c.hw && Math.abs(dx * sin + dz * cos) < c.hd;
+    });
+    expect(covered, 'illusion wall centre must be walkable (no collider)').toBe(false);
   });
 
   it('opening a treasure on interact marks it open + no longer lootable (no lockpick)', () => {
