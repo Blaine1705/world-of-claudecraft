@@ -303,6 +303,12 @@ import {
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import { generateRiftFloor } from './rift/rift_gen';
 import {
+  riftLockpickAbort as riftLockpickAbortImpl,
+  riftLockpickAction as riftLockpickActionImpl,
+  riftLockpickEngage as riftLockpickEngageImpl,
+  riftLockpickViewFor as riftLockpickViewForImpl,
+} from './rift/rift_lockpick';
+import {
   advanceRiftRollers as advanceRiftRollersImpl,
   enterRift as enterRiftImpl,
   leaveRift as leaveRiftImpl,
@@ -314,12 +320,6 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
-import {
-  riftLockpickAbort as riftLockpickAbortImpl,
-  riftLockpickAction as riftLockpickActionImpl,
-  riftLockpickEngage as riftLockpickEngageImpl,
-  riftLockpickViewFor as riftLockpickViewForImpl,
-} from './rift/rift_lockpick';
 import type { RiftInstance } from './rift/types';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
@@ -1467,6 +1467,9 @@ export class Sim {
         gateId: null,
         switchId: null,
         gateOpen: true,
+        minibossId: null,
+        orbId: null,
+        orbActive: false,
         returnPos: { x: 0, z: 0 },
         emptyFor: 0,
         tier: null,

@@ -36,6 +36,9 @@ const PYLON_TRIGGER_RADIUS = 3.0; // walk this close to light a rune pylon
 const SWITCH_TRIGGER_RADIUS = 2.6; // step this close to a gate switch to throw it
 const BEACON_TRIGGER_RADIUS = 2.0; // walk this close to the way-out beacon to leave
 const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
+// Reach the Blood Orb from outside its altar's collider (altar r 1.8 + body 0.6).
+const ORB_TRIGGER_RADIUS = 3.2;
+const ORB_NOTICE_COOLDOWN = 6; // seconds between "the orb is sealed" nudges
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
 const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
 const ICE_SLIDE_SPEED = 13; // yd/s glide across the ice (~1.85x run: frictionless momentum)
@@ -148,6 +151,9 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.gateId = null;
   inst.switchId = null;
   inst.gateOpen = floor.gate === null;
+  inst.minibossId = null;
+  inst.orbId = null;
+  inst.orbActive = false;
 
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
@@ -168,6 +174,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
     if (spawn.boss) inst.bossId = mob.id;
+    if (spawn.miniboss) inst.minibossId = mob.id;
   }
 
   const spawnObj = (templateId: string, name: string, x: number, z: number): number => {
@@ -215,6 +222,10 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
         break;
       case 'switch':
         inst.switchId = spawnObj('rift_switch', obj.name, obj.x, obj.z);
+        break;
+      case 'infernal_orb':
+        // Dormant until this floor's miniboss dies (updateRiftInstances arms it).
+        inst.orbId = spawnObj('rift_infernal_orb', obj.name, obj.x, obj.z);
         break;
       // 'chest'/'exit' are placed on boss death (openExit).
     }
@@ -279,6 +290,9 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.switchId = null;
   inst.gateOpen = true;
   inst.puzzleSolved = false;
+  inst.minibossId = null;
+  inst.orbId = null;
+  inst.orbActive = false;
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
@@ -649,6 +663,39 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
           color: '#adf',
           pid: p.id,
         });
+      }
+    }
+    // Blood Orb (authored citadel): dormant while its miniboss lives; once armed,
+    // touching it grinds the temple portcullis open for good. The orb IS the gate's
+    // switch on an `openOnOrb` floor, so no pressure plate is ever placed.
+    if (inst.orbId !== null) {
+      const orb = ctx.entities.get(inst.orbId);
+      if (orb && dist2d(p.pos, orb.pos) < ORB_TRIGGER_RADIUS) {
+        if (!inst.orbActive) {
+          if (ctx.time >= (p.riftOrbNoticeAt ?? -Infinity) + ORB_NOTICE_COOLDOWN) {
+            p.riftOrbNoticeAt = ctx.time;
+            ctx.emit({
+              type: 'log',
+              text: 'The orb is sealed by the ritual below.',
+              color: '#a9c',
+              pid: p.id,
+            });
+          }
+        } else if (floor.gate && !inst.gateOpen) {
+          inst.gateOpen = true;
+          const gate = inst.gateId !== null ? ctx.entities.get(inst.gateId) : null;
+          if (gate) gate.templateId = 'rift_gate_open';
+          riftFx(ctx, orb.pos.x, orb.pos.z, 'fire', 'nova');
+          if (gate) riftFx(ctx, gate.pos.x, gate.pos.z, 'holy', 'nova');
+          for (const pid of instancePlayerIds(ctx, inst)) {
+            ctx.emit({
+              type: 'log',
+              text: 'The Blood Orb flares. The gates of the temple grind open.',
+              color: '#f97',
+              pid,
+            });
+          }
+        }
       }
     }
     // Switch-gate: stepping the plate raises the linked portcullis for good.
@@ -1049,6 +1096,29 @@ export function updateRiftInstances(ctx: SimContext): void {
             type: 'log',
             text: 'The sockets grind shut. The way stirs.',
             color: '#adf',
+            pid,
+          });
+        }
+      }
+    }
+
+    // Authored citadel: the miniboss's death arms the Blood Orb (which in turn is
+    // the temple gate's only switch). Checked here, not on the kill path, so a
+    // miniboss that despawns with its floor arms nothing.
+    if (inst.minibossId !== null && !inst.orbActive) {
+      const mini = ctx.entities.get(inst.minibossId);
+      if (!mini || mini.dead) {
+        inst.orbActive = true;
+        const orb = inst.orbId !== null ? ctx.entities.get(inst.orbId) : null;
+        if (orb) {
+          orb.templateId = 'rift_infernal_orb_active';
+          riftFx(ctx, orb.pos.x, orb.pos.z, 'fire', 'nova');
+        }
+        for (const pid of instancePlayerIds(ctx, inst)) {
+          ctx.emit({
+            type: 'log',
+            text: "The pentagram's flame gutters out. Something wakes on the altar.",
+            color: '#f97',
             pid,
           });
         }

@@ -125,6 +125,11 @@ const MOB_IDS = [
   'rift_boss_arcane',
   'rift_boss_storm',
   'rift_boss_tide',
+  // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
+  'rift_hellguard',
+  'rift_pact_acolyte',
+  'rift_boss_ritualist',
+  'rift_boss_pitlord',
 ] as const;
 
 const NPC_IDS = [

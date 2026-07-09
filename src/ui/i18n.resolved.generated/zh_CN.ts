@@ -3264,7 +3264,10 @@ export const zh_CN: EnTranslations = {
       "socketsShut": "凹槽隆隆合拢。去路随之震动。",
       "seqProgress": "符文依次回应（{step}/{total}）。",
       "seqReset": "符文尽数熄灭。从头再来。",
-      "gateOpen": "闸门轰隆隆地开启了。"
+      "gateOpen": "闸门轰隆隆地开启了。",
+      "orbSealed": "The orb is sealed by the ritual below.",
+      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
+      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
     },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",
@@ -7188,6 +7191,18 @@ export const zh_CN: EnTranslations = {
       },
       "rift_boss_tide": {
         "name": "深渊之喉"
+      },
+      "rift_hellguard": {
+        "name": "Hellguard"
+      },
+      "rift_pact_acolyte": {
+        "name": "Pact Acolyte"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor the Pactbound"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Lord of the Pit"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"

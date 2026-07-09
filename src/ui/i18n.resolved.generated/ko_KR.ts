@@ -3264,7 +3264,10 @@ export const ko_KR: EnTranslations = {
       "socketsShut": "받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.",
       "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
       "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요.",
-      "gateOpen": "문이 삐걱거리며 열립니다."
+      "gateOpen": "문이 삐걱거리며 열립니다.",
+      "orbSealed": "The orb is sealed by the ritual below.",
+      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
+      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
@@ -7188,6 +7191,18 @@ export const ko_KR: EnTranslations = {
       },
       "rift_boss_tide": {
         "name": "심연의 아가리"
+      },
+      "rift_hellguard": {
+        "name": "Hellguard"
+      },
+      "rift_pact_acolyte": {
+        "name": "Pact Acolyte"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor the Pactbound"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Lord of the Pit"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"

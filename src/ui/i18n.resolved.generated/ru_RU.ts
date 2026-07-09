@@ -3264,7 +3264,10 @@ export const ru_RU: EnTranslations = {
       "socketsShut": "Гнёзда с грохотом смыкаются. Путь пробуждается.",
       "seqProgress": "Руны отвечают по очереди ({step}/{total}).",
       "seqReset": "Руны гаснут. Начните заново.",
-      "gateOpen": "Врата с грохотом отворяются."
+      "gateOpen": "Врата с грохотом отворяются.",
+      "orbSealed": "The orb is sealed by the ritual below.",
+      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
+      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
     },
     "delve": {
       "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",
@@ -7188,6 +7191,18 @@ export const ru_RU: EnTranslations = {
       },
       "rift_boss_tide": {
         "name": "Бездонная Пасть"
+      },
+      "rift_hellguard": {
+        "name": "Hellguard"
+      },
+      "rift_pact_acolyte": {
+        "name": "Pact Acolyte"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor the Pactbound"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Lord of the Pit"
       },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"

@@ -3264,7 +3264,10 @@ export const en_XA: EnTranslations = {
       "socketsShut": "[Ţĥé šóçķéţš ĝŕíñð šĥúţ. Ţĥé ŵáý šţíŕš.]",
       "seqProgress": "[Ţĥé ŕúñéš áñšŵéŕ íñ ţúŕñ ({step}/{total}).]",
       "seqReset": "[Ţĥé ŕúñéš ĝó ðáŕķ. Ɓéĝíñ áĝáíñ.]",
-      "gateOpen": "[Ţĥé ĝáţé ĝŕíñðš óþéñ.]"
+      "gateOpen": "[Ţĥé ĝáţé ĝŕíñðš óþéñ.]",
+      "orbSealed": "[Ţĥé óŕƀ íš šéáļéð ƀý ţĥé ŕíţúáļ ƀéļóŵ.]",
+      "orbWakes": "[Ţĥé þéñţáĝŕáɱ'š ƒļáɱé ĝúţţéŕš óúţ. Šóɱéţĥíñĝ ŵáķéš óñ ţĥé áļţáŕ.]",
+      "orbOpensGate": "[Ţĥé Ɓļóóð Óŕƀ ƒļáŕéš. Ţĥé ĝáţéš óƒ ţĥé ţéɱþļé ĝŕíñð óþéñ.]"
     },
     "delve": {
       "cannotEnterNow": "[Ýóú çáññóţ éñţéŕ á ðéļʋé ŕíĝĥţ ñóŵ.]",
@@ -7188,6 +7191,18 @@ export const en_XA: EnTranslations = {
       },
       "rift_boss_tide": {
         "name": "[Áƀýššáļ Ɱáŵ]"
+      },
+      "rift_hellguard": {
+        "name": "[Ĥéļļĝúáŕð]"
+      },
+      "rift_pact_acolyte": {
+        "name": "[Þáçţ Áçóļýţé]"
+      },
+      "rift_boss_ritualist": {
+        "name": "[Ɱáĝúš Ʋéļ'Ķóŕ ţĥé Þáçţƀóúñð]"
+      },
+      "rift_boss_pitlord": {
+        "name": "[Ážĝóŕáţĥ, Ļóŕð óƒ ţĥé Þíţ]"
       },
       "ironvein_foreman": {
         "name": "[Íŕóñʋéíñ Ƒóŕéɱáñ]"

@@ -3264,7 +3264,10 @@ export const ja_JP: EnTranslations = {
       "socketsShut": "台座が音を立てて閉じる。道が動き出す。",
       "seqProgress": "ルーンが順に応える（{step}/{total}）。",
       "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。",
-      "gateOpen": "門が音を立てて開いた。"
+      "gateOpen": "門が音を立てて開いた。",
+      "orbSealed": "The orb is sealed by the ritual below.",
+      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
+      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
@@ -7188,6 +7191,18 @@ export const ja_JP: EnTranslations = {
       },
       "rift_boss_tide": {
         "name": "深淵の顎"
+      },
+      "rift_hellguard": {
+        "name": "Hellguard"
+      },
+      "rift_pact_acolyte": {
+        "name": "Pact Acolyte"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor the Pactbound"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Lord of the Pit"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
