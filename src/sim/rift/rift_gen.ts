@@ -10,16 +10,21 @@
 // global draw order and is reproducible anywhere.
 
 import type { Collider } from '../colliders';
+import {
+  buildInfernalCitadelFloor,
+  INFERNAL_NOUNS,
+  INFERNAL_THEME_ID,
+} from '../content/rift/infernal_citadel';
 import { RIFT_THEMES, type RiftTheme } from '../content/rift/themes';
 import {
   type DungeonLayout,
   type GridPoint,
-  type InteriorStyle,
   layoutColliders,
   type WallStub,
 } from '../dungeon_layout';
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
+import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
   RiftGate,
@@ -54,55 +59,28 @@ const RIFT_SUFFIXES = [
   'Rift',
 ] as const;
 
-// Deterministic 32-bit mix so each floor gets an independent, reproducible seed
-// from (seed, floorIndex) without consuming any external rng.
-function mix(a: number, b: number): number {
-  let h = (a ^ 0x9e3779b9) >>> 0;
-  h = Math.imul(h ^ (b + 0x85ebca6b), 0xc2b2ae35) >>> 0;
-  h ^= h >>> 13;
-  h = Math.imul(h, 0x27d4eb2f) >>> 0;
-  h ^= h >>> 16;
-  return h >>> 0;
+/** How often a rift seed opens the authored set-piece citadel instead of a
+ * procedural descent. Rolled from its OWN Rng stream, so it neither consumes nor
+ * shifts any draw the procedural generator makes. */
+const SET_PIECE_CHANCE = 0.15;
+
+/** Whether this rift seed opens the hand-authored Infernal Citadel. Pure and
+ * independent of rank: the tier only sets baseLevel (marks/loot), so the citadel
+ * can headline a C-rank or an S-rank portal alike. */
+export function isSetPieceSeed(seed: number): boolean {
+  return new Rng(mixSeed(seed, 0x1f3e)).chance(SET_PIECE_CHANCE);
 }
 
-/** How many floors this rift runs (deterministic from the seed). */
+/** How many floors this rift runs (deterministic from the seed). The authored
+ * set-piece is a single, self-contained citadel. */
 export function riftFloorCount(seed: number): number {
-  return new Rng(mix(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
+  if (isSetPieceSeed(seed)) return 1;
+  return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
 }
 
 function themeForFloor(seed: number, floorIndex: number): RiftTheme {
-  const rng = new Rng(mix(seed, 0x7000 + floorIndex));
+  const rng = new Rng(mixSeed(seed, 0x7000 + floorIndex));
   return rng.pick(RIFT_THEMES as RiftTheme[]);
-}
-
-// Small deterministic per-channel jitter of a 0xRRGGBB colour, so two floors that
-// happen to share a theme still read a little differently. `amt` is a fraction.
-function jitterColor(rng: Rng, hex: number, amt: number): number {
-  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
-  const r = (hex >> 16) & 0xff;
-  const g = (hex >> 8) & 0xff;
-  const b = hex & 0xff;
-  const f = () => 1 + rng.range(-amt, amt);
-  return (clamp(r * f()) << 16) | (clamp(g * f()) << 8) | clamp(b * f());
-}
-
-function buildStyle(rng: Rng, theme: RiftTheme): InteriorStyle {
-  return {
-    kit: theme.kit,
-    torch: {
-      flame: jitterColor(rng, theme.torch.flame, 0.08),
-      emissive: jitterColor(rng, theme.torch.emissive, 0.08),
-      light: jitterColor(rng, theme.torch.light, 0.08),
-    },
-    fog: {
-      color: jitterColor(rng, theme.fog.color, 0.12),
-      near: Math.round(theme.fog.near + rng.range(-2, 2)),
-      far: Math.round(theme.fog.far + rng.range(-6, 6)),
-    },
-    wallTint: theme.wallTint !== undefined ? jitterColor(rng, theme.wallTint, 0.06) : undefined,
-    floorTint: theme.floorTint !== undefined ? jitterColor(rng, theme.floorTint, 0.06) : undefined,
-    daisRaised: theme.daisRaised ?? false,
-  };
 }
 
 // ---- Geometry ---------------------------------------------------------------
@@ -706,9 +684,20 @@ function floorLevelFor(baseLevel: number, floorIndex: number): number {
 
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */
 export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
+  if (isSetPieceSeed(seed)) {
+    const nameRng = new Rng(mixSeed(seed, 0x9a3e));
+    const noun = nameRng.pick(INFERNAL_NOUNS as unknown as string[]);
+    return {
+      seed,
+      baseLevel,
+      name: noun === 'Infernal' ? 'The Infernal Citadel' : `The ${noun} Citadel`,
+      themeId: INFERNAL_THEME_ID,
+      floorCount: 1,
+    };
+  }
   const floorCount = riftFloorCount(seed);
   const bossTheme = themeForFloor(seed, floorCount - 1);
-  const nameRng = new Rng(mix(seed, 0x9a3e));
+  const nameRng = new Rng(mixSeed(seed, 0x9a3e));
   const noun = nameRng.pick(bossTheme.nouns as string[]);
   const suffix = nameRng.pick(RIFT_SUFFIXES as unknown as string[]);
   return {
@@ -731,11 +720,20 @@ export function generateRiftFloor(
   const cached = FLOOR_CACHE.get(key);
   if (cached) return cached;
 
+  // Authored set-piece seeds short-circuit the whole procedural chain BEFORE any
+  // draw is made, so the procedural draw order for every other seed is untouched.
+  if (isSetPieceSeed(seed)) {
+    const setPiece = buildInfernalCitadelFloor(seed, baseLevel, floorLevelFor(baseLevel, 0));
+    if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
+    FLOOR_CACHE.set(key, setPiece);
+    return setPiece;
+  }
+
   const floorCount = riftFloorCount(seed);
   const clampedIndex = Math.max(0, Math.min(floorCount - 1, floorIndex));
   const isBoss = clampedIndex === floorCount - 1;
   const theme = themeForFloor(seed, clampedIndex);
-  const rng = new Rng(mix(seed, 0xf100 + clampedIndex));
+  const rng = new Rng(mixSeed(seed, 0xf100 + clampedIndex));
 
   const geo = buildLayout(rng, clampedIndex, isBoss);
   const style = buildStyle(rng, theme);
