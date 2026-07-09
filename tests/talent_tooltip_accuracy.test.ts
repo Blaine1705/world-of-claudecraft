@@ -2,8 +2,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
 import { TALENTS } from '../src/sim/content/talents';
+import { tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
-import { tTalent } from '../src/ui/talent_i18n';
+import { grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
 
 // Talent descriptions are generated from effect data outside English. English remains
 // authored source text, so this suite keeps it numerically honest against the effect
@@ -118,6 +119,25 @@ function legitNumbers(effect: unknown): Set<number> {
     }
   };
   walk(effect);
+  // A grant option's tooltip appends the granted ability's own description with
+  // its base (rank-1) values resolved, so every number the granted ability
+  // produces (damage min/max, buff, duration, absorb amount, dot total) is
+  // legitimate, not a contradiction. Walk the granted ability's effects too.
+  const grantId = (effect as { grant?: { ability?: string } })?.grant?.ability;
+  if (grantId && ABILITIES[grantId]) {
+    // Render the granted ability description exactly as the tooltip does (base
+    // values), so every number it actually shows counts as legitimate.
+    const { pcts, bare } = descriptionNumbers(
+      tEntity({
+        kind: 'ability',
+        id: grantId,
+        field: 'description',
+        values: grantAbilityValues(grantId),
+      }),
+    );
+    for (const n of pcts) out.add(n);
+    for (const n of bare) out.add(n);
+  }
   return out;
 }
 
