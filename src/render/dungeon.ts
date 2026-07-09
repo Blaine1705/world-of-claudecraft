@@ -899,7 +899,7 @@ export class DungeonInteriors {
     platform: { rampZ0: number; rampZ1: number; height: number },
   ): void {
     const { rampZ0, rampZ1, height } = platform;
-    const halfW = Math.min((layout.wallX ?? 18) - 1, 15);
+    const halfW = Math.min((layout.wallX ?? 18) - 0.5, 22);
     const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
     // Raised rear deck: a solid riser from the floor up to the platform surface.
     const deckDepth = Math.max(2, layout.zMax - rampZ1);
@@ -908,9 +908,12 @@ export class DungeonInteriors {
     deck.receiveShadow = true;
     group.add(deck);
     // Full-width staircase rising 0 to height; each step's top approximates the
-    // linear lift at its centre (the tiny sub-step mismatch is imperceptible).
-    const steps = 7;
-    const stepDepth = (rampZ1 - rampZ0) / steps;
+    // linear lift at its centre (the tiny sub-step mismatch is imperceptible). Step
+    // count scales with the ramp length (~2yd tread) so both a short steep sanctum
+    // and a long gentle climb read as proper stairs, not a few giant blocks.
+    const rampLen = rampZ1 - rampZ0;
+    const steps = Math.max(5, Math.min(20, Math.round(rampLen / 2.2)));
+    const stepDepth = rampLen / steps;
     for (let i = 0; i < steps; i++) {
       const topY = (height * (i + 1)) / steps;
       const step = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, topY, stepDepth + 0.05), mat);

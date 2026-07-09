@@ -134,16 +134,18 @@ function isClear(colliders: readonly Collider[], x: number, z: number, r = BODY_
 }
 
 /** Nudge a candidate point toward the always-clear centre spine until it clears
- * every obstacle. Deterministic (fixed march), and guaranteed to terminate
- * because |x| <= AISLE_HALF is kept obstacle-free by construction. */
-function toClear(colliders: readonly Collider[], x: number, z: number): GridPoint {
-  if (isClear(colliders, x, z)) return { x, z };
+ * every obstacle by radius `r`. Deterministic (fixed march), and guaranteed to
+ * terminate because |x| <= AISLE_HALF is kept obstacle-free by construction. `r`
+ * lets a bulky prop (pylon, rune monolith) demand extra wall clearance so it never
+ * renders embedded in a wall. */
+function toClear(colliders: readonly Collider[], x: number, z: number, r = BODY_R): GridPoint {
+  if (isClear(colliders, x, z, r)) return { x, z };
   const step = x >= 0 ? -1 : 1;
   let cx = x;
   for (let i = 0; i < 40; i++) {
     cx += step;
     if (Math.abs(cx) <= AISLE_HALF) cx = 0;
-    if (isClear(colliders, cx, z)) return { x: cx, z };
+    if (isClear(colliders, cx, z, r)) return { x: cx, z };
     if (cx === 0) break;
   }
   return { x: 0, z };
@@ -221,7 +223,12 @@ function makeProfile(rng: Rng, archetype: string, wMin: number, wMax: number): P
 
 function buildLayout(rng: Rng, _floorIndex: number, isBoss: boolean): GeneratedGeometry {
   const zMin = -19;
-  const length = isBoss ? rng.int(104, 132) : rng.int(104, 152);
+  // Bigger, more spread-out floors: a longer nave and a wider envelope so a run
+  // feels grand and exploratory rather than a short cramped corridor. Kept within
+  // the rift region bounds (data.ts RIFT_REGION_HALF_Z 160 / HALF_X 40): the dais +
+  // descent at the far end must stay inside HALF_Z, and the side walls inside HALF_X,
+  // or the region's trigger/collision checks stop firing there.
+  const length = isBoss ? rng.int(120, 146) : rng.int(130, 168);
   const zMax = zMin + length;
   const midZ = (zMin + zMax) / 2;
   const range = zMax - zMin;
@@ -230,9 +237,9 @@ function buildLayout(rng: Rng, _floorIndex: number, isBoss: boolean): GeneratedG
     ? rng.pick(BOSS_ARCHETYPES as unknown as string[])
     : rng.pick(ROOM_ARCHETYPES as unknown as string[]);
   // Narrowest half-width keeps the spine + a walkable margin (>= AISLE_HALF + ~4);
-  // widest drives how grand the room feels. Boss chambers skew wide.
-  const wMin = rng.range(10, 13);
-  const wMax = isBoss ? rng.range(24, 38) : rng.range(16, 34);
+  // widest drives how grand the room feels (capped so wallX stays < HALF_X 40).
+  const wMin = rng.range(11, 15);
+  const wMax = isBoss ? rng.range(28, 37) : rng.range(22, 36);
   const profile = makeProfile(rng, archetype, wMin, Math.max(wMin + 4, wMax));
   const halfWidthAt = (z: number): number =>
     Math.max(wMin, profile(Math.max(0, Math.min(1, (z - zMin) / range))));
@@ -310,21 +317,25 @@ function buildLayout(rng: Rng, _floorIndex: number, isBoss: boolean): GeneratedG
   }
 
   // Baffle walls: alternating one-sided wall fins that reach in from the (possibly
-  // curved) wall to just past the spine, so the room reads as a winding corridor /
-  // maze you weave through, WITHOUT ever blocking the central walkable path (the
-  // inner edge stays at |x| = AISLE_HALF + margin, so x=0 is always clear and every
-  // floor stays completable + the playability test's spine check holds). Always on
-  // for the thin `corridor` archetype; an occasional garnish elsewhere.
-  if (!isBoss && (archetype === 'corridor' || rng.chance(0.35))) {
-    const gap = AISLE_HALF + 1.5;
-    const bafGap = rng.pick([12, 14, 16]);
+  // curved) wall. These used to be long one-sided fins that walled off most of a
+  // half (reading as full walls); now they are SHORT stubs that jut only a little
+  // way in from the wall, so both the spine AND the far side stay open and you weave
+  // AROUND small obstacle bits rather than through a corridor of walls. The inner
+  // edge stays >= AISLE_HALF + margin (x=0 always clear, playability spine check
+  // holds). Always on for the thin `corridor` archetype; a common garnish elsewhere.
+  if (!isBoss && (archetype === 'corridor' || rng.chance(0.4))) {
+    const bafGap = rng.pick([10, 12, 14]);
     let side = rng.chance(0.5) ? -1 : 1;
     for (let z = zMin + rng.int(24, 32); z <= dais.z - 18; z += bafGap) {
       const w = halfWidthAt(z);
-      const hw = (w - gap) / 2;
-      if (hw > 1) {
-        stubs.push({ x: side * ((w + gap) / 2), z, hw, hd: rng.pick([2, 3]) });
+      if (w < AISLE_HALF + 5) {
+        side = -side;
+        continue; // too narrow here for a fin that still leaves a passage
       }
+      // Short fin hugging the wall: hw capped so the inner edge stays >= AISLE_HALF+1.5.
+      const hw = Math.min(rng.range(2, 3.5), (w - AISLE_HALF - 2) / 2);
+      const cx = side * (w - hw - 0.5);
+      stubs.push({ x: cx, z, hw, hd: rng.pick([1.5, 2, 2.5]) });
       side = -side;
     }
   }
@@ -483,8 +494,12 @@ function planObjects(
     for (let i = 0; i < n; i++) {
       const side = i % 2 === 0 ? -1 : 1;
       const z = n > 1 ? z0 + ((z1 - z0) * i) / (n - 1) : (z0 + z1) / 2;
-      const x = side * Math.max(AISLE_HALF + 2, halfWidthAt(z) - 5);
-      const p = toClear(colliders, x, z);
+      // Sit each pylon well inside the wall (a good fraction of the local width,
+      // clamped off the spine) and clear it by the prop radius so its flaming
+      // brazier never renders embedded in the wall.
+      const x =
+        side * Math.max(AISLE_HALF + 2.5, Math.min(halfWidthAt(z) - 6, halfWidthAt(z) * 0.6));
+      const p = toClear(colliders, x, z, 1.7);
       out.push({ kind: 'rune_pylon', x: p.x, z: p.z, name: 'Rune Pylon' });
     }
   } else if (puzzle.kind === 'ice_slide' && iceZone) {
@@ -516,8 +531,9 @@ function planObjects(
     for (let i = 0; i < n; i++) {
       const side = i % 2 === 0 ? -1 : 1;
       const z = zBase + Math.floor(i / 2) * 16 + (i % 2) * 8;
-      const x = side * Math.max(AISLE_HALF + 2, halfWidthAt(z) - 6);
-      const p = toClear(colliders, x, z);
+      const x =
+        side * Math.max(AISLE_HALF + 2.5, Math.min(halfWidthAt(z) - 6, halfWidthAt(z) * 0.6));
+      const p = toClear(colliders, x, z, 1.5);
       out.push({ kind: 'seq_rune', x: p.x, z: p.z, name: 'Sequence Rune', slot: i });
     }
   }
@@ -593,12 +609,19 @@ function planPlatform(
   hasOtherHazard: boolean,
 ): RiftPlatform | null {
   if (hasOtherHazard) return null;
-  if (!isBoss && !rng.chance(0.3)) return null;
+  // Boss floors now get an elevated sanctum only ~55% of the time (a flush arena is
+  // a welcome change of pace instead of EVERY boss on a dais); non-boss floors ~50%,
+  // so elevation reads throughout a run, not just at the boss.
+  if (isBoss ? !rng.chance(0.55) : !rng.chance(0.5)) return null;
   const { layout } = geo;
-  const rampZ1 = Math.round(layout.dais.z - layout.dais.r - 4); // top of stairs, just south of the dais
-  const rampZ0 = rampZ1 - rng.int(8, 12); // stair band depth
-  if (rampZ0 <= layout.zMin + 26) return null; // keep a real nave in front of the stairs
-  const height = isBoss ? rng.range(2.6, 3.4) : rng.range(1.8, 2.6);
+  const rampZ1 = Math.round(layout.dais.z - layout.dais.r - 4); // top of the climb, south of the dais
+  // Two flavours of elevation: a STEEP rear sanctum (short stair band near the dais)
+  // or a LONG gentle climb that lifts most of the nave, so floors get real
+  // incline variety and read bigger. Boss floors always use the steep sanctum.
+  const gentle = !isBoss && rng.chance(0.5);
+  const rampZ0 = gentle ? layout.zMin + rng.int(24, 32) : rampZ1 - rng.int(8, 13);
+  if (rampZ0 <= layout.zMin + 20 || rampZ1 - rampZ0 < 6) return null;
+  const height = isBoss ? rng.range(2.8, 3.6) : rng.range(1.8, 3.0);
   return { rampZ0, rampZ1, height };
 }
 
