@@ -7948,25 +7948,49 @@ export const zh_TW: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "骨鑄恐懼頭盔"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "骨鑄恐懼頭盔"
+      },
       "crownforged_warspaulders": {
+        "name": "骨鑄戰肩甲"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "骨鑄戰肩甲"
       },
       "nighttalon_crown": {
         "name": "厲牙之冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "厲牙之冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "厲牙護肩"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "厲牙護肩"
       },
       "soulflame_cowl": {
         "name": "怨焰兜帽"
       },
+      "soulflame_cowl_heroic": {
+        "name": "怨焰兜帽"
+      },
       "soulflame_mantle": {
+        "name": "怨焰披肩"
+      },
+      "soulflame_mantle_heroic": {
         "name": "怨焰披肩"
       },
       "stormcallers_crown": {
         "name": "喚風之冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "喚風之冠"
+      },
       "stormcallers_spaulders": {
+        "name": "喚風肩甲"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "喚風肩甲"
       },
       "unknown_alien_weaponry": {

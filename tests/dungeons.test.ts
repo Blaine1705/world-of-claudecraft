@@ -614,22 +614,21 @@ describe('dungeons: heroic boss drops', () => {
     expect(((nBoss.loot?.items ?? []) as any[]).some((s) => heroicIds.has(s.itemId))).toBe(false);
   });
 
-  it('a heroic Nythraxis kill drops raid-tier heroic set pieces plus one heroic-only weapon', () => {
-    // The explicit heroic raid table carries only the heroic-ONLY extras: the
-    // three bespoke raid weapons in a single roll group (one drops per kill). The
-    // heroic set pieces and legendaries are not listed here: the boss's normal
-    // set-piece and legendary drops auto-upgrade to their raid-tier heroic
-    // variants in a heroic claim (loot/loot_roll.ts + heroic_variants.ts).
+  it('the heroic Nythraxis raid boss drops from its own heroic table', () => {
     const heroicTable = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak;
-    const weaponIds = heroicTable.flatMap((e) => (e.itemId ? [e.itemId] : []));
-    const groups = new Set(heroicTable.map((e) => e.rollGroup));
-    expect(groups.size).toBe(1);
-    expect(new Set(weaponIds).size).toBe(3);
-    expect(heroicTable.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
-    for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
-
-    const droppedWeapons = new Set<string>();
-    const droppedVariants = new Set<string>();
+    const table = heroicTable.map((e) => e.itemId);
+    const groups = new Map<string, typeof heroicTable>();
+    for (const entry of heroicTable) {
+      const group = entry.rollGroup!;
+      groups.set(group, [...(groups.get(group) ?? []), entry]);
+    }
+    expect(groups.size).toBe(5);
+    expect(new Set(table).size).toBe(17);
+    for (const entries of groups.values()) {
+      expect(entries.length).toBeGreaterThanOrEqual(3);
+      expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBeCloseTo(1, 10);
+    }
+    const dropped = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
       const tank = sim.addPlayer('warrior', 'Tank');

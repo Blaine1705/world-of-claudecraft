@@ -651,17 +651,42 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // 1.0 so exactly one item drops per group), against the five-mans' two. On a
   // heroic Nythraxis claim loot_roll.ts also suppresses the boss's normal
   // (item-level-26) table, so every epic drop is a [HEROIC] ilvl-33 piece.
-  // Low-chance heroic legendary variants replace an epic inside two groups,
+  // Low-chance heroic legendary variants replace epics inside the weapon group,
   // keeping the total at five drops.
   nythraxis_scourge_of_thornpeak: [
-    { itemId: 'kingsbane_last_oath_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_1' },
-    { itemId: 'deathless_warguard_legmail', chance: 0.485, rollGroup: 'nythraxis_heroic_1' },
-    { itemId: 'deathless_greatblade', chance: 0.485, rollGroup: 'nythraxis_heroic_1' },
-    { itemId: 'deathless_heartwood_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_2' },
-    { itemId: 'soulforged_warplate', chance: 0.485, rollGroup: 'nythraxis_heroic_2' },
-    { itemId: 'stormcallers_focus', chance: 0.485, rollGroup: 'nythraxis_heroic_2' },
-    { itemId: 'scepter_of_the_deathless_court', chance: 1, rollGroup: 'nythraxis_heroic_3' },
-    { itemId: 'soulrend_diadem', chance: 1, rollGroup: 'nythraxis_heroic_4' },
-    { itemId: 'scourgehide_carapace', chance: 1, rollGroup: 'nythraxis_heroic_5' },
+    // Strength mail.
+    { itemId: 'crownforged_dreadhelm_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_1' },
+    {
+      itemId: 'crownforged_warspaulders_heroic',
+      chance: 0.33,
+      rollGroup: 'nythraxis_heroic_1',
+    },
+    { itemId: 'deathless_warguard_legmail', chance: 0.33, rollGroup: 'nythraxis_heroic_1' },
+    // Agility leather.
+    { itemId: 'nighttalon_crown_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_2' },
+    {
+      itemId: 'nighttalon_shoulderguards_heroic',
+      chance: 0.33,
+      rollGroup: 'nythraxis_heroic_2',
+    },
+    { itemId: 'scourgehide_carapace', chance: 0.33, rollGroup: 'nythraxis_heroic_2' },
+    // Caster cloth.
+    { itemId: 'soulflame_cowl_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_3' },
+    { itemId: 'soulflame_mantle_heroic', chance: 0.33, rollGroup: 'nythraxis_heroic_3' },
+    { itemId: 'soulrend_diadem', chance: 0.33, rollGroup: 'nythraxis_heroic_3' },
+    // Healing mail.
+    { itemId: 'stormcallers_crown_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_4' },
+    {
+      itemId: 'stormcallers_spaulders_heroic',
+      chance: 0.33,
+      rollGroup: 'nythraxis_heroic_4',
+    },
+    { itemId: 'soulforged_warplate', chance: 0.33, rollGroup: 'nythraxis_heroic_4' },
+    // Weapons.
+    { itemId: 'kingsbane_last_oath_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'deathless_heartwood_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'deathless_greatblade', chance: 0.314, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'scepter_of_the_deathless_court', chance: 0.313, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'stormcallers_focus', chance: 0.313, rollGroup: 'nythraxis_heroic_5' },
   ],
 };

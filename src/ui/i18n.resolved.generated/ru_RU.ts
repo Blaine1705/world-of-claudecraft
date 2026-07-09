@@ -7948,25 +7948,49 @@ export const ru_RU: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "Костокованый шлем ужаса"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Костокованый шлем ужаса"
+      },
       "crownforged_warspaulders": {
+        "name": "Костокованые боевые наплечники"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Костокованые боевые наплечники"
       },
       "nighttalon_crown": {
         "name": "Корона Лютого Клыка"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Корона Лютого Клыка"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Наплечные стражи Лютого Клыка"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Наплечные стражи Лютого Клыка"
       },
       "soulflame_cowl": {
         "name": "Клобук Призрачного пламени"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Клобук Призрачного пламени"
+      },
       "soulflame_mantle": {
+        "name": "Оплечье Призрачного пламени"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Оплечье Призрачного пламени"
       },
       "stormcallers_crown": {
         "name": "Корона Зова Бури"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Корона Зова Бури"
+      },
       "stormcallers_spaulders": {
+        "name": "Наплечники Зова Бури"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Наплечники Зова Бури"
       },
       "unknown_alien_weaponry": {
