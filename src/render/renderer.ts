@@ -1191,10 +1191,57 @@ export class Renderer {
       ctx.fillRect(0, 0, 128, 128);
       return new THREE.CanvasTexture(cv);
     };
+    // The moon face: a bright sphere with gentle limb shading, then darker maria
+    // and craters painted on. Drawn with normal (not additive) blending so the
+    // dark patches actually read as craters instead of washing out to white.
+    const moonTex = (): THREE.CanvasTexture => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      const ctx = cv.getContext('2d')!;
+      const R = 60;
+      // bright sphere with an offset highlight + dimmer limb for a subtle 3D read
+      const base = ctx.createRadialGradient(54, 50, 6, 64, 64, R);
+      base.addColorStop(0, 'rgba(252, 253, 255, 1)');
+      base.addColorStop(0.68, 'rgba(232, 237, 248, 1)');
+      base.addColorStop(0.9, 'rgba(206, 214, 232, 1)');
+      base.addColorStop(1, 'rgba(206, 214, 232, 0)'); // feathered edge
+      ctx.fillStyle = base;
+      ctx.beginPath();
+      ctx.arc(64, 64, R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(64, 64, R, 0, Math.PI * 2);
+      ctx.clip(); // keep the maria + craters inside the disc
+      const spots: [number, number, number, number][] = [
+        [50, 44, 15, 0.34], // maria
+        [78, 54, 11, 0.3],
+        [60, 80, 17, 0.26],
+        [43, 68, 8, 0.32], // craters
+        [86, 82, 7, 0.3],
+        [72, 38, 6, 0.24],
+        [40, 54, 5, 0.28],
+        [92, 66, 5, 0.22],
+        [66, 60, 4, 0.26],
+      ];
+      for (const [cx, cy, cr, a] of spots) {
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+        g.addColorStop(0, `rgba(110, 122, 150, ${a})`);
+        g.addColorStop(0.7, `rgba(140, 152, 178, ${a * 0.45})`);
+        g.addColorStop(1, 'rgba(140, 152, 178, 0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+      return new THREE.CanvasTexture(cv);
+    };
     const makeCelestialSprite = (
       tex: THREE.CanvasTexture,
       scale: number,
       opacity: number,
+      blending: THREE.Blending = THREE.AdditiveBlending,
     ): THREE.Sprite => {
       const sp = new THREE.Sprite(
         new THREE.SpriteMaterial({
@@ -1203,7 +1250,7 @@ export class Renderer {
           fog: false,
           depthWrite: false,
           depthTest: false,
-          blending: THREE.AdditiveBlending,
+          blending,
           opacity,
         }),
       );
@@ -1220,10 +1267,11 @@ export class Renderer {
       makeCelestialSprite(glowTex(255, 214, 150), 150, LOW_GFX ? 0.6 : 0.3),
       makeCelestialSprite(discTex(255, 224, 168), 42, 0.9),
     ];
-    // moon: a bright white disc (as bright as the stars) under a soft cool glow
+    // moon: a bright cratered face (normal-blended so the maria read as dark)
+    // under a soft cool additive glow
     this.moonSprites = [
       makeCelestialSprite(glowTex(150, 170, 220), 128, 0.22),
-      makeCelestialSprite(discTex(247, 250, 255), 50, 1),
+      makeCelestialSprite(moonTex(), 52, 1, THREE.NormalBlending),
     ];
 
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
