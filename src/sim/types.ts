@@ -420,6 +420,8 @@ interface BaseItemDef {
   requiredLevel?: number;
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
   set?: string;
+  /** Marks a heroic-tier variant for tooltip chrome. */
+  heroic?: boolean;
 }
 
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
@@ -744,6 +746,8 @@ export interface MobTemplate {
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
   // leaves snares landing so most elites can still be kited; a raid boss sets both.
   slowImmune?: boolean;
+  // Ignores taunt/growl forced-target windows. Used by special add AI only.
+  ignoreTaunt?: boolean;
   respawnMult?: number;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
@@ -1818,6 +1822,7 @@ export interface Entity {
   bossDamagers: Set<number>;
   forcedTargetId: number | null; // taunt/growl: attack this target while the timer runs
   forcedTargetTimer: number; // seconds left on the forced-attack window
+  shuffleTargetTimer?: number; // seconds until a special AI may reroll its preferred target
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
@@ -1981,6 +1986,10 @@ export interface NythraxisEncounterState {
   deathlessTimer: number;
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
+  heroicSummonChannelRemaining?: number;
+  dreadCurseTimer?: number;
+  dreadCurseTargetId?: number | null;
+  dreadCurseStacks?: number;
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
