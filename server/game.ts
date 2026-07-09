@@ -1128,7 +1128,8 @@ export class GameServer {
     // and walk-up spectators inside the footprint report the venue, not the
     // vale. English at the source like the dungeon/delve names above; the
     // client re-localizes the label (src/ui/server_i18n.ts localizeZone).
-    const zone = instanceZone ?? (isAtSowfield(pos.x, pos.z) ? 'The Sowfield' : zoneAt(pos.z).name);
+    const zone =
+      instanceZone ?? (isAtSowfield(pos.x, pos.z) ? 'The Sowfield' : zoneAt(pos.x, pos.z).name);
     return { zone, status, x: pos.x, z: pos.z };
   }
 
@@ -1408,7 +1409,7 @@ export class GameServer {
     const zone = e
       ? e.dungeonId
         ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)
-        : zoneAt(e.pos.z).name
+        : zoneAt(e.pos.x, e.pos.z).name
       : REALM;
     // In-game: a system broadcast everyone sees (variable-routed; S3 guard skips it).
     this.broadcastSystem(`[${command.tag}] ${session.name}: ${message || command.label}`);
@@ -2323,7 +2324,9 @@ export class GameServer {
     const dungeonId = e.dungeonId ?? instance?.dungeonId ?? null;
     if (dungeonId) {
       const dungeon = DUNGEONS[dungeonId];
-      const zone = dungeon ? zoneAt(dungeon.doorPos.z) : zoneAt(e.pos.z);
+      const zone = dungeon
+        ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
+        : zoneAt(e.pos.x, e.pos.z);
       return {
         kind: 'dungeon',
         zoneId: zone.id,
@@ -2340,7 +2343,7 @@ export class GameServer {
     const delveRun = this.sim.delveRunForPlayer(e.id);
     if (delveRun) {
       const delve = DELVES[delveRun.delveId];
-      const zone = delve ? zoneAt(delve.doorPos.z) : zoneAt(e.pos.z);
+      const zone = delve ? zoneAt(delve.doorPos.x, delve.doorPos.z) : zoneAt(e.pos.x, e.pos.z);
       return {
         kind: 'delve',
         zoneId: zone.id,
@@ -2354,7 +2357,7 @@ export class GameServer {
       };
     }
 
-    const zone = zoneAt(e.pos.z);
+    const zone = zoneAt(e.pos.x, e.pos.z);
     let bestIndex: number | null = null;
     let bestDistance = ADMIN_LOCATION_POI_RADIUS;
     for (let i = 0; i < zone.pois.length; i++) {

@@ -23,6 +23,8 @@ import {
   playerPortraitDataUrl,
   visualPortraitDataUrl,
 } from '../render/characters/portrait';
+import { currentDayNightPhase } from '../render/day_night_clock';
+import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
@@ -55,6 +57,8 @@ import {
   NPCS,
   QUESTS,
   questRewardItem,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -257,6 +261,7 @@ import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
+import { onMapArtReady } from './map_art';
 import {
   mapQuestListView,
   parseUntrackedQuests,
@@ -266,6 +271,7 @@ import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain
 import { MapWindowPainter } from './map_window_painter';
 import {
   MAP_MAX_ZOOM,
+  MAP_OPEN_ZOOM,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   mapWindowMode,
@@ -657,8 +663,6 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
   'cry',
 ];
 
-// yards past a zone boundary before the crossing banner/welcome commits
-const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
 // Classic-style chat tabs: the ordered channel tabs the player has opened, and the
 // tab that was active last session. The built-in `all`/`combat` views are
@@ -1040,6 +1044,8 @@ export class Hud {
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
+  private dayNightCtx: CanvasRenderingContext2D | null = null;
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; the 12h cycle barely moves
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -1331,6 +1337,18 @@ export class Hud {
       minZ: WORLD_MIN_Z,
       maxZ: WORLD_MAX_Z,
     });
+    // hand-painted plates land in the world strip too, each over its own band
+    {
+      const stripH = this.minimapBg.height;
+      const spanZ = WORLD_MAX_Z - WORLD_MIN_Z;
+      for (const zn of ZONES) {
+        onMapArtReady(zn.id, (img) => {
+          const top = ((WORLD_MAX_Z - zn.zMax) / spanZ) * stripH;
+          const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
+          require2dContext(this.minimapBg).drawImage(img, 0, top, this.minimapBg.width, rows);
+        });
+      }
+    }
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     mm.addEventListener('click', () => this.toggleMap());
@@ -1410,6 +1428,10 @@ export class Hud {
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
     this.clockEl = $('#minimap-clock');
+    // day/night dial on the minimap rim: a decorative canvas showing the 12h
+    // world cycle. Same UI-only wall-clock allowance as the clock above.
+    const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
+    this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
     // lists the player's raid lockouts (the unlock countdown). Always visible;
     // it lights up (.locked) while any raid is on cooldown. attachTooltip already
@@ -1719,7 +1741,7 @@ export class Hud {
       music.setEnabled(!music.enabled);
       styleMusicBtn();
     });
-    const startZone = zoneAt(sim.player.pos.z);
+    const startZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
@@ -6499,27 +6521,24 @@ export class Hud {
     }
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
-    const currentZone = zoneAt(p.pos.z);
+    const currentZone = zoneAt(p.pos.x, p.pos.z);
     if (mediumHud) {
       // zone transitions: banner + welcome hint when crossing into a new band.
       // A ~5yd dead-band past the boundary stops a player straddling the border
       // from re-triggering the banner/log (and the map canvas regen) every step.
       if (!inDungeon && currentZone.id !== this.lastZoneId) {
-        const lastZone = ZONES.find((z) => z.id === this.lastZoneId);
-        const pastDeadBand =
-          !lastZone ||
-          p.pos.z < lastZone.zMin - ZONE_BANNER_DEADBAND ||
-          p.pos.z >= lastZone.zMax + ZONE_BANNER_DEADBAND;
-        if (pastDeadBand) {
-          if (this.lastZoneId !== '') {
-            const currentZoneName = zoneDisplayName(currentZone.id);
-            this.showBanner(currentZoneName);
-            this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
-            this.logZoneWelcome(currentZone);
-          }
-          this.lastZoneId = currentZone.id;
-          this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
+        // commit the moment zoneAt flips: the old 1D z deadband never fired
+        // on an east-west crossing (the grid's column borders share the z
+        // band), so the banner and map lagged the border by a whole realm.
+        // Re-crossing costs only a banner re-emit; the map bg is cached.
+        if (this.lastZoneId !== '') {
+          const currentZoneName = zoneDisplayName(currentZone.id);
+          this.showBanner(currentZoneName);
+          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
+          this.logZoneWelcome(currentZone);
         }
+        this.lastZoneId = currentZone.id;
+        this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
       }
 
       // subzone text: a smaller banner when you step into a named landmark
@@ -6689,6 +6708,7 @@ export class Hud {
         this.updateMinimap();
       }
       this.updateClock();
+      this.updateDayNightDial();
       this.updateMinimapCoords();
       this.updateCompass();
     }
@@ -7412,18 +7432,34 @@ export class Hud {
 
   // The full-zone band used by the world map (and prewarm), keyed only on z.
   private mapZoneRegion(zone: ZoneDef): MapRegion {
-    return { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
+    return {
+      minX: zone.xMin ?? STRIP_MIN_X,
+      maxX: zone.xMax ?? STRIP_MAX_X,
+      minZ: zone.zMin,
+      maxZ: zone.zMax,
+    };
   }
 
   // The cached terrain background for a zone, rendering it synchronously only if
   // a prewarm hasn't already produced it. The synchronous path is the fallback
   // for "opened the map the instant we entered a zone"; normally the idle
   // prewarm has it ready and this is a Map hit.
+  // Composite a hand-painted plate (public/map_art/<zoneId>.*) over a zone's
+  // procedural background canvas once it loads; the caches hold the canvas by
+  // reference, so the next blit picks the art up without invalidation.
+  private compositeMapArt(zoneId: string, canvas: HTMLCanvasElement): void {
+    onMapArtReady(zoneId, (img) => {
+      const ctx = require2dContext(canvas);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    });
+  }
+
   private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
     const cached = this.mapBgCache.get(zone.id);
     if (cached) return cached;
     const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
     this.mapBgCache.set(zone.id, bg);
+    this.compositeMapArt(zone.id, bg);
     // a redundant in-flight prewarm for this same zone can be dropped now
     if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
     return bg;
@@ -7514,13 +7550,36 @@ export class Hud {
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
       this.mapBgCache.set(job.zoneId, job.canvas);
+      this.compositeMapArt(job.zoneId, job.canvas);
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
+      this.pumpPrewarmQueue(); // start the next queued realm's background, if any
       return;
     }
     this.scheduleMapPrewarm();
   };
+
+  // Queue every realm's map background to prewarm during idle, so the
+  // world-relative map has the whole continent to composite when zoomed out.
+  // One realm renders at a time (the existing single-job prewarm), chained via
+  // pumpPrewarmQueue as each completes, so it never blocks a frame.
+  private mapPrewarmQueue: string[] = [];
+  private prewarmAllZones(): void {
+    for (const z of ZONES) {
+      if (this.mapBgCache.has(z.id)) continue;
+      if (this.mapPrewarm?.zoneId === z.id) continue;
+      if (!this.mapPrewarmQueue.includes(z.id)) this.mapPrewarmQueue.push(z.id);
+    }
+    this.pumpPrewarmQueue();
+  }
+
+  private pumpPrewarmQueue(): void {
+    if (this.mapPrewarm) return; // a prewarm is already in flight
+    let next = this.mapPrewarmQueue.shift();
+    while (next && this.mapBgCache.has(next)) next = this.mapPrewarmQueue.shift();
+    if (next) this.prewarmMapBg(next);
+  }
 
   // Refresh the minimap clock to the current real local time. Cheap to call
   // every frame: the formatted string only changes once a minute, and we skip
@@ -7532,6 +7591,98 @@ export class Hud {
       this.lastClockText = text;
       this.clockEl.textContent = text;
     }
+  }
+
+  /** Force the minimap day/night dial to redraw on the next tick (the /daynight
+   *  dev command calls this so an override shows without the ~1s throttle wait). */
+  refreshDayNightDial(): void {
+    this.lastDayNightDrawAt = 0;
+  }
+
+  // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
+  // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
+  // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
+  // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
+  // current time of day and how far the marker sits from the coming day or night.
+  private updateDayNightDial(): void {
+    const ctx = this.dayNightCtx;
+    if (!ctx) return;
+    const now = Date.now();
+    if (now - this.lastDayNightDrawAt < 1000) return; // the 12h cycle crawls; ~1Hz is ample
+    this.lastDayNightDrawAt = now;
+
+    const S = 60; // backing resolution (CSS shows it at 30px, so 2x for crispness)
+    const cx = S / 2;
+    const cy = S / 2;
+    const rMid = 23; // ring centreline radius
+    const ringW = 8;
+    const rInner = rMid - ringW / 2 - 2; // centre disc radius
+    // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
+    // clockwise once per 12h. angle = pi/2 + phase*2pi (canvas y is down).
+    const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
+    const rgb = (c: readonly [number, number, number]): string =>
+      `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
+
+    ctx.clearRect(0, 0, S, S);
+
+    // the ring: sample the cycle in segments, each an arc of its sky color. The
+    // small angular overlap hides seams between the butt-capped arc segments.
+    const SEG = 60;
+    ctx.lineWidth = ringW;
+    ctx.lineCap = 'butt';
+    for (let i = 0; i < SEG; i++) {
+      const p0 = i / SEG;
+      const p1 = (i + 1) / SEG;
+      ctx.strokeStyle = rgb(skyTintForDayness(globalDayness((p0 + p1) / 2)));
+      ctx.beginPath();
+      ctx.arc(cx, cy, rMid, angleForPhase(p0), angleForPhase(p1) + 0.02);
+      ctx.stroke();
+    }
+
+    const phaseNow = currentDayNightPhase();
+    const daynessNow = globalDayness(phaseNow);
+    const skyNow = skyTintForDayness(daynessNow);
+
+    // centre disc tinted to the current sky, with a sun by day or a moon by night
+    ctx.fillStyle = rgb(skyNow);
+    ctx.beginPath();
+    ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+    ctx.fill();
+    if (daynessNow >= 0.5) {
+      ctx.fillStyle = '#ffd45a';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffd45a';
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
+        ctx.lineTo(cx + Math.cos(a) * 10.5, cy + Math.sin(a) * 10.5);
+        ctx.stroke();
+      }
+    } else {
+      // crescent: a pale disc minus an offset disc repainted in the sky color
+      ctx.fillStyle = '#e2e8f6';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = rgb(skyNow);
+      ctx.beginPath();
+      ctx.arc(cx + 3, cy - 2.2, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // the "now" marker: a bright pip riding the ring at the current phase
+    const am = angleForPhase(phaseNow);
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 3.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
   }
 
   // Classic-style coordinate readout pinned under the minimap. Reads only the
@@ -7651,13 +7802,22 @@ export class Hud {
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
-    // '#zone-label' through the write-elision facet.
+    // '#zone-label' through the write-elision facet. It blits the current zone's
+    // high-res map background sharp over the coarse whole-world fallback, so the
+    // player's surroundings are crisp instead of a handful of upscaled pixels.
+    // The zone bg is only PEEKED from the cache (never rendered here: a 10Hz
+    // sync terrain render would hitch); the idle prewarm normally has it ready,
+    // and the coarse fallback covers the gap until then.
+    const p = this.sim.player;
+    const zone = ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z);
+    const cachedZoneBg = this.mapBgCache.get(zone.id);
     this.minimapPainter.paintOverworld(
       ctx,
       this.sim,
       $('#zone-label'),
       this.minimapBg,
       this.minimapZoom,
+      cachedZoneBg ? { canvas: cachedZoneBg, region: this.mapZoneRegion(zone) } : null,
     );
   }
 
@@ -7739,7 +7899,7 @@ export class Hud {
       return;
     }
     this.closeOtherWindows('#map-window');
-    this.mapZoom = 1; // always open at the full-zone view, following the player
+    this.mapZoom = MAP_OPEN_ZOOM; // open on ~4 realms, following the player
     this.mapCenter = null;
     el.style.display = 'block';
     this.updateMapWindow();
@@ -7788,11 +7948,21 @@ export class Hud {
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
     const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+      ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
+      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
+    // The world-relative map composites every cached realm background. Force the
+    // focused realm ready (sync only if its prewarm has not landed), and queue
+    // all the others so the continent fills in during idle.
+    this.mapZoneBg(zone);
+    this.prewarmAllZones();
+    const zoneBgs: { canvas: HTMLCanvasElement; region: MapRegion }[] = [];
+    for (const zn of ZONES) {
+      const cached = this.mapBgCache.get(zn.id);
+      if (cached) zoneBgs.push({ canvas: cached, region: this.mapZoneRegion(zn) });
+    }
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
-      bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
+      zoneBgs,
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
@@ -10870,7 +11040,7 @@ export class Hud {
 
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
-    return isInTownZone(pos, zoneAt(pos.z));
+    return isInTownZone(pos, zoneAt(pos.x, pos.z));
   }
 
   toggleTownFocus(): void {

@@ -26,6 +26,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     onGround: true,
     jumping: false,
     fallStartY: pos.y,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,

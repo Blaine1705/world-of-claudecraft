@@ -1576,7 +1576,7 @@ describe('RL interface', () => {
       const obs = encodeObs(sim);
       for (const v of obs) expect(Number.isFinite(v)).toBe(true);
     }
-  }, 20000);
+  }, 90_000);
 
   it('same seed + same actions => identical trajectories', () => {
     const run = () => {
@@ -1591,7 +1591,7 @@ describe('RL interface', () => {
       return trace;
     };
     expect(run()).toEqual(run());
-  }, 20000);
+  }, 90_000);
 });
 
 describe('gm characters', () => {

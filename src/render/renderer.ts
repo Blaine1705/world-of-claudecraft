@@ -34,10 +34,11 @@ import { generateRiftFloor, riftPlatformLift } from '../sim/rift/rift_gen';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
-import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { SpatialAudioSink, Surface } from './audio_sink';
@@ -50,12 +51,27 @@ import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
+import { currentDayNightPhase } from './day_night_clock';
+import {
+  aboveHorizon,
+  type DayNightGrade,
+  dayNightGrade,
+  effectiveDayness,
+  fullDayGrade,
+  globalDayness,
+  moonDirection,
+  nightStarAmount,
+  REALM_DAYNIGHT_AMPLITUDE,
+  sunDirection,
+} from './day_night_core';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
+import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
+import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -63,6 +79,9 @@ import {
   type FoliagePerfStats,
   type FoliageView,
 } from './foliage';
+import { buildFrostSky, type FrostSkyView } from './frost_sky';
+import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
+import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
@@ -74,8 +93,10 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
+import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
@@ -86,12 +107,14 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
+import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { buildRiftRankBadge } from './rift_rank';
 import { downscaleDims } from './screenshot';
@@ -261,6 +284,17 @@ const DUNGEON_ENV_INTENSITY = 0.05;
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
+// day/night: at night the key sun and sky bounce cool toward moonlight. These
+// are the fully-night blend weights (scaled each frame by the grade's nightAmt).
+const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
+const MOON_HEMI_SKY_COLOR = 0x8b9cd0; // cool sky bounce at deepest night
+const MOON_HEMI_GROUND_COLOR = 0x2b3350; // dark cool ground bounce at deepest night
+const NIGHT_SUN_COOL = 0.55; // how far the sun hue shifts to moonlight at full night
+const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
+// golden tone the sun light warms toward, strongest as the sun nears the horizon
+const WARM_SUN_COLOR = 0xff8a3a;
+// the moving sun/moon key light rides at the same distance the fixed anchor did
+const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
@@ -884,7 +918,15 @@ export class Renderer {
   private sky!: THREE.Mesh;
   private skyView!: SkyView;
   private sunSprites: THREE.Sprite[] = [];
+  private moonSprites: THREE.Sprite[] = [];
   private sunDir = new THREE.Vector3();
+  // the moving moon direction plus how far above the horizon each body sits
+  // (0 down, 1 up); recomputed each frame in updateAmbience from the world clock
+  private moonDir = new THREE.Vector3(0, -1, 0);
+  private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
+  private sunUp = 1;
+  private moonUp = 0;
+  private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
@@ -898,7 +940,24 @@ export class Renderer {
   private motes: MotesView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
+  private realmFlora: RealmFloraView;
+  private emberFeatures: EmberFeaturesView;
+  private frostSky: FrostSkyView;
+  private fenFeatures: FenFeaturesView;
+  private amberFeatures: AmberFeaturesView;
+  private nightFeatures: NightFeaturesView;
+  private hauntFeatures: HauntFeaturesView;
+  private jungleFeatures: JungleFeaturesView;
+  private gardenFeatures: GardenFeaturesView;
+  private galeFeatures: GaleFeaturesView;
   private fogScratch = new THREE.Color();
+  // world day/night grade, recomputed each frame from the UTC-anchored clock in
+  // updateAmbience and consumed by the outdoor fog/light easing, the sky dome,
+  // and the IBL intensity. Defaults to full day for the frames before the first
+  // updateAmbience runs.
+  private dnGrade: DayNightGrade = fullDayGrade();
+  private dnColorScratch = new THREE.Color();
+  private dnMoonScratch = new THREE.Color();
   private flames: THREE.Mesh[];
   private fireLights: THREE.PointLight[];
   // Point lights owned by entity views (e.g. the quest-object glow). These stream
@@ -1121,7 +1180,25 @@ export class Renderer {
     // the environment intensity is rescaled to match the shipped look.
     if (!LOW_GFX) {
       const pmrem = new THREE.PMREMGenerator(this.webgl);
-      for (const b of ['vale', 'marsh', 'peaks'] as BiomeId[]) {
+      // every biome has its own HDRI now (three Poly Haven photographs plus
+      // the five project-generated realm skies), so each gets its own
+      // prefiltered RT; envRTs live for the whole session
+      const biomes: BiomeId[] = [
+        'vale',
+        'marsh',
+        'peaks',
+        'dusk',
+        'ember',
+        'frost',
+        'amber',
+        'fen',
+        'night',
+        'haunt',
+        'jungle',
+        'garden',
+        'gale',
+      ];
+      for (const b of biomes) {
         const eq = this.skyView.envTexture(b);
         if (eq) this.envRTs.set(b, pmrem.fromEquirectangular(eq));
       }
@@ -1170,27 +1247,41 @@ export class Renderer {
     this.sunDir.copy(SUN_DIR);
 
     // visible sun disc + bloom halo
-    const sunCanvas = (core: boolean): THREE.CanvasTexture => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const ctx = c.getContext('2d')!;
-      const g = ctx.createRadialGradient(64, 64, 2, 64, 64, 64);
-      if (core) {
-        g.addColorStop(0, 'rgba(255,252,238,1)');
-        g.addColorStop(0.35, 'rgba(255,238,180,0.95)');
-        g.addColorStop(1, 'rgba(255,220,140,0)');
-      } else {
-        g.addColorStop(0, 'rgba(255,236,180,0.55)');
-        g.addColorStop(1, 'rgba(255,220,150,0)');
-      }
-      ctx.fillStyle = g;
+    // The sun and moon are billboard sprites: always camera-facing, so they read
+    // as perfect circles wherever they sit on screen (a dome-shader disc would
+    // project to an ellipse off-axis). Each is a crisp filled disc plus a soft
+    // glow; the renderer aims them along the sun/moon direction each frame and
+    // fades them by how far the body is above the horizon.
+    const discTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      const ctx = cv.getContext('2d')!;
+      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 1)`);
+      grad.addColorStop(0.82, `rgba(${r}, ${g}, ${b}, 1)`); // solid plateau = crisp disc
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`); // feathered rim to anti-alias the edge
+      ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 128, 128);
-      return new THREE.CanvasTexture(c);
+      return new THREE.CanvasTexture(cv);
     };
-    for (const [tex, scale] of [
-      [sunCanvas(true), 60],
-      [sunCanvas(false), 190],
-    ] as const) {
+    const glowTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      const ctx = cv.getContext('2d')!;
+      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(cv);
+    };
+    const makeCelestialSprite = (
+      tex: THREE.CanvasTexture,
+      scale: number,
+      opacity: number,
+      blending: THREE.Blending = THREE.AdditiveBlending,
+      renderOrder = -9,
+    ): THREE.Sprite => {
       const sp = new THREE.Sprite(
         new THREE.SpriteMaterial({
           map: tex,
@@ -1198,18 +1289,30 @@ export class Renderer {
           fog: false,
           depthWrite: false,
           depthTest: false,
-          blending: THREE.AdditiveBlending,
-          // bloom supplies the big halo on the composer path; the painted one
-          // would double up and wash out the sky
-          opacity: scale === 190 && !LOW_GFX ? SUN_HALO_OPACITY : 1,
+          blending,
+          opacity,
         }),
       );
       setRenderCategory(sp, 'sky');
       sp.scale.set(scale, scale, 1);
-      sp.renderOrder = -9;
-      this.sunSprites.push(sp);
+      sp.renderOrder = renderOrder;
+      sp.frustumCulled = false; // rides the camera at a fixed offset; never cull it
+      sp.userData.baseOpacity = opacity;
       this.scene.add(sp);
-    }
+      return sp;
+    };
+    // sun: a warm disc under a soft warm glow
+    this.sunSprites = [
+      makeCelestialSprite(glowTex(255, 214, 150), 150, LOW_GFX ? 0.6 : 0.3),
+      makeCelestialSprite(discTex(255, 224, 168), 42, 0.9),
+    ];
+    // moon: a bright cratered face (normal-blended so the maria read as dark)
+    // under a soft cool additive glow kept modest so it does not wash the face
+    // moon: a plain bright disc (as bright as the stars) under a soft cool glow
+    this.moonSprites = [
+      makeCelestialSprite(glowTex(150, 170, 220), 128, 0.22),
+      makeCelestialSprite(discTex(247, 250, 255), 52, 1),
+    ];
 
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
     // the camera; opacity follows how directly the camera faces the sun
@@ -1344,6 +1447,53 @@ export class Renderer {
     this.scene.add(gatherNodes.group);
     // Baked into world space at build with no per-frame update(), same as props.
     freezeStaticMatrices(gatherNodes.group);
+
+    // The Veiled Hollow's glowing mushrooms and crystals; their glow lights
+    // join the same rank-culled fire-light budget.
+    this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
+    setRenderCategory(this.realmFlora.group, 'props');
+    this.scene.add(this.realmFlora.group);
+    freezeStaticMatrices(this.realmFlora.group);
+    for (const light of this.realmFlora.glowLights) this.fireLights.push(light);
+
+    // The Drakelands' lava pools and bloodglass, and the Frostveil's aurora.
+    this.emberFeatures = buildEmberFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.emberFeatures.group, 'props');
+    this.scene.add(this.emberFeatures.group);
+    freezeStaticMatrices(this.emberFeatures.group);
+    for (const light of this.emberFeatures.glowLights) this.fireLights.push(light);
+    this.frostSky = buildFrostSky(this.sim.cfg.seed);
+    this.scene.add(this.frostSky.group);
+    for (const light of this.frostSky.glowLights) this.fireLights.push(light);
+    this.fenFeatures = buildFenFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.fenFeatures.group, 'props');
+    this.scene.add(this.fenFeatures.group);
+    freezeStaticMatrices(this.fenFeatures.group);
+    this.amberFeatures = buildAmberFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.amberFeatures.group, 'props');
+    this.scene.add(this.amberFeatures.group);
+    freezeStaticMatrices(this.amberFeatures.group);
+    this.nightFeatures = buildNightFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.nightFeatures.group, 'props');
+    this.scene.add(this.nightFeatures.group);
+    freezeStaticMatrices(this.nightFeatures.group);
+    for (const light of this.nightFeatures.glowLights) this.fireLights.push(light);
+    this.hauntFeatures = buildHauntFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.hauntFeatures.group, 'props');
+    this.scene.add(this.hauntFeatures.group);
+    for (const light of this.hauntFeatures.glowLights) this.fireLights.push(light);
+    this.jungleFeatures = buildJungleFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.jungleFeatures.group, 'props');
+    this.scene.add(this.jungleFeatures.group);
+    freezeStaticMatrices(this.jungleFeatures.group);
+    this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.gardenFeatures.group, 'props');
+    this.scene.add(this.gardenFeatures.group);
+    freezeStaticMatrices(this.gardenFeatures.group);
+    this.galeFeatures = buildGaleFeatures(this.sim.cfg.seed);
+    setRenderCategory(this.galeFeatures.group, 'props');
+    this.scene.add(this.galeFeatures.group);
+    for (const light of this.galeFeatures.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -1592,11 +1742,12 @@ export class Renderer {
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
     if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevelAt(x, z);
-    if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
-    const biome = zoneBiomeAt(z);
+    if (groundHeight(x, z, this.sim.cfg.seed) < WATER_LEVEL && y <= WATER_LEVEL + 0.3)
+      return 'water';
+    const biome = zoneBiomeAt(x, z);
     if (biome === 'vale') return 'grass';
-    if (biome === 'marsh') return 'dirt';
+    if (biome === 'marsh' || biome === 'ember') return 'dirt'; // ember: sandy waste
+    if (biome === 'amber' || biome === 'fen') return 'grass';
     return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
   }
 
@@ -2150,19 +2301,17 @@ export class Renderer {
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
-      this.sun.target.position.set(pp.x, pp.y, pp.z);
+      this.updateKeyLight(pp);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
-      this.skyView.setCameraZ(this.camera.position.z, dt);
+      this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
+      this.skyView.setDayNight(this.dnGrade.sky);
+      this.skyView.setStars(this.starAmt, this.time);
       this.updateEnvBiome(dt);
     }
-    for (const sp of this.sunSprites) {
-      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
-    }
+    this.updateCelestialSprites();
     this.updateGodRays();
     this.nameplatePainter.update(true);
     this.updateChatBubbles();
@@ -2801,7 +2950,7 @@ export class Renderer {
             .slice(0, this.lowGfx ? 3 : 8);
           for (const z of zs) {
             if (performance.now() >= deadline) break;
-            this.skyView.setCameraZ(z, 1 / 20);
+            this.skyView.setCameraPos(this.camera.position.x, z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
@@ -3771,19 +3920,76 @@ export class Renderer {
   // crisp when viewed from the zone's hub/centre; ratio near:far kept roughly
   // constant per biome so the fog gradient itself doesn't change shape.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 95, far: 340 },
-    marsh: { color: 0xa3b294, near: 60, far: 240 },
-    peaks: { color: 0xbdd3ec, near: 110, far: 390 },
+    vale: { color: 0xa6c6e0, near: 130, far: 470 },
+    marsh: { color: 0xa3b294, near: 80, far: 330 },
+    peaks: { color: 0xbdd3ec, near: 160, far: 560 },
     beach: { color: 0xbcd6e6, near: 105, far: 370 },
     desert: { color: 0xd8c9a8, near: 100, far: 360 },
     volcano: { color: 0x8a7468, near: 50, far: 220 },
     cave: { color: 0x76807c, near: 45, far: 190 },
+    // permanent dusk: dense rose-mauve murk, the realm's signature
+    dusk: { color: 0xc9a3bd, near: 55, far: 250 },
+    // scorched haze south, thicker toward the volcanic north (looks pass)
+    ember: { color: 0x9a5844, near: 55, far: 240 },
+    // the Frostveil: dense icy mist, visibility closes right in
+    frost: { color: 0xa9bed2, near: 38, far: 190 },
+    // the Amberfall: warm golden haze under an endless afternoon
+    amber: { color: 0xdec18e, near: 65, far: 270 },
+    // the Willowfen: clear airy morning, the lightest fog in the world
+    fen: { color: 0xcfe2dc, near: 95, far: 340 },
+    // the Nightbloom: a soft lavender dream-haze over the violet downs
+    night: { color: 0xbfb0e8, near: 90, far: 330 },
+    // the Wraithwood: dense dead-grey murk, sightlines close right in
+    haunt: { color: 0x454c46, near: 30, far: 150 },
+    // the Palmreach: bright humid haze, the clearest air in the world
+    jungle: { color: 0xd6efe2, near: 115, far: 400 },
+    // the Evergarden: crystal parkland air with the faintest green cast
+    garden: { color: 0xdcefdc, near: 120, far: 420 },
+    // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
+    gale: { color: 0xe2dee4, near: 118, far: 430 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
+  // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
+  // The three original biomes keep the exact constants the lights were
+  // created with; the dusk realm warms the sun to late-evening orange and
+  // turns the sky bounce rose over violet ground.
+  private static BIOME_LIGHT: Record<
+    BiomeId,
+    { hemiSky: number; hemiGround: number; sun: number }
+  > = {
+    vale: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    peaks: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    dusk: { hemiSky: 0xffc9dd, hemiGround: 0x4d3f63, sun: 0xffb072 },
+    ember: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
+    frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
+    amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
+    fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
+    // the Nightbloom: dreamlight. A rose-white sun over lavender sky bounce
+    // and deep violet ground, bright as day but nothing like it
+    night: { hemiSky: 0xd8ccff, hemiGround: 0x564a80, sun: 0xffe6f0 },
+    // the Wraithwood: sickly grey light strangled by the canopy (the rig has
+    // no intensity knob, so the gloom lives in the color luminance)
+    haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
+    // the Palmreach: hard tropical daylight over deep green bounce
+    jungle: { hemiSky: 0xeafcff, hemiGround: 0x3a6a42, sun: 0xfff4d8 },
+    // the Evergarden: soft perfect afternoon over clipped lawns
+    garden: { hemiSky: 0xe8f8ff, hemiGround: 0x4a7a44, sun: 0xfff2d0 },
+    // the Galecrest: cool dawn light, sea-grey bounce off the downs
+    gale: { hemiSky: 0xe4e8f2, hemiGround: 0x4e6a52, sun: 0xffe8c8 },
+    // paint-only biomes (map editor, never a built-in realm): beach reuses the
+    // neutral vale grade, desert the amber warmth, volcano the ember glow, cave
+    // the wraithwood gloom.
+    beach: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
+    desert: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
+    volcano: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
+    cave: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
+  };
+
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
-    return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.z)];
+    return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
   }
 
   private scheduleDelveModuleBuild(
@@ -3873,6 +4079,27 @@ export class Renderer {
     } else {
       this.valeCupSky.mesh.visible = false;
     }
+    // recompute the world day/night grade from the shared UTC-anchored clock.
+    // This is render-only, so the Date.now() read never touches sim parity; the
+    // grade is per-realm, the player's biome deciding how far the global cycle
+    // pulls its authored look (signature realms swing less, see day_night_core).
+    const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
+    const phase = currentDayNightPhase();
+    const gday = globalDayness(phase);
+    this.dnGrade = dayNightGrade(effectiveDayness(gday, biome));
+    // the sun and moon track the world clock; each disc/key-light strength is
+    // scaled by the realm's day/night amplitude so signature-sky realms (the
+    // Nightbloom, the Veiled Hollow, ...) keep their look instead of gaining a
+    // hard noon sun. The moon keeps a higher floor since it suits most realms.
+    const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
+    const sd = sunDirection(phase);
+    const md = moonDirection(phase);
+    this.sunDir.set(sd[0], sd[1], sd[2]);
+    this.moonDir.set(md[0], md[1], md[2]);
+    this.sunUp = aboveHorizon(sd[1]) * amp;
+    this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
+    // stars follow the global cycle (not per-realm), fading in past dusk
+    this.starAmt = nightStarAmount(gday);
     if (isDelvePos(px) && !inPractice) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isArenaPos(px)) {
@@ -3944,7 +4171,7 @@ export class Renderer {
             ? 'nythraxis'
             : inside
               ? 'dungeon'
-              : camY < waterLevelAt(px, pz) - 0.05
+              : camY < WATER_LEVEL - 0.05
                 ? 'underwater'
                 : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
@@ -4023,22 +4250,68 @@ export class Renderer {
           desired === 'temple' ||
           desired === 'nythraxis' ||
           desired === 'delve';
-        this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
-        this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
+        // returning outdoors restores full daylight rig scaled by the current
+        // day/night grade, so stepping out of a cave at night stays night
+        this.sun.intensity = underground
+          ? DUNGEON_SUN_INTENSITY
+          : SUN_INTENSITY * this.dnGrade.lightScale;
+        this.hemi.intensity = underground
+          ? DUNGEON_HEMI_INTENSITY
+          : HEMI_INTENSITY * this.dnGrade.lightScale;
         this.scene.environmentIntensity = underground
           ? DUNGEON_ENV_INTENSITY
-          : this.envOutdoorIntensity;
+          : this.envOutdoorIntensity * this.dnGrade.lightScale;
         sharedUniforms.uRimBoost.value = underground ? DUNGEON_RIM_BOOST : 1;
       }
       return;
     }
-    // outdoors: ease fog toward the current biome's preset (~2s)
+    // outdoors: ease fog toward the current biome's preset (~2s), then fold in
+    // the day/night grade so the world darkens and cools after dusk.
     if (desired === 'outdoor' && !this.lowGfx) {
+      const g = this.dnGrade;
       const preset = this.outdoorFogPreset();
       const k = 1 - Math.exp(-dt * 1.5);
-      fog.color.lerp(this.fogScratch.setHex(preset.color), k);
+      // fog color: the biome hue multiplied by the day/night color (a dark
+      // dusk-blue by night); far pulls in a little once it is dark
+      this.fogScratch.setHex(preset.color);
+      this.fogScratch.r *= g.fog[0];
+      this.fogScratch.g *= g.fog[1];
+      this.fogScratch.b *= g.fog[2];
+      fog.color.lerp(this.fogScratch, k);
       fog.near += (preset.near - fog.near) * k;
-      fog.far += (preset.far - fog.far) * k;
+      fog.far += (preset.far * g.farScale - fog.far) * k;
+      // ...and the light grade with it (the dusk realm's warm sun and rose sky
+      // bounce, a no-op elsewhere by day since the presets match the ctor hues):
+      // the sun and sky hues cool toward moonlight at night, and the sun + sky
+      // intensity scales down with the grade (the IBL follows in updateEnvBiome).
+      const light = Renderer.BIOME_LIGHT[biome];
+      // the sun light warms toward gold, gently by day and strongly as it nears
+      // the horizon (a golden hour), then cools toward moonlight deep at night.
+      // The warm blend is gated by aboveHorizon so it never tints the moonlight.
+      const sunElev = this.sunDir.y;
+      let hi = (sunElev - 0.08) / 0.5;
+      hi = hi < 0 ? 0 : hi > 1 ? 1 : hi;
+      const lowness = 1 - hi * hi * (3 - 2 * hi);
+      const warmAmt = aboveHorizon(sunElev) * (0.34 + lowness * 0.45);
+      this.dnColorScratch.setHex(light.sun);
+      this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
+      this.dnColorScratch.lerp(
+        this.dnMoonScratch.setHex(MOON_SUN_COLOR),
+        g.nightAmt * NIGHT_SUN_COOL,
+      );
+      this.sun.color.lerp(this.dnColorScratch, k);
+      this.dnColorScratch
+        .setHex(light.hemiSky)
+        .lerp(this.dnMoonScratch.setHex(MOON_HEMI_SKY_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
+      this.hemi.color.lerp(this.dnColorScratch, k);
+      // the ground bounce cools with the sky side so night shading does not keep
+      // a warm daytime tint (its brightness still rides the hemi intensity above)
+      this.dnColorScratch
+        .setHex(light.hemiGround)
+        .lerp(this.dnMoonScratch.setHex(MOON_HEMI_GROUND_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
+      this.hemi.groundColor.lerp(this.dnColorScratch, k);
+      this.sun.intensity += (SUN_INTENSITY * g.lightScale - this.sun.intensity) * k;
+      this.hemi.intensity += (HEMI_INTENSITY * g.lightScale - this.hemi.intensity) * k;
     }
   }
 
@@ -4047,17 +4320,56 @@ export class Renderer {
   // brief intensity dip masks the hard texture swap, then eases back like fog.
   private updateEnvBiome(dt: number): void {
     if (this.lowGfx || this.envRTs.size < 2) return;
-    const blend = this.skyView.biomeAt(this.camera.position.z);
+    const blend = this.skyView.biomeAt(this.camera.position.x, this.camera.position.z);
     const dominant = blend.t < 0.5 ? blend.from : blend.to;
     if (dominant !== this.envBiome && this.envRTs.has(dominant)) {
       this.envBiome = dominant;
       this.scene.environment = this.envRTs.get(dominant)?.texture ?? null;
       this.scene.environmentRotation.y = this.skyView.envRotationY(dominant);
-      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4;
+      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4 * this.dnGrade.lightScale;
     }
     const k = 1 - Math.exp(-dt * 1.5);
     this.scene.environmentIntensity +=
-      (this.envOutdoorIntensity - this.scene.environmentIntensity) * k;
+      (this.envOutdoorIntensity * this.dnGrade.lightScale - this.scene.environmentIntensity) * k;
+  }
+
+  // Aim the key light (sun by day, moon by night) at the player. On the low tier
+  // day/night is off, so it keeps the fixed anchor for a stable, cheap look.
+  private updateKeyLight(pp: THREE.Vector3): void {
+    if (this.lowGfx) {
+      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
+    } else {
+      // the key light hands off from the sun to the moon across the terminator.
+      // Blend the two directions smoothly (rather than a hard switch) as the sun
+      // sinks through the horizon, so the shadow direction glides instead of
+      // popping; the swap happens at dusk/dawn when the light is dim anyway.
+      let t = (0.05 - this.sunDir.y) / 0.2; // sunDir.y 0.05 -> sun, -0.15 -> moon
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const blend = t * t * (3 - 2 * t);
+      this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
+      this.sun.position.set(
+        pp.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
+        pp.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
+        pp.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
+      );
+    }
+    this.sun.target.position.set(pp.x, pp.y, pp.z);
+  }
+
+  // Aim the sun and moon disc sprites along their directions and fade them by how
+  // far each body sits above the horizon (out when below, and only outdoors).
+  private updateCelestialSprites(): void {
+    const outdoor = this.fogState === 'outdoor';
+    for (const sp of this.sunSprites) {
+      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
+      sp.visible = outdoor && this.sunUp > 0.02;
+      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
+    }
+    for (const sp of this.moonSprites) {
+      sp.position.copy(this.camera.position).addScaledVector(this.moonDir, 760);
+      sp.visible = outdoor && this.moonUp > 0.02;
+      sp.material.opacity = (sp.userData.baseOpacity as number) * this.moonUp;
+    }
   }
 
   // Drop the view of an entity that left the world / our interest area.
@@ -4518,12 +4830,10 @@ export class Renderer {
         v.group.scale.setScalar(e.scale);
       }
 
-      // swimming pose: prone at the surface (derived here — the sim is unaware).
-      // waterLevelAt is -Infinity outside a declared lake, so the cheap feet-depth
-      // test also gates entities standing in a dry sunken feature: they can't be
-      // swimming there, and the vast majority (everyone on land) skip
-      // groundHeight() entirely each frame.
-      const wl = waterLevelAt(e.pos.x, e.pos.z);
+      // swimming pose: prone at the surface (derived here, the sim is unaware).
+      // The cheap feet-depth test gates on the flat sea level first, so the vast
+      // majority (everyone on land) skip groundHeight() entirely each frame.
+      const wl = WATER_LEVEL;
       const swimming =
         !e.dead &&
         e.pos.y <= wl - 0.5 &&
@@ -4892,7 +5202,7 @@ export class Renderer {
     // they tint warm sunward / cool anti-sun to anchor the key light's azimuth
     for (const cl of this.clouds) {
       cl.position.x += dt * ((cl.userData.drift as number | undefined) ?? 1.6);
-      if (cl.position.x > 320) cl.position.x = -320;
+      if (cl.position.x > 620) cl.position.x = -620;
       if (!this.lowGfx) {
         const along =
           ((cl.position.x - this.camera.position.x) * this.sunAzimuth.x +
@@ -4958,6 +5268,16 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
+    this.realmFlora.update(this.time);
+    this.emberFeatures.update(this.time);
+    this.frostSky.update(this.time, this.camera.position.x, this.camera.position.z);
+    this.fenFeatures.update(this.time);
+    this.amberFeatures.update(this.time);
+    this.nightFeatures.update(this.time);
+    this.hauntFeatures.update(this.time);
+    this.jungleFeatures.update(this.time);
+    this.gardenFeatures.update(this.time);
+    this.galeFeatures.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     // null-safe cupInfo read: the offline Sim may predate the Vale Cup module
@@ -4981,28 +5301,26 @@ export class Renderer {
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
-      this.sun.position.set(pp.x + SUN_ANCHOR.x, pp.y + SUN_ANCHOR.y, pp.z + SUN_ANCHOR.z);
-      this.sun.target.position.set(pp.x, pp.y, pp.z);
+      this.updateKeyLight(pp);
     }
     worldStart = markWorldPhase('shadows', worldStart);
     // sky dome + sun disc ride along with the camera
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = this.fogState === 'outdoor';
     if (this.sky.visible) {
-      this.skyView.setCameraZ(this.camera.position.z, dt);
+      this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
+      this.skyView.setDayNight(this.dnGrade.sky);
+      this.skyView.setStars(this.starAmt, this.time);
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear
     this.weather.update(
       this.camera.position,
       dt,
-      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.z) : null,
+      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
     );
     worldStart = markWorldPhase('sky', worldStart);
-    for (const sp of this.sunSprites) {
-      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
-    }
+    this.updateCelestialSprites();
     worldStart = markWorldPhase('sunSprites', worldStart);
     this.updateGodRays();
     worldStart = markWorldPhase('godRays', worldStart);
@@ -5079,7 +5397,7 @@ export class Renderer {
         y: roundMs(p.pos.y),
         z: roundMs(p.pos.z),
       },
-      biome: zoneBiomeAt(p.pos.z),
+      biome: zoneBiomeAt(p.pos.x, p.pos.z),
       lastQualityChange: qualityChange,
       createdViews,
       createdViewTypes,
@@ -5230,7 +5548,7 @@ export class Renderer {
         .addScaledVector(sunAzimuth, 48 + i * 26)
         .addScaledVector(side, (i - 1) * 30 + sway);
       sp.position.y = this.camera.position.y + 16 + i * 7;
-      sp.material.opacity = facing * facing * facing * (0.3 - i * 0.05);
+      sp.material.opacity = facing * facing * facing * (0.3 - i * 0.05) * this.sunUp;
     }
   }
 
@@ -5535,18 +5853,18 @@ export class Renderer {
       const fl = Math.hypot(fx, fy, fz) || 1;
       sink.setListener(cpx, cpy, cpz, fx / fl, fy / fl, fz / fl);
       const inDungeon = px > DUNGEON_X_THRESHOLD;
-      const biome = zoneBiomeAt(pz);
+      const biome = zoneBiomeAt(px, pz);
       const precip =
         !this.weatherOn || inDungeon
           ? null
-          : biome === 'peaks'
+          : biome === 'peaks' || biome === 'frost'
             ? 'snow'
-            : biome === 'marsh'
-              ? 'rain'
+            : biome === 'marsh' || biome === 'haunt'
+              ? 'rain' // the haunted wood drips under a permanent drizzle
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
+      const nearWater = !inDungeon && groundHeight(px, pz, seed) < WATER_LEVEL + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = !inDungeon && isAtSowfield(px, pz) ? (this.sim.cupInfo?.live ? 1 : 0.4) : 0;

@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { QUESTS } from '../src/sim/data';
+import { DELVE_X_MIN, QUESTS } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -127,8 +127,13 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
       player: { pos: { x: number } };
       delveRun: unknown;
     };
-    w.player.pos.x = 5000; // a delve-band x (past the arena, below the rift band)
-    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 5000, z: 0 } };
+    w.player.pos.x = DELVE_X_MIN + 200; // a delve-band x
+    w.delveRun = {
+      delveId: 'd',
+      modules: ['m'],
+      moduleIndex: 0,
+      origin: { x: DELVE_X_MIN + 200, z: 0 },
+    };
     expect(minimapMode(w as unknown as IWorld)).toBe('delve');
   });
 });

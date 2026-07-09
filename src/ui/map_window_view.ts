@@ -21,7 +21,10 @@ import {
   PROPS,
   QUESTS,
   WORLD_MAX_X,
+  WORLD_MAX_Z,
   WORLD_MIN_X,
+  WORLD_MIN_Z,
+  ZONES,
   type ZoneDef,
 } from '../sim/data';
 import { type QuestObjectiveRef, questObjectiveAreas } from '../sim/quest_targets';
@@ -31,14 +34,30 @@ import type { FriendInfo, IWorld } from '../world_api';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import { questNumbersByLog } from './map_quest_list_view';
 
-// World-map zoom band: 1 = the whole committed zone, up to MAP_MAX_ZOOM.
+// World-map zoom band: the map is world-relative now. zoom 1 = the whole
+// continent framed square (open ocean east and west of the tall, narrow
+// landmass); MAP_MAX_ZOOM frames roughly a single realm. The view scales the
+// square uniformly between the two, centred on the player (or the pan target).
 export const MAP_MAX_ZOOM = 6;
-// At or above this zoom, the zoomed-detail overlay (buildings + vegetation) draws.
-export const MAP_DETAIL_ZOOM = 2.2;
+// The default zoom the map opens at: about four realms in view.
+export const MAP_OPEN_ZOOM = 1.5;
+// A square margin of open sea around the continent bounds, so the landmass does
+// not touch the top/bottom edges at full zoom-out.
+const WORLD_MARGIN = 120;
+// Below this visible span (world units across the view) the POI / NPC / ally
+// labels draw; wider than this (the continent / multi-realm overview) they are
+// suppressed so the map is not a wall of overlapping text.
+const LABEL_SPAN = 900;
+// Below this visible span the zoomed-detail overlay (buildings + vegetation)
+// draws (roughly a single realm in view).
+const DETAIL_SPAN = 480;
 
 // The zoomed-detail overlay only considers props/decorations within this many
 // world units of the visible region, so a footprint half-off the edge still draws.
 const DETAIL_VIEW_MARGIN = 6;
+// Markers (POIs / portals / NPCs / allies) within this many world units of the
+// visible region still draw, so a label anchored just off the edge is not clipped.
+const MARKER_VIEW_MARGIN = 24;
 // Marker radii in the detail overlay: a px floor plus a per-pixel-per-yard scale,
 // so dots stay visible when zoomed out yet grow with the map (matches the inline
 // site verbatim). ppu = pixels per world unit.
@@ -56,11 +75,11 @@ const CAMPFIRE_RADIUS_PPU = 0.5;
 export type MapWindowMode = 'delve' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
- *  internal `full` rect carries the full committed-zone spans (the whole world in
- *  X, the zone's [zMin, zMax) in Z). The returned model `view` (which Hud stores
- *  as mapView for the drag handler) keeps those FULL min/max bounds but carries
- *  the current ZOOMED spans (full span / zoom). So min/max are always full-zone;
- *  spanX/spanZ are full-zone on `full` and zoomed on the returned `view`. */
+ *  internal `full` rect carries the framed-continent square (its full spans). The
+ *  returned model `view` (which Hud stores as mapView for the drag handler) keeps
+ *  those FULL min/max bounds but carries the current ZOOMED spans (full span /
+ *  zoom). So min/max are always the framed-continent bounds; spanX/spanZ are the
+ *  full square on `full` and the zoomed square on the returned `view`. */
 export interface MapViewRect {
   spanX: number;
   spanZ: number;
@@ -68,15 +87,6 @@ export interface MapViewRect {
   maxX: number;
   minZ: number;
   maxZ: number;
-}
-
-/** The sub-rect of the cached terrain background to blit, as fractions [0, 1] of
- *  the cached canvas (the painter multiplies by its actual width/height). */
-export interface MapBlit {
-  sxFrac: number;
-  syFrac: number;
-  swFrac: number;
-  shFrac: number;
 }
 
 /** A zone POI label: canvas position + the identity the painter localizes. */
@@ -222,12 +232,13 @@ export interface MapDetail {
 /** Everything the painter draws for one overworld map frame, all in canvas-pixel
  *  space and derived purely from IWorld + the committed zone. */
 export interface OverworldMapModel {
-  /** The committed-zone region (the painter assigns it to Hud's mapView). */
+  /** The framed-continent bounds + current zoomed spans (Hud's mapView). */
   view: MapViewRect;
-  /** Drag cursor when zoomed past the full-zone view. */
+  /** Drag cursor when zoomed past the full-continent view. */
   cursor: 'grab' | 'default';
-  /** Sub-rect of the cached terrain background to blit. */
-  blit: MapBlit;
+  /** The visible world rect. The painter composites each realm's cached
+   *  background into it (+X is map-left, +Z map-down) over an ocean fill. */
+  region: { minX: number; maxX: number; minZ: number; maxZ: number };
   /** The committed zone id (the painter localizes the on-canvas title + summary). */
   zoneId: string;
   pois: MapPoiMarker[];
@@ -279,21 +290,24 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const untracked = input.untrackedQuestIds;
   const p = world.player;
 
-  // The full committed-zone region: the whole world in X, the zone band in Z.
+  // The whole continent, framed SQUARE so the tall, narrow landmass sits in the
+  // middle with open ocean east and west at full zoom-out. The view scales this
+  // square uniformly (no distortion), centred on the pan target or the player.
+  const worldCx = (WORLD_MIN_X + WORLD_MAX_X) / 2;
+  const worldCz = (WORLD_MIN_Z + WORLD_MAX_Z) / 2;
+  const fullSpan = WORLD_MAX_Z - WORLD_MIN_Z + WORLD_MARGIN; // the square side
   const full: MapViewRect = {
-    spanX: WORLD_MAX_X - WORLD_MIN_X,
-    spanZ: zone.zMax - zone.zMin,
-    minX: WORLD_MIN_X,
-    maxX: WORLD_MAX_X,
-    minZ: zone.zMin,
-    maxZ: zone.zMax,
+    spanX: fullSpan,
+    spanZ: fullSpan,
+    minX: worldCx - fullSpan / 2,
+    maxX: worldCx + fullSpan / 2,
+    minZ: worldCz - fullSpan / 2,
+    maxZ: worldCz + fullSpan / 2,
   };
-  const fullSpanX = full.maxX - full.minX;
-  const fullSpanZ = full.maxZ - full.minZ;
-  // Zoomed view: a sub-rectangle of the zone, centred on the pan target (or the
-  // player) and clamped to the zone bounds (zoom 1 = the whole zone).
-  const spanX = fullSpanX / zoom;
-  const spanZ = fullSpanZ / zoom;
+  // Zoomed view: a smaller square centred on the player (or pan target), clamped
+  // to the framed-continent bounds. zoom 1 = the whole square (the continent).
+  const spanX = fullSpan / zoom;
+  const spanZ = fullSpan / zoom;
   const baseX = center ? center.x : p.pos.x;
   const baseZ = center ? center.z : p.pos.z;
   const cx = Math.max(full.minX + spanX / 2, Math.min(full.maxX - spanX / 2, baseX));
@@ -305,37 +319,46 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     maxZ: cz + spanZ / 2,
   };
 
-  // +X is map-left (east = -X); +Z is map-down. The painter blits the matching
-  // sub-rect of the cached terrain, so the source rect is expressed as fractions.
-  const blit: MapBlit = {
-    sxFrac: (full.maxX - region.maxX) / fullSpanX,
-    syFrac: (full.maxZ - region.maxZ) / fullSpanZ,
-    swFrac: spanX / fullSpanX,
-    shFrac: spanZ / fullSpanZ,
-  };
+  // +X is map-left (east = -X); +Z is map-down.
   const toMap = (x: number, z: number): { mx: number; my: number } => ({
     mx: ((region.maxX - x) / spanX) * S,
     my: ((region.maxZ - z) / spanZ) * S,
   });
+  const inView = (x: number, z: number): boolean =>
+    x >= region.minX - MARKER_VIEW_MARGIN &&
+    x <= region.maxX + MARKER_VIEW_MARGIN &&
+    z >= region.minZ - MARKER_VIEW_MARGIN &&
+    z <= region.maxZ + MARKER_VIEW_MARGIN;
 
-  const detail =
-    zoom >= MAP_DETAIL_ZOOM ? buildDetail(region, toMap, S / spanX, decorations) : null;
+  // Declutter: the POI / NPC / ally labels only draw at the realm-local scale
+  // (a narrow span); the continent / multi-realm overview keeps just the player
+  // and the dungeon portals so it is not a wall of overlapping text.
+  const labels = spanX < LABEL_SPAN;
+  const detail = spanX < DETAIL_SPAN ? buildDetail(region, toMap, S / spanX, decorations) : null;
 
-  const pois: MapPoiMarker[] = zone.pois.map((poi, poiIndex) => {
-    const { mx, my } = toMap(poi.x, poi.z);
-    return { mx, my, zoneId: zone.id, poiIndex };
-  });
+  // POIs across every realm in view (was the committed zone only).
+  const pois: MapPoiMarker[] = [];
+  if (labels) {
+    for (const zn of ZONES) {
+      for (let poiIndex = 0; poiIndex < zn.pois.length; poiIndex++) {
+        const poi = zn.pois[poiIndex];
+        if (!inView(poi.x, poi.z)) continue;
+        const { mx, my } = toMap(poi.x, poi.z);
+        pois.push({ mx, my, zoneId: zn.id, poiIndex });
+      }
+    }
+  }
 
   // Active-quest objective areas (the classic "your targets live here" blobs),
   // derived from the static content tables (camps / ground objects / NPCs), so
-  // the online interest radius never hides a far-away camp. Filtered to the
-  // committed zone's band like every other marker; radius scales with the zoom.
+  // the online interest radius never hides a far-away camp. Culled to the visible
+  // map rect (inView) like every other grid-map marker; radius scales with zoom.
   // Untracked quests (hidden from the map side list) drop out here, and each
   // surviving area carries its quests' acceptance-order numbers for the badges.
   const questNumbers = questNumbersByLog(world.questLog);
   const questAreas: MapQuestAreaMarker[] = [];
   for (const area of questObjectiveAreas(world.questLog)) {
-    if (area.center.z < zone.zMin || area.center.z >= zone.zMax) continue;
+    if (!inView(area.center.x, area.center.z)) continue;
     const objectives = untracked
       ? area.objectives.filter((ref) => !untracked.has(ref.questId))
       : area.objectives;
@@ -350,19 +373,20 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     questAreas.push({ mx, my, radius: (area.radius / spanX) * S, objectives, numbers });
   }
 
-  const portals: MapPortalMarker[] = overworldDungeonPortals(
-    DUNGEON_LIST,
-    zone.zMin,
-    zone.zMax,
-  ).map((portal) => {
+  // Dungeon portals across the whole world, filtered to the view (shown always).
+  const portals: MapPortalMarker[] = [];
+  for (const portal of overworldDungeonPortals(DUNGEON_LIST, WORLD_MIN_Z, WORLD_MAX_Z)) {
+    if (!inView(portal.x, portal.z)) continue;
     const { mx, my } = toMap(portal.x, portal.z);
-    return { mx, my, dungeonId: portal.id };
-  });
+    portals.push({ mx, my, dungeonId: portal.id });
+  }
 
+  // Quest-giver glyphs show at every zoom (actionable markers, unlike the
+  // zoom-gated zone/POI text labels), culled to the visible map rect.
   const npcs: MapNpcMarker[] = [];
   for (const e of world.entities.values()) {
     if (e.kind !== 'npc') continue;
-    if (e.pos.z < zone.zMin || e.pos.z >= zone.zMax) continue;
+    if (!inView(e.pos.x, e.pos.z)) continue;
     const avail = e.questIds.filter(
       (q) => QUESTS[q].giverNpcId === e.templateId && world.questState(q) === 'available',
     );
@@ -385,7 +409,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   }
 
   let player: MapPlayerMarker | null = null;
-  if (p.pos.z >= zone.zMin && p.pos.z < zone.zMax && p.pos.x <= WORLD_MAX_X) {
+  if (inView(p.pos.x, p.pos.z) && p.pos.x <= WORLD_MAX_X) {
     const { mx, my } = toMap(p.pos.x, p.pos.z);
     player = { mx, my, angle: -p.facing };
   }
@@ -395,7 +419,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // online-only; friends are plotted first and win ties (dedup by id).
   const allies: MapAllyMarker[] = [];
   const social = world.socialInfo;
-  if (social) {
+  if (labels && social) {
     const selfName = p.name;
     const drawn = new Set<number>();
     const plotAlly = (m: FriendInfo, kind: 'friend' | 'guild'): void => {
@@ -407,7 +431,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
         drawn.has(m.id)
       )
         return;
-      if (m.z < zone.zMin || m.z >= zone.zMax || m.x > WORLD_MAX_X) return;
+      if (!inView(m.x, m.z) || m.x > WORLD_MAX_X) return;
       drawn.add(m.id);
       const { mx, my } = toMap(m.x, m.z);
       allies.push({ mx, my, name: m.name, kind });
@@ -419,7 +443,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   return {
     view: { spanX, spanZ, minX: full.minX, maxX: full.maxX, minZ: full.minZ, maxZ: full.maxZ },
     cursor: zoom > 1 ? 'grab' : 'default',
-    blit,
+    region: { minX: region.minX, maxX: region.maxX, minZ: region.minZ, maxZ: region.maxZ },
     zoneId: zone.id,
     pois,
     portals,

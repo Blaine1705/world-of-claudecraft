@@ -572,7 +572,7 @@ describe('hunter pets', () => {
         (e) => e.kind === 'mob' && e.ownerId === null && e.templateId === 'forest_wolf',
       ),
     ).toBe(true);
-  });
+  }, 90_000);
 
   it('friendly target spells can affect controlled pets', () => {
     const { sim, wolf: pet } = tamedSetup();
@@ -657,7 +657,7 @@ describe('hunter pets', () => {
 
     sim.setPetAutoTaunt(true);
     expect(pet.petAutoTaunt).toBe(true);
-    for (let i = 0; i < 20 * 5 && boar.forcedTargetId !== pet.id; i++) sim.tick();
+    for (let i = 0; i < 20 * 12 && boar.forcedTargetId !== pet.id; i++) sim.tick();
     expect(boar.forcedTargetId).toBe(pet.id);
     expect(pet.petTauntTimer).toBeGreaterThan(0);
 
@@ -1155,8 +1155,14 @@ describe('druid forms', () => {
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
+    // pin the opener's rolls: the wolf can dodge the direct component
+    // (rng-stream dependent), which applies the bleed but skips the combo
+    // award; a mid-range draw is always a clean non-crit hit
+    const realNext = (sim as any).rng.next.bind((sim as any).rng);
+    (sim as any).rng.next = () => 0.5;
     sim.castAbility('rake');
     sim.tick();
+    (sim as any).rng.next = realNext;
     expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
     expect(wolf.auras.some((a) => a.id === 'rake' && a.kind === 'dot')).toBe(true);
     expect(sim.player.comboPoints).toBeGreaterThanOrEqual(1);

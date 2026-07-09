@@ -1,8 +1,16 @@
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../sim/data';
 import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
-import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { inGardenMaze, roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -120,25 +128,19 @@ const BIOME_PALETTE: Record<
     dirt: 0x8a6f47,
     sand: 0xc2b283,
   },
-  // Darker, murkier and more desaturated than the vale so the swamp reads as
-  // gloomy lowland rather than "vale but slightly duller". Pushed further
-  // toward drab olive/brown than a first pass so it reads at a glance.
   marsh: {
-    grass: 0x3f4d28,
-    grassDark: 0x2c3a1e,
-    grassYellow: 0x505c34,
-    dirt: 0x4f4028,
-    sand: 0x655741,
+    grass: 0x596d36,
+    grassDark: 0x41522b,
+    grassYellow: 0x71764a,
+    dirt: 0x6e5a3e,
+    sand: 0x8f7f5c,
   },
-  // Cooler and greyer than the vale/marsh's warm greens, pushing toward sage
-  // and stone since altitude thins out the lush growth. Pushed further blue-
-  // grey than a first pass so peaks are unmistakably a different biome.
   peaks: {
-    grass: 0x7a8878,
-    grassDark: 0x5c6862,
-    grassYellow: 0x9aa192,
-    dirt: 0x8a7d6a,
-    sand: 0xbdb49c,
+    grass: 0x687a55,
+    grassDark: 0x4d5c45,
+    grassYellow: 0x8d9168,
+    dirt: 0x7d6a50,
+    sand: 0xb0a486,
   },
   // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
   // Coastal green-blue, brighter sand than the desert's.
@@ -176,6 +178,84 @@ const BIOME_PALETTE: Record<
     dirt: 0x484e56,
     sand: 0x767c86,
   },
+  // dusk: violet-cast glade greens with dusty rose soil
+  dusk: {
+    grass: 0x6d7566,
+    grassDark: 0x4c4e58,
+    grassYellow: 0x8c8078,
+    dirt: 0x6e5a68,
+    sand: 0xa593a2,
+  },
+  ember: {
+    grass: 0xc9a86a,
+    grassDark: 0xa8854f,
+    grassYellow: 0xd8bc80,
+    dirt: 0x9a6a44,
+    sand: 0xe0c088,
+  },
+  frost: {
+    grass: 0xeef4fa,
+    grassDark: 0xd8e4f0,
+    grassYellow: 0xcfdce8,
+    dirt: 0x9fb0c0,
+    sand: 0xdfe8f2,
+  },
+  amber: {
+    grass: 0xc9a44e,
+    grassDark: 0xa88438,
+    grassYellow: 0xe0c060,
+    dirt: 0x8a6a42,
+    sand: 0xd8bc84,
+  },
+  fen: {
+    grass: 0x7cab68,
+    grassDark: 0x5c8a52,
+    grassYellow: 0xa2c47a,
+    dirt: 0x6e6448,
+    sand: 0xb8bc8e,
+  },
+  // night: the Nightbloom dreams in violet. The splat textures are
+  // green-authored, so these run hot and saturated or the meadow reads
+  // green anyway (the amber realm's fire-orange needed the same push)
+  night: {
+    grass: 0xc06cf2,
+    grassDark: 0x8f4ecc,
+    grassYellow: 0xe08cf8,
+    dirt: 0x8a5cb8,
+    sand: 0xd8a8f0,
+  },
+  // haunt: dead mossy floor, cold wet earth, everything a shade too dark
+  haunt: {
+    grass: 0x46543e,
+    grassDark: 0x2e382c,
+    grassYellow: 0x5a6644,
+    dirt: 0x453c34,
+    sand: 0x6b6754,
+  },
+  // jungle: saturated tropical green over bright coral sand
+  jungle: {
+    grass: 0x3f9448,
+    grassDark: 0x2c7038,
+    grassYellow: 0x74b04e,
+    dirt: 0x8a6e4a,
+    sand: 0xf2e2b4,
+  },
+  // garden: mown lawn over warm gravel, tidy even where it has run wild
+  garden: {
+    grass: 0x58a04e,
+    grassDark: 0x3f7e3c,
+    grassYellow: 0x86b85c,
+    dirt: 0x8a7a5a,
+    sand: 0xd8cca8,
+  },
+  // gale: wind-dried sage downs over grey shingle
+  gale: {
+    grass: 0x6a9a62,
+    grassDark: 0x4c7a4e,
+    grassYellow: 0x9ab070,
+    dirt: 0x7a6e58,
+    sand: 0xd8d0b8,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -187,6 +267,16 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   desert: 0.55,
   volcano: 0.35,
   cave: 0.4,
+  dusk: 0.52,
+  ember: 0.5,
+  frost: 0.5,
+  amber: 0.52,
+  fen: 0.6,
+  night: 0.55,
+  haunt: 0.58,
+  jungle: 0.6,
+  garden: 0.6,
+  gale: 0.5, // the cliffs crag early
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
@@ -213,6 +303,14 @@ const wetRockC = new THREE.Color(0x3f4442); // dark wet-rock shoreline (peaks/vo
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
+const emberForestC = new THREE.Color(0x729a4e); // the Drakelands' green gatewood
+const emberScorchC = new THREE.Color(0x6a4a40); // volcanic ground near the Drakemaw
+const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
+const cobbleC = new THREE.Color(0x8f8c86); // the Amberfall's laid stone
+const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
+const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
+const hedgeC = new THREE.Color(0x2e5c30); // the Great Maze's clipped hedge walls
+const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
 const snowCapC = new THREE.Color(0xedf3fa);
 const lowSunC = new THREE.Color(0xe7d9a5);
 const lowShadeC = new THREE.Color(0x60745b);
@@ -227,68 +325,52 @@ const zonePalettes = ZONES.map((zn) => {
   };
 });
 
-// Per-biome palettes for painted cells (a flat lookup, no z-blend).
-const biomePalettes: Record<BiomeId, (typeof zonePalettes)[number]> = {
-  vale: makeBiomePalette('vale'),
-  marsh: makeBiomePalette('marsh'),
-  peaks: makeBiomePalette('peaks'),
-  beach: makeBiomePalette('beach'),
-  desert: makeBiomePalette('desert'),
-  volcano: makeBiomePalette('volcano'),
-  cave: makeBiomePalette('cave'),
-};
-function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
-  const p = BIOME_PALETTE[b];
-  return {
-    grass: new THREE.Color(p.grass),
-    grassDark: new THREE.Color(p.grassDark),
-    grassYellow: new THREE.Color(p.grassYellow),
-    dirt: new THREE.Color(p.dirt),
-    sand: new THREE.Color(p.sand),
-  };
-}
-
-// Palette at a point. A painted cell (biome differs from its zone band) uses that
-// biome's flat palette; otherwise the smooth zone-band blend. With no paint layer
-// `biome === zoneBiomeAt(z)` always, so this is the original z-blend exactly.
-function paletteAt(_x: number, z: number, biome: BiomeId): void {
-  if (biome !== zoneBiomeAt(z)) {
-    const p = biomePalettes[biome];
-    grassC.copy(p.grass);
-    grassDarkC.copy(p.grassDark);
-    grassYellowC.copy(p.grassYellow);
-    dirtC.copy(p.dirt);
-    sandC.copy(p.sand);
-    return;
-  }
-  grassC.copy(zonePalettes[0].grass);
-  grassDarkC.copy(zonePalettes[0].grassDark);
-  grassYellowC.copy(zonePalettes[0].grassYellow);
-  dirtC.copy(zonePalettes[0].dirt);
-  sandC.copy(zonePalettes[0].sand);
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+function paletteAt(x: number, z: number): void {
+  const stripPalette = (zn: (typeof ZONES)[number]) =>
+    zonePalettes[ZONES.indexOf(zn)] ?? zonePalettes[0];
+  grassC.copy(stripPalette(STRIP_ZONES[0]).grass);
+  grassDarkC.copy(stripPalette(STRIP_ZONES[0]).grassDark);
+  grassYellowC.copy(stripPalette(STRIP_ZONES[0]).grassYellow);
+  dirtC.copy(stripPalette(STRIP_ZONES[0]).dirt);
+  sandC.copy(stripPalette(STRIP_ZONES[0]).sand);
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    grassC.lerp(zonePalettes[i + 1].grass, tt);
-    grassDarkC.lerp(zonePalettes[i + 1].grassDark, tt);
-    grassYellowC.lerp(zonePalettes[i + 1].grassYellow, tt);
-    dirtC.lerp(zonePalettes[i + 1].dirt, tt);
-    sandC.lerp(zonePalettes[i + 1].sand, tt);
+    const next = stripPalette(STRIP_ZONES[i + 1]);
+    grassC.lerp(next.grass, tt);
+    grassDarkC.lerp(next.grassDark, tt);
+    grassYellowC.lerp(next.grassYellow, tt);
+    dirtC.lerp(next.dirt, tt);
+    sandC.lerp(next.sand, tt);
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t <= 0) continue;
+    const p = stripPalette(col);
+    grassC.lerp(p.grass, t);
+    grassDarkC.lerp(p.grassDark, t);
+    grassYellowC.lerp(p.grassYellow, t);
+    dirtC.lerp(p.dirt, t);
+    sandC.lerp(p.sand, t);
   }
 }
 
 // How "marsh" a given z is — mirrors the palette/heightfield blend windows so
 // the mud texture fades in exactly where the marsh palette does.
-function marshWeightAt(z: number): number {
-  let w = ZONES[0].biome === 'marsh' ? 1 : 0;
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
+function marshWeightAt(x: number, z: number): number {
+  let w = STRIP_ZONES[0].biome === 'marsh' ? 1 : 0;
+  for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
+    const b = STRIP_ZONES[i].zMax;
     const t = clamp01((z - (b - 30)) / 65);
     const tt = t * t * (3 - 2 * t);
     if (tt <= 0) break;
-    w += ((ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+    w += ((STRIP_ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
+  }
+  for (const col of COLUMN_ZONES) {
+    const t = columnBlendAt(col, x, z);
+    if (t > 0) w += ((col.biome === 'marsh' ? 1 : 0) - w) * t;
   }
   return w;
 }
@@ -317,19 +399,9 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     -(hz / (2 * SLOPE_EPS)) * invLen,
   ];
 
-  const biome = biomeAt(x, z);
-  paletteAt(x, z, biome);
+  paletteAt(x, z);
+  const biome = zoneBiomeAt(x, z);
   const w: [number, number, number, number] = [1, 0, 0, 0];
-  // A painted cell re-bases the splat mix on its biome's dominant ground layer;
-  // without this the splat tier keeps the grass texture everywhere and the
-  // biome override only reads as the gentle vertex tint (invisible in practice).
-  // Shore/road/slope/snow blends below still layer on top, matching zone bands.
-  const painted = biome !== zoneBiomeAt(z);
-  if (painted) {
-    if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
-    else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
-    else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
-  }
   const impact = impactCraterTerrainBlend(x, z);
 
   // base grass with patchy variation: a coarse fbm layer for dry/lush
@@ -340,15 +412,34 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   cTmp.copy(grassC).lerp(grassDarkC, v);
   const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
   cTmp.lerp(grassYellowC, v2 * 0.35);
+  if (biome === 'ember') {
+    // the gatewood is green in the south near Wyrmwatch and dries into sand
+    // northward; the volcanic belt then darkens toward scorched basalt
+    const forest = 1 - clamp01((z - 1925) / 145);
+    if (forest > 0) cTmp.lerp(emberForestC, forest * 0.85);
+    const sandT = clamp01((z - 1925) / 145);
+    lerpSplat(w, 3, sandT * 0.75);
+    // the Wyrmroad: a sheltered green corridor along x 404 through the
+    // volcanic belt toward the south crossing, the realm's second gradient
+    const passT = 1 - clamp01((Math.abs(x - 404) - 26) / 26);
+    const valley = passT * clamp01((z - 2310) / 80);
+    const scorch = clamp01((z - 2260) / 100) * (1 - valley);
+    if (scorch > 0) {
+      cTmp.lerp(emberScorchC, scorch * 0.55);
+      lerpSplat(w, 2, scorch * 0.5);
+    }
+    if (valley > 0) {
+      cTmp.lerp(emberForestC, valley * 0.8);
+      lerpSplat(w, 0, valley * 0.6);
+    }
+  }
   // the marsh reads muddier: patches of wet dirt across the lowland
   if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
   // shoreline blend, biome-specific: marsh has no sandy beach (wet mud
   // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
   // keeps the classic sandy bank. Color and splat weight share one feathered
   // falloff so the shore blends out instead of cutting a razor-hard edge.
-  // waterLevelAt(x, z) (not the flat const) so the beach only tracks water inside
-  // a declared lake's footprint; a dry sunken feature elsewhere gets no shore tint.
-  const wl = waterLevelAt(x, z);
+  const wl = WATER_LEVEL;
   const shore = clamp01((wl + 1.6 - h) / 1.6);
   if (biome === 'marsh') {
     cTmp.lerp(dirtDarkC, shore);
@@ -366,19 +457,38 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
     if (dHub < 14) {
       const hubT = clamp01((14 - dHub) / 3);
-      cTmp.lerp(dirtDarkC, 0.7 * hubT);
-      lerpSplat(w, 1, 0.75 * hubT);
+      if (zn.biome === 'amber') {
+        // Lanternmere's plaza is paved like its roads
+        const cell =
+          (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+        cTmp.lerp(cobbleC, 0.85 * hubT);
+        cTmp.lerp(cobbleDarkC, cell * 0.45 * hubT);
+        lerpSplat(w, 2, 0.75 * hubT);
+      } else {
+        cTmp.lerp(dirtDarkC, 0.7 * hubT);
+        lerpSplat(w, 1, 0.75 * hubT);
+      }
       break;
     }
   }
   const rd = roadDistance(x, z);
+  // the Amberfall paves its ways: cobblestone, cell-jittered so the vertex
+  // grid reads as laid stones rather than one grey ribbon (rock splat)
+  const cobbles = biome === 'amber';
   if (rd < 2.0) {
-    cTmp.lerp(dirtC, 0.85);
-    lerpSplat(w, 1, 0.85);
+    if (cobbles) {
+      const cell = (Math.sin(Math.floor(x * 1.6) * 12.9898 + Math.floor(z * 1.6) * 78.233) + 1) / 2;
+      cTmp.lerp(cobbleC, 0.9);
+      cTmp.lerp(cobbleDarkC, cell * 0.5);
+      lerpSplat(w, 2, 0.85);
+    } else {
+      cTmp.lerp(dirtC, 0.85);
+      lerpSplat(w, 1, 0.85);
+    }
   } else if (rd < 3.4) {
     const t = 0.85 * (1 - (rd - 2.0) / 1.4);
-    cTmp.lerp(dirtC, t);
-    lerpSplat(w, 1, t);
+    cTmp.lerp(cobbles ? cobbleC : dirtC, t);
+    lerpSplat(w, cobbles ? 2 : 1, t);
   }
   // Break up the rock/snow blend so cliffs read as striated stone and snow
   // reads as patchy drifts instead of a single flat tone / a clean cutoff.
@@ -390,13 +500,48 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.lerp(rockC, t);
     cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
     lerpSplat(w, 2, t);
+    // the Great Maze's walls are hedges, not cliffs: inside the maze the
+    // steep faces take clipped evergreen instead of rock
+    if (biome === 'garden' && inGardenMaze(x, z)) {
+      cTmp.lerp(hedgeC, t);
+      lerpSplat(w, 0, t * 0.7); // lean back toward the grass splat
+    }
+    // dusk sea cliffs read as dark weathered stone with pale strata bands, so
+    // the coast walls look like rugged wave-cut rock instead of smooth clay
+    if (biome === 'dusk') {
+      const nearSea = clamp01((16 - h) / 12);
+      const band = (Math.sin(h * 1.7 + x * 0.06 + z * 0.045) + 1) / 2;
+      cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
+      cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
+    }
   }
-  // high ground (ridges, peaks) goes rocky then snowy
+  // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
+  // rock reads as dark basalt instead, and its peaks never take snow)
   let snow = 0;
+  if (biome === 'ember') {
+    const t2 = Math.max(
+      slope > rockStart ? Math.min(1, (slope - rockStart) * 2) : 0,
+      clamp01((h - 18) / 8) * 0.75,
+    );
+    if (t2 > 0) cTmp.lerp(emberBasaltC, t2 * 0.85);
+  }
+  if (biome === 'frost') {
+    // the Reach is snowbound from the shore up, not just on its crowns; the
+    // Snowline and the Goldmelt (the sideways crossings) both sit at z 1890
+    // on opposite borders, so the green valley floors fade under the snow
+    // toward the interior instead of flipping white at the borders
+    const passT = 1 - clamp01((Math.abs(z - 1890) - 26) / 26);
+    const green = passT * clamp01((Math.abs(x) - 95) / 85);
+    const snowline = 1 - green;
+    if (green > 0) cTmp.lerp(emberForestC, green * 0.8);
+    const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * snowline;
+    cTmp.lerp(snowCapC, 0.8 * blanket);
+    snow = Math.max(snow, 0.85 * blanket);
+  }
   if (h > 22) {
     const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
-    cTmp.lerp(rockC, rockT);
-    snow = clamp01((h - 34 + (snowPatch - 0.5) * 8) / 14) * 0.85;
+    cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, rockT);
+    snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 8) / 14) * 0.85;
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }
@@ -423,10 +568,8 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     snow = Math.max(snow, rimSnow);
     lerpSplat(w, 2, rim * 0.85);
   }
-  // mud rides the dirt layer wherever the marsh palette is active; a painted
-  // cell overrides the z-band weight (painted marsh is fully wet, any other
-  // painted biome suppresses band mud that would bleed into it)
-  const mud = painted ? (biome === 'marsh' ? 1 : 0) : marshWeightAt(z);
+  // mud rides the dirt layer wherever the marsh palette is active
+  const mud = marshWeightAt(x, z);
   if (GFX.lowPlus && !GFX.terrainSplat) {
     const ridge = clamp01((slope - 0.22) * 1.6);
     const lowland = clamp01((wl + 7 - h) / 12);

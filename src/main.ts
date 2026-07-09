@@ -14,6 +14,7 @@ import {
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
 import {
+  clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
   clickMoveStep,
   distance2d,
@@ -25,6 +26,7 @@ import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/c
 import { getClientSeed } from './game/client_seed';
 import { initDesktopDownload } from './game/desktop_download';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
+import { installDevTeleports } from './game/dev_shortcuts';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
@@ -98,6 +100,7 @@ import { preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
+import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import type { SelfMotionFrame } from './render/self_motion';
@@ -106,7 +109,7 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS, isDelvePos, isRiftPos, setActiveWorldContent } from './sim/data';
+import { ITEMS, isDelvePos, isRiftPos, setActiveWorldContent, ZONES } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -1013,6 +1016,53 @@ async function startGame(
       autosizeChatInput();
     }
   });
+  // Dev-only chat command to scrub the world day/night cycle for testing:
+  //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
+  // Render-only: it just overrides the shared clock phase (day_night_clock), so
+  // the sky lighting and the minimap dial both jump to the chosen time of day.
+  // Returns true when it handled the input (so it is not also sent to chat).
+  const DAY_NIGHT_PRESETS: Record<string, number> = {
+    midnight: 0,
+    night: 0,
+    dawn: 0.25,
+    sunrise: 0.25,
+    morning: 0.375,
+    day: 0.5,
+    noon: 0.5,
+    midday: 0.5,
+    afternoon: 0.625,
+    dusk: 0.75,
+    sunset: 0.75,
+    evening: 0.8,
+  };
+  const tryDayNightDevCommand = (raw: string): boolean => {
+    const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
+    if (!m) return false;
+    const arg = m[1].trim().toLowerCase();
+    if (!arg) {
+      hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
+      return true;
+    }
+    if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
+      setDayNightPhaseOverride(null);
+      hud.log('[dev] day/night resumed (real UTC clock)', '#8fd0ff');
+      hud.refreshDayNightDial();
+      return true;
+    }
+    let phase: number | null = arg in DAY_NIGHT_PRESETS ? DAY_NIGHT_PRESETS[arg] : null;
+    if (phase === null) {
+      const n = Number.parseFloat(arg);
+      if (Number.isFinite(n)) phase = ((n % 1) + 1) % 1;
+    }
+    if (phase === null) {
+      hud.log(`[dev] unknown time "${arg}" - try night|dawn|day|dusk|<0..1>|auto`, '#ffcf6a');
+      return true;
+    }
+    setDayNightPhaseOverride(phase);
+    hud.log(`[dev] time of day set to ${arg} (phase ${phase.toFixed(2)})`, '#8fd0ff');
+    hud.refreshDayNightDial();
+    return true;
+  };
   chatInput.addEventListener('keydown', (e) => {
     e.stopPropagation();
     // While the "!" command dropdown is open it owns Arrows/Enter/Tab/Escape.
@@ -1027,6 +1077,12 @@ async function startGame(
       // the active channel tab supplies the send prefix, so plain text goes to
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
+      // dev-only day/night scrub command, intercepted before the chat send path
+      if (import.meta.env.DEV && tryDayNightDevCommand(raw)) {
+        chatInput.value = '';
+        closeChat();
+        return;
+      }
       // "/share" links the selected quest into party chat; skip the normal send path.
       if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);
@@ -1656,7 +1712,7 @@ async function startGame(
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
           userAgent: navigator.userAgent,
           viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio },
-          zone: zoneBiomeAt(world.player.pos.z),
+          zone: zoneBiomeAt(world.player.pos.x, world.player.pos.z),
           level: world.player.level,
           // Entity has no `cls`; the player's class is its templateId (see Entity).
           className: world.player.templateId,
@@ -2098,6 +2154,7 @@ async function startGame(
     );
   }
 
+  let lastResolveMovePos: { x: number; z: number } | null = null;
   function resolveMove(
     mouselook: boolean,
     playerPos: { x: number; z: number },
@@ -2107,6 +2164,13 @@ async function startGame(
     attackMoveTick();
     const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
+    // A teleport (door, portal, spirit release) invalidates any pending
+    // click-to-move: the destination is across the transition, and chasing it
+    // walks the player straight back into the trigger.
+    if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
+      input.clearClickMove();
+    }
+    lastResolveMovePos = { x: playerPos.x, z: playerPos.z };
     if (input.clickMoveTarget) {
       const action = resolveClickMoveAction(mi, {
         mouselook,
@@ -2688,6 +2752,21 @@ async function startGame(
             hud.submitLockpickAction(action as import('./sim/lockpick').PickAction),
           flushLockpickEvents: () => hud.flushLockpickEvents(),
         };
+        // Console realm teleports (go.vale() ... go.fen()): offline dev only,
+        // never online (server-authoritative movement) and never production.
+        if (import.meta.env.DEV && offlineSim && !online) {
+          installDevTeleports(
+            ZONES.map((zn) => ({ id: zn.id, town: zn.hub.name, x: zn.hub.x, z: zn.hub.z })),
+            (x, z) => {
+              const me = offlineSim.entities.get(offlineSim.playerId);
+              if (!me) return;
+              me.pos.x = x;
+              me.pos.z = z;
+              me.prevPos = { ...me.pos };
+              me.hp = me.maxHp;
+            },
+          );
+        }
       }, LOADING_FADE_MS);
     }),
   );

@@ -40,6 +40,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -5, z: -52, label: 'Reliquary Hill' },
     { x: 40, z: 140, label: 'Brightwood Glade' },
     { x: -11, z: -112, label: 'The Sowfield' },
+    { x: 150, z: -46, label: 'The Farshore Causeway' },
   ],
   welcome: 'Find Marshal Redbrook in town — he has work for you.',
   welcomeQuestId: 'q_wolves',

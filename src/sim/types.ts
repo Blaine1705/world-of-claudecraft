@@ -639,7 +639,9 @@ export type MobFamily =
   | 'ogre'
   | 'elemental'
   | 'dragonkin'
-  | 'demon';
+  | 'demon'
+  | 'kobold'
+  | 'murloc';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
 
@@ -1473,12 +1475,44 @@ export interface DungeonDef {
   leaveText: string;
 }
 
-export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'beach' | 'desert' | 'volcano' | 'cave';
+export type BiomeId =
+  | 'vale'
+  | 'marsh'
+  | 'peaks'
+  | 'beach'
+  | 'desert'
+  | 'volcano'
+  | 'cave'
+  | 'dusk'
+  | 'ember'
+  | 'frost'
+  | 'amber'
+  | 'fen'
+  | 'night'
+  | 'haunt'
+  | 'jungle'
+  | 'garden'
+  | 'gale';
 
 export interface ZoneDef {
   id: string;
   name: string;
   zMin: number;
+  /**
+   * Optional east-west extent (a world GRID column). Omitted = the original
+   * full-width strip [-WORLD_SIZE/2, WORLD_SIZE/2]. Zones are rectangles;
+   * zoneAt(x, z) picks by rect, so side-by-side columns can share a z band
+   * and meet at a real walkable border, exactly like the north passes.
+   */
+  xMin?: number;
+  xMax?: number;
+  /**
+   * Road passes through a COLUMN border (a shared vertical edge with the
+   * neighbor east or west), the sideways twin of southPassX: the z where
+   * the border ridge opens. Only read when such an edge exists.
+   */
+  eastPassZ?: number;
+  westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
   biome: BiomeId;
@@ -1488,6 +1522,35 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // The zone's southern border ridge has NO road pass and is raised past the
+  // climbable slope: the zone is reachable only by portal (see world.ts).
+  sealedSouthBorder?: boolean;
+  // Where the road pass through the zone's SOUTHERN border ridge sits (x).
+  // Defaults to 0 (the original zones' central road); the Drakelands set it
+  // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
+  southPassX?: number;
+}
+
+// One end of a paired overworld portal. Walking within the pair's trigger
+// radius of this side teleports the player to the OTHER side's landing;
+// `landing` is where a traveler coming out of this side arrives, placed
+// outside this side's own trigger radius so arrivals never bounce back.
+export interface PortalSide {
+  x: number;
+  z: number;
+  landing: { x: number; z: number; facing: number };
+}
+
+// A two-way positional portal between overworld locations (the Veiled Hollow
+// cave). Purely data: src/sim/portals.ts checks these in the tick, in every
+// host, with no entities and no rng.
+export interface PortalDef {
+  id: string;
+  a: PortalSide;
+  b: PortalSide;
+  radius: number;
+  enterText: string; // flavor line for a -> b
+  leaveText: string; // flavor line for b -> a
 }
 
 export interface BuildingDef {
@@ -1522,6 +1585,9 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
+  // colliders here, rendered by render/realm_flora.ts from the same record.
+  greatTrees?: { x: number; z: number; r: number }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -1631,6 +1697,7 @@ export interface Entity {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
   hp: number;
   maxHp: number;
   resource: number;

@@ -1242,7 +1242,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Fallen Chapel",
       "Reliquary Hill",
       "Brightwood Glade",
-      "The Sowfield"
+      "The Sowfield",
+      "The Farshore Causeway"
     ],
     "welcome": "Find Marshal Redbrook in town — he has work for you."
   },
@@ -1285,6 +1286,198 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Gravewyrm Sanctum"
     ],
     "welcome": "Captain Thessaly holds the wall at Highwatch — barely."
+  },
+  {
+    "id": "veiled_hollow",
+    "name": "The Veiled Hollow",
+    "min": 15,
+    "max": 20,
+    "biome": "dusk",
+    "hub": "Eldergleam",
+    "pois": [
+      "Eldergleam",
+      "Duskfall Cave",
+      "Duskfall Overlook",
+      "Elder Grove",
+      "Starfall Basin",
+      "The Sunken Court",
+      "Crystalline Shallows",
+      "The Gleaming Deep"
+    ],
+    "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam."
+  },
+  {
+    "id": "drakelands",
+    "name": "The Drakelands",
+    "min": 16,
+    "max": 20,
+    "biome": "ember",
+    "hub": "Wyrmwatch",
+    "pois": [
+      "Wyrmwatch",
+      "The Gatewood",
+      "Cinder Dunes",
+      "Trollmoot",
+      "Bloodglass Fields",
+      "Drakemaw Caldera"
+    ],
+    "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes."
+  },
+  {
+    "id": "frostveil",
+    "name": "The Frostveil Reach",
+    "min": 17,
+    "max": 20,
+    "biome": "frost",
+    "hub": "Icemantle",
+    "pois": [
+      "Icemantle",
+      "The Snowline",
+      "Glacier Tarn",
+      "The Aurora Steps",
+      "The Shiverfen",
+      "The Howling Terraces"
+    ],
+    "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake."
+  },
+  {
+    "id": "amberfall",
+    "name": "The Amberfall",
+    "min": 18,
+    "max": 20,
+    "biome": "amber",
+    "hub": "Lanternmere",
+    "pois": [
+      "Lanternmere",
+      "The Goldmelt",
+      "The Gilded Orchard",
+      "Harvest Hollow",
+      "The Great Mere",
+      "Cindermaple Rise",
+      "The Leaning Monolith"
+    ],
+    "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you."
+  },
+  {
+    "id": "willowfen",
+    "name": "The Willowfen",
+    "min": 19,
+    "max": 20,
+    "biome": "fen",
+    "hub": "Bridgemere",
+    "pois": [
+      "Bridgemere",
+      "The Amberfen Steps",
+      "The Lilymoors",
+      "Bogshine Pools",
+      "Willowweep",
+      "The Drowsy Flats"
+    ],
+    "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile."
+  },
+  {
+    "id": "nightbloom",
+    "name": "The Nightbloom",
+    "min": 20,
+    "max": 20,
+    "biome": "night",
+    "hub": "Moonrest",
+    "pois": [
+      "Moonrest",
+      "The Nightgate",
+      "The Moonwell",
+      "Gloamfield",
+      "The Standing Vigil",
+      "The Sleepless Barrow"
+    ],
+    "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky."
+  },
+  {
+    "id": "wraithwood",
+    "name": "The Wraithwood",
+    "min": 20,
+    "max": 20,
+    "biome": "haunt",
+    "hub": "Gallowmere",
+    "pois": [
+      "Gallowmere",
+      "The Crowgate",
+      "Widow's Thicket",
+      "The Hanging Glade",
+      "The Mournstone Chapel",
+      "The Huntsman's Clearing"
+    ],
+    "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name."
+  },
+  {
+    "id": "palmreach",
+    "name": "The Palmreach",
+    "min": 20,
+    "max": 20,
+    "biome": "jungle",
+    "hub": "Drifthaven",
+    "pois": [
+      "Drifthaven",
+      "The Tanglemouth",
+      "The Palmstrand",
+      "The Emerald Tangle",
+      "The Vinefall",
+      "The Sapphire Lagoon",
+      "The Sunken Idol"
+    ],
+    "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you."
+  },
+  {
+    "id": "evergarden",
+    "name": "The Evergarden",
+    "min": 20,
+    "max": 20,
+    "biome": "garden",
+    "hub": "Hedgewick",
+    "pois": [
+      "Hedgewick",
+      "The Garden Gate",
+      "The Statuary Walk",
+      "The Rose Wilds",
+      "The Petal Pond",
+      "The Great Maze",
+      "The Fountain Court"
+    ],
+    "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back."
+  },
+  {
+    "id": "galecrest",
+    "name": "The Galecrest",
+    "min": 20,
+    "max": 20,
+    "biome": "gale",
+    "hub": "Wickharbor",
+    "pois": [
+      "Wickharbor",
+      "The Windway",
+      "The Howling Downs",
+      "The Old Beacon",
+      "The Shear",
+      "The Wreckfields",
+      "The Mirror Tarn"
+    ],
+    "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you."
+  },
+  {
+    "id": "farshore_isle",
+    "name": "The Farshore",
+    "min": 3,
+    "max": 7,
+    "biome": "vale",
+    "hub": "Gullhaven",
+    "pois": [
+      "Gullhaven",
+      "The Landing",
+      "The Watch Meadow",
+      "The Sundered Cliffs",
+      "The Riftfields"
+    ],
+    "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you."
   }
 ];
 

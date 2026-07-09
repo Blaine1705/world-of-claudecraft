@@ -111,6 +111,7 @@ import {
   isArenaPos,
   isDelvePos,
   MOBS,
+  migrateLegacyInstancePos,
   NPCS,
   QUESTS,
   RIFT_SLOT_COUNT,
@@ -275,6 +276,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
+import { updateSwimFatigue } from './fatigue';
 import {
   applyHeroicMobTuning,
   mobLevelForDungeonDifficulty,
@@ -294,6 +296,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -1610,6 +1613,10 @@ export class Sim {
     // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
     // position and eject the player to a dungeon door instead of the board door
     // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
+    if (savedPos) {
+      // saves from before the instance plane moved east (see data.ts)
+      savedPos = migrateLegacyInstancePos(savedPos) ?? savedPos;
+    }
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
@@ -3140,6 +3147,8 @@ export class Sim {
         lap?.('p.move');
         this.updateDoorTriggers(p);
         this.updateRiftTriggers(p);
+        updatePortalTriggers(this.ctx, p);
+        updateSwimFatigue(this.ctx, p);
         lap?.('p.doors');
         this.updateCasting(p, meta);
         lap?.('p.casting');
@@ -5153,7 +5162,7 @@ export class Sim {
     // The catch depends on which zone's water you're fishing — each has its own
     // weighted table (src/sim/content/items.ts). Fall back to the Vale table for
     // any spot without its own (e.g. fishable water inside a dungeon zone).
-    const table = FISHING_TABLES[zoneAt(p.pos.z).id] ?? FISHING_TABLES.eastbrook_vale;
+    const table = FISHING_TABLES[zoneAt(p.pos.x, p.pos.z).id] ?? FISHING_TABLES.eastbrook_vale;
     const total = table.reduce((sum, e) => sum + e.weight, 0);
     let roll = this.rng.next() * total;
     let caught: string | null = null;
@@ -5334,7 +5343,7 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
-    const zone = zoneAt(p.pos.z);
+    const zone = zoneAt(p.pos.x, p.pos.z);
     const inTown = professionsFocus.isInTownZone(p.pos, zone);
     const result = professionsFocus.setTownFocus(meta.townFocus, allocation, inTown);
     if (!result.ok) {

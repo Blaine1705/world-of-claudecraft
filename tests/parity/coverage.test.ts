@@ -200,7 +200,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(ev.some((e) => e.type === 'respawn')).toBe(true);
     const victimPid = rec.notes.fiestaPowerupVictimPid as number;
     expect((rec.sim as any).entities.get(victimPid)?.dead).toBe(false);
-  });
+  }, 90_000);
 
   it('duel_to_winner: a duel goes active then ends with a winner, clearing duels', () => {
     const rec = run('duel_to_winner');
@@ -877,5 +877,5 @@ describe('coverage: each scenario fires its subsystem', () => {
     const tankMeta = [...sim.players.values()].find((m: any) => m.name === 'NyxTank') as any;
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
-  });
+  }, 90_000);
 });

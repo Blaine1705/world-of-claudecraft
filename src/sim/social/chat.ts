@@ -434,7 +434,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
 
   // Self-only readouts: emit a private system line and never become chat.
   if (/^\/(?:where|loc|zone)(?:\s|$)/i.test(raw)) {
-    const zone = zoneAt(r.e.pos.z);
+    const zone = zoneAt(r.e.pos.x, r.e.pos.z);
     const [lo, hi] = zone.levelRange;
     ctx.error(
       r.meta.entityId,
@@ -498,7 +498,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
   if (/^\/(?:zones|zonelist|worldmap)(?:\s|$)/i.test(raw)) {
-    ctx.error(r.meta.entityId, readouts.zonesReadout(r.e.pos.z));
+    ctx.error(r.meta.entityId, readouts.zonesReadout(r.e.pos.x, r.e.pos.z));
     return null;
   }
   if (/^\/(?:nearby|near|around)(?:\s|$)/i.test(raw)) {

@@ -60,18 +60,20 @@ export function musicZoneForLocation(
   inDungeon: boolean,
   dungeonId: string | null = null,
 ): MusicZone {
-  // Paint-only biomes (custom maps) borrow the closest shipped theme.
-  const biomeMusic: MusicZone =
+  // Realm + paint-only biomes borrow the closest shipped theme (no bespoke
+  // layer yet); vale/marsh/peaks map to themselves. Covers every BiomeId so a
+  // realm or custom-map zone without an explicit ZONE_MUSIC entry still scores.
+  const biomeLayer: MusicZone =
     biome === 'vale' || biome === 'marsh' || biome === 'peaks'
       ? biome
-      : biome === 'beach'
-        ? 'vale'
-        : biome === 'cave'
-          ? 'marsh'
-          : 'peaks';
+      : biome === 'fen' || biome === 'night' || biome === 'haunt' || biome === 'cave'
+        ? 'marsh'
+        : biome === 'jungle' || biome === 'garden' || biome === 'beach'
+          ? 'vale'
+          : 'peaks'; // dusk/ember/frost/amber/gale/desert/volcano
   if (inDungeon) return dungeonId ? dungeonMusicZoneForDungeon(dungeonId) : 'dungeon_hollow_crypt';
-  if (inHub) return TOWN_MUSIC[zoneId] ?? biomeMusic;
-  return ZONE_MUSIC[zoneId] ?? biomeMusic;
+  if (inHub) return TOWN_MUSIC[zoneId] ?? biomeLayer;
+  return ZONE_MUSIC[zoneId] ?? biomeLayer;
 }
 
 type Inst =

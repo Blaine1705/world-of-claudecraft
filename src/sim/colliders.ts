@@ -26,7 +26,12 @@ import {
 } from './dungeon_layout';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
-import { generateDecorations, groundHeight } from './world';
+import {
+  crossesGardenHedge,
+  crossesSealedBorder,
+  generateDecorations,
+  groundHeight,
+} from './world';
 
 // Static world collision. Prop placement comes from the per-zone content
 // modules (merged into PROPS by sim/data.ts): the renderer builds its meshes
@@ -112,6 +117,15 @@ function staticWorldColliders(seed: number): Collider[] {
       z: w.z,
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, 3.7),
+      camGhost: true,
+    });
+  for (const t of PROPS.greatTrees ?? [])
+    out.push({
+      type: 'circle',
+      x: t.x,
+      z: t.z,
+      r: t.r,
+      cameraTopY: topY(seed, t.x, t.z, 7),
       camGhost: true,
     });
   for (const s of PROPS.stalls)
@@ -564,10 +578,27 @@ export function resolveMovement(
     z = fromZ;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    const nextX = fromX + dx * t;
-    const nextZ = fromZ + dz * t;
+    let nextX = fromX + dx * t;
+    // A sealed zone border is a hard wall regardless of terrain slope (the
+    // climb gate projects rise along the movement direction, so a shallow
+    // diagonal would otherwise sneak over the crest). Clamp z at the crest
+    // and keep the x component, so pushing into the wall slides along it.
+    let nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
+    // The Great Maze's hedges are hard walls for the same reason, tested as
+    // a segment crossing (an endpoint-only test teleports a stalled mover
+    // across once its target passes the wall). The faces are axis-aligned,
+    // so slide by dropping whichever axis component pushes into the hedge.
+    if (crossesGardenHedge(x, z, nextX, nextZ)) {
+      if (!crossesGardenHedge(x, z, x, nextZ)) nextX = x;
+      else if (!crossesGardenHedge(x, z, nextX, z)) nextZ = z;
+      else break; // cornered against the hedge
+    }
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
     const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules, riftToken);
+    // ...and a static-collider slide (a tree hugging the crest) must not
+    // shove the resolved position across it either
+    if (crossesSealedBorder(x, z, resolved.z)) break;
+    if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {

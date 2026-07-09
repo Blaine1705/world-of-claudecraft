@@ -130,9 +130,9 @@ export function createMinimapMarkers(): MinimapMarkers {
       const rim = half - RIM_INSET;
       const rim2 = rim * rim;
       markers.length = 0;
-      model.zoneId = zoneAt(p.pos.z).id;
-      // Inside a rift the overworld zone (zoneAt reads z, rifts displace on x) is
-      // the wrong label; surface the generated rift floor name + rank instead.
+      model.zoneId = zoneAt(p.pos.x, p.pos.z).id;
+      // Inside a rift the overworld zone (zoneAt reads x/z; rifts displace on x well
+      // past any land) is the wrong label; surface the generated rift floor name + rank.
       const rf = world.riftFloor;
       model.rift = rf ? { name: rf.name, rank: rf.tier } : null;
 

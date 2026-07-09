@@ -65,6 +65,7 @@ const QUEST_BADGE_TEXT_LIFT = 4; // px above the arc center to optically center 
 // The `--color-map-*` design tokens the painter resolves once per redraw. These
 // mirror the colors the inline overworld-map render used verbatim.
 const MAP_COLOR_TOKENS = {
+  ocean: '--color-map-ocean',
   label: '--color-map-label',
   outline: '--color-map-outline',
   portalDot: '--color-map-portal-dot',
@@ -95,12 +96,21 @@ const MAP_COLOR_TOKENS = {
 
 type MapColors = Record<keyof typeof MAP_COLOR_TOKENS, string>;
 
-/** Inputs for one overworld redraw. The cached terrain bg + the committed zone are
- *  Hud-owned (Hud keys the bg cache by zone); the painter owns the decorations. */
+/** One realm's cached map background plus the world rect it covers, for the
+ *  world-relative composite. */
+export interface MapZoneBg {
+  canvas: HTMLCanvasElement;
+  region: { minX: number; maxX: number; minZ: number; maxZ: number };
+}
+
+/** Inputs for one overworld redraw. The cached terrain bgs + the committed zone
+ *  are Hud-owned (Hud keys the bg cache by zone); the painter owns the
+ *  decorations. `zoneBgs` are every already-cached realm background; the painter
+ *  composites the ones intersecting the view over an ocean fill. */
 export interface MapPaintOptions {
   zone: ZoneDef;
-  /** The cached terrain background canvas for the committed zone. */
-  bg: HTMLCanvasElement;
+  /** Every realm background Hud has cached, for the world-relative composite. */
+  zoneBgs: readonly MapZoneBg[];
   /** The square map-canvas side in px. */
   canvasSize: number;
   zoom: number;
@@ -158,7 +168,7 @@ export class MapWindowPainter {
       untrackedQuestIds: opts.untrackedQuestIds,
     });
     const colors = this.resolveColors();
-    this.draw(ctx, model, opts.bg, opts.canvasSize, colors);
+    this.draw(ctx, model, opts.zoneBgs, opts.canvasSize, colors);
     return {
       view: model.view,
       cursor: model.cursor,
@@ -170,23 +180,29 @@ export class MapWindowPainter {
   private draw(
     ctx: CanvasRenderingContext2D,
     model: OverworldMapModel,
-    bg: HTMLCanvasElement,
+    zoneBgs: readonly MapZoneBg[],
     S: number,
     colors: MapColors,
   ): void {
-    // Blit the matching sub-rect of the cached terrain (note: +X is map-left).
+    // Open ocean under everything, then composite each realm's cached terrain
+    // over it at its world position (+X is map-left, +Z map-down). Realms that
+    // are not yet cached simply read as ocean until their idle prewarm lands.
+    const r = model.region;
+    const spanX = r.maxX - r.minX;
+    const spanZ = r.maxZ - r.minZ;
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(
-      bg,
-      model.blit.sxFrac * bg.width,
-      model.blit.syFrac * bg.height,
-      model.blit.swFrac * bg.width,
-      model.blit.shFrac * bg.height,
-      0,
-      0,
-      S,
-      S,
-    );
+    ctx.fillStyle = colors.ocean;
+    ctx.fillRect(0, 0, S, S);
+    for (const zb of zoneBgs) {
+      const b = zb.region;
+      // cull realms fully outside the view
+      if (b.maxX < r.minX || b.minX > r.maxX || b.maxZ < r.minZ || b.minZ > r.maxZ) continue;
+      const destX = ((r.maxX - b.maxX) / spanX) * S;
+      const destY = ((r.maxZ - b.maxZ) / spanZ) * S;
+      const destW = ((b.maxX - b.minX) / spanX) * S;
+      const destH = ((b.maxZ - b.minZ) / spanZ) * S;
+      ctx.drawImage(zb.canvas, destX, destY, destW, destH);
+    }
 
     if (model.detail) this.drawDetail(ctx, model.detail, colors);
 

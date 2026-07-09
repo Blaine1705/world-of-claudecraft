@@ -179,7 +179,7 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     prestigeRank: state.prestigeRank ?? 0,
     skin,
     avatarUrl,
-    zone: zoneAt(zPos).name,
+    zone: zoneAt(state.pos?.x ?? 0, zPos).name,
     guild: guild ?? null,
     arena: arenaBrackets(state),
     rank: rank ?? null,

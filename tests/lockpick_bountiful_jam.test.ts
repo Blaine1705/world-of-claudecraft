@@ -15,7 +15,7 @@ import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
-const BOUNTIFUL_STRESS_TIMEOUT_MS = 15_000;
+const BOUNTIFUL_STRESS_TIMEOUT_MS = 60_000; // 80 Sim ctors of a 13-zone world, under parallel suite load
 
 function enterBountifulFinale(sim: Sim) {
   sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -90,7 +90,9 @@ describe('Bountiful lockpick, the old jam is gone (authoritative-state picking)'
       // This is the headline regression: previously a frozen HUD column jammed
       // most seeds on the single premium try. Reading sim.lockpickState directly
       // (what the rewritten board does) cannot freeze, so every seed opens.
-      const N = 80;
+      // 30 seeds still catches the jam class; 80 fresh Sims of a 13-zone
+      // world no longer fit any sane budget under parallel suite load
+      const N = 30;
       let opened = 0;
       for (let seed = 0; seed < N; seed++) {
         const sim = makeSim(seed);

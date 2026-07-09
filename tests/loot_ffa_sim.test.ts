@@ -84,5 +84,6 @@ describe('loot goes FFA one minute after a corpse becomes lootable', () => {
       return Math.max(0, Math.round(mob.lootFfaTimer * 1000));
     };
     expect(run()).toEqual(run());
-  });
+    // two full FFA-delay runs of a 13-zone world: headroom under suite load
+  }, 90_000);
 });

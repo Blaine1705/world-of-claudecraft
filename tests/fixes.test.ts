@@ -65,7 +65,7 @@ function formRaid(sim: Sim) {
 describe('quest lifecycle', () => {
   it('stops showing the Redbrook starter hint after the first quest is accepted', () => {
     const sim = makeSim();
-    const starterZone = zoneAt(sim.player.pos.z);
+    const starterZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
 
     expect(zoneWelcomeText(starterZone, (questId) => sim.questState(questId))).toBe(
       'Find Marshal Redbrook in town — he has work for you.',
@@ -137,14 +137,26 @@ describe('collision & terrain', () => {
     expect(dist2d(p.pos, { x: 10, y: 0, z: 12 })).toBeGreaterThan(2.2);
   });
 
-  it('steep rims are walls, not ramps', () => {
+  it('the open shore is sea with the fatigue turnback, not a wall', () => {
+    // The vale's east rim range became coastline (the Farshore's strait):
+    // walking east now wades into open water, and the sea itself guards
+    // the border: the swimmer takes the fatigue warning and damage long
+    // before the far shore.
     const sim = makeSim();
     const p = sim.player;
     teleportTo(sim, 150, 0);
-    p.facing = Math.PI / 2; // +x, toward the world rim
+    p.facing = Math.PI / 2; // +x, into the strait
     sim.moveInput.forward = true;
-    for (let i = 0; i < 400; i++) sim.tick();
-    expect(p.pos.x).toBeLessThan(170);
+    let warned = false;
+    for (let i = 0; i < 400; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'log' && ev.text.includes('open sea')) warned = true;
+      }
+    }
+    expect(p.pos.y).toBeLessThan(WATER_LEVEL + 0.6); // swimming, not standing
+    expect(warned).toBe(true); // the sea is doing the guarding
+    // (the escalating fatigue damage itself is pinned by the open-sea test
+    // in tests/veiled_hollow.test.ts)
   });
 
   it('NPCs spawn on dry land outside buildings', () => {
@@ -806,7 +818,7 @@ describe('boss loot and encounter resets', () => {
         (e) => e.type === 'loot' && e.text === 'Everyone passed on [[i:greyjaw_hide_boots]].',
       ),
     ).toBe(true);
-  });
+  }, 90_000);
 
   it('returns all-passed need-greed loot to the corpse as open loot', () => {
     const sim = makeSim();
@@ -1303,7 +1315,7 @@ describe('quest npc roles', () => {
 
     for (let i = 0; i < 2 * 20; i++) sim.tick();
     expect(sim.entities.has(boneguard.id)).toBe(false);
-  });
+  }, 90_000);
 
   it('despawns the Bound Guardian after 60 seconds out of combat without damage and resets on damage taken', () => {
     const sim = makeSim();

@@ -13,11 +13,10 @@ import type { BiomeId } from '../sim/types';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
 import {
-  biomeAt,
   generateDecorations,
   roadDistance,
   terrainHeight,
-  waterLevelAt,
+  WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -120,6 +119,16 @@ const PINE_TINT: Record<BiomeId, number> = {
   desert: 0xa8a468,
   volcano: 0x6a5f52,
   cave: 0x77837a,
+  dusk: 0x7f93ab,
+  ember: 0x93a06b,
+  frost: 0x7e99a2, // frosted but dark: pines hold their shape at distance
+  amber: 0xb89a52, // autumn-burnished pines
+  fen: 0x8fae7e,
+  night: 0x8040e0, // dream-violet boughs (saturated: soften + green albedo wash it out)
+  haunt: 0x36443a, // dead dark needles
+  jungle: 0x3f9450, // deep tropical green
+  garden: 0x4a8a4e, // clipped evergreen
+  gale: 0x5a8a58, // wind-hardened scrub
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -129,6 +138,16 @@ const OAK_TINT: Record<BiomeId, number> = {
   desert: 0xb0a468,
   volcano: 0x74624f,
   cave: 0x84907f,
+  dusk: 0x9c92b4,
+  ember: 0xa8a060,
+  frost: 0x84989e,
+  amber: 0xd8852f, // fire-orange canopy
+  fen: 0x9dc47e, // lush wetland green
+  night: 0xb03cf0, // vivid orchid canopy (soften + green albedo wash it out)
+  haunt: 0x424c38, // gnarled grey-green canopy
+  jungle: 0x46b04e, // lush broadleaf canopy
+  garden: 0x55a655, // specimen-tree green
+  gale: 0x669660, // stunted wind-bent crowns
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -138,6 +157,16 @@ const ROCK_TINT: Record<BiomeId, number> = {
   desert: 0xb08d6a,
   volcano: 0x4a4038,
   cave: 0x6a6a66,
+  dusk: 0x8f88a6,
+  ember: 0x9a7a62,
+  frost: 0x9aa8b8,
+  amber: 0x9a8a70,
+  fen: 0x7e8a76,
+  night: 0xa094c8,
+  haunt: 0x565a50,
+  jungle: 0x7e8a6a,
+  garden: 0x9a9a92, // marble and pale stone
+  gale: 0x8a8e90, // salt-grey sea rock
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -147,6 +176,16 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   desert: 0xe6d2ac,
   volcano: 0xb8a394,
   cave: 0xc4c8c2,
+  dusk: 0xd0c8e0,
+  ember: 0xe0cfa8,
+  frost: 0xe4e9f0,
+  amber: 0xd8c0a0,
+  fen: 0xc8cfae,
+  night: 0xe0d4ec,
+  haunt: 0x9a948a, // grey weathered bark
+  jungle: 0xd8c4a0,
+  garden: 0xcfc4b0,
+  gale: 0x9a8a74,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -156,8 +195,31 @@ const GRASS_TINT: Record<BiomeId, number> = {
   desert: 0xdcc890,
   volcano: 0x8a7a68,
   cave: 0xa2a89c,
+  dusk: 0xccc3da,
+  ember: 0xd8c890,
+  frost: 0xdde8f2,
+  amber: 0xe8cf8a,
+  fen: 0xcfe4b0,
+  night: 0xe598ff, // orchid dream grass (green blade albedo mutes it)
+  haunt: 0x99a382, // sickly pale grass
+  jungle: 0xc4ec96, // bright wet tropical grass
+  garden: 0xd0eeb0, // mown lawn
+  gale: 0xb8d09a, // wind-silvered grass
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
+// Flowering-bush bloom colorways for the dusk realm (picked per instance).
+const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
+// the fen blooms brighter: rose, butter, white, sky, coral
+const FEN_BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xffffff, 0xa8d8f2, 0xf2a88f];
+// the Amberfall blooms white: snow-white to warm cream against the gold
+const AMBER_BLOOM_TINTS = [0xffffff, 0xfaf6ec, 0xf4eedd];
+// the Nightbloom's namesake flowers: pale luminous petals that read as
+// glowing under the moon (ice-blue, star-white, violet, mint)
+const NIGHT_BLOOM_TINTS = [0x9fdcff, 0xffffff, 0xc8a8ff, 0xa0ffd8];
+// the Evergarden blooms roses: crimson, blush, white, and tea
+const GARDEN_BLOOM_TINTS = [0xe84a6a, 0xf2a8c8, 0xffffff, 0xf2d0a0];
+// the Galecrest blooms sea thrift and campion: pink, white, pale violet
+const GALE_BLOOM_TINTS = [0xf29ab0, 0xffffff, 0xd8b0f2];
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0xaebf8e,
   marsh: 0x8d9865,
@@ -166,9 +228,25 @@ const DRESS_TINT: Record<BiomeId, number> = {
   desert: 0xc0aa74,
   volcano: 0x7a6a58,
   cave: 0x8a948a,
+  dusk: 0x9e94ba,
+  ember: 0xb8a878,
+  frost: 0xc8d8e0,
+  amber: 0xd8a860,
+  fen: 0xa8c48e,
+  night: 0xc078f2,
+  haunt: 0x707a5e,
+  jungle: 0x6cc064,
+  garden: 0x8cc27a,
+  gale: 0x84a878,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
+// The night realm's exception: soften(violet) x green albedo can only land
+// on green, so its canopies take the orchid tint nearly raw and multiply
+// down to dark dream-plum instead
+const LEAF_TINT_SOFTEN_NIGHT = 0.15;
+const leafSoften = (biome: BiomeId): number =>
+  biome === 'night' ? LEAF_TINT_SOFTEN_NIGHT : LEAF_TINT_SOFTEN;
 const BARK_TINT_SOFTEN = 0.85;
 const ROCK_TINT_SOFTEN = 0.45;
 const DRESS_TINT_SOFTEN = 0.65;
@@ -796,7 +874,7 @@ function placeSpecies(
               d.z,
               tintHex,
               c,
-              spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : LEAF_TINT_SOFTEN,
+              spec.proxyShape === 'dead' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
             ),
           );
         });
@@ -822,7 +900,7 @@ function placeSpecies(
           group.handles[i].parts.push({ mesh: im, index: i, visibleMatrix, hiddenMatrix });
           if (part.isLeaf) {
             const hex = typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
-            im.setColorAt(i, softTint(d.x, d.z, hex, c, LEAF_TINT_SOFTEN));
+            im.setColorAt(i, softTint(d.x, d.z, hex, c, leafSoften(d.biome)));
           } else {
             im.setColorAt(i, softTint(d.x, d.z, TRUNK_TINT[d.biome], c, BARK_TINT_SOFTEN, 0.5));
           }
@@ -985,11 +1063,14 @@ function buildTrees(
   for (const bucket of buckets.values()) {
     const { items } = bucket;
     const pines = items.filter((d) => d.kind === 'tree');
-    const oaks = items.filter((d) => d.kind === 'tree2' && d.biome !== 'marsh');
-    const swamps = items.filter((d) => d.kind === 'tree2' && d.biome === 'marsh');
-    // marsh swamp trees split between twisted (mossy) and dead (bare) models
-    const twisteds = swamps.filter((d) => hashAt(d.x, d.z, 19) >= 0.35);
-    const deads = swamps.filter((d) => hashAt(d.x, d.z, 19) < 0.35);
+    const gnarled = (d: Decoration) => d.biome === 'marsh' || d.biome === 'dusk';
+    const oaks = items.filter((d) => d.kind === 'tree2' && !gnarled(d));
+    const swamps = items.filter((d) => d.kind === 'tree2' && gnarled(d));
+    // marsh swamp trees split between twisted (mossy) and dead (bare) models;
+    // the dusk realm's tree2 elders are all twisted, never dead: the Hollow
+    // is ancient, not rotting
+    const twisteds = swamps.filter((d) => d.biome === 'dusk' || hashAt(d.x, d.z, 19) >= 0.35);
+    const deads = swamps.filter((d) => d.biome !== 'dusk' && hashAt(d.x, d.z, 19) < 0.35);
     const rocks = items.filter((d) => d.kind === 'rock');
 
     let minX = Infinity,
@@ -1103,6 +1184,16 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   desert: 0.07,
   volcano: 0.05,
   cave: 0.08,
+  dusk: 0.24,
+  ember: 0.18,
+  frost: 0.08,
+  amber: 0.34,
+  fen: 0.38,
+  night: 0.32,
+  haunt: 0.3,
+  jungle: 0.5,
+  garden: 0.4,
+  gale: 0.32,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -1127,6 +1218,66 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
   if (biome === 'beach' || biome === 'desert') return 'bush';
   if (biome === 'cave') return r < 0.5 ? 'mushroom' : 'fern';
   if (biome === 'volcano') return 'bush';
+  if (biome === 'dusk') {
+    // glade floor: ferns and flowering bushes carry the ground cover, with
+    // mushrooms as a sparser accent (the big glowing ones live in
+    // realm_flora, so the tiny dressing kind stays scattered and natural)
+    if (r < 0.12) return 'bush';
+    if (r < 0.34) return 'bushFlowers';
+    if (r < 0.78) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'fen') {
+    // the fen floor blooms: flowering hedges everywhere, mushrooms thick in
+    // the damp, plain bushes almost absent
+    if (r < 0.08) return 'bush';
+    if (r < 0.48) return 'bushFlowers';
+    if (r < 0.72) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'amber') {
+    // the gold meadows flower white: bloom hedges lead, ferns fill
+    if (r < 0.1) return 'bush';
+    if (r < 0.52) return 'bushFlowers';
+    if (r < 0.86) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'night') {
+    // the realm's namesake: luminous bloom hedges dominate the moon meadows,
+    // mushrooms fill the dark corners
+    if (r < 0.08) return 'bush';
+    if (r < 0.56) return 'bushFlowers';
+    if (r < 0.76) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'haunt') {
+    // nothing flowers here: brambles, ferns, and mushrooms in the leaf rot
+    if (r < 0.24) return 'bush';
+    if (r < 0.6) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'jungle') {
+    // the understory is the realm: ferns wall the paths, blooms burst
+    // through, mushrooms keep to the deep shade
+    if (r < 0.16) return 'bush';
+    if (r < 0.38) return 'bushFlowers';
+    if (r < 0.88) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'garden') {
+    // rose beds everywhere the gardener's hand once reached
+    if (r < 0.12) return 'bush';
+    if (r < 0.52) return 'bushFlowers';
+    if (r < 0.82) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'gale') {
+    // wind-flattened scrub and thrift clinging to the downs
+    if (r < 0.3) return 'bush';
+    if (r < 0.62) return 'bushFlowers';
+    if (r < 0.9) return 'fern';
+    return 'mushroom';
+  }
   return r < 0.62 ? 'bush' : 'fern';
 }
 
@@ -1153,7 +1304,7 @@ function generateDressing(seed: number): DressingSpot[] {
   for (let gx = -xHalf; gx < xHalf; gx += step) {
     for (let gz = WORLD_MIN_Z + 16; gz < WORLD_MAX_Z - 16; gz += step) {
       const r = hashAt(gx, gz, 41);
-      const biome = zoneBiomeAt(gz);
+      const biome = zoneBiomeAt(gx, gz);
       const density = DRESS_DENSITY[biome] * (GFX.leanFoliage ? DRESS_DENSITY_LOW_SCALE : 1);
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
@@ -1174,7 +1325,7 @@ function generateDressing(seed: number): DressingSpot[] {
       }
       if (blocked) continue;
       if (roadDistance(x, z) < 4) continue;
-      if (terrainHeight(x, z, seed) < waterLevelAt(x, z) + 1.2) continue;
+      if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
       if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
       const kind = dressKindFor(biome, hashAt(gx, gz, 44));
@@ -1237,13 +1388,50 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
           if (kind === 'mushroom') {
             // mushrooms keep their painted cap colors — brightness jitter only
             im.setColorAt(i, c.setScalar(0.85 + hashAt(s.x, s.z, 47) * 0.3));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'amber') {
+            const tint =
+              AMBER_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * AMBER_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'fen') {
+            const tint = FEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * FEN_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'night') {
+            // the nightblooms take their tint raw: pale petals must pop
+            // against the dark ground, not soften toward it
+            const tint =
+              NIGHT_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * NIGHT_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'garden') {
+            // the roses take their tint raw too: a rose bed should read red
+            const tint =
+              GARDEN_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GARDEN_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'gale') {
+            // sea thrift takes its tint raw: pink heads over silver grass
+            const tint =
+              GALE_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * GALE_BLOOM_TINTS.length)];
+            im.setColorAt(i, c.set(tint));
+          } else if (kind === 'bushFlowers' && zoneBiomeAt(s.x, s.z) === 'dusk') {
+            // the Hollow's flowering bushes bloom in several colors, not one
+            const tint =
+              DUSK_BLOOM_TINTS[Math.floor(hashAt(s.x, s.z, 48) * DUSK_BLOOM_TINTS.length)];
+            im.setColorAt(
+              i,
+              softTint(
+                s.x,
+                s.z,
+                tint,
+                c,
+                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
+              ),
+            );
           } else {
             im.setColorAt(
               i,
               softTint(
                 s.x,
                 s.z,
-                DRESS_TINT[zoneBiomeAt(s.z)],
+                DRESS_TINT[zoneBiomeAt(s.x, s.z)],
                 c,
                 GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
               ),
@@ -1499,7 +1687,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
         const h = terrainHeight(x, z, seed);
-        if (h < waterLevelAt(x, z) + 1.6) continue;
+        if (h < WATER_LEVEL + 1.6) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         let nearHub = false;
@@ -1516,7 +1704,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));
         im.setMatrixAt(n, m);
-        c.setHex(GRASS_TINT[biomeAt(x, z)]);
+        c.setHex(GRASS_TINT[zoneBiomeAt(x, z)]);
         c.offsetHSL(
           (hashAt(i, j, 3) - 0.5) * 0.05,
           (hashAt(i, j, 4) - 0.5) * 0.12,

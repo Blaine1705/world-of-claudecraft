@@ -793,6 +793,7 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
