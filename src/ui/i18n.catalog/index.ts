@@ -471,6 +471,7 @@ export const en = {
       socketsShut: 'The sockets grind shut. The way stirs.',
       seqProgress: 'The runes answer in turn ({step}/{total}).',
       seqReset: 'The runes go dark. Begin again.',
+      gateOpen: 'The gate grinds open.',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',

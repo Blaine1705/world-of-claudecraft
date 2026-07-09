@@ -5520,6 +5520,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'sim.rift.seqProgress': '符文依次回应（{step}/{total}）。',
   'sim.rift.seqReset': '符文尽数熄灭。从头再来。',
   'sim.rift.socketsShut': '凹槽隆隆合拢。去路随之震动。',
+  'sim.rift.gateOpen': '闸门轰隆隆地开启了。',
   'sim.rift.stepBack': '你退回裂隙，返回原地。',
   'sim.rift.wayDownOpens': '通往下层的裂口被撕开了。',
   'delveRiteUi.title': '溺亡圣髑仪式',

@@ -3263,7 +3263,8 @@ export const ko_KR: EnTranslations = {
       "iceGoalLit": "서리 문양이 타오릅니다. 길이 꿈틀거립니다.",
       "socketsShut": "받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.",
       "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
-      "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요."
+      "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요.",
+      "gateOpen": "문이 삐걱거리며 열립니다."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",

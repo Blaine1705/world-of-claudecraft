@@ -5400,6 +5400,7 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.seqProgress', { step: m[1], total: m[2] }),
   },
   { re: /^The runes go dark\. Begin again\.$/, build: () => t('sim.rift.seqReset') },
+  { re: /^The gate grinds open\.$/, build: () => t('sim.rift.gateOpen') },
   {
     re: /^A ([CBAS])-rank rift tears open in (.+)!$/,
     build: (m) => t('sim.rift.portalOpens', { tier: m[1], zone: locZone(m[2]) }),

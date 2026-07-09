@@ -3263,7 +3263,8 @@ export const ja_JP: EnTranslations = {
       "iceGoalLit": "霜の紋章が燃え上がる。道が動き出す。",
       "socketsShut": "台座が音を立てて閉じる。道が動き出す。",
       "seqProgress": "ルーンが順に応える（{step}/{total}）。",
-      "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。"
+      "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。",
+      "gateOpen": "門が音を立てて開いた。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",

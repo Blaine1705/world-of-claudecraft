@@ -182,6 +182,61 @@ describe('rift mechanics: off-path treasure behind an illusion wall', () => {
   });
 });
 
+describe('rift mechanics: switch-gate', () => {
+  it('some floors have a gate + switch; the gate spawns closed', () => {
+    let withGate = 0;
+    for (let s = 1; s <= 220; s++) {
+      const fc = generateRiftFloor(s, 20, 0).floorCount;
+      for (let fi = 0; fi < fc - 1; fi++) {
+        const f = generateRiftFloor(s, 20, fi);
+        if (f.gate) {
+          withGate++;
+          // A gate floor carries both the portcullis and its plate, and the plate
+          // sits SOUTH of the gate (reachable first).
+          expect(f.objects.some((o) => o.kind === 'gate')).toBe(true);
+          expect(f.objects.some((o) => o.kind === 'switch')).toBe(true);
+          expect(f.gate.switchZ).toBeLessThan(f.gate.z);
+        }
+      }
+    }
+    expect(withGate, 'some floors are switch-gated').toBeGreaterThan(0);
+  });
+
+  it('a closed gate blocks northward passage until the switch is thrown', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) {
+      if (generateRiftFloor(s, 20, 0).gate) seed = s;
+    }
+    expect(seed, 'found a floor-0 gate').toBeGreaterThan(0);
+    const sim = enter(seed);
+    const inst = active(sim);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const gate = floor.gate!;
+    const origin = riftInstanceOrigin(inst.slot, 0);
+    expect(inst.gateOpen).toBe(false);
+
+    // Try to walk NORTH through the closed gate: the clamp shoves you back south.
+    sim.player.pos = { x: origin.x, y: 0, z: origin.z + gate.z + 1 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(sim.player.pos.z - origin.z, 'clamped south of the gate').toBeLessThan(gate.z);
+
+    // Step the switch: the gate opens and stays open.
+    const sw = sim.entities.get(inst.switchId!)!;
+    sim.player.pos = { ...sw.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(inst.gateOpen).toBe(true);
+    expect(sim.entities.get(inst.gateId!)?.templateId).toBe('rift_gate_open');
+
+    // Now the player can cross north past the gate line.
+    sim.player.pos = { x: origin.x, y: 0, z: origin.z + gate.z + 3 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(sim.player.pos.z - origin.z, 'passes once open').toBeGreaterThan(gate.z);
+  });
+});
+
 describe('rift generator: level cap', () => {
   it('no rift floor (any rank baseLevel, any depth) exceeds level 22', () => {
     let maxSeen = 0;

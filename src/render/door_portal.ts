@@ -620,6 +620,60 @@ export function buildRiftPuzzleProp(
       }
       return { body };
     }
+    case 'rift_gate':
+    case 'rift_gate_open': {
+      // A portcullis spanning the nave: a stone lintel with iron bars that hang to
+      // the floor when closed and retract up under the lintel when raised. Wide
+      // enough that its ends tuck into the walls on a narrow nave.
+      const open = templateId === 'rift_gate_open';
+      const halfW = 16;
+      const H = 4.4;
+      const barMat = new THREE.MeshLambertMaterial({ color: 0x6a6a72, emissive: 0x0c0c12 });
+      const lintel = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2 + 1.4, 0.9, 1.0), stone);
+      lintel.position.set(0, H + 0.4, 0);
+      lintel.castShadow = true;
+      body.add(lintel);
+      const barLen = open ? 1.1 : H;
+      const barCount = 15;
+      for (let i = 0; i < barCount; i++) {
+        const bx = -halfW + (i / (barCount - 1)) * halfW * 2;
+        const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, barLen, 6), barMat);
+        bar.position.set(bx, H - barLen / 2, 0);
+        bar.castShadow = true;
+        body.add(bar);
+      }
+      // A rune band on the lintel: red-hot when barred, calm cyan once raised.
+      const band = new THREE.Mesh(
+        new THREE.BoxGeometry(halfW * 2 + 1.4, 0.16, 1.05),
+        riftGlowMaterial(open ? 0x7fe0ff : 0xff6a4a, open ? 0.8 : 0.85),
+      );
+      band.position.set(0, H + 0.4, 0);
+      body.add(band);
+      body.userData.riftPulse = [band];
+      return { body };
+    }
+    case 'rift_switch':
+    case 'rift_switch_on': {
+      // A floor pressure plate: a stone disc with a rune that sinks + blazes once
+      // pressed (a walk-on trigger that raises the linked gate).
+      const on = templateId === 'rift_switch_on';
+      const plate = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.15, 1.3, on ? 0.16 : 0.32, 16),
+        stone,
+      );
+      plate.position.y = on ? 0.08 : 0.16;
+      plate.receiveShadow = true;
+      body.add(plate);
+      const rune = new THREE.Mesh(
+        new THREE.CircleGeometry(0.8, 20),
+        riftGlowMaterial(on ? 0x9fffc4 : 0xffb24a, on ? 0.95 : 0.55),
+      );
+      rune.rotation.x = -Math.PI / 2;
+      rune.position.y = on ? 0.17 : 0.33;
+      body.add(rune);
+      body.userData.riftPulse = [rune];
+      return { body, portal: undefined };
+    }
     case 'rift_boulder_pad': {
       const ring = new THREE.Mesh(
         new THREE.TorusGeometry(1.3, 0.18, 8, 24),

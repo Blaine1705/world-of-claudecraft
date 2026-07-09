@@ -5942,6 +5942,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.rift.seqProgress': 'Руны отвечают по очереди ({step}/{total}).',
   'sim.rift.seqReset': 'Руны гаснут. Начните заново.',
   'sim.rift.socketsShut': 'Гнёзда с грохотом смыкаются. Путь пробуждается.',
+  'sim.rift.gateOpen': 'Врата с грохотом отворяются.',
   'sim.rift.stepBack': 'Вы возвращаетесь назад сквозь разлом.',
   'sim.rift.wayDownOpens': 'Путь вниз разверзается.',
   'delveRiteUi.title': 'Обряд Утонувшего Реликвария',

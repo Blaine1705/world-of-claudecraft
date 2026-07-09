@@ -40,6 +40,8 @@ export type RiftObjectKind =
   | 'rune_pylon'
   | 'chest'
   | 'treasure' // an off-path reward chest hidden behind an illusion wall (interact -> loot)
+  | 'gate' // a portcullis blocking the nave until its switch is thrown
+  | 'switch' // a pressure plate that raises the linked gate (Pokemon-style)
   // Puzzle nodes:
   | 'ice_goal' // ice-slide destination the party must slide onto
   | 'boulder' // a pushable strength boulder
@@ -88,6 +90,20 @@ export interface RiftRoller {
   phase: number;
 }
 
+/** A Pokemon-style gate: a portcullis spanning the nave at `z` (a runtime clamp box
+ * x +/- hw, z +/- hd, NEVER a static collider, so the spine-clear invariant holds)
+ * that blocks passage north until the player steps its pressure plate at
+ * (switchX, switchZ), south of the gate. Reached only on floors with no other
+ * mechanic, so it is the floor's headline gate. */
+export interface RiftGate {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  switchX: number;
+  switchZ: number;
+}
+
 /** A raised rear "sanctum" tier: the floor steps UP toward the dais over a full
  * width staircase band, so the boss/descent stand on an elevated platform. It is a
  * single-valued height field (a function of instance-local z only), applied as a
@@ -132,6 +148,9 @@ export interface RiftFloorPlan {
    * giga-boss looms on the elevated sanctum); other floors ~30% (never with a
    * rolling boulder, lava, or ice, so one headline mechanic reads at a time). */
   platform: RiftPlatform | null;
+  /** A switch-gated portcullis blocking the nave, or null. Only on otherwise-plain
+   * floors (no puzzle/hazard/roller/platform), so it is the floor's one mechanic. */
+  gate: RiftGate | null;
 }
 
 /** Live per-instance state for an active rift (a Sim field, one per slot in the
@@ -171,6 +190,11 @@ export interface RiftInstance {
   /** Live rolling-boulder entity ids (one per lane in `floor.rollers`). Each rolls
    * down its lane every tick; overlap knocks the player back and chips their HP. */
   rollerIds: number[];
+  /** Switch-gate state: the portcullis + plate entity ids, and whether the gate has
+   * been raised (a closed gate clamps players out of `floor.gate`'s box). */
+  gateId: number | null;
+  switchId: number | null;
+  gateOpen: boolean;
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
   emptyFor: number;

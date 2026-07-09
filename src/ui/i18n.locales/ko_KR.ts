@@ -5820,6 +5820,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.seqProgress': '룬이 차례로 응답합니다 ({step}/{total}).',
   'sim.rift.seqReset': '룬이 모두 어두워집니다. 처음부터 다시 시작하세요.',
   'sim.rift.socketsShut': '받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.',
+  'sim.rift.gateOpen': '문이 삐걱거리며 열립니다.',
   'sim.rift.stepBack': '균열을 통해 원래 자리로 돌아왔습니다.',
   'sim.rift.wayDownOpens': '아래로 향하는 길이 찢겨 열립니다.',
   'delveRiteUi.title': '익사한 유물 의식',

@@ -22,6 +22,7 @@ import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '.
 import { Rng } from '../rng';
 import type {
   RiftFloorPlan,
+  RiftGate,
   RiftObjectPlan,
   RiftPlan,
   RiftPlatform,
@@ -671,6 +672,20 @@ function addIceBlockers(
   geo.colliders = layoutColliders(geo.layout);
 }
 
+/** A Pokemon-style switch-gate for an otherwise-plain floor: a portcullis spanning
+ * the nave (a runtime clamp, never a static collider) with a pressure plate on the
+ * spine to its south. Step the plate to raise the gate, then proceed. Null if the
+ * nave is too short to fit a fair "plate, then gate, then room" sequence. */
+function planGate(rng: Rng, geo: GeneratedGeometry): RiftGate | null {
+  const { layout, halfWidthAt } = geo;
+  const zGate = Math.round(layout.zMin + rng.range(50, Math.max(50, layout.dais.z - 32)));
+  if (zGate >= layout.dais.z - 22) return null;
+  const switchZ = zGate - rng.int(12, 18); // plate south of the gate (reached first)
+  if (switchZ <= layout.zMin + 18) return null;
+  const hw = Math.max(AISLE_HALF + 3, halfWidthAt(zGate)); // span the full walkable width
+  return { x: 0, z: zGate, hw, hd: 1.6, switchX: 0, switchZ };
+}
+
 /** The raised-tier Y lift at instance-local z (0 in the nave, ramps up the stairs,
  * flat `height` on the rear platform). Pure + single-valued, so the authoritative
  * Sim and the render regenerate identical verticality from the descriptor. */
@@ -739,6 +754,22 @@ export function generateRiftFloor(
     isBoss,
     rollers.length > 0 || iceZone !== null || hazards.length > 0,
   );
+  // A switch-gate is the mechanic for a subset of otherwise-plain floors (no puzzle,
+  // hazard, roller, ice, or platform), so exactly one headline mechanic reads.
+  const gate =
+    !isBoss &&
+    puzzle.kind === 'none' &&
+    rollers.length === 0 &&
+    hazards.length === 0 &&
+    iceZone === null &&
+    platform === null &&
+    rng.chance(0.5)
+      ? planGate(rng, geo)
+      : null;
+  if (gate) {
+    objects.push({ kind: 'gate', x: gate.x, z: gate.z, name: 'Rift Gate' });
+    objects.push({ kind: 'switch', x: gate.switchX, z: gate.switchZ, name: 'Rune Switch' });
+  }
 
   const plan: RiftFloorPlan = {
     seed: seed >>> 0,
@@ -758,6 +789,7 @@ export function generateRiftFloor(
     iceZone,
     rollers,
     platform,
+    gate,
   };
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();

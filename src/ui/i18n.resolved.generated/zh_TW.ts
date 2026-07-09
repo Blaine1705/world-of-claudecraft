@@ -3263,7 +3263,8 @@ export const zh_TW: EnTranslations = {
       "iceGoalLit": "霜之印記熊熊燃起。去路隨之震動。",
       "socketsShut": "凹槽隆隆合攏。去路隨之震動。",
       "seqProgress": "符文依次回應（{step}/{total}）。",
-      "seqReset": "符文盡數熄滅。從頭再來。"
+      "seqReset": "符文盡數熄滅。從頭再來。",
+      "gateOpen": "閘門轟隆隆地開啟了。"
     },
     "delve": {
       "cannotEnterNow": "你現在無法進入秘探。",

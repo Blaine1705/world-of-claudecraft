@@ -13,7 +13,6 @@
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
 import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
-import type { LootTier } from '../lockpick';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -24,6 +23,7 @@ import {
 } from '../data';
 import { layoutColliders } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
+import type { LootTier } from '../lockpick';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
@@ -33,6 +33,7 @@ import type { RiftInstance, RiftRoller } from './types';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
 const PYLON_TRIGGER_RADIUS = 3.0; // walk this close to light a rune pylon
+const SWITCH_TRIGGER_RADIUS = 2.6; // step this close to a gate switch to throw it
 const BEACON_TRIGGER_RADIUS = 2.0; // walk this close to the way-out beacon to leave
 const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
@@ -144,6 +145,9 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.rollerIds = [];
   inst.cacheId = null;
   inst.lockpick = null;
+  inst.gateId = null;
+  inst.switchId = null;
+  inst.gateOpen = floor.gate === null;
 
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
@@ -206,6 +210,12 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
         if (t) t.lootable = true;
         break;
       }
+      case 'gate':
+        inst.gateId = spawnObj('rift_gate', obj.name, obj.x, obj.z);
+        break;
+      case 'switch':
+        inst.switchId = spawnObj('rift_switch', obj.name, obj.x, obj.z);
+        break;
       // 'chest'/'exit' are placed on boss death (openExit).
     }
   }
@@ -265,6 +275,9 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.rollerIds = [];
   inst.cacheId = null;
   inst.lockpick = null;
+  inst.gateId = null;
+  inst.switchId = null;
+  inst.gateOpen = true;
   inst.puzzleSolved = false;
 }
 
@@ -636,6 +649,33 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
           color: '#adf',
           pid: p.id,
         });
+      }
+    }
+    // Switch-gate: stepping the plate raises the linked portcullis for good.
+    if (floor.gate && !inst.gateOpen) {
+      const sw = inst.switchId !== null ? ctx.entities.get(inst.switchId) : null;
+      if (sw && dist2d(p.pos, sw.pos) < SWITCH_TRIGGER_RADIUS) {
+        inst.gateOpen = true;
+        sw.templateId = 'rift_switch_on';
+        const gate = inst.gateId !== null ? ctx.entities.get(inst.gateId) : null;
+        if (gate) gate.templateId = 'rift_gate_open';
+        riftFx(ctx, sw.pos.x, sw.pos.z, 'arcane', 'nova');
+        if (gate) riftFx(ctx, gate.pos.x, gate.pos.z, 'holy', 'nova');
+        for (const pid of instancePlayerIds(ctx, inst)) {
+          ctx.emit({ type: 'log', text: 'The gate grinds open.', color: '#adf', pid });
+        }
+      }
+    }
+    // A closed gate is a runtime clamp (never a static collider): shove the player
+    // back to the SOUTH face of the portcullis so they cannot pass until it opens.
+    if (floor.gate && !inst.gateOpen) {
+      const g = floor.gate;
+      const lx = p.pos.x - origin.x;
+      const lz = p.pos.z - origin.z;
+      if (Math.abs(lx - g.x) < g.hw && lz > g.z - g.hd - PLAYER_BODY_R) {
+        p.pos = ctx.groundPos(p.pos.x, origin.z + g.z - g.hd - PLAYER_BODY_R - 0.05);
+        p.prevPos = { ...p.pos };
+        ctx.rebucket(p);
       }
     }
     // Verticality: stand the player on the raised sanctum tier. This is a

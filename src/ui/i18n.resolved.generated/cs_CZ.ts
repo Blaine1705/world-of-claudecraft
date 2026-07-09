@@ -3263,7 +3263,8 @@ export const cs_CZ: EnTranslations = {
       "iceGoalLit": "The frost sigil blazes. The way stirs.",
       "socketsShut": "The sockets grind shut. The way stirs.",
       "seqProgress": "The runes answer in turn ({step}/{total}).",
-      "seqReset": "The runes go dark. Begin again."
+      "seqReset": "The runes go dark. Begin again.",
+      "gateOpen": "The gate grinds open."
     },
     "delve": {
       "cannotEnterNow": "Teď nemůžeš vstoupit do výpravy.",

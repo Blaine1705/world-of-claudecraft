@@ -5830,6 +5830,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.rift.seqProgress': 'ルーンが順に応える（{step}/{total}）。',
   'sim.rift.seqReset': 'ルーンがすべて暗くなる。最初からやり直せ。',
   'sim.rift.socketsShut': '台座が音を立てて閉じる。道が動き出す。',
+  'sim.rift.gateOpen': '門が音を立てて開いた。',
   'sim.rift.stepBack': '裂け目を通って元の場所へ戻った。',
   'sim.rift.wayDownOpens': '下層への道が裂け開いた。',
   'delveRiteUi.title': '溺れし聖遺物の儀式',

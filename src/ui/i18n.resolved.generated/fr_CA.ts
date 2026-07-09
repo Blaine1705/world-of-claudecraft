@@ -3263,7 +3263,8 @@ export const fr_CA: EnTranslations = {
       "iceGoalLit": "The frost sigil blazes. The way stirs.",
       "socketsShut": "The sockets grind shut. The way stirs.",
       "seqProgress": "The runes answer in turn ({step}/{total}).",
-      "seqReset": "The runes go dark. Begin again."
+      "seqReset": "The runes go dark. Begin again.",
+      "gateOpen": "The gate grinds open."
     },
     "delve": {
       "cannotEnterNow": "Vous ne pouvez pas entrer dans une excavation pour l'instant.",
