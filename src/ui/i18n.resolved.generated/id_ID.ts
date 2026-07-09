@@ -6899,26 +6899,50 @@ export const id_ID: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "Helm Seram Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dreadhelm"
+      },
       "crownforged_warspaulders": {
         "name": "Bahu Perang Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
+        "name": "Bonewrought Warspaulders"
       },
       "nighttalon_crown": {
         "name": "Mahkota Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Crown"
+      },
       "nighttalon_shoulderguards": {
         "name": "Pelindung Bahu Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
+        "name": "Direfang Shoulderguards"
       },
       "soulflame_cowl": {
         "name": "Tudung Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Cowl"
+      },
       "soulflame_mantle": {
         "name": "Mantel Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
+        "name": "Wraithfire Mantle"
       },
       "stormcallers_crown": {
         "name": "Mahkota Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Crown"
+      },
       "stormcallers_spaulders": {
         "name": "Pelindung Bahu Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall Spaulders"
       },
       "unknown_alien_weaponry": {
         "name": "Persenjataan Alien Tak Dikenal"

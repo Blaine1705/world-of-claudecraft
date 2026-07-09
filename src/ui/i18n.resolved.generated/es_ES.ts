@@ -6899,26 +6899,50 @@ export const es_ES: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "Yelmo aterrador Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dreadhelm"
+      },
       "crownforged_warspaulders": {
         "name": "Hombreras de guerra Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
+        "name": "Bonewrought Warspaulders"
       },
       "nighttalon_crown": {
         "name": "Corona Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Crown"
+      },
       "nighttalon_shoulderguards": {
         "name": "Guardahombros Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
+        "name": "Direfang Shoulderguards"
       },
       "soulflame_cowl": {
         "name": "Caperuza Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Cowl"
+      },
       "soulflame_mantle": {
         "name": "Manto Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
+        "name": "Wraithfire Mantle"
       },
       "stormcallers_crown": {
         "name": "Corona de Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Crown"
+      },
       "stormcallers_spaulders": {
         "name": "Bufas de Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall Spaulders"
       },
       "unknown_alien_weaponry": {
         "name": "Armamento alienígena desconocido"

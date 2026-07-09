@@ -6899,25 +6899,49 @@ export const ko_KR: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "뼈벼림 공포투구"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "뼈벼림 공포투구"
+      },
       "crownforged_warspaulders": {
+        "name": "뼈벼림 전쟁 어깨갑옷"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "뼈벼림 전쟁 어깨갑옷"
       },
       "nighttalon_crown": {
         "name": "흉포송곳니 왕관"
       },
+      "nighttalon_crown_heroic": {
+        "name": "흉포송곳니 왕관"
+      },
       "nighttalon_shoulderguards": {
+        "name": "흉포송곳니 어깨수호대"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "흉포송곳니 어깨수호대"
       },
       "soulflame_cowl": {
         "name": "망령불꽃 두건"
       },
+      "soulflame_cowl_heroic": {
+        "name": "망령불꽃 두건"
+      },
       "soulflame_mantle": {
+        "name": "망령불꽃 어깨덮개"
+      },
+      "soulflame_mantle_heroic": {
         "name": "망령불꽃 어깨덮개"
       },
       "stormcallers_crown": {
         "name": "강풍부름 관"
       },
+      "stormcallers_crown_heroic": {
+        "name": "강풍부름 관"
+      },
       "stormcallers_spaulders": {
+        "name": "강풍부름 어깨갑옷"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "강풍부름 어깨갑옷"
       },
       "unknown_alien_weaponry": {

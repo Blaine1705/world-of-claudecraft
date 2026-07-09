@@ -10,7 +10,7 @@ import {
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
@@ -28,6 +28,14 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 
 const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }) =>
   Math.hypot(a.x - b.x, a.z - b.z);
+
+describe('heroic set item identity', () => {
+  it('shares the normal set id and carries the heroic flag', () => {
+    expect(ITEMS.crownforged_dreadhelm_heroic.set).toBe(ITEMS.crownforged_dreadhelm.set);
+    expect(ITEMS.crownforged_dreadhelm_heroic.set).toBe('crownforged');
+    expect(ITEMS.crownforged_dreadhelm_heroic.heroic).toBe(true);
+  });
+});
 
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {

@@ -6899,26 +6899,50 @@ export const nl_NL: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "Bonewrought-Schrikhelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dreadhelm"
+      },
       "crownforged_warspaulders": {
         "name": "Bonewrought-Strijdschouderstukken"
+      },
+      "crownforged_warspaulders_heroic": {
+        "name": "Bonewrought Warspaulders"
       },
       "nighttalon_crown": {
         "name": "Direfang-Kroon"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Crown"
+      },
       "nighttalon_shoulderguards": {
         "name": "Direfang-Schouderstukken"
+      },
+      "nighttalon_shoulderguards_heroic": {
+        "name": "Direfang Shoulderguards"
       },
       "soulflame_cowl": {
         "name": "Wraithfire-Kap"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Cowl"
+      },
       "soulflame_mantle": {
         "name": "Wraithfire-Mantel"
+      },
+      "soulflame_mantle_heroic": {
+        "name": "Wraithfire Mantle"
       },
       "stormcallers_crown": {
         "name": "Galecall-Kroon"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Crown"
+      },
       "stormcallers_spaulders": {
         "name": "Galecall-Schouderstukken"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall Spaulders"
       },
       "unknown_alien_weaponry": {
         "name": "Onbekende Buitenaardse Wapens"

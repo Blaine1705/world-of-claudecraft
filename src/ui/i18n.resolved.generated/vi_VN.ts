@@ -6899,26 +6899,50 @@ export const vi_VN: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "Mũ Kinh Hoàng Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dreadhelm"
+      },
       "crownforged_warspaulders": {
         "name": "Giáp Vai Chiến Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
+        "name": "Bonewrought Warspaulders"
       },
       "nighttalon_crown": {
         "name": "Vương Miện Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Crown"
+      },
       "nighttalon_shoulderguards": {
         "name": "Giáp Vai Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
+        "name": "Direfang Shoulderguards"
       },
       "soulflame_cowl": {
         "name": "Mũ Trùm Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Cowl"
+      },
       "soulflame_mantle": {
         "name": "Áo Choàng Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
+        "name": "Wraithfire Mantle"
       },
       "stormcallers_crown": {
         "name": "Vương Miện Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Crown"
+      },
       "stormcallers_spaulders": {
         "name": "Giáp Vai Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall Spaulders"
       },
       "unknown_alien_weaponry": {
         "name": "Vũ Khí Ngoài Hành Tinh Bí Ẩn"

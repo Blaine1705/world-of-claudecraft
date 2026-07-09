@@ -6899,26 +6899,50 @@ export const tr_TR: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "Bonewrought Dehşet Miğferi"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Dreadhelm"
+      },
       "crownforged_warspaulders": {
         "name": "Bonewrought Savaş Omuzlukları"
+      },
+      "crownforged_warspaulders_heroic": {
+        "name": "Bonewrought Warspaulders"
       },
       "nighttalon_crown": {
         "name": "Direfang Tacı"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang Crown"
+      },
       "nighttalon_shoulderguards": {
         "name": "Direfang Omuzlukları"
+      },
+      "nighttalon_shoulderguards_heroic": {
+        "name": "Direfang Shoulderguards"
       },
       "soulflame_cowl": {
         "name": "Wraithfire Başlığı"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire Cowl"
+      },
       "soulflame_mantle": {
         "name": "Wraithfire Pelerini"
+      },
+      "soulflame_mantle_heroic": {
+        "name": "Wraithfire Mantle"
       },
       "stormcallers_crown": {
         "name": "Galecall Tacı"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall Crown"
+      },
       "stormcallers_spaulders": {
         "name": "Galecall Omuzlukları"
+      },
+      "stormcallers_spaulders_heroic": {
+        "name": "Galecall Spaulders"
       },
       "unknown_alien_weaponry": {
         "name": "Bilinmeyen Uzaylı Silahı"

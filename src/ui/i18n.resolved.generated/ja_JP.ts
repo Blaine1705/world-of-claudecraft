@@ -6899,25 +6899,49 @@ export const ja_JP: EnTranslations = {
       "crownforged_dreadhelm": {
         "name": "ボーンロートの恐怖兜"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "ボーンロートの恐怖兜"
+      },
       "crownforged_warspaulders": {
+        "name": "ボーンロートの戦肩当て"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "ボーンロートの戦肩当て"
       },
       "nighttalon_crown": {
         "name": "ダイアファングの冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "ダイアファングの冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "ダイアファングの肩守り"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "ダイアファングの肩守り"
       },
       "soulflame_cowl": {
         "name": "レイスファイアの頭巾"
       },
+      "soulflame_cowl_heroic": {
+        "name": "レイスファイアの頭巾"
+      },
       "soulflame_mantle": {
+        "name": "レイスファイアのマント"
+      },
+      "soulflame_mantle_heroic": {
         "name": "レイスファイアのマント"
       },
       "stormcallers_crown": {
         "name": "ゲイルコールの冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "ゲイルコールの冠"
+      },
       "stormcallers_spaulders": {
+        "name": "ゲイルコールの肩当て"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "ゲイルコールの肩当て"
       },
       "unknown_alien_weaponry": {

@@ -626,7 +626,19 @@ describe('dungeons: heroic boss drops', () => {
   });
 
   it('the heroic Nythraxis raid boss drops from its own heroic table', () => {
-    const table = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak.map((e) => e.itemId);
+    const heroicTable = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak;
+    const table = heroicTable.map((e) => e.itemId);
+    const groups = new Map<string, typeof heroicTable>();
+    for (const entry of heroicTable) {
+      const group = entry.rollGroup!;
+      groups.set(group, [...(groups.get(group) ?? []), entry]);
+    }
+    expect(groups.size).toBe(5);
+    expect(new Set(table).size).toBe(17);
+    for (const entries of groups.values()) {
+      expect(entries.length).toBeGreaterThanOrEqual(3);
+      expect(entries.reduce((sum, entry) => sum + entry.chance, 0)).toBeCloseTo(1, 10);
+    }
     const dropped = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
