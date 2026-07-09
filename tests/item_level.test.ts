@@ -221,28 +221,28 @@ describe('item level: raid tier', () => {
   });
 });
 
-describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/37)', () => {
-  it('every explicit heroic-table drop is at its tier item level with its exact stat budget', () => {
-    // The five-man final bosses register at source level 25 (item level 31). The
-    // 10-player raid boss (Heroic Nythraxis) is one tier above at source level 27:
-    // its explicit table lists only the three heroic-only weapons (item level 33).
-    // See buildSourceIndex + NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL.
+describe('item level: heroic boss drops are budget-exact epics (five-mans 31, raid 33)', () => {
+  it('every heroic drop is an epic at its tier item level with its exact stat budget', () => {
+    // The five-man final bosses register at source level 25 (item level 31); the
+    // 10-player raid boss (Heroic Nythraxis) is one tier above, at source level 27
+    // (item level 33). See buildSourceIndex + NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL.
     const raidIds = new Set(
       (HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? []).flatMap((e) =>
         e.itemId ? [e.itemId] : [],
       ),
     );
-    expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
     const ids = Object.values(HEROIC_BOSS_LOOT)
       .flat()
       .flatMap((e) => (e.itemId ? [e.itemId] : []));
-    expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
+    expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
+    expect(raidIds.size).toBe(7); // the Heroic Nythraxis raid set
     for (const id of ids) {
       const item = ITEMS[id];
       const raid = raidIds.has(id);
       expect(item, `${id} is a real item`).toBeTruthy();
       expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
       expect(item.quality, id).toBe('epic');
+      expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
       expect(itemLevel(item), `${id} ilvl`).toBe(raid ? 33 : 31);
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
     }

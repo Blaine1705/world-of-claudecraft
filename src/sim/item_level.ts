@@ -157,10 +157,9 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // every piece at item level 28, including vendor-only necks and rings.
   for (const itemId of FURY_STOCK) bump(itemId, WARFARE_SOURCE_LEVEL, false);
   // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
-  // five-man epic pieces read item level 31 (25 + the epic bump). The 10-player
-  // raid (Heroic Nythraxis) is one tier ABOVE the five-mans: its heroic-only
-  // weapons register at NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL (27) so they land at
-  // item level 33.
+  // five-man epics read item level 31 (25 + the epic bump). The 10-player raid
+  // (Heroic Nythraxis) is one tier ABOVE the five-mans, so its table registers
+  // at NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL (27) and its epics land at item level 33.
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
     const src =
       bossId === NYTHRAXIS_RAID_BOSS_ID

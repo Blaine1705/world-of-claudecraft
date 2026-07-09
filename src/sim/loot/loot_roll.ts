@@ -24,7 +24,6 @@
 // (enforced by tests/architecture.test.ts).
 
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../content/heroic_loot';
-import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
@@ -162,22 +161,8 @@ export function rollLoot(
   let copper = 0;
   const items: LootSlot[] = [];
   const rolledGroups = new Set<string>();
-  // A heroic dungeon claim upgrades the mob's normal epic/rare drops to their
-  // "Heroic" variant in place (content/heroic_variants.ts). Resolved once and
-  // reused by the heroic-only append below. No rng is drawn here, so normal-run
-  // draw order and the parity goldens are untouched.
-  const heroicClaim =
-    ctx.instances.find(
-      (i) => i.partyKey !== null && i.difficulty === 'heroic' && i.mobIds.includes(mob.id),
-    ) !== undefined;
-  // Swap a base drop for its Heroic variant when the instance is heroic AND the
-  // swap is an upgrade (raid epics, already item level 29, are left as-is).
-  const heroicItem = (id: string): string => {
-    if (!heroicClaim) return id;
-    const variant = ITEMS[heroicVariantId(id)];
-    if (!variant) return id;
-    return (itemLevel(variant) ?? 0) > (itemLevel(ITEMS[id]) ?? 0) ? variant.id : id;
-  };
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  const isHeroic = inst?.difficulty === 'heroic';
   // On a HEROIC Nythraxis (10-player raid) kill, the boss's normal-tier drop
   // groups are suppressed so every drop is an item-level-33 [HEROIC] raid epic
   // (rolled from HEROIC_BOSS_LOOT below); copper still drops. The five-man
@@ -185,7 +170,7 @@ export function rollLoot(
   // so this gate is scoped to the raid boss. Suppression draws NO rng and only
   // fires on a heroic claim, so the normal loot trace and parity goldens are
   // byte-identical.
-  const suppressBaseGroups = heroicClaim && mob.templateId === NYTHRAXIS_RAID_BOSS_ID;
+  const suppressBaseGroups = isHeroic && mob.templateId === NYTHRAXIS_RAID_BOSS_ID;
   for (const entry of template.loot) {
     // Exclusive groups: a single rng draw is partitioned by the group
     // entries' chances, so at most one matching entry drops.
@@ -246,7 +231,7 @@ export function rollLoot(
   // table's, so sharing `rolledGroups` is safe.
   const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId];
   if (heroicEntries) {
-    if (heroicClaim) {
+    if (isHeroic) {
       for (const entry of heroicEntries) {
         if (entry.rollGroup) {
           if (rolledGroups.has(entry.rollGroup)) continue;

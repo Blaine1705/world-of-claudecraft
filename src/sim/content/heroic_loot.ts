@@ -459,7 +459,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     heroic: true,
     requiredLevel: 20,
-    weapon: { min: 29, max: 51, speed: 2.4 },
+    weapon: { min: 22, max: 38, speed: 2.4 },
     stats: { int: 13, spi: 10 },
     sellValue: 16000,
     requiredClass: CASTER,
@@ -514,7 +514,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     heroic: true,
     requiredLevel: 20,
-    weapon: { min: 45, max: 68, speed: 3.4 },
+    weapon: { min: 40, max: 62, speed: 3.4 },
     stats: { str: 14, sta: 9 },
     sellValue: 16000,
     requiredClass: HEAVY,
@@ -541,7 +541,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     heroic: true,
     requiredLevel: 20,
-    weapon: { min: 30, max: 53, speed: 2.5 },
+    weapon: { min: 20, max: 36, speed: 2.5 },
     stats: { int: 14, spi: 9 },
     sellValue: 16000,
     requiredClass: HEAL_MAIL,
@@ -650,43 +650,16 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // The raid drops FIVE heroic epics per kill (five rollGroups, each summing to
   // 1.0 so exactly one item drops per group), against the five-mans' two. On a
   // heroic Nythraxis claim loot_roll.ts also suppresses the boss's normal
-  // (item-level-26) table, so every epic drop is a [HEROIC] ilvl-33 piece.
-  // Low-chance heroic legendary variants replace epics inside the weapon group,
-  // keeping the total at five drops.
+  // (item-level-26) table, so every drop is a [HEROIC] ilvl-33 piece. Groups are
+  // organized by archetype: str plate/mail, heal-mail, and the three
+  // single-piece caster/agile slots.
   nythraxis_scourge_of_thornpeak: [
-    // Strength mail.
-    { itemId: 'crownforged_dreadhelm_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_1' },
-    {
-      itemId: 'crownforged_warspaulders_heroic',
-      chance: 0.33,
-      rollGroup: 'nythraxis_heroic_1',
-    },
-    { itemId: 'deathless_warguard_legmail', chance: 0.33, rollGroup: 'nythraxis_heroic_1' },
-    // Agility leather.
-    { itemId: 'nighttalon_crown_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_2' },
-    {
-      itemId: 'nighttalon_shoulderguards_heroic',
-      chance: 0.33,
-      rollGroup: 'nythraxis_heroic_2',
-    },
-    { itemId: 'scourgehide_carapace', chance: 0.33, rollGroup: 'nythraxis_heroic_2' },
-    // Caster cloth.
-    { itemId: 'soulflame_cowl_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_3' },
-    { itemId: 'soulflame_mantle_heroic', chance: 0.33, rollGroup: 'nythraxis_heroic_3' },
-    { itemId: 'soulrend_diadem', chance: 0.33, rollGroup: 'nythraxis_heroic_3' },
-    // Healing mail.
-    { itemId: 'stormcallers_crown_heroic', chance: 0.34, rollGroup: 'nythraxis_heroic_4' },
-    {
-      itemId: 'stormcallers_spaulders_heroic',
-      chance: 0.33,
-      rollGroup: 'nythraxis_heroic_4',
-    },
-    { itemId: 'soulforged_warplate', chance: 0.33, rollGroup: 'nythraxis_heroic_4' },
-    // Weapons.
-    { itemId: 'kingsbane_last_oath_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_5' },
-    { itemId: 'deathless_heartwood_heroic', chance: 0.03, rollGroup: 'nythraxis_heroic_5' },
-    { itemId: 'deathless_greatblade', chance: 0.314, rollGroup: 'nythraxis_heroic_5' },
-    { itemId: 'scepter_of_the_deathless_court', chance: 0.313, rollGroup: 'nythraxis_heroic_5' },
-    { itemId: 'stormcallers_focus', chance: 0.313, rollGroup: 'nythraxis_heroic_5' },
+    { itemId: 'deathless_warguard_legmail', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'deathless_greatblade', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'soulforged_warplate', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'stormcallers_focus', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'scepter_of_the_deathless_court', chance: 1, rollGroup: 'nythraxis_heroic_3' },
+    { itemId: 'soulrend_diadem', chance: 1, rollGroup: 'nythraxis_heroic_4' },
+    { itemId: 'scourgehide_carapace', chance: 1, rollGroup: 'nythraxis_heroic_5' },
   ],
 };

@@ -654,13 +654,20 @@ describe('dungeons: heroic boss drops', () => {
         'hit',
       );
       const items = (boss.loot?.items ?? []) as any[];
-      // Exactly one heroic-only weapon per kill (one roll group summing to 1.0).
-      const weapons = items.filter((s) => weaponIds.includes(s.itemId));
-      expect(weapons.length, `seed ${seed} weapons`).toBe(1);
-      for (const s of weapons) droppedWeapons.add(s.itemId);
-      // The set-piece / legendary drops are upgraded to their heroic variants.
-      for (const s of items)
-        if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
+      const epics = items.filter((s) => table.includes(s.itemId));
+      expect(epics.length, `seed ${seed}`).toBe(5); // one per heroic roll group
+      // The normal-tier groups are suppressed on a heroic raid claim: every
+      // dropped item is a [HEROIC] raid epic, no normal Nythraxis gear.
+      const normalTierIds = new Set(
+        (MOBS[NYTHRAXIS_BOSS_ID].loot ?? [])
+          .filter((e: any) => e.rollGroup && e.itemId)
+          .map((e: any) => e.itemId),
+      );
+      expect(
+        items.some((s) => normalTierIds.has(s.itemId)),
+        `seed ${seed} no normal gear`,
+      ).toBe(false);
+      for (const s of epics) dropped.add(s.itemId);
     }
     // Over eight kills all three weapons show up, and the set-piece swap is live.
     expect(droppedWeapons.size).toBe(3);
