@@ -4014,6 +4014,10 @@ export class Sim {
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
+    if (MOBS[mob.templateId]?.ignoreTaunt) {
+      this.enterCombat(p, mob);
+      return;
+    }
     if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
       this.enterCombat(p, mob);
       return;
@@ -4791,7 +4795,7 @@ export class Sim {
     // friendly mob in range (including the caster) in an absorb shield. Unlike
     // Mend it targets healthy allies too — a barrier pre-empts the next blows.
     // Refreshes each interval, replacing any partially-soaked ward (same aura id).
-    if (tmpl.wardAllies) {
+    if (tmpl.wardAllies && !this.ctx.isStunned(mob)) {
       mob.wardTimer -= DT;
       if (mob.wardTimer <= 0) {
         mob.wardTimer = tmpl.wardAllies.every;

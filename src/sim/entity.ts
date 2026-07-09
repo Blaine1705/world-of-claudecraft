@@ -111,6 +111,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
+    shuffleTargetTimer: 0,
     ownerId: null,
     petMode: 'defensive',
     petTauntTimer: 0,
