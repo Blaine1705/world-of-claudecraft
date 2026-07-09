@@ -625,6 +625,33 @@ function planPlatform(
   return { rampZ0, rampZ1, height };
 }
 
+/** Scatter blocker pillars across the ice sheet (Pokemon-style obstacles that stop a
+ * slide), while keeping a clear central north corridor (|x| < ICE_CORRIDOR) so the
+ * player can always reach the Frost Sigil by centering up and sliding straight north
+ * (the goal is solved by SLIDING THROUGH it, radius 4, so no stopper is needed).
+ * Off the corridor, the rocks force you to navigate the rink slide by slide. Pushes
+ * the blockers into `geo.layout.pillars` and recomputes `geo.colliders`, so they are
+ * live for the runtime region, the renderer, and the spawn-clearance checks. */
+function addIceBlockers(
+  rng: Rng,
+  geo: GeneratedGeometry,
+  ice: { x: number; z: number; hw: number; hd: number },
+): void {
+  const ICE_CORRIDOR = 4.5;
+  const zS = ice.z - ice.hd;
+  const zN = ice.z + ice.hd;
+  const maxX = Math.max(ICE_CORRIDOR + 2, ice.hw - 2);
+  if (maxX <= ICE_CORRIDOR + 1.5) return; // rink too narrow for off-corridor rocks
+  const n = rng.int(4, 7);
+  for (let i = 0; i < n; i++) {
+    const side = i % 2 === 0 ? -1 : 1;
+    const x = side * rng.range(ICE_CORRIDOR + 1.5, maxX);
+    const z = rng.range(zS + 6, zN - 6);
+    geo.layout.pillars.push({ x: Math.round(x * 10) / 10, z: Math.round(z * 10) / 10 });
+  }
+  geo.colliders = layoutColliders(geo.layout);
+}
+
 /** The raised-tier Y lift at instance-local z (0 in the nave, ramps up the stairs,
  * flat `height` on the rear platform). Pure + single-valued, so the authoritative
  * Sim and the render regenerate identical verticality from the descriptor. */
@@ -681,6 +708,8 @@ export function generateRiftFloor(
   const floorLevel = floorLevelFor(baseLevel, clampedIndex);
   const puzzle = planPuzzle(rng, isBoss);
   const iceZone = puzzle.kind === 'ice_slide' ? iceZoneFor(geo) : null;
+  // Ice-maze rocks go in BEFORE spawns/objects so both place onto clear tiles.
+  if (iceZone) addIceBlockers(rng, geo, iceZone);
   const spawns = planSpawns(rng, theme, geo, floorLevel, isBoss);
   const objects = planObjects(rng, geo, isBoss, puzzle, iceZone);
   const hazards = planHazards(rng, geo, isBoss, iceZone !== null);

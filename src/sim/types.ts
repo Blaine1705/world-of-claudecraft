@@ -1821,6 +1821,9 @@ export interface Entity {
   // each tick, ignoring steering input, until a wall or the sheet edge stops it.
   riftSlideDirX?: number;
   riftSlideDirZ?: number;
+  // True while the ice slide is carrying the player: the renderer holds a frozen
+  // braced pose (no run cycle) so they read as gliding, not sprinting. Wired (`sld`).
+  riftSliding?: boolean;
   // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
   // shoves + chips once rather than every tick of overlap.
   riftRollerUntil?: number;

@@ -701,6 +701,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  if (e.riftSliding) out.sld = 1; // ice-slide: render a frozen gliding pose
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;

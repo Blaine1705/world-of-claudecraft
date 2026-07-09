@@ -1627,6 +1627,7 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.riftSliding = !!w.sld;
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
       e.ownerId = w.own ?? null;

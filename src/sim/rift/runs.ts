@@ -422,6 +422,9 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
+  p.riftSliding = false; // never carry a stale slide pose out to the overworld
+  p.riftSlideDirX = 0;
+  p.riftSlideDirZ = 0;
   if (inst) emitRiftState(ctx, r.meta.entityId, inst, false);
   ctx.emit({
     type: 'log',
@@ -498,9 +501,10 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         p.facing = Math.atan2(dirx, dirz); // face the glide
         ctx.rebucket(p);
         if (advanced < step * 0.5 || !nextOnIce) {
-          // Slammed into a wall, or skated off the ice onto solid ground: stop.
+          // Slammed into a wall/rock, or skated off the ice onto solid ground: stop.
           p.riftSlideDirX = 0;
           p.riftSlideDirZ = 0;
+          p.riftSliding = false;
           riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // spray as you skid to a halt
         }
       } else if (onIce) {
@@ -511,10 +515,12 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         if (moved > ICE_SLIDE_START) {
           p.riftSlideDirX = dx / moved;
           p.riftSlideDirZ = dz / moved;
+          p.riftSliding = true;
           riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // frost spray kicks up as you launch
         }
       }
-    } else if ((p.riftSlideDirX ?? 0) !== 0 || (p.riftSlideDirZ ?? 0) !== 0) {
+    } else if ((p.riftSlideDirX ?? 0) !== 0 || (p.riftSlideDirZ ?? 0) !== 0 || p.riftSliding) {
+      p.riftSliding = false;
       p.riftSlideDirX = 0; // no ice on this floor: never leave a stale slide latched
       p.riftSlideDirZ = 0;
     }

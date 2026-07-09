@@ -4637,6 +4637,14 @@ export class Renderer {
       st.casting = e.castingAbility !== null && !visuallyDead;
       st.swimming = swimming;
       st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
+      // Ice slide: the sim glides the player at speed but they should read as
+      // FROZEN (gliding stiff on the ice), not sprinting. Suppress locomotion +
+      // airborne so the state machine holds the static idle pose while they slide.
+      if (e.riftSliding && !visuallyDead) {
+        st.moving = false;
+        st.running = false;
+        st.airborne = false;
+      }
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
