@@ -216,6 +216,7 @@ function makeCtx() {
     refreshKnownAbilities: vi.fn(),
     syncPetLevel: vi.fn(),
     moveToward: vi.fn(() => false),
+    attackerInFront: vi.fn(() => false),
     mobSwing: vi.fn(),
     updateRangedPetAttack: vi.fn(),
     fleeMoveSpeed: vi.fn(() => 0),

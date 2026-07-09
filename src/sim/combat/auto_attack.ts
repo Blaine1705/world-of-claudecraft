@@ -287,6 +287,13 @@ export function meleeSwing(
     : target.kind === 'player'
       ? target.dodgeChance
       : 0.05 + Math.max(0, target.level - attacker.level) * 0.005;
+  const blockChance =
+    target.kind === 'player' &&
+    ctx.attackerInFront(target, attacker) &&
+    target.blockValue > 0 &&
+    target.blockChance > 0
+      ? target.blockChance
+      : 0;
   const roll = ctx.rng.next();
   if (roll < missChance) {
     ctx.emit({
@@ -342,6 +349,9 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
+  if (blockChance > 0 && roll < missChance + dodgeChance + blockChance) {
+    dmg = Math.max(1, dmg - target.blockValue);
+  }
   const dealtAmount = Math.max(1, Math.round(dmg));
   ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
     flat: opts.threatFlat ?? 0,

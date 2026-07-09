@@ -109,10 +109,17 @@ When `dualWielding` is active:
 
 This mirrors the intended Classic-like model while keeping the current ability system stable.
 
-## Shield and block follow-up (LOCKED)
-- A shield in `offhand` is the prerequisite for a later real block system.
-- The first offhand pass does not need to implement block yet.
-- `shield_slam` does not gain a shield requirement in the first pass unless the operator asks for it
+## Shield and block (LOCKED 2026-07-09)
+- A shield in `offhand` enables a real Classic-style block layer now.
+- Block is passive, not a meter or spender. There is no visible block resource, HUD bar, or extra
+  UI meter.
+- Block applies only against frontal physical melee hits.
+- A successful block reduces the hit by the shield's `blockValue`.
+- The first pass keeps block intentionally narrow:
+  - no new visible block event text is required
+  - no spell block model
+  - no ranged block model
+- `shield_slam` does not gain a shield requirement in this change unless the operator asks for it
   explicitly in a later change.
 
 ## Implementation order (LOCKED)
@@ -124,7 +131,7 @@ Build in this order:
 5. offhand auto-attack stream
 6. online mirror and snapshot coverage
 7. renderer support for a real offhand item
-8. later follow-up: block, shield requirements, or offhand-aware yellow attacks
+8. later follow-up: shield requirements or offhand-aware yellow attacks
 
 ## File map for implementation (PENDING)
 - `src/sim/types.ts`
@@ -154,5 +161,4 @@ Build in this order:
 ## Explicit non-goals for the first pass
 - No attempt to rework every weapon-based ability to choose hand dynamically.
 - No full Classic hit-table rewrite outside the dual-wield white-hit penalty needed here.
-- No block implementation yet.
 - No universal cross-class dual-wield rollout before the operator asks for it.

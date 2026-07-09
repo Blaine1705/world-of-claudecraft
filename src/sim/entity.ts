@@ -12,6 +12,7 @@ import {
   PARRY_BASE,
   PARRY_CLASSES,
   PARRY_STR_PER,
+  SHIELD_BLOCK_BASE,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -52,6 +53,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     dodgeChance: 0.05,
     parryChance: 0,
+    blockChance: 0,
+    blockValue: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     moveSpeed: 7,
@@ -367,6 +370,10 @@ export function recalcPlayerStats(
     mainhand?.kind === 'weapon' &&
     meetsLevelRequirement(lvl, mainhand)
   );
+  e.blockChance =
+    offhand?.kind === 'shield' && meetsLevelRequirement(lvl, offhand) ? SHIELD_BLOCK_BASE : 0;
+  e.blockValue =
+    offhand?.kind === 'shield' && meetsLevelRequirement(lvl, offhand) ? offhand.blockValue ?? 0 : 0;
   // Render-only: the equipped mainhand item id drives the held weapon model on
   // the client (mapped via ITEM_WEAPON_VARIANTS). Gated on the item actually being
   // a weapon, mirroring the e.weapon derivation above (so a non-weapon mainhand,

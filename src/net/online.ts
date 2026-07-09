@@ -811,6 +811,8 @@ function blankEntity(id: number): Entity {
     critChance: 0.05,
     dodgeChance: 0.05,
     parryChance: 0,
+    blockChance: 0,
+    blockValue: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
