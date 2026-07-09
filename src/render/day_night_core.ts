@@ -37,6 +37,24 @@ export interface DayNightGrade {
   nightAmt: number;
 }
 
+/** SHIP DAY ONLY for now. The day/night cycle arrived with the grid-world merge and
+ *  is not the look we release on yet, so every consumer pins itself to full day:
+ *  the clock reports noon and the renderer applies NEUTRAL_DAY_GRADE instead of the
+ *  cycle's grade. Nothing about the cycle math is removed, so flipping this to false
+ *  restores it in one line, and `/daynight <phase>` still overrides it for testing. */
+export const DAY_ONLY = true;
+
+/** The identity grade: the world exactly as its authored daylight rig paints it.
+ *  Note this is NOT `dayNightGrade(1)`, whose "day" is deliberately dimmed and
+ *  cooled (lightScale 0.65, cool sky/fog) to leave headroom for night. */
+export const NEUTRAL_DAY_GRADE: DayNightGrade = {
+  lightScale: 1,
+  sky: [1, 1, 1],
+  fog: [1, 1, 1],
+  farScale: 1,
+  nightAmt: 0,
+};
+
 // Night targets. The floor stays moonlit, not black, so a neutral realm at
 // deepest night still reads and stays playable, but the sky itself goes a deep
 // dark blue so the moon and stars stand out against it; the fog is a touch

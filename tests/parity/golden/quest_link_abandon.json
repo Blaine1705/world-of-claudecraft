@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 654,
+      "nextId": 658,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 656,
-      "state": "a80fd9d6",
-      "events": "5f110877",
+      "nextId": 660,
+      "state": "3db35f0a",
+      "events": "27805cc3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -48,13 +48,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -86,13 +88,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -130,7 +134,7 @@
           "fallStartY": -0.183546,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -179,7 +183,7 @@
           "fallStartY": -0.366437,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -223,8 +227,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 656,
-      "state": "a80fd9d6",
+      "nextId": 660,
+      "state": "3db35f0a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -243,13 +247,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -281,13 +287,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -325,7 +333,7 @@
           "fallStartY": -0.183546,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -374,7 +382,7 @@
           "fallStartY": -0.366437,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -418,9 +426,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 656,
-      "state": "a80fd9d6",
-      "events": "5e96582b",
+      "nextId": 660,
+      "state": "3db35f0a",
+      "events": "90bf5e53",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -438,13 +446,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -476,13 +486,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -520,7 +532,7 @@
           "fallStartY": -0.183546,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -569,7 +581,7 @@
           "fallStartY": -0.366437,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -613,9 +625,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 656,
-      "state": "efd615d8",
-      "events": "ed2cdaef",
+      "nextId": 660,
+      "state": "643e3274",
+      "events": "b97c3023",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -633,13 +645,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -671,13 +685,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -727,7 +743,7 @@
           "fallStartY": -0.183546,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -776,7 +792,7 @@
           "fallStartY": -0.366437,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -820,9 +836,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 656,
-      "state": "a80fd9d6",
-      "events": "bdfe444d",
+      "nextId": 660,
+      "state": "3db35f0a",
+      "events": "cf1134f9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -840,13 +856,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -878,13 +896,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -922,7 +942,7 @@
           "fallStartY": -0.183546,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -971,7 +991,7 @@
           "fallStartY": -0.366437,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1015,8 +1035,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 656,
-      "state": "5e3b3e36",
+      "nextId": 660,
+      "state": "3a631512",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1035,13 +1055,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1073,13 +1095,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1117,7 +1141,7 @@
           "fallStartY": -0.183546,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1166,7 +1190,7 @@
           "fallStartY": -0.366437,
           "fiveSecondRule": 99.1,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

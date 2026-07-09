@@ -6,7 +6,11 @@
 // the HUD (minimap dial) both read currentDayNightPhase(), so a single override
 // drives them together and they never disagree.
 
-import { cyclePhase } from './day_night_core';
+import { cyclePhase, DAY_ONLY } from './day_night_core';
+
+/** Phase 0.5 is solar noon (see globalDayness in day_night_core). While DAY_ONLY
+ *  holds, the live clock reports this instead of the UTC-anchored phase. */
+const NOON_PHASE = 0.5;
 
 let phaseOverride: number | null = null;
 
@@ -21,8 +25,10 @@ export function dayNightPhaseOverride(): number | null {
   return phaseOverride;
 }
 
-/** The current cycle phase in [0,1): the dev override when set, otherwise the
- *  live UTC-anchored clock. Read by both the world lighting and the minimap dial. */
+/** The current cycle phase in [0,1): the dev override when set, otherwise noon
+ *  while DAY_ONLY holds (the live UTC-anchored clock once it is lifted). Read by
+ *  both the world lighting and the minimap dial, so they never disagree. */
 export function currentDayNightPhase(): number {
-  return phaseOverride ?? cyclePhase(Date.now());
+  if (phaseOverride !== null) return phaseOverride;
+  return DAY_ONLY ? NOON_PHASE : cyclePhase(Date.now());
 }

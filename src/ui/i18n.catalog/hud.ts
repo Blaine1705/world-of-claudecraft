@@ -59,6 +59,7 @@ const hudStringsEn = {
       mobileSocial: 'Social',
       mobileArena: 'Arena',
       mobileMenu: 'Menu',
+      mobileSettings: 'Settings',
       mobileUse: 'Interact',
       mobileMeters: 'Meters',
       mobileMap: 'Map',

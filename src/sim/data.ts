@@ -164,6 +164,7 @@ import {
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
+  TOOL_RECIPES as TOOL_RECIPES_CONTENT,
 } from './content/recipes';
 import { RIFT_MOBS } from './content/rift/mobs';
 import {
@@ -180,6 +181,7 @@ import {
 } from './content/temple';
 import { VALE_CUP_BALL_MOB, VALE_CUP_BALL_TEMPLATE_ID } from './content/vale_cup';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
+import { YUMI_MOBS } from './content/yumi';
 import {
   WILLOWFEN_CAMPS,
   WILLOWFEN_ITEMS,
@@ -331,6 +333,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
   ...RIFT_MOBS,
+  ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
   ...FROSTVEIL_MOBS,
@@ -459,7 +462,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
 
-export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT];
+export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT, ...TOOL_RECIPES_CONTENT];
 
 // Every recipe, common and combo alike (#1132 review): the recipeList read
 // surface below lists this, not just COMMON_RECIPES, so a combo recipe is
@@ -906,6 +909,10 @@ export const RIFT_X_MIN = INSTANCE_X_BASE + 9000; // rift instance x (all slots 
 // west wall face so isRiftPos covers the whole footprint and delve/rift never
 // overlap (delves end far below this).
 export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
+// East cap. Every rift slot shares RIFT_X_MIN and stacks along z, so the band is
+// only RIFT_REGION_HALF_X wide either side; 1000u of headroom keeps it clear of the
+// relocated Protect Yumi maze band (YUMI_BAND_X_MIN) that now sits past it.
+export const RIFT_BAND_X_MAX = RIFT_X_MIN + 1000;
 export const RIFT_SLOT_COUNT = 8; // concurrent rifts the world can host
 export const RIFT_MAX_FLOORS = 6; // matches rift_gen MAX_FLOORS
 const RIFT_Z0 = -1250;
@@ -927,7 +934,7 @@ export function riftInstanceOrigin(slot: number, floorIndex: number): { x: numbe
 }
 
 export function isRiftPos(x: number): boolean {
-  return x >= RIFT_BAND_X_MIN;
+  return x >= RIFT_BAND_X_MIN && x < RIFT_BAND_X_MAX;
 }
 
 // Nearest rift-floor origin to a far-off z (all floors share RIFT_X_MIN; they
@@ -948,6 +955,55 @@ export function delveAt(x: number): DelveDef | null {
   if (!isDelvePos(x)) return null;
   const index = Math.round((x - DELVE_X_MIN) / 600);
   return DELVE_LIST.find((d) => d.index === index) ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Protect Yumi! maze instances, the easternmost band. Delve rooms are centred
+// at DELVE_X_MIN + index*600 with a ~26u wall face, so an 8000 band edge
+// leaves headroom for delve indexes 0..5 (4800 + 5*600 + 26 = 7826 < 8000).
+// Like every far-east band: flat ground (world.groundHeight) and one shared
+// instance-local collider set (sim/yumi_maze_layout.ts via sim/colliders.ts).
+// ---------------------------------------------------------------------------
+
+// RELOCATED onto the grid world's instance plane. The maze band shipped at an
+// absolute x = 8000 on the pre-grid strip, where the delve band ended at ~7826.
+// The 2D atlas-grid world moved every instance far east of any real land
+// (INSTANCE_X_BASE), so that literal 8000 now lands on WALKABLE OVERWORLD: the
+// maze would have been built on real terrain instead of the flat instance floor
+// past DUNGEON_X_THRESHOLD. The band keeps its shape (4000 wide, maze 400u in)
+// and moves east of the rift band, the same relocation the delve and rift bands
+// took (see RIFT_X_MIN).
+export const YUMI_BAND_X_MIN = INSTANCE_X_BASE + 10_000; // x at/after this = a yumi maze instance
+// Two-sided cap, like the pre-grid band: the maze must not claim everything to
+// its east the way the delve band once claimed everything past 4773.
+export const YUMI_BAND_X_MAX = INSTANCE_X_BASE + 14_000;
+export const YUMI_MAZE_X = INSTANCE_X_BASE + 10_400; // maze instances share this x; slots stack along z
+export const YUMI_MAZE_SLOT_COUNT = 4; // concurrent Protect Yumi matches
+const YUMI_MAZE_Z0 = -1250;
+const YUMI_MAZE_SLOT_SPACING = 200; // > the ~90u maze footprint so slots never overlap
+
+export function yumiMazeOrigin(slot: number): { x: number; z: number } {
+  return { x: YUMI_MAZE_X, z: YUMI_MAZE_Z0 + slot * YUMI_MAZE_SLOT_SPACING };
+}
+
+export function isYumiMazePos(x: number): boolean {
+  return x >= YUMI_BAND_X_MIN && x < YUMI_BAND_X_MAX;
+}
+
+// Nearest maze instance origin to a far-off position, matched by z-band (the
+// x is shared across slots). Mirrors arenaOriginAt.
+export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0,
+    bestD = Infinity;
+  for (let i = 0; i < YUMI_MAZE_SLOT_COUNT; i++) {
+    const d = Math.abs(z - yumiMazeOrigin(i).z);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  const o = yumiMazeOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
 }
 
 export const DELVES: Record<string, DelveDef> = {

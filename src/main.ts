@@ -13,6 +13,7 @@ import {
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
@@ -179,6 +180,7 @@ import {
 } from './ui/i18n';
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { PerfOverlay } from './ui/perf_overlay';
@@ -264,6 +266,22 @@ function isNativeRuntime(): boolean {
   const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
   return cap?.isNativePlatform?.() === true;
 }
+
+function localStorageOrNull(): Storage | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+applyNativeDeviceLanguage({
+  native: isNativeRuntime(),
+  locationSearch: window.location.search,
+  storage: localStorageOrNull(),
+  languages: navigator.languages,
+  language: navigator.language,
+});
 
 const SITE_URL = 'https://worldofclaudecraft.com/';
 
@@ -979,13 +997,34 @@ async function startGame(
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
+  // On the touch HUD the composer is a desktop-style bar at the TOP of the chat panel
+  // (above the tabs + log), so on mobile it lives INSIDE #chatlog-wrap as its first child
+  // rather than as an absolutely-positioned sibling. Move it there once, lazily, the first
+  // time chat opens (idempotent; a no-op on desktop and after the first move).
+  const ensureMobileComposerInPanel = (): void => {
+    if (!document.body.classList.contains('mobile-touch')) return;
+    const wrap = document.getElementById('chatlog-wrap');
+    if (!wrap || chatInput.parentElement === wrap) return;
+    wrap.insertBefore(chatInput, wrap.firstChild);
+  };
   function openChat(): void {
     // reflect the active chat-channel tab in the placeholder (e.g. "Message World")
+    ensureMobileComposerInPanel();
     chatInput.placeholder = hud.activeChatPlaceholder();
     chatInput.style.display = 'block';
     anchorChatInput();
     autosizeChatInput();
     chatInput.focus();
+  }
+  // Mobile read view: tapping the Chat button opens the centered panel with the composer
+  // bar VISIBLE but NOT focused (no keyboard). Tapping the composer focuses it and raises
+  // the keyboard (native + the focus handler). Same as openChat minus the focus.
+  function openChatRead(): void {
+    ensureMobileComposerInPanel();
+    chatInput.placeholder = hud.activeChatPlaceholder();
+    chatInput.style.display = 'block';
+    document.body.classList.remove('mobile-chat-reply');
+    autosizeChatInput();
   }
   // Fired for every open path (keybind, whisper context menu, mobile toggle)
   // since they all call focus().
@@ -1097,8 +1136,18 @@ async function startGame(
     }
   });
   chatInput.addEventListener('blur', () => {
-    if (chatInput.style.display === 'none') recoverFromMobileKeyboard();
+    // Recover the mobile-chat viewport ONLY when the composer is already hidden (the
+    // close path: closeChat hides then blurs). A keyboard dismiss (the OS hide-keyboard
+    // key) blurs while the composer is still shown, so this is false and chat stays open
+    // in its centered READ view, reflowed by the keyboard_viewport applier off the
+    // visualViewport resize. Only the Chat button closes chat.
+    if (shouldRecoverOnComposerBlur(chatInput.style.display)) recoverFromMobileKeyboard();
   });
+  // The mobile keyboard-dismiss chevron (hidden on mobile in the current model; kept wired
+  // for parity): blur the composer to drop the keyboard and return to the read view,
+  // WITHOUT closing chat.
+  const chatDismiss = document.getElementById('chat-dismiss');
+  chatDismiss?.addEventListener('click', () => chatInput.blur());
 
   const input = new Input(
     canvas,
@@ -1176,14 +1225,16 @@ async function startGame(
       onEmoteWheel: (open) => hud.setEmoteWheelOpen(open),
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
-      canUseGameKeys: () => !hud.isModalOpen() && chatInput.style.display !== 'block',
+      canUseGameKeys: () =>
+        !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block',
     },
     keybinds,
   );
   input.camYaw = world.player.facing;
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
-    canUseGameKeys: !hud.isModalOpen() && chatInput.style.display !== 'block',
+    canUseGameKeys:
+      !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block',
     modalOpen: hud.isModalOpen(),
     chatOpen: chatInput.style.display === 'block',
     gameInputReady,
@@ -1200,6 +1251,8 @@ async function startGame(
     onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
+    onChatOpen: () => openChatRead(),
+    onChatClose: () => closeChat(),
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
@@ -1243,7 +1296,8 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
-  const canUseGameKeysNow = () => !hud.isModalOpen() && chatInput.style.display !== 'block';
+  const canUseGameKeysNow = () =>
+    !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block';
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
       if (hud.cancelGroundAim()) return;
@@ -2691,7 +2745,21 @@ async function startGame(
     input.camDist = pose.dist;
     if (pose.done) finishIntro(false);
   };
-  if (playIntro && !introSeen && world.player.level <= 1 && !settings.get('reduceMotion')) {
+  // "Reduce motion" is the EFFECTIVE flag (the OS prefers-reduced-motion query OR the
+  // in-game switch, the ui_effects_profile model): the intro is exactly the kind of
+  // sweeping camera glide that contract exists for, and checking only the in-game
+  // switch left OS-level reduce-motion players watching it (it also hid #ui from
+  // them, silently dropping any focus() into the HUD while it ran).
+  const osReducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (
+    playIntro &&
+    !introSeen &&
+    world.player.level <= 1 &&
+    !settings.get('reduceMotion') &&
+    !osReducedMotion
+  ) {
     intro = {
       cinematic: spawnCinematicFor({
         yaw: input.camYaw,

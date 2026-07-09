@@ -136,6 +136,12 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
     };
     expect(minimapMode(w as unknown as IWorld)).toBe('delve');
   });
+
+  it('returns yumiMaze anywhere in the Protect Yumi band, run or not', () => {
+    const w = makeWorld('client') as unknown as { player: { pos: { x: number } } };
+    w.player.pos.x = 8400;
+    expect(minimapMode(w as unknown as IWorld)).toBe('yumiMaze');
+  });
 });
 
 describe('createMinimapMarkers: the discriminated union per draw kind', () => {

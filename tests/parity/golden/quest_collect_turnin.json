@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 655,
-      "state": "e3667baf",
+      "nextId": 659,
+      "state": "e476130f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,13 +35,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -75,7 +77,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -118,9 +120,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 655,
-      "state": "e34ba429",
-      "events": "e4641766",
+      "nextId": 659,
+      "state": "fa48e93d",
+      "events": "97af7dae",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -138,13 +140,15 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -190,7 +194,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -233,9 +237,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 655,
-      "state": "c0be2304",
-      "events": "5147580b",
+      "nextId": 659,
+      "state": "ef024278",
+      "events": "d534ea1b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -253,15 +257,17 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "questProgress": 5
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -311,7 +317,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -354,9 +360,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 655,
-      "state": "99553b6d",
-      "events": "d73ac74a",
+      "nextId": 659,
+      "state": "9a9e5b31",
+      "events": "a5208776",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -374,15 +380,17 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "questProgress": 5
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -432,7 +440,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -475,9 +483,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 655,
-      "state": "ac448e43",
-      "events": "a2284167",
+      "nextId": 659,
+      "state": "89daca85",
+      "events": "a19fbc3f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -495,15 +503,17 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
             "questProgress": 6
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -553,7 +563,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -596,9 +606,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 655,
-      "state": "4bcfc700",
-      "events": "30cd1482",
+      "nextId": 659,
+      "state": "51514c5c",
+      "events": "e0c3b096",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -616,6 +626,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 120,
@@ -625,9 +636,10 @@
             "xpGained": 350
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -666,7 +678,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -709,8 +721,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 655,
-      "state": "971049ba",
+      "nextId": 659,
+      "state": "224c93da",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -729,6 +741,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 120,
@@ -738,9 +751,10 @@
             "xpGained": 350
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -779,7 +793,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

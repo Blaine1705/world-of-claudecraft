@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 654,
+      "nextId": 658,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 658,
-      "state": "cbfa9dd0",
-      "events": "958d317a",
+      "nextId": 662,
+      "state": "a9fa33ba",
+      "events": "27f38432",
       "rng": {
         "draws": 1,
         "digest": "0422edd8"
@@ -49,6 +49,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 33,
@@ -56,9 +57,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -94,6 +96,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 34,
@@ -101,9 +104,10 @@
             "lootCopper": 34
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -139,6 +143,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 33,
@@ -146,9 +151,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 656,
+          "entityId": 660,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -182,7 +188,7 @@
           "fallStartY": 1.49341,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -231,7 +237,7 @@
           "fallStartY": 1.335617,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -281,7 +287,7 @@
           "fallStartY": 1.133292,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 656,
+          "id": 660,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -334,7 +340,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 657,
+          "id": 661,
           "kind": "mob",
           "level": 2,
           "loot": {
@@ -343,16 +349,16 @@
                 "count": 1,
                 "itemId": "gnarled_staff",
                 "personalFor": [
-                  655
+                  659
                 ]
               }
             ]
           },
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            654,
-            655,
-            656
+            658,
+            659,
+            660
           ],
           "lootable": true,
           "maxHp": 54,
@@ -374,7 +380,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 654,
+          "tappedById": 658,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -387,9 +393,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 658,
-      "state": "bf7c73ae",
-      "events": "1427822d",
+      "nextId": 662,
+      "state": "9a49548c",
+      "events": "4ae15285",
       "rng": {
         "draws": 3,
         "digest": "f5bc0d71"
@@ -407,6 +413,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 33,
@@ -414,9 +421,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -456,6 +464,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 34,
@@ -463,9 +472,10 @@
             "lootCopper": 34
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -501,6 +511,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 33,
@@ -508,9 +519,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 656,
+          "entityId": 660,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -544,7 +556,7 @@
           "fallStartY": 1.49341,
           "fiveSecondRule": 99.05,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -593,7 +605,7 @@
           "fallStartY": 1.335617,
           "fiveSecondRule": 99.05,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -643,7 +655,7 @@
           "fallStartY": 1.133292,
           "fiveSecondRule": 99.05,
           "hp": 62,
-          "id": 656,
+          "id": 660,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -696,7 +708,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 657,
+          "id": 661,
           "kind": "mob",
           "level": 2,
           "loot": {
@@ -705,7 +717,7 @@
                 "count": 1,
                 "itemId": "gnarled_staff",
                 "personalFor": [
-                  655
+                  659
                 ]
               },
               {
@@ -717,9 +729,9 @@
           },
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            654,
-            655,
-            656
+            658,
+            659,
+            660
           ],
           "lootable": true,
           "maxHp": 54,
@@ -742,7 +754,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 654,
+          "tappedById": 658,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -755,9 +767,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 658,
-      "state": "cc19f938",
-      "events": "d3b7d316",
+      "nextId": 662,
+      "state": "b3adf60c",
+      "events": "0050dcde",
       "rng": {
         "draws": 3,
         "digest": "f5bc0d71"
@@ -775,6 +787,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 33,
@@ -782,9 +795,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -824,6 +838,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 34,
@@ -831,9 +846,10 @@
             "lootCopper": 34
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -877,6 +893,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 33,
@@ -884,9 +901,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 656,
+          "entityId": 660,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -920,7 +938,7 @@
           "fallStartY": 1.49341,
           "fiveSecondRule": 99.05,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -969,7 +987,7 @@
           "fallStartY": 1.335617,
           "fiveSecondRule": 99.05,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1019,7 +1037,7 @@
           "fallStartY": 1.133292,
           "fiveSecondRule": 99.05,
           "hp": 62,
-          "id": 656,
+          "id": 660,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1072,14 +1090,14 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 657,
+          "id": 661,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            654,
-            655,
-            656
+            658,
+            659,
+            660
           ],
           "maxHp": 54,
           "moveSpeed": 8,
@@ -1101,7 +1119,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 654,
+          "tappedById": 658,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -1114,8 +1132,8 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 658,
-      "state": "2227fdab",
+      "nextId": 662,
+      "state": "91671284",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1134,6 +1152,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 33,
@@ -1141,9 +1160,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 654,
+          "entityId": 658,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1183,6 +1203,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
           "copper": 34,
@@ -1190,9 +1211,10 @@
             "lootCopper": 34
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 655,
+          "entityId": 659,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1236,6 +1258,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
           "copper": 33,
@@ -1243,9 +1266,10 @@
             "lootCopper": 33
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 656,
+          "entityId": 660,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1279,7 +1303,7 @@
           "fallStartY": 1.49341,
           "fiveSecondRule": 99.15,
           "hp": 90,
-          "id": 654,
+          "id": 658,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1329,7 +1353,7 @@
           "fallStartY": 1.335617,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 655,
+          "id": 659,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1379,7 +1403,7 @@
           "fallStartY": 1.133292,
           "fiveSecondRule": 99.15,
           "hp": 62,
-          "id": 656,
+          "id": 660,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1420,7 +1444,7 @@
           }
         },
         {
-          "aggroTargetId": 654,
+          "aggroTargetId": 658,
           "aiState": "chase",
           "combatTimer": 99.05,
           "comboUntil": -1,
@@ -1432,7 +1456,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 657,
+          "id": 661,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1465,7 +1489,7 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              654,
+              658,
               1
             ]
           ],
