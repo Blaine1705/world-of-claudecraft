@@ -1793,7 +1793,6 @@ export interface AbilityDef {
   awardsCombo?: number; // rogue builders
   spendsCombo?: boolean; // rogue finishers
   requiresDodgeProc?: boolean; // overpower
-  requiresVictoryProc?: boolean; // warrior kill-window strike
   requiresTargetHpBelow?: number; // execute-style (fraction)
   requiresShield?: boolean; // Protection shield abilities: need a shield in the offhand
   // Classic threat riders: flat bonus threat on a successful use and/or a
@@ -2219,8 +2218,6 @@ export interface Entity {
   comboPoints: number; // retail-style: character-bound, not anchored to a target
   comboUntil: number; // sim-time until which unspent combo points persist
   overpowerUntil: number; // sim-time until which overpower is usable
-  victoryRushUntil: number; // sim-time until which the warrior kill-window strike is usable
-  battleRhythmCounter: number; // transient every-third-ability warrior rhythm counter
   potionCooldownUntil: number; // sim-time until a combat potion can be used again (#103)
   // Same shared potion cooldown as REMAINING seconds, materialized per tick (like
   // gcdRemaining) so the action bar can paint a cooldown swipe without a client

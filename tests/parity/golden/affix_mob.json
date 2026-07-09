@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "adcfd5de",
+      "state": "06b9e332",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -118,7 +118,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -131,7 +130,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "aef4f104",
+      "state": "44e86c20",
       "events": "516d06f7",
       "rng": {
         "draws": 14,
@@ -142,7 +141,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "af5c0709",
+      "state": "de590c61",
       "events": "c8749703",
       "rng": {
         "draws": 28,
@@ -153,7 +152,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 408,
-      "state": "a59d49af",
+      "state": "2ec14b9b",
       "events": "7fd88fd9",
       "rng": {
         "draws": 57,
@@ -301,7 +300,6 @@
           },
           "targetId": 409,
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -376,7 +374,6 @@
               200
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -421,7 +418,6 @@
           "swingTimer": 1.35,
           "targetId": 408,
           "templateId": "ridge_stalker",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 50,
             "min": 32,
@@ -434,7 +430,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 408,
-      "state": "6b1d70a8",
+      "state": "62d5cfc0",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -583,7 +579,6 @@
           },
           "targetId": 409,
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -659,7 +654,6 @@
               200
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -704,7 +698,6 @@
           "swingTimer": 1.15,
           "targetId": 408,
           "templateId": "ridge_stalker",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 50,
             "min": 32,

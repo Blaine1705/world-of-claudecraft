@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "0e862051",
+      "state": "df42e97d",
       "events": "887ecfe6",
       "rng": {
         "draws": 3,
@@ -244,7 +244,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -295,7 +294,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -346,7 +344,6 @@
             "str": 17
           },
           "templateId": "rogue",
-          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -427,7 +424,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 19,
             "min": 12,
@@ -440,7 +436,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "bbf1eb4e",
+      "state": "37a5a736",
       "events": "03d42c4c",
       "rng": {
         "draws": 6,
@@ -654,7 +650,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -705,7 +700,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -756,7 +750,6 @@
             "str": 17
           },
           "templateId": "rogue",
-          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -837,7 +830,6 @@
               60
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 19,
             "min": 12,
@@ -850,7 +842,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "a54beeeb",
+      "state": "40b6f1f7",
       "events": "03d42c4c",
       "rng": {
         "draws": 9,
@@ -1064,7 +1056,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1115,7 +1106,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1166,7 +1156,6 @@
             "str": 17
           },
           "templateId": "rogue",
-          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -1247,7 +1236,6 @@
               90
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 19,
             "min": 12,
@@ -1260,7 +1248,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "c4dc0123",
+      "state": "04d2fd7f",
       "events": "03d42c4c",
       "rng": {
         "draws": 12,
@@ -1474,7 +1462,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1525,7 +1512,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1576,7 +1562,6 @@
             "str": 17
           },
           "templateId": "rogue",
-          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -1657,7 +1642,6 @@
               120
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 19,
             "min": 12,
@@ -1670,7 +1654,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "14247ca5",
+      "state": "a1ff1085",
       "events": "9ff1643e",
       "rng": {
         "draws": 15,
@@ -1681,7 +1665,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "110daf8c",
+      "state": "11f57764",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1692,7 +1676,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "110daf8c",
+      "state": "11f57764",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1908,7 +1892,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1960,7 +1943,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2012,7 +1994,6 @@
             "str": 17
           },
           "templateId": "rogue",
-          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -2096,7 +2077,6 @@
               120
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 19,
             "min": 12,

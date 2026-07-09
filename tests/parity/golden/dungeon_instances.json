@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 421,
-      "state": "1c880946",
+      "state": "8f64ea62",
       "events": "c93030c3",
       "rng": {
         "draws": 39,
@@ -201,7 +201,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -251,7 +250,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -303,7 +301,6 @@
               1
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 42,
             "min": 27,
@@ -355,7 +352,6 @@
               1
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 38,
             "min": 24,
@@ -395,7 +391,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 903.028219,
             "z": -1229.829057
@@ -440,7 +435,6 @@
             "armor": 108
           },
           "templateId": "hollow_acolyte",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 900.703572,
             "z": -1232.954928
@@ -485,7 +479,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 891.778992,
             "z": -1207.63377
@@ -530,7 +523,6 @@
             "armor": 98
           },
           "templateId": "hollow_acolyte",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 888.240627,
             "z": -1213.049431
@@ -575,7 +567,6 @@
             "armor": 84
           },
           "templateId": "bonechill_widow",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 889.299784,
             "z": -1182.477851
@@ -620,7 +611,6 @@
             "armor": 96
           },
           "templateId": "bonechill_widow",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 902.985922,
             "z": -1183.943777
@@ -665,7 +655,6 @@
             "armor": 176
           },
           "templateId": "sexton_marrow",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 900.248928,
             "z": -1174.905226
@@ -710,7 +699,6 @@
             "armor": 98
           },
           "templateId": "hollow_acolyte",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 906.809419,
             "z": -1165.011017
@@ -755,7 +743,6 @@
             "armor": 234
           },
           "templateId": "morthen",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 895.960684,
             "z": -1146.969061
@@ -800,7 +787,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 903.299784,
             "z": -1196.477851
@@ -1153,7 +1139,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 904.14426,
             "z": -1156.846265
@@ -1196,7 +1181,6 @@
           },
           "stats": {},
           "templateId": "dungeon_exit",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -1209,7 +1193,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 421,
-      "state": "17ed7195",
+      "state": "66ef8e85",
       "events": "3b102156",
       "rng": {
         "draws": 47,
@@ -1393,7 +1377,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1443,7 +1426,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1483,7 +1465,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTimer": 4.424821,
           "weapon": {
             "max": 42,
@@ -1524,7 +1505,6 @@
             "armor": 108
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTimer": 4.745525,
           "weapon": {
             "max": 38,
@@ -1565,7 +1545,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 903.028219,
             "z": -1229.829057
@@ -1610,7 +1589,6 @@
             "armor": 108
           },
           "templateId": "hollow_acolyte",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 900.703572,
             "z": -1232.954928
@@ -1655,7 +1633,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 891.778992,
             "z": -1207.63377
@@ -1700,7 +1677,6 @@
             "armor": 98
           },
           "templateId": "hollow_acolyte",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 888.240627,
             "z": -1213.049431
@@ -1745,7 +1721,6 @@
             "armor": 84
           },
           "templateId": "bonechill_widow",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 889.299784,
             "z": -1182.477851
@@ -1790,7 +1765,6 @@
             "armor": 96
           },
           "templateId": "bonechill_widow",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 902.985922,
             "z": -1183.943777
@@ -1835,7 +1809,6 @@
             "armor": 176
           },
           "templateId": "sexton_marrow",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 900.248928,
             "z": -1174.905226
@@ -1880,7 +1853,6 @@
             "armor": 98
           },
           "templateId": "hollow_acolyte",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 906.809419,
             "z": -1165.011017
@@ -1925,7 +1897,6 @@
             "armor": 234
           },
           "templateId": "morthen",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 895.960684,
             "z": -1146.969061
@@ -1970,7 +1941,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 903.299784,
             "z": -1196.477851
@@ -2323,7 +2293,6 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 904.14426,
             "z": -1156.846265
@@ -2366,7 +2335,6 @@
           },
           "stats": {},
           "templateId": "dungeon_exit",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -2379,7 +2347,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 421,
-      "state": "3b4806c6",
+      "state": "641d786e",
       "events": "13c8fd90",
       "rng": {
         "draws": 47,
@@ -2390,7 +2358,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 421,
-      "state": "d1ea9512",
+      "state": "4740d386",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -2401,7 +2369,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 421,
-      "state": "becd5a90",
+      "state": "304a9448",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -2412,7 +2380,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 421,
-      "state": "6e6a25dd",
+      "state": "b7e29601",
       "events": "64b4e648",
       "rng": {
         "draws": 47,
@@ -2423,7 +2391,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 421,
-      "state": "5f9fc34d",
+      "state": "bb261411",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -2619,7 +2587,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2670,7 +2637,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2683,7 +2649,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 421,
-      "state": "5f9fc34d",
+      "state": "bb261411",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -2879,7 +2845,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2930,7 +2895,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,

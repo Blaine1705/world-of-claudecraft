@@ -6382,14 +6382,6 @@ export const zh_TW: EnTranslations = {
         "name": "鋼鐵旋風",
         "description": "化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。（戰士天賦）"
       },
-      "swordguard": {
-        "name": "劍衛",
-        "description": "受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時提高到 20%。（戰士天賦）"
-      },
-      "triumph_rush": {
-        "name": "凱旋奔襲",
-        "description": "擊殺敵人後，20 秒內可造成武器傷害加 {damage}，並恢復最大生命值的 20%。（戰士天賦）"
-      },
       "razor_howl": {
         "name": "銳刃怒吼",
         "description": "使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）"

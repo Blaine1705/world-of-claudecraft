@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "2864ec00",
+      "state": "ec7b428c",
       "events": "9b8485f8",
       "rng": {
         "draws": 6,
@@ -347,7 +347,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -398,7 +397,6 @@
             "str": 22
           },
           "templateId": "paladin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -461,7 +459,6 @@
             "str": 15
           },
           "templateId": "druid",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -512,7 +509,6 @@
             "str": 18
           },
           "templateId": "shaman",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -574,7 +570,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -616,7 +611,6 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -669,7 +663,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -730,7 +723,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -915,7 +907,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -928,7 +919,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "cfcd51e6",
+      "state": "265bdf36",
       "events": "6bf4315e",
       "rng": {
         "draws": 6,
@@ -1246,7 +1237,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1297,7 +1287,6 @@
             "str": 22
           },
           "templateId": "paladin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1360,7 +1349,6 @@
             "str": 15
           },
           "templateId": "druid",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1411,7 +1399,6 @@
             "str": 18
           },
           "templateId": "shaman",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1473,7 +1460,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1515,7 +1501,6 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1586,7 +1571,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1647,7 +1631,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1832,7 +1815,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1845,7 +1827,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 414,
-      "state": "4f575ee9",
+      "state": "8ac91add",
       "events": "cc157a1d",
       "rng": {
         "draws": 10,
@@ -1856,7 +1838,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 414,
-      "state": "136090ef",
+      "state": "2be3cf7f",
       "events": "cc157a1d",
       "rng": {
         "draws": 10,
@@ -2174,7 +2156,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2225,7 +2206,6 @@
             "str": 22
           },
           "templateId": "paladin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2289,7 +2269,6 @@
             "str": 15
           },
           "templateId": "druid",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2340,7 +2319,6 @@
             "str": 18
           },
           "templateId": "shaman",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2414,7 +2392,6 @@
             "str": 23
           },
           "templateId": "warrior",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2457,7 +2434,6 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2538,7 +2514,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2600,7 +2575,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": -82.543054,
             "y": -8.5,
@@ -2668,7 +2642,6 @@
               10
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 94.87499,
             "y": -3.24435,

@@ -6382,14 +6382,6 @@ export const ja_JP: EnTranslations = {
         "name": "鋼の旋風",
         "description": "鋼の旋風となり、毎秒周囲の敵を攻撃して {damage} のダメージを与えます。（ウォリアータレント）"
       },
-      "swordguard": {
-        "name": "剣の守り",
-        "description": "8秒間、受けるダメージが10%減少します。体力が30%未満なら20%減少します。（ウォリアータレント）"
-      },
-      "triumph_rush": {
-        "name": "凱旋突撃",
-        "description": "敵を倒した後20秒以内に、武器ダメージに {damage} を加えて与え、最大体力の20%を回復します。（ウォリアータレント）"
-      },
       "razor_howl": {
         "name": "刃の咆哮",
         "description": "15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）"

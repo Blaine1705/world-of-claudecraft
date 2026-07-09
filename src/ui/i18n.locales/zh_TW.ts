@@ -2260,12 +2260,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.name': '鋼鐵旋風',
   'entities.abilities.bladestorm.description':
     '化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。（戰士天賦）',
-  'entities.abilities.swordguard.name': '劍衛',
-  'entities.abilities.swordguard.description':
-    '受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時提高到 20%。（戰士天賦）',
-  'entities.abilities.triumph_rush.name': '凱旋奔襲',
-  'entities.abilities.triumph_rush.description':
-    '擊殺敵人後，20 秒內可造成武器傷害加 {damage}，並恢復最大生命值的 20%。（戰士天賦）',
   'entities.abilities.razor_howl.name': '銳刃怒吼',
   'entities.abilities.razor_howl.description': '使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）',
   'entities.abilities.stormthrow.name': '風暴投擲',

@@ -63,7 +63,6 @@ const CORPSE_DURATION = 60;
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 const PURSUIT_AURA_ID = 'war_pursuit_speed';
 const BLOODBATH_AURA_ID = 'war_bloodbath';
-const VICTORY_RUSH_WINDOW = 20;
 
 // A handful of casts ignore classic-era spell pushback: ghost_wolf, plus any
 // def flagged `uninterruptible` (Bladestorm: the channel must run its full
@@ -640,8 +639,7 @@ export function dealDamage(
       );
       source.resource = Math.min(
         source.maxResource,
-        source.resource +
-          Math.round(rageFromDealing(amount, source.level) * (1 + mods.autoRagePct + auraMult)),
+        source.resource + Math.round(rageFromDealing(amount, source.level) * (1 + auraMult)),
       );
     }
   }
@@ -656,7 +654,7 @@ export function dealDamage(
         (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
         0,
       );
-      const mult = 1 + (mods?.autoRagePct ?? 0) + auraMult;
+      const mult = 1 + auraMult;
       target.resource = Math.min(
         target.maxResource,
         target.resource + Math.round(rageFromTaking(amount, source.level) * mult),
@@ -963,9 +961,6 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
           sourceId: creditEntity.id,
           school: 'physical',
         });
-      }
-      if (meta.known.some((known) => known.def.id === 'triumph_rush')) {
-        creditEntity.victoryRushUntil = ctx.time + VICTORY_RUSH_WINDOW;
       }
       if (creditMods.global.bloodbathPct > 0) {
         const applyBloodbath = (kind: 'buff_dmg_done' | 'buff_crit', suffix: string) => {

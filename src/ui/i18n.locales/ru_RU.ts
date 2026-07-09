@@ -2415,12 +2415,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.name': 'Стальной циклон',
   'entities.abilities.bladestorm.description':
     'Вы становитесь стальным вихрем, каждую секунду нанося ближайшим врагам {damage} ед. урона. (Талант воина)',
-  'entities.abilities.swordguard.name': 'Защита клинка',
-  'entities.abilities.swordguard.description':
-    'Снижает получаемый урон на 10% на 8 сек.; если здоровья меньше 30%, снижение становится 20%. (Талант воина)',
-  'entities.abilities.triumph_rush.name': 'Триумфальный натиск',
-  'entities.abilities.triumph_rush.description':
-    'После убийства врага в течение 20 сек. наносит урон оружием плюс {damage} и исцеляет вас на 20% максимального здоровья. (Талант воина)',
   'entities.abilities.razor_howl.name': 'Бритвенный рев',
   'entities.abilities.razor_howl.description':
     'Замедляет врагов в радиусе 15 м на 50% на 8 сек. (Талант воина)',

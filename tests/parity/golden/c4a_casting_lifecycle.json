@@ -36,7 +36,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 409,
-      "state": "d74a4b27",
+      "state": "05d0c033",
       "events": "fb12f697",
       "rng": {
         "draws": 2,
@@ -306,7 +306,6 @@
           },
           "targetId": 411,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -356,7 +355,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -407,7 +405,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -461,7 +458,6 @@
               1
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 7.78323,
             "y": 0.475385,
@@ -480,7 +476,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "ea5b72c2",
+      "state": "6980dd5e",
       "events": "e800778d",
       "rng": {
         "draws": 5,
@@ -491,7 +487,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "8a5ae802",
+      "state": "6261012e",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -502,7 +498,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 409,
-      "state": "4778f5e3",
+      "state": "83168db3",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -513,7 +509,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "369a7925",
+      "state": "17f7cae9",
       "events": "a8084a91",
       "rng": {
         "draws": 5,
@@ -524,7 +520,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "555ed7d7",
+      "state": "68158637",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -535,7 +531,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 409,
-      "state": "e1c2b7d0",
+      "state": "55e26a44",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -546,7 +542,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 409,
-      "state": "c1b1e686",
+      "state": "b3facc16",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -557,7 +553,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "797c3e43",
+      "state": "66b1ebaf",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -568,7 +564,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 409,
-      "state": "298400d0",
+      "state": "fcd80040",
       "events": "bc5c110b",
       "rng": {
         "draws": 26,
@@ -579,7 +575,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "0ff1797c",
+      "state": "71f95c90",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -590,7 +586,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 409,
-      "state": "ce5b30bd",
+      "state": "a9e9ff1d",
       "events": "741638a5",
       "rng": {
         "draws": 68,
@@ -601,7 +597,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 409,
-      "state": "148cfd72",
+      "state": "a4b26d3e",
       "events": "741638a5",
       "rng": {
         "draws": 84,
@@ -612,7 +608,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 409,
-      "state": "f8c323d1",
+      "state": "2d6c78c1",
       "events": "741638a5",
       "rng": {
         "draws": 104,
@@ -623,7 +619,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 409,
-      "state": "557783a3",
+      "state": "f35414ef",
       "events": "741638a5",
       "rng": {
         "draws": 128,
@@ -634,7 +630,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "f223e35c",
+      "state": "cf563704",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -645,7 +641,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 409,
-      "state": "66c2295d",
+      "state": "488f6f69",
       "events": "b3301486",
       "rng": {
         "draws": 162,
@@ -656,7 +652,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 409,
-      "state": "6b95d2ad",
+      "state": "ebeef34d",
       "events": "9979b8b1",
       "rng": {
         "draws": 202,
@@ -667,7 +663,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 409,
-      "state": "d512214d",
+      "state": "f78998a9",
       "events": "741638a5",
       "rng": {
         "draws": 227,
@@ -678,7 +674,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 409,
-      "state": "660f04b3",
+      "state": "8ccf3183",
       "events": "741638a5",
       "rng": {
         "draws": 266,
@@ -689,7 +685,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "af8d2e64",
+      "state": "1db7d108",
       "events": "741638a5",
       "rng": {
         "draws": 288,
@@ -700,7 +696,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 409,
-      "state": "600ad55b",
+      "state": "76b7211b",
       "events": "741638a5",
       "rng": {
         "draws": 302,
@@ -711,7 +707,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 409,
-      "state": "5971c1d5",
+      "state": "a6088a01",
       "events": "741638a5",
       "rng": {
         "draws": 323,
@@ -722,7 +718,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 409,
-      "state": "1df8deb9",
+      "state": "03fadc59",
       "events": "741638a5",
       "rng": {
         "draws": 363,
@@ -733,7 +729,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "73aedfa6",
+      "state": "383d8312",
       "events": "741638a5",
       "rng": {
         "draws": 384,
@@ -744,7 +740,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "fcc63294",
+      "state": "cc93500c",
       "events": "d2b49b12",
       "rng": {
         "draws": 429,
@@ -755,7 +751,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 409,
-      "state": "9bd157f0",
+      "state": "621b73c4",
       "events": "741638a5",
       "rng": {
         "draws": 461,
@@ -766,7 +762,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 409,
-      "state": "49ec6349",
+      "state": "d4d646c9",
       "events": "741638a5",
       "rng": {
         "draws": 499,
@@ -777,7 +773,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 409,
-      "state": "b1e9293e",
+      "state": "8fce55da",
       "events": "741638a5",
       "rng": {
         "draws": 523,
@@ -788,7 +784,7 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 409,
-      "state": "5b5bfdc4",
+      "state": "3f8c12f4",
       "events": "741638a5",
       "rng": {
         "draws": 552,
@@ -799,7 +795,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 409,
-      "state": "2d461218",
+      "state": "1cefde3c",
       "events": "741638a5",
       "rng": {
         "draws": 585,
@@ -810,7 +806,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 409,
-      "state": "bca7c088",
+      "state": "63641cf8",
       "events": "741638a5",
       "rng": {
         "draws": 618,
@@ -821,7 +817,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 409,
-      "state": "e21c0e3d",
+      "state": "81c97bc1",
       "events": "741638a5",
       "rng": {
         "draws": 634,
@@ -832,7 +828,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 409,
-      "state": "83a3d958",
+      "state": "45e18fb8",
       "events": "c05ce9df",
       "rng": {
         "draws": 667,
@@ -843,7 +839,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 409,
-      "state": "28f74e60",
+      "state": "f85efd8c",
       "events": "741638a5",
       "rng": {
         "draws": 697,
@@ -854,7 +850,7 @@
       "tick": 174,
       "time": 8.7,
       "nextId": 409,
-      "state": "17837ddf",
+      "state": "01a14af3",
       "events": "741638a5",
       "rng": {
         "draws": 734,
@@ -1159,7 +1155,6 @@
           },
           "targetId": 411,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1209,7 +1204,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1260,7 +1254,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1331,7 +1324,6 @@
               68
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 7.78323,
             "y": 0.475385,
@@ -1350,7 +1342,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 409,
-      "state": "32f8d2a4",
+      "state": "ef184244",
       "events": "741638a5",
       "rng": {
         "draws": 792,
@@ -1361,7 +1353,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 409,
-      "state": "b1d0742f",
+      "state": "eaa3f14b",
       "events": "741638a5",
       "rng": {
         "draws": 764,
@@ -1372,7 +1364,7 @@
       "tick": 185,
       "time": 9.25,
       "nextId": 409,
-      "state": "7d7bea69",
+      "state": "a85fe7e9",
       "events": "855267a0",
       "rng": {
         "draws": 789,
@@ -1383,7 +1375,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 409,
-      "state": "5cf620df",
+      "state": "fc8db24f",
       "events": "741638a5",
       "rng": {
         "draws": 829,
@@ -1394,7 +1386,7 @@
       "tick": 195,
       "time": 9.75,
       "nextId": 409,
-      "state": "7e08efff",
+      "state": "dab3778f",
       "events": "4c64bd96",
       "rng": {
         "draws": 900,
@@ -1405,7 +1397,7 @@
       "tick": 196,
       "time": 9.8,
       "nextId": 409,
-      "state": "8b3019e1",
+      "state": "ee4878e1",
       "events": "28d4b790",
       "rng": {
         "draws": 922,
@@ -1699,7 +1691,6 @@
           },
           "targetId": 411,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1762,7 +1753,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1813,7 +1803,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1884,7 +1873,6 @@
               137
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 7.78323,
             "y": 0.475385,
@@ -1903,7 +1891,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 409,
-      "state": "b218dadc",
+      "state": "25a794e0",
       "events": "da7b67ec",
       "rng": {
         "draws": 896,
@@ -1914,7 +1902,7 @@
       "tick": 205,
       "time": 10.25,
       "nextId": 409,
-      "state": "fe4999e6",
+      "state": "b03625e2",
       "events": "c1d039d1",
       "rng": {
         "draws": 916,
@@ -1925,7 +1913,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 409,
-      "state": "f2d14c9f",
+      "state": "25c19dab",
       "events": "741638a5",
       "rng": {
         "draws": 957,
@@ -1936,7 +1924,7 @@
       "tick": 215,
       "time": 10.75,
       "nextId": 409,
-      "state": "c29db45e",
+      "state": "3a9769e2",
       "events": "741638a5",
       "rng": {
         "draws": 982,
@@ -1947,7 +1935,7 @@
       "tick": 218,
       "time": 10.9,
       "nextId": 409,
-      "state": "e931bb98",
+      "state": "a136e17c",
       "events": "f6164b3a",
       "rng": {
         "draws": 1002,
@@ -2270,7 +2258,6 @@
           },
           "targetId": 411,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2333,7 +2320,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2394,7 +2380,6 @@
           },
           "targetId": 411,
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2464,7 +2449,6 @@
               137
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 7.78323,
             "y": 0.475385,
@@ -2483,7 +2467,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 409,
-      "state": "831b11c2",
+      "state": "85b52b4a",
       "events": "313a8e89",
       "rng": {
         "draws": 1047,
@@ -2494,7 +2478,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 409,
-      "state": "f8cd4b85",
+      "state": "e27dfe0d",
       "events": "ee0df768",
       "rng": {
         "draws": 1069,
@@ -2505,7 +2489,7 @@
       "tick": 226,
       "time": 11.3,
       "nextId": 409,
-      "state": "a6cba605",
+      "state": "37eaf4b1",
       "events": "a4fdc99e",
       "rng": {
         "draws": 1074,
@@ -2792,7 +2776,6 @@
           },
           "targetId": 411,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2854,7 +2837,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2910,7 +2892,6 @@
           },
           "targetId": 411,
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2984,7 +2965,6 @@
               19.5
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 7.78323,
             "y": 0.475385,
@@ -3003,7 +2983,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 409,
-      "state": "b046bc6d",
+      "state": "75ddde9d",
       "events": "741638a5",
       "rng": {
         "draws": 1085,
@@ -3014,7 +2994,7 @@
       "tick": 231,
       "time": 11.55,
       "nextId": 409,
-      "state": "bba1873d",
+      "state": "656cb9f5",
       "events": "741638a5",
       "rng": {
         "draws": 1093,
@@ -3301,7 +3281,6 @@
           },
           "targetId": 411,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3363,7 +3342,6 @@
             "str": 10
           },
           "templateId": "priest",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3420,7 +3398,6 @@
           },
           "targetId": 411,
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3495,7 +3472,6 @@
               19.5
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 7.78323,
             "y": 0.475385,

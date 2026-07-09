@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "223e0179",
+      "state": "a8b80181",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -123,7 +123,6 @@
             "str": 10
           },
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -136,7 +135,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "342f239c",
+      "state": "35149d6c",
       "events": "6f4af3da",
       "rng": {
         "draws": 3,
@@ -147,7 +146,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "9c3c84e2",
+      "state": "388882ce",
       "events": "32aafa0f",
       "rng": {
         "draws": 3,
@@ -158,7 +157,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "7d1211de",
+      "state": "697f700e",
       "events": "c880e87c",
       "rng": {
         "draws": 73,
@@ -169,7 +168,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 407,
-      "state": "d7cc3eee",
+      "state": "0afa71a2",
       "events": "c880e87c",
       "rng": {
         "draws": 163,
@@ -180,7 +179,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "4ff7c34a",
+      "state": "01c2991a",
       "events": "894957f3",
       "rng": {
         "draws": 259,
@@ -191,7 +190,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 407,
-      "state": "644d05b1",
+      "state": "e6303b8d",
       "events": "c880e87c",
       "rng": {
         "draws": 380,
@@ -202,7 +201,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 407,
-      "state": "03556f0d",
+      "state": "b13c24fd",
       "events": "741638a5",
       "rng": {
         "draws": 421,
@@ -332,7 +331,6 @@
           },
           "targetId": 409,
           "templateId": "mage",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -375,7 +373,6 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": -1.188086,
             "y": 1.250784,

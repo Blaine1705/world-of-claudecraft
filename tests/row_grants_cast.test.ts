@@ -68,7 +68,6 @@ describe('every row-granted spell casts on its class', () => {
         p.gcdRemaining = 0;
         p.hp = p.maxHp;
         if (g.ability === 'hammer_of_wrath') mob.hp = Math.floor(mob.maxHp * 0.1); // execute window
-        if (g.ability === 'triumph_rush') p.victoryRushUntil = Number.POSITIVE_INFINITY;
         if (g.ability === 'frenzied_regeneration') {
           sim.castAbility('bear_form'); // Bruin Form gate
           for (let i = 0; i < 3; i++) sim.tick();

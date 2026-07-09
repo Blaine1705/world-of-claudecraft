@@ -6382,17 +6382,9 @@ export const pt_BR: EnTranslations = {
         "name": "Ciclone de Aço",
         "description": "Te convierte en una tormenta de acero que golpea a próximos inimigos cada segundo por {damage}. (talento de guerreiro)"
       },
-      "swordguard": {
-        "name": "Swordguard",
-        "description": "Reduces damage taken by 10% for 8 sec, doubled to 20% while below 30% health. (Warrior talent)"
-      },
-      "triumph_rush": {
-        "name": "Triumph Rush",
-        "description": "After killing an enemy, strike for weapon damage plus {damage} and heal yourself for 20% of maximum health within 20 sec. (Warrior talent)"
-      },
       "razor_howl": {
         "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yd by 50% for 8 sec. (Warrior talent)"
+        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
       },
       "stormthrow": {
         "name": "Stormthrow",
