@@ -220,7 +220,6 @@ const CAMERA_BASE_FOV = 60;
 const CAMERA_MAX_COMP_FOV = 98;
 const SELF_RENDER_SMOOTH_RATE = 30;
 const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
-const SUN_HALO_OPACITY = 0.14; // faint: the sky-shader disc is the sun, bloom the glow
 // lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
 const HEMI_INTENSITY = 0.45;
 const SUN_INTENSITY = 2.8;
@@ -853,6 +852,7 @@ export class Renderer {
   private sky!: THREE.Mesh;
   private skyView!: SkyView;
   private sunSprites: THREE.Sprite[] = [];
+  private moonSprites: THREE.Sprite[] = [];
   private sunDir = new THREE.Vector3();
   // the moving moon direction plus how far above the horizon each body sits
   // (0 down, 1 up); recomputed each frame in updateAmbience from the world clock
@@ -1163,27 +1163,39 @@ export class Renderer {
     this.sunDir.copy(SUN_DIR);
 
     // visible sun disc + bloom halo
-    const sunCanvas = (core: boolean): THREE.CanvasTexture => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const ctx = c.getContext('2d')!;
-      const g = ctx.createRadialGradient(64, 64, 2, 64, 64, 64);
-      if (core) {
-        g.addColorStop(0, 'rgba(255,252,238,1)');
-        g.addColorStop(0.35, 'rgba(255,238,180,0.95)');
-        g.addColorStop(1, 'rgba(255,220,140,0)');
-      } else {
-        g.addColorStop(0, 'rgba(255,236,180,0.55)');
-        g.addColorStop(1, 'rgba(255,220,150,0)');
-      }
-      ctx.fillStyle = g;
+    // The sun and moon are billboard sprites: always camera-facing, so they read
+    // as perfect circles wherever they sit on screen (a dome-shader disc would
+    // project to an ellipse off-axis). Each is a crisp filled disc plus a soft
+    // glow; the renderer aims them along the sun/moon direction each frame and
+    // fades them by how far the body is above the horizon.
+    const discTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      const ctx = cv.getContext('2d')!;
+      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 1)`);
+      grad.addColorStop(0.82, `rgba(${r}, ${g}, ${b}, 1)`); // solid plateau = crisp disc
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`); // feathered rim to anti-alias the edge
+      ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 128, 128);
-      return new THREE.CanvasTexture(c);
+      return new THREE.CanvasTexture(cv);
     };
-    for (const [tex, scale] of [
-      [sunCanvas(true), 16],
-      [sunCanvas(false), 64],
-    ] as const) {
+    const glowTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = 128;
+      const ctx = cv.getContext('2d')!;
+      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(cv);
+    };
+    const makeCelestialSprite = (
+      tex: THREE.CanvasTexture,
+      scale: number,
+      opacity: number,
+    ): THREE.Sprite => {
       const sp = new THREE.Sprite(
         new THREE.SpriteMaterial({
           map: tex,
@@ -1192,21 +1204,26 @@ export class Renderer {
           depthWrite: false,
           depthTest: false,
           blending: THREE.AdditiveBlending,
-          // the sky shader now draws the bold round sun disc, so the sprites are
-          // only a faint bloom aid (a dim tiny core plus a very low-opacity halo),
-          // kept small so they never read as the sun themselves
-          opacity: scale === 64 ? (LOW_GFX ? 1 : SUN_HALO_OPACITY) : 0.2,
+          opacity,
         }),
       );
       setRenderCategory(sp, 'sky');
       sp.scale.set(scale, scale, 1);
       sp.renderOrder = -9;
-      // remember the shipped opacity so the sun disc can fade with sunUp (out at
-      // night) without losing the halo-vs-core opacity difference
-      sp.userData.baseOpacity = sp.material.opacity;
-      this.sunSprites.push(sp);
+      sp.userData.baseOpacity = opacity;
       this.scene.add(sp);
-    }
+      return sp;
+    };
+    // sun: a warm disc under a soft warm glow
+    this.sunSprites = [
+      makeCelestialSprite(glowTex(255, 214, 150), 150, LOW_GFX ? 0.6 : 0.3),
+      makeCelestialSprite(discTex(255, 224, 168), 42, 0.9),
+    ];
+    // moon: a bright white disc (as bright as the stars) under a soft cool glow
+    this.moonSprites = [
+      makeCelestialSprite(glowTex(150, 170, 220), 128, 0.22),
+      makeCelestialSprite(discTex(247, 250, 255), 50, 1),
+    ];
 
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
     // the camera; opacity follows how directly the camera faces the sun
@@ -2165,21 +2182,10 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setCelestial(
-        this.sunDir,
-        this.moonDir,
-        this.sunUp,
-        this.moonUp,
-        this.starAmt,
-        this.time,
-      );
+      this.skyView.setStars(this.starAmt, this.time);
       this.updateEnvBiome(dt);
     }
-    for (const sp of this.sunSprites) {
-      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor' && this.sunUp > 0.02;
-      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
-    }
+    this.updateCelestialSprites();
     this.updateGodRays();
     this.nameplatePainter.update(true);
     this.updateChatBubbles();
@@ -3927,7 +3933,7 @@ export class Renderer {
       let hi = (sunElev - 0.08) / 0.5;
       hi = hi < 0 ? 0 : hi > 1 ? 1 : hi;
       const lowness = 1 - hi * hi * (3 - 2 * hi);
-      const warmAmt = aboveHorizon(sunElev) * (0.22 + lowness * 0.45);
+      const warmAmt = aboveHorizon(sunElev) * (0.34 + lowness * 0.45);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
       this.dnColorScratch.lerp(
@@ -3989,6 +3995,22 @@ export class Renderer {
       );
     }
     this.sun.target.position.set(pp.x, pp.y, pp.z);
+  }
+
+  // Aim the sun and moon disc sprites along their directions and fade them by how
+  // far each body sits above the horizon (out when below, and only outdoors).
+  private updateCelestialSprites(): void {
+    const outdoor = this.fogState === 'outdoor';
+    for (const sp of this.sunSprites) {
+      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
+      sp.visible = outdoor && this.sunUp > 0.02;
+      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
+    }
+    for (const sp of this.moonSprites) {
+      sp.position.copy(this.camera.position).addScaledVector(this.moonDir, 760);
+      sp.visible = outdoor && this.moonUp > 0.02;
+      sp.material.opacity = (sp.userData.baseOpacity as number) * this.moonUp;
+    }
   }
 
   // Drop the view of an entity that left the world / our interest area.
@@ -4751,14 +4773,7 @@ export class Renderer {
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
-      this.skyView.setCelestial(
-        this.sunDir,
-        this.moonDir,
-        this.sunUp,
-        this.moonUp,
-        this.starAmt,
-        this.time,
-      );
+      this.skyView.setStars(this.starAmt, this.time);
       this.updateEnvBiome(dt);
     }
     // precipitation only falls outdoors; indoors/underwater pass null to clear
@@ -4768,11 +4783,7 @@ export class Renderer {
       this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
     );
     worldStart = markWorldPhase('sky', worldStart);
-    for (const sp of this.sunSprites) {
-      sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor' && this.sunUp > 0.02;
-      sp.material.opacity = (sp.userData.baseOpacity as number) * this.sunUp;
-    }
+    this.updateCelestialSprites();
     worldStart = markWorldPhase('sunSprites', worldStart);
     this.updateGodRays();
     worldStart = markWorldPhase('godRays', worldStart);

@@ -343,17 +343,9 @@ export interface SkyView {
   setCameraPos(x: number, z: number, dt: number): void;
   /** per-channel day/night multiplier on the dome color (1,1,1 = full day) */
   setDayNight(mul: readonly [number, number, number]): void;
-  /** move the sun and moon discs, set how far above the horizon each sits
-   *  (0 = down/hidden, 1 = fully up), the star-field strength (0 day, 1 deep
-   *  night), and the current time in seconds (for star twinkle) */
-  setCelestial(
-    sunDir: THREE.Vector3,
-    moonDir: THREE.Vector3,
-    sunUp: number,
-    moonUp: number,
-    starAmt: number,
-    time: number,
-  ): void;
+  /** set the star-field strength (0 day, 1 deep night) and the current time in
+   *  seconds (for star twinkle). The sun/moon discs are sprites, not dome-drawn. */
+  setStars(starAmt: number, time: number): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: BiomeId): THREE.DataTexture | null;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
@@ -384,10 +376,6 @@ const SKY_FRAG = /* glsl */ `
   uniform float uOffB;
   uniform vec2 uTuneA; // x: radiance gain, y: clamp (bloom economy)
   uniform vec2 uTuneB;
-  uniform vec3 uSunDir;
-  uniform vec3 uMoonDir;
-  uniform float uSunUp;  // 0 sun below horizon / hidden, 1 fully up
-  uniform float uMoonUp; // 0 moon below horizon / hidden, 1 fully up
   uniform float uStarAmt; // 0 day, 1 deep night: star-field strength
   uniform float uTime;    // seconds, for star twinkle
   uniform sampler2D uBackdropA;
@@ -452,23 +440,13 @@ const SKY_FRAG = /* glsl */ `
     vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
     vec3 backdrop = mix(backA, backB, uMix);
     c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
-    c *= mix(uTintA, uTintB, uMix); // biome grade before the warm sun glow
-    // the sun: a bold hard-edged warm disc so its round shape reads through
-    // bloom, with only a thin warm corona (no big soft glow blob)
-    float sunDot = max(dot(dir, uSunDir), 0.0);
-    float sunDisc = smoothstep(0.9987, 0.9992, sunDot);             // defined round disc (~2.5 deg)
-    float sunCorona = pow(sunDot, 50.0);                            // tight warm ring, not a blob
-    c += (vec3(1.0, 0.85, 0.58) * sunDisc * 0.9 + vec3(1.0, 0.6, 0.3) * sunCorona * 0.22) * uSunUp;
-    c *= uDayNight;                                                  // world day/night grade, last
-    // the moon: a bold defined disc with a soft cool glow, added on top of the
-    // night-darkened sky so it stays clearly visible (bigger + brighter than a
-    // pinpoint so it reads as a moon, not a star)
-    float moonDot = max(dot(dir, uMoonDir), 0.0);
-    float moonDisc = smoothstep(0.9982, 0.9989, moonDot);          // defined disc (~3 deg)
-    float moonHalo = pow(moonDot, 40.0);
-    c += (vec3(0.95, 0.97, 1.0) * moonDisc + vec3(0.55, 0.62, 0.82) * moonHalo * 0.14) * uMoonUp;
+    c *= mix(uTintA, uTintB, uMix); // biome grade
+    c *= uDayNight;                 // world day/night grade
+    // The sun and moon discs are billboard sprites (see renderer.ts) so they stay
+    // perfect circles on screen; the dome only carries the sky and the stars.
     // stars: a fine field of small twinkling points at hash-jittered spots, only
     // above the horizon, fading in as the sky darkens
+    if (uStarAmt > 0.001) {
     if (uStarAmt > 0.001) {
       vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
       vec2 scell = floor(suv);
@@ -546,7 +524,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
       dome,
       setCameraPos: () => {},
       setDayNight: () => {},
-      setCelestial: () => {},
+      setStars: () => {},
       envTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
@@ -569,10 +547,6 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uOffB: { value: sunOffsetU(start.to, sun) },
     uTuneA: { value: tuneVec(start.from) },
     uTuneB: { value: tuneVec(start.to) },
-    uSunDir: { value: sun.clone() },
-    uMoonDir: { value: new THREE.Vector3(0, -1, 0) },
-    uSunUp: { value: 1 },
-    uMoonUp: { value: 0 },
     uStarAmt: { value: 0 },
     uTime: { value: 0 },
     uBackdropA: { value: backdropTex(start.from) },
@@ -634,18 +608,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
     },
-    setCelestial(
-      sunDir: THREE.Vector3,
-      moonDir: THREE.Vector3,
-      sunUp: number,
-      moonUp: number,
-      starAmt: number,
-      time: number,
-    ): void {
-      uniforms.uSunDir.value.copy(sunDir);
-      uniforms.uMoonDir.value.copy(moonDir);
-      uniforms.uSunUp.value = sunUp;
-      uniforms.uMoonUp.value = moonUp;
+    setStars(starAmt: number, time: number): void {
       uniforms.uStarAmt.value = starAmt;
       uniforms.uTime.value = time;
     },
