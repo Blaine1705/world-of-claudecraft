@@ -69,6 +69,7 @@ export const RAID_MIN_PLAYERS = 10;
 // (head ~1.0, shoulder ~0.75, gloves ~0.65, waist ~0.55) applied to stat points.
 export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
   mainhand: 1.0,
+  offhand: 0.75,
   chest: 1.0,
   legs: 0.9,
   helmet: 0.85,
@@ -209,7 +210,13 @@ export function itemFromRaid(itemId: string): boolean {
 // quest objects, cosmetics) can exist in the item model, but should not get an
 // item-level readout or stat budget.
 export function isItemLevelEligible(item: ItemDef): boolean {
-  return !!item.slot && (item.kind === 'armor' || item.kind === 'weapon');
+  return (
+    !!item.slot &&
+    (item.kind === 'armor' ||
+      item.kind === 'weapon' ||
+      item.kind === 'shield' ||
+      item.kind === 'held_offhand')
+  );
 }
 
 // The item level (tier number) shown in the tooltip, or undefined when there is no

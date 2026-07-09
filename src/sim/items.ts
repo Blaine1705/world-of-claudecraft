@@ -19,7 +19,13 @@
 import { addStacked, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
-import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import {
+  canDualWield,
+  canEquipItem,
+  canEquipItemInSlot,
+  resolveEquipSlot,
+  weaponHand,
+} from './equipment_rules';
 import { formatMoney } from './format_money';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
@@ -38,6 +44,45 @@ import {
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+function shouldAutoRouteToOffhand(meta: PlayerMeta, spec: string | null | undefined): boolean {
+  return meta.cls === 'warrior' && spec === 'fury';
+}
+
+function desiredEquipSlot(
+  meta: PlayerMeta,
+  itemId: string,
+  spec: string | null | undefined,
+): EquipSlot | null {
+  const def = ITEMS[itemId];
+  if (!def?.slot) return null;
+  // Non-weapons resolve their concrete slot directly; rings (slot 'ring') land in
+  // whichever ring slot is empty via resolveEquipSlot (ring1 first).
+  if (def.kind === 'armor' || def.kind === 'shield' || def.kind === 'held_offhand')
+    return resolveEquipSlot(def, meta.equipment);
+  if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
+  const hand = weaponHand(def);
+  if (hand === 'mainhand' || hand === 'twohand') return 'mainhand';
+  if (!meta.equipment.mainhand) return 'mainhand';
+  if (!shouldAutoRouteToOffhand(meta, spec)) return 'mainhand';
+  if (
+    canDualWield(meta.cls, spec) &&
+    canEquipItemInSlot(meta.cls, def, 'offhand', spec) &&
+    !meta.equipment.offhand
+  ) {
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    if (mainhand?.kind !== 'weapon' || weaponHand(mainhand) !== 'twohand') return 'offhand';
+  }
+  if (
+    canDualWield(meta.cls, spec) &&
+    canEquipItemInSlot(meta.cls, def, 'offhand', spec) &&
+    meta.equipment.offhand
+  ) {
+    const offhand = ITEMS[meta.equipment.offhand];
+    if (offhand?.kind === 'weapon') return 'offhand';
+  }
+  return 'mainhand';
+}
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -67,7 +112,15 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
+  if (
+    !def?.slot ||
+    (def.kind !== 'weapon' &&
+      def.kind !== 'armor' &&
+      def.kind !== 'shield' &&
+      def.kind !== 'held_offhand')
+  ) {
+    return;
+  }
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
   if (!canEquipItem(meta.cls, def)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
@@ -77,9 +130,14 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(meta.entityId, `You must be level ${requiredLevelFor(def)} to equip that.`);
     return;
   }
-  // Rings declare slot 'ring'; the resolver picks ring1/ring2 (empty-first).
-  const slot = resolveEquipSlot(def, meta.equipment);
-  if (!slot) return;
+  // Rings declare slot 'ring'; desiredEquipSlot resolves ring1/ring2 (empty-first)
+  // and routes weapons to mainhand/offhand for dual-wield specs.
+  const spec = ctx.playerMods(meta).spec;
+  const slot = desiredEquipSlot(meta, itemId, spec);
+  if (!slot || !canEquipItemInSlot(meta.cls, def, slot, spec)) {
+    ctx.error(meta.entityId, 'You cannot equip that.');
+    return;
+  }
   const old = meta.equipment[slot];
   ctx.removeItem(itemId, 1, meta.entityId);
   if (old) addItemSilent(old, 1, meta);
@@ -209,13 +267,13 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     }
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
     p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
-    if (restoresHp) {
-      const heal = Math.min(Math.round(def.potionHp! * ctx.healingTakenMult(p)), p.maxHp - p.hp);
+    if (restoresHp && def.potionHp !== undefined) {
+      const heal = Math.min(Math.round(def.potionHp * ctx.healingTakenMult(p)), p.maxHp - p.hp);
       p.hp += heal;
       ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
     }
-    if (restoresMana) {
-      p.resource = Math.min(p.maxResource, p.resource + def.potionMana!);
+    if (restoresMana && def.potionMana !== undefined) {
+      p.resource = Math.min(p.maxResource, p.resource + def.potionMana);
     }
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'elixir') {
@@ -235,7 +293,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       school: 'nature',
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-  } else if (def.kind === 'weapon' || def.kind === 'armor') {
+  } else if (
+    def.kind === 'weapon' ||
+    def.kind === 'armor' ||
+    def.kind === 'shield' ||
+    def.kind === 'held_offhand'
+  ) {
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
@@ -376,7 +439,8 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
   let total = 0;
   let soldCount = 0;
   for (const { itemId, count } of junk) {
-    const def = ITEMS[itemId]!;
+    const def = ITEMS[itemId];
+    if (!def) continue;
     ctx.removeItem(itemId, count, meta.entityId);
     recordVendorBuyback(meta, itemId, count);
     total += def.sellValue * count;

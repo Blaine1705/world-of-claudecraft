@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "9da6ecfe",
+      "state": "a3818b44",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,6 +60,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -71,6 +79,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -88,6 +107,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -123,7 +143,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "9efc6b36",
+      "state": "c24b3639",
       "events": "092ab679",
       "rng": {
         "draws": 0,
@@ -167,6 +187,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {
@@ -182,6 +210,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0895,
@@ -199,6 +238,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -234,7 +274,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "b5ab2e8f",
+      "state": "40715c0c",
       "events": "cc9019b1",
       "rng": {
         "draws": 0,
@@ -278,6 +318,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {},
@@ -290,6 +338,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -307,6 +366,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -342,7 +402,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "fc92cf1a",
+      "state": "d5e87581",
       "events": "60bbc56d",
       "rng": {
         "draws": 0,
@@ -402,6 +462,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {
@@ -416,6 +484,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0995,
@@ -433,6 +512,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -468,7 +548,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "82bf8eff",
+      "state": "e603f7da",
       "events": "033d2d51",
       "rng": {
         "draws": 0,
@@ -528,6 +608,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {
@@ -542,6 +630,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -559,6 +658,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -594,7 +694,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "eece542f",
+      "state": "3f4ce954",
       "events": "092ab679",
       "rng": {
         "draws": 0,
@@ -654,6 +754,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {},
@@ -666,6 +774,17 @@
         {
           "aiState": "idle",
           "attackPower": 132,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.1195,
@@ -683,6 +802,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -718,7 +838,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "eece542f",
+      "state": "3f4ce954",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -778,6 +898,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {},
@@ -790,6 +918,17 @@
         {
           "aiState": "idle",
           "attackPower": 132,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.1195,
@@ -807,6 +946,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": 2,

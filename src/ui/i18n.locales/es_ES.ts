@@ -11,9 +11,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
-  // Stat tooltips inherit the es base: none of these keys needs a genuine Iberian
-  // divergence (es already uses "hechizos" and neutral wording), so per the
-  // divergence-only policy es_ES carries no hudChrome.statInfo.* overrides.
   'hudChrome.emotes.question': '¿Tío?',
   'nav.loginRegister': 'Iniciar sesión/Registrarse',
   'stats.playersOnline': 'Jugadores en línea',
@@ -104,11 +101,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'En Chrome, toca el menú y luego Instalar app o Añadir a pantalla de inicio.',
   'mobilePreflight.otherInstallDetail':
     'Instala o añade esta página a la pantalla de inicio para la mejor experiencia móvil a pantalla completa.',
-  // Quest-tracker header toggle hover hint (es_ES uses "seguimiento" vs es-LatAm
-  // "rastreador"); the count badge inherits es (identical "({count})").
   'hudChrome.questTracker.collapseHint': 'Contraer el seguimiento de misiones',
   'hudChrome.questTracker.expandHint': 'Expandir el seguimiento de misiones',
-  // v0.13.0 release i18n fill: bug report, chat window, character takeover, admin bug reports
   'hudChrome.bugReport.failed': 'No se pudo enviar el informe de error. Inténtalo de nuevo.',
   'hudChrome.bugReport.menuButton': 'Informar de un error',
   'hudChrome.bugReport.rateLimited':
@@ -224,7 +218,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.noAttempt': 'No hay ningún intento de forzar la cerradura en curso.',
   'sim.lockpick.tierPremium': 'Premium',
   'sim.lockpick.toolSlips': 'Esa herramienta resbala en esta cerradura.',
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Provoca {value} de daño de {school} cada {interval} s',
   'hudChrome.auraEffect.hot': 'Recupera {value} de salud cada {interval} s',
   'hudChrome.auraEffect.absorb': 'Bloquea {value} de daño',
@@ -278,6 +271,9 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina, daño cuerpo a cuerpo y energía',
   'hudChrome.auraEffect.formTravel': 'Forma Fleet: velocidad de desplazamiento aumentada un {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Guarded Stance: menos daño recibido, más amenaza',
+  'hudChrome.auraEffect.battleStance': 'Actitud de batalla: 10% más de generación de ira',
+  'hudChrome.auraEffect.berserkerStance':
+    'Actitud Berserker: críticos un 3% más frecuentes y un 3% más fuertes',
   'hudChrome.auraEffect.righteousFury':
     'Burning Oath: amenaza por daño Sagrado enormemente aumentada',
   'hudChrome.auraEffect.scale': 'Talla aumentado un {pct}%',
@@ -289,7 +285,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombra',
   'hudChrome.auraEffect.school.holy': 'Sagrada',
   'hudChrome.auraEffect.school.nature': 'Natural',
-  // Corpse-harvest window + mobile hotbar page toggle.
   'hudChrome.corpseHarvest.title': 'Recolección',
   'hudChrome.corpseHarvest.components.gills': 'Branquias',
 };

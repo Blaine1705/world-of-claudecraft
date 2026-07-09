@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 412,
-      "state": "07267d6c",
+      "state": "b1c42465",
       "events": "cb3e7eb4",
       "rng": {
         "draws": 2,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 412,
-      "state": "39a3dd02",
+      "state": "615a9056",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 412,
-      "state": "19af8258",
+      "state": "7a769ce8",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 412,
-      "state": "6b06ee3c",
+      "state": "2a7c1fed",
       "events": "83db7fc1",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 412,
-      "state": "5fe6f3e1",
+      "state": "7ed8069d",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 412,
-      "state": "7bba71b7",
+      "state": "f459a676",
       "events": "1d430444",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 412,
-      "state": "1a719459",
+      "state": "dad7e2d9",
       "events": "b3b75a1c",
       "rng": {
         "draws": 4,
@@ -144,6 +144,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -189,6 +197,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -230,6 +246,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -275,6 +299,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -320,6 +352,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -365,6 +405,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -376,6 +424,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.4,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 100.6,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -393,6 +452,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -492,6 +552,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -543,6 +604,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -592,6 +654,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -755,7 +818,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 412,
-      "state": "1a6ea92d",
+      "state": "f90a3772",
       "events": "fbe8fc0f",
       "rng": {
         "draws": 4,
@@ -766,7 +829,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "497218cf",
+      "state": "54890fb1",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -777,7 +840,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 412,
-      "state": "08c22479",
+      "state": "8c9d338a",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -788,7 +851,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 412,
-      "state": "600dedf4",
+      "state": "20b5bd7e",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -799,7 +862,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 412,
-      "state": "39066672",
+      "state": "0f0d454c",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -810,7 +873,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "38b1b9eb",
+      "state": "e90cdf92",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -821,7 +884,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 412,
-      "state": "16b234ea",
+      "state": "9a453df8",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -832,7 +895,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 412,
-      "state": "dff6d677",
+      "state": "bbb2bafa",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -843,7 +906,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 412,
-      "state": "941ec934",
+      "state": "b12344fd",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -854,7 +917,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 412,
-      "state": "2f3fd445",
+      "state": "82dbff49",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -865,7 +928,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 412,
-      "state": "26e7ae2b",
+      "state": "9f61803c",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -876,7 +939,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 412,
-      "state": "acb8f672",
+      "state": "2f90cb86",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -887,7 +950,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 412,
-      "state": "d3226eee",
+      "state": "db18db3e",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -898,7 +961,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 412,
-      "state": "df3f07fb",
+      "state": "e4a3f61e",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -909,7 +972,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 412,
-      "state": "031944b4",
+      "state": "6f4c5ea8",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -920,7 +983,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 412,
-      "state": "e5fe9c94",
+      "state": "4d33b26b",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -931,7 +994,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 412,
-      "state": "032de4fd",
+      "state": "519665d4",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -942,7 +1005,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 412,
-      "state": "5ddcecb0",
+      "state": "48c4226e",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -953,7 +1016,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 412,
-      "state": "68f59d4d",
+      "state": "ae52072a",
       "events": "741638a5",
       "rng": {
         "draws": 407,
@@ -964,7 +1027,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 412,
-      "state": "f0df9772",
+      "state": "59c0f410",
       "events": "741638a5",
       "rng": {
         "draws": 434,
@@ -975,7 +1038,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 413,
-      "state": "7d6d9db5",
+      "state": "e065c020",
       "events": "e66f2234",
       "rng": {
         "draws": 444,
@@ -1018,6 +1081,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1063,6 +1134,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1104,6 +1183,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1149,6 +1236,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1194,6 +1289,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1239,6 +1342,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1250,6 +1361,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -1267,6 +1389,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -1366,6 +1489,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -1417,6 +1541,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -1466,6 +1591,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -1629,8 +1755,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 414,
-      "state": "91d5709e",
-      "events": "6b5ea059",
+      "state": "f932bd13",
+      "events": "5c77013d",
       "rng": {
         "draws": 445,
         "digest": "357c3bc7"
@@ -1672,9 +1798,18 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -1717,6 +1852,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1758,6 +1901,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1803,6 +1954,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1848,6 +2007,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1893,6 +2060,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1904,6 +2079,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -1911,17 +2097,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1052,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1052,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -1939,10 +2126,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 461,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 84,
             "str": 61
           },
           "targetId": 413,
@@ -2023,6 +2210,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -2074,6 +2262,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -2123,6 +2312,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -2337,7 +2527,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -2352,7 +2542,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 416,
-      "state": "27c719c2",
+      "state": "0d8bcc79",
       "events": "8c5072f1",
       "rng": {
         "draws": 447,
@@ -2395,9 +2585,18 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -2442,6 +2641,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2483,6 +2690,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2528,6 +2743,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2573,6 +2796,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2618,6 +2849,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2629,6 +2868,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -2636,17 +2886,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1052,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1052,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -2664,10 +2915,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 461,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 84,
             "str": 61
           },
           "targetId": 413,
@@ -2748,6 +2999,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -2799,6 +3051,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -2848,6 +3101,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -3062,7 +3316,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -3185,7 +3439,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 417,
-      "state": "afa06440",
+      "state": "cfea2ddf",
       "events": "96c6a170",
       "rng": {
         "draws": 452,
@@ -3228,9 +3482,18 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -3275,6 +3538,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3318,6 +3589,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3363,6 +3642,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3408,6 +3695,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3453,6 +3748,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3464,6 +3767,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -3471,17 +3785,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1052,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1052,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -3499,10 +3814,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 461,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 84,
             "str": 61
           },
           "targetId": 413,
@@ -3590,6 +3905,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -3642,6 +3958,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -3691,6 +4008,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -3905,7 +4223,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -4093,7 +4411,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 418,
-      "state": "86a0af22",
+      "state": "c409c959",
       "events": "3544bf86",
       "rng": {
         "draws": 453,
@@ -4136,9 +4454,18 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -4183,6 +4510,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4226,6 +4561,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4273,6 +4616,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4318,6 +4669,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4363,6 +4722,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4374,6 +4741,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -4381,17 +4759,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1052,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1052,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -4409,10 +4788,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 461,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 84,
             "str": 61
           },
           "targetId": 413,
@@ -4500,6 +4879,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -4576,6 +4956,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -4626,6 +5007,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -4840,7 +5222,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -5079,7 +5461,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "c89e4894",
+      "state": "7f357b2f",
       "events": "0dacb00e",
       "rng": {
         "draws": 453,
@@ -5122,9 +5504,18 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -5169,6 +5560,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5212,6 +5611,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5259,6 +5666,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5304,6 +5719,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5349,6 +5772,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5360,6 +5791,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -5367,17 +5809,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1052,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1052,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -5395,10 +5838,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 461,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 84,
             "str": 61
           },
           "targetId": 413,
@@ -5486,6 +5929,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -5562,6 +6006,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -5623,6 +6068,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -5839,7 +6285,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -6119,7 +6565,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 419,
-      "state": "c89e4894",
+      "state": "7f357b2f",
       "events": "741638a5",
       "rng": {
         "draws": 453,
@@ -6162,9 +6608,18 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
-            "ranks": {}
+            "ranks": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -6209,6 +6664,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -6252,6 +6715,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -6299,6 +6770,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -6344,6 +6823,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -6389,6 +6876,14 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -6400,6 +6895,17 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -6407,17 +6913,18 @@
           "fallStartY": -3.409618,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 1052,
           "id": 405,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
+          "maxHp": 1052,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0805,
           "petMode": "defensive",
           "pos": {
             "x": -42,
@@ -6435,10 +6942,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 461,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 84,
             "str": 61
           },
           "targetId": 413,
@@ -6526,6 +7033,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.068,
           "petMode": "defensive",
           "pos": {
             "x": -14,
@@ -6602,6 +7110,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.08,
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -6663,6 +7172,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.067,
           "petMode": "defensive",
           "pos": {
             "x": 14,
@@ -6879,7 +7389,7 @@
           "threat": [
             [
               405,
-              131
+              170
             ]
           ],
           "weapon": {

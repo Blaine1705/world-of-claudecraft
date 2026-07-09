@@ -225,6 +225,9 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': 'Forme de Fleet : vitesse de déplacement accrue de {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Guarded Stance : dégâts encaissés réduits, menace accrue',
+  'hudChrome.auraEffect.battleStance': 'Battle Stance : 10% de génération de rage en plus',
+  'hudChrome.auraEffect.berserkerStance':
+    'Berserker Stance : critiques 3% plus souvent et 3% plus forts',
   'hudChrome.auraEffect.righteousFury':
     'Burning Oath : menace générée par les dégâts Sacrés fortement accrue',
   'hudChrome.auraEffect.scale': 'Gabarit augmentée de {pct}%',

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "fcc709e3",
+      "state": "05f0f345",
       "events": "a6bdb9f3",
       "rng": {
         "draws": 3,
@@ -74,6 +74,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -120,6 +128,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -162,6 +178,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -173,6 +197,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
@@ -190,13 +225,14 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "y": 2.312838,
             "z": -30
           },
           "potionCooldownUntil": -1,
-          "resource": 29.963644,
+          "resource": 79.10402,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -289,6 +325,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -400,7 +437,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "81c8acb8",
+      "state": "06765f27",
       "events": "ea631a91",
       "rng": {
         "draws": 6,
@@ -444,6 +481,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -490,6 +535,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -532,6 +585,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -543,6 +604,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
@@ -560,13 +632,14 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "y": 2.312838,
             "z": -30
           },
           "potionCooldownUntil": -1,
-          "resource": 59.927288,
+          "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -659,6 +732,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -770,7 +844,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "46f3cd2e",
+      "state": "9143f407",
       "events": "ea631a91",
       "rng": {
         "draws": 9,
@@ -814,6 +888,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -860,6 +942,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -902,6 +992,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -913,6 +1011,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
@@ -930,13 +1039,14 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "y": 2.312838,
             "z": -30
           },
           "potionCooldownUntil": -1,
-          "resource": 89.890932,
+          "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1029,6 +1139,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -1140,7 +1251,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "66b66d17",
+      "state": "981afc9b",
       "events": "ea631a91",
       "rng": {
         "draws": 12,
@@ -1184,6 +1295,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1230,6 +1349,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1272,6 +1399,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1283,6 +1418,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
@@ -1300,6 +1446,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "y": 2.312838,
@@ -1399,6 +1546,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 4,
@@ -1510,7 +1658,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "c1de0d3d",
+      "state": "29269bac",
       "events": "0085b1fd",
       "rng": {
         "draws": 15,
@@ -1521,7 +1669,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "b3717938",
+      "state": "9905786c",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1532,7 +1680,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "b3717938",
+      "state": "9905786c",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1577,6 +1725,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1623,6 +1779,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1665,6 +1829,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1676,6 +1848,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.5,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 0.45,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1694,6 +1877,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "y": 2.312838,
@@ -1795,6 +1979,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 4,

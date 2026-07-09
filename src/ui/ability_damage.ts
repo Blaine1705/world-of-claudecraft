@@ -80,6 +80,13 @@ export function abilityDamageBonus(
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
     }
+    case 'aoeHeal':
+      // AoE heals take the same per-target coefficient penalty as aoeDamage.
+      return directHealBonus(scaling.spellPower, res.castTime, true);
+    case 'consumeAura':
+      if (eff.deal) return directHitBonus(power, def, res.castTime, false);
+      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
+      return 0;
     case 'drainTick':
       return channelTickBonus(power, def);
     case 'dot': {
@@ -113,6 +120,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
     (eff) =>
       eff.type === 'directDamage' ||
       eff.type === 'heal' ||
+      eff.type === 'chainHeal' ||
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
@@ -149,7 +157,7 @@ export function abilityOverTimeEffect(
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
-    if (eff.type === 'aoeAttackPower') return eff.amount;
+    if (eff.type === 'aoeAttackPower') return eff.amount ?? null;
   }
   return null;
 }

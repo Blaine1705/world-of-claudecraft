@@ -290,6 +290,7 @@ export const zh_TW: EnTranslations = {
       "playerLabel": "你的角色",
       "targetLabel": "你的目標",
       "targetAnnounce": "目標：{name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "你的隊伍",
       "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
@@ -566,13 +567,29 @@ export const zh_TW: EnTranslations = {
       "startAttackOnAbility": "使用技能時自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
+      "showTargetOfTarget": "Show Target of Target",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
       "mobileLeftHanded": "左手配置"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon"
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
     },
     "controller": {
       "title": "手把",
@@ -670,7 +687,9 @@ export const zh_TW: EnTranslations = {
       "names": {
         "spellPower": "法術強度",
         "critRating": "暴擊等級",
-        "hasteRating": "急速等級"
+        "hasteRating": "急速等級",
+        "haste": "Haste",
+        "parry": "Parry"
       },
       "desc": {
         "str": "提升你的攻擊強度，使你的武器攻擊更具威力。",
@@ -685,7 +704,9 @@ export const zh_TW: EnTranslations = {
         "critChance": "你的攻擊造成暴擊並施加雙倍傷害的機率。",
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
-        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。"
+        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
+        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
       },
       "effects": {
         "attackPower": "+{value} 攻擊強度",
@@ -801,6 +822,7 @@ export const zh_TW: EnTranslations = {
       "failed": "無法傳送錯誤回報。請重試。"
     },
     "paperdoll": {
+      "offhand": "Offhand",
       "unequipAria": "卸下 {item}",
       "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下"
     },
@@ -1051,9 +1073,24 @@ export const zh_TW: EnTranslations = {
       "formCat": "貓形態：近戰傷害與能量",
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
+      "battleStance": "Battle Stance: 10% more rage generation",
+      "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
+      "victoryRush": "Victory Rush is ready",
+      "maxHpPct": "Increases maximum health by {pct}%",
       "school": {
         "physical": "物理",
         "fire": "火焰",
@@ -1956,11 +1993,13 @@ export const zh_TW: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
+      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
       "battle_shout": "鼓舞士氣的怒吼，提升隊伍的攻擊強度。",
       "commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
       "charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
       "rend": "施加流血，隨時間慢慢磨耗目標。",
       "thunder_clap": "打擊你周遭的一切並降低它們的攻擊速度。",
+      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "為你的攻擊附加神聖傷害，再以裁決將其釋放消耗。",
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
       "devotion_aura": "持續的自我增益，提升護甲讓敵人的攻擊更不痛。",
@@ -4358,6 +4397,7 @@ export const zh_TW: EnTranslations = {
     "combat": {
       "floatingMiss": "未命中",
       "floatingDodge": "閃避",
+      "floatingParry": "Parry",
       "floatingResist": "抵抗",
       "cannotMove": "無法移動！",
       "attack": "攻擊",
@@ -4367,6 +4407,7 @@ export const zh_TW: EnTranslations = {
       "damageTakenCrit": "{source}對你造成致命一擊，造成 {amount} 點傷害。",
       "miss": "你的{ability}未命中{target}。",
       "dodged": "{target}閃避了你的{ability}。",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "{target}抵抗了你的{ability}。",
       "healSelf": "你的{ability}為你恢復 {amount} 點生命。",
       "healSelfCrit": "你的{ability}對你造成暴擊治療，恢復 {amount} 點生命。",
@@ -4409,6 +4450,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughMana": "法力不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
+      "nothingToConsume": "Nothing to consume.",
       "targetMustDodge": "你的目標必須先閃避。",
       "requiresCombo": "該技能需要連擊點。",
       "requiresForm": "你必須處於{form}形態。",
@@ -5073,9 +5115,17 @@ export const zh_TW: EnTranslations = {
         "name": "地震",
         "description": "撼動目標區域，持續 6 秒，每 1.5 秒重擊敵人造成 {damage} 點自然傷害。"
       },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+      },
       "heroic_strike": {
         "name": "劫掠打擊",
         "description": "一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。"
+      },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
       },
       "battle_shout": {
         "name": "鐵嗓怒吼",
@@ -5128,6 +5178,14 @@ export const zh_TW: EnTranslations = {
       "defensive_stance": {
         "name": "戒備姿態",
         "description": "防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。再次施放可離開該姿態。"
+      },
+      "battle_stance": {
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
+      },
+      "berserker_stance": {
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sunder_armor": {
         "name": "削甲",
@@ -5617,9 +5675,61 @@ export const zh_TW: EnTranslations = {
         "name": "致殘打擊",
         "description": "凶狠打擊，造成武器傷害外加 {damage} 點傷害。（武器專精標誌技能）"
       },
+      "sweeping_strikes": {
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)"
+      },
+      "deep_wounds": {
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
+      },
+      "enrage_passive": {
+        "name": "Stoke",
+        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
       "bloodthirst": {
         "name": "放血",
         "description": "在鮮血狂怒中立即攻擊，造成 60% 武器傷害加 {damage}。（狂怒專精標誌技能）"
+      },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for weapon damage plus {damage} each. (Fury)"
+      },
+      "furious_mending": {
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
+      },
+      "emboldening_roar": {
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
+      },
+      "raised_guard": {
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
+      },
+      "iron_resolve": {
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: consumes all of your rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
+      },
+      "faultline": {
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
+      },
+      "defiant_bellow": {
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
+      },
+      "breachmaker": {
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
+      },
+      "measured_fury": {
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "shield_slam": {
         "name": "碎盾擊",
@@ -5632,6 +5742,150 @@ export const zh_TW: EnTranslations = {
       "berserker_rage": {
         "name": "沸血狂怒",
         "description": "進入沸血狂怒，產生 20 點怒氣。（戰士天賦）"
+      },
+      "holy_shock": {
+        "name": "Holy Shock",
+        "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
+      },
+      "holy_shield": {
+        "name": "Hallowed Wall",
+        "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
+      },
+      "repentance": {
+        "name": "Repentance",
+        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
+      },
+      "bestial_wrath": {
+        "name": "Howling Rage",
+        "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
+      },
+      "trueshot_aura": {
+        "name": "Sureflight Aura",
+        "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvern Sting",
+        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+      },
+      "arcane_power": {
+        "name": "Aether Surge",
+        "description": "Fills you with aether surge, increasing spell power by 28 for 12 sec. (Arcane signature)"
+      },
+      "combustion": {
+        "name": "Flashfire",
+        "description": "Focuses your fire magic so your next attack is a critical strike. (Fire signature)"
+      },
+      "cone_of_cold": {
+        "name": "Cone of Cold",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
+      },
+      "cold_blood": {
+        "name": "Killer's Calm",
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+      },
+      "blade_flurry": {
+        "name": "Mirrored Blades",
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+      },
+      "hemorrhage": {
+        "name": "Red Ribbon",
+        "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
+      },
+      "power_infusion": {
+        "name": "Anointing",
+        "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
+      },
+      "holy_nova": {
+        "name": "Holy Nova",
+        "description": "Causes an explosion of Mending Light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+      },
+      "shadowform": {
+        "name": "Gloamveil",
+        "description": "Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+      },
+      "elemental_mastery": {
+        "name": "Primal Mastery",
+        "description": "Calls on primal mastery, making your next spell instant. (Elemental signature)"
+      },
+      "shamanistic_rage": {
+        "name": "Shamanistic Rage",
+        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+      },
+      "natures_swiftness": {
+        "name": "Nature's Swiftness",
+        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+      },
+      "siphon_life": {
+        "name": "Veinleech",
+        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+      },
+      "fel_domination": {
+        "name": "Fel Domination",
+        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
+      },
+      "conflagrate": {
+        "name": "Conflagrate",
+        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+      },
+      "moonkin_form": {
+        "name": "Moonwing Form",
+        "description": "Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+      },
+      "feral_charge": {
+        "name": "Feral Charge",
+        "description": "Charge an enemy and root it for 1 sec. 8-25 yard range. (Feral signature)"
+      },
+      "swiftmend": {
+        "name": "Swiftmend",
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+      },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
+      "pummel": {
+        "name": "Pummel",
+        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
+      },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies."
+      },
+      "rallying_cry": {
+        "name": "Rallying Cry",
+        "description": "Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec."
       },
       "summon_imp": {
         "name": "召喚燼裔",

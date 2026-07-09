@@ -47,13 +47,29 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
-type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted'>;
+// Globals with no auto-generated tooltip label: critVsRooted (situational spell
+// crit) and the choice-row hook globals, whose row options carry hand-authored
+// descriptions instead of the generated "Increases X by Y%" form.
+type DisplayGlobalKey = Exclude<
+  GlobalKey,
+  | 'critVsRooted'
+  | 'autoRagePct'
+  | 'abilityRagePct'
+  | 'onKillSpeedPct'
+  | 'secondWindPctPerSec'
+  | 'battleRhythm'
+  | 'bloodbathPct'
+  | 'cdrPerRage'
+  | 'fearBreakPct'
+>;
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
-  // label ("+10% Agility"), so locales don't repeat them here.
+  // label ("+10% Agility"), so locales don't repeat them here. armorFromStrPct is
+  // likewise excluded: it appears only in the Protection mastery, which carries its
+  // own written description, so no auto-generated stat label is ever needed for it.
   statLabels: Record<
-    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct'>
+    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct' | 'armorFromStrPct'>
     | DisplayGlobalKey
     | 'damage'
     | 'cost'
@@ -7362,9 +7378,17 @@ function statAmount(stat: StatKey, value: number, lang: SupportedLanguage): stri
 
 function translateTitle(source: string, lang: SupportedLanguage): string {
   if (lang === 'en' || lang === 'en_CA') return source;
-  const abilityId = abilityIdByName.get(source);
-  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
   const override = titleOverrides[lang]?.[source];
+  const abilityId = abilityIdByName.get(source);
+  if (abilityId) {
+    const abilityTitle = tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+    // A talent named identically to an ability normally reuses that ability's
+    // localized name (DRY, and they stay in sync). But when the ability name is
+    // still English (its locale fill is pending), a coincidental collision would
+    // leak English into the talent title; prefer the talent's own explicit
+    // override in that case so a translated title never regresses to English.
+    if (abilityTitle !== source || override === undefined) return abilityTitle;
+  }
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
   // ability name (resolved above). A bare return here only triggers for a newly-added
@@ -7424,7 +7448,18 @@ function effectDescription(
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
-    if (key === 'critVsRooted') continue;
+    if (
+      key === 'critVsRooted' ||
+      key === 'autoRagePct' ||
+      key === 'abilityRagePct' ||
+      key === 'onKillSpeedPct' ||
+      key === 'secondWindPctPerSec' ||
+      key === 'battleRhythm' ||
+      key === 'bloodbathPct' ||
+      key === 'cdrPerRage' ||
+      key === 'fearBreakPct'
+    )
+      continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
   }
 

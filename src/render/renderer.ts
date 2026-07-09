@@ -63,6 +63,7 @@ import {
   type FoliagePerfStats,
   type FoliageView,
 } from './foliage';
+import { activeFormTint } from './form_tint';
 import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
@@ -123,6 +124,22 @@ import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+
+// Damage events carry the ability's English NAME (not its id); the per-ability
+// swing-animation override (VisualDef.attackByAbility) is keyed by id, so map
+// name -> id once at load to resolve a swing clip from a damage event.
+const ABILITY_ID_BY_NAME: Map<string, string> = new Map(
+  Object.entries(ABILITIES).map(([id, def]) => [def.name, id]),
+);
+function attackAbilityId(nameOrId: string | null): string | undefined {
+  if (!nameOrId) return undefined;
+  // A value that is already a known id wins; otherwise resolve the display name.
+  return ABILITIES[nameOrId] ? nameOrId : ABILITY_ID_BY_NAME.get(nameOrId);
+}
+
+// Instant melee abilities that animate as a one-shot self-spin (a little
+// tornado) instead of a normal swing. Bladestorm keeps its held channel spin.
+const SPIN_ATTACK_ABILITIES: ReadonlySet<string> = new Set(['whirlwind']);
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -536,7 +553,8 @@ export interface EntityView {
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
-  mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  mainhandItemId: string | null; // last-rendered equipped mainhand, diffed for live held-item swaps
+  offhandItemId: string | null; // last-rendered equipped offhand, diffed for live held-item swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -859,6 +877,7 @@ export class Renderer {
     reverseBackpedal: false,
     dead: false,
     casting: false,
+    spinning: false,
     swimming: false,
     sitting: false,
   };
@@ -2914,6 +2933,7 @@ export class Renderer {
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
@@ -2947,8 +2967,10 @@ export class Renderer {
         break;
       }
       case 'damage':
-        // every melee/ranged swing animates the attacker for all to see
-        if (ev.school === 'physical' && ev.sourceId !== -1) this.triggerAttack(ev.sourceId);
+        // every melee/ranged swing animates the attacker for all to see; a
+        // mapped ability picks its own swing clip (attackByAbility), else rotates
+        if (ev.school === 'physical' && ev.sourceId !== -1)
+          this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
@@ -3579,6 +3601,7 @@ export class Renderer {
       lastZ: e.pos.z,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
+      offhandItemId: e.offhandItemId,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3654,13 +3677,17 @@ export class Renderer {
     v.clickTarget = next.clickProxy;
     v.height = next.height;
     v.skin = e.skin;
-    v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
+    v.mainhandItemId = e.mainhandItemId; // next was built holding the current held items
+    v.offhandItemId = e.offhandItemId;
     v.group.add(next.root);
   }
 
-  triggerAttack(entityId: number): void {
+  triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
-    if (v) this.activeVisual(v)?.playAttack();
+    const vis = v && this.activeVisual(v);
+    if (!vis) return;
+    if (abilityId && SPIN_ATTACK_ABILITIES.has(abilityId)) vis.playWhirl();
+    else vis.playAttack(abilityId);
   }
 
   triggerHit(entityId: number): void {
@@ -4414,11 +4441,12 @@ export class Renderer {
         v.visual.setSkin(e.skin);
       }
 
-      // live held-weapon swap — equipped mainhand changed (self equip or a peer's
-      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
-      if (e.mainhandItemId !== v.mainhandItemId) {
+      // live held-item swap, equipped mainhand/offhand changed (self equip or a
+      // peer's gear update); classes with fixed props no-op.
+      if (e.mainhandItemId !== v.mainhandItemId || e.offhandItemId !== v.offhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
-        v.visual.setWeapon(e.mainhandItemId);
+        v.offhandItemId = e.offhandItemId;
+        v.visual.setWeapons(e.mainhandItemId, e.offhandItemId);
       }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the
@@ -4476,8 +4504,15 @@ export class Renderer {
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
+      const formTint = activeFormTint(e.auras);
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
+      active.setFormTint(formTint);
+      if (active !== v.visual) v.visual.setFormTint(null);
+      if (v.sheepVisual && v.sheepVisual !== active) v.sheepVisual.setFormTint(null);
+      if (v.bearVisual && v.bearVisual !== active) v.bearVisual.setFormTint(null);
+      if (v.catVisual && v.catVisual !== active) v.catVisual.setFormTint(null);
+      if (v.travelVisual && v.travelVisual !== active) v.travelVisual.setFormTint(null);
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
@@ -4543,6 +4578,12 @@ export class Renderer {
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = e.castingAbility !== null && !visuallyDead;
+      // Self-centered channel (Bladestorm): the whirl pose + body spin instead
+      // of the generic cast pose. Def-driven so both worlds render it alike.
+      st.spinning =
+        st.casting &&
+        e.castingAbility !== null &&
+        ABILITIES[e.castingAbility]?.selfCentered === true;
       st.swimming = swimming;
       st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
       // --- spatial movement audio (self + others) --------------------------

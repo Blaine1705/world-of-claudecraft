@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "e31e290e",
+      "state": "264e5ca2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,6 +62,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -90,6 +98,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.057,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -127,7 +136,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "4e0cfa23",
+      "state": "940405d0",
       "events": "43ab1dd4",
       "rng": {
         "draws": 9,
@@ -138,7 +147,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "2b8deeaa",
+      "state": "34018df7",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -149,7 +158,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 409,
-      "state": "9af5856b",
+      "state": "6b4ee614",
       "events": "d6d42245",
       "rng": {
         "draws": 100,
@@ -160,7 +169,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 409,
-      "state": "8b05ee12",
+      "state": "827c1873",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -171,7 +180,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "5a86faae",
+      "state": "6fd96e27",
       "events": "1b963611",
       "rng": {
         "draws": 298,
@@ -182,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "c51d89a7",
+      "state": "783fa0e8",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -193,7 +202,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "c51d89a7",
+      "state": "783fa0e8",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -243,6 +252,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -273,6 +290,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,

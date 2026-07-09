@@ -919,6 +919,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 150,
     buyValue: 1500,
   },
+  eastbrook_buckler: {
+    id: 'eastbrook_buckler',
+    name: 'Eastbrook Buckler',
+    kind: 'shield',
+    slot: 'offhand',
+    blockValue: 6,
+    quality: 'common',
+    stats: { armor: 34, sta: 1 },
+    sellValue: 130,
+    buyValue: 1300,
+    requiredClass: WAR,
+  },
   eastbrook_chain_vest: {
     id: 'eastbrook_chain_vest',
     name: 'Eastbrook Chainmail Vest',

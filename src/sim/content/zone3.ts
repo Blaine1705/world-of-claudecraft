@@ -1097,7 +1097,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: 2.8,
     color: 0x717d7e,
     questIds: [],
-    vendorItems: ['highwatch_warblade', 'craghorn_staff', 'icevein_dirk'],
+    vendorItems: ['highwatch_warblade', 'highwatch_wallshield', 'craghorn_staff', 'icevein_dirk'],
     greeting: 'Forge is hot and the grindstone is turning. If it cuts, I sell it.',
   },
   heroic_quartermaster: {
@@ -3004,6 +3004,18 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 15, max: 24, speed: 2.3 },
     sellValue: 600,
     buyValue: 6000,
+  },
+  highwatch_wallshield: {
+    id: 'highwatch_wallshield',
+    name: 'Highwatch Wallshield',
+    kind: 'shield',
+    slot: 'offhand',
+    blockValue: 14,
+    quality: 'common',
+    stats: { armor: 112, sta: 2 },
+    sellValue: 560,
+    buyValue: 5600,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   craghorn_staff: {
     id: 'craghorn_staff',

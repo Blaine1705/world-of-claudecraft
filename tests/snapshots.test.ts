@@ -341,7 +341,7 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(override?.weaponSlots).toEqual([0, 1]); // equipped weapon shows in BOTH hands
   });
 
-  it('keeps a non-dual class (warrior) mech to a single mainhand over the wire', () => {
+  it('mirrors a warrior mech offhand layout over the wire', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     const pid = sim.playerId;
     sim.setPlayerSkin(pid, 0, 'mech');
@@ -355,7 +355,7 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(mirrored.skinCatalog).toBe('mech');
     expect(mirrored.mainhandItemId).toBe('worn_sword');
     expect(visualKeyFor(mirrored)).toBe('player_mech');
-    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)).toBeNull();
+    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)?.weaponSlots).toEqual([0, 1]);
   });
 });
 
@@ -1711,20 +1711,21 @@ describe('guild nameplate wire', () => {
   });
 });
 
-// Equipped mainhand item id rides the identity wire (terse key `mh`) so the
-// renderer can show each player's held weapon model. Recomputed in
-// recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
-describe('held weapon wire (mainhandItemId)', () => {
+// Equipped held item ids ride the identity wire (terse keys `mh` / `oh`) so the
+// renderer can show each player's visible weapon/shield models.
+describe('held item wire (mainhandItemId/offhandItemId)', () => {
   it('carries the equipped mainhand item through wireEntity', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
     const e = sim.entities.get(pid)!;
     // a fresh warrior starts holding its class startWeapon
     expect(e.mainhandItemId).toBe('worn_sword');
+    expect(e.offhandItemId).toBeNull();
     expect(wireEntity(e).mh).toBe('worn_sword');
+    expect(wireEntity(e).oh).toBeUndefined();
   });
 
-  it('restores entity.mainhandItemId on the client from a full record', () => {
+  it('restores held item ids on the client from a full record', () => {
     const client = bareClient(99);
     const base = {
       id: 7,
@@ -1740,12 +1741,17 @@ describe('held weapon wire (mainhandItemId)', () => {
       mhp: 100,
     };
 
-    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, mh: 'zealotsbane_blade' }] });
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...base, mh: 'zealotsbane_blade', oh: 'eastbrook_buckler' }],
+    });
     expect(client.entities.get(7)?.mainhandItemId).toBe('zealotsbane_blade');
+    expect(client.entities.get(7)?.offhandItemId).toBe('eastbrook_buckler');
 
     // a later full record without `mh` means "no equipped weapon" → reset to null
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
     expect(client.entities.get(7)?.mainhandItemId).toBeNull();
+    expect(client.entities.get(7)?.offhandItemId).toBeNull();
   });
 });
 
@@ -1985,6 +1991,7 @@ const ALL_DELTA_KEYS = [
   'bank',
   'buyback',
   'cds',
+  'chg',
   'corpse',
   'cosmetics',
   'dclears',
@@ -2031,6 +2038,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bank: 'bankInfo',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
+  chg: 'charges',
   cosmetics: 'accountCosmetics',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
@@ -2159,6 +2167,7 @@ function dirtyEveryDeltaField(): {
 
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
+  p.charges = new Map([['charge', { spent: 1, cdMax: 15 }]]);
   p.stats = { ...p.stats, str: 12345 };
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
@@ -2212,6 +2221,7 @@ describe('full self-state snapshot delta fixture', () => {
 
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
+    expect(client.player.charges?.get('charge')?.spent).toBe(1); // chg -> e.charges
     expect(client.player.stats).toMatchObject({ str: 12345 }); // stats (inline s.X ?? e.X)
     expect(client.player.weapon).toMatchObject({ min: 999 }); // weapon (inline s.X ?? e.X)
     expect(client.player.resource).toBe(42); // res -> resource
@@ -2323,9 +2333,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(36);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
+  it('ALL_DELTA_KEYS contains exactly 37 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(37);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(37);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2337,7 +2347,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(36);
+    expect(scraped.size).toBe(37);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

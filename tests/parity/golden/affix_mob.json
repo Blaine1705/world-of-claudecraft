@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "9da6ecfe",
+      "state": "a3818b44",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,6 +59,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -70,6 +78,17 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -87,6 +106,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0615,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -122,7 +142,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "e9d88938",
+      "state": "6a9ffa20",
       "events": "7b53e5aa",
       "rng": {
         "draws": 14,
@@ -133,7 +153,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "f4d80a78",
+      "state": "e8bc12dd",
       "events": "8e584952",
       "rng": {
         "draws": 28,
@@ -144,7 +164,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 408,
-      "state": "1035cc7b",
+      "state": "d49e6aec",
       "events": "7b41105b",
       "rng": {
         "draws": 57,
@@ -191,6 +211,14 @@
           "lifetimeXp": 54100,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -203,6 +231,15 @@
           "aiState": "idle",
           "attackPower": 94,
           "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.5,
+              "school": "physical",
+              "sourceId": 405
+            },
             {
               "duration": 9,
               "id": "bleed_ridge_stalker",
@@ -239,6 +276,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0735,
           "petMode": "defensive",
           "pos": {
             "x": 2.5,
@@ -246,7 +284,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 12.025641,
+          "resource": 19.842308,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -391,7 +429,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 408,
-      "state": "b90d21c6",
+      "state": "80345543",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -438,6 +476,14 @@
           "lifetimeXp": 54100,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -450,6 +496,15 @@
           "aiState": "idle",
           "attackPower": 94,
           "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3597.3,
+              "school": "physical",
+              "sourceId": 405
+            },
             {
               "duration": 9,
               "id": "bleed_ridge_stalker",
@@ -487,6 +542,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0735,
           "petMode": "defensive",
           "pos": {
             "x": 2.5,
@@ -494,7 +550,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 12.025641,
+          "resource": 19.842308,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,

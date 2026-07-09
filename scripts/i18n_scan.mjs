@@ -376,7 +376,7 @@ async function main() {
     };
   }
 
-  const text = JSON.stringify(registry, null, 2) + '\n';
+  const text = `${JSON.stringify(registry, null, 2)}\n`;
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(OUT_PATH, text);
 
@@ -410,7 +410,7 @@ async function main() {
     counts: registry.counts,
     perLocale,
   };
-  const summaryText = JSON.stringify(summary, null, 2) + '\n';
+  const summaryText = `${JSON.stringify(summary, null, 2)}\n`;
   writeFileSync(SUMMARY_PATH, summaryText);
 
   console.log(

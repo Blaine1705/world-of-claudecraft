@@ -8,14 +8,14 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 143,
-  "drawDigest": "9dafb67b",
+  "draws": 142,
+  "drawDigest": "254e4212",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "bf8f6ae7",
+      "state": "02f46b7b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -58,6 +58,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -86,6 +94,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0585,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -123,30 +132,30 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "b92e382d",
-      "events": "33293b2e",
+      "state": "ceacdf50",
+      "events": "e5af3c84",
       "rng": {
-        "draws": 9,
-        "digest": "8ecad8de"
+        "draws": 7,
+        "digest": "14806c1c"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "498df127",
+      "state": "e40cab30",
       "events": "e29847dc",
       "rng": {
-        "draws": 15,
-        "digest": "843b3bf7"
+        "draws": 13,
+        "digest": "3fc203d8"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "cd434bb9",
-      "events": "57dccdba",
+      "state": "6356ad4e",
+      "events": "f83f3f1e",
       "rng": {
         "draws": 90,
         "digest": "0f3d4b16"
@@ -156,11 +165,11 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 407,
-      "state": "bdd410a3",
+      "state": "133e69dc",
       "events": "741638a5",
       "rng": {
-        "draws": 143,
-        "digest": "9dafb67b"
+        "draws": 142,
+        "digest": "254e4212"
       },
       "label": "final",
       "players": [
@@ -181,7 +190,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 79,
-            "damageTaken": 9
+            "damageTaken": 13
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -203,6 +212,14 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -224,7 +241,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 49991,
+          "hp": 49987,
           "id": 405,
           "inCombat": true,
           "kind": "player",
@@ -235,6 +252,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.063,
           "petMode": "defensive",
           "pos": {
             "x": 2.5,

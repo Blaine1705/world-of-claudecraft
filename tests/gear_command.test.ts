@@ -20,7 +20,7 @@ describe('/gear command', () => {
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
     expect(text).toBeDefined();
-    expect(text).toMatch(/^Equipped \(2\/8\):/);
+    expect(text).toMatch(/^Equipped \(2\/9\):/);
     expect(text).toContain('Main Hand:');
     expect(text).toContain('Chest:');
     expect(text).toContain('Helmet: (empty)');
@@ -41,6 +41,7 @@ describe('/gear command', () => {
     const meta = sim.players.get(a)!;
     meta.equipment = {
       mainhand: 'worn_sword',
+      offhand: 'eastbrook_buckler',
       helmet: 'cryptbone_helm',
       shoulder: 'cryptbone_pauldrons',
       chest: 'recruit_tunic',
@@ -52,7 +53,7 @@ describe('/gear command', () => {
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
-    expect(text).toMatch(/^Equipped \(8\/8\):/);
+    expect(text).toMatch(/^Equipped \(9\/9\):/);
     expect(text).toContain('Pitted Shortsword');
     expect(text).toContain('Quilted Trousers');
     expect(text).not.toContain('(empty)');

@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "e31e290e",
+      "state": "264e5ca2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,6 +70,14 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -98,6 +106,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.057,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -135,7 +144,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "326665f9",
+      "state": "4f9af72c",
       "events": "e042fd30",
       "rng": {
         "draws": 0,
@@ -183,6 +192,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -211,6 +228,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -289,7 +307,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "26543354",
+      "state": "4320eb35",
       "events": "97340448",
       "rng": {
         "draws": 0,
@@ -337,6 +355,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -365,6 +391,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -457,7 +484,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "bc4627d2",
+      "state": "715b34c3",
       "events": "d70fb9f2",
       "rng": {
         "draws": 0,
@@ -468,7 +495,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "9701463c",
+      "state": "7dbe7249",
       "events": "1a2734ed",
       "rng": {
         "draws": 0,
@@ -479,7 +506,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "015413c7",
+      "state": "5f98b9c6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -527,6 +554,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -555,6 +590,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -709,7 +745,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "38b11e0d",
+      "state": "0bb6b974",
       "events": "5aadc799",
       "rng": {
         "draws": 0,
@@ -757,6 +793,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -785,6 +829,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -878,7 +923,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "877bfbf7",
+      "state": "0e811162",
       "events": "1b51753b",
       "rng": {
         "draws": 0,
@@ -926,6 +971,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -954,6 +1007,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1088,7 +1142,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "5fdc67bb",
+      "state": "1f3372d2",
       "events": "39bbf203",
       "rng": {
         "draws": 0,
@@ -1136,6 +1190,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1164,6 +1226,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1298,7 +1361,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "38b11e0d",
+      "state": "0bb6b974",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1346,6 +1409,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1374,6 +1445,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1467,7 +1539,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "38b11e0d",
+      "state": "0bb6b974",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1515,6 +1587,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1543,6 +1623,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1636,7 +1717,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 414,
-      "state": "92d5945c",
+      "state": "6c5c80d5",
       "events": "d74bfbad",
       "rng": {
         "draws": 0,
@@ -1684,6 +1765,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1729,6 +1818,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1757,6 +1854,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -1947,7 +2045,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 414,
-      "state": "d062d5e7",
+      "state": "342ef04e",
       "events": "9da7147b",
       "rng": {
         "draws": 82,
@@ -1958,7 +2056,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 414,
-      "state": "5ed8ed97",
+      "state": "aec8f628",
       "events": "1005cba8",
       "rng": {
         "draws": 158,
@@ -1969,7 +2067,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 414,
-      "state": "5ed8ed97",
+      "state": "aec8f628",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -2019,6 +2117,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2064,6 +2170,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2093,6 +2207,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2291,7 +2406,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 415,
-      "state": "e04c8549",
+      "state": "ed3094a0",
       "events": "e3337e5d",
       "rng": {
         "draws": 158,
@@ -2341,6 +2456,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2386,6 +2509,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2415,6 +2546,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2572,7 +2704,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 417,
-      "state": "d4caaf06",
+      "state": "3209a64b",
       "events": "4966d07c",
       "rng": {
         "draws": 158,
@@ -2622,6 +2754,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2667,6 +2807,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2696,6 +2844,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -2903,7 +3052,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 417,
-      "state": "d4caaf06",
+      "state": "3209a64b",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -2953,6 +3102,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2998,6 +3155,14 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3027,6 +3192,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "parryChance": 0.0625,
           "petMode": "defensive",
           "pos": {
             "x": 2,
