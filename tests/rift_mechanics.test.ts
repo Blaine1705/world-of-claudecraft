@@ -153,6 +153,35 @@ describe('rift mechanics: ice-slide goal', () => {
   });
 });
 
+describe('rift mechanics: off-path treasure behind an illusion wall', () => {
+  it('some floors hide a treasure chest fronted by a collider-less illusion wall', () => {
+    let withTreasure = 0;
+    let withIllusion = 0;
+    for (let s = 1; s <= 200; s++) {
+      const f = generateRiftFloor(s, 20, 0);
+      if (f.objects.some((o) => o.kind === 'treasure')) withTreasure++;
+      if ((f.layout.illusionWalls?.length ?? 0) > 0) withIllusion++;
+    }
+    expect(withTreasure, 'some floors hide a treasure').toBeGreaterThan(0);
+    // Every treasure floor also gets its concealing illusion wall.
+    expect(withIllusion).toBe(withTreasure);
+  });
+
+  it('opening a treasure on interact marks it open + no longer lootable (no lockpick)', () => {
+    const seed = seedWithFloor0((f) => f.objects.some((o) => o.kind === 'treasure'));
+    const sim = enter(seed);
+    const chestId = [...sim.entities.values()].find((e) => e.templateId === 'rift_treasure')?.id;
+    expect(chestId, 'treasure chest spawned').toBeTruthy();
+    const chest = sim.entities.get(chestId!)!;
+    expect(chest.lootable).toBe(true);
+    sim.player.pos = { ...chest.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.riftOpenTreasure(chestId!, sim.player.id);
+    expect(chest.templateId).toBe('rift_treasure_open');
+    expect(chest.lootable).toBe(false);
+  });
+});
+
 describe('rift generator: level cap', () => {
   it('no rift floor (any rank baseLevel, any depth) exceeds level 22', () => {
     let maxSeen = 0;

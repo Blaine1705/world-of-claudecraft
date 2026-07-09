@@ -308,6 +308,7 @@ import {
   leaveRift as leaveRiftImpl,
   liftRiftEntities as liftRiftEntitiesImpl,
   riftInstanceAtPos,
+  riftOpenTreasure as riftOpenTreasureImpl,
   riftPlayerLift as riftPlayerLiftImpl,
   tickRiftLockpicks as tickRiftLockpicksImpl,
   updateRiftInstances as updateRiftInstancesImpl,
@@ -2737,6 +2738,7 @@ export class Sim {
       leaveDungeon: sim.leaveDungeon.bind(sim),
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
+      riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
@@ -6325,6 +6327,10 @@ export class Sim {
 
   leaveRift(pid?: number): void {
     leaveRiftImpl(this.ctx, pid);
+  }
+
+  riftOpenTreasure(objectId: number, pid?: number): void {
+    riftOpenTreasureImpl(this.ctx, objectId, pid);
   }
 
   private updateRiftTriggers(p: Entity): void {

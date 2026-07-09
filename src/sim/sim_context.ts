@@ -226,6 +226,8 @@ export interface SimContextCallbacks {
     portal?: Entity,
   ): void;
   leaveRift(pid?: number): void;
+  /** Open an off-path hidden rift treasure chest (interact -> loot, no lockpick). */
+  riftOpenTreasure(objectId: number, pid?: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void;
   awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void;
@@ -836,6 +838,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     leaveDungeon: host.leaveDungeon,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
+    riftOpenTreasure: host.riftOpenTreasure,
     dungeonDifficulty: host.dungeonDifficulty,
     setDungeonDifficulty: host.setDungeonDifficulty,
     awardHeroicMarks: host.awardHeroicMarks,

@@ -191,6 +191,7 @@ function makeCtx() {
     leaveDungeon: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
+    riftOpenTreasure: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),

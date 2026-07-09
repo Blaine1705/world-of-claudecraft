@@ -11,7 +11,9 @@
 // updateRiftInstances) are called from tick().
 
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
+import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
 import { HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
+import type { LootTier } from '../lockpick';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -196,6 +198,14 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
         inst.boulderPads.push({ x: obj.x, z: obj.z });
         spawnObj('rift_boulder_pad', obj.name, obj.x, obj.z);
         break;
+      case 'treasure': {
+        // Hidden reward chest behind an illusion wall. Lootable so the interact
+        // F-scan finds it; opening it (interaction.ts) rolls loot, not a lockpick.
+        const tid = spawnObj('rift_treasure', obj.name, obj.x, obj.z);
+        const t = ctx.entities.get(tid);
+        if (t) t.lootable = true;
+        break;
+      }
       // 'chest'/'exit' are placed on boss death (openExit).
     }
   }
@@ -685,6 +695,39 @@ function openDescent(ctx: SimContext, inst: RiftInstance): void {
   for (const pid of instancePlayerIds(ctx, inst)) {
     ctx.emit({ type: 'log', text: 'The way down tears open.', color: '#b9f', pid });
   }
+}
+
+/** Open an off-path hidden treasure chest on interact: roll real item loot (scaled
+ * by the run's rank), grant it to the picker, and pop the shared loot overlay. No
+ * lockpick minigame - just the reward for exploring behind an illusion wall. */
+export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const chest = ctx.entities.get(objectId);
+  if (!chest || chest.templateId !== 'rift_treasure') return; // already opened / gone
+  if (dist2d(r.e.pos, chest.pos) > 3.5) {
+    ctx.error(r.meta.entityId, 'Move closer to the chest.');
+    return;
+  }
+  const inst = riftInstanceAtPos(ctx, r.e.pos);
+  const tier: LootTier =
+    inst?.tier === 'S' ? 'premium' : inst?.tier === 'A' || inst?.tier === 'B' ? 'medium' : 'low';
+  const cls = ctx.players.get(r.meta.entityId)?.cls ?? 'warrior';
+  const items = delveChestItemsForTier(tier, cls, ctx.rng, false);
+  for (const it of items) ctx.addItem(it.itemId, it.count, r.meta.entityId);
+  chest.templateId = 'rift_treasure_open';
+  chest.name = 'Opened Cache';
+  chest.lootable = false;
+  ctx.emit({
+    type: 'delveChestLoot',
+    chestId: objectId,
+    delveId: 'rift',
+    tierId: inst?.tier ?? 'rift',
+    lootTier: tier,
+    bountiful: false,
+    items,
+    pid: r.meta.entityId,
+  });
 }
 
 function openExit(ctx: SimContext, inst: RiftInstance): void {

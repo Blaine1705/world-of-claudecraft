@@ -3310,7 +3310,9 @@ export class Renderer {
         e.templateId === 'rift_roller' ||
         e.templateId === 'rift_locked_chest' ||
         e.templateId === 'rift_chest_open' ||
-        e.templateId === 'rift_chest_jammed')
+        e.templateId === 'rift_chest_jammed' ||
+        e.templateId === 'rift_treasure' ||
+        e.templateId === 'rift_treasure_open')
     ) {
       // In-rift puzzle props (procedural; glowing ones spin via `portal`, the
       // rolling boulder rolls via `userData.rollRock`).

@@ -719,6 +719,7 @@ export class DungeonInteriors {
     }
     if (opts?.iceZone) this.placeIceSheet(group, opts.iceZone);
     if (opts?.platform) this.placeRiftPlatform(group, layout, opts.platform);
+    if (layout.illusionWalls?.length) this.placeIllusionWalls(group, layout.illusionWalls, variant);
     if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
       if (opts?.moduleId && isLitanyModuleId(opts.moduleId)) {
         // Dry islands render ON TOP of the pool overlays so the sim's
@@ -893,6 +894,27 @@ export class DungeonInteriors {
   // a raised rear deck at `height`. Built in instance-local space (the group is
   // seated at the instance origin), and the deck top lands at y=height so it lines
   // up with the sim height field (riftPlatformLift): the player stands ON it.
+  // Illusion (fake) walls: solid-looking stone panels that carry NO collider (the
+  // sim omits them from layoutColliders), so the player walks through them into the
+  // hidden treasure pocket. Rendered as a plain stone box matching the murky wall
+  // read; a curious explorer pushing into the "dead end" passes clean through.
+  private placeIllusionWalls(group: THREE.Group, walls: WallStub[], variant: Variant): void {
+    const mat = new THREE.MeshLambertMaterial({
+      color: variant === 'temple' ? 0x3a4a52 : 0x54525c,
+      emissive: 0x080810,
+    });
+    for (const w of walls) {
+      const panel = new THREE.Mesh(
+        new THREE.BoxGeometry(w.hw * 2, DUNGEON_WALL_HEIGHT, w.hd * 2),
+        mat,
+      );
+      panel.position.set(w.x, DUNGEON_WALL_HEIGHT / 2, w.z);
+      panel.castShadow = true;
+      panel.receiveShadow = true;
+      group.add(panel);
+    }
+  }
+
   private placeRiftPlatform(
     group: THREE.Group,
     layout: DungeonLayout,

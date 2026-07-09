@@ -39,6 +39,7 @@ export type RiftObjectKind =
   | 'exit'
   | 'rune_pylon'
   | 'chest'
+  | 'treasure' // an off-path reward chest hidden behind an illusion wall (interact -> loot)
   // Puzzle nodes:
   | 'ice_goal' // ice-slide destination the party must slide onto
   | 'boulder' // a pushable strength boulder

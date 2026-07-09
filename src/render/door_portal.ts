@@ -528,6 +528,58 @@ export function buildRiftPuzzleProp(
       body.userData.rollRock = roller;
       return { body };
     }
+    case 'rift_treasure':
+    case 'rift_treasure_open': {
+      // An ornate golden reward chest hidden off-path behind an illusion wall. A
+      // glowing gold aura marks it before opening; the lid swings open on loot.
+      const opened = templateId === 'rift_treasure_open';
+      const wood = new THREE.MeshLambertMaterial({
+        color: 0x6a4a2a,
+        emissive: opened ? 0x2a1c06 : 0x120c04,
+      });
+      const gold = new THREE.MeshLambertMaterial({ color: 0xc9a23a, emissive: 0x3a2c08 });
+      const base = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.72, 0.92), wood);
+      base.position.y = 0.36;
+      base.castShadow = true;
+      body.add(base);
+      const lid = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.36, 0.94), wood);
+      if (opened) {
+        lid.position.set(0, 0.74, -0.46);
+        lid.rotation.x = -1.15;
+      } else {
+        lid.position.set(0, 0.74, 0);
+      }
+      lid.castShadow = true;
+      body.add(lid);
+      for (const bx of [-0.5, 0.5]) {
+        const strap = new THREE.Mesh(new THREE.BoxGeometry(0.14, 1.0, 0.98), gold);
+        strap.position.set(bx, 0.55, 0);
+        body.add(strap);
+      }
+      const latch = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.06), gold);
+      latch.position.set(0, 0.5, 0.49);
+      body.add(latch);
+      if (!opened) {
+        const aura = new THREE.Mesh(
+          new THREE.RingGeometry(0.95, 1.5, 24),
+          riftGlowMaterial(0xffd257, 0.55),
+        );
+        aura.rotation.x = -Math.PI / 2;
+        aura.position.y = 0.06;
+        body.add(aura);
+        body.userData.riftPulse = [aura];
+      } else {
+        // Spilled radiance from the opened cache.
+        const glow = new THREE.Mesh(
+          new THREE.CircleGeometry(0.7, 20),
+          riftGlowMaterial(0xffe89a, 0.85),
+        );
+        glow.rotation.x = -Math.PI / 2;
+        glow.position.set(0, 0.75, 0);
+        body.add(glow);
+      }
+      return { body };
+    }
     case 'rift_locked_chest':
     case 'rift_chest_open':
     case 'rift_chest_jammed': {

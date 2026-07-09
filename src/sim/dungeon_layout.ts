@@ -55,6 +55,10 @@ export interface DungeonLayout {
   doorZ?: number;
   /** floor scatter positions, renderer places props here AND collision circles back them */
   clutter?: GridPoint[];
+  /** Illusion (fake) walls: rendered as solid wall panels but NOT backed by a
+   * collider (deliberately excluded from layoutColliders), so the player walks
+   * THROUGH them into a hidden pocket. Used by rifts to conceal off-path treasure. */
+  illusionWalls?: WallStub[];
   /** Room shell outline (CCW, simple, star-shaped from `shellPole`), instance-local.
    * When present, render/collision derive the room's walls and floor mask from this
    * polygon instead of the rectangular wallX/zMin/zMax shell. */

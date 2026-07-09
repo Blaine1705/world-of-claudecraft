@@ -537,6 +537,25 @@ function planObjects(
       out.push({ kind: 'seq_rune', x: p.x, z: p.z, name: 'Sequence Rune', slot: i });
     }
   }
+
+  // Off-path hidden treasure: ~45% of non-boss floors tuck a reward chest into a
+  // wall pocket behind an illusion (fake) wall you walk THROUGH to reach it. The
+  // fake wall renders as solid stone but carries no collider (see layoutColliders),
+  // so a curious explorer who pushes into the "dead end" is rewarded.
+  if (rng.chance(0.45)) {
+    const side = rng.chance(0.5) ? -1 : 1;
+    const zT = Math.round(layout.zMin + rng.range(32, Math.max(32, layout.dais.z - 26)));
+    const localW = halfWidthAt(zT);
+    if (localW >= AISLE_HALF + 8) {
+      // Chest sits in the pocket (toClear guarantees it is off the wall); the fake
+      // wall stands between it and the aisle (nearer the spine), so you push through
+      // the fake wall to reach the chest against the real wall.
+      const chest = toClear(colliders, side * (localW - 4), zT, 1.0);
+      layout.illusionWalls = layout.illusionWalls ?? [];
+      layout.illusionWalls.push({ x: side * (localW - 6.5), z: zT, hw: 2.6, hd: 2.4 });
+      out.push({ kind: 'treasure', x: chest.x, z: chest.z, name: 'Hidden Cache' });
+    }
+  }
   return out;
 }
 

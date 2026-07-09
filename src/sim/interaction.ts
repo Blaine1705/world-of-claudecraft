@@ -404,6 +404,10 @@ export function interact(ctx: SimContext, pid?: number): void {
           ctx.emit({ type: 'lockpickOffer', objectId: target.id, bountiful: false, pid: p.id });
           return;
         }
+        if (target.templateId === 'rift_treasure') {
+          ctx.riftOpenTreasure(target.id, p.id);
+          return;
+        }
         if (target.templateId === 'mailbox') {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
@@ -465,6 +469,10 @@ export function interact(ctx: SimContext, pid?: number): void {
     }
     if (obj.templateId === 'rift_locked_chest') {
       ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
+      return;
+    }
+    if (obj.templateId === 'rift_treasure') {
+      ctx.riftOpenTreasure(obj.id, p.id);
       return;
     }
     if (obj.templateId === 'mailbox') {
