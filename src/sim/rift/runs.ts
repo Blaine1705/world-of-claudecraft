@@ -35,8 +35,8 @@ const BEACON_TRIGGER_RADIUS = 2.0; // walk this close to the way-out beacon to l
 const SEQ_TRIGGER_RADIUS = 2.6; // walk this close to step a sequence rune
 const BOULDER_PUSH_RADIUS = 2.0; // shove a boulder when this close and moving into it
 const PAD_RADIUS = 2.2; // a boulder counts as socketed within this of its pad
-const ICE_SLIDE_DIST = 70; // how far a slide travels before a wall stops it
-const ICE_SLIDE_COOLDOWN = 0.35; // seconds between chained slides (mid-ice re-push)
+const ICE_SLIDE_SPEED = 13; // yd/s glide across the ice (~1.85x run: frictionless momentum)
+const ICE_SLIDE_START = 0.04; // min input displacement in a tick to push off into a slide
 const PLAYER_BODY_R = 0.6;
 const ROLLER_HIT_COOLDOWN = 0.6; // seconds between rolling-boulder hits on one player
 const ROLLER_KB_SIDE = 3.2; // sideways shove (to the aisle) when a boulder bowls you over
@@ -467,38 +467,62 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
       }
     }
 
-    // Ice slide (FFX / Pokemon): moving onto the frictionless sheet flings the
-    // player in their travel direction until a wall stops them (reuses the pure
-    // swept resolver, so it stops exactly where collision would).
-    if (floor.iceZone && inIceZone(floor.iceZone, p.pos.x - origin.x, p.pos.z - origin.z)) {
-      const dx = p.pos.x - p.prevPos.x;
-      const dz = p.pos.z - p.prevPos.z;
-      const moved = Math.hypot(dx, dz);
-      if (moved > 0.05 && ctx.time >= (p.riftIceUntil ?? 0)) {
-        p.riftIceUntil = ctx.time + ICE_SLIDE_COOLDOWN;
-        riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // frost spray kicks up as you launch
-        const inv = ICE_SLIDE_DIST / moved;
+    // Ice slide (FFX / Pokemon): step onto the frictionless sheet and you GLIDE in
+    // your heading, input locked, one fixed step per tick (NOT a teleport, so it
+    // interpolates smoothly and reads as sliding), until a wall stops you or you
+    // reach solid ground at the sheet's edge. `runDespawnDecay` snapshotted prevPos
+    // = this tick's pre-move pos, so `pos - prevPos` is the drive this tick, and the
+    // glide advances from prevPos each tick (discarding further steering input).
+    if (floor.iceZone) {
+      const onIce = inIceZone(floor.iceZone, p.pos.x - origin.x, p.pos.z - origin.z);
+      const sliding = (p.riftSlideDirX ?? 0) !== 0 || (p.riftSlideDirZ ?? 0) !== 0;
+      if (sliding) {
+        const dirx = p.riftSlideDirX ?? 0;
+        const dirz = p.riftSlideDirZ ?? 0;
+        const step = ICE_SLIDE_SPEED * DT;
         const dest = resolveMovement(
           ctx.cfg.seed,
-          p.pos.x,
-          p.pos.z,
-          p.pos.x + dx * inv,
-          p.pos.z + dz * inv,
+          p.prevPos.x,
+          p.prevPos.z,
+          p.prevPos.x + dirx * step,
+          p.prevPos.z + dirz * step,
           PLAYER_BODY_R,
           false,
           undefined,
           ctx.riftCollisionToken,
         );
+        const advanced = Math.hypot(dest.x - p.prevPos.x, dest.z - p.prevPos.z);
+        const nextOnIce = inIceZone(floor.iceZone, dest.x - origin.x, dest.z - origin.z);
         p.pos = ctx.groundPos(dest.x, dest.z);
-        p.prevPos = { ...p.pos };
+        p.facing = Math.atan2(dirx, dirz); // face the glide
         ctx.rebucket(p);
-        riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // and again where the wall stops you
+        if (advanced < step * 0.5 || !nextOnIce) {
+          // Slammed into a wall, or skated off the ice onto solid ground: stop.
+          p.riftSlideDirX = 0;
+          p.riftSlideDirZ = 0;
+          riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // spray as you skid to a halt
+        }
+      } else if (onIce) {
+        // Push off: capture the heading the moment the player drives on the ice.
+        const dx = p.pos.x - p.prevPos.x;
+        const dz = p.pos.z - p.prevPos.z;
+        const moved = Math.hypot(dx, dz);
+        if (moved > ICE_SLIDE_START) {
+          p.riftSlideDirX = dx / moved;
+          p.riftSlideDirZ = dz / moved;
+          riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // frost spray kicks up as you launch
+        }
       }
+    } else if ((p.riftSlideDirX ?? 0) !== 0 || (p.riftSlideDirZ ?? 0) !== 0) {
+      p.riftSlideDirX = 0; // no ice on this floor: never leave a stale slide latched
+      p.riftSlideDirZ = 0;
     }
     // Ice-slide goal: sliding onto the Frost Sigil solves the floor.
     if (floor.puzzle.kind === 'ice_slide' && !inst.puzzleSolved) {
       const goal = floor.objects.find((o) => o.kind === 'ice_goal');
-      if (goal && dist2d(p.pos, ctx.groundPos(origin.x + goal.x, origin.z + goal.z)) < 3) {
+      // Radius 4 so a straight north slide that skids to a halt just past the far
+      // edge still lands on the sigil (the glide can overshoot by up to one step).
+      if (goal && dist2d(p.pos, ctx.groundPos(origin.x + goal.x, origin.z + goal.z)) < 4) {
         inst.puzzleSolved = true;
         riftFx(ctx, origin.x + goal.x, origin.z + goal.z, 'frost', 'nova'); // the sigil blazes
         for (const pid of instancePlayerIds(ctx, inst)) {

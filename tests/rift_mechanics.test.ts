@@ -111,6 +111,59 @@ describe('rift mechanics: ice-slide goal', () => {
     sim.tick();
     expect(inst.puzzleSolved).toBe(true);
   });
+
+  it('a north slide glides across the sheet (not a teleport), stops at the edge, and solves', () => {
+    const seed = seedWithFloor0((f) => f.puzzle.kind === 'ice_slide');
+    const sim = enter(seed);
+    const inst = active(sim);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const ice = floor.iceZone!;
+    const origin = riftInstanceOrigin(inst.slot, 0);
+    // Start on the ice near its south edge, on the spine, already gliding north
+    // (as a real push-off would leave the player).
+    sim.player.pos = { x: origin.x, y: 0, z: origin.z + ice.z - ice.hd + 2 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.riftSlideDirX = 0;
+    sim.player.riftSlideDirZ = 1;
+
+    const startZ = sim.player.pos.z;
+    let maxStep = 0;
+    let solved = false;
+    for (let i = 0; i < 200; i++) {
+      const z0 = sim.player.pos.z;
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+      maxStep = Math.max(maxStep, Math.abs(sim.player.pos.z - z0));
+      if (inst.puzzleSolved) {
+        solved = true;
+        break;
+      }
+      // Stopped sliding without solving would deadlock the test; guard it.
+      if ((sim.player.riftSlideDirZ ?? 0) === 0 && !inst.puzzleSolved) break;
+    }
+    expect(solved, 'the northward glide should reach and solve the Frost Sigil').toBe(true);
+    expect(sim.player.pos.z, 'glided north across the sheet').toBeGreaterThan(startZ + ice.hd);
+    // A glide, not a teleport: each tick advances at most ~one step (ICE_SLIDE_SPEED
+    // * DT = 13 * 0.05 = 0.65yd), never the whole sheet in one jump.
+    expect(maxStep, 'per-tick advance is a small glide step').toBeLessThan(1.5);
+  });
+});
+
+describe('rift generator: level cap', () => {
+  it('no rift floor (any rank baseLevel, any depth) exceeds level 22', () => {
+    let maxSeen = 0;
+    for (const baseLevel of [20, 22, 25, 28]) {
+      for (let s = 1; s <= 120; s++) {
+        const fc = generateRiftFloor(s, baseLevel, 0).floorCount;
+        for (let fi = 0; fi < fc; fi++) {
+          const floor = generateRiftFloor(s, baseLevel, fi);
+          for (const sp of floor.spawns) maxSeen = Math.max(maxSeen, sp.level);
+        }
+      }
+    }
+    expect(maxSeen, 'S-rank deep floors must still cap mob level at 22').toBeLessThanOrEqual(22);
+    expect(maxSeen, 'sanity: the cap is actually being reached').toBeGreaterThanOrEqual(22);
+  });
 });
 
 describe('rift mechanics: strength boulders', () => {

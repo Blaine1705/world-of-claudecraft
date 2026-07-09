@@ -33,7 +33,11 @@ import type {
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
 const MAX_FLOORS = 6;
-const LEVEL_CAP = 60;
+// Rift mobs never exceed this level, even on a deep S-rank floor. The player cap is
+// MAX_LEVEL (20) and 24+ is effectively unreachable, so an S-rank baseLevel (28) +
+// deep floorIndex would spawn mobs the player can never match; clamp so the hardest
+// rift tops out a hair above the cap (22) and stays a fair, if brutal, fight.
+const RIFT_LEVEL_CAP = 22;
 const ENTRY_Z_OFFSET = 8; // player arrival, past the entrance porch
 const AISLE_HALF = 5.5; // centre column kept clear of all obstacles (walkable spine)
 const BODY_R = 0.6; // player body radius used for clearance checks
@@ -435,7 +439,9 @@ function planPuzzle(rng: Rng, isBoss: boolean): RiftPuzzle {
 function iceZoneFor(geo: GeneratedGeometry): { x: number; z: number; hw: number; hd: number } {
   const { layout } = geo;
   const zC = (layout.zMin + layout.dais.z) / 2;
-  const hd = Math.max(10, (layout.dais.z - 20 - (layout.zMin + 16)) / 2);
+  // Cap the depth so a single north slide crosses it in a couple of seconds (a
+  // full-room rink made the glide drag on); keep it wide enough to read as a rink.
+  const hd = Math.max(10, Math.min(24, (layout.dais.z - 20 - (layout.zMin + 16)) / 2));
   const hw = Math.max(6, Math.min(layout.wallX ?? 20, geo.halfWidthAt(zC)) - 2);
   return { x: 0, z: zC, hw, hd };
 }
@@ -611,7 +617,7 @@ const FLOOR_CACHE = new Map<string, RiftFloorPlan>();
 const CACHE_LIMIT = 128;
 
 function floorLevelFor(baseLevel: number, floorIndex: number): number {
-  return Math.max(1, Math.min(LEVEL_CAP, Math.round(baseLevel) + floorIndex));
+  return Math.max(1, Math.min(RIFT_LEVEL_CAP, Math.round(baseLevel) + floorIndex));
 }
 
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */

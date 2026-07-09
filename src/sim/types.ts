@@ -1816,8 +1816,11 @@ export interface Entity {
   // does not auto-enter portals, so being returned near the entry portal can
   // never bounce them straight back in (clicking the portal still works).
   riftReentryGraceUntil?: number;
-  // Cooldown gate (sim time) between chained ice-slide pushes on a rift ice sheet.
-  riftIceUntil?: number;
+  // Locked glide heading while ice-sliding on a rift frost sheet (unit vector);
+  // both 0/undefined means not sliding. The slide advances a fixed step along this
+  // each tick, ignoring steering input, until a wall or the sheet edge stops it.
+  riftSlideDirX?: number;
+  riftSlideDirZ?: number;
   // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
   // shoves + chips once rather than every tick of overlap.
   riftRollerUntil?: number;
