@@ -129,6 +129,46 @@ always walkable and every puzzle is solvable by construction.
   when the roller bowls you; a spoils burst / dark puff on a cache pick success/fail.
   All render-only (no rng, no sim state), so determinism holds.
 
+## Floor variety additions (v4)
+
+A second polish pass, all still descriptor-driven and within the region bounds
+(`RIFT_REGION_HALF_X/Z`, so the far dais + side walls stay inside the trigger region):
+
+- **Bigger, more varied floors.** Longer naves + wider envelopes (`buildLayout` dims),
+  so runs feel grand, not cramped. Baffle walls are now SHORT wall-hugging fins (both
+  the spine and the far side stay open) rather than long walls: you weave around small
+  obstacle bits. Pylons/runes are placed a good fraction inside the width and cleared
+  by their prop radius (`toClear(..., r)`), so a prop never renders embedded in a wall.
+- **Elevation everywhere + varied bosses.** `planPlatform` runs on ~50% of non-boss
+  floors (was 30%) in two flavours: a steep rear sanctum OR a long gentle climb that
+  lifts most of the nave. Only ~55% of boss floors sit on a dais now (a flush arena is
+  a change of pace). The renderer treats the raised tier as floor: it adds
+  `riftPlatformLift` to the airborne heuristic's ground reference so a standing/climbing
+  player animates walk/run instead of freezing the jump pose (the v3 lift regressed
+  this). The stair step-count scales with ramp length.
+- **Ice slide is a real glide + maze.** Pushing onto the frost sheet locks your heading
+  and glides you a fixed step per tick (input-locked, frozen `riftSliding` pose, wired
+  `sld`) until a wall/rock stops you or you skate off the edge; `addIceBlockers`
+  scatters rocks (Pokemon-style) while keeping a clear central north corridor to the
+  Frost Sigil (solved by sliding through it, radius 4).
+- **Switch-gate** (`planGate`, `RiftGate`): a subset of otherwise-plain floors bar the
+  nave with a portcullis until you step its pressure plate (south of the gate). The
+  closed gate is a RUNTIME clamp (never a static collider, so the spine invariant
+  holds) that shoves you back to its south face; the plate flips `gateOpen`, retracts
+  the bars, and emits "The gate grinds open."
+- **Off-path treasure + illusion walls.** ~45% of non-boss floors hide a golden reward
+  chest in a wall pocket behind an `illusionWalls` panel (rendered solid, NO collider,
+  so you walk through the "dead end"). Interact (`riftOpenTreasure`) rolls real item
+  loot (rank-scaled `delveChestItemsForTier`), grants it, and pops the shared loot
+  overlay (`delveChestLoot`). No lockpick.
+- **Epic pylon/rune assets (Tripo).** `rift_flame.glb` crowns a lit pylon (an arcane
+  flame from a brazier, flickering, replacing the old crystal/beam) and `rift_rune.glb`
+  is the sequence-rune monolith (its baked runes reused as an emissive map so they glow
+  in the murk). See CREDITS.md.
+- **Minimap** shows the rift floor name + rank (`world.riftFloor.tier` threaded through
+  the `riftState` event) instead of the overworld zone. The **way-home beacon** is a
+  real upright swirling portal, not a flat decal.
+
 ## Ranks (C / B / A / S) and world portals (`src/sim/rift/portals.ts`)
 
 A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus the
