@@ -90,9 +90,17 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'war_r8_crippling_strikes',
           name: 'Crippling Strikes',
-          description: 'Hamstring costs 66% less.',
+          description: 'Hamstring costs 66% less and slows the target by 70% for 15 sec.',
           icon: 'hamstring',
-          effect: { ability: [{ ability: 'hamstring', costPct: -0.66 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'hamstring',
+                costPct: -0.66,
+                addEffects: [{ type: 'slow', mult: 0.3, duration: 15 }],
+              },
+            ],
+          },
         },
       ],
     },
@@ -754,9 +762,17 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r8_improved_concussive',
           name: 'Improved Concussive',
-          description: 'Rattling Shot cooldown reduced by 40%.',
+          description: 'Rattling Shot cooldown reduced by 40% and roots the target for 2 sec.',
           icon: 'concussive_shot',
-          effect: { ability: [{ ability: 'concussive_shot', cooldownPct: -0.4 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'concussive_shot',
+                cooldownPct: -0.4,
+                addEffects: [{ type: 'root', duration: 2 }],
+              },
+            ],
+          },
         },
       ],
     },
