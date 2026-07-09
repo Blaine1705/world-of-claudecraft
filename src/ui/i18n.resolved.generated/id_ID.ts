@@ -428,6 +428,15 @@ export const id_ID: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Kontroler",
       "enable": "Aktifkan Kontroler",

@@ -428,6 +428,15 @@ export const ru_RU: EnTranslations = {
       "defaultLoadout": "Набор по умолчанию",
       "comingSoon": "Скоро"
     },
+    "specPanel": {
+      "primaryAttr": "Основная характеристика",
+      "complexity": "Сложность",
+      "complexityLow": "Низкая",
+      "complexityMedium": "Средняя",
+      "complexityHigh": "Высокая",
+      "exampleAbilities": "Примеры способностей",
+      "viewTalents": "Смотреть таланты"
+    },
     "controller": {
       "title": "Геймпад",
       "enable": "Включить геймпад",

@@ -785,6 +785,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.desc.spellPower':
     'Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.',
   'hudChrome.statInfo.names.spellPower': 'Poder con hechizos',
+  'hudChrome.specPanel.primaryAttr': 'Característica principal',
+  'hudChrome.specPanel.complexity': 'Complejidad',
+  'hudChrome.specPanel.complexityLow': 'Baja',
+  'hudChrome.specPanel.complexityMedium': 'Media',
+  'hudChrome.specPanel.complexityHigh': 'Alta',
+  'hudChrome.specPanel.exampleAbilities': 'Habilidades de ejemplo',
+  'hudChrome.specPanel.viewTalents': 'Ver talentos',
   'hudChrome.statInfo.names.haste': 'Celeridad',
   'hudChrome.statInfo.names.parry': 'Parada',
   'hudChrome.statInfo.desc.parry':

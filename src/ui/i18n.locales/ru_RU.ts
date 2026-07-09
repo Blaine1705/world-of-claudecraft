@@ -228,6 +228,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'В режиме «Авто» управление для компьютера или сенсорное выбирается по вашему устройству. Выберите «Компьютер», чтобы включить клавиатуру и мышь (удобно на планшете с клавиатурой), или «Сенсорный» для экранного управления.',
   'hudChrome.statInfo.fromYour': 'От вашей характеристики ({value} {stat}):',
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
+  'hudChrome.specPanel.primaryAttr': 'Основная характеристика',
+  'hudChrome.specPanel.complexity': 'Сложность',
+  'hudChrome.specPanel.complexityLow': 'Низкая',
+  'hudChrome.specPanel.complexityMedium': 'Средняя',
+  'hudChrome.specPanel.complexityHigh': 'Высокая',
+  'hudChrome.specPanel.exampleAbilities': 'Примеры способностей',
+  'hudChrome.specPanel.viewTalents': 'Смотреть таланты',
   'hudChrome.statInfo.names.haste': 'Скорость',
   'hudChrome.statInfo.names.parry': 'Парирование',
   'hudChrome.statInfo.desc.parry':

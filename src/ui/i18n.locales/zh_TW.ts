@@ -219,6 +219,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '自動會根據你的裝置選擇桌面或觸控操作。選擇桌面可強制使用鍵盤與滑鼠（適合有鍵盤的平板），選擇觸控則使用螢幕上的操作控制項。',
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
+  'hudChrome.specPanel.primaryAttr': '主屬性',
+  'hudChrome.specPanel.complexity': '複雜度',
+  'hudChrome.specPanel.complexityLow': '低',
+  'hudChrome.specPanel.complexityMedium': '中',
+  'hudChrome.specPanel.complexityHigh': '高',
+  'hudChrome.specPanel.exampleAbilities': '範例技能',
+  'hudChrome.specPanel.viewTalents': '查看天賦',
   'hudChrome.statInfo.names.haste': '加速',
   'hudChrome.statInfo.names.parry': '招架',
   'hudChrome.statInfo.desc.parry':

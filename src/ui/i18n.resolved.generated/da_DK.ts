@@ -428,6 +428,15 @@ export const da_DK: EnTranslations = {
       "defaultLoadout": "Default Loadout",
       "comingSoon": "Coming soon"
     },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents"
+    },
     "controller": {
       "title": "Controller",
       "enable": "Aktivér controller",

@@ -428,6 +428,15 @@ export const es: EnTranslations = {
       "defaultLoadout": "Configuración predeterminada",
       "comingSoon": "Próximamente"
     },
+    "specPanel": {
+      "primaryAttr": "Característica principal",
+      "complexity": "Complejidad",
+      "complexityLow": "Baja",
+      "complexityMedium": "Media",
+      "complexityHigh": "Alta",
+      "exampleAbilities": "Habilidades de ejemplo",
+      "viewTalents": "Ver talentos"
+    },
     "controller": {
       "title": "Mando",
       "enable": "Activar mando",

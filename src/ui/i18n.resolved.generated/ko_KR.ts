@@ -428,6 +428,15 @@ export const ko_KR: EnTranslations = {
       "defaultLoadout": "기본 구성",
       "comingSoon": "출시 예정"
     },
+    "specPanel": {
+      "primaryAttr": "주요 특성",
+      "complexity": "복잡도",
+      "complexityLow": "낮음",
+      "complexityMedium": "보통",
+      "complexityHigh": "높음",
+      "exampleAbilities": "예시 능력",
+      "viewTalents": "특성 보기"
+    },
     "controller": {
       "title": "컨트롤러",
       "enable": "컨트롤러 사용",

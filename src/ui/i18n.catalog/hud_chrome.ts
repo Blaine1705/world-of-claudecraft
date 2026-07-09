@@ -436,6 +436,18 @@ export const hudChromeStrings = {
     // Wordy (M16): filled in the five non-Latin locales in this change.
     comingSoon: 'Coming soon',
   },
+  // Specialization screen: the detail rows shown under the selected spec's card
+  // (role/description come from the spec itself; these label the extra facts).
+  // Wordy leaves (M16): filled in the five non-Latin locales in this change.
+  specPanel: {
+    primaryAttr: 'Primary attribute',
+    complexity: 'Complexity',
+    complexityLow: 'Low',
+    complexityMedium: 'Medium',
+    complexityHigh: 'High',
+    exampleAbilities: 'Example abilities',
+    viewTalents: 'View talents',
+  },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
   // formatNumber. The button names themselves (A / LB / D-pad, etc.) stay as

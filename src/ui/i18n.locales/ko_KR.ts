@@ -227,6 +227,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.',
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
+  'hudChrome.specPanel.primaryAttr': '주요 특성',
+  'hudChrome.specPanel.complexity': '복잡도',
+  'hudChrome.specPanel.complexityLow': '낮음',
+  'hudChrome.specPanel.complexityMedium': '보통',
+  'hudChrome.specPanel.complexityHigh': '높음',
+  'hudChrome.specPanel.exampleAbilities': '예시 능력',
+  'hudChrome.specPanel.viewTalents': '특성 보기',
   'hudChrome.statInfo.names.haste': '가속',
   'hudChrome.statInfo.names.parry': '무기 막기',
   'hudChrome.statInfo.desc.parry':

@@ -428,6 +428,15 @@ export const en_XA: EnTranslations = {
       "defaultLoadout": "[Ðéƒáúļţ Ļóáðóúţ]",
       "comingSoon": "[Çóɱíñĝ šóóñ]"
     },
+    "specPanel": {
+      "primaryAttr": "[Þŕíɱáŕý áţţŕíƀúţé]",
+      "complexity": "[Çóɱþļéẋíţý]",
+      "complexityLow": "[Ļóŵ]",
+      "complexityMedium": "[Ɱéðíúɱ]",
+      "complexityHigh": "[Ĥíĝĥ]",
+      "exampleAbilities": "[Éẋáɱþļé áƀíļíţíéš]",
+      "viewTalents": "[Ʋíéŵ ţáļéñţš]"
+    },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
       "enable": "[Éñáƀļé Çóñţŕóļļéŕ]",
