@@ -2522,6 +2522,13 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
       p.pos.x = run.origin.x + h.x;
       p.pos.z = run.origin.z + zBase + h.z;
       p.prevPos = { ...p.pos };
+      // A large HP pool so the pct-of-maxHp pulse damage is large and per-pulse
+      // Math.round does not skew the affix ratio: the pulse sums two small rounded
+      // sources (the hazard tier pulse + the boss mark), and at a normal warrior's
+      // maxHp the rounding diluted the 1.35 multiplier to ~1.17. Big HP also keeps
+      // the player alive across the whole window so no damage is HP-floored.
+      p.maxHp = 1_000_000;
+      p.hp = p.maxHp;
       const hp0 = p.hp;
       for (let i = 0; i < 20; i++) sim.tick();
       return hp0 - p.hp;
