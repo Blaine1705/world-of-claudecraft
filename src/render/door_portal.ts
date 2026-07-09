@@ -209,6 +209,14 @@ let riftGateGltf: GLTF | null = null;
 // shared like the gate; buildRiftPuzzleProp falls back to a dodecahedron if absent.
 const RIFT_ROCK_URL = '/models/props/rock_large_f.glb';
 let riftRockGltf: GLTF | null = null;
+// Tripo-generated rift props (see CREDITS.md): an arcane flame that crowns the rune
+// pylons (replacing the old crystal/beam) and a carved rune monolith for the
+// sequence runes. Preloaded + shared like the rock; builders fall back to procedural
+// geometry if the asset is still loading.
+const RIFT_FLAME_URL = '/models/props/rift_flame.glb';
+let riftFlameGltf: GLTF | null = null;
+const RIFT_RUNE_URL = '/models/props/rift_rune.glb';
+let riftRuneGltf: GLTF | null = null;
 
 function markGltfShared(gltf: GLTF): void {
   gltf.scene.traverse((o) => {
@@ -283,6 +291,92 @@ if (typeof window !== 'undefined') {
         riftRockGltf = null;
       }),
   );
+  registerPreload(
+    loadGltf(RIFT_FLAME_URL)
+      .then((gltf) => {
+        markGltfShared(gltf);
+        riftFlameGltf = gltf;
+      })
+      .catch(() => {
+        riftFlameGltf = null;
+      }),
+  );
+  registerPreload(
+    loadGltf(RIFT_RUNE_URL)
+      .then((gltf) => {
+        markGltfShared(gltf);
+        riftRuneGltf = gltf;
+      })
+      .catch(() => {
+        riftRuneGltf = null;
+      }),
+  );
+}
+
+/** Clone the rune monolith GLB (scaled to `height`, base at y=0) and make its carved
+ * runes self-illuminate: reusing the baseColor texture as an emissive map lights the
+ * bright rune glyphs while the dark stone stays dim, so they read as glowing runes in
+ * the murky rift (dim + warm when dormant, bright when `lit`). Per-clone materials,
+ * disposed with the view. */
+function runeClone(height: number, lit: boolean): THREE.Group {
+  const g = new THREE.Group();
+  if (!riftRuneGltf) return g;
+  const model = riftRuneGltf.scene.clone(true);
+  model.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const s = height / Math.max(size.y, 1e-3);
+  model.scale.setScalar(s);
+  model.position.set(
+    -((box.min.x + box.max.x) / 2) * s,
+    -box.min.y * s,
+    -((box.min.z + box.max.z) / 2) * s,
+  );
+  const emis = new THREE.Color(lit ? 0xffc35a : 0xc27a2a);
+  const intensity = lit ? 1.35 : 0.5;
+  const boost = (mm: THREE.Material): THREE.Material => {
+    const c = mm.clone() as THREE.MeshStandardMaterial;
+    if ('emissive' in c) {
+      c.emissive = emis;
+      c.emissiveIntensity = intensity;
+      if (c.map) c.emissiveMap = c.map;
+      c.needsUpdate = true;
+    }
+    return c;
+  };
+  model.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    mesh.castShadow = true;
+    mesh.material = Array.isArray(mesh.material) ? mesh.material.map(boost) : boost(mesh.material);
+  });
+  g.add(model);
+  return g;
+}
+
+/** Clone the flame GLB, scale to `height` (base at y=0), and paint it as an additive
+ * glowing fire in `color`. Returned meshes are tagged for a per-frame flicker. */
+function flameClone(height: number, color: number): THREE.Group {
+  const g = new THREE.Group();
+  if (!riftFlameGltf) return g;
+  const model = riftFlameGltf.scene.clone(true);
+  model.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const s = height / Math.max(size.y, 1e-3);
+  model.scale.setScalar(s);
+  model.position.set(
+    -((box.min.x + box.max.x) / 2) * s,
+    -box.min.y * s,
+    -((box.min.z + box.max.z) / 2) * s,
+  );
+  const mat = riftGlowMaterial(color, 0.92);
+  model.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh) mesh.material = mat;
+  });
+  g.add(model);
+  return g;
 }
 
 /** The world-spawned rift gate body (bespoke GLB), normalized to xz-center +
@@ -497,17 +591,36 @@ export function buildRiftPuzzleProp(
     case 'rift_seq_rune':
     case 'rift_seq_rune_lit': {
       const lit = templateId === 'rift_seq_rune_lit';
-      const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.6, 0.8), stone);
-      pillar.position.y = 0.8;
-      pillar.castShadow = true;
-      body.add(pillar);
-      const gem = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.42, 0),
-        riftGlowMaterial(lit ? 0x9fffc4 : 0x3a6a4a, lit ? 0.95 : 0.5),
-      );
-      gem.position.y = 1.95;
-      body.add(gem);
-      return { body, portal: lit ? gem : undefined };
+      // A real carved rune monolith (Tripo). Its baked rune texture reads dim when
+      // dormant; lit, a glowing halo ring + pulse marks it as answered. Falls back to
+      // a stone pillar + gem if the model is still loading.
+      if (riftRuneGltf) {
+        body.add(runeClone(2.3, lit));
+      } else {
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.6, 0.8), stone);
+        pillar.position.y = 0.8;
+        pillar.castShadow = true;
+        body.add(pillar);
+      }
+      if (lit) {
+        const halo = new THREE.Mesh(
+          new THREE.TorusGeometry(0.75, 0.09, 8, 20),
+          riftGlowMaterial(0x9fffc4, 0.95),
+        );
+        halo.rotation.x = Math.PI / 2;
+        halo.position.y = 1.1;
+        body.add(halo);
+        const ground = new THREE.Mesh(
+          new THREE.RingGeometry(0.7, 1.2, 20),
+          riftGlowMaterial(0x9fffc4, 0.5),
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0.05;
+        body.add(ground);
+        body.userData.riftPulse = [halo, ground];
+        return { body, portal: halo };
+      }
+      return { body };
     }
     case 'rift_beacon': {
       // The always-available "way home": a real upright return portal, not a floor
@@ -540,9 +653,10 @@ export function buildRiftPuzzleProp(
     case 'rift_pylon_lit': {
       const lit = templateId === 'rift_pylon_lit';
       const accent = lit ? 0x9fe8ff : 0x2a4a6a;
-      // A faceted crystalline obelisk: a flared stone base + a tapered hex shaft,
-      // girdled by glowing collar rings, crowned by a floating rune crystal with
-      // orbiting shards. Lit, a pulsing energy column erupts from the crown.
+      // A stone obelisk (flared base + tapered hex shaft + glowing collar rings) with
+      // a brazier bowl on top. Lit, a real arcane FLAME (Tripo) roars from the bowl,
+      // flickering per frame (userData.riftFlame) - replacing the old crystal + energy
+      // beam. Dormant, a cold ember sits in the bowl.
       const base = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.92, 1.1, 6), stone);
       base.position.y = 0.55;
       base.castShadow = true;
@@ -551,6 +665,7 @@ export function buildRiftPuzzleProp(
       shaft.position.y = 2.0;
       shaft.castShadow = true;
       body.add(shaft);
+      const collars: THREE.Mesh[] = [];
       for (const y of [1.35, 2.05, 2.75]) {
         const ring = new THREE.Mesh(
           new THREE.TorusGeometry(0.44, 0.07, 6, 16),
@@ -559,39 +674,25 @@ export function buildRiftPuzzleProp(
         ring.rotation.x = Math.PI / 2;
         ring.position.y = y;
         body.add(ring);
+        collars.push(ring);
       }
-      const crystal = new THREE.Mesh(
-        new THREE.OctahedronGeometry(0.55, 0),
-        riftGlowMaterial(lit ? 0xbfe8ff : 0x2f5a7a, lit ? 0.98 : 0.5),
-      );
-      crystal.position.y = 3.6;
-      body.add(crystal);
-      // Orbiting shards (renderer spins each pivot about Y + bobs it).
-      const orbiters: THREE.Object3D[] = [];
-      const shardCount = lit ? 3 : 2;
-      for (let i = 0; i < shardCount; i++) {
-        const pivot = new THREE.Object3D();
-        pivot.position.y = 3.6;
-        pivot.rotation.y = (i / shardCount) * Math.PI * 2;
-        const shard = new THREE.Mesh(
-          new THREE.OctahedronGeometry(0.15, 0),
-          riftGlowMaterial(accent, lit ? 0.9 : 0.5),
+      const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.3, 0.36, 10), stone);
+      bowl.position.y = 3.3;
+      bowl.castShadow = true;
+      body.add(bowl);
+      if (lit && riftFlameGltf) {
+        const flame = flameClone(1.8, 0x9fd8ff);
+        flame.position.y = 3.4;
+        body.add(flame);
+        body.userData.riftFlame = flame;
+      } else {
+        const ember = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.4, 0),
+          riftGlowMaterial(lit ? 0xbfe8ff : 0x2f5a7a, lit ? 0.95 : 0.45),
         );
-        shard.position.set(0.85, 0, 0);
-        pivot.add(shard);
-        body.add(pivot);
-        orbiters.push(pivot);
-      }
-      body.userData.riftOrbiters = orbiters;
-      if (lit) {
-        // A tall additive beam column of energy (open-ended cylinder) that pulses.
-        const beam = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.16, 0.34, 5.6, 12, 1, true),
-          riftGlowMaterial(0xbfe8ff, 0.26),
-        );
-        beam.position.y = 3.1;
-        body.add(beam);
-        body.userData.riftPulse = [beam];
+        ember.position.y = 3.7;
+        body.add(ember);
+        if (lit) body.userData.riftFlame = ember; // flicker the fallback ember too
       }
       const ground = new THREE.Mesh(
         new THREE.RingGeometry(0.7, 1.3, 20),
@@ -600,7 +701,8 @@ export function buildRiftPuzzleProp(
       ground.rotation.x = -Math.PI / 2;
       ground.position.y = 0.05;
       body.add(ground);
-      return { body, portal: crystal };
+      if (lit) body.userData.riftPulse = [ground, ...collars];
+      return { body };
     }
   }
   return { body };

@@ -4443,6 +4443,15 @@ export class Renderer {
               mat.opacity = (mat.userData.baseOpacity as number) * k;
             }
           }
+          // Arcane flame crowning a lit pylon: flicker the height + a lick of sway,
+          // so the Tripo flame reads as living fire rather than a frozen mesh.
+          const flame = v.group.userData.riftFlame as THREE.Object3D | undefined;
+          if (flame) {
+            const t = this.time * 9 + e.id;
+            flame.scale.y = 1 + Math.sin(t) * 0.14 + Math.sin(t * 2.3) * 0.06;
+            flame.scale.x = flame.scale.z = 1 + Math.sin(t * 1.7 + 1) * 0.06;
+            flame.rotation.y = Math.sin(this.time * 1.3 + e.id) * 0.25;
+          }
           // Continuous particle ambience via the real VFX system (like the Nythraxis
           // wardstone above): a lit pylon fizzes arcane motes; the rolling boulder
           // trails embers. Rate-scaled by dt, skipped on low-gfx by the emitter.
