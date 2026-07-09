@@ -150,13 +150,10 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'war_r14_crippling_blows',
           name: 'Crippling Blows',
-          description:
-            'Bladed Gyre also hamstrings everything it hits, slowing movement by 50% for 5 sec.',
+          description: 'Rend also cripples the target, slowing movement by 50% for 15 sec.',
           icon: 'hamstring',
           effect: {
-            ability: [
-              { ability: 'whirlwind', addEffects: [{ type: 'slow', mult: 0.5, duration: 5 }] },
-            ],
+            ability: [{ ability: 'rend', addEffects: [{ type: 'slow', mult: 0.5, duration: 15 }] }],
           },
         },
         {
