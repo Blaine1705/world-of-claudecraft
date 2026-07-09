@@ -3277,7 +3277,10 @@ export const ko_KR: EnTranslations = {
       "socketsShut": "받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.",
       "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
       "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요.",
-      "gateOpen": "문이 삐걱거리며 열립니다."
+      "gateOpen": "문이 삐걱거리며 열립니다.",
+      "orbSealed": "구슬은 아래의 의식에 봉인되어 있습니다.",
+      "orbWakes": "펜타그램의 불꽃이 꺼집니다. 제단에서 무언가가 깨어납니다.",
+      "orbOpensGate": "피의 구슬이 타오릅니다. 신전의 문이 삐걱거리며 열립니다."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
@@ -7423,6 +7426,18 @@ export const ko_KR: EnTranslations = {
       },
       "sundered_horror": {
         "name": "찢겨진 공포"
+      },
+      "rift_hellguard": {
+        "name": "지옥 수호병"
+      },
+      "rift_pact_acolyte": {
+        "name": "계약의 수련사제"
+      },
+      "rift_boss_ritualist": {
+        "name": "서약에 묶인 마구스 벨코르"
+      },
+      "rift_boss_pitlord": {
+        "name": "구렁의 군주 아즈고라스"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"

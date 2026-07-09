@@ -914,6 +914,16 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.25,
   },
+  // The Infernal Citadel's Magus Vel'Kor: the same necromancer rig, but drenched in
+  // its entity colour (the shared skel_necromancer tints at 0.25 and stays
+  // bone-white, which reads as a snowdrift under the citadel's blood-red grade).
+  rift_ritualist: {
+    url: `${ENEMIES}/necromancer.glb`,
+    height: 2.5,
+    clips: skeletonClips(['2H_Melee_Attack_Chop']),
+    tint: 'entity',
+    tintStrength: 0.8,
+  },
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`,
     height: 3.4,
@@ -1186,6 +1196,11 @@ const MOB_KEYS: Record<string, string> = {
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
   the_wreck_warden: 'skel_golem',
+  // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
+  // family's default skeleton minion. Its demons keep the family fallback
+  // (mob_demonalt), re-tinted deep red by the templates.
+  rift_pact_acolyte: 'mob_dark_caster',
+  rift_boss_ritualist: 'rift_ritualist',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

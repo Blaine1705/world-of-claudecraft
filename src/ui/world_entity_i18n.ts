@@ -180,6 +180,11 @@ const MOB_IDS = [
   'breach_wretch',
   'void_stalker',
   'sundered_horror',
+  // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
+  'rift_hellguard',
+  'rift_pact_acolyte',
+  'rift_boss_ritualist',
+  'rift_boss_pitlord',
 ] as const;
 
 const NPC_IDS = [

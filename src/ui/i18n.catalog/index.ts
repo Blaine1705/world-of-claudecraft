@@ -472,6 +472,9 @@ export const en = {
       seqProgress: 'The runes answer in turn ({step}/{total}).',
       seqReset: 'The runes go dark. Begin again.',
       gateOpen: 'The gate grinds open.',
+      orbSealed: 'The orb is sealed by the ritual below.',
+      orbWakes: "The pentagram's flame gutters out. Something wakes on the altar.",
+      orbOpensGate: 'The Blood Orb flares. The gates of the temple grind open.',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',

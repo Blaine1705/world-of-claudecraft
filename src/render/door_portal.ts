@@ -28,6 +28,10 @@ let nythraxisClickMat: THREE.MeshBasicMaterial | null = null;
 // on both inputs just keeps the builder correct for any caller and unit-testable.
 const portalMats = new Map<string, THREE.MeshBasicMaterial>();
 
+// Height the Blood Orb hovers at: clear of the citadel's altar model (1.2yd native,
+// placed at scale 1.5, see src/sim/content/rift/infernal_citadel.ts).
+const ORB_Y = 2.15;
+
 function doorStoneMaterial(): THREE.Material {
   stoneMat ??= markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
   return stoneMat;
@@ -683,6 +687,32 @@ export function buildRiftPuzzleProp(
       ring.position.y = 0.08;
       body.add(ring);
       return { body };
+    }
+    case 'rift_infernal_orb':
+    case 'rift_infernal_orb_active': {
+      // The Blood Orb on the citadel's sacrificial altar: a dark sphere hovering
+      // over the altar top, dull while the ritual below still binds it, then blazing
+      // and haloed once its keeper falls. ORB_Y clears the altar model (1.2yd native,
+      // placed at scale 1.5 = 1.8yd, see content/rift/infernal_citadel.ts).
+      const active = templateId === 'rift_infernal_orb_active';
+      const orb = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(0.5, 2),
+        active
+          ? riftGlowMaterial(0xff2a1a, 0.95)
+          : new THREE.MeshLambertMaterial({ color: 0x3a0a10, emissive: 0x2a0508 }),
+      );
+      orb.position.y = ORB_Y;
+      body.add(orb);
+      if (!active) return { body };
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(0.9, 0.08, 8, 28),
+        riftGlowMaterial(0xff6a3a, 0.8),
+      );
+      halo.rotation.x = Math.PI / 2;
+      halo.position.y = ORB_Y;
+      body.add(halo);
+      body.userData.riftPulse = [orb];
+      return { body, portal: halo }; // the halo spins; the orb pulses
     }
     case 'rift_ice_goal': {
       const disc = new THREE.Mesh(

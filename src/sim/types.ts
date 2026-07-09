@@ -1879,6 +1879,9 @@ export interface Entity {
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
+  // Sim time of the last "the orb is sealed" nudge shown to this player at a
+  // dormant Blood Orb (authored citadel), throttled the same way.
+  riftOrbNoticeAt?: number;
   // Walk-in portal grace after leaving a rift: until this sim time the player
   // does not auto-enter portals, so being returned near the entry portal can
   // never bounce them straight back in (clicking the portal still works).

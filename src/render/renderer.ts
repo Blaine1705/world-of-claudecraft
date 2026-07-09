@@ -3465,7 +3465,9 @@ export class Renderer {
         e.templateId === 'rift_gate' ||
         e.templateId === 'rift_gate_open' ||
         e.templateId === 'rift_switch' ||
-        e.templateId === 'rift_switch_on')
+        e.templateId === 'rift_switch_on' ||
+        e.templateId === 'rift_infernal_orb' ||
+        e.templateId === 'rift_infernal_orb_active')
     ) {
       // In-rift puzzle props (procedural; glowing ones spin via `portal`, the
       // rolling boulder rolls via `userData.rollRock`).
@@ -3479,7 +3481,9 @@ export class Renderer {
             ? 5.6
             : e.templateId === 'rift_roller'
               ? 3.0
-              : 2.4;
+              : e.templateId === 'rift_infernal_orb' || e.templateId === 'rift_infernal_orb_active'
+                ? 2.2
+                : 2.4;
       objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail

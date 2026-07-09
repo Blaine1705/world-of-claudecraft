@@ -3277,7 +3277,10 @@ export const ru_RU: EnTranslations = {
       "socketsShut": "Гнёзда с грохотом смыкаются. Путь пробуждается.",
       "seqProgress": "Руны отвечают по очереди ({step}/{total}).",
       "seqReset": "Руны гаснут. Начните заново.",
-      "gateOpen": "Врата с грохотом отворяются."
+      "gateOpen": "Врата с грохотом отворяются.",
+      "orbSealed": "Сфера запечатана ритуалом внизу.",
+      "orbWakes": "Пламя пентаграммы гаснет. Нечто пробуждается на алтаре.",
+      "orbOpensGate": "Кровавая сфера вспыхивает. Врата храма с грохотом отворяются."
     },
     "delve": {
       "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",
@@ -7423,6 +7426,18 @@ export const ru_RU: EnTranslations = {
       },
       "sundered_horror": {
         "name": "Расколотый Ужас"
+      },
+      "rift_hellguard": {
+        "name": "Адский страж"
+      },
+      "rift_pact_acolyte": {
+        "name": "Послушник договора"
+      },
+      "rift_boss_ritualist": {
+        "name": "Магус Вель'Кор Связанный Договором"
+      },
+      "rift_boss_pitlord": {
+        "name": "Азгорат, Владыка Бездны"
       },
       "ironvein_foreman": {
         "name": "Прораб Железной жилы"

@@ -3277,7 +3277,10 @@ export const ja_JP: EnTranslations = {
       "socketsShut": "台座が音を立てて閉じる。道が動き出す。",
       "seqProgress": "ルーンが順に応える（{step}/{total}）。",
       "seqReset": "ルーンがすべて暗くなる。最初からやり直せ。",
-      "gateOpen": "門が音を立てて開いた。"
+      "gateOpen": "門が音を立てて開いた。",
+      "orbSealed": "宝珠は下層の儀式によって封じられている。",
+      "orbWakes": "五芒星の炎が消えた。祭壇で何かが目覚める。",
+      "orbOpensGate": "血の宝珠が輝く。神殿の門が音を立てて開いた。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
@@ -7423,6 +7426,18 @@ export const ja_JP: EnTranslations = {
       },
       "sundered_horror": {
         "name": "引き裂かれし恐怖"
+      },
+      "rift_hellguard": {
+        "name": "ヘルガード"
+      },
+      "rift_pact_acolyte": {
+        "name": "契約の侍祭"
+      },
+      "rift_boss_ritualist": {
+        "name": "契約に縛られし魔導士ヴェルコル"
+      },
+      "rift_boss_pitlord": {
+        "name": "奈落の王アズゴラス"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"

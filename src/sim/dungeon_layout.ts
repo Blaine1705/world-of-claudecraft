@@ -5,6 +5,14 @@
 // the old hand-mirroring between renderer geometry and collider literals.
 // Sim layer: no three.js imports.
 import type { Collider } from './colliders';
+import {
+  type AuthoredDecor,
+  type AuthoredDoor,
+  type AuthoredRoom,
+  authoredColliders,
+} from './rift/authored';
+
+export type { AuthoredDecor, AuthoredDoor, AuthoredRoom };
 
 // Shared structural constants (instance-local coordinates, y up, z into the
 // dungeon). Values are frozen gameplay contracts: mob spawns and pathing
@@ -65,6 +73,13 @@ export interface DungeonLayout {
   shellPolygon?: Array<{ x: number; z: number }>;
   /** Star-shaping pole paired with `shellPolygon` (see geometry2d.polygonIsStarShaped). */
   shellPole?: { x: number; z: number };
+  /** AUTHORED room-graph floors (the hand-built set-piece rifts): a set of
+   * axis-aligned rooms joined by `doors`, with `decor` props placed by hand. When
+   * present it REPLACES the rectangular/polygon shell entirely: walls, collision,
+   * and the rendered modules all derive from these three fields (see rift/authored.ts). */
+  rooms?: AuthoredRoom[];
+  doors?: AuthoredDoor[];
+  decor?: AuthoredDecor[];
 }
 
 // The four hand-authored KayKit interior "kits" a procedural rift can build on.
@@ -287,6 +302,11 @@ export function layoutColliders(layout: DungeonLayout): Collider[] {
   const out: Collider[] = [];
   const wallX = layout.wallX ?? DUNGEON_WALL_X;
   const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
+  if (layout.rooms) {
+    // Authored room-graph floor: its rooms + doors ARE the shell, and its decor
+    // carries the measured prop radii. Nothing else on the layout applies.
+    return authoredColliders(layout.rooms, layout.doors ?? [], layout.decor ?? [], DUNGEON_WALL_HW);
+  }
   if (layout.shellPolygon) {
     // Non-rectangular room: the polygon's own edges ARE the walls (front, back,
     // and both curved sides), so skip the rectangular shell.

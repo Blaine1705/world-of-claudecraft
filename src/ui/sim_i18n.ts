@@ -5494,6 +5494,15 @@ const RULES: Rule[] = [
   },
   { re: /^The runes go dark\. Begin again\.$/, build: () => t('sim.rift.seqReset') },
   { re: /^The gate grinds open\.$/, build: () => t('sim.rift.gateOpen') },
+  { re: /^The orb is sealed by the ritual below\.$/, build: () => t('sim.rift.orbSealed') },
+  {
+    re: /^The pentagram's flame gutters out\. Something wakes on the altar\.$/,
+    build: () => t('sim.rift.orbWakes'),
+  },
+  {
+    re: /^The Blood Orb flares\. The gates of the temple grind open\.$/,
+    build: () => t('sim.rift.orbOpensGate'),
+  },
   {
     re: /^A ([CBAS])-rank rift tears open in (.+)!$/,
     build: (m) => t('sim.rift.portalOpens', { tier: m[1], zone: locZone(m[2]) }),

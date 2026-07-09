@@ -30,6 +30,10 @@ export interface RiftSpawn {
   z: number;
   level: number;
   boss?: boolean;
+  /** An authored floor's SECONDARY boss: tracked separately (RiftInstance.minibossId)
+   * because the floor's `boss` is the one whose death opens the exit and pays out.
+   * Killing the miniboss drives the floor's own gate (see the Blood Orb). */
+  miniboss?: boolean;
   color?: number;
   scale?: number;
 }
@@ -46,7 +50,8 @@ export type RiftObjectKind =
   | 'ice_goal' // ice-slide destination the party must slide onto
   | 'boulder' // a pushable strength boulder
   | 'boulder_pad' // the socket a boulder must be pushed onto
-  | 'seq_rune'; // a numbered rune in a Simon-style step-in-order sequence
+  | 'seq_rune' // a numbered rune in a Simon-style step-in-order sequence
+  | 'infernal_orb'; // an authored altar orb: dormant until its miniboss dies, then opens the gate
 
 /** A placed interactable, instance-local. `descent` sinks the party to the next
  * floor; `exit` returns them to the overworld; `chest` is the floor reward; the
@@ -102,6 +107,10 @@ export interface RiftGate {
   hd: number;
   switchX: number;
   switchZ: number;
+  /** Authored floors only: the gate has no pressure plate and is opened by touching
+   * the floor's `infernal_orb` once its miniboss has fallen. `switchX/switchZ` are
+   * unused (no switch object is placed), so the plate trigger never fires. */
+  openOnOrb?: boolean;
 }
 
 /** A raised rear "sanctum" tier: the floor steps UP toward the dais over a full
@@ -151,6 +160,10 @@ export interface RiftFloorPlan {
   /** A switch-gated portcullis blocking the nave, or null. Only on otherwise-plain
    * floors (no puzzle/hazard/roller/platform), so it is the floor's one mechanic. */
   gate: RiftGate | null;
+  /** True for a HAND-AUTHORED set-piece floor (its `layout` carries `rooms`/`doors`/
+   * `decor` instead of a generated single-room shell). The procedural playability
+   * invariants (one nave, a clear central spine, a dais at the far end) do not apply. */
+  authored?: boolean;
 }
 
 /** Live per-instance state for an active rift (a Sim field, one per slot in the
@@ -195,6 +208,12 @@ export interface RiftInstance {
   gateId: number | null;
   switchId: number | null;
   gateOpen: boolean;
+  /** Authored set-piece state. `minibossId` is the secondary boss whose death arms
+   * the Blood Orb (`orbId`); touching the armed orb raises the gate. `orbActive`
+   * mirrors the orb entity's lit template so a re-entering client reads the state. */
+  minibossId: number | null;
+  orbId: number | null;
+  orbActive: boolean;
   /** Overworld position to return the player to when they leave. */
   returnPos: { x: number; z: number };
   emptyFor: number;

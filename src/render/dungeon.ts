@@ -34,6 +34,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
+import { authoredWallSegments } from '../sim/rift/authored';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import {
@@ -45,6 +46,7 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { sharedUniforms } from './gfx';
+import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
@@ -228,6 +230,10 @@ const KIT_MODELS = [
   'banner_green',
   'banner_patternC_green',
   'banner_triple_green',
+  // The Infernal Citadel's authored halls hang blood-red war banners (the kit
+  // already ships them; the crypt's pale ones read as bedsheets under its grade).
+  'banner_red',
+  'banner_triple_red',
   'chest',
   'chest_gold',
   'coin_stack_medium',
@@ -586,6 +592,8 @@ export class DungeonInteriors {
   // instance draws (see marshMaterial). Never touched by any other variant.
   private marshWallMats = new Map<Pack, THREE.Material>();
   private marshFloorMats = new Map<Pack, THREE.Material>();
+  /** Authored-floor material grades, keyed `${pack}:${tint}` (see tintedMaterial). */
+  private tintedMats = new Map<string, THREE.Material>();
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: ArenaHideable[] = [];
 
@@ -695,6 +703,35 @@ export class DungeonInteriors {
     const group = new THREE.Group();
     const p = new Placements();
     const arenaWalls = variant === 'arena' ? this.pendingArenaWalls(layout, ox, oz) : undefined;
+
+    // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
+    // replace the single-room shell entirely. Walls come from the SAME segment
+    // helper the sim derives collision from, so they cannot drift apart.
+    if (layout.rooms) {
+      await ensureInfernalDecorAssets();
+      this.placeAuthoredFloor(p, layout, variant);
+      this.placeAuthoredWalls(p, layout, variant);
+      buildInfernalDecor(group, layout.decor ?? [], torch, (x, z, color, y, scale) =>
+        this.addTorchGlow(group, x, z, color, y, scale),
+      );
+      this.placeDais(group, p, layout, variant, torch, daisRaised);
+      if (opts?.hazards?.length) {
+        this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'lava');
+      }
+      if (layout.illusionWalls?.length) {
+        this.placeIllusionWalls(group, layout.illusionWalls, variant);
+      }
+      // The authored floor honours its InteriorStyle's stone grade (the base kit
+      // reads as grey crypt otherwise). Scoped to this path: the procedural rift
+      // floors keep the look they shipped with.
+      this.emit(group, p, variant, {
+        wall: opts?.style?.wallTint,
+        floor: opts?.style?.floorTint,
+      });
+      group.position.set(ox, 0, oz);
+      this.scene.add(group);
+      return;
+    }
 
     this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
@@ -1074,7 +1111,30 @@ export class DungeonInteriors {
     return mat;
   }
 
-  private emit(group: THREE.Group, p: Placements, variant: Variant): void {
+  /** A pack material multiplied by an arbitrary 0xRRGGBB grade, cached per
+   * (pack, tint). The same trick marshMaterial plays, generalized so an authored
+   * floor can carry its InteriorStyle's wall/floor tint. */
+  private tintedMaterial(pack: Pack, tint: number): THREE.Material {
+    const key = `${pack}:${tint}`;
+    let mat = this.tintedMats.get(key);
+    if (mat) return mat;
+    // this.material(pack) is already a clone of the immutable GLB cache source;
+    // clone again so the tint never mutates the shared pack material.
+    const base = this.material(pack).clone() as
+      | THREE.MeshLambertMaterial
+      | THREE.MeshStandardMaterial;
+    base.color.multiply(new THREE.Color(tint));
+    mat = base;
+    this.tintedMats.set(key, mat);
+    return mat;
+  }
+
+  private emit(
+    group: THREE.Group,
+    p: Placements,
+    variant: Variant,
+    tints?: { wall?: number; floor?: number },
+  ): void {
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
       const asset = moduleAssets.get(kind);
@@ -1089,6 +1149,10 @@ export class DungeonInteriors {
       let mat = this.material(asset.pack);
       if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
       else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
+      else if (tints?.wall !== undefined && WALL_PILLAR_KINDS.has(kind))
+        mat = this.tintedMaterial(asset.pack, tints.wall);
+      else if (tints?.floor !== undefined && RECEIVER_KINDS.has(kind))
+        mat = this.tintedMaterial(asset.pack, tints.floor);
       const mesh = new THREE.InstancedMesh(asset.geo, mat, mats.length);
       for (let i = 0; i < mats.length; i++) mesh.setMatrixAt(i, mats[i]);
       mesh.instanceMatrix.needsUpdate = true;
@@ -1323,6 +1387,81 @@ export class DungeonInteriors {
         const rot = Math.floor(hash2(z, x) * 4) * quarter;
         p.add(kind, x, FLOOR_Y, z, rot);
       }
+    }
+  }
+
+  // Authored room-graph floor: tile each room's rectangle with the SAME
+  // variant-keyed floor modules the procedural rooms use, masked to the union of
+  // the rooms (so the solid rock between them stays bare).
+  private placeAuthoredFloor(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    const rooms = layout.rooms ?? [];
+    if (rooms.length === 0) return;
+    const quarter = Math.PI / 2;
+    const inside = (x: number, z: number): boolean =>
+      rooms.some((r) => x >= r.x0 - 1 && x <= r.x1 + 1 && z >= r.z0 - 1 && z <= r.z1 + 1);
+    const minX = Math.min(...rooms.map((r) => r.x0)) - 2;
+    const maxX = Math.max(...rooms.map((r) => r.x1)) + 2;
+    const minZ = Math.min(...rooms.map((r) => r.z0)) - 2;
+    const maxZ = Math.max(...rooms.map((r) => r.z1)) + 2;
+    for (let z = minZ; z <= maxZ; z += FLOOR_CELL) {
+      for (let x = minX; x <= maxX; x += FLOOR_CELL) {
+        if (!inside(x, z)) continue;
+        let kind = this.floorKind(variant, hash2(x * 1.31, z));
+        if (kind === 'grate') kind = 'floor_tile_large'; // no pits in an authored floor
+        if (kind === 'quad') {
+          for (const dx of [-1, 1]) {
+            for (const dz of [-1, 1]) {
+              if (!inside(x + dx, z + dz)) continue;
+              const sub = this.floorQuadKind(variant, hash2(x + dx, z + dz));
+              const rot = Math.floor(hash2(z + dz, x + dx) * 4) * quarter;
+              p.add(sub, x + dx, FLOOR_Y, z + dz, rot);
+            }
+          }
+          continue;
+        }
+        const rot = Math.floor(hash2(z, x) * 4) * quarter;
+        p.add(kind, x, FLOOR_Y, z, rot);
+      }
+    }
+  }
+
+  // Authored walls: one run of ~8u modules along every wall segment the sim's
+  // `authoredWallSegments` produced (doorway gaps already subtracted), each turned
+  // to face into the room it borders. A door gap gets an arch module for a frame.
+  private placeAuthoredWalls(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    const rooms = layout.rooms ?? [];
+    const bannerEvery = variant === 'crypt' ? 4 : 3;
+    const openAt = (x: number, z: number): boolean =>
+      rooms.some((r) => x > r.x0 && x < r.x1 && z > r.z0 && z < r.z1);
+    let i = 0;
+    for (const seg of authoredWallSegments(rooms, layout.doors ?? [])) {
+      const len = seg.b - seg.a;
+      const count = Math.max(1, Math.round(len / 8));
+      // Face the wall detail into an adjacent room (either one, when it is shared).
+      let ry: number;
+      if (seg.axis === 'x') {
+        const mid = (seg.a + seg.b) / 2;
+        ry = openAt(mid, seg.fixed + 1.5) ? 0 : Math.PI;
+      } else {
+        const mid = (seg.a + seg.b) / 2;
+        ry = openAt(seg.fixed + 1.5, mid) ? Math.PI / 2 : -Math.PI / 2;
+      }
+      for (let s = 0; s < count; s++, i++) {
+        const t = seg.a + (len * (s + 0.5)) / count;
+        const x = seg.axis === 'x' ? t : seg.fixed;
+        const z = seg.axis === 'x' ? seg.fixed : t;
+        const kind = this.wallKind(variant, hash2(x * 13.7, z));
+        p.add(kind, x, 0, z, ry, MODULE_SCALE);
+        if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+          const banner = hash2(z, x * 7.3) < 0.5 ? 'banner_red' : 'banner_triple_red';
+          p.add(banner, x, 0, z, ry, MODULE_SCALE);
+        }
+      }
+    }
+    // Frame each doorway with an arch so an opening reads as a built passage.
+    for (const d of layout.doors ?? []) {
+      const ry = d.hw > d.hd ? 0 : Math.PI / 2; // the opening runs along its long axis
+      p.add('wall_arched', d.x, 0, d.z, ry, MODULE_SCALE);
     }
   }
 
