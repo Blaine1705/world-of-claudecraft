@@ -552,7 +552,7 @@ function currentTaskMultiplier(
 ): number | null {
   if (task.type === 'quest_completion')
     return questCompletionPoints(task, onlineMinutes).multiplier;
-  if (task.type === 'arena_result')
+  if (task.type === 'arena_result' || task.type === 'vale_cup_result')
     return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
       .multiplier;
   if (task.type === 'delve_clear')
@@ -729,6 +729,10 @@ export class DailyRewardService {
       completedAt?: Date;
     },
   ): Promise<number> {
+    // Protect Yumi (yumi3/yumi5) is an unranked objective mode: its bouts do
+    // not count toward the arena daily-reward task (maintainer decision;
+    // fiesta keeps its historical counting behavior).
+    if (result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
@@ -859,6 +863,76 @@ export class DailyRewardService {
         },
       );
       if (recorded) awardedPoints += chestPoints.points;
+    }
+    return awardedPoints;
+  }
+
+  // Vale Cup daily task: wins only. Rated wins use the full task value; bot-filled
+  // and practice wins use a much smaller base so they can contribute without competing
+  // with real ranked match rewards. The match id keys the dedupe row, so one match
+  // yields at most one grant per account.
+  async recordValeCupResult(
+    accountId: number,
+    result: {
+      won: boolean;
+      bracket: number;
+      matchId: number;
+      rated?: boolean;
+      hasBots?: boolean;
+      practice?: boolean;
+      completedAt?: Date;
+    },
+  ): Promise<number> {
+    if (!result.won) return 0;
+    if (result.rated === false && result.hasBots !== true && result.practice !== true) return 0;
+    const completedAt = result.completedAt ?? new Date();
+    const { day, config } = await dailyRewardClock(completedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'vale_cup_result');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const taskConfig = task.config ?? {};
+      const rankedBasePoints = numberConfig(
+        taskConfig,
+        'winBasePoints',
+        task.basePoints ?? task.points,
+      );
+      const botFallbackPoints = Math.max(1, Math.floor(rankedBasePoints * 0.2));
+      const reducedMatch = result.hasBots === true || result.practice === true;
+      const basePoints = reducedMatch
+        ? numberConfig(taskConfig, 'botWinBasePoints', botFallbackPoints)
+        : rankedBasePoints;
+      const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
+      if (points <= 0) continue;
+      const outcomeKey =
+        result.practice === true ? 'practice_win' : reducedMatch ? 'bot_win' : 'win';
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        points,
+        `task:${task.taskId}:vale_cup:${result.matchId}:${outcomeKey}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          bracket: result.bracket,
+          matchId: result.matchId,
+          won: true,
+          matchType: result.practice === true ? 'practice' : reducedMatch ? 'bot' : 'ranked',
+          rated: result.rated !== false,
+          hasBots: result.hasBots === true,
+          practice: result.practice === true,
+          onlineMinutes,
+          multiplier,
+          basePoints,
+        },
+      );
+      if (recorded) awardedPoints += points;
     }
     return awardedPoints;
   }

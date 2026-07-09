@@ -46,6 +46,8 @@ import {
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { computeBankBonus } from './bank_entitlements';
+import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
@@ -54,6 +56,8 @@ import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  acquireCharacterLease,
+  bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
   chatMuteStatusForAccount,
@@ -82,6 +86,8 @@ import {
   pruneClientPerfReports,
   reclaimDeactivatedName,
   referralCountForAccount,
+  releaseAllCharacterLeases,
+  releaseCharacterLease,
   renameCharacter,
   revokeCompanionToken,
   saveToken,
@@ -121,7 +127,9 @@ import { configureGithubContributorsRuntime, topContributors } from './github_co
 import { pruneGitHubOAuthStates } from './github_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
+import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
+import { registerClientPerfMetrics } from './http/client_perf_metrics';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
 import {
   type ApiDelegate,
@@ -129,6 +137,8 @@ import {
   createApiDispatcher,
   selectApiEntry,
 } from './http/dispatch';
+import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
+import { setGameMetricsCounters } from './http/game_signals';
 import { handleLivez, handleMetricsGate, handleReadyz, markDraining } from './http/health';
 import { type Logger, logger } from './http/logger';
 import { createHttpMetrics } from './http/metrics';
@@ -2324,8 +2334,36 @@ export async function startServer(): Promise<http.Server> {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: config.maxWsPerIpHard,
+    acquireCharacterLease,
+    releaseCharacterLease,
+    bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
   });
   wsAuth.attachUpgrade(server, wss);
+
+  // Register the game-state gauges + throughput counters on the SAME registry the
+  // RED exporter built at module scope, then install the counter sink process-wide
+  // (mirrors setAttackSignalSink). Wired here, after `game` and `wss` exist, so the
+  // gauges read live state at scrape time; ws_connections is the raw open-socket
+  // count (joined or not), distinct from players_online (joined sessions).
+  const gameStateSource: GameStateSource = {
+    playersOnline: () => game.clients.size,
+    accountsOnline: () => game.liveAccountIds().size,
+    wsConnections: () => wss.clients.size,
+    simEntities: () => game.sim.entities.size,
+    simTickHz: () => game.simTickHz(),
+    tickPhaseMillis: () => game.tickPhaseMillis(),
+  };
+  setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+
+  // The app-aggregate /metrics collectors (Phase 3 business, Phase 4 client-perf):
+  // each registers bounded gauges on the SAME exporter registry and runs ONE cached
+  // Postgres aggregate on a fixed interval, so a scrape publishes the cached snapshot
+  // and never queries the DB. start() kicks off an immediate refresh plus the
+  // interval (both unref()'d); shutdown stops them below.
+  const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
+  const clientPerfMetrics = registerClientPerfMetrics(httpMetrics.registry);
+  businessMetrics.start();
+  clientPerfMetrics.start();
 
   game.start();
   server.listen(config.port, () => {
@@ -2340,11 +2378,32 @@ export async function startServer(): Promise<http.Server> {
     // /livez keep working through the drain).
     markDraining();
     console.log('shutting down: saving characters...');
+    // Stop the app-aggregate metric collectors so no refresh query races the pool
+    // close below (their intervals are unref()'d, but an in-flight tick could still
+    // fire before pool.end()).
+    businessMetrics.stop();
+    clientPerfMetrics.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();
     await game.endAllPlaySessions();
+    // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
+    // sweep: once the leases drop, a replacement process can load the same character
+    // and write new ledger rows, and rows still queued here would flush after them
+    // with higher insertion ids, inverting the id order the offline audit replays by
+    // (false negative_net / purchased_regression alarms). A clean restart loses no
+    // audit rows this way (a crash still can; the audit tolerates that as a
+    // transient mismatch). Rejections log inside the writer, so the drain never
+    // throws.
+    await bankLedgerIdle();
+    // Drop every character load lease this process holds so a clean restart can
+    // reload its characters immediately instead of waiting out the lease TTL.
+    // Runs before pool.end(); a failure here must not abort the shutdown, so log
+    // and continue to close the pool.
+    await releaseAllCharacterLeases().catch((err) =>
+      console.error('lease release-all failed:', err),
+    );
     await game.chatLog.stop();
     await pool.end();
     process.exit(0);
