@@ -5785,14 +5785,6 @@ export const zh_CN: EnTranslations = {
         "name": "钢铁旋风",
         "description": "化为钢铁旋风，每秒攻击附近敌人，造成 {damage} 点伤害。（战士天赋）"
       },
-      "swordguard": {
-        "name": "剑卫",
-        "description": "受到的伤害降低 10%，持续 8 秒；生命值低于 30% 时提高到 20%。（战士天赋）"
-      },
-      "triumph_rush": {
-        "name": "凯旋奔袭",
-        "description": "击杀敌人后，20 秒内可造成武器伤害加 {damage}，并恢复最大生命值的 20%。（战士天赋）"
-      },
       "razor_howl": {
         "name": "锐刃怒吼",
         "description": "使 15 码内的敌人减速 50%，持续 8 秒。（战士天赋）"

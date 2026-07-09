@@ -104,17 +104,9 @@ export interface GlobalModEffect {
   // 1 hp instead, once per this many seconds (0 disables). Consumed in
   // combat/damage.ts behind the procState internal cooldown.
   cheatDeathIcd?: number;
-  secondWindPctPerSec?: number;
-  secondWindHpBelow?: number;
   fearBreakPct?: number;
   onKillSpeedPct?: number;
   onKillSpeedDuration?: number;
-  autoRagePct?: number;
-  abilityRagePct?: number;
-  battleRhythm?: number;
-  battleRhythmEvery?: number;
-  battleRhythmRagePct?: number;
-  battleRhythmDmgPct?: number;
   bloodbathPct?: number;
   bloodbathDuration?: number;
   bloodbathMaxPct?: number;
@@ -374,17 +366,9 @@ function zeroGlobal(): Required<GlobalModEffect> {
     spellHastePct: 0,
     critVsRooted: 0,
     cheatDeathIcd: 0,
-    secondWindPctPerSec: 0,
-    secondWindHpBelow: 0,
     fearBreakPct: 0,
     onKillSpeedPct: 0,
     onKillSpeedDuration: 0,
-    autoRagePct: 0,
-    abilityRagePct: 0,
-    battleRhythm: 0,
-    battleRhythmEvery: 0,
-    battleRhythmRagePct: 0,
-    battleRhythmDmgPct: 0,
     bloodbathPct: 0,
     bloodbathDuration: 0,
     bloodbathMaxPct: 0,
@@ -467,17 +451,9 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.critDmgPct += (e.critDmgPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
-    g.secondWindPctPerSec += (e.secondWindPctPerSec ?? 0) * mult;
-    g.secondWindHpBelow += (e.secondWindHpBelow ?? 0) * mult;
     g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
     g.onKillSpeedPct += (e.onKillSpeedPct ?? 0) * mult;
     g.onKillSpeedDuration += (e.onKillSpeedDuration ?? 0) * mult;
-    g.autoRagePct += (e.autoRagePct ?? 0) * mult;
-    g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
-    g.battleRhythm += (e.battleRhythm ?? 0) * mult;
-    g.battleRhythmEvery += (e.battleRhythmEvery ?? 0) * mult;
-    g.battleRhythmRagePct += (e.battleRhythmRagePct ?? 0) * mult;
-    g.battleRhythmDmgPct += (e.battleRhythmDmgPct ?? 0) * mult;
     g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
     g.bloodbathDuration += (e.bloodbathDuration ?? 0) * mult;
     g.bloodbathMaxPct += (e.bloodbathMaxPct ?? 0) * mult;

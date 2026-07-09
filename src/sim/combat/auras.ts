@@ -95,14 +95,6 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
   }
-  const secondWind = ctx.playerMods(meta).global.secondWindPctPerSec;
-  if (secondWind > 0 && p.hp > 0 && p.hp < p.maxHp * 0.35) {
-    const heal = Math.min(Math.round(p.maxHp * secondWind * 2), p.maxHp - p.hp);
-    if (heal > 0) {
-      p.hp += heal;
-      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
-    }
-  }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {
     const c = p[slot];

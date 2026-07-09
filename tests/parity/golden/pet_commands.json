@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "2fe0f8ba",
+      "state": "cd2e74a2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -122,7 +122,6 @@
             "str": 14
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -135,7 +134,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "b88824c9",
+      "state": "c0431ec9",
       "events": "e042fd30",
       "rng": {
         "draws": 0,
@@ -235,7 +234,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -277,7 +275,6 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -290,7 +287,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "abd8bf44",
+      "state": "d0eba1a8",
       "events": "97340448",
       "rng": {
         "draws": 0,
@@ -390,7 +387,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -446,7 +442,6 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -459,7 +454,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "3665cfe2",
+      "state": "c431ea3e",
       "events": "d70fb9f2",
       "rng": {
         "draws": 0,
@@ -470,7 +465,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "52ee869c",
+      "state": "86443690",
       "events": "1a2734ed",
       "rng": {
         "draws": 0,
@@ -481,7 +476,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "82227ae7",
+      "state": "a166cd4f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -581,7 +576,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -639,7 +633,6 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -700,7 +693,6 @@
               52
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -713,7 +705,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "463d9d25",
+      "state": "de636535",
       "events": "5aadc799",
       "rng": {
         "draws": 0,
@@ -813,7 +805,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -870,7 +861,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -883,7 +873,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "bf49ea27",
+      "state": "bb3072df",
       "events": "1b51753b",
       "rng": {
         "draws": 0,
@@ -983,7 +973,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1040,7 +1029,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1082,7 +1070,6 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -1095,7 +1082,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "e0ba6613",
+      "state": "37c100eb",
       "events": "39bbf203",
       "rng": {
         "draws": 0,
@@ -1195,7 +1182,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1252,7 +1238,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1294,7 +1279,6 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -1307,7 +1291,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "463d9d25",
+      "state": "de636535",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1407,7 +1391,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1464,7 +1447,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1477,7 +1459,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "463d9d25",
+      "state": "de636535",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1577,7 +1559,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1634,7 +1615,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1647,7 +1627,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 414,
-      "state": "e1db39c8",
+      "state": "44f87d08",
       "events": "d74bfbad",
       "rng": {
         "draws": 0,
@@ -1791,7 +1771,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1848,7 +1827,6 @@
               30
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1905,7 +1883,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1947,7 +1924,6 @@
             "armor": 88
           },
           "templateId": "emberkin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 21,
             "min": 14,
@@ -1960,7 +1936,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 414,
-      "state": "f4a0a1a3",
+      "state": "c7228eb3",
       "events": "a919d341",
       "rng": {
         "draws": 82,
@@ -1971,7 +1947,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 414,
-      "state": "e87a0933",
+      "state": "90d75ee3",
       "events": "1005cba8",
       "rng": {
         "draws": 158,
@@ -1982,7 +1958,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 414,
-      "state": "e87a0933",
+      "state": "90d75ee3",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -2129,7 +2105,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2194,7 +2169,6 @@
               17
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2251,7 +2225,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2293,7 +2266,6 @@
             "armor": 88
           },
           "templateId": "emberkin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 21,
             "min": 14,
@@ -2306,7 +2278,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 415,
-      "state": "b35df791",
+      "state": "9d6d4b65",
       "events": "e3337e5d",
       "rng": {
         "draws": 158,
@@ -2453,7 +2425,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2518,7 +2489,6 @@
               17
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2575,7 +2545,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2588,7 +2557,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 417,
-      "state": "75d6aca2",
+      "state": "64bc7bd2",
       "events": "4966d07c",
       "rng": {
         "draws": 158,
@@ -2735,7 +2704,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2800,7 +2768,6 @@
               17
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2857,7 +2824,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2908,7 +2874,6 @@
               20
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2921,7 +2886,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 417,
-      "state": "75d6aca2",
+      "state": "64bc7bd2",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -3068,7 +3033,6 @@
             "str": 25
           },
           "templateId": "hunter",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3133,7 +3097,6 @@
               17
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -3190,7 +3153,6 @@
             "str": 11
           },
           "templateId": "warlock",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3241,7 +3203,6 @@
               20
             ]
           ],
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,

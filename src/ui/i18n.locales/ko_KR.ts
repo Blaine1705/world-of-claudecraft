@@ -2300,12 +2300,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.name': '강철 회오리',
   'entities.abilities.bladestorm.description':
     '강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다. (전사 특성)',
-  'entities.abilities.swordguard.name': '검의 수호',
-  'entities.abilities.swordguard.description':
-    '8초 동안 받는 피해가 10% 감소하며, 생명력이 30% 미만이면 20% 감소합니다. (전사 특성)',
-  'entities.abilities.triumph_rush.name': '승전 돌격',
-  'entities.abilities.triumph_rush.description':
-    '적을 처치한 뒤 20초 안에 무기 피해에 {damage}를 더해 입히고 최대 생명력의 20%를 회복합니다. (전사 특성)',
   'entities.abilities.razor_howl.name': '칼날 포효',
   'entities.abilities.razor_howl.description':
     '15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)',

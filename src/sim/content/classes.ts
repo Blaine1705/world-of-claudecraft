@@ -4002,40 +4002,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Become a storm of steel, striking nearby enemies each second for $d. (Warrior talent)',
   },
-  swordguard: {
-    id: 'swordguard',
-    name: 'Swordguard',
-    class: 'warrior',
-    learnLevel: 10,
-    cost: 0,
-    castTime: 0,
-    cooldown: 120,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0, duration: 8 }],
-    description:
-      'Reduces damage taken by 10% for 8 sec, doubled to 20% while below 30% health. (Warrior talent)',
-  },
-  triumph_rush: {
-    id: 'triumph_rush',
-    name: 'Triumph Rush',
-    class: 'warrior',
-    learnLevel: 10,
-    cost: 0,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    requiresVictoryProc: true,
-    effects: [
-      { type: 'weaponStrike', bonus: 10 },
-      { type: 'selfHealPctMax', pct: 0.2 },
-    ],
-    description:
-      'After killing an enemy, strike for weapon damage plus $d and heal yourself for 20% of maximum health within 20 sec. (Warrior talent)',
-  },
   razor_howl: {
     id: 'razor_howl',
     name: 'Razor Howl',

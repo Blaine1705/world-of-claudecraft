@@ -163,9 +163,6 @@ export function runEffects(
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
   const mods = ctx.playerMods(meta);
-  const rhythmActive = mods.global.battleRhythm > 0 && ++p.battleRhythmCounter % 3 === 0;
-  const castDamageMult = rhythmActive ? 1.05 : 1;
-  const castResourceMult = rhythmActive ? 1.2 : 1;
   const forceCrit = hasSureCritAura(p);
   const canAreaEcho = hasAreaEchoAura(p) && abilityQualifiesForAreaEcho(res.effects);
   let spentSureCrit = false;
@@ -195,7 +192,6 @@ export function runEffects(
           weaponMult: eff.weaponMult ?? 1,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
-          damageMult: castDamageMult,
         });
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -230,7 +226,6 @@ export function runEffects(
         const crit = forceCrit || rolledCrit;
         if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
-        dmg *= castDamageMult;
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         const finalDamage = Math.round(dmg);
@@ -272,7 +267,6 @@ export function runEffects(
         const crit = forceCrit || rolledCrit;
         if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= 2 + p.critDmgBonus;
-        dmg *= castDamageMult;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -1185,7 +1179,6 @@ export function runEffects(
           const crit = forceCrit || rolledCrit;
           if (forceCrit) spentSureCrit = true;
           if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
-          dmg *= castDamageMult;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(
@@ -1328,16 +1321,12 @@ export function runEffects(
         const rageMult =
           p.resourceType === 'rage'
             ? 1 +
-              mods.global.abilityRagePct +
               p.auras.reduce(
                 (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
                 0,
               )
             : 1;
-        p.resource = Math.min(
-          p.maxResource,
-          p.resource + Math.round(eff.amount * rageMult * castResourceMult),
-        );
+        p.resource = Math.min(p.maxResource, p.resource + Math.round(eff.amount * rageMult));
         break;
       }
       case 'selfDamagePctMax': {
@@ -1369,7 +1358,6 @@ export function runEffects(
           });
           ctx.healingThreat(p, p, healed);
         }
-        if (ability.requiresVictoryProc) p.victoryRushUntil = -1;
         break;
       }
       case 'charge': {
@@ -1382,7 +1370,6 @@ export function runEffects(
         if (p.resourceType === 'rage') {
           const rageMult =
             1 +
-            mods.global.abilityRagePct +
             p.auras.reduce(
               (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
               0,

@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "e8efb7c2",
+      "state": "c77ee89a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -113,7 +113,6 @@
             "str": 22
           },
           "templateId": "paladin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -126,7 +125,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "23fbcfee",
+      "state": "fc36ca46",
       "events": "e8ac312d",
       "rng": {
         "draws": 4,
@@ -137,7 +136,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "a60c0df9",
+      "state": "70a90ad9",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -148,7 +147,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "1db57a11",
+      "state": "96fcffcd",
       "events": "a09f41fc",
       "rng": {
         "draws": 80,
@@ -159,7 +158,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 407,
-      "state": "49afaa2c",
+      "state": "af1198a8",
       "events": "741638a5",
       "rng": {
         "draws": 170,
@@ -170,7 +169,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "76d0155e",
+      "state": "b1245d3a",
       "events": "a17b2c3e",
       "rng": {
         "draws": 270,
@@ -181,7 +180,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 407,
-      "state": "d411ded9",
+      "state": "e3303abd",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -192,7 +191,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 407,
-      "state": "4d4931ed",
+      "state": "4df5a891",
       "events": "b6995f4a",
       "rng": {
         "draws": 501,
@@ -203,7 +202,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 407,
-      "state": "55dcc07b",
+      "state": "d9267fc7",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -214,7 +213,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 407,
-      "state": "d1123595",
+      "state": "aa970099",
       "events": "df861ecc",
       "rng": {
         "draws": 765,
@@ -225,7 +224,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 407,
-      "state": "931c1c8e",
+      "state": "8b930262",
       "events": "741638a5",
       "rng": {
         "draws": 931,
@@ -236,7 +235,7 @@
       "tick": 201,
       "time": 10.05,
       "nextId": 407,
-      "state": "9cd888d2",
+      "state": "dfc56b3a",
       "events": "741638a5",
       "rng": {
         "draws": 932,
@@ -340,7 +339,6 @@
           },
           "targetId": 406,
           "templateId": "paladin",
-          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -398,7 +396,6 @@
               165
             ]
           ],
-          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 9.052871,
             "y": 1.5,

@@ -2313,12 +2313,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bladestorm.name': '鋼の旋風',
   'entities.abilities.bladestorm.description':
     '鋼の旋風となり、毎秒周囲の敵を攻撃して {damage} のダメージを与えます。（ウォリアータレント）',
-  'entities.abilities.swordguard.name': '剣の守り',
-  'entities.abilities.swordguard.description':
-    '8秒間、受けるダメージが10%減少します。体力が30%未満なら20%減少します。（ウォリアータレント）',
-  'entities.abilities.triumph_rush.name': '凱旋突撃',
-  'entities.abilities.triumph_rush.description':
-    '敵を倒した後20秒以内に、武器ダメージに {damage} を加えて与え、最大体力の20%を回復します。（ウォリアータレント）',
   'entities.abilities.razor_howl.name': '刃の咆哮',
   'entities.abilities.razor_howl.description':
     '15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）',

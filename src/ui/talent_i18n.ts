@@ -8656,17 +8656,9 @@ function effectDescription(
     if (
       key === 'critVsRooted' ||
       key === 'cheatDeathIcd' ||
-      key === 'secondWindPctPerSec' ||
-      key === 'secondWindHpBelow' ||
       key === 'fearBreakPct' ||
       key === 'onKillSpeedPct' ||
       key === 'onKillSpeedDuration' ||
-      key === 'autoRagePct' ||
-      key === 'abilityRagePct' ||
-      key === 'battleRhythm' ||
-      key === 'battleRhythmEvery' ||
-      key === 'battleRhythmRagePct' ||
-      key === 'battleRhythmDmgPct' ||
       key === 'bloodbathPct' ||
       key === 'bloodbathDuration' ||
       key === 'bloodbathMaxPct' ||

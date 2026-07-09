@@ -78,8 +78,6 @@ function baseEntity(id: number, pos: Vec3): Entity {
     comboPoints: 0,
     comboUntil: -1,
     overpowerUntil: -1,
-    victoryRushUntil: -1,
-    battleRhythmCounter: 0,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
     savedMana: 0,
