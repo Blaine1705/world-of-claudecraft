@@ -53,7 +53,26 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
-type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted' | 'cheatDeathIcd'>;
+type DisplayGlobalKey = Exclude<
+  GlobalKey,
+  | 'critVsRooted'
+  | 'cheatDeathIcd'
+  | 'secondWindPctPerSec'
+  | 'secondWindHpBelow'
+  | 'fearBreakPct'
+  | 'onKillSpeedPct'
+  | 'onKillSpeedDuration'
+  | 'autoRagePct'
+  | 'abilityRagePct'
+  | 'battleRhythm'
+  | 'battleRhythmEvery'
+  | 'battleRhythmRagePct'
+  | 'battleRhythmDmgPct'
+  | 'bloodbathPct'
+  | 'bloodbathDuration'
+  | 'bloodbathMaxPct'
+  | 'cdrPerRage'
+>;
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
@@ -8438,6 +8457,8 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   if (lang === 'en' || lang === 'en_CA') return source;
   const abilityId = abilityIdByName.get(source);
   if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  const warriorPortOverride = warriorPortTitleOverride(lang, source);
+  if (warriorPortOverride !== undefined) return warriorPortOverride;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
@@ -8445,6 +8466,87 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   // talent that still needs a localized override — clean English is preferable to a
   // broken word-by-word guess, and the leak-guard test flags it for translation.
   return source;
+}
+
+const WARRIOR_PORT_TITLE_NAMES = new Set([
+  'Twin Onrush',
+  'Hot Pursuit',
+  'Crushing Onrush',
+  'Rallying Breath',
+  'Lingering Dread',
+  'Rage Discipline',
+  'Blood Offering',
+  'Battle Rhythm',
+  'Red Harvest',
+  "Giant's Momentum",
+]);
+
+const WARRIOR_PORT_NONLATIN_TITLES: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+  zh_CN: {
+    'Twin Onrush': '双重冲锋',
+    'Hot Pursuit': '热追',
+    'Crushing Onrush': '碾压冲锋',
+    'Rallying Breath': '振作呼吸',
+    'Lingering Dread': '余惧',
+    'Rage Discipline': '怒气纪律',
+    'Blood Offering': '鲜血献礼',
+    'Battle Rhythm': '战斗节奏',
+    'Red Harvest': '赤色收割',
+    "Giant's Momentum": '巨人动势',
+  },
+  zh_TW: {
+    'Twin Onrush': '雙重衝鋒',
+    'Hot Pursuit': '熱追',
+    'Crushing Onrush': '碾壓衝鋒',
+    'Rallying Breath': '振作呼吸',
+    'Lingering Dread': '餘懼',
+    'Rage Discipline': '怒氣紀律',
+    'Blood Offering': '鮮血獻禮',
+    'Battle Rhythm': '戰鬥節奏',
+    'Red Harvest': '赤色收割',
+    "Giant's Momentum": '巨人動勢',
+  },
+  ko_KR: {
+    'Twin Onrush': '쌍중 돌진',
+    'Hot Pursuit': '맹추격',
+    'Crushing Onrush': '분쇄 돌진',
+    'Rallying Breath': '분발의 숨결',
+    'Lingering Dread': '남은 공포',
+    'Rage Discipline': '분노 절제',
+    'Blood Offering': '피의 공물',
+    'Battle Rhythm': '전투 박자',
+    'Red Harvest': '붉은 수확',
+    "Giant's Momentum": '거인의 기세',
+  },
+  ja_JP: {
+    'Twin Onrush': '双連突撃',
+    'Hot Pursuit': '猛追',
+    'Crushing Onrush': '粉砕突撃',
+    'Rallying Breath': '奮起の息吹',
+    'Lingering Dread': '残る恐怖',
+    'Rage Discipline': '怒気の律',
+    'Blood Offering': '血の供物',
+    'Battle Rhythm': '戦の拍子',
+    'Red Harvest': '赤き収穫',
+    "Giant's Momentum": '巨人の勢い',
+  },
+  ru_RU: {
+    'Twin Onrush': 'Двойной натиск',
+    'Hot Pursuit': 'Погоня',
+    'Crushing Onrush': 'Сокрушающий натиск',
+    'Rallying Breath': 'Бодрящее дыхание',
+    'Lingering Dread': 'Тянущийся ужас',
+    'Rage Discipline': 'Дисциплина ярости',
+    'Blood Offering': 'Кровавое подношение',
+    'Battle Rhythm': 'Боевой ритм',
+    'Red Harvest': 'Красная жатва',
+    "Giant's Momentum": 'Поступь исполина',
+  },
+};
+
+function warriorPortTitleOverride(lang: SupportedLanguage, source: string): string | undefined {
+  if (!WARRIOR_PORT_TITLE_NAMES.has(source)) return undefined;
+  return WARRIOR_PORT_NONLATIN_TITLES[lang]?.[source] ?? source;
 }
 
 function abilityName(id: string): string {
@@ -8456,7 +8558,10 @@ function abilityName(id: string): string {
 // "Riposte", Spanish "Vigor") apart from a name that leaks English by accident
 // because the word-substitution dictionary does not cover its vocabulary.
 export function hasTalentTitleOverride(lang: SupportedLanguage, source: string): boolean {
-  return titleOverrides[lang]?.[source] !== undefined;
+  return (
+    warriorPortTitleOverride(lang, source) !== undefined ||
+    titleOverrides[lang]?.[source] !== undefined
+  );
 }
 
 // Public wrapper: localize a content title given its English source name. Resolves an
@@ -8498,7 +8603,26 @@ function effectDescription(
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
-    if (key === 'critVsRooted' || key === 'cheatDeathIcd') continue;
+    if (
+      key === 'critVsRooted' ||
+      key === 'cheatDeathIcd' ||
+      key === 'secondWindPctPerSec' ||
+      key === 'secondWindHpBelow' ||
+      key === 'fearBreakPct' ||
+      key === 'onKillSpeedPct' ||
+      key === 'onKillSpeedDuration' ||
+      key === 'autoRagePct' ||
+      key === 'abilityRagePct' ||
+      key === 'battleRhythm' ||
+      key === 'battleRhythmEvery' ||
+      key === 'battleRhythmRagePct' ||
+      key === 'battleRhythmDmgPct' ||
+      key === 'bloodbathPct' ||
+      key === 'bloodbathDuration' ||
+      key === 'bloodbathMaxPct' ||
+      key === 'cdrPerRage'
+    )
+      continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
   }
 

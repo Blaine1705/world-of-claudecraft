@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "06b9e332",
+      "state": "adcfd5de",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -109,6 +109,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -121,7 +122,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "f222fe94",
+      "state": "aef4f104",
       "events": "516d06f7",
       "rng": {
         "draws": 14,
@@ -132,7 +133,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "00bdc2d4",
+      "state": "af5c0709",
       "events": "c8749703",
       "rng": {
         "draws": 28,
@@ -143,7 +144,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 408,
-      "state": "30b95dab",
+      "state": "a59d49af",
       "events": "7fd88fd9",
       "rng": {
         "draws": 57,
@@ -244,7 +245,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 12.025641,
+          "resource": 12,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -262,6 +263,7 @@
           },
           "targetId": 406,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -333,6 +335,7 @@
               200
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -377,6 +380,7 @@
           "swingTimer": 1.35,
           "targetId": 405,
           "templateId": "ridge_stalker",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 50,
             "min": 32,
@@ -389,7 +393,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 408,
-      "state": "bab2563a",
+      "state": "6b1d70a8",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -491,7 +495,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 12.025641,
+          "resource": 12,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -509,6 +513,7 @@
           },
           "targetId": 406,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -581,6 +586,7 @@
               200
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -625,6 +631,7 @@
           "swingTimer": 1.15,
           "targetId": 405,
           "templateId": "ridge_stalker",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 50,
             "min": 32,

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "98db0b25",
+      "state": "2df8c609",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -114,6 +114,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -126,7 +127,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 406,
-      "state": "3103cebf",
+      "state": "3004b707",
       "events": "52e2641a",
       "rng": {
         "draws": 0,
@@ -137,7 +138,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 406,
-      "state": "4d4884ed",
+      "state": "54dafc35",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -148,7 +149,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 406,
-      "state": "0e8551ec",
+      "state": "0716a798",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -159,7 +160,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 406,
-      "state": "0cd58ea7",
+      "state": "9ba6926f",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -170,7 +171,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "301f134b",
+      "state": "d6fd7473",
       "events": "beca190f",
       "rng": {
         "draws": 271,
@@ -181,7 +182,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 408,
-      "state": "b5cb6baa",
+      "state": "92b00c4e",
       "events": "444f665f",
       "rng": {
         "draws": 366,
@@ -192,7 +193,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 408,
-      "state": "cd2d1095",
+      "state": "2a7f9af1",
       "events": "c6409e52",
       "rng": {
         "draws": 495,
@@ -203,7 +204,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 408,
-      "state": "72f104f1",
+      "state": "2f33f735",
       "events": "4c6e5ad5",
       "rng": {
         "draws": 636,
@@ -214,7 +215,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 408,
-      "state": "f6f2cd17",
+      "state": "767af81b",
       "events": "4e4cd0df",
       "rng": {
         "draws": 774,
@@ -225,7 +226,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 408,
-      "state": "45684324",
+      "state": "f559e3f0",
       "events": "8d48f7c0",
       "rng": {
         "draws": 943,
@@ -236,7 +237,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 408,
-      "state": "ca06652d",
+      "state": "dccfda5d",
       "events": "21908e56",
       "rng": {
         "draws": 1021,
@@ -247,7 +248,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 408,
-      "state": "09d5ff2d",
+      "state": "4fc416a9",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -353,6 +354,7 @@
           "swingTimer": 1.25,
           "targetId": 407,
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -399,6 +401,7 @@
           },
           "swingTimer": 0.05,
           "templateId": "gloomshade",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 15,
             "min": 10,
@@ -462,6 +465,7 @@
               26
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -474,7 +478,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 408,
-      "state": "aae1437b",
+      "state": "d634a78b",
       "events": "9f8a4417",
       "rng": {
         "draws": 1050,
@@ -580,6 +584,7 @@
           "swingTimer": 1.05,
           "targetId": 407,
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -627,6 +632,7 @@
           },
           "swingTimer": 1.85,
           "templateId": "gloomshade",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 15,
             "min": 10,
@@ -691,6 +697,7 @@
               36
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,

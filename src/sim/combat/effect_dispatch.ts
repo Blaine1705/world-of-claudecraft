@@ -33,11 +33,18 @@ import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
+import {
+  abilityQualifiesForAreaEcho,
+  consumeAreaEchoCharge,
+  echoAreaDamage,
+  hasAreaEchoAura,
+} from './area_echo';
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
@@ -155,6 +162,14 @@ export function runEffects(
   const isSpell = ability.school !== 'physical';
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
+  const mods = ctx.playerMods(meta);
+  const rhythmActive = mods.global.battleRhythm > 0 && ++p.battleRhythmCounter % 3 === 0;
+  const castDamageMult = rhythmActive ? 1.05 : 1;
+  const castResourceMult = rhythmActive ? 1.2 : 1;
+  const forceCrit = hasSureCritAura(p);
+  const canAreaEcho = hasAreaEchoAura(p) && abilityQualifiesForAreaEcho(res.effects);
+  let spentSureCrit = false;
+  let spentAreaEcho = false;
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -180,6 +195,7 @@ export function runEffects(
           weaponMult: eff.weaponMult ?? 1,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
+          damageMult: castDamageMult,
         });
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -194,7 +210,7 @@ export function runEffects(
         const rooted = isRootedOrChilled(target);
         const critChance =
           isSpell && rooted
-            ? ctx.spellCrit(p) + ctx.playerMods(meta).global.critVsRooted
+            ? ctx.spellCrit(p) + mods.global.critVsRooted
             : isSpell
               ? ctx.spellCrit(p)
               : p.critChance;
@@ -207,17 +223,21 @@ export function runEffects(
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Conditional talent damage vs a target carrying the CASTER'S DoT
         // (Twisted Faith style). Deterministic aura scan, no rng.
-        const vsDotted = ctx.playerMods(meta).abilities[ability.id]?.dmgPctVsDotted ?? 0;
+        const vsDotted = mods.abilities[ability.id]?.dmgPctVsDotted ?? 0;
         if (vsDotted > 0 && target.auras.some((a) => a.kind === 'dot' && a.sourceId === p.id))
           dmg *= 1 + vsDotted;
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
+        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
+        const crit = forceCrit || rolledCrit;
+        if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+        dmg *= castDamageMult;
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+        const finalDamage = Math.round(dmg);
         ctx.dealDamage(
           p,
           target,
-          Math.round(dmg),
+          finalDamage,
           crit,
           ability.school,
           ability.name,
@@ -225,6 +245,10 @@ export function runEffects(
           false,
           threatOpts,
         );
+        if (canAreaEcho && finalDamage > 0 && !target.dead) {
+          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          spentAreaEcho = true;
+        }
         if (isSpell) noteSpellHit(ctx, p, crit);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -244,8 +268,11 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
+        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
+        const crit = forceCrit || rolledCrit;
+        if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= 2 + p.critDmgBonus;
+        dmg *= castDamageMult;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -460,7 +487,9 @@ export function runEffects(
           baseDmg * (eff.dmgMult ?? 1) +
           (eff.flat ?? 0) +
           directHitBonus(p.spellPower, ability, res.castTime);
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+        const crit = forceCrit || rolledCrit;
+        if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= 1.5 + p.critDmgBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         noteSpellHit(ctx, p, crit);
@@ -591,6 +620,10 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
             breaksOnDamage: true,
+            breakThreshold:
+              mods.global.fearBreakPct > 0
+                ? Math.round(m.maxHp * mods.global.fearBreakPct)
+                : undefined,
           });
           ctx.enterCombat(p, m);
         }
@@ -598,6 +631,25 @@ export function runEffects(
       }
       case 'clearCooldowns': {
         for (const id of eff.abilities) p.cooldowns.delete(id);
+        break;
+      }
+      case 'breakControl': {
+        for (let i = p.auras.length - 1; i >= 0; i--) {
+          const aura = p.auras[i];
+          if (
+            aura.kind !== 'stun' &&
+            aura.kind !== 'root' &&
+            aura.kind !== 'incapacitate' &&
+            aura.kind !== 'polymorph' &&
+            aura.kind !== 'silence' &&
+            aura.kind !== 'blind' &&
+            aura.kind !== 'disarm'
+          ) {
+            continue;
+          }
+          p.auras.splice(i, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        }
         break;
       }
       case 'repositionToAim': {
@@ -1025,6 +1077,61 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyDamage': {
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: `${ability.id}_dmg`,
+            name: ability.name,
+            kind: 'buff_dmg_done',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.pct,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'aoeAllySureCrit': {
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: `${ability.id}_crit`,
+            name: ability.name,
+            kind: 'sure_crit',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: 0,
+            charges: eff.charges,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'aoeSlow': {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'nova',
+        });
+        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+          if (!ctx.hasLineOfSight(p, m)) continue;
+          ctx.applyAura(m, {
+            id: `${ability.id}_slow`,
+            name: ability.name,
+            kind: 'slow',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.mult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+          ctx.enterCombat(p, m);
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           type: 'spellfx',
@@ -1074,8 +1181,11 @@ export function runEffects(
             ctx.rng.range(eff.deal.min, eff.deal.max) +
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
-          const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          const crit = forceCrit || rolledCrit;
+          if (forceCrit) spentSureCrit = true;
           if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+          dmg *= castDamageMult;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(
@@ -1215,7 +1325,19 @@ export function runEffects(
         break;
       }
       case 'gainResource': {
-        p.resource = Math.min(p.maxResource, p.resource + eff.amount);
+        const rageMult =
+          p.resourceType === 'rage'
+            ? 1 +
+              mods.global.abilityRagePct +
+              p.auras.reduce(
+                (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
+                0,
+              )
+            : 1;
+        p.resource = Math.min(
+          p.maxResource,
+          p.resource + Math.round(eff.amount * rageMult * castResourceMult),
+        );
         break;
       }
       case 'selfDamagePctMax': {
@@ -1233,6 +1355,23 @@ export function runEffects(
         });
         break;
       }
+      case 'selfHealPctMax': {
+        const healed = Math.min(Math.round(p.maxHp * eff.pct), p.maxHp - p.hp);
+        if (healed > 0) {
+          p.hp += healed;
+          ctx.emit({
+            type: 'heal2',
+            sourceId: p.id,
+            targetId: p.id,
+            amount: healed,
+            crit: false,
+            ability: ability.name,
+          });
+          ctx.healingThreat(p, p, healed);
+        }
+        if (ability.requiresVictoryProc) p.victoryRushUntil = -1;
+        break;
+      }
       case 'charge': {
         if (!target) break;
         // the stun effect in the same ability lands this tick; the player
@@ -1240,7 +1379,16 @@ export function runEffects(
         p.chargeTargetId = target.id;
         p.chargeTimeLeft = CHARGE_MAX_DURATION;
         p.chargePath = ctx.findChargePath(p, target);
-        if (p.resourceType === 'rage') p.resource = Math.min(p.maxResource, p.resource + 9);
+        if (p.resourceType === 'rage') {
+          const rageMult =
+            1 +
+            mods.global.abilityRagePct +
+            p.auras.reduce(
+              (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
+              0,
+            );
+          p.resource = Math.min(p.maxResource, p.resource + Math.round(9 * rageMult));
+        }
         ctx.enterCombat(p, target);
         break;
       }
@@ -1344,6 +1492,9 @@ export function runEffects(
     }
     if (target?.dead) target = null;
   }
+
+  if (spentSureCrit) consumeSureCritCharge(ctx, p);
+  if (spentAreaEcho) consumeAreaEchoCharge(ctx, p);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

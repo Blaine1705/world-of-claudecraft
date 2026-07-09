@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 408,
-      "state": "5db9d69f",
+      "state": "60cc450b",
       "events": "dc5c470f",
       "rng": {
         "draws": 2,
@@ -167,6 +167,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -217,6 +218,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -263,6 +265,7 @@
           },
           "tappedById": 405,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 4,

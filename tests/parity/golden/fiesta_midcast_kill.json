@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "3251d9ec",
+      "state": "08417bde",
       "events": "11fa1beb",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "99968b94",
+      "state": "3e26a1e6",
       "events": "90b217f1",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "90d65558",
+      "state": "755351a2",
       "events": "d13b86f9",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "ea2e17dc",
+      "state": "65f73c0e",
       "events": "669c1069",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "bb6247c5",
+      "state": "05878eb8",
       "events": "1d077d66",
       "rng": {
         "draws": 300,
@@ -127,12 +127,12 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {
-              "5": "war_r5_juggernaut",
-              "8": "war_r8_pummel",
-              "11": "war_r11_berserker_rage",
-              "14": "war_r14_crippling_blows",
-              "17": "war_r17_shield_wall",
-              "20": "war_r20_bladestorm"
+              "5": "war_r5_twin_onrush",
+              "8": "war_r8_rallying_breath",
+              "11": "war_r11_razor_howl",
+              "14": "war_r14_rage_discipline",
+              "17": "war_r17_reckless_vow",
+              "20": "war_r20_giants_momentum"
             },
             "spec": "arms"
           },
@@ -335,7 +335,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 5.1717,
+          "resource": 6,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -352,6 +352,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -401,6 +402,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -453,6 +455,7 @@
             "str": 36
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -504,6 +507,7 @@
             "str": 33
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -516,7 +520,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "20114179",
+      "state": "d3f0f15c",
       "events": "f8fba87c",
       "rng": {
         "draws": 300,
@@ -568,12 +572,12 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {
-              "5": "war_r5_juggernaut",
-              "8": "war_r8_pummel",
-              "11": "war_r11_berserker_rage",
-              "14": "war_r14_crippling_blows",
-              "17": "war_r17_shield_wall",
-              "20": "war_r20_bladestorm"
+              "5": "war_r5_twin_onrush",
+              "8": "war_r8_rallying_breath",
+              "11": "war_r11_razor_howl",
+              "14": "war_r14_rage_discipline",
+              "17": "war_r17_reckless_vow",
+              "20": "war_r20_giants_momentum"
             },
             "spec": "arms"
           },
@@ -776,7 +780,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 10.343401,
+          "resource": 12,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -793,6 +797,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -842,6 +847,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -892,6 +898,7 @@
             "str": 36
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -943,6 +950,7 @@
             "str": 33
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -955,7 +963,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "6f1a5279",
+      "state": "fbb94ff2",
       "events": "a6f8a49c",
       "rng": {
         "draws": 300,
@@ -1008,12 +1016,12 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {
-              "5": "war_r5_juggernaut",
-              "8": "war_r8_pummel",
-              "11": "war_r11_berserker_rage",
-              "14": "war_r14_crippling_blows",
-              "17": "war_r17_shield_wall",
-              "20": "war_r20_bladestorm"
+              "5": "war_r5_twin_onrush",
+              "8": "war_r8_rallying_breath",
+              "11": "war_r11_razor_howl",
+              "14": "war_r14_rage_discipline",
+              "17": "war_r17_reckless_vow",
+              "20": "war_r20_giants_momentum"
             },
             "spec": "arms"
           },
@@ -1217,7 +1225,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 10.343401,
+          "resource": 12,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1234,6 +1242,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1283,6 +1292,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1333,6 +1343,7 @@
             "str": 36
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -1384,6 +1395,7 @@
             "str": 33
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1396,7 +1408,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "2f610aa1",
+      "state": "e8a17814",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1407,7 +1419,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 409,
-      "state": "0fd95bc7",
+      "state": "80b9cf50",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1460,12 +1472,12 @@
           "nodeHarvestReadyAt": {},
           "talents": {
             "rows": {
-              "5": "war_r5_juggernaut",
-              "8": "war_r8_pummel",
-              "11": "war_r11_berserker_rage",
-              "14": "war_r14_crippling_blows",
-              "17": "war_r17_shield_wall",
-              "20": "war_r20_bladestorm"
+              "5": "war_r5_twin_onrush",
+              "8": "war_r8_rallying_breath",
+              "11": "war_r11_razor_howl",
+              "14": "war_r14_rage_discipline",
+              "17": "war_r17_reckless_vow",
+              "20": "war_r20_giants_momentum"
             },
             "spec": "arms"
           },
@@ -1670,7 +1682,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 10.343401,
+          "resource": 12,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1687,6 +1699,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1736,6 +1749,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1787,6 +1801,7 @@
             "str": 36
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -1838,6 +1853,7 @@
             "str": 33
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,

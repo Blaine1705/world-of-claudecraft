@@ -725,6 +725,7 @@ export interface ResolvedAbility {
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  bonusCharges?: number;
 }
 
 export interface RewardCounters {
@@ -4187,6 +4188,7 @@ export class Sim {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
+      damageMult?: number;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);

@@ -3,7 +3,7 @@ import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
 
 const CLASSES: PlayerClass[] = [
   'warrior',
@@ -68,6 +68,7 @@ describe('every row-granted spell casts on its class', () => {
         p.gcdRemaining = 0;
         p.hp = p.maxHp;
         if (g.ability === 'hammer_of_wrath') mob.hp = Math.floor(mob.maxHp * 0.1); // execute window
+        if (g.ability === 'triumph_rush') p.victoryRushUntil = Number.POSITIVE_INFINITY;
         if (g.ability === 'frenzied_regeneration') {
           sim.castAbility('bear_form'); // Bruin Form gate
           for (let i = 0; i < 3; i++) sim.tick();
@@ -75,15 +76,14 @@ describe('every row-granted spell casts on its class', () => {
           p.gcdRemaining = 0;
         }
         const cdBefore = p.cooldowns.get(g.ability);
-        const events = [];
+        const events: SimEvent[] = [];
         sim.castAbility(g.ability);
         for (let i = 0; i < 6; i++) events.push(...sim.tick());
         const errors = events.filter(
-          (e) => e.type === 'error' && !/requires|range|facing|target/i.test(e.text ?? ''),
+          (e): e is Extract<SimEvent, { type: 'error' }> =>
+            e.type === 'error' && !/requires|range|facing|target/i.test(e.text),
         );
-        expect(errors, `${g.id} cast errors: ${errors.map((e: any) => e.text).join('; ')}`).toEqual(
-          [],
-        );
+        expect(errors, `${g.id} cast errors: ${errors.map((e) => e.text).join('; ')}`).toEqual([]);
         // Proof the cast engaged: cooldown started, GCD consumed, casting began,
         // an aura landed on someone, or the target took damage.
         const engaged =

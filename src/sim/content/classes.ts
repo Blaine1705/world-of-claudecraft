@@ -3946,8 +3946,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 80, duration: 20 }],
-    description: 'Transform into a colossus, increasing attack power for 20 sec. (Warrior talent)',
+    effects: [
+      { type: 'breakControl' },
+      { type: 'selfBuff', kind: 'buff_dmg_done', value: 0.2, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_scale', value: 1.25, duration: 20 },
+    ],
+    description:
+      'Break control effects and become a colossus, increasing damage dealt by 20% for 20 sec. (Warrior talent)',
   },
   avenging_wrath: {
     id: 'avenging_wrath',
@@ -3996,6 +4001,105 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeDamage', min: 30, max: 42, radius: 8 }],
     description:
       'Become a storm of steel, striking nearby enemies each second for $d. (Warrior talent)',
+  },
+  swordguard: {
+    id: 'swordguard',
+    name: 'Swordguard',
+    class: 'warrior',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0, duration: 8 }],
+    description:
+      'Reduces damage taken by 10% for 8 sec, doubled to 20% while below 30% health. (Warrior talent)',
+  },
+  triumph_rush: {
+    id: 'triumph_rush',
+    name: 'Triumph Rush',
+    class: 'warrior',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    requiresVictoryProc: true,
+    effects: [
+      { type: 'weaponStrike', bonus: 10 },
+      { type: 'selfHealPctMax', pct: 0.2 },
+    ],
+    description:
+      'After killing an enemy, strike for weapon damage plus $d and heal yourself for 20% of maximum health within 20 sec. (Warrior talent)',
+  },
+  razor_howl: {
+    id: 'razor_howl',
+    name: 'Razor Howl',
+    class: 'warrior',
+    learnLevel: 10,
+    cost: 10,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeSlow', mult: 0.5, duration: 8, radius: 15 }],
+    description: 'A shout that slows enemies within 15 yd by 50% for 8 sec. (Warrior talent)',
+  },
+  stormthrow: {
+    id: 'stormthrow',
+    name: 'Stormthrow',
+    class: 'warrior',
+    learnLevel: 10,
+    cost: 20,
+    castTime: 0,
+    cooldown: 30,
+    range: 20,
+    school: 'physical',
+    requiresTarget: true,
+    projectile: true,
+    effects: [{ type: 'stun', duration: 3 }],
+    description: 'Hurl your weapon to stun a target for 3 sec. (Warrior talent)',
+  },
+  reckless_vow: {
+    id: 'reckless_vow',
+    name: 'Reckless Vow',
+    class: 'warrior',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'buff_rage_gen', value: 0.5, duration: 12 },
+      { type: 'selfBuff', kind: 'buff_crit', value: 0.2, duration: 12 },
+    ],
+    description:
+      'Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)',
+  },
+  red_banner: {
+    id: 'red_banner',
+    name: 'Red Banner',
+    class: 'warrior',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [
+      { type: 'aoeAllyHaste', mult: 1.1, duration: 20, radius: 30 },
+      { type: 'aoeAllyDamage', pct: 0.1, duration: 20, radius: 30 },
+    ],
+    description:
+      'You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)',
   },
   blink: {
     id: 'blink',
@@ -4737,6 +4841,7 @@ export interface KnownAbility {
   threatFlat: number;
   threatMult: number;
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  bonusCharges?: number;
 }
 
 const INTEGRAL_BUFF_KINDS: ReadonlySet<AuraKind> = new Set([
@@ -4878,6 +4983,7 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
+    if (am.bonusCharges) entry.bonusCharges = (entry.bonusCharges ?? 0) + am.bonusCharges;
     // buffPct strengthens a buff-like effect. Count-like aura values round to whole
     // points; rate and multiplier values keep their fractions.
     if (am.buffPct) {
@@ -4937,6 +5043,7 @@ export function abilitiesKnownAt(
       effects,
       threatFlat,
       threatMult,
+      bonusCharges: 0,
     };
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);

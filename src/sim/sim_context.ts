@@ -573,6 +573,7 @@ export interface SimContextCallbacks {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
+      damageMult?: number;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;

@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 415,
-      "state": "515c08e0",
+      "state": "0140ed41",
       "events": "04e30b94",
       "rng": {
         "draws": 20,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 415,
-      "state": "7edf1cf0",
+      "state": "b1e9b59b",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 415,
-      "state": "b6c03967",
+      "state": "a969e0b3",
       "events": "7893d42f",
       "rng": {
         "draws": 23,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 415,
-      "state": "59958332",
+      "state": "e99c6676",
       "events": "ac44caaf",
       "rng": {
         "draws": 26,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 415,
-      "state": "8a2526ff",
+      "state": "7abc443b",
       "events": "abd40a9b",
       "rng": {
         "draws": 26,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 415,
-      "state": "18454dfe",
+      "state": "81d1f98e",
       "events": "741638a5",
       "rng": {
         "draws": 26,
@@ -101,7 +101,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 415,
-      "state": "f8e07808",
+      "state": "bc9d89c4",
       "events": "abd40a9b",
       "rng": {
         "draws": 26,
@@ -112,7 +112,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 415,
-      "state": "fa89a556",
+      "state": "248c3e1e",
       "events": "17509a3f",
       "rng": {
         "draws": 27,
@@ -123,7 +123,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 415,
-      "state": "7b5634a5",
+      "state": "2f68e36e",
       "events": "d21f48c6",
       "rng": {
         "draws": 68,
@@ -134,7 +134,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 415,
-      "state": "5f658231",
+      "state": "a44458b2",
       "events": "c7ef8fd1",
       "rng": {
         "draws": 93,
@@ -145,7 +145,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 415,
-      "state": "b037d8ae",
+      "state": "cd0a2a6e",
       "events": "abd40a9b",
       "rng": {
         "draws": 105,
@@ -156,7 +156,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 415,
-      "state": "a6e9ccbf",
+      "state": "64a03083",
       "events": "ba8f2f9a",
       "rng": {
         "draws": 129,
@@ -167,7 +167,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 415,
-      "state": "8069e607",
+      "state": "c0ace10b",
       "events": "abd40a9b",
       "rng": {
         "draws": 151,
@@ -178,7 +178,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 415,
-      "state": "3628dfc4",
+      "state": "d8da1978",
       "events": "741638a5",
       "rng": {
         "draws": 173,
@@ -189,7 +189,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 415,
-      "state": "4e5d2437",
+      "state": "782e3037",
       "events": "942a6751",
       "rng": {
         "draws": 198,
@@ -200,7 +200,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 415,
-      "state": "099ffd2c",
+      "state": "ff520ee0",
       "events": "741638a5",
       "rng": {
         "draws": 217,
@@ -211,7 +211,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 415,
-      "state": "6e3fe754",
+      "state": "e90adbcc",
       "events": "b8e05e41",
       "rng": {
         "draws": 255,
@@ -222,7 +222,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 415,
-      "state": "ad1b9cc3",
+      "state": "5ef71958",
       "events": "82c3dc4e",
       "rng": {
         "draws": 286,
@@ -233,7 +233,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 415,
-      "state": "8481dec3",
+      "state": "08dde0eb",
       "events": "abd40a9b",
       "rng": {
         "draws": 316,
@@ -244,7 +244,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 415,
-      "state": "37bda60a",
+      "state": "aa250582",
       "events": "741638a5",
       "rng": {
         "draws": 341,
@@ -255,7 +255,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 415,
-      "state": "c05454af",
+      "state": "9499dc4b",
       "events": "117ad5ab",
       "rng": {
         "draws": 376,
@@ -266,7 +266,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 415,
-      "state": "20ebfe9b",
+      "state": "34d958cf",
       "events": "27e0d029",
       "rng": {
         "draws": 399,
@@ -277,7 +277,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 415,
-      "state": "8b63322e",
+      "state": "8687c4c6",
       "events": "abd40a9b",
       "rng": {
         "draws": 423,
@@ -288,7 +288,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 415,
-      "state": "74f7a8a2",
+      "state": "da294e0e",
       "events": "dd44ceea",
       "rng": {
         "draws": 484,
@@ -299,7 +299,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 415,
-      "state": "74f7a8a2",
+      "state": "da294e0e",
       "events": "741638a5",
       "rng": {
         "draws": 484,
@@ -583,6 +583,7 @@
           "swingTimer": 0.05,
           "targetId": 410,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -637,6 +638,7 @@
           "swingTimer": 1.25,
           "targetId": 411,
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -698,6 +700,7 @@
           "swingTimer": 0.65,
           "targetId": 412,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -753,6 +756,7 @@
           "swingTimer": 0.65,
           "targetId": 413,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -807,6 +811,7 @@
           "swingTimer": 1.25,
           "targetId": 414,
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -864,6 +869,7 @@
               329
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 10,
             "min": 6,
@@ -921,6 +927,7 @@
               61
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -975,6 +982,7 @@
               54
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -1031,6 +1039,7 @@
               69
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 26.013586,
             "y": 2.800258,
@@ -1093,6 +1102,7 @@
               20
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 57.452186,
             "y": 1.950071,
@@ -1111,7 +1121,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 415,
-      "state": "ef3f22e2",
+      "state": "bb9aa342",
       "events": "31f1b3ef",
       "rng": {
         "draws": 520,
@@ -1122,7 +1132,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 415,
-      "state": "1f8e7b9a",
+      "state": "a203f58e",
       "events": "741638a5",
       "rng": {
         "draws": 526,
@@ -1386,7 +1396,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 85.444444,
+          "resource": 85,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1405,6 +1415,7 @@
           "swingTimer": 1.75,
           "targetId": 410,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1458,6 +1469,7 @@
           "swingTimer": 0.95,
           "targetId": 411,
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -1513,6 +1525,7 @@
           "swingTimer": 0.35,
           "targetId": 412,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1568,6 +1581,7 @@
           "swingTimer": 0.35,
           "targetId": 413,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1622,6 +1636,7 @@
           "swingTimer": 0.95,
           "targetId": 414,
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1679,6 +1694,7 @@
               489
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 10,
             "min": 6,
@@ -1736,6 +1752,7 @@
               61
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -1790,6 +1807,7 @@
               54
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -1846,6 +1864,7 @@
               69
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 26.013586,
             "y": 2.800258,
@@ -1908,6 +1927,7 @@
               20
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 57.452186,
             "y": 1.950071,
@@ -1926,7 +1946,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 415,
-      "state": "1f8e7b9a",
+      "state": "a203f58e",
       "events": "741638a5",
       "rng": {
         "draws": 526,
@@ -2190,7 +2210,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 85.444444,
+          "resource": 85,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2209,6 +2229,7 @@
           "swingTimer": 1.75,
           "targetId": 410,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2262,6 +2283,7 @@
           "swingTimer": 0.95,
           "targetId": 411,
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -2317,6 +2339,7 @@
           "swingTimer": 0.35,
           "targetId": 412,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2372,6 +2395,7 @@
           "swingTimer": 0.35,
           "targetId": 413,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2426,6 +2450,7 @@
           "swingTimer": 0.95,
           "targetId": 414,
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2483,6 +2508,7 @@
               489
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 10,
             "min": 6,
@@ -2540,6 +2566,7 @@
               61
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -2594,6 +2621,7 @@
               54
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -2650,6 +2678,7 @@
               69
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 26.013586,
             "y": 2.800258,
@@ -2712,6 +2741,7 @@
               20
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 57.452186,
             "y": 1.950071,

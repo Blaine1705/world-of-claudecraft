@@ -245,6 +245,7 @@ export function meleeSwing(
     weaponMult?: number;
     threatFlat?: number;
     threatMult?: number;
+    damageMult?: number;
   },
 ): boolean {
   const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
@@ -303,6 +304,7 @@ export function meleeSwing(
   );
   const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
   if (crit) dmg *= 2 + attacker.critDmgBonus;
+  if (opts.damageMult !== undefined) dmg *= opts.damageMult;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   ctx.dealDamage(
     attacker,

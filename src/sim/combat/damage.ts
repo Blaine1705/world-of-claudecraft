@@ -54,6 +54,9 @@ import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './
 const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
+const PURSUIT_AURA_ID = 'war_pursuit_speed';
+const BLOODBATH_AURA_ID = 'war_bloodbath';
+const VICTORY_RUSH_WINDOW = 20;
 
 // A handful of casts ignore classic-era spell pushback (e.g. ghost_wolf). Sole user is
 // the dealDamage pushback branch, so the predicate lives here with it.
@@ -103,6 +106,10 @@ export function dealDamage(
   ) {
     amount = Math.round(amount * 0.9);
   }
+  if (source && source.id !== target.id && target.auras.some((a) => a.kind === 'die_by_sword')) {
+    const cut = target.hp <= target.maxHp * 0.3 ? 0.2 : 0.1;
+    amount = Math.round(amount * (1 - cut));
+  }
 
   // Expose: a cracked-guard debuff amplifies the physical damage the victim
   // takes (from any attacker) until it expires. Armor is already applied at the
@@ -139,6 +146,10 @@ export function dealDamage(
   if (source && source.id !== target.id) {
     const hexMult = ctx.hexOutputMult(source);
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
+    let outgoing = 0;
+    for (const a of source.auras)
+      if (a.kind === 'buff_dmg_done') outgoing += a.value * (a.stacks ?? 1);
+    if (outgoing > 0) amount = Math.round(amount * (1 + outgoing));
   }
 
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
@@ -393,10 +404,15 @@ export function dealDamage(
     }
     for (let i = target.auras.length - 1; i >= 0; i--) {
       if (target.auras[i].breaksOnDamage) {
+        const aura = target.auras[i];
+        if (aura.breakThreshold !== undefined) {
+          aura.damageAccrued = (aura.damageAccrued ?? 0) + amount;
+          if (aura.damageAccrued < aura.breakThreshold) continue;
+        }
         ctx.emit({
           type: 'aura',
           targetId: target.id,
-          name: target.auras[i].name,
+          name: aura.name,
           gained: false,
         });
         target.auras.splice(i, 1);
@@ -479,10 +495,16 @@ export function dealDamage(
     if (meta) meta.counters.damageDealt += amount;
     // Talent procs listening for spell crits (deterministic, no rng draw).
     if (crit && school !== 'physical' && ability) onSpellCrit(ctx, source, ability, target);
-    if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
+    if (meta && source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
+      const mods = ctx.playerMods(meta).global;
+      const auraMult = source.auras.reduce(
+        (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
+        0,
+      );
       source.resource = Math.min(
         source.maxResource,
-        source.resource + rageFromDealing(amount, source.level),
+        source.resource +
+          Math.round(rageFromDealing(amount, source.level) * (1 + mods.autoRagePct + auraMult)),
       );
     }
   }
@@ -492,9 +514,15 @@ export function dealDamage(
     // Talent procs listening for big single hits (deterministic, ICD-gated).
     if (amount > 0 && !target.dead) onDamageTaken(ctx, target, amount);
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
+      const mods = meta ? ctx.playerMods(meta).global : null;
+      const auraMult = target.auras.reduce(
+        (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
+        0,
+      );
+      const mult = 1 + (mods?.autoRagePct ?? 0) + auraMult;
       target.resource = Math.min(
         target.maxResource,
-        target.resource + rageFromTaking(amount, source.level),
+        target.resource + Math.round(rageFromTaking(amount, source.level) * mult),
       );
     }
     if (isConsuming(target)) {
@@ -780,6 +808,49 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
 
       meta.counters.kills++;
       if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
+      const creditMods = ctx.playerMods(meta);
+      if (creditMods.global.onKillSpeedPct > 0) {
+        ctx.applyAura(creditEntity, {
+          id: PURSUIT_AURA_ID,
+          name: 'Hot Pursuit',
+          kind: 'buff_speed',
+          remaining: 6,
+          duration: 6,
+          value: 1 + creditMods.global.onKillSpeedPct,
+          sourceId: creditEntity.id,
+          school: 'physical',
+        });
+      }
+      if (meta.known.some((known) => known.def.id === 'triumph_rush')) {
+        creditEntity.victoryRushUntil = ctx.time + VICTORY_RUSH_WINDOW;
+      }
+      if (creditMods.global.bloodbathPct > 0) {
+        const applyBloodbath = (kind: 'buff_dmg_done' | 'buff_crit', suffix: string) => {
+          const existing = creditEntity.auras.find(
+            (a) => a.id === `${BLOODBATH_AURA_ID}_${suffix}` && a.sourceId === creditEntity.id,
+          );
+          if (existing) {
+            existing.stacks = Math.min(5, (existing.stacks ?? 1) + 1);
+            existing.remaining = 8;
+            existing.duration = 8;
+            return;
+          }
+          ctx.applyAura(creditEntity, {
+            id: `${BLOODBATH_AURA_ID}_${suffix}`,
+            name: 'Red Harvest',
+            kind,
+            remaining: 8,
+            duration: 8,
+            value: creditMods.global.bloodbathPct,
+            stacks: 1,
+            sourceId: creditEntity.id,
+            school: 'physical',
+          });
+        };
+        applyBloodbath('buff_dmg_done', 'dmg');
+        applyBloodbath('buff_crit', 'crit');
+        recalcPlayerStats(creditEntity, meta.cls, meta.equipment, creditMods);
+      }
       // combo points are character-bound: unspent points survive the kill and
       // carry to the next target (they fade on their own via updateComboExpiry)
       for (const member of eligible) {

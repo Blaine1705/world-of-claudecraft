@@ -63,7 +63,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
 }
 
-export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
+export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   // Lifesap: living sap restores a flat amount of WHATEVER the current resource
   // is, every classic tick, in combat and across form shifts. Hard control
@@ -95,6 +95,14 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
   }
+  const secondWind = ctx.playerMods(meta).global.secondWindPctPerSec;
+  if (secondWind > 0 && p.hp > 0 && p.hp < p.maxHp * 0.35) {
+    const heal = Math.min(Math.round(p.maxHp * secondWind * 2), p.maxHp - p.hp);
+    if (heal > 0) {
+      p.hp += heal;
+      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+    }
+  }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {
     const c = p[slot];
@@ -121,6 +129,24 @@ export function updateTimers(p: Entity): void {
     const nv = v - DT;
     if (nv <= 0) p.cooldowns.delete(k);
     else p.cooldowns.set(k, nv);
+  }
+  if (p.abilityCharges) {
+    for (const [abilityId, state] of Object.entries(p.abilityCharges)) {
+      if (state.charges >= state.maxCharges) continue;
+      state.recharge -= DT;
+      if (state.recharge > 0) {
+        if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+        continue;
+      }
+      state.charges = Math.min(state.maxCharges, state.charges + 1);
+      if (state.charges < state.maxCharges) {
+        state.recharge += state.rechargeLength;
+        if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+      } else {
+        state.recharge = 0;
+        p.cooldowns.delete(abilityId);
+      }
+    }
   }
 }
 

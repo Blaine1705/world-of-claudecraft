@@ -75,6 +75,7 @@ export interface AbilityModEffect {
   // effect_dispatch at hit time, never baked into the resolved min/max.
   dmgPctVsDotted?: number;
   castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
+  bonusCharges?: number; // extra stored uses for cooldown abilities (1 = two total charges)
   addEffects?: AbilityEffect[];
 }
 
@@ -103,6 +104,21 @@ export interface GlobalModEffect {
   // 1 hp instead, once per this many seconds (0 disables). Consumed in
   // combat/damage.ts behind the procState internal cooldown.
   cheatDeathIcd?: number;
+  secondWindPctPerSec?: number;
+  secondWindHpBelow?: number;
+  fearBreakPct?: number;
+  onKillSpeedPct?: number;
+  onKillSpeedDuration?: number;
+  autoRagePct?: number;
+  abilityRagePct?: number;
+  battleRhythm?: number;
+  battleRhythmEvery?: number;
+  battleRhythmRagePct?: number;
+  battleRhythmDmgPct?: number;
+  bloodbathPct?: number;
+  bloodbathDuration?: number;
+  bloodbathMaxPct?: number;
+  cdrPerRage?: number;
 }
 
 export interface TalentEffect {
@@ -173,6 +189,7 @@ export interface ResolvedAbilityMod {
   castPct: number;
   buffPct: number;
   castWhileMoving: boolean;
+  bonusCharges?: number;
   addEffects: AbilityEffect[];
 }
 
@@ -357,6 +374,21 @@ function zeroGlobal(): Required<GlobalModEffect> {
     spellHastePct: 0,
     critVsRooted: 0,
     cheatDeathIcd: 0,
+    secondWindPctPerSec: 0,
+    secondWindHpBelow: 0,
+    fearBreakPct: 0,
+    onKillSpeedPct: 0,
+    onKillSpeedDuration: 0,
+    autoRagePct: 0,
+    abilityRagePct: 0,
+    battleRhythm: 0,
+    battleRhythmEvery: 0,
+    battleRhythmRagePct: 0,
+    battleRhythmDmgPct: 0,
+    bloodbathPct: 0,
+    bloodbathDuration: 0,
+    bloodbathMaxPct: 0,
+    cdrPerRage: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -369,6 +401,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
+    bonusCharges: 0,
     addEffects: [],
   };
 }
@@ -434,6 +467,21 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.critDmgPct += (e.critDmgPct ?? 0) * mult;
     g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
+    g.secondWindPctPerSec += (e.secondWindPctPerSec ?? 0) * mult;
+    g.secondWindHpBelow += (e.secondWindHpBelow ?? 0) * mult;
+    g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
+    g.onKillSpeedPct += (e.onKillSpeedPct ?? 0) * mult;
+    g.onKillSpeedDuration += (e.onKillSpeedDuration ?? 0) * mult;
+    g.autoRagePct += (e.autoRagePct ?? 0) * mult;
+    g.abilityRagePct += (e.abilityRagePct ?? 0) * mult;
+    g.battleRhythm += (e.battleRhythm ?? 0) * mult;
+    g.battleRhythmEvery += (e.battleRhythmEvery ?? 0) * mult;
+    g.battleRhythmRagePct += (e.battleRhythmRagePct ?? 0) * mult;
+    g.battleRhythmDmgPct += (e.battleRhythmDmgPct ?? 0) * mult;
+    g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
+    g.bloodbathDuration += (e.bloodbathDuration ?? 0) * mult;
+    g.bloodbathMaxPct += (e.bloodbathMaxPct ?? 0) * mult;
+    g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
     // An ICD is a duration, not a rate: take the longest granted, ignore mult.
     g.cheatDeathIcd = Math.max(g.cheatDeathIcd, e.cheatDeathIcd ?? 0);
   }
@@ -450,6 +498,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     cur.cooldownPct += (am.cooldownPct ?? 0) * mult;
     cur.castPct += (am.castPct ?? 0) * mult;
     cur.buffPct += (am.buffPct ?? 0) * mult;
+    cur.bonusCharges = (cur.bonusCharges ?? 0) + (am.bonusCharges ?? 0) * mult;
     if (am.castWhileMoving) cur.castWhileMoving = true;
     // Added effects are rank-1 semantics, not multiplied by talent rank.
     if (am.addEffects) cur.addEffects.push(...am.addEffects);

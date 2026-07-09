@@ -69,6 +69,14 @@ import { onCastCompleted } from './talent_procs';
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
+const COLOSSAL_MIGHT_COOLDOWNS = new Set([
+  'avatar',
+  'bladestorm',
+  'reckless_vow',
+  'red_banner',
+  'bloodthirst',
+  'mortal_strike',
+]);
 
 function isFormToggle(ability: AbilityDef): boolean {
   return ability.effects.some(
@@ -120,6 +128,39 @@ function isShamanShock(abilityId: string): boolean {
     (SHAMAN_SHOCK_COOLDOWN_IDS as readonly string[]).includes(abilityId) ||
     abilityId === 'lightning_shock'
   );
+}
+
+function chargeState(p: Entity, abilityId: string, bonusCharges: number, cooldown: number) {
+  if (bonusCharges <= 0 || cooldown <= 0) return null;
+  p.abilityCharges ??= {};
+  const maxCharges = 1 + Math.max(0, Math.floor(bonusCharges));
+  const existing = p.abilityCharges[abilityId];
+  if (existing && existing.maxCharges === maxCharges && existing.rechargeLength === cooldown) {
+    return existing;
+  }
+  const state =
+    existing ??
+    ({
+      charges: maxCharges,
+      maxCharges,
+      recharge: 0,
+      rechargeLength: cooldown,
+    } satisfies NonNullable<Entity['abilityCharges']>[string]);
+  state.maxCharges = maxCharges;
+  state.rechargeLength = cooldown;
+  state.charges = Math.min(Math.max(state.charges, 0), maxCharges);
+  p.abilityCharges[abilityId] = state;
+  return state;
+}
+
+function hasAbilityCharge(
+  p: Entity,
+  abilityId: string,
+  bonusCharges: number,
+  cooldown: number,
+): boolean {
+  const state = chargeState(p, abilityId, bonusCharges, cooldown);
+  return !!state && state.charges > 0;
 }
 
 export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
@@ -302,7 +343,11 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
-  if ((p.cooldowns.has(ability.id) || sharedCooldown) && !togglingOff) {
+  if (
+    (p.cooldowns.has(ability.id) || sharedCooldown) &&
+    !togglingOff &&
+    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown)
+  ) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }
@@ -324,6 +369,10 @@ export function castAbility(
   ctx.stopFollow(p);
   if (ability.requiresDodgeProc && ctx.time > p.overpowerUntil) {
     ctx.error(p.id, 'Your target must dodge first.');
+    return;
+  }
+  if (ability.requiresVictoryProc && ctx.time > p.victoryRushUntil) {
+    ctx.error(p.id, 'You need a recent kill.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target
@@ -544,8 +593,8 @@ export function castAbility(
   }
 
   if (ability.channel) {
-    spendResource(p, res.cost);
-    armAbilityCooldown(p, ability.id, res.cooldown);
+    spendAbilityCost(ctx, p, meta, res);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
     const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
@@ -609,8 +658,14 @@ function formShiftKind(p: Entity, ability: AbilityDef): 'off' | 'cross' | null {
   return null;
 }
 
-function spendAbilityCost(p: Entity, res: ResolvedAbility): void {
+function spendAbilityCost(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  res: ResolvedAbility,
+): void {
   if (isToggleBuff(res.def) && p.auras.some((a) => a.id === res.def.id)) return;
+  const spentRage = p.resourceType === 'rage' ? res.cost : 0;
   const shift = formShiftKind(p, res.def);
   if (shift === 'off') return;
   if (shift === 'cross') {
@@ -618,6 +673,15 @@ function spendAbilityCost(p: Entity, res: ResolvedAbility): void {
     return;
   }
   spendResource(p, res.cost);
+  const rate = ctx.playerMods(meta).global.cdrPerRage;
+  if (spentRage <= 0 || rate <= 0) return;
+  const refund = spentRage * rate;
+  for (const id of COLOSSAL_MIGHT_COOLDOWNS) {
+    const cur = p.cooldowns.get(id);
+    if (cur === undefined) continue;
+    if (cur <= refund) p.cooldowns.delete(id);
+    else p.cooldowns.set(id, cur - refund);
+  }
 }
 
 function armAbilityCooldown(
@@ -625,8 +689,17 @@ function armAbilityCooldown(
   abilityId: string,
   cooldown: number,
   togglingOff = false,
+  bonusCharges = 0,
 ): void {
   if (cooldown <= 0 || togglingOff) return;
+  const state = chargeState(p, abilityId, bonusCharges, cooldown);
+  if (state) {
+    state.charges = Math.max(0, state.charges - 1);
+    if (state.charges < state.maxCharges && state.recharge <= 0) state.recharge = cooldown;
+    if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+    else p.cooldowns.delete(abilityId);
+    return;
+  }
   if (isShamanShock(abilityId)) {
     for (const id of SHAMAN_SHOCK_COOLDOWN_IDS) p.cooldowns.set(id, cooldown);
     return;
@@ -773,7 +846,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       return;
     }
     spendResource(p, billableCost());
-    armAbilityCooldown(p, ability.id, res.cooldown);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
     ctx.revivePet(p.id);
     return;
   }
@@ -840,8 +913,8 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     ability.targetType === 'friendly' ||
     (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
   ) {
-    spendAbilityCost(p, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+    spendAbilityCost(ctx, p, meta, res);
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
     ctx.runEffects(p, meta, target, res);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
@@ -859,8 +932,8 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   const firesProjectile = ability.school !== 'physical' || ability.projectile === true;
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
-    spendAbilityCost(p, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+    spendAbilityCost(ctx, p, meta, res);
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -902,8 +975,8 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     return;
   }
 
-  spendAbilityCost(p, res);
-  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+  spendAbilityCost(ctx, p, meta, res);
+  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
   ctx.runEffects(p, meta, target, res);
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
   // cloth-capable druid) and toggle-offs fall through here and must not roll.

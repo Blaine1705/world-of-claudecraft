@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "cd2e74a2",
+      "state": "2fe0f8ba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -116,6 +116,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -128,7 +129,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "d1155f19",
+      "state": "86b92671",
       "events": "6366d749",
       "rng": {
         "draws": 14,
@@ -139,7 +140,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 410,
-      "state": "18ebf3bb",
+      "state": "bdaa22c7",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -150,7 +151,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 410,
-      "state": "b3226f70",
+      "state": "37cc6f08",
       "events": "b0165842",
       "rng": {
         "draws": 109,
@@ -161,7 +162,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 410,
-      "state": "33d431c8",
+      "state": "5996771c",
       "events": "741638a5",
       "rng": {
         "draws": 187,
@@ -172,7 +173,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 410,
-      "state": "12051d09",
+      "state": "9df55f51",
       "events": "47e047d3",
       "rng": {
         "draws": 306,
@@ -183,7 +184,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "91fd8042",
+      "state": "edad3c02",
       "events": "741638a5",
       "rng": {
         "draws": 427,
@@ -194,7 +195,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "ee15f3b1",
+      "state": "65e83965",
       "events": "741638a5",
       "rng": {
         "draws": 427,
@@ -299,6 +300,7 @@
           },
           "targetId": 409,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -343,6 +345,7 @@
           },
           "swingTimer": 0.05,
           "templateId": "emberkin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 21,
             "min": 14,
@@ -400,6 +403,7 @@
               52
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 13.601517,
             "y": 1.5,
@@ -451,6 +455,7 @@
           },
           "swingTimer": 0.4,
           "templateId": "gloomshade",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 15,
             "min": 10,
@@ -514,6 +519,7 @@
               56
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -526,7 +532,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 410,
-      "state": "ac61e758",
+      "state": "2ec18d78",
       "events": "741638a5",
       "rng": {
         "draws": 520,
@@ -537,7 +543,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 410,
-      "state": "7a2ede9b",
+      "state": "6a953e6b",
       "events": "741638a5",
       "rng": {
         "draws": 641,
@@ -548,7 +554,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 410,
-      "state": "21a88eff",
+      "state": "5b146187",
       "events": "741638a5",
       "rng": {
         "draws": 773,
@@ -559,7 +565,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 410,
-      "state": "21a88eff",
+      "state": "5b146187",
       "events": "741638a5",
       "rng": {
         "draws": 773,
@@ -663,6 +669,7 @@
           },
           "targetId": 409,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -705,6 +712,7 @@
             "armor": 88
           },
           "templateId": "emberkin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 21,
             "min": 14,
@@ -750,6 +758,7 @@
           "swingTimer": 0.9,
           "tappedById": 405,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 13.601517,
             "y": 1.5,
@@ -805,6 +814,7 @@
             "armor": 495
           },
           "templateId": "gloomshade",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 15,
             "min": 10,
@@ -851,6 +861,7 @@
           "tappedById": 405,
           "targetId": 405,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,

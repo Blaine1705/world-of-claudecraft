@@ -28,7 +28,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "23a4a8ba",
+      "state": "12c0c5e6",
       "events": "fb78e213",
       "rng": {
         "draws": 0,
@@ -301,6 +301,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -351,6 +352,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -401,6 +403,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -451,6 +454,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -501,6 +505,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -513,7 +518,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "23a4a8ba",
+      "state": "12c0c5e6",
       "events": "578ba135",
       "rng": {
         "draws": 0,
@@ -786,6 +791,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -836,6 +842,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -886,6 +893,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -936,6 +944,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -986,6 +995,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -998,7 +1008,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 410,
-      "state": "2c646bd2",
+      "state": "dff3267e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1271,6 +1281,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1321,6 +1332,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1371,6 +1383,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1421,6 +1434,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1471,6 +1485,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,

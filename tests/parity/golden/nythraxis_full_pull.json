@@ -34,7 +34,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 415,
-      "state": "1bc16e31",
+      "state": "7e748adc",
       "events": "4312c627",
       "rng": {
         "draws": 4,
@@ -290,7 +290,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 12.3,
+          "resource": 12,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -307,6 +307,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -355,6 +356,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -403,6 +405,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -451,6 +454,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -499,6 +503,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -556,6 +561,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -568,7 +574,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 415,
-      "state": "de0b0530",
+      "state": "86a12697",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -579,7 +585,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 415,
-      "state": "7243359d",
+      "state": "cba3dcd6",
       "events": "1be84086",
       "rng": {
         "draws": 4,
@@ -590,7 +596,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 415,
-      "state": "2c299ea7",
+      "state": "e2aeb56f",
       "events": "19bc4311",
       "rng": {
         "draws": 5,
@@ -601,7 +607,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 415,
-      "state": "744a7dc5",
+      "state": "5c88692f",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -612,7 +618,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 417,
-      "state": "af4da420",
+      "state": "a8f6b2ea",
       "events": "43bd9a19",
       "rng": {
         "draws": 11,
@@ -869,7 +875,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 23.833333,
+          "resource": 24,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -886,6 +892,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -934,6 +941,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -982,6 +990,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1030,6 +1039,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1078,6 +1088,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1141,6 +1152,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -1192,6 +1204,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -1243,6 +1256,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -1255,7 +1269,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 418,
-      "state": "e1033d75",
+      "state": "d0d87781",
       "events": "1095240a",
       "rng": {
         "draws": 15,
@@ -1523,7 +1537,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 23.833333,
+          "resource": 24,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1540,6 +1554,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1599,6 +1614,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1658,6 +1674,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1717,6 +1734,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1776,6 +1794,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1852,6 +1871,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -1901,6 +1921,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -1950,6 +1971,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -1999,6 +2021,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -2061,6 +2084,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -2123,6 +2147,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -2161,6 +2186,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -2173,7 +2199,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 418,
-      "state": "9baa6b51",
+      "state": "08911add",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -2184,7 +2210,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 418,
-      "state": "8c6bac9e",
+      "state": "d29a8408",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -2195,7 +2221,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 418,
-      "state": "9450e4d3",
+      "state": "ee689c73",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -2206,7 +2232,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 418,
-      "state": "30d15466",
+      "state": "5c103c6e",
       "events": "b97230c5",
       "rng": {
         "draws": 166,
@@ -2217,7 +2243,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 418,
-      "state": "4454f49f",
+      "state": "d73039eb",
       "events": "a4f8c87a",
       "rng": {
         "draws": 228,
@@ -2228,7 +2254,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 418,
-      "state": "dd08f494",
+      "state": "30f4264a",
       "events": "741638a5",
       "rng": {
         "draws": 287,
@@ -2239,7 +2265,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 418,
-      "state": "3513df40",
+      "state": "6ed1c6e8",
       "events": "741638a5",
       "rng": {
         "draws": 341,
@@ -2250,7 +2276,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 418,
-      "state": "d8d0814f",
+      "state": "016e0281",
       "events": "741638a5",
       "rng": {
         "draws": 391,
@@ -2261,7 +2287,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 418,
-      "state": "fa60ef37",
+      "state": "36724a19",
       "events": "e1ed7bac",
       "rng": {
         "draws": 452,
@@ -2272,7 +2298,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 418,
-      "state": "1bfcd8dc",
+      "state": "a3b6fc3e",
       "events": "4573d561",
       "rng": {
         "draws": 517,
@@ -2283,7 +2309,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 418,
-      "state": "9a61f862",
+      "state": "644bef94",
       "events": "741638a5",
       "rng": {
         "draws": 558,
@@ -2294,7 +2320,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 418,
-      "state": "e4d37fc5",
+      "state": "97a70fff",
       "events": "741638a5",
       "rng": {
         "draws": 613,
@@ -2305,7 +2331,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 418,
-      "state": "0bd66f7e",
+      "state": "d8a9eafc",
       "events": "216df840",
       "rng": {
         "draws": 684,
@@ -2316,7 +2342,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 418,
-      "state": "fa38df4d",
+      "state": "007122f6",
       "events": "5b87eefa",
       "rng": {
         "draws": 781,
@@ -2327,7 +2353,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 418,
-      "state": "353ee04e",
+      "state": "1dced9de",
       "events": "5e2bbfab",
       "rng": {
         "draws": 856,
@@ -2338,7 +2364,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 418,
-      "state": "0006f1bd",
+      "state": "2374d02d",
       "events": "741638a5",
       "rng": {
         "draws": 922,
@@ -2349,7 +2375,7 @@
       "tick": 203,
       "time": 10.15,
       "nextId": 418,
-      "state": "cc1deee2",
+      "state": "ce0b4442",
       "events": "741638a5",
       "rng": {
         "draws": 938,
@@ -2623,6 +2649,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2682,6 +2709,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2730,6 +2758,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2789,6 +2818,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2848,6 +2878,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2927,6 +2958,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -2976,6 +3008,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3025,6 +3058,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3074,6 +3108,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3126,6 +3161,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -3178,6 +3214,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -3216,6 +3253,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3228,7 +3266,7 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 418,
-      "state": "c12db589",
+      "state": "e345f34d",
       "events": "2de83940",
       "rng": {
         "draws": 942,
@@ -3502,6 +3540,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3561,6 +3600,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3620,6 +3660,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3679,6 +3720,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3738,6 +3780,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3817,6 +3860,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -3866,6 +3910,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3915,6 +3960,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3964,6 +4010,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -4016,6 +4063,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -4068,6 +4116,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -4106,6 +4155,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -4118,7 +4168,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 418,
-      "state": "e38d0049",
+      "state": "26718065",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -4129,7 +4179,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 418,
-      "state": "db2ef22b",
+      "state": "a478485b",
       "events": "a5034210",
       "rng": {
         "draws": 1005,
@@ -4140,7 +4190,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 418,
-      "state": "476537ea",
+      "state": "95c88c9e",
       "events": "741638a5",
       "rng": {
         "draws": 1055,
@@ -4151,7 +4201,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 418,
-      "state": "83bd2ed6",
+      "state": "0ccd11d6",
       "events": "a344782b",
       "rng": {
         "draws": 1101,
@@ -4162,7 +4212,7 @@
       "tick": 250,
       "time": 12.5,
       "nextId": 418,
-      "state": "ab6e93ea",
+      "state": "d80d0376",
       "events": "741638a5",
       "rng": {
         "draws": 1139,
@@ -4173,7 +4223,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 418,
-      "state": "2c35e868",
+      "state": "7fb6df60",
       "events": "741638a5",
       "rng": {
         "draws": 1190,
@@ -4184,7 +4234,7 @@
       "tick": 270,
       "time": 13.5,
       "nextId": 418,
-      "state": "e596fd92",
+      "state": "b6801cfe",
       "events": "67bf2eec",
       "rng": {
         "draws": 1230,
@@ -4195,7 +4245,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 418,
-      "state": "a2d9c359",
+      "state": "8e091da5",
       "events": "741638a5",
       "rng": {
         "draws": 1288,
@@ -4206,7 +4256,7 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 418,
-      "state": "face7ff2",
+      "state": "21974ce6",
       "events": "afc3f081",
       "rng": {
         "draws": 1345,
@@ -4217,7 +4267,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 418,
-      "state": "0bf3eec2",
+      "state": "42eb555a",
       "events": "741638a5",
       "rng": {
         "draws": 1387,
@@ -4228,7 +4278,7 @@
       "tick": 310,
       "time": 15.5,
       "nextId": 418,
-      "state": "960c3a23",
+      "state": "1b612063",
       "events": "f1e5a8a7",
       "rng": {
         "draws": 1447,
@@ -4239,7 +4289,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 418,
-      "state": "a1ca793d",
+      "state": "c4ee7a2d",
       "events": "741638a5",
       "rng": {
         "draws": 1505,
@@ -4250,7 +4300,7 @@
       "tick": 330,
       "time": 16.5,
       "nextId": 418,
-      "state": "e7d32d18",
+      "state": "95088684",
       "events": "f08319f6",
       "rng": {
         "draws": 1538,
@@ -4261,7 +4311,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 418,
-      "state": "263ea1cb",
+      "state": "b6a42bcf",
       "events": "e04445cf",
       "rng": {
         "draws": 1583,
@@ -4272,7 +4322,7 @@
       "tick": 350,
       "time": 17.5,
       "nextId": 418,
-      "state": "c29a6930",
+      "state": "9a7a954c",
       "events": "741638a5",
       "rng": {
         "draws": 1623,
@@ -4283,7 +4333,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 418,
-      "state": "ed42d998",
+      "state": "1c91b3b4",
       "events": "5aa57ff9",
       "rng": {
         "draws": 1677,
@@ -4294,7 +4344,7 @@
       "tick": 370,
       "time": 18.5,
       "nextId": 418,
-      "state": "e4d2e658",
+      "state": "86a7a9a4",
       "events": "82e6c6c9",
       "rng": {
         "draws": 1732,
@@ -4305,7 +4355,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 418,
-      "state": "c3d7a690",
+      "state": "05314ed0",
       "events": "741638a5",
       "rng": {
         "draws": 1798,
@@ -4316,7 +4366,7 @@
       "tick": 386,
       "time": 19.3,
       "nextId": 418,
-      "state": "44623870",
+      "state": "4aa6c8ec",
       "events": "9e5a9561",
       "rng": {
         "draws": 1825,
@@ -4604,6 +4654,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -4652,6 +4703,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4701,6 +4753,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4750,6 +4803,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4799,6 +4853,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4883,6 +4938,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -4932,6 +4988,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -4981,6 +5038,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5030,6 +5088,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5084,6 +5143,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -5138,6 +5198,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -5176,6 +5237,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5188,7 +5250,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 418,
-      "state": "abe339c8",
+      "state": "38c2a2a0",
       "events": "c0416bae",
       "rng": {
         "draws": 1856,
@@ -5199,7 +5261,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 418,
-      "state": "63c8ffa3",
+      "state": "438d49c3",
       "events": "bf071b13",
       "rng": {
         "draws": 1908,
@@ -5210,7 +5272,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 418,
-      "state": "b47e3bb9",
+      "state": "a962b695",
       "events": "bf071b13",
       "rng": {
         "draws": 1947,
@@ -5221,7 +5283,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 418,
-      "state": "835f99f6",
+      "state": "88c9a93e",
       "events": "bf071b13",
       "rng": {
         "draws": 2001,
@@ -5232,7 +5294,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 418,
-      "state": "46795afe",
+      "state": "2018e552",
       "events": "bf071b13",
       "rng": {
         "draws": 2050,
@@ -5243,7 +5305,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 418,
-      "state": "98c11e29",
+      "state": "b9af87b5",
       "events": "bf071b13",
       "rng": {
         "draws": 2112,
@@ -5254,7 +5316,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 418,
-      "state": "8aa41c57",
+      "state": "412dddc7",
       "events": "bf071b13",
       "rng": {
         "draws": 2158,
@@ -5265,7 +5327,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 418,
-      "state": "af6dba20",
+      "state": "d66f54d8",
       "events": "bf071b13",
       "rng": {
         "draws": 2195,
@@ -5276,7 +5338,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 418,
-      "state": "464a6215",
+      "state": "be20f53d",
       "events": "bf071b13",
       "rng": {
         "draws": 2241,
@@ -5287,7 +5349,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 418,
-      "state": "81ec7ffe",
+      "state": "b05d8066",
       "events": "bf071b13",
       "rng": {
         "draws": 2283,
@@ -5298,7 +5360,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 418,
-      "state": "7c76cd02",
+      "state": "a40bdf72",
       "events": "8412cc75",
       "rng": {
         "draws": 2331,
@@ -5309,7 +5371,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 418,
-      "state": "d46c10e2",
+      "state": "d0255b6e",
       "events": "741638a5",
       "rng": {
         "draws": 2383,
@@ -5320,7 +5382,7 @@
       "tick": 506,
       "time": 25.3,
       "nextId": 418,
-      "state": "de1e1e13",
+      "state": "7111bbd7",
       "events": "741638a5",
       "rng": {
         "draws": 2418,
@@ -5608,6 +5670,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -5657,6 +5720,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -5706,6 +5770,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -5755,6 +5820,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -5803,6 +5869,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -5898,6 +5965,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -5947,6 +6015,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5996,6 +6065,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -6045,6 +6115,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -6099,6 +6170,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -6153,6 +6225,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -6191,6 +6264,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -6203,7 +6277,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 418,
-      "state": "e34a23a8",
+      "state": "2be72d20",
       "events": "741638a5",
       "rng": {
         "draws": 2433,
@@ -6214,7 +6288,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 418,
-      "state": "d06d93d4",
+      "state": "16a69e08",
       "events": "741638a5",
       "rng": {
         "draws": 2479,
@@ -6225,7 +6299,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 418,
-      "state": "5eb95e12",
+      "state": "16457732",
       "events": "741638a5",
       "rng": {
         "draws": 2536,
@@ -6236,7 +6310,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 418,
-      "state": "d2cd1f4a",
+      "state": "bdb76af6",
       "events": "741638a5",
       "rng": {
         "draws": 2573,
@@ -6247,7 +6321,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 418,
-      "state": "9fd5434c",
+      "state": "cd069e64",
       "events": "741638a5",
       "rng": {
         "draws": 2625,
@@ -6258,7 +6332,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 418,
-      "state": "27eab8e0",
+      "state": "80c45dfc",
       "events": "741638a5",
       "rng": {
         "draws": 2658,
@@ -6269,7 +6343,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 418,
-      "state": "29d1ce9c",
+      "state": "e9f83e24",
       "events": "741638a5",
       "rng": {
         "draws": 2704,
@@ -6280,7 +6354,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 418,
-      "state": "901be5be",
+      "state": "57da6272",
       "events": "741638a5",
       "rng": {
         "draws": 2763,
@@ -6291,7 +6365,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 418,
-      "state": "8a22906f",
+      "state": "4a36832b",
       "events": "d4027f9b",
       "rng": {
         "draws": 2817,
@@ -6302,7 +6376,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 418,
-      "state": "f10712cb",
+      "state": "a523a7b3",
       "events": "bf3c91fc",
       "rng": {
         "draws": 2860,
@@ -6313,7 +6387,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 418,
-      "state": "1989fc19",
+      "state": "7a1a01d1",
       "events": "741638a5",
       "rng": {
         "draws": 2906,
@@ -6324,7 +6398,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 418,
-      "state": "091036c3",
+      "state": "391a4daf",
       "events": "741638a5",
       "rng": {
         "draws": 2957,
@@ -6335,7 +6409,7 @@
       "tick": 627,
       "time": 31.35,
       "nextId": 418,
-      "state": "da63bb66",
+      "state": "d9c31f1e",
       "events": "67930173",
       "rng": {
         "draws": 2991,
@@ -6623,6 +6697,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -6672,6 +6747,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -6721,6 +6797,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -6770,6 +6847,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -6818,6 +6896,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -6915,6 +6994,7 @@
               1000
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -6964,6 +7044,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7013,6 +7094,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7062,6 +7144,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7116,6 +7199,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -7170,6 +7254,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -7208,6 +7293,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7220,7 +7306,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 418,
-      "state": "6d2a5d01",
+      "state": "401c0369",
       "events": "f964cba6",
       "rng": {
         "draws": 3002,
@@ -7538,6 +7624,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -7587,6 +7674,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -7636,6 +7724,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -7685,6 +7774,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -7733,6 +7823,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -7847,6 +7938,7 @@
           "swingTimer": 1.05,
           "tappedById": 405,
           "templateId": "nythraxis_scourge_of_thornpeak",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -7896,6 +7988,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7945,6 +8038,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7994,6 +8088,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -8048,6 +8143,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -8102,6 +8198,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -8140,6 +8237,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -8152,7 +8250,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 418,
-      "state": "364c919a",
+      "state": "06db112e",
       "events": "741638a5",
       "rng": {
         "draws": 3009,
@@ -8163,7 +8261,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 418,
-      "state": "d7a166a7",
+      "state": "e90eaea3",
       "events": "741638a5",
       "rng": {
         "draws": 3055,
@@ -8174,7 +8272,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 418,
-      "state": "bfce3097",
+      "state": "5c1f158f",
       "events": "741638a5",
       "rng": {
         "draws": 3091,
@@ -8185,7 +8283,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 418,
-      "state": "c5bbc70a",
+      "state": "bd29969a",
       "events": "741638a5",
       "rng": {
         "draws": 3146,
@@ -8196,7 +8294,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 418,
-      "state": "4dc1d824",
+      "state": "b667d4d8",
       "events": "741638a5",
       "rng": {
         "draws": 3209,
@@ -8207,7 +8305,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 418,
-      "state": "231ab729",
+      "state": "921b312d",
       "events": "741638a5",
       "rng": {
         "draws": 3263,
@@ -8218,7 +8316,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 418,
-      "state": "cbec1efe",
+      "state": "6e4b7b46",
       "events": "4b50c590",
       "rng": {
         "draws": 3299,
@@ -8536,6 +8634,7 @@
             "str": 61
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -8585,6 +8684,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -8634,6 +8734,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -8683,6 +8784,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -8731,6 +8833,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -8845,6 +8948,7 @@
           "swingTimer": 1.05,
           "tappedById": 405,
           "templateId": "nythraxis_scourge_of_thornpeak",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 507,
             "min": 325,
@@ -8894,6 +8998,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -8943,6 +9048,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -8992,6 +9098,7 @@
           },
           "stats": {},
           "templateId": "ground_bastion_ward_stone",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -9046,6 +9153,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -9100,6 +9208,7 @@
           "swingTimer": 0.6,
           "tappedById": 405,
           "templateId": "nythraxis_skeleton_warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 248,
             "min": 159,
@@ -9138,6 +9247,7 @@
           },
           "stats": {},
           "templateId": "brother_aldric_raid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,

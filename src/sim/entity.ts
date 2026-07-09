@@ -78,6 +78,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     comboPoints: 0,
     comboUntil: -1,
     overpowerUntil: -1,
+    victoryRushUntil: -1,
+    battleRhythmCounter: 0,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
     savedMana: 0,
@@ -254,6 +256,7 @@ export function recalcPlayerStats(
   let staPct = 0;
   let buffArmorPct = 0;
   let buffApPct = 0;
+  let buffCrit = 0;
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
@@ -284,6 +287,7 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    else if (a.kind === 'buff_crit') buffCrit += a.value * (a.stacks ?? 1);
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
@@ -420,6 +424,7 @@ export function recalcPlayerStats(
     s.agi * 0.0005 +
     (mods?.stats.crit ?? 0) +
     setEff.crit +
+    buffCrit +
     critFractionFromRating(e.critRating);
   // Extra crit damage from a spec mastery (e.g. Fire mage: spell crits deal double).
   e.critDmgBonus = mods?.global.critDmgPct ?? 0;

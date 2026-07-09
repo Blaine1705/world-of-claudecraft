@@ -5785,6 +5785,30 @@ export const vi_VN: EnTranslations = {
         "name": "Lốc Thép",
         "description": "Te convierte en una tormenta de acero que golpea a gần đó kẻ địch cada segundo por {damage}. (thiên phú chiến binh)"
       },
+      "swordguard": {
+        "name": "Swordguard",
+        "description": "Reduces damage taken by 10% for 8 sec, doubled to 20% while below 30% health. (Warrior talent)"
+      },
+      "triumph_rush": {
+        "name": "Triumph Rush",
+        "description": "After killing an enemy, strike for weapon damage plus {damage} and heal yourself for 20% of maximum health within 20 sec. (Warrior talent)"
+      },
+      "razor_howl": {
+        "name": "Razor Howl",
+        "description": "A shout that slows enemies within 15 yd by 50% for 8 sec. (Warrior talent)"
+      },
+      "stormthrow": {
+        "name": "Stormthrow",
+        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+      },
+      "reckless_vow": {
+        "name": "Reckless Vow",
+        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+      },
+      "red_banner": {
+        "name": "Red Banner",
+        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+      },
       "blink": {
         "name": "Bước Chớp",
         "description": "Te teletransporta 15 m hacia delante y rompe raíces. (thiên phú pháp sư)"

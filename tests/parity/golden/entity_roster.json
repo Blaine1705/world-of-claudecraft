@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "06b9e332",
+      "state": "adcfd5de",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -109,6 +109,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -121,7 +122,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 408,
-      "state": "87a909fc",
+      "state": "6b9ac7c8",
       "events": "92f827a1",
       "rng": {
         "draws": 4,
@@ -132,7 +133,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 408,
-      "state": "cc98d7f2",
+      "state": "5c6fcc26",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -143,7 +144,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 408,
-      "state": "375edb0e",
+      "state": "900f4972",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -237,6 +238,7 @@
             "str": 41
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -249,7 +251,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 408,
-      "state": "5d072e67",
+      "state": "416d149f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -350,6 +352,7 @@
             "str": 41
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -362,7 +365,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 408,
-      "state": "c2843d04",
+      "state": "d393c670",
       "events": "45bbc7de",
       "rng": {
         "draws": 4,
@@ -468,6 +471,7 @@
             "str": 10
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -480,7 +484,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 408,
-      "state": "d4f7028f",
+      "state": "3128d247",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -491,7 +495,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 408,
-      "state": "47bebb1f",
+      "state": "67fe58f7",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -597,6 +601,7 @@
             "str": 10
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,

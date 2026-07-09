@@ -5770,8 +5770,8 @@ export const zh_CN: EnTranslations = {
         "description": "以野性之力激励附近的盟友，提高攻击强度，持续 5 分钟。（猎人天赋）"
       },
       "avatar": {
-        "name": "巨像",
-        "description": "化身为巨像，提高攻击强度，持续 20 秒。（战士天赋）"
+        "name": "巨像化身",
+        "description": "解除控制效果并化为巨像，使造成的伤害提高 20%，持续 20 秒。（战士天赋）"
       },
       "avenging_wrath": {
         "name": "复仇之翼",
@@ -5783,7 +5783,31 @@ export const zh_CN: EnTranslations = {
       },
       "bladestorm": {
         "name": "钢铁旋风",
-        "description": "化作钢铁风暴，每秒对附近敌人造成 {damage} 点伤害。（战士天赋）"
+        "description": "化为钢铁旋风，每秒攻击附近敌人，造成 {damage} 点伤害。（战士天赋）"
+      },
+      "swordguard": {
+        "name": "剑卫",
+        "description": "受到的伤害降低 10%，持续 8 秒；生命值低于 30% 时提高到 20%。（战士天赋）"
+      },
+      "triumph_rush": {
+        "name": "凯旋奔袭",
+        "description": "击杀敌人后，20 秒内可造成武器伤害加 {damage}，并恢复最大生命值的 20%。（战士天赋）"
+      },
+      "razor_howl": {
+        "name": "锐刃怒吼",
+        "description": "使 15 码内的敌人减速 50%，持续 8 秒。（战士天赋）"
+      },
+      "stormthrow": {
+        "name": "风暴投掷",
+        "description": "投掷武器，使目标昏迷 3 秒。（战士天赋）"
+      },
+      "reckless_vow": {
+        "name": "鲁莽誓言",
+        "description": "所有怒气生成提高 50%，暴击几率提高 20%，持续 12 秒。（战士天赋）"
+      },
+      "red_banner": {
+        "name": "赤红战旗",
+        "description": "你和附近盟友的攻击速度提高 10%，伤害提高 10%，持续 20 秒。（战士天赋）"
       },
       "blink": {
         "name": "闪烁步",

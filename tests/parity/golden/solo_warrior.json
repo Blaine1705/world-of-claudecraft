@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "06b9e332",
+      "state": "adcfd5de",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -110,6 +110,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -122,7 +123,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "d5545743",
+      "state": "5d3c26ff",
       "events": "a2e349cb",
       "rng": {
         "draws": 6,
@@ -133,7 +134,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "c00d2d70",
+      "state": "6bfdc3ec",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -144,7 +145,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "7622a880",
+      "state": "20d65c5c",
       "events": "d6a5e26e",
       "rng": {
         "draws": 98,
@@ -155,7 +156,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 407,
-      "state": "af733007",
+      "state": "b54304d3",
       "events": "11ba1106",
       "rng": {
         "draws": 154,
@@ -257,6 +258,7 @@
           "swingTimer": 0.45,
           "targetId": 406,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -316,6 +318,7 @@
           "tappedById": 405,
           "targetId": 405,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 4,
@@ -328,7 +331,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 407,
-      "state": "a6e5d217",
+      "state": "36eeaed7",
       "events": "741638a5",
       "rng": {
         "draws": 172,
@@ -431,6 +434,7 @@
           "swingTimer": 0.25,
           "targetId": 406,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -490,6 +494,7 @@
           "tappedById": 405,
           "targetId": 405,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 4,

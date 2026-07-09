@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 407,
-      "state": "3117b0e5",
+      "state": "7648e9a1",
       "events": "3156212d",
       "rng": {
         "draws": 4,
@@ -110,7 +110,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 6.222222,
+          "resource": 6,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -127,6 +127,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -171,6 +172,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -184,7 +186,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "61ef3db3",
+      "state": "5a580cd0",
       "events": "126d656c",
       "rng": {
         "draws": 8,
@@ -273,7 +275,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 10.822222,
+          "resource": 11,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -290,6 +292,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -334,6 +337,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -379,6 +383,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -391,7 +396,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "e0e24586",
+      "state": "22dd74c5",
       "events": "5244a413",
       "rng": {
         "draws": 13,
@@ -491,7 +496,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 17,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -508,6 +513,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -552,6 +558,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -597,6 +604,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -642,6 +650,7 @@
           "swingTimer": 2,
           "templateId": "sister_nhalia",
           "terrifyTimer": 16,
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 108,
             "min": 69,
@@ -654,7 +663,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "6be44b5c",
+      "state": "245e6a3b",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -754,7 +763,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 17,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -771,6 +780,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -815,6 +825,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -860,6 +871,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -905,6 +917,7 @@
           "swingTimer": 2,
           "templateId": "sister_nhalia",
           "terrifyTimer": 16,
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 108,
             "min": 69,
@@ -947,6 +960,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 298.918529,
             "y": 57.734603,
@@ -965,7 +979,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "0e91a5c1",
+      "state": "e07cf250",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1065,7 +1079,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 17,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1082,6 +1096,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1126,6 +1141,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -1171,6 +1187,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -1216,6 +1233,7 @@
           "swingTimer": 2,
           "templateId": "sister_nhalia",
           "terrifyTimer": 16,
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 108,
             "min": 69,
@@ -1258,6 +1276,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 298.918529,
             "y": 57.734603,
@@ -1305,6 +1324,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 7.771505,
           "weapon": {
             "max": 12,
@@ -1318,7 +1338,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 412,
-      "state": "b54580c6",
+      "state": "0cfb881f",
       "events": "c96afe7d",
       "rng": {
         "draws": 16,
@@ -1418,7 +1438,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 17,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1435,6 +1455,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1479,6 +1500,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -1524,6 +1546,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -1569,6 +1592,7 @@
           "swingTimer": 2,
           "templateId": "sister_nhalia",
           "terrifyTimer": 16,
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 108,
             "min": 69,
@@ -1611,6 +1635,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 298.918529,
             "y": 57.734603,
@@ -1658,6 +1683,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 7.771505,
           "weapon": {
             "max": 12,
@@ -1704,6 +1730,7 @@
             "armor": 90
           },
           "templateId": "mogger_lackey",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 20,
             "min": 13,
@@ -1716,7 +1743,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 412,
-      "state": "d6fc97bd",
+      "state": "277a7938",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1816,7 +1843,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 17,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1833,6 +1860,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1877,6 +1905,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -1922,6 +1951,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -1967,6 +1997,7 @@
           "swingTimer": 2,
           "templateId": "sister_nhalia",
           "terrifyTimer": 16,
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 108,
             "min": 69,
@@ -2009,6 +2040,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 298.918529,
             "y": 57.734603,
@@ -2056,6 +2088,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 7.771505,
           "weapon": {
             "max": 12,
@@ -2103,6 +2136,7 @@
             "armor": 90
           },
           "templateId": "mogger_lackey",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 20,
             "min": 13,
@@ -2115,7 +2149,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 412,
-      "state": "d6fc97bd",
+      "state": "277a7938",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2215,7 +2249,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 17,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2232,6 +2266,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2276,6 +2311,7 @@
           },
           "swingTimer": 2.2,
           "templateId": "mogger",
+          "victoryRushUntil": -1,
           "wardTimer": 11.95,
           "weapon": {
             "max": 55,
@@ -2321,6 +2357,7 @@
           "stompTimer": 12,
           "swingTimer": 2.8,
           "templateId": "korgath_the_bound",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 130,
             "min": 83,
@@ -2366,6 +2403,7 @@
           "swingTimer": 2,
           "templateId": "sister_nhalia",
           "terrifyTimer": 16,
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 108,
             "min": 69,
@@ -2408,6 +2446,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 298.918529,
             "y": 57.734603,
@@ -2455,6 +2494,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 7.771505,
           "weapon": {
             "max": 12,
@@ -2502,6 +2542,7 @@
             "armor": 90
           },
           "templateId": "mogger_lackey",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 20,
             "min": 13,
