@@ -221,11 +221,12 @@ describe('item level: raid tier', () => {
   });
 });
 
-describe('item level: heroic boss drops are budget-exact epics (five-mans 31, raid 33)', () => {
-  it('every heroic drop is an epic at its tier item level with its exact stat budget', () => {
+describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/37)', () => {
+  it('every heroic drop is at its tier item level with its exact stat budget', () => {
     // The five-man final bosses register at source level 25 (item level 31); the
     // 10-player raid boss (Heroic Nythraxis) is one tier above, at source level 27
-    // (item level 33). See buildSourceIndex + NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL.
+    // (epic item level 33, legendary item level 37). See buildSourceIndex +
+    // NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL.
     const raidIds = new Set(
       (HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak ?? []).flatMap((e) =>
         e.itemId ? [e.itemId] : [],
@@ -235,48 +236,23 @@ describe('item level: heroic boss drops are budget-exact epics (five-mans 31, ra
       .flat()
       .flatMap((e) => (e.itemId ? [e.itemId] : []));
     expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
-    expect(raidIds.size).toBe(7); // the Heroic Nythraxis raid set
+    expect(raidIds.size).toBe(9); // seven epics plus two heroic legendary rolls
     for (const id of ids) {
       const item = ITEMS[id];
       const raid = raidIds.has(id);
       expect(item, `${id} is a real item`).toBeTruthy();
       expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
-      expect(item.quality, id).toBe('epic');
-      expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
-      expect(itemLevel(item), `${id} ilvl`).toBe(raid ? 33 : 31);
+      if (item.quality === 'legendary') {
+        expect(raid, `${id} legendary only appears in the raid table`).toBe(true);
+        expect(itemLevel(item), `${id} ilvl`).toBe(37);
+      } else {
+        expect(item.quality, id).toBe('epic');
+        expect(itemLevel(item), `${id} ilvl`).toBe(raid ? 33 : 31);
+      }
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
     }
     expect(primaryStatSum(ITEMS.deathless_heartwood_heroic)).toBe(49);
     expect(primaryStatSum(ITEMS.kingsbane_last_oath_heroic)).toBe(49);
-  });
-
-  it('the raid boss set pieces and legendaries upgrade to raid-tier heroic variants (33/37)', () => {
-    // These are not listed in the explicit table: they come from the normal-loot
-    // heroic swap (heroic_<base>), rescaled to the raid tier (source 27).
-    const raidBases = (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
-      e.itemId ? [e.itemId] : [],
-    );
-    expect(raidBases.length).toBeGreaterThanOrEqual(8);
-    let epics = 0;
-    let legendaries = 0;
-    for (const base of raidBases) {
-      const variant = ITEMS[`heroic_${base}`];
-      expect(variant, `heroic_${base} exists`).toBeTruthy();
-      expect(itemSourceLevel(variant.id), `${variant.id} source`).toBe(27);
-      if (variant.quality === 'legendary') {
-        legendaries++;
-        expect(itemLevel(variant), `${variant.id} ilvl`).toBe(37);
-      } else {
-        epics++;
-        expect(variant.quality, variant.id).toBe('epic');
-        expect(itemLevel(variant), `${variant.id} ilvl`).toBe(33);
-      }
-      expect(primaryStatSum(variant), `${variant.id} stat sum == budget`).toBe(
-        expectedStatBudget(variant),
-      );
-    }
-    expect(epics + legendaries).toBe(raidBases.length);
-    expect(legendaries).toBe(2); // Deathless Heartwood + Kingsbane, Last Oath
   });
 });
 
