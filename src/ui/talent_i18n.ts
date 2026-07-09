@@ -11,7 +11,13 @@ import {
 import { ABILITIES } from '../sim/data';
 import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { getLanguage, languageTag, type SupportedLanguage, t } from './i18n';
+import {
+  getLanguage,
+  type InterpolationValues,
+  languageTag,
+  type SupportedLanguage,
+  t,
+} from './i18n';
 import { TALENT_NEW, TALENT_NEW_TITLE_OVERRIDES } from './talent_i18n.newlocales';
 
 declare module '../sim/content/talents' {
@@ -9323,11 +9329,44 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
+// Base (rank-1, no player scaling) values for a granted ability's description
+// placeholders, so a grant tooltip on the planning screen resolves {damage}/
+// {buff}/{duration} instead of showing raw braces. 37 of 54 granted abilities
+// have static descriptions and skip this; the 17 with placeholders use it.
+export function grantAbilityValues(id: string): InterpolationValues {
+  const def = ABILITIES[id];
+  const effs = def?.effects ?? [];
+  const values: Record<string, string> = {};
+  const damageEff = effs.find((e) =>
+    ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(e.type),
+  ) as { min?: number; max?: number } | undefined;
+  const absorbEff = effs.find((e) => e.type === 'absorb') as { amount?: number } | undefined;
+  const dotEff = effs.find((e) => e.type === 'dot' || e.type === 'hot') as
+    | { total?: number }
+    | undefined;
+  const buffEff = effs.find((e) => e.type === 'selfBuff' || e.type === 'buffTarget') as
+    | { value?: number }
+    | undefined;
+  const durEff = effs.find(
+    (e) => 'duration' in e && typeof (e as { duration?: number }).duration === 'number',
+  ) as { duration?: number } | undefined;
+  if (damageEff?.min !== undefined) {
+    values.damage =
+      damageEff.min === damageEff.max
+        ? String(damageEff.min)
+        : `${damageEff.min} to ${damageEff.max}`;
+  } else if (absorbEff?.amount !== undefined) values.damage = String(absorbEff.amount);
+  else if (dotEff?.total !== undefined) values.damage = String(dotEff.total);
+  if (buffEff?.value !== undefined) values.buff = String(buffEff.value);
+  if (durEff?.duration !== undefined) values.duration = String(durEff.duration);
+  return values;
+}
+
 // The granted ability's own description, so a grant option's tooltip tells the
 // player what the spell DOES instead of a dead-end "Grants X." Localized by
-// tEntity, so grant tooltips read correctly in every locale.
+// tEntity; placeholders resolve to base values (grantAbilityValues).
 function abilityDescription(id: string): string {
-  return tEntity({ kind: 'ability', id, field: 'description' });
+  return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) });
 }
 
 // True when a talent title has an explicit per-locale translation override. The
