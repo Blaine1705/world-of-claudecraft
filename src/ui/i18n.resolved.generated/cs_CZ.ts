@@ -155,6 +155,7 @@ export const cs_CZ: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Sleduješ {name}"
     },
@@ -7934,7 +7935,13 @@ export const cs_CZ: EnTranslations = {
       "deathless_heartwood": {
         "name": "Jádrové dřevo nesmrtelné koruny"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Jádrové dřevo nesmrtelné koruny"
+      },
       "kingsbane_last_oath": {
+        "name": "Trůnobijec, poslední přísaha Thornpeaku"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Trůnobijec, poslední přísaha Thornpeaku"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const cs_CZ: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Povstalá královská stráž"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, metla Thornpeaku"

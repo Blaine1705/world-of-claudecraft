@@ -4348,19 +4348,12 @@ export class Hud {
   private itemTooltip(item: ItemDef, compare = true): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
-    // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
-    // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
-    // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
-    let qualityKindHtml = esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind),
-      }),
-    );
-    if (item.heroicOf || item.heroic) {
-      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
-    }
-    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
+    const qualityKind = t('itemUi.tooltip.qualityKind', {
+      quality: itemQualityLabel(item.quality),
+      kind: itemKindLabel(item.kind),
+    });
+    const heroicTag = item.heroic ? ` ${t('hudChrome.itemHeroicTag')}` : '';
+    html += `<div class="tt-sub">${esc(`${qualityKind}${heroicTag}`)}</div>`;
     if (item.slot) {
       // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
       // right-aligned on the same line so it is clear which classes the gear suits.

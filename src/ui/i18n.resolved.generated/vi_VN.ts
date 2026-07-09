@@ -155,6 +155,7 @@ export const vi_VN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Đang xem {name}"
     },
@@ -7934,7 +7935,13 @@ export const vi_VN: EnTranslations = {
       "deathless_heartwood": {
         "name": "Lõi Gỗ Của Vương Miện Bất Tử"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Lõi Gỗ Của Vương Miện Bất Tử"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Lời Thề Cuối Cùng Của Đỉnh Gai"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Lời Thề Cuối Cùng Của Đỉnh Gai"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const vi_VN: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Cấm Vệ Hồi Sinh"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tai Họa Đỉnh Gai"

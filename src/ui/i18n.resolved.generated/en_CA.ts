@@ -155,6 +155,7 @@ export const en_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Spectating {name}"
     },
@@ -7934,7 +7935,13 @@ export const en_CA: EnTranslations = {
       "deathless_heartwood": {
         "name": "Heartwood of the Deathless Crown"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Heartwood of the Deathless Crown"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Last Oath of Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Last Oath of Thornpeak"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const en_CA: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Risen Royal Guard"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Scourge of Thornpeak"

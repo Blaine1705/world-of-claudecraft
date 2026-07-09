@@ -155,6 +155,7 @@ export const nl_NL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Toeschouwer bij {name}"
     },
@@ -7934,7 +7935,13 @@ export const nl_NL: EnTranslations = {
       "deathless_heartwood": {
         "name": "Kernhout van de Dodeloze Kroon"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Kernhout van de Dodeloze Kroon"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Laatste Eed van Doorntop"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Laatste Eed van Doorntop"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const nl_NL: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Verrezen Koninklijke Garde"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Gesel van Doorntop"

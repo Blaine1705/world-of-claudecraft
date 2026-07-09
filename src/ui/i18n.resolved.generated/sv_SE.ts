@@ -155,6 +155,7 @@ export const sv_SE: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Åskådar {name}"
     },
@@ -7934,7 +7935,13 @@ export const sv_SE: EnTranslations = {
       "deathless_heartwood": {
         "name": "Kärnved från den odödliga kronan"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Kärnved från den odödliga kronan"
+      },
       "kingsbane_last_oath": {
+        "name": "Tronbane, Törntoppens sista ed"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Tronbane, Törntoppens sista ed"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const sv_SE: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Uppstånden kunglig vakt"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Törntoppens gissel"

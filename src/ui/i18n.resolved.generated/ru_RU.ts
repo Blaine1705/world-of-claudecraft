@@ -155,6 +155,7 @@ export const ru_RU: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
@@ -7934,7 +7935,13 @@ export const ru_RU: EnTranslations = {
       "deathless_heartwood": {
         "name": "Сердцевина бессмертной короны"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Сердцевина бессмертной короны"
+      },
       "kingsbane_last_oath": {
+        "name": "Погибель Трона, последняя клятва Торнпика"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Погибель Трона, последняя клятва Торнпика"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const ru_RU: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Восставший королевский страж"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Олдрен, бессмертный страж"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Малрик, бессмертный иерофант"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Восс, бессмертный клинок"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Нитраксис, Бич Торнпика"

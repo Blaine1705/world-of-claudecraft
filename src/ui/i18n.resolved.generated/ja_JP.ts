@@ -155,6 +155,7 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[英雄]",
     "spectate": {
       "banner": "{name}を観戦中"
     },
@@ -7934,7 +7935,13 @@ export const ja_JP: EnTranslations = {
       "deathless_heartwood": {
         "name": "不死王冠の心材"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不死王冠の心材"
+      },
       "kingsbane_last_oath": {
+        "name": "スロウンベイン、ソーンピーク最後の誓い"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "スロウンベイン、ソーンピーク最後の誓い"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "蘇った王家の衛兵"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "死なずの戦衛オルドレン"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "死なずの司祭長マルリック"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "死なずの刃ヴォス"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"

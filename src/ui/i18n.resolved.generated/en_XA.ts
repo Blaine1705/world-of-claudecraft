@@ -155,6 +155,7 @@ export const en_XA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },
@@ -7934,7 +7935,13 @@ export const en_XA: EnTranslations = {
       "deathless_heartwood": {
         "name": "[Ĥéáŕţŵóóð óƒ ţĥé Ðéáţĥļéšš Çŕóŵñ]"
       },
+      "deathless_heartwood_heroic": {
+        "name": "[Ĥéáŕţŵóóð óƒ ţĥé Ðéáţĥļéšš Çŕóŵñ]"
+      },
       "kingsbane_last_oath": {
+        "name": "[Ţĥŕóñéƀáñé, Ļášţ Óáţĥ óƒ Ţĥóŕñþéáķ]"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "[Ţĥŕóñéƀáñé, Ļášţ Óáţĥ óƒ Ţĥóŕñþéáķ]"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const en_XA: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "[Ŕíšéñ Ŕóýáļ Ĝúáŕð]"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "[Áļðŕéñ, Ðéáţĥļéšš Ŵáŕĝúáŕð]"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "[Ɱáļŕíç, Ðéáţĥļéšš Ĥíéŕóþĥáñţ]"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "[Ʋóšš, Ðéáţĥļéšš Ķñíƒé]"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "[Ñýţĥŕáẋíš, Šçóúŕĝé óƒ Ţĥóŕñþéáķ]"

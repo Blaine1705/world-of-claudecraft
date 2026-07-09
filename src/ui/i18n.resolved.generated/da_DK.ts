@@ -155,6 +155,7 @@ export const da_DK: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Tilskuer til {name}"
     },
@@ -7934,7 +7935,13 @@ export const da_DK: EnTranslations = {
       "deathless_heartwood": {
         "name": "Kerneved fra Den Udødelige Krone"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Kerneved fra Den Udødelige Krone"
+      },
       "kingsbane_last_oath": {
+        "name": "Tronebane, Tornetops Sidste Ed"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Tronebane, Tornetops Sidste Ed"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const da_DK: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Genopstanden Kongelig Garder"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tornetops Svøbe"

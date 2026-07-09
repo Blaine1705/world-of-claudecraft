@@ -155,6 +155,7 @@ export const id_ID: EnTranslations = {
     }
   },
   "hudChrome": {
+    "itemHeroicTag": "[HEROIC]",
     "spectate": {
       "banner": "Menonton {name}"
     },
@@ -7934,7 +7935,13 @@ export const id_ID: EnTranslations = {
       "deathless_heartwood": {
         "name": "Inti Kayu Mahkota Baka"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Inti Kayu Mahkota Baka"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Sumpah Terakhir Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Sumpah Terakhir Thornpeak"
       },
       "crownforged_dreadhelm": {
@@ -8208,6 +8215,15 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Pengawal Kerajaan Bangkit"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Deathless Warguard"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Deathless Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Deathless Knife"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"

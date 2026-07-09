@@ -10,6 +10,7 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  itemHeroicTag: '[HEROIC]',
   spectate: {
     banner: 'Spectating {name}',
   },
