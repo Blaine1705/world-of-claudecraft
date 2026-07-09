@@ -57,8 +57,9 @@ import { buildCritters, type CritterField } from './critters';
 import { currentDayNightPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
-  dayNightGrade,
   DAY_ONLY,
+  type DayNightGrade,
+  dayNightGrade,
   effectiveDayness,
   fullDayGrade,
   globalDayness,
@@ -67,7 +68,6 @@ import {
   nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
   sunDirection,
-  type DayNightGrade,
 } from './day_night_core';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
