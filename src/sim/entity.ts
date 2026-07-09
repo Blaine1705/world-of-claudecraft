@@ -561,6 +561,7 @@ export function createNpc(id: number, def: NpcDef, pos: Vec3): Entity {
   e.color = def.color;
   e.questIds = [...def.questIds];
   e.vendorItems = [...(def.vendorItems ?? [])];
+  e.devVendor = def.devVendor ?? false;
   return e;
 }
 

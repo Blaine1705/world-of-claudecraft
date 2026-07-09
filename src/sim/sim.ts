@@ -64,6 +64,7 @@ import { isSpellResisted } from './combat/spell_resist';
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
+import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
@@ -1964,6 +1965,17 @@ export class Sim {
     return pid;
   }
 
+  // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
+  // (dev-command realms only). Returns the vendor entity id, or -1 on failure.
+  spawnDevVendor(pid?: number): number {
+    const me = this.entities.get(pid ?? this.primaryId);
+    if (!me) return -1;
+    const pos = this.groundPos(me.pos.x + 2, me.pos.z + 2);
+    const npc = createNpc(this.nextId++, PTR_DEV_VENDOR_DEF, pos);
+    this.addEntity(npc);
+    return npc.id;
+  }
+
   removePlayer(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
@@ -2983,6 +2995,7 @@ export class Sim {
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
+      spawnDevVendor: sim.spawnDevVendor.bind(sim),
       // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
       // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
       // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests

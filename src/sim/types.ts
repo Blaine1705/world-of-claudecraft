@@ -1571,6 +1571,10 @@ export interface NpcDef {
   color: number;
   questIds: string[];
   vendorItems?: string[];
+  // PTR / dev-only free-epic vendor (src/sim/content/ptr_dev_vendor.ts): buyItem
+  // sells its stock for free when the realm has ALLOW_DEV_COMMANDS. Never placed
+  // as permanent content; spawned on demand by /dev vendor.
+  devVendor?: boolean;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
@@ -1994,6 +1998,7 @@ export interface Entity {
   // npc
   questIds: string[];
   vendorItems: string[];
+  devVendor?: boolean; // dev free-epic vendor (ptr_dev_vendor.ts)
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
