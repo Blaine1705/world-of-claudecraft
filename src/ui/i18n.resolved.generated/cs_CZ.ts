@@ -7860,6 +7860,27 @@ export const cs_CZ: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Žezlo nesmrtelného dvora"
       },
+      "deathless_warguard_legmail": {
+        "name": "Nesmrtelné nohavice válečné stráže"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "Deathless Warguard Gauntlets"
+      },
+      "soulrend_diadem": {
+        "name": "Diadém rozervání duše"
+      },
+      "soulrend_handwraps": {
+        "name": "Soulrend Handwraps"
+      },
+      "scourgehide_carapace": {
+        "name": "Krunýř z kůže pohromy"
+      },
+      "scourgehide_grips": {
+        "name": "Scourgehide Grips"
+      },
+      "soulforged_gauntlets": {
+        "name": "Soulforged Gauntlets"
+      },
       "cryptplate_helm": {
         "name": "Kryptoplátová helma"
       },

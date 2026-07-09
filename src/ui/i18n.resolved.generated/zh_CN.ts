@@ -7860,6 +7860,27 @@ export const zh_CN: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死王庭权杖"
       },
+      "deathless_warguard_legmail": {
+        "name": "不死战卫腿甲"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "不死战卫护手"
+      },
+      "soulrend_diadem": {
+        "name": "裂魂冠冕"
+      },
+      "soulrend_handwraps": {
+        "name": "裂魂缠手"
+      },
+      "scourgehide_carapace": {
+        "name": "灾祸之皮甲壳"
+      },
+      "scourgehide_grips": {
+        "name": "灾祸之皮握爪"
+      },
+      "soulforged_gauntlets": {
+        "name": "铸魂护手"
+      },
       "cryptplate_helm": {
         "name": "墓板头盔"
       },

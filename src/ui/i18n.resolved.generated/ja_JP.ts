@@ -7860,6 +7860,27 @@ export const ja_JP: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死の宮廷の笏"
       },
+      "deathless_warguard_legmail": {
+        "name": "不死の戦衛レッグメイル"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "不死の戦衛ガントレット"
+      },
+      "soulrend_diadem": {
+        "name": "ソウルレンドの宝冠"
+      },
+      "soulrend_handwraps": {
+        "name": "ソウルレンドの手甲"
+      },
+      "scourgehide_carapace": {
+        "name": "スカージハイドの甲殻"
+      },
+      "scourgehide_grips": {
+        "name": "スカージハイドのグリップ"
+      },
+      "soulforged_gauntlets": {
+        "name": "魂鍛のガントレット"
+      },
       "cryptplate_helm": {
         "name": "クリプトプレートヘルム"
       },

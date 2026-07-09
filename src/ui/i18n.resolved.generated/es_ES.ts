@@ -7860,6 +7860,27 @@ export const es_ES: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Cetro de la Corte Imperecedera"
       },
+      "deathless_warguard_legmail": {
+        "name": "Malla de piernas del Guardián Imperecedero"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "Deathless Warguard Gauntlets"
+      },
+      "soulrend_diadem": {
+        "name": "Diadema Desgarralmas"
+      },
+      "soulrend_handwraps": {
+        "name": "Soulrend Handwraps"
+      },
+      "scourgehide_carapace": {
+        "name": "Caparazón de piel de Azote"
+      },
+      "scourgehide_grips": {
+        "name": "Scourgehide Grips"
+      },
+      "soulforged_gauntlets": {
+        "name": "Soulforged Gauntlets"
+      },
       "cryptplate_helm": {
         "name": "Yelmo Placacripta"
       },

@@ -236,7 +236,7 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
       .flat()
       .flatMap((e) => (e.itemId ? [e.itemId] : []));
     expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
-    expect(raidIds.size).toBe(9); // seven epics plus two heroic legendary rolls
+    expect(raidIds.size).toBe(13); // nine epics (incl. four set gloves) plus two heroic legendary rolls
     for (const id of ids) {
       const item = ITEMS[id];
       const raid = raidIds.has(id);

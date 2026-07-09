@@ -7860,6 +7860,27 @@ export const ru_RU: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Скипетр бессмертного двора"
       },
+      "deathless_warguard_legmail": {
+        "name": "Ножные латы бессмертного стража"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "Рукавицы бессмертного стража"
+      },
+      "soulrend_diadem": {
+        "name": "Диадема разрыва души"
+      },
+      "soulrend_handwraps": {
+        "name": "Обмотки разрыва души"
+      },
+      "scourgehide_carapace": {
+        "name": "Панцирь бичевой шкуры"
+      },
+      "scourgehide_grips": {
+        "name": "Хваты бичевой шкуры"
+      },
+      "soulforged_gauntlets": {
+        "name": "Душекованые рукавицы"
+      },
       "cryptplate_helm": {
         "name": "Гробничный латный шлем"
       },

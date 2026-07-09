@@ -7860,6 +7860,27 @@ export const nl_NL: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Scepter van het Doodloze Hof"
       },
+      "deathless_warguard_legmail": {
+        "name": "Doodloze Krijgswacht-Beenmalie"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "Deathless Warguard Gauntlets"
+      },
+      "soulrend_diadem": {
+        "name": "Zielscheur-Diadeem"
+      },
+      "soulrend_handwraps": {
+        "name": "Soulrend Handwraps"
+      },
+      "scourgehide_carapace": {
+        "name": "Geselhuid-Pantser"
+      },
+      "scourgehide_grips": {
+        "name": "Scourgehide Grips"
+      },
+      "soulforged_gauntlets": {
+        "name": "Soulforged Gauntlets"
+      },
       "cryptplate_helm": {
         "name": "Kryptplaat-Helm"
       },

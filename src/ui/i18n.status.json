@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6523,
-    "rows": 136983,
-    "translated": 136730,
-    "pending": 60,
+    "keys": 6527,
+    "rows": 137067,
+    "translated": 136754,
+    "pending": 120,
     "blocked": 193,
     "blockedSource": 95
   },
@@ -167419,6 +167419,88 @@
         }
       }
     },
+    "main:entities.items.deathless_warguard_gauntlets.name": {
+      "scope": "main",
+      "enHash": "3cbc249e9a013bcb",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "3cbc249e9a013bcb",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "translated",
+          "srcHash": "3cbc249e9a013bcb",
+          "by": "human"
+        },
+        "zh_TW": {
+          "state": "translated",
+          "srcHash": "3cbc249e9a013bcb",
+          "by": "human"
+        },
+        "ko_KR": {
+          "state": "translated",
+          "srcHash": "3cbc249e9a013bcb",
+          "by": "human"
+        },
+        "ja_JP": {
+          "state": "translated",
+          "srcHash": "3cbc249e9a013bcb",
+          "by": "human"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "translated",
+          "srcHash": "3cbc249e9a013bcb",
+          "by": "human"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
     "main:entities.items.deathless_warguard_legmail.name": {
       "scope": "main",
       "enHash": "697baf31a4e1d47f",
@@ -194739,6 +194821,88 @@
         }
       }
     },
+    "main:entities.items.scourgehide_grips.name": {
+      "scope": "main",
+      "enHash": "612a8ad35b837e6e",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "612a8ad35b837e6e",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "translated",
+          "srcHash": "612a8ad35b837e6e",
+          "by": "human"
+        },
+        "zh_TW": {
+          "state": "translated",
+          "srcHash": "612a8ad35b837e6e",
+          "by": "human"
+        },
+        "ko_KR": {
+          "state": "translated",
+          "srcHash": "612a8ad35b837e6e",
+          "by": "human"
+        },
+        "ja_JP": {
+          "state": "translated",
+          "srcHash": "612a8ad35b837e6e",
+          "by": "human"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "translated",
+          "srcHash": "612a8ad35b837e6e",
+          "by": "human"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
     "main:entities.items.seal_of_the_nine_oaths.name": {
       "scope": "main",
       "enHash": "738a120248c77174",
@@ -197763,115 +197927,85 @@
         }
       }
     },
-    "main:entities.items.soulflame_mantle_heroic.name": {
+    "main:entities.items.soulforged_gauntlets.name": {
       "scope": "main",
-      "enHash": "06185b0cfb2e2b19",
+      "enHash": "1716c24d06f8fdcf",
       "placeholders": [],
       "locales": {
         "es": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "es_ES": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "fr_FR": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "fr_CA": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
+          "srcHash": "1716c24d06f8fdcf",
           "by": "human"
         },
         "it_IT": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "de_DE": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "zh_CN": {
           "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
+          "srcHash": "1716c24d06f8fdcf",
           "by": "human"
         },
         "zh_TW": {
           "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
+          "srcHash": "1716c24d06f8fdcf",
           "by": "human"
         },
         "ko_KR": {
           "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
+          "srcHash": "1716c24d06f8fdcf",
           "by": "human"
         },
         "ja_JP": {
           "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
+          "srcHash": "1716c24d06f8fdcf",
           "by": "human"
         },
         "pt_BR": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "ru_RU": {
           "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
+          "srcHash": "1716c24d06f8fdcf",
           "by": "human"
         },
         "cs_CZ": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "nl_NL": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "pl_PL": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "id_ID": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "tr_TR": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "sv_SE": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "vi_VN": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         },
         "da_DK": {
-          "state": "translated",
-          "srcHash": "06185b0cfb2e2b19",
-          "by": "human"
+          "state": "pending"
         }
       }
     },
@@ -198096,6 +198230,88 @@
           "state": "translated",
           "srcHash": "39b65e31bb8b9b82",
           "by": "human"
+        }
+      }
+    },
+    "main:entities.items.soulrend_handwraps.name": {
+      "scope": "main",
+      "enHash": "8a5e64fee83dfdb2",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "8a5e64fee83dfdb2",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "translated",
+          "srcHash": "8a5e64fee83dfdb2",
+          "by": "human"
+        },
+        "zh_TW": {
+          "state": "translated",
+          "srcHash": "8a5e64fee83dfdb2",
+          "by": "human"
+        },
+        "ko_KR": {
+          "state": "translated",
+          "srcHash": "8a5e64fee83dfdb2",
+          "by": "human"
+        },
+        "ja_JP": {
+          "state": "translated",
+          "srcHash": "8a5e64fee83dfdb2",
+          "by": "human"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "translated",
+          "srcHash": "8a5e64fee83dfdb2",
+          "by": "human"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
         }
       }
     },

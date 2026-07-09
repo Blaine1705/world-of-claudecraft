@@ -7860,6 +7860,27 @@ export const pl_PL: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Berło nieśmiertelnego dworu"
       },
+      "deathless_warguard_legmail": {
+        "name": "Nieśmiertelne nogawice wojennej straży"
+      },
+      "deathless_warguard_gauntlets": {
+        "name": "Deathless Warguard Gauntlets"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem rozdarcia dusz"
+      },
+      "soulrend_handwraps": {
+        "name": "Soulrend Handwraps"
+      },
+      "scourgehide_carapace": {
+        "name": "Pancerz ze skóry plagi"
+      },
+      "scourgehide_grips": {
+        "name": "Scourgehide Grips"
+      },
+      "soulforged_gauntlets": {
+        "name": "Soulforged Gauntlets"
+      },
       "cryptplate_helm": {
         "name": "Hełm z kryptowej płyty"
       },
