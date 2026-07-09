@@ -184,10 +184,10 @@ describe('precomputed modifiers', () => {
   it('folds row grants into the known ability set without a spec', () => {
     const leap = computeTalentModifiers(
       'warrior',
-      alloc({ rows: { 8: rowOption('warrior', 1, 1) } }),
+      alloc({ rows: { 8: rowOption('warrior', 1, 0) } }),
       20,
     );
-    expect(leap.grants.some((g) => g.ability === 'swordguard')).toBe(true);
+    expect(leap.grants.some((g) => g.ability === 'pummel')).toBe(true);
     expect(leap.grants.some((g) => g.ability === 'mortal_strike')).toBe(false);
   });
 
@@ -296,7 +296,7 @@ describe('Sim integration', () => {
     const sim = warriorAtCap();
     const build = alloc({
       spec: 'arms',
-      rows: { 8: rowOption('warrior', 1, 1), 20: rowOption('warrior', 5, 1) },
+      rows: { 8: rowOption('warrior', 1, 0), 20: rowOption('warrior', 5, 1) },
     });
     expect(sim.applyTalents(build)).toBe(true);
     const state = sim.serializeCharacter(sim.playerId)!;
@@ -307,7 +307,7 @@ describe('Sim integration', () => {
     const meta = sim2.meta(pid)!;
     expect(meta.talents).toEqual(build);
     expect(meta.talentMods.spec).toBe('arms');
-    expect(meta.talentMods.grants.some((g) => g.ability === 'swordguard')).toBe(true);
+    expect(meta.talentMods.grants.some((g) => g.ability === 'pummel')).toBe(true);
     expect(meta.talentMods.grants.some((g) => g.ability === 'bladestorm')).toBe(true);
   });
 
@@ -326,13 +326,13 @@ describe('Sim integration', () => {
 describe('loadouts and build-string application', () => {
   it('saves and switches loadouts, restoring spec, rows, and action bar', () => {
     const sim = warriorAtCap();
-    const arms = alloc({ spec: 'arms', rows: { 8: rowOption('warrior', 1, 1) } });
+    const arms = alloc({ spec: 'arms', rows: { 8: rowOption('warrior', 1, 0) } });
     const prot = alloc({
       spec: 'prot',
       rows: { 5: rowOption('warrior', 0), 17: rowOption('warrior', 4) },
     });
 
-    expect(sim.saveLoadout('Arms PvE', ['mortal_strike', 'swordguard', null], arms)).toBe(0);
+    expect(sim.saveLoadout('Arms PvE', ['mortal_strike', 'pummel', null], arms)).toBe(0);
     expect(sim.saveLoadout('Prot Tank', ['shield_slam', 'shield_wall'], prot)).toBe(1);
     expect(sim.loadouts.length).toBe(2);
     expect(sim.talents).toEqual(prot);
@@ -342,9 +342,9 @@ describe('loadouts and build-string application', () => {
     expect(sim.talents).toEqual(arms);
     expect(sim.talentSpec).toBe('arms');
     expect(sim.activeLoadout).toBe(0);
-    expect(sim.loadouts[0].bar).toEqual(['mortal_strike', 'swordguard', null]);
+    expect(sim.loadouts[0].bar).toEqual(['mortal_strike', 'pummel', null]);
     expect(sim.known.some((k) => k.def.id === 'mortal_strike')).toBe(true);
-    expect(sim.known.some((k) => k.def.id === 'swordguard')).toBe(true);
+    expect(sim.known.some((k) => k.def.id === 'pummel')).toBe(true);
   });
 
   it('deletes a loadout, repairs the active index, and caps loadout count', () => {
@@ -438,7 +438,7 @@ describe('ClientWorld wire path', () => {
     const c = bareClient(1);
     const snapshotAlloc = alloc({
       spec: 'prot',
-      rows: { 8: rowOption('warrior', 1, 1), 17: rowOption('warrior', 4) },
+      rows: { 8: rowOption('warrior', 1, 0), 17: rowOption('warrior', 4) },
     });
     c.applySnapshot({
       t: 'snap',
@@ -461,7 +461,7 @@ describe('ClientWorld wire path', () => {
     expect(c.loadouts.length).toBe(1);
     expect(c.activeLoadout).toBe(0);
     expect(c.known.some((k: any) => k.def.id === 'shield_slam')).toBe(true);
-    expect(c.known.some((k: any) => k.def.id === 'swordguard')).toBe(true);
+    expect(c.known.some((k: any) => k.def.id === 'pummel')).toBe(true);
     expect(c.known.some((k: any) => k.def.id === 'reckless_vow')).toBe(true);
     expect(c.talentPoints()).toEqual({ total: 6, spent: pickedRows(snapshotAlloc.rows) });
   });

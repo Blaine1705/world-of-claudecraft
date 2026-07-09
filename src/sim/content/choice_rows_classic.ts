@@ -78,26 +78,40 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'warcraft',
       options: [
         {
-          id: 'war_r8_rallying_breath',
-          name: 'Rallying Breath',
-          description:
-            "Blaine1705's playtested tuning: below 35% health, you regenerate 1.5% of your health per second.",
-          icon: 'last_stand',
-          effect: { global: { secondWindPctPerSec: 0.015, secondWindHpBelow: 0.35 } },
+          id: 'war_r8_pummel',
+          name: 'Jawcrack',
+          description: 'Interrupt spellcasting for a 4 sec school lockout.',
+          icon: 'pummel',
+          effect: { grant: { ability: 'pummel' } },
         },
         {
-          id: 'war_r8_swordguard',
-          name: 'Swordguard',
-          description: 'Grants Swordguard.',
-          icon: 'shield_wall',
-          effect: { grant: { ability: 'swordguard' } },
+          id: 'war_r8_concussive_clap',
+          name: 'Concussive Clap',
+          description: 'Quaking Blow also roots targets hit within 8 yd for 1 sec.',
+          icon: 'thunder_clap',
+          effect: {
+            ability: [
+              {
+                ability: 'thunder_clap',
+                addEffects: [{ type: 'aoeRoot', duration: 1, radius: 8, min: 0, max: 0 }],
+              },
+            ],
+          },
         },
         {
-          id: 'war_r8_triumph_rush',
-          name: 'Triumph Rush',
-          description: 'Grants Triumph Rush.',
-          icon: 'overpower',
-          effect: { grant: { ability: 'triumph_rush' } },
+          id: 'war_r8_crippling_strikes',
+          name: 'Crippling Strikes',
+          description: 'Hamstring costs 66% less and slows the target by 70% for 15 sec.',
+          icon: 'hamstring',
+          effect: {
+            ability: [
+              {
+                ability: 'hamstring',
+                costPct: -0.66,
+                addEffects: [{ type: 'slow', mult: 0.3, duration: 15 }],
+              },
+            ],
+          },
         },
       ],
     },
@@ -134,43 +148,30 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'arms_master',
       options: [
         {
-          id: 'war_r14_rage_discipline',
-          name: 'Rage Discipline',
+          id: 'war_r14_crippling_blows',
+          name: 'Crippling Blows',
           description:
-            "Blaine1705's playtested tuning: your auto-attacks generate 25% more rage and your abilities 15% more.",
-          icon: 'bloodrage',
-          effect: { global: { autoRagePct: 0.25, abilityRagePct: 0.15 } },
-        },
-        {
-          id: 'war_r14_blood_offering',
-          name: 'Blood Offering',
-          description:
-            "Blaine1705's playtested tuning: Blood Toll grants 20 additional rage and recharges 50% faster.",
-          icon: 'bloodrage',
+            'Bladed Gyre also hamstrings everything it hits, slowing movement by 50% for 5 sec.',
+          icon: 'hamstring',
           effect: {
             ability: [
-              {
-                ability: 'bloodrage',
-                cooldownPct: -0.5,
-                addEffects: [{ type: 'gainResource', amount: 20 }],
-              },
+              { ability: 'whirlwind', addEffects: [{ type: 'slow', mult: 0.5, duration: 5 }] },
             ],
           },
         },
         {
-          id: 'war_r14_battle_rhythm',
-          name: 'Battle Rhythm',
-          description:
-            "Blaine1705's playtested tuning: every 3rd ability generates 20% more rage and deals 5% more damage.",
-          icon: 'battle_shout',
-          effect: {
-            global: {
-              battleRhythm: 1,
-              battleRhythmEvery: 3,
-              battleRhythmRagePct: 0.2,
-              battleRhythmDmgPct: 0.05,
-            },
-          },
+          id: 'war_r14_whirlwind',
+          name: 'Bladed Gyre',
+          description: 'Grants Whirlwind.',
+          icon: 'whirlwind',
+          effect: { grant: { ability: 'whirlwind' } },
+        },
+        {
+          id: 'war_r14_executioner',
+          name: 'Executioner',
+          description: 'Execute costs 50% less and deals 20% more damage.',
+          icon: 'execute',
+          effect: { ability: [{ ability: 'execute', costPct: -0.5, dmgPct: 0.2 }] },
         },
       ],
     },

@@ -52,22 +52,10 @@ describe('Blaine1705 warrior row mechanics', () => {
     expect(sim.resolvedAbility('charge')?.bonusCharges).toBe(1);
   });
 
-  it('Rallying Breath heals below 35 percent on the regen cadence', () => {
-    const { sim, p } = rig({ 8: 'war_r8_rallying_breath' });
-    p.hp = Math.floor(p.maxHp * 0.3);
-    p.inCombat = true;
-    for (let i = 0; i < 40; i++) sim.tick();
-    expect(p.hp).toBeGreaterThan(Math.floor(p.maxHp * 0.3));
-  });
-
-  it('Triumph Rush kill window and Red Harvest stacks apply on credited kills', () => {
-    const { sim, p } = rig({
-      8: 'war_r8_triumph_rush',
-      17: 'war_r17_red_harvest',
-    });
+  it('Red Harvest stacks apply on credited kills', () => {
+    const { sim, p } = rig({ 17: 'war_r17_red_harvest' });
     const first = addMob(sim, 10);
     dealDamage(sim, p, first, 20);
-    expect(p.victoryRushUntil).toBeGreaterThan(sim.time);
     expect(p.auras.find((a) => a.id === 'war_bloodbath_dmg')?.stacks).toBe(1);
 
     const second = addMob(sim, 10);
