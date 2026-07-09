@@ -6803,23 +6803,11 @@ export const tr_TR: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "Ölümsüz Savaşmuhafızı Bacak Zırhı"
       },
-      "deathless_warguard_gauntlets": {
-        "name": "Deathless Warguard Gauntlets"
-      },
       "soulrend_diadem": {
         "name": "Ruhyırtan Tacı"
       },
-      "soulrend_handwraps": {
-        "name": "Soulrend Handwraps"
-      },
       "scourgehide_carapace": {
         "name": "Afetpostu Kabuğu"
-      },
-      "scourgehide_grips": {
-        "name": "Scourgehide Grips"
-      },
-      "soulforged_gauntlets": {
-        "name": "Soulforged Gauntlets"
       },
       "cryptplate_helm": {
         "name": "Mezarzırh Miğferi"

@@ -6803,23 +6803,11 @@ export const sv_SE: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "Odödlig krigsvakts benbrynja"
       },
-      "deathless_warguard_gauntlets": {
-        "name": "Deathless Warguard Gauntlets"
-      },
       "soulrend_diadem": {
         "name": "Själsrivardiadem"
       },
-      "soulrend_handwraps": {
-        "name": "Soulrend Handwraps"
-      },
       "scourgehide_carapace": {
         "name": "Gisselhudspansar"
-      },
-      "scourgehide_grips": {
-        "name": "Scourgehide Grips"
-      },
-      "soulforged_gauntlets": {
-        "name": "Soulforged Gauntlets"
       },
       "cryptplate_helm": {
         "name": "Kryptplåtshjälm"

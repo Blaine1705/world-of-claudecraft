@@ -6803,23 +6803,11 @@ export const it_IT: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "Cosciali di maglia del guardiaguerra senza morte"
       },
-      "deathless_warguard_gauntlets": {
-        "name": "Deathless Warguard Gauntlets"
-      },
       "soulrend_diadem": {
         "name": "Diadema straccianima"
       },
-      "soulrend_handwraps": {
-        "name": "Soulrend Handwraps"
-      },
       "scourgehide_carapace": {
         "name": "Carapace di pelle del flagello"
-      },
-      "scourgehide_grips": {
-        "name": "Scourgehide Grips"
-      },
-      "soulforged_gauntlets": {
-        "name": "Soulforged Gauntlets"
       },
       "cryptplate_helm": {
         "name": "Elmo della corazza della cripta"

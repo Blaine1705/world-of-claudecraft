@@ -6803,23 +6803,11 @@ export const zh_TW: EnTranslations = {
       "deathless_warguard_legmail": {
         "name": "不死戰衛腿甲"
       },
-      "deathless_warguard_gauntlets": {
-        "name": "不死戰衛護手"
-      },
       "soulrend_diadem": {
         "name": "裂魂冠冕"
       },
-      "soulrend_handwraps": {
-        "name": "裂魂纏手"
-      },
       "scourgehide_carapace": {
         "name": "災禍之皮甲殼"
-      },
-      "scourgehide_grips": {
-        "name": "災禍之皮握爪"
-      },
-      "soulforged_gauntlets": {
-        "name": "鑄魂護手"
       },
       "cryptplate_helm": {
         "name": "墓板頭盔"

@@ -10,40 +10,24 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "es_ES": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "fr_FR": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "fr_CA": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
@@ -51,20 +35,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "de_DE": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
@@ -75,10 +51,6 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
@@ -86,80 +58,48 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "nl_NL": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "pl_PL": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "id_ID": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "tr_TR": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "sv_SE": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "vi_VN": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
     "hudChrome.itemHeroicTag"
   ],
   "da_DK": [
-    "entities.items.deathless_warguard_gauntlets.name",
-    "entities.items.scourgehide_grips.name",
-    "entities.items.soulforged_gauntlets.name",
-    "entities.items.soulrend_handwraps.name",
     "entities.mobs.nythraxis_heroic_priest_add.name",
     "entities.mobs.nythraxis_heroic_rogue_add.name",
     "entities.mobs.nythraxis_heroic_warrior_add.name",
