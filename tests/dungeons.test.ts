@@ -651,8 +651,20 @@ describe('dungeons: heroic boss drops', () => {
         null,
         'hit',
       );
-      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) => table.includes(s.itemId));
-      expect(epics.length, `seed ${seed}`).toBe(2); // one per roll group
+      const items = (boss.loot?.items ?? []) as any[];
+      const epics = items.filter((s) => table.includes(s.itemId));
+      expect(epics.length, `seed ${seed}`).toBe(5); // one per heroic roll group
+      // The normal-tier groups are suppressed on a heroic raid claim: every
+      // dropped item is a [HEROIC] raid epic, no normal Nythraxis gear.
+      const normalTierIds = new Set(
+        (MOBS[NYTHRAXIS_BOSS_ID].loot ?? [])
+          .filter((e: any) => e.rollGroup && e.itemId)
+          .map((e: any) => e.itemId),
+      );
+      expect(
+        items.some((s) => normalTierIds.has(s.itemId)),
+        `seed ${seed} no normal gear`,
+      ).toBe(false);
       for (const s of epics) dropped.add(s.itemId);
     }
     expect(dropped.size).toBeGreaterThan(2);

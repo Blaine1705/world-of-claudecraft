@@ -23,6 +23,17 @@ import type { ItemDef, LootEntry } from '../types';
 // epic pieces land at item level 31 (25 + the epic bump of 6).
 export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 
+// The 10-player raid (Heroic Nythraxis) sits one tier above the heroic
+// five-mans: its set reads a higher source level so the epics land at item
+// level 33 (27 + the epic bump of 6), a clear step above heroic dungeon gear
+// (variants 28, dungeon final-boss sets 31). buildSourceIndex in item_level.ts
+// registers the Nythraxis boss table at this level, the five-mans at
+// HEROIC_LOOT_SOURCE_LEVEL.
+export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
+
+// The boss whose heroic table reads the raid source level (see above).
+export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
@@ -331,7 +342,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 22, max: 38, speed: 2.4 },
-    stats: { int: 12, spi: 10 },
+    stats: { int: 13, spi: 10 },
     sellValue: 16000,
     requiredClass: CASTER,
   },
@@ -343,7 +354,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 315, str: 11, sta: 9 },
+    stats: { armor: 315, str: 12, sta: 9 },
     sellValue: 13000,
     requiredClass: HEAVY,
   },
@@ -355,7 +366,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 76, int: 10, spi: 8 },
+    stats: { armor: 76, int: 11, spi: 9 },
     sellValue: 12000,
     requiredClass: CASTER,
   },
@@ -367,7 +378,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 172, agi: 12, sta: 10 },
+    stats: { armor: 172, agi: 13, sta: 10 },
     sellValue: 14000,
     requiredClass: AGILE_WILD,
   },
@@ -379,7 +390,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 40, max: 62, speed: 3.4 },
-    stats: { str: 13, sta: 9 },
+    stats: { str: 14, sta: 9 },
     sellValue: 16000,
     requiredClass: HEAVY,
   },
@@ -391,7 +402,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 335, int: 12, spi: 10 },
+    stats: { armor: 335, int: 13, spi: 10 },
     sellValue: 14000,
     requiredClass: HEAL_MAIL,
   },
@@ -403,7 +414,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 20, max: 36, speed: 2.5 },
-    stats: { int: 13, spi: 9 },
+    stats: { int: 14, spi: 9 },
     sellValue: 16000,
     requiredClass: HEAL_MAIL,
   },
@@ -445,13 +456,19 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
     { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
   ],
+  // The raid drops FIVE heroic epics per kill (five rollGroups, each summing to
+  // 1.0 so exactly one item drops per group), against the five-mans' two. On a
+  // heroic Nythraxis claim loot_roll.ts also suppresses the boss's normal
+  // (item-level-26) table, so every drop is a [HEROIC] ilvl-33 piece. Groups are
+  // organized by archetype: str plate/mail, heal-mail, and the three
+  // single-piece caster/agile slots.
   nythraxis_scourge_of_thornpeak: [
-    { itemId: 'scepter_of_the_deathless_court', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_warguard_legmail', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'soulrend_diadem', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'scourgehide_carapace', chance: 0.25, rollGroup: 'nythraxis_heroic' },
-    { itemId: 'deathless_greatblade', chance: 0.34, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'soulforged_warplate', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
-    { itemId: 'stormcallers_focus', chance: 0.33, rollGroup: 'nythraxis_heroic2' },
+    { itemId: 'deathless_warguard_legmail', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'deathless_greatblade', chance: 0.5, rollGroup: 'nythraxis_heroic_1' },
+    { itemId: 'soulforged_warplate', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'stormcallers_focus', chance: 0.5, rollGroup: 'nythraxis_heroic_2' },
+    { itemId: 'scepter_of_the_deathless_court', chance: 1, rollGroup: 'nythraxis_heroic_3' },
+    { itemId: 'soulrend_diadem', chance: 1, rollGroup: 'nythraxis_heroic_4' },
+    { itemId: 'scourgehide_carapace', chance: 1, rollGroup: 'nythraxis_heroic_5' },
   ],
 };

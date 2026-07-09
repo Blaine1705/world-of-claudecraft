@@ -23,7 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
+import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../content/heroic_loot';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
@@ -149,11 +149,22 @@ export function rollLoot(
   let copper = 0;
   const items: LootSlot[] = [];
   const rolledGroups = new Set<string>();
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  const isHeroic = inst?.difficulty === 'heroic';
+  // On a HEROIC Nythraxis (10-player raid) kill, the boss's normal-tier drop
+  // groups are suppressed so every drop is an item-level-33 [HEROIC] raid epic
+  // (rolled from HEROIC_BOSS_LOOT below); copper still drops. The five-man
+  // heroics deliberately keep their normal groups (they drop normal + heroic),
+  // so this gate is scoped to the raid boss. Suppression draws NO rng and only
+  // fires on a heroic claim, so the normal loot trace and parity goldens are
+  // byte-identical.
+  const suppressBaseGroups = isHeroic && mob.templateId === NYTHRAXIS_RAID_BOSS_ID;
   for (const entry of template.loot) {
     // Exclusive groups: a single rng draw is partitioned by the group
     // entries' chances, so at most one matching entry drops.
     // Exactly one rng.next() per group keeps replays deterministic.
     if (entry.rollGroup) {
+      if (suppressBaseGroups) continue;
       if (rolledGroups.has(entry.rollGroup)) continue;
       rolledGroups.add(entry.rollGroup);
       const group = template.loot.filter((l) => l.rollGroup === entry.rollGroup);
@@ -193,8 +204,7 @@ export function rollLoot(
   // table's, so sharing `rolledGroups` is safe.
   const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId];
   if (heroicEntries) {
-    const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-    if (inst?.difficulty === 'heroic') {
+    if (isHeroic) {
       for (const entry of heroicEntries) {
         if (entry.rollGroup) {
           if (rolledGroups.has(entry.rollGroup)) continue;
