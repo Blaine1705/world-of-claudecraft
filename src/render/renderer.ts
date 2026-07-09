@@ -1204,32 +1204,34 @@ export class Renderer {
       ctx.arc(64, 64, R, 0, Math.PI * 2);
       ctx.clip();
       // spherical shading: a bright highlight up-left falling to a shaded lower-
-      // right limb. Only the highlight is bright enough to bloom, so the rest of
-      // the face keeps its detail instead of washing to a uniform white ball.
+      // right limb. The peak is kept UNDER the 0.85 bloom threshold so the whole
+      // face never blooms into a featureless white ball (that was the bug: at
+      // night, full brightness, the disc crossed the threshold and washed out).
+      // The soft glow sprite behind it carries the "luminous" feel instead.
       const base = ctx.createRadialGradient(46, 44, 4, 62, 62, R * 1.3);
-      base.addColorStop(0, 'rgba(236, 240, 250, 1)');
-      base.addColorStop(0.45, 'rgba(200, 208, 228, 1)');
-      base.addColorStop(0.8, 'rgba(146, 158, 188, 1)');
-      base.addColorStop(1, 'rgba(112, 124, 156, 1)');
+      base.addColorStop(0, 'rgba(196, 202, 216, 1)'); // ~0.77, just under bloom
+      base.addColorStop(0.45, 'rgba(166, 174, 196, 1)');
+      base.addColorStop(0.8, 'rgba(116, 126, 154, 1)');
+      base.addColorStop(1, 'rgba(88, 98, 126, 1)');
       ctx.fillStyle = base;
       ctx.fillRect(0, 0, 128, 128);
-      // maria (dark seas) + craters, darker for clear contrast under bloom
+      // maria (dark seas) + craters, kept dark for strong contrast against the face
       const spots: [number, number, number, number][] = [
-        [50, 44, 16, 0.5],
-        [80, 56, 12, 0.42],
-        [58, 82, 18, 0.4],
-        [42, 66, 9, 0.5],
-        [86, 84, 8, 0.42],
-        [72, 36, 7, 0.36],
-        [38, 52, 6, 0.4],
-        [94, 66, 6, 0.32],
-        [64, 58, 5, 0.36],
+        [50, 44, 16, 0.55],
+        [80, 56, 12, 0.46],
+        [58, 82, 18, 0.44],
+        [42, 66, 9, 0.55],
+        [86, 84, 8, 0.46],
+        [72, 36, 7, 0.4],
+        [38, 52, 6, 0.44],
+        [94, 66, 6, 0.36],
+        [64, 58, 5, 0.4],
       ];
       for (const [cx, cy, cr, a] of spots) {
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-        g.addColorStop(0, `rgba(64, 74, 100, ${a})`);
-        g.addColorStop(0.7, `rgba(90, 100, 128, ${a * 0.5})`);
-        g.addColorStop(1, 'rgba(90, 100, 128, 0)');
+        g.addColorStop(0, `rgba(48, 56, 80, ${a})`);
+        g.addColorStop(0.7, `rgba(74, 84, 112, ${a * 0.5})`);
+        g.addColorStop(1, 'rgba(74, 84, 112, 0)');
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(cx, cy, cr, 0, Math.PI * 2);
@@ -1281,7 +1283,7 @@ export class Renderer {
     // moon: a bright cratered face (normal-blended so the maria read as dark)
     // under a soft cool additive glow kept modest so it does not wash the face
     this.moonSprites = [
-      makeCelestialSprite(glowTex(150, 170, 220), 116, 0.16),
+      makeCelestialSprite(glowTex(160, 178, 226), 126, 0.2),
       makeCelestialSprite(moonTex(), 52, 1, THREE.NormalBlending),
     ];
 
