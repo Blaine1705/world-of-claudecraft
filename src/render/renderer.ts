@@ -1199,42 +1199,53 @@ export class Renderer {
       cv.width = cv.height = 128;
       const ctx = cv.getContext('2d')!;
       const R = 60;
-      // bright sphere with an offset highlight + dimmer limb for a subtle 3D read
-      const base = ctx.createRadialGradient(54, 50, 6, 64, 64, R);
-      base.addColorStop(0, 'rgba(252, 253, 255, 1)');
-      base.addColorStop(0.68, 'rgba(232, 237, 248, 1)');
-      base.addColorStop(0.9, 'rgba(206, 214, 232, 1)');
-      base.addColorStop(1, 'rgba(206, 214, 232, 0)'); // feathered edge
-      ctx.fillStyle = base;
-      ctx.beginPath();
-      ctx.arc(64, 64, R, 0, Math.PI * 2);
-      ctx.fill();
       ctx.save();
       ctx.beginPath();
       ctx.arc(64, 64, R, 0, Math.PI * 2);
-      ctx.clip(); // keep the maria + craters inside the disc
+      ctx.clip();
+      // spherical shading: a bright highlight up-left falling to a shaded lower-
+      // right limb. Only the highlight is bright enough to bloom, so the rest of
+      // the face keeps its detail instead of washing to a uniform white ball.
+      const base = ctx.createRadialGradient(46, 44, 4, 62, 62, R * 1.3);
+      base.addColorStop(0, 'rgba(236, 240, 250, 1)');
+      base.addColorStop(0.45, 'rgba(200, 208, 228, 1)');
+      base.addColorStop(0.8, 'rgba(146, 158, 188, 1)');
+      base.addColorStop(1, 'rgba(112, 124, 156, 1)');
+      ctx.fillStyle = base;
+      ctx.fillRect(0, 0, 128, 128);
+      // maria (dark seas) + craters, darker for clear contrast under bloom
       const spots: [number, number, number, number][] = [
-        [50, 44, 15, 0.34], // maria
-        [78, 54, 11, 0.3],
-        [60, 80, 17, 0.26],
-        [43, 68, 8, 0.32], // craters
-        [86, 82, 7, 0.3],
-        [72, 38, 6, 0.24],
-        [40, 54, 5, 0.28],
-        [92, 66, 5, 0.22],
-        [66, 60, 4, 0.26],
+        [50, 44, 16, 0.5],
+        [80, 56, 12, 0.42],
+        [58, 82, 18, 0.4],
+        [42, 66, 9, 0.5],
+        [86, 84, 8, 0.42],
+        [72, 36, 7, 0.36],
+        [38, 52, 6, 0.4],
+        [94, 66, 6, 0.32],
+        [64, 58, 5, 0.36],
       ];
       for (const [cx, cy, cr, a] of spots) {
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-        g.addColorStop(0, `rgba(110, 122, 150, ${a})`);
-        g.addColorStop(0.7, `rgba(140, 152, 178, ${a * 0.45})`);
-        g.addColorStop(1, 'rgba(140, 152, 178, 0)');
+        g.addColorStop(0, `rgba(64, 74, 100, ${a})`);
+        g.addColorStop(0.7, `rgba(90, 100, 128, ${a * 0.5})`);
+        g.addColorStop(1, 'rgba(90, 100, 128, 0)');
         ctx.fillStyle = g;
         ctx.beginPath();
         ctx.arc(cx, cy, cr, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
+      // feather the rim so the disc edge anti-aliases into the sky
+      ctx.globalCompositeOperation = 'destination-out';
+      const fade = ctx.createRadialGradient(64, 64, R - 2, 64, 64, R);
+      fade.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      fade.addColorStop(1, 'rgba(0, 0, 0, 1)');
+      ctx.fillStyle = fade;
+      ctx.beginPath();
+      ctx.arc(64, 64, R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
       return new THREE.CanvasTexture(cv);
     };
     const makeCelestialSprite = (
@@ -1268,9 +1279,9 @@ export class Renderer {
       makeCelestialSprite(discTex(255, 224, 168), 42, 0.9),
     ];
     // moon: a bright cratered face (normal-blended so the maria read as dark)
-    // under a soft cool additive glow
+    // under a soft cool additive glow kept modest so it does not wash the face
     this.moonSprites = [
-      makeCelestialSprite(glowTex(150, 170, 220), 128, 0.22),
+      makeCelestialSprite(glowTex(150, 170, 220), 116, 0.16),
       makeCelestialSprite(moonTex(), 52, 1, THREE.NormalBlending),
     ];
 
