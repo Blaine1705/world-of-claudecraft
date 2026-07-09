@@ -9,7 +9,11 @@ function equip(cls: Parameters<Sim['addPlayer']>[0], itemId: string) {
   sim.setPlayerLevel(20, pid);
   sim.addItem(itemId, 1, pid);
   sim.equipItem(itemId, pid);
-  return sim.meta(pid)!;
+  const meta = sim.meta(pid);
+  if (!meta) {
+    throw new Error(`Missing player meta for ${pid}`);
+  }
+  return meta;
 }
 
 describe('armor proficiencies', () => {
@@ -62,5 +66,12 @@ describe('armor proficiencies', () => {
     expect(equip('warrior', 'staff_of_the_gravewyrm').equipment.mainhand).not.toBe(
       'staff_of_the_gravewyrm',
     );
+  });
+
+  it('allows shields for warrior-style classes and keeps cloth casters out', () => {
+    expect(equip('warrior', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('paladin', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('shaman', 'eastbrook_buckler').equipment.offhand).toBe('eastbrook_buckler');
+    expect(equip('mage', 'eastbrook_buckler').equipment.offhand).toBeUndefined();
   });
 });

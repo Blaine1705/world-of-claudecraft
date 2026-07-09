@@ -37,7 +37,13 @@ export const PAPERDOLL_LEFT_SLOTS: readonly EquipSlot[] = [
   'chest',
   'mainhand',
 ];
-export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = ['gloves', 'waist', 'legs', 'feet'];
+export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
+  'gloves',
+  'waist',
+  'legs',
+  'feet',
+  'offhand',
+];
 
 /**
  * Build the paperdoll view from the player's equipment and the item table. A

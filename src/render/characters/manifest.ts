@@ -66,11 +66,11 @@ export interface VisualDef {
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
   attach?: AttachDef[];
-  /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
-   *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
-   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). Usually [0]
-   *  (the mainhand); the rogue lists [0, 1] so a dagger shows in BOTH hands. A fixed
-   *  offhand left off this list stays as authored (the warlock spellbook). */
+  /** Indices into `attach` whose model is replaced by equipped hand-held items.
+   *  Slot order is mainhand first, offhand second when present. undefined/empty =
+   *  held props never change with gear (hunter keeps its crossbow; mobs/NPCs are
+   *  fixed). A fixed offhand left off this list stays as authored (the warlock
+   *  spellbook). */
   weaponSlots?: number[];
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
@@ -258,20 +258,29 @@ const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 
-/** GLB url for an equipped mainhand item's held weapon model, or null if the item
- *  has no mapped model (then the class default attach is kept). Mirrors the bag
- *  icon via the shared ITEM_WEAPON_VARIANTS map, so held weapon == inventory icon. */
-export function itemWeaponModelUrl(itemId: string | null | undefined): string | null {
+const ITEM_OFFHAND_MODELS: Record<string, string> = {
+  eastbrook_buckler: 'shield_round',
+  highwatch_wallshield: 'shield_square',
+};
+
+/** GLB url for an equipped held item model, or null if the item has no mapped
+ *  model. Weapons mirror the bag icon via ITEM_WEAPON_VARIANTS; shields and
+ *  other offhands use a small render-only map. */
+export function itemHeldModelUrl(itemId: string | null | undefined): string | null {
   if (!itemId) return null;
-  const key = ITEM_WEAPON_VARIANTS[itemId];
+  const key = ITEM_WEAPON_VARIANTS[itemId] ?? ITEM_OFFHAND_MODELS[itemId];
   return key ? `${WEAPONS}/${key}.glb` : null;
 }
 
-/** Distinct held-weapon GLB urls (one per variant), for the boot preload sweep so
- *  setWeapon can attach any equipped weapon synchronously (resolvedGltf throws on
- *  an un-preloaded url). */
-export function itemWeaponModelUrls(): string[] {
-  return [...new Set(Object.values(ITEM_WEAPON_VARIANTS).map((key) => `${WEAPONS}/${key}.glb`))];
+/** Distinct held-item GLB urls (weapons + offhands), for the boot preload sweep. */
+export function itemHeldModelUrls(): string[] {
+  return [
+    ...new Set(
+      [...Object.values(ITEM_WEAPON_VARIANTS), ...Object.values(ITEM_OFFHAND_MODELS)].map(
+        (key) => `${WEAPONS}/${key}.glb`,
+      ),
+    ),
+  ];
 }
 
 const LOW_URL_ALIAS: Record<string, string> = {
@@ -436,8 +445,11 @@ export const VISUALS: Record<string, VisualDef> = {
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
-    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
   },
   player_paladin: {
     url: `${PLAYERS}/paladin.glb`,
@@ -446,8 +458,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
   },
   player_hunter: {
     url: `${PLAYERS}/ranger.glb`,
@@ -466,7 +481,7 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
     ],
-    weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
+    weaponSlots: [0, 1], // mainhand in right, offhand in left
   },
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
@@ -484,8 +499,11 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
     tint: 0x6f8fc9,
     tintStrength: 0.4,
   },
@@ -535,8 +553,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // mainhand: the shared handslot.r bone carries the grip (the mech reuses the
     // exact KayKit rig), so weaponSlots swaps attach[0] to the equipped weapon's
     // model just like every other class. The sword is only the no-weapon default.
-    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
-    weaponSlots: [0],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
     lazyPreload: true,
   },
 
@@ -1114,7 +1135,7 @@ export function visualKeyFor(e: Entity): string {
  *  as a player entity's templateId, so this applies the same offline and online. */
 export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride | null {
   const classDef = VISUALS[`player_${cls}`];
-  if (!classDef || (classDef.weaponSlots?.length ?? 0) < 2) return null;
+  if (!classDef?.attach || !classDef.weaponSlots?.length) return null;
   return { attach: classDef.attach, weaponSlots: classDef.weaponSlots };
 }
 
@@ -1127,9 +1148,9 @@ export function manifestUrls(): string[] {
     for (const url of def.animUrls ?? []) urls.add(url);
     for (const a of def.attach ?? []) urls.add(a.url);
   }
-  // Equipped-weapon models a player may swap to at runtime (any nearby player's
-  // gear), so they are resolved-and-ready when setWeapon attaches them.
-  for (const url of itemWeaponModelUrls()) urls.add(url);
+  // Equipped held-item models a player may swap to at runtime (any nearby
+  // player's gear), so they are resolved-and-ready when setHeldItems attaches them.
+  for (const url of itemHeldModelUrls()) urls.add(url);
   return [...urls];
 }
 

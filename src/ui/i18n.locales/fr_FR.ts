@@ -2449,7 +2449,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Une frappe circulaire qui touche tous les ennemis devant vous pour {damage} points de dégâts.',
   'entities.abilities.defensive_stance.name': 'Posture de garde',
   'entities.abilities.defensive_stance.description':
-    'Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l\'offensive.',
+    "Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l'offensive.",
   'entities.abilities.battle_stance.name': 'Posture de combat',
   'entities.abilities.battle_stance.description':
     'Posture de combat agressive: vous générez 10% de rage en plus. La posture par défaut pour Armes et Protection.',

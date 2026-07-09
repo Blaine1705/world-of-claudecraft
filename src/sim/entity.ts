@@ -42,6 +42,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     overheadEmoteSeq: 0,
     stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
     weapon: { min: 1, max: 2, speed: 2 },
+    offhandWeapon: null,
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
@@ -58,6 +59,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    offhandSwingTimer: 0,
+    dualWielding: false,
     inCombat: false,
     combatTimer: 99,
     auras: [],
@@ -144,6 +147,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    offhandItemId: null,
     equippedItems: {},
     guild: '',
   };
@@ -349,17 +353,33 @@ export function recalcPlayerStats(
   // until the wearer is high enough level. The mainhand still stays worn (see
   // e.mainhandItemId below) so the weapon model keeps rendering.
   const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
   const weapon =
-    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
+    mainhand?.kind === 'weapon' && meetsLevelRequirement(lvl, mainhand)
       ? mainhand.weapon
       : { min: 1, max: 2, speed: 2 };
+  const offhandWeapon =
+    offhand?.kind === 'weapon' && meetsLevelRequirement(lvl, offhand) ? offhand.weapon : null;
   e.weapon = weapon;
+  e.offhandWeapon = offhandWeapon;
+  e.dualWielding = !!(
+    offhandWeapon &&
+    mainhand?.kind === 'weapon' &&
+    meetsLevelRequirement(lvl, mainhand)
+  );
   // Render-only: the equipped mainhand item id drives the held weapon model on
   // the client (mapped via ITEM_WEAPON_VARIANTS). Gated on the item actually being
   // a weapon, mirroring the e.weapon derivation above (so a non-weapon mainhand,
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  e.offhandItemId =
+    equipment.offhand &&
+    (ITEMS[equipment.offhand]?.kind === 'weapon' ||
+      ITEMS[equipment.offhand]?.kind === 'shield' ||
+      ITEMS[equipment.offhand]?.kind === 'held_offhand')
+      ? equipment.offhand
+      : null;
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.

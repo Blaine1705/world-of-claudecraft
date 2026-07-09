@@ -2415,7 +2415,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un colpo ampio che raggiunge tutti i nemici davanti a te per {damage} danni.',
   'entities.abilities.defensive_stance.name': 'Posizione Guardinga',
   'entities.abilities.defensive_stance.description':
-    'Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lancia Posizione di Battaglia per tornare all\'offensiva.',
+    "Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lancia Posizione di Battaglia per tornare all'offensiva.",
   'entities.abilities.battle_stance.name': 'Posizione di Battaglia',
   'entities.abilities.battle_stance.description':
     'Posizione di combattimento aggressiva: generi il 10% di rabbia in più. La posizione predefinita per Armi e Protezione.',
@@ -5700,7 +5700,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formCat': 'Forma felina: danni in mischia ed energia',
   'hudChrome.auraEffect.formTravel': 'Forma di Fleet: velocità di movimento aumentata del {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Posizione Guardinga: danni subiti ridotti, più minaccia',
-  'hudChrome.auraEffect.battleStance': 'Posizione di Battaglia: 10% di generazione di rabbia in più',
+  'hudChrome.auraEffect.battleStance':
+    'Posizione di Battaglia: 10% di generazione di rabbia in più',
   'hudChrome.auraEffect.berserkerStance':
     'Posizione Berserker: critici il 3% più spesso e il 3% più forti',
   'hudChrome.auraEffect.righteousFury':

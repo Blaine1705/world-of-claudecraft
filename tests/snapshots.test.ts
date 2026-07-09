@@ -305,7 +305,7 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(override?.weaponSlots).toEqual([0, 1]); // equipped weapon shows in BOTH hands
   });
 
-  it('keeps a non-dual class (warrior) mech to a single mainhand over the wire', () => {
+  it('mirrors a warrior mech offhand layout over the wire', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     const pid = sim.playerId;
     sim.setPlayerSkin(pid, 0, 'mech');
@@ -319,7 +319,7 @@ describe('Combat Mech held weapon over the wire', () => {
     expect(mirrored.skinCatalog).toBe('mech');
     expect(mirrored.mainhandItemId).toBe('worn_sword');
     expect(visualKeyFor(mirrored)).toBe('player_mech');
-    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)).toBeNull();
+    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)?.weaponSlots).toEqual([0, 1]);
   });
 });
 
@@ -1567,20 +1567,21 @@ describe('guild nameplate wire', () => {
   });
 });
 
-// Equipped mainhand item id rides the identity wire (terse key `mh`) so the
-// renderer can show each player's held weapon model. Recomputed in
-// recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
-describe('held weapon wire (mainhandItemId)', () => {
+// Equipped held item ids ride the identity wire (terse keys `mh` / `oh`) so the
+// renderer can show each player's visible weapon/shield models.
+describe('held item wire (mainhandItemId/offhandItemId)', () => {
   it('carries the equipped mainhand item through wireEntity', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
     const e = sim.entities.get(pid)!;
     // a fresh warrior starts holding its class startWeapon
     expect(e.mainhandItemId).toBe('worn_sword');
+    expect(e.offhandItemId).toBeNull();
     expect(wireEntity(e).mh).toBe('worn_sword');
+    expect(wireEntity(e).oh).toBeUndefined();
   });
 
-  it('restores entity.mainhandItemId on the client from a full record', () => {
+  it('restores held item ids on the client from a full record', () => {
     const client = bareClient(99);
     const base = {
       id: 7,
@@ -1596,12 +1597,17 @@ describe('held weapon wire (mainhandItemId)', () => {
       mhp: 100,
     };
 
-    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, mh: 'zealotsbane_blade' }] });
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...base, mh: 'zealotsbane_blade', oh: 'eastbrook_buckler' }],
+    });
     expect(client.entities.get(7)?.mainhandItemId).toBe('zealotsbane_blade');
+    expect(client.entities.get(7)?.offhandItemId).toBe('eastbrook_buckler');
 
     // a later full record without `mh` means "no equipped weapon" → reset to null
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
     expect(client.entities.get(7)?.mainhandItemId).toBeNull();
+    expect(client.entities.get(7)?.offhandItemId).toBeNull();
   });
 });
 

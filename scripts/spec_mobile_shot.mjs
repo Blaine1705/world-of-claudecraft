@@ -28,9 +28,9 @@ const cdp = await page.target().createCDPSession();
 await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'pointer', value: 'coarse' }] });
 
 const errors = [];
-page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
 page.on('console', (m) => {
-  if (m.type() === 'error') errors.push('CONSOLE: ' + m.text());
+  if (m.type() === 'error') errors.push(`CONSOLE: ${m.text()}`);
 });
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));

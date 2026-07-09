@@ -499,7 +499,8 @@ export interface EntityView {
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
-  mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  mainhandItemId: string | null; // last-rendered equipped mainhand, diffed for live held-item swaps
+  offhandItemId: string | null; // last-rendered equipped offhand, diffed for live held-item swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -3348,6 +3349,7 @@ export class Renderer {
       lastZ: e.pos.z,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
+      offhandItemId: e.offhandItemId,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3422,7 +3424,8 @@ export class Renderer {
     v.clickTarget = next.clickProxy;
     v.height = next.height;
     v.skin = e.skin;
-    v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
+    v.mainhandItemId = e.mainhandItemId; // next was built holding the current held items
+    v.offhandItemId = e.offhandItemId;
     v.group.add(next.root);
   }
 
@@ -4082,11 +4085,12 @@ export class Renderer {
         v.visual.setSkin(e.skin);
       }
 
-      // live held-weapon swap — equipped mainhand changed (self equip or a peer's
-      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
-      if (e.mainhandItemId !== v.mainhandItemId) {
+      // live held-item swap, equipped mainhand/offhand changed (self equip or a
+      // peer's gear update); classes with fixed props no-op.
+      if (e.mainhandItemId !== v.mainhandItemId || e.offhandItemId !== v.offhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
-        v.visual.setWeapon(e.mainhandItemId);
+        v.offhandItemId = e.offhandItemId;
+        v.visual.setWeapons(e.mainhandItemId, e.offhandItemId);
       }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the

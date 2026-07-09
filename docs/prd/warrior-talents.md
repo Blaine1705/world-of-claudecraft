@@ -16,6 +16,16 @@ Status legend: DONE = implemented and green on `integration`; PENDING = not yet 
 - Protection (tank): active mitigation + control. Signature `shield_slam` ("Shieldcrack").
   Mastery "Recompense" (+30% threat, +10% armor).
 
+## Warrior offhand and dual-wield identity (LOCKED 2026-07-09)
+- See [offhand-dual-wield.md](C:/Users/joseg/Desktop/world-of-claudecraft/docs/prd/offhand-dual-wield.md)
+  for the cross-system equipment/combat spec.
+- Warrior spec identities for that system are locked as:
+  - Arms: two-handed, no dual wield in the first pass
+  - Fury: one-handed mainhand + one-handed offhand, dual wield enabled
+  - Protection: one-handed mainhand + shield offhand, no dual wield in the first pass
+- The first offhand pass keeps warrior weapon abilities on `mainhand`; offhand weapon gameplay is
+  auto-attack only until a later change says otherwise.
+
 ## Base-kit changes (DONE)
 - `battle_shout` "Iron Bellow": GROUP attack-power buff (caster + friendlies within 40 yd),
   duration 1 HOUR, ranks 20/35/50 AP, cost 0 (free), learnLevel 7. Stays in the `warrior_shout`

@@ -44,12 +44,15 @@ import {
   MELEE_RANGE,
   normAngle,
   swingMissChance,
+  type WeaponInfo,
 } from '../types';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { baseSwingSpeed } from './form_swing';
 import { applyThornsReaction } from './thorns_charge';
+
+const DUAL_WIELD_WHITE_MISS_PENALTY = 0.19;
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -99,13 +102,13 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
+  p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead || !ctx.isHostileTo(p, t)) {
     p.autoAttack = false;
     return;
   }
-  if (p.swingTimer > 0) return;
   if (isStunned(p)) return;
   if (isDisarmed(p)) return; // weapon knocked away: no auto-attack swings
   const d = dist2d(p.pos, t.pos);
@@ -130,51 +133,79 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // logic in Sim.abilityNeedsLineOfSight.
   if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
   ctx.breakGhostWolf(p);
+  if (p.swingTimer > 0 && (!p.dualWielding || !p.offhandWeapon || p.offhandSwingTimer > 0)) return;
 
-  let bonus = 0;
-  let abilityName: string | null = null;
-  let threatFlat = 0;
-  let threatMult = 1;
-  if (p.queuedOnSwing) {
-    const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
-    if (queued) {
-      const eff = queued.effects.find((e) => e.type === 'weaponDamage');
-      const queuedCost = p.queuedOnSwingFree === true ? 0 : queued.cost;
-      if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
-        spendResource(p, queuedCost);
-        // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
-        // in castAbility, so their cooldown must be applied on the swing too (#56)
-        if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
-        bonus = eff.bonus;
-        abilityName = queued.def.name;
-        threatFlat = queued.threatFlat;
-        threatMult = queued.threatMult;
+  if (p.swingTimer <= 0) {
+    let bonus = 0;
+    let abilityName: string | null = null;
+    let threatFlat = 0;
+    let threatMult = 1;
+    if (p.queuedOnSwing) {
+      const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
+      if (queued) {
+        const eff = queued.effects.find((e) => e.type === 'weaponDamage');
+        const queuedCost = p.queuedOnSwingFree === true ? 0 : queued.cost;
+        if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
+          spendResource(p, queuedCost);
+          // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
+          // in castAbility, so their cooldown must be applied on the swing too (#56)
+          if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
+          bonus = eff.bonus;
+          abilityName = queued.def.name;
+          threatFlat = queued.threatFlat;
+          threatMult = queued.threatMult;
+        }
       }
+      p.queuedOnSwing = null;
+      delete p.queuedOnSwingFree;
     }
-    p.queuedOnSwing = null;
-    delete p.queuedOnSwingFree;
-  }
-  const connected = meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
-  // Battle Trance (warrior baseline): every CONNECTED auto swing has a chance
-  // to make the next Reaver Strike or Brute Swing free (empower_next.ts owns
-  // the consumption scope). Rolled AFTER the swing so the white-hit table's
-  // own rng draws keep their positions; only warriors draw here.
-  if (connected && meta.cls === 'warrior' && ctx.rng.chance(BATTLE_TRANCE_CHANCE)) {
-    ctx.applyAura(p, {
-      id: 'battle_trance',
-      name: 'Battle Trance',
-      kind: 'battle_trance',
-      remaining: BATTLE_TRANCE_DURATION,
-      duration: BATTLE_TRANCE_DURATION,
-      value: 0,
-      sourceId: p.id,
-      school: 'physical',
+    const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      threatFlat,
+      threatMult,
+      whiteDualWieldPenalty: p.dualWielding && abilityName === null,
     });
+    // Battle Trance (warrior baseline): every CONNECTED auto swing has a chance
+    // to make the next Reaver Strike or Brute Swing free (empower_next.ts owns
+    // the consumption scope). Rolled AFTER the swing so the white-hit table's
+    // own rng draws keep their positions; only warriors draw here.
+    if (connected && meta.cls === 'warrior' && ctx.rng.chance(BATTLE_TRANCE_CHANCE)) {
+      ctx.applyAura(p, {
+        id: 'battle_trance',
+        name: 'Battle Trance',
+        kind: 'battle_trance',
+        remaining: BATTLE_TRANCE_DURATION,
+        duration: BATTLE_TRANCE_DURATION,
+        value: 0,
+        sourceId: p.id,
+        school: 'physical',
+      });
+    }
+    // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
+    // speed (see combat/form_swing.ts); everyone else uses their weapon speed. Melee
+    // haste (item-set bonus) then shortens whatever base interval that yields.
+    p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
   }
-  // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
-  // speed (see combat/form_swing.ts); everyone else uses their weapon speed. Melee
-  // haste (item-set bonus) then shortens whatever base interval that yields.
-  p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
+  if (p.dualWielding && p.offhandWeapon && p.offhandSwingTimer <= 0) {
+    const connected = meleeSwing(ctx, p, t, 0, null, {
+      weapon: p.offhandWeapon,
+      weaponMult: 0.5,
+      apSwingSpeed: p.offhandWeapon.speed,
+      whiteDualWieldPenalty: true,
+    });
+    if (connected && meta.cls === 'warrior' && ctx.rng.chance(BATTLE_TRANCE_CHANCE)) {
+      ctx.applyAura(p, {
+        id: 'battle_trance',
+        name: 'Battle Trance',
+        kind: 'battle_trance',
+        remaining: BATTLE_TRANCE_DURATION,
+        duration: BATTLE_TRANCE_DURATION,
+        value: 0,
+        sourceId: p.id,
+        school: 'physical',
+      });
+    }
+    p.offhandSwingTimer = (p.offhandWeapon.speed * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
+  }
 }
 
 export function rangedSwing(
@@ -230,7 +261,9 @@ export function meleeSwing(
   abilityName: string | null,
   opts: {
     cannotBeDodged?: boolean;
+    weapon?: WeaponInfo;
     weaponMult?: number;
+    apSwingSpeed?: number;
     threatFlat?: number;
     threatMult?: number;
     // Bladed Echo consumer (combat/area_echo.ts): receives the RESOLVED swing
@@ -242,9 +275,13 @@ export function meleeSwing(
     // before (determinism: the stream position never moves); only the rolled
     // outcome is overridden. Plain auto swings never set this.
     forceCrit?: boolean;
+    whiteDualWieldPenalty?: boolean;
   },
 ): boolean {
-  const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
+  const missChance =
+    swingMissChance(attacker, target) +
+    blindMissBonus(attacker) +
+    (opts.whiteDualWieldPenalty ? DUAL_WIELD_WHITE_MISS_PENALTY : 0);
   const dodgeChance = opts.cannotBeDodged
     ? 0
     : target.kind === 'player'
@@ -281,16 +318,18 @@ export function meleeSwing(
     return false;
   }
   const mult = opts.weaponMult ?? 1;
+  const weapon = opts.weapon ?? attacker.weapon;
+  const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
-    (ctx.rng.range(attacker.weapon.min, attacker.weapon.max) +
+    (ctx.rng.range(weapon.min, weapon.max) +
       // Normalize the attack-power contribution to the SAME cadence the swing
       // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
       // AP-per-swing must use that speed too, not the slow staff's, or feral
       // would double-dip (fast swings AND heavy slow-weapon AP weighting).
-      (ctx.effectiveAttackPower(attacker) / 14) * baseSwingSpeed(attacker)) *
+      (ctx.effectiveAttackPower(attacker) / 14) * apSwingSpeed) *
       mult +
     bonus +
     imbueBonus;

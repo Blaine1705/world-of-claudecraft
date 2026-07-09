@@ -540,7 +540,8 @@ export const guideStrings = {
   // press it). Keyed by the sim ability id.
   abilityHook: {
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
-    revenge: 'A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.',
+    revenge:
+      'A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.',
     battle_shout: 'A rallying cry that raises attack power for the party.',
     commanding_shout: 'Bolsters stamina so everyone has more staying power in a fight.',
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',

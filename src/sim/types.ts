@@ -347,6 +347,7 @@ export interface WeaponInfo {
 
 export type EquipSlot =
   | 'mainhand'
+  | 'offhand'
   | 'helmet'
   | 'shoulder'
   | 'chest'
@@ -359,6 +360,7 @@ export type EquipSlot =
 // the entity loop and the server's unequip-command validation.
 export const EQUIP_SLOTS: readonly EquipSlot[] = [
   'mainhand',
+  'offhand',
   'helmet',
   'shoulder',
   'chest',
@@ -387,10 +389,13 @@ export type ItemUse =
 export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
 export type ArmorType = 'cloth' | 'leather' | 'mail';
+export type WeaponHand = 'mainhand' | 'onehand' | 'twohand';
 
 type ItemKind =
   | 'weapon'
   | 'armor'
+  | 'shield'
+  | 'held_offhand'
   | 'quest'
   | 'junk'
   | 'food'
@@ -483,7 +488,7 @@ export interface ItemSet {
 
 export interface ArmorItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: Exclude<EquipSlot, 'mainhand'>;
+  slot: Exclude<EquipSlot, 'mainhand' | 'offhand'>;
   armorType: ArmorType;
   weapon?: never;
 }
@@ -492,15 +497,35 @@ export interface WeaponItemDef extends BaseItemDef {
   kind: 'weapon';
   slot: 'mainhand';
   weapon: WeaponInfo;
+  hand?: WeaponHand;
   armorType?: never;
+}
+
+export interface ShieldItemDef extends BaseItemDef {
+  kind: 'shield';
+  slot: 'offhand';
+  armorType?: never;
+  weapon?: never;
+}
+
+export interface HeldOffhandItemDef extends BaseItemDef {
+  kind: 'held_offhand';
+  slot: 'offhand';
+  armorType?: never;
+  weapon?: never;
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'shield' | 'held_offhand'>;
   armorType?: never;
 }
 
-export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
+export type ItemDef =
+  | ArmorItemDef
+  | WeaponItemDef
+  | ShieldItemDef
+  | HeldOffhandItemDef
+  | OtherItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -1746,6 +1771,7 @@ export interface Entity {
   overheadEmoteSeq: number;
   stats: Stats;
   weapon: WeaponInfo;
+  offhandWeapon: WeaponInfo | null;
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
   spellPower: number; // casters: added to spell damage via per-spell coefficients
@@ -1765,6 +1791,8 @@ export interface Entity {
   targetId: number | null;
   autoAttack: boolean;
   swingTimer: number;
+  offhandSwingTimer: number;
+  dualWielding: boolean;
   /** petSpell windup in flight: sim tick the committed release fires on
    *  (transient combat state like swingTimer; never persisted or wired). */
   rangedWindupReleaseTick?: number | null;
@@ -1914,6 +1942,10 @@ export interface Entity {
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
   mainhandItemId: string | null;
+  // Equipped offhand item id (players only; null otherwise). Render-only: the
+  // client maps it to a held offhand model. Recomputed in recalcPlayerStats and
+  // synced in identity fields (terse `oh`). The sim never reads it for gameplay.
+  offhandItemId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,

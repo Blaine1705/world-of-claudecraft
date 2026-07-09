@@ -37,7 +37,7 @@ import { SPEC_CARD_INFO } from './class_details_data';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { t, type TranslationKey } from './i18n';
+import { type TranslationKey, t } from './i18n';
 import { iconDataUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';

@@ -2347,7 +2347,7 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Posture défensive',
-          'Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l\'offensive.',
+          "Posture de combat défensive: vous générez 30% de menace en plus, mais infligez et subissez 10% de dégâts en moins. Lancez Posture de combat pour revenir à l'offensive.",
         ],
         [
           'battle_stance',
@@ -3229,7 +3229,7 @@ export const classAbilityNames = {
         [
           'defensive_stance',
           'Posizione Difensiva',
-          'Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lancia Posizione di Battaglia per tornare all\'offensiva.',
+          "Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lancia Posizione di Battaglia per tornare all'offensiva.",
         ],
         [
           'battle_stance',

@@ -1870,6 +1870,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/sword_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_round.glb",
+        "bone": "handslot.l"
       }
     ]
   },
@@ -1881,6 +1885,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_square.glb",
+        "bone": "handslot.l"
       }
     ]
   },
@@ -1936,6 +1944,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_round.glb",
+        "bone": "handslot.l"
       }
     ],
     "tintStrength": 0.4

@@ -1,4 +1,4 @@
-import type { ItemDef, InvSlot } from '../sim/types';
+import type { InvSlot, ItemDef } from '../sim/types';
 
 // Pure, DOM-free core for the modular bag filtering system. The HUD is a thin
 // consumer: it owns the controls and the DOM, and calls applyBagFilter() to turn
@@ -6,11 +6,18 @@ import type { ItemDef, InvSlot } from '../sim/types';
 // host-agnostic lets tests drive it directly (tests/bag_filter.test.ts) without a
 // browser, mirroring unit_portrait.ts / xp_bar.ts.
 
-export const BAG_CATEGORIES = ['all', 'weapon', 'armor', 'consumable', 'material', 'quest'] as const;
+export const BAG_CATEGORIES = [
+  'all',
+  'weapon',
+  'armor',
+  'consumable',
+  'material',
+  'quest',
+] as const;
 export const BAG_SORTS = ['recent', 'quality', 'name'] as const;
 
-export type BagCategory = typeof BAG_CATEGORIES[number];
-export type BagSort = typeof BAG_SORTS[number];
+export type BagCategory = (typeof BAG_CATEGORIES)[number];
+export type BagSort = (typeof BAG_SORTS)[number];
 
 export interface BagFilterState {
   category: BagCategory;
@@ -31,9 +38,14 @@ function matchesCategory(item: ItemDef, category: BagCategory): boolean {
     case 'weapon':
       return item.kind === 'weapon';
     case 'armor':
-      return item.kind === 'armor';
+      return item.kind === 'armor' || item.kind === 'shield' || item.kind === 'held_offhand';
     case 'consumable':
-      return item.kind === 'food' || item.kind === 'drink' || item.kind === 'potion' || item.kind === 'elixir';
+      return (
+        item.kind === 'food' ||
+        item.kind === 'drink' ||
+        item.kind === 'potion' ||
+        item.kind === 'elixir'
+      );
     case 'material':
       return item.kind === 'junk' || item.kind === 'tool';
     case 'quest':
@@ -59,21 +71,25 @@ function qualityRank(item: ItemDef): number {
 // Filter, then sort. Returns a new array; never mutates the input. Sorts are
 // stable (Array.prototype.sort is spec-stable), so ties preserve insertion order
 // and the 'recent' sort is simply the unsorted filtered list.
-export function applyBagFilter(slots: readonly InvSlot[], lookup: ItemLookup, state: BagFilterState): InvSlot[] {
+export function applyBagFilter(
+  slots: readonly InvSlot[],
+  lookup: ItemLookup,
+  state: BagFilterState,
+): InvSlot[] {
   const query = state.search.trim().toLowerCase();
-  const filtered = slots.filter((slot) => {
+  const filtered = slots.flatMap((slot) => {
     const item = lookup(slot.itemId);
-    if (!item) return false;
-    if (!matchesCategory(item, state.category)) return false;
-    if (query && !item.name.toLowerCase().includes(query)) return false;
-    return true;
+    if (!item) return [];
+    if (!matchesCategory(item, state.category)) return [];
+    if (query && !item.name.toLowerCase().includes(query)) return [];
+    return [{ slot, item }] as const;
   });
   if (state.sort === 'quality') {
-    filtered.sort((a, b) => qualityRank(lookup(a.itemId)!) - qualityRank(lookup(b.itemId)!));
+    filtered.sort((a, b) => qualityRank(a.item) - qualityRank(b.item));
   } else if (state.sort === 'name') {
-    filtered.sort((a, b) => lookup(a.itemId)!.name.localeCompare(lookup(b.itemId)!.name));
+    filtered.sort((a, b) => a.item.name.localeCompare(b.item.name));
   }
-  return filtered;
+  return filtered.map(({ slot }) => slot);
 }
 
 export function serializeBagFilter(state: BagFilterState): string {

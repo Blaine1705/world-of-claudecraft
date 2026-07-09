@@ -545,6 +545,7 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
 type ItemQuality = NonNullable<ItemDef['quality']>;
 const ITEM_SLOT_LABEL_KEYS: Record<EquipSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
+  offhand: 'itemUi.slots.mainhand',
   helmet: 'itemUi.slots.helmet',
   shoulder: 'itemUi.slots.shoulder',
   chest: 'itemUi.slots.chest',
@@ -569,6 +570,8 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   food: 'itemUi.kind.food',
   drink: 'itemUi.kind.drink',
   tool: 'itemUi.kind.tool',
+  shield: 'itemUi.kind.armor',
+  held_offhand: 'itemUi.kind.armor',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
@@ -10132,17 +10135,17 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    // Show the player's currently equipped mainhand on the character sheet, so the
-    // 3D model reflects gear changes (the char window repaints the preview after an
-    // equip via charWindow.renderIfOpen -> renderPreview).
+    // Show the player's currently equipped held items on the character sheet, so
+    // the 3D model reflects gear changes.
     const weapon = this.sim.equipment.mainhand ?? null;
+    const offhand = this.sim.equipment.offhand ?? null;
     if (previewKey) {
       // mech is class-agnostic; mirror the wearer class's hand layout (rogue
       // dual-wields) so the paperdoll matches the in-world render
       const override = previewKey === 'player_mech' ? mechHeldWeaponOverride(cls) : null;
-      this.charPreview.setVisualKey(previewKey, weapon, override);
+      this.charPreview.setVisualKey(previewKey, weapon, override, offhand);
     } else {
-      this.charPreview.setClass(cls, weapon);
+      this.charPreview.setClass(cls, weapon, offhand);
     }
     this.charPreview.setSkin(skin);
   }
@@ -11051,7 +11054,7 @@ export class Hud {
     // everywhere at once, not be re-decided per export).
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
 
-    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+    const slots: EquipSlot[] = ['mainhand', 'offhand', 'chest', 'legs', 'feet'];
     const gear = slots.map((slot) => {
       const id = sim.equipment[slot];
       const item = id ? ITEMS[id] : null;
@@ -12652,6 +12655,7 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
 }
 
 function itemSlotName(slot: EquipSlot): string {
+  if (slot === 'offhand') return t('hudChrome.paperdoll.offhand' as TranslationKey);
   return t(ITEM_SLOT_LABEL_KEYS[slot]);
 }
 

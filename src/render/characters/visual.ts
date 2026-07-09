@@ -18,7 +18,7 @@ import {
   assembleModel,
   ensureSkinTexture,
   prepareVisual,
-  setHeldWeapon,
+  setHeldItems,
   skinEmissiveTexture,
   skinTexture,
   tintedFarMaterials,
@@ -86,7 +86,8 @@ export class CharacterVisual {
   private key: string;
   private entityColor: number;
   private skinIndex: number;
-  private weaponItemId: string | null;
+  private mainhandItemId: string | null;
+  private offhandItemId: string | null;
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
@@ -128,7 +129,8 @@ export class CharacterVisual {
     key: string,
     entityColor: number,
     skinIndex = 0,
-    weaponItemId: string | null = null,
+    mainhandItemId: string | null = null,
+    offhandItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
   ) {
     const prep = prepareVisual(key);
@@ -142,13 +144,14 @@ export class CharacterVisual {
     this.key = key;
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
-    this.weaponItemId = weaponItemId;
+    this.mainhandItemId = mainhandItemId;
+    this.offhandItemId = offhandItemId;
     this.height = prep.def.height;
 
     // model: yaw/scale/feet normalization wrapper around the skinned clone. The
-    // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
-    // the held weapon model, so the visual is born holding the right weapon.
-    this.model = assembleModel(this.def, weaponItemId);
+    // Equipped held items (if the class swaps; see VisualDef.weaponSlots) pick
+    // the visible weapon/shield models, so the visual is born holding live gear.
+    this.model = assembleModel(this.def, [mainhandItemId, offhandItemId]);
     applyMaterials(
       this.model,
       this.def,
@@ -292,7 +295,7 @@ export class CharacterVisual {
         : 0;
 
     // distant corpses show the static idle far mesh — tip it over
-    if (this.farMesh && this.farMesh.visible) {
+    if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
         this.farMesh.position.y = this.height * 0.16;
@@ -519,17 +522,16 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if
-   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs —
-   *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
-   *  shared material pass, re-snapshot the original-material map, then re-apply any
-   *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
-   *  animation state, unlike a full visual rebuild. */
-  setWeapon(weaponItemId: string | null): void {
-    if (weaponItemId === this.weaponItemId) return;
-    this.weaponItemId = weaponItemId;
+  /** Swap the held item models at runtime (gear equip/unequip); no-op if unchanged
+   *  or if this class keeps fixed props. Mirrors setSkin: re-attach the prop(s),
+   *  re-run the shared material pass, re-snapshot the original-material map, then
+   *  re-apply any active ghost/soul-rend overlay. */
+  setWeapons(mainhandItemId: string | null, offhandItemId: string | null): void {
+    if (mainhandItemId === this.mainhandItemId && offhandItemId === this.offhandItemId) return;
+    this.mainhandItemId = mainhandItemId;
+    this.offhandItemId = offhandItemId;
     if (!this.def.weaponSlots?.length) return;
-    setHeldWeapon(this.model, this.def, weaponItemId);
+    setHeldItems(this.model, this.def, [mainhandItemId, offhandItemId]);
     applyMaterials(
       this.model,
       this.def,
@@ -779,7 +781,7 @@ export class CharacterVisual {
     if (flourish) {
       // skeletons claw back out of the ground; bosses taunt
       this.current = null;
-      this.playOneShot(this.def.clips.flourish!, 1);
+      this.playOneShot(flourish.getClip().name, 1);
     } else {
       this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
     }

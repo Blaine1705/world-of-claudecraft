@@ -5674,8 +5674,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.defensiveStance':
     'Bewaakte Houding: minder ontvangen schade, meer dreiging',
   'hudChrome.auraEffect.battleStance': 'Strijdhouding: 10% meer woede-opwekking',
-  'hudChrome.auraEffect.berserkerStance':
-    'Berserkerhouding: crits 3% vaker en 3% harder',
+  'hudChrome.auraEffect.berserkerStance': 'Berserkerhouding: crits 3% vaker en 3% harder',
   'hudChrome.auraEffect.righteousFury':
     'Brandende Eed: sterk verhoogde dreiging door Heilige schade',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',

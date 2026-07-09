@@ -102,9 +102,10 @@ export interface CharacterSummary {
   playtimeSeconds?: number;
   // Real, in-world appearance so the char-select preview matches the game. Both
   // optional for back-compat with an older server that omits them: absent
-  // skinCatalog defaults to the class rig, absent mainhand shows no weapon.
+  // skinCatalog defaults to the class rig, absent held items show no weapon.
   skinCatalog?: 'class' | 'mech';
   mainhandItemId?: string | null;
+  offhandItemId?: string | null;
 }
 
 function stringList(value: unknown): string[] {
@@ -800,6 +801,7 @@ function blankEntity(id: number): Entity {
     overheadEmoteSeq: 0,
     stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
     weapon: { min: 1, max: 2, speed: 2 },
+    offhandWeapon: null,
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
@@ -814,6 +816,8 @@ function blankEntity(id: number): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    offhandSwingTimer: 0,
+    dualWielding: false,
     inCombat: false,
     combatTimer: 99,
     auras: [],
@@ -896,6 +900,7 @@ function blankEntity(id: number): Entity {
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    offhandItemId: null,
     equippedItems: {},
     guild: '',
   };
@@ -1484,6 +1489,7 @@ export class ClientWorld implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
+        e.offhandItemId = w.oh ?? null; // equipped offhand → held item model (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)

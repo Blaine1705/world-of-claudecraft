@@ -435,6 +435,7 @@ export function questReadout(meta: PlayerMeta): string {
 export function gearReadout(meta: PlayerMeta): string {
   const slots: [EquipSlot, string][] = [
     ['mainhand', 'Main Hand'],
+    ['offhand', 'Off Hand'],
     ['helmet', 'Helmet'],
     ['shoulder', 'Shoulder'],
     ['chest', 'Chest'],
