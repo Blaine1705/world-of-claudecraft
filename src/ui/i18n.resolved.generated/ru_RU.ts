@@ -299,6 +299,7 @@ export const ru_RU: EnTranslations = {
       "targetLabel": "Ваша цель",
       "targetAnnounce": "Цель: {name}",
       "partyLabel": "Ваша группа",
+      "partyChip": "Группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
       "durationUnitMinutes": "м",
@@ -328,7 +329,9 @@ export const ru_RU: EnTranslations = {
       "actionPageIndicator": "Стр. {page}",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
-      "spellbookPageLabel": "Страница {page}"
+      "spellbookPageLabel": "Страница {page}",
+      "hideKeyboard": "Скрыть клавиатуру",
+      "chatPlaceholder": "Напишите сообщение..."
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -1439,6 +1442,7 @@ export const ru_RU: EnTranslations = {
     "archetypeTitle": {
       "label": "Титул",
       "none": "Нет",
+      "hobbyLabel": "Хобби",
       "armorcrafting": "Бронник",
       "weaponcrafting": "Оружейник",
       "jewelcrafting": "Ювелир",
@@ -1461,7 +1465,10 @@ export const ru_RU: EnTranslations = {
       "craftedToast": "Создано: {name}",
       "insufficientMaterials": "У вас недостаточно материалов.",
       "unknownRecipe": "Такого рецепта не существует.",
-      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта."
+      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
+      "notAtHub": "Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.",
+      "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
+      "recipeNotLearned": "Вы еще не изучили этот рецепт."
     }
   },
   "apiError": {
@@ -4150,6 +4157,7 @@ export const ru_RU: EnTranslations = {
       "mobileSocial": "Общение",
       "mobileArena": "Арена",
       "mobileMenu": "Меню",
+      "mobileSettings": "Настройки",
       "mobileUse": "Использовать",
       "mobileMeters": "Счетчики",
       "mobileMap": "Карта",
@@ -4698,6 +4706,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
+      "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
     },
@@ -7290,7 +7299,7 @@ export const ru_RU: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "Юми"
       },
       "forest_wolf": {
         "name": "Лесной волк"

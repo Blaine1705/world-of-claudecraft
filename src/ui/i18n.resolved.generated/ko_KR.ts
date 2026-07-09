@@ -299,6 +299,7 @@ export const ko_KR: EnTranslations = {
       "targetLabel": "내 대상",
       "targetAnnounce": "대상: {name}",
       "partyLabel": "내 파티",
+      "partyChip": "파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
@@ -328,7 +329,9 @@ export const ko_KR: EnTranslations = {
       "actionPageIndicator": "{page}페이지",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
-      "spellbookPageLabel": "페이지 {page}"
+      "spellbookPageLabel": "페이지 {page}",
+      "hideKeyboard": "키보드 숨기기",
+      "chatPlaceholder": "메시지 입력..."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -1439,6 +1442,7 @@ export const ko_KR: EnTranslations = {
     "archetypeTitle": {
       "label": "칭호",
       "none": "없음",
+      "hobbyLabel": "취미",
       "armorcrafting": "방어구 장인",
       "weaponcrafting": "무기 장인",
       "jewelcrafting": "보석 세공사",
@@ -1461,7 +1465,10 @@ export const ko_KR: EnTranslations = {
       "craftedToast": "제작 완료:{name}",
       "insufficientMaterials": "재료가 부족합니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
-      "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다."
+      "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
+      "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
+      "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
+      "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
     }
   },
   "apiError": {
@@ -4150,6 +4157,7 @@ export const ko_KR: EnTranslations = {
       "mobileSocial": "소셜",
       "mobileArena": "투기장",
       "mobileMenu": "메뉴",
+      "mobileSettings": "설정",
       "mobileUse": "사용",
       "mobileMeters": "미터",
       "mobileMap": "지도",
@@ -4698,6 +4706,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
     },
@@ -7290,7 +7299,7 @@ export const ko_KR: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "유미"
       },
       "forest_wolf": {
         "name": "숲늑대"

@@ -26,6 +26,7 @@ import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
   type Aura,
+  CAST_QUEUE_WINDOW_SEC,
   DT,
   dist2d,
   type Entity,
@@ -2997,6 +2998,7 @@ function c4aCastingLifecycle(): Scenario {
     coverage: [
       'castAbility timed-cast START (mage fireball) + Math.max gcd arm',
       'updateCasting progress + finish -> applyAbility spell-hit roll (rng) -> runEffects',
+      'single-slot spell queue (#1360): tail-window press queues, fires on completion',
       'pushbackCast timed branch (+CAST_PUSHBACK_SEC) via dealDamage mid-cast',
       'updateCasting silence branch -> cancelCast (priest lesser_heal, holy)',
       'castAbility channel START (warlock drain_life): spend+arm at START',
@@ -3015,7 +3017,7 @@ function c4aCastingLifecycle(): Scenario {
       const eMage = sim.entities.get(mage) as AnyEntity;
       const ePriest = sim.entities.get(priest) as AnyEntity;
       const eWarlock = sim.entities.get(warlock) as AnyEntity;
-      // Level 12: fireball rank 3 (2.5s), lesser_heal rank 3 (2.0s, holy),
+      // Level 12: fireball rank 3 (3.0s), lesser_heal rank 3 (2.0s, holy),
       // drain_life rank 1 (5s channel / 5 ticks = 1s per tick). drain_life needs >=10.
       for (const pid of [mage, priest, warlock]) sim.setPlayerLevel(12, pid);
       teleport(sim, eMage, -3, -45);
@@ -3044,6 +3046,26 @@ function c4aCastingLifecycle(): Scenario {
       sim.dealDamage(mob, eMage, 40, false, 'physical', null, 'hit'); // pushbackCast timed branch
       rec.snapshot('mage-pushback');
       rec.tick(120); // let the 2.5s cast (+ pushback) finish -> applyAbility -> runEffects
+
+      // --- mage: spell queue (#1360): a press in the cast tail queues, fires on completion ---
+      eMage.resource = eMage.maxResource;
+      face(eMage, mob);
+      sim.castAbility('fireball', mage); // second timed-cast START (fresh cast, no pushback)
+      // drain to inside the queue window: tick one at a time (cast time varies by rank/level,
+      // so a hardcoded tick count would silently drift outside the window) until castRemaining
+      // is within CAST_QUEUE_WINDOW_SEC but the cast has not yet completed.
+      while (eMage.castRemaining > CAST_QUEUE_WINDOW_SEC) rec.tick(1);
+      if (!(eMage.castingAbility && eMage.castRemaining > 0)) {
+        throw new Error(
+          'c4a_casting_lifecycle: fireball cast completed before entering the queue window',
+        );
+      }
+      sim.castAbility('fireball', mage); // queues instead of erroring "You are busy."
+      if (eMage.queuedCastAbility !== 'fireball') {
+        throw new Error('c4a_casting_lifecycle: press inside the queue window did not queue');
+      }
+      rec.snapshot('mage-queued');
+      rec.tick(20); // finishes the in-flight cast (fires the queued one) and lets it progress
 
       // --- priest: timed self-heal start -> silence lands -> updateCasting cancel ---
       ePriest.hp = Math.max(1, ePriest.maxHp - 1000);

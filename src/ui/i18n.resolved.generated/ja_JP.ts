@@ -299,6 +299,7 @@ export const ja_JP: EnTranslations = {
       "targetLabel": "あなたのターゲット",
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
+      "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
@@ -328,7 +329,9 @@ export const ja_JP: EnTranslations = {
       "actionPageIndicator": "{page}ページ",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
-      "spellbookPageLabel": "ページ{page}"
+      "spellbookPageLabel": "ページ{page}",
+      "hideKeyboard": "キーボードを隠す",
+      "chatPlaceholder": "発言する..."
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -1439,6 +1442,7 @@ export const ja_JP: EnTranslations = {
     "archetypeTitle": {
       "label": "称号",
       "none": "なし",
+      "hobbyLabel": "趣味",
       "armorcrafting": "防具鍛冶師",
       "weaponcrafting": "武器鍛冶師",
       "jewelcrafting": "宝石職人",
@@ -1461,7 +1465,10 @@ export const ja_JP: EnTranslations = {
       "craftedToast": "製作しました:{name}",
       "insufficientMaterials": "材料が不足しています。",
       "unknownRecipe": "そのレシピは存在しません。",
-      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。"
+      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
+      "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
+      "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
+      "recipeNotLearned": "そのレシピはまだ習得していません。"
     }
   },
   "apiError": {
@@ -4150,6 +4157,7 @@ export const ja_JP: EnTranslations = {
       "mobileSocial": "ソーシャル",
       "mobileArena": "アリーナ",
       "mobileMenu": "メニュー",
+      "mobileSettings": "設定",
       "mobileUse": "使用",
       "mobileMeters": "メーター",
       "mobileMap": "マップ",
@@ -4698,6 +4706,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
+      "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
     },
@@ -5130,7 +5139,7 @@ export const ja_JP: EnTranslations = {
       },
       "sunder_armor": {
         "name": "装甲切断",
-        "description": "対象のアーマーを破壊し、1回ごとに {damage}% 低下させます。最大5回まで重なります。大量の脅威を生成します。"
+        "description": "対象のアーマーを破壊し、1回ごとに{damage}%低下させます。最大5回まで重なります。大量の脅威を生成します。"
       },
       "taunt": {
         "name": "挑発",
@@ -5586,7 +5595,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "対象のアーマーを40秒間 {damage}% 低下させます。装甲切断とは重なりません。"
+        "description": "対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。"
       },
       "hibernate": {
         "name": "微睡み",
@@ -7290,7 +7299,7 @@ export const ja_JP: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "ユミ"
       },
       "forest_wolf": {
         "name": "森の狼"

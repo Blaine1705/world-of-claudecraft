@@ -299,6 +299,7 @@ export const en_XA: EnTranslations = {
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
       "targetAnnounce": "[Ɱáŕķ {name}]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
+      "partyChip": "[Þáŕţý]",
       "partyGroup": "[Ĝŕóúþ {n}]",
       "durationUnitSeconds": "[š]",
       "durationUnitMinutes": "[ɱ]",
@@ -313,7 +314,7 @@ export const en_XA: EnTranslations = {
       "chat": "[Šķíþ ţó Çĥáţ]"
     },
     "mobile": {
-      "autorun": "[Áúţóŕúñ]",
+      "autorun": "[Áúţó]",
       "jump": "[Ĵúɱþ]",
       "leaderboard": "[Ŕáñķš]",
       "dailyRewards": "[Ŕéŵáŕðš]",
@@ -328,7 +329,9 @@ export const en_XA: EnTranslations = {
       "actionPageIndicator": "[{page}]",
       "targetCycle": "[Šŵáþ ţáŕĝéţ]",
       "targetCycleShort": "[Ţáŕĝéţ]",
-      "spellbookPageLabel": "[Þáĝé {page}]"
+      "spellbookPageLabel": "[Þáĝé {page}]",
+      "hideKeyboard": "[Ĥíðé ķéýƀóáŕð]",
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ...]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -1439,6 +1442,7 @@ export const en_XA: EnTranslations = {
     "archetypeTitle": {
       "label": "[Ţíţļé]",
       "none": "[Ñóñé]",
+      "hobbyLabel": "[Ĥóƀƀý]",
       "armorcrafting": "[Áŕɱóŕéŕ]",
       "weaponcrafting": "[Ŵéáþóñšɱíţĥ]",
       "jewelcrafting": "[Ĵéŵéļéŕ]",
@@ -1461,7 +1465,10 @@ export const en_XA: EnTranslations = {
       "craftedToast": "[Çŕáƒţéð: {name}]",
       "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
       "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]",
-      "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]"
+      "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]",
+      "notAtHub": "[Ýóú ɱúšţ ƀé áţ ţĥé çŕáƒţíñĝ ĥúƀ, áţ ţĥé ŕéɋúíŕéð ļéʋéļ, ţó çŕáƒţ ţĥáţ.]",
+      "throttled": "[Ýóú áŕé çŕáƒţíñĝ ţóó ɋúíçķļý. Ŵáíţ á ɱóɱéñţ áñð ţŕý áĝáíñ.]",
+      "recipeNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ŕéçíþé ýéţ.]"
     }
   },
   "apiError": {
@@ -4150,6 +4157,7 @@ export const en_XA: EnTranslations = {
       "mobileSocial": "[Šóçíáļ]",
       "mobileArena": "[Áŕéñá]",
       "mobileMenu": "[Ɱéñú]",
+      "mobileSettings": "[Šéţţíñĝš]",
       "mobileUse": "[Íñţéŕáçţ]",
       "mobileMeters": "[Ɱéţéŕš]",
       "mobileMap": "[Ɱáþ]",
@@ -4698,6 +4706,7 @@ export const en_XA: EnTranslations = {
       "offGlobalCooldown": "[Óƒƒ ţĥé ĝļóƀáļ çóóļðóŵñ]",
       "friendlyTarget": "[Ƒŕíéñðļý ţáŕĝéţ]",
       "enemyTarget": "[Éñéɱý ţáŕĝéţ]",
+      "selfOnly": "[Šéļƒ óñļý]",
       "damageRange": "[{min} ţó {max}]",
       "finisherDamage": "[{base} þļúš {perCombo} þéŕ çóɱƀó þóíñţ]"
     },
@@ -5586,7 +5595,7 @@ export const en_XA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "[Ŵíţçĥļíĝĥţ]",
-        "description": "[Ðéçŕéášéš ţĥé ţáŕĝéţ'š áŕɱóŕ ƀý {damage}% ƒóŕ 40 šéç. Ðóéš ñóţ šţáçķ ŵíţĥ Šúñðéŕ Áŕɱóŕ.]"
+        "description": "[Ðéçŕéášéš ţĥé ţáŕĝéţ'š áŕɱóŕ ƀý {damage}% ƒóŕ 40 šéç. Ðóéš ñóţ šţáçķ ŵíţĥ Áŕɱóŕ Šĥéáŕ.]"
       },
       "hibernate": {
         "name": "[Šļúɱƀéŕ]",

@@ -299,6 +299,7 @@ export const en_CA: EnTranslations = {
       "targetLabel": "Your Mark",
       "targetAnnounce": "Mark {name}",
       "partyLabel": "Your Band",
+      "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -313,7 +314,7 @@ export const en_CA: EnTranslations = {
       "chat": "Skip to Chat"
     },
     "mobile": {
-      "autorun": "Autorun",
+      "autorun": "Auto",
       "jump": "Jump",
       "leaderboard": "Ranks",
       "dailyRewards": "Rewards",
@@ -328,7 +329,9 @@ export const en_CA: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "Swap target",
       "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "Page {page}",
+      "hideKeyboard": "Hide keyboard",
+      "chatPlaceholder": "Say something..."
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -1439,6 +1442,7 @@ export const en_CA: EnTranslations = {
     "archetypeTitle": {
       "label": "Title",
       "none": "None",
+      "hobbyLabel": "Hobby",
       "armorcrafting": "Armorer",
       "weaponcrafting": "Weaponsmith",
       "jewelcrafting": "Jeweler",
@@ -1461,7 +1465,10 @@ export const en_CA: EnTranslations = {
       "craftedToast": "Crafted: {name}",
       "insufficientMaterials": "You do not have the materials for that.",
       "unknownRecipe": "That recipe does not exist.",
-      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
+      "notAtHub": "You must be at the crafting hub, at the required level, to craft that.",
+      "throttled": "You are crafting too quickly. Wait a moment and try again.",
+      "recipeNotLearned": "You have not learned that recipe yet."
     }
   },
   "apiError": {
@@ -4150,6 +4157,7 @@ export const en_CA: EnTranslations = {
       "mobileSocial": "Social",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Settings",
       "mobileUse": "Interact",
       "mobileMeters": "Meters",
       "mobileMap": "Map",
@@ -4698,6 +4706,7 @@ export const en_CA: EnTranslations = {
       "offGlobalCooldown": "Off the global cooldown",
       "friendlyTarget": "Friendly target",
       "enemyTarget": "Enemy target",
+      "selfOnly": "Self only",
       "damageRange": "{min} to {max}",
       "finisherDamage": "{base} plus {perCombo} per combo point"
     },
@@ -5586,7 +5595,7 @@ export const en_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear."
       },
       "hibernate": {
         "name": "Slumber",

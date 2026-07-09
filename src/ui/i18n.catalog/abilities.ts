@@ -45,6 +45,7 @@ const abilityStringsEn = {
       offGlobalCooldown: 'Off the global cooldown',
       friendlyTarget: 'Friendly target',
       enemyTarget: 'Enemy target',
+      selfOnly: 'Self only',
       damageRange: '{min} to {max}',
       finisherDamage: '{base} plus {perCombo} per combo point',
     },
@@ -1128,7 +1129,7 @@ const classAbilityNamesEn = {
       [
         'faerie_fire',
         'Witchlight',
-        "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor.",
+        "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear.",
       ],
       [
         'hibernate',

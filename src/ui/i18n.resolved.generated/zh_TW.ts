@@ -299,6 +299,7 @@ export const zh_TW: EnTranslations = {
       "targetLabel": "你的目標",
       "targetAnnounce": "目標：{name}",
       "partyLabel": "你的隊伍",
+      "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
@@ -328,7 +329,9 @@ export const zh_TW: EnTranslations = {
       "actionPageIndicator": "第{page}頁",
       "targetCycle": "切換目標",
       "targetCycleShort": "目標",
-      "spellbookPageLabel": "頁{page}"
+      "spellbookPageLabel": "頁{page}",
+      "hideKeyboard": "隱藏鍵盤",
+      "chatPlaceholder": "說點什麼..."
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -1439,6 +1442,7 @@ export const zh_TW: EnTranslations = {
     "archetypeTitle": {
       "label": "稱號",
       "none": "無",
+      "hobbyLabel": "愛好",
       "armorcrafting": "鍛甲師",
       "weaponcrafting": "武器匠",
       "jewelcrafting": "珠寶匠",
@@ -1461,7 +1465,10 @@ export const zh_TW: EnTranslations = {
       "craftedToast": "已製作:{name}",
       "insufficientMaterials": "你沒有足夠的材料。",
       "unknownRecipe": "該配方不存在。",
-      "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。"
+      "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。",
+      "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
+      "throttled": "你製作得太快了，請稍等片刻後再試。",
+      "recipeNotLearned": "你還沒有學會這個配方。"
     }
   },
   "apiError": {
@@ -4150,6 +4157,7 @@ export const zh_TW: EnTranslations = {
       "mobileSocial": "社交",
       "mobileArena": "競技場",
       "mobileMenu": "選單",
+      "mobileSettings": "設定",
       "mobileUse": "使用",
       "mobileMeters": "統計",
       "mobileMap": "地圖",
@@ -4698,6 +4706,7 @@ export const zh_TW: EnTranslations = {
       "offGlobalCooldown": "不觸發公共冷卻",
       "friendlyTarget": "友方目標",
       "enemyTarget": "敵方目標",
+      "selfOnly": "僅對自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每個連擊點 {perCombo}"
     },
@@ -5586,7 +5595,7 @@ export const zh_TW: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目標的護甲降低 {damage}%，持續 40 秒。不會與削甲疊加。"
+        "description": "使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。"
       },
       "hibernate": {
         "name": "沉眠",
@@ -7290,7 +7299,7 @@ export const zh_TW: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "由美"
       },
       "forest_wolf": {
         "name": "森林狼"

@@ -299,6 +299,7 @@ export const da_DK: EnTranslations = {
       "targetLabel": "Dit mål",
       "targetAnnounce": "Markér {name}",
       "partyLabel": "Dit følge",
+      "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -328,7 +329,9 @@ export const da_DK: EnTranslations = {
       "actionPageIndicator": "Side {page}",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
-      "spellbookPageLabel": "Side {page}"
+      "spellbookPageLabel": "Side {page}",
+      "hideKeyboard": "Skjul tastatur",
+      "chatPlaceholder": "Sig noget..."
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -1022,18 +1025,18 @@ export const da_DK: EnTranslations = {
       },
       "allStatsPctReduce": "Reducerer alle attributter med {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Øger angrebskraft med {pct}%",
+        "armor": "Øger rustning med {pct}%",
+        "int": "Øger Intellekt med {pct}%",
+        "sta": "Øger Udholdenhed med {pct}%",
+        "allStats": "Øger alle attributter med {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Reducerer rustning med {pct}%",
+      "armorPctStacks": "Reducerer rustning med {pct}% ({stacks} stakke)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1439,6 +1442,7 @@ export const da_DK: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Ingen",
+      "hobbyLabel": "Fritid",
       "armorcrafting": "Rustningssmed",
       "weaponcrafting": "Våbensmed",
       "jewelcrafting": "Juveler",
@@ -1461,7 +1465,10 @@ export const da_DK: EnTranslations = {
       "craftedToast": "Udformet: {name}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
       "unknownRecipe": "Den opskrift findes ikke.",
-      "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift."
+      "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
+      "notAtHub": "Du skal være ved håndværksstationen og på det krævede niveau for at lave det.",
+      "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
+      "recipeNotLearned": "Du har ikke lært den opskrift endnu."
     }
   },
   "apiError": {
@@ -2234,8 +2241,8 @@ export const da_DK: EnTranslations = {
       "waveGoldBody": "Den midterste bølge: tveæggede kombinationer hvor din build begynder at tage form og synge.",
       "wavePrismaticTitle": "Prismatisk",
       "wavePrismaticBody": "Den sidste bølge: build-definerende, skærm-smeltende spidser der skal føles latterlige på den bedste måde.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Beskyt Yumi",
+      "yumiBody": "Beskyt Yumi er en holdbaseret måltilstand, der spilles i en labyrint: hver side vogter sin egen katfølgesvend, mens den jager modstanderens. Med jævne mellemrum blinker begge katte til nye hjørner af labyrinten, så kampen svinger mellem at forsvare, jage og kapløbet om at finde dem igen. Stil op som tre mod tre eller fem mod fem; at falde i kamp sætter dig kun på bænken et øjeblik.",
       "powerupsTitle": "Power-ups i ringen",
       "powerupsBody": "Glødende kugler falder også ned i arenaen midt i kampen, gratis for den der når dem først. De er bevidst overdrevne og varer kun et kort øjeblik: Speed Demon for et glimt af blændende fart, Colossus for at svulme op til en kluntet kæmpe, Moon Boots for et hoppende, lavtyngdekrafts-hop, og Berserker for et pludseligt udbrud af raseri.",
       "ladderHeading": "At klatre op ad rangstigen",
@@ -3666,42 +3673,42 @@ export const da_DK: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 mod 3",
+    "bracket5": "Yumi 5 mod 5",
+    "enterQueue": "Tilmeld dig Beskyt Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Du stiller dig i Beskyt Yumi-køen. Vogt din følgesvend…",
+      "leave": "Du forlader Beskyt Yumi-køen.",
+      "teamLeave": "Dit hold forlader Beskyt Yumi-køen."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Beskyt Yumi 3 mod 3 tillader en gruppe på op til tre.",
+      "partyTooBig5": "Beskyt Yumi 5 mod 5 tillader en gruppe på op til fem."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Beskyt Yumi! Forsvar din følgesvend, og jag deres."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "BESKYT YUMI",
+      "getReady": "Gør dig klar…",
+      "teleportIn": "Yumierne flytter sig om {s}",
+      "suddenDeath": "PLUDSELIG DØD",
+      "yourYumi": "Din Yumi",
+      "enemyYumi": "Fjendens Yumi",
+      "aria": "Din Yumi på {mine} af {max} helbred, fjendens Yumi på {theirs}.",
+      "collapse": "Skjul Beskyt Yumi-bjælkerne",
+      "expand": "Vis Beskyt Yumi-bjælkerne"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "SLÅET NED!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "PLUDSELIG DØD! Yumierne holder stand!",
+      "teleport": "Yumierne teleporterer!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "SEJR! Yumi er i sikkerhed!",
+      "loss": "NEDERLAG! Din Yumi er faldet."
     }
   },
   "fiesta": {
@@ -4150,6 +4157,7 @@ export const da_DK: EnTranslations = {
       "mobileSocial": "Socialt",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Indstillinger",
       "mobileUse": "Brug",
       "mobileMeters": "Målere",
       "mobileMap": "Kort",
@@ -4698,6 +4706,7 @@ export const da_DK: EnTranslations = {
       "offGlobalCooldown": "Uden for den globale nedkøling",
       "friendlyTarget": "Venligt mål",
       "enemyTarget": "Fjendtligt mål",
+      "selfOnly": "Kun på dig selv",
       "damageRange": "{min} til {max}",
       "finisherDamage": "{base} plus {perCombo} per combopoint"
     },
@@ -5007,7 +5016,7 @@ export const da_DK: EnTranslations = {
       "greedAria": "Grådighed efter {item}",
       "passAria": "Stå over {item}",
       "everyonePassed": "Alle stod over {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} har slået"
     }
   },
   "entities": {
@@ -5130,7 +5139,7 @@ export const da_DK: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rustningsskær",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel."
       },
       "taunt": {
         "name": "Ægge",
@@ -5586,7 +5595,7 @@ export const da_DK: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Hekselys",
-        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
+        "description": "Sænker målets rustning med {damage}% i 40 sek. Stakker ikke med Rustningsskær."
       },
       "hibernate": {
         "name": "Slummer",
@@ -7353,7 +7362,7 @@ export const da_DK: EnTranslations = {
         "name": "Diakon Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Træningsdukke"
       },
       "ridge_stalker": {
         "name": "Bjergkamssniger"

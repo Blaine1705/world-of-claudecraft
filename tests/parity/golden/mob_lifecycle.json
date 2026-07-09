@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "f81ac8bd",
+      "state": "07aa27ef",
       "events": "d640aaf1",
       "rng": {
         "draws": 5,
@@ -59,6 +59,7 @@
             "xpGained": 84
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -369,7 +370,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "f67c6ff1",
+      "state": "5f3fc0fb",
       "events": "1c970bc0",
       "rng": {
         "draws": 8,
@@ -397,6 +398,7 @@
             "xpGained": 198
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -760,7 +762,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "4a767c35",
+      "state": "06a2bd47",
       "events": "e6546e7c",
       "rng": {
         "draws": 9,
@@ -789,6 +791,7 @@
             "xpGained": 198
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1153,7 +1156,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 413,
-      "state": "27a18c9c",
+      "state": "d2448d1c",
       "events": "25f1ab05",
       "rng": {
         "draws": 15,
@@ -1182,6 +1185,7 @@
             "xpGained": 282
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1589,7 +1593,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "15522013",
+      "state": "43c9076d",
       "events": "38ff1b69",
       "rng": {
         "draws": 20,
@@ -1618,6 +1622,7 @@
             "xpGained": 366
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -2086,7 +2091,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 414,
-      "state": "15522013",
+      "state": "43c9076d",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2115,6 +2120,7 @@
             "xpGained": 366
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,

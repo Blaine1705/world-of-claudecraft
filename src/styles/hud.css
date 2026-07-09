@@ -3800,6 +3800,13 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  /* The mobile keyboard-dismiss chevron is hidden by default (desktop AND mobile-when-
+     chat-closed); only body.mobile-touch.mobile-chat-open reveals it (hud.mobile.css,
+     a later @layer, so it wins there). Without this base hide the button would render
+     as a stray control on desktop, which has no mobile-touch-scoped rule to hide it. */
+  #chat-dismiss {
+    display: none;
+  }
 
   /* ---------- party frames ---------- */
   #party-frames {
@@ -3810,6 +3817,15 @@
     flex-direction: column;
     gap: 6px;
     z-index: 5;
+  }
+  /* The painter nests the member rows one level down in a .party-rows wrapper (so the
+     mobile collapse chip can sit alone on its own line). On desktop the wrapper is
+     transparent (display: contents), so the rows lay out as direct flex items of
+     #party-frames exactly as before the wrapper existed: the flex column gap and every
+     .party-frame rule apply unchanged. Mobile re-declares the wrapper as its own
+     2-column grid (hud.mobile.css). */
+  #party-frames .party-rows {
+    display: contents;
   }
   #party-frames.below-target {
     top: 96px;
@@ -4221,6 +4237,9 @@
     border: 1px solid #cc9a3c88;
     border-radius: 12px;
     color: var(--gold);
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
     pointer-events: auto;
   }
   #mail-indicator[hidden] {
