@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "2bcf2f74",
+      "nextId": 406,
+      "state": "342a40db",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -119,6 +119,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -131,9 +132,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 414,
-      "state": "64945cc8",
-      "events": "a8af5cb6",
+      "nextId": 419,
+      "state": "a76ec8b2",
+      "events": "d9e43221",
       "rng": {
         "draws": 4,
         "digest": "e1f30e03"
@@ -142,9 +143,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 414,
-      "state": "185908bf",
-      "events": "b93c7dc5",
+      "nextId": 419,
+      "state": "c84451dd",
+      "events": "9cfda0e2",
       "rng": {
         "draws": 4,
         "digest": "e1f30e03"
@@ -153,9 +154,9 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 414,
-      "state": "29508630",
-      "events": "0b43bbc3",
+      "nextId": 419,
+      "state": "abe3e540",
+      "events": "356a26ae",
       "rng": {
         "draws": 5,
         "digest": "0d1e87b1"
@@ -164,9 +165,9 @@
     {
       "tick": 38,
       "time": 1.9,
-      "nextId": 420,
-      "state": "02b48881",
-      "events": "d52ac135",
+      "nextId": 421,
+      "state": "6d7220ea",
+      "events": "cd3e9e9b",
       "rng": {
         "draws": 8,
         "digest": "20464699"
@@ -317,6 +318,7 @@
           },
           "targetId": 418,
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -358,6 +360,7 @@
           },
           "swingTimer": 1.6,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 1.1,
           "weapon": {
             "max": 10,
@@ -413,6 +416,7 @@
           "stompTimer": 12,
           "tappedById": 408,
           "templateId": "deacon_varric",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 4795.28058,
             "z": -1177.556469
@@ -456,6 +460,7 @@
           },
           "stats": {},
           "templateId": "delve_reward_chest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,
@@ -467,8 +472,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 416,
-      "state": "eaa45b86",
+      "nextId": 421,
+      "state": "57ff66e1",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -478,8 +483,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 416,
-      "state": "eaa45b86",
+      "nextId": 421,
+      "state": "57ff66e1",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -631,6 +636,7 @@
           },
           "targetId": 418,
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -672,6 +678,7 @@
           },
           "swingTimer": 1.4,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 1,
           "weapon": {
             "max": 10,
@@ -727,6 +734,7 @@
           "stompTimer": 12,
           "tappedById": 408,
           "templateId": "deacon_varric",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 4795.28058,
             "z": -1177.556469
@@ -770,6 +778,7 @@
           },
           "stats": {},
           "templateId": "delve_reward_chest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 2,
             "min": 1,

@@ -22,8 +22,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "66fb5d13",
+      "nextId": 406,
+      "state": "2fe0f8ba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -132,6 +132,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -143,9 +144,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 403,
-      "state": "f9597282",
-      "events": "05262050",
+      "nextId": 408,
+      "state": "b88824c9",
+      "events": "e042fd30",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -254,6 +255,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -295,6 +297,7 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -306,9 +309,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 403,
-      "state": "87a74f44",
-      "events": "ccdfda1a",
+      "nextId": 408,
+      "state": "abd8bf44",
+      "events": "97340448",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -417,6 +420,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -472,6 +476,7 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -483,9 +488,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 403,
-      "state": "0dff233e",
-      "events": "3e42cd9b",
+      "nextId": 408,
+      "state": "3665cfe2",
+      "events": "d70fb9f2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -494,9 +499,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 403,
-      "state": "18638998",
-      "events": "42d1397b",
+      "nextId": 408,
+      "state": "52ee869c",
+      "events": "1a2734ed",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -505,8 +510,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 404,
-      "state": "67e2b8cc",
+      "nextId": 409,
+      "state": "82227ae7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -891,6 +896,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -899,6 +905,64 @@
         },
         {
           "aggroTargetId": 408,
+          "aiState": "idle",
+          "auras": [
+            {
+              "duration": 5,
+              "id": "feed_pet",
+              "kind": "hot",
+              "name": "Fed",
+              "remaining": 3,
+              "school": "nature",
+              "sourceId": 405,
+              "tickInterval": 1,
+              "tickTimer": 1,
+              "value": 13
+            }
+          ],
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 127,
+          "id": 407,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 12,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 194,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "ownerId": 405,
+          "petMode": "defensive",
+          "petTauntTimer": 10,
+          "pos": {
+            "x": 4,
+            "y": 1.5,
+            "z": -1
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5,
+            "z": -1
+          },
+          "stats": {
+            "armor": 110
+          },
+          "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 26,
+            "min": 16,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 407,
           "aiState": "chase",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -943,10 +1007,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              408,
+              405,
               30
+            ],
+            [
+              407,
+              52
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -958,9 +1027,179 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 406,
-      "state": "cd2c7438",
-      "events": "a48da5e0",
+      "nextId": 409,
+      "state": "463d9d25",
+      "events": "5aadc799",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "pet-abandoned",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "hunter",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 405,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_hatchet"
+          },
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 44000,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 83,
+          "combatTimer": 101,
+          "comboUntil": -1,
+          "critChance": 0.079,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.079,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 101,
+          "hp": 50000,
+          "id": 405,
+          "kind": "player",
+          "level": 12,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "maxResource": 358,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "rangedPower": 116,
+          "resource": 358,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 12,
+          "stats": {
+            "agi": 58,
+            "armor": 263,
+            "int": 24,
+            "spi": 25,
+            "sta": 41,
+            "str": 25
+          },
+          "templateId": "hunter",
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.2
+          }
+        },
+        {
+          "aggroTargetId": 405,
+          "aiState": "chase",
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "forcedTargetId": 407,
+          "forcedTargetTimer": 3,
+          "hostile": true,
+          "hp": 50000,
+          "id": 408,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 5,
+            "y": 1.5,
+            "z": -1
+          },
+          "level": 8,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 5,
+            "y": 1.5,
+            "z": -1
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 5,
+            "y": 1.5,
+            "z": -1
+          },
+          "stats": {
+            "armor": 70
+          },
+          "targetId": 407,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              405,
+              30
+            ]
+          ],
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 18,
+            "min": 11,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 411,
+      "state": "bf49ea27",
+      "events": "1b51753b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1087,6 +1326,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1143,6 +1383,7 @@
               30
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1184,6 +1425,7 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -1195,9 +1437,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 406,
-      "state": "115746dc",
-      "events": "df23db54",
+      "nextId": 411,
+      "state": "e0ba6613",
+      "events": "39bbf203",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1324,6 +1566,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1380,6 +1623,7 @@
               30
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1421,6 +1665,7 @@
             "armor": 110
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 26,
             "min": 16,
@@ -1432,8 +1677,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 406,
-      "state": "e14599f9",
+      "nextId": 411,
+      "state": "463d9d25",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1561,6 +1806,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1617,6 +1863,7 @@
               30
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1628,8 +1875,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 407,
-      "state": "e14599f9",
+      "nextId": 412,
+      "state": "463d9d25",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1757,6 +2004,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1813,6 +2061,7 @@
               30
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1824,9 +2073,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 409,
-      "state": "f98ec465",
-      "events": "23c9bb1b",
+      "nextId": 414,
+      "state": "e1db39c8",
+      "events": "d74bfbad",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2007,6 +2256,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2063,6 +2313,7 @@
               30
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2119,6 +2370,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2160,6 +2412,7 @@
             "armor": 88
           },
           "templateId": "emberkin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 21,
             "min": 14,
@@ -2171,9 +2424,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 413,
-      "state": "fc12b31a",
-      "events": "ebf85a44",
+      "nextId": 414,
+      "state": "f4a0a1a3",
+      "events": "a919d341",
       "rng": {
         "draws": 82,
         "digest": "e2e5902a"
@@ -2182,9 +2435,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 409,
-      "state": "8f367639",
-      "events": "a307338a",
+      "nextId": 414,
+      "state": "e87a0933",
+      "events": "1005cba8",
       "rng": {
         "draws": 158,
         "digest": "878ecdcb"
@@ -2193,8 +2446,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 409,
-      "state": "8f367639",
+      "nextId": 414,
+      "state": "e87a0933",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -2394,6 +2647,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2458,6 +2712,7 @@
               17
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2514,6 +2769,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2555,6 +2811,7 @@
             "armor": 88
           },
           "templateId": "emberkin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 21,
             "min": 14,
@@ -2566,9 +2823,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 410,
-      "state": "1cb08ae3",
-      "events": "4289fd33",
+      "nextId": 415,
+      "state": "b35df791",
+      "events": "e3337e5d",
       "rng": {
         "draws": 158,
         "digest": "878ecdcb"
@@ -2767,6 +3024,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2831,6 +3089,7 @@
               17
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -2887,6 +3146,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2939,9 +3199,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 412,
-      "state": "ff1d0084",
-      "events": "dcc8e761",
+      "nextId": 417,
+      "state": "75d6aca2",
+      "events": "4966d07c",
       "rng": {
         "draws": 158,
         "digest": "878ecdcb"
@@ -3140,6 +3400,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3204,6 +3465,7 @@
               17
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -3260,6 +3522,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3310,6 +3573,7 @@
               20
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -3321,8 +3585,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 412,
-      "state": "ff1d0084",
+      "nextId": 417,
+      "state": "75d6aca2",
       "events": "741638a5",
       "rng": {
         "draws": 158,
@@ -3522,6 +3786,7 @@
             "str": 25
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3586,6 +3851,7 @@
               17
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -3642,6 +3908,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3692,6 +3959,7 @@
               20
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,

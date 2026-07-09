@@ -201,6 +201,12 @@ export type AuraKind =
   | 'buff_spellcrit'
   | 'buff_spelldmg'
   | 'buff_spellhaste'
+  | 'buff_crit'
+  | 'buff_dmg_done'
+  | 'buff_rage_gen'
+  | 'die_by_sword'
+  | 'aoe_echo'
+  | 'sure_crit'
   | 'cast_shield'
   | 'hot'
   | 'absorb'
@@ -437,8 +443,6 @@ export interface Aura {
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
-  // Lingering Dread: a break-on-damage aura with a threshold soaks this much
-  // damage before breaking (undefined = classic break on ANY damage).
   breakThreshold?: number;
   damageAccrued?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
@@ -1590,6 +1594,7 @@ export type AbilityEffect =
   | { type: 'silence'; duration: number }
   | { type: 'aoeFear'; duration: number; radius: number }
   | { type: 'clearCooldowns'; abilities: string[] }
+  | { type: 'breakControl' }
   // Swept teleports: reposition along the line, stopping at walls/fences/steep
   // slopes/deep water (never clips through). repositionToAim uses the ground-target
   // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
@@ -1673,6 +1678,9 @@ export type AbilityEffect =
       radius: number;
     }
   | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
+  | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
+  | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
+  | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   | {
       type: 'consumeAura';
@@ -1704,41 +1712,7 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
-  | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
-  // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
-  // fraction of the caster's MAXIMUM health over the duration (the pct-of-max
-  // sibling of the flat 'hot' effect; carries no spell-power rider).
-  | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
-  // Rallying Cry (owner rework): the caster and party members within radius
-  // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
-  // hp FRACTION, so current health rises and falls with the buff, WoW-style).
-  | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
-  // Mass Barrier (mage choice row): the caster and every friendly within radius
-  // gain an absorb shield (the aoeAlly* family shape with an 'absorb' aura).
-  | {
-      type: 'aoeAllyAbsorb';
-      amount: number;
-      duration: number;
-      radius: number;
-      // When set, only the NEAREST this many friendlies in radius are shielded (the
-      // caster included, distance 0). Absent = every friendly in radius.
-      maxTargets?: number;
-    }
-  // Greater Invisibility (mage choice row): one dispatch applies the whole
-  // package (a 'stealth'-kind vanish for `duration`, a buff_dr damage cut for
-  // `duration` + `linger` so it survives an early break, and strips up to
-  // `removeDotCount` damage-over-time auras). One effect so the two self-auras
-  // get distinct ids (the selfBuff case keys auras by the ability id alone).
-  | {
-      type: 'greaterInvisibility';
-      duration: number;
-      drValue: number;
-      linger: number;
-      removeDotCount: number;
-    }
-  // Sanguine Aura: buff the caster and every MELEE party member (MELEE_CLASSES)
-  // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
-  | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
+  | { type: 'selfHealPctMax'; pct: number }
   | { type: 'charge' }
   // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
   // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
@@ -1826,6 +1800,7 @@ export interface AbilityDef {
   awardsCombo?: number; // rogue builders
   spendsCombo?: boolean; // rogue finishers
   requiresDodgeProc?: boolean; // overpower
+  requiresVictoryProc?: boolean; // warrior kill-window strike
   requiresTargetHpBelow?: number; // execute-style (fraction)
   requiresShield?: boolean; // Protection shield abilities: need a shield in the offhand
   // Classic threat riders: flat bonus threat on a successful use and/or a
@@ -2126,6 +2101,15 @@ export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
+  abilityCharges?: Record<
+    string,
+    {
+      charges: number;
+      maxCharges: number;
+      recharge: number;
+      rechargeLength: number;
+    }
+  >;
   id: number;
   kind: EntityKind;
   templateId: string; // mob/npc template id, or class for player
@@ -2242,6 +2226,8 @@ export interface Entity {
   comboPoints: number; // retail-style: character-bound, not anchored to a target
   comboUntil: number; // sim-time until which unspent combo points persist
   overpowerUntil: number; // sim-time until which overpower is usable
+  victoryRushUntil: number; // sim-time until which the warrior kill-window strike is usable
+  battleRhythmCounter: number; // transient every-third-ability warrior rhythm counter
   potionCooldownUntil: number; // sim-time until a combat potion can be used again (#103)
   // Same shared potion cooldown as REMAINING seconds, materialized per tick (like
   // gcdRemaining) so the action bar can paint a cooldown swipe without a client

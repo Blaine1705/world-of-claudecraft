@@ -420,14 +420,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '任務已完成。返回雷德布魯克元帥處並點按「使用」按鈕繳交任務。',
   'hudChrome.tutorial.doneBodyTouch':
     '你已掌握基礎，{name}。東溪谷任你探索。點按「更多」再選「任務日誌」即可隨時查看任務。祝你狩獵順利。',
-  'hudChrome.tutorial.slayTargetHint':
-    '第一次戰鬥嗎？按下 {targetKey} 或點擊狼來選定牠，然後使用快捷欄技能攻擊牠。',
-  'hudChrome.tutorial.slayTargetHintTouch':
-    '第一次戰鬥嗎？點擊狼來選定牠，然後點擊快捷欄技能攻擊牠。',
-  'hudChrome.tutorial.nextTipsTitle': '接下來去哪',
-  'hudChrome.tutorial.nextTipQuestLog': '開啟任務日誌（{key}）尋找附近的下一個任務。',
-  'hudChrome.tutorial.nextTipMap': '查看世界地圖（{key}）了解任務所在位置。',
-  'hudChrome.tutorial.nextTipSocial': '開啟社交面板（{key}）尋找隊伍應對更強的戰鬥。',
   'hudChrome.raidLockout.title': '團隊副本鎖定',
   'hudChrome.raidLockout.allReady': '所有團隊副本就緒',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小時',
@@ -536,30 +528,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceModeTouch': '觸控',
   'hudChrome.options.interfaceModeNote':
     '自動會根據你的裝置選擇桌面或觸控操作。選擇桌面可強制使用鍵盤與滑鼠（適合有鍵盤的平板），選擇觸控則使用螢幕上的操作控制項。',
-  'hudChrome.warfare.honorAmount': '{amount} 點榮譽',
-  'hudChrome.warfare.dualPrice': '{money} + {honor}',
-  'hudChrome.warfare.balance': '榮譽：{amount}',
-  'hudChrome.warfare.honorFloat': '+{amount} 榮譽',
-  'hudChrome.warfare.honorGain': '你獲得了 {amount} 點榮譽（{reason}）。',
-  'hudChrome.warfare.notEnoughHonor': '榮譽不足。',
-  'hudChrome.warfare.reasons.arenaWin': '競技場勝利',
-  'hudChrome.warfare.reasons.fiestaKill': '嘉年華擊倒',
-  'hudChrome.warfare.reasons.fiestaComplete': '完成嘉年華',
-  'hudChrome.warfare.reasons.fiestaWin': '嘉年華勝利',
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
   'hudChrome.statInfo.names.hasteRating': '急速等級',
-  'hudChrome.statInfo.names.warfare': '戰爭',
-  'hudChrome.statInfo.warfareValue': '造成傷害 +{increase}% / 承受傷害 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
     '來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。',
   'hudChrome.statInfo.desc.hasteRating':
     '來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
-  'hudChrome.statInfo.desc.warfare':
-    '對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。',
   'hudChrome.statInfo.sources.header': '構成：',
   'hudChrome.statInfo.sources.base': '基礎：{value}',
   'hudChrome.statInfo.sources.attributes': '來自屬性：{value}',
@@ -2204,9 +2182,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': '臨終聖禮',
   'entities.abilities.lay_on_hands.description':
     '巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。',
-  'entities.abilities.holy_taunt.name': '神聖挑釁',
-  'entities.abilities.holy_taunt.description':
-    '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
   'entities.abilities.flash_of_light.name': '光癒術',
   'entities.abilities.flash_of_light.description':
     '快速而高效的聖光迸發，為一個友方目標恢復 {damage} 點生命值。',
@@ -2387,7 +2362,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': '昏迷目標 2 秒。僅限巨熊形態。',
   'entities.abilities.faerie_fire.name': '巫光',
   'entities.abilities.faerie_fire.description':
-    '使目標的護甲降低 {damage}%，持續 40 秒。不會與削甲疊加。',
+    '使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目標陷入深度睡眠，最多持續 8 秒。任何傷害都會將其喚醒。',
@@ -2525,8 +2500,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': '野牙偽裝',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性之力激勵附近的盟友，提高攻擊強度，持續 5 分鐘。（獵人天賦）',
-  'entities.abilities.avatar.name': '巨像',
-  'entities.abilities.avatar.description': '化身為巨像，提高攻擊強度，持續 20 秒。（戰士天賦）',
+  'entities.abilities.avatar.name': '巨像化身',
+  'entities.abilities.avatar.description':
+    '解除控制效果並化為巨像，使造成的傷害提高 20%，持續 20 秒。（戰士天賦）',
   'entities.abilities.avenging_wrath.name': '復仇之翼',
   'entities.abilities.avenging_wrath.description':
     '喚降復仇之力，提高攻擊強度與法術強度，持續 20 秒。（聖騎士天賦）',
@@ -2534,7 +2510,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.description': '提高攻擊強度，持續 15 秒。（德魯伊天賦）',
   'entities.abilities.bladestorm.name': '鋼鐵旋風',
   'entities.abilities.bladestorm.description':
-    '化作鋼鐵風暴，每秒對附近敵人造成 {damage} 點傷害。（戰士天賦）',
+    '化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。（戰士天賦）',
+  'entities.abilities.swordguard.name': '劍衛',
+  'entities.abilities.swordguard.description':
+    '受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時提高到 20%。（戰士天賦）',
+  'entities.abilities.triumph_rush.name': '凱旋奔襲',
+  'entities.abilities.triumph_rush.description':
+    '擊殺敵人後，20 秒內可造成武器傷害加 {damage}，並恢復最大生命值的 20%。（戰士天賦）',
+  'entities.abilities.razor_howl.name': '銳刃怒吼',
+  'entities.abilities.razor_howl.description': '使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）',
+  'entities.abilities.stormthrow.name': '風暴投擲',
+  'entities.abilities.stormthrow.description': '投擲武器，使目標昏迷 3 秒。（戰士天賦）',
+  'entities.abilities.reckless_vow.name': '魯莽誓言',
+  'entities.abilities.reckless_vow.description':
+    '所有怒氣生成提高 50%，暴擊機率提高 20%，持續 12 秒。（戰士天賦）',
+  'entities.abilities.red_banner.name': '赤紅戰旗',
+  'entities.abilities.red_banner.description':
+    '你和附近盟友的攻擊速度提高 10%，傷害提高 10%，持續 20 秒。（戰士天賦）',
   'entities.abilities.blink.name': '閃爍步',
   'entities.abilities.blink.description': '向前瞬移 15 碼並解除定身效果。（法師天賦）',
   'entities.abilities.bloodlust.name': '戰鼓',
@@ -3101,12 +3093,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '守潮者',
   'entities.npcs.tidewatcher_ondrel.greeting':
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
-  'entities.quests.q_prof_intro.title': '人人都有一技之長',
-  'entities.quests.q_prof_intro.text':
-    '伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。',
-  'entities.quests.q_prof_intro.completion':
-    '看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，靠這些都能正經謀生。',
-  'entities.quests.q_prof_intro.objectives.0.label': '礦石塊',
   'entities.quests.q_wolves.title': '門前群狼',
   'entities.quests.q_wolves.text':
     '森林狼已敢撲咬北路旅人，{playerName}。擊敗8隻森林狼，讓東溪能鬆一口氣。',
@@ -4223,43 +4209,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.skipToContent': '跳至主要內容',
   'guide.loading': '載入中...',
   'guide.controls.targetFriendly': '鎖定最近的友方',
-  'guide.deedsPage.cat.chronicle': '編年史',
-  'guide.deedsPage.cat.collection': '收藏',
-  'guide.deedsPage.cat.combat': '戰鬥',
-  'guide.deedsPage.cat.delve': '秘探',
-  'guide.deedsPage.cat.dungeon': '地城',
-  'guide.deedsPage.cat.exploration': '探索',
-  'guide.deedsPage.cat.feat': '壯舉',
-  'guide.deedsPage.cat.progression': '成長',
-  'guide.deedsPage.cat.pvp': 'PvP與競技',
-  'guide.deedsPage.cat.social': '社交',
-  'guide.deedsPage.catalogBody':
-    '這裡列出了功績之書所能容納的每一個功績，按類別整理。隱密的功績被特意略去，等待你自己去發現。在遊戲內打開功績之書，即可查看每個功績的具體要求。',
-  'guide.deedsPage.catalogHeading': '功績全錄',
-  'guide.deedsPage.chroniclesBody':
-    '每個區域都保有自己的編年史，這是一組由當地記錄者收集的功績，他們自願承擔起記錄每一位過路旅人的責任。東溪谷的Saul是其中的第一位。一部編年史分為若干章節，你可以按任意順序來完成它們。',
-  'guide.deedsPage.chroniclesHeading': '編年史',
-  'guide.deedsPage.colRenown': '名望',
-  'guide.deedsPage.colReward': '獎勵',
-  'guide.deedsPage.featsBody':
-    '壯舉自成一類：它們是傳承與世界首創的記錄，是那些與逝去紀元相關、或只會發生一次的功績。它們不帶來任何名望，也不計入完成度，將作為對往昔功業的紀念被永久保存。',
-  'guide.deedsPage.featsHeading': '壯舉',
-  'guide.deedsPage.howBody':
-    '功績以單一角色為單位逐一贏得並留存，因此你所扮演的每一位英雄都會各自累積自己的功績之書；只有王國的排行榜才會匯總你所扮演的所有角色的名望，且每個功績只計一次。每個功績都在遊戲內的功績之書中清楚寫明它的要求，讓你始終知道該追求什麼；你也可以追蹤心儀的功績，讓它們在遊玩時常在眼前。少數功績會保持隱密，只有在你贏得它們之後才會揭曉。功績之書也對自己誠實：凡是你過往的記錄能夠證明的，它都會當場記上功勞，因此老練的玩家絕不會翻開一頁空白；只有計數類的功績才會從零開始累計。',
-  'guide.deedsPage.howHeading': '功績如何運作',
-  'guide.deedsPage.intro':
-    '功績之書記錄著你在這個世界所做的一切，從走出新手山谷的第一步，到王國所能提供的最艱難的戰鬥。一邊遊玩一邊贏得功績，佩戴它們授予的頭銜，看著你的名望不斷攀升。',
-  'guide.deedsPage.renownBody':
-    '名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。',
-  'guide.deedsPage.renownHeading': '名望',
-  'guide.deedsPage.rewardBorder': '邊框',
-  'guide.deedsPage.rewardsBody':
-    '這些獎勵純粹是為了炫耀，而這正是它們的意義所在。有些功績會授予你可佩戴的頭銜，或是為你的名字增添裝飾的邊框，絕不會給出任何讓你的英雄變強的東西。在功績之書中選擇你想要的頭銜，它便會隨你出現在銘牌上、聊天中與排行榜上，供所有人觀看。',
-  'guide.deedsPage.rewardsHeading': '頭銜與邊框',
-  'guide.deedsPage.standingsNote':
-    '各王國會持續統計所有帳號累積的名望。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。',
   'guide.delvesPage.affixesBody':
-    '較高難度的旅程會擲出一項詞綴，改變這趟探索的進行方式，從不安的亡者到污濁的空氣，再到搖搖欲墜的屋頂結構。它們同時提高了危險與獎勵。每座秘探都會從契合自身主題的詞綴中抽取；就整個王國而言，詞綴池如下：',
+    '較高難度的旅程會擲出一項詞綴，改變這趟探索的進行方式，從不安的亡者到污濁的空氣，再到搖搖欲墜的屋頂結構。它們同時提高了危險與獎勵。一座以墓穴為主題的秘探可能擲出以下任何一種：',
   'guide.delvesPage.affixesHeading': '旅程詞綴',
   'guide.delvesPage.affixesLabel': '可能出現的詞綴',
   'guide.delvesPage.companionBody':
@@ -4291,7 +4242,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '秘探是一座小型的副本地城，專為你與至多一名盟友打造，是一份不會受到打擾的獨立複本。你從世界中由秘探看守人看管的看板啟程，下到其中，一路打穿少數幾個房間，並在單一守護者面前作結。旅程短促且設計來反覆挑戰，因此每當開放世界無事可做時，秘探都是一份可靠的進度來源。',
   'guide.delvesPage.whatHeading': '何謂秘探',
   'guide.delvesPage.whereBody':
-    '第一座秘探「崩塌的聖物庫」在起始山谷東溪谷的聖物庫山丘開啟。哈爾文修士在那裡看管著看板，待你準備就緒，他便會送你下去。他的巡迴並不止於此：越過泥沼濕地北緣的巨魔墳丘，這位看守人又為已站穩腳跟的秘探者開啟了「溺亡連禱」。',
+    '第一座秘探「崩塌的聖物庫」位於東溪谷地起始山谷中的聖物庫山丘。哈爾文修士在那裡看管著看板，待你準備就緒，他便會送你下去。',
   'guide.delvesPage.whereHeading': '何處能找到',
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '總覽',
@@ -4370,7 +4321,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1': '是的。整款遊戲可免費遊玩至等級上限，並且在GitHub上開放原始碼。',
   'guide.home.faq.q2': '我需要加密貨幣錢包嗎？',
   'guide.home.faq.a2':
-    '不需要。沒有它遊戲也能完整遊玩。選用的社群代幣僅增添外觀裝飾，以及每日獎勵獎池的一份分紅，絕不影響戰力。',
+    '不需要。沒有它遊戲也能完整遊玩。選用的社群代幣僅能解鎖外觀裝飾，絕不影響戰力。',
   'guide.home.faq.q3': '我可以離線遊玩嗎？',
   'guide.home.faq.a3': '可以。瀏覽器中提供即時的單人模式，另外還有共享的線上世界。',
   'guide.home.faq.q4': '達到最高等級需要多久？',
@@ -4409,7 +4360,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '向頭上有標記的人接取任務，完成目標後回報，即可換取經驗值、金幣與裝備。畫面上的任務追蹤器會讓你隨時掌握目標。',
   'guide.howToPlay.deathTitle': '死亡並非終點',
   'guide.howToPlay.deathBody':
-    '若你倒下，你的軀體會留在倒下之處，而你會化為鬼魂在最近的墓地甦醒。讓你的靈魂跑回軀體旁，即可當場復活、毫無懲罰；或者接受墓地的靈魂醫者，以一段短暫的虛弱為代價立即復生。全新的英雄可完全免除這份虛弱，而你所擁有或掙得的一切也絕不會失去。',
+    '若你倒下，可釋放靈魂並在最近的墓地復活，生命值回滿，再自行回到你原先所在之處。不會損失任何經驗值。',
   'guide.howToPlay.groupingTitle': '同心協力',
   'guide.howToPlay.groupingBody':
     '邀請其他人組成隊伍，即可共享任務進度並挑戰地城。世界大部分內容皆可單人完成，因此組隊是一種選擇，而非負擔。',
@@ -4417,7 +4368,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.onlineBody':
     '與所有人一同遊玩共享的線上世界，或在瀏覽器中開啟即時的離線世界來熟悉操作。',
   'guide.howToPlay.reassure':
-    '天賦於10級解鎖，且只要脫離戰鬥便可隨時重置，因此你早期的選擇絕非永久。儘管放手嘗試吧。',
+    '天賦於10級解鎖，且可隨時重置，因此你早期的選擇絕非永久。儘管放手嘗試吧。',
   'guide.howToPlay.controlsLink': '查看完整操作按鍵說明',
   'guide.controls.intro':
     '電腦版的預設按鍵。除了永遠用來開啟遊戲選單的 Esc 之外，每項配置皆可在遊戲選項中變更，而一項配置也可以是像 Shift+Z 這樣的組合鍵。',
@@ -4447,12 +4398,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '還有一項預設關閉的功能：在選項中啟用「攻擊移動」後，會保留一個按鍵（選項開啟期間為 A），按下它，你便會朝游標走去，並對游標下的敵人，或沿途遇到的第一個敵人展開攻擊。',
   'guide.controls.mobileHeading': '行動裝置上',
   'guide.controls.mobileBody':
-    '在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在其他任意處拖曳即可環顧，用兩指捏合來縮放鏡頭，並有螢幕上的按鈕供你使用技能與選單。左上角的一個小箭頭可以顯示或隱藏選單按鈕，而那裡的「更多」按鈕則收納了你其餘的視窗。',
+    '在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在右側任意處拖曳即可環顧，並有螢幕上的按鈕供你使用技能與選單。',
   'guide.settingsPage.heading': '設定與效能',
   'guide.settingsPage.intro':
     '讓遊戲畫面美到極致，或跑得飛快。三套現成配置，加上每個圖形選項的真正作用。',
   'guide.settingsPage.wherePath':
-    '本頁介紹的一切都在遊戲裡：按下 Esc 開啟選項。選單會開在釘選要項的「總覽」頁，類別則排列在一旁的軌道上：以下的設定位於「顯示」群組中的「圖形」、「介面」與「無障礙」之下，而「效能監視器」則在「系統」之下。更快的方式，是在頂端的搜尋框輸入名稱，直接跳到它。',
+    '本頁介紹的一切都在遊戲裡：按下 Esc，就能在「圖形」、「介面」與「效能監視器」中找到。',
   'guide.settingsPage.fairnessTitle': '天生公平',
   'guide.settingsPage.fairnessBody':
     '這裡沒有任何選項會用畫面換取優勢。調低設定只會捨去外觀上的修飾，絕不會犧牲作戰所需的資訊：你的減益效果、施法條、隊伍血量與傷害數字，從「低」到「超高」完全相同。用入門機器遊玩絕不吃虧。',
@@ -4494,7 +4445,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '「進階」以「高」這一檔為起點，並解鎖四個額外選項，讓你把效能花在真正看得出差別的地方：地形細節、植被密度、特效與光照，以及陰影品質。它們和圖形品質一樣，需要重新載入後才會生效。',
   'guide.settingsPage.advancedMixes':
     '兩種人氣搭配：把陰影品質維持在「高」、特效與光照調成「低」，畫面清爽俐落、沒有光暈，跑起來也輕鬆；或者反過來，保留光暈，讓陰影柔和一些。',
-  'guide.settingsPage.tableHeading': '每個圖形選項，逐一解說',
+  'guide.settingsPage.tableHeading': '每個選項，逐一解說',
   'guide.settingsPage.colSetting': '選項',
   'guide.settingsPage.colDoes': '作用',
   'guide.settingsPage.colImpact': 'FPS 影響',
@@ -4528,11 +4479,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.mobileTitle': '在手機與平板上',
   'guide.settingsPage.mobileBody':
     '行動裝置上，遊戲會替你打理更多：自動挑選檔位、將解析度稍微壓低以節省電力並抑制發熱，最高的幾個檔位則僅限桌機。上面的配置依然適用，只是手機最高到「高」為止。',
-  'guide.settingsPage.touchBody':
-    '在觸控螢幕上，選項還會多出一組專屬的舒適度設定：搖桿的大小與靈敏度、螢幕按鈕的大小與不透明度、左撇子的鏡像佈局、可選的鏡頭搖桿，以及反轉觸控視角，讓螢幕來配合你的雙手，而不是反過來。',
-  'guide.settingsPage.audioTitle': '聲音與語言',
-  'guide.settingsPage.audioBody':
-    '選項視窗管的不只是畫面。「音訊」分頁提供音效、音樂與語音各自獨立的音量控制，「介面」區則有一個語言選擇器，能當場重新在地化整個介面，無需重新載入。',
   'guide.combat.intro':
     '戰鬥遵循熟悉的經典MMO規則。你完全不需要研究這些就能玩得很好，這只是讓你了解戰鬥運作的大致樣貌。',
   'guide.combat.hitTitle': '並非每一擊都會命中',
@@ -4546,10 +4492,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '戰士在激戰中累積怒氣，盜賊消耗會穩定回復的能量，施法者則管理一池法力。掌握你的資源，等於掌握了玩好職業的一半。',
   'guide.combat.growTitle': '你每升一級都會更強',
   'guide.combat.growBody':
-    '每一級都會讓你更強韌並解鎖新技能，一路直到 {cap} 級的上限。進行任務是升級最快的途徑；狩獵、地城與秘探則讓過程更完整。',
-  'guide.combat.queueTitle': '你的下一招早已上膛',
-  'guide.combat.queueBody':
-    '你不必把按鍵時機掐準到每一格。在當前技能仍在施放時按下你的下一個技能，它便會排入佇列，在施法完成的那一瞬間立刻發動，讓熟練的操作流暢無間。有些近戰打擊也以同樣的方式運作，隨著你的下一次武器揮擊一併出手。',
+    '每一級都會讓你更強韌並解鎖新技能，一路直到 {cap} 級的上限。進行任務是升級最快的途徑；地城與探索則讓過程更完整。',
   'guide.glossary.intro': '本指南與聊天中所用術語的快速參考。',
   'guide.glossary.aggroTerm': '仇恨',
   'guide.glossary.aggroDef': '敵人的注意力。產生最高威脅值的玩家會吸住仇恨並遭受攻擊。',
@@ -4578,12 +4521,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a1': '是的。整款遊戲可免費遊玩至等級上限，原始碼也在GitHub上公開。',
   'guide.faqPage.q2': '我需要加密貨幣錢包或任何代幣嗎？',
   'guide.faqPage.a2':
-    '不需要。沒有它遊戲也能完整遊玩。選用的社群代幣僅增添外觀裝飾，以及每日獎勵獎池的一份分紅，絕不影響戰力或進度。',
+    '不需要。沒有它遊戲也能完整遊玩。選用的社群代幣僅能解鎖外觀裝飾，絕不影響戰力或進度。',
   'guide.faqPage.q3': '我可以在手機上玩嗎？',
   'guide.faqPage.a3': '可以。遊戲可在行動瀏覽器中以觸控操作運行，另外也提供電腦版啟動器。',
   'guide.faqPage.q4': '我可以離線或單人遊玩嗎？',
   'guide.faqPage.a4':
-    '可以。遊戲提供即時的單人離線模式，而線上世界除了地城、團隊副本與世界首領之外，皆可完全單人完成。',
+    '可以。遊戲提供即時的單人離線模式，而線上世界除了地城與團隊副本外，皆可完全單人完成。',
   'guide.faqPage.q5': '總共有幾種職業？',
   'guide.faqPage.a5':
     '九種，涵蓋經典的坦克、治療與輸出角色定位，每一種都有自己的資源系統（怒氣、法力或能量）以及專屬的招牌技能。',
@@ -4625,7 +4568,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.home': '返回總覽',
   'guide.bestiary.heading': '生物圖鑑',
   'guide.bestiary.intro':
-    '世界中的生物，依族群分類。這些是你在野外會遇到的日常敵人。菁英敵人與牠們的首領不會出現在這些頁面上，而最致命之物則潛伏在地城門後。',
+    '世界中的生物，依族群分類。這些是你在野外會遇到的敵人。最致命之物則潛伏在地城門後，未列於此。',
   'guide.bestiary.rare': '稀有',
   'guide.bestiary.levels': '等級 {min} 到 {max}',
   'guide.bestiary.levelsSame': '等級 {min}',
@@ -4667,7 +4610,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.intro': '任務是世界的核心，也是升級最快的途徑。以下說明它們的運作方式。',
   'guide.questsPage.acceptTitle': '尋找與接取',
   'guide.questsPage.acceptBody':
-    '頭頂有標記的人有工作要交給你。與他們交談即可接取任務。在東溪鎮，執法官紅溪正等著你接下「狼臨城下」，這是你最先能接的任務之一。',
+    '頭頂有標記的人有工作要交給你。與他們交談即可接取任務。你的第一個任務是「狼臨城下」，由東溪鎮的執法官紅溪發布。',
   'guide.questsPage.objectivesTitle': '目標',
   'guide.questsPage.objectivesBody':
     '擊殺特定敵人、收集物品，或與世界中的某物互動。畫面上的任務追蹤器會隨著你的進展計算進度。若你改變心意，可以從任務記錄中放棄一項任務，日後再從發布者那裡重新接取。',
@@ -4676,7 +4619,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '將完成的任務帶到它的繳交標記處（地圖會指示位置），即可換得經驗值、金幣，以及通常會有一件配合你職業挑選的裝備。那通常就是把任務交給你的人，不過有些任務會讓你轉而前往另一個人那裡。',
   'guide.questsPage.partyTitle': '組隊接任務',
   'guide.questsPage.partyBody':
-    '附近的隊伍成員會共享擊殺與目標進度，所以一起接任務只會更快，絕不會更慢。你也可以與隊伍分享任務：用 /share 指令將它以可點擊的連結貼到聊天中，任何符合條件的成員都能一鍵接取同一項任務。',
+    '附近的隊伍成員會共享擊殺與目標進度，所以一起接任務只會更快，絕不會更慢。你也可以與隊伍分享任務：用 /share 指令將它以可點擊的連結貼到聊天中，任何符合條件的附近成員都能一鍵接取同一項任務。',
   'guide.questsPage.storyTitle': '一條主線貫穿其中',
   'guide.questsPage.storyBody':
     '從你在東溪鎮的第一批跑腿差事開始，亡者出了問題。一個邪教正在運作，線索向北穿過每個區域。循線追查，便能查出幕後主使是誰。',
@@ -4703,17 +4646,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
   'guide.dungeonsPage.raidName': '最終團隊副本',
   'guide.dungeonsPage.raidBody':
-    '在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股整個團隊必須齊心遏止的不死力量。先掙得入內的資格，再帶上九位夥伴。',
-  'guide.dungeonsPage.heroicTitle': '英雄模式',
-  'guide.dungeonsPage.heroicBody':
-    '每座五人地城，以及團隊副本本身，都有一個等在等級上限之後的英雄版本。同樣的殿堂，為裝備精良的終局隊伍重新打造：一切都打得更痛，沒有什麼能靠雙腿甩開，首領更是對昏迷與緩速完全免疫。先超越普通版本吧；英雄難度假定你早已做到。',
-  'guide.dungeonsPage.heroicHowBody':
-    '在你的隊伍認領副本之前先選好難度：輸入 /dungeon heroic，或切換隊伍選單上的「地城難度」開關。這個選擇由全隊共享，並在踏入大門時鎖定，因此一趟征程始終保持它被認領時的樣子。',
-  'guide.dungeonsPage.heroicRewardsTitle': '英雄徽記與升級版戰利品',
-  'guide.dungeonsPage.heroicRewardsBody':
-    '英雄首領掉落你所熟悉的戰利品，經過升級並在提示框上標註「英雄」，而每趟征程的最終首領還會追加別處找不到的史詩裝備。那最後一擊也會為每位參與者留下英雄徽記：一種在高望的軍需官維克斯處花用的貨幣，他存貨中的戒指與項鍊是全王國唯一的珠寶。',
-  'guide.dungeonsPage.heroicLockoutBody':
-    '普通地城可以整天連刷。英雄難度則講求耐心：每座地城每天只獎勵一次英雄通關，團隊副本也為每種難度各保有一個每日鎖定。已通關的征程對它自己的隊伍永遠敞開，所以沒有人會被擋在自己掙得的戰利品之外。',
+    '在一道封印的皇家大門之後，等待著一場十人試煉：一場多階段的戰鬥，以及一股不死的力量，需要整個團隊齊心將其終結。先掙得入內的資格，再帶上九位夥伴。',
   'guide.abilityHook.arcane_intellect': '提升智力以擴大友方的法力上限，開怪前先施放。',
   'guide.abilityHook.arcane_shot': '從遠處射出的瞬發一擊，迅速造成額外傷害。',
   'guide.abilityHook.aspect_of_the_hawk': '持續維持的姿態，用來強化你的遠程攻擊強度。',
@@ -4771,13 +4704,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     '強化與增益只在該場對戰中有效。它們著重於即興、好玩的搭配，而非長久的力量，所以沒有人能花錢買到勝利。',
   'guide.arenaPage.coliseumBody':
-    '灰燼競技場是這個王國的競技場，你會在排名對戰中面對其他玩家，進行一對一或二對二的較量。每個級別都各自保有自己的排名，因此一場勝利能讓你在那道天梯上往上爬，讓整個王國都看得見。開啟競技場視窗即可報名參加某個級別，可以獨自一人，也可以與你的搭檔一同上場。',
+    'Coliseum 是這個王國的競技場，你會在排名對戰中面對其他玩家，進行一對一或二對二的較量。每個級別都各自保有自己的排名，因此一場勝利能讓你在那道天梯上往上爬，讓整個王國都看得見。',
   'guide.arenaPage.coliseumHeading': '灰燼鬥獸場',
   'guide.arenaPage.duelsBody':
     '向你遇到的任何玩家發起一場友誼決鬥。賭上的只有顏面，所以這是學習對戰組合或解決友好爭論最簡單的方式。',
   'guide.arenaPage.duelsHeading': '決鬥',
   'guide.arenaPage.fiestaBody':
-    '嘉年華是一種快節奏的二對二混戰，以一場連續不斷的對戰進行，每位鬥士都被拉到同一起跑線上。隨著戰鬥推進，你會抽選強化，這些快速的增益能即時重塑你的配套，讓每場對戰都不盡相同。',
+    '嘉年華是一種快節奏的二對二模式，以短回合進行。每回合之間你都會抽選強化，這些快速的增益能即時重塑你的配套，讓每場對戰都不盡相同。',
   'guide.arenaPage.fiestaHeading': '二對二嘉年華',
   'guide.arenaPage.heading': '競技場與PvP',
   'guide.arenaPage.intro':
@@ -4800,14 +4733,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.style': '風格',
   'guide.classPage.fullKitHeading': '完整技能',
   'guide.classPage.fullKitNote':
-    '此職業隨等級成長所學會的技能，依照解鎖順序排列。天賦會再賦予少數幾項技能，並決定哪些技能撐起你的構築。',
+    '此職業能學習的每一項技能，依照解鎖順序排列。天賦決定哪些技能撐起你的配置。',
   'guide.classPage.masteryLabel': '精通',
   'guide.classPage.petsHeading': '惡魔',
   'guide.classPage.petsNote': '術士召喚惡魔並肩作戰，每隻各擅長不同的任務。',
   'guide.dungeonsPage.levelBand': '等級 {min} 至 {max}',
   'guide.dungeonsPage.partySize': '{n} 名玩家',
   'guide.faqPage.a10':
-    '等級上限是 {cap} 級。從那裡開始，你可以挑戰五人地城與十人團隊副本，再以英雄模式重新征服它們以取得升級版戰利品，在世界首領崛起時與他一戰，在競技場中考驗自己，帶著一名同伴深入秘探，並在功績之書中追逐功績，以攀登王國排名。',
+    '等級上限是 {cap} 級。從那裡開始，你可以挑戰五人地城和十人團隊副本、追求更好的裝備，並在競技場中考驗自己。',
   'guide.faqPage.a11':
     '邀請你遇到的任何人組隊、在聊天中招募，或在地城前湊隊。世界上大部分內容都能單人完成，所以組隊是一種選擇，而非必要。',
   'guide.faqPage.a9':
@@ -4824,9 +4757,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.ccTerm': '群體控制',
   'guide.glossary.debuffDef': '施加在目標身上的有害效果，例如減速、流血或護甲削弱。',
   'guide.glossary.debuffTerm': '減益',
-  'guide.glossary.deedDef':
-    '記錄在功績之書中的成就。贏得功績能獲得名望，其中一些還會授予外觀頭銜或銘牌邊框。',
-  'guide.glossary.deedTerm': '功績',
   'guide.glossary.delveDef':
     '供一到兩名玩家進行、可重複挑戰的短程副本探索，自看守人的看板啟程，並有一名同伴隨侍在側。',
   'guide.glossary.delveTerm': '秘探',
@@ -4900,17 +4830,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每棵天賦樹上都有少數幾點是十字路口，而非單純的購買：該節點提供兩到三個選項，而你只能認定其中之一。你的下一次重置會重新開啟這個選擇，就像樹上的其他一切一樣。',
   'guide.talentsPage.heading': '天賦與專精',
   'guide.talentsPage.howBody':
-    '天賦在 10 級開放，隨著你向等級上限攀升，會持續獲得點數。你在職業的天賦面板中分配點數，較深的階層會隨著你的投入與升級而開放，而且你可以儲存多套配置以在不同構築間切換。',
+    '天賦在10級開放，隨著你向等級上限攀升，會持續獲得點數。你在職業的天賦面板中分配點數，而且可以儲存多套配置以在不同構築間切換。',
   'guide.talentsPage.howHeading': '運作方式',
   'guide.talentsPage.intro':
     '天賦是你讓職業展現個人風格的方式。它們是選擇性的、寬容的，而且容易更動，所以你可以放心嘗試。',
   'guide.talentsPage.resetNote':
-    '只要脫離戰鬥且不在競技場對戰中，你隨時都能重置天賦，所以早期的選擇絕不會是陷阱。儘管嘗試，看看自己喜歡什麼，並自由地改變主意。',
+    '只要脫離戰鬥，你隨時都能重置天賦，所以早期的選擇絕不會是陷阱。儘管嘗試，看看自己喜歡什麼，並自由地改變主意。',
   'guide.talentsPage.resetTitle': '沒有什麼是永久的',
   'guide.talentsPage.shareNote':
     '一套完成的天賦配置可以複製成一段可分享的短代碼，交給朋友，對方只要把它直接貼進自己的天賦面板即可載入。',
   'guide.talentsPage.specsBody':
-    '每個職業都有數種專精，各有自己的角色定位和標誌性的著重方向。在天賦面板中選擇其一，會賦予一項標誌性技能與一份專屬的持久精通。以下是它們全部的輪廓。打開某個職業即可查看其完整技能。',
+    '每個職業都有數種專精，各有自己的角色定位和標誌性的著重方向。以下是它們全部的輪廓。打開某個職業即可查看其完整技能。',
   'guide.talentsPage.specsHeading': '各職業的專精',
   'guide.talentsPage.whatBody':
     '隨著升級，你會獲得天賦點數，可用於小幅且永久地強化你的技能與屬性。它們塑造職業的手感，使其偏向更高的傷害、更堅固的防禦或更強的治療。',
@@ -4921,7 +4851,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每個職業都能撐住場面並達到等級上限。選擇你喜歡的奇幻設定，而不是別人口中所謂最好的那個。',
   'guide.wishPage.i1Title': '你不會選錯職業',
   'guide.wishPage.i2Body':
-    '當你倒下時，你會化為鬼魂在最近的墓地甦醒。跑回你的軀體旁即可免費復活，或者接受靈魂醫者的當場復生，以一段短暫的虛弱換取這份便利。經驗、裝備與錢幣都絕不會失去，所以放心去冒險、去學習。',
+    '當你倒下時，會釋放靈魂並在最近的墓地復活，再自行返回原處。不會損失任何經驗，所以放心去冒險、去學習。',
   'guide.wishPage.i2Title': '死亡幾乎不會讓你付出代價',
   'guide.wishPage.i3Body':
     '天賦在10級解鎖，而且只要脫離戰鬥，想何時重置都可以，所以你早期的選擇絕不是永久的。',
@@ -4958,7 +4888,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.waveSilverBody': '開場那波：乾淨俐落的單一屬性增益，磨利你職業的基本功。',
   'guide.arenaPage.waveSilverTitle': '白銀',
   'guide.arenaPage.wavesBody':
-    '一場嘉年華對戰會隨著進行不斷發給你新的選項，而戰鬥拖得愈久，選項也愈來愈大膽。你會一波接一波地堆疊構築，每次從幾個選項中挑一個，並保留到這場對戰結束。',
+    '嘉年華的每一回合都會發給你一份新的選項，而隨著對戰進行，選項也愈來愈大膽。你會一波接一波地堆疊配套，每次從幾個選項中挑一個，並保留到這場對戰結束。',
   'guide.arenaPage.wavesTitle': '強化如波浪般湧來',
   'guide.bestiary.flavor.gravecaller_cultist':
     '死亡邪教的長袍僕從，他們的作為玷污了從谷地到群峰的座座墳塚。凡他們聚集之處，亡者便不得安息。',
@@ -4972,9 +4902,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一具長出了肩膀的風暴元素，行走在風暴岩之上的遠處峭壁間，身上的心核碎片值得人冒著雷電去搶。',
   'guide.bestiary.notedLabel': '值得一提',
   'guide.combat.ccBody':
-    '控場是一種特殊的減益，會限制目標所能做的事：昏迷、定身與緩速、阻斷施法的沉默、繳械、恐懼，還有能讓敵人短暫變得無害的變形。對上其他玩家時，控制會隨著重複而磨損：同一類控場重複施加得太快便會減弱、繼而完全失效，而一記從潛行中開場的昏迷會與其後的昏迷分開計算，因此沒有人能被永無止盡地連鎖控制。這個世界的生物則沒有這種記性：控場對牠們永遠不會因重複而減弱，不過許多最強大的敵人，包括具名的菁英與其中最強的首領，則完全無法被控制。',
+    '控場是一種特殊的減益，會限制目標所能做的事：暈眩、定身與緩速、阻斷施法的沉默、繳械、恐懼，還有能讓敵人短暫無害的變形。其中有些，例如定身、恐懼與變形，若太快重複施加便會失去效用，因此無法永無止盡地連鎖控制。',
   'guide.combat.deathBody':
-    '若你的生命值歸零，你便當場倒下，你的軀體會留在原地。釋放你的靈魂，你會化為鬼魂在最近的墓地甦醒：比活人腳程更快、敵人也無法觸及，卻無法戰鬥、拾取，也無法與任何人交談，唯獨盤旋在墓石之上的靈魂醫者例外。接下來由你選擇。讓你的鬼魂跑回軀體旁，你便會當場復活，回復部分生命與法力，毫無任何懲罰。或者接受靈魂醫者的當場復生，代價則是「復活虛弱」：一種對你全身上下的暫時削弱，你的資歷愈深，它持續得愈久，而全新的角色則可完全免除。若你在地城中倒下，你的靈魂會在外頭的墓地等候；讓你的鬼魂走回門前，你便會在入口處復活。秘探則是例外：在那裡倒下，你只會被重新扶起於秘探的入口處，不過第二次倒下便會結束這趟探索。無論哪條路，你都不會損失經驗、裝備或錢幣。戰鬥之間，坐下進食飲水，好讓你以全盛狀態迎接下一場。',
+    '若你的生命值歸零，你便倒下了。釋放你的靈魂，在最近的墓地以全滿生命值復活，再自行跑回原處，所以死亡只會花掉你一點時間，而非你的進度。戰鬥之間，坐下進食飲水，好讓你以全盛狀態迎接下一場。',
   'guide.combat.deathTitle': '當你倒下時',
   'guide.combat.effectsBody':
     '許多技能會施加一個會持續存在的效果。有益的（增益）能提升你的屬性、為你護盾，或一點一滴地治療你；有害的（減益）則以持續傷害消耗你的生命，或使你衰弱。留意畫面頂端角落、小地圖旁的小圖示，便能看出你身上有哪些效果以及還會持續多久。',
@@ -4986,7 +4916,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '這座神殿有著自己的傳說，比你在別處追查的邪教更為古老。在微光湖的岸邊（那是一座飲下月光、又交還溺亡者的山中湖泊），一名孤獨的看守者守著一道蒼白光芒之門。在水面之下，一道冰冷的石階向下通往那裡。沉沒在此的人並非死於意外：他們是蒼白唱詩班，在禮拜中沉入水底，自此再未停止吟唱。古老的守衛在被湖水吞沒之前，在岩石上刻下了唯一一句警語，一段向他們稱之為溺月之物獻上的禱詞，其下另有一隻更沉穩的手添上了兩個字：它只是沉睡。',
   'guide.dungeonsPage.templeLoreTitle': '溺亡神殿，再深入一些',
   'guide.economy.buyingBody':
-    '與商人交談並選擇瀏覽他的貨品，他的商店便會開啟，內含三個分頁：選購、出售與買回。選購分頁陳列他所有的存貨，只要你負擔得起便能買下。出售分頁列出你背包中他願意收購的物品，而出售一件帶有自身擲選品質的物品時，會先請你確認，好讓珍貴的一件絕不會因失誤而流失。若你割捨了某樣讓你後悔的東西，買回分頁會保留你近期的售出物，讓你能以當初賣得的錢幣把它們買回來。',
+    '站在商人附近即可開啟他的視窗。只要你負擔得起，便能買下他所販售的任何商品，也能將背包裡大部分的東西換成錢幣。若你不小心賣錯了東西，商人會為你保留近期的售出物，讓你能買回來。',
   'guide.economy.buyingTitle': '買與賣',
   'guide.economy.coinBody':
     '錢幣分為三種。一百枚銅幣換一枚銀幣，一百枚銀幣換一枚金幣，因此你的錢袋會從最小的硬幣開始累積。你可透過任務獎勵、拾取被擊敗的敵人，以及變賣不再需要的物品來賺取金錢。',
@@ -4994,15 +4924,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.economy.intro':
     '錢幣是整個世界的潤滑劑：它能購買你的裝備、補給與旅行用品，並在玩家之間易手。這一切只要遊玩就能自然取得，所以不妨把這一頁當成一張地圖，看看你的錢從何處來、又往何處去。',
   'guide.economy.junkBody':
-    '你用不上的掉落物仍能賣給任何商人，因此每當你經過城鎮時就清空背包，別讓它們塞滿。商人的出售分頁甚至備有一個一鍵按鈕，能一次賣出所有粗劣品質的雜物。真正一文不值的零碎雜物也可以直接丟棄以騰出空間。',
+    '你用不上的掉落物仍能賣給任何商人，因此每當你經過城鎮時就清空背包，別讓它們塞滿。真正一文不值的零碎雜物也可以直接丟棄以騰出空間。',
   'guide.economy.junkTitle': '清理雜物',
-  'guide.economy.mailTitle': '渡鴉郵驛',
-  'guide.economy.mailBody':
-    '每座主據點城鎮都立著一根雕刻的渡鴉石柱：那是渡鴉郵驛的信箱，這個王國的信件服務。站在石柱旁，即可寫信給任何一位指名的角色，無論是在線的朋友還是久未上線的故人，並支付一小筆郵資，在信中附上錢幣或貨物。渡鴉需要飛上一小段時間；當牠降落時，一個信封指示會告訴收件人有東西在等著。',
-  'guide.economy.mailHow':
-    '收信的方式正好相反：站在任何石柱旁閱讀你的信件，把它們所載之物收進你的錢袋與背包。信件不會永遠等候，所以要在渡鴉對你死心之前領取。有兩樣東西郵驛一概拒收：靈魂綁定的物品與任務物品，它們要麼隨你同行，要麼哪兒也去不了。另外，繳交一個漂亮的任務之後，記得留意石柱；有些任務給予者會寫信。',
   'guide.economy.marketBody':
-    '商人經營著世界市場，那是一個由玩家驅動的交易所，讓你能與或許從未謀面的人買賣。與東溪鎮的商人交談，或找高守哨站上的拍賣師沃斯，即可開啟它：兩位管理者服務於同一個共享市場。商人也會在那裡長期掛售自己的一批貨品，因此即使沒有其他玩家上架，也總有東西可買。',
+    '商人經營著世界市場，那是一個由玩家驅動的交易所，讓你能與或許從未謀面的人買賣。與商人對話即可開啟它。商人也會在那裡長期掛售自己的一批貨品，因此即使沒有其他玩家上架，也總有東西可買。',
   'guide.economy.marketBrowse':
     '瀏覽：捲動列表或按名稱搜尋，找出待售的商品。每筆刊登都會顯示貨物、賣家，以及整堆的開價。',
   'guide.economy.marketCollect':
@@ -5013,8 +4938,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '定價由你決定。開價稍低於他人通常賣得更快，而開價過高則可能乏人問津。刊登之前先瀏覽一下，看看目前的行情如何。',
   'guide.economy.marketTitle': '世界市場',
   'guide.economy.marksBody':
-    '錢幣並非你唯一能積攢的東西。秘探會給予秘探印記，只能在秘探看守人處花用，用於同伴升級以及在別處找不到的裝備。英雄地城的征程則會在最終首領身上留下英雄徽記，在高望的英雄軍需官處花用，換取王國任何其他角落都不出售的珠寶。兩者都絕不會與你的錢幣混在一起。',
-  'guide.economy.marksTitle': '印記與徽記：錢幣之外的貨幣',
+    '錢幣並非你唯一能積攢的東西。秘探會給予秘探印記，這是一種獨立的貨幣，只能在秘探看守人處花用，用於同伴升級以及在別處找不到的裝備。它們絕不會與你的錢幣混在一起。',
+  'guide.economy.marksTitle': '第二種貨幣：秘探印記',
   'guide.economy.tradeBody':
     '你可以與站在你身旁的任何人面對面交易。雙方都把物品與錢幣放進一個共享的視窗，唯有兩人都確認後交換才會成立，因此誰都不會吃虧。這是把掉落物交給朋友或敲定一筆買賣最簡單的方法。',
   'guide.economy.tradeTitle': '與其他玩家交易',
@@ -5051,7 +4976,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     '裝備是你角色身上穿戴的物件與隨身攜帶的物品。更好的裝備是變強最穩當的途徑，而其中大部分只要遊玩就能取得。',
   'guide.gear.itemLevelBody':
-    '若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。在世界中贏得的裝備，來自敵人與任務者，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。',
+    '若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。屆時每件武器與護甲都會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。',
   'guide.gear.qualityBody':
     '每件物品都有一個品質，其名稱也會以對應的顏色標示，讓你一眼就能看出它的價值。從最常見到最珍貴：',
   'guide.gear.qualityCommon': '普通',
@@ -5079,11 +5004,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsBody':
     '你有一個武器欄位、七個護甲欄位，以及三個珠寶欄位：一個頸部與兩個手指。每種職業只能使用特定的武器，並穿戴不超過自身重量等級的護甲，無論是布甲、皮甲或鎖甲，因此適合你的升級品，正是為你的職業打造的那些。珠寶則完全不分重量：任何職業都能佩戴自己掙得的一切。在這個範圍內，用你所能找到最好的物件填滿每一個欄位。',
   'guide.gear.slotsTitle': '你能裝備什麼',
-  'guide.gear.soulboundBody':
-    '許多珍貴的裝備是靈魂綁定的，從你取得的那一刻起便與你的角色綁定。靈魂綁定的物品無法交易、無法郵寄、無法賣給商人，也無法在市場上架；它如今是你故事的一部分，沒有其他人能替你佩戴它。',
-  'guide.gear.soulboundTitle': '靈魂綁定：屬於你，也僅屬於你',
   'guide.gear.sourcesBody':
-    '你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。',
+    '你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，玩家市場則讓你能向其他冒險者購買。',
   'guide.gear.sourcesTitle': '裝備從何而來',
   'guide.gear.upgradeBody':
     '用一件全新的升級品換下舊裝備，對你的助益遠勝於穿著早已過時的裝備打得再完美。當有更好的東西掉落，或任務提供升級時，就收下吧。別把你的好物品留到以後。',
@@ -5116,7 +5038,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.progression.bandLabel': '等級 {min} 至 {max}',
   'guide.progression.capBody': '每一級都會讓你更強韌並帶來新技能，一路直到 {cap} 級的上限。',
   'guide.progression.capJourneyBody':
-    '{cap} 級是上限，是升級的終點，卻不是成長的盡頭。從那裡開始，你會以普通與英雄難度挑戰地城與團隊副本、在世界首領崛起時與他一戰、追逐更好的裝備，並在競技場中試煉自己。',
+    '{cap} 級是上限，是升級的終點，卻不是成長的盡頭。從那裡開始，你會挑戰地城與團隊副本、追逐更好的裝備，並在競技場中試煉自己。',
   'guide.progression.capTitle': '抵達 {cap} 級',
   'guide.progression.intro':
     '每一場戰鬥、每一個任務、每一步北行，都會讓你的英雄更為強大。以下說明升級如何運作，以及當你登上巔峰之後，是什麼讓你持續成長。',
@@ -5131,7 +5053,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '走進旅店並保持脫離戰鬥，你的角色便會在等待時累積充分休息經驗。每座城鎮都有一間旅店。下一次你出門戰鬥，那一池經驗會額外加成你的擊殺，直到耗盡為止。在旅店裡稍作停留絕非浪費時間，它能加速你接下來的一段升級。',
   'guide.progression.restedTitle': '充分休息經驗',
   'guide.progression.xpBody':
-    '你透過完成任務、擊敗敵人與通關秘探來賺取經驗值。任務給予的經驗值遠遠最多，因此跟隨任務的軌跡是攀升最快的方式。沿途的殺敵與秘探則補足其餘部分。',
+    '你透過完成任務與擊敗敵人來賺取經驗值。任務給予的經驗值遠遠最多，因此跟隨任務的軌跡是攀升最快的方式。沿途殺敵則補足其餘部分。',
   'guide.progression.xpTitle': '你如何獲得經驗值',
   'guide.questsPage.sagaBody':
     '主線故事是一場漫長的追查。一個死亡邪教正對著國度的墳塚動手，你結束的每一個篇章都會指向北方更遠的一座區域。你絕不會一次對抗整場陰謀；你只拉動一條線索，而它會引向下一隻握著它的手。',
@@ -5156,7 +5078,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在故事之外，Vale 與沼澤的執法官與守衛還會發布一道長期的懸賞階梯。一個敵人接一個敵人地往上爬，就像在你之前的每一位賞金獵人掙得席位的方式那樣。這是踏實的升級，也是一趟巡覽各區域最惡劣麻煩製造者的旅程。',
   'guide.questsPage.sideWardenTitle': '掙得你的名聲',
   'guide.questsPage.typeGatherBody':
-    '從世界中或從敵人的掉落物收集物品：草藥、礦石、一個邪教陰森的施法材料。有些物件只會從特定的敵人身上掉落，所以狩獵與收穫相輔相成。',
+    '從世界中或從敵人的掉落物收集物品：草藥、礦石、遺失的書信、一個邪教陰森的施法材料。有些物件只會從特定的敵人身上掉落，所以狩獵與收集相輔相成。',
   'guide.questsPage.typeGatherTitle': '收集',
   'guide.questsPage.typeGroupBody':
     '主線故事的每一個篇章都終結於一道地城之門。前導部分可單人完成，但對一個篇章反派的最後一擊，是為五人隊伍而設。',
@@ -5168,7 +5090,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '有些任務會要你在北征之前召集一座城鎮：削減城門口的威脅，並蒐集守軍所需之物。這些是擊殺與收集目標，為了那些你身在其故事之中的人們而效力，並讓你與他們一同前行。',
   'guide.questsPage.typeMusterTitle': '召集防禦',
   'guide.questsPage.typeSlayBody':
-    '削減一群野獸，或藉由擊敗指定數量的某種標記敵人來瓦解一個邪教的掌控。你最初的任務之一，清除東溪大道上的群狼，便是這類任務。',
+    '削減一群野獸，或藉由擊敗指定數量的某種標記敵人來瓦解一個邪教的掌控。遊戲中的第一個任務，清除東溪大道上的群狼，便是這類任務。',
   'guide.questsPage.typeSlayTitle': '擊殺',
   'guide.questsPage.typesBody':
     '大多數任務都屬於幾種熟悉的形式之一。畫面上的追蹤器會明確指出每一個任務的要求，讓你絕不會無所適從。',
@@ -5178,7 +5100,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一個常駐的全王國頻道，能觸及所有在線的人，適合用來提問或閒聊。不同於「世界」與「尋求組隊」，你永遠不需要主動加入。',
   'guide.social.chanGuild': '公會與幹部。',
   'guide.social.chanGuildBody':
-    '供你公會使用的頻道。公會聊天能傳達給每一位成員；幹部頻道則供幹部與公會會長使用。',
+    '供你公會使用的頻道。公會聊天能傳達給每一位成員；幹部頻道則僅供幹部使用。',
   'guide.social.chanLfg': '尋找隊伍。',
   'guide.social.chanLfgBody':
     '一個選擇性加入、涵蓋全伺服器的頻道，用來尋找人一同挑戰地城。開啟它的分頁即可加入。',
@@ -5199,7 +5121,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '聊天分為數個頻道，各自顯示於專屬的分頁上。輸入訊息即可在使用中的頻道送出，或用斜線指令將單一一行訊息導向別處。以下是你能交談的頻道：',
   'guide.social.chatHeading': '聊天頻道',
   'guide.social.etiquetteBody':
-    '組隊是一種選擇，而非負擔。加入時打聲招呼，只在你真正會用上的裝備上選擇需求，離隊前先讓隊伍知道。一點點禮貌就能帶來很大不同，而大多數玩家也樂於有人作伴。管理員負責維持秩序，而不願讓他人好好享受遊戲的玩家，可能會被關進牢房，直到管理員將他放出來為止。',
+    '組隊是一種選擇，而非負擔。加入時打聲招呼，只在你真正會用上的裝備上選擇需求，離隊前先讓隊伍知道。一點點禮貌就能帶來很大不同，而大多數玩家也樂於有人作伴。',
   'guide.social.etiquetteHeading': '組隊禮儀',
   'guide.social.friendsBody':
     '把玩家加入你的好友名單，便能看到他們何時上線、人在何處，好讓你在他們登入的那一刻就能組隊。',
@@ -5216,7 +5138,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.lootCoinBody': '一次擊殺所得的金錢，可以歸給拾取它的人，也可以在隊伍間平均分配。',
   'guide.social.lootCoinTitle': '錢幣。',
   'guide.social.lootCommonBody':
-    '普通的掉落物可以在隊伍中輪流分配，或歸給拾取者，較好的掉落物則會擺出來擲骰，好讓每個人都有公平的機會。',
+    '普通的掉落物可以歸給拾取者，較好的掉落物則會擺出來擲骰，好讓每個人都有公平的機會。',
   'guide.social.lootCommonTitle': '物品。',
   'guide.social.lootHeading': '隊伍戰利品',
   'guide.social.lootMasterBody':
@@ -5225,9 +5147,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.lootRollBody':
     '當一件物品進行擲骰時，每位符合資格的成員若想要它便選擇需求，若只想當備品則選擇貪婪，或選擇放棄退出。骰點最高者勝出。',
   'guide.social.lootRollTitle': '需求、貪婪或放棄。',
-  'guide.social.markersHeading': '目標標記',
-  'guide.social.markersBody':
-    '在隊伍中，對一個敵對生物按右鍵，即可為它冠上八種團隊符號之一。任何成員都能標記，每個符號一次只存在於一個目標身上，而對同一目標重複施加同一符號便會將其清除。擊殺順序、控場分工，或一句簡單的「先打這個」，化作符號都比化作句子傳得更快。',
   'guide.social.partyBody':
     '對另一名玩家的名字按右鍵並選擇邀請。一支隊伍最多容納五名玩家，你們其中一人為隊長。',
   'guide.social.partyCredit':
@@ -5235,20 +5154,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.partyHeading': '組成隊伍',
   'guide.social.raidBody':
     '當你有了一支五人的滿員隊伍，隊長便能將它轉換成一支最多十人的團隊，以挑戰終局團隊副本。',
-  'guide.social.readyHeading': '準備確認',
-  'guide.social.readyBody':
-    '在一場大戰開打之前，隊長可以輸入 /ready 對全體發起表決：其他每個人都會收到「準備就緒」或「未準備」的提示，而當所有人都答覆完畢，或30秒耗盡後，全隊會看到一份匯總人數的總結。沒有人會被點名；重點在於人數，而非揪出誰沒準備好。',
   'guide.stats.agiBody':
     '敏捷會從多方面磨利你：它能提升你打出暴擊的機率與閃躲的機率，並增添少許護甲。對盜賊與獵人而言，它還會灌注攻擊強度，並驅動獵人的遠程射擊。',
   'guide.stats.agiTitle': '敏捷',
   'guide.stats.apBody':
-    '攻擊強度衡量你的武器揮擊得有多狠。你的主要屬性會灌注它，帶有那些屬性的裝備能進一步提升它，而更強的武器則直接提高你的傷害，這正是為什麼一件升級品可能帶來傷害上實實在在的躍進。',
+    '攻擊強度衡量你的武器揮擊得有多狠。你的主要屬性會灌注它，而更強的武器與裝備能進一步提升它，這正是為什麼一件升級品可能帶來傷害上實實在在的躍進。',
   'guide.stats.apTitle': '攻擊強度',
   'guide.stats.armorBody':
     '護甲能減少你受到的物理傷害。它大多來自你身上的穿戴，而重甲職業攜帶的護甲遠多得多。對上一個與你等級相近的敵人，護甲愈多便意味著它的每一擊落下時都更輕。',
   'guide.stats.armorTitle': '護甲',
   'guide.stats.critBody':
-    '你的暴擊機率是攻擊打出額外傷害的頻率。每個人都從一個微小的基礎機率起步，而敏捷（外加一些天賦與裝備）則在其上累加。你的角色面板會同時顯示這個機率本身，以及你的裝備為它貢獻的暴擊等級。',
+    '你的暴擊機率是攻擊打出額外傷害的頻率。每個人都從一個微小的基礎機率起步，而敏捷（外加一些天賦與裝備）則在其上累加。',
   'guide.stats.critTitle': '暴擊',
   'guide.stats.dodgeBody':
     '閃躲是你完全避開一次來襲近戰攻擊的機率。你從一個微小的基礎機率起步，而敏捷會提升它，因此身手敏捷的職業能閃過更多攻擊。',
@@ -5259,9 +5175,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.stats.growBody':
     '有兩件事會提升你的屬性。每一級都會依你的職業添加固定的各項屬性，而你裝備的裝備則在其上再添。保持裝備更新是變強最穩當的途徑，一路直到等級上限。',
   'guide.stats.growHeading': '你的屬性如何成長',
-  'guide.stats.hasteBody':
-    '急速是一項能讓你所做的一切都變快的屬性：近戰揮擊、遠程射擊與施法會一同提速。它來自裝備，最主要是護甲的套裝加成，少數技能也會給予短暫的急速爆發。你的角色面板將它顯示為急速等級。',
-  'guide.stats.hasteTitle': '急速',
   'guide.stats.intBody':
     '智力能擴大施法者的法力池，提升他們的法術強度好讓法術打得更重，並提高他們法術造成暴擊的機率。它對那些以法力施法的職業很重要；對怒氣或能量職業而言則作用甚微。',
   'guide.stats.intTitle': '智力',
@@ -5277,7 +5190,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '法術強度是施法者對應於攻擊強度的屬性：它會提高你的法術所造成的傷害。智力會增進它，施法者的裝備與增益還會在其上額外疊加，因此施法者關注法術強度，就如同近戰鬥士關注攻擊強度一般。',
   'guide.stats.spTitle': '法術強度',
   'guide.stats.spiBody':
-    '精神主宰著施法者每當停下施法時，法力回復得有多快，而那多半是戰鬥之間的時候。一如智力，它服務於那些以法力施法的職業，對其他職業而言意義不大。',
+    '精神主宰著施法者的法力在脫離戰鬥後回復得有多快。一如智力，它服務於那些以法力施法的職業，對其他職業而言意義不大。',
   'guide.stats.spiTitle': '精神',
   'guide.stats.staBody':
     '耐力是你的續戰能力。耐力愈高便意味著更大的生命池，並能加速你脫離戰鬥休息時所回復的生命。每種職業都會想要一些。',
@@ -5295,7 +5208,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.marshGreeter': '守衛芬威克，沼橋鎮',
   'guide.worldPage.marshGreeting': '守在城門這頭。越過那片蘆葦，沼澤便會替我們動手殺人。',
   'guide.worldPage.marshPlaceNotes':
-    '芬橋鎮守著唯一一條乾燥的道路。潛伏者蘆葦地與深沼淺灘擠滿了沼澤野獸與泥鰭；寡婦灌木叢被蛛網織得密不透風；溺沒禮拜堂與巨魔墳丘藏著更古老的危險，而沼澤自己的秘探「溺亡連禱」就在墳丘以北開啟；喚墓者營地是邪教挖壕據守之處，沉沒堡壘則是沼澤的副本核心。',
+    '沼橋鎮鎮守著唯一一條乾燥的道路。潛獵蘆葦叢與深沼淺灘擠滿了沼澤野獸與泥鰭；寡婦密林被蛛網織得密不透風；溺亡禮拜堂與巨魔土塚藏著更古老的危險；喚墓者營地是邪教的據點，而沉沒堡壘則是沼澤的副本核心。',
   'guide.worldPage.peaksGreeter': '瑟莎莉隊長，高守哨站',
   'guide.worldPage.peaksGreeting': '這座城牆已守了兩百年。它不會在我當值時破，但它正在呻吟。',
   'guide.worldPage.peaksPlaceNotes':
@@ -5662,7 +5575,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
   'entities.itemSets.wyrmshadow.bonus4':
     '你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 25%，持續 8 秒。',
-  'hudChrome.itemSoulbound': '靈魂綁定',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',
@@ -6312,10 +6224,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
   'guide.professions.intro':
-    '除了戰鬥與任務之外，這個世界還會獎勵你耕耘土地與鍛造：採集原材料，透過十種製作行業將其打造成裝備與物品，並在這些行業所代表的十種命途之一中確立自己的身分。',
+    '除了戰鬥與任務之外，這個世界還會獎勵你耕耘土地與鍛造：採集原材料，在十種不同行業的製作站中將其打造成裝備，並在這些行業所代表的十種命途之一中確立自己的身分。',
   'guide.professions.gatherTitle': '採集：採礦、伐木與草藥學',
   'guide.professions.gatherIntro':
-    '三種採集行業讓你從世界中直接取得原材料：採礦從礦脈中開採礦石與石料，伐木從林地中砍伐木材，草藥學採集野生生長的草藥與植物。三者分別計算進度，從事其中一項不會拖慢你在另一項上的進展。初次接觸這一切嗎？東溪鎮的工頭歐戴爾有一項簡短的差事，「人人皆可從事的行業」，會帶你走過你的第一次採集。',
+    '三種採集行業讓你從世界中直接取得原材料：採礦從礦脈中開採礦石與石料，伐木從林地中砍伐木材，草藥學採集野生生長的草藥與植物。三者分別計算進度，從事其中一項不會拖慢你在另一項上的進展。',
   'guide.professions.gatherWhatTitle': '資源節點',
   'guide.professions.gatherWhatBody':
     '礦脈、林地與藥草叢作為可見、無主的地物分布在溪谷與濕地各處。走近並與之互動即可採集其中的資源。採集過一個節點後，它需要一段時間才能恢復供你本人再次採集，但這從不會阻擋其他玩家：其他人可以在此期間採集同一個節點。',
@@ -6324,13 +6236,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每次成功採集都會提升你在該採集行業的熟練度，而你的角色資訊面板會分別記錄每一門行業。多加練習永遠不會損及你的進展，只會不斷為它增添。',
   'guide.professions.gatherToolsTitle': '行業工具',
   'guide.professions.gatherToolsBody':
-    '商人出售各採集行業的基礎工具，更好的工具則可以製作出來。目前採集節點並不需要任何工具：工具是為日後更豐富的節點所鋪的基礎，屆時更高階的鎬、斧與鐮刀將是採集它們的門路。',
-  'guide.professions.harvestTitle': '從狩獵本身採收',
-  'guide.professions.harvestBody':
-    '採集並不止於節點。有些被擊倒的野獸可以採收出部件：獸皮、獠牙、絲線，以及更稀奇的東西，直接從屍體上取得，與它的普通戰利品並存。每次擊殺只容一位採收者：誰先動手，就全歸誰所有。每一次也都由你選擇：把屍體能給的一切盡數剝下，或專注於單一部件，換取更精細的品級。任何角色都能採收，無需入行也無需訓練，而一件特別精良的部件甚至會冠上採收者的名字。',
-  'guide.professions.focusTitle': '城鎮專注',
-  'guide.professions.focusBody':
-    '每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把一小筆專注點數投向你在意的部件類型。此後每具屍體上的專注部件都會精細一個品級、也略微豐厚一些；你的分配會跟著角色走遍天涯，而且日後任何一次回到鎮上，都能免費重新調整。',
+    '商人出售各採集行業的基礎工具，更好的工具則可以被製作出來，因此為節點採集做準備應當讓人感覺自己在不斷變強，而不是原地踏步。更高級的工具是解鎖更豐富節點、並在長時間遊玩中更有效率採集的既定途徑。',
   'guide.professions.craftTitle': '十大製作行業',
   'guide.professions.craftIntro':
     '十種製作行業將採集到的材料轉化為成品裝備與物品：製甲、製械與珠寶加工將原材料塑形為可穿戴裝備；煉金術與工程學依靠反覆試驗；烹飪、銘文與附魔各自作用於其他行業的產出；裁縫與製皮則依照精確的圖樣進行。它們共同構成一個輪環，每種行業都與兩個鄰居相鄰，並與另一種行業相對。',
@@ -6339,19 +6245,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '十種行業排列在一個固定的輪環上，行業在輪環上的位置很重要：相鄰的行業彼此之間的共通之處比處於對面的行業更多。專注於一種行業應當讓人感覺像是加入了一個相關行業組成的家族，而不是選擇了一項孤立的技能。',
   'guide.professions.craftRecipesTitle': '配方與材料',
   'guide.professions.craftRecipesBody':
-    '每個配方都需要你採集或購買的特定材料。最簡單的配方只需要普通材料，從一開始就能製作，因此你一拿起一門行業就能立刻上手。配方清單仍在持續補齊：少數行業還在等待它們的第一批配方，而隨著這些行業成長，會有更多配方登場。',
+    '每種行業都有自己的配方，各自需要你採集或購買的特定材料。每種行業中最基礎的配方只需要普通材料即可製作，從一開始就可以上手，因此你拿起一門行業後即可立刻開始製作，而無需等待解鎖。',
   'guide.professions.craftMasteryTitle': '技能與精通',
   'guide.professions.craftMasteryBody':
     '成功製作會提升你在該行業的技能，而技能從不會把行業的配方鎖起來：只要你會某個配方並持有其材料，就能嘗試製作。技能為你換來的其實是品質，熟練的手藝能做出更精良的作品。唯一的例外是組合配方，它們要求你先在兩門相關行業中都證明過自己，才會開放。',
   'guide.professions.craftComboTitle': '組合配方',
   'guide.professions.craftComboBody':
-    '除了單一行業自身的配方列表之外，這個輪環還支援需要同時調用兩個相鄰行業的組合配方，用以獎勵那些在輪環上投入了相鄰行業的角色，而非只專精孤立一項的人。製作者必須自己同時掌握這兩門行業；夥伴的技能無法替代其中任一半。',
+    '除了單一行業自身的配方列表之外，這個輪環還支援需要同時調用兩個相鄰行業的組合配方，用以獎勵那些（或是一對交易夥伴）投入了輪環上相鄰行業的角色，而非只專精孤立的一項。',
   'guide.professions.archetypeTitle': '十大命途',
   'guide.professions.archetypeIntro':
     '十種行業各自也代表一種命途，一種超越單純從事該行業本身的更廣闊身分。你的當前命途一次只能有一個，而非一份清單：你只承載一個命途，但如果願意，之後可以更改。',
   'guide.professions.archetypeChooseTitle': '選擇你的命途',
   'guide.professions.archetypeChooseBody':
-    '宣告一種命途將會是一個劇情時刻：一個正式接納你進入該身分的任務。那條路仍在修築之中，所以眼下每個角色都帶著這個尚未做出的選擇行走世間，而在此期間，每種行業都能推進到稀有品質層級。',
+    '你需要透過第一區域中一個正式接納你進入該身分的早期劇情任務，來宣告你的第一個命途。在完成該任務之前，你尚未選擇任何命途。',
   'guide.professions.archetypeSwitchTitle': '回心轉意',
   'guide.professions.archetypeSwitchBody':
     '宣告也不會是一紙終身判決。目前的計畫是：在拿起新行業之前，先向你的舊行業完成一次可重複的贖罪，而每轉換一次，贖罪就會加重一分，因此這個選擇始終有其分量，而非毫無代價。它和宣告本身一樣，仍在路上。',
@@ -6732,29 +6638,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的位置決定你帶上球場的技能。人人都會踢球；其餘看性情。在一人制與二人制的級別中，每個人都使用全能配套，因此位置的選擇要從三人制起才真正發揮作用。',
   'guide.valeCupPage.rewardsHeading': '休戰規矩',
   'guide.valeCupPage.rewardsBody':
-    '休戰規矩意味著沒有經驗也沒有戰利品：一場分出勝負的比賽會計入你的戰績和優勝者榜，而一場勝利也會計入當日的獎勵任務。中途棄賽會讓你的位置空缺，而場地管理員可記著呢。',
-  'guide.valeCupPage.bettingHeading': '欄杆邊的小賭一把',
-  'guide.valeCupPage.bettingBody':
-    '比賽成形期間，母豬場的觀眾可以押注其中一方：賭注匯成獎池，終場哨響時，勝方按各自押注的比例瓜分敗方的獎池。平局，或是無人押中的冷門，會退還每一枚錢幣。上場比賽的球員不得押注自己的比賽，而欄杆邊會記下你勝、負與淨賺錢幣的生涯紀錄。',
-  'guide.valeCupPage.practiceHeading': '練習賽與閒置的球場',
-  'guide.valeCupPage.practiceBody':
-    '溪谷盃視窗也提供練習：一座球場的私人複本，由機器人補滿雙方，任何內容都不計入你的戰績。正式比賽還差一兩個人？稍候片刻，機器人便會補齊隊伍，而任何有機器人上場的比賽都是友誼賽，絕不計入排名。而當母豬場閒置時，機器人會上演一場表演賽，你可以從看台上觀賞、也可以下注；一旦真正的玩家準備就緒，表演賽便會讓出球場，所有賭注全數退還。',
+    '休戰規矩意味著沒有經驗也沒有戰利品：一場分出勝負的比賽會計入你的戰績和優勝者榜，並附帶每日獎勵點數。中途棄賽會讓你的位置空缺，而場地管理員記著呢。',
   'entities.npcs.groundskeeper_bram.name': '場地管理員布拉姆',
   'entities.npcs.groundskeeper_bram.title': '母豬場看守',
   'entities.npcs.groundskeeper_bram.greeting':
     '休戰約定在母豬場依然有效，{className}：只許用腳和肩膀。想為銅奶桶一戰嗎？',
-  'entities.npcs.chronicler_saul.name': '編年史者紹爾',
-  'entities.npcs.chronicler_saul.title': '東溪谷編年史',
-  'entities.npcs.chronicler_saul.greeting':
-    '值得做的事蹟，就值得寫下兩遍，{playerName}：一遍記進帳冊，一遍留給爐邊。',
-  'entities.npcs.chronicler_osric_fenn.name': '編年史者奧斯里克·芬恩',
-  'entities.npcs.chronicler_osric_fenn.title': '泥沼濕地編年史',
-  'entities.npcs.chronicler_osric_fenn.greeting':
-    '當心書頁受潮，{playerName}。沼澤吞掉的書可比讀者讀掉的多。',
-  'entities.npcs.chronicler_edda_hartwell.name': '編年史者贊西',
-  'entities.npcs.chronicler_edda_hartwell.title': '荊峰高地編年史',
-  'entities.npcs.chronicler_edda_hartwell.greeting':
-    '高山什麼都不會忘記，{playerName}，我也一樣。讓我看看你都做過什麼吧。',
   'entities.zones.eastbrook_vale.pois.10.label': '母豬場',
   'entities.abilities.sport_kick.name': '踢球',
   'entities.abilities.sport_kick.description': '沿地面把球踢向瞄準點。',
@@ -6788,49 +6676,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '鍍金保險箱',
   'entities.npcs.bursar_aldous_crane.greeting':
     '每一只木箱、每一個錢櫃、每一件飾物，交給鍍金保險箱都萬無一失。',
-  'entities.items.furyforged_warhelm.name': '怒鑄戰盔',
-  'entities.items.furyforged_warspaulders.name': '怒鑄戰肩',
-  'entities.items.furyforged_warplate.name': '怒鑄戰甲',
-  'entities.items.furyforged_girdle.name': '怒鑄腰帶',
-  'entities.items.furyforged_legguards.name': '怒鑄護腿',
-  'entities.items.furyforged_gauntlets.name': '怒鑄護手',
-  'entities.items.furyforged_sabatons.name': '怒鑄戰靴',
-  'entities.items.stormbound_crown.name': '縛雷王冠',
-  'entities.items.stormbound_spaulders.name': '縛雷肩甲',
-  'entities.items.stormbound_hauberk.name': '縛雷鎖甲',
-  'entities.items.stormbound_waistguard.name': '縛雷護腰',
-  'entities.items.stormbound_legmail.name': '縛雷腿甲',
-  'entities.items.stormbound_handguards.name': '縛雷護手',
-  'entities.items.stormbound_greaves.name': '縛雷脛甲',
-  'entities.items.ashstalker_cowl.name': '獵燼兜帽',
-  'entities.items.ashstalker_shoulderguards.name': '獵燼護肩',
-  'entities.items.ashstalker_harness.name': '獵燼胸甲',
-  'entities.items.ashstalker_waistband.name': '獵燼腰帶',
-  'entities.items.ashstalker_legguards.name': '獵燼護腿',
-  'entities.items.ashstalker_grips.name': '獵燼護手',
-  'entities.items.ashstalker_treads.name': '獵燼軟靴',
-  'entities.items.cinderweave_cowl.name': '織燼兜帽',
-  'entities.items.cinderweave_mantle.name': '織燼披肩',
-  'entities.items.cinderweave_raiment.name': '織燼法衣',
-  'entities.items.cinderweave_cord.name': '織燼腰繩',
-  'entities.items.cinderweave_legwraps.name': '織燼裹腿',
-  'entities.items.cinderweave_handwraps.name': '織燼裹手',
-  'entities.items.cinderweave_slippers.name': '織燼便鞋',
-  'entities.items.final_oath_medallion.name': '最終誓約勳章',
-  'entities.items.razorwind_torque.name': '剃風頸環',
-  'entities.items.cinder_sigil_pendant.name': '燼印墜飾',
-  'entities.items.iron_vow_band.name': '鐵誓指環',
-  'entities.items.unbroken_circle.name': '不破之環',
-  'entities.items.fleetblood_band.name': '疾血指環',
-  'entities.items.last_step_signet.name': '末步徽戒',
-  'entities.items.ashen_focus_ring.name': '灰燼專注戒指',
-  'entities.items.spellbreakers_seal.name': '破法者之印',
-  'entities.items.final_argument_greatblade.name': '最終論斷巨刃',
-  'entities.items.first_blood_razor.name': '初血剃刀',
-  'entities.items.emberglass_warstaff.name': '燼晶戰杖',
-  'entities.npcs.fury.name': '怒焰',
-  'entities.npcs.fury.title': '榮譽軍需官',
-  'entities.npcs.fury.greeting': '戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。',
   'guide.economy.bankBody':
     '每座主城都設有鍍金保險箱的分號，它是這片大陸的銀行商號。與那裡的司庫交談即可打開你的保險庫：一處背包之外的私人儲物空間，伴隨角色終身。無論你下次造訪哪家分號，寄存的物品都會安然等候。',
   'guide.economy.bankHow':

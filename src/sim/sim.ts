@@ -756,10 +756,7 @@ export interface ResolvedAbility {
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
-  charges?: number; // stored uses (def maxCharges and/or Double Charge talent); undefined = 1
   bonusCharges?: number;
-  /** 1-based authoritative charge stage for hold-to-charge spells. */
-  empowerLevel?: number;
 }
 
 export interface RewardCounters {
@@ -4698,10 +4695,6 @@ export class Sim {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
-      onDealt?: (amount: number) => void;
-      // Emboldened (combat/sure_crit.ts): override the connected swing's crit
-      // OUTCOME; the crit rng inside meleeSwing is still drawn as before.
-      forceCrit?: boolean;
       damageMult?: number;
     },
   ): boolean {

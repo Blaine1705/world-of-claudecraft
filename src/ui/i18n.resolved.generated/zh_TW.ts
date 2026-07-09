@@ -6366,8 +6366,8 @@ export const zh_TW: EnTranslations = {
         "description": "以野性之力激勵附近的盟友，提高攻擊強度，持續 5 分鐘。（獵人天賦）"
       },
       "avatar": {
-        "name": "巨像",
-        "description": "化身為巨像，提高攻擊強度，持續 20 秒。（戰士天賦）"
+        "name": "巨像化身",
+        "description": "解除控制效果並化為巨像，使造成的傷害提高 20%，持續 20 秒。（戰士天賦）"
       },
       "avenging_wrath": {
         "name": "復仇之翼",
@@ -6379,7 +6379,31 @@ export const zh_TW: EnTranslations = {
       },
       "bladestorm": {
         "name": "鋼鐵旋風",
-        "description": "化作鋼鐵風暴，每秒對附近敵人造成 {damage} 點傷害。（戰士天賦）"
+        "description": "化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。（戰士天賦）"
+      },
+      "swordguard": {
+        "name": "劍衛",
+        "description": "受到的傷害降低 10%，持續 8 秒；生命值低於 30% 時提高到 20%。（戰士天賦）"
+      },
+      "triumph_rush": {
+        "name": "凱旋奔襲",
+        "description": "擊殺敵人後，20 秒內可造成武器傷害加 {damage}，並恢復最大生命值的 20%。（戰士天賦）"
+      },
+      "razor_howl": {
+        "name": "銳刃怒吼",
+        "description": "使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）"
+      },
+      "stormthrow": {
+        "name": "風暴投擲",
+        "description": "投擲武器，使目標昏迷 3 秒。（戰士天賦）"
+      },
+      "reckless_vow": {
+        "name": "魯莽誓言",
+        "description": "所有怒氣生成提高 50%，暴擊機率提高 20%，持續 12 秒。（戰士天賦）"
+      },
+      "red_banner": {
+        "name": "赤紅戰旗",
+        "description": "你和附近盟友的攻擊速度提高 10%，傷害提高 10%，持續 20 秒。（戰士天賦）"
       },
       "blink": {
         "name": "閃爍步",

@@ -363,7 +363,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウォレットが最低額の $20 USD 相当のWOCを下回っています。',
   'hudChrome.dailyRewards.reason.price_unavailable':
     'WOCの価格を取得できないため、報酬は一時的にロックされています。',
-  'hudChrome.dailyRewards.reason.banned': 'デイリー報酬への参加が禁止されています。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
@@ -439,16 +438,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。',
   'hudChrome.tutorial.doneBodyTouch':
     '基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！',
-  'hudChrome.tutorial.slayTargetHint':
-    '戦闘は初めてですか？{targetKey} を押すか狼をクリックしてターゲットし、アクションバーのスキルで攻撃しましょう。',
-  'hudChrome.tutorial.slayTargetHintTouch':
-    '戦闘は初めてですか？狼をタップしてターゲットし、アクションバーのスキルをタップして攻撃しましょう。',
-  'hudChrome.tutorial.nextTipsTitle': '次にすべきこと',
-  'hudChrome.tutorial.nextTipQuestLog':
-    'クエストログ（{key}）を開いて近くの次のクエストを確認しましょう。',
-  'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
-  'hudChrome.tutorial.nextTipSocial':
-    'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -558,30 +547,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceModeTouch': 'タッチ',
   'hudChrome.options.interfaceModeNote':
     '自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。',
-  'hudChrome.warfare.honorAmount': '名誉 {amount}',
-  'hudChrome.warfare.dualPrice': '{money} + {honor}',
-  'hudChrome.warfare.balance': '名誉: {amount}',
-  'hudChrome.warfare.honorFloat': '名誉 +{amount}',
-  'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
-  'hudChrome.warfare.notEnoughHonor': '名誉が足りません。',
-  'hudChrome.warfare.reasons.arenaWin': 'アリーナ勝利',
-  'hudChrome.warfare.reasons.fiestaKill': 'フィエスタ撃破',
-  'hudChrome.warfare.reasons.fiestaComplete': 'フィエスタ完遂',
-  'hudChrome.warfare.reasons.fiestaWin': 'フィエスタ勝利',
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
   'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
-  'hudChrome.statInfo.names.warfare': 'ウォーフェア',
-  'hudChrome.statInfo.warfareValue': '与ダメージ +{increase}% / 被ダメージ -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
     '装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。',
   'hudChrome.statInfo.desc.hasteRating':
     '装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。',
   'hudChrome.statInfo.desc.spellPower':
     '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
-  'hudChrome.statInfo.desc.warfare':
-    'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。',
   'hudChrome.statInfo.sources.header': '内訳:',
   'hudChrome.statInfo.sources.base': '基本: {value}',
   'hudChrome.statInfo.sources.attributes': '能力値から: {value}',
@@ -2158,7 +2133,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。再度使用するとスタンスを解除します。',
   'entities.abilities.sunder_armor.name': '装甲切断',
   'entities.abilities.sunder_armor.description':
-    '対象のアーマーを破壊し、1回ごとに {damage}% 低下させます。最大5回まで重なります。大量の脅威を生成します。',
+    '対象のアーマーを破壊し、1回ごとに{damage}%低下させます。最大5回まで重なります。大量の脅威を生成します。',
   'entities.abilities.taunt.name': '挑発',
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
@@ -2299,9 +2274,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
   'entities.abilities.lay_on_hands.description':
     '大きな癒やしの波で体力を{damage}回復します。クールダウン10分。',
-  'entities.abilities.holy_taunt.name': '聖なる挑発',
-  'entities.abilities.holy_taunt.description':
-    '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
   'entities.abilities.flash_of_light.name': '光の癒し',
   'entities.abilities.flash_of_light.description':
     '素早く効率的な光の迸りで味方対象の体力を {damage} 回復します。',
@@ -2500,7 +2472,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': '対象を2秒間スタンさせます。ブルーインフォーム専用。',
   'entities.abilities.faerie_fire.name': '魔女火',
   'entities.abilities.faerie_fire.description':
-    '対象のアーマーを40秒間 {damage}% 低下させます。装甲切断とは重なりません。',
+    '対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
     '対象を最大8秒間深い眠りに落とします。ダメージを受けると目を覚まします。',
@@ -2640,9 +2612,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': '野牙の装い',
   'entities.abilities.aspect_of_the_wild.description':
     '野生の力で周囲の味方を鼓舞し、攻撃力を高める。効果時間 5 分。（ハンタータレント）',
-  'entities.abilities.avatar.name': '巨像',
+  'entities.abilities.avatar.name': '巨像化',
   'entities.abilities.avatar.description':
-    '巨像と化し、攻撃力を高める。効果時間 20 秒。（ウォリアータレント）',
+    '操作不能効果を解除して巨像となり、20秒間、与えるダメージが20%増加します。（ウォリアータレント）',
   'entities.abilities.avenging_wrath.name': '復讐の翼',
   'entities.abilities.avenging_wrath.description':
     '報復の力を呼び降ろし、攻撃力と呪文能力を高める。効果時間 20 秒。（パラディンタレント）',
@@ -2650,7 +2622,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.description': '攻撃力を高める。効果時間 15 秒。（ドルイドタレント）',
   'entities.abilities.bladestorm.name': '鋼の旋風',
   'entities.abilities.bladestorm.description':
-    '鋼鉄の嵐と化し、毎秒周囲の敵に {damage} のダメージを与える。（ウォリアータレント）',
+    '鋼の旋風となり、毎秒周囲の敵を攻撃して {damage} のダメージを与えます。（ウォリアータレント）',
+  'entities.abilities.swordguard.name': '剣の守り',
+  'entities.abilities.swordguard.description':
+    '8秒間、受けるダメージが10%減少します。体力が30%未満なら20%減少します。（ウォリアータレント）',
+  'entities.abilities.triumph_rush.name': '凱旋突撃',
+  'entities.abilities.triumph_rush.description':
+    '敵を倒した後20秒以内に、武器ダメージに {damage} を加えて与え、最大体力の20%を回復します。（ウォリアータレント）',
+  'entities.abilities.razor_howl.name': '刃の咆哮',
+  'entities.abilities.razor_howl.description':
+    '15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）',
+  'entities.abilities.stormthrow.name': '嵐投げ',
+  'entities.abilities.stormthrow.description':
+    '武器を投げ、対象を3秒間スタンさせます。（ウォリアータレント）',
+  'entities.abilities.reckless_vow.name': '無謀の誓い',
+  'entities.abilities.reckless_vow.description':
+    '12秒間、怒り生成が50%、クリティカル率が20%増加します。（ウォリアータレント）',
+  'entities.abilities.red_banner.name': '赤旗',
+  'entities.abilities.red_banner.description':
+    '20秒間、自分と周囲の味方の攻撃速度とダメージがそれぞれ10%増加します。（ウォリアータレント）',
   'entities.abilities.blink.name': '瞬き歩み',
   'entities.abilities.blink.description':
     '前方 15 ヤードに瞬間移動し、移動不能効果を解除する。（メイジタレント）',
@@ -3234,12 +3224,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '潮見の番人',
   'entities.npcs.tidewatcher_ondrel.greeting':
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
-  'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
-  'entities.quests.q_prof_intro.text':
-    'イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。',
-  'entities.quests.q_prof_intro.completion':
-    'どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。',
-  'entities.quests.q_prof_intro.objectives.0.label': '鉱石のかけら',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -4472,7 +4456,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デルヴは、あなたと最大1人の味方だけのために用意された、小さなインスタンスダンジョンです。誰にも邪魔されない専用のコピーです。フィールドにいるデルヴの番人が管理するボードから開始し、中へ降りて、いくつかの部屋を戦い抜き、最後に1体の守護者で締めくくります。ランは手早く、繰り返し遊べるように作られているので、オープンワールドでやることが尽きたときにも、デルヴは着実な成長の手段になります。',
   'guide.delvesPage.whatHeading': 'デルヴとは',
   'guide.delvesPage.whereBody':
-    '最初のデルヴ「崩れた聖遺物庫」は、始まりの谷イーストブルック渓谷の聖遺物庫の丘で開かれます。ボードを管理しているのはハルヴェン修道士で、準備が整えばあなたを下へ送り出してくれます。彼の受け持ちはそこで終わりません。マイアフェン湿地の北の端、トロルの塚を越えた先では、同じ番人が、足場を固めた潜行者のために溺れし連祷を開いています。',
+    '最初のデルヴ「崩れた聖遺物庫」は、イーストブルックの谷の出発地点にある聖遺物庫の丘で開放されます。ボードを管理しているのはハルヴェン修道士で、準備が整えばあなたを下へ送り出してくれます。',
   'guide.delvesPage.whereHeading': 'どこにあるか',
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '概要',
@@ -4558,7 +4542,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'はい。ゲーム全体が最大レベルまで無料で、GitHubでオープンソースとして公開されています。',
   'guide.home.faq.q2': '暗号通貨ウォレットは必要ですか?',
   'guide.home.faq.a2':
-    'いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは、見た目の装飾と、デイリー報酬の賞金プールの分け前を加えるだけで、性能には一切影響しません。',
+    'いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは見た目の装飾を解放するだけで、性能には一切影響しません。',
   'guide.home.faq.q3': 'オフラインで遊べますか?',
   'guide.home.faq.a3':
     'はい。ブラウザですぐに遊べるシングルプレイモードに加え、共有のオンラインワールドもあります。',
@@ -4579,7 +4563,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'クラスと見た目を選び、ヒーローに名前を付けてワールドへ。キャラクターは後からでも追加できます。',
   'guide.howToPlay.step2Title': '最初のクエストを見つける',
   'guide.howToPlay.step2Body':
-    '開始の街では、レッドブルック隊長が「門前の狼」を持って待っており、近くのオデル親方にも仕事があります。どちらかに話しかけて、最初のクエストを受注しましょう。',
+    '開始の街でレッドブルック隊長が待っています。話しかけて「門前の狼」を受注しましょう。',
   'guide.howToPlay.step3Title': '移動して見回す',
   'guide.howToPlay.step3Body':
     'W、A、S、Dで移動します。右マウスボタンを押したままドラッグすると見回せます。基本はこれだけです。',
@@ -4604,7 +4588,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '頭上にマーカーが表示された人物からクエストを受け、目標を達成して報告すると、経験値、コイン、装備が手に入ります。画面上のトラッカーで目標を常に確認できます。',
   'guide.howToPlay.deathTitle': '死は終わりではない',
   'guide.howToPlay.deathBody':
-    '倒れると、亡骸はその場に残り、あなたは最寄りの墓地で亡霊として起き上がります。霊魂を亡骸まで走らせれば、ペナルティなしでその場で復活できます。あるいは墓地の霊魂の癒し手を頼れば、つかの間の衰弱と引き換えに、その場ですぐ蘇らせてもらえます。生まれたての英雄は衰弱を完全に免除され、あなたの持ち物も稼いだものも決して失われません。',
+    '倒れたら魂を解放し、最寄りの墓地で全回復して復活し、元いた場所まで戻ります。経験値は失われません。',
   'guide.howToPlay.groupingTitle': '一緒に遊ぶ',
   'guide.howToPlay.groupingBody':
     '他のプレイヤーをパーティに招待すれば、クエストの達成を共有したりダンジョンに挑んだりできます。ワールドの大半はソロで進められるので、グループ行動は義務ではなく選択です。',
@@ -4612,10 +4596,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.onlineBody':
     'みんなと一緒に共有のオンラインワールドで遊ぶか、ブラウザですぐに始められるオフラインワールドで基本を覚えるか、選べます。',
   'guide.howToPlay.reassure':
-    'タレントはレベル10で解放され、戦闘の外ならいつでもリセットできます。序盤の選択が永久に固定されることはないので、自由に試してみてください。',
+    'タレントはレベル10で解放され、いつでもリセットできます。序盤の選択が永久に固定されることはないので、自由に試してみてください。',
   'guide.howToPlay.controlsLink': '操作方法の完全なリファレンスを見る',
   'guide.controls.intro':
-    'PC用のデフォルトキーです。すべてのキー割り当てはゲームのオプションで変更できます。ただしEscだけは例外で、常にゲームメニューを開きます。また、Shift+Zのような修飾キーの組み合わせを割り当てることもできます。',
+    'PC用のデフォルトキーです。すべてのキー割り当てはゲームのオプションで変更できます。',
   'guide.controls.keyHeader': 'キー',
   'guide.controls.actionHeader': 'アクション',
   'guide.controls.groupMovement': '移動',
@@ -4630,26 +4614,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.talents': 'タレント',
   'guide.controls.arena': 'アリーナ',
   'guide.controls.leaderboard': 'リーダーボード',
-  'guide.controls.deeds': '功績の書',
-  'guide.controls.crafting': '製作',
-  'guide.controls.valeCup': 'ヴェイルカップ',
-  'guide.controls.calendar': 'イベントカレンダー',
-  'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     'アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）',
-  'guide.controls.groupPet': 'ペットコマンド',
-  'guide.controls.petBar':
-    'ペットバー：攻撃、停止、挑発、防御、攻撃的（ハンターまたはウォーロックのペットを出しているとき）',
-  'guide.controls.attackMoveNote':
-    'もう一つ、初期設定ではオフのものがあります。オプションでアタックムーブを有効にするとキーがひとつ確保され（オンの間はA）、押せばカーソルの方へ歩き出し、カーソルの下にいる敵、あるいは道中で最初に出会った敵に攻撃を仕掛けます。',
   'guide.controls.mobileHeading': 'モバイルでは',
   'guide.controls.mobileBody':
-    'スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、それ以外の場所はどこでもドラッグして視点操作、二本指でつまむとカメラをズームでき、そしてアビリティやメニュー用の画面上ボタンが現れます。左上隅の小さな矢印でメニューボタンの表示と非表示を切り替えられ、そこにある「その他」ボタンに残りのウィンドウがまとめられています。',
+    'スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、右側はどこでもドラッグして視点操作、そしてアビリティやメニュー用の画面上ボタンが現れます。',
   'guide.settingsPage.heading': '設定とパフォーマンス',
   'guide.settingsPage.intro':
     '見た目を最高にするのも、動作を最速にするのも自由自在。すぐに使える3つの構成と、各グラフィックオプションの本当の働きを紹介します。',
   'guide.settingsPage.wherePath':
-    'このページの内容はすべてゲーム内にあります。Escキーを押すとオプションが開きます。メニューは、ピン留めされた要点をまとめた「概要」から開き、その脇のレールにカテゴリが並びます。以下で触れる設定は、「表示」グループの「グラフィック」「インターフェース」「アクセシビリティ」の下にあり、「パフォーマンスオーバーレイ」は「システム」の下にあります。さらに手早く行うなら、上部の検索ボックスに名前を打ち込んで直接そこへ飛べます。',
+    'このページの内容はすべてゲーム内にあります。Escキーを押して、グラフィック、インターフェース、パフォーマンスオーバーレイの各項目を確認してください。',
   'guide.settingsPage.fairnessTitle': '公平さは設計から',
   'guide.settingsPage.fairnessBody':
     'ここにあるオプションは、見た目と引き換えに強さを得るものではありません。設定を下げて削られるのは装飾的な美しさだけで、戦いに使う情報は決して失われません。デバフ、詠唱バー、パーティの体力、ダメージ数値は「低」から「ウルトラ」まで完全に同一です。控えめなマシンでのプレイが不利になることはありません。',
@@ -4692,7 +4666,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「詳細」プリセットは「高」ティアを出発点に、地形の詳細、草木の密度、エフェクトと照明、影の品質という4つの追加設定を開放します。本当に違いを実感できるところへフレームを振り分けられるようになります。グラフィック品質と同じく、変更は再読み込み後に適用されます。',
   'guide.settingsPage.advancedMixes':
     'おすすめの組み合わせを2つ。影の品質を「高」に保ちつつエフェクトと照明を「低」にすると、光の演出を抑えたくっきり軽快な画面になります。逆にすれば、ブルームの輝きを残したまま影を柔らかくできます。',
-  'guide.settingsPage.tableHeading': 'グラフィックの全オプション解説',
+  'guide.settingsPage.tableHeading': '全オプション解説',
   'guide.settingsPage.colSetting': '設定項目',
   'guide.settingsPage.colDoes': '効果',
   'guide.settingsPage.colImpact': 'FPSへの影響',
@@ -4730,11 +4704,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.mobileTitle': 'スマートフォンとタブレットでは',
   'guide.settingsPage.mobileBody':
     'モバイルではゲームがより多くを自動で管理します。ティアの選択はゲーム側が行い、バッテリーの消耗と発熱を抑えるために解像度をわずかに低めに保ち、最上位ティアはデスクトップ専用のままにします。上記の構成はそのまま役立ちますが、スマートフォンでは上限が「高」になります。',
-  'guide.settingsPage.touchBody':
-    'タッチスクリーンでは、オプションに専用の快適設定がひとまとまり加わります。ジョイスティックの大きさと感度、画面上ボタンの大きさと不透明度、左右を反転した左利きレイアウト、任意のカメラスティック、そしてタッチ視点の反転です。あなたの手を画面に合わせるのではなく、画面があなたの手に合うようになります。',
-  'guide.settingsPage.audioTitle': 'サウンドと言語',
-  'guide.settingsPage.audioBody':
-    'オプションウィンドウにあるのは映像の設定だけではありません。オーディオタブには効果音、音楽、ボイスそれぞれの音量調整があり、インターフェースの項目には言語の選択が用意されていて、再読み込みなしにその場でインターフェース全体を選んだ言語へ切り替えられます。',
   'guide.combat.intro':
     '戦闘はおなじみのクラシックMMOのルールに沿っています。うまく遊ぶために細かく学ぶ必要はまったくありません。これは戦いの仕組みの概要にすぎません。',
   'guide.combat.hitTitle': 'すべての一撃が命中するわけではない',
@@ -4748,7 +4717,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウォリアーは激しい戦いの中でレイジを溜め、ローグは着実に回復するエナジーを消費し、キャスターはマナのプールを管理します。自分のリソースを理解することが、クラスをうまく使いこなす半分です。',
   'guide.combat.growTitle': 'レベルごとに強くなる',
   'guide.combat.growBody':
-    'レベルが上がるたびに頑丈になり、新たなアビリティを習得します。これはレベル上限{cap}まで続きます。最速で成長するのはクエストで、狩り、ダンジョン攻略、デルヴがそれを補います。',
+    'レベルが上がるたびに頑丈になり、新たなアビリティを習得します。これはレベル上限{cap}まで続きます。最速で成長するのはクエスト。ダンジョンと探索がそれを補います。',
   'guide.glossary.intro': 'このガイドやチャットで使われる用語のクイックリファレンスです。',
   'guide.glossary.aggroTerm': 'アグロ',
   'guide.glossary.aggroDef':
@@ -4784,13 +4753,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'はい。ゲーム全体が最大レベルまで無料でプレイでき、ソースコードはGitHubで公開されています。',
   'guide.faqPage.q2': '暗号通貨ウォレットやトークンは必要ですか?',
   'guide.faqPage.a2':
-    'いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは、見た目の装飾と、デイリー報酬の賞金プールの分け前を加えるだけで、性能や進行には一切影響しません。',
+    'いいえ。ウォレットがなくても完全にプレイできます。任意のコミュニティトークンは見た目の装飾を解放するだけで、性能や進行には一切影響しません。',
   'guide.faqPage.q3': 'スマートフォンで遊べますか?',
   'guide.faqPage.a3':
     'はい。モバイルブラウザでタッチ操作によりプレイでき、デスクトップ用ランチャーもあります。',
   'guide.faqPage.q4': 'オフラインやソロで遊べますか?',
   'guide.faqPage.a4':
-    'はい。すぐに遊べるシングルプレイのオフラインモードがあり、オンラインの世界もダンジョン、レイド、ワールドボスを除けば完全にソロで進められます。',
+    'はい。すぐに遊べるシングルプレイのオフラインモードがあり、オンラインの世界もダンジョンとレイドを除けば完全にソロで進められます。',
   'guide.faqPage.q5': 'クラスはいくつありますか?',
   'guide.faqPage.a5':
     '九つで、クラシックなタンク、ヒーラー、ダメージのロールを網羅し、それぞれがリソースシステム（レイジ、マナ、またはエナジー）と独自の代表的なアビリティを持ちます。',
@@ -4834,7 +4803,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.home': '概要に戻る',
   'guide.bestiary.heading': 'モンスター図鑑',
   'guide.bestiary.intro':
-    '世界に棲む生き物たちを、種族ごとにまとめて紹介します。ここに載っているのは、フィールドで出会う日常の敵たちです。エリートの敵やその頭目たちはこのページには姿を見せず、最も危険な存在はすべてダンジョンの扉の奥で待ち構えています。',
+    '世界に棲む生き物たちを、種族ごとにまとめて紹介します。ここに載っているのは、フィールドで出会う敵たちです。最も危険な存在は図鑑には載らず、ダンジョンの扉の奥で待ち構えています。',
   'guide.bestiary.rare': 'レア',
   'guide.bestiary.levels': 'レベル{min}から{max}',
   'guide.bestiary.levelsSame': 'レベル{min}',
@@ -4884,7 +4853,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'クエストはこの世界の中心であり、最も早くレベルを上げる手段です。その仕組みを紹介します。',
   'guide.questsPage.acceptTitle': '探し方と受注',
   'guide.questsPage.acceptBody':
-    '頭の上にマークが付いた人物が、あなたに依頼を持っています。話しかけてクエストを受注しましょう。イーストブルックでは、受注できる最初のクエストの一つ「門前の狼」を持って、レッドブルック隊長が待っています。',
+    '頭の上にマークが付いた人物が、あなたに依頼を持っています。話しかけてクエストを受注しましょう。最初のクエストは、イーストブルックのレッドブルック隊長から受ける「扉のオオカミ」です。',
   'guide.questsPage.objectivesTitle': '目標',
   'guide.questsPage.objectivesBody':
     '特定の敵を倒したり、アイテムを集めたり、世界の何かと対話したり。画面上のトラッカーが、進行に合わせて進捗を数えてくれます。気が変わったら、クエストログからクエストを破棄し、後でその発注者から再び受けることができます。',
@@ -4923,17 +4892,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
-    '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
-  'guide.dungeonsPage.heroicTitle': 'ヒロイックモード',
-  'guide.dungeonsPage.heroicBody':
-    'すべての5人用ダンジョンと、レイドそのものにも、レベル上限の先にヒロイック版が待っています。同じ回廊が、装備の整ったエンドゲームパーティのために作り直されています。あらゆる攻撃はより重く、徒歩で振り切れるものは何もなく、ボスはスタンや減速を完全に払いのけます。まずはノーマル版を卒業しましょう。ヒロイックは、それを前提に組まれています。',
-  'guide.dungeonsPage.heroicHowBody':
-    '難易度は、グループがインスタンスを確保する前に選びます。/dungeon heroic と入力するか、パーティメニューのダンジョン難易度の切り替えを使いましょう。選択はパーティ全体で共有され、扉のところで固定されるので、ランは確保されたときの難易度のまま最後まで進みます。',
-  'guide.dungeonsPage.heroicRewardsTitle': '英雄の証と強化された戦利品',
-  'guide.dungeonsPage.heroicRewardsBody':
-    'ヒロイックのボスは、おなじみの戦利品を強化し、ツールチップにヒロイックの表記を添えて落とします。さらに各ランの最後のボスは、ほかでは見つからないエピックを加えてくれます。その最後の討伐は、参加者全員に英雄の証も残します。ハイウォッチの補給係ヴェックスのもとで使う通貨で、彼の扱う指輪と首飾りは、このレルムで手に入る唯一の装身具です。',
-  'guide.dungeonsPage.heroicLockoutBody':
-    'ノーマルのダンジョンは一日中回れます。ヒロイックは辛抱を求めます。各ダンジョンが報酬を出すヒロイッククリアは一日に一度で、レイドは難易度ごとに一日のロックアウトを保ちます。クリア済みのランはそのパーティに常に開かれたままなので、勝ち取った戦利品から締め出される者はいません。',
+    '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数フェーズの戦いと、レイド全員で力を合わせて止めねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
   'guide.abilityHook.arcane_intellect':
     '知力を上げて仲間のマナ総量を増やします。プルの前に唱えておきましょう。',
   'guide.abilityHook.arcane_shot': '遠距離からの即時ショットで、手早く追加ダメージを与えます。',
@@ -5013,7 +4972,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。',
   'guide.arenaPage.duelsHeading': '決闘',
   'guide.arenaPage.fiestaBody':
-    'フィエスタは、一つの途切れない試合として行うテンポの速い2対2の乱戦で、すべての戦士が対等な条件で戦います。試合が進むにつれてオーグメント、つまりその場で構成を組み替える手早い強化をドラフトするので、同じマッチは二つとありません。',
+    'フィエスタは短いラウンドで行う、テンポの速い2対2のモードです。ラウンドの合間にオーグメント、つまりその場で構成を組み替える手早い強化をドラフトするので、同じマッチは二つとありません。',
   'guide.arenaPage.fiestaHeading': '2対2のフィエスタ',
   'guide.arenaPage.heading': 'アリーナとPvP',
   'guide.arenaPage.intro':
@@ -5036,7 +4995,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.style': 'スタイル',
   'guide.classPage.fullKitHeading': '全アビリティ一覧',
   'guide.classPage.fullKitNote':
-    'このクラスがレベルアップに伴い習得していくアビリティを、使えるようになる順に並べています。タレントはさらにいくつかのアビリティを与え、そのどれがビルドの軸になるかを決めます。',
+    'このクラスが習得できるすべてのアビリティを、使えるようになる順に並べています。どれがビルドの軸になるかはタレントが決めます。',
   'guide.classPage.masteryLabel': 'マスタリー',
   'guide.classPage.petsHeading': 'デーモン',
   'guide.classPage.petsNote':
@@ -5044,7 +5003,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelBand': 'レベル{min}から{max}',
   'guide.dungeonsPage.partySize': '{n}人',
   'guide.faqPage.a10':
-    '上限はレベル{cap}です。そこからは5人用ダンジョンと10人用レイドに挑み、ヒロイックモードで再び攻略して強化された戦利品を狙い、ワールドボスが現れれば立ち向かい、アリーナで腕を試し、仲間を連れてデルヴに潜り、功績の書で功績を追い求めてレルムの順位を駆け上がります。',
+    '上限はレベル{cap}です。そこからは5人用ダンジョンや10人用レイドに挑み、より良い装備を求め、アリーナで腕を試します。',
   'guide.faqPage.a11':
     '出会った相手をパーティに誘ったり、チャットで呼びかけたり、ダンジョンで合流したりしましょう。ワールドのほとんどはソロで進められるので、グループを組むかどうかは必須ではなく選択です。',
   'guide.faqPage.a9':
@@ -5143,17 +5102,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'ソロ向き',
   'guide.talentsPage.heading': 'タレントとスペシャライゼーション',
   'guide.talentsPage.howBody':
-    'タレントはレベル10で解放され、上限まで上がる間ポイントを稼ぎ続けます。ポイントはクラスのタレントパネルで振り、投資とレベルアップに応じてより深い段が開いていきます。複数の配分を保存して、ビルドを切り替えることもできます。',
+    'タレントはレベル10で解放され、上限まで上がる間ポイントを稼ぎ続けます。ポイントはクラスのタレントパネルで振り、複数の配分を保存してビルドを切り替えられます。',
   'guide.talentsPage.howHeading': '仕組み',
   'guide.talentsPage.intro':
     'タレントは、クラスを自分らしくするための手段です。任意で、寛容で、変更も簡単なので、恐れずに試せます。',
   'guide.talentsPage.resetNote':
-    'タレントは、戦闘の外でアリーナの試合中でなければ、いつでもリセットできるので、序盤の選択が落とし穴になることはありません。いろいろ試し、好みを見つけ、自由に考えを変えましょう。',
+    'タレントは戦闘の外であればいつでもリセットできるので、序盤の選択が落とし穴になることはありません。いろいろ試し、好みを見つけ、自由に考えを変えましょう。',
   'guide.talentsPage.resetTitle': '決定的なものは何もない',
   'guide.talentsPage.shareNote':
     '完成したビルドは短い共有コードにコピーして、フレンドに渡せます。受け取った相手は、自分のタレントパネルにそのまま貼り付けるだけで読み込めます。',
   'guide.talentsPage.specsBody':
-    'どのクラスにもいくつかのスペシャライゼーションがあり、それぞれに固有のロールと特徴的な軸があります。タレントパネルで一つを選ぶと、象徴的なアビリティと、それ自身の恒久的なマスタリーが与えられます。ここではそのすべての概要を示します。全アビリティはクラスを開いて確認してください。',
+    'どのクラスにもいくつかのスペシャライゼーションがあり、それぞれに固有のロールと特徴的な軸があります。ここではそのすべての概要を示します。全アビリティはクラスを開いて確認してください。',
   'guide.talentsPage.specsHeading': 'クラス別のスペシャライゼーション',
   'guide.talentsPage.whatBody':
     'レベルが上がると、アビリティやステータスへの小さく永続的な強化に振るタレントポイントを獲得します。これがクラスの感触を形作り、より高いダメージ、より硬い防御、より強い回復へと傾けていきます。',
@@ -5166,10 +5125,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どのクラスも十分に通用し、上限まで到達できます。誰かが最強と呼ぶものではなく、自分が好きなファンタジーを選びましょう。',
   'guide.wishPage.i1Title': '間違ったクラスを選ぶことはない',
   'guide.wishPage.i2Body':
-    '倒れると、最寄りの墓地で亡霊として起き上がります。亡骸まで走って戻れば無償で復活でき、霊魂の癒し手のその場での蘇生を選べば、その手軽さと引き換えに短い衰弱を背負います。経験値、装備、コインは決して失われないので、安心してリスクを取り、学べます。',
+    '倒れると魂を解放し、最寄りの墓地で復活し、元いた場所まで戻ります。経験値は失われないので、安心してリスクを取り、学べます。',
   'guide.wishPage.i2Title': '死んでもほとんど痛手はない',
   'guide.wishPage.i3Body':
-    'タレントはレベル10で解放され、戦闘の外なら好きなときにリセットできるので、序盤の選択が永続することはありません。',
+    'タレントはレベル10で解放され、いつでもリセットできるので、序盤の選択が永続することはありません。',
   'guide.wishPage.i3Title': 'タレントは落とし穴ではない',
   'guide.wishPage.i4Body':
     'クエストは最も速いレベリング手段で、ワールド中へとあなたを導きます。どこへ行けばよいか分からないときは、次のマーカーを探しましょう。',
@@ -5245,7 +5204,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.economy.intro':
     'コインは世界全体の潤滑油です。装備や物資、旅の道具を買い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
   'guide.economy.junkBody':
-    '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
+    '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
   'guide.economy.junkTitle': 'がらくたの整理',
   'guide.economy.mailBody':
     'どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。',
@@ -5253,7 +5212,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '受け取りも同じで、向きが逆になるだけです。どの柱の前でも手紙を読み、添えられたものを財布とバッグに納められます。手紙は永遠には待ってくれないので、ワタリガラスに見放される前に受け取りましょう。ポストがきっぱり断るものが二つあります。魂縛のアイテムとクエスト品は、あなた自身が運ぶか、まったく運ばれないかのどちらかです。そして、良い報告を終えたあとは柱に目を配りましょう。手紙をよこす発注者もいるのです。',
   'guide.economy.mailTitle': 'レイヴンポスト',
   'guide.economy.marketBody':
-    '商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。イーストブルックの商人、あるいはハイウォッチの競売人ヴォスに話しかけると開けます。どちらの管理人も同じ一つの共有マーケットを扱っています。商人は自らの品も常に在庫として出品しているので、他のプレイヤーが何も出していないときでも、いつでも買えるものがあります。',
+    '商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。商人に話しかけて開きましょう。商人は自らの品も常に在庫として出品しているので、他のプレイヤーが何も出していないときでも、いつでも買えるものがあります。',
   'guide.economy.marketBrowse':
     '閲覧：出品を一覧でスクロールするか、名前で検索して売り物を探します。各出品には品物、出品者、そしてスタック全体の希望価格が表示されます。',
   'guide.economy.marketCollect':
@@ -5302,7 +5261,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     'ギアとは、あなたのキャラクターが身につける装備や持ち歩くアイテムのことです。より良いギアこそが強くなる最も着実な道であり、そのほとんどは遊んでいるだけで手に入ります。',
   'guide.gear.itemLevelBody':
-    '2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエストなど、世界で勝ち取った装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。',
+    '2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。すると各武器や防具にアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。',
   'guide.gear.qualityBody':
     'どのアイテムにも品質があり、その名前は品質に合わせて色付けされているので、ひと目で価値が読み取れます。最もありふれたものから最も値打ちのあるものまで、順に並べると次の通りです。',
   'guide.gear.qualityCommon': '一般',
@@ -5371,7 +5330,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.progression.capBody':
     'レベルが上がるたびに頑丈になり、新たなアビリティが手に入ります。それはレベル上限{cap}まで続きます。',
   'guide.progression.capJourneyBody':
-    'レベル{cap}が上限、レベリングの終わりですが、成長の終わりではありません。そこからはダンジョンとレイドにノーマルとヒロイックで挑み、ワールドボスが現れれば立ち向かい、より良いギアを追い、アリーナで己を試します。',
+    'レベル{cap}が上限、レベリングの終わりですが、成長の終わりではありません。そこからはダンジョンやレイドに挑み、より良いギアを追い、アリーナで己を試します。',
   'guide.progression.capTitle': 'レベル{cap}に到達する',
   'guide.progression.intro':
     'あらゆる戦い、クエスト、北へ進む一歩が、あなたの英雄を強くします。ここでは、レベリングの仕組みと、頂点に達した後も成長を続けさせるものを紹介します。',
@@ -5386,7 +5345,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '宿屋に入り、戦闘の外にいれば、待っている間にキャラクターは休息経験値を蓄えます。どの町にも宿屋があります。次に外へ出て戦うとき、その蓄えが尽きるまで討伐に追加のボーナスがかかります。宿屋での一休みは決して無駄な時間ではなく、次のレベリングの区間を早めてくれます。',
   'guide.progression.restedTitle': '休息経験値',
   'guide.progression.xpBody':
-    '経験値は、クエストの達成、敵の討伐、そしてデルヴの攻略で得られます。クエストが断然多くを与えてくれるので、クエストの道筋をたどるのが最も早く登る方法です。道すがらの討伐やデルヴの攻略が、残りを埋めてくれます。',
+    '経験値はクエストの達成と敵の討伐で得られます。クエストが断然多くを与えてくれるので、クエストの道筋をたどるのが最も早く登る方法です。道すがら何かを倒すことが、残りを埋めてくれます。',
   'guide.progression.xpTitle': '経験値の稼ぎ方',
   'guide.questsPage.sagaBody':
     'メインストーリーは一つの長い追跡劇です。死のカルトが王国の墓に手を出しており、一章を閉じるごとに、道はさらにゾーン一つ分先を指し示します。陰謀の全体を一度に相手取ることはありません。一本の糸を引けば、それが次にその糸を握る手へと導いてくれます。',
@@ -5411,7 +5370,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '物語と並んで、Valeと沼の保安官や番人たちが、常設の賞金の階段を授けてくれます。あなた以前のすべての賞金稼ぎがその地位を得てきたように、敵を一体ずつ倒して登り詰めましょう。それは正攻法のレベリングであり、各ゾーンの最悪の厄介者たちを巡る旅です。',
   'guide.questsPage.sideWardenTitle': '己の名を勝ち取る',
   'guide.questsPage.typeGatherBody':
-    '世界から、あるいは敵が落とすものからアイテムを集めます。薬草、鉱石、カルトの不吉な試薬など。特定の敵からしか落ちないものもあるので、狩りと収集は表裏一体です。',
+    '世界から、あるいは敵が落とすものからアイテムを集めます。薬草、鉱石、失われた手紙、カルトの不吉な試薬など。特定の敵からしか落ちないものもあるので、狩りと収集は表裏一体です。',
   'guide.questsPage.typeGatherTitle': '収集',
   'guide.questsPage.typeGroupBody':
     'メインストーリーの各章は、ダンジョンの扉で終わります。導入はソロでこなせますが、章の悪役への最後の一撃は五人パーティ向けに作られています。',
@@ -5423,7 +5382,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'いくつかのクエストでは、北へ攻め込む前に町を結集させます。門に迫る脅威を間引き、守り手が必要とするものを集めるのです。これらは、あなたがその物語の一員である人々のために行う討伐と収集の目標であり、彼らと共に動き続けさせてくれます。',
   'guide.questsPage.typeMusterTitle': '守りを結集する',
   'guide.questsPage.typeSlayBody':
-    '獣の群れを間引いたり、指定された数の標的の敵を倒してカルトの支配を打ち砕いたりします。最初のクエストの一つ、イーストブルックの道から狼を排除するものも、その一つです。',
+    '獣の群れを間引いたり、指定された数の標的の敵を倒してカルトの支配を打ち砕いたりします。ゲーム最初のクエスト、イーストブルックの道から狼を排除するものも、その一つです。',
   'guide.questsPage.typeSlayTitle': '討伐',
   'guide.questsPage.typesBody':
     'ほとんどのクエストは、おなじみのいくつかの型のどれかです。画面上のトラッカーが、それぞれ何を求めているかを正確に示してくれるので、迷うことはありません。',
@@ -5433,7 +5392,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'オンラインの全員に届く、常時オンのレルム全体のチャンネル。質問したり雑談したりするのに向いています。WorldやLooking for Groupとは違い、参加を選ぶ必要は一切ありません。',
   'guide.social.chanGuild': 'ギルドとオフィサー。',
   'guide.social.chanGuildBody':
-    'ギルド用のチャンネル。ギルドチャットは全メンバーに届き、オフィサーチャンネルはオフィサーとギルドリーダー用です。',
+    'ギルド用のチャンネル。ギルドチャットは全メンバーに届き、オフィサーチャンネルはオフィサー専用です。',
   'guide.social.chanLfg': 'パーティ募集。',
   'guide.social.chanLfgBody':
     'ダンジョンを回る仲間を探すための、任意参加のレルム全体チャンネル。タブを開いて参加しましょう。',
@@ -5475,7 +5434,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '討伐で得たお金は、それをルートした人のものになるか、パーティ全員に均等に分けられます。',
   'guide.social.lootCoinTitle': 'コイン。',
   'guide.social.lootCommonBody':
-    'ありふれたドロップ品は、パーティ内で順番に回ることも、ルートした人のものになることもあります。一方、より良いドロップ品はロールにかけられ、全員に公平な機会が与えられます。',
+    'ありふれたドロップ品はルートした人のものに、より良いドロップ品はロールにかけられて、全員に公平な機会が与えられます。',
   'guide.social.lootCommonTitle': 'アイテム。',
   'guide.social.lootHeading': 'パーティの戦利品',
   'guide.social.lootMasterBody':
@@ -5484,9 +5443,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.lootRollBody':
     'アイテムがロールにかけられると、対象となる各メンバーは、欲しければニード、余りなら受け取る程度ならグリード、辞退するならパスを選びます。最も高い出目が勝ちます。',
   'guide.social.lootRollTitle': 'ニード、グリード、パス。',
-  'guide.social.markersBody':
-    'パーティ中は、敵対的なクリーチャーを右クリックすると、8種類のレイドシンボルのひとつをその頭上に冠せられます。マークは誰でも付けられ、各シンボルが付くのは一度にひとつのターゲットだけで、同じターゲットに同じシンボルを付け直すと外れます。討伐順も、群衆制御の割り当ても、ただの「まずこいつ」も、文章よりシンボルの方が速く伝わります。',
-  'guide.social.markersHeading': 'ターゲットマーカー',
   'guide.social.partyBody':
     '相手の名前を右クリックして招待を選ぶことで、他のプレイヤーを招待します。パーティは最大五人まで入れ、そのうち一人がリーダーです。',
   'guide.social.partyCredit':
@@ -5494,20 +5450,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.partyHeading': 'パーティを組む',
   'guide.social.raidBody':
     '五人のフルパーティが揃ったら、リーダーはそれをエンドゲームのレイドに向けて、最大十人のレイドへと変換できます。',
-  'guide.social.readyBody':
-    '大きなプルの前に、グループリーダーは /ready と入力してみんなに問いかけられます。他の全員に準備完了か準備未完了かを尋ねる確認が表示され、全員が答えるか30秒が経つと、グループ全体にその集計だけがひとつ表示されます。誰かが名指しされることはありません。大事なのは数であって、犯人捜しではないのです。',
-  'guide.social.readyHeading': '準備確認',
   'guide.stats.agiBody':
     '敏捷性はいくつもの形であなたを鋭くします。クリティカルヒットを当てる確率と回避する確率を上げ、わずかなアーマーも加えます。ローグとハンターにとってはアタックパワーにもなり、ハンターの遠隔射撃を支えます。',
   'guide.stats.agiTitle': '敏捷性',
   'guide.stats.apBody':
-    'アタックパワーは、武器がどれだけ強く打つかを表します。あなたの主要能力値がこれを養い、それらの能力値を備えたギアがさらに引き上げます。一方でより強い武器は直接ダメージを高めるので、アップグレードがダメージの本当の跳ね上がりになるのです。',
+    'アタックパワーは、武器がどれだけ強く打つかを表します。あなたの主要能力値がこれを養い、より強い武器やギアがさらに引き上げるので、アップグレードがダメージの本当の跳ね上がりになるのです。',
   'guide.stats.apTitle': 'アタックパワー',
   'guide.stats.armorBody':
     'アーマーは受ける物理ダメージを軽減します。その多くは身につけているものから得られ、重装のクラスほどはるかに多くを備えます。自分のレベルに近い相手に対してアーマーが多いほど、その一撃一撃が柔らかく当たります。',
   'guide.stats.armorTitle': 'アーマー',
   'guide.stats.critBody':
-    'クリティカル率は、攻撃が追加ダメージ付きで当たる頻度です。誰もがわずかな基礎確率から始まり、敏捷性（さらに一部のタレントやギア）がそれを積み上げます。キャラクターシートには、確率そのものと、ギアがそこへ寄与するクリティカルレーティングの両方が表示されます。',
+    'クリティカル率は、攻撃が追加ダメージで当たる頻度です。誰もがわずかな基礎確率から始まり、敏捷性（さらに一部のタレントやギア）がそれを積み上げます。',
   'guide.stats.critTitle': 'クリティカル',
   'guide.stats.dodgeBody':
     '回避は、向かってくる近接攻撃を丸ごとかわす確率です。わずかな基礎確率から始まり、敏捷性がそれを上げるので、すばしこいクラスほど多くの一撃をかわします。',
@@ -5536,7 +5489,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スペルパワーは、術者にとってのアタックパワーにあたるステータスで、呪文で与えるダメージを高めます。知力によって伸び、術者向けの装備やバフでさらに上乗せされます。近接戦士がアタックパワーを気にかけるように、術者はスペルパワーに目を配ります。',
   'guide.stats.spTitle': 'スペルパワー',
   'guide.stats.spiBody':
-    '精神力は、キャスターが詠唱を止めているあいだ、つまり戦闘の合間のほとんどの時間に、マナがどれだけ速く戻るかを左右します。知力と同じく、マナのクラスに役立ち、他のクラスにはほとんど意味がありません。',
+    '精神力は、戦闘外でキャスターのマナがどれだけ速く戻るかを左右します。知力と同じく、マナのクラスに役立ち、他のクラスにはほとんど意味がありません。',
   'guide.stats.spiTitle': '精神力',
   'guide.stats.staBody':
     '体力はあなたの粘り強さです。体力が多いほど体力プールが大きくなり、戦闘外で休んでいる間の回復も速まります。どのクラスもいくらかは欲しいものです。',
@@ -5936,7 +5889,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
   'entities.itemSets.wyrmshadow.bonus4':
     '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
-  'hudChrome.itemSoulbound': '魂縛',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -6683,7 +6635,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '十の職はそれぞれ生き方も体現しており、その職に単に従事すること以上の、より広いアイデンティティを取り入れることができる。あなたの現在の生き方は一度にひとつだけであり、チェックリストではない：あなたは一つを担い、望むならば後で変更することもできる。',
   'guide.professions.archetypeChooseTitle': '生き方を選ぶ',
   'guide.professions.archetypeChooseBody':
-    '生き方の宣言は、物語の一幕になる予定だ：そのアイデンティティへとあなたを正式に迎え入れるクエストである。その道はまだ建設中なので、今のところすべてのキャラクターは選択を前に残したまま世界を歩いており、その間、すべての製作はレアの品質ティアまで進められる。',
+    '最初の生き方は、ゾーン1にある初期の物語クエストを通じて宣言し、そのクエストがあなたを正式にそのアイデンティティへと迎え入れる。そのクエストを完了するまで、あなたはまだ何の生き方も選んでいない。',
   'guide.professions.archetypeSwitchTitle': '心変わり',
   'guide.professions.archetypeSwitchBody':
     '宣言が終身刑になるわけでもない。予定されているのは、新しい職を取り上げる前に古い職へ「償い」をする繰り返し可能な行いで、切り替えるたびに償いは少しずつ重くなる。そのため選択は代償のないものにはならず、意味を持ち続ける。宣言そのものと同じく、これもまだ道の途上にある。',
@@ -6916,9 +6868,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
-  'hudChrome.crafting.notAtHub': 'それを製作するには、必要なレベルで製作拠点にいる必要があります。',
-  'hudChrome.crafting.throttled': '製作が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.crafting.recipeNotLearned': 'そのレシピはまだ習得していません。',
   'hudChrome.mobile.actionPageIndicator': '{page}ページ',
   'hudChrome.mobile.spellbookPageLabel': 'ページ{page}',
   'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
@@ -7079,32 +7028,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.nationCopperdig': '銅と茶、鶴嘴を携えて:走り止まない坑夫たち。',
   'guide.valeCupPage.rolesHeading': 'ポジション',
   'guide.valeCupPage.rolesBody':
-    'あなたのポジションが、ピッチに持ち込むキットを決めます。誰もが蹴れます。あとは気性次第です。一対一と二対二のブラケットでは全員がオールラウンダーのキットで戦うため、ポジション選びが本領を発揮するのは三対三以上からです。',
+    'ポジションがピッチに持ち込むキットを決める。誰もが蹴れる。あとは気性次第。',
   'guide.valeCupPage.rewardsHeading': '休戦の掟',
   'guide.valeCupPage.rewardsBody':
-    '休戦の掟のもとでは経験値も戦利品もありません。決着のついた試合は戦績と勝者の掲示板に刻まれ、勝利はその日の報酬課題にも加算されます。試合を放棄すれば席はベンチ送りとなり、整備人はそれを覚えています。',
-  'guide.valeCupPage.bettingHeading': '柵際のひと賭け',
-  'guide.valeCupPage.bettingBody':
-    'ソウフィールドの観客は、試合が組まれている間にどちらかの側を後押しできる。賭け金はひとつのプールにまとめられ、終了の笛が鳴れば、勝った側が自分の賭けた額に応じて負けた側のプールを分け合う。引き分けの試合や、誰も賭けなかった側の番狂わせでは、コインはすべて払い戻される。試合に出る本人はその試合には賭けられず、柵際にはあなたの生涯のベット成績、勝ち、負け、そして純収支が刻まれていく。',
-  'guide.valeCupPage.practiceHeading': '練習試合と、静かなピッチ',
-  'guide.valeCupPage.practiceBody':
-    'ヴェイルカップウィンドウでは練習もできる。ボットが両チームを埋める専用コピーのピッチで、何ひとつ戦績には数えられない。本番に一人か二人足りないときも、少し待てばボットが人数を埋めてくれるし、ボットがピッチにいる試合はすべて親善試合で、決してレート戦にはならない。そしてソウフィールドが空いている間は、ボットたちがエキシビションを繰り広げる。スタンドから観戦もでき、賭けることもできる。本物のプレイヤーが準備を整えた瞬間、エキシビションはピッチを譲り、賭け金はすべて返される。',
+    '休戦の掟のもとでは経験値も戦利品もない。決着のついた試合は戦績と勝者の掲示板に刻まれ、デイリー報酬ポイントが付いてくる。試合を放棄すれば席はベンチ送りとなり、整備人は覚えている。',
   'entities.npcs.groundskeeper_bram.name': '整備人ブラム',
   'entities.npcs.groundskeeper_bram.title': 'ソウフィールドの番人',
   'entities.npcs.groundskeeper_bram.greeting':
     'ソウフィールドでは休戦が守られている、{className}よ。使っていいのは足と肩だけだ。銅のミルク桶を懸けて一戦どうだ?',
-  'entities.npcs.chronicler_saul.name': '年代記官ソール',
-  'entities.npcs.chronicler_saul.title': 'イーストブルック渓谷の年代記',
-  'entities.npcs.chronicler_saul.greeting':
-    '為すに値する行いは、二度書き記すに値する、{playerName}よ。一度は台帳に、もう一度は炉辺の語り草に。',
-  'entities.npcs.chronicler_osric_fenn.name': '年代記官オズリック・フェン',
-  'entities.npcs.chronicler_osric_fenn.title': 'マイアフェン湿地の年代記',
-  'entities.npcs.chronicler_osric_fenn.greeting':
-    'ページの湿気に気をつけることだ、{playerName}よ。沼は読者よりずっと多くの本を呑み込むのだ。',
-  'entities.npcs.chronicler_edda_hartwell.name': '年代記官ゼンジー',
-  'entities.npcs.chronicler_edda_hartwell.title': 'ソーンピーク高地の年代記',
-  'entities.npcs.chronicler_edda_hartwell.greeting':
-    '山は何ひとつ忘れない、{playerName}よ。私もだ。あなたの成したことを見せてもらおう。',
   'entities.zones.eastbrook_vale.pois.10.label': 'ソウフィールド',
   'entities.abilities.sport_kick.name': 'キック',
   'entities.abilities.sport_kick.description': '狙った地点へボールをグラウンダーで蹴り出す。',
@@ -7142,49 +7073,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '金張りの金庫',
   'entities.npcs.bursar_aldous_crane.greeting':
     'どんな木箱も、金櫃も、装身具も、金張りの金庫にお預けいただければ安全です。',
-  'entities.items.furyforged_warhelm.name': '憤怒鋳りの戦兜',
-  'entities.items.furyforged_warspaulders.name': '憤怒鋳りの戦肩当て',
-  'entities.items.furyforged_warplate.name': '憤怒鋳りの戦鎧',
-  'entities.items.furyforged_girdle.name': '憤怒鋳りの腰帯',
-  'entities.items.furyforged_legguards.name': '憤怒鋳りの脚当て',
-  'entities.items.furyforged_gauntlets.name': '憤怒鋳りの篭手',
-  'entities.items.furyforged_sabatons.name': '憤怒鋳りの戦靴',
-  'entities.items.stormbound_crown.name': '嵐縛りの王冠',
-  'entities.items.stormbound_spaulders.name': '嵐縛りの肩当て',
-  'entities.items.stormbound_hauberk.name': '嵐縛りの鎖帷子',
-  'entities.items.stormbound_waistguard.name': '嵐縛りの腰守り',
-  'entities.items.stormbound_legmail.name': '嵐縛りの脚鎖',
-  'entities.items.stormbound_handguards.name': '嵐縛りの手甲',
-  'entities.items.stormbound_greaves.name': '嵐縛りの脛当て',
-  'entities.items.ashstalker_cowl.name': '灰追いの頭巾',
-  'entities.items.ashstalker_shoulderguards.name': '灰追いの肩守り',
-  'entities.items.ashstalker_harness.name': '灰追いの胴具',
-  'entities.items.ashstalker_waistband.name': '灰追いの腰帯',
-  'entities.items.ashstalker_legguards.name': '灰追いの脚当て',
-  'entities.items.ashstalker_grips.name': '灰追いの手甲',
-  'entities.items.ashstalker_treads.name': '灰追いの足袋',
-  'entities.items.cinderweave_cowl.name': '熾火織りの頭巾',
-  'entities.items.cinderweave_mantle.name': '熾火織りの肩衣',
-  'entities.items.cinderweave_raiment.name': '熾火織りの法衣',
-  'entities.items.cinderweave_cord.name': '熾火織りの腰紐',
-  'entities.items.cinderweave_legwraps.name': '熾火織りの脚巻き',
-  'entities.items.cinderweave_handwraps.name': '熾火織りの手巻き',
-  'entities.items.cinderweave_slippers.name': '熾火織りの上履き',
-  'entities.items.final_oath_medallion.name': '最後の誓いのメダリオン',
-  'entities.items.razorwind_torque.name': '刃風の首輪',
-  'entities.items.cinder_sigil_pendant.name': '熾火印のペンダント',
-  'entities.items.iron_vow_band.name': '鉄の誓いの指輪',
-  'entities.items.unbroken_circle.name': '不壊の円環',
-  'entities.items.fleetblood_band.name': '疾血の指輪',
-  'entities.items.last_step_signet.name': '最後の一歩の印章',
-  'entities.items.ashen_focus_ring.name': '灰燼の集中指輪',
-  'entities.items.spellbreakers_seal.name': '呪文砕きの印章',
-  'entities.items.final_argument_greatblade.name': '最後の論駁の大剣',
-  'entities.items.first_blood_razor.name': '初血の剃刀',
-  'entities.items.emberglass_warstaff.name': '熾火硝子の戦杖',
-  'entities.npcs.fury.name': 'フューリー',
-  'entities.npcs.fury.title': '名誉補給官',
-  'entities.npcs.fury.greeting': '戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。',
   'guide.economy.bankBody':
     '各拠点の町には、この地の銀行商会である金張りの金庫の支店があります。そこの出納官に話しかけると自分の金庫が開きます。バッグとは別の私的な収納で、キャラクターが生涯持ち続けるものです。預けた品は、次にどの支店を訪れてもそのまま安全に待っています。',
   'guide.economy.bankHow':

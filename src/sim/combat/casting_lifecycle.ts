@@ -79,9 +79,7 @@ import { onCastCompleted } from './talent_procs';
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 const COLOSSAL_MIGHT_COOLDOWNS = new Set([
-  'recklessness',
   'avatar',
-  'storm_bolt',
   'bladestorm',
   'reckless_vow',
   'red_banner',
@@ -481,19 +479,10 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
-  // Charge-limited abilities (Double Charge, p.charges map): a running cooldown is
-  // only the RECHARGE timer; the cast is blocked only once every stored use is spent.
-  const maxCharges = res.charges ?? 1;
-  const chargeAvailable = maxCharges > 1 && (p.charges?.get(ability.id)?.spent ?? 0) < maxCharges;
-  // A cast is blocked only if it is on cooldown AND neither charge system (the
-  // p.charges stored-use map NOR the abilityCharges recharge model) has a use left.
   if (
-    (sharedCooldown || (p.cooldowns.has(ability.id) && !chargeAvailable)) &&
+    (p.cooldowns.has(ability.id) || sharedCooldown) &&
     !togglingOff &&
-    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown) &&
-    // An armed Brain Freeze lets Flurry cast through its running cooldown
-    // (combat/frost_mage.ts; the override below consumes the proc).
-    !brainFreezeBypassesCooldown(p, ability.id)
+    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown)
   ) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
@@ -526,18 +515,8 @@ export function castAbility(
     ctx.error(p.id, 'Your target must dodge first.');
     return;
   }
-  // Kill-window abilities (Victory Rush): usable only while the enabling aura
-  // is worn; runEffects consumes it on a successful cast. Reuses the existing
-  // not-ready error literal so no new client matcher is needed. requiresAuraStacks
-  // (Glacial Spike's full 5-stack Icicles) additionally gates on the stack count.
-  if (
-    ability.requiresAuraKind &&
-    !p.auras.some(
-      (a) =>
-        a.kind === ability.requiresAuraKind && (a.stacks ?? 1) >= (ability.requiresAuraStacks ?? 1),
-    )
-  ) {
-    ctx.error(p.id, 'That ability is not ready yet.');
+  if (ability.requiresVictoryProc && ctx.time > p.victoryRushUntil) {
+    ctx.error(p.id, 'You need a recent kill.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target
@@ -789,12 +768,7 @@ export function castAbility(
 
   if (ability.channel) {
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
-    // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
-    frostMageChannelStart(p, ability.id);
-    // Aether Darts arms its one-time Arcane Charge consume for THIS channel
-    // (combat/chronomancy.ts); inert for every other channel.
-    aetherDartsChannelStart(p, ability.id);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
     const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
@@ -893,14 +867,6 @@ function spendAbilityCost(
     return;
   }
   spendResource(p, res.cost);
-  // Overflowing Power (mage choice row): every 10% of maximum mana actually
-  // spent shaves manaDefCdrPer10 seconds off the mage defensive cooldowns,
-  // capped per rolling window (the 'internal_cd' aura carries the window's
-  // running total, so no new entity field enters the parity state hash).
-  overflowingPowerCdr(ctx, p, meta, res.cost);
-  // Colossal Might: each point of rage actually spent shaves cdrPerRage seconds
-  // off the tracked offensive cooldowns (deleting one that reaches zero, like
-  // the updateTimers decrement does). 0 for everyone without the capstone.
   const rate = ctx.playerMods(meta).global.cdrPerRage;
   if (spentRage <= 0 || rate <= 0) return;
   const refund = spentRage * rate;
@@ -912,93 +878,11 @@ function spendAbilityCost(
   }
 }
 
-// Overflowing Power (mage choice row): the Colossal Might pattern on mana. The
-// defensive set it shaves, the seconds cap, and the rolling window; the cap
-// accumulator rides an 'internal_cd' aura the player can watch tick down.
-const MAGE_DEFENSIVE_COOLDOWNS = [
-  'blink',
-  'ice_barrier',
-  'blazing_barrier',
-  'greater_invisibility',
-] as const;
-const OVERFLOW_CAP_SECONDS = 10;
-const OVERFLOW_CAP_WINDOW = 30;
-
-function overflowingPowerCdr(ctx: SimContext, p: Entity, meta: PlayerMeta, cost: number): void {
-  if (cost <= 0 || p.resourceType !== 'mana' || p.maxResource <= 0) return;
-  const per10 = ctx.playerMods(meta).global.manaDefCdrPer10;
-  if (per10 <= 0) return;
-  const capAura = p.auras.find((a) => a.id === 'overflowing_power_cap');
-  const used = capAura?.value ?? 0;
-  const shave = Math.min((cost / p.maxResource) * 10 * per10, OVERFLOW_CAP_SECONDS - used);
-  if (shave <= 0) return;
-  if (capAura) {
-    capAura.value += shave;
-  } else {
-    ctx.applyAura(p, {
-      id: 'overflowing_power_cap',
-      name: 'Overflowing Power',
-      kind: 'internal_cd',
-      value: shave,
-      remaining: OVERFLOW_CAP_WINDOW,
-      duration: OVERFLOW_CAP_WINDOW,
-      sourceId: p.id,
-      school: 'arcane',
-    });
-  }
-  for (const id of MAGE_DEFENSIVE_COOLDOWNS) {
-    const cur = p.cooldowns.get(id);
-    if (cur === undefined) continue;
-    if (cur <= shave) p.cooldowns.delete(id);
-    else p.cooldowns.set(id, cur - shave);
-  }
-}
-
-// Overload (mage choice row): consume the armed amplifier on a mana spell,
-// returning a scaled copy of the resolved ability (numeric effect fields ride
-// the output amp; the bill rides the cost amp). The original resolved struct
-// is never mutated. Draws no rng.
-const OVERLOAD_COST_MULT = 1.5;
-
-function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): ResolvedAbility {
-  if (res.def.school === 'physical' || res.cost <= 0) return res;
-  const idx = p.auras.findIndex((a) => a.kind === 'overload');
-  if (idx < 0) return res;
-  const aura = p.auras[idx];
-  const amp = 1 + aura.value;
-  p.auras.splice(idx, 1);
-  ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
-  const effects = res.effects.map((eff) => {
-    if (eff.type === 'empoweredCone') {
-      return {
-        ...eff,
-        stages: eff.stages.map((stage) => ({
-          ...stage,
-          min: Math.round(stage.min * amp),
-          max: Math.round(stage.max * amp),
-        })),
-      };
-    }
-    const scaled: Record<string, unknown> = { ...eff };
-    for (const key of ['min', 'max', 'amount', 'bonus', 'total', 'value'] as const) {
-      const v = scaled[key];
-      if (typeof v === 'number' && v > 0) scaled[key] = Math.round(v * amp);
-    }
-    return scaled as typeof eff;
-  });
-  return { ...res, cost: Math.round(res.cost * OVERLOAD_COST_MULT), effects };
-}
-
 function armAbilityCooldown(
   p: Entity,
   abilityId: string,
   cooldown: number,
   togglingOff = false,
-  // Two coexisting charge systems (mutually exclusive per ability via the early
-  // return below): `bonusCharges` drives the abilityCharges recharge model (PTR);
-  // `maxCharges` drives the p.charges stored-use Map (Double Charge). Content sets
-  // at most one, so an ability never double-arms.
-  maxCharges = 1,
   bonusCharges = 0,
 ): void {
   if (cooldown <= 0 || togglingOff) return;
@@ -1292,7 +1176,7 @@ function applyAbility(
       return;
     }
     spendResource(p, billableCost());
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
     ctx.revivePet(p.id);
     return;
   }
@@ -1371,8 +1255,8 @@ function applyAbility(
     ability.targetType === 'friendly' ||
     (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
   ) {
-    spendAbilityCost(p, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
+    spendAbilityCost(ctx, p, meta, res);
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
     ctx.runEffects(p, meta, target, res);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
@@ -1404,14 +1288,7 @@ function applyAbility(
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(
-      p,
-      ability.id,
-      res.cooldown,
-      togglingOff,
-      res.charges ?? 1,
-      res.bonusCharges ?? 0,
-    );
+    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -1454,27 +1331,8 @@ function applyAbility(
   }
 
   spendAbilityCost(ctx, p, meta, res);
-  armAbilityCooldown(
-    p,
-    ability.id,
-    res.cooldown,
-    togglingOff,
-    res.charges ?? 1,
-    res.bonusCharges ?? 0,
-  );
-  // A shout announces itself: world-visible cue so the caster roars and the
-  // shockwave ring reads for everyone nearby (renderer-only; no mechanic).
-  if (ability.castFx && !togglingOff) {
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: p.id,
-      targetId: p.id,
-      school: ability.school,
-      fx: ability.castFx,
-      ability: ability.id,
-    });
-  }
-  ctx.runEffects(p, meta, target, res, echoOpts);
+  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+  ctx.runEffects(p, meta, target, res);
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)

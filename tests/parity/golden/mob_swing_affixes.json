@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "37e8f13b",
+      "nextId": 406,
+      "state": "adcfd5de",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -119,6 +119,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -130,9 +131,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 411,
-      "state": "f16276cf",
-      "events": "9e3e34e9",
+      "nextId": 412,
+      "state": "2e0bc5f0",
+      "events": "ac5f82ce",
       "rng": {
         "draws": 54,
         "digest": "d9836924"
@@ -141,9 +142,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 411,
-      "state": "0802f6b9",
-      "events": "1e7f8bac",
+      "nextId": 412,
+      "state": "cff44207",
+      "events": "1a1eee41",
       "rng": {
         "draws": 95,
         "digest": "43c2d2eb"
@@ -152,9 +153,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 411,
-      "state": "d1a48881",
-      "events": "02c6b36c",
+      "nextId": 412,
+      "state": "58f5f175",
+      "events": "2e4754a2",
       "rng": {
         "draws": 224,
         "digest": "22d4749f"
@@ -163,8 +164,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 407,
-      "state": "8e00b4c5",
+      "nextId": 412,
+      "state": "0708ba9f",
       "events": "741638a5",
       "rng": {
         "draws": 224,
@@ -317,7 +318,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 55.444444,
+          "resource": 54,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -334,6 +335,7 @@
             "str": 53
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -380,6 +382,7 @@
           "swingTimer": 1.05,
           "targetId": 408,
           "templateId": "mogger_lackey",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 50,
             "min": 32,
@@ -424,6 +427,7 @@
           "swingTimer": 0.65,
           "targetId": 408,
           "templateId": "webwood_spider",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 41,
             "min": 26,
@@ -470,6 +474,7 @@
           "swingTimer": 1.05,
           "targetId": 408,
           "templateId": "gravecaller_summoner",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 66,
             "min": 42,
@@ -530,6 +535,7 @@
           "swingTimer": 2.3,
           "targetId": 408,
           "templateId": "warlord_drogmar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 109,
             "min": 69,
@@ -575,6 +581,7 @@
           },
           "swingTimer": 1.05,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -632,6 +639,7 @@
               84
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -643,8 +651,8 @@
     {
       "tick": 64,
       "time": 3.2,
-      "nextId": 407,
-      "state": "bc23abbc",
+      "nextId": 412,
+      "state": "3964bbba",
       "events": "741638a5",
       "rng": {
         "draws": 244,
@@ -797,7 +805,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 55.444444,
+          "resource": 54,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -814,6 +822,7 @@
             "str": 53
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -860,6 +869,7 @@
           "swingTimer": 0.85,
           "targetId": 408,
           "templateId": "mogger_lackey",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 50,
             "min": 32,
@@ -904,6 +914,7 @@
           "swingTimer": 0.45,
           "targetId": 408,
           "templateId": "webwood_spider",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 41,
             "min": 26,
@@ -950,6 +961,7 @@
           "swingTimer": 0.85,
           "targetId": 408,
           "templateId": "gravecaller_summoner",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 66,
             "min": 42,
@@ -1010,6 +1022,7 @@
           "swingTimer": 2.1,
           "targetId": 408,
           "templateId": "warlord_drogmar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 109,
             "min": 69,
@@ -1055,6 +1068,7 @@
           },
           "swingTimer": 0.85,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -1112,6 +1126,7 @@
               84
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,

@@ -358,7 +358,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.under_minimum': '지갑이 최소 $20 USD WOC 기준에 미치지 못합니다.',
   'hudChrome.dailyRewards.reason.price_unavailable':
     'WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.',
-  'hudChrome.dailyRewards.reason.banned': '일일 보상 참여가 금지되었습니다. 사유: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name} 관전 중',
   'hudChrome.readyCheck.prompt': '{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?',
@@ -432,14 +431,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '임무를 마쳤습니다. 레드브룩 원수에게 돌아가 사용 버튼을 눌러 완료하세요.',
   'hudChrome.tutorial.doneBodyTouch':
     '기본기를 익혔습니다, {name}. 이제 골짜기를 자유롭게 누비세요. 더보기를 누른 뒤 퀘스트 기록을 눌러 언제든 퀘스트를 확인할 수 있습니다. 좋은 사냥 되세요.',
-  'hudChrome.tutorial.slayTargetHint':
-    '전투가 처음인가요? {targetKey} 를 누르거나 늑대를 클릭해 대상으로 지정한 뒤, 액션바 기술로 공격하세요.',
-  'hudChrome.tutorial.slayTargetHintTouch':
-    '전투가 처음인가요? 늑대를 탭해 대상으로 지정한 뒤, 액션바 기술을 탭해 공격하세요.',
-  'hudChrome.tutorial.nextTipsTitle': '다음으로 할 일',
-  'hudChrome.tutorial.nextTipQuestLog': '퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.',
-  'hudChrome.tutorial.nextTipMap': '월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.',
-  'hudChrome.tutorial.nextTipSocial': '소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요.',
   'hudChrome.raidLockout.title': '공격대 잠금',
   'hudChrome.raidLockout.allReady': '모든 공격대 준비됨',
   'hudChrome.raidLockout.daysHours': '{d}일 {h}시간',
@@ -564,16 +555,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
   'hudChrome.statInfo.names.hasteRating': '가속 등급',
-  'hudChrome.statInfo.names.warfare': '워페어',
-  'hudChrome.statInfo.warfareValue': '주는 피해 +{increase}% / 받는 피해 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
     '장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.',
   'hudChrome.statInfo.desc.hasteRating':
     '장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.',
   'hudChrome.statInfo.desc.spellPower':
     '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
-  'hudChrome.statInfo.desc.warfare':
-    '플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다.',
   'hudChrome.statInfo.sources.header': '구성:',
   'hudChrome.statInfo.sources.base': '기본: {value}',
   'hudChrome.statInfo.sources.attributes': '능력치에서: {value}',
@@ -2276,9 +2263,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': '마지막 의식',
   'entities.abilities.lay_on_hands.description':
     '막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분.',
-  'entities.abilities.holy_taunt.name': '신성한 부추김',
-  'entities.abilities.holy_taunt.description':
-    '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
   'entities.abilities.flash_of_light.name': '빛의 치유',
   'entities.abilities.flash_of_light.description':
     '빠르고 효율적인 빛줄기로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
@@ -2620,9 +2604,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_wild.name': '야생송곳니 형상',
   'entities.abilities.aspect_of_the_wild.description':
     '야생의 힘으로 주위 아군을 고무하여 전투력을 높입니다. 5분 동안 지속됩니다. (사냥꾼 특성)',
-  'entities.abilities.avatar.name': '거상',
+  'entities.abilities.avatar.name': '거상화',
   'entities.abilities.avatar.description':
-    '거상으로 변신하여 전투력을 높입니다. 20초 동안 지속됩니다. (전사 특성)',
+    '제어 효과를 해제하고 거상이 되어 20초 동안 주는 피해가 20% 증가합니다. (전사 특성)',
   'entities.abilities.avenging_wrath.name': '응징의 날개',
   'entities.abilities.avenging_wrath.description':
     '복수의 힘을 내려 전투력과 주문력을 높입니다. 20초 동안 지속됩니다. (성기사 특성)',
@@ -2631,7 +2615,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전투력을 높입니다. 15초 동안 지속됩니다. (드루이드 특성)',
   'entities.abilities.bladestorm.name': '강철 회오리',
   'entities.abilities.bladestorm.description':
-    '강철의 폭풍이 되어 매초 주위 적에게 {damage}의 피해를 입힙니다. (전사 특성)',
+    '강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다. (전사 특성)',
+  'entities.abilities.swordguard.name': '검의 수호',
+  'entities.abilities.swordguard.description':
+    '8초 동안 받는 피해가 10% 감소하며, 생명력이 30% 미만이면 20% 감소합니다. (전사 특성)',
+  'entities.abilities.triumph_rush.name': '승전 돌격',
+  'entities.abilities.triumph_rush.description':
+    '적을 처치한 뒤 20초 안에 무기 피해에 {damage}를 더해 입히고 최대 생명력의 20%를 회복합니다. (전사 특성)',
+  'entities.abilities.razor_howl.name': '칼날 포효',
+  'entities.abilities.razor_howl.description':
+    '15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)',
+  'entities.abilities.stormthrow.name': '폭풍 투척',
+  'entities.abilities.stormthrow.description':
+    '무기를 던져 대상을 3초 동안 기절시킵니다. (전사 특성)',
+  'entities.abilities.reckless_vow.name': '무모한 맹세',
+  'entities.abilities.reckless_vow.description':
+    '12초 동안 모든 분노 생성이 50%, 치명타 확률이 20% 증가합니다. (전사 특성)',
+  'entities.abilities.red_banner.name': '붉은 깃발',
+  'entities.abilities.red_banner.description':
+    '20초 동안 자신과 주위 아군의 공격 속도와 피해가 각각 10% 증가합니다. (전사 특성)',
   'entities.abilities.blink.name': '섬광걸음',
   'entities.abilities.blink.description':
     '전방 15미터로 순간이동하며 이동 불가 효과를 해제합니다. (마법사 특성)',
@@ -3217,12 +3219,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '조수지기',
   'entities.npcs.tidewatcher_ondrel.greeting':
     '이 호수는 달빛을 마시고, {className}, 익사한 자들을 되돌려 보낸다네. 나는 서른 밤 동안 저 관문을 지켜보았지 — 그리고 오늘 밤, 마침내 그것이 열렸네.',
-  'entities.quests.q_prof_intro.title': '검 말고도 할 수 있는 일',
-  'entities.quests.q_prof_intro.text':
-    '이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.',
-  'entities.quests.q_prof_intro.completion':
-    '봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.',
-  'entities.quests.q_prof_intro.objectives.0.label': '광석 조각',
   'entities.quests.q_wolves.title': '문 앞의 늑대들',
   'entities.quests.q_wolves.text':
     '숲늑대들이 북쪽 길의 여행자들을 물어뜯고 있습니다, {playerName}. 8마리를 처치해 이스트브룩이 숨 돌리게 해 주십시오.',
@@ -4240,9 +4236,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnTitle': '보상 받기',
   'hud.tutorial.returnBody':
     '임무를 마쳤습니다. 레드브룩 원수에게 돌아가 {interactKey} 키를 눌러 완료하세요.',
-  'entities.mobs.nythraxis_heroic_warrior_add.name': '죽지 않는 전쟁수호병 알드렌',
-  'entities.mobs.nythraxis_heroic_priest_add.name': '죽지 않는 대사제 말릭',
-  'entities.mobs.nythraxis_heroic_rogue_add.name': '죽지 않는 칼날 보스',
   'entities.mobs.nythraxis_skeleton_warrior.name': '되살아난 왕실 근위병',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': '나이트락시스, 손피크의 재앙',
   'itemUi.quality.legendary': '전설',
@@ -4463,7 +4456,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '탐굴은 당신과 최대 한 명의 아군만을 위해 만들어진 작은 인스턴스 던전으로, 누구에게도 방해받지 않는 개인 사본입니다. 세계 곳곳의 탐굴 관리인이 지키는 게시판에서 시작해 안으로 들어간 뒤, 몇 개의 방을 헤치며 싸우고 하나의 수호자에서 마무리합니다. 탐굴은 빠르고 반복하도록 만들어져 있어, 열린 세계에서 할 일이 떨어졌을 때 믿을 만한 성장 수단이 됩니다.',
   'guide.delvesPage.whatHeading': '탐굴이란',
   'guide.delvesPage.whereBody':
-    '첫 번째 탐굴인 무너진 성물실은 시작 지역인 이스트브룩 골짜기의 성물실 언덕에서 열립니다. 그곳의 게시판은 브라더 할벤이 지키며, 준비가 되면 그가 당신을 아래로 내려보냅니다. 그의 순회는 거기서 끝나지 않습니다. 마이어펜 습지 북쪽 끝의 트롤 봉분 너머에서는, 같은 관리인이 제 발로 설 수 있게 된 탐굴자들을 위해 익사한 연도를 엽니다.',
+    '첫 번째 탐굴인 무너진 성물실은 시작 지역인 이스트브룩 골짜기의 성물실 언덕에서 열립니다. 그곳의 게시판은 브라더 할벤이 지키며, 준비가 되면 그가 당신을 아래로 내려보냅니다.',
   'guide.delvesPage.whereHeading': '어디서 찾을 수 있나',
   'guide.docTitle': '{page} - {brand}',
   'guide.nav.overview': '개요',
@@ -4547,7 +4540,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '네. 게임 전체를 최고 레벨까지 무료로 즐길 수 있으며, GitHub에 공개된 오픈 소스입니다.',
   'guide.home.faq.q2': '암호화폐 지갑이 필요한가요?',
   'guide.home.faq.a2':
-    '아니요. 지갑 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식과 일일 보상 상금 풀의 지분만 더할 뿐, 결코 능력에 영향을 주지 않습니다.',
+    '아니요. 지갑 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식만 해제하며, 결코 능력에 영향을 주지 않습니다.',
   'guide.home.faq.q3': '오프라인으로 플레이할 수 있나요?',
   'guide.home.faq.a3':
     '네. 브라우저에서 바로 즐기는 1인 플레이 모드와 함께 모두가 모이는 온라인 월드도 있습니다.',
@@ -4568,7 +4561,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '직업과 외형을 고르고, 영웅에게 이름을 지어준 뒤 세계로 들어가세요. 캐릭터는 나중에 더 만들 수 있습니다.',
   'guide.howToPlay.step2Title': '첫 퀘스트 찾기',
   'guide.howToPlay.step2Body':
-    "시작 마을에서 레드브룩 원수가 '문 앞의 늑대들'을 들고 기다리고 있으며, 가까이 있는 오델 십장에게도 일거리가 있습니다. 둘 중 누구에게든 말을 걸어 첫 퀘스트를 받으세요.",
+    "시작 마을에서 레드브룩 원수가 기다리고 있습니다. 말을 걸고 '문 앞의 늑대' 퀘스트를 수락하세요.",
   'guide.howToPlay.step3Title': '이동하고 둘러보기',
   'guide.howToPlay.step3Body':
     'W, A, S, D로 이동합니다. 마우스 오른쪽 버튼을 누른 채 끌어서 시점을 돌리세요. 기본은 이게 거의 전부입니다.',
@@ -4593,7 +4586,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '머리 위에 표시가 있는 사람에게서 퀘스트를 수락하고, 목표를 완료한 뒤 완수하여 경험치와 금화, 장비를 받으세요. 화면의 추적 창이 목표를 한눈에 보여줍니다.',
   'guide.howToPlay.deathTitle': '죽음은 끝이 아닙니다',
   'guide.howToPlay.deathBody':
-    '쓰러지면 몸은 그 자리에 남고, 여러분은 가장 가까운 묘지에서 유령으로 일어납니다. 영혼을 이끌고 몸이 있는 곳으로 돌아가면 아무 불이익 없이 그 자리에서 되살아나고, 묘지의 영혼 치유사에게 맡기면 잠시 스치는 쇠약을 대가로 즉시 부활할 수 있습니다. 갓 태어난 영웅은 그 쇠약조차 완전히 면제되며, 지니고 있거나 쌓아 온 것은 무엇도 결코 잃지 않습니다.',
+    '쓰러지면 영혼을 풀어내 가장 가까운 묘지에서 온전한 생명력으로 되살아난 뒤, 있던 자리로 돌아가면 됩니다. 경험치는 잃지 않습니다.',
   'guide.howToPlay.groupingTitle': '함께 플레이하기',
   'guide.howToPlay.groupingBody':
     '다른 사람을 파티에 초대해 퀘스트 점수를 나누고 던전에 도전하세요. 세계 대부분은 혼자서도 누빌 수 있으니, 파티 플레이는 의무가 아니라 선택입니다.',
@@ -4601,7 +4594,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.onlineBody':
     '모두와 함께하는 온라인 월드에서 플레이하거나, 브라우저에서 즉시 오프라인 세계를 열어 기본기를 익히세요.',
   'guide.howToPlay.reassure':
-    '특성은 10레벨에 해금되며 전투 중이 아니라면 언제든 초기화할 수 있으니, 초반 선택이 영구적인 일은 결코 없습니다. 마음껏 실험해 보세요.',
+    '특성은 10레벨에 해금되며 언제든 초기화할 수 있으니, 초반 선택이 영구적인 일은 결코 없습니다. 마음껏 실험해 보세요.',
   'guide.howToPlay.controlsLink': '전체 조작법 참고 자료 보기',
   'guide.controls.intro':
     'PC 기본 단축키입니다. Esc를 제외한 모든 키 설정은 게임 옵션에서 바꿀 수 있으며, Esc는 언제나 게임 메뉴를 엽니다. 또한 Shift+Z 같은 조합 키로도 설정할 수 있습니다.',
@@ -4619,26 +4612,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.talents': '특성',
   'guide.controls.arena': '투기장',
   'guide.controls.leaderboard': '순위표',
-  'guide.controls.deeds': '업적의 서',
-  'guide.controls.crafting': '제작',
-  'guide.controls.valeCup': '베일 컵',
-  'guide.controls.calendar': '이벤트 달력',
-  'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     '행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)',
-  'guide.controls.groupPet': '펫 명령',
-  'guide.controls.petBar':
-    '펫 단축바: 공격, 정지, 도발, 방어, 공격적 (사냥꾼이나 흑마법사의 펫을 소환한 상태에서)',
-  'guide.controls.attackMoveNote':
-    '기본으로는 꺼져 있는 것이 하나 더 있습니다. 옵션에서 공격 이동을 켜면 전용 키(옵션이 켜져 있는 동안 A)가 생기는데, 이 키를 누르면 커서 방향으로 걸어가다가 커서 아래의 적, 또는 길에서 처음 마주치는 적에게 공격을 시작합니다.',
   'guide.controls.mobileHeading': '모바일에서',
   'guide.controls.mobileBody':
-    '휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 그 밖의 아무 곳이나 끌면 시점 전환, 두 손가락으로 오므리면 카메라 확대, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다. 왼쪽 위 구석의 작은 화살표로 메뉴 버튼을 보이거나 숨길 수 있고, 그곳의 더 보기 버튼에 나머지 창들이 담겨 있습니다.',
+    '휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 오른쪽 아무 곳이나 끌면 시점 전환, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다.',
   'guide.settingsPage.heading': '설정 및 성능',
   'guide.settingsPage.intro':
     '화면을 가장 아름답게, 혹은 게임을 가장 빠르게. 바로 쓸 수 있는 세 가지 추천 설정과 함께, 모든 그래픽 옵션이 실제로 하는 일을 정리했습니다.',
   'guide.settingsPage.wherePath':
-    '이 페이지의 모든 항목은 게임 안에 있습니다. Esc를 눌러 옵션을 여세요. 메뉴는 고정된 핵심 항목의 개요로 열리며, 그 옆의 목록에 분류가 놓입니다. 아래의 설정들은 표시 그룹의 그래픽, 인터페이스, 접근성 아래에 있고, 성능 오버레이는 시스템 아래에 있습니다. 더 빠르게는, 상단의 검색창에 이름을 입력해 곧바로 해당 항목으로 이동하세요.',
+    '이 페이지의 모든 항목은 게임 안에 있습니다. Esc 키를 누르고 그래픽, 인터페이스, 성능 오버레이에서 확인하세요.',
   'guide.settingsPage.fairnessTitle': '설계부터 공정하게',
   'guide.settingsPage.fairnessBody':
     '이곳의 어떤 옵션도 화면과 유불리를 맞바꾸지 않습니다. 설정을 낮추면 겉모습의 화려함만 줄어들 뿐, 전투에 쓰는 정보는 그대로 남습니다. 약화 효과, 시전 막대, 파티원 체력, 피해량 숫자는 낮음부터 울트라까지 완전히 동일합니다. 사양이 낮은 기기로 플레이해도 결코 불리하지 않습니다.',
@@ -4720,11 +4703,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.mobileTitle': '휴대폰과 태블릿에서',
   'guide.settingsPage.mobileBody':
     '모바일에서는 게임이 더 많은 것을 대신 관리해 줍니다. 등급을 자동으로 고르고, 배터리와 발열 부담을 줄이기 위해 해상도를 살짝 낮게 유지하며, 최상위 등급은 데스크톱 전용으로 남겨 둡니다. 위의 추천 설정은 그대로 유효하며, 휴대폰에서는 높음이 최고 단계입니다.',
-  'guide.settingsPage.touchBody':
-    '터치스크린에서는 옵션에 전용 편의 묶음이 하나 더 자랍니다. 조이스틱 크기와 감도, 화면 버튼의 크기와 불투명도, 왼손잡이용 반전 배치, 선택 사항인 카메라 스틱, 그리고 터치 시점 반전까지. 손이 화면에 맞추는 것이 아니라, 화면이 손에 맞춰지도록 말입니다.',
-  'guide.settingsPage.audioTitle': '소리와 언어',
-  'guide.settingsPage.audioBody':
-    '옵션 창이 그림 이야기만 하는 것은 아닙니다. 오디오 탭에는 효과음, 음악, 음성의 볼륨을 따로 조절하는 항목이 있고, 인터페이스 항목의 언어 선택은 새로고침 없이 그 자리에서 인터페이스 전체를 새 언어로 바꿔 줍니다.',
   'guide.combat.intro':
     '전투는 익숙한 클래식 MMO 규칙을 따릅니다. 잘 플레이하기 위해 이를 공부할 필요는 전혀 없으며, 그저 전투가 어떻게 돌아가는지에 대한 개요일 뿐입니다.',
   'guide.combat.hitTitle': '모든 일격이 맞는 것은 아닙니다',
@@ -4738,10 +4716,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '전사는 격전 속에서 분노를 쌓고, 도적은 꾸준히 차오르는 기력을 소모하며, 마법사 계열은 마나 자원을 관리합니다. 자신의 자원을 익히는 것이 직업을 잘 플레이하는 절반입니다.',
   'guide.combat.growTitle': '레벨마다 더 강해집니다',
   'guide.combat.growBody':
-    '레벨이 오를 때마다 더 단단해지고 새 능력이 해금되며, 최고 레벨인 {cap}레벨까지 이어집니다. 퀘스트가 가장 빠른 성장 길이고, 사냥과 던전, 탐굴이 이를 채워 줍니다.',
-  'guide.combat.queueTitle': '다음 한 수는 이미 장전되어 있습니다',
-  'guide.combat.queueBody':
-    '입력을 프레임 단위로 맞출 필요는 없습니다. 지금 능력을 시전하는 동안 다음 능력을 눌러 두면 예약되어, 시전이 끝나는 순간 곧바로 나갑니다. 그래서 손에 익은 플레이는 빈틈없이 흘러갑니다. 일부 근접 공격도 같은 방식으로, 다음 무기 휘두름에 실려 나갑니다.',
+    '레벨이 오를 때마다 더 단단해지고 새 능력이 해금되며, 최고 레벨인 {cap}레벨까지 이어집니다. 퀘스트가 가장 빠른 성장 길이고, 던전과 탐험이 이를 채워줍니다.',
   'guide.glossary.intro': '이 가이드와 대화 곳곳에 쓰이는 용어를 간단히 정리했습니다.',
   'guide.glossary.aggroTerm': '어그로',
   'guide.glossary.aggroDef':
@@ -4778,13 +4753,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '네. 게임 전체를 최고 레벨까지 무료로 플레이할 수 있으며, 소스 코드는 GitHub에 공개되어 있습니다.',
   'guide.faqPage.q2': '암호화폐 지갑이나 토큰이 필요한가요?',
   'guide.faqPage.a2':
-    '아니요. 그런 것 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식과 일일 보상 상금 풀의 지분만 더할 뿐, 능력이나 성장에는 결코 영향을 주지 않습니다.',
+    '아니요. 그런 것 없이도 완전히 플레이할 수 있습니다. 선택 사항인 커뮤니티 토큰은 외형 장식만 해제하며, 능력이나 성장에는 결코 영향을 주지 않습니다.',
   'guide.faqPage.q3': '휴대전화로 플레이할 수 있나요?',
   'guide.faqPage.a3':
     '네. 게임은 터치 조작과 함께 모바일 브라우저에서 실행되며, PC용 런처도 있습니다.',
   'guide.faqPage.q4': '오프라인이나 혼자서 플레이할 수 있나요?',
   'guide.faqPage.a4':
-    '네. 즉시 즐기는 1인 오프라인 모드가 있고, 온라인 세계도 던전과 공격대, 월드 보스를 제외하면 혼자서 완전히 누빌 수 있습니다.',
+    '네. 즉시 즐기는 1인 오프라인 모드가 있고, 온라인 세계도 던전과 공격대를 제외하면 혼자서 완전히 누빌 수 있습니다.',
   'guide.faqPage.q5': '직업은 몇 개인가요?',
   'guide.faqPage.a5':
     '9개로, 클래식한 탱커, 힐러, 딜러 역할을 아우르며, 각자 자원 체계(분노, 마나, 기력)와 고유한 대표 능력을 지니고 있습니다.',
@@ -4830,7 +4805,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.home': '개요로 돌아가기',
   'guide.bestiary.heading': '몬스터 도감',
   'guide.bestiary.intro':
-    '세계의 생명체들을 종족별로 묶었습니다. 이들은 야외에서 흔히 마주치는 적입니다. 정예 적과 그 군주들은 이 지면에 오르지 않으며, 가장 치명적인 것들은 던전 문 너머에서 기다립니다.',
+    '세계의 생명체들을 종족별로 묶었습니다. 이들은 야외에서 마주치는 적입니다. 가장 치명적인 것들은 도감에 오르지 않은 채, 던전 문 너머에서 기다립니다.',
   'guide.bestiary.rare': '희귀',
   'guide.bestiary.levels': '{min}~{max}레벨',
   'guide.bestiary.levelsSame': '{min}레벨',
@@ -4863,9 +4838,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.family.dragonkin.name': '용족',
   'guide.family.elemental.desc':
     '원소가 강하게 흐르는 야생의 장소에 매여 있는, 살아 있는 폭풍과 돌.',
-  'guide.family.reptile.name': '파충류',
-  'guide.family.reptile.desc':
-    '쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다.',
   'guide.worldPage.heading': '세계',
   'guide.worldPage.intro':
     'World of ClaudeCraft는 두 발로 가로지르는 하나로 이어진 대지이며, 남에서 북으로 펼쳐진 세 개의 지역으로 이루어져 있습니다. 빠른 이동이 없으니, 여정 자체가 모험의 일부입니다.',
@@ -4881,7 +4853,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '퀘스트는 세계의 심장이자 가장 빠른 성장 수단입니다. 작동 방식은 다음과 같습니다.',
   'guide.questsPage.acceptTitle': '찾기와 수락하기',
   'guide.questsPage.acceptBody':
-    "머리 위에 표식이 있는 사람들이 여러분에게 맡길 일이 있습니다. 그들에게 말을 걸어 퀘스트를 수락하세요. 이스트브룩에서는 레드브룩 원수가 '문 앞의 늑대들'을 들고 기다리는데, 여러분이 처음 받을 수 있는 퀘스트 중 하나입니다.",
+    "머리 위에 표식이 있는 사람들이 당신에게 맡길 일이 있습니다. 그들에게 말을 걸어 퀘스트를 수락하세요. 가장 첫 퀘스트는 동개울의 레드브룩 원수가 주는 '문 앞의 늑대들'입니다.",
   'guide.questsPage.objectivesTitle': '목표',
   'guide.questsPage.objectivesBody':
     '특정 적을 처치하거나, 아이템을 모으거나, 세계의 무언가와 상호작용하세요. 화면의 추적기가 진행 상황을 실시간으로 세어 줍니다. 마음이 바뀌면 퀘스트 일지에서 퀘스트를 포기했다가 나중에 그것을 준 사람에게서 다시 받을 수 있습니다.',
@@ -4920,17 +4892,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
   'guide.dungeonsPage.raidBody':
-    '봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.',
-  'guide.dungeonsPage.heroicTitle': '영웅 난이도',
-  'guide.dungeonsPage.heroicBody':
-    '모든 5인 던전, 그리고 공격대 그 자체에도 최고 레벨 너머에서 기다리는 영웅 판이 있습니다. 같은 회랑이지만 장비를 갖춘 최종 단계 파티에 맞춰 다시 빚어져, 모든 것이 더 아프게 때리고, 무엇도 발로는 따돌릴 수 없으며, 우두머리들은 기절과 속박을 아예 떨쳐 냅니다. 먼저 일반 판을 졸업하세요. 영웅은 당신이 이미 그랬다고 가정합니다.',
-  'guide.dungeonsPage.heroicHowBody':
-    '파티가 인스턴스를 차지하기 전에 난이도를 고르세요. /dungeon heroic을 입력하거나, 파티 메뉴의 던전 난이도 스위치를 젖히면 됩니다. 선택은 파티 전체가 공유하며 문 앞에서 잠기므로, 한 번의 공략은 시작할 때 정한 그대로 유지됩니다.',
-  'guide.dungeonsPage.heroicRewardsTitle': '영웅의 징표와 업그레이드된 전리품',
-  'guide.dungeonsPage.heroicRewardsBody':
-    '영웅 우두머리들은 익숙한 전리품을 업그레이드된 모습으로, 툴팁에 영웅 표시를 달고 떨어뜨리며, 매 공략의 마지막 우두머리는 다른 어디에서도 나오지 않는 영웅 등급 아이템을 더합니다. 그 마지막 처치는 참가자 전원에게 영웅의 징표도 남깁니다. 하이워치의 병참장교 벡스에게 쓰는 화폐로, 그가 갖춘 반지와 목걸이는 왕국의 유일한 장신구입니다.',
-  'guide.dungeonsPage.heroicLockoutBody':
-    '일반 던전은 하루 종일 돌 수 있습니다. 영웅은 인내를 요구합니다. 각 던전은 하루에 한 번의 영웅 클리어만 보상하고, 공격대는 난이도마다 하루 단위의 잠금을 유지합니다. 이미 끝낸 공략은 그 파티에게는 언제나 열려 있으므로, 스스로 얻어 낸 전리품에서 잠겨 나가는 사람은 없습니다.',
+    '봉인된 왕실 문 너머에 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 막아야 하는 불사의 힘. 입장 자격을 얻은 뒤, 친구 아홉을 데려오세요.',
   'guide.abilityHook.arcane_intellect':
     '지능을 높여 아군의 마나량을 늘려 줍니다. 전투를 시작하기 전에 시전하세요.',
   'guide.abilityHook.arcane_shot': '원거리에서 즉시 날리는 사격으로, 빠르게 추가 피해를 줍니다.',
@@ -5035,7 +4997,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.style': '방식',
   'guide.classPage.fullKitHeading': '전체 기술 구성',
   'guide.classPage.fullKitNote':
-    '이 직업이 레벨을 올리며 배우는 기술을, 사용 가능해지는 순서대로 정리했습니다. 특성은 몇 가지 능력을 더 내어 주고, 그중 어떤 것이 빌드의 중심이 될지를 결정합니다.',
+    '이 직업이 배울 수 있는 모든 기술을, 사용 가능해지는 순서대로 정리했습니다. 어떤 기술이 빌드의 중심이 될지는 특성이 결정합니다.',
   'guide.classPage.masteryLabel': '전문화',
   'guide.classPage.petsHeading': '악마',
   'guide.classPage.petsNote':
@@ -5043,7 +5005,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelBand': '{min}레벨에서 {max}레벨',
   'guide.dungeonsPage.partySize': '{n}인',
   'guide.faqPage.a10':
-    '최고 레벨은 {cap}레벨입니다. 그 이후로는 5인 던전과 10인 공격대를 진행하고, 영웅 난이도로 다시 도전해 업그레이드된 전리품을 노리며, 월드 보스가 깨어나면 맞서고, 투기장에서 실력을 시험하며, 동료를 곁에 두고 탐굴에 뛰어들고, 업적의 서에서 업적을 좇아 왕국 순위를 오릅니다.',
+    '최고 레벨은 {cap}레벨입니다. 그 이후로는 5인 던전과 10인 공격대를 진행하고, 더 좋은 장비를 모으며, 투기장에서 실력을 시험합니다.',
   'guide.faqPage.a11':
     '마주치는 누구든 파티에 초대하거나, 채팅으로 물어보거나, 던전 앞에서 팀을 꾸리세요. 세계 대부분은 혼자서도 진행할 수 있으므로, 파티 구성은 필수가 아니라 선택입니다.',
   'guide.faqPage.a9':
@@ -5150,12 +5112,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.intro':
     '특성은 직업을 자신만의 것으로 만드는 방법입니다. 선택은 자유롭고, 부담 없이 바꿀 수 있으므로 마음껏 시도해 볼 수 있습니다.',
   'guide.talentsPage.resetNote':
-    '특성은 전투 중이 아니고 투기장 경기 중이 아닐 때면 언제든 초기화할 수 있으므로, 초반의 선택이 발목을 잡는 일은 없습니다. 이것저것 시도해 보고, 마음에 드는 것을 찾고, 자유롭게 마음을 바꾸세요.',
+    '특성은 전투 중이 아닐 때면 언제든 초기화할 수 있으므로, 초반의 선택이 발목을 잡는 일은 없습니다. 이것저것 시도해 보고, 마음에 드는 것을 찾고, 자유롭게 마음을 바꾸세요.',
   'guide.talentsPage.resetTitle': '영구적인 것은 없습니다',
   'guide.talentsPage.shareNote':
     '완성한 특성 구성은 짧은 공유 코드로 복사해 친구에게 건넬 수 있고, 친구는 그 코드를 자신의 특성 창에 그대로 붙여 넣어 불러올 수 있습니다.',
   'guide.talentsPage.specsBody':
-    '모든 직업에는 몇 가지 전문화가 있으며, 각각 고유한 역할과 대표적인 특징을 지닙니다. 특성 창에서 하나를 선택하면 대표 능력과 그 전문화만의 지속되는 통달을 얻습니다. 여기 그 전체 윤곽을 정리했습니다. 전체 기술 구성은 직업을 열어 확인하세요.',
+    '모든 직업에는 몇 가지 전문화가 있으며, 각각 고유한 역할과 대표적인 특징을 지닙니다. 여기 그 전체 윤곽을 정리했습니다. 전체 기술 구성은 직업을 열어 확인하세요.',
   'guide.talentsPage.specsHeading': '직업별 전문화',
   'guide.talentsPage.whatBody':
     '레벨을 올리면 특성 점수를 얻어, 기술과 능력치를 작게 영구적으로 강화하는 데 투자합니다. 이 점수는 직업의 감각을 빚어내며, 더 강한 피해나 더 단단한 방어, 더 강력한 치유 쪽으로 기울입니다.',
@@ -5166,10 +5128,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 직업은 제 몫을 다하고 최고 레벨에 도달할 수 있습니다. 남이 최고라고 말하는 것이 아니라, 당신이 좋아하는 환상을 고르세요.',
   'guide.wishPage.i1Title': '잘못된 직업이란 없습니다',
   'guide.wishPage.i2Body':
-    '쓰러지면 가장 가까운 묘지에서 유령으로 일어납니다. 몸이 있는 곳으로 달려가면 아무 대가 없이 되살아나고, 영혼 치유사의 즉시 부활을 받으면 그 편리함의 값으로 잠시 가는 쇠약을 짊어집니다. 경험치도 장비도 동전도 결코 잃지 않으므로, 위험을 무릅쓰고 배워도 안전합니다.',
+    '쓰러지면 영혼을 풀어내 가장 가까운 묘지에서 되살아난 뒤, 원래 자리로 돌아가면 됩니다. 경험치는 잃지 않으므로, 위험을 무릅쓰고 배워도 안전합니다.',
   'guide.wishPage.i2Title': '죽어도 손해는 거의 없습니다',
   'guide.wishPage.i3Body':
-    '특성은 10레벨에 열리고 전투 중이 아니라면 원할 때 언제든 초기화되므로, 초반의 선택이 영구적인 일은 없습니다.',
+    '특성은 10레벨에 열리고 원할 때 언제든 초기화되므로, 초반의 선택이 영구적인 일은 없습니다.',
   'guide.wishPage.i3Title': '특성은 함정이 아닙니다',
   'guide.wishPage.i4Body':
     '퀘스트는 가장 빠르게 레벨을 올리는 방법이며 당신을 세계 곳곳으로 이끕니다. 어디로 가야 할지 모를 때는 다음 표식을 찾으세요.',
@@ -5250,7 +5212,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '받는 것도 똑같이 거꾸로 하면 됩니다. 어느 석주 앞에서든 편지를 읽고, 담긴 것을 지갑과 가방으로 옮기세요. 편지는 영원히 기다려 주지 않으니, 까마귀가 당신을 포기하기 전에 찾아가세요. 우편이 딱 잘라 거절하는 것이 둘 있습니다. 귀속 아이템과 퀘스트 물품은 당신과 함께 다니거나, 아예 다니지 않습니다. 그리고 보람찬 퀘스트 완료 뒤에는 석주를 눈여겨보세요. 편지를 쓰는 퀘스트 제공자들도 있으니까요.',
   'guide.economy.mailTitle': '레이븐포스트',
   'guide.economy.marketBody':
-    '상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 이스트브룩의 상인에게 말을 걸거나 하이워치의 경매인 보스에게 말을 걸어 열 수 있으며, 두 관리인 모두 하나의 공용 시장을 담당합니다. 상인은 자신의 물품도 상시 목록에 올려 두므로, 다른 플레이어가 아무것도 올리지 않았을 때에도 언제나 살 것이 있습니다.',
+    '상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 상인에게 말을 걸어 열어 보세요. 상인은 자신의 물품도 상시 목록에 올려 두므로, 다른 플레이어가 아무것도 올리지 않았을 때에도 언제나 살 것이 있습니다.',
   'guide.economy.marketBrowse':
     '둘러보기: 목록을 넘겨 보거나 이름으로 검색해 무엇이 매물로 나와 있는지 찾으세요. 각 매물에는 물품, 판매자, 그리고 묶음 전체의 호가가 표시됩니다.',
   'guide.economy.marketCollect':
@@ -5299,7 +5261,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     '장비는 캐릭터가 걸치는 장구이자 지니고 다니는 물건입니다. 더 좋은 장비는 강해지는 가장 꾸준한 길이며, 그 대부분은 그저 플레이하는 것만으로 손에 들어옵니다.',
   'guide.gear.itemLevelBody':
-    '두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 적과 퀘스트에서 세계를 누비며 얻은 장비에는 아이템 레벨이 표시되는데, 이는 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 업그레이드가 더 값어치 있는지 한눈에 알 수 있습니다. 그런 출처가 없는 물건, 이를테면 평범한 상인 기본품이나 초보용 장비에는 아이템 레벨이 표시되지 않으므로, 숫자가 없는 것은 결함이 아니라 정상입니다.',
+    '두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 그러면 무기와 방어구마다 아이템 레벨이 표시되는데, 이는 장비의 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 장비가 더 값어치 있는지 한눈에 알 수 있습니다.',
   'guide.gear.qualityBody':
     '모든 물건에는 품질이 있고, 한눈에 그 값어치를 읽을 수 있도록 이름이 그에 맞게 색으로 칠해집니다. 가장 흔한 것부터 가장 값진 것까지:',
   'guide.gear.qualityCommon': '일반',
@@ -5368,7 +5330,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.progression.capBody':
     '레벨이 오를 때마다 더 단단해지고 새 능력이 따라오며, 최고 레벨인 {cap}레벨까지 이어집니다.',
   'guide.progression.capJourneyBody':
-    '{cap}레벨이 최고 레벨입니다. 레벨업의 끝일 뿐, 성장의 끝은 아닙니다. 그곳에서부터는 던전과 공격대를 일반과 영웅 난이도로 진행하고, 월드 보스가 깨어나면 맞서며, 더 좋은 장비를 좇고, 투기장에서 실력을 시험합니다.',
+    '{cap}레벨이 한계, 즉 레벨업의 끝이지만 성장의 끝은 아닙니다. 그곳에서부터는 던전과 공격대를 누비고, 더 좋은 장비를 좇으며, 투기장에서 자신을 시험합니다.',
   'guide.progression.capTitle': '{cap}레벨에 이르기',
   'guide.progression.intro':
     '모든 전투와 퀘스트, 북쪽으로 내딛는 한 걸음 한 걸음이 당신의 영웅을 강하게 만듭니다. 레벨업이 어떻게 돌아가는지, 그리고 정점에 이른 뒤에도 무엇이 당신을 계속 성장하게 하는지 정리했습니다.',
@@ -5420,7 +5382,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '어떤 퀘스트는 북진을 앞두고 마을을 결집하게 합니다. 성문의 위협을 솎아 내고 수비대가 필요로 하는 것을 모으세요. 당신이 그 이야기 속에 함께 있는 사람들을 위한 처치와 수집 목표이며, 그들과 발맞춰 나아가게 해 줍니다.',
   'guide.questsPage.typeMusterTitle': '수비대 소집',
   'guide.questsPage.typeSlayBody':
-    '정해진 수의 표적 적을 물리쳐 짐승 무리를 솎아내거나 교단의 손아귀를 무너뜨리세요. 여러분의 첫 퀘스트 중 하나인 이스트브룩 길의 늑대 처치도 이런 종류입니다.',
+    '정해진 수의 표적 적을 물리쳐 짐승 무리를 솎아내거나 교단의 손아귀를 무너뜨리세요. 게임의 첫 퀘스트인 동부개울 길의 늑대 처치도 이런 종류입니다.',
   'guide.questsPage.typeSlayTitle': '처치',
   'guide.questsPage.typesBody':
     '대부분의 퀘스트는 익숙한 몇 가지 형태 중 하나입니다. 화면의 추적 창이 각각 무엇을 원하는지 정확히 일러 주므로, 헤맬 일이 없습니다.',
@@ -5430,7 +5392,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '온라인에 접속한 모두에게 닿는, 서버 전역에서 늘 켜져 있는 채널로, 질문을 던지거나 이런저런 이야기를 나누기 좋습니다. 세계 채널이나 파티 찾기 채널과 달리, 따로 참여를 신청할 필요가 전혀 없습니다.',
   'guide.social.chanGuild': '길드와 장교.',
   'guide.social.chanGuildBody':
-    '길드를 위한 채널입니다. 길드 채팅은 모든 구성원에게 닿고, 장교 채널은 장교와 길드장을 위한 것입니다.',
+    '길드를 위한 채널입니다. 길드 채팅은 모든 구성원에게 닿고, 장교 채널은 장교들만을 위한 것입니다.',
   'guide.social.chanLfg': '파티 찾기.',
   'guide.social.chanLfgBody':
     '던전을 함께 돌 사람을 찾기 위한, 선택 참여형 렐름 전체 채널입니다. 해당 탭을 열어 참여하세요.',
@@ -5472,7 +5434,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '처치로 얻은 돈은 줍는 사람에게 가거나, 파티 전원에게 고르게 나뉠 수 있습니다.',
   'guide.social.lootCoinTitle': '동전.',
   'guide.social.lootCommonBody':
-    '평범한 전리품은 파티 안에서 차례로 돌아가거나 줍는 사람에게 가고, 더 좋은 전리품은 입찰에 부쳐 모두가 공정한 기회를 갖게 합니다.',
+    '평범한 전리품은 줍는 사람에게 가고, 더 좋은 전리품은 입찰에 부쳐 모두가 공정한 기회를 갖게 할 수 있습니다.',
   'guide.social.lootCommonTitle': '물품.',
   'guide.social.lootHeading': '파티 전리품',
   'guide.social.lootMasterBody':
@@ -5481,9 +5443,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.lootRollBody':
     '물품이 입찰에 부쳐지면, 자격 있는 구성원은 저마다 원하면 입찰을, 남는 것만 받겠다면 가치 입찰을, 빠지겠다면 포기를 고릅니다. 가장 높은 수를 낸 사람이 가져갑니다.',
   'guide.social.lootRollTitle': '입찰, 가치 입찰, 또는 포기.',
-  'guide.social.markersBody':
-    '파티에서는 적대적인 생명체를 마우스 오른쪽 버튼으로 눌러 여덟 가지 공격대 징표 중 하나를 씌울 수 있습니다. 징표는 누구나 달 수 있고, 각 징표는 한 번에 한 대상에게만 붙으며, 같은 징표를 그 대상에게 다시 달면 지워집니다. 처치 순서든, 군중 제어 분담이든, 그저 "이놈 먼저"든, 문장보다 징표가 더 빨리 전해집니다.',
-  'guide.social.markersHeading': '대상 징표',
   'guide.social.partyBody':
     '다른 플레이어를 초대하려면 그 이름을 마우스 오른쪽 버튼으로 누른 뒤 초대를 고르세요. 파티는 최대 다섯 명까지이며, 그중 한 명이 파티장입니다.',
   'guide.social.partyCredit':
@@ -5491,9 +5450,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.social.partyHeading': '파티 맺기',
   'guide.social.raidBody':
     '다섯 명으로 파티가 가득 차면, 파티장은 최종 단계 공격대를 위해 그것을 최대 열 명의 공격대로 전환할 수 있습니다.',
-  'guide.social.readyBody':
-    '큰 풀링을 앞두고 파티장은 /ready를 입력해 모두에게 물을 수 있습니다. 나머지 모두에게 준비 완료 또는 준비 안 됨을 묻는 창이 뜨고, 전원이 답하거나 30초가 지나면 파티 전체가 그 집계를 하나의 요약으로 봅니다. 누구도 지목당하지 않습니다. 핵심은 숫자이지, 범인이 아니니까요.',
-  'guide.social.readyHeading': '준비 확인',
   'guide.stats.agiBody':
     '민첩성은 여러 방식으로 당신을 날카롭게 합니다. 치명타 명중 확률과 회피 확률을 올리고, 약간의 방어도를 더합니다. 도적과 사냥꾼에게는 공격력에도 보태지며, 사냥꾼의 원거리 사격을 좌우합니다.',
   'guide.stats.agiTitle': '민첩성',
@@ -5504,7 +5460,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '방어도는 받는 물리 피해를 줄여 줍니다. 대부분 착용한 장비에서 나오며, 중장갑 직업일수록 훨씬 많이 지닙니다. 자신과 비슷한 레벨의 적을 상대로 방어도가 높으면, 그 적의 공격 하나하나가 더 무르게 박힙니다.',
   'guide.stats.armorTitle': '방어도',
   'guide.stats.critBody':
-    '치명타 확률은 공격이 추가 피해를 입히며 박히는 빈도입니다. 누구나 작은 기본 확률로 시작하며, 민첩성(그리고 일부 특성과 장비)이 그 위에 쌓아 올립니다. 캐릭터 정보 창에는 그 확률 자체와, 장비가 거기에 보태는 치명타 등급이 함께 표시됩니다.',
+    '치명타 확률은 공격이 추가 피해를 입히며 박히는 빈도입니다. 누구나 작은 기본 확률로 시작하며, 민첩성(그리고 일부 특성과 장비)이 그 위에 쌓아 올립니다.',
   'guide.stats.critTitle': '치명타',
   'guide.stats.dodgeBody':
     '회피는 들어오는 근접 공격을 통째로 피해 낼 확률입니다. 작은 기본 확률로 시작하며 민첩성이 이를 올려 주므로, 날쌘 직업일수록 더 많은 공격을 흘려보냅니다.',
@@ -5533,7 +5489,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문력은 시전자에게 공격력에 해당하는 능력치로, 당신의 주문이 입히는 피해를 높여 줍니다. 지능이 주문력을 키우고, 시전자 장비와 강화 효과가 그 위에 더해지므로, 주문 시전자는 근접 전사가 공격력을 살피듯 주문력을 살핍니다.',
   'guide.stats.spTitle': '주문력',
   'guide.stats.spiBody':
-    '정신력은 시전자가 시전을 멈출 때마다, 다시 말해 전투 사이 대부분의 시간에 마나가 얼마나 빠르게 돌아오는지를 다스립니다. 지능과 마찬가지로 마나 직업에게 쓸모 있고 다른 직업에게는 별 의미가 없습니다.',
+    '정신력은 전투 밖에서 시전자의 마나가 얼마나 빠르게 돌아오는지를 다스립니다. 지능과 마찬가지로 마나 직업에게 쓸모 있고 다른 직업에게는 별 의미가 없습니다.',
   'guide.stats.spiTitle': '정신력',
   'guide.stats.staBody':
     '체력은 당신의 버티는 힘입니다. 체력이 높을수록 생명력 양이 커지고, 전투 밖에서 쉬는 동안 회복하는 생명력도 빨라집니다. 모든 직업이 어느 정도 원하는 능력치입니다.',
@@ -5935,7 +5891,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus4':
     '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
-  'hudChrome.itemSoulbound': '귀속',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
@@ -6672,7 +6627,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '원형을 선언하는 것은 하나의 이야기 장면이 될 것이다: 그 정체성으로 당신을 공식적으로 받아들이는 퀘스트다. 그 길은 아직 만들어지는 중이므로, 지금은 모든 캐릭터가 그 선택을 앞에 둔 채 세계를 걷고 있으며, 그동안 모든 제작은 희귀 품질 등급까지 나아간다.',
   'guide.professions.archetypeSwitchTitle': '마음을 바꾸기',
   'guide.professions.archetypeSwitchBody':
-    '선언이 종신형이 되는 일도 없을 것이다. 계획은 새 원형을 받아들이기 전에 옛 전문직에 속죄하는 반복 가능한 절차이며, 바꿀 때마다 그 속죄는 조금씩 더 무거워져, 선택이 대가 없는 것이 아니라 늘 의미 있는 것으로 남는다. 선언 그 자체와 마찬가지로, 이 역시 아직 오는 중이다.',
+    "한 번 원형을 선언했다고 해서 영원히 그것에 묶이는 것은 아니다. 다른 원형으로 바꾸려면 먼저 옛 원형을 위한 반복 가능한 '속죄' 퀘스트를 완료해야 하며, 바꿀 때마다 다음번에 요구되는 속죄는 조금씩 더 무거워진다. 그래서 전환은 항상 의미가 있으며 대가 없이 이루어지지 않는다.",
   'guide.professions.archetypeIdentityTitle': '당신의 원형이 의미하는 것',
   'guide.professions.archetypeIdentityBody':
     '당신의 현재 원형은 이 세계에서 당신의 캐릭터가 누구인지에 대한 선언이며, 다른 이들과 세계가 당신을 부르는 방식에 반영된다. 그에 따르는 구체적인 보상과 인정은 아직 다듬어지는 중이다. 시스템이 채워지는 대로 다시 확인해 보라.',
@@ -6898,9 +6853,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '패배! 아군 Yumi가 쓰러졌습니다.',
   'hudChrome.crafting.comboRequirementUnmet':
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
-  'hudChrome.crafting.notAtHub': '그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.',
-  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
   'hudChrome.mobile.actionPageIndicator': '{page}페이지',
   'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
@@ -7064,7 +7016,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.valeCupPage.nationCopperdig': '구리빛과 갈색, 곡괭이와 함께: 쉬지 않고 달리는 광부들.',
   'guide.valeCupPage.rolesHeading': '포지션',
   'guide.valeCupPage.rolesBody':
-    '포지션이 경기장에 들고 갈 키트를 정합니다. 누구나 공을 찹니다. 나머지는 기질의 문제입니다. 1인전과 2인전 구간에서는 모두가 만능 키트로 뛰므로, 포지션 선택은 3인전부터 비로소 제 몫을 합니다.',
+    '포지션이 경기장에 들고 갈 키트를 정합니다. 누구나 공을 찹니다. 나머지는 기질의 문제입니다.',
   'guide.valeCupPage.rewardsHeading': '휴전 규칙',
   'guide.valeCupPage.rewardsBody':
     '휴전 규칙이란 경험치도 전리품도 없다는 뜻입니다. 승부가 난 경기는 전적과 우승자 명판에 기록되고, 승리는 그날의 보상 과제에도 포함됩니다. 경기를 버리면 자리가 비고, 경기장 관리인은 그것을 기억합니다.',
@@ -7078,18 +7030,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.groundskeeper_bram.title': '소우필드의 관리인',
   'entities.npcs.groundskeeper_bram.greeting':
     '소우필드에서는 휴전이 지켜지고 있소, {className}. 발과 어깨만 쓸 수 있소. 구리 들통을 걸고 한판 하겠소?',
-  'entities.npcs.chronicler_saul.name': '연대기 기록관 사울',
-  'entities.npcs.chronicler_saul.title': '이스트브룩 골짜기 연대기',
-  'entities.npcs.chronicler_saul.greeting':
-    '할 가치가 있는 일은 두 번 적을 가치가 있지, {playerName}. 한 번은 장부에, 한 번은 난롯가 이야기로 말일세.',
-  'entities.npcs.chronicler_osric_fenn.name': '연대기 기록관 오스릭 펜',
-  'entities.npcs.chronicler_osric_fenn.title': '마이어펜 습지 연대기',
-  'entities.npcs.chronicler_osric_fenn.greeting':
-    '책장이 눅눅해지지 않게 조심하게, {playerName}. 늪은 독자보다 훨씬 많은 책을 삼킨다네.',
-  'entities.npcs.chronicler_edda_hartwell.name': '연대기 기록관 젠지',
-  'entities.npcs.chronicler_edda_hartwell.title': '쏜피크 고지 연대기',
-  'entities.npcs.chronicler_edda_hartwell.greeting':
-    '산은 아무것도 잊지 않네, {playerName}. 나도 마찬가지지. 자네가 이룬 일을 보여 주게.',
   'entities.zones.eastbrook_vale.pois.10.label': '소우필드',
   'entities.abilities.sport_kick.name': '킥',
   'entities.abilities.sport_kick.description': '조준 지점을 향해 공을 땅볼로 차 보냅니다.',
@@ -7129,49 +7069,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.bursar_aldous_crane.title': '도금 금고',
   'entities.npcs.bursar_aldous_crane.greeting':
     '어떤 상자든, 금궤든, 장신구든 도금 금고에 맡기시면 안전합니다.',
-  'entities.items.furyforged_warhelm.name': '분노벼림 전투투구',
-  'entities.items.furyforged_warspaulders.name': '분노벼림 전투어깨갑옷',
-  'entities.items.furyforged_warplate.name': '분노벼림 전투흉갑',
-  'entities.items.furyforged_girdle.name': '분노벼림 요대',
-  'entities.items.furyforged_legguards.name': '분노벼림 다리보호대',
-  'entities.items.furyforged_gauntlets.name': '분노벼림 건틀릿',
-  'entities.items.furyforged_sabatons.name': '분노벼림 전투장화',
-  'entities.items.stormbound_crown.name': '폭풍결속 왕관',
-  'entities.items.stormbound_spaulders.name': '폭풍결속 어깨갑옷',
-  'entities.items.stormbound_hauberk.name': '폭풍결속 사슬갑옷',
-  'entities.items.stormbound_waistguard.name': '폭풍결속 허리보호대',
-  'entities.items.stormbound_legmail.name': '폭풍결속 다리사슬갑옷',
-  'entities.items.stormbound_handguards.name': '폭풍결속 손보호대',
-  'entities.items.stormbound_greaves.name': '폭풍결속 경갑',
-  'entities.items.ashstalker_cowl.name': '잿빛추적자 두건',
-  'entities.items.ashstalker_shoulderguards.name': '잿빛추적자 어깨보호대',
-  'entities.items.ashstalker_harness.name': '잿빛추적자 멜빵갑옷',
-  'entities.items.ashstalker_waistband.name': '잿빛추적자 허리띠',
-  'entities.items.ashstalker_legguards.name': '잿빛추적자 다리보호대',
-  'entities.items.ashstalker_grips.name': '잿빛추적자 장갑',
-  'entities.items.ashstalker_treads.name': '잿빛추적자 발덮개',
-  'entities.items.cinderweave_cowl.name': '불씨매듭 두건',
-  'entities.items.cinderweave_mantle.name': '불씨매듭 어깨망토',
-  'entities.items.cinderweave_raiment.name': '불씨매듭 예복',
-  'entities.items.cinderweave_cord.name': '불씨매듭 장식끈',
-  'entities.items.cinderweave_legwraps.name': '불씨매듭 다리싸개',
-  'entities.items.cinderweave_handwraps.name': '불씨매듭 손싸개',
-  'entities.items.cinderweave_slippers.name': '불씨매듭 덧신',
-  'entities.items.final_oath_medallion.name': '최후의 맹세 메달',
-  'entities.items.razorwind_torque.name': '칼바람 목가리개',
-  'entities.items.cinder_sigil_pendant.name': '불씨 인장 목걸이',
-  'entities.items.iron_vow_band.name': '강철 맹세의 반지',
-  'entities.items.unbroken_circle.name': '깨지지 않는 고리',
-  'entities.items.fleetblood_band.name': '쾌혈의 반지',
-  'entities.items.last_step_signet.name': '마지막 걸음의 인장',
-  'entities.items.ashen_focus_ring.name': '잿빛 집중의 반지',
-  'entities.items.spellbreakers_seal.name': '주문파괴자의 인장',
-  'entities.items.final_argument_greatblade.name': '최후 논박의 대검',
-  'entities.items.first_blood_razor.name': '첫 피의 면도날',
-  'entities.items.emberglass_warstaff.name': '불씨유리 전투지팡이',
-  'entities.npcs.fury.name': '퓨리',
-  'entities.npcs.fury.title': '명예 병참장교',
-  'entities.npcs.fury.greeting': '전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라.',
   'guide.economy.bankBody':
     '모든 거점 마을에는 이 땅의 은행 상회인 도금 금고의 지점이 있습니다. 그곳의 출납관에게 말을 걸면 자신의 금고가 열립니다. 가방과는 별개인 개인 보관 공간으로, 캐릭터가 평생 유지합니다. 맡겨 둔 물건은 다음에 어느 지점을 찾아가도 안전하게 기다리고 있습니다.',
   'guide.economy.bankHow':

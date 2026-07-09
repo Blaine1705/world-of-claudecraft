@@ -603,10 +603,6 @@ export interface SimContextCallbacks {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
-      onDealt?: (amount: number) => void;
-      // Emboldened (combat/sure_crit.ts): override the connected swing's crit
-      // OUTCOME; the crit rng inside meleeSwing is still drawn as before.
-      forceCrit?: boolean;
       damageMult?: number;
     },
   ): boolean;

@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "323b0b19",
-      "events": "94d1c02a",
+      "nextId": 410,
+      "state": "874d2223",
+      "events": "d640aaf1",
       "rng": {
         "draws": 5,
         "digest": "ca7bbe9c"
@@ -142,6 +142,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -198,6 +199,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -264,6 +266,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -330,6 +333,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -371,6 +375,7 @@
             "armor": 56
           },
           "templateId": "wild_boar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -382,9 +387,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "2527546b",
-      "events": "e3b41027",
+      "nextId": 411,
+      "state": "8563966b",
+      "events": "1c970bc0",
       "rng": {
         "draws": 8,
         "digest": "cac7cfb2"
@@ -501,6 +506,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -557,6 +563,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -623,6 +630,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -689,6 +697,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -730,6 +739,7 @@
             "armor": 56
           },
           "templateId": "wild_boar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -783,6 +793,7 @@
           },
           "tappedById": 408,
           "templateId": "bog_bloat",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 31,
             "min": 20,
@@ -794,9 +805,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "c1df6729",
-      "events": "c3f1be7f",
+      "nextId": 411,
+      "state": "e8014f23",
+      "events": "e6546e7c",
       "rng": {
         "draws": 9,
         "digest": "88aac2f9"
@@ -898,7 +909,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.2,
+          "resource": 1,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -915,6 +926,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -971,6 +983,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1037,6 +1050,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1103,6 +1117,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1144,6 +1159,7 @@
             "armor": 56
           },
           "templateId": "wild_boar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -1197,6 +1213,7 @@
           },
           "tappedById": 408,
           "templateId": "bog_bloat",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 31,
             "min": 20,
@@ -1208,9 +1225,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 412,
-      "state": "ab88261b",
-      "events": "c58939ee",
+      "nextId": 413,
+      "state": "0e501c40",
+      "events": "25f1ab05",
       "rng": {
         "draws": 15,
         "digest": "ca70052b"
@@ -1312,7 +1329,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.2,
+          "resource": 1,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1329,6 +1346,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1385,6 +1403,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1451,6 +1470,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1517,6 +1537,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1558,6 +1579,7 @@
             "armor": 56
           },
           "templateId": "wild_boar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -1611,6 +1633,7 @@
           },
           "tappedById": 408,
           "templateId": "bog_bloat",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 31,
             "min": 20,
@@ -1653,6 +1676,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 3.932005,
           "weapon": {
             "max": 12,
@@ -1665,9 +1689,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 413,
-      "state": "dd149edb",
-      "events": "b49e1a0a",
+      "nextId": 414,
+      "state": "53439145",
+      "events": "38ff1b69",
       "rng": {
         "draws": 20,
         "digest": "e612091c"
@@ -1773,7 +1797,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.2,
+          "resource": 1,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1790,6 +1814,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1846,6 +1871,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1912,6 +1938,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1978,6 +2005,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2019,6 +2047,7 @@
             "armor": 56
           },
           "templateId": "wild_boar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -2072,6 +2101,7 @@
           },
           "tappedById": 408,
           "templateId": "bog_bloat",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 31,
             "min": 20,
@@ -2114,6 +2144,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 3.932005,
           "weapon": {
             "max": 12,
@@ -2176,6 +2207,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2187,8 +2219,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "fce8cd1a",
+      "nextId": 414,
+      "state": "53439145",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2295,7 +2327,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1.2,
+          "resource": 1,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2312,6 +2344,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2368,6 +2401,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2434,6 +2468,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2500,6 +2535,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2541,6 +2577,7 @@
             "armor": 56
           },
           "templateId": "wild_boar",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 14,
             "min": 9,
@@ -2594,6 +2631,7 @@
           },
           "tappedById": 408,
           "templateId": "bog_bloat",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 31,
             "min": 20,
@@ -2636,6 +2674,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTimer": 3.932005,
           "weapon": {
             "max": 12,
@@ -2698,6 +2737,7 @@
           },
           "tappedById": 408,
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,

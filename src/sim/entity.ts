@@ -101,6 +101,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     comboPoints: 0,
     comboUntil: -1,
     overpowerUntil: -1,
+    victoryRushUntil: -1,
+    battleRhythmCounter: 0,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
     savedMana: 0,
@@ -308,7 +310,7 @@ export function recalcPlayerStats(
   let staPct = 0;
   let buffArmorPct = 0;
   let buffApPct = 0;
-  let maxHpPctAura = 0; // Rallying Cry: summed buff_maxhp_pct fractions
+  let buffCrit = 0;
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     else if (a.kind === 'buff_ap_pct') bonusApPct += pctValue(a.value);
@@ -341,22 +343,7 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
-    // Die by the Sword: its "+100% parry" is modelled as a big dodge boost.
-    else if (a.kind === 'die_by_sword') bonusDodge += DIE_BY_SWORD_DODGE;
-    // Choice-row talent buffs: additive crit chance while worn. buff_crit is the
-    // generic kind (its value scales with the aura's stacks); buff_reckless carries
-    // Recklessness' +20% crit half (its rage half lives in rageGenAuraMult); a
-    // bloodbath aura's value is its per-stack crit times the current stacks. Expiry
-    // re-runs this recalc via the statsDirty pass in combat/auras.ts, so each bonus
-    // falls off with its aura.
-    else if (a.kind === 'buff_crit') bonusCrit += a.value * (a.stacks ?? 1);
-    else if (a.kind === 'buff_reckless' || a.kind === 'bloodbath') bonusCrit += a.value;
-    // Berserker Stance (Fury): a flat additive crit-chance bonus while worn. Its
-    // crit-DAMAGE half lives in combat/damage.ts (berserkerCritDamage).
-    else if (a.kind === 'berserker_stance') bonusCrit += BERSERKER_CRIT_CHANCE;
-    // Fury Enrage: +25% haste while worn, folded into the real haste stat below so
-    // it speeds swings AND casts and shows in the Haste stat (never touches GCD).
-    else if (a.kind === 'enrage') bonusHaste += ENRAGE_HASTE_PCT;
+    else if (a.kind === 'buff_crit') buffCrit += a.value * (a.stacks ?? 1);
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
@@ -510,7 +497,13 @@ export function recalcPlayerStats(
   // caster spec can shorten every cast; the cast-time tooltips read the same total.
   e.spellHaste = setEff.haste + (mods?.global.spellHastePct ?? 0);
   // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
+  e.critChance =
+    0.05 +
+    s.agi * 0.0005 +
+    (mods?.stats.crit ?? 0) +
+    setEff.crit +
+    buffCrit +
+    critFractionFromRating(e.critRating);
   // Extra crit damage from a spec mastery (e.g. Fire mage: spell crits deal double).
   e.critDmgBonus = mods?.global.critDmgPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;

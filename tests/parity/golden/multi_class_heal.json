@@ -33,9 +33,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
-      "state": "296f9b1d",
-      "events": "36482172",
+      "nextId": 414,
+      "state": "2864ec00",
+      "events": "9b8485f8",
       "rng": {
         "draws": 6,
         "digest": "e9e34462"
@@ -347,6 +347,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -397,6 +398,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -459,6 +461,7 @@
             "str": 15
           },
           "templateId": "druid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -509,6 +512,7 @@
             "str": 18
           },
           "templateId": "shaman",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -570,6 +574,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -611,6 +616,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -660,7 +666,125 @@
             ],
             [
               409,
+              10
+            ]
+          ],
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 12,
+            "min": 8,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -1.48336,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 50000,
+          "id": 412,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 5,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -90,
+            "y": -1.48336,
+            "z": 90
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -90,
+            "y": -1.48336,
+            "z": 90
+          },
+          "stats": {
+            "armor": 40
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              405,
+              115.666667
+            ],
+            [
+              406,
               200
+            ],
+            [
+              407,
+              87.5
+            ],
+            [
+              409,
+              10
+            ]
+          ],
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 12,
+            "min": 8,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -1.48336,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 50000,
+          "id": 413,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 5,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 90,
+            "y": -1.48336,
+            "z": -90
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 90,
+            "y": -1.48336,
+            "z": -90
+          },
+          "stats": {
+            "armor": 40
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              405,
+              115.666667
+            ],
+            [
+              406,
+              200
+            ],
+            [
+              407,
+              87.5
             ],
             [
               410,
@@ -791,6 +915,7 @@
               10
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -802,9 +927,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 413,
-      "state": "aa7e9900",
-      "events": "c34d6314",
+      "nextId": 414,
+      "state": "cfcd51e6",
+      "events": "6bf4315e",
       "rng": {
         "draws": 6,
         "digest": "e9e34462"
@@ -1121,6 +1246,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1171,6 +1297,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1233,6 +1360,7 @@
             "str": 15
           },
           "templateId": "druid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1283,6 +1411,7 @@
             "str": 18
           },
           "templateId": "shaman",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1344,6 +1473,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1385,6 +1515,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1452,7 +1583,125 @@
             ],
             [
               409,
+              10
+            ]
+          ],
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 12,
+            "min": 8,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -1.48336,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 50000,
+          "id": 412,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 5,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -90,
+            "y": -1.48336,
+            "z": 90
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": -90,
+            "y": -1.48336,
+            "z": 90
+          },
+          "stats": {
+            "armor": 40
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              405,
+              115.666667
+            ],
+            [
+              406,
               200
+            ],
+            [
+              407,
+              87.5
+            ],
+            [
+              409,
+              10
+            ]
+          ],
+          "victoryRushUntil": -1,
+          "weapon": {
+            "max": 12,
+            "min": 8,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": -1.48336,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 50000,
+          "id": 413,
+          "inCombat": true,
+          "kind": "mob",
+          "level": 5,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 90,
+            "y": -1.48336,
+            "z": -90
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 90,
+            "y": -1.48336,
+            "z": -90
+          },
+          "stats": {
+            "armor": 40
+          },
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              405,
+              115.666667
+            ],
+            [
+              406,
+              200
+            ],
+            [
+              407,
+              87.5
             ],
             [
               410,
@@ -1583,6 +1832,7 @@
               10
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1594,9 +1844,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 409,
-      "state": "0f949cae",
-      "events": "fb83a59d",
+      "nextId": 414,
+      "state": "4f575ee9",
+      "events": "cc157a1d",
       "rng": {
         "draws": 10,
         "digest": "fce7a45d"
@@ -1605,9 +1855,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 409,
-      "state": "fb49c414",
-      "events": "fb83a59d",
+      "nextId": 414,
+      "state": "136090ef",
+      "events": "cc157a1d",
       "rng": {
         "draws": 10,
         "digest": "fce7a45d"
@@ -1924,6 +2174,7 @@
             "str": 10
           },
           "templateId": "priest",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1974,6 +2225,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2037,6 +2289,7 @@
             "str": 15
           },
           "templateId": "druid",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2087,6 +2340,7 @@
             "str": 18
           },
           "templateId": "shaman",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2160,6 +2414,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2202,6 +2457,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2282,6 +2538,7 @@
               10
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2343,6 +2600,7 @@
               10
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": -82.543054,
             "y": -8.5,
@@ -2410,6 +2668,7 @@
               10
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": 94.87499,
             "y": -3.24435,

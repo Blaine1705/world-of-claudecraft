@@ -49,20 +49,30 @@ function dealDamage(sim: Sim, source: Entity | null, target: Entity, amount: num
 describe('Blaine1705 warrior row mechanics', () => {
   it('Twin Onrush resolves to two stored Onrush uses', () => {
     const { sim } = rig({ 5: 'war_r5_twin_onrush' });
-    // Twin Onrush arms one bonus stored use; the resolved ability exposes it as a
-    // total charge count of 2 (base 1 + talent).
-    expect(sim.resolvedAbility('charge')?.charges).toBe(2);
+    expect(sim.resolvedAbility('charge')?.bonusCharges).toBe(1);
   });
 
-  it('Red Harvest stacks apply on credited kills', () => {
-    const { sim, p } = rig({ 17: 'war_r17_red_harvest' });
+  it('Rallying Breath heals below 35 percent on the regen cadence', () => {
+    const { sim, p } = rig({ 8: 'war_r8_rallying_breath' });
+    p.hp = Math.floor(p.maxHp * 0.3);
+    p.inCombat = true;
+    for (let i = 0; i < 40; i++) sim.tick();
+    expect(p.hp).toBeGreaterThan(Math.floor(p.maxHp * 0.3));
+  });
+
+  it('Triumph Rush kill window and Red Harvest stacks apply on credited kills', () => {
+    const { sim, p } = rig({
+      8: 'war_r8_triumph_rush',
+      17: 'war_r17_red_harvest',
+    });
     const first = addMob(sim, 10);
     dealDamage(sim, p, first, 20);
-    expect(p.auras.find((a) => a.id === 'bloodbath')?.stacks).toBe(1);
+    expect(p.victoryRushUntil).toBeGreaterThan(sim.time);
+    expect(p.auras.find((a) => a.id === 'war_bloodbath_dmg')?.stacks).toBe(1);
 
     const second = addMob(sim, 10);
     dealDamage(sim, p, second, 20);
-    expect(p.auras.find((a) => a.id === 'bloodbath')?.stacks).toBe(2);
+    expect(p.auras.find((a) => a.id === 'war_bloodbath_dmg')?.stacks).toBe(2);
   });
 
   it('area echo and sure-crit charges consume deterministically without rng', () => {

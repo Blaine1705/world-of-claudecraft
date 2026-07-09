@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 402,
-      "state": "e701e112",
-      "events": "f97d10ae",
+      "nextId": 407,
+      "state": "d68c696a",
+      "events": "10366efa",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 402,
-      "state": "16b68e1e",
-      "events": "485835de",
+      "nextId": 407,
+      "state": "e4e3440a",
+      "events": "084c2ae4",
       "rng": {
         "draws": 34,
         "digest": "a750ddeb"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 402,
-      "state": "5d375116",
-      "events": "154b31fe",
+      "nextId": 407,
+      "state": "6bb7f89e",
+      "events": "0166c11c",
       "rng": {
         "draws": 134,
         "digest": "e12cceee"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 402,
-      "state": "c45a2c92",
-      "events": "cedd0946",
+      "nextId": 407,
+      "state": "c8b7251a",
+      "events": "d8f42c8c",
       "rng": {
         "draws": 254,
         "digest": "07655741"
@@ -72,9 +72,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 406,
-      "state": "1f5d8df5",
-      "events": "40c7f2cb",
+      "nextId": 407,
+      "state": "dc7d7e11",
+      "events": "a0fde7ac",
       "rng": {
         "draws": 384,
         "digest": "9a9a7293"
@@ -83,8 +83,8 @@
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 402,
-      "state": "935554b1",
+      "nextId": 407,
+      "state": "a4f009cd",
       "events": "741638a5",
       "rng": {
         "draws": 483,
@@ -275,6 +275,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -324,6 +325,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,

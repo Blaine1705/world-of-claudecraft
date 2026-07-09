@@ -6366,8 +6366,8 @@ export const ja_JP: EnTranslations = {
         "description": "野生の力で周囲の味方を鼓舞し、攻撃力を高める。効果時間 5 分。（ハンタータレント）"
       },
       "avatar": {
-        "name": "巨像",
-        "description": "巨像と化し、攻撃力を高める。効果時間 20 秒。（ウォリアータレント）"
+        "name": "巨像化",
+        "description": "操作不能効果を解除して巨像となり、20秒間、与えるダメージが20%増加します。（ウォリアータレント）"
       },
       "avenging_wrath": {
         "name": "復讐の翼",
@@ -6379,7 +6379,31 @@ export const ja_JP: EnTranslations = {
       },
       "bladestorm": {
         "name": "鋼の旋風",
-        "description": "鋼鉄の嵐と化し、毎秒周囲の敵に {damage} のダメージを与える。（ウォリアータレント）"
+        "description": "鋼の旋風となり、毎秒周囲の敵を攻撃して {damage} のダメージを与えます。（ウォリアータレント）"
+      },
+      "swordguard": {
+        "name": "剣の守り",
+        "description": "8秒間、受けるダメージが10%減少します。体力が30%未満なら20%減少します。（ウォリアータレント）"
+      },
+      "triumph_rush": {
+        "name": "凱旋突撃",
+        "description": "敵を倒した後20秒以内に、武器ダメージに {damage} を加えて与え、最大体力の20%を回復します。（ウォリアータレント）"
+      },
+      "razor_howl": {
+        "name": "刃の咆哮",
+        "description": "15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）"
+      },
+      "stormthrow": {
+        "name": "嵐投げ",
+        "description": "武器を投げ、対象を3秒間スタンさせます。（ウォリアータレント）"
+      },
+      "reckless_vow": {
+        "name": "無謀の誓い",
+        "description": "12秒間、怒り生成が50%、クリティカル率が20%増加します。（ウォリアータレント）"
+      },
+      "red_banner": {
+        "name": "赤旗",
+        "description": "20秒間、自分と周囲の味方の攻撃速度とダメージがそれぞれ10%増加します。（ウォリアータレント）"
       },
       "blink": {
         "name": "瞬き歩み",

@@ -36,10 +36,17 @@ import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
+import {
+  abilityQualifiesForAreaEcho,
+  consumeAreaEchoCharge,
+  echoAreaDamage,
+  hasAreaEchoAura,
+} from './area_echo';
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 // repositionToAim sweep tuning (harvested from PR #1348): the leap walks the
@@ -174,32 +181,14 @@ export function runEffects(
   const isSpell = ability.school !== 'physical';
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
-  // Talent-modifier snapshot for this cast (PTR): consumed by the directDamage
-  // crit/rooted reads, the fear break threshold, etc.
   const mods = ctx.playerMods(meta);
-  // Set by the weaponStrike/directDamage cases when an echo-eligible cast
-  // actually dealt single-target hostile damage; gates the charge consumption
-  // after the loop (a fully whiffed cast keeps its charge).
-  let areaEchoDealt = false;
-  // Sweeping Strikes (Arms): a worn window makes each single-target strike clip
-  // one nearby enemy for 75%. Aura-driven (no charge), resolved once per cast
-  // like the echo. SWEEP_MULT is the reduced fraction.
-  const SWEEP_MULT = 0.75;
-  const sweeping = hasSweepingStrikes(p) && abilityQualifiesForAreaEcho(ability.effects);
-  // Emboldened (combat/sure_crit.ts): resolved ONCE per cast, so a
-  // multi-strike cast (Red Harvest) crits every strike and spends a single
-  // charge below. Each crit-roll site still draws its rng exactly as before
-  // (the stream position never moves); the flag only overrides the outcome.
-  // `sureCritRolled` is set where a crit roll actually happened, so a fully
-  // whiffed cast or a cast with no crit roll (pure buffs, plain AoE) never
-  // spends a charge.
-  const sureCrit = hasSureCritAura(p);
-  let sureCritRolled = false;
-  // Frost mage (combat/frost_mage.ts): resolved ONCE per cast, like the sure
-  // crit above, so a multi-hit cast shares one frozen resolution and spends at
-  // most one Fingers of Frost stack / Winter's Chill charge. Inert (and free)
-  // for everyone who is not a committed-frost mage. Deterministic, no rng.
-  const frozen = resolveFrozenCast(ctx, p, meta, ability, target);
+  const rhythmActive = mods.global.battleRhythm > 0 && ++p.battleRhythmCounter % 3 === 0;
+  const castDamageMult = rhythmActive ? 1.05 : 1;
+  const castResourceMult = rhythmActive ? 1.2 : 1;
+  const forceCrit = hasSureCritAura(p);
+  const canAreaEcho = hasAreaEchoAura(p) && abilityQualifiesForAreaEcho(res.effects);
+  let spentSureCrit = false;
+  let spentAreaEcho = false;
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -298,41 +287,7 @@ export function runEffects(
           weaponMult: strikeMult,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
-          // Emboldened: override the swing's crit outcome (its rng is still
-          // drawn inside meleeSwing exactly as before).
-          forceCrit: sureCrit,
-          // Bladed Echo (charge) and Sweeping Strikes (window) both replay this
-          // swing's RESOLVED damage (post crit/armor) onto nearby enemies with
-          // no re-roll: the echo hits all for 65%, the sweep one for 75%.
-          onDealt:
-            opts?.areaEcho || sweeping
-              ? (amount) => {
-                  if (opts?.areaEcho) {
-                    areaEchoDealt = true;
-                    echoAreaDamage(
-                      ctx,
-                      p,
-                      strikeTarget,
-                      amount,
-                      ability.school,
-                      ability.name,
-                      threatOpts,
-                    );
-                  }
-                  if (sweeping) {
-                    sweepStrikeDamage(
-                      ctx,
-                      p,
-                      strikeTarget,
-                      amount,
-                      SWEEP_MULT,
-                      ability.school,
-                      ability.name,
-                      threatOpts,
-                    );
-                  }
-                }
-              : undefined,
+          damageMult: castDamageMult,
         });
         // A connected swing rolled (and had overridden) its crit; a miss or
         // dodge never reached the crit roll, so it spends nothing.
@@ -349,7 +304,7 @@ export function runEffects(
         if (!ctx.isHostileTo(p, target)) break;
         const rooted = isRootedOrChilled(target);
         const critChance =
-          (isSpell && rooted
+          isSpell && rooted
             ? ctx.spellCrit(p) + mods.global.critVsRooted
             : isSpell
               ? ctx.spellCrit(p)
@@ -366,18 +321,16 @@ export function runEffects(
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Conditional talent damage vs a target carrying the CASTER'S DoT
         // (Twisted Faith style). Deterministic aura scan, no rng.
-        const vsDotted = ctx.playerMods(meta).abilities[ability.id]?.dmgPctVsDotted ?? 0;
+        const vsDotted = mods.abilities[ability.id]?.dmgPctVsDotted ?? 0;
         if (vsDotted > 0 && target.auras.some((a) => a.kind === 'dot' && a.sourceId === p.id))
           dmg *= 1 + vsDotted;
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
+        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
+        const crit = forceCrit || rolledCrit;
+        if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+        dmg *= castDamageMult;
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
-        // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
-        // FULL post-spell-power, post-crit damage. The extra damage is what feeds
-        // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
-        // the caster's charge aura (combat/chronomancy.ts).
-        if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
         ctx.dealDamage(
           p,
@@ -390,6 +343,10 @@ export function runEffects(
           false,
           threatOpts,
         );
+        if (canAreaEcho && finalDamage > 0 && !target.dead) {
+          echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
+          spentAreaEcho = true;
+        }
         if (isSpell) noteSpellHit(ctx, p, crit);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -409,8 +366,11 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
+        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
+        const crit = forceCrit || rolledCrit;
+        if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= 2 + p.critDmgBonus;
+        dmg *= castDamageMult;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -727,7 +687,9 @@ export function runEffects(
           baseDmg * (eff.dmgMult ?? 1) +
           (eff.flat ?? 0) +
           directHitBonus(p.spellPower, ability, res.castTime);
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+        const crit = forceCrit || rolledCrit;
+        if (forceCrit) spentSureCrit = true;
         if (crit) dmg *= 1.5 + p.critDmgBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         noteSpellHit(ctx, p, crit);
@@ -869,6 +831,10 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
             breaksOnDamage: true,
+            breakThreshold:
+              mods.global.fearBreakPct > 0
+                ? Math.round(m.maxHp * mods.global.fearBreakPct)
+                : undefined,
           });
           ctx.enterCombat(p, m);
         }
@@ -876,6 +842,25 @@ export function runEffects(
       }
       case 'clearCooldowns': {
         for (const id of eff.abilities) p.cooldowns.delete(id);
+        break;
+      }
+      case 'breakControl': {
+        for (let i = p.auras.length - 1; i >= 0; i--) {
+          const aura = p.auras[i];
+          if (
+            aura.kind !== 'stun' &&
+            aura.kind !== 'root' &&
+            aura.kind !== 'incapacitate' &&
+            aura.kind !== 'polymorph' &&
+            aura.kind !== 'silence' &&
+            aura.kind !== 'blind' &&
+            aura.kind !== 'disarm'
+          ) {
+            continue;
+          }
+          p.auras.splice(i, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        }
         break;
       }
       case 'repositionToAim': {
@@ -1520,6 +1505,61 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyDamage': {
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: `${ability.id}_dmg`,
+            name: ability.name,
+            kind: 'buff_dmg_done',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.pct,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'aoeAllySureCrit': {
+        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
+          ctx.applyAura(m, {
+            id: `${ability.id}_crit`,
+            name: ability.name,
+            kind: 'sure_crit',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: 0,
+            charges: eff.charges,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'aoeSlow': {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'nova',
+        });
+        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+          if (!ctx.hasLineOfSight(p, m)) continue;
+          ctx.applyAura(m, {
+            id: `${ability.id}_slow`,
+            name: ability.name,
+            kind: 'slow',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.mult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+          ctx.enterCombat(p, m);
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           type: 'spellfx',
@@ -1951,8 +1991,11 @@ export function runEffects(
             ctx.rng.range(eff.deal.min, eff.deal.max) +
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
-          const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          const crit = forceCrit || rolledCrit;
+          if (forceCrit) spentSureCrit = true;
           if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+          dmg *= castDamageMult;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(
@@ -2108,16 +2151,19 @@ export function runEffects(
         break;
       }
       case 'gainResource': {
-        // Ability-granted rage is scaled by the choice-row talent multiplier
-        // (Anger Management's abilityRagePct) and the aura-driven bonus
-        // (Recklessness / Battle Rhythm; rageGenAuraMult sums the buff_rage_gen
-        // auras). Non-rage resources (energy from Adrenaline Rush, etc.) are
-        // deliberately untouched.
-        const gainAmt =
+        const rageMult =
           p.resourceType === 'rage'
-            ? eff.amount * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p)
-            : eff.amount;
-        p.resource = Math.min(p.maxResource, p.resource + gainAmt);
+            ? 1 +
+              mods.global.abilityRagePct +
+              p.auras.reduce(
+                (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
+                0,
+              )
+            : 1;
+        p.resource = Math.min(
+          p.maxResource,
+          p.resource + Math.round(eff.amount * rageMult * castResourceMult),
+        );
         break;
       }
       case 'selfDamagePctMax': {
@@ -2136,15 +2182,20 @@ export function runEffects(
         break;
       }
       case 'selfHealPctMax': {
-        // A flat fraction of max health through the shared heal path (threat/
-        // heal-absorb/crit handled there). Furious Mending (aura id
-        // 'furious_mending') supercharges Bloodletting's self-heal to 20% while
-        // it holds; Math.max keeps Victory Rush's own 0.20 unchanged and only
-        // lifts Bloodletting's 0.03 under the buff. No rng.
-        const pct = p.auras.some((a) => a.id === 'furious_mending')
-          ? Math.max(eff.pct, 0.2)
-          : eff.pct;
-        ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
+        const healed = Math.min(Math.round(p.maxHp * eff.pct), p.maxHp - p.hp);
+        if (healed > 0) {
+          p.hp += healed;
+          ctx.emit({
+            type: 'heal2',
+            sourceId: p.id,
+            targetId: p.id,
+            amount: healed,
+            crit: false,
+            ability: ability.name,
+          });
+          ctx.healingThreat(p, p, healed);
+        }
+        if (ability.requiresVictoryProc) p.victoryRushUntil = -1;
         break;
       }
       case 'charge': {
@@ -2154,12 +2205,15 @@ export function runEffects(
         p.chargeTargetId = target.id;
         p.chargeTimeLeft = CHARGE_MAX_DURATION;
         p.chargePath = ctx.findChargePath(p, target);
-        // Charge's rage burst, scaled like gainResource by abilityRagePct and
-        // the aura-driven bonus (Recklessness / Battle Rhythm).
         if (p.resourceType === 'rage') {
-          const chargeRage =
-            9 * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p);
-          p.resource = Math.min(p.maxResource, p.resource + chargeRage);
+          const rageMult =
+            1 +
+            mods.global.abilityRagePct +
+            p.auras.reduce(
+              (sum, aura) => sum + (aura.kind === 'buff_rage_gen' ? aura.value : 0),
+              0,
+            );
+          p.resource = Math.min(p.maxResource, p.resource + Math.round(9 * rageMult));
         }
         ctx.enterCombat(p, target);
         break;
@@ -2301,18 +2355,8 @@ export function runEffects(
     if (target?.dead) target = null;
   }
 
-  // Bladed Echo: one charge per CAST (not per strike), spent only after the
-  // cast actually dealt single-target hostile damage this resolution.
-  if (opts?.areaEcho && areaEchoDealt) consumeAreaEchoCharge(ctx, p);
-
-  // Emboldened: one charge per CAST (not per strike/effect), spent only after
-  // this cast actually rolled (and overrode) at least one crit.
-  if (sureCritRolled) consumeSureCritCharge(ctx, p);
-
-  // Frost mage post-impact rider (combat/frost_mage.ts): frostbolt rolls its
-  // two procs (committed frost only, so no existing golden moves); Flurry
-  // plants Winter's Chill on its surviving target. Inert for everyone else.
-  frostMageAfterCast(ctx, p, meta, ability, target);
+  if (spentSureCrit) consumeSureCritCharge(ctx, p);
+  if (spentAreaEcho) consumeAreaEchoCharge(ctx, p);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

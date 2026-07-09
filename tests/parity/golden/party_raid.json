@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
-      "events": "6526c79b",
+      "nextId": 412,
+      "state": "5acff26c",
+      "events": "4a084237",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -449,6 +449,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -499,6 +500,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -549,6 +551,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -601,6 +604,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -651,6 +655,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -701,6 +706,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -750,6 +756,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -761,9 +768,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
-      "events": "e145c8f9",
+      "nextId": 412,
+      "state": "5acff26c",
+      "events": "990b7e1b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1181,6 +1188,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1231,6 +1239,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1281,6 +1290,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -1333,6 +1343,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1383,6 +1394,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1433,6 +1445,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1482,6 +1495,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1493,9 +1507,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
-      "events": "d7c0ff35",
+      "nextId": 412,
+      "state": "5acff26c",
+      "events": "6f783d83",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1917,6 +1931,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1967,6 +1982,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2017,6 +2033,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -2069,6 +2086,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2119,6 +2137,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2169,6 +2188,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2218,6 +2238,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2229,9 +2250,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
-      "events": "b38fe9c1",
+      "nextId": 412,
+      "state": "5acff26c",
+      "events": "155e419c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -2653,6 +2674,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2703,6 +2725,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2753,6 +2776,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -2805,6 +2829,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2855,6 +2880,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -2905,6 +2931,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2954,6 +2981,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2965,9 +2993,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
-      "events": "914f1e15",
+      "nextId": 412,
+      "state": "5acff26c",
+      "events": "b1bbcce2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -3389,6 +3417,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3439,6 +3468,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3489,6 +3519,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -3541,6 +3572,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3591,6 +3623,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -3641,6 +3674,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3690,6 +3724,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -3701,9 +3736,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
-      "events": "5f7ababc",
+      "nextId": 412,
+      "state": "5acff26c",
+      "events": "88ad795a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -4125,6 +4160,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -4175,6 +4211,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4225,6 +4262,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -4277,6 +4315,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -4327,6 +4366,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4377,6 +4417,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -4426,6 +4467,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -4437,8 +4479,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "86950d93",
+      "nextId": 412,
+      "state": "5acff26c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -4861,6 +4903,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -4911,6 +4954,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -4961,6 +5005,7 @@
             "str": 17
           },
           "templateId": "rogue",
+          "victoryRushUntil": -1,
           "weapon": {
             "dagger": true,
             "max": 4,
@@ -5013,6 +5058,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -5063,6 +5109,7 @@
             "str": 11
           },
           "templateId": "warlock",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -5113,6 +5160,7 @@
             "str": 22
           },
           "templateId": "paladin",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -5162,6 +5210,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,

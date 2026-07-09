@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "b4e4df8c",
+      "nextId": 406,
+      "state": "223e0179",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -123,6 +123,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -134,9 +135,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 402,
-      "state": "3b4f08ea",
-      "events": "9bba49b4",
+      "nextId": 407,
+      "state": "342f239c",
+      "events": "6f4af3da",
       "rng": {
         "draws": 3,
         "digest": "73521d70"
@@ -145,9 +146,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 402,
-      "state": "0336f61d",
-      "events": "fbffbbed",
+      "nextId": 407,
+      "state": "9c3c84e2",
+      "events": "32aafa0f",
       "rng": {
         "draws": 3,
         "digest": "73521d70"
@@ -156,9 +157,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 402,
-      "state": "79c95b8d",
-      "events": "e7371025",
+      "nextId": 407,
+      "state": "7d1211de",
+      "events": "c880e87c",
       "rng": {
         "draws": 73,
         "digest": "7ef074c8"
@@ -167,9 +168,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 402,
-      "state": "65d6abd9",
-      "events": "e7371025",
+      "nextId": 407,
+      "state": "d7cc3eee",
+      "events": "c880e87c",
       "rng": {
         "draws": 163,
         "digest": "5caeab93"
@@ -178,9 +179,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 402,
-      "state": "7cfea7a9",
-      "events": "91956d6d",
+      "nextId": 407,
+      "state": "4ff7c34a",
+      "events": "894957f3",
       "rng": {
         "draws": 259,
         "digest": "bf0b305f"
@@ -189,9 +190,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 402,
-      "state": "90d958b4",
-      "events": "e7371025",
+      "nextId": 407,
+      "state": "644d05b1",
+      "events": "c880e87c",
       "rng": {
         "draws": 380,
         "digest": "ed0c4a9f"
@@ -200,8 +201,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 402,
-      "state": "ce2716a4",
+      "nextId": 407,
+      "state": "03556f0d",
       "events": "741638a5",
       "rng": {
         "draws": 421,
@@ -331,6 +332,7 @@
           },
           "targetId": 409,
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -373,6 +375,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
+          "victoryRushUntil": -1,
           "wanderTarget": {
             "x": -1.188086,
             "y": 1.250784,

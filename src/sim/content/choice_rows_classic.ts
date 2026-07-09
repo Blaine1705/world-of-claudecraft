@@ -38,26 +38,37 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'onslaught',
       options: [
         {
-          id: 'war_r5_juggernaut',
-          name: 'Juggernaut',
-          description: 'Charge cooldown reduced by 50%. You open with it on cooldown.',
+          id: 'war_r5_twin_onrush',
+          name: 'Twin Onrush',
+          description:
+            "Blaine1705's playtested tuning: Onrush stores 2 uses, so you can charge twice in a row.",
           icon: 'charge',
-          effect: { ability: [{ ability: 'charge', cooldownPct: -0.5 }] },
+          effect: { ability: [{ ability: 'charge', bonusCharges: 1 }] },
         },
         {
-          id: 'war_r5_heroic_leap',
-          name: 'Warleap',
-          description: 'Leap to a ground target, dealing small area damage. 20 sec cooldown.',
-          icon: 'heroic_leap',
-          effect: { grant: { ability: 'heroic_leap' } },
+          id: 'war_r5_hot_pursuit',
+          name: 'Hot Pursuit',
+          description:
+            "Blaine1705's playtested tuning: each enemy you kill grants 30% movement speed for 6 sec.",
+          icon: 'sprint',
+          effect: { global: { onKillSpeedPct: 0.3, onKillSpeedDuration: 6 } },
         },
         {
-          id: 'war_r5_warbringer',
-          name: 'Warbringer',
-          description: 'Charge also roots the target for 1.5 sec.',
+          id: 'war_r5_crushing_onrush',
+          name: 'Crushing Onrush',
+          description:
+            "Blaine1705's playtested tuning: Onrush also roots the target for 4 sec and slows it by 50% for 15 sec.",
           icon: 'charge',
           effect: {
-            ability: [{ ability: 'charge', addEffects: [{ type: 'root', duration: 1.5 }] }],
+            ability: [
+              {
+                ability: 'charge',
+                addEffects: [
+                  { type: 'root', duration: 4 },
+                  { type: 'slow', mult: 0.5, duration: 15 },
+                ],
+              },
+            ],
           },
         },
       ],
@@ -67,40 +78,26 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'warcraft',
       options: [
         {
-          id: 'war_r8_pummel',
-          name: 'Jawcrack',
-          description: 'Interrupt spellcasting for a 4 sec school lockout.',
-          icon: 'pummel',
-          effect: { grant: { ability: 'pummel' } },
+          id: 'war_r8_rallying_breath',
+          name: 'Rallying Breath',
+          description:
+            "Blaine1705's playtested tuning: below 35% health, you regenerate 1.5% of your health per second.",
+          icon: 'last_stand',
+          effect: { global: { secondWindPctPerSec: 0.015, secondWindHpBelow: 0.35 } },
         },
         {
-          id: 'war_r8_concussive_clap',
-          name: 'Concussive Clap',
-          description: 'Quaking Blow also roots targets hit within 8 yd for 1 sec.',
-          icon: 'thunder_clap',
-          effect: {
-            ability: [
-              {
-                ability: 'thunder_clap',
-                addEffects: [{ type: 'aoeRoot', duration: 1, radius: 8, min: 0, max: 0 }],
-              },
-            ],
-          },
+          id: 'war_r8_swordguard',
+          name: 'Swordguard',
+          description: 'Grants Swordguard.',
+          icon: 'shield_wall',
+          effect: { grant: { ability: 'swordguard' } },
         },
         {
-          id: 'war_r8_crippling_strikes',
-          name: 'Crippling Strikes',
-          description: 'Hamstring costs 66% less and slows the target by 70% for 15 sec.',
-          icon: 'hamstring',
-          effect: {
-            ability: [
-              {
-                ability: 'hamstring',
-                costPct: -0.66,
-                addEffects: [{ type: 'slow', mult: 0.3, duration: 15 }],
-              },
-            ],
-          },
+          id: 'war_r8_triumph_rush',
+          name: 'Triumph Rush',
+          description: 'Grants Triumph Rush.',
+          icon: 'overpower',
+          effect: { grant: { ability: 'triumph_rush' } },
         },
       ],
     },
@@ -109,30 +106,26 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'bloodlust',
       options: [
         {
-          id: 'war_r11_berserker_rage',
-          name: 'Seething Fury',
-          description: 'Grants Berserker Rage.',
-          icon: 'berserker_rage',
-          effect: { grant: { ability: 'berserker_rage' } },
+          id: 'war_r11_razor_howl',
+          name: 'Razor Howl',
+          description: 'Grants Razor Howl.',
+          icon: 'demoralizing_shout',
+          effect: { grant: { ability: 'razor_howl' } },
         },
         {
-          id: 'war_r11_furious_bloodrage',
-          name: 'Furious Bloodrage',
-          description: 'Bloodrage cooldown reduced by 50% and rage gain increased by 50%.',
-          icon: 'bloodrage',
-          effect: { ability: [{ ability: 'bloodrage', cooldownPct: -0.5, dmgPct: 0.5 }] },
+          id: 'war_r11_stormthrow',
+          name: 'Stormthrow',
+          description: 'Grants Stormthrow.',
+          icon: 'throwing_axe',
+          effect: { grant: { ability: 'stormthrow' } },
         },
         {
-          id: 'war_r11_commanding_presence',
-          name: 'Commanding Presence',
-          description: 'Battle Shout and Commanding Shout effects increased by 50%.',
-          icon: 'commanding_shout',
-          effect: {
-            ability: [
-              { ability: 'battle_shout', buffPct: 0.5 },
-              { ability: 'commanding_shout', buffPct: 0.5 },
-            ],
-          },
+          id: 'war_r11_lingering_dread',
+          name: 'Lingering Dread',
+          description:
+            "Blaine1705's playtested tuning: enemies feared by your shouts can endure 20% of their health in damage before the fear breaks.",
+          icon: 'intimidating_shout',
+          effect: { global: { fearBreakPct: 0.2 } },
         },
       ],
     },
@@ -141,30 +134,43 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'arms_master',
       options: [
         {
-          id: 'war_r14_crippling_blows',
-          name: 'Crippling Blows',
+          id: 'war_r14_rage_discipline',
+          name: 'Rage Discipline',
           description:
-            'Bladed Gyre also hamstrings everything it hits, slowing movement by 50% for 5 sec.',
-          icon: 'hamstring',
+            "Blaine1705's playtested tuning: your auto-attacks generate 25% more rage and your abilities 15% more.",
+          icon: 'bloodrage',
+          effect: { global: { autoRagePct: 0.25, abilityRagePct: 0.15 } },
+        },
+        {
+          id: 'war_r14_blood_offering',
+          name: 'Blood Offering',
+          description:
+            "Blaine1705's playtested tuning: Blood Toll grants 20 additional rage and recharges 50% faster.",
+          icon: 'bloodrage',
           effect: {
             ability: [
-              { ability: 'whirlwind', addEffects: [{ type: 'slow', mult: 0.5, duration: 5 }] },
+              {
+                ability: 'bloodrage',
+                cooldownPct: -0.5,
+                addEffects: [{ type: 'gainResource', amount: 20 }],
+              },
             ],
           },
         },
         {
-          id: 'war_r14_whirlwind',
-          name: 'Bladed Gyre',
-          description: 'Grants Whirlwind.',
-          icon: 'whirlwind',
-          effect: { grant: { ability: 'whirlwind' } },
-        },
-        {
-          id: 'war_r14_executioner',
-          name: 'Executioner',
-          description: 'Execute costs 50% less and deals 20% more damage.',
-          icon: 'execute',
-          effect: { ability: [{ ability: 'execute', costPct: -0.5, dmgPct: 0.2 }] },
+          id: 'war_r14_battle_rhythm',
+          name: 'Battle Rhythm',
+          description:
+            "Blaine1705's playtested tuning: every 3rd ability generates 20% more rage and deals 5% more damage.",
+          icon: 'battle_shout',
+          effect: {
+            global: {
+              battleRhythm: 1,
+              battleRhythmEvery: 3,
+              battleRhythmRagePct: 0.2,
+              battleRhythmDmgPct: 0.05,
+            },
+          },
         },
       ],
     },
@@ -173,25 +179,28 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'bulwark',
       options: [
         {
-          id: 'war_r17_shield_wall',
-          name: 'Bulwark',
-          description: 'Grants Shield Wall.',
-          icon: 'shield_wall',
-          effect: { grant: { ability: 'shield_wall' } },
+          id: 'war_r17_reckless_vow',
+          name: 'Reckless Vow',
+          description: 'Grants Reckless Vow.',
+          icon: 'berserker_rage',
+          effect: { grant: { ability: 'reckless_vow' } },
         },
         {
-          id: 'war_r17_last_stand',
-          name: 'Eleventh Hour',
-          description: 'Grants Last Stand.',
-          icon: 'last_stand',
-          effect: { grant: { ability: 'last_stand' } },
+          id: 'war_r17_colossus',
+          name: 'Colossus',
+          description: 'Grants Colossus.',
+          icon: 'avatar',
+          effect: { grant: { ability: 'avatar' } },
         },
         {
-          id: 'war_r17_iron_hide',
-          name: 'Iron Hide',
-          description: 'Armor increased by 12%.',
-          icon: 'defensive_stance',
-          effect: { stats: { armorPct: 0.12 } },
+          id: 'war_r17_red_harvest',
+          name: 'Red Harvest',
+          description:
+            "Blaine1705's playtested tuning: each enemy you kill grants 5% critical strike and 5% damage dealt for 8 sec, stacking up to 25%.",
+          icon: 'rend',
+          effect: {
+            global: { bloodbathPct: 0.05, bloodbathDuration: 8, bloodbathMaxPct: 0.25 },
+          },
         },
       ],
     },
@@ -200,25 +209,26 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'avatar',
       options: [
         {
-          id: 'war_r20_bladestorm',
+          id: 'war_r20_giants_momentum',
+          name: "Giant's Momentum",
+          description:
+            "Blaine1705's playtested tuning: each rage spent reduces major offensive cooldowns by 0.1 sec.",
+          icon: 'avatar',
+          effect: { global: { cdrPerRage: 0.1 } },
+        },
+        {
+          id: 'war_r20_steel_cyclone',
           name: 'Steel Cyclone',
-          description: 'Grants Bladestorm.',
+          description: 'Grants Steel Cyclone.',
           icon: 'bladestorm',
           effect: { grant: { ability: 'bladestorm' } },
         },
         {
-          id: 'war_r20_avatar',
-          name: 'Colossus',
-          description: 'Grants Avatar.',
-          icon: 'avatar',
-          effect: { grant: { ability: 'avatar' } },
-        },
-        {
-          id: 'war_r20_rallying_cry',
-          name: 'Muster',
-          description: 'Grants Rallying Cry.',
+          id: 'war_r20_red_banner',
+          name: 'Red Banner',
+          description: 'Grants Red Banner.',
           icon: 'rallying_cry',
-          effect: { grant: { ability: 'rallying_cry' } },
+          effect: { grant: { ability: 'red_banner' } },
         },
       ],
     },

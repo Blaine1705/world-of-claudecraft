@@ -38,6 +38,16 @@ const PCT_FIELDS = new Set([
   'spellHastePct',
   'petDmgPct',
   'petDmgSharePct',
+  'secondWindPctPerSec',
+  'secondWindHpBelow',
+  'fearBreakPct',
+  'onKillSpeedPct',
+  'autoRagePct',
+  'abilityRagePct',
+  'battleRhythmRagePct',
+  'battleRhythmDmgPct',
+  'bloodbathPct',
+  'bloodbathMaxPct',
   'dmgPct',
   'costPct',
   'cooldownPct',
@@ -67,6 +77,7 @@ function expectedTokens(effect: unknown): string[] {
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
+        if (key === 'battleRhythm') continue;
         if (key === 'critDmgPct' && value === 0.5) {
           toks.push('double');
           continue;
@@ -84,6 +95,10 @@ function expectedTokens(effect: unknown): string[] {
         // A proc firing on EVERY matching cast (n: 1) reads as "every cast";
         // no numeral is required in the copy.
         if (key === 'n' && value === 1) continue;
+        if (key === 'bonusCharges') {
+          toks.push(`${value + 1}`);
+          continue;
+        }
         toks.push(
           PCT_FIELDS.has(key)
             ? `${+(Math.abs(value) * 100).toFixed(1)}%`
@@ -106,10 +121,12 @@ function legitNumbers(effect: unknown): Set<number> {
     if (!obj || typeof obj !== 'object') return;
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
+        if (key === 'battleRhythm') continue;
         add(value, PCT_FIELDS.has(key));
         // Cheat death leaves the player at 1 health: the floor is intrinsic to
         // the mechanic, so copy may state the 1.
         if (key === 'cheatDeathIcd') out.add(1);
+        if (key === 'bonusCharges') out.add(value + 1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).
         if (key === 'mult' && value > 0 && value < 1) out.add(Math.round((1 - value) * 100));
       } else if (Array.isArray(value)) value.forEach(walk);
@@ -312,8 +329,8 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
       return entry.render();
     };
 
-    expect(render('warrior', 'war_r5_juggernaut')).toContain('50%');
-    expect(render('warrior', 'war_r17_iron_hide')).toContain('12%');
+    expect(render('warrior', 'war_r5_crushing_onrush')).toContain('50%');
+    expect(render('warrior', 'war_r17_red_harvest')).toContain('25%');
     const survival = render('hunter', 'survival.mastery');
     expect(survival).toContain('Agility');
     expect(survival).toContain('15%');

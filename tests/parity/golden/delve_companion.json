@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "37e8f13b",
+      "nextId": 406,
+      "state": "adcfd5de",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -118,6 +118,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -129,9 +130,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 410,
-      "state": "be5ec87e",
-      "events": "f072cbc1",
+      "nextId": 415,
+      "state": "04c343ea",
+      "events": "5a5f26b1",
       "rng": {
         "draws": 4,
         "digest": "a3310c41"
@@ -140,8 +141,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 410,
-      "state": "232dd069",
+      "nextId": 415,
+      "state": "0ed32b77",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -151,8 +152,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 410,
-      "state": "311ab379",
+      "nextId": 415,
+      "state": "a24ba871",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -162,9 +163,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 410,
-      "state": "5be0b20a",
-      "events": "b93c7dc5",
+      "nextId": 415,
+      "state": "e90030f0",
+      "events": "9cfda0e2",
       "rng": {
         "draws": 4,
         "digest": "a3310c41"
@@ -173,8 +174,8 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 410,
-      "state": "1aa57407",
+      "nextId": 415,
+      "state": "bbc85c0f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -184,8 +185,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 410,
-      "state": "d30d3e92",
+      "nextId": 415,
+      "state": "104519d6",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -195,9 +196,9 @@
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 410,
-      "state": "8a09ffcd",
-      "events": "99a32fc8",
+      "nextId": 415,
+      "state": "d4168a19",
+      "events": "92136cf6",
       "rng": {
         "draws": 6,
         "digest": "420a4159"
@@ -206,8 +207,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 410,
-      "state": "f0eb2a23",
+      "nextId": 415,
+      "state": "45b300d5",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -217,8 +218,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 410,
-      "state": "f0eb2a23",
+      "nextId": 415,
+      "state": "45b300d5",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -333,6 +334,7 @@
           },
           "targetId": 414,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -374,6 +376,7 @@
           },
           "swingTimer": 1.9,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 1,
           "weapon": {
             "max": 11,
@@ -415,6 +418,7 @@
           },
           "stompTimer": 12,
           "templateId": "deacon_varric",
+          "victoryRushUntil": -1,
           "wanderTimer": 6.765032,
           "weapon": {
             "max": 51,
@@ -427,9 +431,9 @@
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 410,
-      "state": "a9770af8",
-      "events": "1aaa30ce",
+      "nextId": 415,
+      "state": "61db4056",
+      "events": "a979a0fd",
       "rng": {
         "draws": 8,
         "digest": "767efc66"
@@ -545,6 +549,7 @@
           },
           "targetId": 414,
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -586,6 +591,7 @@
           },
           "swingTimer": 1.8,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 3,
           "weapon": {
             "max": 11,
@@ -639,6 +645,7 @@
               1
             ]
           ],
+          "victoryRushUntil": -1,
           "wanderTimer": 6.765032,
           "weapon": {
             "max": 51,
@@ -651,8 +658,8 @@
     {
       "tick": 45,
       "time": 2.25,
-      "nextId": 410,
-      "state": "5f276b80",
+      "nextId": 415,
+      "state": "9bccaf3e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -662,8 +669,8 @@
     {
       "tick": 49,
       "time": 2.45,
-      "nextId": 410,
-      "state": "d0c0bdd6",
+      "nextId": 415,
+      "state": "4b3239e0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -778,6 +785,7 @@
             "str": 35
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -818,6 +826,7 @@
           },
           "swingTimer": 1,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 2.6,
           "weapon": {
             "max": 11,
@@ -830,8 +839,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 410,
-      "state": "4f2f9181",
+      "nextId": 415,
+      "state": "7916289b",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -841,8 +850,8 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 410,
-      "state": "58dbf2ee",
+      "nextId": 415,
+      "state": "0704bda8",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -957,6 +966,7 @@
             "str": 35
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -998,6 +1008,7 @@
           },
           "swingTimer": 0.8,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 2.5,
           "weapon": {
             "max": 11,
@@ -1010,8 +1021,8 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 410,
-      "state": "58dbf2ee",
+      "nextId": 415,
+      "state": "0704bda8",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -1126,6 +1137,7 @@
             "str": 35
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1167,6 +1179,7 @@
           },
           "swingTimer": 0.8,
           "templateId": "acolyte_tessa",
+          "victoryRushUntil": -1,
           "wanderTimer": 2.5,
           "weapon": {
             "max": 11,

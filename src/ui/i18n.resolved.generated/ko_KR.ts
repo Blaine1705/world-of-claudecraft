@@ -6366,8 +6366,8 @@ export const ko_KR: EnTranslations = {
         "description": "야생의 힘으로 주위 아군을 고무하여 전투력을 높입니다. 5분 동안 지속됩니다. (사냥꾼 특성)"
       },
       "avatar": {
-        "name": "거상",
-        "description": "거상으로 변신하여 전투력을 높입니다. 20초 동안 지속됩니다. (전사 특성)"
+        "name": "거상화",
+        "description": "제어 효과를 해제하고 거상이 되어 20초 동안 주는 피해가 20% 증가합니다. (전사 특성)"
       },
       "avenging_wrath": {
         "name": "응징의 날개",
@@ -6379,7 +6379,31 @@ export const ko_KR: EnTranslations = {
       },
       "bladestorm": {
         "name": "강철 회오리",
-        "description": "강철의 폭풍이 되어 매초 주위 적에게 {damage}의 피해를 입힙니다. (전사 특성)"
+        "description": "강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다. (전사 특성)"
+      },
+      "swordguard": {
+        "name": "검의 수호",
+        "description": "8초 동안 받는 피해가 10% 감소하며, 생명력이 30% 미만이면 20% 감소합니다. (전사 특성)"
+      },
+      "triumph_rush": {
+        "name": "승전 돌격",
+        "description": "적을 처치한 뒤 20초 안에 무기 피해에 {damage}를 더해 입히고 최대 생명력의 20%를 회복합니다. (전사 특성)"
+      },
+      "razor_howl": {
+        "name": "칼날 포효",
+        "description": "15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)"
+      },
+      "stormthrow": {
+        "name": "폭풍 투척",
+        "description": "무기를 던져 대상을 3초 동안 기절시킵니다. (전사 특성)"
+      },
+      "reckless_vow": {
+        "name": "무모한 맹세",
+        "description": "12초 동안 모든 분노 생성이 50%, 치명타 확률이 20% 증가합니다. (전사 특성)"
+      },
+      "red_banner": {
+        "name": "붉은 깃발",
+        "description": "20초 동안 자신과 주위 아군의 공격 속도와 피해가 각각 10% 증가합니다. (전사 특성)"
       },
       "blink": {
         "name": "섬광걸음",

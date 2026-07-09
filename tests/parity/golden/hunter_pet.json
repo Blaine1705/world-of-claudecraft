@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "66fb5d13",
+      "nextId": 406,
+      "state": "2fe0f8ba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -124,6 +124,7 @@
             "str": 14
           },
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -135,9 +136,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 408,
-      "state": "2ae4b428",
-      "events": "d17f69d8",
+      "nextId": 409,
+      "state": "b0763c5f",
+      "events": "aad1beb5",
       "rng": {
         "draws": 9,
         "digest": "381f4473"
@@ -146,8 +147,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 404,
-      "state": "6ebe9cc6",
+      "nextId": 409,
+      "state": "f8783b62",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -157,9 +158,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 408,
-      "state": "d9582ae0",
-      "events": "fbda591c",
+      "nextId": 409,
+      "state": "5345e87f",
+      "events": "35c1ec5c",
       "rng": {
         "draws": 100,
         "digest": "a2f9eb23"
@@ -168,8 +169,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 404,
-      "state": "73dfba26",
+      "nextId": 409,
+      "state": "db8554e2",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -179,9 +180,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 408,
-      "state": "25b8d80d",
-      "events": "79f04456",
+      "nextId": 409,
+      "state": "9e8c2a7e",
+      "events": "5a0db5c0",
       "rng": {
         "draws": 298,
         "digest": "dea1e796"
@@ -190,8 +191,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 404,
-      "state": "8991a2ff",
+      "nextId": 409,
+      "state": "ef2bcbfb",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -201,8 +202,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 404,
-      "state": "8991a2ff",
+      "nextId": 409,
+      "state": "ef2bcbfb",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -339,6 +340,7 @@
           "swingTimer": 0.9,
           "targetId": 410,
           "templateId": "hunter",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -384,6 +386,7 @@
           },
           "swingTimer": 0.05,
           "templateId": "warlock_imp",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 9,
             "min": 6,
@@ -446,6 +449,7 @@
               49
             ]
           ],
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 18,
             "min": 11,
@@ -492,6 +496,7 @@
           "swingTimer": 0.05,
           "targetId": 408,
           "templateId": "warlock_imp",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 9,
             "min": 6,

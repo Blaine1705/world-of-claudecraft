@@ -31,9 +31,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "8b34a771",
-      "events": "9af26b3e",
+      "nextId": 407,
+      "state": "19d73c73",
+      "events": "84c5f94d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -192,6 +192,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -242,6 +243,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -253,9 +255,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "74bca4ff",
-      "events": "2d9d34b4",
+      "nextId": 407,
+      "state": "f1dfc4c5",
+      "events": "252eb0c9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -414,6 +416,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -464,6 +467,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -475,8 +479,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "74bca4ff",
+      "nextId": 407,
+      "state": "f1dfc4c5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -636,6 +640,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -686,6 +691,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -697,8 +703,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "74bca4ff",
+      "nextId": 407,
+      "state": "f1dfc4c5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -858,6 +864,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -908,6 +915,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -919,9 +927,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "92d15227",
-      "events": "23a4df9f",
+      "nextId": 407,
+      "state": "e3eed495",
+      "events": "80c5cba6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1085,6 +1093,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1135,6 +1144,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1146,9 +1156,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "92d15227",
-      "events": "c8c80607",
+      "nextId": 407,
+      "state": "e3eed495",
+      "events": "8ce3d8c8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1312,6 +1322,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1362,6 +1373,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1373,9 +1385,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 402,
-      "state": "0a1a9c3e",
-      "events": "2a121e2d",
+      "nextId": 407,
+      "state": "5b9a6938",
+      "events": "6a0cdba1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1384,8 +1396,8 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 402,
-      "state": "0a1a9c3e",
+      "nextId": 407,
+      "state": "5b9a6938",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1556,6 +1568,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1606,6 +1619,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1617,9 +1631,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 402,
-      "state": "ebbabdd1",
-      "events": "239ad78b",
+      "nextId": 407,
+      "state": "70b7e6df",
+      "events": "baa14029",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1792,6 +1806,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -1842,6 +1857,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,
@@ -1853,8 +1869,8 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 402,
-      "state": "ebbabdd1",
+      "nextId": 407,
+      "state": "70b7e6df",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2028,6 +2044,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -2078,6 +2095,7 @@
             "str": 10
           },
           "templateId": "mage",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 6,
             "min": 3,

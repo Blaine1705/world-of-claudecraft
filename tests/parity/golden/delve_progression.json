@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "37e8f13b",
+      "nextId": 406,
+      "state": "adcfd5de",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -118,6 +118,7 @@
             "str": 23
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -129,9 +130,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 422,
-      "state": "7eabab21",
-      "events": "3669b315",
+      "nextId": 427,
+      "state": "c526a3e4",
+      "events": "5d953739",
       "rng": {
         "draws": 1,
         "digest": "5eb1ea5d"
@@ -140,8 +141,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 422,
-      "state": "5d05aa6b",
+      "nextId": 427,
+      "state": "ea8f1d4a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -253,6 +254,7 @@
             "str": 35
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -264,9 +266,9 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 422,
-      "state": "b1b4113d",
-      "events": "81315207",
+      "nextId": 427,
+      "state": "e5ce10fe",
+      "events": "330a0171",
       "rng": {
         "draws": 3,
         "digest": "e3485a8b"
@@ -385,6 +387,7 @@
             "str": 35
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
@@ -396,8 +399,8 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 422,
-      "state": "e90a2127",
+      "nextId": 427,
+      "state": "5a4c07b4",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -517,6 +520,7 @@
             "str": 35
           },
           "templateId": "warrior",
+          "victoryRushUntil": -1,
           "weapon": {
             "max": 5,
             "min": 2,
