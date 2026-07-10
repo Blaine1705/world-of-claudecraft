@@ -146,7 +146,7 @@ export const de_DE: EnTranslations = {
         "noTree": "Eure Klasse hat noch keinen Talentbaum.",
         "locked": "Ihr habt die Talente noch nicht freigeschaltet; sie beginnen auf Stufe {level}.",
         "noSpec": "keine Spezialisierung",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talente: {head}, {picked}/{unlocked} Entscheidungsreihen gewählt.",
         "summary": "Talente: {head} — {spent}/{total} Punkte ausgegeben ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const de_DE: EnTranslations = {
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} absorbiert",
+      "cheap": "Günstiger!"
     },
     "emotes": {
       "wave": "Winken",
@@ -1665,8 +1665,8 @@ export const de_DE: EnTranslations = {
       "parcelsLabel": "Pakete",
       "parcelsHint": "Klicke einen Gegenstand in deinen Taschen an, um ihn beizulegen.",
       "removeParcelAria": "{item} aus dem Brief entfernen",
-      "parcelQtyDecreaseAria": "Ein Stück weniger von {item} senden",
-      "parcelQtyIncreaseAria": "Ein Stück mehr von {item} senden",
+      "parcelQtyDecreaseAria": "Ein {item} weniger senden",
+      "parcelQtyIncreaseAria": "Ein {item} mehr senden",
       "sendButton": "Brief senden",
       "postageNote": "Porto: {amount}. Der Rabe ist etwa {seconds}s unterwegs.",
       "arrivedBanner": "Der Rabe ist gelandet: Post von {name}.",
@@ -6243,8 +6243,8 @@ export const de_DE: EnTranslations = {
         "description": "Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Kettenheilung",
+        "description": "Heilt ein verbündetes Ziel stark und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Mit jedem Sprung wird 50 % weniger geheilt. (Signatur von Wiederherstellung)"
       },
       "metamorphosis": {
         "name": "Metamorphose",
@@ -6383,20 +6383,20 @@ export const de_DE: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a nahe Gegner cada segundo por {damage}. (Krieger-Talent)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Klingenheulen",
+        "description": "Ein Ruf, der Gegner im Umkreis von 15 m 8 Sek. lang um 50 % verlangsamt. (Kriegertalent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Sturmwurf",
+        "description": "Schleudert Eure Waffe, um ein Ziel 3 Sek. lang zu betäuben. (Kriegertalent)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Tollkühner Schwur",
+        "description": "Erhöht 12 Sek. lang sämtliche Wuterzeugung um 50 % und die kritische Trefferchance um 20 %. (Kriegertalent)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Rotes Banner",
+        "description": "Ihr und Verbündete in der Nähe erhaltet 20 Sek. lang 10 % Angriffstempo und 10 % Schaden. (Kriegertalent)"
       },
       "blink": {
         "name": "Flimmerschritt",
@@ -8609,8 +8609,8 @@ export const de_DE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ein Handwerk für jede Hand",
-        "text": "Jeder in Eastbrook übt neben dem Schwert ein Handwerk aus, {playerName}. Rund um die Stadt gibt es Erzadern, also schwing die Spitzhacke und bring mir 5 Brocken. Bau sie selbst ab, wohlgemerkt; ich werde den Unterschied erkennen.",
-        "completion": "Siehst du? Erz in deinem Rucksack und Schwielen an deinen Händen. Bleib beim Bergbau, Holzfällen und Kräutersammeln, während du die Straßen bereist. Wenn du wieder in der Stadt bist, wirf einen Blick auf die Stadtfokus-Tafel am Markt und die Werkbank in der Nähe. In all dem wartet ein ehrlicher Verdienst, wenn du ihn willst.",
+        "text": "Jede Seele in Eastbrook geht neben dem Schwert einem Handwerk nach, {playerName}. Rund um die Stadt liegen Erzadern verstreut. Nehmt also eine Spitzhacke und bringt mir 5 Brocken. Baut sie selbst ab; ich erkenne den Unterschied.",
+        "completion": "Seht Ihr? Erz im Beutel und Schwielen an den Händen. Baut auf Euren Reisen weiter Erz ab, fällt Holz und sammelt Kräuter. Wenn Ihr wieder in der Stadt seid, denkt an die Tafel für den Stadtfokus beim Markt und an die Werkbank daneben. In all dem wartet ein ehrliches Handwerk, wenn Ihr es wollt.",
         "objectives": {
           "0": {
             "label": "Erzbrocken"

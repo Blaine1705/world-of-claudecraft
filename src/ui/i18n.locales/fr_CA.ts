@@ -236,70 +236,32 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
-  'entities.abilities.holy_shock.name': 'Horion sacré',
-  'entities.abilities.holy_shock.description':
-    'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
-  'entities.abilities.holy_shield.name': 'Bouclier sacré',
-  'entities.abilities.holy_shield.description':
-    'Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)',
-  'entities.abilities.bestial_wrath.name': 'Courroux bestial',
-  'entities.abilities.bestial_wrath.description':
-    'Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)',
-  'entities.abilities.trueshot_aura.name': 'Aura de précision',
-  'entities.abilities.trueshot_aura.description':
-    'Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)',
-  'entities.abilities.wyvern_sting.name': 'Piqûre de wyverne',
-  'entities.abilities.wyvern_sting.description':
-    'Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)',
-  'entities.abilities.arcane_power.name': 'Pouvoir des Arcanes',
-  'entities.abilities.arcane_power.description':
-    'Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)',
-  'entities.abilities.combustion.name': 'Combustion',
-  'entities.abilities.combustion.description':
-    'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
-  'entities.abilities.icy_veins.name': 'Veines glaciales',
-  'entities.abilities.icy_veins.description':
-    'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
-  'entities.abilities.cold_blood.name': 'Sang froid',
-  'entities.abilities.cold_blood.description':
-    'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
-  'entities.abilities.blade_flurry.name': 'Déluge de lames',
-  'entities.abilities.blade_flurry.description':
-    'Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)',
-  'entities.abilities.hemorrhage.name': 'Hémorragie',
-  'entities.abilities.hemorrhage.description':
-    'Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)',
-  'entities.abilities.power_infusion.name': 'Infusion de puissance',
-  'entities.abilities.power_infusion.description':
-    'Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)',
-  'entities.abilities.holy_nova.name': 'Nova sacrée',
-  'entities.abilities.holy_nova.description':
-    'Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)',
-  'entities.abilities.shadowform.name': "Forme d'Ombre",
-  'entities.abilities.shadowform.description':
-    'Adopte la Forme d’Ombre, renforçant la magie de l’ombre jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Ombre)',
-  'entities.abilities.elemental_mastery.name': 'Maîtrise élémentaire',
-  'entities.abilities.elemental_mastery.description':
-    'Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)',
-  'entities.abilities.siphon_life.name': 'Siphon de vie',
-  'entities.abilities.siphon_life.description':
-    'Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)',
-  'entities.abilities.conflagrate.name': 'Conflagration',
-  'entities.abilities.conflagrate.description':
-    'Consume votre Immolation sur l’ennemi pour l’enflammer et lui infliger {damage} points de dégâts de Feu. (signature Destruction)',
-  'entities.abilities.moonkin_form.name': 'Forme de sélénien',
-  'entities.abilities.moonkin_form.description':
-    'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
-  'entities.abilities.feral_charge.name': 'Charge farouche',
-  'entities.abilities.feral_charge.description':
-    'Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)',
-  'entities.abilities.swiftmend.name': 'Prompte guérison',
-  'entities.abilities.swiftmend.description':
-    'Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)',
-  'entities.abilities.crusader_strike.name': 'Frappe du croisé',
-  'entities.abilities.crusader_strike.description':
-    'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
-  'entities.abilities.metamorphosis.name': 'Métamorphose',
-  'entities.abilities.metamorphosis.description':
-    'Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)',
+  'entities.abilities.chain_heal.name': 'Soins en chaîne',
+  'entities.abilities.chain_heal.description':
+    "Soigne grandement une cible alliée, puis rebondit vers jusqu'à 2 autres alliés proches, avec 50 % de soins en moins à chaque rebond. (Technique signature de Restauration)",
+  'entities.abilities.razor_howl.name': 'Hurlement tranchant',
+  'entities.abilities.razor_howl.description':
+    'Un cri qui ralentit de 50 % les ennemis à moins de 15 m pendant 8 s. (Talent de guerrier)',
+  'entities.abilities.stormthrow.name': 'Lancer-tempête',
+  'entities.abilities.stormthrow.description':
+    'Lance votre arme pour étourdir une cible pendant 3 s. (Talent de guerrier)',
+  'entities.abilities.reckless_vow.name': 'Vœu téméraire',
+  'entities.abilities.reckless_vow.description':
+    'Augmente toute la génération de rage de 50 % et les chances de coup critique de 20 % pendant 12 s. (Talent de guerrier)',
+  'entities.abilities.red_banner.name': 'Bannière rouge',
+  'entities.abilities.red_banner.description':
+    'Vous et les alliés proches gagnez 10 % de vitesse d’attaque et 10 % de dégâts pendant 20 s. (Talent de guerrier)',
+  'entities.items.chunk_of_ore.name': 'Morceau de minerai',
+  'entities.quests.q_prof_intro.title': 'Un métier pour chaque main',
+  'entities.quests.q_prof_intro.text':
+    "À Eastbrook, chacun exerce un métier en plus du maniement de l'épée, {playerName}. Des filons de minerai sont disséminés autour de la ville, alors prenez une pioche et rapportez-moi 5 morceaux. Extrayez-les vous-même; je saurai faire la différence.",
+  'entities.quests.q_prof_intro.completion':
+    "Vous voyez? Du minerai dans votre sac et des durillons aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l'établi voisin. Un métier honnête vous attend dans chacune de ces activités, si vous le souhaitez.",
+  'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
+  'game.talents.readout.rowsSummary':
+    'Talents : {head}, {picked}/{unlocked} rangées de choix sélectionnées.',
+  'hudChrome.fct.absorbed': 'Absorbé : {amount}',
+  'hudChrome.fct.cheap': 'Coût réduit !',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Envoyer un {item} de moins',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Envoyer un {item} de plus',
 };

@@ -146,7 +146,7 @@ export const it_IT: EnTranslations = {
         "noTree": "La tua classe non ha ancora un albero dei talenti.",
         "locked": "Non hai ancora sbloccato i talenti; iniziano al livello {level}.",
         "noSpec": "nessuna specializzazione",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenti: {head}, selezionate {picked}/{unlocked} righe di scelta.",
         "summary": "Talenti: {head} — {spent}/{total} punti spesi ({breakdown}).",
         "breakdownClass": "Classe {classPts}",
         "breakdownSpec": "Classe {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const it_IT: EnTranslations = {
       "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Assorbito {amount}",
+      "cheap": "Costo ridotto!"
     },
     "emotes": {
       "wave": "Saluta",
@@ -6243,8 +6243,8 @@ export const it_IT: EnTranslations = {
         "description": "Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Cura concatenata",
+        "description": "Cura notevolmente un bersaglio alleato, poi rimbalza su un massimo di altri 2 alleati vicini, con il 50% di cure in meno a ogni rimbalzo. (Abilità distintiva di Rigenerazione)"
       },
       "metamorphosis": {
         "name": "Metamorfosi",
@@ -6383,20 +6383,20 @@ export const it_IT: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a vicini nemici cada segundo por {damage}. (talento da guerriero)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Ululato tagliente",
+        "description": "Un grido che rallenta del 50% i nemici entro 15 m per 8 s. (Talento del guerriero)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Lancio tempestoso",
+        "description": "Scaglia la tua arma per stordire un bersaglio per 3 s. (Talento del guerriero)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Voto spericolato",
+        "description": "Aumenta del 50% tutta la generazione di rabbia e del 20% la probabilità di colpo critico per 12 s. (Talento del guerriero)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Stendardo rosso",
+        "description": "Tu e gli alleati vicini ottenete il 10% di velocità d’attacco e il 10% di danni per 20 s. (Talento del guerriero)"
       },
       "blink": {
         "name": "Passo Baleno",
@@ -6740,7 +6740,7 @@ export const it_IT: EnTranslations = {
         "name": "Zanna del vecchio Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Pezzo di Minerale"
+        "name": "Pezzo di minerale"
       },
       "weathered_ledger_page": {
         "name": "Pagina di registro logora"
@@ -8609,11 +8609,11 @@ export const it_IT: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Un mestiere per ogni mano",
-        "text": "A Eastbrook ogni anima pratica un mestiere oltre all’arte della spada, {playerName}. Ci sono vene di minerale sparse intorno alla città, quindi impugna un piccone e portami 5 pezzi. Estraili tu, bada bene, saprò riconoscere la differenza.",
-        "completion": "Vedi? Minerale nello zaino e calli sulle mani. Continua a estrarre minerali, tagliare legna e raccogliere erbe mentre percorri le strade. Quando torni in città, tieni d’occhio il tabellone delle Priorità della città vicino al mercato e il banco da lavoro lì accanto. C’è un mestiere onesto in tutto questo, se ti interessa.",
+        "text": "Ogni anima di Eastbrook pratica un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale sparsi attorno alla città, quindi impugna un piccone e portami 5 pezzi. Estraili di persona; saprò riconoscere la differenza.",
+        "completion": "Vedi? Minerale nella borsa e calli sulle mani. Continua a estrarre, tagliare legna e raccogliere erbe lungo le strade e, quando torni in città, ricorda il tabellone delle Priorità della città vicino al mercato e il banco da lavoro lì accanto. In tutto questo ti aspetta un mestiere onesto, se lo desideri.",
         "objectives": {
           "0": {
-            "label": "Pezzo di Minerale"
+            "label": "Pezzo di minerale"
           }
         }
       },

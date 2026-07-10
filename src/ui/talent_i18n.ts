@@ -1,3 +1,4 @@
+import type { ProcDef } from '../sim/combat/talent_procs';
 import { CHOICE_ROWS, type ChoiceRowOption } from '../sim/content/choice_rows';
 import {
   type ClassTalents,
@@ -8881,7 +8882,55 @@ const WARRIOR_PORT_TITLE_NAMES = new Set([
   "Giant's Momentum",
 ]);
 
-const WARRIOR_PORT_NONLATIN_TITLES: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+const WARRIOR_PORT_TITLES: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+  es: {
+    'Twin Onrush': 'Arremetida doble',
+    'Hot Pursuit': 'Persecución ardiente',
+    'Crushing Onrush': 'Arremetida aplastante',
+    'Lingering Dread': 'Pavor persistente',
+    'Red Harvest': 'Cosecha roja',
+    "Giant's Momentum": 'Impulso del gigante',
+  },
+  es_ES: {
+    'Twin Onrush': 'Arremetida doble',
+    'Hot Pursuit': 'Persecución ardiente',
+    'Crushing Onrush': 'Arremetida aplastante',
+    'Lingering Dread': 'Pavor persistente',
+    'Red Harvest': 'Cosecha roja',
+    "Giant's Momentum": 'Impulso del gigante',
+  },
+  fr_FR: {
+    'Twin Onrush': 'Double ruée',
+    'Hot Pursuit': 'Poursuite ardente',
+    'Crushing Onrush': 'Écrasante ruée',
+    'Lingering Dread': 'Terreur persistante',
+    'Red Harvest': 'Moisson rouge',
+    "Giant's Momentum": 'Élan du géant',
+  },
+  fr_CA: {
+    'Twin Onrush': 'Double ruée',
+    'Hot Pursuit': 'Poursuite ardente',
+    'Crushing Onrush': 'Écrasante ruée',
+    'Lingering Dread': 'Terreur persistante',
+    'Red Harvest': 'Moisson rouge',
+    "Giant's Momentum": 'Élan du géant',
+  },
+  it_IT: {
+    'Twin Onrush': 'Doppia irruzione',
+    'Hot Pursuit': 'Inseguimento ardente',
+    'Crushing Onrush': 'Irruzione devastante',
+    'Lingering Dread': 'Terrore persistente',
+    'Red Harvest': 'Mietitura rossa',
+    "Giant's Momentum": 'Impeto del gigante',
+  },
+  de_DE: {
+    'Twin Onrush': 'Doppeltes Vorpreschen',
+    'Hot Pursuit': 'Heiße Verfolgung',
+    'Crushing Onrush': 'Zermalmendes Vorpreschen',
+    'Lingering Dread': 'Anhaltender Schrecken',
+    'Red Harvest': 'Rote Ernte',
+    "Giant's Momentum": 'Schwung des Riesen',
+  },
   zh_CN: {
     'Twin Onrush': '双重冲锋',
     'Hot Pursuit': '热追',
@@ -8942,11 +8991,362 @@ const WARRIOR_PORT_NONLATIN_TITLES: Partial<Record<SupportedLanguage, Record<str
     'Red Harvest': 'Красная жатва',
     "Giant's Momentum": 'Поступь исполина',
   },
+  pt_BR: {
+    'Twin Onrush': 'Arremetida Dupla',
+    'Hot Pursuit': 'Perseguição Ardente',
+    'Crushing Onrush': 'Arremetida Esmagadora',
+    'Lingering Dread': 'Pavor Persistente',
+    'Red Harvest': 'Colheita Vermelha',
+    "Giant's Momentum": 'Ímpeto do Gigante',
+  },
+  cs_CZ: {
+    'Twin Onrush': 'Dvojitý nápor',
+    'Hot Pursuit': 'Žhavé pronásledování',
+    'Crushing Onrush': 'Drtivý nápor',
+    'Lingering Dread': 'Přetrvávající děs',
+    'Red Harvest': 'Rudá žeň',
+    "Giant's Momentum": 'Obrova hybnost',
+  },
+  nl_NL: {
+    'Twin Onrush': 'Dubbele bestorming',
+    'Hot Pursuit': 'Heet op de hielen',
+    'Crushing Onrush': 'Verpletterende bestorming',
+    'Lingering Dread': 'Aanhoudende angst',
+    'Red Harvest': 'Rode oogst',
+    "Giant's Momentum": 'Reuzenmomentum',
+  },
+  pl_PL: {
+    'Twin Onrush': 'Podwójne natarcie',
+    'Hot Pursuit': 'Gorący pościg',
+    'Crushing Onrush': 'Miażdżące natarcie',
+    'Lingering Dread': 'Długotrwały lęk',
+    'Red Harvest': 'Czerwone żniwa',
+    "Giant's Momentum": 'Pęd olbrzyma',
+  },
+  id_ID: {
+    'Twin Onrush': 'Serbuan Ganda',
+    'Hot Pursuit': 'Pengejaran Membara',
+    'Crushing Onrush': 'Serbuan Penghancur',
+    'Lingering Dread': 'Kengerian Membekas',
+    'Red Harvest': 'Panen Merah',
+    "Giant's Momentum": 'Momentum Raksasa',
+  },
+  tr_TR: {
+    'Twin Onrush': 'Çifte Atılım',
+    'Hot Pursuit': 'Sıcak Takip',
+    'Crushing Onrush': 'Ezici Atılım',
+    'Lingering Dread': 'Süren Dehşet',
+    'Red Harvest': 'Kızıl Hasat',
+    "Giant's Momentum": 'Devin İvmesi',
+  },
+  sv_SE: {
+    'Twin Onrush': 'Dubbel anstormning',
+    'Hot Pursuit': 'Het jakt',
+    'Crushing Onrush': 'Krossande anstormning',
+    'Lingering Dread': 'Kvardröjande skräck',
+    'Red Harvest': 'Röd skörd',
+    "Giant's Momentum": 'Jättens driv',
+  },
+  vi_VN: {
+    'Twin Onrush': 'Xông Tới Kép',
+    'Hot Pursuit': 'Truy Đuổi Nóng Bỏng',
+    'Crushing Onrush': 'Xông Tới Nghiền Nát',
+    'Lingering Dread': 'Nỗi Kinh Hoàng Dai Dẳng',
+    'Red Harvest': 'Thu Hoạch Đỏ',
+    "Giant's Momentum": 'Đà Của Người Khổng Lồ',
+  },
+  da_DK: {
+    'Twin Onrush': 'Dobbelt fremstorm',
+    'Hot Pursuit': 'Hed forfølgelse',
+    'Crushing Onrush': 'Knusende fremstorm',
+    'Lingering Dread': 'Dvælende rædsel',
+    'Red Harvest': 'Rød høst',
+    "Giant's Momentum": 'Kæmpens fremdrift',
+  },
+};
+
+const WARRIOR_PORT_DESCRIPTIONS: Partial<Record<SupportedLanguage, Record<string, string>>> = {
+  es: {
+    war_r5_twin_onrush:
+      'Ajuste probado por Blaine1705: Arremetida almacena 2 usos, por lo que puedes cargar dos veces seguidas.',
+    war_r5_hot_pursuit:
+      'Ajuste probado por Blaine1705: cada enemigo que matas te otorga un 30% de velocidad de movimiento durante 6 s.',
+    war_r5_crushing_onrush:
+      'Ajuste probado por Blaine1705: Arremetida también enraíza al objetivo durante 4 s y lo ralentiza un 50% durante 15 s.',
+    war_r11_lingering_dread:
+      'Ajuste probado por Blaine1705: los enemigos asustados por tus gritos pueden soportar daño equivalente al 20% de su salud antes de que el miedo termine.',
+    war_r17_red_harvest:
+      'Ajuste probado por Blaine1705: cada enemigo que matas te otorga un 5% de golpe crítico y un 5% de daño durante 8 s, acumulable hasta un 25%.',
+    war_r20_giants_momentum:
+      'Ajuste probado por Blaine1705: cada punto de ira gastado reduce 0,1 s los tiempos de reutilización ofensivos principales.',
+  },
+  es_ES: {
+    war_r5_twin_onrush:
+      'Ajuste probado por Blaine1705: Arremetida almacena 2 usos, por lo que puedes cargar dos veces seguidas.',
+    war_r5_hot_pursuit:
+      'Ajuste probado por Blaine1705: cada enemigo que matas te otorga un 30% de velocidad de movimiento durante 6 s.',
+    war_r5_crushing_onrush:
+      'Ajuste probado por Blaine1705: Arremetida también enraíza al objetivo durante 4 s y lo ralentiza un 50% durante 15 s.',
+    war_r11_lingering_dread:
+      'Ajuste probado por Blaine1705: los enemigos asustados por tus gritos pueden soportar daño equivalente al 20% de su salud antes de que el miedo termine.',
+    war_r17_red_harvest:
+      'Ajuste probado por Blaine1705: cada enemigo que matas te otorga un 5% de golpe crítico y un 5% de daño durante 8 s, acumulable hasta un 25%.',
+    war_r20_giants_momentum:
+      'Ajuste probado por Blaine1705: cada punto de ira gastado reduce 0,1 s los tiempos de reutilización ofensivos principales.',
+  },
+  fr_FR: {
+    war_r5_twin_onrush:
+      'Réglage testé par Blaine1705 : Ruée stocke 2 utilisations, ce qui permet de charger deux fois de suite.',
+    war_r5_hot_pursuit:
+      'Réglage testé par Blaine1705 : chaque ennemi que vous tuez vous confère 30 % de vitesse de déplacement pendant 6 s.',
+    war_r5_crushing_onrush:
+      'Réglage testé par Blaine1705 : Ruée immobilise aussi la cible pendant 4 s et la ralentit de 50 % pendant 15 s.',
+    war_r11_lingering_dread:
+      'Réglage testé par Blaine1705 : les ennemis effrayés par vos cris peuvent subir des dégâts équivalant à 20 % de leur santé avant que la peur ne cesse.',
+    war_r17_red_harvest:
+      "Réglage testé par Blaine1705 : chaque ennemi tué confère 5 % de chances de coup critique et 5 % de dégâts pendant 8 s, cumulables jusqu'à 25 %.",
+    war_r20_giants_momentum:
+      'Réglage testé par Blaine1705 : chaque point de rage dépensé réduit de 0,1 s les temps de recharge offensifs majeurs.',
+  },
+  fr_CA: {
+    war_r5_twin_onrush:
+      'Réglage testé par Blaine1705 : Ruée stocke 2 utilisations, ce qui permet de charger deux fois de suite.',
+    war_r5_hot_pursuit:
+      'Réglage testé par Blaine1705 : chaque ennemi que vous tuez vous confère 30 % de vitesse de déplacement pendant 6 s.',
+    war_r5_crushing_onrush:
+      'Réglage testé par Blaine1705 : Ruée immobilise aussi la cible pendant 4 s et la ralentit de 50 % pendant 15 s.',
+    war_r11_lingering_dread:
+      'Réglage testé par Blaine1705 : les ennemis effrayés par vos cris peuvent subir des dégâts équivalant à 20 % de leur santé avant que la peur ne cesse.',
+    war_r17_red_harvest:
+      "Réglage testé par Blaine1705 : chaque ennemi tué confère 5 % de chances de coup critique et 5 % de dégâts pendant 8 s, cumulables jusqu'à 25 %.",
+    war_r20_giants_momentum:
+      'Réglage testé par Blaine1705 : chaque point de rage dépensé réduit de 0,1 s les temps de recharge offensifs majeurs.',
+  },
+  it_IT: {
+    war_r5_twin_onrush:
+      'Bilanciamento collaudato da Blaine1705: Irruzione accumula 2 utilizzi, così puoi caricare due volte di seguito.',
+    war_r5_hot_pursuit:
+      'Bilanciamento collaudato da Blaine1705: ogni nemico ucciso conferisce il 30% di velocità di movimento per 6 s.',
+    war_r5_crushing_onrush:
+      'Bilanciamento collaudato da Blaine1705: Irruzione immobilizza anche il bersaglio per 4 s e lo rallenta del 50% per 15 s.',
+    war_r11_lingering_dread:
+      'Bilanciamento collaudato da Blaine1705: i nemici impauriti dalle tue grida possono subire danni pari al 20% della loro salute prima che la paura termini.',
+    war_r17_red_harvest:
+      'Bilanciamento collaudato da Blaine1705: ogni nemico ucciso conferisce il 5% di probabilità di critico e il 5% di danni per 8 s, accumulabili fino al 25%.',
+    war_r20_giants_momentum:
+      'Bilanciamento collaudato da Blaine1705: ogni punto di rabbia speso riduce di 0,1 s i tempi di recupero offensivi principali.',
+  },
+  de_DE: {
+    war_r5_twin_onrush:
+      'Von Blaine1705 erprobte Abstimmung: Vorpreschen speichert 2 Einsätze, sodass Ihr zweimal hintereinander anstürmen könnt.',
+    war_r5_hot_pursuit:
+      'Von Blaine1705 erprobte Abstimmung: Jeder getötete Gegner gewährt Euch 6 Sek. lang 30 % Bewegungstempo.',
+    war_r5_crushing_onrush:
+      'Von Blaine1705 erprobte Abstimmung: Vorpreschen macht das Ziel zusätzlich 4 Sek. lang bewegungsunfähig und verlangsamt es 15 Sek. lang um 50 %.',
+    war_r11_lingering_dread:
+      'Von Blaine1705 erprobte Abstimmung: Gegner, die Eure Rufe fürchten, können Schaden in Höhe von 20 % ihrer Gesundheit erleiden, bevor die Furcht endet.',
+    war_r17_red_harvest:
+      'Von Blaine1705 erprobte Abstimmung: Jeder getötete Gegner gewährt 8 Sek. lang 5 % kritische Trefferchance und 5 % Schaden, bis zu 25 % stapelbar.',
+    war_r20_giants_momentum:
+      'Von Blaine1705 erprobte Abstimmung: Jeder verbrauchte Wutpunkt verringert wichtige offensive Abklingzeiten um 0,1 Sek.',
+  },
+  zh_CN: {
+    war_r5_twin_onrush: 'Blaine1705 的实测调校：突进可储存 2 次使用次数，因此你能连续冲锋两次。',
+    war_r5_hot_pursuit: 'Blaine1705 的实测调校：每击杀一个敌人，便获得 30% 移动速度，持续 6 秒。',
+    war_r5_crushing_onrush:
+      'Blaine1705 的实测调校：突进还会将目标定身 4 秒，并使其减速 50%，持续 15 秒。',
+    war_r11_lingering_dread:
+      'Blaine1705 的实测调校：被你的怒吼恐惧的敌人，可承受相当于其 20% 生命值的伤害后恐惧才会解除。',
+    war_r17_red_harvest:
+      'Blaine1705 的实测调校：每击杀一个敌人，便获得 5% 暴击几率和 5% 伤害，持续 8 秒，最多叠加至 25%。',
+    war_r20_giants_momentum:
+      'Blaine1705 的实测调校：每消耗 1 点怒气，主要进攻技能的冷却时间缩短 0.1 秒。',
+  },
+  zh_TW: {
+    war_r5_twin_onrush: 'Blaine1705 的實測調校：猛衝可儲存 2 次使用次數，因此你能連續衝鋒兩次。',
+    war_r5_hot_pursuit: 'Blaine1705 的實測調校：每擊殺一個敵人，便獲得 30% 移動速度，持續 6 秒。',
+    war_r5_crushing_onrush:
+      'Blaine1705 的實測調校：猛衝還會將目標定身 4 秒，並使其減速 50%，持續 15 秒。',
+    war_r11_lingering_dread:
+      'Blaine1705 的實測調校：被你的怒吼恐懼的敵人，可承受相當於其 20% 生命值的傷害後恐懼才會解除。',
+    war_r17_red_harvest:
+      'Blaine1705 的實測調校：每擊殺一個敵人，便獲得 5% 爆擊機率和 5% 傷害，持續 8 秒，最多疊加至 25%。',
+    war_r20_giants_momentum:
+      'Blaine1705 的實測調校：每消耗 1 點怒氣，主要進攻技能的冷卻時間縮短 0.1 秒。',
+  },
+  ko_KR: {
+    war_r5_twin_onrush:
+      'Blaine1705의 실전 검증 조정: 쇄도는 사용 횟수를 2회 저장하여 연속으로 두 번 돌진할 수 있습니다.',
+    war_r5_hot_pursuit:
+      'Blaine1705의 실전 검증 조정: 적을 처치할 때마다 6초 동안 이동 속도가 30% 증가합니다.',
+    war_r5_crushing_onrush:
+      'Blaine1705의 실전 검증 조정: 쇄도가 대상을 4초 동안 제자리에 묶고 15초 동안 50% 느려지게 합니다.',
+    war_r11_lingering_dread:
+      'Blaine1705의 실전 검증 조정: 당신의 함성에 공포에 질린 적은 생명력의 20%에 해당하는 피해를 입어야 공포가 해제됩니다.',
+    war_r17_red_harvest:
+      'Blaine1705의 실전 검증 조정: 적을 처치할 때마다 8초 동안 치명타 확률과 피해가 각각 5% 증가하며 최대 25%까지 중첩됩니다.',
+    war_r20_giants_momentum:
+      'Blaine1705의 실전 검증 조정: 분노를 1 소모할 때마다 주요 공격 기술의 재사용 대기시간이 0.1초 감소합니다.',
+  },
+  ja_JP: {
+    war_r5_twin_onrush:
+      'Blaine1705の実戦検証調整：突撃は2回分の使用回数を蓄積し、2回連続で突進できます。',
+    war_r5_hot_pursuit:
+      'Blaine1705の実戦検証調整：敵を1体倒すたびに、6秒間、移動速度が30%上昇します。',
+    war_r5_crushing_onrush:
+      'Blaine1705の実戦検証調整：突撃は対象を4秒間足止めし、15秒間、移動速度を50%低下させます。',
+    war_r11_lingering_dread:
+      'Blaine1705の実戦検証調整：あなたの叫びで恐怖した敵は、自身の体力の20%に相当するダメージを受けるまで恐怖が解けません。',
+    war_r17_red_harvest:
+      'Blaine1705の実戦検証調整：敵を1体倒すたびに、8秒間、クリティカル率と与ダメージがそれぞれ5%上昇し、最大25%まで累積します。',
+    war_r20_giants_momentum:
+      'Blaine1705の実戦検証調整：怒気を1消費するたびに、主要な攻撃スキルのクールダウンが0.1秒短縮されます。',
+  },
+  pt_BR: {
+    war_r5_twin_onrush:
+      'Ajuste testado por Blaine1705: Arremetida armazena 2 usos, permitindo avançar duas vezes seguidas.',
+    war_r5_hot_pursuit:
+      'Ajuste testado por Blaine1705: cada inimigo abatido concede 30% de velocidade de movimento por 6 s.',
+    war_r5_crushing_onrush:
+      'Ajuste testado por Blaine1705: Arremetida também enraíza o alvo por 4 s e reduz sua velocidade em 50% por 15 s.',
+    war_r11_lingering_dread:
+      'Ajuste testado por Blaine1705: inimigos amedrontados por seus gritos suportam dano equivalente a 20% da própria vida antes que o medo termine.',
+    war_r17_red_harvest:
+      'Ajuste testado por Blaine1705: cada inimigo abatido concede 5% de chance de acerto crítico e 5% de dano por 8 s, acumulando até 25%.',
+    war_r20_giants_momentum:
+      'Ajuste testado por Blaine1705: cada ponto de raiva gasto reduz em 0,1 s as recargas ofensivas principais.',
+  },
+  ru_RU: {
+    war_r5_twin_onrush:
+      'Проверенная Blaine1705 настройка: Натиск сохраняет 2 заряда, позволяя совершить два рывка подряд.',
+    war_r5_hot_pursuit:
+      'Проверенная Blaine1705 настройка: каждый убитый враг повышает скорость передвижения на 30% на 6 сек.',
+    war_r5_crushing_onrush:
+      'Проверенная Blaine1705 настройка: Натиск также обездвиживает цель на 4 сек. и замедляет её на 50% на 15 сек.',
+    war_r11_lingering_dread:
+      'Проверенная Blaine1705 настройка: напуганные вашими криками враги выдерживают урон в размере 20% своего здоровья, прежде чем страх рассеется.',
+    war_r17_red_harvest:
+      'Проверенная Blaine1705 настройка: каждый убитый враг на 8 сек. повышает шанс критического удара и наносимый урон на 5%, суммируясь до 25%.',
+    war_r20_giants_momentum:
+      'Проверенная Blaine1705 настройка: каждая потраченная единица ярости сокращает основные атакующие перезарядки на 0,1 сек.',
+  },
+  cs_CZ: {
+    war_r5_twin_onrush:
+      'Blaine1705 otestoval toto vyladění: Nápor uchovává 2 použití, takže můžeš dvakrát za sebou vyrazit vpřed.',
+    war_r5_hot_pursuit:
+      'Blaine1705 otestoval toto vyladění: každý zabitý nepřítel ti na 6 sek. zvýší rychlost pohybu o 30 %.',
+    war_r5_crushing_onrush:
+      'Blaine1705 otestoval toto vyladění: Nápor také na 4 sek. znehybní cíl a na 15 sek. ho zpomalí o 50 %.',
+    war_r11_lingering_dread:
+      'Blaine1705 otestoval toto vyladění: nepřátelé vystrašení tvými výkřiky snesou poškození ve výši 20 % svého zdraví, než strach pomine.',
+    war_r17_red_harvest:
+      'Blaine1705 otestoval toto vyladění: každý zabitý nepřítel ti na 8 sek. přidá 5 % k šanci na kritický zásah a 5 % k poškození, až do 25 %.',
+    war_r20_giants_momentum:
+      'Blaine1705 otestoval toto vyladění: každý spotřebovaný bod zuřivosti zkrátí hlavní útočné obnovy o 0,1 sek.',
+  },
+  nl_NL: {
+    war_r5_twin_onrush:
+      'Door Blaine1705 beproefde afstelling: Bestorming bewaart 2 inzetten, zodat je twee keer achter elkaar kunt aanvallen.',
+    war_r5_hot_pursuit:
+      'Door Blaine1705 beproefde afstelling: elke gedode vijand geeft 30% bewegingssnelheid gedurende 6 sec.',
+    war_r5_crushing_onrush:
+      'Door Blaine1705 beproefde afstelling: Bestorming houdt het doelwit ook 4 sec. op zijn plaats en vertraagt het 15 sec. lang met 50%.',
+    war_r11_lingering_dread:
+      'Door Blaine1705 beproefde afstelling: vijanden die bang zijn door je kreten kunnen schade ter hoogte van 20% van hun gezondheid verdragen voordat de angst eindigt.',
+    war_r17_red_harvest:
+      'Door Blaine1705 beproefde afstelling: elke gedode vijand geeft 8 sec. lang 5% kans op een kritieke treffer en 5% schade, stapelbaar tot 25%.',
+    war_r20_giants_momentum:
+      'Door Blaine1705 beproefde afstelling: elk verbruikt woedepunt verkort belangrijke offensieve afkoeltijden met 0,1 sec.',
+  },
+  pl_PL: {
+    war_r5_twin_onrush:
+      'Ustawienie przetestowane przez Blaine1705: Natarcie przechowuje 2 użycia, więc możesz zaszarżować dwa razy z rzędu.',
+    war_r5_hot_pursuit:
+      'Ustawienie przetestowane przez Blaine1705: każdy zabity wróg zwiększa szybkość ruchu o 30% na 6 sek.',
+    war_r5_crushing_onrush:
+      'Ustawienie przetestowane przez Blaine1705: Natarcie unieruchamia cel na 4 sek. i spowalnia go o 50% na 15 sek.',
+    war_r11_lingering_dread:
+      'Ustawienie przetestowane przez Blaine1705: wrogowie przestraszeni twoimi okrzykami mogą otrzymać obrażenia równe 20% swojego zdrowia, zanim strach minie.',
+    war_r17_red_harvest:
+      'Ustawienie przetestowane przez Blaine1705: każdy zabity wróg na 8 sek. zwiększa szansę na trafienie krytyczne i zadawane obrażenia o 5%, kumulując się do 25%.',
+    war_r20_giants_momentum:
+      'Ustawienie przetestowane przez Blaine1705: każdy wydany punkt szału skraca główne ofensywne czasy odnowienia o 0,1 sek.',
+  },
+  id_ID: {
+    war_r5_twin_onrush:
+      'Penyesuaian teruji Blaine1705: Serbuan menyimpan 2 penggunaan, sehingga kamu dapat menerjang dua kali berturut-turut.',
+    war_r5_hot_pursuit:
+      'Penyesuaian teruji Blaine1705: setiap musuh yang kamu kalahkan memberikan 30% kecepatan gerak selama 6 dtk.',
+    war_r5_crushing_onrush:
+      'Penyesuaian teruji Blaine1705: Serbuan juga menahan target selama 4 dtk. dan memperlambatnya sebesar 50% selama 15 dtk.',
+    war_r11_lingering_dread:
+      'Penyesuaian teruji Blaine1705: musuh yang ketakutan oleh teriakanmu dapat menerima kerusakan sebesar 20% dari kesehatan mereka sebelum rasa takut berakhir.',
+    war_r17_red_harvest:
+      'Penyesuaian teruji Blaine1705: setiap musuh yang kamu kalahkan memberikan 5% peluang serangan kritis dan 5% kerusakan selama 8 dtk., menumpuk hingga 25%.',
+    war_r20_giants_momentum:
+      'Penyesuaian teruji Blaine1705: setiap amarah yang digunakan mengurangi waktu pemulihan ofensif utama sebesar 0,1 dtk.',
+  },
+  tr_TR: {
+    war_r5_twin_onrush:
+      'Blaine1705 tarafından test edilen ayar: Atılım 2 kullanım depolar, böylece art arda iki kez hücum edebilirsin.',
+    war_r5_hot_pursuit:
+      'Blaine1705 tarafından test edilen ayar: öldürdüğün her düşman 6 sn. boyunca %30 hareket hızı kazandırır.',
+    war_r5_crushing_onrush:
+      'Blaine1705 tarafından test edilen ayar: Atılım hedefi ayrıca 4 sn. sabitler ve 15 sn. boyunca %50 yavaşlatır.',
+    war_r11_lingering_dread:
+      'Blaine1705 tarafından test edilen ayar: haykırışlarının korkuttuğu düşmanlar, korku bozulmadan önce canlarının %20’si kadar hasara dayanabilir.',
+    war_r17_red_harvest:
+      'Blaine1705 tarafından test edilen ayar: öldürdüğün her düşman 8 sn. boyunca %5 kritik vuruş şansı ve %5 hasar kazandırır, en fazla %25 birikir.',
+    war_r20_giants_momentum:
+      'Blaine1705 tarafından test edilen ayar: harcanan her öfke puanı önemli saldırı bekleme sürelerini 0,1 sn. azaltır.',
+  },
+  sv_SE: {
+    war_r5_twin_onrush:
+      'Av Blaine1705 speltestad justering: Anstormning lagrar 2 användningar, så att du kan rusa fram två gånger i rad.',
+    war_r5_hot_pursuit:
+      'Av Blaine1705 speltestad justering: varje fiende du dödar ger 30% rörelsehastighet i 6 sek.',
+    war_r5_crushing_onrush:
+      'Av Blaine1705 speltestad justering: Anstormning binder även målet i 4 sek. och saktar ned det med 50% i 15 sek.',
+    war_r11_lingering_dread:
+      'Av Blaine1705 speltestad justering: fiender som skräms av dina rop kan ta skada motsvarande 20% av sin hälsa innan rädslan upphör.',
+    war_r17_red_harvest:
+      'Av Blaine1705 speltestad justering: varje fiende du dödar ger 5% chans till kritisk träff och 5% skada i 8 sek., staplingsbart till 25%.',
+    war_r20_giants_momentum:
+      'Av Blaine1705 speltestad justering: varje förbrukad raseripoäng minskar viktiga offensiva nedkylningar med 0,1 sek.',
+  },
+  vi_VN: {
+    war_r5_twin_onrush:
+      'Tinh chỉnh đã được Blaine1705 thử nghiệm: Xông Tới tích trữ 2 lượt dùng, cho phép bạn xung phong hai lần liên tiếp.',
+    war_r5_hot_pursuit:
+      'Tinh chỉnh đã được Blaine1705 thử nghiệm: mỗi kẻ địch bạn hạ gục cho 30% tốc độ di chuyển trong 6 giây.',
+    war_r5_crushing_onrush:
+      'Tinh chỉnh đã được Blaine1705 thử nghiệm: Xông Tới cũng trói chân mục tiêu trong 4 giây và làm chậm 50% trong 15 giây.',
+    war_r11_lingering_dread:
+      'Tinh chỉnh đã được Blaine1705 thử nghiệm: kẻ địch bị tiếng hét của bạn làm hoảng sợ có thể chịu sát thương bằng 20% máu trước khi hiệu ứng sợ hãi kết thúc.',
+    war_r17_red_harvest:
+      'Tinh chỉnh đã được Blaine1705 thử nghiệm: mỗi kẻ địch bạn hạ gục cho 5% tỉ lệ chí mạng và 5% sát thương trong 8 giây, cộng dồn tối đa 25%.',
+    war_r20_giants_momentum:
+      'Tinh chỉnh đã được Blaine1705 thử nghiệm: mỗi điểm nộ đã dùng giảm 0,1 giây thời gian hồi của các kỹ năng tấn công chính.',
+  },
+  da_DK: {
+    war_r5_twin_onrush:
+      'Justering spiltestet af Blaine1705: Fremstorm gemmer 2 anvendelser, så du kan storme frem to gange i træk.',
+    war_r5_hot_pursuit:
+      'Justering spiltestet af Blaine1705: hver fjende, du dræber, giver 30% bevægelseshastighed i 6 sek.',
+    war_r5_crushing_onrush:
+      'Justering spiltestet af Blaine1705: Fremstorm binder også målet i 4 sek. og sænker det med 50% i 15 sek.',
+    war_r11_lingering_dread:
+      'Justering spiltestet af Blaine1705: fjender, som frygter dine råb, kan tåle skade svarende til 20% af deres helbred, før frygten ophører.',
+    war_r17_red_harvest:
+      'Justering spiltestet af Blaine1705: hver fjende, du dræber, giver 5% chance for kritiske træffere og 5% skade i 8 sek., der kan stables op til 25%.',
+    war_r20_giants_momentum:
+      'Justering spiltestet af Blaine1705: hvert brugt raseripoint reducerer vigtige offensive nedkølinger med 0,1 sek.',
+  },
 };
 
 function warriorPortTitleOverride(lang: SupportedLanguage, source: string): string | undefined {
   if (!WARRIOR_PORT_TITLE_NAMES.has(source)) return undefined;
-  return WARRIOR_PORT_NONLATIN_TITLES[lang]?.[source] ?? source;
+  return WARRIOR_PORT_TITLES[lang]?.[source] ?? source;
 }
 
 function abilityName(id: string): string {
@@ -8991,6 +9391,132 @@ export function grantAbilityValues(id: string): InterpolationValues {
 // tEntity; placeholders resolve to base values (grantAbilityValues).
 function abilityDescription(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) });
+}
+
+function seconds(value: number, lang: SupportedLanguage): string {
+  return `${formatNumber(value, lang)} s`;
+}
+
+function abilityList(ids: readonly string[] | undefined): string {
+  return ids && ids.length > 0 ? ids.map(abilityName).join(' / ') : '*';
+}
+
+// Proc and rider tooltips use compact mechanical notation instead of authored prose.
+// The words that remain are resolved locale labels and localized ability names; ASCII
+// operators keep the description equally precise for every language without maintaining
+// a second, drift-prone translation corpus for declarative combat data.
+function procTriggerDescription(
+  proc: ProcDef,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  const trigger = proc.trigger;
+  switch (trigger.on) {
+    case 'castNth':
+      return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'spellCrit':
+      return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
+    case 'shieldConsumed':
+      return `${abilityName(trigger.ability)}: ${t('hudChrome.auraEffect.absorb', { value: '0' })}`;
+    case 'hotExpired':
+      return `${abilityName(trigger.ability)}: 0 s`;
+    case 'bigHitTaken':
+      return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeSwingWhile':
+      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
+    case 'thornsReflect':
+      return `${translateTitle(proc.name, lang)}: ${t('guide.abilityHook.thorns')}`;
+  }
+}
+
+function procResponseDescription(
+  response: ProcDef['responses'][number],
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  switch (response.kind) {
+    case 'empowerNext': {
+      const name = abilityList(response.abilities);
+      const window = `(${seconds(response.duration, lang)})`;
+      if (response.aura === 'next_cast_instant') {
+        return `${name}: -${formatPercent(1, lang)} ${text.statLabels.castTime} ${window}`;
+      }
+      const reduction = response.aura === 'next_cast_free' ? 1 : (response.costPct ?? 0);
+      return `${name}: -${formatPercent(reduction, lang)} ${text.statLabels.cost} ${window}`;
+    }
+    case 'cooldownRefund':
+      return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
+    case 'resource':
+      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+    case 'heal':
+      return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
+    case 'absorb':
+      return `${t('hudChrome.auraEffect.absorb', { value: formatNumber(response.amount, lang) })} (${seconds(response.duration, lang)})`;
+    case 'echo':
+      return `+${formatNumber(response.heal, lang)} ${t('hud.meters.healing')} @ <= ${formatPercent(response.belowFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(response.window, lang)})`;
+  }
+}
+
+function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLocaleText): string {
+  const trigger = procTriggerDescription(proc, lang, text);
+  const responses = proc.responses
+    .map((response) => procResponseDescription(response, lang, text))
+    .join('; ');
+  return `${trigger} -> ${responses}.`;
+}
+
+type DescribedAddedEffect = Extract<
+  AbilityEffect,
+  {
+    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+  }
+>;
+
+function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is DescribedAddedEffect {
+  if (
+    effect.type !== 'root' &&
+    effect.type !== 'aoeRoot' &&
+    effect.type !== 'slow' &&
+    effect.type !== 'absorb' &&
+    effect.type !== 'dot' &&
+    effect.type !== 'extendDot' &&
+    effect.type !== 'interrupt' &&
+    effect.type !== 'consumeDot'
+  ) {
+    throw new Error(`Unsupported talent rider effect: ${effect.type}`);
+  }
+}
+
+function addedEffectDescription(
+  sourceAbility: string,
+  effect: AbilityEffect,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  assertDescribedAddedEffect(effect);
+  const name = abilityName(sourceAbility);
+  switch (effect.type) {
+    case 'root':
+      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}).`;
+    case 'aoeRoot':
+      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}; r=${formatNumber(effect.radius, lang)}).`;
+    case 'slow':
+      return `${name}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber((1 - effect.mult) * 100, lang) })} (${seconds(effect.duration, lang)}).`;
+    case 'absorb':
+      return `${name}: ${t('hudChrome.auraEffect.absorb', { value: formatNumber(effect.amount, lang) })} (${seconds(effect.duration, lang)}).`;
+    case 'dot': {
+      const leech = effect.leechPct
+        ? `; +${formatPercent(effect.leechPct, lang)} ${t('hud.meters.healing')}`
+        : '';
+      return `${name}: ${formatNumber(effect.total, lang)} ${text.statLabels.damage} / ${seconds(effect.duration, lang)} (${seconds(effect.interval, lang)}${leech}).`;
+    }
+    case 'extendDot':
+      return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+    case 'interrupt':
+      return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
+    case 'consumeDot':
+      return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+  }
 }
 
 // True when a talent title has an explicit per-locale translation override. The
@@ -9215,11 +9741,9 @@ export function tTalent(request: TalentTranslationRequest): string {
   }
   if (request.kind === 'talentChoice') {
     if (request.field === 'name') return translateTitle(request.choice.name, lang);
-    // Proc and rider mechanics have no generated form yet: fall back to the
-    // authored English description (the standard English-fill model) rather
-    // than rendering an empty "no effect" tooltip.
-    const generated = effectDescription(request.choice.effect, 1, lang);
-    return generated === localeText[lang].noEffect ? request.choice.description : generated;
+    const warriorPortDescription = WARRIOR_PORT_DESCRIPTIONS[lang]?.[request.choice.id];
+    if (warriorPortDescription !== undefined) return warriorPortDescription;
+    return effectDescription(request.choice.effect, 1, lang);
   }
   const exhaustive: never = request;
   return exhaustive;

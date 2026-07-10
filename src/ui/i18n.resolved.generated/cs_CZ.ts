@@ -85,9 +85,9 @@ export const cs_CZ: EnTranslations = {
       "title": "Talenty",
       "classTab": "Třída",
       "specTab": "Specializace",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Volby",
+      "rowUnlockToast": "Odemkla se nová volba talentu!",
+      "rowUnlocks": "Odemkne se na úrovni {level}",
       "available": "Dostupné",
       "spent": "Utraceno",
       "pointSource": "Získáš 1 talentový bod na každé úrovni od úrovně {first} do {cap}. Zvyšuj úroveň a získáš další body.",
@@ -146,7 +146,7 @@ export const cs_CZ: EnTranslations = {
         "noTree": "Tvoje třída zatím nemá talentový strom.",
         "locked": "Talenty ještě nemáš odemčené - začínají na úrovni {level}.",
         "noSpec": "žádná specializace",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenty: {head}, vybráno {picked}/{unlocked} řádků voleb.",
         "summary": "Talenty: {head} - utraceno {spent}/{total} bodů ({breakdown}).",
         "breakdownClass": "Třída {classPts}",
         "breakdownSpec": "Třída {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const cs_CZ: EnTranslations = {
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Pohlceno {amount}",
+      "cheap": "Levnější!"
     },
     "emotes": {
       "wave": "Zamávání",
@@ -1665,8 +1665,8 @@ export const cs_CZ: EnTranslations = {
       "parcelsLabel": "Balíky",
       "parcelsHint": "Klikni na předmět v batozích a přilož ho.",
       "removeParcelAria": "Odebrat {item} z dopisu",
-      "parcelQtyDecreaseAria": "Odeslat o jeden kus {item} méně",
-      "parcelQtyIncreaseAria": "Odeslat o jeden kus {item} více",
+      "parcelQtyDecreaseAria": "Odeslat o jeden {item} méně",
+      "parcelQtyIncreaseAria": "Odeslat o jeden {item} více",
       "sendButton": "Odeslat dopis",
       "postageNote": "Poštovné: {amount}. Havran poletí asi {seconds} s.",
       "arrivedBanner": "Havran přistál: pošta od {name}.",
@@ -6240,99 +6240,99 @@ export const cs_CZ: EnTranslations = {
       },
       "crusader_strike": {
         "name": "Křižácký úder",
-        "description": "Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)"
+        "description": "Zasáhne cíl za poškození zbraní plus {damage} bodů Svatého poškození. (Paladinský talent)"
       },
       "chain_heal": {
         "name": "Řetězové léčení",
-        "description": "Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)"
+        "description": "Silně vyléčí spřátelený cíl a pak přeskočí až na 2 další spojence poblíž. Každý skok léčí o 50 % méně. (Charakteristická schopnost obnovy)"
       },
       "metamorphosis": {
-        "name": "Dread Aspect",
-        "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
+        "name": "Děsivá podoba",
+        "description": "Promění tě na 20 sek. v obludného démona, zvýší poškození kouzel o 20 % a rychlost sesílání o 20 %. Tvůj démon získá 50 % k poškození a 20 % k rychlosti sesílání. (Charakteristická schopnost démonologie)"
       },
       "aura_surge": {
-        "name": "Radiant Swell",
-        "description": "Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)"
+        "name": "Zářivý příboj",
+        "description": "Přetíží tvou auru a zpevní tě 160 body brnění na 10 sek. (Paladinský talent)"
       },
       "holy_shock": {
-        "name": "Svatý otřes",
-        "description": "Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)"
+        "name": "Svatý šok",
+        "description": "Šokuje spřátelený cíl Svatou energií a vyléčí ho, nebo nepříteli způsobí {damage} bodů Svatého poškození. (Charakteristická schopnost svatosti)"
       },
       "holy_shield": {
-        "name": "Hallowed Wall",
-        "description": "Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
+        "name": "Posvátná hradba",
+        "description": "Vrhně zářivou záštitu na nepřítele, způsobí Svaté poškození a odrazí se na 2 nepřátele poblíž. (Charakteristická schopnost ochrany)"
       },
       "bestial_wrath": {
-        "name": "Howling Rage",
-        "description": "Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)"
+        "name": "Vyjící zuřivost",
+        "description": "Uvrhne tě do zvířecí zuřivosti, která na 15 sek. zvýší tvou útočnou sílu o 20 % a poškození tvého mazlíčka o 100 %. (Charakteristická schopnost znalce zvířat)"
       },
       "trueshot_aura": {
-        "name": "Sureflight Aura",
-        "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
+        "name": "Aura jistého letu",
+        "description": "Povzbudí spojence poblíž a zvýší jejich útočnou sílu o 10 % na 30 min. (Charakteristická schopnost střelby)"
       },
       "wyvern_sting": {
-        "name": "Žihadlo wyverny",
-        "description": "Bodne nepřítele na dálku a vyřadí ho až na 4 s. Jakékoli poškození efekt přeruší. (klíčová schopnost Přežití)"
+        "name": "Bodnutí wyverny",
+        "description": "Bodne nepřítele na dálku a vyřadí ho až na 4 sek. Jakékoli poškození účinek zruší. (Charakteristická schopnost přežití)"
       },
       "arcane_power": {
         "name": "Příval éteru",
-        "description": "Zvýší tvoje poškození kouzly o 20 % a rychlost sesílání o 10 % na 10 s. (klíčová schopnost Tajemné magie)"
+        "description": "Na 10 sek. zvýší poškození kouzel o 20 % a rychlost kouzlení o 10 %. (Charakteristická schopnost arkánní magie)"
       },
       "combustion": {
-        "name": "Bleskový žár",
-        "description": "Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)"
+        "name": "Bleskový oheň",
+        "description": "Na 15 sek. zvýší šanci na kritický zásah kouzlem o 50 %. (Charakteristická schopnost ohně)"
       },
       "icy_veins": {
         "name": "Ledové žíly",
-        "description": "Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)"
+        "description": "Na 10 sek. zvýší rychlost kouzlení o 30 % a zabrání přerušení či zpomalení sesílání. (Charakteristická schopnost mrazu)"
       },
       "cold_blood": {
         "name": "Klid zabijáka",
-        "description": "Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritickým zásahem. (klíčová schopnost Vraždění)"
+        "description": "Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritický zásah. (Charakteristická schopnost vraždění)"
       },
       "blade_flurry": {
-        "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+        "name": "Zrcadlené čepele",
+        "description": "Rozpoutá smršť čepelí a na 12 sek. zvýší rychlost útoku o 20 %. (Charakteristická schopnost boje)"
       },
       "hemorrhage": {
-        "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
+        "name": "Rudá stuha",
+        "description": "Zasáhne nepřítele za poškození zbraní plus {damage}, způsobí krvácení po dobu 12 sek. a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 bod komba. (Charakteristická schopnost lstivosti)"
       },
       "power_infusion": {
-        "name": "Anointing",
-        "description": "Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)"
+        "name": "Pomazání",
+        "description": "Naplní spřátelený cíl mocí a na 15 sek. zvýší jeho rychlost kouzlení o 20 %. (Charakteristická schopnost disciplíny)"
       },
       "holy_nova": {
         "name": "Svatá nova",
-        "description": "Vyvolá výbuch svaté záře, který vyléčí blízké spojence za {damage} a poškodí blízké nepřátele. (klíčová schopnost Svaté magie)"
+        "description": "Vyvolá výbuch Svaté záře, který vyléčí spojence poblíž za {damage} a poškodí nepřátele poblíž. (Charakteristická schopnost svatosti)"
       },
       "shadowform": {
-        "name": "Gloamveil Form",
-        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "name": "Podoba šerého závoje",
+        "description": "Přijme stínovou podobu, zvýší tvé Stínové poškození o 15 a posílí stínovou magii, dokud se neproměníš zpět. Opětovným sesláním se vrátíš do běžné podoby. (Charakteristická schopnost stínu)"
       },
       "elemental_mastery": {
-        "name": "Primal Mastery",
-        "description": "Calls on the storm, making your next spell instant. (Elemental signature)"
+        "name": "Prvotní mistrovství",
+        "description": "Povolá bouři, díky níž bude tvé příští kouzlo okamžité. (Charakteristická schopnost živlů)"
       },
       "siphon_life": {
-        "name": "Veinleech",
-        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+        "name": "Vysávání žil",
+        "description": "Vysává z nepřítele život, způsobí {damage} bodů Stínového poškození za 30 sek. a vyléčí tě za způsobené poškození. (Charakteristická schopnost utrpení)"
       },
       "conflagrate": {
-        "name": "Vzplanutí",
-        "description": "Spotřebuje Hořící pakt na nepříteli a zapálí ho za {damage} ohnivého poškození. (klíčová schopnost Ničení)"
+        "name": "Požár",
+        "description": "Spotřebuje tvé Zapálení na nepříteli a zažehne ho za {damage} bodů Ohnivého poškození. (Charakteristická schopnost zkázy)"
       },
       "moonkin_form": {
-        "name": "Moonwing Form",
-        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
+        "name": "Podoba měsíčního křídla",
+        "description": "Promění tě v děsivého sovodlaka, zvýší poškození kouzel o 20 % a brnění o 50 %. Trvá, dokud podobu neopustíš. Opětovným sesláním se vrátíš do podoby sesilatele. (Charakteristická schopnost rovnováhy)"
       },
       "feral_charge": {
-        "name": "Prvotní nápor",
-        "description": "Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)"
+        "name": "Prvotní příval",
+        "description": "Rozpoutá prvotní příval. Ve Vlčí podobě se na 10 sek. zvýší obnova energie o 100 %. V Medvědí podobě okamžitě vytvoří 50 bodů zuřivosti. (Charakteristická schopnost divokosti)"
       },
       "swiftmend": {
-        "name": "Rychlé zhojení",
-        "description": "Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)"
+        "name": "Rychlé uzdravení",
+        "description": "Spotřebuje efekt průběžného léčení na spřáteleném cíli a vyléčí ho za {damage}. (Charakteristická schopnost obnovy)"
       },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",
@@ -6383,20 +6383,20 @@ export const cs_CZ: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a blízké nepřátele cada segundo por {damage}. (válečnický talent)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Břitký řev",
+        "description": "Výkřik, který na 8 sek. zpomalí nepřátele do 15 m o 50 %. (Válečnický talent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Bouřný hod",
+        "description": "Mrští tvou zbraní a omráčí cíl na 3 sek. (Válečnický talent)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Lehkomyslná přísaha",
+        "description": "Na 12 sek. zvýší veškerou tvorbu zuřivosti o 50 % a šanci na kritický zásah o 20 %. (Válečnický talent)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Rudý prapor",
+        "description": "Ty a spojenci poblíž získáte na 20 sek. 10 % k rychlosti útoku a 10 % k poškození. (Válečnický talent)"
       },
       "blink": {
         "name": "Mihokrok",
@@ -8609,8 +8609,8 @@ export const cs_CZ: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Řemeslo pro každou ruku",
-        "text": "Každý v Eastbrooku ovládá vedle meče i nějaké řemeslo, {playerName}. Kolem města jsou roztroušené rudné žíly, tak se rozmáchni krumpáčem a přines mi 5 kusů. Vytěž je vlastníma rukama; rozdíl poznám.",
-        "completion": "Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.",
+        "text": "Každý v Eastbrooku se kromě meče živí i řemeslem, {playerName}. Kolem města jsou rozeseté rudné žíly, tak vezmi krumpáč a přines mi 5 kusů. Vytěž je sám; poznám rozdíl.",
+        "completion": "Vidíš? Ruda v brašně a mozoly na rukou. Při cestách dál těž, kácej dřevo a sbírej byliny. Až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a nedaleký pracovní stůl. Ve všem tom čeká poctivé řemeslo, pokud o něj stojíš.",
         "objectives": {
           "0": {
             "label": "Kus rudy"

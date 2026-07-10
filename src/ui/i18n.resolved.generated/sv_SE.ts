@@ -85,9 +85,9 @@ export const sv_SE: EnTranslations = {
       "title": "Talanger",
       "classTab": "Klass",
       "specTab": "Specialisering",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Val",
+      "rowUnlockToast": "Ett nytt talangval har låsts upp!",
+      "rowUnlocks": "Låses upp på nivå {level}",
       "available": "Tillgänglig",
       "spent": "Lagda",
       "pointSource": "Tjäna 1 talangpoäng per nivå från nivå {first} till {cap}. Gå upp i nivå för att få fler poäng.",
@@ -146,7 +146,7 @@ export const sv_SE: EnTranslations = {
         "noTree": "Din klass har inget talangträd än.",
         "locked": "Du har inte låst upp talanger än, de börjar vid nivå {level}.",
         "noSpec": "ingen specialisering",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talanger: {head}, {picked}/{unlocked} valrader valda.",
         "summary": "Talanger: {head} — {spent}/{total} poäng lagda ({breakdown}).",
         "breakdownClass": "Klass {classPts}",
         "breakdownSpec": "Klass {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const sv_SE: EnTranslations = {
       "spiritHealerAlive": "Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} absorberat",
+      "cheap": "Billigare!"
     },
     "emotes": {
       "wave": "Vinka",
@@ -1666,7 +1666,7 @@ export const sv_SE: EnTranslations = {
       "parcelsHint": "Klicka på ett föremål i dina väskor för att bifoga det.",
       "removeParcelAria": "Ta bort {item} från brevet",
       "parcelQtyDecreaseAria": "Skicka en {item} mindre",
-      "parcelQtyIncreaseAria": "Skicka en till {item}",
+      "parcelQtyIncreaseAria": "Skicka en {item} mer",
       "sendButton": "Skicka brev",
       "postageNote": "Porto: {amount}. Korpen flyger i ungefär {seconds}s.",
       "arrivedBanner": "Korpen har landat: post från {name}.",
@@ -6243,8 +6243,8 @@ export const sv_SE: EnTranslations = {
         "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Kedjeläkning",
+        "description": "Helar ett vänligt mål kraftigt och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp helar 50% mindre. (Restaureringens signaturförmåga)"
       },
       "metamorphosis": {
         "name": "Metamorfos",
@@ -6383,20 +6383,20 @@ export const sv_SE: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a närliggande fiender cada segundo por {damage}. (krigartalang)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Rakbladsvrål",
+        "description": "Ett stridsrop som saktar ned fiender inom 15 m med 50% i 8 sek. (Krigartalang)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Stormkast",
+        "description": "Kasta ditt vapen för att bedöva ett mål i 3 sek. (Krigartalang)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Hänsynslöst löfte",
+        "description": "Ökar all generering av raseri med 50% och chansen till kritiska träffar med 20% i 12 sek. (Krigartalang)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Rött baner",
+        "description": "Du och allierade i närheten får 10% attackhastighet och 10% skada i 20 sek. (Krigartalang)"
       },
       "blink": {
         "name": "Flimmersteg",
@@ -6740,7 +6740,7 @@ export const sv_SE: EnTranslations = {
         "name": "Gamle Gråkäftens huggtand"
       },
       "chunk_of_ore": {
-        "name": "Malmklump"
+        "name": "Malmbit"
       },
       "weathered_ledger_page": {
         "name": "Väderbiten liggarsida"
@@ -8609,11 +8609,11 @@ export const sv_SE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ett yrke för varje hand",
-        "text": "Alla i Östbäck har ett yrke vid sidan om svärdet, {playerName}. Det finns malmådror utspridda runt staden, så svinga en hacka och ge mig 5 klumpar. Bryt dem själv, märk väl; jag ser skillnaden.",
-        "completion": "Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.",
+        "text": "Alla i Eastbrook har ett yrke vid sidan av svärdet, {playerName}. Malmådror ligger spridda runt staden, så ta en hacka och hämta 5 bitar åt mig. Bryt dem själv; jag märker skillnaden.",
+        "completion": "Ser du? Malm i väskan och valkar på händerna. Fortsätt bryta malm, hugga timmer och plocka örter längs vägarna. När du återvänder till staden, kom ihåg tavlan för Stadsfokus vid marknaden och arbetsbänken intill. I allt detta väntar ett hederligt yrke, om du vill ha det.",
         "objectives": {
           "0": {
-            "label": "Malmklump"
+            "label": "Malmbit"
           }
         }
       },

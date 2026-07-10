@@ -85,9 +85,9 @@ export const pl_PL: EnTranslations = {
       "title": "Talenty",
       "classTab": "Klasa",
       "specTab": "Specjalizacja",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Wybory",
+      "rowUnlockToast": "Odblokowano nowy wybór talentu!",
+      "rowUnlocks": "Odblokowuje się na poziomie {level}",
       "available": "Dostępne",
       "spent": "Wydano",
       "pointSource": "Zdobywasz 1 punkt talentu na każdym poziomie od poziomu {first} do {cap}. Awansuj, aby zdobyć więcej punktów.",
@@ -146,7 +146,7 @@ export const pl_PL: EnTranslations = {
         "noTree": "Twoja klasa nie ma jeszcze drzewka talentów.",
         "locked": "Nie odblokowałeś jeszcze talentów — pojawiają się na poziomie {level}.",
         "noSpec": "brak specjalizacji",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenty: {head}, wybrano {picked}/{unlocked} rzędów wyboru.",
         "summary": "Talenty: {head} — wydano {spent}/{total} punktów ({breakdown}).",
         "breakdownClass": "Klasa {classPts}",
         "breakdownSpec": "Klasa {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const pl_PL: EnTranslations = {
       "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Pochłonięto {amount}",
+      "cheap": "Taniej!"
     },
     "emotes": {
       "wave": "Pomachaj",
@@ -1665,8 +1665,8 @@ export const pl_PL: EnTranslations = {
       "parcelsLabel": "Paczki",
       "parcelsHint": "Kliknij przedmiot w torbach, aby go załączyć.",
       "removeParcelAria": "Usuń {item} z listu",
-      "parcelQtyDecreaseAria": "Wyślij o jedną sztukę {item} mniej",
-      "parcelQtyIncreaseAria": "Wyślij o jedną sztukę {item} więcej",
+      "parcelQtyDecreaseAria": "Wyślij o jeden {item} mniej",
+      "parcelQtyIncreaseAria": "Wyślij o jeden {item} więcej",
       "sendButton": "Wyślij list",
       "postageNote": "Opłata pocztowa: {amount}. Kruk leci około {seconds} s.",
       "arrivedBanner": "Kruk wylądował: poczta od {name}.",
@@ -6243,8 +6243,8 @@ export const pl_PL: EnTranslations = {
         "description": "Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Łańcuchowe leczenie",
+        "description": "Leczy sojuszniczy cel za dużą wartość, a następnie przeskakuje na maksymalnie 2 dodatkowych pobliskich sojuszników. Każdy przeskok leczy o 50% mniej. (Umiejętność specjalna Odnowy)"
       },
       "metamorphosis": {
         "name": "Metamorfoza",
@@ -6383,20 +6383,20 @@ export const pl_PL: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a pobliskich wrogów cada segundo por {damage}. (talent wojownika)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Tnący ryk",
+        "description": "Okrzyk, który spowalnia wrogów w promieniu 15 m o 50% na 8 sek. (Talent wojownika)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Burzowy rzut",
+        "description": "Rzuć bronią, aby ogłuszyć cel na 3 sek. (Talent wojownika)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Lekkomyślna przysięga",
+        "description": "Zwiększa całe generowanie szału o 50% i szansę na trafienie krytyczne o 20% na 12 sek. (Talent wojownika)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Czerwony sztandar",
+        "description": "Ty i pobliscy sojusznicy zyskujecie 10% szybkości ataku i 10% obrażeń na 20 sek. (Talent wojownika)"
       },
       "blink": {
         "name": "Migotliwy Krok",
@@ -6740,7 +6740,7 @@ export const pl_PL: EnTranslations = {
         "name": "Kieł Starego Szaroszczękiego"
       },
       "chunk_of_ore": {
-        "name": "Kawałek rudy"
+        "name": "Bryła rudy"
       },
       "weathered_ledger_page": {
         "name": "Zniszczona strona księgi"
@@ -8609,11 +8609,11 @@ export const pl_PL: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Fach dla każdej dłoni",
-        "text": "Każdy w Eastbrook para się jakimś fachem oprócz władania mieczem, {playerName}. Wokół miasta pełno żył rudy, więc chwyć za kilof i przynieś mi 5 kawałków. Wydobądź je własnoręcznie; poznam różnicę.",
-        "completion": "Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.",
+        "text": "Każdy w Eastbrook poza władaniem mieczem zna jakiś fach, {playerName}. Wokół miasta rozsiane są żyły rudy, więc chwyć kilof i przynieś mi 5 brył. Wydobądź je samodzielnie; poznam różnicę.",
+        "completion": "Widzisz? Ruda w torbie i odciski na dłoniach. W drodze dalej wydobywaj rudę, ścinaj drewno i zbieraj zioła. Po powrocie do miasta pamiętaj o tablicy Priorytetów miasta przy rynku i pobliskim warsztacie. W każdej z tych prac czeka uczciwy fach, jeśli go zechcesz.",
         "objectives": {
           "0": {
-            "label": "Kawałek rudy"
+            "label": "Bryła rudy"
           }
         }
       },

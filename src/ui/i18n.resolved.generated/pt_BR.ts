@@ -146,7 +146,7 @@ export const pt_BR: EnTranslations = {
         "noTree": "Sua classe ainda não tem árvore de talentos.",
         "locked": "Você ainda não desbloqueou talentos — eles começam no nível {level}.",
         "noSpec": "sem especialização",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talentos: {head}, escolhidas {picked}/{unlocked} linhas de opções.",
         "summary": "Talentos: {head} — {spent}/{total} pontos gastos ({breakdown}).",
         "breakdownClass": "Classe {classPts}",
         "breakdownSpec": "Classe {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const pt_BR: EnTranslations = {
       "spiritHealerAlive": "O Guardião Pálido vela pelos mortos. Você ainda está entre os vivos."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} absorvido",
+      "cheap": "Custo reduzido!"
     },
     "emotes": {
       "wave": "Acenar",
@@ -6243,8 +6243,8 @@ export const pt_BR: EnTranslations = {
         "description": "Golpeia o alvo com dano da arma mais {damage} de dano Sagrado. (talento de paladino)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Cura Encadeada",
+        "description": "Cura bastante um alvo aliado e depois salta para até 2 aliados próximos adicionais, curando 50% menos a cada salto. (Habilidade exclusiva de Restauração)"
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -6383,20 +6383,20 @@ export const pt_BR: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a próximos inimigos cada segundo por {damage}. (talento de guerreiro)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Uivo Cortante",
+        "description": "Um grito que reduz em 50% a velocidade dos inimigos em um raio de 15 m por 8 s. (Talento de guerreiro)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Arremesso da Tempestade",
+        "description": "Arremessa sua arma para atordoar um alvo por 3 s. (Talento de guerreiro)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Juramento Imprudente",
+        "description": "Aumenta em 50% toda a geração de raiva e em 20% a chance de acerto crítico por 12 s. (Talento de guerreiro)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Estandarte Vermelho",
+        "description": "Você e os aliados próximos recebem 10% de velocidade de ataque e 10% de dano por 20 s. (Talento de guerreiro)"
       },
       "blink": {
         "name": "Passo Cintilante",
@@ -8608,9 +8608,9 @@ export const pt_BR: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "Um ofício para cada mão",
-        "text": "Cada pessoa em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério espalhados pela cidade, então pegue uma picareta e traga 5 pedaços para mim. Extraia você mesmo, viu? Eu vou saber a diferença.",
-        "completion": "Viu só? Minério na mochila e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, preste atenção no quadro do Foco da Cidade perto do mercado e na bancada de criação ali ao lado. Dá para ganhar a vida honestamente com tudo isso, se você quiser.",
+        "title": "Um Ofício para Cada Mão",
+        "text": "Toda alma em Eastbrook pratica um ofício além da espada, {playerName}. Há veios de minério espalhados pela cidade, então pegue uma picareta e traga 5 pedaços para mim. Minere você mesmo; eu saberei a diferença.",
+        "completion": "Viu só? Minério na bolsa e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, lembre-se do quadro de Foco da Cidade perto do mercado e da bancada de trabalho ao lado. Há um ofício honesto esperando em tudo isso, se você quiser.",
         "objectives": {
           "0": {
             "label": "Pedaço de Minério"

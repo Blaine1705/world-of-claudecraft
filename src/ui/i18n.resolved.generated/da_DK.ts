@@ -85,9 +85,9 @@ export const da_DK: EnTranslations = {
       "title": "Talenter",
       "classTab": "Klasse",
       "specTab": "Specialisering",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Valg",
+      "rowUnlockToast": "Et nyt talentvalg er låst op!",
+      "rowUnlocks": "Låses op på niveau {level}",
       "available": "Tilgængelig",
       "spent": "Brugt",
       "pointSource": "Optjen 1 talentpoint per niveau fra niveau {first} til {cap}. Stig i niveau for at få flere point.",
@@ -146,7 +146,7 @@ export const da_DK: EnTranslations = {
         "noTree": "Din klasse har endnu ikke et talenttræ.",
         "locked": "Du har endnu ikke låst talenter op — de begynder ved niveau {level}.",
         "noSpec": "ingen specialisering",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenter: {head}, {picked}/{unlocked} valgrupper valgt.",
         "summary": "Talenter: {head} — {spent}/{total} point brugt ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -173,8 +173,8 @@ export const da_DK: EnTranslations = {
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} absorberet",
+      "cheap": "Billigere!"
     },
     "emotes": {
       "wave": "Vink",
@@ -6243,8 +6243,8 @@ export const da_DK: EnTranslations = {
         "description": "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Kædeheling",
+        "description": "Helbreder et venligt mål kraftigt og springer derefter til op til 2 yderligere allierede i nærheden. Hvert spring helbreder 50% mindre. (Restaurerings signaturfærdighed)"
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -6383,20 +6383,20 @@ export const da_DK: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a nærliggende fjender cada segundo por {damage}. (krigertalent)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Skarpt hyl",
+        "description": "Et råb, der sænker fjender inden for 15 m med 50% i 8 sek. (Kriger-talent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Stormkast",
+        "description": "Kast dit våben for at bedøve et mål i 3 sek. (Kriger-talent)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Dumdristigt løfte",
+        "description": "Øger al generering af raseri med 50% og chancen for kritiske træffere med 20% i 12 sek. (Kriger-talent)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Rødt banner",
+        "description": "Du og allierede i nærheden får 10% angrebshastighed og 10% skade i 20 sek. (Kriger-talent)"
       },
       "blink": {
         "name": "Flimmertrin",
@@ -6740,7 +6740,7 @@ export const da_DK: EnTranslations = {
         "name": "Gamle Gråkæbes Hugtand"
       },
       "chunk_of_ore": {
-        "name": "Malmklump"
+        "name": "Stykke malm"
       },
       "weathered_ledger_page": {
         "name": "Forvitret Regnskabsside"
@@ -8609,11 +8609,11 @@ export const da_DK: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Et håndværk til hver hånd",
-        "text": "Alle i Østbæk har et håndværk ved siden af sværdet, {playerName}. Der ligger malmårer rundt om byen, så sving en hakke og bring mig 5 klumper. Bryd dem selv, vel at mærke; jeg kan kende forskel.",
-        "completion": "Kan du se? Malm i din taske og hård hud på dine hænder. Fortsæt med minedrift, skovhugst og urtesamling, mens du rejser ad vejene. Når du er tilbage i byen, så husk Byfokus-tavlen ved markedet og arbejdsbænken i nærheden. Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.",
+        "text": "Alle i Eastbrook har et håndværk ved siden af sværdet, {playerName}. Der ligger malmårer spredt rundt om byen, så tag en hakke og hent 5 stykker til mig. Bryd dem selv; jeg kan se forskellen.",
+        "completion": "Kan du se det? Malm i tasken og hård hud på hænderne. Fortsæt med at bryde malm, hugge træ og samle urter langs vejene. Når du vender tilbage til byen, så husk tavlen for Byfokus ved markedet og arbejdsbænken ved siden af. I alt dette venter et ærligt håndværk, hvis du vil have det.",
         "objectives": {
           "0": {
-            "label": "Malmklump"
+            "label": "Stykke malm"
           }
         }
       },

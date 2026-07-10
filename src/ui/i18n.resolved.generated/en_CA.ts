@@ -6244,7 +6244,7 @@ export const en_CA: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Dread Aspect",
