@@ -6,6 +6,7 @@ import {
   resolvePosition,
 } from '../src/sim/colliders';
 import {
+  BUILTIN_WORLD,
   CLASSES,
   CRYPT_DOOR_POS,
   DUNGEON_LIST,
@@ -25,10 +26,11 @@ import { createMob } from '../src/sim/entity';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import { dist2d, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 import {
   DECORATION_MAX_SLOPE,
   generateDecorations,
+  generateDecorationsInBounds,
   groundHeight,
   terrainSteepness,
   terrainSteepnessAt,
@@ -38,9 +40,27 @@ import {
 import { wallFootFixture } from './helpers/wall_foot';
 
 const SEED = 20061;
+const RITUAL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: BUILTIN_WORLD.groundObjects.filter(
+    (object) => object.itemId === 'crypt_ritual_circle',
+  ),
+};
+let decorationCache: ReturnType<typeof generateDecorations> | null = null;
+
+function decorations() {
+  if (!decorationCache) decorationCache = generateDecorations(SEED);
+  return decorationCache;
+}
 
 function makeSim(cls: 'warrior' | 'mage' | 'hunter' = 'warrior') {
   return new Sim({ seed: SEED, playerClass: cls });
+}
+
+function makeRitualSim() {
+  return new Sim({ seed: SEED, playerClass: 'warrior', world: RITUAL_TEST_WORLD });
 }
 
 function teleportTo(sim: Sim, x: number, z: number, pid?: number) {
@@ -236,7 +256,7 @@ describe('collision & terrain', () => {
   });
 
   it('camera ghosts through trees while movement still collides', () => {
-    const tree = generateDecorations(SEED).find((d) => d.kind !== 'rock')!;
+    const tree = decorations().find((d) => d.kind !== 'rock')!;
     const groundY = groundHeight(tree.x, tree.z, SEED);
 
     const through = cameraOcclusion(
@@ -255,11 +275,27 @@ describe('collision & terrain', () => {
     expect(Math.abs(blocked.x - tree.x) + Math.abs(blocked.z - tree.z)).toBeGreaterThan(0.5);
   });
 
+  it('bounded decoration queries exactly match filtering the full deterministic field', () => {
+    const all = decorations();
+    const bounds = [
+      { minX: -64, maxX: 73, minZ: -80, maxZ: 230 },
+      { minX: -540, maxX: -180, minZ: 900, maxZ: 1900 },
+      { minX: 180, maxX: 540, minZ: 900, maxZ: 1900 },
+      { minX: 15.9, maxX: 16.1, minZ: 1023.9, maxZ: 1024.1 },
+    ];
+    for (const box of bounds) {
+      expect(generateDecorationsInBounds(SEED, box)).toEqual(
+        all.filter((d) => d.x >= box.minX && d.x <= box.maxX && d.z >= box.minZ && d.z <= box.maxZ),
+      );
+    }
+    expect(generateDecorationsInBounds(SEED, { minX: 1, maxX: 0, minZ: 0, maxZ: 1 })).toEqual([]);
+  });
+
   it('does not scatter trees or rocks onto cliff faces', () => {
     // A prop on a wall steeper than the climb limit floats off the face and
     // (for large rocks / trunks) plants an invisible collider there.
     expect(DECORATION_MAX_SLOPE).toBe(1.5);
-    const onCliffs = generateDecorations(SEED)
+    const onCliffs = decorations()
       .filter((d) => terrainSteepness(d.x, d.z, SEED) > DECORATION_MAX_SLOPE)
       .map((d) => `${d.kind}@${d.x.toFixed(0)},${d.z.toFixed(0)}`);
     expect(onCliffs).toEqual([]);
@@ -1422,7 +1458,7 @@ describe('quest npc roles', () => {
   });
 
   it('despawns Varkas Boneguards after 60 seconds out of combat without damage and resets on damage taken', () => {
-    const sim = makeSim();
+    const sim = makeRitualSim();
     const boneguard = createMob(909900, MOBS.varkas_boneguard, 19, { x: 0, y: 0, z: 0 });
     boneguard.maxHp = 1000;
     boneguard.hp = 1000;
@@ -1469,7 +1505,7 @@ describe('quest npc roles', () => {
   }, 90_000);
 
   it('despawns the Bound Guardian after 60 seconds out of combat without damage and resets on damage taken', () => {
-    const sim = makeSim();
+    const sim = makeRitualSim();
     const ritual = [...sim.entities.values()].find(
       (e) => e.kind === 'object' && e.objectItemId === 'crypt_ritual_circle',
     )!;

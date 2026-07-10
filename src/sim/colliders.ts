@@ -31,7 +31,8 @@ import { valeCupColliders } from './vale_cup_layout';
 import {
   crossesGardenHedge,
   crossesSealedBorder,
-  generateDecorations,
+  type Decoration,
+  generateDecorationsInBounds,
   groundHeight,
 } from './world';
 import { yumiMazeColliders } from './yumi_maze_layout';
@@ -209,30 +210,6 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
 
-  // trees & large rocks from the deterministic decoration field
-  for (const d of generateDecorations(seed)) {
-    if (d.kind === 'rock') {
-      if (d.scale >= 0.8)
-        out.push({
-          type: 'circle',
-          x: d.x,
-          z: d.z,
-          r: 0.7 * d.scale,
-          cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale),
-        });
-    } else {
-      // tree trunks only — canopies don't block
-      out.push({
-        type: 'circle',
-        x: d.x,
-        z: d.z,
-        r: 0.55 * d.scale,
-        cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale),
-        camGhost: true,
-      });
-    }
-  }
-
   // Editor-placed assets with a collide footprint (custom maps only; the
   // built-in world has no placements). The ONE placement record drives both the
   // renderer and this collider, so what you see is what you collide with.
@@ -319,6 +296,12 @@ const FENCE_RAIL_HEIGHT = 2.8;
 
 interface ColliderGrid {
   cells: Map<string, Collider[]>;
+  // The authored prop grid above is cheap and eager. The multi-realm
+  // decoration field is generated one queried cell at a time, then combined
+  // with that authored list. This keeps collision identical without making a
+  // cold Sim enumerate the whole continent before its first spawn.
+  decorationCells: Map<string, Collider[]>;
+  combinedCells: Map<string, Collider[]>;
 }
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
@@ -349,7 +332,7 @@ function gridFor(seed: number): ColliderGrid {
   }
   let grid = perContent.get(seed);
   if (grid) return grid;
-  grid = { cells: new Map() };
+  grid = { cells: new Map(), decorationCells: new Map(), combinedCells: new Map() };
   for (const c of staticWorldColliders(seed)) {
     const b = colliderBounds(c);
     const x0 = Math.floor((b.minX - MAX_BODY_RADIUS) / GRID_CELL);
@@ -367,6 +350,74 @@ function gridFor(seed: number): ColliderGrid {
   }
   perContent.set(seed, grid);
   return grid;
+}
+
+// Decoration scale is `0.7 + hash * 0.9` (world.ts), and rocks have the
+// largest collision multiplier at 0.7. This conservative bound selects every
+// candidate whose circle could be assigned to a queried grid cell.
+const MAX_DECORATION_COLLIDER_RADIUS = 1.6 * 0.7;
+
+function decorationCollider(seed: number, d: Decoration): Collider | null {
+  if (d.kind === 'rock') {
+    if (d.scale < 0.8) return null;
+    return {
+      type: 'circle',
+      x: d.x,
+      z: d.z,
+      r: 0.7 * d.scale,
+      cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale),
+    };
+  }
+  // tree trunks only — canopies don't block
+  return {
+    type: 'circle',
+    x: d.x,
+    z: d.z,
+    r: 0.55 * d.scale,
+    cameraTopY: topY(seed, d.x, d.z, 7.5 * d.scale),
+    camGhost: true,
+  };
+}
+
+function collidersInCell(grid: ColliderGrid, seed: number, gx: number, gz: number): Collider[] {
+  const key = `${gx},${gz}`;
+  const cached = grid.combinedCells.get(key);
+  if (cached) return cached;
+
+  let decorations = grid.decorationCells.get(key);
+  if (!decorations) {
+    decorations = [];
+    const minX = gx * GRID_CELL;
+    const maxX = (gx + 1) * GRID_CELL;
+    const minZ = gz * GRID_CELL;
+    const maxZ = (gz + 1) * GRID_CELL;
+    const pad = MAX_BODY_RADIUS + MAX_DECORATION_COLLIDER_RADIUS;
+    for (const decoration of generateDecorationsInBounds(seed, {
+      minX: minX - pad,
+      maxX: maxX + pad,
+      minZ: minZ - pad,
+      maxZ: maxZ + pad,
+    })) {
+      const collider = decorationCollider(seed, decoration);
+      if (!collider) continue;
+      const bounds = colliderBounds(collider);
+      const x0 = Math.floor((bounds.minX - MAX_BODY_RADIUS) / GRID_CELL);
+      const x1 = Math.floor((bounds.maxX + MAX_BODY_RADIUS) / GRID_CELL);
+      const z0 = Math.floor((bounds.minZ - MAX_BODY_RADIUS) / GRID_CELL);
+      const z1 = Math.floor((bounds.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
+      if (gx >= x0 && gx <= x1 && gz >= z0 && gz <= z1) decorations.push(collider);
+    }
+    grid.decorationCells.set(key, decorations);
+  }
+
+  const authored = grid.cells.get(key);
+  const combined = authored?.length
+    ? decorations.length
+      ? [...authored, ...decorations]
+      : authored
+    : decorations;
+  grid.combinedCells.set(key, combined);
+  return combined;
 }
 
 // Push (x,z) out of one collider. Returns the corrected point, or null if clear.
@@ -531,9 +582,8 @@ export function resolvePosition(
     return { x: local.x + ox, z: local.z + oz };
   }
   const grid = gridFor(seed);
-  const key = `${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`;
-  const list = grid.cells.get(key);
-  if (!list) return { x, z };
+  const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
+  if (list.length === 0) return { x, z };
   return resolveAgainst(list, x, z, r, ignoreFences);
 }
 
@@ -848,8 +898,9 @@ export function cameraOcclusion(
   let best = 1;
   for (let gx = gx0; gx <= gx1; gx++) {
     for (let gz = gz0; gz <= gz1; gz++) {
-      const list = grid.cells.get(`${gx},${gz}`);
-      if (list) best = Math.min(best, sweepColliders(list, ax, ay, az, bx, by, bz, pad, false));
+      const list = collidersInCell(grid, seed, gx, gz);
+      if (list.length > 0)
+        best = Math.min(best, sweepColliders(list, ax, ay, az, bx, by, bz, pad, false));
     }
   }
   return best;
@@ -911,8 +962,8 @@ function sightBlockedAt(
     return overlapsAny(INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS, x - ox, z - oz, false);
   }
   const grid = gridFor(seed);
-  const list = grid.cells.get(`${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`);
-  return list ? overlapsAny(list, x, z, true) : false;
+  const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
+  return list.length > 0 ? overlapsAny(list, x, z, true) : false;
 }
 
 export function lineOfSightClear(

@@ -2683,128 +2683,198 @@ export function biomeAt(x: number, z: number): BiomeId {
 // Pinned as a literal by tests/fixes.test.ts.
 export const DECORATION_MAX_SLOPE = 1.5;
 
-export function generateDecorations(seed: number): Decoration[] {
-  const out: Decoration[] = [];
-  const step = 10;
-  const xHalf = WORLD_MAX_X - 14;
-  for (let gx = -xHalf; gx < xHalf; gx += step) {
-    for (let gz = WORLD_MIN_Z + 14; gz < WORLD_MAX_Z - 14; gz += step) {
-      const r = hash2(Math.round(gx), Math.round(gz), seed + 31);
-      const biome = zoneBiomeAt(gx, gz);
-      // density gate + kind mix per biome
-      let kind: Decoration['kind'] | null = null;
-      if (biome === 'vale') {
-        if (r > 0.48) continue;
-        kind = r < 0.3 ? 'tree' : r < 0.4 ? 'tree2' : 'rock';
-      } else if (biome === 'marsh') {
-        if (r > 0.34) continue;
-        kind = r < 0.08 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
-      } else if (biome === 'dusk') {
-        // the hollow is a glade: sparse pines, more twisted elders and stone;
-        // the dense mushroom flora comes from ground dressing and realm props
-        if (r > 0.38) continue;
-        kind = r < 0.14 ? 'tree' : r < 0.28 ? 'tree2' : 'rock';
-      } else if (biome === 'ember') {
-        // the gatewood thins mile by mile into open waste: trees fade out
-        // northward, scorched rock takes over
-        const t = Math.max(0, Math.min(1, (gz - 1560) / 170));
-        const treeGate = 0.36 * (1 - t) + 0.05 * t;
-        if (r > treeGate + 0.12 + t * 0.1) continue; // rockier as the waste opens
-        kind = r < treeGate * 0.55 ? 'tree' : r < treeGate ? 'tree2' : 'rock';
-      } else if (biome === 'frost') {
-        // hardy pines and broken stone on the snow benches
-        if (r > 0.36) continue;
-        kind = r < 0.18 ? 'tree' : r < 0.23 ? 'tree2' : 'rock';
-      } else if (biome === 'amber') {
-        // a dense fire-colored weald, broadleaf-heavy
-        if (r > 0.5) continue;
-        kind = r < 0.12 ? 'tree' : r < 0.42 ? 'tree2' : 'rock';
-      } else if (biome === 'fen') {
-        // open and soft: scattered broadleafs, very little stone
-        if (r > 0.3) continue;
-        kind = r < 0.06 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
-      } else if (biome === 'night') {
-        // open moon meadows: sparse silvered groves, standing stones between
-        if (r > 0.28) continue;
-        kind = r < 0.08 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
-      } else if (biome === 'haunt') {
-        // the densest forest in the world: the canopy is the realm
-        if (r > 0.62) continue;
-        kind = r < 0.3 ? 'tree' : r < 0.54 ? 'tree2' : 'rock';
-      } else if (biome === 'jungle') {
-        // wall-to-wall broadleaf inland; the palms on the beaches are the
-        // render module's (this grid skips the low sand shelf below)
-        if (terrainHeight(gx, gz, seed) < 3) continue;
-        if (r > 0.58) continue;
-        kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
-      } else if (biome === 'garden') {
-        // open parkland: sparse specimen trees on the lawns, and the maze
-        // keeps its corridors clear (the hedges are terrain, not dressing)
-        if (inGardenMaze(gx, gz)) continue;
-        if (r > 0.3) continue;
-        kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
-      } else if (biome === 'gale') {
-        // wind-scoured downs: rock outcrops everywhere, trees almost never
-        // (what survives grows stunted in the render dressing)
-        if (r > 0.22) continue;
-        kind = r < 0.04 ? 'tree' : r < 0.07 ? 'tree2' : 'rock';
-      } else {
-        if (r > 0.44) continue;
-        kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
+const DECORATION_STEP = 10;
+const DECORATION_X_START = -(WORLD_MAX_X - 14);
+const DECORATION_X_END = WORLD_MAX_X - 14;
+const DECORATION_Z_START = WORLD_MIN_Z + 14;
+const DECORATION_Z_END = WORLD_MAX_Z - 14;
+const DECORATION_JITTER = DECORATION_STEP / 2;
+
+// Evaluate one stable decoration-grid anchor. Keeping every gate in this one
+// function lets the renderer enumerate the whole field while collision asks
+// only for the handful of anchors near a queried spatial cell. The latter is
+// important now that the world spans multiple columns: eagerly rebuilding the
+// entire field in every isolated test worker made the first Sim in each file
+// pay for thousands of terrain samples it never touched.
+function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
+  const r = hash2(Math.round(gx), Math.round(gz), seed + 31);
+  const biome = zoneBiomeAt(gx, gz);
+  // density gate + kind mix per biome
+  let kind: Decoration['kind'] | null = null;
+  if (biome === 'vale') {
+    if (r > 0.48) return null;
+    kind = r < 0.3 ? 'tree' : r < 0.4 ? 'tree2' : 'rock';
+  } else if (biome === 'marsh') {
+    if (r > 0.34) return null;
+    kind = r < 0.08 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
+  } else if (biome === 'dusk') {
+    // the hollow is a glade: sparse pines, more twisted elders and stone;
+    // the dense mushroom flora comes from ground dressing and realm props
+    if (r > 0.38) return null;
+    kind = r < 0.14 ? 'tree' : r < 0.28 ? 'tree2' : 'rock';
+  } else if (biome === 'ember') {
+    // the gatewood thins mile by mile into open waste: trees fade out
+    // northward, scorched rock takes over
+    const t = Math.max(0, Math.min(1, (gz - 1560) / 170));
+    const treeGate = 0.36 * (1 - t) + 0.05 * t;
+    if (r > treeGate + 0.12 + t * 0.1) return null; // rockier as the waste opens
+    kind = r < treeGate * 0.55 ? 'tree' : r < treeGate ? 'tree2' : 'rock';
+  } else if (biome === 'frost') {
+    // hardy pines and broken stone on the snow benches
+    if (r > 0.36) return null;
+    kind = r < 0.18 ? 'tree' : r < 0.23 ? 'tree2' : 'rock';
+  } else if (biome === 'amber') {
+    // a dense fire-colored weald, broadleaf-heavy
+    if (r > 0.5) return null;
+    kind = r < 0.12 ? 'tree' : r < 0.42 ? 'tree2' : 'rock';
+  } else if (biome === 'fen') {
+    // open and soft: scattered broadleafs, very little stone
+    if (r > 0.3) return null;
+    kind = r < 0.06 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
+  } else if (biome === 'night') {
+    // open moon meadows: sparse silvered groves, standing stones between
+    if (r > 0.28) return null;
+    kind = r < 0.08 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
+  } else if (biome === 'haunt') {
+    // the densest forest in the world: the canopy is the realm
+    if (r > 0.62) return null;
+    kind = r < 0.3 ? 'tree' : r < 0.54 ? 'tree2' : 'rock';
+  } else if (biome === 'jungle') {
+    // wall-to-wall broadleaf inland; the palms on the beaches are the
+    // render module's (this grid skips the low sand shelf below)
+    if (terrainHeight(gx, gz, seed) < 3) return null;
+    if (r > 0.58) return null;
+    kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
+  } else if (biome === 'garden') {
+    // open parkland: sparse specimen trees on the lawns, and the maze
+    // keeps its corridors clear (the hedges are terrain, not dressing)
+    if (inGardenMaze(gx, gz)) return null;
+    if (r > 0.3) return null;
+    kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
+  } else if (biome === 'gale') {
+    // wind-scoured downs: rock outcrops everywhere, trees almost never
+    // (what survives grows stunted in the render dressing)
+    if (r > 0.22) return null;
+    kind = r < 0.04 ? 'tree' : r < 0.07 ? 'tree2' : 'rock';
+  } else {
+    if (r > 0.44) return null;
+    kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
+  }
+  // grid cells outside every zone rect are open sea between columns
+  let inRect = false;
+  for (const zn of ZONES) {
+    if (gz < zn.zMin || gz >= zn.zMax) continue;
+    if (gx < (zn.xMin ?? STRIP_MIN_X) || gx >= (zn.xMax ?? STRIP_MAX_X)) continue;
+    inRect = true;
+    break;
+  }
+  if (!inRect) return null;
+  const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * DECORATION_STEP;
+  const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * DECORATION_STEP;
+  const x = gx + ox,
+    z = gz + oz;
+  if (isExcludedDecoration(x, z)) return null;
+  // The Sowfield stadium footprint grows no trees or rocks (hash-based
+  // placement, so skipping here shifts no other decoration or rng draw).
+  if (isInSowfieldShell(x, z)) return null;
+  for (const zone of ZONES) {
+    const dx = x - zone.hub.x,
+      dz = z - zone.hub.z;
+    if (Math.sqrt(dx * dx + dz * dz) < zone.hub.radius + 4) return null;
+  }
+  if (terrainHeight(x, z, seed) < WATER_LEVEL + 1) return null;
+  if (roadDistance(x, z) < 5) return null;
+  for (const c of CAMPS) {
+    const dx = x - c.center.x,
+      dz = z - c.center.z;
+    if (Math.sqrt(dx * dx + dz * dz) < c.radius + 3) return null;
+  }
+  // no scatter on cliff faces: a prop anchored to the surface here floats
+  // off the wall (and large ones would be phantom colliders). Checked last,
+  // after the cheaper gates, so the four-sample steepness only runs for
+  // candidates that survive everything else.
+  if (terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE) return null;
+  return {
+    kind,
+    x,
+    z,
+    scale: 0.7 + hash2(Math.round(gx), Math.round(gz), seed + 13) * 0.9,
+    variant: Math.floor(hash2(Math.round(gx), Math.round(gz), seed + 77) * 3),
+    biome,
+  };
+}
+
+function decorationAnchorCount(start: number, end: number): number {
+  return Math.max(0, Math.ceil((end - start) / DECORATION_STEP));
+}
+
+function appendDecorationRange(
+  out: Decoration[],
+  seed: number,
+  xFirst: number,
+  xEnd: number,
+  zFirst: number,
+  zEnd: number,
+  bounds?: { minX: number; maxX: number; minZ: number; maxZ: number },
+): void {
+  for (let xi = xFirst; xi < xEnd; xi++) {
+    const gx = DECORATION_X_START + xi * DECORATION_STEP;
+    for (let zi = zFirst; zi < zEnd; zi++) {
+      const gz = DECORATION_Z_START + zi * DECORATION_STEP;
+      const decoration = decorationAt(seed, gx, gz);
+      if (!decoration) continue;
+      if (
+        bounds &&
+        (decoration.x < bounds.minX ||
+          decoration.x > bounds.maxX ||
+          decoration.z < bounds.minZ ||
+          decoration.z > bounds.maxZ)
+      ) {
+        continue;
       }
-      // grid cells outside every zone rect are open sea between columns
-      let inRect = false;
-      for (const zn of ZONES) {
-        if (gz < zn.zMin || gz >= zn.zMax) continue;
-        if (gx < (zn.xMin ?? STRIP_MIN_X) || gx >= (zn.xMax ?? STRIP_MAX_X)) continue;
-        inRect = true;
-        break;
-      }
-      if (!inRect) continue;
-      const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
-      const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
-      const x = gx + ox,
-        z = gz + oz;
-      if (isExcludedDecoration(x, z)) continue;
-      // The Sowfield stadium footprint grows no trees or rocks (hash-based
-      // placement, so skipping here shifts no other decoration or rng draw).
-      if (isInSowfieldShell(x, z)) continue;
-      let inHub = false;
-      for (const zone of ZONES) {
-        const dx = x - zone.hub.x,
-          dz = z - zone.hub.z;
-        if (Math.sqrt(dx * dx + dz * dz) < zone.hub.radius + 4) {
-          inHub = true;
-          break;
-        }
-      }
-      if (inHub) continue;
-      if (terrainHeight(x, z, seed) < WATER_LEVEL + 1) continue;
-      if (roadDistance(x, z) < 5) continue;
-      let inCamp = false;
-      for (const c of CAMPS) {
-        const dx = x - c.center.x,
-          dz = z - c.center.z;
-        if (Math.sqrt(dx * dx + dz * dz) < c.radius + 3) {
-          inCamp = true;
-          break;
-        }
-      }
-      if (inCamp) continue;
-      // no scatter on cliff faces: a prop anchored to the surface here floats
-      // off the wall (and large ones would be phantom colliders). Checked last,
-      // after the cheaper gates, so the four-sample steepness only runs for
-      // candidates that survive everything else.
-      if (terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE) continue;
-      out.push({
-        kind,
-        x,
-        z,
-        scale: 0.7 + hash2(Math.round(gx), Math.round(gz), seed + 13) * 0.9,
-        variant: Math.floor(hash2(Math.round(gx), Math.round(gz), seed + 77) * 3),
-        biome,
-      });
+      out.push(decoration);
     }
   }
+}
+
+/**
+ * Return the exact subset of the deterministic decoration field whose centers
+ * fall inside `bounds`. Candidate anchors include the full placement jitter,
+ * so filtering this result is byte-for-byte equivalent to filtering
+ * `generateDecorations(seed)` without paying to evaluate the other realms.
+ */
+export function generateDecorationsInBounds(
+  seed: number,
+  bounds: { minX: number; maxX: number; minZ: number; maxZ: number },
+): Decoration[] {
+  if (bounds.minX > bounds.maxX || bounds.minZ > bounds.maxZ) return [];
+  const xCount = decorationAnchorCount(DECORATION_X_START, DECORATION_X_END);
+  const zCount = decorationAnchorCount(DECORATION_Z_START, DECORATION_Z_END);
+  const first = (value: number, start: number, count: number): number =>
+    Math.max(0, Math.min(count, Math.ceil((value - DECORATION_JITTER - start) / DECORATION_STEP)));
+  const end = (value: number, start: number, count: number): number =>
+    Math.max(
+      0,
+      Math.min(count, Math.floor((value + DECORATION_JITTER - start) / DECORATION_STEP) + 1),
+    );
+  const xFirst = first(bounds.minX, DECORATION_X_START, xCount);
+  const xEnd = end(bounds.maxX, DECORATION_X_START, xCount);
+  const zFirst = first(bounds.minZ, DECORATION_Z_START, zCount);
+  const zEnd = end(bounds.maxZ, DECORATION_Z_START, zCount);
+  const out: Decoration[] = [];
+  appendDecorationRange(out, seed, xFirst, xEnd, zFirst, zEnd, bounds);
+  return out;
+}
+
+export function generateDecorations(seed: number): Decoration[] {
+  const out: Decoration[] = [];
+  appendDecorationRange(
+    out,
+    seed,
+    0,
+    decorationAnchorCount(DECORATION_X_START, DECORATION_X_END),
+    0,
+    decorationAnchorCount(DECORATION_Z_START, DECORATION_Z_END),
+  );
   return out;
 }
