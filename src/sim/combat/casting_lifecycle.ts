@@ -67,7 +67,11 @@ import {
   hasFreeCostFor,
 } from './empower_next';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
-import { applyBrainFreezeOverride } from './frost_mage';
+import {
+  applyBrainFreezeOverride,
+  frostMageChannelPulse,
+  frostMageChannelStart,
+} from './frost_mage';
 import {
   hasCastShield,
   noteSpellHit,
@@ -762,7 +766,9 @@ export function castAbility(
 
   if (ability.channel) {
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.bonusCharges ?? 0);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
+    // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
+    frostMageChannelStart(p, ability.id);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
     const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
@@ -962,78 +968,6 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       }
     }
     frostMageChannelPulse(ctx, p, res.def.id, struck);
-    return;
-  }
-
-  // Self-centered AoE channel (Steel Cyclone / bladestorm): a targetless channel
-  // whose storm follows the CASTER, pulsing its aoeDamage on every hostile in
-  // radius around the caster each tick (center is live p.pos, so it moves with
-  // the warrior). Distinct from the position channel above (which clamps a
-  // ground point) and from the single-target channel below.
-  if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeDamage')) {
-    const isSpell = res.def.school !== 'physical';
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
-    for (const eff of res.effects) {
-      if (eff.type !== 'aoeDamage') continue;
-      ctx.emit({
-        type: 'spellfxAt',
-        x: p.pos.x,
-        z: p.pos.z,
-        school: res.def.school,
-        fx: 'nova',
-        radius: eff.radius,
-      });
-      for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
-        if (!ctx.hasLineOfSight(p, m)) continue;
-        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
-        if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
-        ctx.dealDamage(p, m, Math.round(dmg), false, res.def.school, res.def.name, 'hit');
-      }
-    }
-    return;
-  }
-
-  // Targetless SELF channel (Aetherwell): no aim point, no area, no enemy.
-  // Each tick restores the flat mana AND stacks the channel's spell-power
-  // buff (owner design: the longer you channel, the more spell power), the
-  // aura value growing by the effect value per pulse with its clock
-  // refreshed; the recalc applies the new power at once. Draws no rng.
-  if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'gainResource')) {
-    for (const eff of res.effects) {
-      if (eff.type === 'gainResource') {
-        p.resource = Math.min(p.maxResource, p.resource + eff.amount);
-      } else if (eff.type === 'selfBuff' && eff.kind === 'buff_spellpower') {
-        const existing = p.auras.find((a) => a.id === res.def.id && a.kind === 'buff_spellpower');
-        if (existing) {
-          existing.value += eff.value;
-          existing.stacks = (existing.stacks ?? 1) + 1;
-          existing.remaining = eff.duration;
-          existing.duration = eff.duration;
-        } else {
-          ctx.applyAura(p, {
-            id: res.def.id,
-            name: res.def.name,
-            kind: 'buff_spellpower',
-            value: eff.value,
-            remaining: eff.duration,
-            duration: eff.duration,
-            sourceId: p.id,
-            school: res.def.school,
-            stacks: 1,
-          });
-        }
-        const channelMeta = ctx.players.get(p.id);
-        if (channelMeta) {
-          recalcPlayerStats(
-            p,
-            channelMeta.cls,
-            channelMeta.equipment,
-            ctx.playerMods(channelMeta),
-            channelMeta.equipmentInstance,
-          );
-        }
-      }
-    }
     return;
   }
 

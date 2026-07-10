@@ -52,6 +52,7 @@ import {
   SHATTER_CRIT_BONUS,
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
+import { spawnFrozenOrb } from './frozen_orb';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
@@ -1305,22 +1306,6 @@ export function runEffects(
           ability.name,
           directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         );
-        break;
-      }
-      case 'aoeHeal': {
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'nova',
-        });
-        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime);
-        for (const m of friendliesInRadius(ctx, p, eff.radius)) {
-          if (!ctx.hasLineOfSight(p, m)) continue;
-          const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
-          ctx.applyHeal(p, m, healAmount, ability.name);
-        }
         break;
       }
       case 'groundAoE': {

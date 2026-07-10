@@ -939,6 +939,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Icebind"
       },
       {
+        "id": "frozen_orb",
+        "name": "Frozen Orb"
+      },
+      {
+        "id": "blizzard",
+        "name": "Blizzard"
+      },
+      {
         "id": "arcane_explosion",
         "name": "Aetherburst"
       },

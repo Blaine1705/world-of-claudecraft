@@ -1668,6 +1668,31 @@ export type AbilityEffect =
   | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
+  // caster that pulses frost damage + a snare every `interval` for `duration`
+  // seconds and feeds Fingers of Frost (frost mage spec kit).
+  | {
+      type: 'frozenOrb';
+      min: number;
+      max: number;
+      radius: number;
+      duration: number;
+      interval: number;
+    }
+  // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
+  // match ball toward the caster's castAim (power = ground speed yd/s, loft =
+  // initial vertical speed); sportDash is a targetless directional lunge along
+  // the aim direction (catchBall lets a keeper's Dive catch a crossing ball);
+  // sportShove bumps the target back via the knockback walker. ballPass rolls a
+  // firm auto-paced ground pass to the caster's targeted teammate (else the best
+  // teammate toward the aim), leading their run. All no-damage.
+  | { type: 'ballKick'; power: number; loft: number }
+  | { type: 'ballPass'; power: number; loft: number }
+  // ballShoot fires the ball at the enemy goal; power (ground speed) and loft
+  // both scale with the caster's charge, so a max-power shot sails OVER the bar.
+  | { type: 'ballShoot'; power: number; loft: number }
+  | { type: 'sportDash'; distance: number; catchBall?: boolean }
+  | { type: 'sportShove'; distance: number }
   | {
       type: 'consumeAura';
       auraIds?: string[];
@@ -2086,6 +2111,10 @@ export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
+  // Transient per-cast budget: how much Frozen Orb cooldown this Blizzard
+  // channel has already refunded (combat/frost_mage.ts, reset at channel
+  // start). Never serialized or wired.
+  blizzardOrbCdr?: number;
   abilityCharges?: Record<
     string,
     {

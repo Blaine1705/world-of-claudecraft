@@ -7,6 +7,8 @@ const mageSpellAbilityIds = [
   'frostbolt',
   'ice_lance',
   'flurry',
+  'frozen_orb',
+  'blizzard',
   'fire_blast',
   'frost_armor',
   'arcane_intellect',

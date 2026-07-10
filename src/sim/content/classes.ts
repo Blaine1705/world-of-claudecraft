@@ -138,10 +138,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_nova',
       'frozen_orb',
       'blizzard',
-      'icy_veins',
-      'glacial_spike',
-      'glacial_front',
-      'dragons_breath',
       'arcane_explosion',
       'scorch',
       'ice_barrier',
@@ -1481,6 +1477,59 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)",
+  },
+  // Frozen Orb: the roaming proc generator (combat/frozen_orb.ts). Instant,
+  // 30s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
+  // once per second for 8s. First strike guarantees a Fingers of Frost stack,
+  // then 20% per striking pulse. Blizzard shortens its cooldown (below).
+  frozen_orb: {
+    id: 'frozen_orb',
+    name: 'Frozen Orb',
+    class: 'mage',
+    learnLevel: 10,
+    specs: ['frost'],
+    cost: 50,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'frozenOrb', min: 8, max: 11, radius: 6, duration: 8, interval: 1 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 70,
+        effects: [{ type: 'frozenOrb', min: 14, max: 18, radius: 6, duration: 8, interval: 1 }],
+      },
+    ],
+    description:
+      'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
+  },
+  // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
+  // rain_of_fire template plus a snare rider (the position-channel aoeSlow
+  // pulse) and the Frozen Orb refund (frostMageChannelPulse, 0.5s per enemy
+  // struck, at most 3s per cast).
+  blizzard: {
+    id: 'blizzard',
+    name: 'Blizzard',
+    class: 'mage',
+    learnLevel: 14,
+    specs: ['frost'],
+    cost: 70,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'frost',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 6, ticks: 6 },
+    effects: [
+      { type: 'aoeDamage', min: 12, max: 16, radius: 7 },
+      { type: 'aoeSlow', mult: 0.6, duration: 2, radius: 7 },
+    ],
+    description:
+      'Calls an ice storm onto the target area for 6 sec, dealing $d Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
   },
   // The three frost spec passives: spellbook/spec-screen documentation of the
   // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
