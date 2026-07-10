@@ -71,6 +71,15 @@ export function frostProcGlowActive(
   return false;
 }
 
+/** Cooldown-gate bypass (castAbility): an armed Brain Freeze lets Flurry be
+ *  cast straight through its RUNNING cooldown (the proc is the point: a
+ *  hard-cast Flurry arms 10s, and the next proc should not sit blocked
+ *  behind it). The running timer keeps ticking; applyBrainFreezeOverride
+ *  then arms no new one (cooldown: 0). */
+export function brainFreezeBypassesCooldown(p: Entity, abilityId: string): boolean {
+  return abilityId === 'flurry' && p.auras.some((a) => a.kind === 'brain_freeze');
+}
+
 function isCommittedFrost(ctx: SimContext, meta: PlayerMeta): boolean {
   return meta.cls === 'mage' && ctx.playerMods(meta).spec === 'frost';
 }

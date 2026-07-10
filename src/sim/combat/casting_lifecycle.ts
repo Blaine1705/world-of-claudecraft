@@ -69,6 +69,7 @@ import {
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
+  brainFreezeBypassesCooldown,
   frostMageChannelPulse,
   frostMageChannelStart,
 } from './frost_mage';
@@ -488,7 +489,10 @@ export function castAbility(
   if (
     (p.cooldowns.has(ability.id) || sharedCooldown) &&
     !togglingOff &&
-    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown)
+    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown) &&
+    // An armed Brain Freeze lets Flurry cast through its running cooldown
+    // (combat/frost_mage.ts; the override below consumes the proc).
+    !brainFreezeBypassesCooldown(p, ability.id)
   ) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
