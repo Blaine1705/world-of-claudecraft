@@ -3,6 +3,7 @@ import {
   BRAIN_FREEZE_DURATION,
   FINGERS_OF_FROST_DURATION,
   FINGERS_OF_FROST_MAX_STACKS,
+  frostProcGlowActive,
   WINTERS_CHILL_CHARGES,
   WINTERS_CHILL_SPENDERS,
 } from '../src/sim/combat/frost_mage';
@@ -149,6 +150,17 @@ describe('frost kit content defs', () => {
     expect(WINTERS_CHILL_SPENDERS.has('ice_lance')).toBe(true);
     expect(WINTERS_CHILL_SPENDERS.has('flurry')).toBe(false);
     expect(WINTERS_CHILL_SPENDERS.has('frostbolt')).toBe(false);
+  });
+
+  it('the action-bar glow predicate scopes each proc to its spender', () => {
+    const fingers = [{ kind: 'fingers_of_frost' }];
+    const brain = [{ kind: 'brain_freeze' }];
+    expect(frostProcGlowActive(fingers, 'ice_lance')).toBe(true);
+    expect(frostProcGlowActive(fingers, 'flurry')).toBe(false);
+    expect(frostProcGlowActive(brain, 'flurry')).toBe(true);
+    expect(frostProcGlowActive(brain, 'ice_lance')).toBe(false);
+    expect(frostProcGlowActive([], 'ice_lance')).toBe(false);
+    expect(frostProcGlowActive([...fingers, ...brain], 'frostbolt')).toBe(false);
   });
 });
 

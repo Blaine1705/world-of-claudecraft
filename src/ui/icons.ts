@@ -2278,6 +2278,41 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ),
   polymorph: r('arcane', 'pink', ['sheep_head'], ['sparkle']),
   frost_nova: r('frost', 'ice', ['snowflake'], ['arcs', 'glow']),
+  // Frost spec kit (owner design 2026-07-11): procedural recipes; distinct
+  // silhouettes from frostbolt (bolt+flake) and frost_nova (flake+arcs).
+  ice_lance: r('frost', 'ice', [{ p: 'dagger', rot: -Math.PI / 4 }], ['glow', 'motion']),
+  flurry: r(
+    'frost',
+    'ice',
+    [
+      { p: 'bolt', x: -12, y: -12, s: 0.55 },
+      { p: 'bolt', s: 0.65 },
+      { p: 'bolt', x: 12, y: 12, s: 0.75 },
+    ],
+    ['motion'],
+  ),
+  frozen_orb: r(
+    'frost',
+    'ice',
+    [
+      { p: 'gem', s: 1.05 },
+      { p: 'snowflake', ...TR },
+    ],
+    ['glow'],
+  ),
+  blizzard: r(
+    'frost',
+    'sky',
+    [
+      { p: 'snowflake', x: -10, y: -8, s: 0.5 },
+      { p: 'snowflake', x: 8, y: -2, s: 0.6 },
+      { p: 'snowflake', x: -2, y: 12, s: 0.45 },
+    ],
+    ['motion'],
+  ),
+  fingers_of_frost: r('frost', 'ice', ['claw_slash', { p: 'snowflake', ...BR }], ['glow']),
+  brain_freeze: r('frost', 'ice', ['eye', { p: 'snowflake', ...BR }], ['sparkle']),
+  shatter: r('frost', 'ice', ['snowflake', { p: 'claw_slash', ...BIG }], ['arcs']),
   // rogue
   sinister_strike: r('steel', 'steel', ['dagger'], ['glow']),
   eviscerate: r('blood', 'blood', ['dagger'], ['drips']),
