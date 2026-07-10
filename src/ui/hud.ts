@@ -1626,6 +1626,7 @@ export class Hud {
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.syncAnyWindowOpenState();
     });
     const mapCanvas = $('#map-canvas') as unknown as HTMLCanvasElement;
     mapCanvas.addEventListener(
@@ -1978,10 +1979,20 @@ export class Hud {
   }
 
   private syncAnyWindowOpenState(): void {
-    const anyOpen = [...document.querySelectorAll<HTMLElement>('.window.panel')]
+    const windows = [...document.querySelectorAll<HTMLElement>('.window.panel')];
+    const anyOpen = windows
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const mapWindow = document.getElementById('map-window');
+    const questLogWindow = document.getElementById('quest-log-window');
+    document.body.classList.toggle(
+      'mobile-map-quest-open',
+      !!mapWindow &&
+        !!questLogWindow &&
+        this.isWindowVisible(mapWindow) &&
+        this.isWindowVisible(questLogWindow),
+    );
   }
 
   private placeNewWindow(el: HTMLElement): void {
@@ -3898,6 +3909,7 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     focusFirstInteractive: (root, preferredSelector) =>
       this.focusManager.focusFirst(root, preferredSelector),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
@@ -8280,6 +8292,7 @@ export class Hud {
     if (el.style.display === 'block') {
       el.style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.syncAnyWindowOpenState();
       return;
     }
     this.closeOtherWindows('#map-window');
@@ -8287,6 +8300,7 @@ export class Hud {
     this.mapCenter = null;
     el.style.display = 'block';
     this.updateMapWindow();
+    this.syncAnyWindowOpenState();
   }
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
