@@ -2391,6 +2391,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   shield_slam: r('steel', 'steel', ['shield', { p: 'mace', ...BR }]),
   whirlwind: r('fury', 'steel', ['sword'], ['arcs']),
   berserker_rage: r('fury', 'blood', ['fist'], ['glow']),
+  razor_howl: r('fury', 'steel', ['roar', { p: 'claw_slash', ...BR }], ['arcs']),
+  stormthrow: r('storm', 'sky', ['axe', { p: 'lightning', ...TR }], ['motion']),
+  reckless_vow: r('blood', 'gold', ['heart', { p: 'fist', ...TR }], ['glow', 'arcs']),
+  red_banner: r('blood', 'blood', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['arcs']),
   // mage
   conjure_food: r('arcane', 'arcanePink', ['bread'], ['sparkle']),
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
