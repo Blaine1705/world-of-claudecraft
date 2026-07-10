@@ -25,6 +25,7 @@ import {
 } from './game/click_move';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { initDesktopDownload } from './game/desktop_download';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
@@ -1274,7 +1275,6 @@ async function startGame(
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
     onInteract: () => interactKey(),
-    onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),
@@ -2164,6 +2164,7 @@ async function startGame(
   let last = performance.now();
   let acc = 0;
   let onlineInputEchoMs = 0;
+  let playerWasDead = world.player.dead;
   // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
@@ -2476,6 +2477,12 @@ async function startGame(
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
     input.setSuspendMovement(!gameInputReady || hud.isModalOpen() || intro !== null);
+    const playerDead = world.player.dead;
+    if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
+      input.setAutorun(false);
+      mobileControls.syncAutorun(false);
+    }
+    playerWasDead = playerDead;
     perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
       frameDtMs: frameDt * 1000,
     });

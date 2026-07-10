@@ -5062,7 +5062,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/g',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}g',
-  'hudChrome.mobile.autorun': 'Tự Chạy',
   'hudChrome.mobile.haptics': 'Phản Hồi Rung',
   'hudChrome.mobile.hapticsOff': 'Tắt Phản Hồi Rung',
   'hudChrome.mobile.jump': 'Nhảy',
