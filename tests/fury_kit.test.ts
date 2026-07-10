@@ -256,15 +256,16 @@ describe('balance pass 2026-07-10: Fury execute cooldown + Fury-only Bladed Gyre
     expect(fury?.cost).toBe(0);
     expect(fury?.cooldown).toBe(6); // the infinite-rage-engine fix
     expect(fury?.effects.some((e) => e.type === 'gainResource' && e.amount === 20)).toBe(true);
-    for (const spec of ['arms', 'prot'] as const) {
-      const entry = knownEntry(spec, 'execute');
-      expect(entry?.cost, spec).toBe(15);
-      expect(entry?.cooldown, spec).toBe(0);
-      expect(
-        entry?.effects.some((e) => e.type === 'gainResource'),
-        spec,
-      ).toBe(false);
-    }
+    // Arms pays 10 (balance pass 2026-07-10: at 15 it competed head-on with
+    // Maiming Strike and Redhand), Prot keeps the classic 15; both no-CD.
+    const arms = knownEntry('arms', 'execute');
+    expect(arms?.cost).toBe(10);
+    expect(arms?.cooldown).toBe(0);
+    expect(arms?.effects.some((e) => e.type === 'gainResource')).toBe(false);
+    const prot = knownEntry('prot', 'execute');
+    expect(prot?.cost).toBe(15);
+    expect(prot?.cooldown).toBe(0);
+    expect(prot?.effects.some((e) => e.type === 'gainResource')).toBe(false);
   });
 
   it('Bladed Gyre (whirlwind) is base-kit for committed Fury and for nobody else', () => {

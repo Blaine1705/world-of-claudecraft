@@ -1185,7 +1185,7 @@ const classAbilityNamesEn = {
       [
         'sweeping_strikes',
         'Widening Arc',
-        'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
+        'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
       ],
       [
         'deep_wounds',

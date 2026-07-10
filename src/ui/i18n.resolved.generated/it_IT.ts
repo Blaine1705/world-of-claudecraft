@@ -5704,7 +5704,7 @@ export const it_IT: EnTranslations = {
       },
       "sweeping_strikes": {
         "name": "Widening Arc",
-        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)"
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
         "name": "Gaping Wounds",

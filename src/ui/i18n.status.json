@@ -131432,7 +131432,7 @@
     },
     "main:entities.abilities.sweeping_strikes.description": {
       "scope": "main",
-      "enHash": "41295ca5cd7529bc",
+      "enHash": "427d330a815e4002",
       "placeholders": [],
       "locales": {
         "es": {
@@ -131449,7 +131449,7 @@
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "41295ca5cd7529bc",
+          "srcHash": "427d330a815e4002",
           "by": "human"
         },
         "it_IT": {
@@ -131460,22 +131460,22 @@
         },
         "zh_CN": {
           "state": "translated",
-          "srcHash": "41295ca5cd7529bc",
+          "srcHash": "427d330a815e4002",
           "by": "human"
         },
         "zh_TW": {
           "state": "translated",
-          "srcHash": "41295ca5cd7529bc",
+          "srcHash": "427d330a815e4002",
           "by": "human"
         },
         "ko_KR": {
           "state": "translated",
-          "srcHash": "41295ca5cd7529bc",
+          "srcHash": "427d330a815e4002",
           "by": "human"
         },
         "ja_JP": {
           "state": "translated",
-          "srcHash": "41295ca5cd7529bc",
+          "srcHash": "427d330a815e4002",
           "by": "human"
         },
         "pt_BR": {
@@ -131483,7 +131483,7 @@
         },
         "ru_RU": {
           "state": "translated",
-          "srcHash": "41295ca5cd7529bc",
+          "srcHash": "427d330a815e4002",
           "by": "human"
         },
         "cs_CZ": {

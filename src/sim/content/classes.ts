@@ -639,7 +639,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redhand',
     class: 'warrior',
     learnLevel: 2,
-    cost: 20,
+    cost: 15,
     castTime: 0,
     cooldown: 5,
     // Two charges (owner 2026-07-08, like Twinstrike): usable twice back to back,
@@ -649,7 +649,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     // Owner decision 2026-07-09: baseline early rage SPENDER (learned at level 2),
-    // costing 20 rage per use. The classic dodge-proc gate stays gone (too RNG);
+    // costing 15 rage per use. The classic dodge-proc gate stays gone (too RNG);
     // the requiresDodgeProc machinery itself remains for hunter mongoose_bite.
     // Fury AND Prot hand it off at 10 (owner 2026-07-10): it stays the early
     // rage spender through 5-9, then retires when each spec's own kit fills
@@ -670,7 +670,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 2,
         level: 16,
-        cost: 20,
+        cost: 15,
         effects: [
           { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
           { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
@@ -1081,9 +1081,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 0.75, duration: 12 }],
+    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 1, duration: 12 }],
     description:
-      'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
+      'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
   },
   deep_wounds: {
     id: 'deep_wounds',
@@ -1108,14 +1108,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'warrior',
     learnLevel: 14,
     specs: ['arms'],
-    cost: 20,
+    // Balance pass 2026-07-10 (Arms buff round): 20 rage / 20-26 -> 15 rage /
+    // 30-38, soft-capped at 5 targets (the Revenge mechanism: above 5 the
+    // total holds at 5x per-target, scaling already-rolled hits, no rng moved).
+    cost: 15,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     threat: { flat: 30 }, // classic 100 at rank 5/level 58, scaled to the 1-20 band
-    effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
+    effects: [{ type: 'aoeDamage', min: 30, max: 38, radius: 5, softCap: 5 }],
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
   },
   // Protection's frontal-arc filler, replacing Reaver Strike for committed prot
@@ -4967,6 +4970,11 @@ export function abilitiesKnownAt(
     // cast-time cost gate sees 0 and the appended gainResource flows through the
     // normal dispatch scaling (abilityRagePct / rage-gen auras).
     let cooldown = def.cooldown;
+    // Arms' execute is cheaper (balance pass 2026-07-10, Arms buff round): at
+    // 15 it competed head-on with Maiming Strike and Redhand for the same bar.
+    if (id === 'execute' && mods?.spec === 'arms') {
+      cost = 10;
+    }
     if (id === 'execute' && mods?.spec === 'fury') {
       cost = 0;
       effects = [...effects, { type: 'gainResource', amount: 20 }];
