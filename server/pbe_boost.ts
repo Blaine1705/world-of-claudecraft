@@ -1,8 +1,6 @@
 // PBE account boost. When the server runs with PBE_BOOST_ACCOUNTS=1, a freshly
 // registered account is pre-populated with one level-20 character per class,
-// each wearing the non-heroic best-in-slot kit for its primary role under a
-// random generated name, with four best-in-slot bags, 10 gold of pocket money,
-// and (for the hybrid classes) the alternate role's kit carried in the bags,
+// each wearing the non-heroic best-in-slot kit under a random generated name,
 // so public-beta testers land straight in endgame testing instead of leveling.
 //
 // The flag is read live per registration (the PERF_TICK_LOG pattern, not the
@@ -16,16 +14,10 @@
 // consistent with what the game itself would produce.
 
 import { randomInt } from 'node:crypto';
-import { BAG_SOCKETS } from '../src/sim/bags';
 import { HEROIC_ITEMS } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { ITEMS } from '../src/sim/data';
-import {
-  canDualWield,
-  canEquipItem,
-  canEquipItemInSlot,
-  weaponHand,
-} from '../src/sim/equipment_rules';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { EquipSlot, ItemDef, PlayerClass } from '../src/sim/types';
@@ -159,94 +151,55 @@ export function randomBoostName(rand: RandFn = randomInt): string {
 
 const HEROIC_VENDOR_IDS: ReadonlySet<string> = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
 
-// Test-kit stat heuristics per ROLE, not balance truth: primary stats the role
+// Test-kit stat heuristics per class, not balance truth: primary stats a class
 // scales with (AP/spell power/HP derivations in recalcPlayerStats), sta for
 // survivability. Armor and weapon dps mirror itemScore's conversions
-// (src/sim/item_level.ts): 12 armor = 1 point, melee roles value weapon dps at
-// half weight; caster roles instead value spell power and barely swing.
-//
-// The role ids follow the class spec identities (src/sim/content/
-// talents_classic.ts). The FIRST role is what the character spawns wearing;
-// every later role's kit is placed in the bags so hybrid classes (paladin,
-// shaman, druid) can test their other playstyle without farming gear.
+// (src/sim/item_level.ts): 12 armor = 1 point, melee dps at half weight;
+// casters instead value spell power and barely swing.
 type WeightableStat = 'str' | 'agi' | 'sta' | 'int' | 'spi';
-export interface BoostRole {
-  /** Spec identity this kit gears for (matches the talent spec naming). */
-  id: string;
-  weights: Partial<Record<WeightableStat, number>>;
-  /** Melee roles value weapon dps; caster roles value spell power. */
-  melee: boolean;
-}
-
-export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
-  warrior: [{ id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true }],
-  paladin: [
-    { id: 'retribution', weights: { str: 1, sta: 0.8, int: 0.3, spi: 0.2 }, melee: true },
-    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
-  ],
-  hunter: [{ id: 'marksmanship', weights: { agi: 1, sta: 0.6, int: 0.2 }, melee: true }],
-  rogue: [{ id: 'combat', weights: { agi: 1, sta: 0.6, str: 0.4 }, melee: true }],
-  priest: [{ id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false }],
-  shaman: [
-    { id: 'elemental', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'enhancement', weights: { agi: 1, str: 0.8, sta: 0.6 }, melee: true },
-  ],
-  mage: [{ id: 'frost', weights: { int: 1, spi: 0.6, sta: 0.4 }, melee: false }],
-  warlock: [{ id: 'demonology', weights: { int: 1, sta: 0.6, spi: 0.5 }, melee: false }],
-  druid: [
-    { id: 'balance', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'feral', weights: { agi: 1, str: 0.6, sta: 0.6 }, melee: true },
-  ],
+const CLASS_STAT_WEIGHTS: Record<PlayerClass, Partial<Record<WeightableStat, number>>> = {
+  warrior: { str: 1, sta: 0.8, agi: 0.4 },
+  paladin: { str: 1, sta: 0.8, int: 0.3, spi: 0.2 },
+  hunter: { agi: 1, sta: 0.6, int: 0.2 },
+  rogue: { agi: 1, sta: 0.6, str: 0.4 },
+  priest: { int: 1, spi: 0.8, sta: 0.4 },
+  shaman: { int: 1, spi: 0.7, sta: 0.5 },
+  mage: { int: 1, spi: 0.6, sta: 0.4 },
+  warlock: { int: 1, sta: 0.6, spi: 0.5 },
+  druid: { int: 1, spi: 0.7, sta: 0.5 },
 };
-
+const CASTER_CLASSES: ReadonlySet<PlayerClass> = new Set([
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
+]);
 const ARMOR_PER_POINT = 12;
 const MELEE_DPS_WEIGHT = 0.5;
 const CASTER_DPS_WEIGHT = 0.1;
 const SPELL_POWER_WEIGHT = 0.9;
 const RATING_WEIGHT = 0.3;
-// Armor on a piece with NONE of the role's identity stats (the weighted
-// str/agi/int/spi, or spell power for casters; sta is universal so it never
-// counts as identity) is heavily discounted: without this a healer role picks
-// dead-stat plate purely for its armor pool, and a melee role hoards int mail.
-const DEAD_STAT_ARMOR_FACTOR = 0.3;
-const IDENTITY_STATS: readonly WeightableStat[] = ['str', 'agi', 'int', 'spi'];
 
-export function roleItemScore(role: BoostRole, item: ItemDef): number {
+export function classItemScore(cls: PlayerClass, item: ItemDef): number {
+  const weights = CLASS_STAT_WEIGHTS[cls];
   let score = 0;
-  for (const [stat, weight] of Object.entries(role.weights) as [WeightableStat, number][]) {
+  for (const [stat, weight] of Object.entries(weights) as [WeightableStat, number][]) {
     score += (item.stats?.[stat] ?? 0) * weight;
   }
-  let identity = 0;
-  for (const stat of IDENTITY_STATS) {
-    identity += (item.stats?.[stat] ?? 0) * (role.weights[stat] ?? 0);
-  }
-  if (!role.melee) identity += item.spellPower ?? 0;
-  score +=
-    ((item.stats?.armor ?? 0) / ARMOR_PER_POINT) * (identity > 0 ? 1 : DEAD_STAT_ARMOR_FACTOR);
+  score += (item.stats?.armor ?? 0) / ARMOR_PER_POINT;
   if (item.weapon) {
     const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
-    score += dps * (role.melee ? MELEE_DPS_WEIGHT : CASTER_DPS_WEIGHT);
+    score += dps * (CASTER_CLASSES.has(cls) ? CASTER_DPS_WEIGHT : MELEE_DPS_WEIGHT);
   }
-  if (!role.melee) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
+  if (CASTER_CLASSES.has(cls)) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
   score += ((item.critRating ?? 0) + (item.hasteRating ?? 0)) * RATING_WEIGHT;
   return score;
 }
 
-/** The class's PRIMARY (spawn-equipped) role score; kept for the kit tests. */
-export function classItemScore(cls: PlayerClass, item: ItemDef): number {
-  return roleItemScore(CLASS_ROLES[cls][0], item);
-}
-
 function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   if (!item.slot) return false;
-  if (
-    item.kind !== 'weapon' &&
-    item.kind !== 'armor' &&
-    item.kind !== 'shield' &&
-    item.kind !== 'held_offhand'
-  ) {
-    return false;
-  }
+  if (item.kind !== 'weapon' && item.kind !== 'armor') return false;
   if (item.heroic || item.heroicOf) return false;
   if (item.id in HEROIC_ITEMS) return false;
   if (HEROIC_VENDOR_IDS.has(item.id)) return false;
@@ -257,12 +210,9 @@ function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   return meetsLevelRequirement(BOOST_LEVEL, item);
 }
 
-/** The slot order the kit is equipped in: mainhand before offhand (a shield or
- *  a rogue's second weapon routes to the offhand once the mainhand is filled);
- *  rings resolve ring1 then ring2. */
+/** The slot order the kit is equipped in; rings resolve ring1 then ring2. */
 const KIT_SLOTS: readonly EquipSlot[] = [
   'mainhand',
-  'offhand',
   'helmet',
   'neck',
   'shoulder',
@@ -275,93 +225,36 @@ const KIT_SLOTS: readonly EquipSlot[] = [
   'ring2',
 ];
 
-export function bisKitForRole(
-  cls: PlayerClass,
-  role: BoostRole,
-): Partial<Record<EquipSlot, string>> {
+export function nonHeroicBisKit(cls: PlayerClass): Partial<Record<EquipSlot, string>> {
   const bestBySlot = new Map<string, { id: string; score: number }>();
   const rings: { id: string; score: number }[] = [];
-  const weapons: { id: string; score: number; twoHand: boolean }[] = [];
   for (const item of Object.values(ITEMS)) {
     if (!eligibleForBoost(cls, item)) continue;
-    const score = roleItemScore(role, item);
-    if (item.kind === 'weapon') {
-      weapons.push({ id: item.id, score, twoHand: weaponHand(item) === 'twohand' });
-      continue;
-    }
+    const score = classItemScore(cls, item);
     if (item.slot === 'ring') {
       rings.push({ id: item.id, score });
       continue;
     }
-    // Shields and held offhands declare slot 'offhand' and land in that bucket.
     const slot = item.slot as string;
     const best = bestBySlot.get(slot);
     if (!best || score > best.score) bestBySlot.set(slot, { id: item.id, score });
   }
   rings.sort((a, b) => b.score - a.score);
-  weapons.sort((a, b) => b.score - a.score);
   const kit: Partial<Record<EquipSlot, string>> = {};
   for (const slot of KIT_SLOTS) {
-    if (slot === 'mainhand' || slot === 'offhand' || slot === 'ring1' || slot === 'ring2') {
-      continue;
-    }
+    if (slot === 'ring1' || slot === 'ring2') continue;
     const best = bestBySlot.get(slot);
     if (best) kit[slot] = best.id;
-  }
-  const mainhand = weapons[0];
-  if (mainhand) kit.mainhand = mainhand.id;
-  // A two-handed mainhand occupies both hands (equipping any offhand would
-  // displace it, src/sim/items.ts equipItem); otherwise the offhand takes the
-  // best of a shield / held offhand, or, for a dual-wielder (rogue at spawn:
-  // no spec is chosen yet), the second-best one-hand weapon.
-  if (mainhand && !mainhand.twoHand) {
-    const held = bestBySlot.get('offhand');
-    // The second weapon must be offhand-legal (canEquipItemInSlot excludes
-    // two-handers and mainhand-only weapons for a spec-less dual-wielder);
-    // anything else would displace the mainhand pick on equip.
-    const second = canDualWield(cls, null)
-      ? weapons.find(
-          (w) => w.id !== mainhand.id && canEquipItemInSlot(cls, ITEMS[w.id], 'offhand', null),
-        )
-      : undefined;
-    const off = [held, second]
-      .filter((c): c is { id: string; score: number } => c !== undefined)
-      .sort((a, b) => b.score - a.score)[0];
-    if (off) kit.offhand = off.id;
   }
   if (rings[0]) kit.ring1 = rings[0].id;
   if (rings[1]) kit.ring2 = rings[1].id;
   return kit;
 }
 
-/** The class's PRIMARY (spawn-equipped) role kit. */
-export function nonHeroicBisKit(cls: PlayerClass): Partial<Record<EquipSlot, string>> {
-  return bisKitForRole(cls, CLASS_ROLES[cls][0]);
-}
-
-/** The best non-heroic bag: strictly the most slots (no tiebreak needed; the
- *  content has a single largest bag, and the test pins its id). */
-export function bestBoostBag(): string {
-  let best: ItemDef | null = null;
-  for (const item of Object.values(ITEMS)) {
-    if (item.kind !== 'bag') continue;
-    if (item.heroic || item.heroicOf || item.id in HEROIC_ITEMS) continue;
-    if (HEROIC_VENDOR_IDS.has(item.id)) continue;
-    if (!best || (item.bagSlots ?? 0) > (best.bagSlots ?? 0)) best = item;
-  }
-  if (!best) throw new Error('no bag items in content');
-  return best.id;
-}
-
 // ---------------------------------------------------------------------------
 // Character state construction: the same throwaway-Sim shape as
-// initialCharacterState (server/main.ts), plus level, bags, gear, gold, and
-// the alternate-role kits. The Sim is never ticked, so nothing in the world
-// can interact with the player.
-
-export const BOOST_BAG_SOCKETS = BAG_SOCKETS;
-/** Pocket money for consumables, repairs, and the auction house: 10 gold. */
-export const BOOST_COPPER = 100_000;
+// initialCharacterState (server/main.ts), plus level and gear. The Sim is
+// never ticked, so nothing in the world can interact with the player.
 
 export function buildBoostedCharacterState(
   cls: PlayerClass,
@@ -372,54 +265,15 @@ export function buildBoostedCharacterState(
   const pid = sim.playerId;
   sim.setPlayerSkin(pid, skin);
   sim.setPlayerLevel(BOOST_LEVEL, pid);
-  // Bags first so the pooled capacity exists before the alternate kits land.
-  const bagId = bestBoostBag();
-  for (let socket = 0; socket < BOOST_BAG_SOCKETS; socket++) {
-    sim.addItem(bagId, 1, pid);
-    sim.equipBag(bagId, socket, pid);
-  }
-  const [primary, ...altRoles] = CLASS_ROLES[cls];
-  const kit = bisKitForRole(cls, primary);
-  const equipped = new Set(Object.values(kit));
-  // Fresh characters spawn holding a starter weapon: clear both hands first so
-  // the kit weapons route to their intended slots (with the mainhand occupied,
-  // a one-hand upgrade would auto-route to a dual-wielder's empty OFFHAND and
-  // the starter would keep the strong hand).
-  sim.unequipItem('mainhand', pid);
-  sim.unequipItem('offhand', pid);
+  const kit = nonHeroicBisKit(cls);
   for (const slot of KIT_SLOTS) {
     const itemId = kit[slot];
     if (!itemId) continue;
     sim.addItem(itemId, 1, pid);
     sim.equipItem(itemId, pid);
   }
-  // Alternate-role kits ride in the bags (e.g. the shaman spawns in caster
-  // gear and carries the enhancement melee kit); pieces the primary kit
-  // already wears are not duplicated.
-  const bagged = new Set<string>();
-  for (const role of altRoles) {
-    for (const itemId of Object.values(bisKitForRole(cls, role))) {
-      if (!itemId || equipped.has(itemId) || bagged.has(itemId)) continue;
-      bagged.add(itemId);
-      sim.addItem(itemId, 1, pid);
-    }
-  }
-  const meta = sim.ctx.resolve(pid)?.meta;
-  if (meta) meta.copper += BOOST_COPPER;
   const state = sim.serializeCharacter(pid);
   if (!state) throw new Error('failed to serialize boosted character');
-  // Fail loud (caught and logged per class upstream) rather than persist a
-  // half-equipped roster if a content change ever breaks an equip silently.
-  for (const slot of KIT_SLOTS) {
-    const want = kit[slot];
-    if (want && state.equipment[slot] !== want) {
-      throw new Error(`boost equip failed for ${cls} ${slot}: ${want}`);
-    }
-  }
-  const bags = state.bags ?? [];
-  if (bags.length !== BOOST_BAG_SOCKETS || bags.some((b) => b !== bagId)) {
-    throw new Error(`boost bag equip failed for ${cls}`);
-  }
   return state;
 }
 
