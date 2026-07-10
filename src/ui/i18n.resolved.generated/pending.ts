@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
@@ -343,6 +346,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "es_ES": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
@@ -676,6 +682,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "fr_FR": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
@@ -1009,6 +1018,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "fr_CA": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
@@ -1343,6 +1355,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
@@ -1676,6 +1691,9 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.wayDownOpens"
   ],
   "de_DE": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",
@@ -2029,6 +2047,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag"
   ],
   "pt_BR": [
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.items.rift_essence.name",
     "entities.items.rift_gem_azure.name",

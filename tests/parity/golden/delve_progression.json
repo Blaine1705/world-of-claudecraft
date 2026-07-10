@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 659,
-      "state": "573bba04",
+      "state": "58fef937",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,7 +49,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -123,7 +123,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 680,
-      "state": "02f88bab",
+      "state": "e764eab2",
       "events": "e1497e79",
       "rng": {
         "draws": 1,
@@ -134,7 +134,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 680,
-      "state": "6f458675",
+      "state": "1f33c884",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -167,7 +167,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -240,7 +240,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 680,
-      "state": "a5770cf9",
+      "state": "0ff12a50",
       "events": "b8d0fd21",
       "rng": {
         "draws": 3,
@@ -280,7 +280,7 @@
             "legs": "reliquary_legs",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -353,7 +353,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 680,
-      "state": "8cf3ca43",
+      "state": "8ac579fa",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -393,7 +393,7 @@
             "legs": "reliquary_legs",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

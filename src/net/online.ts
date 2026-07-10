@@ -995,6 +995,7 @@ function blankEntity(id: number): Entity {
     skin: 0,
     mainhandItemId: null,
     equippedItems: {},
+    equippedInstances: {},
     guild: '',
   };
 }

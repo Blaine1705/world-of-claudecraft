@@ -5919,6 +5919,15 @@ export const cs_CZ: EnTranslations = {
       "linen_scrap": {
         "name": "Lněný útržek"
       },
+      "arcane_dust": {
+        "name": "Arkánní prach"
+      },
+      "arcane_essence": {
+        "name": "Arkánní esence"
+      },
+      "arcane_shard": {
+        "name": "Arkánní střep"
+      },
       "fen_muster_order": {
         "name": "Fenbridgeský svolávací rozkaz"
       },

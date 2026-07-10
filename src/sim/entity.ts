@@ -11,6 +11,7 @@ import type {
   Vec3,
 } from './types';
 import {
+  cloneItemInstancePayload,
   critFractionFromRating,
   EQUIP_SLOTS,
   hasteFractionFromRating,
@@ -154,6 +155,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     skin: 0,
     mainhandItemId: null,
     equippedItems: {},
+    equippedInstances: {},
     guild: '',
   };
 }
@@ -195,8 +197,8 @@ export function recalcPlayerStats(
   e: Entity,
   cls: PlayerClass,
   equipment: PlayerEquipment,
-  mods?: TalentModifiers,
-  equipmentInstances?: PlayerEquipmentInstances,
+  mods: TalentModifiers | undefined,
+  equipmentInstance: PlayerEquipmentInstances,
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -235,8 +237,12 @@ export function recalcPlayerStats(
       s.spi += item.stats.spi ?? 0;
       s.armor += item.stats.armor ?? 0;
     }
-    const equippedInstance = equipmentInstances?.[slot];
-    const rolled = equippedInstance?.rift ? equippedInstance.rolled?.stats : undefined;
+    // Instance bonus, additive on top of the item's own base stats, from this
+    // specific instance's rolled.stats: an enchanted piece (Enchanting,
+    // src/sim/professions/enchanting.ts applyEnchant) or a rift-forged upgrade
+    // (the rift payload keeps rolled.stats as its authoritative aggregate).
+    // A plain piece has no entry here, so this is a no-op for the common case.
+    const rolled = equipmentInstance?.[slot]?.rolled?.stats;
     if (rolled) {
       s.str += Number.isFinite(rolled.str) ? rolled.str : 0;
       s.agi += Number.isFinite(rolled.agi) ? rolled.agi : 0;
@@ -385,6 +391,18 @@ export function recalcPlayerStats(
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
   e.equippedItems = { ...equipment };
+  // Render-only mirror of PlayerMeta.equipmentInstance, same copy-not-alias
+  // reasoning as equippedItems above. Deep-cloned via cloneItemInstancePayload
+  // (not a shallow spread) since a payload's own rolled.stats map must not be
+  // aliased into the mirror.
+  e.equippedInstances = equipmentInstance
+    ? Object.fromEntries(
+        Object.entries(equipmentInstance).map(([slot, inst]) => [
+          slot,
+          cloneItemInstancePayload(inst),
+        ]),
+      )
+    : {};
   // Melee AP by class (classic-era-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.
   const apFromStats =
@@ -484,10 +502,11 @@ export function characterDerivedStats(
   level: number,
   equipment: PlayerEquipment,
   mods?: TalentModifiers,
+  equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>,
 ): DerivedCharacterStats {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = Math.max(1, Math.floor(level));
-  recalcPlayerStats(e, cls, equipment, mods);
+  recalcPlayerStats(e, cls, equipment, mods, equipmentInstance ?? {});
   return {
     stats: e.stats,
     maxHp: e.maxHp,

@@ -2134,7 +2134,7 @@ function dirtyEveryDeltaField(): {
   meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
   meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
   meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
-  meta.equipmentInstances = {
+  meta.equipmentInstance = {
     ring1: { rolled: { quality: 'epic', stats: { str: 2 } }, boundTo: lp },
   };
   meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });

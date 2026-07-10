@@ -5919,6 +5919,15 @@ export const en_CA: EnTranslations = {
       "linen_scrap": {
         "name": "Linen Scrap"
       },
+      "arcane_dust": {
+        "name": "Arcane Dust"
+      },
+      "arcane_essence": {
+        "name": "Arcane Essence"
+      },
+      "arcane_shard": {
+        "name": "Arcane Shard"
+      },
       "fen_muster_order": {
         "name": "Fenbridge Muster Order"
       },

@@ -5919,6 +5919,15 @@ export const en_XA: EnTranslations = {
       "linen_scrap": {
         "name": "[Ļíñéñ Šçŕáþ]"
       },
+      "arcane_dust": {
+        "name": "[Áŕçáñé Ðúšţ]"
+      },
+      "arcane_essence": {
+        "name": "[Áŕçáñé Éššéñçé]"
+      },
+      "arcane_shard": {
+        "name": "[Áŕçáñé Šĥáŕð]"
+      },
       "fen_muster_order": {
         "name": "[Ƒéñƀŕíðĝé Ɱúšţéŕ Óŕðéŕ]"
       },

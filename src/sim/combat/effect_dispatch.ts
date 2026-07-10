@@ -680,7 +680,7 @@ export function runEffects(
               meta.cls,
               meta.equipment,
               ctx.playerMods(meta),
-              meta.equipmentInstances,
+              meta.equipmentInstance,
             );
             break;
           }
@@ -729,7 +729,7 @@ export function runEffects(
           meta.cls,
           meta.equipment,
           ctx.playerMods(meta),
-          meta.equipmentInstances,
+          meta.equipmentInstance,
         );
         break;
       }
