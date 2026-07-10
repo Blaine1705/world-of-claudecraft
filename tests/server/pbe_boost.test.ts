@@ -12,12 +12,17 @@ process.env.DATABASE_URL ??= 'postgres://unused:unused@localhost:9/unused';
 import { describe, expect, it } from 'vitest';
 import { normalizeCharName, offensiveName } from '../../server/auth';
 import {
+  BOOST_BAG_SOCKETS,
   BOOST_CLASSES,
+  BOOST_COPPER,
   BOOST_LEVEL,
   type BoostCreateResult,
   type BoostDeps,
+  bestBoostBag,
+  bisKitForRole,
   boostAccountCharacters,
   buildBoostedCharacterState,
+  CLASS_ROLES,
   classItemScore,
   nonHeroicBisKit,
   pbeBoostEnabled,
@@ -26,7 +31,7 @@ import {
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { ITEMS } from '../../src/sim/data';
-import { canEquipItem } from '../../src/sim/equipment_rules';
+import { canEquipItem, canEquipItemInSlot } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
@@ -150,6 +155,27 @@ describe('nonHeroicBisKit', () => {
       expect(weapon?.weapon, `${cls} mainhand dps`).toBeDefined();
     }
   });
+
+  it('fills the offhand legally: never beside a two-hander, always slot-equippable', () => {
+    for (const cls of BOOST_CLASSES) {
+      const kit = nonHeroicBisKit(cls);
+      if (!kit.offhand) continue;
+      const main = ITEMS[kit.mainhand as string];
+      expect(main.kind === 'weapon' && main.hand === 'twohand', `${cls} 2H+offhand`).toBe(false);
+      const off = ITEMS[kit.offhand];
+      expect(canEquipItemInSlot(cls, off, 'offhand', null), `${cls} offhand ${off.id}`).toBe(true);
+      expect(kit.offhand).not.toBe(kit.mainhand);
+    }
+    // Concrete pins for today's content: the shield classes raise the
+    // Wallshield (including the elemental shaman), the rogue dual-wields a
+    // second real weapon, and cloth casters (no shield, no held offhand
+    // content yet, no dual wield) keep both hands on the staff.
+    expect(nonHeroicBisKit('warrior').offhand).toBe('highwatch_wallshield');
+    expect(nonHeroicBisKit('paladin').offhand).toBe('highwatch_wallshield');
+    expect(nonHeroicBisKit('shaman').offhand).toBe('highwatch_wallshield');
+    const rogue = nonHeroicBisKit('rogue');
+    expect(ITEMS[rogue.offhand as string]?.kind).toBe('weapon');
+  });
 });
 
 describe('buildBoostedCharacterState', () => {
@@ -172,6 +198,84 @@ describe('buildBoostedCharacterState', () => {
     const reloaded = sim.serializeCharacter(pid);
     expect(reloaded?.level).toBe(BOOST_LEVEL);
     expect(reloaded?.equipment).toEqual(state.equipment);
+  });
+});
+
+describe('bags, gold, and alternate role kits', () => {
+  it('equips the best non-heroic bag in every bag socket', () => {
+    const bagId = bestBoostBag();
+    expect(bagId).toBe('mistcallers_duffel');
+    const bags = Object.values(ITEMS).filter(
+      (i) =>
+        i.kind === 'bag' &&
+        !i.heroic &&
+        !i.heroicOf &&
+        !(i.id in HEROIC_ITEMS) &&
+        !HEROIC_VENDOR_IDS.has(i.id),
+    );
+    const maxSlots = Math.max(...bags.map((b) => b.bagSlots ?? 0));
+    expect(ITEMS[bagId].bagSlots).toBe(maxSlots);
+    const state = buildBoostedCharacterState('warrior', 'Pbetestbags', 0);
+    expect(state.bags).toEqual(Array(BOOST_BAG_SOCKETS).fill(bagId));
+  });
+
+  it('grants exactly 10 gold of pocket money (fresh characters start at zero)', () => {
+    expect(BOOST_COPPER).toBe(100000);
+    const state = buildBoostedCharacterState('rogue', 'Pbetestgold', 0);
+    expect(state.copper).toBe(BOOST_COPPER);
+  });
+
+  it('exactly the hybrid classes define an alternate role', () => {
+    const hybrids = BOOST_CLASSES.filter((c) => CLASS_ROLES[c].length > 1);
+    expect([...hybrids].sort()).toEqual(['druid', 'paladin', 'shaman']);
+    for (const cls of BOOST_CLASSES) {
+      expect(CLASS_ROLES[cls].length, cls).toBeGreaterThanOrEqual(1);
+      expect(CLASS_ROLES[cls].length, cls).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('hybrid classes carry their full alternate-role kit in the bags, without duplicates', () => {
+    for (const cls of BOOST_CLASSES.filter((c) => CLASS_ROLES[c].length > 1)) {
+      const state = buildBoostedCharacterState(cls, 'Pbetesthyb', 0);
+      const equipped = new Set(Object.values(state.equipment));
+      const carried = state.inventory.map((s) => s.itemId);
+      const carriedSet = new Set(carried);
+      let distinctAltPieces = 0;
+      for (const role of CLASS_ROLES[cls].slice(1)) {
+        const altKit = bisKitForRole(cls, role);
+        for (const itemId of Object.values(altKit)) {
+          if (!itemId) continue;
+          expect(canEquipItem(cls, ITEMS[itemId]), `${cls} ${role.id} ${itemId} canEquip`).toBe(
+            true,
+          );
+          if (equipped.has(itemId)) continue;
+          distinctAltPieces++;
+          expect(carriedSet.has(itemId), `${cls} ${role.id} ${itemId}`).toBe(true);
+        }
+      }
+      // The alternate role must actually add SOMETHING (at minimum its weapon);
+      // otherwise a regression that stops bagging alt kits passes silently.
+      expect(distinctAltPieces, `${cls} distinct alt pieces`).toBeGreaterThanOrEqual(1);
+      // Dedupe: nothing the character wears rides in the bags as a copy, and
+      // no alt piece was added twice.
+      for (const id of equipped) {
+        if (id) expect(carriedSet.has(id), `${cls} equipped ${id} duplicated in bags`).toBe(false);
+      }
+      expect(carried.length, `${cls} inventory has stack-level duplicates`).toBe(carriedSet.size);
+    }
+  });
+
+  it('the shaman spawns in caster gear and carries a distinct melee weapon', () => {
+    const state = buildBoostedCharacterState('shaman', 'Pbetestsham', 0);
+    const equippedMain = ITEMS[state.equipment.mainhand as string];
+    expect(equippedMain.stats?.int ?? 0, 'equipped weapon is caster gear').toBeGreaterThan(0);
+    const enhancement = CLASS_ROLES.shaman[1];
+    expect(enhancement.id).toBe('enhancement');
+    const altMain = bisKitForRole('shaman', enhancement).mainhand as string;
+    expect(altMain).not.toBe(equippedMain.id);
+    const altDef = ITEMS[altMain];
+    expect((altDef.stats?.agi ?? 0) + (altDef.stats?.str ?? 0), 'melee stats').toBeGreaterThan(0);
+    expect(state.inventory.some((s) => s.itemId === altMain)).toBe(true);
   });
 });
 
