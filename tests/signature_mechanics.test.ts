@@ -393,8 +393,10 @@ describe('PR3 signature mechanics', () => {
 
     sim.castAbility('trueshot_aura');
 
-    expect(p.auras.some((a) => a.kind === 'buff_ap' && a.id === 'trueshot_aura_ap')).toBe(true);
-    expect(friend.auras.some((a) => a.kind === 'buff_ap' && a.id === 'trueshot_aura_ap')).toBe(
+    // PTR (THEIRS) Trueshot is a PERCENT attack-power buff (apPct: 10 -> buff_ap_pct),
+    // not the old flat +35 (buff_ap): the ally-scoped, no-hostile intent is unchanged.
+    expect(p.auras.some((a) => a.kind === 'buff_ap_pct' && a.id === 'trueshot_aura_ap')).toBe(true);
+    expect(friend.auras.some((a) => a.kind === 'buff_ap_pct' && a.id === 'trueshot_aura_ap')).toBe(
       true,
     );
     expect(hostile.auras.length).toBe(0);

@@ -85,6 +85,9 @@ export const zh_TW: EnTranslations = {
       "title": "天賦",
       "classTab": "職業",
       "specTab": "專精",
+      "choicesTab": "抉擇",
+      "rowUnlockToast": "新的天賦抉擇已解鎖！",
+      "rowUnlocks": "在 {level} 級解鎖",
       "available": "可用",
       "spent": "已用",
       "pointSource": "從 {first} 級到 {cap} 級，每升一級獲得 1 點天賦點。繼續升級可獲得更多點數。",
@@ -143,6 +146,7 @@ export const zh_TW: EnTranslations = {
         "noTree": "你的職業尚無天賦樹。",
         "locked": "你尚未解鎖天賦，天賦將在 {level} 級開啟。",
         "noSpec": "未選擇專精",
+        "rowsSummary": "天賦：{head}，已選擇 {picked}/{unlocked} 列選項。",
         "summary": "天賦：{head} — 已用 {spent}/{total} 點（{breakdown}）。",
         "breakdownClass": "職業 {classPts}",
         "breakdownSpec": "職業 {classPts}，{spec} {specPts}",
@@ -158,6 +162,10 @@ export const zh_TW: EnTranslations = {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
       "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+    },
+    "fct": {
+      "absorbed": "吸收 {amount}",
+      "cheap": "費用降低!"
     },
     "emotes": {
       "wave": "揮手",
@@ -744,7 +752,7 @@ export const zh_TW: EnTranslations = {
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[英雄]",
     "itemSoulbound": "靈魂綁定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -5790,6 +5798,18 @@ export const zh_TW: EnTranslations = {
         "name": "神聖懲擊",
         "description": "以神聖能量衝擊友方目標，治療其 {damage} 點生命。（神聖專精標誌技能）"
       },
+      "crusader_strike": {
+        "name": "十字軍聖擊",
+        "description": "打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）"
+      },
+      "metamorphosis": {
+        "name": "惡魔變形",
+        "description": "化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）"
+      },
+      "aura_surge": {
+        "name": "光輝湧動",
+        "description": "過載你的光環，使你在10秒內獲得160點護甲。（聖騎士天賦）"
+      },
       "holy_shield": {
         "name": "神聖之牆",
         "description": "以神聖能量為你護盾，持續 10 秒，使護甲提高 90，並對近戰攻擊者造成 12 點神聖傷害。（防護專精標誌技能）"
@@ -5818,9 +5838,9 @@ export const zh_TW: EnTranslations = {
         "name": "閃火",
         "description": "凝聚你的火焰魔法，使你的下一次攻擊必定是暴擊。（火焰專精標誌技能）"
       },
-      "cone_of_cold": {
-        "name": "Cone of Cold",
-        "description": "以冰霜轟擊附近的敵人，造成 {damage} 點冰霜傷害。（冰霜專精標誌技能）"
+      "icy_veins": {
+        "name": "冰冷血脈",
+        "description": "法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）"
       },
       "cold_blood": {
         "name": "殺手之靜",
@@ -5839,7 +5859,7 @@ export const zh_TW: EnTranslations = {
         "description": "為友方目標灌注力量，使法術強度提高 28，持續 15 秒。（戒律專精標誌技能）"
       },
       "holy_nova": {
-        "name": "Holy Nova",
+        "name": "神聖新星",
         "description": "引發一陣療癒之光的爆發，治療附近的盟友 {damage} 點生命並傷害附近的敵人。（神聖專精標誌技能）"
       },
       "shadowform": {
@@ -5898,10 +5918,6 @@ export const zh_TW: EnTranslations = {
         "name": "魯莽",
         "description": "激怒：你的怒氣產生提高 50%，暴擊機率提高 20%，持續 12 秒。"
       },
-      "avatar": {
-        "name": "戰爭化身",
-        "description": "化身為巨像，持續 20 秒，解除你身上所有的控制效果，並使你造成的傷害提高 20%。"
-      },
       "sanguine_aura": {
         "name": "血色光環",
         "description": "以敵人的鮮血浸染你的武器：你與你的近戰盟友獲得 10% 攻擊速度與 10% 傷害，持續 20 秒。"
@@ -5910,25 +5926,9 @@ export const zh_TW: EnTranslations = {
         "name": "乘勝追擊",
         "description": "攻擊造成武器傷害外加 {damage}，並治療你 20% 的最大生命值。只能在擊殺敵人後的 20 秒內使用。"
       },
-      "bladestorm": {
-        "name": "劍刃風暴",
-        "description": "化為一陣旋轉的鋼鐵風暴，每秒對 8 碼內的所有敵人造成 {damage} 點傷害，持續 4 秒。"
-      },
       "intimidating_shout": {
         "name": "破膽怒吼",
         "description": "一聲駭人的怒吼，使 8 碼內最多 5 個敵人陷入恐懼而逃竄，持續 8 秒。傷害可能會打破效果。"
-      },
-      "pummel": {
-        "name": "拳擊",
-        "description": "打斷施法，使該法術學派的任何法術在 4 秒內無法施放。成功打斷一次施法時產生 10 點怒氣。"
-      },
-      "heroic_leap": {
-        "name": "英勇飛躍",
-        "description": "躍向目標區域，對附近的敵人造成 {damage} 點傷害。"
-      },
-      "rallying_cry": {
-        "name": "團結號令",
-        "description": "發出一聲團結的號令，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。"
       },
       "summon_imp": {
         "name": "召喚燼裔",
@@ -5957,6 +5957,226 @@ export const zh_TW: EnTranslations = {
       "summon_doomguard": {
         "name": "召喚怨魂裔",
         "description": "將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。"
+      },
+      "aspect_of_the_wild": {
+        "name": "野牙偽裝",
+        "description": "以野性之力激勵附近的盟友，提高攻擊強度，持續 5 分鐘。（獵人天賦）"
+      },
+      "avatar": {
+        "name": "戰爭化身",
+        "description": "化身為巨像，持續 20 秒，解除你身上所有的控制效果，並使你造成的傷害提高 20%。"
+      },
+      "avenging_wrath": {
+        "name": "復仇之翼",
+        "description": "喚降復仇之力，提高攻擊強度與法術強度，持續 20 秒。（聖騎士天賦）"
+      },
+      "berserk": {
+        "name": "赤紅迷霧",
+        "description": "提高攻擊強度，持續 15 秒。（德魯伊天賦）"
+      },
+      "bladestorm": {
+        "name": "劍刃風暴",
+        "description": "化為一陣旋轉的鋼鐵風暴，每秒對 8 碼內的所有敵人造成 {damage} 點傷害，持續 4 秒。"
+      },
+      "razor_howl": {
+        "name": "銳刃怒吼",
+        "description": "使 15 碼內的敵人減速 50%，持續 8 秒。（戰士天賦）"
+      },
+      "stormthrow": {
+        "name": "風暴投擲",
+        "description": "投擲武器，使目標昏迷 3 秒。（戰士天賦）"
+      },
+      "reckless_vow": {
+        "name": "魯莽誓言",
+        "description": "所有怒氣生成提高 50%，暴擊機率提高 20%，持續 12 秒。（戰士天賦）"
+      },
+      "red_banner": {
+        "name": "赤紅戰旗",
+        "description": "你和附近盟友的攻擊速度提高 10%，傷害提高 10%，持續 20 秒。（戰士天賦）"
+      },
+      "blink": {
+        "name": "閃爍步",
+        "description": "向前瞬移 15 碼並解除定身效果。（法師天賦）"
+      },
+      "bloodlust": {
+        "name": "戰鼓",
+        "description": "使附近的盟友陷入狂熱，提高攻擊速度，持續 15 秒。（薩滿天賦）"
+      },
+      "chain_lightning": {
+        "name": "叉狀閃電",
+        "description": "向目標區域擲出閃電，對附近敵人造成 {damage} 點傷害。（薩滿天賦）"
+      },
+      "chaos_bolt": {
+        "name": "毀滅箭",
+        "description": "擲出一枚混亂火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影斗篷",
+        "description": "以暗影包裹自身，吸收傷害，持續 5 秒。（盜賊天賦）"
+      },
+      "cone_of_cold": {
+        "name": "寒霜橫掃",
+        "description": "以冰霜轟擊附近的敵人，造成 {damage} 點冰霜傷害。（冰霜專精標誌技能）"
+      },
+      "counter_shot": {
+        "name": "緘默射擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）"
+      },
+      "counterspell": {
+        "name": "破法",
+        "description": "反制敵人的施法，使該系法術在 6 秒內無法施放。（法師天賦）"
+      },
+      "curse_of_exhaustion": {
+        "name": "鉛沉妖咒",
+        "description": "詛咒目標，使其移動速度降低 30%，持續 12 秒。（術士天賦）"
+      },
+      "death_coil": {
+        "name": "墓穴纏卷",
+        "description": "對敵人造成 {damage} 點暗影傷害，隨後使其恐懼 3 秒。此法術不會治療施法者。（術士天賦）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "將目標深度凍結，造成 {damage} 點冰霜傷害並使其昏迷 4 秒。（法師天賦）"
+      },
+      "desperate_prayer": {
+        "name": "最後祈禱",
+        "description": "立即為你治療 {damage} 點生命值。（牧師天賦）"
+      },
+      "deterrence": {
+        "name": "鬃刺守衛",
+        "description": "提高你的閃躲機率 50%，持續 10 秒。（獵人天賦）"
+      },
+      "divine_shield": {
+        "name": "聖光守護",
+        "description": "以神聖之力護佑你，吸收大量傷害，持續 8 秒。（聖騎士天賦）"
+      },
+      "earthbind": {
+        "name": "攫握大地",
+        "description": "將附近的敵人束縛於大地，定身 2 秒。（薩滿天賦）"
+      },
+      "evocation": {
+        "name": "乙太之井",
+        "description": "快速恢復法力。（法師天賦）"
+      },
+      "frenzied_regeneration": {
+        "name": "野性癒合",
+        "description": "在 10 秒內恢復生命值。僅限蠻熊形態。（德魯伊天賦）"
+      },
+      "frost_trap": {
+        "name": "霜紋陷阱",
+        "description": "將目標區域的敵人凍結在原地，持續 3 秒。（獵人天賦）"
+      },
+      "ghostly_strike": {
+        "name": "幽魂打擊",
+        "description": "對敵人造成武器傷害外加 {damage} 點傷害，並短暫提高閃躲機率。獲得 1 個連擊點。（盜賊天賦）"
+      },
+      "hammer_of_wrath": {
+        "name": "鳴鐘之錘",
+        "description": "向受創的敵人擲出神聖之鎚，造成 {damage} 點神聖傷害。僅可對生命值低於 20% 的目標使用。（聖騎士天賦）"
+      },
+      "healing_stream": {
+        "name": "泉湧",
+        "description": "在 12 秒內治療一名友方目標。（薩滿天賦）"
+      },
+      "heroic_leap": {
+        "name": "英勇飛躍",
+        "description": "躍向目標區域，對附近的敵人造成 {damage} 點傷害。"
+      },
+      "holy_wrath": {
+        "name": "聖徒之怒",
+        "description": "釋放神聖之力，對附近敵人造成 {damage} 點傷害。（聖騎士天賦）"
+      },
+      "howl_of_terror": {
+        "name": "恐懼嚎叫",
+        "description": "恐嚇附近的敵人，最多持續 3 秒。受到傷害可能打破該效果。（術士天賦）"
+      },
+      "ice_block": {
+        "name": "寒冰棺",
+        "description": "將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）"
+      },
+      "inner_focus": {
+        "name": "靜心",
+        "description": "使你的下一個法術不消耗法力。持續 60 秒。（牧師天賦）"
+      },
+      "innervate": {
+        "name": "生命樹液",
+        "description": "生命樹液在你體內湧動10秒，如波浪般恢復20點當前資源：法力、怒氣或能量，變形也不會中斷。（德魯伊天賦）"
+      },
+      "kick": {
+        "name": "踢擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（盜賊天賦）"
+      },
+      "last_stand": {
+        "name": "第十一刻",
+        "description": "暫時提高耐力，持續 15 秒，提高最大生命值。（戰士天賦）"
+      },
+      "mend_pet": {
+        "name": "修補",
+        "description": "在 15 秒內為友方目標治療 {damage} 點生命值。（獵人天賦）"
+      },
+      "meteor": {
+        "name": "天石",
+        "description": "喚降一顆隕石轟擊目標區域，造成 {damage} 點火焰傷害並點燃地面。（法師天賦）"
+      },
+      "mind_sear": {
+        "name": "灼思",
+        "description": "向目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"
+      },
+      "multi_shot": {
+        "name": "分裂射擊",
+        "description": "射出多枚箭矢，對附近敵人造成 {damage} 點傷害。（獵人天賦）"
+      },
+      "prayer_of_healing": {
+        "name": "聖歌癒療",
+        "description": "治療附近的盟友 {damage} 點生命值。（牧師天賦）"
+      },
+      "preparation": {
+        "name": "應變",
+        "description": "結束疾跑、閃避和消失的冷卻時間。（盜賊天賦）"
+      },
+      "presence_of_mind": {
+        "name": "疾思",
+        "description": "使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）"
+      },
+      "psychic_scream": {
+        "name": "心靈尖嘯",
+        "description": "恐嚇附近的敵人，最多持續 4 秒。受到傷害可能打破該效果。（牧師天賦）"
+      },
+      "pummel": {
+        "name": "拳擊",
+        "description": "打斷施法，使該法術學派的任何法術在 4 秒內無法施放。成功打斷一次施法時產生 10 點怒氣。"
+      },
+      "rallying_cry": {
+        "name": "團結號令",
+        "description": "發出一聲團結的號令，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。"
+      },
+      "rebuke": {
+        "name": "斥責",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（聖騎士天賦）"
+      },
+      "shadowstep": {
+        "name": "影步",
+        "description": "穿過暗影，移動到目標身旁。（盜賊天賦）"
+      },
+      "shield_wall": {
+        "name": "壁壘",
+        "description": "築起堅不可摧的壁壘，大幅提高護甲，持續 10 秒。（戰士天賦）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "沉默目標，持續 4 秒。（牧師天賦）"
+      },
+      "skull_bash": {
+        "name": "顱擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（德魯伊天賦）"
+      },
+      "spell_lock": {
+        "name": "封口令",
+        "description": "打斷施法，並使該系法術在 5 秒內無法施放。（術士天賦）"
+      },
+      "tranquility": {
+        "name": "林地之歌",
+        "description": "引導恢復之力，每秒治療附近的盟友。（德魯伊天賦）"
       },
       "bear_charge": {
         "name": "巨熊衝鋒",
@@ -7207,31 +7427,61 @@ export const zh_TW: EnTranslations = {
       "deathless_heartwood": {
         "name": "不朽王冠之心木"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不朽王冠之心木"
+      },
       "kingsbane_last_oath": {
+        "name": "弒座者，荊峰的最後誓言"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "弒座者，荊峰的最後誓言"
       },
       "crownforged_dreadhelm": {
         "name": "骨鑄恐懼頭盔"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "骨鑄恐懼頭盔"
+      },
       "crownforged_warspaulders": {
+        "name": "骨鑄戰肩甲"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "骨鑄戰肩甲"
       },
       "nighttalon_crown": {
         "name": "厲牙之冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "厲牙之冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "厲牙護肩"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "厲牙護肩"
       },
       "soulflame_cowl": {
         "name": "怨焰兜帽"
       },
+      "soulflame_cowl_heroic": {
+        "name": "怨焰兜帽"
+      },
       "soulflame_mantle": {
+        "name": "怨焰披肩"
+      },
+      "soulflame_mantle_heroic": {
         "name": "怨焰披肩"
       },
       "stormcallers_crown": {
         "name": "喚風之冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "喚風之冠"
+      },
       "stormcallers_spaulders": {
+        "name": "喚風肩甲"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "喚風肩甲"
       },
       "unknown_alien_weaponry": {
@@ -7481,6 +7731,15 @@ export const zh_TW: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "復甦王室衛兵"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "奧德倫，亡魂戰衛"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "馬爾里克，亡魂大祭司"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "沃斯，亡魂之刃"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荊峰之災"

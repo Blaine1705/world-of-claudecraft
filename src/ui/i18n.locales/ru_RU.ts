@@ -137,7 +137,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': 'ч',
   'hudChrome.unitFrame.durationUnitDays': 'д',
   'hudChrome.unitFrame.partyLabel': 'Ваша группа',
-  'hudChrome.unitFrame.partyChip': 'Группа',
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
   'hudChrome.unitFrame.targetAnnounce': 'Цель: {name}',
   'hudChrome.unitFrame.targetLabel': 'Ваша цель',
@@ -499,6 +498,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.talents.title': 'Таланты',
   'game.talents.classTab': 'Класс',
   'game.talents.specTab': 'Специализация',
+  'game.talents.choicesTab': 'Варианты',
+  'game.talents.readout.rowsSummary': 'Таланты: {head}, выбрано рядов {picked}/{unlocked}.',
+  'game.talents.rowUnlockToast': 'Доступен новый выбор таланта!',
+  'game.talents.rowUnlocks': 'Открывается на {level} уровне',
   'game.talents.available': 'Доступно',
   'game.talents.spent': 'Потрачено',
   'game.talents.pointSource':
@@ -1079,7 +1082,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Общение',
   'hud.core.mobileArena': 'Арена',
   'hud.core.mobileMenu': 'Меню',
-  'hud.core.mobileSettings': 'Настройки',
   'hud.core.mobileUse': 'Использовать',
   'hud.core.mobileMeters': 'Счетчики',
   'hud.core.mobileMap': 'Карта',
@@ -1541,6 +1543,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.range': 'Дальность {range} м',
   'abilityUi.tooltip.rangeWithMin': 'Дальность {min}-{max} м',
   'abilityUi.tooltip.instant': 'Мгновенно',
+  'hudChrome.fct.absorbed': 'Поглощено {amount}',
+  'hudChrome.fct.cheap': 'Дешевле!',
   'abilityUi.tooltip.castSeconds': '{seconds} сек. применения',
   'abilityUi.tooltip.channeledSeconds': 'Поддерживаемое ({seconds} сек.)',
   'abilityUi.tooltip.cooldownSeconds': '{seconds} сек. восстановления',
@@ -1557,7 +1561,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'Вне глобального восстановления',
   'abilityUi.tooltip.friendlyTarget': 'Дружественная цель',
   'abilityUi.tooltip.enemyTarget': 'Вражеская цель',
-  'abilityUi.tooltip.selfOnly': 'Только на себя',
   'abilityUi.tooltip.damageRange': 'от {min} до {max}',
   'abilityUi.tooltip.finisherDamage': '{base} плюс {perCombo} за прием серии',
   'abilityUi.resources.mana': 'маны',
@@ -2275,6 +2278,164 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Оживление питомца',
   'entities.abilities.revive_pet.description':
     'Оживляет вашего павшего питомца и возвращает его к вам.',
+  'entities.abilities.aura_surge.name': 'Лучезарная волна',
+  'entities.abilities.aura_surge.description':
+    'Перегружает вашу ауру, укрепляя вас 160 ед. брони на 10 сек. (талант паладина)',
+  'entities.abilities.icy_veins.name': 'Ледяные жилы',
+  'entities.abilities.icy_veins.description':
+    'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
+  'entities.abilities.holy_nova.name': 'Кольцо света',
+  'entities.abilities.crusader_strike.name': 'Удар воина Света',
+  'entities.abilities.crusader_strike.description':
+    'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
+  'entities.abilities.metamorphosis.name': 'Метаморфоза',
+  'entities.abilities.metamorphosis.description':
+    'Принимает демоническую силу, повышая броню и силу атаки на 20 сек. (талант чернокнижника)',
+  'entities.abilities.aspect_of_the_wild.name': 'Облик дикого клыка',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Вдохновляет находящихся рядом союзников дикой силой, повышая силу атаки на 5 мин. (Талант охотника)',
+  'entities.abilities.avenging_wrath.name': 'Крыло возмездия',
+  'entities.abilities.avenging_wrath.description':
+    'Призывает карающую силу, повышая силу атаки и силу заклинаний на 20 сек. (Талант паладина)',
+  'entities.abilities.berserk.name': 'Багровая дымка',
+  'entities.abilities.berserk.description': 'Повышает силу атаки на 15 сек. (Талант друида)',
+  'entities.abilities.razor_howl.name': 'Бритвенный рев',
+  'entities.abilities.razor_howl.description':
+    'Замедляет врагов в радиусе 15 м на 50% на 8 сек. (Талант воина)',
+  'entities.abilities.stormthrow.name': 'Штормовой бросок',
+  'entities.abilities.stormthrow.description':
+    'Бросает оружие и оглушает цель на 3 сек. (Талант воина)',
+  'entities.abilities.reckless_vow.name': 'Безрассудная клятва',
+  'entities.abilities.reckless_vow.description':
+    'Повышает весь прирост ярости на 50%, а шанс критического удара на 20% на 12 сек. (Талант воина)',
+  'entities.abilities.red_banner.name': 'Красное знамя',
+  'entities.abilities.red_banner.description':
+    'Вы и ближайшие союзники получаете на 10% больше скорости атаки и урона на 20 сек. (Талант воина)',
+  'entities.abilities.blink.name': 'Мерцающий шаг',
+  'entities.abilities.blink.description':
+    'Переносит вас на 15 м вперед и снимает эффекты обездвиживания. (Талант мага)',
+  'entities.abilities.bloodlust.name': 'Боевые барабаны',
+  'entities.abilities.bloodlust.description':
+    'Приводит ближайших союзников в неистовство, повышая скорость атаки на 15 сек. (Талант шамана)',
+  'entities.abilities.chain_lightning.name': 'Разветвленная молния',
+  'entities.abilities.chain_lightning.description':
+    'Обрушивает молнию на выбранную область, нанося ближайшим врагам {damage} ед. урона. (Талант шамана)',
+  'entities.abilities.chaos_bolt.name': 'Стрела погибели',
+  'entities.abilities.chaos_bolt.description':
+    'Выпускает снаряд хаотического огня, наносящий {damage} ед. урона от огня. (Талант чернокнижника)',
+  'entities.abilities.cloak_of_shadows.name': 'Плащ теней',
+  'entities.abilities.cloak_of_shadows.description':
+    'Окутывает вас тенями, поглощая урон в течение 5 сек. (Талант разбойника)',
+  'entities.abilities.cone_of_cold.name': 'Ледяной взмах',
+  'entities.abilities.counter_shot.name': 'Глушащий выстрел',
+  'entities.abilities.counter_shot.description':
+    'Прерывает произнесение заклинания и запрещает заклинания этой школы на 4 сек. (Талант охотника)',
+  'entities.abilities.counterspell.name': 'Чаролом',
+  'entities.abilities.counterspell.description':
+    'Прерывает произнесение заклинания противника и запрещает заклинания этой школы на 6 сек. (Талант мага)',
+  'entities.abilities.curse_of_exhaustion.name': 'Свинцовое проклятие',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Проклинает цель, снижая скорость передвижения на 30% на 12 сек. (Талант чернокнижника)',
+  'entities.abilities.death_coil.name': 'Могильная спираль',
+  'entities.abilities.death_coil.description':
+    'Наносит врагу {damage} ед. темного урона, а затем приводит его в ужас на 3 сек. Это заклинание не исцеляет заклинателя. (Талант чернокнижника)',
+  'entities.abilities.deep_freeze.name': 'Мертвый мороз',
+  'entities.abilities.deep_freeze.description':
+    'Глубоко замораживает цель, нанося {damage} ед. урона от льда и оглушая ее на 4 сек. (Талант мага)',
+  'entities.abilities.desperate_prayer.name': 'Последняя молитва',
+  'entities.abilities.desperate_prayer.description':
+    'Мгновенно исцеляет вас на {damage} ед. (Талант жреца)',
+  'entities.abilities.deterrence.name': 'Колючий страж',
+  'entities.abilities.deterrence.description':
+    'Повышает ваш шанс уклонения на 50% на 10 сек. (Талант охотника)',
+  'entities.abilities.divine_shield.name': 'Световой оберег',
+  'entities.abilities.divine_shield.description':
+    'Окружает вас святой защитой, поглощающей огромный урон в течение 8 сек. (Талант паладина)',
+  'entities.abilities.earthbind.name': 'Хватка земли',
+  'entities.abilities.earthbind.description':
+    'Приковывает ближайших врагов к земле, обездвиживая их на 2 сек. (Талант шамана)',
+  'entities.abilities.evocation.name': 'Эфирный колодец',
+  'entities.abilities.evocation.description': 'Быстро восполняет ману. (Талант мага)',
+  'entities.abilities.frenzied_regeneration.name': 'Дикое исцеление',
+  'entities.abilities.frenzied_regeneration.description':
+    'Восстанавливает здоровье в течение 10 сек. Только в облике бурого медведя. (Талант друида)',
+  'entities.abilities.frost_trap.name': 'Инейная ловушка',
+  'entities.abilities.frost_trap.description':
+    'Замораживает врагов в выбранной области на 3 сек. (Талант охотника)',
+  'entities.abilities.ghostly_strike.name': 'Призрачный удар',
+  'entities.abilities.ghostly_strike.description':
+    'Наносит врагу урон оружием и дополнительно {damage} ед. урона, ненадолго повышая уклонение. Дает 1 очко серии приемов. (Талант разбойника)',
+  'entities.abilities.hammer_of_wrath.name': 'Звонкий молот',
+  'entities.abilities.hammer_of_wrath.description':
+    'Метает святой молот в раненого врага, нанося {damage} ед. светлого урона. Действует только на цели со здоровьем ниже 20%. (Талант паладина)',
+  'entities.abilities.healing_stream.name': 'Источник',
+  'entities.abilities.healing_stream.description':
+    'Исцеляет союзника в течение 12 сек. (Талант шамана)',
+  'entities.abilities.holy_wrath.name': 'Гнев святого',
+  'entities.abilities.holy_wrath.description':
+    'Высвобождает святую силу, нанося ближайшим врагам {damage} ед. урона. (Талант паладина)',
+  'entities.abilities.howl_of_terror.name': 'Вой ужаса',
+  'entities.abilities.howl_of_terror.description':
+    'Приводит ближайших врагов в ужас на срок до 3 сек. Урон может развеять эффект. (Талант чернокнижника)',
+  'entities.abilities.ice_block.name': 'Холодный гроб',
+  'entities.abilities.ice_block.description':
+    'Заключает вас в лед, поглощающий огромный урон в течение 8 сек. (Талант мага)',
+  'entities.abilities.inner_focus.name': 'Утихший разум',
+  'entities.abilities.inner_focus.description':
+    'Ваше следующее заклинание не потребует затрат. Действует 60 сек. (Талант жреца)',
+  'entities.abilities.innervate.name': 'Живой сок',
+  'entities.abilities.innervate.description':
+    'Живой сок наполняет вас в течение 10 сек., волнами восполняя 20 текущего ресурса: ману, ярость или энергию; смена облика его не прерывает. (талант друида)',
+  'entities.abilities.kick.name': 'Пинок',
+  'entities.abilities.kick.description':
+    'Прерывает произнесение заклинания и запрещает заклинания этой школы на 4 сек. (Талант разбойника)',
+  'entities.abilities.last_stand.name': 'Одиннадцатый час',
+  'entities.abilities.last_stand.description':
+    'Временно повышает выносливость на 15 сек., увеличивая максимальный запас здоровья. (Талант воина)',
+  'entities.abilities.mend_pet.name': 'Перевязка',
+  'entities.abilities.mend_pet.description':
+    'Исцеляет союзную цель на {damage} ед. в течение 15 сек. (Талант охотника)',
+  'entities.abilities.meteor.name': 'Небесный камень',
+  'entities.abilities.meteor.description':
+    'Обрушивает метеор на выбранную область, нанося {damage} ед. урона от огня и поджигая землю. (Талант мага)',
+  'entities.abilities.mind_sear.name': 'Выжигание мыслей',
+  'entities.abilities.mind_sear.description':
+    'Направляет темную энергию в выбранную область, каждую секунду нанося ближайшим врагам {damage} ед. урона. (Талант жреца)',
+  'entities.abilities.multi_shot.name': 'Раздвоенный выстрел',
+  'entities.abilities.multi_shot.description':
+    'Выпускает несколько снарядов, нанося ближайшим врагам {damage} ед. урона. (Талант охотника)',
+  'entities.abilities.prayer_of_healing.name': 'Хоровое исцеление',
+  'entities.abilities.prayer_of_healing.description':
+    'Исцеляет ближайших союзников на {damage} ед. (Талант жреца)',
+  'entities.abilities.preparation.name': 'Запасной план',
+  'entities.abilities.preparation.description':
+    'Мгновенно восстанавливает спринт, уклонение и исчезновение. (Талант разбойника)',
+  'entities.abilities.presence_of_mind.name': 'Быстрый разум',
+  'entities.abilities.presence_of_mind.description':
+    'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
+  'entities.abilities.psychic_scream.name': 'Психический крик',
+  'entities.abilities.psychic_scream.description':
+    'Приводит ближайших врагов в ужас на срок до 4 сек. Урон может развеять эффект. (Талант жреца)',
+  'entities.abilities.rebuke.name': 'Укор',
+  'entities.abilities.rebuke.description':
+    'Прерывает произнесение заклинания и запрещает заклинания этой школы на 4 сек. (Талант паладина)',
+  'entities.abilities.shadowstep.name': 'Теневой шаг',
+  'entities.abilities.shadowstep.description':
+    'Вы проскальзываете сквозь тени к своей цели. (Талант разбойника)',
+  'entities.abilities.shield_wall.name': 'Бастион',
+  'entities.abilities.shield_wall.description':
+    'Возводит нерушимую преграду, значительно повышая броню на 10 сек. (Талант воина)',
+  'entities.abilities.silence.name': 'Безмолвие',
+  'entities.abilities.silence.description': 'Заставляет цель замолчать на 4 сек. (Талант жреца)',
+  'entities.abilities.skull_bash.name': 'Удар черепом',
+  'entities.abilities.skull_bash.description':
+    'Прерывает произнесение заклинания и запрещает заклинания этой школы на 4 сек. (Талант друида)',
+  'entities.abilities.spell_lock.name': 'Приказ заткнуть',
+  'entities.abilities.spell_lock.description':
+    'Прерывает произнесение заклинания и запрещает заклинания этой школы на 5 сек. (Талант чернокнижника)',
+  'entities.abilities.tranquility.name': 'Песнь рощи',
+  'entities.abilities.tranquility.description':
+    'Направляет восстанавливающую энергию, каждую секунду исцеляя ближайших союзников. (Талант друида)',
   'entities.items.worn_sword.name': 'Щербатый короткий меч',
   'entities.items.gnarled_staff.name': 'Посох мореного дуба',
   'entities.items.rusty_dagger.name': 'Ржавый кинжал',
@@ -3758,17 +3919,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnBody':
     'Задание выполнено. Вернитесь к маршалу Редбруку и нажмите {interactKey}, чтобы сдать его.',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Восставший королевский страж',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Олдрен, бессмертный страж',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Малрик, бессмертный иерофант',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Восс, бессмертный клинок',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Нитраксис, Бич Торнпика',
   'itemUi.quality.legendary': 'Легендарное',
   'entities.items.deathless_heartwood.name': 'Сердцевина бессмертной короны',
+  'entities.items.deathless_heartwood_heroic.name': 'Сердцевина бессмертной короны',
   'entities.items.kingsbane_last_oath.name': 'Погибель Трона, последняя клятва Торнпика',
+  'entities.items.kingsbane_last_oath_heroic.name': 'Погибель Трона, последняя клятва Торнпика',
   'entities.items.crownforged_dreadhelm.name': 'Костокованый шлем ужаса',
+  'entities.items.crownforged_dreadhelm_heroic.name': 'Костокованый шлем ужаса',
   'entities.items.crownforged_warspaulders.name': 'Костокованые боевые наплечники',
+  'entities.items.crownforged_warspaulders_heroic.name': 'Костокованые боевые наплечники',
   'entities.items.nighttalon_crown.name': 'Корона Лютого Клыка',
+  'entities.items.nighttalon_crown_heroic.name': 'Корона Лютого Клыка',
   'entities.items.nighttalon_shoulderguards.name': 'Наплечные стражи Лютого Клыка',
+  'entities.items.nighttalon_shoulderguards_heroic.name': 'Наплечные стражи Лютого Клыка',
   'entities.items.soulflame_cowl.name': 'Клобук Призрачного пламени',
+  'entities.items.soulflame_cowl_heroic.name': 'Клобук Призрачного пламени',
   'entities.items.soulflame_mantle.name': 'Оплечье Призрачного пламени',
+  'entities.items.soulflame_mantle_heroic.name': 'Оплечье Призрачного пламени',
   'entities.items.stormcallers_crown.name': 'Корона Зова Бури',
+  'entities.items.stormcallers_crown_heroic.name': 'Корона Зова Бури',
   'entities.items.crownforged_gauntlets.name': 'Короннокованые рукавицы',
   'entities.items.nighttalon_grips.name': 'Захваты Ночного Когтя',
   'entities.items.soulflame_gloves.name': 'Перчатки Пламени души',
@@ -3781,6 +3954,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
   'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',
   'entities.items.stormcallers_spaulders.name': 'Наплечники Зова Бури',
+  'entities.items.stormcallers_spaulders_heroic.name': 'Наплечники Зова Бури',
   'hud.chat.context.convertToRaid': 'Преобразовать в рейд',
   'hud.chat.context.convertToParty': 'Преобразовать в группу',
   'hudChrome.raidConvert.leaderOnly': 'Только лидер рейда может преобразовать рейд в группу.',
@@ -5391,6 +5565,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ловкость повышается на 15, вероятность критического удара на 2%.',
   'entities.itemSets.wyrmshadow.bonus4':
     'Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 25% на 8 сек.',
+  'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКАЯ]',
   'hudChrome.itemSoulbound': 'Персональный',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
@@ -6312,7 +6487,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Травничество',
   'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
   'hudChrome.archetypeTitle.armorcrafting': 'Бронник',
   'hudChrome.archetypeTitle.weaponcrafting': 'Оружейник',
   'hudChrome.archetypeTitle.jewelcrafting': 'Ювелир',
@@ -6324,7 +6498,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypeTitle.tailoring': 'Портной',
   'hudChrome.archetypeTitle.leatherworking': 'Кожевник',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
-  // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
   'yumi.hud.expand': 'Развернуть полосы Protect Yumi',
   'guide.arenaPage.yumiHeading': 'Защитите Yumi',
@@ -6353,16 +6526,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': 'ПОРАЖЕНИЕ! Ваша Yumi пала.',
   'hudChrome.crafting.comboRequirementUnmet':
     'У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.',
-  'hudChrome.crafting.notAtHub':
-    'Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.',
-  'hudChrome.crafting.throttled':
-    'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
-  'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
   'hudChrome.mobile.actionPageIndicator': 'Стр. {page}',
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
-  'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
-  'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
-  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.vcup.title': 'Кубок Долины',
   'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
@@ -6620,6 +6785,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
+  'hudChrome.unitFrame.partyChip': 'Группа',
+  'hud.core.mobileSettings': 'Настройки',
+  'abilityUi.tooltip.selfOnly': 'Только на себя',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
+  'hudChrome.crafting.notAtHub':
+    'Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.',
+  'hudChrome.crafting.throttled':
+    'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
+  'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
+  'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
+  'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
   'entities.mobs.yumi_cat.name': 'Юми',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',

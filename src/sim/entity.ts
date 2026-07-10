@@ -66,6 +66,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    critDmgBonus: 0,
     dodgeChance: 0.05,
     parryChance: 0,
     blockChance: 0,
@@ -136,6 +137,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
+    shuffleTargetTimer: 0,
     ownerId: null,
     petMode: 'defensive',
     petTauntTimer: 0,
@@ -212,6 +214,10 @@ function manaFromIntellect(int: number): number {
   // the mana pool below its level-based base into negative territory.
   const i = Math.max(0, int);
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
+}
+
+export function pctValue(value: number): number {
+  return value > 1 ? value / 100 : value;
 }
 
 // Recompute all derived stats for the player from class, level, gear, buffs, and
@@ -292,6 +298,7 @@ export function recalcPlayerStats(
   let bonusHaste = 0; // Fury Enrage folds +25% haste here (real haste: swings + casts)
   let bearForm = false;
   let catForm = false;
+  let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
   // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
   // Devotion Aura / Battle Shout / Blessing of Might). Accumulated as fractions here,
@@ -336,12 +343,13 @@ export function recalcPlayerStats(
     // Die by the Sword: its "+100% parry" is modelled as a big dodge boost.
     else if (a.kind === 'die_by_sword') bonusDodge += DIE_BY_SWORD_DODGE;
     // Choice-row talent buffs: additive crit chance while worn. buff_crit is the
-    // generic kind; buff_reckless carries Recklessness' +20% crit half (its rage
-    // half lives in rageGenAuraMult); a bloodbath aura's value is its per-stack
-    // crit times the current stacks. Expiry re-runs this recalc via the
-    // statsDirty pass in combat/auras.ts, so each bonus falls off with its aura.
-    else if (a.kind === 'buff_crit' || a.kind === 'buff_reckless' || a.kind === 'bloodbath')
-      bonusCrit += a.value;
+    // generic kind (its value scales with the aura's stacks); buff_reckless carries
+    // Recklessness' +20% crit half (its rage half lives in rageGenAuraMult); a
+    // bloodbath aura's value is its per-stack crit times the current stacks. Expiry
+    // re-runs this recalc via the statsDirty pass in combat/auras.ts, so each bonus
+    // falls off with its aura.
+    else if (a.kind === 'buff_crit') bonusCrit += a.value * (a.stacks ?? 1);
+    else if (a.kind === 'buff_reckless' || a.kind === 'bloodbath') bonusCrit += a.value;
     // Berserker Stance (Fury): a flat additive crit-chance bonus while worn. Its
     // crit-DAMAGE half lives in combat/damage.ts (berserkerCritDamage).
     else if (a.kind === 'berserker_stance') bonusCrit += BERSERKER_CRIT_CHANCE;
@@ -349,6 +357,8 @@ export function recalcPlayerStats(
     // it speeds swings AND casts and shows in the Haste stat (never touches GCD).
     else if (a.kind === 'enrage') bonusHaste += ENRAGE_HASTE_PCT;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
+    // Metamorphosis: a temporary demon transform that also makes the caster larger.
+    else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
     // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
     // integer-rounding talent value multiplier; converted to a fraction here.
     else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;
@@ -363,7 +373,10 @@ export function recalcPlayerStats(
     else if (a.kind === 'form_cat') catForm = true;
     // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
     // the form aura's value, so the bonus lives and dies with the one toggle.
-    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') bonusSp += a.value;
+    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') {
+      bonusSp += a.value;
+      if (a.kind === 'form_moonkin') moonkinForm = true;
+    }
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
@@ -410,6 +423,9 @@ export function recalcPlayerStats(
   // Protection's Vanguard: bonus armor from Strength, added (on the fully-summed
   // Strength) before the armor multiplier so armorPct amplifies it too.
   if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
+  // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
+  // separate buff_spelldmg aura the form applies).
+  if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
@@ -501,10 +517,13 @@ export function recalcPlayerStats(
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  // hasteFrac folds set-bonus + rating haste; bonusHaste adds Fury Enrage's +25%.
-  e.meleeHaste = hasteFrac + bonusHaste;
+  // hasteFrac folds set-bonus + rating haste (#1471); bonusHaste adds Fury Enrage's
+  // +25%; and a spec mastery's passive haste (#1543) adds on its own channel.
+  e.meleeHaste = hasteFrac + bonusHaste + (mods?.global.meleeHastePct ?? 0);
   e.rangedHaste = hasteFrac + bonusHaste;
-  e.spellHaste = hasteFrac + bonusHaste;
+  // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
+  // caster spec can shorten every cast; the cast-time tooltips read the same total.
+  e.spellHaste = hasteFrac + bonusHaste + (mods?.global.spellHastePct ?? 0);
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
   // Crit: ~1% per 20 agi at low level (+ buff_crit auras summed above, + crit rating)
@@ -515,6 +534,8 @@ export function recalcPlayerStats(
     setEff.crit +
     bonusCrit +
     critFractionFromRating(e.critRating);
+  // Extra crit damage from a spec mastery (e.g. Fire mage: spell crits deal double).
+  e.critDmgBonus = mods?.global.critDmgPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
@@ -655,6 +676,7 @@ export function createNpc(id: number, def: NpcDef, pos: Vec3): Entity {
   e.color = def.color;
   e.questIds = [...def.questIds];
   e.vendorItems = [...(def.vendorItems ?? [])];
+  e.devVendor = def.devVendor ?? false;
   return e;
 }
 

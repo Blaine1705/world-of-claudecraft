@@ -199,9 +199,9 @@ describe('classic formulas', () => {
     // rank via the no-spec kit which keeps it: rank 2 at level 10.
     const hs10 = abilitiesKnownAt('warrior', 10).find((k) => k.def.id === 'heroic_strike')!;
     expect(hs10.rank).toBe(2);
-    const m8 = abilitiesKnownAt('mage', 8).map((k) => k.def.id);
-    expect(m8).toContain('polymorph');
-    expect(m8).not.toContain('frost_nova'); // level 10
+    const m5 = abilitiesKnownAt('mage', 5).map((k) => k.def.id);
+    expect(m5).toContain('polymorph');
+    expect(m5).toContain('frost_nova');
   });
 
   it('ranks and new abilities carry the kit through the 10-20 band', () => {

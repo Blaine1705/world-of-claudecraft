@@ -178,7 +178,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "pummel",
-        "name": "Pummel"
+        "name": "Jawcrack"
       },
       {
         "id": "execute",
@@ -326,7 +326,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "retribution",
         "name": "Requital",
         "role": "dps",
-        "signature": "repentance"
+        "signature": "crusader_strike"
       }
     ],
     "signatureAbilities": [
@@ -790,13 +790,13 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "enhancement",
         "name": "Warspirit",
         "role": "dps",
-        "signature": "shamanistic_rage"
+        "signature": "stormstrike"
       },
       {
         "id": "restoration",
         "name": "Spiritmend",
         "role": "healer",
-        "signature": "natures_swiftness"
+        "signature": "chain_heal"
       }
     ],
     "signatureAbilities": [
@@ -867,14 +867,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Shadewolf"
       },
       {
-        "id": "chain_heal",
-        "name": "Chain Heal"
-      },
-      {
-        "id": "stormstrike",
-        "name": "Ancestral Strike"
-      },
-      {
         "id": "earthquake",
         "name": "Earthquake"
       }
@@ -907,7 +899,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "frost",
         "name": "Cryomancy",
         "role": "dps",
-        "signature": "cone_of_cold"
+        "signature": "icy_veins"
       }
     ],
     "signatureAbilities": [
@@ -1019,7 +1011,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "demonology",
         "name": "Pactbound",
         "role": "dps",
-        "signature": "fel_domination"
+        "signature": "metamorphosis"
       },
       {
         "id": "destruction",

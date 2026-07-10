@@ -310,10 +310,10 @@ export class TalentsWindow {
       panel.setAttribute('role', 'radio');
       panel.setAttribute('tabindex', selected || !stage.spec ? '0' : '-1');
       panel.setAttribute('aria-checked', String(selected));
-      panel.setAttribute('aria-label', `${specName}, ${roleLabel(specVM.role)}`);
+      panel.setAttribute('aria-label', `${specName}, ${roleLabel(sp.role)}`);
       let html =
         `<div class="ts-panel-head">${specIconHtml(cls, sp.id, sp.icon)}` +
-        `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(specVM.role)}</div></div></div>` +
+        `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(sp.role)}</div></div></div>` +
         `<div class="ts-det-desc">${esc(specDesc)}</div>`;
       if (info) {
         const statLabel = t(`itemUi.stats.${info.primaryStat}` as TranslationKey);
@@ -383,15 +383,10 @@ export class TalentsWindow {
 
   private setSpec(stage: TalentAllocation, specId: string): void {
     if (stage.spec === specId) return;
+    // Rows model: switching spec picks the new spec and clears every chosen row
+    // (rows are spec-scoped, so none carry over).
     stage.spec = specId;
-    const ct = talentsFor(this.deps.playerClass());
-    for (const id of Object.keys(stage.ranks)) {
-      const n = ct?.nodes.find((x) => x.id === id);
-      if (n?.tree === 'spec' && n.specId !== specId) {
-        delete stage.ranks[id];
-        delete stage.choices[id];
-      }
-    }
+    stage.rows = {};
     this.render();
   }
 
@@ -446,7 +441,7 @@ export class TalentsWindow {
   ): void {
     const cls = this.deps.playerClass();
     const valid = validateAllocation(cls, stage, total).ok;
-    const spent = Object.values(stage.ranks).reduce((a, b) => a + b, 0);
+    const spent = Object.keys(stage.rows ?? {}).length;
     const loadouts = this.deps.loadouts();
     const activeIdx = this.deps.activeLoadout();
 

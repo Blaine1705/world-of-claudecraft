@@ -85,6 +85,9 @@ export const fr_FR: EnTranslations = {
       "title": "Talents",
       "classTab": "Classe",
       "specTab": "Spécialisation",
+      "choicesTab": "Choix",
+      "rowUnlockToast": "Nouveau choix de talent disponible !",
+      "rowUnlocks": "Se débloque au niveau {level}",
       "available": "Disponibles",
       "spent": "Dépensés",
       "pointSource": "Gagnez 1 point de talent par niveau du niveau {first} au niveau {cap}. Montez de niveau pour obtenir plus de points.",
@@ -143,6 +146,7 @@ export const fr_FR: EnTranslations = {
         "noTree": "Votre classe n'a pas encore d'arbre de talents.",
         "locked": "Vous n'avez pas encore débloqué les talents — ils commencent au niveau {level}.",
         "noSpec": "aucune spécialisation",
+        "rowsSummary": "Talents : {head}, {picked}/{unlocked} rangées de choix sélectionnées.",
         "summary": "Talents: {head} — {spent}/{total} points dépensés ({breakdown}).",
         "breakdownClass": "Classe {classPts}",
         "breakdownSpec": "Classe {classPts}, {spec} {specPts}",
@@ -158,6 +162,10 @@ export const fr_FR: EnTranslations = {
       "resurrectAtCorpse": "Ressusciter près du cadavre",
       "resurrectAtHealer": "Le Veilleur pâle (Glas du Veilleur)",
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants."
+    },
+    "fct": {
+      "absorbed": "Absorbé : {amount}",
+      "cheap": "Coût réduit !"
     },
     "emotes": {
       "wave": "Saluer de la main",
@@ -744,8 +752,8 @@ export const fr_FR: EnTranslations = {
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HÉROÏQUE]",
+    "itemSoulbound": "Lié à l’âme",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1356,8 +1364,8 @@ export const fr_FR: EnTranslations = {
       "parcelsLabel": "Colis",
       "parcelsHint": "Cliquez sur un objet dans vos sacs pour le joindre.",
       "removeParcelAria": "Retirer {item} de la lettre",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Envoyer un {item} de moins",
+      "parcelQtyIncreaseAria": "Envoyer un {item} de plus",
       "sendButton": "Envoyer la lettre",
       "postageNote": "Affranchissement : {amount}. Le corbeau vole environ {seconds}s.",
       "arrivedBanner": "Le corbeau s'est posé : du courrier de {name}.",
@@ -5143,7 +5151,7 @@ export const fr_FR: EnTranslations = {
         "description": "Fait trembler la zone visée pendant 6 s, frappant les ennemis pour {damage} points de dégâts de Nature toutes les 1.5 s."
       },
       "chain_heal": {
-        "name": "Chain Heal",
+        "name": "Soins en chaîne",
         "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
       },
       "heroic_strike": {
@@ -5196,7 +5204,7 @@ export const fr_FR: EnTranslations = {
       },
       "slam": {
         "name": "Coup brutal",
-        "description": "Frappe l'adversaire pour les dégâts de l'arme plus {damage}."
+        "description": "Frappe l'adversaire pour 50 % des dégâts de l'arme plus {damage}, générant {rage} points de rage."
       },
       "cleave": {
         "name": "Arc faucheur",
@@ -5787,68 +5795,80 @@ export const fr_FR: EnTranslations = {
         "description": "Entre dans une fureur bouillonnante et génère 20 points de rage. (talent de guerrier)"
       },
       "holy_shock": {
-        "name": "Holy Shock",
-        "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
+        "name": "Horion sacré",
+        "description": "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)"
+      },
+      "crusader_strike": {
+        "name": "Frappe du croisé",
+        "description": "Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)"
+      },
+      "metamorphosis": {
+        "name": "Métamorphose",
+        "description": "Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)"
+      },
+      "aura_surge": {
+        "name": "Houle radieuse",
+        "description": "Surcharge votre aura et vous renforce de 160 points d'armure pendant 10 s. (talent de Paladin)"
       },
       "holy_shield": {
-        "name": "Hallowed Wall",
-        "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
+        "name": "Bouclier sacré",
+        "description": "Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)"
       },
       "repentance": {
         "name": "Repentance",
         "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
-        "name": "Howling Rage",
-        "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
+        "name": "Courroux bestial",
+        "description": "Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)"
       },
       "trueshot_aura": {
-        "name": "Sureflight Aura",
-        "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
+        "name": "Aura de précision",
+        "description": "Inspire les alliés proches, augmentant leur puissance d’attaque de 35 pendant 5 min. (signature Précision)"
       },
       "wyvern_sting": {
-        "name": "Wyvern Sting",
-        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+        "name": "Piqûre de wyverne",
+        "description": "Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)"
       },
       "arcane_power": {
-        "name": "Aether Surge",
-        "description": "Fills you with aether surge, increasing spell power by 28 for 12 sec. (Arcane signature)"
+        "name": "Pouvoir des Arcanes",
+        "description": "Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)"
       },
       "combustion": {
-        "name": "Flashfire",
-        "description": "Focuses your fire magic so your next attack is a critical strike. (Fire signature)"
+        "name": "Combustion",
+        "description": "Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)"
       },
-      "cone_of_cold": {
-        "name": "Cone of Cold",
-        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
+      "icy_veins": {
+        "name": "Veines glaciales",
+        "description": "Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)"
       },
       "cold_blood": {
-        "name": "Killer's Calm",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+        "name": "Sang froid",
+        "description": "Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)"
       },
       "blade_flurry": {
-        "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+        "name": "Déluge de lames",
+        "description": "Déchaîne un déluge de lames, augmentant la vitesse d’attaque de 20% pendant 12 s. (signature Combat)"
       },
       "hemorrhage": {
-        "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
+        "name": "Hémorragie",
+        "description": "Frappe l’ennemi pour les dégâts de l’arme plus {damage} et inflige des dégâts de saignement pendant 12 s. Confère 1 point de combo. (signature Finesse)"
       },
       "power_infusion": {
-        "name": "Anointing",
-        "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
+        "name": "Infusion de puissance",
+        "description": "Insuffle de la puissance à une cible alliée, augmentant sa puissance des sorts de 28 pendant 15 s. (signature Discipline)"
       },
       "holy_nova": {
-        "name": "Holy Nova",
-        "description": "Causes an explosion of Mending Light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+        "name": "Nova sacrée",
+        "description": "Provoque une explosion de lumière sacrée, rend {damage} points de vie aux alliés proches et blesse les ennemis proches. (signature Sacré)"
       },
       "shadowform": {
-        "name": "Gloamveil",
-        "description": "Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "name": "Forme d'Ombre",
+        "description": "Adopte la Forme d’Ombre, renforçant la magie de l’ombre jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Ombre)"
       },
       "elemental_mastery": {
-        "name": "Primal Mastery",
-        "description": "Calls on primal mastery, making your next spell instant. (Elemental signature)"
+        "name": "Maîtrise élémentaire",
+        "description": "Fait appel à la maîtrise élémentaire, rendant votre prochain sort instantané. (signature Élémentaire)"
       },
       "shamanistic_rage": {
         "name": "Shamanistic Rage",
@@ -5859,28 +5879,28 @@ export const fr_FR: EnTranslations = {
         "description": "Calls on nature to make your next spell instant. (Restoration signature)"
       },
       "siphon_life": {
-        "name": "Veinleech",
-        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+        "name": "Siphon de vie",
+        "description": "Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)"
       },
       "fel_domination": {
         "name": "Fel Domination",
         "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
-        "name": "Conflagrate",
-        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+        "name": "Conflagration",
+        "description": "Consume votre Immolation sur l’ennemi pour l’enflammer et lui infliger {damage} points de dégâts de Feu. (signature Destruction)"
       },
       "moonkin_form": {
-        "name": "Moonwing Form",
-        "description": "Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+        "name": "Forme de sélénien",
+        "description": "Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)"
       },
       "feral_charge": {
-        "name": "Feral Charge",
-        "description": "Charge an enemy and root it for 1 sec. 8-25 yard range. (Feral signature)"
+        "name": "Charge farouche",
+        "description": "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)"
       },
       "swiftmend": {
-        "name": "Swiftmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+        "name": "Prompte guérison",
+        "description": "Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)"
       },
       "storm_bolt": {
         "name": "Storm Bolt",
@@ -5898,10 +5918,6 @@ export const fr_FR: EnTranslations = {
         "name": "Recklessness",
         "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
-      "avatar": {
-        "name": "Avatar",
-        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
-      },
       "sanguine_aura": {
         "name": "Sanguine Aura",
         "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
@@ -5910,25 +5926,9 @@ export const fr_FR: EnTranslations = {
         "name": "Victory Rush",
         "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
-      "bladestorm": {
-        "name": "Bladestorm",
-        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
-      },
       "intimidating_shout": {
         "name": "Intimidating Shout",
         "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
-      "pummel": {
-        "name": "Pummel",
-        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
-      },
-      "heroic_leap": {
-        "name": "Heroic Leap",
-        "description": "Leap to the target area, dealing {damage} damage to nearby enemies."
-      },
-      "rallying_cry": {
-        "name": "Rallying Cry",
-        "description": "Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -5957,6 +5957,226 @@ export const fr_FR: EnTranslations = {
       "summon_doomguard": {
         "name": "Invoquer un Wraithborn",
         "description": "Soumet un Wraithborn à votre volonté, un démon d'élite qui déverse de lourds dégâts d'Ombre à distance. Un long temps de recharge bride sa puissance dévastatrice. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
+      },
+      "aspect_of_the_wild": {
+        "name": "Apparence du Croc-sauvage",
+        "description": "Inspira a proches alliés con fuerza salvaje, aumentando puissance d’attaque durante 5 min. (talent de chasseur)"
+      },
+      "avatar": {
+        "name": "Colosse",
+        "description": "Te transforma en un coloso y aumenta puissance d’attaque durante 20 s. (talent de guerrier)"
+      },
+      "avenging_wrath": {
+        "name": "Aile vengeresse",
+        "description": "Invoca poder vengador y aumenta puissance d’attaque y puissance des sorts durante 20 s. (talent de paladin)"
+      },
+      "berserk": {
+        "name": "Brume rouge",
+        "description": "Aumenta puissance d’attaque durante 15 s. (talent de druide)"
+      },
+      "bladestorm": {
+        "name": "Cyclone d’acier",
+        "description": "Te convierte en una tormenta de acero que golpea a proches ennemis cada segundo por {damage}. (talent de guerrier)"
+      },
+      "razor_howl": {
+        "name": "Razor Howl",
+        "description": "Un cri qui ralentit de 50 % les ennemis à moins de 15 m pendant 8 s. (Talent de guerrier)"
+      },
+      "stormthrow": {
+        "name": "Lancer-tempête",
+        "description": "Lance votre arme pour étourdir une cible pendant 3 s. (Talent de guerrier)"
+      },
+      "reckless_vow": {
+        "name": "Vœu téméraire",
+        "description": "Augmente toute la génération de rage de 50 % et les chances de coup critique de 20 % pendant 12 s. (Talent de guerrier)"
+      },
+      "red_banner": {
+        "name": "Bannière rouge",
+        "description": "Vous et les alliés proches gagnez 10 % de vitesse d’attaque et 10 % de dégâts pendant 20 s. (Talent de guerrier)"
+      },
+      "blink": {
+        "name": "Pas scintillant",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (talent de mage)"
+      },
+      "bloodlust": {
+        "name": "Tambours de guerre",
+        "description": "Lleva a proches alliés al frenesí y aumenta su velocidad de ataque durante 15 s. (talent de chaman)"
+      },
+      "chain_lightning": {
+        "name": "Éclair fourchu",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a proches ennemis. (talent de chaman)"
+      },
+      "chaos_bolt": {
+        "name": "Trait de ruine",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Feu. (talent de démoniste)"
+      },
+      "cloak_of_shadows": {
+        "name": "Cape d’ombre",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 s. (talent de voleur)"
+      },
+      "cone_of_cold": {
+        "name": "Balayage de givre",
+        "description": "Golpea a proches ennemis con escarcha e inflige {damage} de daño de Givre. (talent de mage)"
+      },
+      "counter_shot": {
+        "name": "Tir assourdissant",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de chasseur)"
+      },
+      "counterspell": {
+        "name": "Brise-sort",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 6 s. (talent de mage)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Maléfice de plomb",
+        "description": "Maldice a cible y reduce su velocidad de movimiento un 30% durante 12 s. (talent de démoniste)"
+      },
+      "death_coil": {
+        "name": "Spirale funèbre",
+        "description": "Golpea a cible por {damage} de daño de Ombre y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (talent de démoniste)"
+      },
+      "deep_freeze": {
+        "name": "Gel mort",
+        "description": "Congela profundamente a cible, inflige {damage} de daño de Givre y lo aturde durante 4 s. (talent de mage)"
+      },
+      "desperate_prayer": {
+        "name": "Dernière prière",
+        "description": "Te sana al instante por {damage}. (talent de prêtre)"
+      },
+      "deterrence": {
+        "name": "Garde-hérissée",
+        "description": "Aumenta tu chances d’esquive un 50% durante 10 s. (talent de chasseur)"
+      },
+      "divine_shield": {
+        "name": "Garde-lumière",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (talent de paladin)"
+      },
+      "earthbind": {
+        "name": "Terre agrippante",
+        "description": "Ata a la tierra a proches ennemis y los inmoviliza durante 2 s. (talent de chaman)"
+      },
+      "evocation": {
+        "name": "Puits d’éther",
+        "description": "Restaura mana rápidamente. (talent de mage)"
+      },
+      "frenzied_regeneration": {
+        "name": "Régénération sauvage",
+        "description": "Regenera salud durante 10 s. Solo en Forma de oso. (talent de druide)"
+      },
+      "frost_trap": {
+        "name": "Piège de givre",
+        "description": "Congela a los ennemis en el área objetivo durante 3 s. (talent de chasseur)"
+      },
+      "ghostly_strike": {
+        "name": "Frappe spectrale",
+        "description": "Golpea a cible por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (talent de voleur)"
+      },
+      "hammer_of_wrath": {
+        "name": "Marteau sonnant",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Sacré. Solo se usa por debajo del 20% de salud. (talent de paladin)"
+      },
+      "healing_stream": {
+        "name": "Puits de source",
+        "description": "Restaura a cible alliée durante 12 s. (talent de chaman)"
+      },
+      "heroic_leap": {
+        "name": "Bond de guerre",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Physique a proches ennemis. (talent de guerrier)"
+      },
+      "holy_wrath": {
+        "name": "Courroux du saint",
+        "description": "Desata poder sagrado e inflige {damage} de daño a proches ennemis. (talent de paladin)"
+      },
+      "howl_of_terror": {
+        "name": "Hurlement d’effroi",
+        "description": "Aterroriza a proches ennemis hasta 3 s. El daño puede romper el efecto. (talent de démoniste)"
+      },
+      "ice_block": {
+        "name": "Cercueil froid",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)"
+      },
+      "inner_focus": {
+        "name": "Esprit apaisé",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (talent de prêtre)"
+      },
+      "innervate": {
+        "name": "Sève vitale",
+        "description": "La sève vivante afflue en vous pendant 10 s, restaurant 20 de votre ressource actuelle par vagues : mana, rage ou énergie ; changer de forme ne l'interrompt pas. (talent de druide)"
+      },
+      "kick": {
+        "name": "Botte",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de voleur)"
+      },
+      "last_stand": {
+        "name": "Onzième heure",
+        "description": "Aumenta temporalmente Endurance durante 15 s, aumentando la salud máxima. (talent de guerrier)"
+      },
+      "mend_pet": {
+        "name": "Rapiécer",
+        "description": "Sana a cible alliée por {damage} durante 15 s. (talent de chasseur)"
+      },
+      "meteor": {
+        "name": "Pierre du ciel",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Feu y quema el suelo. (talent de mage)"
+      },
+      "mind_sear": {
+        "name": "Brûle-pensée",
+        "description": "Canaliza energía de Ombre en el área objetivo e inflige {damage} cada segundo a proches ennemis. (talent de prêtre)"
+      },
+      "multi_shot": {
+        "name": "Tir fendu",
+        "description": "Dispara varios proyectiles e inflige {damage} a proches ennemis. (talent de chasseur)"
+      },
+      "prayer_of_healing": {
+        "name": "Soin du chœur",
+        "description": "Sana a proches alliés por {damage}. (talent de prêtre)"
+      },
+      "preparation": {
+        "name": "Contingence",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (talent de voleur)"
+      },
+      "presence_of_mind": {
+        "name": "Esprit fulgurant",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)"
+      },
+      "psychic_scream": {
+        "name": "Cri psychique",
+        "description": "Aterroriza a proches ennemis hasta 4 s. El daño puede romper el efecto. (talent de prêtre)"
+      },
+      "pummel": {
+        "name": "Rossée",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de guerrier)"
+      },
+      "rallying_cry": {
+        "name": "Ralliement",
+        "description": "Lanza un grito de reunión y aumenta puissance d’attaque de proches alliés durante 10 s. (talent de guerrier)"
+      },
+      "rebuke": {
+        "name": "Réprimande",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de paladin)"
+      },
+      "shadowstep": {
+        "name": "Glissement d’ombre",
+        "description": "Das un paso entre las sombras hacia tu cible. (talent de voleur)"
+      },
+      "shield_wall": {
+        "name": "Rempart",
+        "description": "Alzas un muro de escudo y aumentas mucho la armure durante 10 s. (talent de guerrier)"
+      },
+      "silence": {
+        "name": "Silence",
+        "description": "Silencia a cible durante 4 s. (talent de prêtre)"
+      },
+      "skull_bash": {
+        "name": "Coup de crâne",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 4 s. (talent de druide)"
+      },
+      "spell_lock": {
+        "name": "Ordre de bâillon",
+        "description": "Interrompt l’incantation et empêche tout sort de cette école pendant 5 s. (talent de démoniste)"
+      },
+      "tranquility": {
+        "name": "Chant du bosquet",
+        "description": "Canaliza energía restauradora y sana a proches alliés cada segundo. (talent de druide)"
       },
       "bear_charge": {
         "name": "Ruée de Bruin",
@@ -6116,7 +6336,7 @@ export const fr_FR: EnTranslations = {
         "name": "Croc du vieux Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Morceau de minerai"
       },
       "weathered_ledger_page": {
         "name": "Page de registre usée"
@@ -7207,31 +7427,61 @@ export const fr_FR: EnTranslations = {
       "deathless_heartwood": {
         "name": "Bois-coeur de la Couronne immortelle"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Bois-coeur de la Couronne immortelle"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, dernier serment de Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, dernier serment de Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Heaume d'effroi Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Heaume d'effroi Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Spallières de guerre Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Spallières de guerre Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Couronne de Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Couronne de Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Garde-épaules de Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Garde-épaules de Direfang"
       },
       "soulflame_cowl": {
         "name": "Capuche Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Capuche Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Mantelet Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Mantelet Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Couronne de Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Couronne de Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Spallières de Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Spallières de Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7481,6 +7731,15 @@ export const fr_FR: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Garde royal relevé"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Garde immortel"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hiérophante immortel"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lame immortelle"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
@@ -7811,12 +8070,12 @@ export const fr_FR: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Un métier pour chaque main",
+        "text": "À Eastbrook, chacun exerce un métier en plus du maniement de l'épée, {playerName}. Des filons de minerai sont disséminés autour de la ville, alors prenez une pioche et rapportez-moi 5 morceaux. Extrayez-les vous-même; je saurai faire la différence.",
+        "completion": "Vous voyez? Du minerai dans votre sac et des durillons aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l'établi voisin. Un métier honnête vous attend dans chacune de ces activités, si vous le souhaitez.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Morceau de minerai"
           }
         }
       },

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "3cf6ed35",
+      "state": "af31607d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,8 +70,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -142,7 +141,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 419,
-      "state": "cbae62e4",
+      "state": "13b723d8",
       "events": "d9e43221",
       "rng": {
         "draws": 4,
@@ -153,7 +152,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "af4b27d7",
+      "state": "5a8410bf",
       "events": "9cfda0e2",
       "rng": {
         "draws": 4,
@@ -164,7 +163,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 419,
-      "state": "a5e527d4",
+      "state": "5349ca28",
       "events": "356a26ae",
       "rng": {
         "draws": 5,
@@ -175,8 +174,8 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 421,
-      "state": "d465ce00",
-      "events": "13255c68",
+      "state": "ac114e50",
+      "events": "cd3e9e9b",
       "rng": {
         "draws": 8,
         "digest": "20464699"
@@ -246,8 +245,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 898
@@ -457,7 +455,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 421,
-      "state": "98ea1f7f",
+      "state": "861ac1a3",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -468,7 +466,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 421,
-      "state": "98ea1f7f",
+      "state": "861ac1a3",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -539,8 +537,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 898

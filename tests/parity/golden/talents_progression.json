@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "73412a12",
+      "state": "a2887c7e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,8 +71,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -147,8 +146,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "f519abc3",
-      "events": "092ab679",
+      "state": "8ab0f2ba",
+      "events": "5cdf4fb2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -202,11 +201,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {
-              "arms_imp_overpower": 2,
-              "war_cruelty": 2
-            },
+            "rows": {},
             "spec": "arms"
           },
           "townFocus": {}
@@ -231,7 +226,7 @@
           "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.0895,
+          "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -282,7 +277,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "ef8e47a6",
+      "state": "8ab0f2ba",
       "events": "cc9019b1",
       "rng": {
         "draws": 0,
@@ -337,8 +332,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {},
+            "rows": {},
             "spec": "arms"
           },
           "townFocus": {}
@@ -414,7 +408,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "be771441",
+      "state": "409745c8",
       "events": "60bbc56d",
       "rng": {
         "draws": 0,
@@ -460,10 +454,7 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -485,160 +476,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {
-              "war_cruelty": 3
-            },
-            "spec": "arms"
-          },
-          "townFocus": {}
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 122,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 405
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.0995,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 822,
-          "id": 405,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 822,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "parryChance": 0.0805,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 39,
-            "armor": 410,
-            "int": 10,
-            "spi": 11,
-            "sta": 61,
-            "str": 61
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 406,
-      "state": "a97087a4",
-      "events": "033d2d51",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "switch-loadout",
-      "players": [
-        {
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "autoEquip": true,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {},
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "craftThrottle": {},
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 405,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword",
-            "offhand": "eastbrook_buckler"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "loadouts": [
-            {
-              "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
-                "spec": "arms"
-              },
-              "bar": [
-                "mortal_strike",
-                "overpower",
-                null
-              ],
-              "name": "Arms"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "rowPicks": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-          ],
-          "talents": {
-            "choices": {},
-            "ranks": {
-              "arms_imp_overpower": 2
-            },
+            "rows": {},
             "spec": "arms"
           },
           "townFocus": {}
@@ -714,8 +552,152 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "b1108f04",
-      "events": "092ab679",
+      "state": "409745c8",
+      "events": "033d2d51",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "switch-loadout",
+      "players": [
+        {
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 405,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "loadouts": [
+            {
+              "alloc": {
+                "rows": {},
+                "spec": "arms"
+              },
+              "bar": [
+                "mortal_strike",
+                "overpower",
+                null
+              ],
+              "name": "Arms"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "rowPicks": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "talents": {
+            "rows": {},
+            "spec": "arms"
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 405
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 822,
+          "id": 405,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "parryChance": 0.0805,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 406,
+      "state": "ee8466c6",
+      "events": "200d071c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -760,10 +742,7 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -785,8 +764,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {},
+            "rows": {},
             "spec": "fury"
           },
           "townFocus": {}
@@ -862,7 +840,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "b1108f04",
+      "state": "ee8466c6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -908,10 +886,7 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
+                "rows": {},
                 "spec": "arms"
               },
               "bar": [
@@ -933,8 +908,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {},
+            "rows": {},
             "spec": "fury"
           },
           "townFocus": {}

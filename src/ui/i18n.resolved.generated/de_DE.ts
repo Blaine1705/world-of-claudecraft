@@ -85,6 +85,9 @@ export const de_DE: EnTranslations = {
       "title": "Talente",
       "classTab": "Klasse",
       "specTab": "Spezialisierung",
+      "choicesTab": "Entscheidungen",
+      "rowUnlockToast": "Neue Talentwahl verfügbar!",
+      "rowUnlocks": "Wird auf Stufe {level} freigeschaltet",
       "available": "Verfügbar",
       "spent": "Ausgegeben",
       "pointSource": "Ihr erhaltet pro Stufe von {first} bis {cap} 1 Talentpunkt. Steigt auf, um mehr Punkte zu bekommen.",
@@ -143,6 +146,7 @@ export const de_DE: EnTranslations = {
         "noTree": "Eure Klasse hat noch keinen Talentbaum.",
         "locked": "Ihr habt die Talente noch nicht freigeschaltet; sie beginnen auf Stufe {level}.",
         "noSpec": "keine Spezialisierung",
+        "rowsSummary": "Talente: {head}, {picked}/{unlocked} Entscheidungsreihen gewählt.",
         "summary": "Talente: {head} — {spent}/{total} Punkte ausgegeben ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -158,6 +162,10 @@ export const de_DE: EnTranslations = {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden."
+    },
+    "fct": {
+      "absorbed": "{amount} absorbiert",
+      "cheap": "Günstiger!"
     },
     "emotes": {
       "wave": "Winken",
@@ -744,8 +752,8 @@ export const de_DE: EnTranslations = {
     "tips": {
       "joinChannels": "Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HEROISCH]",
+    "itemSoulbound": "Seelengebunden",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1356,8 +1364,8 @@ export const de_DE: EnTranslations = {
       "parcelsLabel": "Pakete",
       "parcelsHint": "Klicke einen Gegenstand in deinen Taschen an, um ihn beizulegen.",
       "removeParcelAria": "{item} aus dem Brief entfernen",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Ein {item} weniger senden",
+      "parcelQtyIncreaseAria": "Ein {item} mehr senden",
       "sendButton": "Brief senden",
       "postageNote": "Porto: {amount}. Der Rabe ist etwa {seconds}s unterwegs.",
       "arrivedBanner": "Der Rabe ist gelandet: Post von {name}.",
@@ -5143,7 +5151,7 @@ export const de_DE: EnTranslations = {
         "description": "Lässt den Zielbereich 6 Sek. lang erbeben und trifft Gegner alle 1.5 Sek. für {damage} Naturschaden."
       },
       "chain_heal": {
-        "name": "Chain Heal",
+        "name": "Kettenheilung",
         "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
       },
       "heroic_strike": {
@@ -5196,7 +5204,7 @@ export const de_DE: EnTranslations = {
       },
       "slam": {
         "name": "Roher Schwung",
-        "description": "Zerschmettert den Gegner für Waffenschaden plus {damage}."
+        "description": "Zerschmettert den Gegner für 50 % Waffenschaden plus {damage} und erzeugt {rage} Wut."
       },
       "cleave": {
         "name": "Sichelschwung",
@@ -5787,68 +5795,80 @@ export const de_DE: EnTranslations = {
         "description": "Ihr verfallt in brodelnde Raserei und erzeugt 20 Wut. (Krieger-Talent)"
       },
       "holy_shock": {
-        "name": "Holy Shock",
-        "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"
+        "name": "Heiliger Schock",
+        "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"
+      },
+      "crusader_strike": {
+        "name": "Kreuzfahrerstoß",
+        "description": "Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)"
+      },
+      "metamorphosis": {
+        "name": "Metamorphose",
+        "description": "Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)"
+      },
+      "aura_surge": {
+        "name": "Strahlende Woge",
+        "description": "Überlädt Eure Aura und härtet Euch mit 160 Rüstung für 10 Sek. (Paladintalent)"
       },
       "holy_shield": {
-        "name": "Hallowed Wall",
-        "description": "Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)"
+        "name": "Heiliger Schild",
+        "description": "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)"
       },
       "repentance": {
         "name": "Repentance",
         "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
       },
       "bestial_wrath": {
-        "name": "Howling Rage",
-        "description": "Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)"
+        "name": "Zorn des Wildtiers",
+        "description": "Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)"
       },
       "trueshot_aura": {
-        "name": "Sureflight Aura",
-        "description": "Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)"
+        "name": "Aura des Volltreffers",
+        "description": "Inspiriert nahe Verbündete und erhöht die Angriffskraft 5 Min. lang um 35. (Treffsicherheits-Signatur)"
       },
       "wyvern_sting": {
-        "name": "Wyvern Sting",
-        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+        "name": "Stich des Flügeldrachen",
+        "description": "Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)"
       },
       "arcane_power": {
-        "name": "Aether Surge",
-        "description": "Fills you with aether surge, increasing spell power by 28 for 12 sec. (Arcane signature)"
+        "name": "Arkane Macht",
+        "description": "Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)"
       },
       "combustion": {
-        "name": "Flashfire",
-        "description": "Focuses your fire magic so your next attack is a critical strike. (Fire signature)"
+        "name": "Verbrennung",
+        "description": "Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)"
       },
-      "cone_of_cold": {
-        "name": "Cone of Cold",
-        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
+      "icy_veins": {
+        "name": "Eisige Adern",
+        "description": "Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)"
       },
       "cold_blood": {
-        "name": "Killer's Calm",
-        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+        "name": "Kaltblütigkeit",
+        "description": "Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)"
       },
       "blade_flurry": {
-        "name": "Mirrored Blades",
-        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+        "name": "Klingenwirbel",
+        "description": "Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)"
       },
       "hemorrhage": {
-        "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage} and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)"
+        "name": "Blutsturz",
+        "description": "Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)"
       },
       "power_infusion": {
-        "name": "Anointing",
-        "description": "Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)"
+        "name": "Machtinfusion",
+        "description": "Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)"
       },
       "holy_nova": {
-        "name": "Holy Nova",
-        "description": "Causes an explosion of Mending Light, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+        "name": "Heilige Nova",
+        "description": "Verursacht eine Explosion Heiligen Lichts, heilt nahe Verbündete um {damage} und schädigt nahe Gegner. (Heilig-Signatur)"
       },
       "shadowform": {
-        "name": "Gloamveil",
-        "description": "Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "name": "Schattenform",
+        "description": "Nehmt Schattenform an und verstärkt Schattenmagie, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Schatten-Signatur)"
       },
       "elemental_mastery": {
-        "name": "Primal Mastery",
-        "description": "Calls on primal mastery, making your next spell instant. (Elemental signature)"
+        "name": "Elementarbeherrschung",
+        "description": "Ruft Elementarbeherrschung an und macht Euren nächsten Zauber sofort wirkbar. (Elementar-Signatur)"
       },
       "shamanistic_rage": {
         "name": "Shamanistic Rage",
@@ -5859,28 +5879,28 @@ export const de_DE: EnTranslations = {
         "description": "Calls on nature to make your next spell instant. (Restoration signature)"
       },
       "siphon_life": {
-        "name": "Veinleech",
-        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+        "name": "Lebensentzug",
+        "description": "Entzieht dem Gegner Leben, verursacht über 30 Sek. {damage} Schattenschaden und heilt Euch um den verursachten Schaden. (Gebrechen-Signatur)"
       },
       "fel_domination": {
         "name": "Fel Domination",
         "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
       },
       "conflagrate": {
-        "name": "Conflagrate",
-        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+        "name": "Feuersbrunst",
+        "description": "Verbraucht Euer Feuerbrand auf dem Gegner, um ihn zu entzünden und {damage} Feuerschaden zu verursachen. (Zerstörungs-Signatur)"
       },
       "moonkin_form": {
-        "name": "Moonwing Form",
-        "description": "Assume Moonwing Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)"
+        "name": "Mondkingestalt",
+        "description": "Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)"
       },
       "feral_charge": {
-        "name": "Feral Charge",
-        "description": "Charge an enemy and root it for 1 sec. 8-25 yard range. (Feral signature)"
+        "name": "Wilde Attacke",
+        "description": "Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)"
       },
       "swiftmend": {
-        "name": "Swiftmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+        "name": "Rasche Heilung",
+        "description": "Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)"
       },
       "storm_bolt": {
         "name": "Storm Bolt",
@@ -5898,10 +5918,6 @@ export const de_DE: EnTranslations = {
         "name": "Recklessness",
         "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
-      "avatar": {
-        "name": "Avatar",
-        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
-      },
       "sanguine_aura": {
         "name": "Sanguine Aura",
         "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
@@ -5910,25 +5926,9 @@ export const de_DE: EnTranslations = {
         "name": "Victory Rush",
         "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
-      "bladestorm": {
-        "name": "Bladestorm",
-        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
-      },
       "intimidating_shout": {
         "name": "Intimidating Shout",
         "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
-      },
-      "pummel": {
-        "name": "Pummel",
-        "description": "Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast."
-      },
-      "heroic_leap": {
-        "name": "Heroic Leap",
-        "description": "Leap to the target area, dealing {damage} damage to nearby enemies."
-      },
-      "rallying_cry": {
-        "name": "Rallying Cry",
-        "description": "Lets loose a rallying cry, granting you and party members within 40 yards 20% additional maximum health for 10 sec."
       },
       "summon_imp": {
         "name": "Emberkin beschwören",
@@ -5957,6 +5957,226 @@ export const de_DE: EnTranslations = {
       "summon_doomguard": {
         "name": "Wraithborn beschwören",
         "description": "Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."
+      },
+      "aspect_of_the_wild": {
+        "name": "Wildfanggewand",
+        "description": "Inspira a nahe Verbündete con fuerza salvaje, aumentando Angriffskraft durante 5 Min.. (Jäger-Talent)"
+      },
+      "avatar": {
+        "name": "Koloss",
+        "description": "Te transforma en un coloso y aumenta Angriffskraft durante 20 Sek.. (Krieger-Talent)"
+      },
+      "avenging_wrath": {
+        "name": "Zornschwinge",
+        "description": "Invoca poder vengador y aumenta Angriffskraft y Zaubermacht durante 20 Sek.. (Paladin-Talent)"
+      },
+      "berserk": {
+        "name": "Roter Dunst",
+        "description": "Aumenta Angriffskraft durante 15 Sek.. (Druiden-Talent)"
+      },
+      "bladestorm": {
+        "name": "Stahlzyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a nahe Gegner cada segundo por {damage}. (Krieger-Talent)"
+      },
+      "razor_howl": {
+        "name": "Klingenheulen",
+        "description": "Ein Ruf, der Gegner im Umkreis von 15 m 8 Sek. lang um 50 % verlangsamt. (Kriegertalent)"
+      },
+      "stormthrow": {
+        "name": "Sturmwurf",
+        "description": "Schleudert Eure Waffe, um ein Ziel 3 Sek. lang zu betäuben. (Kriegertalent)"
+      },
+      "reckless_vow": {
+        "name": "Tollkühner Schwur",
+        "description": "Erhöht 12 Sek. lang sämtliche Wuterzeugung um 50 % und die kritische Trefferchance um 20 %. (Kriegertalent)"
+      },
+      "red_banner": {
+        "name": "Rotes Banner",
+        "description": "Ihr und Verbündete in der Nähe erhaltet 20 Sek. lang 10 % Angriffstempo und 10 % Schaden. (Kriegertalent)"
+      },
+      "blink": {
+        "name": "Flimmerschritt",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (Magier-Talent)"
+      },
+      "bloodlust": {
+        "name": "Kriegstrommeln",
+        "description": "Lleva a nahe Verbündete al frenesí y aumenta su velocidad de ataque durante 15 Sek.. (Schamanen-Talent)"
+      },
+      "chain_lightning": {
+        "name": "Gabelblitz",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a nahe Gegner. (Schamanen-Talent)"
+      },
+      "chaos_bolt": {
+        "name": "Verderbensblitz",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Feuer. (Hexenmeister-Talent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Schattenmantel",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 Sek.. (Schurken-Talent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostfeger",
+        "description": "Golpea a nahe Gegner con escarcha e inflige {damage} de daño de Frost. (Magier-Talent)"
+      },
+      "counter_shot": {
+        "name": "Dämpfender Schuss",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Jäger-Talent)"
+      },
+      "counterspell": {
+        "name": "Zauberbruch",
+        "description": "Unterbricht das Wirken und verhindert 6 Sek. lang Zauber dieser Schule. (Magier-Talent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Bleierner Fluch",
+        "description": "Maldice a Ziel y reduce su velocidad de movimiento un 30% durante 12 Sek.. (Hexenmeister-Talent)"
+      },
+      "death_coil": {
+        "name": "Grabspirale",
+        "description": "Golpea a Ziel por {damage} de daño de Schatten y luego lo aterroriza durante 3 Sek.. Esta versión no sana al lanzador. (Hexenmeister-Talent)"
+      },
+      "deep_freeze": {
+        "name": "Totenfrost",
+        "description": "Congela profundamente a Ziel, inflige {damage} de daño de Frost y lo aturde durante 4 Sek.. (Magier-Talent)"
+      },
+      "desperate_prayer": {
+        "name": "Letztes Gebet",
+        "description": "Te sana al instante por {damage}. (Priester-Talent)"
+      },
+      "deterrence": {
+        "name": "Borstenwacht",
+        "description": "Aumenta tu Ausweichchance un 50% durante 10 Sek.. (Jäger-Talent)"
+      },
+      "divine_shield": {
+        "name": "Lichtwacht",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 Sek.. (Paladin-Talent)"
+      },
+      "earthbind": {
+        "name": "Greifende Erde",
+        "description": "Ata a la tierra a nahe Gegner y los inmoviliza durante 2 Sek.. (Schamanen-Talent)"
+      },
+      "evocation": {
+        "name": "Ätherbrunnen",
+        "description": "Restaura Mana rápidamente. (Magier-Talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Wilde Heilung",
+        "description": "Regenera salud durante 10 Sek.. Solo en Forma de oso. (Druiden-Talent)"
+      },
+      "frost_trap": {
+        "name": "Reifschlinge",
+        "description": "Congela a los Gegner en el área objetivo durante 3 Sek.. (Jäger-Talent)"
+      },
+      "ghostly_strike": {
+        "name": "Geisterschlag",
+        "description": "Golpea a Ziel por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (Schurken-Talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Läutender Hammer",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Heilig. Solo se usa por debajo del 20% de salud. (Paladin-Talent)"
+      },
+      "healing_stream": {
+        "name": "Quellbrunnen",
+        "description": "Restaura a freundliches Ziel durante 12 Sek.. (Schamanen-Talent)"
+      },
+      "heroic_leap": {
+        "name": "Kriegssprung",
+        "description": "Saltas al área objetivo e infliges {damage} de daño physischen a nahe Gegner. (Krieger-Talent)"
+      },
+      "holy_wrath": {
+        "name": "Heiligenzorn",
+        "description": "Desata poder sagrado e inflige {damage} de daño a nahe Gegner. (Paladin-Talent)"
+      },
+      "howl_of_terror": {
+        "name": "Schreckensheulen",
+        "description": "Aterroriza a nahe Gegner hasta 3 Sek.. El daño puede romper el efecto. (Hexenmeister-Talent)"
+      },
+      "ice_block": {
+        "name": "Kalter Sarg",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)"
+      },
+      "inner_focus": {
+        "name": "Stiller Geist",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 Sek.. (Priester-Talent)"
+      },
+      "innervate": {
+        "name": "Lebenssaft",
+        "description": "Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 20 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie; Gestaltwandel unterbricht ihn nicht. (Druidentalent)"
+      },
+      "kick": {
+        "name": "Stiefeltritt",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)"
+      },
+      "last_stand": {
+        "name": "Elfte Stunde",
+        "description": "Aumenta temporalmente Ausdauer durante 15 Sek., aumentando la salud máxima. (Krieger-Talent)"
+      },
+      "mend_pet": {
+        "name": "Zusammenflicken",
+        "description": "Sana a freundliches Ziel por {damage} durante 15 Sek.. (Jäger-Talent)"
+      },
+      "meteor": {
+        "name": "Himmelsstein",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Feuer y quema el suelo. (Magier-Talent)"
+      },
+      "mind_sear": {
+        "name": "Gedankenbrand",
+        "description": "Canaliza energía de Schatten en el área objetivo e inflige {damage} cada segundo a nahe Gegner. (Priester-Talent)"
+      },
+      "multi_shot": {
+        "name": "Spaltschuss",
+        "description": "Dispara varios proyectiles e inflige {damage} a nahe Gegner. (Jäger-Talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Chorheilung",
+        "description": "Sana a nahe Verbündete por {damage}. (Priester-Talent)"
+      },
+      "preparation": {
+        "name": "Notfallplan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (Schurken-Talent)"
+      },
+      "presence_of_mind": {
+        "name": "Rasender Geist",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)"
+      },
+      "psychic_scream": {
+        "name": "Schreckensschrei",
+        "description": "Aterroriza a nahe Gegner hasta 4 Sek.. El daño puede romper el efecto. (Priester-Talent)"
+      },
+      "pummel": {
+        "name": "Prügel",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Krieger-Talent)"
+      },
+      "rallying_cry": {
+        "name": "Sammelruf",
+        "description": "Lanza un grito de reunión y aumenta Angriffskraft de nahe Verbündete durante 10 Sek.. (Krieger-Talent)"
+      },
+      "rebuke": {
+        "name": "Tadel",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Paladin-Talent)"
+      },
+      "shadowstep": {
+        "name": "Schattengleiten",
+        "description": "Das un paso entre las sombras hacia tu Ziel. (Schurken-Talent)"
+      },
+      "shield_wall": {
+        "name": "Bollwerk",
+        "description": "Alzas un muro de escudo y aumentas mucho la Rüstung durante 10 Sek.. (Krieger-Talent)"
+      },
+      "silence": {
+        "name": "Stille",
+        "description": "Silencia a Ziel durante 4 Sek.. (Priester-Talent)"
+      },
+      "skull_bash": {
+        "name": "Schädelstoß",
+        "description": "Unterbricht das Wirken und verhindert 4 Sek. lang Zauber dieser Schule. (Druiden-Talent)"
+      },
+      "spell_lock": {
+        "name": "Knebelbefehl",
+        "description": "Unterbricht das Wirken und verhindert 5 Sek. lang Zauber dieser Schule. (Hexenmeister-Talent)"
+      },
+      "tranquility": {
+        "name": "Hainlied",
+        "description": "Canaliza energía restauradora y sana a nahe Verbündete cada segundo. (Druiden-Talent)"
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",
@@ -6116,7 +6336,7 @@ export const de_DE: EnTranslations = {
         "name": "Zahn des alten Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Erzbrocken"
       },
       "weathered_ledger_page": {
         "name": "Verwitterte Buchseite"
@@ -7207,31 +7427,61 @@ export const de_DE: EnTranslations = {
       "deathless_heartwood": {
         "name": "Herzholz der todlosen Krone"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Herzholz der todlosen Krone"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, letzter Eid von Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, letzter Eid von Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought-Schreckenshelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought-Schreckenshelm"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought-Kriegsschultern"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought-Kriegsschultern"
       },
       "nighttalon_crown": {
         "name": "Direfang-Krone"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang-Krone"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang-Schulterschützer"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang-Schulterschützer"
       },
       "soulflame_cowl": {
         "name": "Wraithfire-Kapuze"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire-Kapuze"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire-Mantel"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire-Mantel"
       },
       "stormcallers_crown": {
         "name": "Galecall-Krone"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall-Krone"
+      },
       "stormcallers_spaulders": {
+        "name": "Galecall-Schulterplatten"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Galecall-Schulterplatten"
       },
       "unknown_alien_weaponry": {
@@ -7481,6 +7731,15 @@ export const de_DE: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Auferstandene Königswache"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Todlose Kriegswache"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Todloser Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Todlose Klinge"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"
@@ -7811,12 +8070,12 @@ export const de_DE: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Ein Handwerk für jede Hand",
+        "text": "Jede Seele in Eastbrook geht neben dem Schwert einem Handwerk nach, {playerName}. Rund um die Stadt liegen Erzadern verstreut. Nehmt also eine Spitzhacke und bringt mir 5 Brocken. Baut sie selbst ab; ich erkenne den Unterschied.",
+        "completion": "Seht Ihr? Erz im Beutel und Schwielen an den Händen. Baut auf Euren Reisen weiter Erz ab, fällt Holz und sammelt Kräuter. Wenn Ihr wieder in der Stadt seid, denkt an die Tafel für den Stadtfokus beim Markt und an die Werkbank daneben. In all dem wartet ein ehrliches Handwerk, wenn Ihr es wollt.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Erzbrocken"
           }
         }
       },

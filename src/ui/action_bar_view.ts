@@ -27,6 +27,7 @@
 import { freeCostAuraActive } from '../sim/combat/empower_next';
 import {
   type AbilityDef,
+  type AuraKind,
   dist2d,
   GCD,
   type ItemDef,
@@ -59,6 +60,9 @@ const COOLDOWN_TEXT_THRESHOLD = 1;
 // The container gets the 'many-spells' class once more than this many slots are
 // bound (the former `hotbarActions.filter(a => a !== null).length > 10`).
 const MANY_SPELLS_THRESHOLD = 10;
+const NEXT_CAST_FREE: AuraKind = 'next_cast_free';
+const NEXT_CAST_INSTANT: AuraKind = 'next_cast_instant';
+const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 
 // The i18n keys the core renders. They already exist in i18n.catalog/abilities.ts.
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
@@ -72,6 +76,12 @@ export interface ActionBarAbility {
   cost: number;
   /** Talent-resolved stored uses (Double Charge); undefined = 1. */
   charges?: number;
+}
+
+export interface ActionBarAuraInput {
+  kind: AuraKind;
+  value?: number;
+  empowerAbilities?: readonly string[];
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -128,10 +138,11 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
-  /** The player's worn auras (kind only): the free-cost proc read (Battle
-   *  Trance / next_cast_free) that drives the slot glow and usable state.
-   *  Both worlds expose the live aura list. */
-  auras: readonly { kind: string }[];
+  /** The player's worn auras: the free-cost proc read (Battle Trance /
+   *  next_cast_free) that drives the slot glow and usable state, the kill-window
+   *  gate, and the next-cast empowerment read. Both worlds expose the live aura
+   *  list. */
+  auras: readonly ActionBarAuraInput[];
   /** Charge-limited abilities' spent counts (Double Charge); the recharge
    *  timer itself rides `cooldowns`. Optional: absent when nothing is spent. */
   charges?: { get(id: string): { spent: number } | undefined };
@@ -170,6 +181,7 @@ export interface ActionBarSlotState {
    *  painter renders the classic gold proc glow. Actionable info, so it is
    *  NEVER shed by a graphics tier. */
   procGlow: boolean;
+  empowered: boolean;
   ariaLabel: string;
   keybindLabel: string;
 }
@@ -201,9 +213,39 @@ function makeSlotState(): ActionBarSlotState {
     outOfRange: false,
     queued: false,
     procGlow: false,
+    empowered: false,
     ariaLabel: '',
     keybindLabel: '',
   };
+}
+
+export function isNextCastEmpowerKind(kind: AuraKind): boolean {
+  return kind === NEXT_CAST_FREE || kind === NEXT_CAST_INSTANT || kind === NEXT_CAST_CHEAP;
+}
+
+function empowermentScopeMatches(aura: ActionBarAuraInput, abilityId: string): boolean {
+  if (!aura.empowerAbilities) return true;
+  return aura.empowerAbilities.includes(abilityId);
+}
+
+function auraCanEmpowerAbility(aura: ActionBarAuraInput, ability: ActionBarAbility): boolean {
+  if (!isNextCastEmpowerKind(aura.kind)) return false;
+  if (!empowermentScopeMatches(aura, ability.def.id)) return false;
+  if (aura.kind === NEXT_CAST_INSTANT) {
+    return ability.def.castTime > 0 && ability.def.school !== 'physical' && !ability.def.channel;
+  }
+  return ability.cost > 0;
+}
+
+function hasEmpoweringAura(
+  auras: readonly ActionBarAuraInput[] | undefined,
+  ability: ActionBarAbility,
+): boolean {
+  if (!auras) return false;
+  for (const aura of auras) {
+    if (auraCanEmpowerAbility(aura, ability)) return true;
+  }
+  return false;
 }
 
 function inventoryCount(
@@ -266,6 +308,7 @@ export function createActionBarView(
           slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
           slot.queued = player.autoAttack;
           slot.procGlow = false;
+          slot.empowered = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
@@ -291,6 +334,7 @@ export function createActionBarView(
           slot.outOfRange = false;
           slot.queued = false;
           slot.procGlow = false;
+          slot.empowered = false;
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
           slot.keybindLabel = sd.keybindLabel();
           continue;
@@ -322,6 +366,7 @@ export function createActionBarView(
           slot.outOfRange = false;
           slot.queued = false;
           slot.procGlow = false;
+          slot.empowered = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.itemName(item),
@@ -388,6 +433,7 @@ export function createActionBarView(
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
         slot.procGlow = freeByProc || windowGlow;
+        slot.empowered = hasEmpoweringAura(player.auras, ability);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),

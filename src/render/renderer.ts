@@ -78,6 +78,7 @@ import {
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
+import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
@@ -1038,6 +1039,8 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  private lightPulses!: LightPulses;
+  private pulseAt!: (id: number, school: string, intensity: number, duration: number) => void;
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
@@ -1587,6 +1590,7 @@ export class Renderer {
     }
 
     // particle system: projectiles, impacts, heal glows, ambience
+    this.lightPulses = new LightPulses(this.scene);
     this.vfx = new Vfx(this.scene, (id, frac) => {
       const v = this.views.get(id);
       if (!v) return null;
@@ -1595,6 +1599,11 @@ export class Renderer {
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
     });
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    this.pulseAt = (id, school, intensity, duration) => {
+      const v = this.views.get(id);
+      if (!v) return;
+      this.lightPulses.pulse(v.group.position, school, intensity, duration);
+    };
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -2251,6 +2260,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    this.lightPulses.update(dt);
     const pv = this.views.get(p.id);
     if (pv) {
       const pp = pv.group.position;
@@ -3026,7 +3036,19 @@ export class Renderer {
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
-        else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
+        else if (ev.fx === 'procSurge') {
+          this.vfx.procSurge(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 5, 0.4);
+        } else if (ev.fx === 'wardBloom') {
+          this.vfx.wardBloom(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 7, 0.55);
+        } else if (ev.fx === 'echoBurst') {
+          this.vfx.echoBurst(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, 'nature', 6, 0.5);
+        } else if (ev.fx === 'detonate') {
+          this.vfx.detonate(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 9, 0.5);
+        } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock
@@ -4365,6 +4387,9 @@ export class Renderer {
       let hasCatForm = false;
       let hasTravelForm = false;
       let hasStealth = false;
+      let hasShadowform = false;
+      let hasMoonkin = false;
+      let hasMetamorph = false;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -4372,6 +4397,9 @@ export class Renderer {
         if (a.kind === 'form_cat') hasCatForm = true;
         if (a.kind === 'form_travel') hasTravelForm = true;
         if (a.kind === 'stealth') hasStealth = true;
+        if (a.kind === 'form_shadow') hasShadowform = true;
+        if (a.kind === 'form_moonkin') hasMoonkin = true;
+        if (a.kind === 'form_metamorph') hasMetamorph = true;
       }
       const polyed = hasPoly;
       const bear = !polyed && hasBear;
@@ -4617,12 +4645,20 @@ export class Renderer {
       const formTint = activeFormTint(e.auras);
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
+      // Data-driven form tint (shadow, moonkin) on the active rig; cleared on any
+      // inactive alternate rig so a stale tint never lingers through a form swap.
       active.setFormTint(formTint);
       if (active !== v.visual) v.visual.setFormTint(null);
       if (v.sheepVisual && v.sheepVisual !== active) v.sheepVisual.setFormTint(null);
       if (v.bearVisual && v.bearVisual !== active) v.bearVisual.setFormTint(null);
       if (v.catVisual && v.catVisual !== active) v.catVisual.setFormTint(null);
       if (v.travelVisual && v.travelVisual !== active) v.travelVisual.setFormTint(null);
+      // Metamorphosis has no tint-table entry, so it keeps its dedicated fel-demon
+      // material (it also grows the body via Entity.scale in the sim). Shadowform and
+      // Moonkin toggles ride alongside; the tint above wins for those two forms.
+      active.setShadowform(hasShadowform);
+      active.setMoonkin(hasMoonkin);
+      active.setMetamorph(hasMetamorph);
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
@@ -4783,6 +4819,14 @@ export class Renderer {
         }
       } else if (v.recklessOn) {
         v.recklessOn = false;
+      }
+      // Shapeshift-form particle auras riding the tints above: metamorph fire,
+      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+      // (the auras themselves drop, but a corpse must not smolder for a frame).
+      if (!e.dead) {
+        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
       }
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
@@ -4968,6 +5012,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.lightPulses.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);

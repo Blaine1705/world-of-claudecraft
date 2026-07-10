@@ -25,7 +25,9 @@ type TestSim = Sim & {
 const furyWhirlwindAlloc = (): TalentAllocation => ({
   ...emptyAllocation(),
   spec: 'fury',
-  ranks: { fury_cruelty: 2, fury_whirlwind: 1 },
+  // Bladed Gyre (the fury AoE, ability id 'whirlwind') is granted by the level-14
+  // choice-row option war_r14_whirlwind (src/sim/content/choice_rows_classic.ts).
+  rows: { 14: 'war_r14_whirlwind' },
 });
 
 function makeSim(seed = 31337): { sim: TestSim; p: Entity } {

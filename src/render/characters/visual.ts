@@ -53,6 +53,16 @@ const SPIN_ONCE_RATE = 18; // rad/sec
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
+const SHADOWFORM_OPACITY = 0.9;
+const SHADOWFORM_TINT = new THREE.Color(0x5a2a8f);
+// Moonkin Form: a brighter, more luminous violet than the ghost run (owner's brief: a
+// purplish tint like ghost form but a bit brighter).
+const MOONKIN_OPACITY = 0.72;
+const MOONKIN_TINT = new THREE.Color(0x9d6bff);
+// Metamorphosis: a monstrous demon shell, deep fel-purple body with a hot glow
+// (the fire aura around it comes from vfx.formAura, not the material). Kept
+// dark enough that the body still shades and the flames read against it.
+const METAMORPH_TINT = new THREE.Color(0x4f2170);
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -111,6 +121,9 @@ export class CharacterVisual {
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private formTintMaterials = new Map<string, Map<THREE.Material, THREE.Material>>();
+  private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
+  private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
+  private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -131,6 +144,9 @@ export class CharacterVisual {
   private soulRend = false;
   private formTint: FormTint | null = null;
   private formTintSig = '';
+  private shadowform = false;
+  private moonkin = false;
+  private metamorph = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -502,6 +518,24 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  setShadowform(on: boolean): void {
+    if (on === this.shadowform) return;
+    this.shadowform = on;
+    this.applyVisualMaterials();
+  }
+
+  setMoonkin(on: boolean): void {
+    if (on === this.moonkin) return;
+    this.moonkin = on;
+    this.applyVisualMaterials();
+  }
+
+  setMetamorph(on: boolean): void {
+    if (on === this.metamorph) return;
+    this.metamorph = on;
+    this.applyVisualMaterials();
+  }
+
   private applyVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
@@ -675,11 +709,16 @@ export class CharacterVisual {
   }
 
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
-    let effected = material;
-    if (this.soulRend) effected = this.soulRendMaterial(effected);
-    else if (this.ghosted) effected = this.ghostMaterial(effected);
-    if (this.formTint) effected = this.formTintMaterial(effected, this.formTint);
-    return effected;
+    // Death treatments (soul rend, ghost run) win over the shapeshift tints. The
+    // data-driven form tint (shadow, moonkin) takes precedence over the dedicated
+    // shapeshift materials, which cover forms not in the tint table (metamorph).
+    if (this.soulRend) return this.soulRendMaterial(material);
+    if (this.ghosted) return this.ghostMaterial(material);
+    if (this.formTint) return this.formTintMaterial(material, this.formTint);
+    if (this.metamorph) return this.metamorphMaterial(material);
+    if (this.moonkin) return this.moonkinMaterial(material);
+    if (this.shadowform) return this.shadowformMaterial(material);
+    return material;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
@@ -735,6 +774,69 @@ export class CharacterVisual {
     }
     byMaterial.set(material, tinted);
     return tinted;
+  }
+
+  private shadowformMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.shadowformMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    marked.transparent = true;
+    marked.opacity = SHADOWFORM_OPACITY;
+    marked.depthWrite = true;
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.copy(SHADOWFORM_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x2a0a4a);
+      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.4);
+    }
+    this.shadowformMaterials.set(material, marked);
+    return marked;
+  }
+
+  private moonkinMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.moonkinMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    marked.transparent = true;
+    marked.opacity = MOONKIN_OPACITY;
+    marked.depthWrite = true;
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.copy(MOONKIN_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x6a3fd0);
+      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.55);
+    }
+    this.moonkinMaterials.set(material, marked);
+    return marked;
+  }
+
+  private metamorphMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.metamorphMaterials.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.copy(METAMORPH_TINT);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(0x7a1abf);
+      // Set, don't floor: the source materials ship emissiveIntensity 1 (with a
+      // black emissive color), so a Math.max floor keeps full-strength glow and
+      // the body renders as flat neon, drowning the fire aura and all shading.
+      withColor.emissiveIntensity = 0.35;
+    }
+    this.metamorphMaterials.set(material, marked);
+    return marked;
   }
 
   private action(name: string | undefined): THREE.AnimationAction | null {

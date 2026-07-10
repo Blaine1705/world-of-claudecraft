@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "3dd35853",
+      "state": "34ac3903",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,8 +72,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -137,8 +136,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "6a7fe3e9",
-      "events": "43ab1dd4",
+      "state": "ec251b19",
+      "events": "aad1beb5",
       "rng": {
         "draws": 9,
         "digest": "381f4473"
@@ -148,7 +147,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "bc7e8284",
+      "state": "bf067678",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -159,8 +158,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 409,
-      "state": "276b8155",
-      "events": "d6d42245",
+      "state": "22a7059d",
+      "events": "35c1ec5c",
       "rng": {
         "draws": 100,
         "digest": "a2f9eb23"
@@ -170,7 +169,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 409,
-      "state": "43d35508",
+      "state": "e9fe9b44",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -181,8 +180,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "6fe73bf4",
-      "events": "1b963611",
+      "state": "064b1ec8",
+      "events": "5a0db5c0",
       "rng": {
         "draws": 298,
         "digest": "dea1e796"
@@ -192,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "2460a6b1",
+      "state": "26d55241",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -203,7 +202,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "2460a6b1",
+      "state": "26d55241",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -263,8 +262,7 @@
             null
           ],
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
