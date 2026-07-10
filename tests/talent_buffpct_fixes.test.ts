@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import type { AbilityModEffect, TalentModifiers } from '../src/sim/content/talents';
 import {
   accumulateTalentEffect,
   computeTalentModifiers,
@@ -7,7 +8,13 @@ import {
 } from '../src/sim/content/talents';
 import type { AbilityEffect, PlayerClass } from '../src/sim/types';
 
-function rowMods(cls: PlayerClass, rows: Record<number, string>) {
+function modsFor(...effects: AbilityModEffect[]): TalentModifiers {
+  const mods = emptyModifiers();
+  accumulateTalentEffect(mods, { ability: effects }, 1);
+  return mods;
+}
+
+function rowMods(cls: PlayerClass, rows: Record<number, string>): TalentModifiers {
   return computeTalentModifiers(cls, { spec: null, rows }, 20);
 }
 
@@ -15,51 +22,68 @@ function resolvedEffect<T extends AbilityEffect['type']>(
   cls: PlayerClass,
   abilityId: string,
   type: T,
-  rows: Record<number, string>,
+  mods: TalentModifiers,
 ): Extract<AbilityEffect, { type: T }> {
-  const ability = abilitiesKnownAt(cls, 20, rowMods(cls, rows)).find((a) => a.def.id === abilityId);
+  const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === abilityId);
   if (!ability) throw new Error(`missing resolved ability ${cls}:${abilityId}`);
   const effect = ability.effects.find((candidate) => candidate.type === type);
   if (!effect) throw new Error(`missing resolved effect ${cls}:${abilityId}:${type}`);
   return effect as Extract<AbilityEffect, { type: T }>;
 }
 
-function resolvedAbility(cls: PlayerClass, abilityId: string, rows: Record<number, string>) {
-  const ability = abilitiesKnownAt(cls, 20, rowMods(cls, rows)).find((a) => a.def.id === abilityId);
+function resolvedAbility(cls: PlayerClass, abilityId: string, mods: TalentModifiers) {
+  const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === abilityId);
   if (!ability) throw new Error(`missing resolved ability ${cls}:${abilityId}`);
   return ability;
 }
 
 describe('talent buffPct resolver fixes', () => {
-  it('Improved Cutthroat Tempo scales Slice and Dice finisher haste bonus', () => {
-    const effect = resolvedEffect('rogue', 'slice_and_dice', 'finisherHaste', {
-      11: 'rog_r11_improved_slice_and_dice',
-    });
+  // The choice-row quality pass replaced several original passive ability mods
+  // with proc mechanics. These resolver tests use synthetic mods so they pin the
+  // engine behavior without changing the authored row choices back.
+  it('buffPct scales a finisher haste bonus above its neutral multiplier', () => {
+    const effect = resolvedEffect(
+      'rogue',
+      'slice_and_dice',
+      'finisherHaste',
+      modsFor({ ability: 'slice_and_dice', buffPct: 0.25 }),
+    );
 
     expect(effect.mult).toBeCloseTo(1.375, 6);
     expect(effect.basedur).toBe(9);
     expect(effect.perCombo).toBe(3);
   });
 
-  it('Improved Evasion scales Evasion dodge and cooldown', () => {
-    const ability = resolvedAbility('rogue', 'evasion', { 17: 'rog_r17_improved_evasion' });
+  it('buffPct and cooldownPct compose on the same defensive ability', () => {
+    const ability = resolvedAbility(
+      'rogue',
+      'evasion',
+      modsFor({ ability: 'evasion', buffPct: 0.3, cooldownPct: -0.2 }),
+    );
     const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
 
     expect(ability.cooldown).toBeCloseTo(240, 6);
     expect(effect).toMatchObject({ kind: 'buff_dodge', value: 0.65 });
   });
 
-  it("Aspect Mastery scales Marten's Guise fractional dodge", () => {
-    const effect = resolvedEffect('hunter', 'aspect_of_the_monkey', 'selfBuff', {
-      5: 'hun_r5_aspect_mastery',
-    });
+  it('buffPct scales a fractional dodge value without rounding it away', () => {
+    const effect = resolvedEffect(
+      'hunter',
+      'aspect_of_the_monkey',
+      'selfBuff',
+      modsFor({ ability: 'aspect_of_the_monkey', buffPct: 0.4 }),
+    );
 
     expect(effect.kind).toBe('buff_dodge');
     expect(effect.value).toBeCloseTo(0.112, 6);
   });
 
   it('Rapid Killing preserves Fevered Draw fractional haste multiplier', () => {
-    const ability = resolvedAbility('hunter', 'rapid_fire', { 20: 'hun_r20_rapid_killing' });
+    const ability = resolvedAbility(
+      'hunter',
+      'rapid_fire',
+      rowMods('hunter', { 20: 'hun_r20_rapid_killing' }),
+    );
     const effect = ability.effects.find((candidate) => candidate.type === 'selfBuff');
 
     expect(ability.cooldown).toBeCloseTo(150, 6);
