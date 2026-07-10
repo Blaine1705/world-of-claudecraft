@@ -172,10 +172,10 @@ A second polish pass, all still descriptor-driven and within the region bounds
 ## Set-piece floors: The Infernal Citadel
 
 Roughly one seed in seven (`isSetPieceSeed`, `Rng(mix(seed, 0x1f3e)).chance(0.15)`) opens a
-HAND-AUTHORED dungeon instead of a procedural descent: a single, fixed, eight-room infernal
-citadel with two bosses. Because the theme is chosen by the SEED and the rank only sets
-`baseLevel` (marks/loot), the citadel can headline a C-rank or an S-rank portal alike; there is
-nothing to gate.
+HAND-AUTHORED dungeon instead of a procedural descent: a fixed TWO-FLOOR citadel
+(`INFERNAL_FLOOR_COUNT`) with two bosses, the halls above and The Pit below. Because the theme
+is chosen by the SEED and the rank only sets `baseLevel` (marks/loot), the citadel can headline
+a C-rank or an S-rank portal alike; there is nothing to gate.
 
 - **The authored-layout seam** (`src/sim/rift/authored.ts`). `DungeonLayout` gained optional
   `rooms` / `doors` / `decor`. `authoredWallSegments(rooms, doors)` unions every coincident room
@@ -185,23 +185,39 @@ nothing to gate.
   do NOT apply to an authored floor (`RiftFloorPlan.authored`); the procedural playability tests
   skip set-piece seeds and `tests/rift_infernal.test.ts` pins the room graph instead
   (reachability BFS over the door graph, spawn/decor clearance, region bounds).
-- **The content** (`src/sim/content/rift/infernal_citadel.ts`, data-as-code). Broad gatehouse,
-  Sacrificial Hall (altar + Blood Orb), Relic Gallery (gibbets, a cache behind an illusion wall),
-  West Processional (a lava band), Pentagram Rotunda, Bone Chamber, Great Temple, Hell Forge.
-  The west wing loops back into the central route, so killing the Magus gives a short return to
-  the Orb. The Bone Chamber remains a compact optional branch and cannot bypass the temple gate.
+- **Floor 0, the halls** (`src/sim/content/rift/infernal_citadel.ts`, data-as-code). Broad
+  gatehouse, Sacrificial Hall (altar + Blood Orb), Relic Gallery (gibbets, a cache behind an
+  illusion wall), West Processional (a lava band), Pentagram Rotunda, Bone Chamber, and the
+  stairhead. The west wing loops back into the central route, so killing the Magus gives a short
+  return to the Orb; the Bone Chamber remains a compact optional branch and cannot bypass the
+  portcullis.
 - **The gating chain.** Kill **Magus Vel'Kor the Pactbound** on the pentagram; the Blood Orb on
   the altar wakes (`orbActive`, a templateId swap like a lit pylon). Touch the woken orb and the
-  temple portcullis grinds open: it is a `RiftGate` with `openOnOrb`, so it places NO pressure
-  plate and reuses the existing runtime clamp (never a static collider). Behind it, the giga-boss
-  **Azgorath, Lord of the Pit** drops the usual exit + sealed cache + rank-scaled Heroic Marks.
+  portcullis grinds open: a `RiftGate` with `openOnOrb`, NO pressure plate, reusing the runtime
+  clamp (never a static collider). Behind it the stairhead holds the **Rift Descent**, the only
+  way down (a BFS test pins the gate as the sole cut to it). Both transitions have positional
+  audio: ground-anchored `spellfxAt` novas play the shared nova clip layered with a
+  school-flavored impact, so the orb's fire flare and the gate's holy release each read.
+- **Floor 1, The Pit.** The descent lands on a raised balcony (lift 3.2) above the temple nave
+  tier (1.6); the arena where the giga-boss **Azgorath, Lord of the Pit** waits drops to the pit
+  floor (0), with the Hell Forge wing (molten-runoff hazard, forge cache) off the nave. His death
+  opens the usual exit + sealed cache + rank-scaled Heroic Marks, and the won run SEALS its entry
+  portal (dev portals included), so a cleared rift can never be re-entered.
+- **Authored relief.** `AuthoredRoom` carries an optional per-room `lift`; the pure
+  `authoredLiftAt(rooms, doors, x, z)` turns every lift-changing door into a linear stair ramp,
+  and `riftLiftAt` is the ONE entry point read by the sim's entity lift, the movement kernel
+  strip, the renderer's ground reference, the camera clamp, and the riser/stair geometry
+  (`placeAuthoredRelief`), so sim ground and drawn geometry agree by construction on all hosts.
   Both bosses reuse existing rigs (`mob_demonalt`, `skel_necromancer`) re-tinted by their
   templates; the miniboss rides `RiftSpawn.miniboss` so `bossId` (and the payout) stay the pit
   lord's.
-- **Assets.** Seven Tripo-generated props (brazier, altar, demon idol, hell forge, hanging cage,
-  bone pile, obsidian fang; see CREDITS.md), placed by `src/render/rift_decor.ts` with the
-  footprints MEASURED from the built GLBs, so decor collision matches the models. The pentagram
-  sigil and the processional rugs are procedural (a generated mesh of a flat sigil reads as a
+- **Assets.** Ten Tripo-generated props (brazier, altar, demon idol, hell forge, hanging cage,
+  bone pile, obsidian fang, hooded sentinel statue, slag cauldron, bone throne; see CREDITS.md),
+  placed by `src/render/rift_decor.ts` with footprints MEASURED from the built GLBs, so decor
+  collision matches the models, and each riding its room's lift. Authored light sources spawn
+  real point lights on the shared budgeted fire-light seam; wall modules are fitted to their
+  segments (`fitAuthoredWallSegment`) so a short piece never visually covers a doorway. The
+  pentagram sigil and the rugs are procedural (a generated mesh of a flat sigil reads as a
   lumpy disc).
 - **Dev command.** `/dev portal [seed] [level] [C|B|A|S] [infernal|random]` forces the dungeon
   type. The kind is NOT a wire field: it searches for a seed of the requested kind (the roll is a
@@ -293,8 +309,11 @@ LETTER is a game glyph (like item-quality colour), not translated.
 
 ## Known scope / deferred
 
-- Rift state is ephemeral (not persisted), appropriate for an event-driven world
-  feature; a portal open at server restart is simply re-scheduled.
+- Rift EVENT state persists across restarts (`rift/persistence.ts`: portal
+  deadlines, event history, winners, scheduler state, upgrade artifacts, with
+  manifests re-validated on load); runtime PARTY instances stay ephemeral and are
+  never restored. The AI Dungeon Upgrader and runtime asset bridge that ride the
+  events are documented in `docs/design/rift-mode.md`.
 - **Dungeon break** (an uncleared portal spilling mobs into the overworld) is
   deferred: the design intent is to build a whole new zone around that mechanic
   (NPCs aware of the breaks, defend-the-town). The open/sealed/collapsed portal
