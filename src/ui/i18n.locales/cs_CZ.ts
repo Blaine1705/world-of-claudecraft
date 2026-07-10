@@ -6724,4 +6724,21 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.fct.cheap': 'Levnější!',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Odeslat o jeden {item} méně',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Odeslat o jeden {item} více',
+  'hudChrome.auth.forgotPrompt': 'Zapomenuté heslo?',
+  'hudChrome.auth.forgotTitle': 'Obnovení hesla',
+  'hudChrome.auth.forgotHint':
+    'Zadejte své uživatelské jméno a na uloženou e-mailovou adresu pošleme odkaz pro obnovení.',
+  'hudChrome.auth.forgotUsername': 'Uživatelské jméno',
+  'hudChrome.auth.forgotSubmit': 'Poslat odkaz pro obnovení',
+  'hudChrome.auth.forgotSent':
+    'Pokud má účet s tímto uživatelským jménem uloženou e-mailovou adresu, poslali jsme odkaz pro obnovení. Zkontrolujte svou schránku.',
+  'hudChrome.auth.forgotBack': 'Zpět na přihlášení',
+  'hudChrome.auth.resetTitle': 'Zvolte nové heslo',
+  'hudChrome.auth.resetNewPassword': 'Nové heslo',
+  'hudChrome.auth.resetConfirm': 'Potvrďte nové heslo',
+  'hudChrome.auth.resetSubmit': 'Aktualizovat heslo',
+  'hudChrome.auth.resetDone': 'Vaše heslo bylo aktualizováno. Nyní se můžete přihlásit.',
+  'hudChrome.auth.resetMismatch': 'Hesla se neshodují.',
+  'hudChrome.auth.resetErrInvalid':
+    'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
 };

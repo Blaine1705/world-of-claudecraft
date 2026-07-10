@@ -6796,4 +6796,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Val',
   'game.talents.rowUnlockToast': 'Ett nytt talangval har låsts upp!',
   'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
+  'hudChrome.auth.forgotPrompt': 'Glömt lösenordet?',
+  'hudChrome.auth.forgotTitle': 'Återställ ditt lösenord',
+  'hudChrome.auth.forgotHint':
+    'Ange ditt användarnamn så skickar vi en återställningslänk till den registrerade e-postadressen.',
+  'hudChrome.auth.forgotUsername': 'Användarnamn',
+  'hudChrome.auth.forgotSubmit': 'Skicka återställningslänk',
+  'hudChrome.auth.forgotSent':
+    'Om ett konto med det användarnamnet har en registrerad e-postadress har vi skickat en återställningslänk. Kolla din inkorg.',
+  'hudChrome.auth.forgotBack': 'Tillbaka till inloggning',
+  'hudChrome.auth.resetTitle': 'Välj ett nytt lösenord',
+  'hudChrome.auth.resetNewPassword': 'Nytt lösenord',
+  'hudChrome.auth.resetConfirm': 'Bekräfta nytt lösenord',
+  'hudChrome.auth.resetSubmit': 'Uppdatera lösenord',
+  'hudChrome.auth.resetDone': 'Ditt lösenord har uppdaterats. Du kan nu logga in.',
+  'hudChrome.auth.resetMismatch': 'Lösenorden stämmer inte överens.',
+  'hudChrome.auth.resetErrInvalid':
+    'Den här återställningslänken är ogiltig eller har gått ut. Begär en ny.',
 };
