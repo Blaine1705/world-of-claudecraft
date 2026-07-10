@@ -2631,6 +2631,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     name: 'Wyrmfang Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
     weapon: { min: 30, max: 48, speed: 2.6 },
     stats: { str: 11, sta: 7 },

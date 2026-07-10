@@ -376,6 +376,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     name: 'Deathless Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 43, max: 66, speed: 3.4 },
