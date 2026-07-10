@@ -142,7 +142,11 @@ jobs:
         run: npm run security:gate
 
       - name: Run tests (PR tier)
-        run: npm test
+        # Full Sim suites are CPU-heavy. Vitest's default consumes every runner
+        # core, starving concurrent files until honest 20s budgets become
+        # scheduling-luck failures. Match scripts/gate.mjs: half the available
+        # cores, at least one worker.
+        run: npm test -- --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
       - name: Typecheck
         run: npx tsc --noEmit
@@ -197,7 +201,7 @@ jobs:
         run: npm run security:gate
 
       - name: Run tests (release tier - 14-locale + empty-pending)
-        run: npm test
+        run: npm test -- --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
       - name: Typecheck
         run: npx tsc --noEmit
