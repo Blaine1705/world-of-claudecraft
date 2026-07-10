@@ -387,6 +387,38 @@ describe("Flurry and Winter's Chill", () => {
     expect(sum(bfHits)).toBeGreaterThan(sum(hardHits) * 1.1);
   });
 
+  it('an armed Brain Freeze casts Flurry straight through its running cooldown', () => {
+    const { sim, p } = makeSim();
+    const mob = spawnTarget(sim, p);
+    sim.drainEvents();
+    // Without the proc, a running cooldown refuses the cast.
+    p.cooldowns.set('flurry', 10);
+    p.gcdRemaining = 0;
+    p.resource = p.maxResource;
+    sim.castAbility('flurry');
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === 'That ability is not ready yet.'),
+    ).toBe(true);
+    // With Brain Freeze armed, the same press goes through: instant, three
+    // bolts, proc consumed, and the RUNNING timer keeps ticking (no re-arm).
+    pushAura(p, { id: 'brain_freeze', name: 'Brain Freeze', kind: 'brain_freeze' });
+    p.gcdRemaining = 0;
+    sim.castAbility('flurry');
+    expect(p.castingAbility).toBeNull();
+    expect(p.auras.some((a) => a.kind === 'brain_freeze')).toBe(false);
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 60 && damageEvents(events, 'Flurry').length < 3; i++) {
+      events.push(...sim.tick());
+    }
+    expect(damageEvents(events, 'Flurry')).toHaveLength(3);
+    expect(mob.auras.find((a) => a.kind === 'winters_chill')?.charges).toBe(WINTERS_CHILL_CHARGES);
+    const remaining = p.cooldowns.get('flurry');
+    expect(remaining).toBeDefined();
+    expect(remaining as number).toBeLessThan(10);
+  });
+
   it('a blocked cast never eats Brain Freeze (consumed after every gate)', () => {
     const { sim, p } = makeSim();
     // No target at all: the cast is refused up front.
