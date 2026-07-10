@@ -85,6 +85,9 @@ export const cs_CZ: EnTranslations = {
       "title": "Talenty",
       "classTab": "Třída",
       "specTab": "Specializace",
+      "choicesTab": "Choices",
+      "rowUnlockToast": "New talent choice available!",
+      "rowUnlocks": "Unlocks at level {level}",
       "available": "Dostupné",
       "spent": "Utraceno",
       "pointSource": "Získáš 1 talentový bod na každé úrovni od úrovně {first} do {cap}. Zvyšuj úroveň a získáš další body.",
@@ -143,6 +146,7 @@ export const cs_CZ: EnTranslations = {
         "noTree": "Tvoje třída zatím nemá talentový strom.",
         "locked": "Talenty ještě nemáš odemčené - začínají na úrovni {level}.",
         "noSpec": "žádná specializace",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talenty: {head} - utraceno {spent}/{total} bodů ({breakdown}).",
         "breakdownClass": "Třída {classPts}",
         "breakdownSpec": "Třída {classPts}, {spec} {specPts}",
@@ -158,6 +162,10 @@ export const cs_CZ: EnTranslations = {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
       "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými."
+    },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
     },
     "emotes": {
       "wave": "Zamávání",
@@ -5635,6 +5643,102 @@ export const cs_CZ: EnTranslations = {
         "name": "Vroucí zuřivost",
         "description": "Vstoupíš do vroucí zuřivosti a získáš 20 vzteku. (Talent válečníka)"
       },
+      "crusader_strike": {
+        "name": "Crusader Strike",
+        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+      },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
+      "metamorphosis": {
+        "name": "Dread Aspect",
+        "description": "Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)"
+      },
+      "aura_surge": {
+        "name": "Radiant Swell",
+        "description": "Overcharges your aura, hardening you with 160 armor for 10 sec. (Paladin talent)"
+      },
+      "holy_shock": {
+        "name": "Holy Shock",
+        "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
+      },
+      "holy_shield": {
+        "name": "Hallowed Wall",
+        "description": "Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
+      },
+      "bestial_wrath": {
+        "name": "Howling Rage",
+        "description": "Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)"
+      },
+      "trueshot_aura": {
+        "name": "Sureflight Aura",
+        "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvern Sting",
+        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+      },
+      "arcane_power": {
+        "name": "Aether Surge",
+        "description": "Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)"
+      },
+      "combustion": {
+        "name": "Flashfire",
+        "description": "Increases spell critical chance by 50% for 15 sec. (Fire signature)"
+      },
+      "icy_veins": {
+        "name": "Icy Veins",
+        "description": "Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)"
+      },
+      "cold_blood": {
+        "name": "Killer's Calm",
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Assassination signature)"
+      },
+      "blade_flurry": {
+        "name": "Mirrored Blades",
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
+      },
+      "hemorrhage": {
+        "name": "Red Ribbon",
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
+      },
+      "power_infusion": {
+        "name": "Anointing",
+        "description": "Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)"
+      },
+      "holy_nova": {
+        "name": "Holy Nova",
+        "description": "Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)"
+      },
+      "shadowform": {
+        "name": "Gloamveil Form",
+        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+      },
+      "elemental_mastery": {
+        "name": "Primal Mastery",
+        "description": "Calls on the storm, making your next spell instant. (Elemental signature)"
+      },
+      "siphon_life": {
+        "name": "Veinleech",
+        "description": "Siphons life from the enemy, causing {damage} Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)"
+      },
+      "conflagrate": {
+        "name": "Conflagrate",
+        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+      },
+      "moonkin_form": {
+        "name": "Moonwing Form",
+        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
+      },
+      "feral_charge": {
+        "name": "Primal Surge",
+        "description": "Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)"
+      },
+      "swiftmend": {
+        "name": "Swiftmend",
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+      },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",
         "description": "Vyvolá Žhavorozeného pod velením černokněžníka. Žhavorozený vrhá na nepřátele z dálky popelavé šípy. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
@@ -5662,6 +5766,226 @@ export const cs_CZ: EnTranslations = {
       "summon_doomguard": {
         "name": "Vyvolat Zrozence přízraků",
         "description": "Spoutá Zrozence přízraků do tvé vůle, elitního démona, který z dálky sesílá těžké stínové poškození. Jeho ničivou sílu omezuje dlouhý cooldown. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
+      },
+      "aspect_of_the_wild": {
+        "name": "Maska divokého tesáku",
+        "description": "Inspira a blízké spojence con fuerza salvaje, aumentando útočnou sílu durante 5 min. (lovecký talent)"
+      },
+      "avatar": {
+        "name": "Kolos",
+        "description": "Te transforma en un coloso y aumenta útočnou sílu durante 20 s. (válečnický talent)"
+      },
+      "avenging_wrath": {
+        "name": "Křídlo odplaty",
+        "description": "Invoca poder vengador y aumenta útočnou sílu y sílu kouzel durante 20 s. (paladinský talent)"
+      },
+      "berserk": {
+        "name": "Rudý opar",
+        "description": "Aumenta útočnou sílu durante 15 s. (druidský talent)"
+      },
+      "bladestorm": {
+        "name": "Ocelový cyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a blízké nepřátele cada segundo por {damage}. (válečnický talent)"
+      },
+      "razor_howl": {
+        "name": "Razor Howl",
+        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+      },
+      "stormthrow": {
+        "name": "Stormthrow",
+        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+      },
+      "reckless_vow": {
+        "name": "Reckless Vow",
+        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+      },
+      "red_banner": {
+        "name": "Red Banner",
+        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+      },
+      "blink": {
+        "name": "Mihokrok",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (mágovský talent)"
+      },
+      "bloodlust": {
+        "name": "Válečné bubny",
+        "description": "Lleva a blízké spojence al frenesí y aumenta su velocidad de ataque durante 15 s. (šamanský talent)"
+      },
+      "chain_lightning": {
+        "name": "Rozvětvený blesk",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a blízké nepřátele. (šamanský talent)"
+      },
+      "chaos_bolt": {
+        "name": "Zkázný šíp",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Ohně. (černokněžnický talent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Stínoplášť",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 s. (lotrovský talent)"
+      },
+      "cone_of_cold": {
+        "name": "Mrazivý smyk",
+        "description": "Golpea a blízké nepřátele con escarcha e inflige {damage} de daño de Mrazu. (mágovský talent)"
+      },
+      "counter_shot": {
+        "name": "Umlčující střela",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (lovecký talent)"
+      },
+      "counterspell": {
+        "name": "Lamač kouzel",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 6 s. (mágovský talent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Olověná kletba",
+        "description": "Maldice a cíl y reduce su velocidad de movimiento un 30% durante 12 s. (černokněžnický talent)"
+      },
+      "death_coil": {
+        "name": "Hrobová spirála",
+        "description": "Golpea a cíl por {damage} de daño de Stínu y luego lo aterroriza durante 3 s. Esta versión no sana al lanzador. (černokněžnický talent)"
+      },
+      "deep_freeze": {
+        "name": "Mrtvý mráz",
+        "description": "Congela profundamente a cíl, inflige {damage} de daño de Mrazu y lo aturde durante 4 s. (mágovský talent)"
+      },
+      "desperate_prayer": {
+        "name": "Poslední modlitba",
+        "description": "Te sana al instante por {damage}. (kněžský talent)"
+      },
+      "deterrence": {
+        "name": "Štětinová stráž",
+        "description": "Aumenta tu šanci na vyhnutí un 50% durante 10 s. (lovecký talent)"
+      },
+      "divine_shield": {
+        "name": "Světelný štít",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 s. (paladinský talent)"
+      },
+      "earthbind": {
+        "name": "Svírající země",
+        "description": "Ata a la tierra a blízké nepřátele y los inmoviliza durante 2 s. (šamanský talent)"
+      },
+      "evocation": {
+        "name": "Éterická studna",
+        "description": "Restaura manu rápidamente. (mágovský talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Divoké zacelení",
+        "description": "Regenera salud durante 10 s. Solo en Forma de oso. (druidský talent)"
+      },
+      "frost_trap": {
+        "name": "Jinovatková léčka",
+        "description": "Congela a los nepřátele en el área objetivo durante 3 s. (lovecký talent)"
+      },
+      "ghostly_strike": {
+        "name": "Přízračný úder",
+        "description": "Golpea a cíl por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (lotrovský talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Zvonící kladivo",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Svaté magie. Solo se usa por debajo del 20% de salud. (paladinský talent)"
+      },
+      "healing_stream": {
+        "name": "Pramenná studna",
+        "description": "Restaura a spřátelený cíl durante 12 s. (šamanský talent)"
+      },
+      "heroic_leap": {
+        "name": "Válečný skok",
+        "description": "Saltas al área objetivo e infliges {damage} de daño fyzického a blízké nepřátele. (válečnický talent)"
+      },
+      "holy_wrath": {
+        "name": "Hněv světce",
+        "description": "Desata poder sagrado e inflige {damage} de daño a blízké nepřátele. (paladinský talent)"
+      },
+      "howl_of_terror": {
+        "name": "Děsivé zavytí",
+        "description": "Aterroriza a blízké nepřátele hasta 3 s. El daño puede romper el efecto. (černokněžnický talent)"
+      },
+      "ice_block": {
+        "name": "Ledová rakev",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)"
+      },
+      "inner_focus": {
+        "name": "Ztišená mysl",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 s. (kněžský talent)"
+      },
+      "innervate": {
+        "name": "Míza života",
+        "description": "Živá míza v tobě 10 s vzlíná a ve vlnách obnovuje 20 tvého aktuálního zdroje: manu, zuřivost nebo energii; změna podoby ji nepřeruší. (druidský talent)"
+      },
+      "kick": {
+        "name": "Kopnutí",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (lotrovský talent)"
+      },
+      "last_stand": {
+        "name": "Jedenáctá hodina",
+        "description": "Aumenta temporalmente Výdrž durante 15 s, aumentando la salud máxima. (válečnický talent)"
+      },
+      "mend_pet": {
+        "name": "Ošetření",
+        "description": "Sana a spřátelený cíl por {damage} durante 15 s. (lovecký talent)"
+      },
+      "meteor": {
+        "name": "Nebeský kámen",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Ohně y quema el suelo. (mágovský talent)"
+      },
+      "mind_sear": {
+        "name": "Spálení mysli",
+        "description": "Canaliza energía de Stínu en el área objetivo e inflige {damage} cada segundo a blízké nepřátele. (kněžský talent)"
+      },
+      "multi_shot": {
+        "name": "Tříštivý výstřel",
+        "description": "Dispara varios proyectiles e inflige {damage} a blízké nepřátele. (lovecký talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Sborové zacelení",
+        "description": "Sana a blízké spojence por {damage}. (kněžský talent)"
+      },
+      "preparation": {
+        "name": "Záložní plán",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (lotrovský talent)"
+      },
+      "presence_of_mind": {
+        "name": "Zrychlená mysl",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)"
+      },
+      "psychic_scream": {
+        "name": "Výkřik hrůzy",
+        "description": "Aterroriza a blízké nepřátele hasta 4 s. El daño puede romper el efecto. (kněžský talent)"
+      },
+      "pummel": {
+        "name": "Drtivá rána",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (válečnický talent)"
+      },
+      "rallying_cry": {
+        "name": "Svolání",
+        "description": "Lanza un grito de reunión y aumenta útočnou sílu de blízké spojence durante 10 s. (válečnický talent)"
+      },
+      "rebuke": {
+        "name": "Pokárání",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (paladinský talent)"
+      },
+      "shadowstep": {
+        "name": "Stínový skluz",
+        "description": "Das un paso entre las sombras hacia tu cíl. (lotrovský talent)"
+      },
+      "shield_wall": {
+        "name": "Bašta",
+        "description": "Alzas un muro de escudo y aumentas mucho la zbroj durante 10 s. (válečnický talent)"
+      },
+      "silence": {
+        "name": "Umlčení",
+        "description": "Silencia a cíl durante 4 s. (kněžský talent)"
+      },
+      "skull_bash": {
+        "name": "Čelní úder",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 4 s. (druidský talent)"
+      },
+      "spell_lock": {
+        "name": "Rozkaz umlčení",
+        "description": "Přeruší sesílání a zabrání kouzlům dané školy na 5 s. (černokněžnický talent)"
+      },
+      "tranquility": {
+        "name": "Píseň háje",
+        "description": "Canaliza energía restauradora y sana a blízké spojence cada segundo. (druidský talent)"
       },
       "bear_charge": {
         "name": "Medvědí výpad",

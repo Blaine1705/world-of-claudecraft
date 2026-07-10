@@ -115,7 +115,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': '시',
   'hudChrome.unitFrame.durationUnitDays': '일',
   'hudChrome.unitFrame.partyLabel': '내 파티',
-  'hudChrome.unitFrame.partyChip': '파티',
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
   'hudChrome.unitFrame.targetAnnounce': '대상: {name}',
   'hudChrome.unitFrame.targetLabel': '내 대상',
@@ -466,6 +465,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'game.talents.title': '특성',
   'game.talents.classTab': '직업',
   'game.talents.specTab': '전문화',
+  'game.talents.choicesTab': '선택',
+  'game.talents.readout.rowsSummary': '특성: {head}, 선택한 줄 {picked}/{unlocked}.',
+  'game.talents.rowUnlockToast': '새로운 특성 선택이 열렸습니다!',
+  'game.talents.rowUnlocks': '{level} 레벨에 해제',
   'game.talents.available': '사용 가능',
   'game.talents.spent': '사용함',
   'game.talents.pointSource':
@@ -1028,7 +1031,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': '소셜',
   'hud.core.mobileArena': '투기장',
   'hud.core.mobileMenu': '메뉴',
-  'hud.core.mobileSettings': '설정',
   'hud.core.mobileUse': '사용',
   'hud.core.mobileMeters': '미터',
   'hud.core.mobileMap': '지도',
@@ -1484,6 +1486,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.range': '사정거리 {range}미터',
   'abilityUi.tooltip.rangeWithMin': '사정거리 {min}-{max}미터',
   'abilityUi.tooltip.instant': '즉시 시전',
+  'hudChrome.fct.absorbed': '{amount} 흡수',
+  'hudChrome.fct.cheap': '비용 감소!',
   'abilityUi.tooltip.castSeconds': '{seconds}초 시전',
   'abilityUi.tooltip.channeledSeconds': '정신 집중 ({seconds}초)',
   'abilityUi.tooltip.cooldownSeconds': '재사용 대기시간 {seconds}초',
@@ -1500,7 +1504,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '공용 재사용 대기시간 없음',
   'abilityUi.tooltip.friendlyTarget': '아군 대상',
   'abilityUi.tooltip.enemyTarget': '적 대상',
-  'abilityUi.tooltip.selfOnly': '자신에게만',
   'abilityUi.tooltip.damageRange': '{min}에서 {max}',
   'abilityUi.tooltip.finisherDamage': '기본 {base}, 연계 점수당 {perCombo}',
   'abilityUi.resources.mana': '마나',
@@ -2030,6 +2033,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
+  'entities.abilities.chain_heal.name': '연쇄 치유',
+  'entities.abilities.chain_heal.description':
+    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
@@ -2210,6 +2216,238 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',
   'entities.abilities.revive_pet.name': '소환수 소생',
   'entities.abilities.revive_pet.description': '죽은 소환수를 되살려 당신의 곁으로 되돌립니다.',
+  'entities.abilities.aura_surge.name': '광휘의 파동',
+  'entities.abilities.aura_surge.description':
+    '오라를 과충전하여 10초 동안 방어도 160으로 몸을 단단히 합니다. (성기사 특성)',
+  'entities.abilities.holy_shock.name': '신성 충격',
+  'entities.abilities.holy_shock.description':
+    '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
+  'entities.abilities.holy_shield.name': '신성한 방패',
+  'entities.abilities.holy_shield.description':
+    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
+  'entities.abilities.bestial_wrath.name': '야수의 격노',
+  'entities.abilities.bestial_wrath.description':
+    '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
+  'entities.abilities.trueshot_aura.name': '정조준 오라',
+  'entities.abilities.trueshot_aura.description':
+    '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
+  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
+  'entities.abilities.wyvern_sting.description':
+    '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
+  'entities.abilities.arcane_power.name': '신비의 마법 강화',
+  'entities.abilities.arcane_power.description':
+    '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
+  'entities.abilities.combustion.name': '발화',
+  'entities.abilities.combustion.description':
+    '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)',
+  'entities.abilities.icy_veins.name': '얼음 핏줄',
+  'entities.abilities.icy_veins.description':
+    '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
+  'entities.abilities.cold_blood.name': '냉혈',
+  'entities.abilities.cold_blood.description':
+    '살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)',
+  'entities.abilities.blade_flurry.name': '폭풍의 칼날',
+  'entities.abilities.blade_flurry.description':
+    '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
+  'entities.abilities.hemorrhage.name': '과다출혈',
+  'entities.abilities.hemorrhage.description':
+    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+  'entities.abilities.power_infusion.name': '마력 주입',
+  'entities.abilities.power_infusion.description':
+    '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
+  'entities.abilities.holy_nova.name': '신성한 폭발',
+  'entities.abilities.holy_nova.description':
+    '신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)',
+  'entities.abilities.shadowform.name': '어둠의 형상',
+  'entities.abilities.shadowform.description':
+    '어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)',
+  'entities.abilities.elemental_mastery.name': '정기의 깨달음',
+  'entities.abilities.elemental_mastery.description':
+    '정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)',
+  'entities.abilities.siphon_life.name': '생명력 착취',
+  'entities.abilities.siphon_life.description':
+    '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
+  'entities.abilities.conflagrate.name': '점화',
+  'entities.abilities.conflagrate.description':
+    '적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)',
+  'entities.abilities.moonkin_form.name': '달빛야수 변신',
+  'entities.abilities.moonkin_form.description':
+    '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
+  'entities.abilities.feral_charge.name': '야성의 돌진',
+  'entities.abilities.feral_charge.description':
+    '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
+  'entities.abilities.swiftmend.name': '신속한 치유',
+  'entities.abilities.swiftmend.description':
+    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
+  'entities.abilities.crusader_strike.name': '성전사의 일격',
+  'entities.abilities.crusader_strike.description':
+    '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
+  'entities.abilities.metamorphosis.name': '악마 변신',
+  'entities.abilities.metamorphosis.description':
+    '악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)',
+  'entities.abilities.aspect_of_the_wild.name': '야생송곳니 형상',
+  'entities.abilities.aspect_of_the_wild.description':
+    '야생의 힘으로 주위 아군을 고무하여 전투력을 높입니다. 5분 동안 지속됩니다. (사냥꾼 특성)',
+  'entities.abilities.avatar.name': '거상화',
+  'entities.abilities.avatar.description':
+    '제어 효과를 해제하고 거상이 되어 20초 동안 주는 피해가 20% 증가합니다. (전사 특성)',
+  'entities.abilities.avenging_wrath.name': '응징의 날개',
+  'entities.abilities.avenging_wrath.description':
+    '복수의 힘을 내려 전투력과 주문력을 높입니다. 20초 동안 지속됩니다. (성기사 특성)',
+  'entities.abilities.berserk.name': '붉은 안개',
+  'entities.abilities.berserk.description':
+    '전투력을 높입니다. 15초 동안 지속됩니다. (드루이드 특성)',
+  'entities.abilities.bladestorm.name': '강철 회오리',
+  'entities.abilities.bladestorm.description':
+    '강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다. (전사 특성)',
+  'entities.abilities.razor_howl.name': '칼날 포효',
+  'entities.abilities.razor_howl.description':
+    '15미터 안의 적을 8초 동안 50% 느려지게 합니다. (전사 특성)',
+  'entities.abilities.stormthrow.name': '폭풍 투척',
+  'entities.abilities.stormthrow.description':
+    '무기를 던져 대상을 3초 동안 기절시킵니다. (전사 특성)',
+  'entities.abilities.reckless_vow.name': '무모한 맹세',
+  'entities.abilities.reckless_vow.description':
+    '12초 동안 모든 분노 생성이 50%, 치명타 확률이 20% 증가합니다. (전사 특성)',
+  'entities.abilities.red_banner.name': '붉은 깃발',
+  'entities.abilities.red_banner.description':
+    '20초 동안 자신과 주위 아군의 공격 속도와 피해가 각각 10% 증가합니다. (전사 특성)',
+  'entities.abilities.blink.name': '섬광걸음',
+  'entities.abilities.blink.description':
+    '전방 15미터로 순간이동하며 이동 불가 효과를 해제합니다. (마법사 특성)',
+  'entities.abilities.bloodlust.name': '전쟁 북',
+  'entities.abilities.bloodlust.description':
+    '주위 아군을 광란에 빠뜨려 공격 속도를 높입니다. 15초 동안 지속됩니다. (주술사 특성)',
+  'entities.abilities.chain_lightning.name': '갈래 번개',
+  'entities.abilities.chain_lightning.description':
+    '대상 지역에 번개를 던져 주위 적에게 {damage}의 피해를 입힙니다. (주술사 특성)',
+  'entities.abilities.chaos_bolt.name': '파멸 화살',
+  'entities.abilities.chaos_bolt.description':
+    '혼돈의 화염 화살을 발사하여 {damage}의 화염 피해를 입힙니다. (흑마법사 특성)',
+  'entities.abilities.cloak_of_shadows.name': '그림자망토',
+  'entities.abilities.cloak_of_shadows.description':
+    '그림자로 몸을 감싸 피해를 흡수합니다. 5초 동안 지속됩니다. (도적 특성)',
+  'entities.abilities.cone_of_cold.name': '서리휩쓸기',
+  'entities.abilities.cone_of_cold.description':
+    '주위 적을 냉기로 강타하여 {damage}의 냉기 피해를 입힙니다. (마법사 특성)',
+  'entities.abilities.counter_shot.name': '침묵 사격',
+  'entities.abilities.counter_shot.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (사냥꾼 특성)',
+  'entities.abilities.counterspell.name': '주문파괴',
+  'entities.abilities.counterspell.description':
+    '적의 시전을 차단하고 해당 계열 주문을 6초 동안 시전할 수 없게 만듭니다. (마법사 특성)',
+  'entities.abilities.curse_of_exhaustion.name': '납빛 저주',
+  'entities.abilities.curse_of_exhaustion.description':
+    '대상을 저주하여 이동 속도를 30% 늦춥니다. 12초 동안 지속됩니다. (흑마법사 특성)',
+  'entities.abilities.death_coil.name': '무덤 고리',
+  'entities.abilities.death_coil.description':
+    '적에게 {damage}의 암흑 피해를 입힌 뒤 3초 동안 공포에 빠뜨립니다. 이 주문은 시전자를 치유하지 않습니다. (흑마법사 특성)',
+  'entities.abilities.deep_freeze.name': '죽은서리',
+  'entities.abilities.deep_freeze.description':
+    '대상을 깊이 얼려 {damage}의 냉기 피해를 입히고 4초 동안 기절시킵니다. (마법사 특성)',
+  'entities.abilities.desperate_prayer.name': '마지막 기도',
+  'entities.abilities.desperate_prayer.description':
+    '자신을 즉시 {damage}만큼 치유합니다. (사제 특성)',
+  'entities.abilities.deterrence.name': '가시수호',
+  'entities.abilities.deterrence.description':
+    '회피율을 50% 높입니다. 10초 동안 지속됩니다. (사냥꾼 특성)',
+  'entities.abilities.divine_shield.name': '빛의 수호',
+  'entities.abilities.divine_shield.description':
+    '신성한 힘으로 자신을 보호하여 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (성기사 특성)',
+  'entities.abilities.earthbind.name': '붙드는 대지',
+  'entities.abilities.earthbind.description':
+    '주위 적을 대지에 옭아매어 2초 동안 이동 불가로 만듭니다. (주술사 특성)',
+  'entities.abilities.evocation.name': '에테르샘',
+  'entities.abilities.evocation.description': '마나를 빠르게 회복합니다. (마법사 특성)',
+  'entities.abilities.frenzied_regeneration.name': '야성 치유',
+  'entities.abilities.frenzied_regeneration.description':
+    '10초에 걸쳐 생명력을 회복합니다. 브루인 형상에서만 사용할 수 있습니다. (드루이드 특성)',
+  'entities.abilities.frost_trap.name': '서리덫',
+  'entities.abilities.frost_trap.description':
+    '대상 지역의 적을 3초 동안 그 자리에 얼립니다. (사냥꾼 특성)',
+  'entities.abilities.ghostly_strike.name': '망령의 일격',
+  'entities.abilities.ghostly_strike.description':
+    '적에게 무기 피해에 더해 {damage}의 피해를 입히고 잠시 회피율을 높입니다. 연계 점수를 1점 얻습니다. (도적 특성)',
+  'entities.abilities.hammer_of_wrath.name': '울림 망치',
+  'entities.abilities.hammer_of_wrath.description':
+    '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)',
+  'entities.abilities.healing_stream.name': '샘물',
+  'entities.abilities.healing_stream.description':
+    '12초에 걸쳐 아군 대상을 치유합니다. (주술사 특성)',
+  'entities.abilities.heroic_leap.name': '전쟁도약',
+  'entities.abilities.heroic_leap.description':
+    '대상 지역으로 도약하여 주위 적에게 {damage}의 물리 피해를 입힙니다. (전사 특성)',
+  'entities.abilities.holy_wrath.name': '성자의 분노',
+  'entities.abilities.holy_wrath.description':
+    '신성한 힘을 발산하여 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)',
+  'entities.abilities.howl_of_terror.name': '공포의 울부짖음',
+  'entities.abilities.howl_of_terror.description':
+    '주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (흑마법사 특성)',
+  'entities.abilities.ice_block.name': '차가운 관',
+  'entities.abilities.ice_block.description':
+    '자신을 얼음 속에 가두어 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (마법사 특성)',
+  'entities.abilities.inner_focus.name': '고요한 마음',
+  'entities.abilities.inner_focus.description':
+    '다음 주문의 소모값을 없앱니다. 60초 동안 지속됩니다. (사제 특성)',
+  'entities.abilities.innervate.name': '생명 수액',
+  'entities.abilities.innervate.description':
+    '생명의 수액이 10초 동안 차올라 현재 자원을 파도처럼 20씩 회복합니다. 마나, 분노, 기력 모두에 적용되며 변신해도 끊기지 않습니다. (드루이드 특성)',
+  'entities.abilities.kick.name': '발차기',
+  'entities.abilities.kick.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (도적 특성)',
+  'entities.abilities.last_stand.name': '열한 번째 시각',
+  'entities.abilities.last_stand.description':
+    '일시적으로 체력을 높여 최대 생명력을 증가시킵니다. 15초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.mend_pet.name': '응급처치',
+  'entities.abilities.mend_pet.description':
+    '15초에 걸쳐 아군 대상을 {damage}만큼 치유합니다. (사냥꾼 특성)',
+  'entities.abilities.meteor.name': '하늘돌',
+  'entities.abilities.meteor.description':
+    '대상 지역에 운석을 떨어뜨려 {damage}의 화염 피해를 입히고 지면을 불태웁니다. (마법사 특성)',
+  'entities.abilities.mind_sear.name': '생각불꽃',
+  'entities.abilities.mind_sear.description':
+    '대상 지역에 암흑 기운을 퍼부어 매초 주위 적에게 {damage}의 피해를 입힙니다. (사제 특성)',
+  'entities.abilities.multi_shot.name': '분산 사격',
+  'entities.abilities.multi_shot.description':
+    '여러 발의 화살을 쏘아 주위 적에게 {damage}의 피해를 입힙니다. (사냥꾼 특성)',
+  'entities.abilities.prayer_of_healing.name': '성가 치유',
+  'entities.abilities.prayer_of_healing.description':
+    '주위 아군을 {damage}만큼 치유합니다. (사제 특성)',
+  'entities.abilities.preparation.name': '대비책',
+  'entities.abilities.preparation.description':
+    '전력 질주, 회피, 소멸의 재사용 대기시간을 초기화합니다. (도적 특성)',
+  'entities.abilities.presence_of_mind.name': '질주하는 정신',
+  'entities.abilities.presence_of_mind.description':
+    '시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)',
+  'entities.abilities.psychic_scream.name': '정신의 절규',
+  'entities.abilities.psychic_scream.description':
+    '주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다. (사제 특성)',
+  'entities.abilities.pummel.name': '턱 부수기',
+  'entities.abilities.pummel.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (전사 특성)',
+  'entities.abilities.rallying_cry.name': '집결',
+  'entities.abilities.rallying_cry.description':
+    '결집의 함성을 질러 주위 아군의 전투력을 높입니다. 10초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.rebuke.name': '꾸짖음',
+  'entities.abilities.rebuke.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (성기사 특성)',
+  'entities.abilities.shadowstep.name': '그림자걸음',
+  'entities.abilities.shadowstep.description':
+    '그림자를 통과해 대상 곁으로 이동합니다. (도적 특성)',
+  'entities.abilities.shield_wall.name': '보루',
+  'entities.abilities.shield_wall.description':
+    '무너지지 않는 방벽을 세워 방어도를 크게 높입니다. 10초 동안 지속됩니다. (전사 특성)',
+  'entities.abilities.silence.name': '침묵',
+  'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
+  'entities.abilities.skull_bash.name': '박치기',
+  'entities.abilities.skull_bash.description':
+    '시전을 차단하고 해당 계열 주문을 4초 동안 시전할 수 없게 만듭니다. (드루이드 특성)',
+  'entities.abilities.spell_lock.name': '재갈 명령',
+  'entities.abilities.spell_lock.description':
+    '시전을 차단하고 해당 계열 주문을 5초 동안 시전할 수 없게 만듭니다. (흑마법사 특성)',
+  'entities.abilities.tranquility.name': '숲노래',
+  'entities.abilities.tranquility.description':
+    '회복의 기운을 쏟아 매초 주위 아군을 치유합니다. (드루이드 특성)',
   'entities.items.worn_sword.name': '흠집 난 쇼트소드',
   'entities.items.gnarled_staff.name': '늪참나무 지팡이',
   'entities.items.rusty_dagger.name': '녹슨 단검',
@@ -6152,7 +6390,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
-  'hudChrome.archetypeTitle.hobbyLabel': '취미',
   'hudChrome.archetypeTitle.armorcrafting': '방어구 장인',
   'hudChrome.archetypeTitle.weaponcrafting': '무기 장인',
   'hudChrome.archetypeTitle.jewelcrafting': '보석 세공사',
@@ -6164,7 +6401,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypeTitle.tailoring': '재단사',
   'hudChrome.archetypeTitle.leatherworking': '가죽공예사',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
-  // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumi 게이지 접기',
   'yumi.hud.expand': 'Protect Yumi 게이지 펼치기',
   'guide.arenaPage.yumiHeading': 'Yumi를 지켜라',
@@ -6193,14 +6429,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '패배! 아군 Yumi가 쓰러졌습니다.',
   'hudChrome.crafting.comboRequirementUnmet':
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
-  'hudChrome.crafting.notAtHub': '그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.',
-  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
   'hudChrome.mobile.actionPageIndicator': '{page}페이지',
   'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
-  'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
-  'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
-  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.vcup.title': '베일 컵',
   'hudChrome.vcup.close': '베일 컵 창 닫기',
@@ -6450,5 +6680,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.',
   'hudChrome.bank.bonusSectionAria': '보너스 은행 칸과 획득 방법',
+  'hudChrome.unitFrame.partyChip': '파티',
+  'hud.core.mobileSettings': '설정',
+  'abilityUi.tooltip.selfOnly': '자신에게만',
+  'hudChrome.archetypeTitle.hobbyLabel': '취미',
+  'hudChrome.crafting.notAtHub': '그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.',
+  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
+  'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
+  'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
   'entities.mobs.yumi_cat.name': '유미',
 };

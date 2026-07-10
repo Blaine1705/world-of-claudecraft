@@ -85,6 +85,9 @@ export const nl_NL: EnTranslations = {
       "title": "Talenten",
       "classTab": "Klasse",
       "specTab": "Specialisatie",
+      "choicesTab": "Choices",
+      "rowUnlockToast": "New talent choice available!",
+      "rowUnlocks": "Unlocks at level {level}",
       "available": "Beschikbaar",
       "spent": "Besteed",
       "pointSource": "Verdien 1 talentpunt per level van level {first} tot {cap}. Level omhoog om meer punten te krijgen.",
@@ -143,6 +146,7 @@ export const nl_NL: EnTranslations = {
         "noTree": "Je klasse heeft nog geen talentenboom.",
         "locked": "Je hebt nog geen talenten ontgrendeld — die beginnen op niveau {level}.",
         "noSpec": "geen specialisatie",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talenten: {head} — {spent}/{total} punten besteed ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -158,6 +162,10 @@ export const nl_NL: EnTranslations = {
       "resurrectAtCorpse": "Herrijs bij je lijk",
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden."
+    },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
     },
     "emotes": {
       "wave": "Zwaaien",
@@ -5635,6 +5643,102 @@ export const nl_NL: EnTranslations = {
         "name": "Kolkende Woede",
         "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
       },
+      "crusader_strike": {
+        "name": "Kruisvaardersslag",
+        "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
+      },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfose",
+        "description": "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)"
+      },
+      "aura_surge": {
+        "name": "Stralende Golf",
+        "description": "Overlaadt je aura en verhardt je met 160 bepantsering gedurende 10 sec. (Paladijntalent)"
+      },
+      "holy_shock": {
+        "name": "Heilige schok",
+        "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
+      },
+      "holy_shield": {
+        "name": "Heilig schild",
+        "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
+      },
+      "bestial_wrath": {
+        "name": "Beestachtige woede",
+        "description": "Stuurt je in beestachtige razernij, waardoor aanvalskracht 15 sec met 55 toeneemt. (Beestbeheersing signatuur)"
+      },
+      "trueshot_aura": {
+        "name": "Zuiver schot-aura",
+        "description": "Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernsteek",
+        "description": "Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)"
+      },
+      "arcane_power": {
+        "name": "Arcanekracht",
+        "description": "Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)"
+      },
+      "combustion": {
+        "name": "Verbranding",
+        "description": "Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)"
+      },
+      "icy_veins": {
+        "name": "IJzige Aders",
+        "description": "Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)"
+      },
+      "cold_blood": {
+        "name": "Koud bloed",
+        "description": "Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)"
+      },
+      "blade_flurry": {
+        "name": "Klingenvlaag",
+        "description": "Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)"
+      },
+      "hemorrhage": {
+        "name": "Bloeding",
+        "description": "Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)"
+      },
+      "power_infusion": {
+        "name": "Krachtinfusie",
+        "description": "Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)"
+      },
+      "holy_nova": {
+        "name": "Heilige nova",
+        "description": "Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)"
+      },
+      "shadowform": {
+        "name": "Schaduwvorm",
+        "description": "Neem schaduwvorm aan en versterk schaduwmagie totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Schaduw signatuur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementaire meesterschap",
+        "description": "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)"
+      },
+      "siphon_life": {
+        "name": "Levenshevel",
+        "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
+      },
+      "conflagrate": {
+        "name": "Ontvlamming",
+        "description": "Verbruikt je Verbranden op de vijand om hem te ontsteken voor {damage} Vuurschade. (Vernietiging signatuur)"
+      },
+      "moonkin_form": {
+        "name": "Maanuilvorm",
+        "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
+      },
+      "feral_charge": {
+        "name": "Wilde stormloop",
+        "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
+      },
+      "swiftmend": {
+        "name": "Snelle genezing",
+        "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
+      },
       "summon_imp": {
         "name": "Emberkin Oproepen",
         "description": "Roept een Emberkin op onder bevel van de Heksenmeester. De Emberkin slingert van veraf Ashbolts naar je vijanden. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
@@ -5662,6 +5766,226 @@ export const nl_NL: EnTranslations = {
       "summon_doomguard": {
         "name": "Wraithborn Oproepen",
         "description": "Bindt een Wraithborn aan je wil, een elite-demon die van veraf zware Schaduwschade laat regenen. Een lange afkoeltijd beteugelt zijn verwoestende kracht. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."
+      },
+      "aspect_of_the_wild": {
+        "name": "Wildtandgedaante",
+        "description": "Inspira a nabije bondgenoten con fuerza salvaje, aumentando aanvalskracht durante 5 min. (jagertalent)"
+      },
+      "avatar": {
+        "name": "Kolossus",
+        "description": "Te transforma en un coloso y aumenta aanvalskracht durante 20 sec. (krijgerstalent)"
+      },
+      "avenging_wrath": {
+        "name": "Wraakvleugel",
+        "description": "Invoca poder vengador y aumenta aanvalskracht y spreukkracht durante 20 sec. (paladijntalent)"
+      },
+      "berserk": {
+        "name": "Rode nevel",
+        "description": "Aumenta aanvalskracht durante 15 sec. (druïdetalent)"
+      },
+      "bladestorm": {
+        "name": "Stalen cycloon",
+        "description": "Te convierte en una tormenta de acero que golpea a nabije vijanden cada segundo por {damage}. (krijgerstalent)"
+      },
+      "razor_howl": {
+        "name": "Razor Howl",
+        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+      },
+      "stormthrow": {
+        "name": "Stormthrow",
+        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+      },
+      "reckless_vow": {
+        "name": "Reckless Vow",
+        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+      },
+      "red_banner": {
+        "name": "Red Banner",
+        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+      },
+      "blink": {
+        "name": "Flikkerstap",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (magiertalent)"
+      },
+      "bloodlust": {
+        "name": "Oorlogstrommen",
+        "description": "Lleva a nabije bondgenoten al frenesí y aumenta su velocidad de ataque durante 15 sec. (sjamaantalent)"
+      },
+      "chain_lightning": {
+        "name": "Gevorkte bliksem",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a nabije vijanden. (sjamaantalent)"
+      },
+      "chaos_bolt": {
+        "name": "Ruinenschicht",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Vuur. (heksenmeestertalent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Schaduwmantel",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 sec. (schurkentalent)"
+      },
+      "cone_of_cold": {
+        "name": "Vorstveeg",
+        "description": "Golpea a nabije vijanden con escarcha e inflige {damage} de daño de Vorst. (magiertalent)"
+      },
+      "counter_shot": {
+        "name": "Sussend schot",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (jagertalent)"
+      },
+      "counterspell": {
+        "name": "Spreukbreuk",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 6 sec. (magiertalent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Loden vloek",
+        "description": "Maldice a doelwit y reduce su velocidad de movimiento un 30% durante 12 sec. (heksenmeestertalent)"
+      },
+      "death_coil": {
+        "name": "Grafspiraal",
+        "description": "Golpea a doelwit por {damage} de daño de Schaduw y luego lo aterroriza durante 3 sec. Esta versión no sana al lanzador. (heksenmeestertalent)"
+      },
+      "deep_freeze": {
+        "name": "Doodsvorst",
+        "description": "Congela profundamente a doelwit, inflige {damage} de daño de Vorst y lo aturde durante 4 sec. (magiertalent)"
+      },
+      "desperate_prayer": {
+        "name": "Laatste gebed",
+        "description": "Te sana al instante por {damage}. (priestertalent)"
+      },
+      "deterrence": {
+        "name": "Borstelwacht",
+        "description": "Aumenta tu ontwijkkans un 50% durante 10 sec. (jagertalent)"
+      },
+      "divine_shield": {
+        "name": "Lichtwacht",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sec. (paladijntalent)"
+      },
+      "earthbind": {
+        "name": "Grijpende aarde",
+        "description": "Ata a la tierra a nabije vijanden y los inmoviliza durante 2 sec. (sjamaantalent)"
+      },
+      "evocation": {
+        "name": "Etherbron",
+        "description": "Restaura mana rápidamente. (magiertalent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Wilde genezing",
+        "description": "Regenera salud durante 10 sec. Solo en Forma de oso. (druïdetalent)"
+      },
+      "frost_trap": {
+        "name": "Rijpval",
+        "description": "Congela a los vijanden en el área objetivo durante 3 sec. (jagertalent)"
+      },
+      "ghostly_strike": {
+        "name": "Spookslag",
+        "description": "Golpea a doelwit por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (schurkentalent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Klinkende hamer",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Heilig. Solo se usa por debajo del 20% de salud. (paladijntalent)"
+      },
+      "healing_stream": {
+        "name": "Bronwel",
+        "description": "Restaura a vriendelijk doelwit durante 12 sec. (sjamaantalent)"
+      },
+      "heroic_leap": {
+        "name": "Oorlogssprong",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fysieke a nabije vijanden. (krijgerstalent)"
+      },
+      "holy_wrath": {
+        "name": "Heiligenwoede",
+        "description": "Desata poder sagrado e inflige {damage} de daño a nabije vijanden. (paladijntalent)"
+      },
+      "howl_of_terror": {
+        "name": "Huiveringwekkende huil",
+        "description": "Aterroriza a nabije vijanden hasta 3 sec. El daño puede romper el efecto. (heksenmeestertalent)"
+      },
+      "ice_block": {
+        "name": "Koude kist",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sec. (magiertalent)"
+      },
+      "inner_focus": {
+        "name": "Gestilde geest",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 sec. (priestertalent)"
+      },
+      "innervate": {
+        "name": "Levenssap",
+        "description": "Levend sap welt 10 sec in je op en herstelt in golven 20 van je huidige energiebron: mana, woede of energie; van gedaante wisselen onderbreekt het niet. (Druïdetalent)"
+      },
+      "kick": {
+        "name": "Schop",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (schurkentalent)"
+      },
+      "last_stand": {
+        "name": "Elfde uur",
+        "description": "Aumenta temporalmente Uithoudingsvermogen durante 15 sec, aumentando la salud máxima. (krijgerstalent)"
+      },
+      "mend_pet": {
+        "name": "Oplappen",
+        "description": "Sana a vriendelijk doelwit por {damage} durante 15 sec. (jagertalent)"
+      },
+      "meteor": {
+        "name": "Hemelsteen",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Vuur y quema el suelo. (magiertalent)"
+      },
+      "mind_sear": {
+        "name": "Gedachtenbrand",
+        "description": "Canaliza energía de Schaduw en el área objetivo e inflige {damage} cada segundo a nabije vijanden. (priestertalent)"
+      },
+      "multi_shot": {
+        "name": "Splijtschot",
+        "description": "Dispara varios proyectiles e inflige {damage} a nabije vijanden. (jagertalent)"
+      },
+      "prayer_of_healing": {
+        "name": "Koorherstel",
+        "description": "Sana a nabije bondgenoten por {damage}. (priestertalent)"
+      },
+      "preparation": {
+        "name": "Noodplan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (schurkentalent)"
+      },
+      "presence_of_mind": {
+        "name": "Razende geest",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sec. (magiertalent)"
+      },
+      "psychic_scream": {
+        "name": "Psychische schreeuw",
+        "description": "Aterroriza a nabije vijanden hasta 4 sec. El daño puede romper el efecto. (priestertalent)"
+      },
+      "pummel": {
+        "name": "Beuken",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (krijgerstalent)"
+      },
+      "rallying_cry": {
+        "name": "Verzameling",
+        "description": "Lanza un grito de reunión y aumenta aanvalskracht de nabije bondgenoten durante 10 sec. (krijgerstalent)"
+      },
+      "rebuke": {
+        "name": "Berisping",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (paladijntalent)"
+      },
+      "shadowstep": {
+        "name": "Schaduwglip",
+        "description": "Das un paso entre las sombras hacia tu doelwit. (schurkentalent)"
+      },
+      "shield_wall": {
+        "name": "Bolwerk",
+        "description": "Alzas un muro de escudo y aumentas mucho la pantser durante 10 sec. (krijgerstalent)"
+      },
+      "silence": {
+        "name": "Stilte",
+        "description": "Silencia a doelwit durante 4 sec. (priestertalent)"
+      },
+      "skull_bash": {
+        "name": "Kopstoot",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 4 sec. (druïdetalent)"
+      },
+      "spell_lock": {
+        "name": "Muilkorfbevel",
+        "description": "Onderbreekt spreuken en voorkomt spreuken van die school gedurende 5 sec. (heksenmeestertalent)"
+      },
+      "tranquility": {
+        "name": "Woudlied",
+        "description": "Canaliza energía restauradora y sana a nabije bondgenoten cada segundo. (druïdetalent)"
       },
       "bear_charge": {
         "name": "Bruin-stormloop",

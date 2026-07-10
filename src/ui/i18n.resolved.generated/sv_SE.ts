@@ -85,6 +85,9 @@ export const sv_SE: EnTranslations = {
       "title": "Talanger",
       "classTab": "Klass",
       "specTab": "Specialisering",
+      "choicesTab": "Choices",
+      "rowUnlockToast": "New talent choice available!",
+      "rowUnlocks": "Unlocks at level {level}",
       "available": "Tillgänglig",
       "spent": "Lagda",
       "pointSource": "Tjäna 1 talangpoäng per nivå från nivå {first} till {cap}. Gå upp i nivå för att få fler poäng.",
@@ -143,6 +146,7 @@ export const sv_SE: EnTranslations = {
         "noTree": "Din klass har inget talangträd än.",
         "locked": "Du har inte låst upp talanger än, de börjar vid nivå {level}.",
         "noSpec": "ingen specialisering",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talanger: {head} — {spent}/{total} poäng lagda ({breakdown}).",
         "breakdownClass": "Klass {classPts}",
         "breakdownSpec": "Klass {classPts}, {spec} {specPts}",
@@ -158,6 +162,10 @@ export const sv_SE: EnTranslations = {
       "resurrectAtCorpse": "Återuppstå vid liket",
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
       "spiritHealerAlive": "Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande."
+    },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
     },
     "emotes": {
       "wave": "Vinka",
@@ -5635,6 +5643,102 @@ export const sv_SE: EnTranslations = {
         "name": "Sjudande raseri",
         "description": "Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)"
       },
+      "crusader_strike": {
+        "name": "Korsfararslag",
+        "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
+      },
+      "chain_heal": {
+        "name": "Chain Heal",
+        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+      },
+      "metamorphosis": {
+        "name": "Metamorfos",
+        "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"
+      },
+      "aura_surge": {
+        "name": "Strålande Svall",
+        "description": "Överladdar din aura och härdar dig med 160 rustning i 10 sek. (Paladintalang)"
+      },
+      "holy_shock": {
+        "name": "Helig chock",
+        "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"
+      },
+      "holy_shield": {
+        "name": "Helig sköld",
+        "description": "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)"
+      },
+      "bestial_wrath": {
+        "name": "Bestialisk vrede",
+        "description": "Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)"
+      },
+      "trueshot_aura": {
+        "name": "Träffsäkerhetsaura",
+        "description": "Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernsting",
+        "description": "Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)"
+      },
+      "arcane_power": {
+        "name": "Arkan kraft",
+        "description": "Ökar besvärjelseskada med 20% och besvärjelsehastighet med 10% i 10 sek. (Arkan signatur)"
+      },
+      "combustion": {
+        "name": "Förbränning",
+        "description": "Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)"
+      },
+      "icy_veins": {
+        "name": "Isiga Ådror",
+        "description": "Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)"
+      },
+      "cold_blood": {
+        "name": "Kallt blod",
+        "description": "Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)"
+      },
+      "blade_flurry": {
+        "name": "Klingflod",
+        "description": "Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)"
+      },
+      "hemorrhage": {
+        "name": "Blödning",
+        "description": "Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)"
+      },
+      "power_infusion": {
+        "name": "Kraftinfusion",
+        "description": "Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)"
+      },
+      "holy_nova": {
+        "name": "Helig nova",
+        "description": "Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)"
+      },
+      "shadowform": {
+        "name": "Skuggform",
+        "description": "Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementär mästerskap",
+        "description": "Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)"
+      },
+      "siphon_life": {
+        "name": "Livssifon",
+        "description": "Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)"
+      },
+      "conflagrate": {
+        "name": "Storbrand",
+        "description": "Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)"
+      },
+      "moonkin_form": {
+        "name": "Månugglaform",
+        "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
+      },
+      "feral_charge": {
+        "name": "Vild rusning",
+        "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
+      },
+      "swiftmend": {
+        "name": "Snabb läkning",
+        "description": "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)"
+      },
       "summon_imp": {
         "name": "Frammana Emberkin",
         "description": "Frammanar en Emberkin under häxmästarens befäl. Emberkin slungar askpilar mot dina fiender från avstånd. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
@@ -5662,6 +5766,226 @@ export const sv_SE: EnTranslations = {
       "summon_doomguard": {
         "name": "Frammana Wraithborn",
         "description": "Binder en Wraithborn till din vilja, en elitdemon som öser tung skuggskada från avstånd. En lång nedkylning hindrar dess förödande kraft. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
+      },
+      "aspect_of_the_wild": {
+        "name": "Vildtands skepnad",
+        "description": "Inspira a närliggande allierade con fuerza salvaje, aumentando attackkraft durante 5 min. (jägartalang)"
+      },
+      "avatar": {
+        "name": "Koloss",
+        "description": "Te transforma en un coloso y aumenta attackkraft durante 20 sek. (krigartalang)"
+      },
+      "avenging_wrath": {
+        "name": "Hämndvinge",
+        "description": "Invoca poder vengador y aumenta attackkraft y besvärjelsekraft durante 20 sek. (paladintalang)"
+      },
+      "berserk": {
+        "name": "Röd dimma",
+        "description": "Aumenta attackkraft durante 15 sek. (druidtalang)"
+      },
+      "bladestorm": {
+        "name": "Stålcyklon",
+        "description": "Te convierte en una tormenta de acero que golpea a närliggande fiender cada segundo por {damage}. (krigartalang)"
+      },
+      "razor_howl": {
+        "name": "Razor Howl",
+        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+      },
+      "stormthrow": {
+        "name": "Stormthrow",
+        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+      },
+      "reckless_vow": {
+        "name": "Reckless Vow",
+        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+      },
+      "red_banner": {
+        "name": "Red Banner",
+        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+      },
+      "blink": {
+        "name": "Flimmersteg",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (magikertalang)"
+      },
+      "bloodlust": {
+        "name": "Krigstrummor",
+        "description": "Lleva a närliggande allierade al frenesí y aumenta su velocidad de ataque durante 15 sek. (shamantalang)"
+      },
+      "chain_lightning": {
+        "name": "Gaffelblixt",
+        "description": "Lanza relámpagos al área objetivo e inflige {damage} de daño a närliggande fiender. (shamantalang)"
+      },
+      "chaos_bolt": {
+        "name": "Fördärvsbult",
+        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Eld. (häxmästartalang)"
+      },
+      "cloak_of_shadows": {
+        "name": "Skuggmantel",
+        "description": "Te envuelve en sombras y absorbe daño durante 5 sek. (skurk talang)"
+      },
+      "cone_of_cold": {
+        "name": "Frostsvep",
+        "description": "Golpea a närliggande fiender con escarcha e inflige {damage} de daño de Frost. (magikertalang)"
+      },
+      "counter_shot": {
+        "name": "Tystande skott",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (jägartalang)"
+      },
+      "counterspell": {
+        "name": "Trollbrott",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 6 sek. (magikertalang)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Blytung förbannelse",
+        "description": "Maldice a målet y reduce su velocidad de movimiento un 30% durante 12 sek. (häxmästartalang)"
+      },
+      "death_coil": {
+        "name": "Gravspiral",
+        "description": "Golpea a målet por {damage} de daño de Skugga y luego lo aterroriza durante 3 sek. Esta versión no sana al lanzador. (häxmästartalang)"
+      },
+      "deep_freeze": {
+        "name": "Dödfrost",
+        "description": "Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalang)"
+      },
+      "desperate_prayer": {
+        "name": "Sista bön",
+        "description": "Te sana al instante por {damage}. (prästtalang)"
+      },
+      "deterrence": {
+        "name": "Borstvakt",
+        "description": "Aumenta tu undvikelschans un 50% durante 10 sek. (jägartalang)"
+      },
+      "divine_shield": {
+        "name": "Ljusvärn",
+        "description": "Te protege con poder sagrado y absorbe una enorme cantidad de daño durante 8 sek. (paladintalang)"
+      },
+      "earthbind": {
+        "name": "Gripande jord",
+        "description": "Ata a la tierra a närliggande fiender y los inmoviliza durante 2 sek. (shamantalang)"
+      },
+      "evocation": {
+        "name": "Eterbrunn",
+        "description": "Restaura mana rápidamente. (magikertalang)"
+      },
+      "frenzied_regeneration": {
+        "name": "Vild läkning",
+        "description": "Regenera salud durante 10 sek. Solo en Forma de oso. (druidtalang)"
+      },
+      "frost_trap": {
+        "name": "Rimfälla",
+        "description": "Congela a los fiender en el área objetivo durante 3 sek. (jägartalang)"
+      },
+      "ghostly_strike": {
+        "name": "Vålnadsslag",
+        "description": "Golpea a målet por daño de arma más {damage} y aumenta brevemente la evasión. Otorga 1 punto de combo. (skurk talang)"
+      },
+      "hammer_of_wrath": {
+        "name": "Klingande hammare",
+        "description": "Lanza un martillo sagrado a un enemigo herido e inflige {damage} de daño de Helig. Solo se usa por debajo del 20% de salud. (paladintalang)"
+      },
+      "healing_stream": {
+        "name": "Källbrunn",
+        "description": "Restaura a vänligt mål durante 12 sek. (shamantalang)"
+      },
+      "heroic_leap": {
+        "name": "Krigssprång",
+        "description": "Saltas al área objetivo e infliges {damage} de daño Fysisk a närliggande fiender. (krigartalang)"
+      },
+      "holy_wrath": {
+        "name": "Helgonvrede",
+        "description": "Desata poder sagrado e inflige {damage} de daño a närliggande fiender. (paladintalang)"
+      },
+      "howl_of_terror": {
+        "name": "Skräckyl",
+        "description": "Aterroriza a närliggande fiender hasta 3 sek. El daño puede romper el efecto. (häxmästartalang)"
+      },
+      "ice_block": {
+        "name": "Kall kista",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)"
+      },
+      "inner_focus": {
+        "name": "Stillat sinne",
+        "description": "Hace que tu siguiente hechizo no tenga coste. Dura 60 sek. (prästtalang)"
+      },
+      "innervate": {
+        "name": "Livssav",
+        "description": "Levande sav väller upp i dig i 10 sek och återställer 20 av din nuvarande resurs i vågor: mana, raseri eller energi; att byta form avbryter den inte. (Druidtalang)"
+      },
+      "kick": {
+        "name": "Spark",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (skurk talang)"
+      },
+      "last_stand": {
+        "name": "Elfte timmen",
+        "description": "Aumenta temporalmente Uthållighet durante 15 sek, aumentando la salud máxima. (krigartalang)"
+      },
+      "mend_pet": {
+        "name": "Lappa ihop",
+        "description": "Sana a vänligt mål por {damage} durante 15 sek. (jägartalang)"
+      },
+      "meteor": {
+        "name": "Himmelsten",
+        "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Eld y quema el suelo. (magikertalang)"
+      },
+      "mind_sear": {
+        "name": "Tankebrand",
+        "description": "Canaliza energía de Skugga en el área objetivo e inflige {damage} cada segundo a närliggande fiender. (prästtalang)"
+      },
+      "multi_shot": {
+        "name": "Splitterskott",
+        "description": "Dispara varios proyectiles e inflige {damage} a närliggande fiender. (jägartalang)"
+      },
+      "prayer_of_healing": {
+        "name": "Körläkning",
+        "description": "Sana a närliggande allierade por {damage}. (prästtalang)"
+      },
+      "preparation": {
+        "name": "Reservplan",
+        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Vanish. (skurk talang)"
+      },
+      "presence_of_mind": {
+        "name": "Rusande sinne",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)"
+      },
+      "psychic_scream": {
+        "name": "Psykiskt skrik",
+        "description": "Aterroriza a närliggande fiender hasta 4 sek. El daño puede romper el efecto. (prästtalang)"
+      },
+      "pummel": {
+        "name": "Mörbulta",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (krigartalang)"
+      },
+      "rallying_cry": {
+        "name": "Mönstring",
+        "description": "Lanza un grito de reunión y aumenta attackkraft de närliggande allierade durante 10 sek. (krigartalang)"
+      },
+      "rebuke": {
+        "name": "Tillrättavisning",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (paladintalang)"
+      },
+      "shadowstep": {
+        "name": "Skuggkliv",
+        "description": "Das un paso entre las sombras hacia tu målet. (skurk talang)"
+      },
+      "shield_wall": {
+        "name": "Bålverk",
+        "description": "Alzas un muro de escudo y aumentas mucho la rustning durante 10 sek. (krigartalang)"
+      },
+      "silence": {
+        "name": "Tystnad",
+        "description": "Silencia a målet durante 4 sek. (prästtalang)"
+      },
+      "skull_bash": {
+        "name": "Skallskall",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 4 sek. (druidtalang)"
+      },
+      "spell_lock": {
+        "name": "Munkavleorder",
+        "description": "Avbryter kastandet och hindrar besvärjelser av den skolan i 5 sek. (häxmästartalang)"
+      },
+      "tranquility": {
+        "name": "Gläntsång",
+        "description": "Canaliza energía restauradora y sana a närliggande allierade cada segundo. (druidtalang)"
       },
       "bear_charge": {
         "name": "Bruinrusning",

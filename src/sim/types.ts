@@ -177,12 +177,16 @@ export type AuraKind =
   | 'dot'
   | 'slow'
   | 'stun'
+  | 'stasis'
   | 'root'
   | 'incapacitate'
   | 'polymorph'
   | 'attackspeed'
   | 'debuff_ap'
   | 'buff_ap'
+  | 'buff_ap_pct'
+  | 'pet_damage_pct'
+  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -190,6 +194,16 @@ export type AuraKind =
   | 'buff_speed'
   | 'buff_haste'
   | 'buff_spellpower'
+  | 'buff_spellcrit'
+  | 'buff_spelldmg'
+  | 'buff_spellhaste'
+  | 'buff_crit'
+  | 'buff_dmg_done'
+  | 'buff_rage_gen'
+  | 'die_by_sword'
+  | 'aoe_echo'
+  | 'sure_crit'
+  | 'cast_shield'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -203,6 +217,13 @@ export type AuraKind =
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
+  | 'form_moonkin'
+  | 'form_shadow'
+  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
+  // its damage/haste bonuses ride separate buff auras).
+  | 'form_metamorph'
+  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
+  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   | 'righteous_fury'
@@ -223,6 +244,7 @@ export type AuraKind =
   | 'blind'
   | 'disarm'
   | 'expose'
+  | 'bleed_vuln'
   | 'spellvuln'
   | 'lockout'
   | 'vulnerability'
@@ -233,7 +255,12 @@ export type AuraKind =
   | 'critvuln'
   | 'next_cast_instant'
   | 'next_cast_free'
+  | 'next_cast_cheap'
+  // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
+  // any resource type, combat or not, carried across form shifts.
+  | 'resource_sap'
   | 'next_attack_crit'
+  | 'heal_echo'
   | 'buff_spi'
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
@@ -269,10 +296,19 @@ export interface Aura {
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
+  breakThreshold?: number;
+  damageAccrued?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
+  // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
+  // ids may consume this aura; undefined means any eligible cast.
+  empowerAbilities?: string[];
+  // extendDot bookkeeping: seconds already added to this DoT application, so
+  // the per-application maxBonus cap holds across channel ticks.
+  extendedBy?: number;
+  leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
 export type CrowdControlDrCategory =
@@ -1323,11 +1359,29 @@ export type AbilityEffect =
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
+  // Channel-tick rider: each application extends the caster's named DoT on the
+  // target by `seconds`, up to `maxBonus` total added per DoT application.
+  | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
+  // Detonates the caster's named DoT on the target: its remaining damage lands
+  // instantly as this ability's school and the DoT is removed.
+  | { type: 'consumeDot'; dot: string }
+  | { type: 'silence'; duration: number }
+  | { type: 'aoeFear'; duration: number; radius: number }
+  | { type: 'clearCooldowns'; abilities: string[] }
+  | { type: 'breakControl' }
+  // Swept teleports: reposition along the line, stopping at walls/fences/steep
+  // slopes/deep water (never clips through). repositionToAim uses the ground-target
+  // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
+  | { type: 'repositionToAim'; breakRoots?: boolean }
+  | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
+  // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
+  // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
+  | { type: 'chainHeal'; min: number; max: number; jumps: number; falloff: number; radius: number }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
-  | { type: 'judgement' } // consume your imbue, deal its judgement damage to the target
+  | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | {
@@ -1342,13 +1396,14 @@ export type AbilityEffect =
       party?: boolean;
     } // fortitude/might/mark on a friendly target
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
-  | { type: 'dot'; total: number; duration: number; interval: number }
+  | { type: 'dot'; total: number; duration: number; interval: number; leechPct?: number }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
       min: number;
@@ -1359,6 +1414,18 @@ export type AbilityEffect =
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
+  // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
+  | {
+      type: 'aoeAllyAttackPower';
+      amount?: number;
+      apPct?: number;
+      duration: number;
+      radius: number;
+    }
+  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
+  | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
+  | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
+  | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =
@@ -1375,6 +1442,13 @@ export type AbilityEffect =
   | { type: 'sportDash'; distance: number; catchBall?: boolean }
   | { type: 'sportShove'; distance: number }
   | {
+      type: 'consumeAura';
+      auraIds?: string[];
+      auraKind?: 'dot' | 'hot';
+      deal?: { min: number; max: number };
+      heal?: { min: number; max: number };
+    }
+  | {
       type: 'selfBuff';
       kind: AuraKind;
       value: number;
@@ -1384,11 +1458,17 @@ export type AbilityEffect =
       charges?: number;
       internalCooldown?: number;
     }
+  | { type: 'petBuff'; kind: AuraKind; value: number; duration: number }
+  | { type: 'applyDebuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
+  | { type: 'selfHealPctMax'; pct: number }
   | { type: 'charge' }
+  // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
+  // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
+  | { type: 'feralCharge' }
   // Sunder Armor: stacking PERCENT armor debuff (2% per stack via effectiveArmor) +
   // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
   // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
@@ -1421,6 +1501,7 @@ export interface AbilityDef {
   castWhileMoving?: boolean;
   // A cast/channel with this flag cannot be stopped by interrupt effects.
   uninterruptible?: boolean;
+  fearDr?: boolean; // incapacitate effects use fear PvP diminishing returns
   channel?: { duration: number; ticks: number }; // arcane missiles
   cooldown: number; // seconds, 0 = none (GCD only)
   range: number; // yards; 0 = melee range
@@ -1444,7 +1525,7 @@ export interface AbilityDef {
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
   requiresTarget: boolean;
-  targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
+  targetType?: 'enemy' | 'friendly' | 'any'; // friendly = self or allied player (defaults to enemy)
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
@@ -1459,6 +1540,9 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Castable while shapeshifted without requiring a SPECIFIC form (Feral Instinct works in
+  // both Cat and Bear Form). Exempts the ability from the "can't act while shapeshifted" lock.
+  usableInForm?: boolean;
   // Mutually exclusive self-buff group: casting one ability in the group cancels
   // any active buff from a sibling in the same group (e.g. hunter aspects, where
   // only one aspect may be active at a time). Distinct from form toggles, which
@@ -1486,6 +1570,10 @@ export interface NpcDef {
   color: number;
   questIds: string[];
   vendorItems?: string[];
+  // PTR / dev-only free-epic vendor (src/sim/content/ptr_dev_vendor.ts): buyItem
+  // sells its stock for free when the realm has ALLOW_DEV_COMMANDS. Never placed
+  // as permanent content; spawned on demand by /dev vendor.
+  devVendor?: boolean;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
@@ -1694,6 +1782,18 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
 }
 
 export interface Entity {
+  // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
+  // Never serialized; reset on death.
+  procState?: { counters: Record<string, number>; icds: Record<string, number> };
+  abilityCharges?: Record<
+    string,
+    {
+      charges: number;
+      maxCharges: number;
+      recharge: number;
+      rechargeLength: number;
+    }
+  >;
   id: number;
   kind: EntityKind;
   templateId: string; // mob/npc template id, or class for player
@@ -1740,6 +1840,9 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  // Extra critical-strike damage from a spec mastery (0 = none). Added to the base crit
+  // multiplier at the crit site: spell crits deal 1.5 + this, physical crits 2 + this.
+  critDmgBonus: number;
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
@@ -1892,6 +1995,7 @@ export interface Entity {
   // npc
   questIds: string[];
   vendorItems: string[];
+  devVendor?: boolean; // dev free-epic vendor (ptr_dev_vendor.ts)
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
@@ -2028,6 +2132,7 @@ export type SimEvent = { pid?: number } & (
       school: string;
       ability: string | null;
       kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      absorbed?: number;
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -2062,7 +2167,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questProgress'; questId: string; text: string }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
-  | { type: 'aura'; targetId: number; name: string; gained: boolean }
+  | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
   | { type: 'castStart'; entityId: number; ability: string; time: number }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }
@@ -2258,7 +2363,21 @@ export type SimEvent = { pid?: number } & (
       sourceId: number;
       targetId: number;
       school: string;
-      fx: 'projectile' | 'beam' | 'tick' | 'nova' | 'windup' | 'lightning';
+      fx:
+        | 'projectile'
+        | 'beam'
+        | 'tick'
+        | 'nova'
+        | 'windup'
+        | 'lightning'
+        | 'chainHeal'
+        // Talent-moment effects: a proc arming (procSurge), a ward appearing
+        // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
+        // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.
+        | 'procSurge'
+        | 'wardBloom'
+        | 'echoBurst'
+        | 'detonate';
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

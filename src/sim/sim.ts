@@ -55,6 +55,7 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
@@ -63,6 +64,7 @@ import { isSpellResisted } from './combat/spell_resist';
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
+import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
@@ -83,7 +85,6 @@ import {
   type SavedLoadout,
   type TalentAllocation,
   type TalentModifiers,
-  talentPointsAtLevel,
 } from './content/talents';
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
@@ -128,6 +129,7 @@ import {
   createNpc,
   createPlayer,
   type PlayerEquipment,
+  pctValue,
   recalcPlayerStats,
 } from './entity';
 import {
@@ -724,6 +726,7 @@ export interface ResolvedAbility {
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  bonusCharges?: number;
 }
 
 export interface RewardCounters {
@@ -1816,10 +1819,9 @@ export class Sim {
           cls,
           {
             spec: s.talents.spec ?? null,
-            ranks: { ...s.talents.ranks },
-            choices: { ...s.talents.choices },
+            rows: { ...(s.talents.rows ?? {}) },
           },
-          talentPointsAtLevel(player.level),
+          player.level,
         );
       if (s.loadouts)
         meta.loadouts = s.loadouts.map((l) => ({
@@ -1866,7 +1868,7 @@ export class Sim {
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
-    meta.talentMods = computeTalentModifiers(cls, meta.talents);
+    meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
     if (savedState) {
@@ -1961,6 +1963,17 @@ export class Sim {
       this.rebucket(e);
     }
     return pid;
+  }
+
+  // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
+  // (dev-command realms only). Returns the vendor entity id, or -1 on failure.
+  spawnDevVendor(pid?: number): number {
+    const me = this.entities.get(pid ?? this.primaryId);
+    if (!me) return -1;
+    const pos = this.groundPos(me.pos.x + 2, me.pos.z + 2);
+    const npc = createNpc(this.nextId++, PTR_DEV_VENDOR_DEF, pos);
+    this.addEntity(npc);
+    return npc.id;
   }
 
   removePlayer(pid: number): void {
@@ -2856,6 +2869,7 @@ export class Sim {
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
+      resolveMove: sim.resolveMove.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
       // through this seam binding (late-bound arrow so sim.ctx resolves at call time).
       updatePet: (pet) => petAi.updatePet(sim.ctx, pet),
@@ -2981,6 +2995,7 @@ export class Sim {
       notice: sim.notice.bind(sim),
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
+      spawnDevVendor: sim.spawnDevVendor.bind(sim),
       // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
       // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
       // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests
@@ -3068,6 +3083,7 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
+    r.meta.talentMods = computeTalentModifiers(r.meta.cls, r.meta.talents, r.e.level);
     recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, this.playerMods(r.meta));
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
@@ -3426,6 +3442,17 @@ export class Sim {
     return Math.max(0, attackPower);
   }
 
+  private petDamageMult(e: Entity): number {
+    if (e.ownerId === null) return 1;
+    let mult = 1;
+    for (const a of e.auras) {
+      if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
+    }
+    const ownerMeta = this.players.get(e.ownerId);
+    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
+    return mult;
+  }
+
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
   // these thin delegates for the applyAura/aura-expiry callers (this.applyNonPlayerStatAura)
   // and respawnMob's ctx.clearNonPlayerStatAuras.
@@ -3669,7 +3696,9 @@ export class Sim {
     });
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
-      const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
+      const isSpell = effect.school !== 'physical';
+      const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
+      const dmg = Math.round(isSpell ? rawDmg * spellDamageMultFromAuras(source) : rawDmg);
       this.dealDamage(
         source,
         target,
@@ -3769,7 +3798,7 @@ export class Sim {
   }
 
   private spellCrit(p: Entity): number {
-    return 0.05 + p.stats.int * 0.0008;
+    return 0.05 + p.stats.int * 0.0008 + spellCritBonusFromAuras(p);
   }
 
   // Heal core, heal multipliers, heal-absorb soak, crit-vuln bonus, and the
@@ -4172,6 +4201,7 @@ export class Sim {
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
+      damageMult?: number;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
@@ -4494,6 +4524,7 @@ export class Sim {
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
+    dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
     const dealt = Math.max(1, Math.round(dmg));
@@ -4556,7 +4587,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         const dmg = Math.round(
-          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1),
+          this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
+            this.petDamageMult(pet),
         );
         this.dealDamage(pet, target, Math.max(1, dmg), false, spell.school, spell.name, 'hit');
       }
