@@ -287,6 +287,13 @@ const ENV_INTENSITY = 0.5;
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
 const DUNGEON_SUN_INTENSITY = 0.3;
 const DUNGEON_ENV_INTENSITY = 0.05;
+// The authored Infernal Citadel is larger than a procedural floor and carries
+// real budgeted brazier lights. A stronger ambient floor preserves the black-red
+// infernal grade while keeping its loops, bosses, and doors readable between pools.
+const INFERNAL_SUN_INTENSITY = 0.48;
+const INFERNAL_HEMI_INTENSITY = 0.36;
+const INFERNAL_ENV_INTENSITY = 0.12;
+const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away —
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
@@ -4096,6 +4103,9 @@ export class Renderer {
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
+  // Cached with riftFogKey: whether the current rift floor is an authored set
+  // piece, so the per-frame lighting read avoids regenerating the floor.
+  private riftFogAuthored = false;
   private fogState:
     | 'outdoor'
     | 'dungeon'
@@ -4412,22 +4422,25 @@ export class Renderer {
       const fogKey = `${riftFloor.contentHash}:${riftFloor.floorIndex}`;
       if (fogKey !== this.riftFogKey) {
         this.riftFogKey = fogKey;
-        const style = generateRiftFloor(
+        const floor = generateRiftFloor(
           riftFloor.seed,
           riftFloor.baseLevel,
           riftFloor.floorIndex,
           riftFloor.upgrade,
-        ).style;
+        );
+        this.riftFogAuthored = floor.authored === true;
+        const style = floor.style;
         fog.color.setHex(style.fog.color);
         fog.near = style.fog.near;
         fog.far = style.fog.far;
       }
       this.fogState = 'rift';
       if (!this.lowGfx) {
-        this.sun.intensity = DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = DUNGEON_RIM_BOOST;
+        const authored = this.riftFogAuthored;
+        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
+        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
+        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
+        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
       }
       return;
     }

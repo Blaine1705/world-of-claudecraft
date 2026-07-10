@@ -1,7 +1,7 @@
 // The Infernal Citadel: a HAND-AUTHORED set-piece rift floor.
 //
 // Most rifts are a single procedural room per floor (see rift/rift_gen.ts). A
-// fraction of seeds instead open this: one fixed, seven-room citadel with two
+// fraction of seeds instead open this: one fixed, eight-room citadel with two
 // bosses, laid out from the design map (docs/design/rift-portals.md, "Set-piece
 // floors"). It is a SINGLE floor (floorCount 1), so it can headline a rift of any
 // rank: the rank only sets the level/marks/loot, never the content.
@@ -43,10 +43,10 @@ export function infernalCitadelName(seed: number): string {
  * glow of the procedural `ember` theme, so the two never read as the same place. */
 export const INFERNAL_STYLE: StyleSource = {
   kit: 'crypt',
-  torch: { flame: 0xff4a2a, emissive: 0xc41a0a, light: 0xff5a3a },
-  fog: { color: 0x14040a, near: 12, far: 70 },
-  wallTint: 0x9a5a4a,
-  floorTint: 0x7a3a34,
+  torch: { flame: 0xff5a32, emissive: 0xd52a12, light: 0xff7048 },
+  fog: { color: 0x26070b, near: 20, far: 110 },
+  wallTint: 0xb86b55,
+  floorTint: 0x8f493e,
   daisRaised: false,
 };
 
@@ -57,31 +57,32 @@ export const INFERNAL_STYLE: StyleSource = {
 // bounds (|x| <= 40, |z| <= 160, data.ts RIFT_REGION_HALF_X/Z).
 
 export const INFERNAL_ROOMS: readonly AuthoredRoom[] = [
-  { id: 'entry', x0: -4, x1: 4, z0: -19, z1: 2 }, // R0: entrance corridor
-  { id: 'sacrifice', x0: -18, x1: 18, z0: 2, z1: 44 }, // R1: Sacrificial Hall (altar + orb)
-  { id: 'relics', x0: 18, x1: 34, z0: 6, z1: 40 }, // R2: Relic Gallery (cages, hidden cache)
-  { id: 'gallery', x0: -32, x1: -18, z0: 6, z1: 76 }, // R3: West Gallery (lava band)
-  { id: 'rotunda', x0: -34, x1: -18, z0: -12, z1: 6 }, // R4: Pentagram Rotunda (miniboss)
-  { id: 'bonepit', x0: -34, x1: -18, z0: 76, z1: 92 }, // R5: Bone Chamber
-  { id: 'temple', x0: -18, x1: 18, z0: 44, z1: 96 }, // R6: Great Temple (giga-boss)
-  { id: 'forge', x0: 18, x1: 34, z0: 56, z1: 80 }, // R7: Hell Forge
+  { id: 'entry', x0: -7, x1: 7, z0: -34, z1: -14 }, // R0: Gatehouse
+  { id: 'sacrifice', x0: -18, x1: 18, z0: -14, z1: 28 }, // R1: Sacrificial Hall
+  { id: 'relics', x0: 18, x1: 36, z0: -8, z1: 22 }, // R2: Relic Gallery
+  { id: 'gallery', x0: -36, x1: -18, z0: -8, z1: 22 }, // R3: West Processional
+  { id: 'rotunda', x0: -36, x1: -18, z0: 22, z1: 48 }, // R4: Pentagram Rotunda
+  { id: 'bonepit', x0: -36, x1: -18, z0: 48, z1: 74 }, // R5: Bone Chamber
+  { id: 'temple', x0: -18, x1: 18, z0: 28, z1: 96 }, // R6: Great Temple
+  { id: 'forge', x0: 18, x1: 36, z0: 46, z1: 78 }, // R7: Hell Forge
 ];
 
 /** Doorways. The extent ACROSS the wall (`hw` on a constant-x wall, `hd` on a
  * constant-z wall) only has to reach the wall; the other extent is the opening. */
 export const INFERNAL_DOORS: readonly AuthoredDoor[] = [
-  { x: 0, z: 2, hw: 2.5, hd: 1 }, // entry -> sacrifice
-  { x: 0, z: 44, hw: 2.5, hd: 1 }, // sacrifice -> temple (PORTCULLIS)
-  { x: -18, z: 20, hw: 1, hd: 2.5 }, // sacrifice -> gallery
-  { x: 18, z: 20, hw: 1, hd: 2.5 }, // sacrifice -> relics
-  { x: -26, z: 6, hw: 2.5, hd: 1 }, // gallery -> rotunda
-  { x: -26, z: 76, hw: 2.5, hd: 1 }, // gallery -> bonepit
-  { x: 18, z: 68, hw: 1, hd: 2.5 }, // temple -> forge
+  { x: 0, z: -14, hw: 3.5, hd: 1 }, // entry -> sacrifice
+  { x: 0, z: 28, hw: 4, hd: 1 }, // sacrifice -> temple (PORTCULLIS)
+  { x: -18, z: 6, hw: 1, hd: 3 }, // sacrifice -> gallery
+  { x: 18, z: 6, hw: 1, hd: 3 }, // sacrifice -> relics
+  { x: -27, z: 22, hw: 3, hd: 1 }, // gallery -> rotunda
+  { x: -18, z: 25, hw: 1, hd: 2 }, // rotunda -> sacrifice (short return to orb)
+  { x: -27, z: 48, hw: 3, hd: 1 }, // rotunda -> bonepit
+  { x: 18, z: 62, hw: 1, hd: 3 }, // temple -> forge
 ];
 
-const GATE_Z = 44; // the portcullis line (the sacrifice -> temple door)
-const ALTAR = { x: 0, z: 40 }; // the Blood Orb's altar, just south of the gate
-const ROTUNDA = { x: -26, z: -3 }; // pentagram centre (miniboss arena)
+const GATE_Z = 28; // the portcullis line (the sacrifice -> temple door)
+const ALTAR = { x: 0, z: 24 }; // the Blood Orb's altar, just south of the gate
+const ROTUNDA = { x: -27, z: 35 }; // pentagram centre (miniboss arena)
 const DAIS = { x: 0, z: 84, r: 11 }; // temple dais (giga-boss)
 
 // Collision radii below are the footprints MEASURED from the built GLBs by the
@@ -104,105 +105,113 @@ const brazier = (x: number, z: number): AuthoredDecor => ({
 });
 
 export const INFERNAL_DECOR: readonly AuthoredDecor[] = [
-  // R0 entrance
-  brazier(-2.5, -16),
-  brazier(2.5, -16),
+  // R0 Gatehouse: a broad, readable arrival lane with a lit threshold.
+  brazier(-5, -30),
+  brazier(5, -30),
+  brazier(-5, -17),
+  brazier(5, -17),
   // R1 Sacrificial Hall: braziers down both flanks, the altar at the north end.
-  brazier(-14, 8),
-  brazier(14, 8),
-  brazier(-14, 23),
-  brazier(14, 23),
-  brazier(-14, 38),
-  brazier(14, 38),
+  brazier(-14, -8),
+  brazier(14, -8),
+  brazier(-14, 7),
+  brazier(14, 7),
+  brazier(-14, 21),
+  brazier(14, 21),
   { key: 'infernal_altar', x: ALTAR.x, z: ALTAR.z, yaw: 0, scale: 1.5, r: R_ALTAR },
-  { key: 'rug', x: 0, z: 22, yaw: 0, scale: 1 },
-  { key: 'bone_pile', x: -15.5, z: 14, yaw: 0.6, r: R_BONES },
-  { key: 'bone_pile', x: 15.5, z: 31, yaw: 2.1, r: R_BONES },
+  { key: 'rug', x: 0, z: 5, yaw: 0, scale: 1 },
+  { key: 'bone_pile', x: -15.5, z: 13, yaw: 0.6, r: R_BONES },
+  { key: 'bone_pile', x: 15.5, z: 18, yaw: 2.1, r: R_BONES },
   // R2 Relic Gallery: gibbets over the aisle, braziers, an alcove behind a fake wall.
-  brazier(21, 10),
-  brazier(31, 10),
-  brazier(21, 36),
-  brazier(31, 36),
-  { key: 'hanging_cage', x: 21.5, z: 14, yaw: 0, r: R_CAGE },
-  { key: 'hanging_cage', x: 30.5, z: 20, yaw: 0.4, r: R_CAGE },
-  { key: 'hanging_cage', x: 22, z: 27, yaw: 2.6, r: R_CAGE },
+  brazier(22, -4),
+  brazier(32, -4),
+  brazier(22, 18),
+  brazier(32, 18),
+  { key: 'hanging_cage', x: 22.5, z: 1, yaw: 0, r: R_CAGE },
+  { key: 'hanging_cage', x: 31.5, z: 7, yaw: 0.4, r: R_CAGE },
+  { key: 'hanging_cage', x: 23, z: 13, yaw: 2.6, r: R_CAGE },
   // R3 West Gallery: a long processional lit by braziers, obsidian breaking the floor.
-  brazier(-28, 14),
-  brazier(-22, 32),
-  brazier(-28, 52),
-  brazier(-22, 68),
-  { key: 'obsidian_fang', x: -25.5, z: 24, yaw: 0.8, r: R_FANG },
-  { key: 'obsidian_fang', x: -29, z: 60, yaw: 2.2, r: R_FANG },
+  brazier(-32, -4),
+  brazier(-22, -4),
+  brazier(-32, 18),
+  brazier(-22, 18),
+  { key: 'obsidian_fang', x: -33, z: 8, yaw: 0.8, r: R_FANG },
+  { key: 'obsidian_fang', x: -21, z: 13, yaw: 2.2, r: R_FANG },
   // R4 Pentagram Rotunda: the sigil, ringed by five flames.
   { key: 'pentagram', x: ROTUNDA.x, z: ROTUNDA.z, yaw: 0, scale: 6.5 },
-  { key: 'obsidian_fang', x: -31.5, z: -9.5, yaw: 1.1, r: R_FANG },
-  { key: 'obsidian_fang', x: -20.5, z: -9.5, yaw: 2.7, r: R_FANG },
+  { key: 'obsidian_fang', x: -33, z: 25, yaw: 1.1, r: R_FANG },
+  { key: 'obsidian_fang', x: -21, z: 45, yaw: 2.7, r: R_FANG },
   // R5 Bone Chamber
-  brazier(-31, 80),
-  brazier(-21, 80),
-  { key: 'bone_pile', x: -29.5, z: 85, yaw: 0.3, r: R_BONES },
-  { key: 'bone_pile', x: -22.5, z: 87, yaw: 1.9, r: R_BONES },
-  { key: 'bone_pile', x: -26, z: 89.5, yaw: 3.0, r: R_BONES },
+  brazier(-32, 52),
+  brazier(-22, 52),
+  brazier(-32, 70),
+  brazier(-22, 70),
+  { key: 'bone_pile', x: -32, z: 60, yaw: 0.3, r: R_BONES },
+  { key: 'bone_pile', x: -22, z: 64, yaw: 1.9, r: R_BONES },
+  { key: 'bone_pile', x: -27, z: 68, yaw: 3.0, r: R_BONES },
   // R6 Great Temple: the long nave, the idol looming over the dais.
+  brazier(-14, 34),
+  brazier(14, 34),
   brazier(-14, 50),
   brazier(14, 50),
-  brazier(-14, 66),
-  brazier(14, 66),
+  brazier(-14, 68),
+  brazier(14, 68),
   brazier(-14, 82),
   brazier(14, 82),
-  { key: 'rug', x: 0, z: 62, yaw: 0, scale: 1 },
+  { key: 'rug', x: 0, z: 48, yaw: 0, scale: 1 },
+  { key: 'rug', x: 0, z: 73, yaw: 0, scale: 1 },
   // The idol looks SOUTH down the nave (yaw PI): a party climbing to the dais walks
   // into its gaze, not its back.
   { key: 'demon_idol', x: 0, z: 93.5, yaw: Math.PI, r: R_IDOL },
-  { key: 'obsidian_fang', x: -13, z: 57, yaw: 0.5, r: R_FANG },
+  { key: 'obsidian_fang', x: -13, z: 58, yaw: 0.5, r: R_FANG },
   { key: 'obsidian_fang', x: 13, z: 74, yaw: 2.4, r: R_FANG },
   // R7 Hell Forge
-  brazier(21, 60),
-  brazier(31, 76),
-  { key: 'hell_forge', x: 28.5, z: 71, yaw: Math.PI, r: R_FORGE },
-  { key: 'bone_pile', x: 21, z: 66, yaw: 1.2, r: R_BONES },
+  brazier(22, 50),
+  brazier(32, 50),
+  brazier(22, 74),
+  brazier(32, 74),
+  { key: 'hell_forge', x: 30, z: 67, yaw: Math.PI, r: R_FORGE },
+  { key: 'bone_pile', x: 22, z: 66, yaw: 1.2, r: R_BONES },
 ];
 
 /** Trash placements: (templateId, x, z). Kept inside their rooms and off every
  * decor collider (pinned by tests/rift_infernal.test.ts). */
 const TRASH_PLAN: ReadonlyArray<readonly [string, number, number]> = [
   // R1 Sacrificial Hall
-  ['rift_hellguard', -10, 12],
-  ['rift_hellguard', 8, 13],
-  ['rift_pact_acolyte', -7, 26],
-  ['rift_hellguard', 9, 27],
-  ['rift_pact_acolyte', -11, 35],
-  ['rift_hellguard', 11, 35],
+  ['rift_hellguard', -10, -5],
+  ['rift_hellguard', 8, -4],
+  ['rift_pact_acolyte', -7, 8],
+  ['rift_hellguard', 9, 9],
+  ['rift_pact_acolyte', -10, 18],
+  ['rift_hellguard', 10, 18],
   // R2 Relic Gallery
-  ['rift_hellguard', 24, 16],
-  ['rift_pact_acolyte', 30, 23],
-  ['rift_hellguard', 24, 31],
+  ['rift_hellguard', 27, -2],
+  ['rift_pact_acolyte', 27, 7],
+  ['rift_hellguard', 28, 15],
   // R3 West Gallery
+  ['rift_hellguard', -27, 0],
+  ['rift_pact_acolyte', -29, 7],
   ['rift_hellguard', -25, 16],
-  ['rift_pact_acolyte', -27, 34],
-  ['rift_hellguard', -24, 56],
-  ['rift_hellguard', -28, 67],
   // R4 Pentagram Rotunda: the ritualist's two attendants
-  ['rift_pact_acolyte', -30.5, -3],
-  ['rift_pact_acolyte', -21.5, -3],
+  ['rift_pact_acolyte', -32, 35],
+  ['rift_pact_acolyte', -22, 35],
   // R5 Bone Chamber
-  ['rift_pact_acolyte', -29.5, 82.5],
-  ['rift_pact_acolyte', -23, 83.5],
+  ['rift_pact_acolyte', -30, 57],
+  ['rift_pact_acolyte', -24, 64],
   // R6 Great Temple
-  ['rift_pact_acolyte', -12, 52],
-  ['rift_pact_acolyte', 12, 52],
-  ['rift_hellguard', 0, 60],
-  ['rift_hellguard', -7, 76],
-  ['rift_hellguard', 7, 76],
+  ['rift_pact_acolyte', -10, 36],
+  ['rift_pact_acolyte', 10, 36],
+  ['rift_hellguard', 0, 47],
+  ['rift_hellguard', -7, 65],
+  ['rift_hellguard', 7, 65],
   // R7 Hell Forge
-  ['rift_hellguard', 23, 60],
-  ['rift_hellguard', 30, 62],
+  ['rift_hellguard', 24, 55],
+  ['rift_hellguard', 31, 58],
 ];
 
 /** The lava band flooding the middle of the west gallery: jump it, skirt it, or
  * take the burn. Same damage model as the procedural floors' molten bands. */
 const INFERNAL_HAZARDS: readonly DelveHazardZone[] = [
-  { x: -25, z: 44, r: 6, rx: 6, rz: 3.5, tier: 'shallow' },
+  { x: -27, z: 11, r: 6.2, rx: 6.2, rz: 3.5, tier: 'shallow' },
 ];
 
 // ---- The builder -----------------------------------------------------------
@@ -217,25 +226,25 @@ export function buildInfernalCitadelFloor(
   const rng = new Rng(mixSeed(seed, 0xc17a));
 
   const layout = {
-    zMin: -19,
+    zMin: -34,
     zMax: 96,
-    sideWallZ: 38.5,
-    sideWallHd: 57.5,
+    sideWallZ: 31,
+    sideWallHd: 65,
     pillars: [],
     tombs: [],
     stubs: [],
     dais: { ...DAIS },
-    wallX: 34,
-    endWallHw: 35,
-    floorHalfX: 34,
-    doorZ: -17,
+    wallX: 36,
+    endWallHw: 37,
+    floorHalfX: 36,
+    doorZ: -32,
     rooms: INFERNAL_ROOMS.map((r) => ({ ...r })),
     doors: INFERNAL_DOORS.map((d) => ({ ...d })),
     decor: INFERNAL_DECOR.map((d) => ({ ...d })),
     // The relic gallery's alcove hides behind a wall panel that renders solid but
     // carries no collider (layoutColliders never emits illusion walls), so pushing
     // into the "dead end" reveals the cache behind it.
-    illusionWalls: [{ x: 28.5, z: 33, hw: 0.6, hd: 3.2 }],
+    illusionWalls: [{ x: 31, z: 16, hw: 0.6, hd: 3.2 }],
   };
 
   const spawns: RiftSpawn[] = TRASH_PLAN.map(([templateId, x, z]) => ({
@@ -269,8 +278,8 @@ export function buildInfernalCitadelFloor(
     { kind: 'chest', x: 0, z: 89, name: 'Rift Cache' },
     // Two off-path reward caches: one behind the relic gallery's illusion wall, one
     // beside the forge for anyone who explores past the temple door.
-    { kind: 'treasure', x: 31.5, z: 33, name: 'Hidden Cache' },
-    { kind: 'treasure', x: 23, z: 74, name: 'Forge Cache' },
+    { kind: 'treasure', x: 34, z: 16, name: 'Hidden Cache' },
+    { kind: 'treasure', x: 23, z: 71, name: 'Forge Cache' },
   ];
 
   return {
@@ -284,7 +293,7 @@ export function buildInfernalCitadelFloor(
     themeName: INFERNAL_THEME_NAME,
     layout,
     style: buildStyle(rng, INFERNAL_STYLE),
-    entry: { x: 0, z: -11 },
+    entry: { x: 0, z: -24 },
     spawns,
     objects,
     puzzle: { kind: 'none', pylonCount: 0 },

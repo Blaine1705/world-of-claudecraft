@@ -7,6 +7,7 @@
 
 import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { fitAuthoredWallSegment } from '../src/render/authored_walls_core';
 import type { Collider } from '../src/sim/colliders';
 import {
   buildInfernalCitadelFloor,
@@ -170,9 +171,9 @@ describe('infernal citadel: authored geometry', () => {
     }
   });
 
-  it('has 8 rooms joined by 7 doorways, none overlapping', () => {
+  it('has 8 rooms joined by a looped 8-door graph, none overlapping', () => {
     expect(INFERNAL_ROOMS.length).toBe(8);
-    expect(INFERNAL_DOORS.length).toBe(7);
+    expect(INFERNAL_DOORS.length).toBe(8);
     for (let i = 0; i < INFERNAL_ROOMS.length; i++) {
       for (let j = i + 1; j < INFERNAL_ROOMS.length; j++) {
         const a = INFERNAL_ROOMS[i];
@@ -181,6 +182,41 @@ describe('infernal citadel: authored geometry', () => {
         expect(overlap, `${a.id} overlaps ${b.id}`).toBe(false);
       }
     }
+  });
+
+  it('fits every rendered wall module inside its source segment', () => {
+    for (const seg of authoredWallSegments(INFERNAL_ROOMS, INFERNAL_DOORS)) {
+      const cells = fitAuthoredWallSegment(seg.a, seg.b, 8);
+      expect(cells.length).toBeGreaterThan(0);
+      for (const cell of cells) {
+        expect(cell.center - cell.length / 2).toBeGreaterThanOrEqual(seg.a - 1e-9);
+        expect(cell.center + cell.length / 2).toBeLessThanOrEqual(seg.b + 1e-9);
+      }
+    }
+  });
+
+  it('fitAuthoredWallSegment handles degenerate and exact-multiple inputs', () => {
+    expect(fitAuthoredWallSegment(5, 5, 8)).toEqual([]);
+    expect(fitAuthoredWallSegment(5, 3, 8)).toEqual([]);
+    expect(fitAuthoredWallSegment(0, 10, 0)).toEqual([]);
+    expect(fitAuthoredWallSegment(0, 10, -4)).toEqual([]);
+    expect(fitAuthoredWallSegment(0, 16, 8)).toEqual([
+      { center: 4, length: 8 },
+      { center: 12, length: 8 },
+    ]);
+    expect(fitAuthoredWallSegment(0, 1.5, 8)).toEqual([{ center: 0.75, length: 1.5 }]);
+  });
+
+  it('gives the entrance enough room for the player and chase camera', () => {
+    const entrance = INFERNAL_ROOMS.find((room) => room.id === 'entry');
+    expect(entrance).toBeDefined();
+    expect(
+      (entrance as NonNullable<typeof entrance>).x1 - (entrance as NonNullable<typeof entrance>).x0,
+    ).toBeGreaterThanOrEqual(14);
+    expect(
+      (entrance as NonNullable<typeof entrance>).z1 - (entrance as NonNullable<typeof entrance>).z0,
+    ).toBeGreaterThanOrEqual(18);
+    expect(floor.entry.z - (entrance as NonNullable<typeof entrance>).z0).toBeGreaterThanOrEqual(8);
   });
 
   it('walls seal the shell: no segment crosses a doorway centre', () => {
@@ -228,6 +264,48 @@ describe('infernal citadel: authored geometry', () => {
       seen.size,
       `unreachable rooms: ${INFERNAL_ROOMS.filter((r) => !seen.has(r.id)).map((r) => r.id)}`,
     ).toBe(INFERNAL_ROOMS.length);
+  });
+
+  it('loops the Magus and side-room routes back into the central progression', () => {
+    const edges = new Set<string>();
+    for (const d of INFERNAL_DOORS) {
+      const along = d.hw > d.hd ? { dx: 0, dz: 1 } : { dx: 1, dz: 0 };
+      const a = roomAt(INFERNAL_ROOMS, d.x - along.dx * 2, d.z - along.dz * 2);
+      const b = roomAt(INFERNAL_ROOMS, d.x + along.dx * 2, d.z + along.dz * 2);
+      if (a && b) edges.add([a.id, b.id].sort().join(':'));
+    }
+    expect(edges).toContain('gallery:sacrifice');
+    expect(edges).toContain('gallery:rotunda');
+    expect(edges).toContain('rotunda:sacrifice');
+    expect(edges).toContain('bonepit:rotunda');
+    expect(edges).not.toContain('bonepit:temple');
+  });
+
+  it('makes the temple gate the only route to Azgorath and the forge', () => {
+    const gate = floor.gate as NonNullable<typeof floor.gate>;
+    const adj = new Map<string, string[]>(INFERNAL_ROOMS.map((room) => [room.id, []]));
+    for (const door of INFERNAL_DOORS) {
+      if (door.x === gate.x && door.z === gate.z) continue;
+      const along = door.hw > door.hd ? { dx: 0, dz: 1 } : { dx: 1, dz: 0 };
+      const a = roomAt(INFERNAL_ROOMS, door.x - along.dx * 2, door.z - along.dz * 2);
+      const b = roomAt(INFERNAL_ROOMS, door.x + along.dx * 2, door.z + along.dz * 2);
+      if (!a || !b) continue;
+      adj.get(a.id)?.push(b.id);
+      adj.get(b.id)?.push(a.id);
+    }
+    const seen = new Set(['entry']);
+    const queue = ['entry'];
+    while (queue.length) {
+      for (const next of adj.get(queue.shift() as string) ?? []) {
+        if (seen.has(next)) continue;
+        seen.add(next);
+        queue.push(next);
+      }
+    }
+    expect(seen).toContain('rotunda');
+    expect(seen).toContain('bonepit');
+    expect(seen).not.toContain('temple');
+    expect(seen).not.toContain('forge');
   });
 
   it('places the player entry, every spawn, and every object on clear ground inside a room', () => {
@@ -382,16 +460,14 @@ describe('infernal citadel: lifecycle', () => {
   });
 
   it('never clamps a player who is legitimately in a side room', () => {
-    const floor = generateRiftFloor(seed, 22, 0);
-    const gate = floor.gate as NonNullable<typeof floor.gate>;
     const i = inst() as NonNullable<ReturnType<typeof inst>>;
     const o = riftInstanceOrigin(i.slot, i.floorIndex);
     killTrash();
-    // The west gallery and the forge both sit NORTH of the gate line but outside its
+    // The Bone Chamber and forge both sit NORTH of the gate line but outside its
     // span, so the closed portcullis must leave them alone (it spans |x| < 18).
     for (const [x, z, room] of [
-      [-25, 60, 'gallery'],
-      [-26, 84, 'bonepit'],
+      [-27, 60, 'bonepit'],
+      [27, 62, 'forge'],
     ] as const) {
       teleport(x, z);
       sim.tick();

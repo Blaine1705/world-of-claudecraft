@@ -37,6 +37,7 @@ import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
 import { authoredWallSegments } from '../sim/rift/authored';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { fitAuthoredWallSegment } from './authored_walls_core';
 import {
   placeLitanyMarshDressing,
   placeMarshBlackwaterPools,
@@ -730,7 +731,7 @@ export class DungeonInteriors {
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
       buildInfernalDecor(group, layout.decor ?? [], torch, (x, z, color, y, scale) =>
-        this.addTorchGlow(group, x, z, color, y, scale),
+        this.addInfernalLight(group, x, z, color, y, scale),
       );
       this.placeDais(group, p, layout, variant, torch, daisRaised);
       if (opts?.hazards?.length) {
@@ -1445,7 +1446,9 @@ export class DungeonInteriors {
 
   // Authored walls: one run of ~8u modules along every wall segment the sim's
   // `authoredWallSegments` produced (doorway gaps already subtracted), each turned
-  // to face into the room it borders. A door gap gets an arch module for a frame.
+  // to face into the room it borders. The fitted wall ends frame each opening on
+  // their own: placing a nominal "arched wall" in the gap visually sealed doors
+  // even though the shared sim collider correctly left them open.
   private placeAuthoredWalls(p: Placements, layout: DungeonLayout, variant: Variant): void {
     const rooms = layout.rooms ?? [];
     const bannerEvery = variant === 'crypt' ? 4 : 3;
@@ -1453,8 +1456,7 @@ export class DungeonInteriors {
       rooms.some((r) => x > r.x0 && x < r.x1 && z > r.z0 && z < r.z1);
     let i = 0;
     for (const seg of authoredWallSegments(rooms, layout.doors ?? [])) {
-      const len = seg.b - seg.a;
-      const count = Math.max(1, Math.round(len / 8));
+      const cells = fitAuthoredWallSegment(seg.a, seg.b, 8);
       // Face the wall detail into an adjacent room (either one, when it is shared).
       let ry: number;
       if (seg.axis === 'x') {
@@ -1464,22 +1466,19 @@ export class DungeonInteriors {
         const mid = (seg.a + seg.b) / 2;
         ry = openAt(seg.fixed + 1.5, mid) ? Math.PI / 2 : -Math.PI / 2;
       }
-      for (let s = 0; s < count; s++, i++) {
-        const t = seg.a + (len * (s + 0.5)) / count;
+      for (const cell of cells) {
+        const t = cell.center;
         const x = seg.axis === 'x' ? t : seg.fixed;
         const z = seg.axis === 'x' ? seg.fixed : t;
         const kind = this.wallKind(variant, hash2(x * 13.7, z));
-        p.add(kind, x, 0, z, ry, MODULE_SCALE);
+        const scale: [number, number, number] = [cell.length / 4, MODULE_SCALE, MODULE_SCALE];
+        p.add(kind, x, 0, z, ry, scale);
         if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
           const banner = hash2(z, x * 7.3) < 0.5 ? 'banner_red' : 'banner_triple_red';
-          p.add(banner, x, 0, z, ry, MODULE_SCALE);
+          p.add(banner, x, 0, z, ry, scale);
         }
+        i++;
       }
-    }
-    // Frame each doorway with an arch so an opening reads as a built passage.
-    for (const d of layout.doors ?? []) {
-      const ry = d.hw > d.hd ? 0 : Math.PI / 2; // the opening runs along its long axis
-      p.add('wall_arched', d.x, 0, d.z, ry, MODULE_SCALE);
     }
   }
 
@@ -1795,6 +1794,29 @@ export class DungeonInteriors {
     glow.scale.setScalar(scale);
     glow.renderOrder = 1; // after the floor it floats over
     group.add(glow);
+  }
+
+  /** A real, budgeted light plus its baked floor pool for the authored citadel.
+   * The nearest GFX-tier allowance shines; the rest remain zero-intensity, so the
+   * richer authored lighting does not expand the forward-render light budget. */
+  private addInfernalLight(
+    group: THREE.Group,
+    x: number,
+    z: number,
+    colorHex: number,
+    y = 0.7,
+    scale = 1,
+  ): void {
+    this.addTorchGlow(group, x, z, colorHex, y, scale);
+    const base = this.lowGfx ? 10 : DUNGEON_LIGHT_INTENSITY * Math.min(1.35, 0.55 + scale * 0.3);
+    const distance = this.lowGfx
+      ? 20
+      : DUNGEON_LIGHT_DISTANCE * Math.min(1.25, 0.65 + scale * 0.18);
+    const light = new THREE.PointLight(colorHex, base, distance, 2);
+    light.userData.baseIntensity = base;
+    light.position.set(x, Math.max(2.8, y + 1.8), z);
+    group.add(light);
+    this.fireLights.push(light);
   }
 
   // Wall-side obstacles at +-19 (OBB 2.2 x 4.2): sarcophagi in the crypt and

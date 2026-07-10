@@ -209,6 +209,7 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
   'src/render/day_night_core.ts',
+  'src/render/authored_walls_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)

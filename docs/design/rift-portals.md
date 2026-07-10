@@ -172,7 +172,7 @@ A second polish pass, all still descriptor-driven and within the region bounds
 ## Set-piece floors: The Infernal Citadel
 
 Roughly one seed in seven (`isSetPieceSeed`, `Rng(mix(seed, 0x1f3e)).chance(0.15)`) opens a
-HAND-AUTHORED dungeon instead of a procedural descent: a single, fixed, seven-room infernal
+HAND-AUTHORED dungeon instead of a procedural descent: a single, fixed, eight-room infernal
 citadel with two bosses. Because the theme is chosen by the SEED and the rank only sets
 `baseLevel` (marks/loot), the citadel can headline a C-rank or an S-rank portal alike; there is
 nothing to gate.
@@ -185,9 +185,11 @@ nothing to gate.
   do NOT apply to an authored floor (`RiftFloorPlan.authored`); the procedural playability tests
   skip set-piece seeds and `tests/rift_infernal.test.ts` pins the room graph instead
   (reachability BFS over the door graph, spawn/decor clearance, region bounds).
-- **The content** (`src/sim/content/rift/infernal_citadel.ts`, data-as-code). Entrance corridor,
+- **The content** (`src/sim/content/rift/infernal_citadel.ts`, data-as-code). Broad gatehouse,
   Sacrificial Hall (altar + Blood Orb), Relic Gallery (gibbets, a cache behind an illusion wall),
-  West Gallery (a lava band), Pentagram Rotunda, Bone Chamber, Great Temple, Hell Forge.
+  West Processional (a lava band), Pentagram Rotunda, Bone Chamber, Great Temple, Hell Forge.
+  The west wing loops back into the central route, so killing the Magus gives a short return to
+  the Orb. The Bone Chamber remains a compact optional branch and cannot bypass the temple gate.
 - **The gating chain.** Kill **Magus Vel'Kor the Pactbound** on the pentagram; the Blood Orb on
   the altar wakes (`orbActive`, a templateId swap like a lit pylon). Touch the woken orb and the
   temple portcullis grinds open: it is a `RiftGate` with `openOnOrb`, so it places NO pressure
