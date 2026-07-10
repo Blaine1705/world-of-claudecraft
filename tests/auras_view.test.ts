@@ -72,7 +72,6 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'attackspeed',
         'blind',
         'bleed_vuln',
-        'cauterize_fatigue',
         'corrode',
         'cost_tax',
         'critvuln',

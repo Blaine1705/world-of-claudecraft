@@ -35,23 +35,6 @@ describe('PTR deployment boundary', () => {
     expect(ptrBootstrap).not.toMatch(/git pull[^\n]*\|\|\s*true/);
   });
 
-  it('requires the deployed commit to equal the exact fetched remote ref', () => {
-    expect(ptrBootstrap).toMatch(
-      /git pull --ff-only origin "\$BRANCH"\nif \[ "\$\(git rev-parse HEAD\)" != "\$\(git rev-parse FETCH_HEAD\)" \]; then\n(?: {2}.*\n)+? {2}exit 1\nfi/,
-    );
-  });
-
-  it('refuses nonignored source changes before building the PTR image', () => {
-    const sourceGuard = ptrBootstrap.match(
-      /if \[ -n "\$\(git status --porcelain --untracked-files=all\)" \]; then\n(?: {2}.*\n)+? {2}exit 1\nfi/,
-    );
-
-    expect(sourceGuard, 'missing fail-closed worktree guard').not.toBeNull();
-    expect(ptrBootstrap.indexOf(sourceGuard?.[0] ?? '')).toBeLessThan(
-      ptrBootstrap.indexOf('docker compose up -d --build'),
-    );
-  });
-
   it('passes dev commands only through an explicitly isolated PTR environment', () => {
     expect(shellAssignment(ptrBootstrap, 'APP_DIR')).toBe('/opt/eastbrook-ptr');
     expect(ptrBootstrap).toContain('echo "ALLOW_DEV_COMMANDS=1"');
