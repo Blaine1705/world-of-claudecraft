@@ -731,6 +731,31 @@ const classAbilityNamesEn = {
         'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%.',
       ],
       [
+        'ice_lance',
+        'Ice Lance',
+        "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)",
+      ],
+      [
+        'flurry',
+        'Flurry',
+        "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)",
+      ],
+      [
+        'fingers_of_frost',
+        'Fingers of Frost',
+        'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',
+      ],
+      [
+        'brain_freeze',
+        'Brain Freeze',
+        'Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)',
+      ],
+      [
+        'shatter',
+        'Shatter',
+        "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
+      ],
+      [
         'conjure_water',
         'Waterbind',
         'Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water.',

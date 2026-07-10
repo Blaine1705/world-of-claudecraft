@@ -585,6 +585,13 @@ export const guideStrings = {
     frost_armor: 'A lasting self-buff that hardens your armor before a fight.',
     arcane_intellect: "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
     frostbolt: 'Strikes from range and slows the target so it cannot close on you.',
+    ice_lance: 'An instant shard for spending frost procs, it hits far harder on a frozen target.',
+    flurry:
+      'Three quick bolts that chill the target so your next frost hits land as if it were frozen.',
+    fingers_of_frost:
+      'Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.',
+    brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and harder-hitting.',
+    shatter: 'Your spells crit far more often against frozen targets.',
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',

@@ -60,6 +60,7 @@ import {
   hasFreeCostFor,
 } from './empower_next';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import { applyBrainFreezeOverride } from './frost_mage';
 import {
   hasCastShield,
   noteSpellHit,
@@ -599,6 +600,12 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
+
+  // Brain Freeze (combat/frost_mage.ts): consumed HERE, after every gate
+  // above (so a blocked cast never eats the proc) and before the cast-time /
+  // cost / cooldown reads below: the armed Flurry goes instant, skips its
+  // cooldown and carries its 30% baked into the resolved effects.
+  res = applyBrainFreezeOverride(ctx, p, res);
 
   const gcd = ctx.playerGcdFor(meta.cls);
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.

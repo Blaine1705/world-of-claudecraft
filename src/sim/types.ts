@@ -229,6 +229,16 @@ export type AuraKind =
   // one nearby enemy for a reduced fraction (like a timed Bladed Echo).
   | 'overpower_charge'
   | 'sweeping_strikes'
+  // Frost mage proc engine (combat/frost_mage.ts, owner design 2026-07-11).
+  // `fingers_of_frost`: self buff, up to 2 stacks; an Ice Lance spends one to
+  // treat its target as frozen (Shatter + its 3x frozen damage).
+  // `brain_freeze`: self buff, single; the next Flurry goes instant, skips its
+  // cooldown and hits 30% harder (consumed in castAbility's override).
+  // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
+  // impact spends one to count the target as frozen.
+  | 'fingers_of_frost'
+  | 'brain_freeze'
+  | 'winters_chill'
   // Warrior combat stances (mutually exclusive, exclusiveGroup 'warrior_stance').
   // `battle_stance`: the offensive default for Arms/Prot/no-spec; its only effect
   // is +STANCE_RAGE_GEN rage generation, folded in rageGenAuraMult below.

@@ -332,6 +332,9 @@ const baseEnTable = {
   'aura.bladedEcho': 'Bladed Echo',
   'aura.emboldened': 'Emboldened',
   'aura.enraged': 'Enraged',
+  'aura.fingersOfFrost': 'Fingers of Frost',
+  'aura.brainFreeze': 'Brain Freeze',
+  'aura.wintersChill': "Winter's Chill",
 } as const;
 
 const petEnTable = {
@@ -558,6 +561,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   es: {
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
     'aura.enraged': 'Enfurecido',
+    'aura.fingersOfFrost': 'Dedos de Escarcha',
+    'aura.brainFreeze': 'Congelación Cerebral',
+    'aura.wintersChill': 'Frío Invernal',
     'groundPickup.supplyCrateDeny': 'El cajón está cerrado con clavos.',
     'groundPickup.gravecallerSigilDeny': 'El sigilo repele tu tacto.',
     'groundPickup.ledgerPageDeny':
@@ -4658,6 +4664,11 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // Fury Enrage buff (the enrageChance case in src/sim/combat/effect_dispatch.ts),
   // procced by Bloodletting and Desenfreno / Rampage; shown on the buff bar.
   Enraged: 'aura.enraged',
+  // Frost mage proc engine (src/sim/combat/frost_mage.ts): the two self
+  // procs and the target debuff; buff bar, target frame and combat log.
+  'Fingers of Frost': 'aura.fingersOfFrost',
+  'Brain Freeze': 'aura.brainFreeze',
+  "Winter's Chill": 'aura.wintersChill',
   // Talent-proc buff/ward names (choice rows).
   'Searing Light': 'aura.searingLight',
   'Lingering Grace': 'aura.lingeringGraceWard',

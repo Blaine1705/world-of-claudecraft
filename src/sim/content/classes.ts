@@ -124,9 +124,16 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'arcane_intellect',
       'frostbolt',
       'conjure_water',
+      // Frost spec kit (owner design 2026-07-11, `specs: ['frost']` gated):
+      // Ice Lance + its three spec passives at the spec pick, Flurry at 8.
+      'ice_lance',
+      'fingers_of_frost',
+      'brain_freeze',
+      'shatter',
       'conjure_food',
       'fire_blast',
       'arcane_missiles',
+      'flurry',
       'polymorph',
       'frost_nova',
       'arcane_explosion',
@@ -1375,6 +1382,130 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description: 'Launches a bolt of frost, causing $d Frost damage and slowing movement by 40%.',
+  },
+  // Frost mage spec kit (owner design 2026-07-11; combat/frost_mage.ts owns
+  // the proc engine these feed). Ice Lance: the instant proc spender. Its 3x
+  // against frozen-counting targets lives in the per-cast frozen resolution
+  // (effect_dispatch reads FrozenCastState), not here in the data.
+  ice_lance: {
+    id: 'ice_lance',
+    name: 'Ice Lance',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    cost: 10,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    effects: [{ type: 'directDamage', min: 10, max: 12 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 15,
+        effects: [{ type: 'directDamage', min: 20, max: 24 }],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 20,
+        effects: [{ type: 'directDamage', min: 30, max: 35 }],
+      },
+    ],
+    description:
+      "Hurl a shard of ice, dealing $d Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)",
+  },
+  // Flurry: the Winter's Chill planter. Its three bolts resolve on one
+  // projectile arrival; the debuff rider lands in frostMageAfterCast so the
+  // bolts themselves can never eat the charges they just applied. Brain
+  // Freeze's instant/harder/no-cooldown override is applyBrainFreezeOverride.
+  flurry: {
+    id: 'flurry',
+    name: 'Flurry',
+    class: 'mage',
+    learnLevel: 8,
+    specs: ['frost'],
+    cost: 30,
+    castTime: 1.5,
+    cooldown: 10,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 7, max: 9 },
+      { type: 'directDamage', min: 7, max: 9 },
+      { type: 'directDamage', min: 7, max: 9 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 16,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 14, max: 17 },
+          { type: 'directDamage', min: 14, max: 17 },
+          { type: 'directDamage', min: 14, max: 17 },
+        ],
+      },
+    ],
+    description:
+      "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)",
+  },
+  // The three frost spec passives: spellbook/spec-screen documentation of the
+  // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
+  // effects, the seasoned_soldier idiom).
+  fingers_of_frost: {
+    id: 'fingers_of_frost',
+    name: 'Fingers of Frost',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',
+  },
+  brain_freeze: {
+    id: 'brain_freeze',
+    name: 'Brain Freeze',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Rimelance has a 20% chance to make your next Flurry instant, 30% harder, and free of its cooldown. (Frost)',
+  },
+  shatter: {
+    id: 'shatter',
+    name: 'Shatter',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [],
+    description:
+      "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
   },
   conjure_water: {
     id: 'conjure_water',
