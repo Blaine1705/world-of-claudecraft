@@ -80,6 +80,7 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     outOfRange: false,
     queued: false,
     procGlow: false,
+    empowered: false,
     ariaLabel: 'A',
     keybindLabel: 'K',
     ...over,
@@ -105,6 +106,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
           usable: false,
           outOfRange: true,
           queued: true,
+          empowered: true,
           ariaLabel: 'aria1',
           keybindLabel: '1',
         }),
@@ -123,6 +125,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'oor', true] },
       { m: 'toggleClass', args: [el.btn, 'queued', true] },
       { m: 'toggleClass', args: [el.btn, 'proc', false] },
+      { m: 'toggleClass', args: [el.btn, 'empowered', true] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);

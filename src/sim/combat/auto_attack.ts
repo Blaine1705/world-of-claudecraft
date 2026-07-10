@@ -49,11 +49,12 @@ import {
   type WeaponInfo,
 } from '../types';
 import { spendResource } from './casting_lifecycle';
-import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
+import { onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
@@ -70,6 +71,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (!r) return;
   const p = r.e;
   if (p.dead) return;
+  if (isInStasis(p)) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead || !ctx.isHostileTo(p, t)) {
     ctx.error(p.id, 'Invalid attack target.');
@@ -307,7 +309,7 @@ export function rangedSwing(
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
     const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
-    if (crit) dmg *= 2;
+    if (crit) dmg *= 2 + atk.critDmgBonus;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
     ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
@@ -346,6 +348,7 @@ export function meleeSwing(
     // outcome is overridden. Plain auto swings never set this.
     forceCrit?: boolean;
     whiteDualWieldPenalty?: boolean;
+    damageMult?: number;
   },
 ): boolean {
   const missChance =
@@ -417,7 +420,8 @@ export function meleeSwing(
   const crit =
     ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance) ||
     opts.forceCrit === true;
-  if (crit) dmg *= 2;
+  if (crit) dmg *= 2 + attacker.critDmgBonus;
+  if (opts.damageMult !== undefined) dmg *= opts.damageMult;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   if (blockChance > 0 && roll < missChance + dodgeChance + blockChance) {
     dmg = Math.max(1, dmg - target.blockValue);
@@ -434,6 +438,9 @@ export function meleeSwing(
   // Bladed Echo hook: report the resolved amount of a CONNECTED swing so the
   // effect-dispatch caller can fan it out (no rng drawn here or there).
   opts.onDealt?.(dealtAmount);
+  // Talent procs keyed to a landed swing while a condition aura (seal, imbue)
+  // is up (deterministic, no rng draw).
+  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

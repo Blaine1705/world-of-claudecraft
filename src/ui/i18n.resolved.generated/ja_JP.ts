@@ -85,6 +85,9 @@ export const ja_JP: EnTranslations = {
       "title": "タレント",
       "classTab": "クラス",
       "specTab": "専門化",
+      "choicesTab": "選択",
+      "rowUnlockToast": "新しいタレント選択が解放されました!",
+      "rowUnlocks": "レベル{level}で解放",
       "available": "使用可能",
       "spent": "使用済み",
       "pointSource": "レベル{first}から{cap}まで、レベルごとにタレントポイントを1獲得します。さらにポイントを得るにはレベルを上げてください。",
@@ -143,6 +146,7 @@ export const ja_JP: EnTranslations = {
         "noTree": "あなたのクラスにはまだタレントツリーがありません。",
         "locked": "タレントはまだ解除されていません——レベル{level}から始まります。",
         "noSpec": "専門化なし",
+        "rowsSummary": "タレント: {head}、選択済み行 {picked}/{unlocked}。",
         "summary": "タレント: {head}——{spent}/{total} ポイント使用済み（{breakdown}）。",
         "breakdownClass": "クラス {classPts}",
         "breakdownSpec": "クラス {classPts}、{spec} {specPts}",
@@ -158,6 +162,10 @@ export const ja_JP: EnTranslations = {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
+    },
+    "fct": {
+      "absorbed": "{amount} 吸収",
+      "cheap": "低コスト!"
     },
     "emotes": {
       "wave": "手を振る",
@@ -744,7 +752,7 @@ export const ja_JP: EnTranslations = {
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
-    "itemHeroicTag": "[HEROIC]",
+    "itemHeroicTag": "[ヒロイック]",
     "itemSoulbound": "魂縛",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -5790,6 +5798,18 @@ export const ja_JP: EnTranslations = {
         "name": "ホーリーショック",
         "description": "味方対象に神聖なエネルギーの衝撃を与え、体力を{damage}回復します。（神聖シグネチャー）"
       },
+      "crusader_strike": {
+        "name": "クルセイダー ストライク",
+        "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
+      },
+      "metamorphosis": {
+        "name": "悪魔変身",
+        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
+      },
+      "aura_surge": {
+        "name": "光輝の高まり",
+        "description": "オーラを過負荷させ、10秒間160の防御力で身を固める。(パラディンの才能)"
+      },
       "holy_shield": {
         "name": "聖なる壁",
         "description": "10秒間、神聖な力で身を守り、アーマーが90増加し、近接攻撃者に12の神聖ダメージを与えます。（防御シグネチャー）"
@@ -5818,9 +5838,9 @@ export const ja_JP: EnTranslations = {
         "name": "閃火",
         "description": "火の魔法を集中させ、次の攻撃を必ずクリティカルにします。（火シグネチャー）"
       },
-      "cone_of_cold": {
-        "name": "Cone of Cold",
-        "description": "周囲の敵を冷気で撃ち、{damage}の氷ダメージを与えます。（氷シグネチャー）"
+      "icy_veins": {
+        "name": "アイシーヴェインズ",
+        "description": "10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）"
       },
       "cold_blood": {
         "name": "殺意の静けさ",
@@ -5839,7 +5859,7 @@ export const ja_JP: EnTranslations = {
         "description": "味方対象に力を注ぎ込み、15秒間、呪文威力が28増加します。（統制シグネチャー）"
       },
       "holy_nova": {
-        "name": "Holy Nova",
+        "name": "ホーリーノヴァ",
         "description": "癒しの光を爆発させ、周囲の味方の体力を{damage}回復し、周囲の敵にダメージを与えます。（神聖シグネチャー）"
       },
       "shadowform": {
@@ -5898,10 +5918,6 @@ export const ja_JP: EnTranslations = {
         "name": "無謀",
         "description": "激昂。12秒間、怒りの生成量が50%、クリティカル率が20%増加します。"
       },
-      "avatar": {
-        "name": "化身",
-        "description": "20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。"
-      },
       "sanguine_aura": {
         "name": "血のオーラ",
         "description": "武器に敵の血を宿し、20秒間、自分と近接の味方の攻撃速度が10%、ダメージが10%増加します。"
@@ -5910,25 +5926,9 @@ export const ja_JP: EnTranslations = {
         "name": "勝利の追撃",
         "description": "武器ダメージに{damage}を加えたダメージを与え、最大体力の20%を回復します。敵を倒してから20秒以内にのみ使用できます。"
       },
-      "bladestorm": {
-        "name": "剣の嵐",
-        "description": "鋼の嵐と化し、4秒間、8yd以内のすべての敵に毎秒{damage}のダメージを与えます。"
-      },
       "intimidating_shout": {
         "name": "威圧の雄叫び",
         "description": "恐ろしい叫びを上げ、8yd以内の最大5体の敵を8秒間、恐怖で逃げ惑わせます。ダメージを受けると効果が解除されることがあります。"
-      },
-      "pummel": {
-        "name": "殴打",
-        "description": "呪文の詠唱を中断し、4秒間、その系統の呪文を詠唱できなくします。詠唱を止めたときに怒りを10生成します。"
-      },
-      "heroic_leap": {
-        "name": "英雄的跳躍",
-        "description": "対象地点へ跳躍し、周囲の敵に{damage}のダメージを与えます。"
-      },
-      "rallying_cry": {
-        "name": "結束の雄叫び",
-        "description": "結束の雄叫びを上げ、40yd以内の自分とパーティメンバーの最大体力を10秒間、20%増加させます。"
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",
@@ -5957,6 +5957,226 @@ export const ja_JP: EnTranslations = {
       "summon_doomguard": {
         "name": "レイスボーンの召喚",
         "description": "レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+      },
+      "aspect_of_the_wild": {
+        "name": "野牙の装い",
+        "description": "野生の力で周囲の味方を鼓舞し、攻撃力を高める。効果時間 5 分。（ハンタータレント）"
+      },
+      "avatar": {
+        "name": "化身",
+        "description": "20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。"
+      },
+      "avenging_wrath": {
+        "name": "復讐の翼",
+        "description": "報復の力を呼び降ろし、攻撃力と呪文能力を高める。効果時間 20 秒。（パラディンタレント）"
+      },
+      "berserk": {
+        "name": "赤き霞",
+        "description": "攻撃力を高める。効果時間 15 秒。（ドルイドタレント）"
+      },
+      "bladestorm": {
+        "name": "剣の嵐",
+        "description": "鋼の嵐と化し、4秒間、8yd以内のすべての敵に毎秒{damage}のダメージを与えます。"
+      },
+      "razor_howl": {
+        "name": "刃の咆哮",
+        "description": "15メートル以内の敵を8秒間50%遅くします。（ウォリアータレント）"
+      },
+      "stormthrow": {
+        "name": "嵐投げ",
+        "description": "武器を投げ、対象を3秒間スタンさせます。（ウォリアータレント）"
+      },
+      "reckless_vow": {
+        "name": "無謀の誓い",
+        "description": "12秒間、怒り生成が50%、クリティカル率が20%増加します。（ウォリアータレント）"
+      },
+      "red_banner": {
+        "name": "赤旗",
+        "description": "20秒間、自分と周囲の味方の攻撃速度とダメージがそれぞれ10%増加します。（ウォリアータレント）"
+      },
+      "blink": {
+        "name": "瞬き歩み",
+        "description": "前方 15 ヤードに瞬間移動し、移動不能効果を解除する。（メイジタレント）"
+      },
+      "bloodlust": {
+        "name": "戦の太鼓",
+        "description": "周囲の味方を狂乱させ、攻撃速度を高める。効果時間 15 秒。（シャーマンタレント）"
+      },
+      "chain_lightning": {
+        "name": "枝分かれの稲妻",
+        "description": "対象地点に稲妻を放ち、周囲の敵に {damage} のダメージを与える。（シャーマンタレント）"
+      },
+      "chaos_bolt": {
+        "name": "破滅の矢",
+        "description": "混沌の炎の矢を放ち、{damage} の火炎ダメージを与える。（ウォーロックタレント）"
+      },
+      "cloak_of_shadows": {
+        "name": "影まとい",
+        "description": "影で身を包み、ダメージを吸収する。効果時間 5 秒。（ローグタレント）"
+      },
+      "cone_of_cold": {
+        "name": "霜払い",
+        "description": "周囲の敵を冷気で撃ち、{damage}の氷ダメージを与えます。（氷シグネチャー）"
+      },
+      "counter_shot": {
+        "name": "沈黙の射撃",
+        "description": "詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ハンタータレント）"
+      },
+      "counterspell": {
+        "name": "呪文砕き",
+        "description": "敵の詠唱を打ち消し、その系統の呪文を 6 秒間詠唱不能にする。（メイジタレント）"
+      },
+      "curse_of_exhaustion": {
+        "name": "鉛の呪い",
+        "description": "対象を呪い、移動速度を 30% 低下させる。効果時間 12 秒。（ウォーロックタレント）"
+      },
+      "death_coil": {
+        "name": "墓所の螺旋",
+        "description": "敵に {damage} の暗影ダメージを与え、その後 3 秒間恐怖させる。この呪文は詠唱者を回復しない。（ウォーロックタレント）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）"
+      },
+      "desperate_prayer": {
+        "name": "最後の祈り",
+        "description": "自身を即座に {damage} 回復する。（プリーストタレント）"
+      },
+      "deterrence": {
+        "name": "針毛の守り",
+        "description": "回避率を 50% 高める。効果時間 10 秒。（ハンタータレント）"
+      },
+      "divine_shield": {
+        "name": "光の護り",
+        "description": "聖なる力で身を守り、大量のダメージを吸収する。効果時間 8 秒。（パラディンタレント）"
+      },
+      "earthbind": {
+        "name": "大地の縛り",
+        "description": "周囲の敵を大地に縛り付け、2 秒間移動不能にする。（シャーマンタレント）"
+      },
+      "evocation": {
+        "name": "エーテルの井戸",
+        "description": "マナを急速に回復する。（メイジタレント）"
+      },
+      "frenzied_regeneration": {
+        "name": "野生の癒し",
+        "description": "10 秒かけて体力を回復する。ブルーインフォーム限定。（ドルイドタレント）"
+      },
+      "frost_trap": {
+        "name": "霧氷の罠",
+        "description": "対象地点の敵を 3 秒間その場に凍結させる。（ハンタータレント）"
+      },
+      "ghostly_strike": {
+        "name": "亡霊の一撃",
+        "description": "敵に武器ダメージに加え {damage} のダメージを与え、短時間回避率を高める。コンボポイントを 1 獲得する。（ローグタレント）"
+      },
+      "hammer_of_wrath": {
+        "name": "鐘鳴りの槌",
+        "description": "傷ついた敵に聖なる鎚を投げ、{damage} の神聖ダメージを与える。体力が 20% 未満の対象にのみ使用可能。（パラディンタレント）"
+      },
+      "healing_stream": {
+        "name": "湧き水",
+        "description": "12 秒かけて味方一人を回復する。（シャーマンタレント）"
+      },
+      "heroic_leap": {
+        "name": "英雄的跳躍",
+        "description": "対象地点へ跳躍し、周囲の敵に{damage}のダメージを与えます。"
+      },
+      "holy_wrath": {
+        "name": "聖者の怒り",
+        "description": "聖なる力を解き放ち、周囲の敵に {damage} のダメージを与える。（パラディンタレント）"
+      },
+      "howl_of_terror": {
+        "name": "恐怖の遠吠え",
+        "description": "周囲の敵を最大 3 秒間恐怖させる。ダメージで効果が解ける場合がある。（ウォーロックタレント）"
+      },
+      "ice_block": {
+        "name": "冷たき棺",
+        "description": "自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）"
+      },
+      "inner_focus": {
+        "name": "静まる心",
+        "description": "次の呪文のコストを無料にする。効果時間 60 秒。（プリーストタレント）"
+      },
+      "innervate": {
+        "name": "生命の樹液",
+        "description": "生命の樹液が10秒間あふれ、現在のリソースを波状に20ずつ回復する。マナ、怒り、エナジーのいずれにも作用し、変身しても途切れない。(ドルイドの才能)"
+      },
+      "kick": {
+        "name": "蹴り",
+        "description": "詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ローグタレント）"
+      },
+      "last_stand": {
+        "name": "第十一刻",
+        "description": "一時的にスタミナを高め、最大体力を増加させる。効果時間 15 秒。（ウォリアータレント）"
+      },
+      "mend_pet": {
+        "name": "手当て",
+        "description": "15 秒かけて味方対象を {damage} 回復する。（ハンタータレント）"
+      },
+      "meteor": {
+        "name": "天の石",
+        "description": "対象地点に隕石を呼び降ろし、{damage} の火炎ダメージを与えて地面を燃やす。（メイジタレント）"
+      },
+      "mind_sear": {
+        "name": "思念焼き",
+        "description": "対象地点に暗影の力を注ぎ、毎秒周囲の敵に {damage} のダメージを与える。（プリーストタレント）"
+      },
+      "multi_shot": {
+        "name": "分裂射撃",
+        "description": "複数の矢を放ち、周囲の敵に {damage} のダメージを与える。（ハンタータレント）"
+      },
+      "prayer_of_healing": {
+        "name": "聖歌の癒し",
+        "description": "周囲の味方を {damage} 回復する。（プリーストタレント）"
+      },
+      "preparation": {
+        "name": "備え",
+        "description": "スプリント、回避、バニッシュのクールダウンを終了させる。（ローグタレント）"
+      },
+      "presence_of_mind": {
+        "name": "駆ける心",
+        "description": "次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）"
+      },
+      "psychic_scream": {
+        "name": "精神の絶叫",
+        "description": "周囲の敵を最大 4 秒間恐怖させる。ダメージで効果が解ける場合がある。（プリーストタレント）"
+      },
+      "pummel": {
+        "name": "殴打",
+        "description": "呪文の詠唱を中断し、4秒間、その系統の呪文を詠唱できなくします。詠唱を止めたときに怒りを10生成します。"
+      },
+      "rallying_cry": {
+        "name": "結束の雄叫び",
+        "description": "結束の雄叫びを上げ、40yd以内の自分とパーティメンバーの最大体力を10秒間、20%増加させます。"
+      },
+      "rebuke": {
+        "name": "叱責",
+        "description": "詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（パラディンタレント）"
+      },
+      "shadowstep": {
+        "name": "影すべり",
+        "description": "影を抜けて対象のもとへ移動する。（ローグタレント）"
+      },
+      "shield_wall": {
+        "name": "防壁",
+        "description": "揺るぎない防壁を築き、アーマーを大幅に高める。効果時間 10 秒。（ウォリアータレント）"
+      },
+      "silence": {
+        "name": "沈黙",
+        "description": "対象を 4 秒間沈黙させる。（プリーストタレント）"
+      },
+      "skull_bash": {
+        "name": "頭突き",
+        "description": "詠唱を妨害し、その系統の呪文を 4 秒間詠唱不能にする。（ドルイドタレント）"
+      },
+      "spell_lock": {
+        "name": "口封じ令",
+        "description": "詠唱を妨害し、その系統の呪文を 5 秒間詠唱不能にする。（ウォーロックタレント）"
+      },
+      "tranquility": {
+        "name": "木立の歌",
+        "description": "回復の力を注ぎ、毎秒周囲の味方を回復する。（ドルイドタレント）"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",
@@ -7207,31 +7427,61 @@ export const ja_JP: EnTranslations = {
       "deathless_heartwood": {
         "name": "不死王冠の心材"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不死王冠の心材"
+      },
       "kingsbane_last_oath": {
+        "name": "スロウンベイン、ソーンピーク最後の誓い"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "スロウンベイン、ソーンピーク最後の誓い"
       },
       "crownforged_dreadhelm": {
         "name": "ボーンロートの恐怖兜"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "ボーンロートの恐怖兜"
+      },
       "crownforged_warspaulders": {
+        "name": "ボーンロートの戦肩当て"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "ボーンロートの戦肩当て"
       },
       "nighttalon_crown": {
         "name": "ダイアファングの冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "ダイアファングの冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "ダイアファングの肩守り"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "ダイアファングの肩守り"
       },
       "soulflame_cowl": {
         "name": "レイスファイアの頭巾"
       },
+      "soulflame_cowl_heroic": {
+        "name": "レイスファイアの頭巾"
+      },
       "soulflame_mantle": {
+        "name": "レイスファイアのマント"
+      },
+      "soulflame_mantle_heroic": {
         "name": "レイスファイアのマント"
       },
       "stormcallers_crown": {
         "name": "ゲイルコールの冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "ゲイルコールの冠"
+      },
       "stormcallers_spaulders": {
+        "name": "ゲイルコールの肩当て"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "ゲイルコールの肩当て"
       },
       "unknown_alien_weaponry": {
@@ -7481,6 +7731,15 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "蘇った王家の衛兵"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "死なずの戦衛オルドレン"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "死なずの司祭長マルリック"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "死なずの刃ヴォス"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"

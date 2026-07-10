@@ -25,6 +25,14 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponStrike: 'damage',
   directDamage: 'damage',
   interrupt: 'other',
+  extendDot: 'other',
+  consumeDot: 'damage',
+  silence: 'breakCC',
+  aoeFear: 'breakCC',
+  clearCooldowns: 'other',
+  breakControl: 'other',
+  repositionToAim: 'other',
+  blinkForward: 'other',
   finisherDamage: 'damage',
   dot: 'damage',
   aoeDamage: 'damage',
@@ -38,6 +46,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   polymorph: 'breakCC',
   heal: 'other',
   chainHeal: 'other',
+  feralCharge: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
@@ -51,23 +60,21 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   stun: 'other',
   aoeAttackSpeed: 'other',
   aoeAttackPower: 'other',
-  // Choice-row talents: an AoE slow is a non-breaking snare; the Avatar
-  // control-break and the Sanguine party buff are pure utility.
+  // Choice-row talents: an AoE slow is a non-breaking snare; the party buff is
+  // pure utility. (aoeFear/breakControl/repositionToAim are classified above.)
   aoeSlow: 'other',
-  // Fear BREAKS on damage: an auto swing would shatter it (see 'breakCC').
-  aoeFear: 'breakCC',
-  breakControl: 'other',
   partyMeleeBuff: 'other',
-  // PR #1348 base-kit rescues: the leap's relocation is utility (its
-  // aoeDamage rider classifies the ability); the rallying AP buff likewise.
-  repositionToAim: 'other',
   aoeAllyAttackPower: 'other',
   aoeAllyMaxHp: 'other',
+  aoeAllyHaste: 'other',
+  aoeAllyDamage: 'other',
   // Fury support cooldowns: the group guaranteed-crit buff and the self
   // HoT are both pure utility, never an attack.
   aoeAllySureCrit: 'other',
   selfHotPctMax: 'other',
   selfBuff: 'other',
+  petBuff: 'other',
+  applyDebuff: 'other',
   finisherHaste: 'other',
   finisherStun: 'other',
   // Fury Enrage proc: a pure self-buff, never itself an attack (the ability's

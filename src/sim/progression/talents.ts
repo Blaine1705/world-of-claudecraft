@@ -10,7 +10,7 @@
 // `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam) or to
 // a sibling function in this module. Statement order, branch order, validation order,
 // and the in-place mutation (the refactor's immutability waiver: `r.meta.talents = ...`,
-// `loadouts.push`, `delete cand.ranks[id]`, `meta.talentMods = ...`) are preserved
+// `loadouts.push`, `meta.talentMods = ...`) are preserved
 // exactly so the parity gate's full-state trace AND rng draw-order log stay byte-
 // identical. Talent application draws NO rng.
 //
@@ -36,13 +36,13 @@ import { computeModifiersWithRows, rowTreeFor } from '../content/talent_rows';
 import {
   cloneAllocation,
   MAX_LOADOUTS,
-  pointsSpent,
   repairAllocation,
+  rowsPicked,
+  rowsUnlockedAtLevel,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   SPEC_UNLOCK_LEVEL,
   type TalentAllocation,
-  talentPointsAtLevel,
   talentsFor,
   validateAllocation,
 } from '../content/talents';
@@ -56,11 +56,17 @@ import type { Entity } from '../types';
 // (point tree + choice-row picks, one bake) and refreshes the stat pass +
 // known-ability resolver that consume it.
 function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
-  meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks);
   const e = ctx.entities.get(meta.entityId);
+  meta.talentMods = computeModifiersWithRows(meta.cls, meta.talents, meta.rowPicks, e?.level ?? 20);
   if (e)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
-  ctx.refreshKnownAbilities(meta, false);
+  // Announce newly granted abilities (spec signature, active nodes): emits `learnAbility`
+  // (the HUD places it on the bar + spellbook) and a "You have learned" log. This is a
+  // LIVE-action path only (apply/spec-pick/respec/loadout-switch); character LOAD resolves
+  // known abilities via its own silent path (refreshKnownAbilities(meta, false) in the
+  // addPlayer/restore block), so this never spams on login. refreshKnownAbilities only
+  // fires for abilities genuinely new since the last known-set.
+  ctx.refreshKnownAbilities(meta, true);
 }
 
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
@@ -72,20 +78,14 @@ function talentLockReason(ctx: SimContext, p: Entity): string | null {
 export function talentPointBudget(ctx: SimContext, pid?: number): { total: number; spent: number } {
   const r = ctx.resolve(pid);
   if (!r) return { total: 0, spent: 0 };
-  return { total: talentPointsAtLevel(r.e.level), spent: pointsSpent(r.meta.talents) };
+  return {
+    total: rowsUnlockedAtLevel(r.meta.cls, r.e.level),
+    spent: rowsPicked(r.meta.talents),
+  };
 }
 
 function sanitizeTalentAllocation(alloc: TalentAllocation): TalentAllocation {
-  const sanitized: TalentAllocation = {
-    spec: alloc.spec ?? null,
-    ranks: {},
-    choices: { ...alloc.choices },
-  };
-  for (const id in alloc.ranks) {
-    const v = Math.floor(alloc.ranks[id]);
-    if (v > 0) sanitized.ranks[id] = v;
-  }
-  return sanitized;
+  return { spec: alloc.spec ?? null, rows: { ...(alloc.rows ?? {}) } };
 }
 
 // Commit a whole staged allocation in one shot (the UI's "Apply"). Rejects any
@@ -107,7 +107,7 @@ export function applyTalentAllocation(
     ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
     return false;
   }
-  const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+  const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
   if (!check.ok) {
     ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
     return false;
@@ -123,18 +123,16 @@ export function applyTalentAllocation(
   return true;
 }
 
-// Spend a single point into a node (incremental API; the UI mostly stages then
-// applies). Validated identically by building + checking a candidate alloc.
+// Legacy incremental API retained for old scripts. The node system is gone, so
+// this no longer changes state.
 export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
-  const cand = cloneAllocation(r.meta.talents);
-  cand.ranks[nodeId] = (cand.ranks[nodeId] ?? 0) + 1;
-  return applyTalentAllocation(ctx, cand, pid);
+  ctx.error(r.e.id, 'Invalid talent build.');
+  return false;
 }
 
-// Choose / change specialization. Switching specs drops the previous spec
-// tree's points (they belonged to that tree); the class tree is untouched.
+// Choose / change specialization. Choice rows are independent of specialization.
 export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
@@ -150,13 +148,6 @@ export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: numb
   }
   const cand = cloneAllocation(r.meta.talents);
   cand.spec = specId;
-  for (const id of Object.keys(cand.ranks)) {
-    const node = ct?.nodes.find((n) => n.id === id);
-    if (node?.tree === 'spec' && node.specId !== specId) {
-      delete cand.ranks[id];
-      delete cand.choices[id];
-    }
-  }
   return applyTalentAllocation(ctx, cand, pid);
 }
 
@@ -192,7 +183,7 @@ export function pickChoiceRowTalent(
   return true;
 }
 
-// Free respec (out of combat): wipe all talent points. Spec is retained.
+// Free respec (out of combat): wipe choice rows. Spec is retained.
 export function respecTalents(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
@@ -201,7 +192,7 @@ export function respecTalents(ctx: SimContext, pid?: number): boolean {
     ctx.error(r.e.id, lock);
     return false;
   }
-  r.meta.talents = { spec: r.meta.talents.spec, ranks: {}, choices: {} };
+  r.meta.talents = { spec: r.meta.talents.spec ?? null, rows: {} };
   recomputeTalents(ctx, r.meta);
   ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents reset.', color: '#ffd100' });
   return true;
@@ -232,7 +223,7 @@ export function saveTalentLoadout(
       ctx.error(r.e.id, `You may choose a specialization at level ${SPEC_UNLOCK_LEVEL}.`);
       return -1;
     }
-    const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+    const check = validateAllocation(r.meta.cls, sanitized, r.e.level);
     if (!check.ok) {
       ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
       return -1;
@@ -281,7 +272,7 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
     ctx.error(r.e.id, 'That loadout needs a higher level.');
     return false;
   }
-  const check = validateAllocation(r.meta.cls, lo.alloc, talentPointsAtLevel(r.e.level));
+  const check = validateAllocation(r.meta.cls, lo.alloc, r.e.level);
   if (!check.ok) {
     ctx.error(r.e.id, `Loadout invalid: ${check.reason ?? 'unknown'}`);
     return false;
@@ -312,12 +303,7 @@ export function deleteTalentLoadout(ctx: SimContext, index: number, pid?: number
       // This is an AUTO-apply (no user gate), so repair against the level budget
       // first: switchTalentLoadout validates on its path, but here a stale or
       // tampered next loadout would otherwise be baked into live mods wholesale.
-      r.meta.talents = repairAllocation(
-        r.meta.cls,
-        next.alloc,
-        talentPointsAtLevel(r.e.level),
-        r.e.level >= SPEC_UNLOCK_LEVEL,
-      );
+      r.meta.talents = repairAllocation(r.meta.cls, next.alloc, r.e.level);
       recomputeTalents(ctx, r.meta);
     }
   } else if (r.meta.activeLoadout > index) r.meta.activeLoadout -= 1;

@@ -137,8 +137,11 @@ export function computeModifiersWithRows(
   cls: PlayerClass,
   alloc: TalentAllocation,
   picks: RowPicks,
+  // Optional player level so spec-mastery magnitudes scale with it (min(1, level/20)
+  // inside computeTalentModifiers); omitted callers get the max-level bake.
+  level?: number,
 ): TalentModifiers {
-  const mods = computeTalentModifiers(cls, alloc);
+  const mods = computeTalentModifiers(cls, alloc, level);
   const tree = rowTreeFor(cls);
   if (tree) accumulateRowPicks(mods, tree, picks);
   return mods;

@@ -592,6 +592,7 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
     'fct-damage-done-auto': '#fff',
     'fct-damage-done-ability': '#ffe97a',
     'fct-damage-taken': '#ff5544',
+    'fct-absorb': '#9fd7ff',
     'fct-heal': '#3ce63c',
     'fct-xp': '#b974ff',
     'fct-rested-xp': '#4a9eff',

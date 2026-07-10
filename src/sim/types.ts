@@ -177,12 +177,16 @@ export type AuraKind =
   | 'dot'
   | 'slow'
   | 'stun'
+  | 'stasis'
   | 'root'
   | 'incapacitate'
   | 'polymorph'
   | 'attackspeed'
   | 'debuff_ap'
   | 'buff_ap'
+  | 'buff_ap_pct'
+  | 'pet_damage_pct'
+  | 'pet_spellhaste'
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
@@ -193,6 +197,10 @@ export type AuraKind =
   // Rallying Cry: value = fraction added to maximum health while worn (the
   // recalc keeps the hp fraction, so current health scales with it).
   | 'buff_maxhp_pct'
+  | 'buff_spellcrit'
+  | 'buff_spelldmg'
+  | 'buff_spellhaste'
+  | 'cast_shield'
   | 'hot'
   | 'absorb'
   | 'imbue'
@@ -208,6 +216,11 @@ export type AuraKind =
   | 'form_travel'
   | 'form_moonkin'
   | 'form_shadow'
+  // Warlock Metamorphosis: a temporary demon transform (cosmetic scale + tint in render,
+  // its damage/haste bonuses ride separate buff auras).
+  | 'form_metamorph'
+  // Feral (cat form): Energy regeneration multiplier while active (value = fraction, 1 = +100%).
+  | 'buff_energyregen'
   | 'stealth'
   | 'defensive_stance'
   // Arms restructure (owner 2026-07-08). `overpower_charge`: Redhand stacks it
@@ -242,6 +255,7 @@ export type AuraKind =
   | 'blind'
   | 'disarm'
   | 'expose'
+  | 'bleed_vuln'
   | 'spellvuln'
   | 'lockout'
   | 'vulnerability'
@@ -257,7 +271,12 @@ export type AuraKind =
   | 'critvuln'
   | 'next_cast_instant'
   | 'next_cast_free'
+  | 'next_cast_cheap'
+  // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
+  // any resource type, combat or not, carried across form shifts.
+  | 'resource_sap'
   | 'next_attack_crit'
+  | 'heal_echo'
   | 'buff_spi'
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
@@ -371,12 +390,19 @@ export interface Aura {
   // Lingering Dread: a break-on-damage aura with a threshold soaks this much
   // damage before breaking (undefined = classic break on ANY damage).
   breakThreshold?: number;
+  damageAccrued?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   // thorns: remaining reflect charges (Lightning Shield); aoe_echo/sure_crit:
   // remaining ability CASTS. undefined => unlimited
   charges?: number;
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
+  // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability
+  // ids may consume this aura; undefined means any eligible cast.
+  empowerAbilities?: string[];
+  // extendDot bookkeeping: seconds already added to this DoT application, so
+  // the per-application maxBonus cap holds across channel ticks.
+  extendedBy?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
 }
 
@@ -542,6 +568,9 @@ interface BaseItemDef {
   // client composes the display name as "Heroic {base name}" from this (see
   // itemDisplayName), so a variant carries no translated name key of its own.
   heroicOf?: string;
+  // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
+  // tooltip chrome; these keep their own name key, unlike heroicOf variants.
+  heroic?: boolean;
 }
 
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
@@ -906,6 +935,8 @@ export interface MobTemplate {
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
   // leaves snares landing so most elites can still be kited; a raid boss sets both.
   slowImmune?: boolean;
+  // Ignores taunt/growl forced-target windows. Used by special add AI only.
+  ignoreTaunt?: boolean;
   respawnMult?: number;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
@@ -1487,22 +1518,46 @@ export type AbilityEffect =
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
+  // Channel-tick rider: each application extends the caster's named DoT on the
+  // target by `seconds`, up to `maxBonus` total added per DoT application.
+  | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
+  // Detonates the caster's named DoT on the target: its remaining damage lands
+  // instantly as this ability's school and the DoT is removed.
+  | { type: 'consumeDot'; dot: string }
+  | { type: 'silence'; duration: number }
+  // `maxTargets` (Intimidating Shout) caps how many hostiles within radius are
+  // feared; absent = fear every hostile in radius (the warlock-style AoE fear).
+  | { type: 'aoeFear'; duration: number; radius: number; maxTargets?: number }
+  | { type: 'clearCooldowns'; abilities: string[] }
+  | { type: 'breakControl' }
+  // Swept teleports: reposition along the line, stopping at walls/fences/steep
+  // slopes/deep water (never clips through). repositionToAim uses the ground-target
+  // aim point; blinkForward travels facing-forward (Shadeslip snaps behind the target).
+  // `landingAoe` (Heroic Leap) defers a blast to touchdown (updateLeapMovement) so
+  // it slams down where the caster lands instead of firing at cast time.
+  | {
+      type: 'repositionToAim';
+      breakRoots?: boolean;
+      landingAoe?: { min: number; max: number; radius: number };
+    }
+  | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
-  // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps` nearby
-  // allies (the most injured within `jumpRange` yards of the previous target, never
-  // repeating one), each hop healing `falloff` of the previous hop's amount.
+  // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
+  // nearby allies, each hop healing `falloff` of the previous hop's amount. The
+  // arc reach is given as `jumpRange` on some variants and `radius` on others.
   | {
       type: 'chainHeal';
       min: number;
       max: number;
       jumps: number;
-      jumpRange: number;
       falloff: number;
+      jumpRange?: number;
+      radius?: number;
     }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
-  | { type: 'judgement' } // consume your imbue, deal its judgement damage to the target
+  | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | {
@@ -1580,6 +1635,18 @@ export type AbilityEffect =
   // negative buff_dmg_done aura), the owner's Direhowl rework: mobs carry most
   // of their damage on the weapon roll, so a flat AP drain barely dents them.
   | { type: 'aoeAttackPower'; amount?: number; pct?: number; duration: number; radius: number }
+  // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
+  | {
+      type: 'aoeAllyAttackPower';
+      amount?: number;
+      apPct?: number;
+      duration: number;
+      radius: number;
+    }
+  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
+  | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
+  | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
+  | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =
@@ -1618,33 +1685,14 @@ export type AbilityEffect =
       auraId?: string;
       auraName?: string;
     }
+  | { type: 'petBuff'; kind: AuraKind; value: number; duration: number }
+  | { type: 'applyDebuff'; kind: AuraKind; value: number; duration: number }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'enrageChance'; chance: number; duration: number } // Fury Enrage (Bloodletting / Rampage)
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
-  // Piercing Howl: slow every hostile within radius (no target needed).
-  | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
-  // Intimidating Shout: fear up to maxTargets hostiles within radius (the
-  // same fear_incap aura + flee movement the warlock Fear uses, DR shared).
-  | { type: 'aoeFear'; duration: number; radius: number; maxTargets: number }
-  // Heroic Leap: relocate the caster to the aimed point via a collision- and
-  // cliff-checked sweep (harvested from PR #1348's movement primitive).
-  | {
-      type: 'repositionToAim';
-      breakRoots?: boolean;
-      // Heroic Leap: instead of aoeDamage firing at cast time, the leap defers this
-      // blast to touchdown (updateLeapMovement) so it slams down where you land.
-      landingAoe?: { min: number; max: number; radius: number };
-    }
-  // An attack-power BUFF on the caster and party members within radius (the
-  // friendly mirror of aoeAttackPower; PR #1348 harvest, Trueshot Aura).
-  | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
-  // Emboldening Roar: the caster and friendly players within radius gain the
-  // sure_crit aura ('Emboldened'): their next `charges` damaging ability casts
-  // are guaranteed critical strikes (combat/sure_crit.ts).
-  | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
   // fraction of the caster's MAXIMUM health over the duration (the pct-of-max
   // sibling of the flat 'hot' effect; carries no spell-power rider).
@@ -1653,13 +1701,13 @@ export type AbilityEffect =
   // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
   // hp FRACTION, so current health rises and falls with the buff, WoW-style).
   | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
-  // Avatar: strip every control aura (stun/root/incapacitate/polymorph via the
-  // shared isControlAura predicate, plus silence/disarm/slow) off the caster.
-  | { type: 'breakControl' }
   // Sanguine Aura: buff the caster and every MELEE party member (MELEE_CLASSES)
   // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
   | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
   | { type: 'charge' }
+  // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
+  // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.
+  | { type: 'feralCharge' }
   // Sunder Armor: stacking PERCENT armor debuff (2% per stack via effectiveArmor) +
   // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
   // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
@@ -1701,6 +1749,7 @@ export interface AbilityDef {
   castWhileMoving?: boolean;
   // A cast/channel with this flag cannot be stopped by interrupt effects.
   uninterruptible?: boolean;
+  fearDr?: boolean; // incapacitate effects use fear PvP diminishing returns
   channel?: { duration: number; ticks: number }; // arcane missiles
   cooldown: number; // seconds, 0 = none (GCD only)
   // Stored uses for a charge-limited BASE-KIT ability (Twinstrike): `cooldown`
@@ -1757,7 +1806,8 @@ export interface AbilityDef {
   // hand-off (Redhand serves committed Fury as its rage spender until Red
   // Harvest arrives, then retires). Without it exclusion applies at any level.
   excludeSpecsAtLevel?: number;
-  targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
+  // friendly = self or allied player; 'any' = either (defaults to enemy)
+  targetType?: 'enemy' | 'friendly' | 'any';
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
@@ -1777,6 +1827,9 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Castable while shapeshifted without requiring a SPECIFIC form (Feral Instinct works in
+  // both Cat and Bear Form). Exempts the ability from the "can't act while shapeshifted" lock.
+  usableInForm?: boolean;
   // Mutually exclusive self-buff group: casting one ability in the group cancels
   // any active buff from a sibling in the same group (e.g. hunter aspects, where
   // only one aspect may be active at a time). Distinct from form toggles, which
@@ -1815,6 +1868,10 @@ export interface NpcDef {
   color: number;
   questIds: string[];
   vendorItems?: string[];
+  // PTR / dev-only free-epic vendor (src/sim/content/ptr_dev_vendor.ts): buyItem
+  // sells its stock for free when the realm has ALLOW_DEV_COMMANDS. Never placed
+  // as permanent content; spawned on demand by /dev vendor.
+  devVendor?: boolean;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
@@ -2037,6 +2094,18 @@ export interface LeapFlight {
 }
 
 export interface Entity {
+  // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
+  // Never serialized; reset on death.
+  procState?: { counters: Record<string, number>; icds: Record<string, number> };
+  abilityCharges?: Record<
+    string,
+    {
+      charges: number;
+      maxCharges: number;
+      recharge: number;
+      rechargeLength: number;
+    }
+  >;
   id: number;
   kind: EntityKind;
   templateId: string; // mob/npc template id, or class for player
@@ -2084,6 +2153,9 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  // Extra critical-strike damage from a spec mastery (0 = none). Added to the base crit
+  // multiplier at the crit site: spell crits deal 1.5 + this, physical crits 2 + this.
+  critDmgBonus: number;
   dodgeChance: number;
   parryChance: number; // 0..1: chance to fully avoid a FRONTAL melee attack (parry classes only)
   blockChance: number; // 0..1: passive shield block chance against FRONTAL physical melee hits
@@ -2179,6 +2251,7 @@ export interface Entity {
   bossDamagers: Set<number>;
   forcedTargetId: number | null; // taunt/growl: attack this target while the timer runs
   forcedTargetTimer: number; // seconds left on the forced-attack window
+  shuffleTargetTimer?: number; // seconds until a special AI may reroll its preferred target
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
@@ -2257,6 +2330,7 @@ export interface Entity {
   // npc
   questIds: string[];
   vendorItems: string[];
+  devVendor?: boolean; // dev free-epic vendor (ptr_dev_vendor.ts)
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
@@ -2357,6 +2431,10 @@ export interface NythraxisEncounterState {
   deathlessTimer: number;
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
+  heroicSummonChannelRemaining?: number;
+  dreadCurseTimer?: number;
+  dreadCurseTargetId?: number | null;
+  dreadCurseStacks?: number;
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
@@ -2405,6 +2483,7 @@ export type SimEvent = { pid?: number } & (
       school: string;
       ability: string | null;
       kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      absorbed?: number;
     }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
@@ -2439,7 +2518,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questProgress'; questId: string; text: string }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
-  | { type: 'aura'; targetId: number; name: string; gained: boolean }
+  | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
   | { type: 'castStart'; entityId: number; ability: string; time: number }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }
@@ -2645,7 +2724,14 @@ export type SimEvent = { pid?: number } & (
         | 'lightning'
         | 'shout'
         | 'weaponAura'
-        | 'flourish';
+        | 'flourish'
+        // Talent-moment effects: a proc arming (procSurge), a ward appearing
+        // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
+        // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.
+        | 'procSurge'
+        | 'wardBloom'
+        | 'echoBurst'
+        | 'detonate';
       // The casting ability's id, carried only by fx kinds whose visual varies per
       // ability (shouts pick their wave colour; weapon auras identify the buff).
       ability?: string;

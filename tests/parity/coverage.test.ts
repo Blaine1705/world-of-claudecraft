@@ -901,7 +901,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
       true,
     );
-    // Bladestorm: the self-centered channel pulsed damage.
-    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
+    // Steel Cyclone (bladestorm): the self-centered channel pulsed damage.
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Steel Cyclone')).toBe(true);
   });
 });

@@ -342,6 +342,16 @@ export class Vfx {
     return Math.random() <= dt * ratePerSecond * (0.35 + 0.65 * this.quality);
   }
 
+  // Frame-rate-independent variant for continuous auras: emitChance caps at one
+  // spawn per frame, which starves a steady aura on a slow frame (a 15 fps
+  // client would show a third of the particles a 60 fps client does). Returns
+  // the whole expected count plus a Bernoulli draw on the fraction.
+  private emitCount(ratePerSecond: number, dt: number): number {
+    const expected = dt * ratePerSecond * (0.35 + 0.65 * this.quality);
+    const n = Math.floor(expected);
+    return n + (Math.random() <= expected - n ? 1 : 0);
+  }
+
   private spawn(
     x: number,
     y: number,
@@ -502,6 +512,160 @@ export class Vfx {
       trailSprite: SPR.sparkle,
       lightning: true,
     });
+  }
+
+  // A talent proc arming: a tight ascending double-helix of bright motes around
+  // the caster with a star flash at the chest. Reads as "your next cast is
+  // charged" without covering the character. Original procedural effect.
+  procSurge(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.5);
+    if (!at) return;
+    const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(2.6));
+    const soft = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(1.5));
+    const steps = this.scaledCount(40);
+    for (let i = 0; i < steps; i++) {
+      const f = i / steps;
+      const a = f * Math.PI * 4; // two full turns
+      const r = 0.55 - f * 0.25; // helix tightens as it climbs
+      for (const phase of [0, Math.PI]) {
+        this.spawn(
+          at.x + Math.cos(a + phase) * r,
+          at.y - 0.6 + f * 1.7,
+          at.z + Math.sin(a + phase) * r,
+          -Math.cos(a + phase) * 0.3,
+          1.6 + f * 0.8,
+          -Math.sin(a + phase) * 0.3,
+          phase === 0 ? core : soft,
+          0.48,
+          0.6 + f * 0.35,
+          -0.5,
+          phase === 0 ? SPR.sparkle : SPR.glowSoft,
+        );
+      }
+    }
+    // the chest flash that sells the moment
+    this.spawn(at.x, at.y + 0.2, at.z, 0, 0.6, 0, core, 1.8, 0.5, 0, SPR.star);
+  }
+
+  // A ward appearing: an expanding translucent dome ring at chest height plus a
+  // slow rain of glints along its shell. Used for absorb procs and the
+  // cheat-death save. Original procedural effect.
+  wardBloom(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.55);
+    if (!at) return;
+    const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffdf80).multiplyScalar(hdr(2.2));
+    const rim = new THREE.Color(0xfff6d8).multiplyScalar(hdr(1.6));
+    const ringN = this.scaledCount(34);
+    for (let i = 0; i < ringN; i++) {
+      const a = (i / ringN) * Math.PI * 2;
+      // ring expands outward at the waist, drifting slightly up
+      this.spawn(
+        at.x + Math.cos(a) * 0.4,
+        at.y,
+        at.z + Math.sin(a) * 0.4,
+        Math.cos(a) * 2.4,
+        0.7,
+        Math.sin(a) * 2.4,
+        i % 2 === 0 ? core : rim,
+        0.62,
+        0.7,
+        -0.6,
+        SPR.ring,
+      );
+    }
+    const glints = this.scaledCount(10);
+    for (let i = 0; i < glints; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.5 + Math.random() * 0.35;
+      this.spawn(
+        at.x + Math.cos(a) * r,
+        at.y + 0.9 + Math.random() * 0.5,
+        at.z + Math.sin(a) * r,
+        0,
+        -0.5 - Math.random() * 0.4,
+        0,
+        rim,
+        0.26,
+        0.7 + Math.random() * 0.3,
+        0,
+        SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 2.2, 0.45, 0, SPR.flash);
+  }
+
+  // A stored heal-echo firing: a fountain of life-green motes bursting upward
+  // from the saved ally, collapsing back like a heartbeat. Original effect.
+  echoBurst(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.4);
+    if (!at) return;
+    const green = new THREE.Color(0x9cf58e).multiplyScalar(hdr(2.4));
+    const gold = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(1.8));
+    const n = this.scaledCount(38);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const up = 2.2 + Math.random() * 1.8;
+      const out = 0.4 + Math.random() * 0.8;
+      this.spawn(
+        at.x,
+        at.y + 0.1,
+        at.z,
+        Math.cos(a) * out,
+        up,
+        Math.sin(a) * out,
+        i % 3 === 0 ? gold : green,
+        0.5,
+        0.7 + Math.random() * 0.3,
+        -6.5, // strong gravity: the fountain collapses back down
+        i % 2 === 0 ? SPR.sparkle : SPR.glowSoft,
+      );
+    }
+    this.spawn(at.x, at.y + 0.5, at.z, 0, 1.2, 0, green, 1.7, 0.45, 0, SPR.star);
+  }
+
+  // A DoT detonation (Earthen Jolt eating Cinder Jolt): a fast ground-level
+  // shockwave ring plus an ember shower in the DoT's school color. Original.
+  detonate(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.15);
+    if (!at) return;
+    const hot = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(2.8));
+    const ember = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(1.6));
+    const ringN = this.scaledCount(28);
+    for (let i = 0; i < ringN; i++) {
+      const a = (i / ringN) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.cos(a) * 0.2,
+        at.y + 0.05,
+        at.z + Math.sin(a) * 0.2,
+        Math.cos(a) * 5.5,
+        0.3,
+        Math.sin(a) * 5.5,
+        hot,
+        0.6,
+        0.5,
+        -0.8,
+        SPR.ring,
+      );
+    }
+    const embers = this.scaledCount(26);
+    for (let i = 0; i < embers; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.2 + Math.random() * 2.4;
+      this.spawn(
+        at.x,
+        at.y + 0.3,
+        at.z,
+        Math.cos(a) * sp,
+        2.5 + Math.random() * 2.5,
+        Math.sin(a) * sp,
+        ember,
+        0.3,
+        0.5 + Math.random() * 0.35,
+        -7.5,
+        i % 2 === 0 ? SPR.firePuff : SPR.debris,
+      );
+    }
+    this.spawn(at.x, at.y + 0.4, at.z, 0, 0.8, 0, hot, 2.4, 0.42, 0, SPR.flash);
   }
 
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
@@ -801,6 +965,88 @@ export class Vfx {
       -0.5,
       school === 'fire' ? SPR.flame : SPR.magicWisp,
     );
+  }
+
+  // Shapeshift-form aura (continuous, called per frame while the form aura is
+  // on). Each form reads distinctly at a glance: metamorph = flame tongues +
+  // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
+  // smoke curls.
+  formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
+    if (form === 'metamorph') {
+      const n = this.emitCount(48, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.3);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        // wide ring: Metamorphosis also grows the body (Entity.scale), so the
+        // flames must clear the fattened silhouette or they vanish inside it
+        const r = 0.6 + Math.random() * 0.45;
+        const ember = Math.random() < 0.45;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + Math.random() * 0.9,
+          at.z + Math.cos(a) * r,
+          Math.sin(a) * 0.25,
+          0.9 + Math.random() * 0.8,
+          Math.cos(a) * 0.25,
+          ember ? 0xffe08a : 0xffa040,
+          ember ? 0.24 : 0.62,
+          0.8 + Math.random() * 0.4,
+          -0.3,
+          ember ? SPR.sparkBurst : SPR.flame,
+          (Math.random() - 0.5) * 0.6,
+        );
+      }
+      return;
+    }
+    if (form === 'moonkin') {
+      const n = this.emitCount(30, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.55);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.45 + Math.random() * 0.5;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + (Math.random() - 0.3) * 0.8,
+          at.z + Math.cos(a) * r,
+          Math.sin(a) * 0.15,
+          0.35 + Math.random() * 0.5,
+          Math.cos(a) * 0.15,
+          Math.random() < 0.35 ? 0xd98aff : 0xfff2c0,
+          0.24 + Math.random() * 0.18,
+          1.1 + Math.random() * 0.5,
+          -0.15,
+          SPR.star,
+        );
+      }
+      return;
+    }
+    // shadowform: dark wisps curling around the silhouette, the odd smoke curl
+    const n = this.emitCount(24, dt);
+    if (!n) return;
+    const at = this.anchor(entityId, 0.45);
+    if (!at) return;
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.4 + Math.random() * 0.4;
+      const smoke = Math.random() < 0.25;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + (Math.random() - 0.2) * 0.7,
+        at.z + Math.cos(a) * r,
+        -Math.cos(a) * 0.6,
+        0.4 + Math.random() * 0.5,
+        Math.sin(a) * 0.6,
+        smoke ? 0x3a2a55 : 0x9a5df0,
+        smoke ? 0.5 : 0.34,
+        0.85 + Math.random() * 0.5,
+        -0.2,
+        smoke ? SPR.smoke : SPR.magicWisp,
+      );
+    }
   }
 
   swimRipple(at: THREE.Vector3, dt: number): void {

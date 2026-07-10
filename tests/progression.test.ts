@@ -1,8 +1,9 @@
 // Content integration checks: referential integrity across the merged
 // content tables, and the XP pacing budget that keeps leveling 1-20 free of
-// forced grinding. These tests are content-shape tests — they run against
+// forced grinding. These tests are content-shape tests: they run against
 // whatever the content modules currently export, so they hold as zones grow.
 import { describe, expect, it } from 'vitest';
+import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import {
   ABILITIES,
   CAMPS,
@@ -23,6 +24,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
@@ -208,6 +210,28 @@ describe('content referential integrity', () => {
         }
       }
     }
+  });
+});
+
+describe('talent row unlock progression', () => {
+  const unlockedRowsAt = (level: number): number =>
+    CHOICE_ROW_LEVELS.filter((rowLevel) => rowLevel <= level).length;
+
+  it('unlocks rows on the choice-row level schedule', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    for (const level of [1, 4, 5, 7, 8, 11, 14, 17, 20]) {
+      sim.setPlayerLevel(level);
+      expect(sim.talentPoints().total, `level ${level}`).toBe(unlockedRowsAt(level));
+    }
+  });
+
+  it('counts spent talents as picked rows, not old rank totals', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    sim.setPlayerLevel(20);
+    const r5 = CHOICE_ROWS.warrior.rows[0].options[0].id;
+    const r11 = CHOICE_ROWS.warrior.rows[2].options[1].id;
+    expect(sim.applyTalents({ spec: null, rows: { 5: r5, 11: r11 } })).toBe(true);
+    expect(sim.talentPoints()).toEqual({ total: CHOICE_ROW_LEVELS.length, spent: 2 });
   });
 });
 

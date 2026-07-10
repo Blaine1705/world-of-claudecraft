@@ -50,19 +50,38 @@ import {
   normAngle,
 } from '../types';
 import { abilityQualifiesForAreaEcho, hasAreaEchoAura } from './area_echo';
-import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   consumeFreeCostFor,
   consumeNextAttackCrit,
+  consumeNextCastCheap,
+  consumeNextCastFree,
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import {
+  hasCastShield,
+  noteSpellHit,
+  spellDamageMultFromAuras,
+  spellHasteMult,
+} from './spell_combat';
 import { isSpellResisted } from './spell_resist';
+import { onCastCompleted } from './talent_procs';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
+const COLOSSAL_MIGHT_COOLDOWNS = new Set([
+  'recklessness',
+  'avatar',
+  'storm_bolt',
+  'bladestorm',
+  'reckless_vow',
+  'red_banner',
+  'bloodthirst',
+  'mortal_strike',
+]);
 
 function isFormToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
@@ -75,8 +94,26 @@ function isToggleBuff(ability: AbilityDef): boolean {
   return ability.effects.some(
     (e) =>
       e.type === 'selfBuff' &&
-      (isFormAuraKind(e.kind) || e.kind === 'defensive_stance' || e.kind === 'stealth'),
+      (isFormAuraKind(e.kind) ||
+        e.kind === 'defensive_stance' ||
+        e.kind === 'stealth' ||
+        e.kind === 'stasis'),
   );
+}
+
+function isStasisToggle(ability: AbilityDef): boolean {
+  return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stasis');
+}
+
+function cancelStasisToggle(ctx: SimContext, p: Entity, ability: AbilityDef): boolean {
+  if (!isStasisToggle(ability) || !p.auras.some((a) => a.id === ability.id)) return false;
+  for (let i = p.auras.length - 1; i >= 0; i--) {
+    const aura = p.auras[i];
+    if (aura.id !== ability.id && aura.id !== `${ability.id}_absorb`) continue;
+    p.auras.splice(i, 1);
+    ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  }
+  return true;
 }
 
 function isShamanShock(abilityId: string): boolean {
@@ -84,6 +121,39 @@ function isShamanShock(abilityId: string): boolean {
     (SHAMAN_SHOCK_COOLDOWN_IDS as readonly string[]).includes(abilityId) ||
     abilityId === 'lightning_shock'
   );
+}
+
+function chargeState(p: Entity, abilityId: string, bonusCharges: number, cooldown: number) {
+  if (bonusCharges <= 0 || cooldown <= 0) return null;
+  p.abilityCharges ??= {};
+  const maxCharges = 1 + Math.max(0, Math.floor(bonusCharges));
+  const existing = p.abilityCharges[abilityId];
+  if (existing && existing.maxCharges === maxCharges && existing.rechargeLength === cooldown) {
+    return existing;
+  }
+  const state =
+    existing ??
+    ({
+      charges: maxCharges,
+      maxCharges,
+      recharge: 0,
+      rechargeLength: cooldown,
+    } satisfies NonNullable<Entity['abilityCharges']>[string]);
+  state.maxCharges = maxCharges;
+  state.rechargeLength = cooldown;
+  state.charges = Math.min(Math.max(state.charges, 0), maxCharges);
+  p.abilityCharges[abilityId] = state;
+  return state;
+}
+
+function hasAbilityCharge(
+  p: Entity,
+  abilityId: string,
+  bonusCharges: number,
+  cooldown: number,
+): boolean {
+  const state = chargeState(p, abilityId, bonusCharges, cooldown);
+  return !!state && state.charges > 0;
 }
 
 export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
@@ -190,6 +260,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 }
 
 export function pushbackCast(p: Entity): void {
+  if (hasCastShield(p)) return;
   // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
   const factor = 1 - p.castPushbackReduction;
   if (factor <= 0) return;
@@ -248,6 +319,8 @@ export function castAbility(
   if (res.def.passive) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  if (cancelStasisToggle(ctx, p, ability)) return;
+  if (isInStasis(p)) return;
   if (isStunned(p)) {
     ctx.error(p.id, 'You are stunned!');
     return;
@@ -283,11 +356,17 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
-  // Charge-limited abilities (Double Charge): a running cooldown is only the
-  // RECHARGE timer; the cast is blocked only once every stored use is spent.
+  // Charge-limited abilities (Double Charge, p.charges map): a running cooldown is
+  // only the RECHARGE timer; the cast is blocked only once every stored use is spent.
   const maxCharges = res.charges ?? 1;
   const chargeAvailable = maxCharges > 1 && (p.charges?.get(ability.id)?.spent ?? 0) < maxCharges;
-  if ((sharedCooldown || (p.cooldowns.has(ability.id) && !chargeAvailable)) && !togglingOff) {
+  // A cast is blocked only if it is on cooldown AND neither charge system (the
+  // p.charges stored-use map NOR the abilityCharges recharge model) has a use left.
+  if (
+    (sharedCooldown || (p.cooldowns.has(ability.id) && !chargeAvailable)) &&
+    !togglingOff &&
+    !hasAbilityCharge(p, ability.id, res.bonusCharges ?? 0, res.cooldown)
+  ) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }
@@ -340,7 +419,7 @@ export function castAbility(
       ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Wolf'} Form.`);
       return;
     }
-  } else if (form && !isFormToggle(ability)) {
+  } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
     ctx.error(p.id, "You can't do that while shapeshifted.");
     return;
   }
@@ -360,6 +439,22 @@ export function castAbility(
     target = resolveFriendlyTarget(ctx, p, castTargetId);
     const d = dist2d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5)) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetType === 'any') {
+    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+      ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
+      return;
+    }
+    const d = dist2d(p.pos, target.pos);
+    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
@@ -511,7 +606,7 @@ export function castAbility(
     !ability.channel &&
     res.castTime > 0 &&
     ability.school !== 'physical' &&
-    consumeNextCastInstant(ctx, p)
+    consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
   // A free cast is consumed where the cost is actually billed: here for channels
@@ -519,14 +614,19 @@ export function castAbility(
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) res = { ...res, cost: 0 };
+    if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
+      res = { ...res, cost: 0 };
+    } else if (res.cost > 0) {
+      const cheap = consumeNextCastCheap(ctx, p, ability.id);
+      if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
+    }
   }
 
   if (ability.channel) {
-    spendResource(p, res.cost);
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1);
+    spendAbilityCost(ctx, p, meta, res);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
-    const channelDuration = ability.channel.duration / (1 + p.spellHaste);
+    const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
     p.castTotal = channelDuration;
     p.castRemaining = channelDuration;
@@ -545,6 +645,7 @@ export function castAbility(
     // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target ?? null, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
     return;
   }
 
@@ -554,7 +655,7 @@ export function castAbility(
     // so meleeHaste always equals spellHaste and the classic melee-haste scaling
     // falls out identically. If the haste channels ever split, give physical casts
     // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
-    const stretchedCastTime = (castTime * tonguesMult(p)) / (1 + p.spellHaste);
+    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMult(p);
     p.castingAbility = ability.id;
     // The resolved target (incl. the mouseover-resolved friendly) was captured
     // into p.castTargetId above; the finish path re-validates it.
@@ -586,11 +687,6 @@ function formShiftKind(p: Entity, ability: AbilityDef): 'off' | 'cross' | null {
   return null;
 }
 
-// Colossal Might (warrior choice-row capstone): the "big offensive abilities"
-// whose remaining cooldowns rage spending shaves. A named set so tuning the
-// roster is one edit; bladestorm is listed ahead of its implementation slice.
-const COLOSSAL_MIGHT_ABILITIES = ['recklessness', 'avatar', 'storm_bolt', 'bladestorm'] as const;
-
 function spendAbilityCost(
   ctx: SimContext,
   p: Entity,
@@ -598,6 +694,7 @@ function spendAbilityCost(
   res: ResolvedAbility,
 ): void {
   if (isToggleBuff(res.def) && p.auras.some((a) => a.id === res.def.id)) return;
+  const spentRage = p.resourceType === 'rage' ? res.cost : 0;
   const shift = formShiftKind(p, res.def);
   if (shift === 'off') return;
   if (shift === 'cross') {
@@ -617,15 +714,14 @@ function spendAbilityCost(
   // Colossal Might: each point of rage actually spent shaves cdrPerRage seconds
   // off the tracked offensive cooldowns (deleting one that reaches zero, like
   // the updateTimers decrement does). 0 for everyone without the capstone.
-  const cdr = ctx.playerMods(meta).global.cdrPerRage;
-  if (cdr > 0 && res.cost > 0 && p.resourceType === 'rage') {
-    for (const id of COLOSSAL_MIGHT_ABILITIES) {
-      const rem = p.cooldowns.get(id);
-      if (rem === undefined) continue;
-      const next = rem - res.cost * cdr;
-      if (next <= 0) p.cooldowns.delete(id);
-      else p.cooldowns.set(id, next);
-    }
+  const rate = ctx.playerMods(meta).global.cdrPerRage;
+  if (spentRage <= 0 || rate <= 0) return;
+  const refund = spentRage * rate;
+  for (const id of COLOSSAL_MIGHT_COOLDOWNS) {
+    const cur = p.cooldowns.get(id);
+    if (cur === undefined) continue;
+    if (cur <= refund) p.cooldowns.delete(id);
+    else p.cooldowns.set(id, cur - refund);
   }
 }
 
@@ -634,9 +730,22 @@ function armAbilityCooldown(
   abilityId: string,
   cooldown: number,
   togglingOff = false,
+  // Two coexisting charge systems (mutually exclusive per ability via the early
+  // return below): `bonusCharges` drives the abilityCharges recharge model (PTR);
+  // `maxCharges` drives the p.charges stored-use Map (Double Charge). Content sets
+  // at most one, so an ability never double-arms.
   maxCharges = 1,
+  bonusCharges = 0,
 ): void {
   if (cooldown <= 0 || togglingOff) return;
+  const state = chargeState(p, abilityId, bonusCharges, cooldown);
+  if (state) {
+    state.charges = Math.max(0, state.charges - 1);
+    if (state.charges < state.maxCharges && state.recharge <= 0) state.recharge = cooldown;
+    if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+    else p.cooldowns.delete(abilityId);
+    return;
+  }
   if (isShamanShock(abilityId)) {
     for (const id of SHAMAN_SHOCK_COOLDOWN_IDS) p.cooldowns.set(id, cooldown);
     return;
@@ -689,6 +798,34 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
+  // Self-centered AoE channel (Steel Cyclone / bladestorm): a targetless channel
+  // whose storm follows the CASTER, pulsing its aoeDamage on every hostile in
+  // radius around the caster each tick (center is live p.pos, so it moves with
+  // the warrior). Distinct from the position channel above (which clamps a
+  // ground point) and from the single-target channel below.
+  if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeDamage')) {
+    const isSpell = res.def.school !== 'physical';
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    for (const eff of res.effects) {
+      if (eff.type !== 'aoeDamage') continue;
+      ctx.emit({
+        type: 'spellfxAt',
+        x: p.pos.x,
+        z: p.pos.z,
+        school: res.def.school,
+        fx: 'nova',
+        radius: eff.radius,
+      });
+      for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+        if (!ctx.hasLineOfSight(p, m)) continue;
+        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+        ctx.dealDamage(p, m, Math.round(dmg), false, res.def.school, res.def.name, 'hit');
+      }
+    }
+    return;
+  }
+
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
     cancelCast(ctx, p);
@@ -720,8 +857,10 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       if (eff.type === 'directDamage') {
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+        noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
@@ -762,8 +901,12 @@ function applyAbility(
   // The free charge is consumed exactly where a cost is actually billed; the
   // early-return utility branches below bill directly, so they must go through
   // this too or a free conjure/revive would keep the charge alive.
-  const billableCost = (): number =>
-    res.cost > 0 && !togglingOff && consumeFreeCostFor(ctx, p, ability.id) ? 0 : res.cost;
+  const billableCost = (): number => {
+    if (res.cost <= 0 || togglingOff) return res.cost;
+    if (consumeFreeCostFor(ctx, p, ability.id)) return 0;
+    const cheap = consumeNextCastCheap(ctx, p, ability.id);
+    return cheap !== null ? Math.ceil(res.cost * cheap) : res.cost;
+  };
   if (ability.id === 'conjure_water') {
     // higher ranks conjure better water (falls back if the item isn't defined)
     const tiered = `conjured_water${res.rank}`;
@@ -802,7 +945,7 @@ function applyAbility(
       return;
     }
     spendResource(p, billableCost());
-    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1);
+    armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
     ctx.revivePet(p.id);
     return;
   }
@@ -813,6 +956,22 @@ function applyAbility(
     // override wins while valid, else current-friendly-target-else-self.
     target = resolveFriendlyTarget(ctx, p, castTarget);
     if (dist2d(p.pos, target.pos) > Math.max(ability.range, 5) + 2) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetType === 'any') {
+    target = castTarget !== null ? (ctx.entities.get(castTarget) ?? null) : null;
+    if (!target || target.dead || (!ctx.isHostileTo(p, target) && !ctx.isFriendlyTo(p, target))) {
+      ctx.error(p.id, 'You have no target.');
+      return;
+    }
+    const d = dist2d(p.pos, target.pos);
+    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
     }
@@ -844,8 +1003,12 @@ function applyAbility(
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }
-  if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id))
+  if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
     res = { ...res, cost: 0 };
+  } else if (res.cost > 0 && !togglingOff) {
+    const cheap = consumeNextCastCheap(ctx, p, ability.id);
+    if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
+  }
   // Spend-ALL abilities (Iron Resolve): the def's `cost` is only the MINIMUM
   // gate (checked just above); the actual bill is the caster's entire bar,
   // snapshotted into the resolved cost here so spendAbilityCost drains it and
@@ -860,13 +1023,24 @@ function applyAbility(
   }
 
   // helpful spells never miss
-  if (ability.targetType === 'friendly') {
+  if (
+    ability.targetType === 'friendly' ||
+    (ability.targetType === 'any' && target && ctx.isFriendlyTo(p, target))
+  ) {
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
+    armAbilityCooldown(
+      p,
+      ability.id,
+      res.cooldown,
+      togglingOff,
+      res.charges ?? 1,
+      res.bonusCharges ?? 0,
+    );
     ctx.runEffects(p, meta, target, res);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
     return;
   }
 
@@ -892,7 +1066,14 @@ function applyAbility(
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res);
-    armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
+    armAbilityCooldown(
+      p,
+      ability.id,
+      res.cooldown,
+      togglingOff,
+      res.charges ?? 1,
+      res.bonusCharges ?? 0,
+    );
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -930,11 +1111,19 @@ function applyAbility(
     // resisted or fizzled bolt was still a cast). Physical projectile shots
     // (hunter Aimed / Concussive) are not spells and never roll.
     if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
+    if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, target);
     return;
   }
 
   spendAbilityCost(ctx, p, meta, res);
-  armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.charges ?? 1);
+  armAbilityCooldown(
+    p,
+    ability.id,
+    res.cooldown,
+    togglingOff,
+    res.charges ?? 1,
+    res.bonusCharges ?? 0,
+  );
   // A shout announces itself: world-visible cue so the caster roars and the
   // shockwave ring reads for everyone nearby (renderer-only; no mechanic).
   if (ability.castFx && !togglingOff) {
@@ -952,4 +1141,5 @@ function applyAbility(
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
     ctx.applySetProcs(p, target, 'spellCast');
+  if (p.kind === 'player' && !togglingOff) onCastCompleted(ctx, p, ability.id, target);
 }

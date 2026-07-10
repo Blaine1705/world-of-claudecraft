@@ -1121,33 +1121,31 @@ describe('i18n Localization Key Coverage', () => {
     // RELEASE-TIER ONLY: specific real-translation spot-checks (would render the
     // English fill, not these strings, for an untranslated key on a PR).
     if (RELEASE_TIER) {
+      const requiredTalentEntry = (id: string, field: 'name' | 'description') => {
+        const entry = talentEntries.find(
+          (candidate) => candidate.id === id && candidate.field === field,
+        );
+        if (!entry) throw new Error(`Missing talent manifest entry: ${id}.${field}`);
+        return entry;
+      };
+
       setLanguage('es');
       expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_toughness' && entry.field === 'name')!,
-        ),
-      ).toContain('Dureza');
+        renderTalentManifestEntry(requiredTalentEntry('8.war_r8_concussive_clap', 'name')),
+      ).toContain('conmocionante');
       expect(
-        renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'arms.mastery' && entry.field === 'description',
-          )!,
-        ),
+        renderTalentManifestEntry(requiredTalentEntry('arms.mastery', 'description')),
       ).toContain('daño');
 
       setLanguage('zh_CN');
       expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_cruelty' && entry.field === 'name')!,
-        ),
-      ).toContain('残忍');
+        renderTalentManifestEntry(requiredTalentEntry('8.war_r8_concussive_clap', 'name')),
+      ).toContain('震荡');
 
       setLanguage('ko_KR');
       expect(
         renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'prot_choice.pc_last_stand' && entry.field === 'description',
-          )!,
+          requiredTalentEntry('11.hun_r11_survival_instincts', 'description'),
         ),
       ).toContain('생명력');
     }

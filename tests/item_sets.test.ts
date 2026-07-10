@@ -30,6 +30,14 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }) =>
   Math.hypot(a.x - b.x, a.z - b.z);
 
+describe('heroic set item identity', () => {
+  it('shares the normal set id and carries the heroic flag', () => {
+    expect(ITEMS.crownforged_dreadhelm_heroic.set).toBe(ITEMS.crownforged_dreadhelm.set);
+    expect(ITEMS.crownforged_dreadhelm_heroic.set).toBe('crownforged');
+    expect(ITEMS.crownforged_dreadhelm_heroic.heroic).toBe(true);
+  });
+});
+
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));
@@ -220,6 +228,19 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     // Rogue AP = str + agi + bonusAp; the only set bonus at 2pc is +40 AP.
     expect(two.attackPower - (two.stats.str + two.stats.agi)).toBe(40);
     expect(two.attackPower).toBeGreaterThan(base.attackPower);
+  });
+
+  it('normal and heroic Nythraxis armor pieces mix for set thresholds', () => {
+    const base = statsFor('mage', 20, {});
+    const mixed = statsFor('mage', 20, {
+      helmet: 'soulrend_diadem',
+      shoulder: 'soulflame_mantle',
+      gloves: 'soulflame_gloves',
+      waist: 'soulflame_cord',
+    });
+    expect(mixed.knockbackResistance).toBe(1);
+    expect(mixed.stats.int).toBe(base.stats.int + 11 + 9 + 8 + 8 + 15);
+    expect(mixed.stats.spi).toBe(base.stats.spi + 9 + 5 + 15);
   });
 
   it("Necromancer's (t1 caster): knockback resistance at 2pc, int/sta added at 3pc", () => {

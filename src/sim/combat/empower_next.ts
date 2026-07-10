@@ -1,20 +1,32 @@
 import type { SimContext } from '../sim_context';
-import type { AuraKind, Entity } from '../types';
+import type { Aura, AuraKind, Entity } from '../types';
 
-export function consumeAuraKind(ctx: SimContext, e: Entity, kind: AuraKind): boolean {
-  const idx = e.auras.findIndex((a) => a.kind === kind);
-  if (idx < 0) return false;
+// An empowerment aura may be ability-scoped (talent procs set empowerAbilities);
+// an unscoped aura (item sets, fiesta powerups) matches any cast.
+function matches(a: Aura, abilityId?: string): boolean {
+  if (!a.empowerAbilities) return true;
+  return abilityId !== undefined && a.empowerAbilities.includes(abilityId);
+}
+
+export function consumeAuraKind(
+  ctx: SimContext,
+  e: Entity,
+  kind: AuraKind,
+  abilityId?: string,
+): Aura | null {
+  const idx = e.auras.findIndex((a) => a.kind === kind && matches(a, abilityId));
+  if (idx < 0) return null;
   const [aura] = e.auras.splice(idx, 1);
-  ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
-  return true;
+  ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false, auraKind: aura.kind });
+  return aura;
 }
 
-export function hasNextCastFree(e: Entity): boolean {
-  return e.auras.some((a) => a.kind === 'next_cast_free');
+export function hasNextCastFree(e: Entity, abilityId?: string): boolean {
+  return e.auras.some((a) => a.kind === 'next_cast_free' && matches(a, abilityId));
 }
 
-export function consumeNextCastFree(ctx: SimContext, e: Entity): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_free');
+export function consumeNextCastFree(ctx: SimContext, e: Entity, abilityId?: string): boolean {
+  return consumeAuraKind(ctx, e, 'next_cast_free', abilityId) !== null;
 }
 
 // Battle Trance (warrior baseline, excluding Fury): the ability-SCOPED sibling
@@ -57,17 +69,30 @@ export function hasFreeCostFor(e: Entity, abilityId: string): boolean {
 /** Consume whichever free-cost proc covers `abilityId` (the generic
  *  next_cast_free first, then a scope-matched Battle Trance). */
 export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string): boolean {
-  if (consumeNextCastFree(ctx, e)) return true;
+  // Pass the ability id so an ability-SCOPED next_cast_free aura (empowerAbilities
+  // set by a talent proc, e.g. Searing Light / Fault Line) is only spent by an
+  // ability it actually empowers. An unscoped aura still matches any cast.
+  if (consumeNextCastFree(ctx, e, abilityId)) return true;
   if (BATTLE_TRANCE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'battle_trance'))
     return true;
   if (abilityId === 'execute' && consumeAuraKind(ctx, e, 'sudden_death')) return true;
-  return REVENGE_FREE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'revenge_free');
+  return REVENGE_FREE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'revenge_free') !== null;
 }
 
-export function consumeNextCastInstant(ctx: SimContext, e: Entity): boolean {
-  return consumeAuraKind(ctx, e, 'next_cast_instant');
+export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
+  return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
+}
+
+/** Returns the cost multiplier (e.g. 0.5) or null when no cheap charge matches. */
+export function consumeNextCastCheap(
+  ctx: SimContext,
+  e: Entity,
+  abilityId?: string,
+): number | null {
+  const aura = consumeAuraKind(ctx, e, 'next_cast_cheap', abilityId);
+  return aura ? aura.value : null;
 }
 
 export function consumeNextAttackCrit(ctx: SimContext, e: Entity): boolean {
-  return consumeAuraKind(ctx, e, 'next_attack_crit');
+  return consumeAuraKind(ctx, e, 'next_attack_crit') !== null;
 }
