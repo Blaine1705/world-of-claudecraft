@@ -556,25 +556,30 @@ export function runEffects(
           // so it is independent of grid iteration order (no rng here).
           // Arc reach: content uses either jumpRange (warrior overhaul) or radius
           // (PTR); read whichever is set.
-          ctx.grid.forEachInRadius(from.pos.x, from.pos.z, eff.jumpRange ?? eff.radius ?? 0, (e, d2) => {
-            if (e.dead || chain.includes(e)) return;
-            // Allies only: players and player-owned pets (what a friendly-target
-            // heal may hit), never a hostile or an NPC bystander.
-            if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
-            // hp/maxHp are integers, so equal fractions compute the identical float:
-            // an EXACT ladder (frac, then distance, then id) is transitive and thus
-            // order-independent, no epsilon window needed.
-            const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-            const better =
-              best === null ||
-              frac < bestFrac ||
-              (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
-            if (better) {
-              best = e;
-              bestFrac = frac;
-              bestD2 = d2;
-            }
-          });
+          ctx.grid.forEachInRadius(
+            from.pos.x,
+            from.pos.z,
+            eff.jumpRange ?? eff.radius ?? 0,
+            (e, d2) => {
+              if (e.dead || chain.includes(e)) return;
+              // Allies only: players and player-owned pets (what a friendly-target
+              // heal may hit), never a hostile or an NPC bystander.
+              if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
+              // hp/maxHp are integers, so equal fractions compute the identical float:
+              // an EXACT ladder (frac, then distance, then id) is transitive and thus
+              // order-independent, no epsilon window needed.
+              const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
+              const better =
+                best === null ||
+                frac < bestFrac ||
+                (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
+              if (better) {
+                best = e;
+                bestFrac = frac;
+                bestD2 = d2;
+              }
+            },
+          );
           if (best === null) break;
           chain.push(best);
         }
