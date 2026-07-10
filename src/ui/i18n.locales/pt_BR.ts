@@ -6331,6 +6331,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.name': 'Traje Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': 'Aumenta o poder de ataque em 40.',
   'entities.itemSets.wyrmshadow.bonus3': 'Aumenta a agilidade em 15 e a chance de crítico em 2%.',
+  'hudChrome.itemHeroicTag': '[HEROICO]',
+  'hudChrome.itemSoulbound': 'Vinculado à alma',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistiu',

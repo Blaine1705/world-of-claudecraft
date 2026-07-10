@@ -6242,6 +6242,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.name': 'Nightfang Cübbeleri',
   'entities.itemSets.wyrmshadow.bonus2': 'Saldırı gücünü 40 artırır.',
   'entities.itemSets.wyrmshadow.bonus3': 'Çevikliği 15 ve kritik şansını %2 artırır.',
+  'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
+  'hudChrome.itemSoulbound': 'Ruha bağlı',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Direnildi',

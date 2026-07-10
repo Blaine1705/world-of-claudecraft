@@ -6281,6 +6281,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': 'Zwiększa siłę ataku o 40.',
   'entities.itemSets.wyrmshadow.bonus3':
     'Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%.',
+  'hudChrome.itemHeroicTag': '[HEROICZNY]',
+  'hudChrome.itemSoulbound': 'Związany z duszą',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Odparto',

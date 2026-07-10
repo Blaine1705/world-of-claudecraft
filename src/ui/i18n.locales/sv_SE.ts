@@ -6232,6 +6232,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.name': 'Nightfang-skrud',
   'entities.itemSets.wyrmshadow.bonus2': 'Ökar attackkraft med 40.',
   'entities.itemSets.wyrmshadow.bonus3': 'Ökar smidighet med 15 och kritisk chans med 2%.',
+  'hudChrome.itemHeroicTag': '[HEROISK]',
+  'hudChrome.itemSoulbound': 'Själsbunden',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Motstod',

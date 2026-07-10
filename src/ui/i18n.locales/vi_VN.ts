@@ -6272,6 +6272,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.name': 'Áo Lễ Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': 'Tăng sức mạnh tấn công thêm 40.',
   'entities.itemSets.wyrmshadow.bonus3': 'Tăng nhanh nhẹn thêm 15 và tỉ lệ chí mạng thêm 2%.',
+  'hudChrome.itemHeroicTag': '[ANH HÙNG]',
+  'hudChrome.itemSoulbound': 'Ràng buộc linh hồn',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Kháng',

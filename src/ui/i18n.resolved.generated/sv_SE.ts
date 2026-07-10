@@ -730,6 +730,8 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
+    "itemHeroicTag": "[HEROISK]",
+    "itemSoulbound": "Själsbunden",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"

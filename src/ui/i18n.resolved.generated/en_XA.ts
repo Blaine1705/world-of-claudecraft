@@ -730,6 +730,8 @@ export const en_XA: EnTranslations = {
     "tips": {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"
     },
+    "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
+    "itemSoulbound": "[Šóúļƀóúñð]",
     "itemSet": {
       "header": "[{name} ({have}/{total})]",
       "bonusLine": "[({pieces}) {bonus}]"

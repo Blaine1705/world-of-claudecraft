@@ -6313,6 +6313,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.name': 'Nightfang-Gewaden',
   'entities.itemSets.wyrmshadow.bonus2': 'Verhoogt aanvalskracht met 40.',
   'entities.itemSets.wyrmshadow.bonus3': 'Verhoogt behendigheid met 15 en kritieke kans met 2%.',
+  'hudChrome.itemHeroicTag': '[HEROÏSCH]',
+  'hudChrome.itemSoulbound': 'Zielsgebonden',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Weerstaan',

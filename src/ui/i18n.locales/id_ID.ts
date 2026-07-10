@@ -6325,6 +6325,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': 'Meningkatkan daya serang sebesar 40.',
   'entities.itemSets.wyrmshadow.bonus3':
     'Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.',
+  'hudChrome.itemHeroicTag': '[HEROIK]',
+  'hudChrome.itemSoulbound': 'Terikat jiwa',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Ditahan',

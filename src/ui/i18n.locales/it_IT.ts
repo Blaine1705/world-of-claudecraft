@@ -6353,6 +6353,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.wyrmshadow.bonus3':
     'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
+  'hudChrome.itemHeroicTag': '[EROICA]',
+  'hudChrome.itemSoulbound': 'Vincolato all’anima',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistito',
