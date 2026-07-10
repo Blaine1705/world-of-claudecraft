@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
 import {
   abilitiesKnownAt,
+  BUILTIN_WORLD,
   DEEPFEN_SHALLOWS_LAKE,
   GROUND_OBJECTS,
   ITEMS,
@@ -22,12 +23,39 @@ import {
   rageFromTaking,
   type SimEvent,
   spellHitChance,
+  type WorldContent,
   xpForLevel,
 } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
+}
+
+const PICKUP_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: BUILTIN_WORLD.groundObjects.filter((object) => object.itemId === 'supply_crate'),
+};
+const RL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'forest_wolf').slice(0, 1),
+  npcs: {},
+  groundObjects: [],
+};
+
+function makePickupSim() {
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: PICKUP_TEST_WORLD,
+  });
+}
+
+function makeRlSim(cls: 'warrior' | 'rogue', seed: number) {
+  return new Sim({ seed, playerClass: cls, autoEquip: true, world: RL_TEST_WORLD });
 }
 
 function nearestMob(sim: Sim, templateId?: string) {
@@ -1497,9 +1525,11 @@ describe('quests', () => {
   });
 
   it('ground objects can only be picked up with the quest active', () => {
-    const sim = makeSim('warrior');
+    const sim = makePickupSim();
     sim.player.level = 3;
-    const crate = [...sim.entities.values()].find((e) => e.kind === 'object')!;
+    const crate = [...sim.entities.values()].find(
+      (e) => e.kind === 'object' && e.objectItemId === 'supply_crate',
+    )!;
     teleportTo(sim, crate.pos.x + 1, crate.pos.z);
     sim.pickUpObject(crate.id);
     expect(sim.countItem('supply_crate')).toBe(0);
@@ -1577,7 +1607,7 @@ describe('RL interface', () => {
   });
 
   it('actions execute without error and sim stays finite', () => {
-    const sim = makeSim('rogue', 123);
+    const sim = makeRlSim('rogue', 123);
     for (let step = 0; step < 600; step++) {
       applyAction(sim, step % ACTIONS.length);
       for (let t = 0; t < 4; t++) sim.tick();
@@ -1588,7 +1618,7 @@ describe('RL interface', () => {
 
   it('same seed + same actions => identical trajectories', () => {
     const run = () => {
-      const sim = makeSim('warrior', 999);
+      const sim = makeRlSim('warrior', 999);
       const trace: number[] = [];
       for (let step = 0; step < 300; step++) {
         applyAction(sim, (step * 7) % ACTIONS.length);

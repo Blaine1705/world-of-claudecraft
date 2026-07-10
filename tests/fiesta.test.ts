@@ -5,13 +5,20 @@ import {
   eligibleAugments,
   tierForWave,
 } from '../src/sim/content/augments';
-import { arenaOrigin } from '../src/sim/data';
+import { arenaOrigin, BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+const FIESTA_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: FIESTA_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

@@ -6,6 +6,7 @@ import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers
 import {
   ARENA_X,
   ARENA_X_MIN,
+  BUILTIN_WORLD,
   DELVE_BAND_X_MIN,
   DELVE_LIST,
   DELVE_MODULES,
@@ -34,11 +35,18 @@ import { solveLockActions } from '../src/sim/lockpick';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Rng } from '../src/sim/rng';
 import { DELVE_IMPLEMENTED_AFFIXES, Sim } from '../src/sim/sim';
-import { DT } from '../src/sim/types';
+import { DT, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
+const DELVE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(cls: 'warrior' | 'warlock' = 'warrior', seed = 42) {
-  return new Sim({ seed, playerClass: cls, autoEquip: true });
+  return new Sim({ seed, playerClass: cls, autoEquip: true, world: DELVE_TEST_WORLD });
 }
 
 function teleport(sim: Sim, x: number, z: number) {
@@ -751,8 +759,9 @@ describe('delve interactables and affixes', () => {
     // can never drift (a hook-less affix added to the constant would still be
     // caught by that affix's own dedicated hook test, e.g. restless_graves above).
     // Try many seeds; every Heroic roll must be an implemented affix.
-    // 60 seeds keep full affix-pool coverage; 120 fresh Sims of a 13-zone
-    // world no longer fit the budget under parallel suite load
+    // 60 seeds keep full affix-pool coverage. The fixture contains only the
+    // delve under test, so this sweep does not repeatedly spawn the unrelated
+    // overworld continent.
     for (let seed = 1; seed <= 60; seed++) {
       const sim = makeSim('warrior', seed);
       enterReliquary(sim, 'heroic');
@@ -760,10 +769,7 @@ describe('delve interactables and affixes', () => {
       for (const id of run.affixes) expect(DELVE_IMPLEMENTED_AFFIXES.has(id)).toBe(true);
       expect(run.affixes.length).toBe(1); // Heroic affixCount = 1
     }
-    // 120 full Sim constructions of an 11-zone world: the seed count and the
-    // timeout are rescaled together whenever the world grows (each ctor costs
-    // ~0.2s now), so this stays green under full-suite parallel load.
-  }, 60000);
+  });
 
   it('Deacon Varric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {
@@ -974,9 +980,8 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('the Bountiful roll is deterministic for a given seed', () => {
     // Read the raw roll via enterReliquary (enterFinale pins it false). Same seed
-    // ⇒ same outcome; seed 22 is known to roll Bountiful under the current
-    // world-gen draw order (re-pin this fixture when content shifts the stream,
-    // like the parity goldens).
+    // ⇒ same outcome; seed 38 is known to roll Bountiful under the sparse
+    // delve fixture's draw order (re-pin this alongside that fixture).
     const rollFor = (seed: number) => {
       const s = makeSim('warrior', seed);
       s.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -984,7 +989,7 @@ describe('delve reward chest + surface exit flow', () => {
       return s.delveRunForPlayer(s.playerId)?.bountiful;
     };
     expect(rollFor(1234)).toBe(rollFor(1234));
-    expect(rollFor(22)).toBe(true);
+    expect(rollFor(38)).toBe(true);
   });
 
   it('a Bountiful Coffer refuses the lower antes and only opens at Hard-tier + Premium ante', () => {
