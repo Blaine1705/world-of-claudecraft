@@ -2,6 +2,70 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Plunderaarsslag',
+  'entities.abilities.cw_heroic_strike.description':
+    'Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag.',
+  'entities.abilities.cw_battle_shout.name': 'IJzeren Gebrul',
+  'entities.abilities.cw_battle_shout.description':
+    'Verhoogt je aanvalskracht met {buff} gedurende 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Versterkende Kreet',
+  'entities.abilities.cw_commanding_shout.description':
+    'Verhoogt je Uithoudingsvermogen met {buff} gedurende 2 min.',
+  'entities.abilities.cw_charge.name': 'Bestorming',
+  'entities.abilities.cw_charge.description':
+    'Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m.',
+  'entities.abilities.cw_rend.name': 'Diepe Snee',
+  'entities.abilities.cw_rend.description':
+    'Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec.',
+  'entities.abilities.cw_thunder_clap.name': 'Schuddende Klap',
+  'entities.abilities.cw_thunder_clap.description':
+    'Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec.',
+  'entities.abilities.cw_hamstring.name': 'Kreupelsnede',
+  'entities.abilities.cw_hamstring.description':
+    'Verminkt de vijand voor {damage} schade en vertraagt zijn beweging met 50% gedurende 15 sec.',
+  'entities.abilities.cw_bloodrage.name': 'Bloedtol',
+  'entities.abilities.cw_bloodrage.description': 'Genereert 10 woede ten koste van levenskracht.',
+  'entities.abilities.cw_overpower.name': 'Roodhand',
+  'entities.abilities.cw_overpower.description':
+    'Ogenblikkelijke aanval voor wapenschade plus {damage}. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken.',
+  'entities.abilities.cw_execute.name': 'Vroeg Graf',
+  'entities.abilities.cw_execute.description':
+    'Poging om een gewonde vijand af te maken voor {damage} schade. Alleen bruikbaar op vijanden met minder dan 20% levenskracht.',
+  'entities.abilities.cw_slam.name': 'Botte Zwaai',
+  'entities.abilities.cw_slam.description':
+    'Dreunt op de tegenstander in voor wapenschade plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Maaiboog',
+  'entities.abilities.cw_cleave.description':
+    'Een vegende slag die alle vijanden voor je raakt voor {damage} schade.',
+  'entities.abilities.cw_defensive_stance.name': 'Bewaakte Houding',
+  'entities.abilities.cw_defensive_stance.description':
+    'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Grimmig Gehuil',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec.',
+  'entities.abilities.cw_sunder_armor.name': 'Pantserscheur',
+  'entities.abilities.cw_sunder_armor.description':
+    'Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging.',
+  'entities.abilities.cw_taunt.name': 'Provoceren',
+  'entities.abilities.cw_taunt.description':
+    'Provoceert het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt 3 sec lang gedwongen jou aan te vallen.',
+  'entities.abilities.cw_bloodthirst.name': 'Aderlating',
+  'entities.abilities.cw_bloodthirst.description':
+    'Val onmiddellijk aan in een bloedrazernij voor 60% wapenschade plus {damage}. (Razernij-kenmerk)',
+  'entities.abilities.cw_mortal_strike.name': 'Verminkende Slag',
+  'entities.abilities.cw_mortal_strike.description':
+    'Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)',
+  'entities.abilities.cw_shield_slam.name': 'Schildbreuk',
+  'entities.abilities.cw_shield_slam.description':
+    'Sla het doelwit met je schild voor 50% wapenschade plus {damage} en enorme dreiging. (Protectie-kenmerk)',
+  'entities.abilities.cw_whirlwind.name': 'Snijdende Wenteling',
+  'entities.abilities.cw_whirlwind.description':
+    'Draai in een dodelijke boog en tref alle nabije vijanden voor {damage}. (Razernij-talent)',
+  'entities.abilities.cw_berserker_rage.name': 'Kolkende Woede',
+  'entities.abilities.cw_berserker_rage.description':
+    'Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)',
+  'classDetails.roles.warriorClassic': 'Tank / Melee-DPS',
+  'classes.warriorClassic': 'Krijger',
   'entities.abilities.sport_boot.description':
     'Een lange, hoge uithaal richting het richtpunt. Het publiek smult ervan.',
   'entities.abilities.sport_boot.name': 'Grote Uithaal',

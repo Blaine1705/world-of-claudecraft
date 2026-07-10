@@ -2,6 +2,71 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Serangan Perampas',
+  'entities.abilities.cw_heroic_strike.description':
+    'Serangan kuat yang meningkatkan kerusakan jarak dekat sebesar {damage}. Aktif pada ayunan berikutnya.',
+  'entities.abilities.cw_battle_shout.name': 'Raungan Besi',
+  'entities.abilities.cw_battle_shout.description':
+    'Meningkatkan daya serangmu sebesar {buff} selama 2 menit.',
+  'entities.abilities.cw_commanding_shout.name': 'Seruan Penguat',
+  'entities.abilities.cw_commanding_shout.description':
+    'Meningkatkan Staminamu sebesar {buff} selama 2 menit.',
+  'entities.abilities.cw_charge.name': 'Serbuan',
+  'entities.abilities.cw_charge.description':
+    'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard.',
+  'entities.abilities.cw_rend.name': 'Sayatan Dalam',
+  'entities.abilities.cw_rend.description':
+    'Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik.',
+  'entities.abilities.cw_thunder_clap.name': 'Pukulan Gempa',
+  'entities.abilities.cw_thunder_clap.description':
+    'Menghantam musuh di sekitar sebesar {damage} kerusakan dan memperlambat serangan mereka sebesar 10% selama 10 detik.',
+  'entities.abilities.cw_hamstring.name': 'Sayatan Pincang',
+  'entities.abilities.cw_hamstring.description':
+    'Melukai musuh sebesar {damage} kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik.',
+  'entities.abilities.cw_bloodrage.name': 'Tumbal Darah',
+  'entities.abilities.cw_bloodrage.description':
+    'Menghasilkan 10 amarah dengan mengorbankan nyawa.',
+  'entities.abilities.cw_overpower.name': 'Redhand',
+  'entities.abilities.cw_overpower.description':
+    'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan.',
+  'entities.abilities.cw_execute.name': 'Ajal Dini',
+  'entities.abilities.cw_execute.description':
+    'Berupaya menghabisi musuh yang terluka, menimbulkan {damage} kerusakan. Hanya dapat digunakan pada musuh di bawah 20% kesehatan.',
+  'entities.abilities.cw_slam.name': 'Ayunan Brutal',
+  'entities.abilities.cw_slam.description':
+    'Menghantam lawan sebesar kerusakan senjata ditambah {damage}.',
+  'entities.abilities.cw_cleave.name': 'Busur Penuai',
+  'entities.abilities.cw_cleave.description':
+    'Sabetan menyapu yang menghantam semua musuh di hadapanmu untuk {damage} kerusakan.',
+  'entities.abilities.cw_defensive_stance.name': 'Kuda-kuda Waspada',
+  'entities.abilities.cw_defensive_stance.description':
+    'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Direhowl',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik.',
+  'entities.abilities.cw_sunder_armor.name': 'Robek Zirah',
+  'entities.abilities.cw_sunder_armor.description':
+    'Merobek zirah target, menguranginya sebesar {damage}% per penerapan. Menumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah besar.',
+  'entities.abilities.cw_taunt.name': 'Hasutan',
+  'entities.abilities.cw_taunt.description':
+    'Memprovokasi target: ancamanmu naik menyamai musuhnya yang paling dibenci dan ia terpaksa menyerangmu selama 3 detik.',
+  'entities.abilities.cw_bloodthirst.name': 'Pertumpahan Darah',
+  'entities.abilities.cw_bloodthirst.description':
+    'Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)',
+  'entities.abilities.cw_mortal_strike.name': 'Serangan Pelukai',
+  'entities.abilities.cw_mortal_strike.description':
+    'Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)',
+  'entities.abilities.cw_shield_slam.name': 'Shieldcrack',
+  'entities.abilities.cw_shield_slam.description':
+    'Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)',
+  'entities.abilities.cw_whirlwind.name': 'Pusaran Berpisau',
+  'entities.abilities.cw_whirlwind.description':
+    'Berputar dalam busur mematikan, menyerang semua musuh di sekitar sebesar {damage}. (Talenta Murka)',
+  'entities.abilities.cw_berserker_rage.name': 'Amukan Mendidih',
+  'entities.abilities.cw_berserker_rage.description':
+    'Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)',
+  'classDetails.roles.warriorClassic': 'Tank / DPS Jarak Dekat',
+  'classes.warriorClassic': 'Prajurit',
   'entities.abilities.sport_boot.description':
     'Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya.',
   'entities.abilities.sport_boot.name': 'Tendangan Jauh',

@@ -2,7 +2,7 @@ import type { ArmorType, EquipSlot, ItemDef, PlayerClass, WeaponItemDef } from '
 
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
-const MAIL_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
+const MAIL_CLASSES = new Set<PlayerClass>(['warrior', 'warrior_classic', 'paladin', 'shaman']);
 const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter']);
 const WARRIOR_WEAPON_CLASSES = new Set<PlayerClass>([
   'warrior',
@@ -89,6 +89,11 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 }
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
+  // The classic warrior (the pre-overhaul side-by-side test class) shares the
+  // warrior's WEAPON and ARMOR proficiencies: authored requiredClass lists
+  // predate it and say 'warrior'. It does NOT inherit shields or dual-wield
+  // (the old kit had neither), so those checks below use the literal cls.
+  const gearCls: PlayerClass = cls === 'warrior_classic' ? 'warrior' : cls;
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
   if (item.kind === 'shield' || item.kind === 'held_offhand') {
@@ -96,10 +101,10 @@ export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
     return true;
   }
   const weaponArchetype = weaponArchetypeForItem(item);
-  if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(cls);
-  if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(cls);
-  if (weaponArchetype === 'rogue') return ROGUE_WEAPON_CLASSES.has(cls);
-  if (item.requiredClass) return item.requiredClass.includes(cls);
+  if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(gearCls);
+  if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(gearCls);
+  if (weaponArchetype === 'rogue') return ROGUE_WEAPON_CLASSES.has(gearCls);
+  if (item.requiredClass) return item.requiredClass.includes(gearCls);
   return true;
 }
 

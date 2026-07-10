@@ -13,11 +13,7 @@
 // recalcPlayerStats (through characterDerivedStats), zone via zoneAt, spec via
 // the talents specLabel, virtualLevel via the types helper.
 
-import {
-  accumulateRowPicks,
-  rowTreeFor,
-  sanitizeRowPicks,
-} from '../src/sim/content/talent_rows';
+import { accumulateRowPicks, rowTreeFor, sanitizeRowPicks } from '../src/sim/content/talent_rows';
 import {
   computeTalentModifiers,
   emptyAllocation,
@@ -103,6 +99,7 @@ export interface CharacterSheet {
 
 const CLASS_LABELS: Record<PlayerClass, string> = {
   warrior: 'Warrior',
+  warrior_classic: 'Classic Warrior',
   paladin: 'Paladin',
   hunter: 'Hunter',
   rogue: 'Rogue',

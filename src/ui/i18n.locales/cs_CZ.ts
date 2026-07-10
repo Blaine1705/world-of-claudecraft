@@ -2,6 +2,67 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Nájezdnický úder',
+  'entities.abilities.cw_heroic_strike.description':
+    'Silný útok, který zvýší poškození na blízko o {damage}. Aktivuje se při tvém dalším úderu.',
+  'entities.abilities.cw_battle_shout.name': 'Železný řev',
+  'entities.abilities.cw_battle_shout.description': 'Zvýší tvoji sílu útoku o {buff} na 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Povzbuzující pokřik',
+  'entities.abilities.cw_commanding_shout.description': 'Zvýší tvoji výdrž o {buff} na 2 min.',
+  'entities.abilities.cw_charge.name': 'Nápor',
+  'entities.abilities.cw_charge.description':
+    'Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Dosah 8-25 yardů.',
+  'entities.abilities.cw_rend.name': 'Hluboká rána',
+  'entities.abilities.cw_rend.description':
+    'Zraní cíl a způsobí mu krvácení za {damage} poškození během {duration} s.',
+  'entities.abilities.cw_thunder_clap.name': 'Chvějící úder',
+  'entities.abilities.cw_thunder_clap.description':
+    'Zasáhne blízké nepřátele za {damage} poškození a zpomalí jejich útoky o 10 % na 10 s.',
+  'entities.abilities.cw_hamstring.name': 'Mrzačící řez',
+  'entities.abilities.cw_hamstring.description':
+    'Zmrzačí nepřítele za {damage} poškození a zpomalí jeho pohyb o 50 % na 15 s.',
+  'entities.abilities.cw_bloodrage.name': 'Krvavá daň',
+  'entities.abilities.cw_bloodrage.description': 'Vygeneruje 10 vzteku za cenu zdraví.',
+  'entities.abilities.cw_overpower.name': 'Rudá ruka',
+  'entities.abilities.cw_overpower.description':
+    'Okamžitý útok za poškození zbraně plus {damage}. Použitelné jen poté, co cíl uhne. Nelze mu uhnout.',
+  'entities.abilities.cw_execute.name': 'Předčasný hrob',
+  'entities.abilities.cw_execute.description':
+    'Pokusí se dorazit zraněného nepřítele a způsobí {damage} poškození. Použitelné jen na nepřátele pod 20 % zdraví.',
+  'entities.abilities.cw_slam.name': 'Hrubý švih',
+  'entities.abilities.cw_slam.description': 'Praští protivníka za poškození zbraně plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Žací oblouk',
+  'entities.abilities.cw_cleave.description':
+    'Rozmáchlý úder, který zasáhne všechny nepřátele před tebou za {damage} poškození.',
+  'entities.abilities.cw_defensive_stance.name': 'Krytý postoj',
+  'entities.abilities.cw_defensive_stance.description':
+    'Obranný bojový postoj: vytváříš o 30 % více hrozby, ale způsobuješ i utrpíš o 10 % méně poškození. Sesláním znovu postoj opustíš.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Děsivé vytí',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Vypustíš děsivý řev, který sníží sílu útoku všech blízkých nepřátel o {buff} na 30 s.',
+  'entities.abilities.cw_sunder_armor.name': 'Seřezání zbroje',
+  'entities.abilities.cw_sunder_armor.description':
+    'Rozpoltí zbroj cíle a sníží ji o {damage} za každou aplikaci. Stakuje se až 5 krát. Vytváří velké množství hrozby.',
+  'entities.abilities.cw_taunt.name': 'Provokace',
+  'entities.abilities.cw_taunt.description':
+    'Vyprovokuje cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit.',
+  'entities.abilities.cw_bloodthirst.name': 'Pouštění žilou',
+  'entities.abilities.cw_bloodthirst.description':
+    'Okamžitě zaútočíš v krvavém šílenství za 60 % poškození zbraně plus {damage}. (Hlavní schopnost Fury)',
+  'entities.abilities.cw_mortal_strike.name': 'Mrzačící úder',
+  'entities.abilities.cw_mortal_strike.description':
+    'Zákeřný úder, který způsobí poškození zbraně plus {damage}. (Hlavní schopnost Arms)',
+  'entities.abilities.cw_shield_slam.name': 'Proražení štítem',
+  'entities.abilities.cw_shield_slam.description':
+    'Udeří cíl štítem za 50 % poškození zbraně plus {damage} a masivní hrozbu. (Hlavní schopnost Protection)',
+  'entities.abilities.cw_whirlwind.name': 'Čepelový vír',
+  'entities.abilities.cw_whirlwind.description':
+    'Roztočíš se v smrtícím oblouku a zasáhneš všechny blízké nepřátele za {damage}. (Talent Fury)',
+  'entities.abilities.cw_berserker_rage.name': 'Vroucí zuřivost',
+  'entities.abilities.cw_berserker_rage.description':
+    'Vstoupíš do vroucí zuřivosti a získáš 20 vzteku. (Talent válečníka)',
+  'classDetails.roles.warriorClassic': 'Tank / DPS na blízko',
+  'classes.warriorClassic': 'Válečník',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',

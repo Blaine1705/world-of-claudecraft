@@ -49,6 +49,7 @@ const NAME_ATTEMPTS = 8;
 
 export const BOOST_CLASSES: readonly PlayerClass[] = [
   'warrior',
+  'warrior_classic',
   'paladin',
   'hunter',
   'rogue',
@@ -180,6 +181,7 @@ export interface BoostRole {
 
 export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   warrior: [{ id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true }],
+  warrior_classic: [{ id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true }],
   paladin: [
     { id: 'retribution', weights: { str: 1, sta: 0.8, int: 0.3, spi: 0.2 }, melee: true },
     { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
@@ -252,8 +254,10 @@ function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   if (HEROIC_VENDOR_IDS.has(item.id)) return false;
   if (!canEquipItem(cls, item)) return false;
   // canEquipItem checks requiredClass for weapons only; class-locked armor
-  // (the tier sets) declares intent through requiredClass too, so honor it.
-  if (item.requiredClass && !item.requiredClass.includes(cls)) return false;
+  // (the tier sets) declares intent through requiredClass too, so honor it
+  // (the classic warrior counts as a warrior for authored gear locks).
+  const gearCls = cls === 'warrior_classic' ? 'warrior' : cls;
+  if (item.requiredClass && !item.requiredClass.includes(gearCls)) return false;
   return meetsLevelRequirement(BOOST_LEVEL, item);
 }
 

@@ -14,6 +14,68 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Golpe do Saqueador',
+  'entities.abilities.cw_heroic_strike.description':
+    'Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe.',
+  'entities.abilities.cw_battle_shout.name': 'Brado de Ferro',
+  'entities.abilities.cw_battle_shout.description':
+    'Aumenta seu poder de ataque em {buff} por 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Brado Encorajador',
+  'entities.abilities.cw_commanding_shout.description': 'Aumenta seu Vigor em {buff} por 2 min.',
+  'entities.abilities.cw_charge.name': 'Arremetida',
+  'entities.abilities.cw_charge.description':
+    'Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8-25 m.',
+  'entities.abilities.cw_rend.name': 'Corte Profundo',
+  'entities.abilities.cw_rend.description':
+    'Fere o alvo, fazendo-o sangrar por {damage} de dano ao longo de {duration} s.',
+  'entities.abilities.cw_thunder_clap.name': 'Golpe Sísmico',
+  'entities.abilities.cw_thunder_clap.description':
+    'Atinge inimigos próximos com {damage} de dano e reduz seus ataques em 10% por 10 s.',
+  'entities.abilities.cw_hamstring.name': 'Corte Manquejante',
+  'entities.abilities.cw_hamstring.description':
+    'Mutila o inimigo, causando {damage} de dano e reduzindo sua velocidade de movimento em 50% por 15 s.',
+  'entities.abilities.cw_bloodrage.name': 'Tributo de Sangue',
+  'entities.abilities.cw_bloodrage.description': 'Gera 10 de raiva ao custo de vida.',
+  'entities.abilities.cw_overpower.name': 'Mão Vermelha',
+  'entities.abilities.cw_overpower.description':
+    'Ataque instantâneo com dano de arma mais {damage}. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado.',
+  'entities.abilities.cw_execute.name': 'Cova Prematura',
+  'entities.abilities.cw_execute.description':
+    'Tenta finalizar um inimigo ferido, causando {damage} de dano. Só pode ser usado em inimigos com menos de 20% de vida.',
+  'entities.abilities.cw_slam.name': 'Golpe Brutal',
+  'entities.abilities.cw_slam.description': 'Atinge o oponente com dano de arma mais {damage}.',
+  'entities.abilities.cw_cleave.name': 'Arco Ceifante',
+  'entities.abilities.cw_cleave.description':
+    'Um golpe amplo que atinge todos os inimigos à sua frente com {damage} de dano.',
+  'entities.abilities.cw_defensive_stance.name': 'Postura de Guarda',
+  'entities.abilities.cw_defensive_stance.description':
+    'Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance de novo para sair da postura.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Uivo Sinistro',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em {buff} por 30 s.',
+  'entities.abilities.cw_sunder_armor.name': 'Retalhar Armadura',
+  'entities.abilities.cw_sunder_armor.description':
+    'Retalha a armadura do alvo, reduzindo-a em {damage}% por aplicação. Acumula até 5 vezes. Gera uma grande quantidade de ameaça.',
+  'entities.abilities.cw_taunt.name': 'Provocar',
+  'entities.abilities.cw_taunt.description':
+    'Provoca o alvo: sua ameaça sobe para igualar a do inimigo mais odiado por ele, que é forçado a atacar você por 3 s.',
+  'entities.abilities.cw_bloodthirst.name': 'Sangria',
+  'entities.abilities.cw_bloodthirst.description':
+    'Ataca instantaneamente em frenesi sangrento, causando 60% do dano de arma mais {damage}. (assinatura de Fúria)',
+  'entities.abilities.cw_mortal_strike.name': 'Golpe Mutilador',
+  'entities.abilities.cw_mortal_strike.description':
+    'Um golpe cruel que causa dano da arma mais {damage}. (assinatura de Armas)',
+  'entities.abilities.cw_shield_slam.name': 'Estrondo de Escudo',
+  'entities.abilities.cw_shield_slam.description':
+    'Golpeia o alvo com seu escudo, causando 50% do dano de arma mais {damage} e muita ameaça. (assinatura de Proteção)',
+  'entities.abilities.cw_whirlwind.name': 'Redemoinho de Lâminas',
+  'entities.abilities.cw_whirlwind.description':
+    'Gira em um arco mortal, atingindo todos os inimigos próximos por {damage}. (talento de Fúria)',
+  'entities.abilities.cw_berserker_rage.name': 'Fúria Fervente',
+  'entities.abilities.cw_berserker_rage.description':
+    'Entra em uma fúria fervente, gerando 20 de raiva. (talento de guerreiro)',
+  'classDetails.roles.warriorClassic': 'Tanque / DPS corpo a corpo',
+  'classes.warriorClassic': 'Guerreiro',
   'entities.abilities.sport_boot.description':
     'Um chutão alto e longo em direção ao ponto de mira. A torcida adora.',
   'entities.abilities.sport_boot.name': 'Chutão',

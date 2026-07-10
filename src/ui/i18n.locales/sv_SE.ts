@@ -2,6 +2,68 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Plundrarhugg',
+  'entities.abilities.cw_heroic_strike.description':
+    'Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg.',
+  'entities.abilities.cw_battle_shout.name': 'Järnvrål',
+  'entities.abilities.cw_battle_shout.description': 'Ökar din attackkraft med {buff} i 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Stärkande rop',
+  'entities.abilities.cw_commanding_shout.description': 'Ökar din uthållighet med {buff} i 2 min.',
+  'entities.abilities.cw_charge.name': 'Anstormning',
+  'entities.abilities.cw_charge.description':
+    'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
+  'entities.abilities.cw_rend.name': 'Djup skåra',
+  'entities.abilities.cw_rend.description':
+    'Sårar målet och får det att blöda för {damage} skada över {duration} sek.',
+  'entities.abilities.cw_thunder_clap.name': 'Skälvande slag',
+  'entities.abilities.cw_thunder_clap.description':
+    'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
+  'entities.abilities.cw_hamstring.name': 'Haltande hugg',
+  'entities.abilities.cw_hamstring.description':
+    'Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek.',
+  'entities.abilities.cw_bloodrage.name': 'Blodstull',
+  'entities.abilities.cw_bloodrage.description': 'Genererar 10 raseri på bekostnad av hälsa.',
+  'entities.abilities.cw_overpower.name': 'Rödhand',
+  'entities.abilities.cw_overpower.description':
+    'Omedelbart anfall för vapenskada plus {damage}. Endast användbart efter att målet väjt undan. Kan inte väjas undan.',
+  'entities.abilities.cw_execute.name': 'Tidig grav',
+  'entities.abilities.cw_execute.description':
+    'Försöker göra slut på en sårad fiende och vållar {damage} skada. Endast användbar på fiender under 20 % hälsa.',
+  'entities.abilities.cw_slam.name': 'Brutalt sving',
+  'entities.abilities.cw_slam.description':
+    'Smäller till motståndaren för vapenskada plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Skördebåge',
+  'entities.abilities.cw_cleave.description':
+    'Ett svepande hugg som träffar alla fiender framför dig för {damage} skada.',
+  'entities.abilities.cw_defensive_stance.name': 'Gardställning',
+  'entities.abilities.cw_defensive_stance.description':
+    'En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Fasans tjut',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek.',
+  'entities.abilities.cw_sunder_armor.name': 'Rustningsklipp',
+  'entities.abilities.cw_sunder_armor.description':
+    'Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot.',
+  'entities.abilities.cw_taunt.name': 'Egga',
+  'entities.abilities.cw_taunt.description':
+    'Hånar målet: ditt hot stiger till nivå med dess mest hatade fiende och det tvingas anfalla dig i 3 sek.',
+  'entities.abilities.cw_bloodthirst.name': 'Åderlåtning',
+  'entities.abilities.cw_bloodthirst.description':
+    'Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)',
+  'entities.abilities.cw_mortal_strike.name': 'Stympande hugg',
+  'entities.abilities.cw_mortal_strike.description':
+    'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
+  'entities.abilities.cw_shield_slam.name': 'Sköldkross',
+  'entities.abilities.cw_shield_slam.description':
+    'Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)',
+  'entities.abilities.cw_whirlwind.name': 'Klingvirvel',
+  'entities.abilities.cw_whirlwind.description':
+    'Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)',
+  'entities.abilities.cw_berserker_rage.name': 'Sjudande raseri',
+  'entities.abilities.cw_berserker_rage.description':
+    'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
+  'classDetails.roles.warriorClassic': 'Tank / Närstrids-DPS',
+  'classes.warriorClassic': 'Krigare',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',

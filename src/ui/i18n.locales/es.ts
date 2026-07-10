@@ -14,6 +14,70 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Golpe del Saqueador',
+  'entities.abilities.cw_heroic_strike.description':
+    'Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe.',
+  'entities.abilities.cw_battle_shout.name': 'Bramido de Hierro',
+  'entities.abilities.cw_battle_shout.description':
+    'Aumenta tu poder de ataque en {buff} durante 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Grito Alentador',
+  'entities.abilities.cw_commanding_shout.description':
+    'Aumenta tu Aguante en {buff} durante 2 min.',
+  'entities.abilities.cw_charge.name': 'Arremetida',
+  'entities.abilities.cw_charge.description':
+    'Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m.',
+  'entities.abilities.cw_rend.name': 'Tajo Profundo',
+  'entities.abilities.cw_rend.description':
+    'Hiere al objetivo y le hace sangrar por {damage} de daño durante {duration} s.',
+  'entities.abilities.cw_thunder_clap.name': 'Golpe Sísmico',
+  'entities.abilities.cw_thunder_clap.description':
+    'Golpea a los enemigos cercanos por {damage} de daño y ralentiza sus ataques un 10% durante 10 s.',
+  'entities.abilities.cw_hamstring.name': 'Corte Paralizante',
+  'entities.abilities.cw_hamstring.description':
+    'Mutila al enemigo por {damage} de daño y reduce su velocidad de movimiento un 50% durante 15 s.',
+  'entities.abilities.cw_bloodrage.name': 'Tributo de Sangre',
+  'entities.abilities.cw_bloodrage.description': 'Genera 10 de ira a costa de salud.',
+  'entities.abilities.cw_overpower.name': 'Mano Roja',
+  'entities.abilities.cw_overpower.description':
+    'Ataque instantáneo que inflige daño de arma más {damage}. Solo se puede usar después de que el objetivo esquive. No puede esquivarse.',
+  'entities.abilities.cw_execute.name': 'Tumba Temprana',
+  'entities.abilities.cw_execute.description':
+    'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',
+  'entities.abilities.cw_slam.name': 'Mandoble Brutal',
+  'entities.abilities.cw_slam.description':
+    'Golpea al oponente e inflige daño de arma más {damage}.',
+  'entities.abilities.cw_cleave.name': 'Arco Segador',
+  'entities.abilities.cw_cleave.description':
+    'Un golpe amplio que alcanza a todos los enemigos frente a ti por {damage} de daño.',
+  'entities.abilities.cw_defensive_stance.name': 'Actitud en Guardia',
+  'entities.abilities.cw_defensive_stance.description':
+    'Actitud de combate defensiva: generas un 30% más de amenaza, pero infliges y recibes un 10% menos de daño. Lánzala de nuevo para salir de la actitud.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Aullido Pavoroso',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s.',
+  'entities.abilities.cw_sunder_armor.name': 'Cizalla de Armadura',
+  'entities.abilities.cw_sunder_armor.description':
+    'Cizalla la armadura del objetivo y la reduce un {damage}% por aplicación. Se acumula hasta 5 veces. Genera una gran cantidad de amenaza.',
+  'entities.abilities.cw_taunt.name': 'Provocar',
+  'entities.abilities.cw_taunt.description':
+    'Provoca al objetivo: tu amenaza sube hasta igualar la de su enemigo más odiado y queda obligado a atacarte durante 3 s.',
+  'entities.abilities.cw_bloodthirst.name': 'Sangría',
+  'entities.abilities.cw_bloodthirst.description':
+    'Atacas al instante en un frenesí sangriento por un 60% de daño de arma más {damage}. (habilidad distintiva de Furia)',
+  'entities.abilities.cw_mortal_strike.name': 'Golpe Mutilador',
+  'entities.abilities.cw_mortal_strike.description':
+    'Ataque brutal que inflige daño de arma más {damage}. (habilidad distintiva de Armas)',
+  'entities.abilities.cw_shield_slam.name': 'Quiebra de Escudo',
+  'entities.abilities.cw_shield_slam.description':
+    'Golpeas al objetivo con tu escudo por un 50% de daño de arma más {damage} y generas una amenaza enorme. (habilidad distintiva de Protección)',
+  'entities.abilities.cw_whirlwind.name': 'Remolino de Cuchillas',
+  'entities.abilities.cw_whirlwind.description':
+    'Giras en un arco letal y golpeas a todos los enemigos cercanos por {damage}. (talento de Furia)',
+  'entities.abilities.cw_berserker_rage.name': 'Furia Hirviente',
+  'entities.abilities.cw_berserker_rage.description':
+    'Entras en un frenesí hirviente y generas 20 de furia. (talento de guerrero)',
+  'classDetails.roles.warriorClassic': 'Tanque / DPS cuerpo a cuerpo',
+  'classes.warriorClassic': 'Guerrero',
   'entities.abilities.sport_boot.description':
     'Un patadón largo y elevado hacia el punto de mira. El público lo adora.',
   'entities.abilities.sport_boot.name': 'Patadón',

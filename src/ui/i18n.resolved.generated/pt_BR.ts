@@ -2032,6 +2032,12 @@ export const pt_BR: EnTranslations = {
       "charge": "Avança contra um inimigo distante para abrir a luta com um breve atordoamento.",
       "rend": "Abre um sangramento que desgasta o alvo ao longo do tempo.",
       "thunder_clap": "Atinge tudo ao seu redor e reduz a velocidade dos ataques deles.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Imbui seus golpes com dano Sagrado; depois gaste-o com Verdict.",
       "holy_light": "Uma cura firme e considerável para recuperar um aliado ou você mesmo.",
@@ -3339,6 +3345,7 @@ export const pt_BR: EnTranslations = {
   },
   "classes": {
     "warrior": "Guerreiro",
+    "warriorClassic": "Guerreiro",
     "paladin": "Paladino",
     "hunter": "Caçador",
     "rogue": "Ladino",
@@ -4106,6 +4113,7 @@ export const pt_BR: EnTranslations = {
     },
     "roles": {
       "warrior": "Tanque / DPS corpo a corpo",
+      "warriorClassic": "Tanque / DPS corpo a corpo",
       "paladin": "Curador / Tanque / DPS corpo a corpo",
       "hunter": "DPS à distância",
       "rogue": "DPS corpo a corpo",
@@ -4130,6 +4138,7 @@ export const pt_BR: EnTranslations = {
     },
     "lore": {
       "warrior": "Guerreiros são combatentes de linha de frente que acumulam raiva ao causar ou receber dano. Eles absorvem golpes pesados ou esmagam inimigos.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Paladinos são cruzados sagrados que apoiam aliados com bênçãos, curam feridas com a Luz Restauradora e protegem os fracos com armaduras robustas.",
       "hunter": "Caçadores são especialistas em combate à distância que lutam ao lado de uma fera domada, crivando inimigos com tiros certeiros e disparos rápidos, reduzindo-os com picadas e fogo concussivo, e alternando aspectos conforme o momento exige.",
       "rogue": "Ladinos são assassinos furtivos que gastam energia e pontos de combo para atacar das sombras.",
@@ -5157,6 +5166,90 @@ export const pt_BR: EnTranslations = {
       "heroic_strike": {
         "name": "Golpe do Saqueador",
         "description": "Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe."
+      },
+      "cw_heroic_strike": {
+        "name": "Golpe do Saqueador",
+        "description": "Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe."
+      },
+      "cw_battle_shout": {
+        "name": "Brado de Ferro",
+        "description": "Aumenta seu poder de ataque em {buff} por 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Brado Encorajador",
+        "description": "Aumenta seu Vigor em {buff} por 2 min."
+      },
+      "cw_charge": {
+        "name": "Arremetida",
+        "description": "Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8-25 m."
+      },
+      "cw_rend": {
+        "name": "Corte Profundo",
+        "description": "Fere o alvo, fazendo-o sangrar por {damage} de dano ao longo de {duration} s."
+      },
+      "cw_thunder_clap": {
+        "name": "Golpe Sísmico",
+        "description": "Atinge inimigos próximos com {damage} de dano e reduz seus ataques em 10% por 10 s."
+      },
+      "cw_hamstring": {
+        "name": "Corte Manquejante",
+        "description": "Mutila o inimigo, causando {damage} de dano e reduzindo sua velocidade de movimento em 50% por 15 s."
+      },
+      "cw_bloodrage": {
+        "name": "Tributo de Sangue",
+        "description": "Gera 10 de raiva ao custo de vida."
+      },
+      "cw_overpower": {
+        "name": "Mão Vermelha",
+        "description": "Ataque instantâneo com dano de arma mais {damage}. Só pode ser usado depois que o alvo esquiva. Não pode ser esquivado."
+      },
+      "cw_execute": {
+        "name": "Cova Prematura",
+        "description": "Tenta finalizar um inimigo ferido, causando {damage} de dano. Só pode ser usado em inimigos com menos de 20% de vida."
+      },
+      "cw_slam": {
+        "name": "Golpe Brutal",
+        "description": "Atinge o oponente com dano de arma mais {damage}."
+      },
+      "cw_cleave": {
+        "name": "Arco Ceifante",
+        "description": "Um golpe amplo que atinge todos os inimigos à sua frente com {damage} de dano."
+      },
+      "cw_defensive_stance": {
+        "name": "Postura de Guarda",
+        "description": "Postura de combate defensiva: você gera 30% mais ameaça, mas causa e recebe 10% menos dano. Lance de novo para sair da postura."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Uivo Sinistro",
+        "description": "Solta um grito apavorante, reduzindo o poder de ataque de todos os inimigos próximos em {buff} por 30 s."
+      },
+      "cw_sunder_armor": {
+        "name": "Retalhar Armadura",
+        "description": "Retalha a armadura do alvo, reduzindo-a em {damage}% por aplicação. Acumula até 5 vezes. Gera uma grande quantidade de ameaça."
+      },
+      "cw_taunt": {
+        "name": "Provocar",
+        "description": "Provoca o alvo: sua ameaça sobe para igualar a do inimigo mais odiado por ele, que é forçado a atacar você por 3 s."
+      },
+      "cw_bloodthirst": {
+        "name": "Sangria",
+        "description": "Ataca instantaneamente em frenesi sangrento, causando 60% do dano de arma mais {damage}. (assinatura de Fúria)"
+      },
+      "cw_mortal_strike": {
+        "name": "Golpe Mutilador",
+        "description": "Um golpe cruel que causa dano da arma mais {damage}. (assinatura de Armas)"
+      },
+      "cw_shield_slam": {
+        "name": "Estrondo de Escudo",
+        "description": "Golpeia o alvo com seu escudo, causando 50% do dano de arma mais {damage} e muita ameaça. (assinatura de Proteção)"
+      },
+      "cw_whirlwind": {
+        "name": "Redemoinho de Lâminas",
+        "description": "Gira em um arco mortal, atingindo todos os inimigos próximos por {damage}. (talento de Fúria)"
+      },
+      "cw_berserker_rage": {
+        "name": "Fúria Fervente",
+        "description": "Entra em uma fúria fervente, gerando 20 de raiva. (talento de guerreiro)"
       },
       "revenge": {
         "name": "Revenge",

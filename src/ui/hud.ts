@@ -799,7 +799,9 @@ function castKeyForAbility(ability: string): string | null {
  *  (other players), flesh (creatures). */
 function materialImpactKey(tgt: Entity): string {
   if (tgt.kind === 'player')
-    return tgt.templateId === 'warrior' || tgt.templateId === 'paladin'
+    return tgt.templateId === 'warrior' ||
+      tgt.templateId === 'warrior_classic' ||
+      tgt.templateId === 'paladin'
       ? 'impact_metal'
       : 'impact_leather';
   if (tgt.kind === 'mob')
@@ -6241,7 +6243,8 @@ export class Hud {
   // changes (sig elision, like the pet bar).
   private renderStanceBar(): void {
     const bar = $('#stancebar') as HTMLElement;
-    const isWarrior = this.sim.cfg.playerClass === 'warrior';
+    const isWarrior =
+      this.sim.cfg.playerClass === 'warrior' || this.sim.cfg.playerClass === 'warrior_classic';
     const knownStances = isWarrior
       ? this.sim.known.filter((k) => k.def.exclusiveGroup === WARRIOR_STANCE_GROUP)
       : [];

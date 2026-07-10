@@ -310,14 +310,19 @@ function assetUrl(url: string): string {
 // tier via assetUrl(), and resolvedGltf() throws "character asset not preloaded"
 // synchronously, so the preload set must be a superset of any tier's placement set or
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
+// Browser-only (the vale_cup_stadium.ts preload pattern): under Node/Vitest the
+// root-relative fetches cannot resolve and each one dies as an unhandled
+// rejection on the loader's retry timer, so the boot sweep never starts there.
 const preloadUrls = characterPreloadUrls(GFX.standardMaterials);
 
-for (const url of preloadUrls) {
-  registerPreload(
-    loadGltf(url).then((g) => {
-      gltfByUrl.set(url, g);
-    }),
-  );
+if (typeof window !== 'undefined') {
+  for (const url of preloadUrls) {
+    registerPreload(
+      loadGltf(url).then((g) => {
+        gltfByUrl.set(url, g);
+      }),
+    );
+  }
 }
 
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
@@ -336,13 +341,16 @@ function loadSkinTexInto(url: string, into: Map<string, THREE.Texture>): Promise
 }
 
 // Boot sweep skips lazyPreload keys (e.g. the cosmetic mech) - those load on
-// demand via preloadMechAssets().
+// demand via preloadMechAssets(). Browser-only, like the GLB sweep above
+// (three's TextureLoader needs `document` and dies under Node/Vitest).
 const bootSkinUrls = new Set<string>();
 for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+if (typeof window !== 'undefined') {
+  for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+}
 
 /** Resolved skin texture for a visual key + skin index, or null for the model's
  *  embedded default (index 0, unknown key, or an atlas that is not loaded yet). */

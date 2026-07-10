@@ -2032,6 +2032,12 @@ export const tr_TR: EnTranslations = {
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
       "rend": "Hedefi zamanla yıpratan bir kanama açar.",
       "thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.",
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
@@ -3339,6 +3345,7 @@ export const tr_TR: EnTranslations = {
   },
   "classes": {
     "warrior": "Savaşçı",
+    "warriorClassic": "Savaşçı",
     "paladin": "Paladin",
     "hunter": "Avcı",
     "rogue": "Hırsız",
@@ -4106,6 +4113,7 @@ export const tr_TR: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / Yakın DPS",
+      "warriorClassic": "Tank / Yakın DPS",
       "paladin": "Şifacı / Tank / Yakın DPS",
       "hunter": "Menzilli DPS",
       "rogue": "Yakın DPS",
@@ -4130,6 +4138,7 @@ export const tr_TR: EnTranslations = {
     },
     "lore": {
       "warrior": "Savaşçılar, hasar verdikçe ya da aldıkça Öfke biriktiren çelik gibi yakın dövüş savaşçılarıdır. Ağır darbeleri soğurur ya da düşmanları güçlü silahlarla ezerler.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Paladinler, müttefiklerini kutsamalarla destekleyen, yaraları Onaran Işık'la iyileştiren ve ağır zırhları içinde güçsüzü koruyan kutsal şövalyelerdir.",
       "hunter": "Avcılar, evcilleştirdikleri bir canavarın yanında savaşan menzilli uzmanlardır; düşmanları nişanlı ve seri atış yağmuruna tutar, sokmalar ve sersemletici atışlarla yavaşlatır ve ana uygun suretlere bürünürler.",
       "rogue": "Hırsızlar, gölgelerden sırttan bıçaklamalar ve bitirici hamleler için Enerji ile Kombo Puanı harcayan gizli suikastçılardır.",
@@ -5157,6 +5166,90 @@ export const tr_TR: EnTranslations = {
       "heroic_strike": {
         "name": "Yağmacı Darbesi",
         "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."
+      },
+      "cw_heroic_strike": {
+        "name": "Yağmacı Darbesi",
+        "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."
+      },
+      "cw_battle_shout": {
+        "name": "Demir Nara",
+        "description": "Saldırı gücünü 2 dakika boyunca {buff} artırır."
+      },
+      "cw_commanding_shout": {
+        "name": "Güçlendiren Nara",
+        "description": "Dayanıklılığını 2 dakika boyunca {buff} artırır."
+      },
+      "cw_charge": {
+        "name": "Atılım",
+        "description": "Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil."
+      },
+      "cw_rend": {
+        "name": "Derin Yarık",
+        "description": "Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar."
+      },
+      "cw_thunder_clap": {
+        "name": "Sarsan Darbe",
+        "description": "Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır."
+      },
+      "cw_hamstring": {
+        "name": "Topallatan Kesik",
+        "description": "Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır."
+      },
+      "cw_bloodrage": {
+        "name": "Kan Bedeli",
+        "description": "Can pahasına 10 öfke üretir."
+      },
+      "cw_overpower": {
+        "name": "Kızıl El",
+        "description": "Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz."
+      },
+      "cw_execute": {
+        "name": "Erken Mezar",
+        "description": "Yaralı bir düşmanı bitirmeye çalışır ve {damage} hasar verir. Yalnızca canı %20'nin altındaki düşmanlarda kullanılabilir."
+      },
+      "cw_slam": {
+        "name": "Kaba Savuruş",
+        "description": "Rakibe silah hasarı artı {damage} için çarpar."
+      },
+      "cw_cleave": {
+        "name": "Biçen Yay",
+        "description": "Önündeki tüm düşmanlara {damage} hasar veren süpüren bir darbe."
+      },
+      "cw_defensive_stance": {
+        "name": "Korumali Durus",
+        "description": "Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Vahim Uluma",
+        "description": "Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır."
+      },
+      "cw_sunder_armor": {
+        "name": "Zırh Kesme",
+        "description": "Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir."
+      },
+      "cw_taunt": {
+        "name": "Tahrik",
+        "description": "Hedefi kışkırtır: tehdidin onun en nefret ettiği düşmana eşit hale gelir ve 3 saniye boyunca sana saldırmaya zorlanır."
+      },
+      "cw_bloodthirst": {
+        "name": "Kan Akıtma",
+        "description": "Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)"
+      },
+      "cw_mortal_strike": {
+        "name": "Sakatlayan Darbe",
+        "description": "Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)"
+      },
+      "cw_shield_slam": {
+        "name": "Kalkan Kırma",
+        "description": "Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)"
+      },
+      "cw_whirlwind": {
+        "name": "Bıçaklı Girdap",
+        "description": "Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)"
+      },
+      "cw_berserker_rage": {
+        "name": "Kaynayan Gazap",
+        "description": "Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)"
       },
       "revenge": {
         "name": "Revenge",

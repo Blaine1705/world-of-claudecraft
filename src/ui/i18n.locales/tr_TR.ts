@@ -2,6 +2,69 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Yağmacı Darbesi',
+  'entities.abilities.cw_heroic_strike.description':
+    'Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir.',
+  'entities.abilities.cw_battle_shout.name': 'Demir Nara',
+  'entities.abilities.cw_battle_shout.description':
+    'Saldırı gücünü 2 dakika boyunca {buff} artırır.',
+  'entities.abilities.cw_commanding_shout.name': 'Güçlendiren Nara',
+  'entities.abilities.cw_commanding_shout.description':
+    'Dayanıklılığını 2 dakika boyunca {buff} artırır.',
+  'entities.abilities.cw_charge.name': 'Atılım',
+  'entities.abilities.cw_charge.description':
+    'Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil.',
+  'entities.abilities.cw_rend.name': 'Derin Yarık',
+  'entities.abilities.cw_rend.description':
+    'Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar.',
+  'entities.abilities.cw_thunder_clap.name': 'Sarsan Darbe',
+  'entities.abilities.cw_thunder_clap.description':
+    'Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır.',
+  'entities.abilities.cw_hamstring.name': 'Topallatan Kesik',
+  'entities.abilities.cw_hamstring.description':
+    'Düşmanı {damage} hasarla sakatlayarak hareketini 15 saniye boyunca %50 yavaşlatır.',
+  'entities.abilities.cw_bloodrage.name': 'Kan Bedeli',
+  'entities.abilities.cw_bloodrage.description': 'Can pahasına 10 öfke üretir.',
+  'entities.abilities.cw_overpower.name': 'Kızıl El',
+  'entities.abilities.cw_overpower.description':
+    'Silah hasarı artı {damage} veren anında saldırı. Yalnızca hedef sıyırma yaptıktan sonra kullanılabilir. Sıyrılamaz.',
+  'entities.abilities.cw_execute.name': 'Erken Mezar',
+  'entities.abilities.cw_execute.description':
+    "Yaralı bir düşmanı bitirmeye çalışır ve {damage} hasar verir. Yalnızca canı %20'nin altındaki düşmanlarda kullanılabilir.",
+  'entities.abilities.cw_slam.name': 'Kaba Savuruş',
+  'entities.abilities.cw_slam.description': 'Rakibe silah hasarı artı {damage} için çarpar.',
+  'entities.abilities.cw_cleave.name': 'Biçen Yay',
+  'entities.abilities.cw_cleave.description':
+    'Önündeki tüm düşmanlara {damage} hasar veren süpüren bir darbe.',
+  'entities.abilities.cw_defensive_stance.name': 'Korumali Durus',
+  'entities.abilities.cw_defensive_stance.description':
+    'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Vahim Uluma',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır.',
+  'entities.abilities.cw_sunder_armor.name': 'Zırh Kesme',
+  'entities.abilities.cw_sunder_armor.description':
+    'Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir.',
+  'entities.abilities.cw_taunt.name': 'Tahrik',
+  'entities.abilities.cw_taunt.description':
+    'Hedefi kışkırtır: tehdidin onun en nefret ettiği düşmana eşit hale gelir ve 3 saniye boyunca sana saldırmaya zorlanır.',
+  'entities.abilities.cw_bloodthirst.name': 'Kan Akıtma',
+  'entities.abilities.cw_bloodthirst.description':
+    'Bir kan çılgınlığıyla anında %60 silah hasarı artı {damage} veren bir saldırı yap. (Hiddet imzası)',
+  'entities.abilities.cw_mortal_strike.name': 'Sakatlayan Darbe',
+  'entities.abilities.cw_mortal_strike.description':
+    'Silah hasarı artı {damage} veren acımasız bir darbe. (Silahşor imzası)',
+  'entities.abilities.cw_shield_slam.name': 'Kalkan Kırma',
+  'entities.abilities.cw_shield_slam.description':
+    'Hedefe kalkanınla %50 silah hasarı artı {damage} hasar verir ve devasa tehdit üretirsin. (Koruma imzası)',
+  'entities.abilities.cw_whirlwind.name': 'Bıçaklı Girdap',
+  'entities.abilities.cw_whirlwind.description':
+    'Ölümcül bir yayda dönerek yakındaki tüm düşmanları {damage} için vurursun. (Cinnet yeteneği)',
+  'entities.abilities.cw_berserker_rage.name': 'Kaynayan Gazap',
+  'entities.abilities.cw_berserker_rage.description':
+    'Kaynayan bir gazaba kapılarak 20 öfke üretir. (Savaşçı yeteneği)',
+  'classDetails.roles.warriorClassic': 'Tank / Yakın DPS',
+  'classes.warriorClassic': 'Savaşçı',
   'entities.abilities.sport_boot.description':
     'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',

@@ -123,6 +123,7 @@ const CHARACTER_LIMIT = 10;
 /** The nine playable classes accepted by create (mirrors the legacy inline list). */
 const VALID_CLASSES: readonly string[] = [
   'warrior',
+  'warrior_classic',
   'paladin',
   'hunter',
   'rogue',

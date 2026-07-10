@@ -43,17 +43,18 @@ describe('talents_window: no magic values', () => {
     expect(painter.includes('–'), 'en dash found').toBe(false);
   });
 
-  it('wires Choices row radios to roving tabindex and arrow-key selection', () => {
-    expect(painter).toContain('const rowOptCards: HTMLElement[] = [];');
-    expect(painter).toContain(
-      "card.setAttribute('tabindex', row.unlocked && optionIndex === rovingIndex ? '0' : '-1')",
-    );
-    expect(painter).toContain("const next = rovingTarget(ke.key, i, rowOptCards.length, 'both');");
-    expect(painter).toMatch(
-      /this\.deps\s*\.root\(\)\s*\.querySelectorAll\('\.tal-row-opts'\)\s*\[rowIndex\]/,
-    );
-    expect(painter).toContain(
-      'this.keyboardActivate(ke, () => this.pickRowChoice(stage, row.level, option.id));',
-    );
+  // The warrior-overhaul window rework (2dc432c4a) moved the Choices rows out of the
+  // painter into talent_rows_tab.ts and replaced the div-radio + roving-tabindex wiring
+  // with NATIVE <button> options (tabbable and Enter/Space-activatable for free), so the
+  // keyboard contract is now: real buttons, pressed state, a full accessible name (name +
+  // description), and locked rows disabled.
+  it('renders Choices row options as native buttons with pressed state and accessible names', () => {
+    const rowsTab = readFileSync(new URL('../src/ui/talent_rows_tab.ts', import.meta.url), 'utf8');
+    expect(painter).toContain('paintTalentRowsTab(body, rowsVm, {');
+    expect(rowsTab).toContain('`<button type="button" class="tal-row-opt${o.picked ?');
+    expect(rowsTab).toContain('aria-pressed="${o.picked}"');
+    expect(rowsTab).toContain('aria-label="${esc(aria)}"');
+    expect(rowsTab).toContain("${row.unlocked && !o.pending ? '' : 'disabled'}");
+    expect(rowsTab).toContain('deps.pickRow(rowIndex, wasPicked ? null : optId);');
   });
 });

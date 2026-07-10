@@ -2032,6 +2032,12 @@ export const it_IT: EnTranslations = {
       "charge": "Si scaglia su un nemico distante per aprire lo scontro con un breve stordimento.",
       "rend": "Apre un'emorragia che logora il bersaglio nel tempo.",
       "thunder_clap": "Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Imbeve i tuoi colpi di danno Sacro, poi spendilo con Verdict.",
       "holy_light": "Una cura costante e di buona entità per rimettere in piedi un alleato o te stesso.",
@@ -3339,6 +3345,7 @@ export const it_IT: EnTranslations = {
   },
   "classes": {
     "warrior": "Guerriero",
+    "warriorClassic": "Guerriero",
     "paladin": "Paladino",
     "hunter": "Cacciatore",
     "rogue": "Ladro",
@@ -4106,6 +4113,7 @@ export const it_IT: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / DPS da mischia",
+      "warriorClassic": "Tank / DPS da mischia",
       "paladin": "Guaritore / Tank / DPS da mischia",
       "hunter": "DPS a distanza",
       "rogue": "DPS da mischia",
@@ -4130,6 +4138,7 @@ export const it_IT: EnTranslations = {
     },
     "lore": {
       "warrior": "I guerrieri sono combattenti temprati che accumulano rabbia infliggendo o subendo danni. Incassano colpi pesanti o schiacciano i nemici.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "I paladini sono crociati sacri che aiutano gli alleati con benedizioni, curano le ferite con la Luce Risanatrice e proteggono i deboli con armature robuste.",
       "hunter": "I cacciatori sono specialisti a distanza che combattono al fianco di una bestia addomesticata, tempestando i nemici con tiri mirati e rapidi, rallentandoli con punture e tiri storditori, e cambiando aspetto a seconda del momento.",
       "rogue": "I ladri sono assassini furtivi che spendono energia e punti combo per colpire dalle ombre.",
@@ -5157,6 +5166,90 @@ export const it_IT: EnTranslations = {
       "heroic_strike": {
         "name": "Colpo del Predone",
         "description": "Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo."
+      },
+      "cw_heroic_strike": {
+        "name": "Colpo del Predone",
+        "description": "Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo."
+      },
+      "cw_battle_shout": {
+        "name": "Urlo di Ferro",
+        "description": "Aumenta la tua potenza d'attacco di {buff} per 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Grido Rincuorante",
+        "description": "Aumenta la tua Tempra di {buff} per 2 min."
+      },
+      "cw_charge": {
+        "name": "Irruzione",
+        "description": "Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m."
+      },
+      "cw_rend": {
+        "name": "Squarcio Profondo",
+        "description": "Ferisce il bersaglio e lo fa sanguinare per {damage} danni in {duration} sec."
+      },
+      "cw_thunder_clap": {
+        "name": "Colpo Sismico",
+        "description": "Colpisce i nemici vicini per {damage} danni e rallenta i loro attacchi del 10% per 10 s."
+      },
+      "cw_hamstring": {
+        "name": "Taglio Azzoppante",
+        "description": "Menoma il nemico per {damage} danni, riducendo la sua velocità di movimento del 50% per 15 sec."
+      },
+      "cw_bloodrage": {
+        "name": "Tributo di Sangue",
+        "description": "Genera 10 rabbia al costo di salute."
+      },
+      "cw_overpower": {
+        "name": "Mano Rossa",
+        "description": "Attacco istantaneo per danni dell'arma più {damage}. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato."
+      },
+      "cw_execute": {
+        "name": "Tomba Prematura",
+        "description": "Tenta di finire un nemico ferito, infliggendo {damage} danni. Utilizzabile solo sui nemici sotto il 20% di salute."
+      },
+      "cw_slam": {
+        "name": "Colpo Brutale",
+        "description": "Schianta l'avversario per danni dell'arma più {damage}."
+      },
+      "cw_cleave": {
+        "name": "Arco Mietitore",
+        "description": "Un colpo ampio che raggiunge tutti i nemici davanti a te per {damage} danni."
+      },
+      "cw_defensive_stance": {
+        "name": "Posizione Guardinga",
+        "description": "Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lanciala di nuovo per uscire dalla posizione."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Ululato Sinistro",
+        "description": "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di {buff} per 30 sec."
+      },
+      "cw_sunder_armor": {
+        "name": "Trancia Armatura",
+        "description": "Lacera l'armatura del bersaglio, riducendola del {damage}% per applicazione. Si accumula fino a 5 volte. Genera una grande quantità di minaccia."
+      },
+      "cw_taunt": {
+        "name": "Aizzare",
+        "description": "Provoca il bersaglio: la tua minaccia sale fino a eguagliare quella del suo nemico più odiato e lo costringe ad attaccarti per 3 s."
+      },
+      "cw_bloodthirst": {
+        "name": "Salasso",
+        "description": "Attacca istantaneamente in una frenesia sanguigna per il 60% dei danni dell'arma più {damage}. (firma Furia)"
+      },
+      "cw_mortal_strike": {
+        "name": "Colpo Mutilante",
+        "description": "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)"
+      },
+      "cw_shield_slam": {
+        "name": "Frantumascudo",
+        "description": "Colpisce il bersaglio con lo scudo per il 50% dei danni dell'arma più {damage} e genera una minaccia enorme. (firma Protezione)"
+      },
+      "cw_whirlwind": {
+        "name": "Vortice di Lame",
+        "description": "Ruoti in un arco letale, colpendo tutti i nemici vicini per {damage}. (talento Furia)"
+      },
+      "cw_berserker_rage": {
+        "name": "Furia Ribollente",
+        "description": "Entri in una furia ribollente, generando 20 punti rabbia. (talento del guerriero)"
       },
       "revenge": {
         "name": "Revenge",

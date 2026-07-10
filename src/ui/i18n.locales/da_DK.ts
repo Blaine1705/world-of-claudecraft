@@ -2,6 +2,67 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Plyndrerslag',
+  'entities.abilities.cw_heroic_strike.description':
+    'Et stærkt angreb, der øger nærkampsskaden med {damage}. Aktiveres ved dit næste hug.',
+  'entities.abilities.cw_battle_shout.name': 'Jernbrøl',
+  'entities.abilities.cw_battle_shout.description': 'Øger din angrebskraft med {buff} i 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Styrkende Råb',
+  'entities.abilities.cw_commanding_shout.description': 'Øger din Udholdenhed med {buff} i 2 min.',
+  'entities.abilities.cw_charge.name': 'Fremstorm',
+  'entities.abilities.cw_charge.description':
+    'Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde.',
+  'entities.abilities.cw_rend.name': 'Dyb Flænge',
+  'entities.abilities.cw_rend.description':
+    'Sårer målet og får det til at bløde for {damage} skade over {duration} sek.',
+  'entities.abilities.cw_thunder_clap.name': 'Rystende Slag',
+  'entities.abilities.cw_thunder_clap.description':
+    'Sprænger nærliggende fjender for {damage} skade og sløver deres angreb med 10 % i 10 sek.',
+  'entities.abilities.cw_hamstring.name': 'Lammende Snit',
+  'entities.abilities.cw_hamstring.description':
+    'Lemlæster fjenden for {damage} skade og sænker dens bevægelse med 50% i 15 sek.',
+  'entities.abilities.cw_bloodrage.name': 'Blodtold',
+  'entities.abilities.cw_bloodrage.description': 'Genererer 10 raseri på bekostning af helbred.',
+  'entities.abilities.cw_overpower.name': 'Rødhånd',
+  'entities.abilities.cw_overpower.description':
+    'Øjeblikkeligt angreb for våbenskade plus {damage}. Kan kun bruges efter målet undviger. Kan ikke undviges.',
+  'entities.abilities.cw_execute.name': 'Tidlig Grav',
+  'entities.abilities.cw_execute.description':
+    'Forsøg på at gøre det af med en såret fjende, hvilket volder {damage} skade. Kan kun bruges på fjender under 20% helbred.',
+  'entities.abilities.cw_slam.name': 'Brutalt Sving',
+  'entities.abilities.cw_slam.description': 'Drøner modstanderen for våbenskade plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Mejende Bue',
+  'entities.abilities.cw_cleave.description':
+    'Et fejende slag, der rammer alle fjender foran dig for {damage} skade.',
+  'entities.abilities.cw_defensive_stance.name': 'Værgende Stilling',
+  'entities.abilities.cw_defensive_stance.description':
+    'En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér igen for at forlade stillingen.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Rædselshyl',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med {buff} i 30 sek.',
+  'entities.abilities.cw_sunder_armor.name': 'Rustningsskær',
+  'entities.abilities.cw_sunder_armor.description':
+    'Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel.',
+  'entities.abilities.cw_taunt.name': 'Ægge',
+  'entities.abilities.cw_taunt.description':
+    'Håner målet: din trussel stiger til at matche dets mest forhadte fjende, og det tvinges til at angribe dig i 3 sek.',
+  'entities.abilities.cw_bloodthirst.name': 'Åreladning',
+  'entities.abilities.cw_bloodthirst.description':
+    'Angrib øjeblikkeligt i et blodraseri for 60% våbenskade plus {damage}. (Furie-signatur)',
+  'entities.abilities.cw_mortal_strike.name': 'Lemlæstende Slag',
+  'entities.abilities.cw_mortal_strike.description':
+    'Et ondskabsfuldt slag, der volder våbenskade plus {damage}. (Arms-signatur)',
+  'entities.abilities.cw_shield_slam.name': 'Skjoldknæk',
+  'entities.abilities.cw_shield_slam.description':
+    'Slå målet med dit skjold for 50% våbenskade plus {damage} og enorm trussel. (Beskyttelses-kendetegn)',
+  'entities.abilities.cw_whirlwind.name': 'Klingehvirvel',
+  'entities.abilities.cw_whirlwind.description':
+    'Snur i en dødelig bue og ram alle nærliggende fjender for {damage}. (Raseri-talent)',
+  'entities.abilities.cw_berserker_rage.name': 'Sydende Raseri',
+  'entities.abilities.cw_berserker_rage.description':
+    'Gå i et sydende raseri, og generér 20 raseri. (Krigertalent)',
+  'classDetails.roles.warriorClassic': 'Tank / Nærkamps-DPS',
+  'classes.warriorClassic': 'Kriger',
   'entities.abilities.sport_boot.description':
     'Et langt, højt spark mod sigtepunktet. Publikum elsker det.',
   'entities.abilities.sport_boot.name': 'Kæmpespark',

@@ -49,6 +49,10 @@ function lcg(seed: number): (maxExclusive: number) => number {
 }
 
 const HEROIC_VENDOR_IDS = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
+// The classic warrior shares the warrior's authored gear locks (see
+// equipment_rules.ts gearCls); the test mirrors resolve the same way.
+const gearClsOf = (cls: PlayerClass): PlayerClass => (cls === 'warrior_classic' ? 'warrior' : cls);
+
 const ARMOR_SLOTS: EquipSlot[] = [
   'mainhand',
   'helmet',
@@ -105,7 +109,8 @@ describe('nonHeroicBisKit', () => {
         expect(itemId in HEROIC_ITEMS, `${cls} ${slot} ${itemId} bespoke heroic`).toBe(false);
         expect(HEROIC_VENDOR_IDS.has(itemId), `${cls} ${slot} ${itemId} vendor`).toBe(false);
         expect(canEquipItem(cls, item), `${cls} ${slot} ${itemId} canEquip`).toBe(true);
-        if (item.requiredClass) expect(item.requiredClass, `${cls} ${slot}`).toContain(cls);
+        if (item.requiredClass)
+          expect(item.requiredClass, `${cls} ${slot}`).toContain(gearClsOf(cls));
         expect(meetsLevelRequirement(BOOST_LEVEL, item), `${cls} ${slot} level`).toBe(true);
       }
     }
@@ -139,7 +144,7 @@ describe('nonHeroicBisKit', () => {
           !(i.id in HEROIC_ITEMS) &&
           !HEROIC_VENDOR_IDS.has(i.id) &&
           canEquipItem(cls, i) &&
-          (!i.requiredClass || i.requiredClass.includes(cls)) &&
+          (!i.requiredClass || i.requiredClass.includes(gearClsOf(cls))) &&
           meetsLevelRequirement(BOOST_LEVEL, i),
       );
       const best = Math.max(...candidates.map((i) => classItemScore(cls, i)));

@@ -2032,6 +2032,12 @@ export const pl_PL: EnTranslations = {
       "charge": "Szarżujesz na odległego wroga, otwierając walkę krótkim ogłuszeniem.",
       "rend": "Otwiera krwawienie, które z czasem wyczerpuje cel.",
       "thunder_clap": "Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Nasyca twoje ciosy świętymi obrażeniami, które potem zużywasz Verdictem.",
       "holy_light": "Stabilne, pokaźne leczenie do uzupełnienia zdrowia sojusznika lub własnego.",
@@ -3339,6 +3345,7 @@ export const pl_PL: EnTranslations = {
   },
   "classes": {
     "warrior": "Wojownik",
+    "warriorClassic": "Wojownik",
     "paladin": "Paladyn",
     "hunter": "Łowca",
     "rogue": "Łotrzyk",
@@ -4106,6 +4113,7 @@ export const pl_PL: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / DPS wręcz",
+      "warriorClassic": "Tank / DPS wręcz",
       "paladin": "Uzdrowiciel / Tank / DPS wręcz",
       "hunter": "Dystansowy DPS",
       "rogue": "DPS wręcz",
@@ -4130,6 +4138,7 @@ export const pl_PL: EnTranslations = {
     },
     "lore": {
       "warrior": "Wojownicy to zaprawieni w boju wojownicy walki wręcz, którzy gromadzą Furię, zadając lub otrzymując obrażenia. Pochłaniają potężne ciosy lub miażdżą wrogów potężnym orężem.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Paladyni to święci krzyżowcy, którzy wspierają sojuszników błogosławieństwami, leczą rany Kojącym Światłem i chronią słabych, odziani w ciężki pancerz.",
       "hunter": "Łowcy to specjaliści walki dystansowej, którzy walczą u boku oswojonej bestii, zasypując wrogów celnymi i szybkimi strzałami, spowalniając ich żądłami oraz ogłuszającym ostrzałem i zmieniając aspekty stosownie do chwili.",
       "rogue": "Łotrzykowie to skradający się zabójcy, którzy wydają Energię i Punkty Kombosów na ciosy w plecy i wykończenia z cienia.",
@@ -5157,6 +5166,90 @@ export const pl_PL: EnTranslations = {
       "heroic_strike": {
         "name": "Cios łupieżcy",
         "description": "Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu."
+      },
+      "cw_heroic_strike": {
+        "name": "Cios łupieżcy",
+        "description": "Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu."
+      },
+      "cw_battle_shout": {
+        "name": "Żelazny ryk",
+        "description": "Zwiększa twoją moc ataku o {buff} na 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Krzepiący okrzyk",
+        "description": "Zwiększa twoją kondycję o {buff} na 2 min."
+      },
+      "cw_charge": {
+        "name": "Natarcie",
+        "description": "Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów."
+      },
+      "cw_rend": {
+        "name": "Głęboka rana",
+        "description": "Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek."
+      },
+      "cw_thunder_clap": {
+        "name": "Trzęsący cios",
+        "description": "Razi pobliskich wrogów za {damage} obrażeń i spowalnia ich ataki o 10% na 10 sek."
+      },
+      "cw_hamstring": {
+        "name": "Kulawiące cięcie",
+        "description": "Okalecza wroga, zadając {damage} obrażeń i spowalniając jego ruch o 50% na 15 sek."
+      },
+      "cw_bloodrage": {
+        "name": "Krwawa danina",
+        "description": "Generuje 10 wściekłości kosztem zdrowia."
+      },
+      "cw_overpower": {
+        "name": "Krwawa ręka",
+        "description": "Natychmiastowy atak za obrażenia broni plus {damage}. Użyteczne tylko po uniku celu. Nie można uniknąć."
+      },
+      "cw_execute": {
+        "name": "Przedwczesny grób",
+        "description": "Próba dobicia rannego przeciwnika, zadająca {damage} obrażeń. Użyteczne tylko na wrogach poniżej 20% zdrowia."
+      },
+      "cw_slam": {
+        "name": "Brutalny zamach",
+        "description": "Wali przeciwnika, zadając obrażenia broni plus {damage}."
+      },
+      "cw_cleave": {
+        "name": "Kosiący łuk",
+        "description": "Zamaszyste uderzenie, które trafia wszystkich wrogów przed tobą, zadając {damage} obrażeń."
+      },
+      "cw_defensive_stance": {
+        "name": "Czujna postawa",
+        "description": "Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Złowieszcze wycie",
+        "description": "Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek."
+      },
+      "cw_sunder_armor": {
+        "name": "Rozdarcie pancerza",
+        "description": "Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia."
+      },
+      "cw_taunt": {
+        "name": "Podjudzenie",
+        "description": "Prowokuje cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel jest zmuszony atakować cię przez 3 sek."
+      },
+      "cw_bloodthirst": {
+        "name": "Upust krwi",
+        "description": "Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)"
+      },
+      "cw_mortal_strike": {
+        "name": "Okaleczające uderzenie",
+        "description": "Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)"
+      },
+      "cw_shield_slam": {
+        "name": "Trzask tarczy",
+        "description": "Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)"
+      },
+      "cw_whirlwind": {
+        "name": "Wir ostrzy",
+        "description": "Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)"
+      },
+      "cw_berserker_rage": {
+        "name": "Kipiąca furia",
+        "description": "Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)"
       },
       "revenge": {
         "name": "Revenge",

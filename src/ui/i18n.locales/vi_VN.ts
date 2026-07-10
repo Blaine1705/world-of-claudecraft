@@ -2,6 +2,70 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Đòn Cướp Phá',
+  'entities.abilities.cw_heroic_strike.description':
+    'Một đòn đánh mạnh tăng sát thương cận chiến thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn.',
+  'entities.abilities.cw_battle_shout.name': 'Tiếng Gầm Thép',
+  'entities.abilities.cw_battle_shout.description':
+    'Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút.',
+  'entities.abilities.cw_commanding_shout.name': 'Tiếng Hô Trợ Uy',
+  'entities.abilities.cw_commanding_shout.description':
+    'Tăng Thể Lực của ngươi thêm {buff} trong 2 phút.',
+  'entities.abilities.cw_charge.name': 'Xông Tới',
+  'entities.abilities.cw_charge.description':
+    'Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước.',
+  'entities.abilities.cw_rend.name': 'Vết Rạch Sâu',
+  'entities.abilities.cw_rend.description':
+    'Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây.',
+  'entities.abilities.cw_thunder_clap.name': 'Đòn Chấn Rung',
+  'entities.abilities.cw_thunder_clap.description':
+    'Giáng đòn lên các kẻ địch lân cận gây {damage} sát thương và làm chậm 10% đòn tấn công của chúng trong 10 giây.',
+  'entities.abilities.cw_hamstring.name': 'Nhát Cắt Què Chân',
+  'entities.abilities.cw_hamstring.description':
+    'Làm bị thương kẻ địch gây {damage} sát thương, làm chậm di chuyển của nó 50% trong 15 giây.',
+  'entities.abilities.cw_bloodrage.name': 'Giá Máu',
+  'entities.abilities.cw_bloodrage.description': 'Tạo 10 nộ khí bằng cái giá sinh lực.',
+  'entities.abilities.cw_overpower.name': 'Bàn Tay Đẫm Máu',
+  'entities.abilities.cw_overpower.description':
+    'Đòn tấn công tức thời gây sát thương vũ khí cộng thêm {damage}. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né.',
+  'entities.abilities.cw_execute.name': 'Nấm Mồ Sớm',
+  'entities.abilities.cw_execute.description':
+    'Cố gắng kết liễu kẻ thù đang trọng thương, gây {damage} sát thương. Chỉ dùng được trên kẻ địch còn dưới 20% máu.',
+  'entities.abilities.cw_slam.name': 'Cú Vung Thô Bạo',
+  'entities.abilities.cw_slam.description':
+    'Giáng đòn vào đối thủ gây sát thương vũ khí cộng thêm {damage}.',
+  'entities.abilities.cw_cleave.name': 'Vòng Chém Gặt',
+  'entities.abilities.cw_cleave.description':
+    'Một đòn chém quét trúng mọi kẻ địch phía trước ngươi gây {damage} sát thương.',
+  'entities.abilities.cw_defensive_stance.name': 'Thế Thủ',
+  'entities.abilities.cw_defensive_stance.description':
+    'Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Tiếng Hú Hung Hiểm',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây.',
+  'entities.abilities.cw_sunder_armor.name': 'Xẻ Giáp',
+  'entities.abilities.cw_sunder_armor.description':
+    'Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn.',
+  'entities.abilities.cw_taunt.name': 'Chọc Tức',
+  'entities.abilities.cw_taunt.description':
+    'Khiêu khích mục tiêu: đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó buộc phải tấn công bạn trong 3 giây.',
+  'entities.abilities.cw_bloodthirst.name': 'Trích Huyết',
+  'entities.abilities.cw_bloodthirst.description':
+    'Tấn công tức thời trong cơn cuồng huyết gây 60% sát thương vũ khí cộng thêm {damage}. (Tuyệt chiêu Cuồng Nộ)',
+  'entities.abilities.cw_mortal_strike.name': 'Đòn Tàn Phế',
+  'entities.abilities.cw_mortal_strike.description':
+    'Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)',
+  'entities.abilities.cw_shield_slam.name': 'Giáng Nứt Khiên',
+  'entities.abilities.cw_shield_slam.description':
+    'Giáng khiên vào mục tiêu gây 50% sát thương vũ khí cộng thêm {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)',
+  'entities.abilities.cw_whirlwind.name': 'Vòng Xoáy Lưỡi Kiếm',
+  'entities.abilities.cw_whirlwind.description':
+    'Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)',
+  'entities.abilities.cw_berserker_rage.name': 'Thịnh Nộ Sục Sôi',
+  'entities.abilities.cw_berserker_rage.description':
+    'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
+  'classDetails.roles.warriorClassic': 'Đỡ Đòn / DPS Cận Chiến',
+  'classes.warriorClassic': 'Chiến Binh',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
   'entities.abilities.sport_boot.name': 'Cú Sút Lớn',

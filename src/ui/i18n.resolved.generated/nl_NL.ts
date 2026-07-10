@@ -2032,6 +2032,12 @@ export const nl_NL: EnTranslations = {
       "charge": "Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.",
       "rend": "Opent een bloeding die het doelwit na verloop van tijd uitput.",
       "thunder_clap": "Raakt alles om je heen en vertraagt hun aanvallen.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Doordringt je uithalen met Heilige schade, besteed het daarna met Verdict.",
       "holy_light": "Een gestage, flinke genezing om een bondgenoot of jezelf aan te vullen.",
@@ -3339,6 +3345,7 @@ export const nl_NL: EnTranslations = {
   },
   "classes": {
     "warrior": "Krijger",
+    "warriorClassic": "Krijger",
     "paladin": "Paladijn",
     "hunter": "Jager",
     "rogue": "Schurk",
@@ -4106,6 +4113,7 @@ export const nl_NL: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / Melee-DPS",
+      "warriorClassic": "Tank / Melee-DPS",
       "paladin": "Genezer / Tank / Melee-DPS",
       "hunter": "Ranged-DPS",
       "rogue": "Melee-DPS",
@@ -4130,6 +4138,7 @@ export const nl_NL: EnTranslations = {
     },
     "lore": {
       "warrior": "Krijgers zijn in de strijd geharde man-tot-man-vechters die Woede opbouwen terwijl ze schade uitdelen of incasseren. Ze absorberen zware klappen of verpletteren vijanden met krachtige wapens.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Paladijnen zijn heilige kruisvaarders die bondgenoten steunen met zegeningen, wonden helen met Helend Licht en de zwakken beschermen in zwaar pantser.",
       "hunter": "Jagers zijn afstandsspecialisten die aan de zijde van een getemd beest vechten, vijanden bestoken met gerichte en snelle schoten, hen vertragen met steken en verdovend vuur, en van aspect wisselen om zich aan het moment aan te passen.",
       "rogue": "Schurken zijn sluipende sluipmoordenaars die Energie en Combopunten besteden aan rugsteken en finishers vanuit de schaduwen.",
@@ -5157,6 +5166,90 @@ export const nl_NL: EnTranslations = {
       "heroic_strike": {
         "name": "Plunderaarsslag",
         "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."
+      },
+      "cw_heroic_strike": {
+        "name": "Plunderaarsslag",
+        "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."
+      },
+      "cw_battle_shout": {
+        "name": "IJzeren Gebrul",
+        "description": "Verhoogt je aanvalskracht met {buff} gedurende 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Versterkende Kreet",
+        "description": "Verhoogt je Uithoudingsvermogen met {buff} gedurende 2 min."
+      },
+      "cw_charge": {
+        "name": "Bestorming",
+        "description": "Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m."
+      },
+      "cw_rend": {
+        "name": "Diepe Snee",
+        "description": "Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec."
+      },
+      "cw_thunder_clap": {
+        "name": "Schuddende Klap",
+        "description": "Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec."
+      },
+      "cw_hamstring": {
+        "name": "Kreupelsnede",
+        "description": "Verminkt de vijand voor {damage} schade en vertraagt zijn beweging met 50% gedurende 15 sec."
+      },
+      "cw_bloodrage": {
+        "name": "Bloedtol",
+        "description": "Genereert 10 woede ten koste van levenskracht."
+      },
+      "cw_overpower": {
+        "name": "Roodhand",
+        "description": "Ogenblikkelijke aanval voor wapenschade plus {damage}. Alleen bruikbaar nadat het doelwit ontwijkt. Kan niet worden ontweken."
+      },
+      "cw_execute": {
+        "name": "Vroeg Graf",
+        "description": "Poging om een gewonde vijand af te maken voor {damage} schade. Alleen bruikbaar op vijanden met minder dan 20% levenskracht."
+      },
+      "cw_slam": {
+        "name": "Botte Zwaai",
+        "description": "Dreunt op de tegenstander in voor wapenschade plus {damage}."
+      },
+      "cw_cleave": {
+        "name": "Maaiboog",
+        "description": "Een vegende slag die alle vijanden voor je raakt voor {damage} schade."
+      },
+      "cw_defensive_stance": {
+        "name": "Bewaakte Houding",
+        "description": "Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Grimmig Gehuil",
+        "description": "Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec."
+      },
+      "cw_sunder_armor": {
+        "name": "Pantserscheur",
+        "description": "Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging."
+      },
+      "cw_taunt": {
+        "name": "Provoceren",
+        "description": "Provoceert het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt 3 sec lang gedwongen jou aan te vallen."
+      },
+      "cw_bloodthirst": {
+        "name": "Aderlating",
+        "description": "Val onmiddellijk aan in een bloedrazernij voor 60% wapenschade plus {damage}. (Razernij-kenmerk)"
+      },
+      "cw_mortal_strike": {
+        "name": "Verminkende Slag",
+        "description": "Een venijnige slag die wapenschade plus {damage} toebrengt. (Wapens-handtekening)"
+      },
+      "cw_shield_slam": {
+        "name": "Schildbreuk",
+        "description": "Sla het doelwit met je schild voor 50% wapenschade plus {damage} en enorme dreiging. (Protectie-kenmerk)"
+      },
+      "cw_whirlwind": {
+        "name": "Snijdende Wenteling",
+        "description": "Draai in een dodelijke boog en tref alle nabije vijanden voor {damage}. (Razernij-talent)"
+      },
+      "cw_berserker_rage": {
+        "name": "Kolkende Woede",
+        "description": "Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)"
       },
       "revenge": {
         "name": "Revenge",

@@ -95,7 +95,13 @@ describe('weapon requiredClass is representative of who can equip', () => {
   it('lists exactly the classes canEquipItem allows, for every weapon with a class list', () => {
     for (const item of Object.values(ITEMS)) {
       if (item.kind !== 'weapon' || !item.requiredClass) continue;
-      const equippable = ALL_CLASSES.filter((c) => canEquipItem(c, item)).sort();
+      // warrior_classic is exempt: it equips via the deliberate gearCls alias to
+      // 'warrior' (equipment_rules.ts), because the class is a warrior variant and
+      // every authored requiredClass list predates it. Tooltips listing the warrior
+      // group are correct for it, so the alias never appears in requiredClass.
+      const equippable = ALL_CLASSES.filter(
+        (c) => c !== 'warrior_classic' && canEquipItem(c, item),
+      ).sort();
       const listed = [...item.requiredClass].sort();
       expect(listed, `${item.id}: requiredClass must match its equippable classes`).toEqual(
         equippable,

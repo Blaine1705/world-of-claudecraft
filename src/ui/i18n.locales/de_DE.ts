@@ -14,6 +14,70 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Reaver-Hieb',
+  'entities.abilities.cw_heroic_strike.description':
+    'Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
+  'entities.abilities.cw_battle_shout.name': 'Eisernes Gebrüll',
+  'entities.abilities.cw_battle_shout.description':
+    'Erhöht eure Angriffskraft 2 Min. lang um {buff}.',
+  'entities.abilities.cw_commanding_shout.name': 'Stärkender Ruf',
+  'entities.abilities.cw_commanding_shout.description':
+    'Erhöht eure Ausdauer 2 Min. lang um {buff}.',
+  'entities.abilities.cw_charge.name': 'Vorpreschen',
+  'entities.abilities.cw_charge.description':
+    'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',
+  'entities.abilities.cw_rend.name': 'Tiefe Wunde',
+  'entities.abilities.cw_rend.description':
+    'Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten.',
+  'entities.abilities.cw_thunder_clap.name': 'Bebender Schlag',
+  'entities.abilities.cw_thunder_clap.description':
+    'Trifft nahe Gegner für {damage} Schaden und verlangsamt ihre Angriffe 10 Sek. lang um 10%.',
+  'entities.abilities.cw_hamstring.name': 'Lähmender Schnitt',
+  'entities.abilities.cw_hamstring.description':
+    'Verkrüppelt den Gegner für {damage} Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
+  'entities.abilities.cw_bloodrage.name': 'Blutzoll',
+  'entities.abilities.cw_bloodrage.description': 'Erzeugt 10 Wut auf Kosten von Gesundheit.',
+  'entities.abilities.cw_overpower.name': 'Redhand',
+  'entities.abilities.cw_overpower.description':
+    'Sofortiger Angriff mit Waffenschaden plus {damage}. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
+  'entities.abilities.cw_execute.name': 'Frühes Grab',
+  'entities.abilities.cw_execute.description':
+    'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',
+  'entities.abilities.cw_slam.name': 'Roher Schwung',
+  'entities.abilities.cw_slam.description':
+    'Zerschmettert den Gegner für Waffenschaden plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Sichelschwung',
+  'entities.abilities.cw_cleave.description':
+    'Ein weiter Hieb, der alle Gegner vor euch für {damage} Schaden trifft.',
+  'entities.abilities.cw_defensive_stance.name': 'Wehrhafte Haltung',
+  'entities.abilities.cw_defensive_stance.description':
+    'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Direhowl',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}.',
+  'entities.abilities.cw_sunder_armor.name': 'Rüstungsspalter',
+  'entities.abilities.cw_sunder_armor.description':
+    'Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung.',
+  'entities.abilities.cw_taunt.name': 'Anstacheln',
+  'entities.abilities.cw_taunt.description':
+    'Verspottet das Ziel: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen.',
+  'entities.abilities.cw_bloodthirst.name': 'Aderlass',
+  'entities.abilities.cw_bloodthirst.description':
+    'Greift sofort in blutiger Raserei an und verursacht 60% Waffenschaden plus {damage}. (Furor-Signatur)',
+  'entities.abilities.cw_mortal_strike.name': 'Verstümmelnder Hieb',
+  'entities.abilities.cw_mortal_strike.description':
+    'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
+  'entities.abilities.cw_shield_slam.name': 'Shieldcrack',
+  'entities.abilities.cw_shield_slam.description':
+    'Schlägt das Ziel mit eurem Schild für 50% Waffenschaden plus {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
+  'entities.abilities.cw_whirlwind.name': 'Klingenwirbel',
+  'entities.abilities.cw_whirlwind.description':
+    'Dreht euch in einem tödlichen Bogen und trefft alle nahen Gegner für {damage}. (Furor-Talent)',
+  'entities.abilities.cw_berserker_rage.name': 'Brodelnde Raserei',
+  'entities.abilities.cw_berserker_rage.description':
+    'Ihr verfallt in brodelnde Raserei und erzeugt 20 Wut. (Krieger-Talent)',
+  'classDetails.roles.warriorClassic': 'Tank / Nahkampf-DPS',
+  'classes.warriorClassic': 'Krieger',
   'entities.abilities.sport_boot.description':
     'Ein hoher, weiter Schlag Richtung Zielpunkt. Die Menge liebt es.',
   'entities.abilities.sport_boot.name': 'Weitschlag',

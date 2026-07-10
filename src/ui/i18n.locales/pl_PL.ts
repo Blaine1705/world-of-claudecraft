@@ -2,6 +2,69 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.cw_heroic_strike.name': 'Cios łupieżcy',
+  'entities.abilities.cw_heroic_strike.description':
+    'Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu.',
+  'entities.abilities.cw_battle_shout.name': 'Żelazny ryk',
+  'entities.abilities.cw_battle_shout.description': 'Zwiększa twoją moc ataku o {buff} na 2 min.',
+  'entities.abilities.cw_commanding_shout.name': 'Krzepiący okrzyk',
+  'entities.abilities.cw_commanding_shout.description':
+    'Zwiększa twoją kondycję o {buff} na 2 min.',
+  'entities.abilities.cw_charge.name': 'Natarcie',
+  'entities.abilities.cw_charge.description':
+    'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów.',
+  'entities.abilities.cw_rend.name': 'Głęboka rana',
+  'entities.abilities.cw_rend.description':
+    'Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek.',
+  'entities.abilities.cw_thunder_clap.name': 'Trzęsący cios',
+  'entities.abilities.cw_thunder_clap.description':
+    'Razi pobliskich wrogów za {damage} obrażeń i spowalnia ich ataki o 10% na 10 sek.',
+  'entities.abilities.cw_hamstring.name': 'Kulawiące cięcie',
+  'entities.abilities.cw_hamstring.description':
+    'Okalecza wroga, zadając {damage} obrażeń i spowalniając jego ruch o 50% na 15 sek.',
+  'entities.abilities.cw_bloodrage.name': 'Krwawa danina',
+  'entities.abilities.cw_bloodrage.description': 'Generuje 10 wściekłości kosztem zdrowia.',
+  'entities.abilities.cw_overpower.name': 'Krwawa ręka',
+  'entities.abilities.cw_overpower.description':
+    'Natychmiastowy atak za obrażenia broni plus {damage}. Użyteczne tylko po uniku celu. Nie można uniknąć.',
+  'entities.abilities.cw_execute.name': 'Przedwczesny grób',
+  'entities.abilities.cw_execute.description':
+    'Próba dobicia rannego przeciwnika, zadająca {damage} obrażeń. Użyteczne tylko na wrogach poniżej 20% zdrowia.',
+  'entities.abilities.cw_slam.name': 'Brutalny zamach',
+  'entities.abilities.cw_slam.description':
+    'Wali przeciwnika, zadając obrażenia broni plus {damage}.',
+  'entities.abilities.cw_cleave.name': 'Kosiący łuk',
+  'entities.abilities.cw_cleave.description':
+    'Zamaszyste uderzenie, które trafia wszystkich wrogów przed tobą, zadając {damage} obrażeń.',
+  'entities.abilities.cw_defensive_stance.name': 'Czujna postawa',
+  'entities.abilities.cw_defensive_stance.description':
+    'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
+  'entities.abilities.cw_demoralizing_shout.name': 'Złowieszcze wycie',
+  'entities.abilities.cw_demoralizing_shout.description':
+    'Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek.',
+  'entities.abilities.cw_sunder_armor.name': 'Rozdarcie pancerza',
+  'entities.abilities.cw_sunder_armor.description':
+    'Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia.',
+  'entities.abilities.cw_taunt.name': 'Podjudzenie',
+  'entities.abilities.cw_taunt.description':
+    'Prowokuje cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel jest zmuszony atakować cię przez 3 sek.',
+  'entities.abilities.cw_bloodthirst.name': 'Upust krwi',
+  'entities.abilities.cw_bloodthirst.description':
+    'Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)',
+  'entities.abilities.cw_mortal_strike.name': 'Okaleczające uderzenie',
+  'entities.abilities.cw_mortal_strike.description':
+    'Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)',
+  'entities.abilities.cw_shield_slam.name': 'Trzask tarczy',
+  'entities.abilities.cw_shield_slam.description':
+    'Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)',
+  'entities.abilities.cw_whirlwind.name': 'Wir ostrzy',
+  'entities.abilities.cw_whirlwind.description':
+    'Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)',
+  'entities.abilities.cw_berserker_rage.name': 'Kipiąca furia',
+  'entities.abilities.cw_berserker_rage.description':
+    'Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)',
+  'classDetails.roles.warriorClassic': 'Tank / DPS wręcz',
+  'classes.warriorClassic': 'Wojownik',
   'entities.abilities.sport_boot.description':
     'Długie, wysokie wykopnięcie w stronę punktu celowania. Trybuny to uwielbiają.',
   'entities.abilities.sport_boot.name': 'Potężny Wykop',

@@ -47,7 +47,9 @@ import {
   NYTHRAXIS_BOSS_ID,
   PARTY_XP_RANGE,
   rageFromDealing,
+  rageFromDealingClassic,
   rageFromTaking,
+  rageFromTakingClassic,
   rageGenAuraMult,
   VICTORY_RUSH_WINDOW,
   virtualLevel,
@@ -610,7 +612,11 @@ export function dealDamage(
         seasonedCrit;
       source.resource = Math.min(
         source.maxResource,
-        source.resource + rageFromDealing(amount, source.level) * autoMult,
+        source.resource +
+          (meta?.cls === 'warrior_classic'
+            ? rageFromDealingClassic(amount, source.level)
+            : rageFromDealing(amount, source.level)) *
+            autoMult,
       );
     }
   }
@@ -624,7 +630,11 @@ export function dealDamage(
       // enrages ALL rage generation); the talent-static globals do not apply here.
       target.resource = Math.min(
         target.maxResource,
-        target.resource + rageFromTaking(amount, source.level) * rageGenAuraMult(target),
+        target.resource +
+          (ctx.resolve(target.id)?.meta.cls === 'warrior_classic'
+            ? rageFromTakingClassic(amount, source.level)
+            : rageFromTaking(amount, source.level)) *
+            rageGenAuraMult(target),
       );
     }
     if (isConsuming(target)) {

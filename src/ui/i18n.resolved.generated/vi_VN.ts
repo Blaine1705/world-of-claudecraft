@@ -2032,6 +2032,12 @@ export const vi_VN: EnTranslations = {
       "charge": "Lao tới kẻ địch ở xa để mở màn trận đấu bằng một cú choáng ngắn.",
       "rend": "Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian.",
       "thunder_clap": "Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Phù chú đòn vung của bạn với sát thương Thánh, rồi giải phóng bằng Verdict.",
       "holy_light": "Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.",
@@ -3339,6 +3345,7 @@ export const vi_VN: EnTranslations = {
   },
   "classes": {
     "warrior": "Chiến Binh",
+    "warriorClassic": "Chiến Binh",
     "paladin": "Thánh Kỵ Sĩ",
     "hunter": "Thợ Săn",
     "rogue": "Đạo Tặc",
@@ -4106,6 +4113,7 @@ export const vi_VN: EnTranslations = {
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
+      "warriorClassic": "Đỡ Đòn / DPS Cận Chiến",
       "paladin": "Trị Liệu / Đỡ Đòn / DPS Cận Chiến",
       "hunter": "DPS Tầm Xa",
       "rogue": "DPS Cận Chiến",
@@ -4130,6 +4138,7 @@ export const vi_VN: EnTranslations = {
     },
     "lore": {
       "warrior": "Chiến Binh là những đấu sĩ cận chiến dày dạn trận mạc, tích lũy Nộ Khí khi gây ra hoặc nhận sát thương. Họ hứng chịu những đòn nặng nề hoặc nghiền nát kẻ thù bằng vũ khí uy lực.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Thánh Kỵ Sĩ là những thập tự quân thần thánh, hỗ trợ đồng minh bằng các phúc lành, chữa lành vết thương bằng Thánh Quang Chữa Lành, và bảo vệ kẻ yếu trong bộ giáp nặng.",
       "hunter": "Thợ Săn là những chuyên gia tầm xa chiến đấu bên cạnh một mãnh thú đã thuần hóa, dội vào kẻ thù những phát bắn nhắm chuẩn và liên hồi, làm chậm chúng bằng các đòn chích nọc và hỏa lực chấn động, và chuyển đổi Linh Khí để thích ứng với từng khoảnh khắc.",
       "rogue": "Đạo Tặc là những sát thủ ẩn mình, tiêu hao Năng Lượng và Điểm Liên Hoàn cho những đòn đâm lén và đòn kết liễu từ trong bóng tối.",
@@ -5157,6 +5166,90 @@ export const vi_VN: EnTranslations = {
       "heroic_strike": {
         "name": "Đòn Cướp Phá",
         "description": "Một đòn đánh mạnh tăng sát thương cận chiến thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn."
+      },
+      "cw_heroic_strike": {
+        "name": "Đòn Cướp Phá",
+        "description": "Một đòn đánh mạnh tăng sát thương cận chiến thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn."
+      },
+      "cw_battle_shout": {
+        "name": "Tiếng Gầm Thép",
+        "description": "Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút."
+      },
+      "cw_commanding_shout": {
+        "name": "Tiếng Hô Trợ Uy",
+        "description": "Tăng Thể Lực của ngươi thêm {buff} trong 2 phút."
+      },
+      "cw_charge": {
+        "name": "Xông Tới",
+        "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước."
+      },
+      "cw_rend": {
+        "name": "Vết Rạch Sâu",
+        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây."
+      },
+      "cw_thunder_clap": {
+        "name": "Đòn Chấn Rung",
+        "description": "Giáng đòn lên các kẻ địch lân cận gây {damage} sát thương và làm chậm 10% đòn tấn công của chúng trong 10 giây."
+      },
+      "cw_hamstring": {
+        "name": "Nhát Cắt Què Chân",
+        "description": "Làm bị thương kẻ địch gây {damage} sát thương, làm chậm di chuyển của nó 50% trong 15 giây."
+      },
+      "cw_bloodrage": {
+        "name": "Giá Máu",
+        "description": "Tạo 10 nộ khí bằng cái giá sinh lực."
+      },
+      "cw_overpower": {
+        "name": "Bàn Tay Đẫm Máu",
+        "description": "Đòn tấn công tức thời gây sát thương vũ khí cộng thêm {damage}. Chỉ dùng được sau khi mục tiêu né đòn. Không thể bị né."
+      },
+      "cw_execute": {
+        "name": "Nấm Mồ Sớm",
+        "description": "Cố gắng kết liễu kẻ thù đang trọng thương, gây {damage} sát thương. Chỉ dùng được trên kẻ địch còn dưới 20% máu."
+      },
+      "cw_slam": {
+        "name": "Cú Vung Thô Bạo",
+        "description": "Giáng đòn vào đối thủ gây sát thương vũ khí cộng thêm {damage}."
+      },
+      "cw_cleave": {
+        "name": "Vòng Chém Gặt",
+        "description": "Một đòn chém quét trúng mọi kẻ địch phía trước ngươi gây {damage} sát thương."
+      },
+      "cw_defensive_stance": {
+        "name": "Thế Thủ",
+        "description": "Thế đứng phòng thủ: bạn tạo ra nhiều hơn 30% mối đe dọa nhưng gây và nhận ít hơn 10% sát thương. Thi triển lại để rời khỏi thế đứng."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Tiếng Hú Hung Hiểm",
+        "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây."
+      },
+      "cw_sunder_armor": {
+        "name": "Xẻ Giáp",
+        "description": "Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn."
+      },
+      "cw_taunt": {
+        "name": "Chọc Tức",
+        "description": "Khiêu khích mục tiêu: đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó buộc phải tấn công bạn trong 3 giây."
+      },
+      "cw_bloodthirst": {
+        "name": "Trích Huyết",
+        "description": "Tấn công tức thời trong cơn cuồng huyết gây 60% sát thương vũ khí cộng thêm {damage}. (Tuyệt chiêu Cuồng Nộ)"
+      },
+      "cw_mortal_strike": {
+        "name": "Đòn Tàn Phế",
+        "description": "Một đòn đánh hung hãn gây sát thương vũ khí cộng thêm {damage}. (Đặc trưng nhánh Vũ Khí)"
+      },
+      "cw_shield_slam": {
+        "name": "Giáng Nứt Khiên",
+        "description": "Giáng khiên vào mục tiêu gây 50% sát thương vũ khí cộng thêm {damage} và lượng đe dọa khổng lồ. (Đặc trưng Hộ Vệ)"
+      },
+      "cw_whirlwind": {
+        "name": "Vòng Xoáy Lưỡi Kiếm",
+        "description": "Xoay theo một vòng cung chết chóc, đánh tất cả kẻ địch lân cận gây {damage}. (Tài năng Cuồng Nộ)"
+      },
+      "cw_berserker_rage": {
+        "name": "Thịnh Nộ Sục Sôi",
+        "description": "Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)"
       },
       "revenge": {
         "name": "Revenge",

@@ -2032,6 +2032,12 @@ export const de_DE: EnTranslations = {
       "charge": "Stürmt auf einen entfernten Gegner zu und eröffnet den Kampf mit einer kurzen Betäubung.",
       "rend": "Eröffnet eine Blutung, die das Ziel über Zeit zermürbt.",
       "thunder_clap": "Trifft alles um dich herum und verlangsamt deren Angriffe.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Verzaubert deine Schwünge mit heiligem Schaden, den du dann mit Verdict verbrauchst.",
       "holy_light": "Eine stetige, ansehnliche Heilung, um einen Verbündeten oder dich selbst aufzufüllen.",
@@ -3339,6 +3345,7 @@ export const de_DE: EnTranslations = {
   },
   "classes": {
     "warrior": "Krieger",
+    "warriorClassic": "Krieger",
     "paladin": "Paladin",
     "hunter": "Jäger",
     "rogue": "Schurke",
@@ -4106,6 +4113,7 @@ export const de_DE: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / Nahkampf-DPS",
+      "warriorClassic": "Tank / Nahkampf-DPS",
       "paladin": "Heiler / Tank / Nahkampf-DPS",
       "hunter": "Fernkampf-DPS",
       "rogue": "Nahkampf-DPS",
@@ -4130,6 +4138,7 @@ export const de_DE: EnTranslations = {
     },
     "lore": {
       "warrior": "Krieger sind kampferprobte Nahkämpfer, die Wut aufbauen, wenn sie Schaden verursachen oder erleiden. Sie halten schwere Treffer aus oder zerschmettern Gegner.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Paladine sind heilige Kreuzritter, die mit Segen unterstützen, Wunden mit Mending Light heilen und Schwache in schwerer Rüstung schützen.",
       "hunter": "Jäger sind Fernkampfspezialisten, die an der Seite eines gezähmten Tieres kämpfen, Gegner mit gezielten und schnellen Schüssen überschütten, sie mit Stichen und erschütterndem Beschuss verlangsamen und je nach Augenblick zwischen ihren Aspekten wechseln.",
       "rogue": "Schurken sind verstohlene Assassinen, die Energie und Kombopunkte für Angriffe aus den Schatten ausgeben.",
@@ -5157,6 +5166,90 @@ export const de_DE: EnTranslations = {
       "heroic_strike": {
         "name": "Reaver-Hieb",
         "description": "Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst."
+      },
+      "cw_heroic_strike": {
+        "name": "Reaver-Hieb",
+        "description": "Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst."
+      },
+      "cw_battle_shout": {
+        "name": "Eisernes Gebrüll",
+        "description": "Erhöht eure Angriffskraft 2 Min. lang um {buff}."
+      },
+      "cw_commanding_shout": {
+        "name": "Stärkender Ruf",
+        "description": "Erhöht eure Ausdauer 2 Min. lang um {buff}."
+      },
+      "cw_charge": {
+        "name": "Vorpreschen",
+        "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m."
+      },
+      "cw_rend": {
+        "name": "Tiefe Wunde",
+        "description": "Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten."
+      },
+      "cw_thunder_clap": {
+        "name": "Bebender Schlag",
+        "description": "Trifft nahe Gegner für {damage} Schaden und verlangsamt ihre Angriffe 10 Sek. lang um 10%."
+      },
+      "cw_hamstring": {
+        "name": "Lähmender Schnitt",
+        "description": "Verkrüppelt den Gegner für {damage} Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%."
+      },
+      "cw_bloodrage": {
+        "name": "Blutzoll",
+        "description": "Erzeugt 10 Wut auf Kosten von Gesundheit."
+      },
+      "cw_overpower": {
+        "name": "Redhand",
+        "description": "Sofortiger Angriff mit Waffenschaden plus {damage}. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden."
+      },
+      "cw_execute": {
+        "name": "Frühes Grab",
+        "description": "Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar."
+      },
+      "cw_slam": {
+        "name": "Roher Schwung",
+        "description": "Zerschmettert den Gegner für Waffenschaden plus {damage}."
+      },
+      "cw_cleave": {
+        "name": "Sichelschwung",
+        "description": "Ein weiter Hieb, der alle Gegner vor euch für {damage} Schaden trifft."
+      },
+      "cw_defensive_stance": {
+        "name": "Wehrhafte Haltung",
+        "description": "Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Direhowl",
+        "description": "Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}."
+      },
+      "cw_sunder_armor": {
+        "name": "Rüstungsspalter",
+        "description": "Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung."
+      },
+      "cw_taunt": {
+        "name": "Anstacheln",
+        "description": "Verspottet das Ziel: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen."
+      },
+      "cw_bloodthirst": {
+        "name": "Aderlass",
+        "description": "Greift sofort in blutiger Raserei an und verursacht 60% Waffenschaden plus {damage}. (Furor-Signatur)"
+      },
+      "cw_mortal_strike": {
+        "name": "Verstümmelnder Hieb",
+        "description": "Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)"
+      },
+      "cw_shield_slam": {
+        "name": "Shieldcrack",
+        "description": "Schlägt das Ziel mit eurem Schild für 50% Waffenschaden plus {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)"
+      },
+      "cw_whirlwind": {
+        "name": "Klingenwirbel",
+        "description": "Dreht euch in einem tödlichen Bogen und trefft alle nahen Gegner für {damage}. (Furor-Talent)"
+      },
+      "cw_berserker_rage": {
+        "name": "Brodelnde Raserei",
+        "description": "Ihr verfallt in brodelnde Raserei und erzeugt 20 Wut. (Krieger-Talent)"
       },
       "revenge": {
         "name": "Revenge",

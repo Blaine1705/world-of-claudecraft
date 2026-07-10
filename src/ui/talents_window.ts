@@ -129,7 +129,10 @@ const TAL_COLOR = {
 const SPEC_ICON_DIR = '/ui/specs';
 
 function specIconUrl(cls: PlayerClass, specId: string): string | null {
-  if (cls === 'warrior' && (specId === 'arms' || specId === 'fury' || specId === 'prot')) {
+  if (
+    (cls === 'warrior' || cls === 'warrior_classic') &&
+    (specId === 'arms' || specId === 'fury' || specId === 'prot')
+  ) {
     return `${SPEC_ICON_DIR}/${cls}/${specId}.webp`;
   }
   return null;

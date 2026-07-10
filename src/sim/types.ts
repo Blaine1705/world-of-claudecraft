@@ -82,6 +82,9 @@ export const DELVE_COMPANION_HEAL_INTERVAL = 3;
 
 export type PlayerClass =
   | 'warrior'
+  // The pre-overhaul warrior kit, kept as its own class on the PTR branch so
+  // testers can compare the two warrior designs side by side (owner 2026-07-11).
+  | 'warrior_classic'
   | 'paladin'
   | 'hunter'
   | 'rogue'
@@ -136,6 +139,7 @@ export interface ArenaCombatant {
 }
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
+  'warrior_classic',
   'paladin',
   'hunter',
   'rogue',
@@ -3195,6 +3199,17 @@ export function rageFromTaking(damage: number, attackerLevel: number): number {
   return damage / Math.max(1, attackerLevel);
 }
 
+// The pre-overhaul rage model, kept verbatim for the classic warrior (the
+// side-by-side test class): the overhaul raised the dealing coefficient
+// 7.5 -> 9 and removed the 1.5x attacker-level divisor on taken damage.
+export function rageFromDealingClassic(damage: number, level: number): number {
+  return (7.5 * damage) / rageConversion(level);
+}
+
+export function rageFromTakingClassic(damage: number, attackerLevel: number): number {
+  return damage / (Math.max(1, attackerLevel) * 1.5);
+}
+
 // Choice-row warrior talents: aura-driven rage-generation multiplier, applied
 // at every rage mint site (auto-attack dealing, taking, gainResource, Charge's
 // burst) on top of the talent-static autoRagePct/abilityRagePct globals. A
@@ -3253,6 +3268,7 @@ export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
 // is included (WoW hunters parry) even though it is not in MELEE_CLASSES.
 export const PARRY_CLASSES: ReadonlySet<PlayerClass> = new Set([
   'warrior',
+  'warrior_classic',
   'paladin',
   'rogue',
   'hunter',

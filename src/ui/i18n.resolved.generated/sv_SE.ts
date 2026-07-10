@@ -2032,6 +2032,12 @@ export const sv_SE: EnTranslations = {
       "charge": "Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.",
       "rend": "Öppnar en blödning som sliter ner målet över tid.",
       "thunder_clap": "Slår allt runt omkring dig och saktar ner deras attacker.",
+      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
+      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
+      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "cw_rend": "Opens a bleed that wears the target down over time.",
+      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
       "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
       "seal_of_righteousness": "Besjälar dina sving med helig skada, förbruka den sedan med Verdict.",
       "holy_light": "En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.",
@@ -3339,6 +3345,7 @@ export const sv_SE: EnTranslations = {
   },
   "classes": {
     "warrior": "Krigare",
+    "warriorClassic": "Krigare",
     "paladin": "Paladin",
     "hunter": "Jägare",
     "rogue": "Skurk",
@@ -4106,6 +4113,7 @@ export const sv_SE: EnTranslations = {
     },
     "roles": {
       "warrior": "Tank / Närstrids-DPS",
+      "warriorClassic": "Tank / Närstrids-DPS",
       "paladin": "Helare / Tank / Närstrids-DPS",
       "hunter": "Distans-DPS",
       "rogue": "Närstrids-DPS",
@@ -4130,6 +4138,7 @@ export const sv_SE: EnTranslations = {
     },
     "lore": {
       "warrior": "Krigare är stridshärdade närstridskämpar som bygger upp Raseri när de utdelar eller tar skada. De absorberar tunga slag eller krossar fiender med kraftfulla vapen.",
+      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
       "paladin": "Paladiner är heliga korsriddare som stödjer allierade med välsignelser, läker sår med Lagande ljus och skyddar de svaga i tung rustning.",
       "hunter": "Jägare är distansspecialister som slåss vid sidan av ett tämjt vilddjur, pepprar fiender med riktade skott och snabbeld, saktar ner dem med stick och krossande eld, och skiftar skepnader efter stundens behov.",
       "rogue": "Skurkar är smygande lönnmördare som spenderar Energi och Kombopoäng på ryggdolkar och dödsstötar från skuggorna.",
@@ -5157,6 +5166,90 @@ export const sv_SE: EnTranslations = {
       "heroic_strike": {
         "name": "Plundrarhugg",
         "description": "Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg."
+      },
+      "cw_heroic_strike": {
+        "name": "Plundrarhugg",
+        "description": "Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg."
+      },
+      "cw_battle_shout": {
+        "name": "Järnvrål",
+        "description": "Ökar din attackkraft med {buff} i 2 min."
+      },
+      "cw_commanding_shout": {
+        "name": "Stärkande rop",
+        "description": "Ökar din uthållighet med {buff} i 2 min."
+      },
+      "cw_charge": {
+        "name": "Anstormning",
+        "description": "Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd."
+      },
+      "cw_rend": {
+        "name": "Djup skåra",
+        "description": "Sårar målet och får det att blöda för {damage} skada över {duration} sek."
+      },
+      "cw_thunder_clap": {
+        "name": "Skälvande slag",
+        "description": "Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek."
+      },
+      "cw_hamstring": {
+        "name": "Haltande hugg",
+        "description": "Stympar fienden för {damage} skada och saktar dess förflyttning med 50 % i 15 sek."
+      },
+      "cw_bloodrage": {
+        "name": "Blodstull",
+        "description": "Genererar 10 raseri på bekostnad av hälsa."
+      },
+      "cw_overpower": {
+        "name": "Rödhand",
+        "description": "Omedelbart anfall för vapenskada plus {damage}. Endast användbart efter att målet väjt undan. Kan inte väjas undan."
+      },
+      "cw_execute": {
+        "name": "Tidig grav",
+        "description": "Försöker göra slut på en sårad fiende och vållar {damage} skada. Endast användbar på fiender under 20 % hälsa."
+      },
+      "cw_slam": {
+        "name": "Brutalt sving",
+        "description": "Smäller till motståndaren för vapenskada plus {damage}."
+      },
+      "cw_cleave": {
+        "name": "Skördebåge",
+        "description": "Ett svepande hugg som träffar alla fiender framför dig för {damage} skada."
+      },
+      "cw_defensive_stance": {
+        "name": "Gardställning",
+        "description": "En defensiv stridsställning: du genererar 30 % mer hot men vållar och tar 10 % mindre skada. Kasta igen för att lämna ställningen."
+      },
+      "cw_demoralizing_shout": {
+        "name": "Fasans tjut",
+        "description": "Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek."
+      },
+      "cw_sunder_armor": {
+        "name": "Rustningsklipp",
+        "description": "Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot."
+      },
+      "cw_taunt": {
+        "name": "Egga",
+        "description": "Hånar målet: ditt hot stiger till nivå med dess mest hatade fiende och det tvingas anfalla dig i 3 sek."
+      },
+      "cw_bloodthirst": {
+        "name": "Åderlåtning",
+        "description": "Attackera omedelbart i ett blodsraseri för 60 % vapenskada plus {damage}. (Raserisignatur)"
+      },
+      "cw_mortal_strike": {
+        "name": "Stympande hugg",
+        "description": "Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)"
+      },
+      "cw_shield_slam": {
+        "name": "Sköldkross",
+        "description": "Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)"
+      },
+      "cw_whirlwind": {
+        "name": "Klingvirvel",
+        "description": "Snurra i en dödlig båge och hugg alla närliggande fiender för {damage}. (Raserital)"
+      },
+      "cw_berserker_rage": {
+        "name": "Sjudande raseri",
+        "description": "Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)"
       },
       "revenge": {
         "name": "Revenge",
