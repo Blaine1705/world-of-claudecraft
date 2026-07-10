@@ -5,6 +5,7 @@ import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
+  CAMPS,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -25,15 +26,14 @@ import {
   isYumiMazePos,
   MOBS,
   NPCS,
-  WORLD_MAX_Z,
-  WORLD_MIN_Z,
   YUMI_MAZE_SLOT_COUNT,
   yumiMazeOrigin,
   ZONES,
+  zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftPlatformLift } from '../sim/rift/rift_gen';
-import type { BiomeId } from '../sim/types';
+import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
@@ -125,7 +125,7 @@ import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
-import { buildClouds, buildSky, type SkyView } from './sky';
+import { buildClouds, buildSky, ensureSkyAssetsAt, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
@@ -277,7 +277,6 @@ const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
 // Decay rate of the one-time offset captured when the self-motion predictor
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
-const SUN_HALO_OPACITY = 0.35; // bloom now supplies most of the halo
 // lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
 const HEMI_INTENSITY = 0.45;
 const SUN_INTENSITY = 2.8;
@@ -953,16 +952,16 @@ export class Renderer {
   private motes: MotesView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
-  private realmFlora: RealmFloraView;
-  private emberFeatures: EmberFeaturesView;
-  private frostSky: FrostSkyView;
-  private fenFeatures: FenFeaturesView;
-  private amberFeatures: AmberFeaturesView;
-  private nightFeatures: NightFeaturesView;
-  private hauntFeatures: HauntFeaturesView;
-  private jungleFeatures: JungleFeaturesView;
-  private gardenFeatures: GardenFeaturesView;
-  private galeFeatures: GaleFeaturesView;
+  private realmFlora: RealmFloraView | null = null;
+  private emberFeatures: EmberFeaturesView | null = null;
+  private frostSky: FrostSkyView | null = null;
+  private fenFeatures: FenFeaturesView | null = null;
+  private amberFeatures: AmberFeaturesView | null = null;
+  private nightFeatures: NightFeaturesView | null = null;
+  private hauntFeatures: HauntFeaturesView | null = null;
+  private jungleFeatures: JungleFeaturesView | null = null;
+  private gardenFeatures: GardenFeaturesView | null = null;
+  private galeFeatures: GaleFeaturesView | null = null;
   private fogScratch = new THREE.Color();
   // world day/night grade, recomputed each frame from the UTC-anchored clock in
   // updateAmbience and consumed by the outdoor fog/light easing, the sky dome,
@@ -1000,8 +999,22 @@ export class Renderer {
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
+  private envRTBySource = new WeakMap<THREE.Texture, THREE.WebGLRenderTarget>();
   private envBiome: BiomeId = 'vale';
   private envOutdoorIntensity = ENV_INTENSITY;
+  private preparedZones = new Set<string>();
+  private pendingZonePrepares = new Map<string, Promise<void>>();
+  private lastZonePrepareStats: {
+    zoneId: string;
+    totalMs: number;
+    skyMs: number;
+    terrainMs: number;
+    waterMs: number;
+    featuresMs: number;
+  } | null = null;
+  private prewarmedMobTemplates = new Set<string>();
+  private prewarmedNpcModels = new Set<string>();
+  private prewarmedZonePrograms = new Set<string>();
   private time = 0;
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
@@ -1181,7 +1194,10 @@ export class Renderer {
     // sky dome — follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
     // low keeps the legacy canvas-gradient dome.
-    this.skyView = buildSky(LOW_GFX, SUN_ANCHOR);
+    const initialX = this.sim.player.pos.x;
+    const initialZ = this.sim.player.pos.z;
+    const initialBiome = zoneBiomeAt(initialX, initialZ);
+    this.skyView = buildSky(LOW_GFX, SUN_ANCHOR, initialX, initialZ);
     this.sky = this.skyView.dome;
     setRenderCategory(this.sky, 'sky');
     this.scene.add(this.sky);
@@ -1192,42 +1208,22 @@ export class Renderer {
     // the unclamped sun that the dome shader tames with per-biome gain, so
     // the environment intensity is rescaled to match the shipped look.
     if (!LOW_GFX) {
-      const pmrem = new THREE.PMREMGenerator(this.webgl);
-      // every biome has its own HDRI now (three Poly Haven photographs plus
-      // the five project-generated realm skies), so each gets its own
-      // prefiltered RT; envRTs live for the whole session
-      const biomes: BiomeId[] = [
-        'vale',
-        'marsh',
-        'peaks',
-        'dusk',
-        'ember',
-        'frost',
-        'amber',
-        'fen',
-        'night',
-        'haunt',
-        'jungle',
-        'garden',
-        'gale',
-      ];
-      for (const b of biomes) {
-        const eq = this.skyView.envTexture(b);
-        if (eq) this.envRTs.set(b, pmrem.fromEquirectangular(eq));
-      }
-      if (this.envRTs.size > 0) {
+      const envRT = this.ensureEnvironmentBiome(initialBiome);
+      if (envRT) {
         this.envOutdoorIntensity = ENV_INTENSITY * IBL_RAW_SCALE;
-        this.scene.environment = this.envRTs.get('vale')?.texture ?? null;
-        this.scene.environmentRotation.y = this.skyView.envRotationY('vale');
+        this.scene.environment = envRT.texture;
+        this.scene.environmentRotation.y = this.skyView.envRotationY(initialBiome);
+        this.envBiome = initialBiome;
       } else {
         // fallback: prefilter the dome itself (gain/clamp already applied)
+        const pmrem = new THREE.PMREMGenerator(this.webgl);
         const envScene = new THREE.Scene();
         envScene.add(this.sky.clone());
         const envRT = pmrem.fromScene(envScene, 0.04, 0.1, 1100); // far must cover the 560u dome
         this.scene.environment = envRT.texture;
+        pmrem.dispose();
       }
       this.scene.environmentIntensity = this.envOutdoorIntensity;
-      pmrem.dispose(); // prefiltered envRTs stay alive for the session
     }
 
     const hemi = new THREE.HemisphereLight(0xdcefff, 0x465f39, LOW_GFX ? 0.98 : HEMI_INTENSITY);
@@ -1385,11 +1381,9 @@ export class Renderer {
     // visibility): stop their per-frame matrix recompose (static_matrix.ts).
     freezeStaticMatrices(this.terrainView.group);
     this.waterView = buildWater(this.sim.cfg.seed);
-    for (const mesh of this.waterView.meshes) {
-      setRenderCategory(mesh, 'water');
-      this.scene.add(mesh);
-      freezeStaticMatrices(mesh); // water animates via uniforms, never transforms
-    }
+    setRenderCategory(this.waterView.group, 'water');
+    this.scene.add(this.waterView.group);
+    freezeStaticMatrices(this.waterView.group); // water animates via uniforms, never transforms
 
     this.foliage = buildFoliage(this.sim.cfg.seed);
     setRenderCategory(this.foliage.group, 'foliage');
@@ -1460,53 +1454,6 @@ export class Renderer {
     this.scene.add(gatherNodes.group);
     // Baked into world space at build with no per-frame update(), same as props.
     freezeStaticMatrices(gatherNodes.group);
-
-    // The Veiled Hollow's glowing mushrooms and crystals; their glow lights
-    // join the same rank-culled fire-light budget.
-    this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
-    setRenderCategory(this.realmFlora.group, 'props');
-    this.scene.add(this.realmFlora.group);
-    freezeStaticMatrices(this.realmFlora.group);
-    for (const light of this.realmFlora.glowLights) this.fireLights.push(light);
-
-    // The Drakelands' lava pools and bloodglass, and the Frostveil's aurora.
-    this.emberFeatures = buildEmberFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.emberFeatures.group, 'props');
-    this.scene.add(this.emberFeatures.group);
-    freezeStaticMatrices(this.emberFeatures.group);
-    for (const light of this.emberFeatures.glowLights) this.fireLights.push(light);
-    this.frostSky = buildFrostSky(this.sim.cfg.seed);
-    this.scene.add(this.frostSky.group);
-    for (const light of this.frostSky.glowLights) this.fireLights.push(light);
-    this.fenFeatures = buildFenFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.fenFeatures.group, 'props');
-    this.scene.add(this.fenFeatures.group);
-    freezeStaticMatrices(this.fenFeatures.group);
-    this.amberFeatures = buildAmberFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.amberFeatures.group, 'props');
-    this.scene.add(this.amberFeatures.group);
-    freezeStaticMatrices(this.amberFeatures.group);
-    this.nightFeatures = buildNightFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.nightFeatures.group, 'props');
-    this.scene.add(this.nightFeatures.group);
-    freezeStaticMatrices(this.nightFeatures.group);
-    for (const light of this.nightFeatures.glowLights) this.fireLights.push(light);
-    this.hauntFeatures = buildHauntFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.hauntFeatures.group, 'props');
-    this.scene.add(this.hauntFeatures.group);
-    for (const light of this.hauntFeatures.glowLights) this.fireLights.push(light);
-    this.jungleFeatures = buildJungleFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.jungleFeatures.group, 'props');
-    this.scene.add(this.jungleFeatures.group);
-    freezeStaticMatrices(this.jungleFeatures.group);
-    this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.gardenFeatures.group, 'props');
-    this.scene.add(this.gardenFeatures.group);
-    freezeStaticMatrices(this.gardenFeatures.group);
-    this.galeFeatures = buildGaleFeatures(this.sim.cfg.seed);
-    setRenderCategory(this.galeFeatures.group, 'props');
-    this.scene.add(this.galeFeatures.group);
-    for (const light of this.galeFeatures.glowLights) this.fireLights.push(light);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -1739,6 +1686,208 @@ export class Renderer {
   /** Tone-mapping exposure multiplier (1.0 = the default look). */
   setBrightness(mult: number): void {
     this.webgl.toneMappingExposure = this.baseExposure * mult;
+  }
+
+  zoneIdAt(x: number, z: number): string | null {
+    return x > DUNGEON_X_THRESHOLD ? null : zoneAt(x, z).id;
+  }
+
+  isZonePreparedAt(x: number, z: number): boolean {
+    const id = this.zoneIdAt(x, z);
+    return id === null || this.preparedZones.has(id);
+  }
+
+  zoneStreamingStats(): {
+    prepared: number;
+    pending: number;
+    last: {
+      zoneId: string;
+      totalMs: number;
+      skyMs: number;
+      terrainMs: number;
+      waterMs: number;
+      featuresMs: number;
+    } | null;
+  } {
+    return {
+      prepared: this.preparedZones.size,
+      pending: this.pendingZonePrepares.size,
+      last: this.lastZonePrepareStats,
+    };
+  }
+
+  private ensureEnvironmentBiome(biome: BiomeId): THREE.WebGLRenderTarget | null {
+    if (this.lowGfx) return null;
+    const existing = this.envRTs.get(biome);
+    if (existing) return existing;
+    const source = this.skyView.envTexture(biome);
+    if (!source) return null;
+    let target = this.envRTBySource.get(source);
+    if (!target) {
+      const pmrem = new THREE.PMREMGenerator(this.webgl);
+      target = pmrem.fromEquirectangular(source);
+      pmrem.dispose();
+      this.envRTBySource.set(source, target);
+    }
+    this.envRTs.set(biome, target);
+    return target;
+  }
+
+  /**
+   * Materialize the terrain, water and bespoke render layer for one overworld
+   * zone. Calls for an already-loaded (or currently-loading) zone are cheap and
+   * share the same promise, so teleports and boundary jitter cannot duplicate
+   * geometry.
+   */
+  prepareZoneAt(
+    x: number,
+    z: number,
+    onProgress?: (done: number, total: number) => void,
+  ): Promise<void> {
+    const zoneId = this.zoneIdAt(x, z);
+    if (zoneId === null || this.preparedZones.has(zoneId)) {
+      onProgress?.(1, 1);
+      return Promise.resolve();
+    }
+    const pending = this.pendingZonePrepares.get(zoneId);
+    if (pending) return pending;
+    const zone = zoneAt(x, z);
+    const task = (async () => {
+      const started = performance.now();
+      onProgress?.(0, 100);
+      await ensureSkyAssetsAt(x, z);
+      this.ensureEnvironmentBiome(zone.biome);
+      const skyDone = performance.now();
+      onProgress?.(5, 100);
+      await this.terrainView.ensureZone(zone, (done, total) =>
+        onProgress?.(5 + Math.round((done / Math.max(1, total)) * 83), 100),
+      );
+      // The group itself was frozen while still empty in the constructor.
+      // Freeze the children added by this zone as well; subsequent zones are
+      // handled by their own prepare pass.
+      freezeStaticMatrices(this.terrainView.group);
+      const terrainDone = performance.now();
+      onProgress?.(89, 100);
+      const waterMeshes = await this.waterView.ensureZone(zone);
+      for (const mesh of waterMeshes) freezeStaticMatrices(mesh);
+      const waterDone = performance.now();
+      onProgress?.(96, 100);
+      this.ensureZoneFeatures(zone);
+      const featuresDone = performance.now();
+      this.preparedZones.add(zone.id);
+      this.lastZonePrepareStats = {
+        zoneId: zone.id,
+        totalMs: Math.round((featuresDone - started) * 10) / 10,
+        skyMs: Math.round((skyDone - started) * 10) / 10,
+        terrainMs: Math.round((terrainDone - skyDone) * 10) / 10,
+        waterMs: Math.round((waterDone - terrainDone) * 10) / 10,
+        featuresMs: Math.round((featuresDone - waterDone) * 10) / 10,
+      };
+      onProgress?.(100, 100);
+    })().finally(() => this.pendingZonePrepares.delete(zoneId));
+    this.pendingZonePrepares.set(zoneId, task);
+    return task;
+  }
+
+  async prewarmZoneAt(x: number, z: number): Promise<void> {
+    const zoneId = this.zoneIdAt(x, z);
+    if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
+    const zone = zoneAt(x, z);
+    const deadline = performance.now() + 5000;
+    const mobGroup = this.buildEntityPrewarmGroup(zone);
+    const npcGroup = this.buildNpcPrewarmGroup(zone, deadline);
+    this.scene.add(mobGroup, npcGroup);
+    try {
+      this.renderPrewarmPass(1 / 60);
+      if (this.asyncCompileSupported) {
+        await Promise.race([
+          this.webgl.compileAsync(this.scene, this.camera),
+          sleep(PREWARM_COMPILE_MAX_MS),
+        ]);
+      }
+      this.prewarmedZonePrograms.add(zoneId);
+    } finally {
+      mobGroup.removeFromParent();
+      npcGroup.removeFromParent();
+    }
+  }
+
+  private attachZoneFeature(
+    view: { group: THREE.Group; glowLights?: THREE.PointLight[] },
+    freeze = true,
+  ): void {
+    setRenderCategory(view.group, 'props');
+    this.scene.add(view.group);
+    if (freeze) freezeStaticMatrices(view.group);
+    for (const light of view.glowLights ?? []) this.fireLights.push(light);
+    this.lightRankDirty = true;
+  }
+
+  private ensureZoneFeatures(zone: ZoneDef): void {
+    switch (zone.biome) {
+      case 'dusk':
+        if (!this.realmFlora) {
+          this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
+          this.attachZoneFeature(this.realmFlora);
+        }
+        break;
+      case 'ember':
+        if (!this.emberFeatures) {
+          this.emberFeatures = buildEmberFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.emberFeatures);
+        }
+        break;
+      case 'frost':
+        if (!this.frostSky) {
+          this.frostSky = buildFrostSky(this.sim.cfg.seed);
+          this.attachZoneFeature(this.frostSky, false);
+        }
+        break;
+      case 'fen':
+        if (!this.fenFeatures) {
+          this.fenFeatures = buildFenFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.fenFeatures);
+        }
+        break;
+      case 'amber':
+        if (!this.amberFeatures) {
+          this.amberFeatures = buildAmberFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.amberFeatures);
+        }
+        break;
+      case 'night':
+        if (!this.nightFeatures) {
+          this.nightFeatures = buildNightFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.nightFeatures);
+        }
+        break;
+      case 'haunt':
+        if (!this.hauntFeatures) {
+          this.hauntFeatures = buildHauntFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.hauntFeatures, false);
+        }
+        break;
+      case 'jungle':
+        if (!this.jungleFeatures) {
+          this.jungleFeatures = buildJungleFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.jungleFeatures);
+        }
+        break;
+      case 'garden':
+        if (!this.gardenFeatures) {
+          this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.gardenFeatures);
+        }
+        break;
+      case 'gale':
+        if (!this.galeFeatures) {
+          this.galeFeatures = buildGaleFeatures(this.sim.cfg.seed);
+          this.attachZoneFeature(this.galeFeatures, false);
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   /** Toggle biome-driven ambient precipitation (snow/rain). */
@@ -2438,7 +2587,31 @@ export class Renderer {
     pool.push(object);
   }
 
-  private buildEntityPrewarmGroup(): THREE.Group {
+  private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
+    const ids = new Set<string>();
+    // Static content is authoritative here: online clients only receive nearby
+    // entities, so a just-crossed zone may not have delivered its first snapshot
+    // by the time the transition prewarm starts.
+    if (kind === 'mob') {
+      for (const camp of CAMPS) {
+        if (zoneAt(camp.center.x, camp.center.z).id === zone.id) ids.add(camp.mobId);
+      }
+    } else {
+      for (const npc of Object.values(NPCS)) {
+        if (!npc.dynamic && zoneAt(npc.pos.x, npc.pos.z).id === zone.id) ids.add(npc.id);
+      }
+    }
+    // Dynamic/event content has no static camp record. Union whatever the sim
+    // already knows without making correctness depend on snapshot timing.
+    for (const entity of this.sim.entities.values()) {
+      if (entity.kind !== kind || !entity.templateId || entity.pos.x > DUNGEON_X_THRESHOLD)
+        continue;
+      if (zoneAt(entity.pos.x, entity.pos.z).id === zone.id) ids.add(entity.templateId);
+    }
+    return [...ids].sort();
+  }
+
+  private buildEntityPrewarmGroup(zone: ZoneDef): THREE.Group {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 14);
@@ -2449,16 +2622,11 @@ export class Renderer {
       group.add(obj);
       idx++;
     };
-    // Track which visual MODELS have been built (visualKeyFor = the model selector;
-    // distinct shader programs are per-model, so this is what we must cover). The
-    // pool itself is still keyed per template via visualPoolKeyFor.
-    const builtModels = new Set<string>();
     const build = (templateId: string, copies: number): void => {
       const template = MOBS[templateId];
       if (!template) return;
       for (let i = 0; i < copies; i++) {
         const entity = this.prewarmEntity('mob', template.id, template.color, template.scale);
-        builtModels.add(visualKeyFor(entity));
         const visual = createCharacterVisual(entity);
         const poolKey = this.visualPoolKeyFor(entity);
         if (poolKey) this.storePooledVisual(poolKey, visual);
@@ -2466,26 +2634,13 @@ export class Renderer {
         place(visual.root);
       }
     };
-    // Common mobs spawn in packs → pool several copies per template (this also
-    // compiles their shaders).
-    for (const templateId of PREWARM_MOB_TEMPLATE_IDS) build(templateId, PREWARM_MOB_POOL_COPIES);
-    // Then every remaining mob whose visual MODEL hasn't been built yet — one copy,
-    // so its shader program is compiled at load and never hitches in-world. Mobs that
-    // share a family model are built only once. NOT deadline-gated: the distinct-model
-    // set is small (deduped by visualKeyFor) and is the whole point of this pass — a
-    // skipped model is a guaranteed in-world compile stall (real-GPU walk profiling
-    // caught a beast model linking ~4 programs / ~240ms when first seen north of spawn
-    // because the shared build deadline cut this loop off). The deadline still bounds
-    // the EXTRA pool copies above; one copy per model is cheap and mandatory.
-    for (const templateId of Object.keys(MOBS)) {
-      if (PREWARM_MOB_COMMON_IDS.has(templateId)) continue;
-      const template = MOBS[templateId];
-      if (!template) continue;
-      const modelKey = visualKeyFor(
-        this.prewarmEntity('mob', template.id, template.color, template.scale),
-      );
-      if (builtModels.has(modelKey)) continue;
-      build(templateId, 1);
+    // Warm only templates that can appear in this zone. The per-template set
+    // persists across transitions, so shared families are paid once per session.
+    for (const templateId of this.templateIdsInZone(zone, 'mob')) {
+      if (this.prewarmedMobTemplates.has(templateId)) continue;
+      const copies = PREWARM_MOB_COMMON_IDS.has(templateId) ? PREWARM_MOB_POOL_COPIES : 1;
+      build(templateId, copies);
+      this.prewarmedMobTemplates.add(templateId);
     }
     return group;
   }
@@ -2493,19 +2648,20 @@ export class Renderer {
   // Every NPC visual MODEL once (NPCs were not prewarmed at all — entering a zone hub
   // compiled their shaders live). Most NPCs share a handful of models (npc_knight,
   // npc_mage, ...), so dedup by model key (visualKeyFor) builds each only once.
-  private buildNpcPrewarmGroup(deadline: number): THREE.Group {
+  private buildNpcPrewarmGroup(zone: ZoneDef, deadline: number): THREE.Group {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 24);
     setRenderCategory(group, 'prewarm');
     let idx = 0;
-    const builtModels = new Set<string>();
-    for (const npc of Object.values(NPCS)) {
+    for (const npcId of this.templateIdsInZone(zone, 'npc')) {
       if (performance.now() >= deadline) break;
+      const npc = NPCS[npcId];
+      if (!npc) continue;
       const entity = this.prewarmEntity('npc', npc.id, npc.color, 1);
       const modelKey = visualKeyFor(entity);
-      if (builtModels.has(modelKey)) continue;
-      builtModels.add(modelKey);
+      if (this.prewarmedNpcModels.has(modelKey)) continue;
+      this.prewarmedNpcModels.add(modelKey);
       const visual = createCharacterVisual(entity);
       const poolKey = this.visualPoolKeyFor(entity);
       if (poolKey) this.storePooledVisual(poolKey, visual);
@@ -2659,6 +2815,9 @@ export class Renderer {
     const startCounts = this.prewarmCounts();
     const createdViewTypes: string[] = [];
     const p = this.sim.player;
+    const activeZone = zoneAt(p.pos.x, p.pos.z);
+    const zoneMobTemplateIds = this.templateIdsInZone(activeZone, 'mob');
+    const zoneNpcTemplateIds = this.templateIdsInZone(activeZone, 'npc');
     let createdViews = 0;
     let candidateViews = 0;
     let doorPrewarmGroup: THREE.Group | null = null;
@@ -2821,11 +2980,11 @@ export class Renderer {
         priority: 35,
         required: true,
         run: () => {
-          entityPrewarmGroup = this.buildEntityPrewarmGroup();
+          entityPrewarmGroup = this.buildEntityPrewarmGroup(activeZone);
           this.scene.add(entityPrewarmGroup);
         },
         detail: () =>
-          `mobs=${Object.keys(MOBS).length};common=${PREWARM_MOB_TEMPLATE_IDS.length};copies=${PREWARM_MOB_POOL_COPIES}`,
+          `zone=${activeZone.id};mobs=${zoneMobTemplateIds.length};copies=${PREWARM_MOB_POOL_COPIES}`,
       },
       {
         id: 'entities.npc-archetypes',
@@ -2833,10 +2992,10 @@ export class Renderer {
         priority: 36,
         required: true,
         run: () => {
-          npcPrewarmGroup = this.buildNpcPrewarmGroup(buildDeadline);
+          npcPrewarmGroup = this.buildNpcPrewarmGroup(activeZone, buildDeadline);
           this.scene.add(npcPrewarmGroup);
         },
-        detail: () => `npcs=${Object.keys(NPCS).length}`,
+        detail: () => `zone=${activeZone.id};npcs=${zoneNpcTemplateIds.length}`,
       },
       {
         id: 'objects.quest-archetypes',
@@ -2953,17 +3112,15 @@ export class Renderer {
         detail: () => `mode=${compileMode};timedOut=${compileTimedOut}`,
       },
       {
-        id: 'sky.biome-variants',
+        id: 'sky.current-zone',
         category: 'sky',
         priority: 90,
         required: false,
         run: () => {
-          const zs = [p.pos.z, ...ZONES.map((z) => z.zMax - 8), ...ZONES.map((z) => z.zMax + 8)]
-            .filter((z) => Number.isFinite(z) && z > WORLD_MIN_Z && z < WORLD_MAX_Z)
-            .slice(0, this.lowGfx ? 3 : 8);
-          for (const z of zs) {
+          const points = [p.pos, activeZone.hub];
+          for (const point of points) {
             if (performance.now() >= deadline) break;
-            this.skyView.setCameraPos(this.camera.position.x, z, 1 / 20);
+            this.skyView.setCameraPos(point.x, point.z, 1 / 20);
             this.renderPrewarmPass(1 / 60);
             renderPasses++;
           }
@@ -3050,6 +3207,7 @@ export class Renderer {
       diagnosticsBaseline,
     };
     this.lastPrewarmStats = stats;
+    this.prewarmedZonePrograms.add(activeZone.id);
     return stats;
   }
 
@@ -5353,16 +5511,16 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
-    this.realmFlora.update(this.time);
-    this.emberFeatures.update(this.time);
-    this.frostSky.update(this.time, this.camera.position.x, this.camera.position.z);
-    this.fenFeatures.update(this.time);
-    this.amberFeatures.update(this.time);
-    this.nightFeatures.update(this.time);
-    this.hauntFeatures.update(this.time);
-    this.jungleFeatures.update(this.time);
-    this.gardenFeatures.update(this.time);
-    this.galeFeatures.update(this.time);
+    this.realmFlora?.update(this.time);
+    this.emberFeatures?.update(this.time);
+    this.frostSky?.update(this.time, this.camera.position.x, this.camera.position.z);
+    this.fenFeatures?.update(this.time);
+    this.amberFeatures?.update(this.time);
+    this.nightFeatures?.update(this.time);
+    this.hauntFeatures?.update(this.time);
+    this.jungleFeatures?.update(this.time);
+    this.gardenFeatures?.update(this.time);
+    this.galeFeatures?.update(this.time);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     // null-safe cupInfo read: the offline Sim may predate the Vale Cup module
@@ -5759,6 +5917,15 @@ export class Renderer {
     this.terrainView = buildTerrain(this.sim.cfg.seed);
     setRenderCategory(this.terrainView.group, 'terrain');
     this.scene.add(this.terrainView.group);
+    freezeStaticMatrices(this.terrainView.group);
+    // A full editor rebuild replaces the zone cache along with the geometry.
+    // Re-run the same preparation path for every resident zone so the renderer
+    // cannot mistake an empty replacement view for an already-ready region.
+    const residentZones = ZONES.filter((zone) => this.preparedZones.has(zone.id));
+    this.preparedZones.clear();
+    for (const zone of residentZones) {
+      void this.prepareZoneAt(zone.hub.x, zone.hub.z);
+    }
   }
 
   /**
@@ -5791,18 +5958,23 @@ export class Renderer {
    * while the terrain basin itself has already moved. Editor-only.
    */
   rebuildWaterBodies(): void {
-    for (const mesh of this.waterView.meshes) {
-      this.scene.remove(mesh);
+    const old = this.waterView;
+    this.scene.remove(old.group);
+    for (const mesh of old.meshes) {
       mesh.geometry.dispose();
       const mat = mesh.material as THREE.Material | THREE.Material[];
       if (Array.isArray(mat)) for (const m of mat) m.dispose();
       else mat.dispose();
     }
     this.waterView = buildWater(this.sim.cfg.seed);
-    for (const mesh of this.waterView.meshes) {
-      setRenderCategory(mesh, 'water');
-      this.scene.add(mesh);
-      freezeStaticMatrices(mesh);
+    setRenderCategory(this.waterView.group, 'water');
+    this.scene.add(this.waterView.group);
+    freezeStaticMatrices(this.waterView.group);
+    for (const zone of ZONES) {
+      if (!this.preparedZones.has(zone.id)) continue;
+      void this.waterView.ensureZone(zone).then((meshes) => {
+        for (const mesh of meshes) freezeStaticMatrices(mesh);
+      });
     }
   }
 

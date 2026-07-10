@@ -1,15 +1,7 @@
 import * as THREE from 'three';
-import {
-  COLUMN_ZONES,
-  columnBlendAt,
-  STRIP_ZONES,
-  WORLD_MAX_Z,
-  WORLD_MIN_Z,
-  ZONES,
-} from '../sim/data';
+import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { loadHdr, loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
 import { cloudTexture, skyTexture } from './textures';
 
@@ -341,21 +333,18 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
-// 2K HDRs are ~17MB on disk; 1K is ~4MB. Pick the lighter set for phone /
-// low-memory browser sessions before preload starts, and skip entirely when
-// the URL already forces the gradient-dome tier. An auto-detected software-GL
-// low tier can only be known after WebGL context creation, which happens after
-// preload, so this best-effort device gate keeps mobile out of the worst path.
-if (GFX.standardMaterials) {
-  for (const biome of Object.keys(BIOME_HDRI) as BiomeId[]) {
-    registerPreload(
+const skyAssetTasks = new Map<BiomeId, Promise<void>>();
+
+export function ensureSkyBiomeAssets(biomes: readonly BiomeId[]): Promise<void> {
+  if (!GFX.standardMaterials) return Promise.resolve();
+  const tasks = [...new Set(biomes)].map((biome) => {
+    const existing = skyAssetTasks.get(biome);
+    if (existing) return existing;
+    const task = Promise.all([
       loadHdr(BIOME_HDRI[biome]).then((tex) => {
-        tex.wrapS = THREE.RepeatWrapping; // azimuth rotation needs u to wrap
+        tex.wrapS = THREE.RepeatWrapping;
         hdriStore[biome] = tex;
-        return tex;
       }),
-    );
-    registerPreload(
       loadTexture(BIOME_BACKDROP[biome], { srgb: true })
         .then((tex) => {
           tex.wrapS = THREE.RepeatWrapping;
@@ -364,19 +353,23 @@ if (GFX.standardMaterials) {
           tex.magFilter = THREE.LinearFilter;
           tex.generateMipmaps = true;
           backdropStore[biome] = tex;
-          return tex;
         })
         .catch(() => undefined),
-    );
-  }
+    ]).then(() => undefined);
+    skyAssetTasks.set(biome, task);
+    return task;
+  });
+  return Promise.all(tasks).then(() => undefined);
 }
 
-export function hasSkyHdriAssets(): boolean {
-  return Boolean(hdriStore.vale && hdriStore.marsh && hdriStore.peaks);
+export function hasSkyHdriAssets(biomes: readonly BiomeId[] = ['vale', 'marsh', 'peaks']): boolean {
+  return biomes.every((biome) => Boolean(hdriStore[biome]));
 }
 
-export function hasBackdropAssets(): boolean {
-  return Boolean(backdropStore.vale && backdropStore.marsh && backdropStore.peaks);
+export function hasBackdropAssets(
+  biomes: readonly BiomeId[] = ['vale', 'marsh', 'peaks'],
+): boolean {
+  return biomes.every((biome) => Boolean(backdropStore[biome]));
 }
 
 export interface SkyView {
@@ -543,14 +536,30 @@ function biomeBlendAt(x: number, z: number): BiomeBlend {
   return { from, to, t };
 }
 
+export function skyBiomesAt(x: number, z: number): readonly BiomeId[] {
+  const blend = biomeBlendAt(x, z);
+  return blend.from === blend.to ? [blend.from] : [blend.from, blend.to];
+}
+
+export function ensureSkyAssetsAt(x: number, z: number): Promise<void> {
+  return ensureSkyBiomeAssets(skyBiomesAt(x, z));
+}
+
 // u offset that moves a given HDRI's sun azimuth onto SUN_ANCHOR's azimuth
 function sunOffsetU(biome: BiomeId, sunDir: THREE.Vector3): number {
   const sunU = Math.atan2(sunDir.z, sunDir.x) / (2 * Math.PI) + 0.5;
   return HDRI_SUN_U[biome] - sunU;
 }
 
-export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
-  if (lowGfx || !hasSkyHdriAssets()) {
+export function buildSky(
+  lowGfx: boolean,
+  sunDir: THREE.Vector3,
+  initialX = 0,
+  initialZ = 0,
+): SkyView {
+  const start = biomeBlendAt(initialX, initialZ);
+  const startBiomes = start.from === start.to ? [start.from] : [start.from, start.to];
+  if (lowGfx || !hasSkyHdriAssets(startBiomes)) {
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(DOME_RADIUS, 24, 16),
       new THREE.MeshBasicMaterial({
@@ -573,13 +582,12 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   }
 
   const sun = sunDir.clone().normalize();
-  const backdropsReady = hasBackdropAssets();
+  const backdropsReady = hasBackdropAssets(startBiomes);
   const tuneVec = (b: BiomeId): THREE.Vector2 =>
     new THREE.Vector2(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp);
   const tintVec = (b: BiomeId): THREE.Vector3 => new THREE.Vector3(...BIOME_TINT[b]);
   const backdropTex = (b: BiomeId): THREE.Texture =>
     (backdropsReady ? backdropStore[b] : hdriStore[b]) as THREE.Texture;
-  const start = biomeBlendAt(0, 0);
   const uniforms = {
     uSkyA: { value: hdriStore[start.from] as THREE.Texture },
     uSkyB: { value: hdriStore[start.to] as THREE.Texture },
@@ -619,6 +627,7 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     dome,
     setCameraPos(x: number, z: number, dt: number): void {
       const next = biomeBlendAt(x, z);
+      if (!hasSkyHdriAssets([next.from, next.to])) return;
       if (next.from !== cur.from || next.to !== cur.to) {
         uniforms.uSkyA.value = hdriStore[next.from] as THREE.Texture;
         uniforms.uSkyB.value = hdriStore[next.to] as THREE.Texture;

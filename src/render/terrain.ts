@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import {
   COLUMN_ZONES,
   columnBlendAt,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
@@ -9,7 +11,7 @@ import {
   ZONES,
 } from '../sim/data';
 import { fbm2 } from '../sim/rng';
-import type { BiomeId } from '../sim/types';
+import type { BiomeId, ZoneDef } from '../sim/types';
 import { inGardenMaze, roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -123,9 +125,13 @@ const LOD_BANDS = {
 const WALL_LOD_RIDGE_HALF = 30;
 const WALL_LOD_RIM_MARGIN = 40;
 
-// terrain normal map resolution (~0.56u per texel over 360x1080)
-const NORMAL_TEX_W = 640;
-const NORMAL_TEX_H = 1920;
+// Macro relief only needs to carry broad slopes: vertex normals and the four
+// tiled material normals own close detail. The atlas spans the whole expanded
+// world but is baked sparsely by zone, so keep it compact enough that entering
+// a new region never turns tens of thousands of terrainHeight samples into a
+// second boot. At the current bounds this is roughly 3yd/texel.
+const NORMAL_TEX_W = 320;
+const NORMAL_TEX_H = 960;
 const NORMAL_TEX_STRENGTH = 1.35;
 
 // Ground colors per biome; boundaries blend across the same window as the
@@ -801,9 +807,16 @@ function bakeNormalRegion(
   }
 }
 
-function terrainNormalTexture(seed: number): THREE.DataTexture {
+function terrainNormalTexture(): THREE.DataTexture {
   const data = new Uint8Array(NORMAL_TEX_W * NORMAL_TEX_H * 4);
-  bakeNormalRegion(data, seed, 0, NORMAL_TEX_W - 1, 0, NORMAL_TEX_H - 1);
+  // Zone texels are baked on demand. Unloaded areas remain a flat normal and
+  // have no geometry, so they cannot be sampled on screen.
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 128;
+    data[i + 1] = 128;
+    data[i + 2] = 255;
+    data[i + 3] = 255;
+  }
   const tex = new THREE.DataTexture(data, NORMAL_TEX_W, NORMAL_TEX_H, THREE.RGBAFormat);
   tex.colorSpace = THREE.NoColorSpace;
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
@@ -1059,6 +1072,9 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
 
 export interface TerrainView {
   group: THREE.Group;
+  /** Materialize one overworld zone. Repeated calls share the cached task. */
+  ensureZone(zone: ZoneDef, onProgress?: (done: number, total: number) => void): Promise<void>;
+  isZoneLoaded(zoneId: string): boolean;
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
   /**
@@ -1089,7 +1105,7 @@ export interface TerrainView {
 export function buildTerrain(seed: number): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
   const brush = makeBrushUniforms();
-  const normalTex = lowGfx ? null : terrainNormalTexture(seed);
+  const normalTex = lowGfx ? null : terrainNormalTexture();
   const mat = normalTex ? buildSplatMaterial(normalTex, brush) : buildLambertMaterial(brush);
   const bands = lowGfx ? LOD_BANDS.low : LOD_BANDS.high;
   const group = new THREE.Group();
@@ -1170,47 +1186,134 @@ export function buildTerrain(seed: number): TerrainView {
   // count hurts and culling granularity matters least
   const farBand = bands.length - 1;
   const built = new Set<number>();
-  for (let cz = 0; cz < chunksZ; cz++) {
-    for (let cx = 0; cx < chunksX; cx++) {
-      if (built.has(cz * chunksX + cx)) continue;
-      const superOk =
-        cx % 2 === 0 &&
-        cz % 2 === 0 &&
-        cx + 1 < chunksX &&
-        cz + 1 < chunksZ &&
-        bandIndexAt(cx, cz) === farBand &&
-        bandIndexAt(cx + 1, cz) === farBand &&
-        bandIndexAt(cx, cz + 1) === farBand &&
-        bandIndexAt(cx + 1, cz + 1) === farBand;
-      if (superOk) {
-        for (const [dx, dz] of [
-          [0, 0],
-          [1, 0],
-          [0, 1],
-          [1, 1],
-        ]) {
-          built.add((cz + dz) * chunksX + (cx + dx));
-        }
-        addChunk(
-          -WORLD_MAX_X + cx * CHUNK_SIZE,
-          WORLD_MIN_Z + cz * CHUNK_SIZE,
-          CHUNK_SIZE * 2,
-          bands[farBand].spacing,
-        );
-      } else {
-        built.add(cz * chunksX + cx);
-        const band = bands[bandIndexAt(cx, cz)];
-        addChunk(
-          -WORLD_MAX_X + cx * CHUNK_SIZE,
-          WORLD_MIN_Z + cz * CHUNK_SIZE,
-          CHUNK_SIZE,
-          band.spacing,
-        );
+  const loadedZones = new Set<string>();
+  const pendingZones = new Map<string, Promise<void>>();
+  const cellOwnerId = (cx: number, cz: number): string | null => {
+    const x = -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE;
+    const z = WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE;
+    // zoneAt deliberately clamps gaps/out-of-bounds positions to the nearest
+    // playable zone. Terrain ownership must not: otherwise asking for one
+    // column can accidentally materialize chunks in an empty neighbouring
+    // column merely because that zone is the fallback for the same z band.
+    return (
+      ZONES.find(
+        (candidate) =>
+          z >= candidate.zMin &&
+          z < candidate.zMax &&
+          x >= (candidate.xMin ?? STRIP_MIN_X) &&
+          x < (candidate.xMax ?? STRIP_MAX_X),
+      )?.id ?? null
+    );
+  };
+  const zoneCells = (zone: ZoneDef): [number, number][] => {
+    const out: [number, number][] = [];
+    for (let cz = 0; cz < chunksZ; cz++) {
+      for (let cx = 0; cx < chunksX; cx++) {
+        if (cellOwnerId(cx, cz) === zone.id) out.push([cx, cz]);
       }
     }
-  }
+    return out;
+  };
+  const yieldBuild = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+  const normalBoundsFor = (zone: ZoneDef) =>
+    normalTexelBounds(
+      zone.xMin ?? STRIP_MIN_X,
+      zone.zMin,
+      zone.xMax ?? STRIP_MAX_X,
+      zone.zMax,
+      -WORLD_MAX_X,
+      WORLD_MIN_Z,
+      WORLD_MAX_X * 2,
+      WORLD_MAX_Z - WORLD_MIN_Z,
+      NORMAL_TEX_W,
+      NORMAL_TEX_H,
+      1,
+    );
+  const ensureZone = (
+    zone: ZoneDef,
+    onProgress?: (done: number, total: number) => void,
+  ): Promise<void> => {
+    if (loadedZones.has(zone.id)) {
+      onProgress?.(1, 1);
+      return Promise.resolve();
+    }
+    const pending = pendingZones.get(zone.id);
+    if (pending) return pending;
+    const task = (async () => {
+      const cells = zoneCells(zone);
+      const normalBounds = normalTex ? normalBoundsFor(zone) : null;
+      const rowsPerSlice = 12;
+      const normalSlices = normalBounds
+        ? Math.ceil((normalBounds.j1 - normalBounds.j0 + 1) / rowsPerSlice)
+        : 0;
+      const total = Math.max(1, normalSlices + cells.length);
+      let done = 0;
+      if (normalTex && normalBounds) {
+        for (let j = normalBounds.j0; j <= normalBounds.j1; j += rowsPerSlice) {
+          bakeNormalRegion(
+            normalTex.image.data as Uint8Array,
+            seed,
+            normalBounds.i0,
+            normalBounds.i1,
+            j,
+            Math.min(normalBounds.j1, j + rowsPerSlice - 1),
+          );
+          onProgress?.(++done, total);
+          await yieldBuild();
+        }
+        normalTex.needsUpdate = true;
+      }
+      for (const [cx, cz] of cells) {
+        const cell = cz * chunksX + cx;
+        if (!built.has(cell)) {
+          const superCells = [
+            [cx, cz],
+            [cx + 1, cz],
+            [cx, cz + 1],
+            [cx + 1, cz + 1],
+          ] as const;
+          const superOk =
+            cx % 2 === 0 &&
+            cz % 2 === 0 &&
+            cx + 1 < chunksX &&
+            cz + 1 < chunksZ &&
+            superCells.every(
+              ([sx, sz]) =>
+                cellOwnerId(sx, sz) === zone.id &&
+                !built.has(sz * chunksX + sx) &&
+                bandIndexAt(sx, sz) === farBand,
+            );
+          if (superOk) {
+            for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
+            addChunk(
+              -WORLD_MAX_X + cx * CHUNK_SIZE,
+              WORLD_MIN_Z + cz * CHUNK_SIZE,
+              CHUNK_SIZE * 2,
+              bands[farBand].spacing,
+            );
+          } else {
+            built.add(cell);
+            addChunk(
+              -WORLD_MAX_X + cx * CHUNK_SIZE,
+              WORLD_MIN_Z + cz * CHUNK_SIZE,
+              CHUNK_SIZE,
+              bands[bandIndexAt(cx, cz)].spacing,
+            );
+          }
+        }
+        onProgress?.(++done, total);
+        if (done % 4 === 0) await yieldBuild();
+      }
+      loadedZones.add(zone.id);
+      onProgress?.(total, total);
+    })().finally(() => pendingZones.delete(zone.id));
+    pendingZones.set(zone.id, task);
+    return task;
+  };
   return {
     group,
+    ensureZone,
+    isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
     update(camX: number, camZ: number, fogFar: number): void {
       // fully-fogged chunks are pure overdraw; drop them before the frustum
       for (const chunk of chunks) {

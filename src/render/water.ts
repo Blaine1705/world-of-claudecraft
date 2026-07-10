@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE, ZONES } from '../sim/data';
+import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE } from '../sim/data';
+import type { ZoneDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -48,7 +49,10 @@ const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
 export interface WaterView {
+  group: THREE.Group;
   meshes: THREE.Mesh[];
+  ensureZone(zone: ZoneDef): Promise<THREE.Mesh[]>;
+  isZoneLoaded(zoneId: string): boolean;
   /** advances the legacy texture scroll (low tier); high tier uses uTime */
   update(time: number): void;
   /**
@@ -160,6 +164,10 @@ function buildShaderWater(seed: number): WaterView {
   });
 
   const meshes: THREE.Mesh[] = [];
+  const group = new THREE.Group();
+  group.name = 'water';
+  const loadedZones = new Set<string>();
+  const pendingZones = new Map<string, Promise<THREE.Mesh[]>>();
   // Per-mesh in-place refit closures: re-seat y and recompute the shore-depth
   // attribute from the CURRENT terrain (build and setLevel share them). The
   // vertices never move (only the attribute + the mesh transform change), so
@@ -180,12 +188,13 @@ function buildShaderWater(seed: number): WaterView {
     const apron = new THREE.Mesh(geo, material);
     apron.position.y = WATER_LEVEL - 0.06;
     meshes.push(apron);
+    group.add(apron);
     refits.push(() => {
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       apron.position.y = WATER_LEVEL - 0.06;
     });
   }
-  for (const zone of ZONES) {
+  const buildZone = (zone: ZoneDef): THREE.Mesh => {
     const depth = zone.zMax - zone.zMin;
     // each plane covers its zone's own rect: the side columns live at
     // x beyond the strip, and a strip-centered plane would leave their
@@ -214,14 +223,32 @@ function buildShaderWater(seed: number): WaterView {
     const mesh = new THREE.Mesh(geo, material);
     mesh.position.y = WATER_LEVEL;
     meshes.push(mesh);
+    group.add(mesh);
     refits.push(() => {
       fill();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       mesh.position.y = WATER_LEVEL;
     });
-  }
+    return mesh;
+  };
   return {
+    group,
     meshes,
+    ensureZone(zone: ZoneDef): Promise<THREE.Mesh[]> {
+      if (loadedZones.has(zone.id)) return Promise.resolve([]);
+      const pending = pendingZones.get(zone.id);
+      if (pending) return pending;
+      const task = new Promise<void>((resolve) => setTimeout(resolve, 0))
+        .then(() => {
+          const mesh = buildZone(zone);
+          loadedZones.add(zone.id);
+          return [mesh];
+        })
+        .finally(() => pendingZones.delete(zone.id));
+      pendingZones.set(zone.id, task);
+      return task;
+    },
+    isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
     update: () => {},
     setLevel(): void {
       for (const refit of refits) refit();
@@ -250,8 +277,14 @@ function buildPhongWater(): WaterView {
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, worldDepth).rotateX(-Math.PI / 2), mat);
   mesh.position.set(0, WATER_LEVEL, (WORLD_MIN_Z + WORLD_MAX_Z) / 2);
   const meshes = [mesh];
+  const group = new THREE.Group();
+  group.name = 'water';
+  group.add(mesh);
   return {
+    group,
     meshes,
+    ensureZone: async () => [],
+    isZoneLoaded: () => true,
     update(time: number): void {
       tex.offset.x = time * 0.008;
       tex.offset.y = time * 0.011;

@@ -106,7 +106,7 @@ import { setDayNightPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import type { SelfMotionFrame } from './render/self_motion';
-import { navigatorSaveData } from './render/sky';
+import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
@@ -714,12 +714,14 @@ let loadingHideTimer: number | null = null;
 
 function showLoadingScreen(statusText: string): void {
   const el = $('#loading-screen');
+  const wasVisible = el.classList.contains('visible');
   if (loadingHideTimer !== null) {
     window.clearTimeout(loadingHideTimer);
     loadingHideTimer = null;
   }
   el.classList.remove('fade');
   el.classList.add('visible');
+  if (!wasVisible) $('#ls-fill').style.width = '0%';
   setLoadingStatus(statusText);
 }
 
@@ -727,9 +729,21 @@ function setLoadingStatus(text: string): void {
   $('#ls-status').textContent = text;
 }
 
-function setLoadingProgress(done: number, total: number): void {
-  $('#ls-fill').style.width = total > 0 ? `${Math.round((done / total) * 100)}%` : '0%';
+function setLoadingProgressRange(
+  done: number,
+  total: number,
+  rangeStart: number,
+  rangeEnd: number,
+): void {
+  const fraction = total > 0 ? Math.max(0, Math.min(1, done / total)) : 0;
+  const percent = rangeStart + (rangeEnd - rangeStart) * fraction;
+  $('#ls-fill').style.width = `${Math.round(percent)}%`;
   setLoadingStatus(t('loading.worldProgress', { done, total }));
+}
+
+function setLoadingPercent(percent: number, statusText: string): void {
+  $('#ls-fill').style.width = `${Math.max(0, Math.min(100, Math.round(percent)))}%`;
+  setLoadingStatus(statusText);
 }
 
 function hideLoadingScreen(): void {
@@ -838,7 +852,7 @@ async function startGame(
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
   try {
-    await assetsReady((done, total) => setLoadingProgress(done, total));
+    await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
   } catch (err) {
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
@@ -910,6 +924,9 @@ async function startGame(
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null);
   try {
+    setLoadingPercent(37, t('loading.enteringWorld'));
+    await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
+    setLoadingPercent(40, t('loading.enteringWorld'));
     renderer = new Renderer(world, canvas, nameplates);
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
@@ -2144,6 +2161,45 @@ async function startGame(
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
   let gameInputReady = false;
+  let zoneWarmup: Promise<void> | null = null;
+
+  const maybeWarmCurrentZone = (): void => {
+    const player = world.player;
+    if (zoneWarmup || renderer.isZonePreparedAt(player.pos.x, player.pos.z)) return;
+    const zoneX = player.pos.x;
+    const zoneZ = player.pos.z;
+    const resumeInput = gameInputReady;
+    gameInputReady = false;
+    showLoadingScreen(t('loading.world'));
+    zoneWarmup = nextPaint()
+      .then(() =>
+        renderer.prepareZoneAt(zoneX, zoneZ, (done, total) =>
+          setLoadingProgressRange(done, total, 0, 94),
+        ),
+      )
+      .then(async () => {
+        setLoadingPercent(96, t('loading.enteringWorld'));
+        try {
+          await renderer.prewarmZoneAt(zoneX, zoneZ);
+        } catch (err) {
+          console.warn('Zone shader prewarm failed', err);
+        }
+      })
+      .then(() => setLoadingPercent(100, t('loading.enteringWorld')))
+      .then(nextPaint)
+      .then(() => {
+        hideLoadingScreen();
+        gameInputReady = resumeInput;
+        last = performance.now();
+        acc = 0;
+      })
+      .catch((err) => {
+        fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
+      })
+      .finally(() => {
+        zoneWarmup = null;
+      });
+  };
 
   // Camera follow state: keyboard turning advances facing in 20Hz sim steps,
   // so the camera tracks the player's render-interpolated facing per frame
@@ -2402,6 +2458,7 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
+    maybeWarmCurrentZone();
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
@@ -2776,10 +2833,23 @@ async function startGame(
   input.setSuspendMovement(true);
   await nextPaint();
   try {
+    await renderer.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
+      setLoadingProgressRange(done, total, 40, 88),
+    );
+  } catch (err) {
+    fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
+    return;
+  }
+  setLoadingPercent(90, t('loading.enteringWorld'));
+  try {
     await renderer.prewarmInitialScene();
   } catch (err) {
+    // Shader prewarm is an optimization; a failed program warmup can safely
+    // fall back to Three's normal first-use compilation once the zone itself
+    // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
+  setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();
   requestAnimationFrame(frame);
