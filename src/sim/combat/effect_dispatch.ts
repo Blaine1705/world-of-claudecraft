@@ -45,6 +45,13 @@ import {
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { isFormAuraKind } from './forms';
+import {
+  frostMageAfterCast,
+  resolveFrozenCast,
+  SHATTER_CRIT_BONUS,
+  SHATTER_CRIT_DMG_BONUS,
+} from './frost_mage';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
@@ -182,10 +189,29 @@ export function runEffects(
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
   const mods = ctx.playerMods(meta);
-  const forceCrit = hasSureCritAura(p);
-  const canAreaEcho = hasAreaEchoAura(p) && abilityQualifiesForAreaEcho(res.effects);
-  let spentSureCrit = false;
-  let spentAreaEcho = false;
+  // Set by the weaponStrike/directDamage cases when an echo-eligible cast
+  // actually dealt single-target hostile damage; gates the charge consumption
+  // after the loop (a fully whiffed cast keeps its charge).
+  let areaEchoDealt = false;
+  // Sweeping Strikes (Arms): a worn window makes each single-target strike clip
+  // one nearby enemy for 75%. Aura-driven (no charge), resolved once per cast
+  // like the echo. SWEEP_MULT is the reduced fraction.
+  const SWEEP_MULT = 0.75;
+  const sweeping = hasSweepingStrikes(p) && abilityQualifiesForAreaEcho(ability.effects);
+  // Emboldened (combat/sure_crit.ts): resolved ONCE per cast, so a
+  // multi-strike cast (Red Harvest) crits every strike and spends a single
+  // charge below. Each crit-roll site still draws its rng exactly as before
+  // (the stream position never moves); the flag only overrides the outcome.
+  // `sureCritRolled` is set where a crit roll actually happened, so a fully
+  // whiffed cast or a cast with no crit roll (pure buffs, plain AoE) never
+  // spends a charge.
+  const sureCrit = hasSureCritAura(p);
+  let sureCritRolled = false;
+  // Frost mage (combat/frost_mage.ts): resolved ONCE per cast, like the sure
+  // crit above, so a multi-hit cast shares one frozen resolution and spends at
+  // most one Fingers of Frost stack / Winter's Chill charge. Inert (and free)
+  // for everyone who is not a committed-frost mage. Deterministic, no rng.
+  const frozen = resolveFrozenCast(ctx, p, meta, ability, target);
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -300,7 +326,7 @@ export function runEffects(
         if (!ctx.isHostileTo(p, target)) break;
         const rooted = isRootedOrChilled(target);
         const critChance =
-          isSpell && rooted
+          (isSpell && rooted
             ? ctx.spellCrit(p) + mods.global.critVsRooted
             : isSpell
               ? ctx.spellCrit(p)
@@ -315,15 +341,23 @@ export function runEffects(
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
+        // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
+        // the per-cast resolution carries its 3x; 1 for every other cast.
+        if (isSpell && frozen.treatAsFrozen) dmg *= frozen.damageMult;
         // Conditional talent damage vs a target carrying the CASTER'S DoT
         // (Twisted Faith style). Deterministic aura scan, no rng.
         const vsDotted = mods.abilities[ability.id]?.dmgPctVsDotted ?? 0;
         if (vsDotted > 0 && target.auras.some((a) => a.kind === 'dot' && a.sourceId === p.id))
           dmg *= 1 + vsDotted;
-        const rolledCrit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
-        const crit = forceCrit || rolledCrit;
-        if (forceCrit) spentSureCrit = true;
-        if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+        // Emboldened: the roll is still drawn; only the outcome is overridden.
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit;
+        if (sureCrit) sureCritRolled = true;
+        if (crit)
+          dmg *=
+            (isSpell ? 1.5 : 2) +
+            p.critDmgBonus +
+            // Shatter: crits against a frozen-counting target hit harder.
+            (isSpell && frozen.treatAsFrozen ? SHATTER_CRIT_DMG_BONUS : 0);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         const finalDamage = Math.round(dmg);
@@ -548,25 +582,32 @@ export function runEffects(
           // mobs); isFriendlyTo filters to healable allies, so one scan suffices.
           // The pick is a deterministic min (hp fraction, then distance, then id),
           // so it is independent of grid iteration order (no rng here).
-          ctx.grid.forEachInRadius(from.pos.x, from.pos.z, eff.radius, (e, d2) => {
-            if (e.dead || chain.includes(e)) return;
-            // Allies only: players and player-owned pets (what a friendly-target
-            // heal may hit), never a hostile or an NPC bystander.
-            if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
-            // hp/maxHp are integers, so equal fractions compute the identical float:
-            // an EXACT ladder (frac, then distance, then id) is transitive and thus
-            // order-independent, no epsilon window needed.
-            const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-            const better =
-              best === null ||
-              frac < bestFrac ||
-              (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
-            if (better) {
-              best = e;
-              bestFrac = frac;
-              bestD2 = d2;
-            }
-          });
+          // Arc reach: content uses either jumpRange (warrior overhaul) or radius
+          // (PTR); read whichever is set.
+          ctx.grid.forEachInRadius(
+            from.pos.x,
+            from.pos.z,
+            eff.jumpRange ?? eff.radius ?? 0,
+            (e, d2) => {
+              if (e.dead || chain.includes(e)) return;
+              // Allies only: players and player-owned pets (what a friendly-target
+              // heal may hit), never a hostile or an NPC bystander.
+              if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
+              // hp/maxHp are integers, so equal fractions compute the identical float:
+              // an EXACT ladder (frac, then distance, then id) is transitive and thus
+              // order-independent, no epsilon window needed.
+              const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
+              const better =
+                best === null ||
+                frac < bestFrac ||
+                (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
+              if (better) {
+                best = e;
+                bestFrac = frac;
+                bestD2 = d2;
+              }
+            },
+          );
           if (best === null) break;
           chain.push(best);
         }
@@ -2344,6 +2385,11 @@ export function runEffects(
 
   if (spentSureCrit) consumeSureCritCharge(ctx, p);
   if (spentAreaEcho) consumeAreaEchoCharge(ctx, p);
+
+  // Frost mage post-impact rider (combat/frost_mage.ts): frostbolt rolls its
+  // two procs (committed frost only, so no existing golden moves); Flurry
+  // plants Winter's Chill on its surviving target. Inert for everyone else.
+  frostMageAfterCast(ctx, p, meta, ability, target);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

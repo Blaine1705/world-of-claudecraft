@@ -243,16 +243,9 @@ export type AuraKind =
   // cooldown and hits 30% harder (consumed in castAbility's override).
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
-  // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
-  // Orb pulses. At 5 it gates Glacial Spike (requiresAuraStacks), which consumes
-  // the whole stack for its slow, heavy hit + a target freeze.
   | 'fingers_of_frost'
   | 'brain_freeze'
   | 'winters_chill'
-  | 'icicles'
-  // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
-  // Darts does not consume the caster's Arcane Charges.
-  | 'perfect_moment'
   // Warrior combat stances (mutually exclusive, exclusiveGroup 'warrior_stance').
   // `battle_stance`: the offensive default for Arms/Prot/no-spec; its only effect
   // is +STANCE_RAGE_GEN rage generation, folded in rageGenAuraMult below.

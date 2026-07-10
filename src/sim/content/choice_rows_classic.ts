@@ -5,6 +5,8 @@ const mageSpellAbilityIds = [
   // will overstate its "mana spell" description.
   'fireball',
   'frostbolt',
+  'ice_lance',
+  'flurry',
   'fire_blast',
   'frost_armor',
   'arcane_intellect',

@@ -66,6 +66,8 @@ import {
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
+import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import { applyBrainFreezeOverride } from './frost_mage';
 import {
   hasCastShield,
   noteSpellHit,
@@ -736,11 +738,7 @@ export function castAbility(
   // cooldown and carries its 30% baked into the resolved effects.
   res = applyBrainFreezeOverride(ctx, p, res);
 
-  // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
-  // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
-  // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
-  // unchanged.
-  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
+  const gcd = ctx.playerGcdFor(meta.cls);
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
   const castTime =
     !ability.channel &&

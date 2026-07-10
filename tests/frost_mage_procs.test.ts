@@ -3,7 +3,6 @@ import {
   BRAIN_FREEZE_DURATION,
   FINGERS_OF_FROST_DURATION,
   FINGERS_OF_FROST_MAX_STACKS,
-  frostProcGlowActive,
   WINTERS_CHILL_CHARGES,
   WINTERS_CHILL_SPENDERS,
 } from '../src/sim/combat/frost_mage';
@@ -136,19 +135,13 @@ describe('frost kit content defs', () => {
   });
 
   it('pins the three spec passives as effect-less frost-gated docs', () => {
-    // Owner leveling pass 2026-07-14: the two proc passives arrive at the spec
-    // pick (5); the Shatter payoff lands at 10.
-    for (const [id, lvl] of [
-      ['fingers_of_frost', 5],
-      ['brain_freeze', 5],
-      ['shatter', 10],
-    ] as const) {
+    for (const id of ['fingers_of_frost', 'brain_freeze', 'shatter']) {
       const def = ABILITIES[id];
       expect(def, id).toBeDefined();
       expect(def.passive, id).toBe(true);
       expect(def.specs, id).toEqual(['frost']);
       expect(def.effects, id).toEqual([]);
-      expect(def.learnLevel, id).toBe(lvl);
+      expect(def.learnLevel, id).toBe(5);
     }
   });
 
@@ -156,17 +149,6 @@ describe('frost kit content defs', () => {
     expect(WINTERS_CHILL_SPENDERS.has('ice_lance')).toBe(true);
     expect(WINTERS_CHILL_SPENDERS.has('flurry')).toBe(false);
     expect(WINTERS_CHILL_SPENDERS.has('frostbolt')).toBe(false);
-  });
-
-  it('the action-bar glow predicate scopes each proc to its spender', () => {
-    const fingers = [{ kind: 'fingers_of_frost' }];
-    const brain = [{ kind: 'brain_freeze' }];
-    expect(frostProcGlowActive(fingers, 'ice_lance')).toBe(true);
-    expect(frostProcGlowActive(fingers, 'flurry')).toBe(false);
-    expect(frostProcGlowActive(brain, 'flurry')).toBe(true);
-    expect(frostProcGlowActive(brain, 'ice_lance')).toBe(false);
-    expect(frostProcGlowActive([], 'ice_lance')).toBe(false);
-    expect(frostProcGlowActive([...fingers, ...brain], 'frostbolt')).toBe(false);
   });
 });
 
@@ -391,38 +373,6 @@ describe("Flurry and Winter's Chill", () => {
     // Same seed casts identical underlying rolls; the empowered set must land
     // meaningfully above the hard set (1.3x baked, before crit noise).
     expect(sum(bfHits)).toBeGreaterThan(sum(hardHits) * 1.1);
-  });
-
-  it('an armed Brain Freeze casts Flurry straight through its running cooldown', () => {
-    const { sim, p } = makeSim();
-    const mob = spawnTarget(sim, p);
-    sim.drainEvents();
-    // Without the proc, a running cooldown refuses the cast.
-    p.cooldowns.set('flurry', 10);
-    p.gcdRemaining = 0;
-    p.resource = p.maxResource;
-    sim.castAbility('flurry');
-    expect(
-      sim
-        .drainEvents()
-        .some((e) => e.type === 'error' && e.text === 'That ability is not ready yet.'),
-    ).toBe(true);
-    // With Brain Freeze armed, the same press goes through: instant, three
-    // bolts, proc consumed, and the RUNNING timer keeps ticking (no re-arm).
-    pushAura(p, { id: 'brain_freeze', name: 'Brain Freeze', kind: 'brain_freeze' });
-    p.gcdRemaining = 0;
-    sim.castAbility('flurry');
-    expect(p.castingAbility).toBeNull();
-    expect(p.auras.some((a) => a.kind === 'brain_freeze')).toBe(false);
-    const events: SimEvent[] = [];
-    for (let i = 0; i < 60 && damageEvents(events, 'Flurry').length < 3; i++) {
-      events.push(...sim.tick());
-    }
-    expect(damageEvents(events, 'Flurry')).toHaveLength(3);
-    expect(mob.auras.find((a) => a.kind === 'winters_chill')?.charges).toBe(WINTERS_CHILL_CHARGES);
-    const remaining = p.cooldowns.get('flurry');
-    expect(remaining).toBeDefined();
-    expect(remaining as number).toBeLessThan(10);
   });
 
   it('a blocked cast never eats Brain Freeze (consumed after every gate)', () => {

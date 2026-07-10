@@ -124,25 +124,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'arcane_intellect',
       'frostbolt',
       'conjure_water',
-      // Blink joins the BASE kit at 5 (owner core-kit decision 2026-07-11):
-      // two level-5 choice-row options modify it, so it can no longer live
-      // behind a row grant of its own.
-      'blink',
-      // Ice Block joins the BASE kit (owner 2026-07-13): a key mage escape/immunity
-      // every spec gets. No specs gate; Frost carries a second charge (resolvedAbility).
-      'ice_block',
-      // Fire spec kit (owner design 2026-07-11, `specs: ['fire']` gated):
-      // the Ignition mastery + Hot Streak passives at the pick, Blazing
-      // Barrier at 10, Meteor at 17. Combustion is the shared signature slot.
-      'ignition',
-      'hot_streak',
-      'blazing_barrier',
-      'meteor',
-      'combustion',
       // Frost spec kit (owner design 2026-07-11, `specs: ['frost']` gated):
-      // Ice Lance + its three spec passives at the spec pick, Flurry at 8,
-      // the Water Elemental at 12.
-      'summon_water_elemental',
+      // Ice Lance + its three spec passives at the spec pick, Flurry at 8.
       'ice_lance',
       'fingers_of_frost',
       'brain_freeze',
@@ -1499,182 +1482,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)",
   },
-  // Frozen Orb: the roaming proc generator (combat/frozen_orb.ts). Instant,
-  // 30s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
-  // once per second for 8s. First strike guarantees a Fingers of Frost stack,
-  // then 20% per striking pulse. Blizzard shortens its cooldown (below).
-  frozen_orb: {
-    id: 'frozen_orb',
-    name: 'Frozen Orb',
-    class: 'mage',
-    learnLevel: 12,
-    specs: ['frost'],
-    cost: 50,
-    castTime: 0,
-    cooldown: 30,
-    range: 0,
-    school: 'frost',
-    requiresTarget: false,
-    effects: [{ type: 'frozenOrb', min: 8, max: 11, radius: 6, duration: 8, interval: 1 }],
-    ranks: [
-      {
-        rank: 2,
-        level: 18,
-        cost: 70,
-        effects: [{ type: 'frozenOrb', min: 14, max: 18, radius: 6, duration: 8, interval: 1 }],
-      },
-    ],
-    description:
-      'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
-  },
-  // Glacial Spike: the frost spec's slow, heavy spender. Gated on a FULL Icicles
-  // stack (requiresAuraStacks 5), which the cast consumes; it lands a big frost
-  // hit and freezes the target with a short root, so the follow-up Ice Lance and
-  // spells Shatter even where the target was not already frozen. The Icicles
-  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frozen Orb
-  // pulses); the freeze reuses the shared root effect so isRooted counts it.
-  glacial_spike: {
-    id: 'glacial_spike',
-    name: 'Glacial Spike',
-    class: 'mage',
-    learnLevel: 16,
-    specs: ['frost'],
-    cost: 50,
-    castTime: 2.7,
-    cooldown: 0,
-    range: 30,
-    school: 'frost',
-    requiresTarget: true,
-    requiresAuraKind: 'icicles',
-    requiresAuraStacks: 5,
-    effects: [
-      { type: 'directDamage', min: 90, max: 105 },
-      { type: 'root', duration: 4 },
-    ],
-    ranks: [
-      {
-        rank: 2,
-        level: 20,
-        cost: 65,
-        effects: [
-          { type: 'directDamage', min: 140, max: 160 },
-          { type: 'root', duration: 4 },
-        ],
-      },
-    ],
-    description:
-      'Conjure a massive spike of ice, consuming 5 Icicles to deal $d Frost damage and freeze the target in place for 4 sec. (Frost)',
-  },
-  // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
-  // rain_of_fire template plus a snare rider (the position-channel aoeSlow
-  // pulse) and the Frozen Orb refund (frostMageChannelPulse, 0.5s per enemy
-  // struck, at most 3s per cast).
-  blizzard: {
-    id: 'blizzard',
-    name: 'Blizzard',
-    class: 'mage',
-    learnLevel: 10,
-    specs: ['frost'],
-    cost: 70,
-    cooldown: 8,
-    range: 30,
-    school: 'frost',
-    requiresTarget: false,
-    targetMode: 'position',
-    // Owner playtest 2026-07-11: no longer a channel. A 2 sec cast places the
-    // storm, which then pulses on its own for 6 sec (a groundAoE with the
-    // snare + Frozen Orb refund riders; delayed skips the on-cast pulse so
-    // the first wave lands as the storm visibly forms).
-    castTime: 2,
-    effects: [
-      {
-        type: 'groundAoE',
-        min: 12,
-        max: 16,
-        radius: 7,
-        // 6 one-second waves; the extra half second keeps the LAST wave from
-        // dying on the zone clock's exact edge (delayed drops the on-cast one).
-        duration: 6.5,
-        interval: 1,
-        delayed: true,
-        slowMult: 0.6,
-        slowDuration: 2,
-        orbCdr: true,
-      },
-    ],
-    description:
-      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
-  },
-  // Frente Glacial: Frost's hold-to-charge cone. The 2.4 sec cast is the
-  // authoritative maximum charge clock; releasing earlier selects one of the
-  // four range/damage stages. The preview grows continuously, but gameplay
-  // changes only at the deterministic quarter thresholds.
-  glacial_front: {
-    id: 'glacial_front',
-    name: 'Glacial Front',
-    class: 'mage',
-    learnLevel: 17,
-    specs: ['frost'],
-    cost: 80,
-    castTime: 2.4,
-    empowerStages: 4,
-    cooldown: 12,
-    range: 0,
-    school: 'frost',
-    requiresTarget: false,
-    projectile: false,
-    effects: [
-      {
-        type: 'empoweredCone',
-        angle: 70,
-        slowMult: 0.5,
-        slowDuration: 4,
-        stages: [
-          { range: 7, min: 35, max: 42 },
-          { range: 10, min: 50, max: 60 },
-          { range: 13, min: 68, max: 80 },
-          { range: 16, min: 88, max: 104, rootDuration: 1 },
-        ],
-      },
-    ],
-    description:
-      'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
-  },
-  // Aliento de dragón: Fire's hold-to-charge frontal breath. The server owns
-  // the live 2.4 second clock; each release resolves one deterministic range,
-  // angle, damage, and breakable disorientation stage.
-  dragons_breath: {
-    id: 'dragons_breath',
-    name: "Dragon's Breath",
-    class: 'mage',
-    learnLevel: 14,
-    specs: ['fire'],
-    cost: 90,
-    castTime: 2.4,
-    empowerStages: 4,
-    cooldown: 20,
-    range: 0,
-    school: 'fire',
-    requiresTarget: false,
-    projectile: false,
-    effects: [
-      {
-        type: 'empoweredCone',
-        angle: 90,
-        fx: 'fireCone',
-        guaranteedCritLevel: 4,
-        hotStreakOnce: true,
-        stages: [
-          { range: 6, angle: 55, min: 32, max: 40, incapacitateDuration: 1 },
-          { range: 8, angle: 65, min: 48, max: 60, incapacitateDuration: 1.5 },
-          { range: 10, angle: 78, min: 68, max: 82, incapacitateDuration: 2 },
-          { range: 12, angle: 90, min: 90, max: 110, incapacitateDuration: 3 },
-        ],
-      },
-    ],
-    description:
-      'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
-  },
   // The three frost spec passives: spellbook/spec-screen documentation of the
   // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
   // effects, the seasoned_soldier idiom).
@@ -1716,7 +1523,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'shatter',
     name: 'Shatter',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     specs: ['frost'],
     passive: true,
     cost: 0,

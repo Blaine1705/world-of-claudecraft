@@ -873,8 +873,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Waterbind"
       },
       {
-        "id": "conjure_food",
-        "name": "Breadbind"
+        "id": "ice_lance",
+        "name": "Ice Lance"
       }
     ],
     "abilities": [
@@ -899,6 +899,22 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Waterbind"
       },
       {
+        "id": "ice_lance",
+        "name": "Ice Lance"
+      },
+      {
+        "id": "fingers_of_frost",
+        "name": "Fingers of Frost"
+      },
+      {
+        "id": "brain_freeze",
+        "name": "Brain Freeze"
+      },
+      {
+        "id": "shatter",
+        "name": "Shatter"
+      },
+      {
         "id": "conjure_food",
         "name": "Breadbind"
       },
@@ -909,6 +925,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "arcane_missiles",
         "name": "Aether Darts"
+      },
+      {
+        "id": "flurry",
+        "name": "Flurry"
       },
       {
         "id": "polymorph",
