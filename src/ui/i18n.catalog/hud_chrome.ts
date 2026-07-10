@@ -1335,6 +1335,9 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    riftTier: '{tier}-rank Rift item',
+    riftUpgrade: 'Rift upgrade {level}/{max}',
+    riftSockets: 'Rift gems {used}/{total}',
   },
   discord: {
     title: 'Discord',

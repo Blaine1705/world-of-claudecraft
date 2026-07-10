@@ -1,152 +1,299 @@
-// Natural (world-spawned) Rift portals + the C/B/A/S rank system.
+// Natural (world-spawned) Rift portals and their C/B/A/S rank system.
 //
-// A scheduler opens ranked rift portals across the three overworld zones on a
-// fixed sim-time cadence, announces each world-visibly, and collapses portals
-// nobody closes in time. Closing a rift (killing its final boss) seals the
-// portal and pays Heroic Marks scaled by rank (daily-gated per rank, riding the
-// same meta.heroicDaily set the heroic dungeons use).
+// A portal is the discoverable overworld entrance to one shared RiftEvent. Each
+// group entering it receives an independent RiftInstance, while every instance
+// points back to the same event and races for its single first-clear claim.
 //
-// Determinism: this module NEVER draws from the shared ctx.rng stream. Every
-// roll (zone, rank, position, rift seed) comes from a dedicated Rng derived
-// from (world seed, spawn ordinal), so adding the scheduler does not shift the
-// global draw order any existing content depends on.
-//
-// State (naturalRiftPortals, riftPortalSpawnCount) stays on Sim as live
-// SimContext views; behaviour lives here (module-first, SimContext seam).
+// Determinism: scheduling and portal placement use streams derived only from the
+// realm seed and spawn ordinal. They never consume ctx.rng, so enabling Rifts
+// cannot perturb combat, loot, or any other pre-existing simulation stream.
 
 import { isBlocked } from '../colliders';
-import { WORLD_MAX_X, WORLD_MIN_X, ZONES } from '../data';
+import { STRIP_MAX_X, STRIP_MIN_X, WORLD_MAX_X, WORLD_MIN_X, ZONES, zoneAt } from '../data';
 import { createGroundObject } from '../entity';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
-import { RIFT_TIER_COLORS, type RiftTier } from '../types';
+import { RIFT_TIER_COLORS, type RiftTier, type ZoneDef } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
 import { generateRiftPlan } from './rift_gen';
+import type { RiftEvent } from './types';
+import {
+  buildHeuristicRiftUpgrade,
+  buildRiftDungeonDraft,
+  installRiftUpgrade,
+} from './upgrader_draft';
 
-// Every rift portal is endgame content: level 20+ only, in every zone (a low
-// level player walking into an Eastbrook portal gets the denial line instead).
 export const RIFT_MIN_LEVEL = 20;
 
-// Sim time is wall-clock on the live server (fixed 20 Hz), so these seconds are
-// real seconds there. A ranked gate opens roughly every 3 hours; the first
-// comes soon after boot so a fresh realm is not empty, and an uncleared gate
-// lingers an hour before it collapses (a real window to muster and clear it).
-export const RIFT_PORTAL_FIRST_AT = 120; // s of sim time before the first natural portal
-export const RIFT_PORTAL_INTERVAL = 3 * 60 * 60; // s between natural portal spawns (~3 h)
-export const RIFT_PORTAL_LIFETIME = 60 * 60; // s an unclosed portal stays before collapsing (1 h)
-export const RIFT_PORTAL_MAX_OPEN = 3; // open natural portals at once, world-wide
+export const RIFT_PORTAL_FIRST_AT = 120;
+export const RIFT_PORTAL_INTERVAL_MIN = 2 * 60 * 60;
+export const RIFT_PORTAL_INTERVAL_MAX = 4 * 60 * 60;
+/** Compatibility/telemetry value: the mean of the deterministic random window. */
+export const RIFT_PORTAL_INTERVAL = (RIFT_PORTAL_INTERVAL_MIN + RIFT_PORTAL_INTERVAL_MAX) / 2;
+export const RIFT_PORTAL_LIFETIME = 60 * 60;
+export const RIFT_PORTAL_MAX_OPEN = 3;
+const RIFT_EVENT_HISTORY_LIMIT = 64;
 
-/** Per-rank tuning: the generated dungeon's baseLevel (MAX_LEVEL is 20, so B+
- * mobs run above the player cap), the Heroic Marks paid on sealing it, and the
- * badge colour both hosts render above the portal. */
-export const RIFT_TIER_INFO: Record<RiftTier, { baseLevel: number; marks: number; color: number }> =
-  {
-    C: { baseLevel: 20, marks: 1, color: RIFT_TIER_COLORS.C },
-    B: { baseLevel: 22, marks: 2, color: RIFT_TIER_COLORS.B },
-    A: { baseLevel: 25, marks: 3, color: RIFT_TIER_COLORS.A },
-    S: { baseLevel: 28, marks: 4, color: RIFT_TIER_COLORS.S },
-  };
+/** Rank tuning. `raceMarks` is paid only to the first group and is deliberately
+ * separate from the normal rank reward so the speed race has a visible prize. */
+export const RIFT_TIER_INFO: Record<
+  RiftTier,
+  { baseLevel: number; marks: number; raceMarks: number; color: number }
+> = {
+  C: { baseLevel: 20, marks: 1, raceMarks: 1, color: RIFT_TIER_COLORS.C },
+  B: { baseLevel: 22, marks: 2, raceMarks: 1, color: RIFT_TIER_COLORS.B },
+  A: { baseLevel: 25, marks: 3, raceMarks: 2, color: RIFT_TIER_COLORS.A },
+  S: { baseLevel: 28, marks: 4, raceMarks: 3, color: RIFT_TIER_COLORS.S },
+};
 
-/** Zone band -> rank pool: Eastbrook Vale rolls only C, Mirefen Marsh B/A,
- * Thornpeak Heights A/S (higher zones skew higher). */
-export function riftTierForZone(zoneIndex: number, roll: number): RiftTier {
-  if (zoneIndex <= 0) return 'C';
-  if (zoneIndex === 1) return roll < 0.6 ? 'B' : 'A';
-  return roll < 0.6 ? 'A' : 'S';
+const TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];
+
+/** Select a rank from content-authored relative weights. The roll is expected in
+ * [0,1), but clamping keeps callers and persisted old values harmless. */
+export function riftTierForZone(zone: ZoneDef, roll: number): RiftTier {
+  const weights = zone.riftTierWeights;
+  let total = 0;
+  for (const tier of TIERS) total += Math.max(0, weights?.[tier] ?? 0);
+  if (total <= 0) return 'C';
+  let cursor = Math.max(0, Math.min(0.999999999, roll)) * total;
+  for (const tier of TIERS) {
+    cursor -= Math.max(0, weights?.[tier] ?? 0);
+    if (cursor < 0) return tier;
+  }
+  return 'S';
 }
 
-/** One open world-spawned portal (a live Sim-field view via SimContext). */
+/** One currently visible overworld portal. The longer-lived history and race
+ * result live in RiftEvent; this record disappears when the entrance closes. */
 export interface NaturalRiftPortal {
-  id: number; // portal ground-object entity id
+  id: number;
+  eventId: string;
   tier: RiftTier;
+  zoneId: string;
   zoneName: string;
   riftName: string;
-  expiresAt: number; // sim time; collapse when nobody closed it
+  seed: number;
+  baseLevel: number;
+  openedAt: number;
+  expiresAt: number;
+  position: { x: number; z: number };
 }
 
 function announce(ctx: SimContext, text: string, color: string): void {
   ctx.emit({ type: 'log', text, color });
 }
 
-function spawnNaturalRiftPortal(ctx: SimContext, ordinal: number): void {
-  // Dedicated stream per spawn ordinal: never the shared ctx.rng.
-  const rng = new Rng((ctx.cfg.seed ^ ((ordinal + 1) * 0x9e3779b9)) >>> 0);
-  const zoneIndex = rng.int(0, ZONES.length - 1);
-  const zone = ZONES[zoneIndex];
-  const tier = riftTierForZone(zoneIndex, rng.next());
-  const info = RIFT_TIER_INFO[tier];
+function scheduleRng(ctx: SimContext, ordinal: number): Rng {
+  return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x85ebca6b) ^ 0x51f15e5d) >>> 0);
+}
 
-  // Deterministic rejection sampling for a sane overworld spot: on land, out of
-  // buildings/props, and clear of the hub settlement.
-  let x = zone.hub.x;
-  let z = zone.hub.z + zone.hub.radius + 40;
-  for (let attempt = 0; attempt < 24; attempt++) {
-    const cx = rng.range(WORLD_MIN_X + 30, WORLD_MAX_X - 30);
-    const cz = rng.range(zone.zMin + 25, zone.zMax - 25);
-    const hubD = Math.hypot(cx - zone.hub.x, cz - zone.hub.z);
-    if (hubD < zone.hub.radius + 30) continue;
-    if (groundHeight(cx, cz, ctx.cfg.seed) < WATER_LEVEL + 0.5) continue;
-    if (isBlocked(ctx.cfg.seed, cx, cz, 1.5)) continue;
-    x = cx;
-    z = cz;
+function portalRng(ctx: SimContext, ordinal: number): Rng {
+  return new Rng((ctx.cfg.seed ^ Math.imul(ordinal + 1, 0x9e3779b9) ^ 0xa341316c) >>> 0);
+}
+
+export function riftPortalDelay(ctx: SimContext, ordinal: number): number {
+  return scheduleRng(ctx, ordinal).range(RIFT_PORTAL_INTERVAL_MIN, RIFT_PORTAL_INTERVAL_MAX);
+}
+
+function contentHash(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
+function eventForPortal(ctx: SimContext, portal: NaturalRiftPortal): RiftEvent | null {
+  return ctx.riftEvents.find((event) => event.eventId === portal.eventId) ?? null;
+}
+
+function trimEventHistory(ctx: SimContext): void {
+  const completed = ctx.riftEvents.filter(
+    (event) => event.status === 'cleared' || event.status === 'collapsed',
+  );
+  const excess = completed.length - RIFT_EVENT_HISTORY_LIMIT;
+  if (excess <= 0) return;
+  const remove = new Set(completed.slice(0, excess).map((event) => event.eventId));
+  for (let i = ctx.riftEvents.length - 1; i >= 0; i--) {
+    if (remove.has(ctx.riftEvents[i].eventId)) ctx.riftEvents.splice(i, 1);
+  }
+}
+
+/** Recreate the runtime entity/registry side of a persisted open event. Event
+ * validation and deadline conversion belong to persistence.ts. */
+export function restoreNaturalRiftPortal(ctx: SimContext, event: RiftEvent): number {
+  const entity = createGroundObject(
+    ctx.nextId++,
+    '',
+    event.riftName,
+    ctx.groundPos(event.position.x, event.position.z),
+  );
+  entity.templateId = 'rift_portal';
+  entity.objectItemId = null;
+  entity.lootable = true;
+  entity.riftSeed = event.seed;
+  entity.riftBaseLevel = event.baseLevel;
+  entity.riftTier = event.tier;
+  entity.riftEventId = event.eventId;
+  ctx.addEntity(entity);
+  event.portalId = entity.id;
+  ctx.naturalRiftPortals.push({
+    id: entity.id,
+    eventId: event.eventId,
+    tier: event.tier,
+    zoneId: event.zoneId,
+    zoneName: event.zoneName,
+    riftName: event.riftName,
+    seed: event.seed,
+    baseLevel: event.baseLevel,
+    openedAt: event.openedAt,
+    expiresAt: event.expiresAt,
+    position: { ...event.position },
+  });
+  return entity.id;
+}
+
+/** Spawn one deterministic event. False means no eligible/valid position was
+ * available; the scheduler leaves the ordinal pending and retries later. */
+export function spawnNaturalRiftPortal(ctx: SimContext, ordinal: number): boolean {
+  const eligible = ZONES.filter(
+    (zone) => zone.riftPortalEligible && zone.riftTierWeights !== undefined,
+  );
+  if (eligible.length === 0) return false;
+
+  const rng = portalRng(ctx, ordinal);
+  const zone = eligible[rng.int(0, eligible.length - 1)];
+  const tier = riftTierForZone(zone, rng.next());
+  const info = RIFT_TIER_INFO[tier];
+  const xMin = Math.max(WORLD_MIN_X, zone.xMin ?? STRIP_MIN_X) + 25;
+  const xMax = Math.min(WORLD_MAX_X, zone.xMax ?? STRIP_MAX_X) - 25;
+  const zMin = zone.zMin + 25;
+  const zMax = zone.zMax - 25;
+  if (xMin >= xMax || zMin >= zMax) return false;
+
+  let position: { x: number; z: number } | null = null;
+  for (let attempt = 0; attempt < 64; attempt++) {
+    const x = rng.range(xMin, xMax);
+    const z = rng.range(zMin, zMax);
+    if (zoneAt(x, z).id !== zone.id) continue;
+    if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < zone.hub.radius + 30) continue;
+    if (groundHeight(x, z, ctx.cfg.seed) < WATER_LEVEL + 0.5) continue;
+    if (isBlocked(ctx.cfg.seed, x, z, 1.5)) continue;
+    position = { x, z };
     break;
   }
+  if (position === null) return false;
 
   const seed = rng.int(1, 1_000_000_000) >>> 0;
   const plan = generateRiftPlan(seed, info.baseLevel);
-  const portal = createGroundObject(ctx.nextId++, '', plan.name, ctx.groundPos(x, z));
-  portal.templateId = 'rift_portal';
-  portal.objectItemId = null;
-  portal.lootable = true;
-  portal.riftSeed = seed;
-  portal.riftBaseLevel = info.baseLevel;
-  portal.riftTier = tier;
-  ctx.addEntity(portal);
-  ctx.naturalRiftPortals.push({
-    id: portal.id,
+  const eventId = `rift-${ordinal + 1}-${seed.toString(36)}`;
+  const contentId = `procedural-v1:${seed}:${info.baseLevel}`;
+  const portalEntity = createGroundObject(
+    ctx.nextId++,
+    '',
+    plan.name,
+    ctx.groundPos(position.x, position.z),
+  );
+  portalEntity.templateId = 'rift_portal';
+  portalEntity.objectItemId = null;
+  portalEntity.lootable = true;
+  portalEntity.riftSeed = seed;
+  portalEntity.riftBaseLevel = info.baseLevel;
+  portalEntity.riftTier = tier;
+  portalEntity.riftEventId = eventId;
+  ctx.addEntity(portalEntity);
+
+  const portal: NaturalRiftPortal = {
+    id: portalEntity.id,
+    eventId,
     tier,
+    zoneId: zone.id,
     zoneName: zone.name,
     riftName: plan.name,
+    seed,
+    baseLevel: info.baseLevel,
+    openedAt: ctx.time,
     expiresAt: ctx.time + RIFT_PORTAL_LIFETIME,
+    position,
+  };
+  ctx.naturalRiftPortals.push(portal);
+  ctx.riftEvents.push({
+    eventId,
+    ordinal,
+    portalId: portal.id,
+    status: 'open',
+    tier,
+    zoneId: zone.id,
+    zoneName: zone.name,
+    riftName: plan.name,
+    seed,
+    baseLevel: info.baseLevel,
+    openedAt: portal.openedAt,
+    expiresAt: portal.expiresAt,
+    position: { ...position },
+    contentId,
+    contentHash: contentHash(`${contentId}:${plan.name}:${plan.floorCount}`),
+    contentLocked: false,
+    upgradeStatus: 'pending',
+    upgrade: null,
+    assetPipeline: { status: 'none', jobId: null, requestIds: [] },
+    firstClear: null,
   });
+  const heuristic = buildHeuristicRiftUpgrade(buildRiftDungeonDraft(seed, info.baseLevel));
+  if (heuristic) installRiftUpgrade(ctx, eventId, heuristic, 'heuristic');
+  trimEventHistory(ctx);
   announce(ctx, `A ${tier}-rank rift tears open in ${zone.name}!`, '#d9f');
+  return true;
 }
 
-/** Seal (boss killed) or collapse (timed out) a natural portal by entity id.
- * Safe to call for dev-spawned portals: an id not in the registry is a no-op. */
+/** Remove a visible portal. A timed-out entrance becomes collapsed only when no
+ * group is inside; active races may finish even after their entry closes. */
 export function closeNaturalRiftPortal(
   ctx: SimContext,
   portalId: number,
   outcome: 'sealed' | 'collapsed',
 ): void {
-  const i = ctx.naturalRiftPortals.findIndex((p) => p.id === portalId);
-  if (i < 0) return;
-  const p = ctx.naturalRiftPortals[i];
-  ctx.naturalRiftPortals.splice(i, 1);
-  if (ctx.entities.has(p.id)) ctx.dropEntity(p.id);
+  const index = ctx.naturalRiftPortals.findIndex((portal) => portal.id === portalId);
+  if (index < 0) return;
+  const portal = ctx.naturalRiftPortals[index];
+  ctx.naturalRiftPortals.splice(index, 1);
+  if (ctx.entities.has(portal.id)) ctx.dropEntity(portal.id);
+
+  const event = eventForPortal(ctx, portal);
+  if (event) {
+    event.portalId = null;
+    if (outcome === 'collapsed' && event.status !== 'cleared') {
+      const hasLiveInstance = ctx.riftInstances.some(
+        (instance) => instance.partyKey !== null && instance.eventId === event.eventId,
+      );
+      event.status = hasLiveInstance ? 'active' : 'collapsed';
+    }
+  }
   if (outcome === 'sealed') {
-    announce(ctx, `The ${p.tier}-rank rift in ${p.zoneName} has been sealed.`, '#9f9');
+    announce(ctx, `The ${portal.tier}-rank rift in ${portal.zoneName} has been sealed.`, '#9f9');
   } else {
-    announce(ctx, `The ${p.tier}-rank rift in ${p.zoneName} collapses.`, '#a9c');
+    announce(ctx, `The ${portal.tier}-rank rift in ${portal.zoneName} collapses.`, '#a9c');
   }
 }
 
-/** Per-tick scheduler (runs once a second, offset from the instance driver's
- * tick slot): expire overdue portals, then open a new one when the cadence is
- * due and the world-wide open cap has room. A due spawn skipped by the cap is
- * consumed (not queued), so a busy world does not burst-spawn later. */
+/** Once-per-second scheduler. A full world cap postpones the due event instead of
+ * consuming it, and every successful spawn samples the next 2-4 hour deadline. */
 export function updateRiftPortals(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 10) return;
 
   for (let i = ctx.naturalRiftPortals.length - 1; i >= 0; i--) {
-    const p = ctx.naturalRiftPortals[i];
-    if (ctx.time >= p.expiresAt) closeNaturalRiftPortal(ctx, p.id, 'collapsed');
+    const portal = ctx.naturalRiftPortals[i];
+    if (ctx.time >= portal.expiresAt) closeNaturalRiftPortal(ctx, portal.id, 'collapsed');
   }
 
-  const due = ctx.time >= RIFT_PORTAL_FIRST_AT + ctx.riftPortalSpawnCount * RIFT_PORTAL_INTERVAL;
-  if (!due) return;
-  const ordinal = ctx.riftPortalSpawnCount;
-  ctx.riftPortalSpawnCount += 1;
+  if (ctx.time < ctx.riftPortalNextAt) return;
   if (ctx.naturalRiftPortals.length >= RIFT_PORTAL_MAX_OPEN) return;
-  spawnNaturalRiftPortal(ctx, ordinal);
+  const ordinal = ctx.riftPortalSpawnCount;
+  if (!spawnNaturalRiftPortal(ctx, ordinal)) {
+    ctx.riftPortalNextAt = ctx.time + 60;
+    return;
+  }
+  ctx.riftPortalSpawnCount += 1;
+  ctx.riftPortalNextAt = ctx.time + riftPortalDelay(ctx, ordinal);
 }

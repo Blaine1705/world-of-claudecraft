@@ -1096,7 +1096,10 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
-      "requiresLevel": "必要レベル {level}"
+      "requiresLevel": "必要レベル {level}",
+      "riftTier": "{tier}ランク・リフト装備",
+      "riftUpgrade": "リフト強化 {level}/{max}",
+      "riftSockets": "リフト宝石 {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -3347,7 +3350,13 @@ export const ja_JP: EnTranslations = {
       "gateOpen": "門が音を立てて開いた。",
       "orbSealed": "宝珠は下層の儀式によって封じられている。",
       "orbWakes": "五芒星の炎が消えた。祭壇で何かが目覚める。",
-      "orbOpensGate": "血の宝珠が輝く。神殿の門が音を立てて開いた。"
+      "orbOpensGate": "血の宝珠が輝く。神殿の門が音を立てて開いた。",
+      "alreadyCleared": "このリフトはすでに {names} が攻略しました。",
+      "raceLost": "このリフトはすでに {names} が攻略しました。挑戦は終了します。",
+      "raceWorldWin": "{names} が {seconds}秒で{tier}ランク・リフトレースに勝利！",
+      "raceWinBanner": "リフトレース勝利 — {seconds}秒",
+      "raceLostBanner": "リフト攻略済み",
+      "forgeComplete": "{name} のリフト鍛造「{action}」が完了しました。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",
@@ -6390,6 +6399,27 @@ export const ja_JP: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "サンペタル草"
+      },
+      "rift_essence": {
+        "name": "リフトエッセンス"
+      },
+      "rift_gem_crimson": {
+        "name": "深紅のリフト宝石"
+      },
+      "rift_gem_azure": {
+        "name": "紺碧のリフト宝石"
+      },
+      "rift_gem_verdant": {
+        "name": "翠緑のリフト宝石"
+      },
+      "riftbound_band_of_might": {
+        "name": "剛力のリフトバウンドリング"
+      },
+      "riftbound_band_of_insight": {
+        "name": "叡智のリフトバウンドリング"
+      },
+      "riftbound_band_of_guile": {
+        "name": "機略のリフトバウンドリング"
       },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"

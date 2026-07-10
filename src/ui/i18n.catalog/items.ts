@@ -1994,6 +1994,13 @@ const ITEM_ENTITY_IDS = [
   'elderwood_log',
   'goldleaf_herb',
   'sunpetal_herb',
+  'rift_essence',
+  'rift_gem_crimson',
+  'rift_gem_azure',
+  'rift_gem_verdant',
+  'riftbound_band_of_might',
+  'riftbound_band_of_insight',
+  'riftbound_band_of_guile',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2002,15 +2009,26 @@ type ItemEntityTranslation = { name: string };
 
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
+const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  rift_essence: 'Rift Essence',
+  rift_gem_crimson: 'Crimson Rift Gem',
+  rift_gem_azure: 'Azure Rift Gem',
+  rift_gem_verdant: 'Verdant Rift Gem',
+  riftbound_band_of_might: 'Riftbound Band of Might',
+  riftbound_band_of_insight: 'Riftbound Band of Insight',
+  riftbound_band_of_guile: 'Riftbound Band of Guile',
+};
+
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
-  if (names.length !== ITEM_ENTITY_IDS.length) {
+  const legacyCount = ITEM_ENTITY_IDS.length - Object.keys(APPENDED_ITEM_NAMES).length;
+  if (names.length !== ITEM_ENTITY_IDS.length && names.length !== legacyCount) {
     throw new Error(
-      `Item translation count mismatch: expected ${ITEM_ENTITY_IDS.length}, got ${names.length}`,
+      `Item translation count mismatch: expected ${legacyCount} or ${ITEM_ENTITY_IDS.length}, got ${names.length}`,
     );
   }
   const translations = {} as ItemEntityTranslations;
   ITEM_ENTITY_IDS.forEach((id, index) => {
-    const name = names[index];
+    const name = names[index] ?? APPENDED_ITEM_NAMES[id];
     if (!name) throw new Error(`Missing item translation for ${id}`);
     translations[id] = { name };
   });

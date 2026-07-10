@@ -1976,9 +1976,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 36 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 37 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 37th unregistered delta key reddens this gate.
+// 38th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -1994,6 +1994,7 @@ const ALL_DELTA_KEYS = [
   'dmarks',
   'drun',
   'duel',
+  'einst',
   'equip',
   'gprof',
   'inv',
@@ -2038,6 +2039,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dmarks: 'delveMarks',
   drun: 'delveRun',
   duel: 'duelInfo',
+  einst: 'equipmentInstances',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
   inv: 'inventory',
@@ -2132,6 +2134,9 @@ function dirtyEveryDeltaField(): {
   meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
   meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
   meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
+  meta.equipmentInstances = {
+    ring1: { rolled: { quality: 'epic', stats: { str: 2 } }, boundTo: lp },
+  };
   meta.questLog.set('q_widows', { questId: 'q_widows', counts: [10, 0], state: 'active' });
   meta.questsDone.add('q_wolves');
   meta.raidLockouts.set('nythraxis_boss_arena', FAR_FUTURE_MS);
@@ -2227,6 +2232,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.inventory).toEqual([{ itemId: 'baked_bread', count: 3 }]); // inv -> inventory
     expect(client.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]); // buyback -> vendorBuyback
     expect(client.equipment).toMatchObject({ mainhand: 'zealotsbane_blade' }); // equip -> equipment
+    expect(client.equipmentInstances.ring1?.rolled?.stats).toEqual({ str: 2 });
     // cosmetics -> accountCosmetics, asserted against the normalized shape (the input
     // is already the normal {completedQuestIds, mechChromaIds} form, see :192-202)
     expect(client.accountCosmetics).toEqual({
@@ -2323,9 +2329,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(36);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
+  it('ALL_DELTA_KEYS contains exactly 37 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(37);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(37);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2337,7 +2343,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(36);
+    expect(scraped.size).toBe(37);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -3,10 +3,10 @@ import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { ZONES } from '../src/sim/data';
 import {
   RIFT_MIN_LEVEL,
-  RIFT_PORTAL_FIRST_AT,
   RIFT_PORTAL_LIFETIME,
   RIFT_TIER_INFO,
   riftTierForZone,
+  updateRiftPortals,
 } from '../src/sim/rift/portals';
 import { Sim } from '../src/sim/sim';
 import { DT, type SimEvent } from '../src/sim/types';
@@ -33,14 +33,31 @@ function tickSeconds(sim: Sim, seconds: number): SimEvent[] {
   return out;
 }
 
+// Portal cadence is a scheduler concern, not an integration test for 2,400 full
+// world ticks. Move the deterministic clock to its deadline and invoke that one
+// subsystem tick directly; run gameplay ticks only where the test needs them.
+function spawnDuePortal(sim: Sim): SimEvent[] {
+  sim.time = sim.riftPortalNextAt + 0.1;
+  sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+  updateRiftPortals(sim.ctx);
+  return sim.drainEvents();
+}
+
 describe('rift ranks: zone mapping and tuning', () => {
-  it('Eastbrook rolls only C; higher zones skew higher (B/A then A/S)', () => {
-    expect(riftTierForZone(0, 0)).toBe('C');
-    expect(riftTierForZone(0, 0.99)).toBe('C');
-    expect(riftTierForZone(1, 0)).toBe('B');
-    expect(riftTierForZone(1, 0.99)).toBe('A');
-    expect(riftTierForZone(2, 0)).toBe('A');
-    expect(riftTierForZone(2, 0.99)).toBe('S');
+  it('uses content-authored weights only on the new regions', () => {
+    const eligible = ZONES.filter((zone) => zone.riftPortalEligible);
+    expect(eligible.length).toBeGreaterThan(3);
+    expect(
+      ZONES.filter((zone) =>
+        ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'].includes(zone.id),
+      ).every((zone) => !zone.riftPortalEligible),
+    ).toBe(true);
+    const farshore = eligible.find((zone) => zone.id === 'farshore_isle')!;
+    const nightbloom = eligible.find((zone) => zone.id === 'nightbloom')!;
+    expect(riftTierForZone(farshore, 0)).toBe('C');
+    expect(riftTierForZone(farshore, 0.99)).toBe('B');
+    expect(riftTierForZone(nightbloom, 0)).toBe('A');
+    expect(riftTierForZone(nightbloom, 0.99)).toBe('S');
   });
 
   it('rank tuning is monotonic: higher rank, higher baseLevel and more marks', () => {
@@ -59,7 +76,7 @@ describe('rift portals: natural spawn scheduler', () => {
   it('spawns a ranked portal on the cadence and announces it world-visibly', () => {
     const sim = makeSim();
     expect(sim.naturalRiftPortals.length).toBe(0);
-    const events = tickSeconds(sim, RIFT_PORTAL_FIRST_AT + 2);
+    const events = spawnDuePortal(sim);
     expect(sim.naturalRiftPortals.length).toBe(1);
     const p = sim.naturalRiftPortals[0];
     const portal = sim.entities.get(p.id)!;
@@ -80,8 +97,8 @@ describe('rift portals: natural spawn scheduler', () => {
   it('is deterministic: two same-seed sims spawn the identical portal', () => {
     const a = makeSim();
     const b = makeSim();
-    tickSeconds(a, RIFT_PORTAL_FIRST_AT + 2);
-    tickSeconds(b, RIFT_PORTAL_FIRST_AT + 2);
+    spawnDuePortal(a);
+    spawnDuePortal(b);
     const pa = a.naturalRiftPortals[0];
     const pb = b.naturalRiftPortals[0];
     expect(pa.tier).toBe(pb.tier);
@@ -94,12 +111,15 @@ describe('rift portals: natural spawn scheduler', () => {
 
   it('collapses an unclosed portal after its lifetime, with a world announce', () => {
     const sim = makeSim();
-    tickSeconds(sim, RIFT_PORTAL_FIRST_AT + 2);
+    spawnDuePortal(sim);
     const p = sim.naturalRiftPortals[0];
     expect(Math.abs(p.expiresAt - (sim.time + RIFT_PORTAL_LIFETIME))).toBeLessThan(3);
     // Fast-forward the deadline instead of ticking 15 real minutes.
     p.expiresAt = sim.time + 1;
-    const events = tickSeconds(sim, 2.5);
+    sim.time = p.expiresAt + 0.1;
+    sim.tickCount += (10 - (sim.tickCount % 20) + 20) % 20;
+    updateRiftPortals(sim.ctx);
+    const events = sim.drainEvents();
     expect(sim.naturalRiftPortals.find((q) => q.id === p.id)).toBeUndefined();
     expect(sim.entities.has(p.id)).toBe(false);
     expect(
@@ -113,7 +133,7 @@ describe('rift portals: natural spawn scheduler', () => {
 describe('rift portals: level 20 gate', () => {
   it('turns away a low-level player at the portal with the denial line', () => {
     const sim = makeSim();
-    tickSeconds(sim, RIFT_PORTAL_FIRST_AT + 2);
+    spawnDuePortal(sim);
     const p = sim.naturalRiftPortals[0];
     const portal = sim.entities.get(p.id)!;
     expect(sim.player.level).toBeLessThan(RIFT_MIN_LEVEL);
@@ -135,7 +155,7 @@ describe('rift portals: level 20 gate', () => {
   it('admits a level 20 player and stamps the run with the portal rank', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
-    tickSeconds(sim, RIFT_PORTAL_FIRST_AT + 2);
+    spawnDuePortal(sim);
     const p = sim.naturalRiftPortals[0];
     const portal = sim.entities.get(p.id)!;
     sim.player.pos = { ...portal.pos };
@@ -185,7 +205,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
-    tickSeconds(sim, RIFT_PORTAL_FIRST_AT + 2);
+    spawnDuePortal(sim);
     const { inst, boss, portalInfo } = runToBossKill(sim);
     const events = tickSeconds(sim, 1.2);
     expect(inst.rewarded).toBe(true);
@@ -201,7 +221,9 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     ).toBe(true);
     // Marks on the boss corpse, personal to the player, scaled by rank.
     const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID);
-    expect(marks.length).toBe(RIFT_TIER_INFO[portalInfo.tier].marks);
+    expect(marks.length).toBe(
+      RIFT_TIER_INFO[portalInfo.tier].marks + RIFT_TIER_INFO[portalInfo.tier].raceMarks,
+    );
     expect(marks[0].personalFor).toEqual([sim.player.id]);
   });
 
@@ -210,7 +232,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
     const meta = sim.players.get(sim.player.id)!;
-    tickSeconds(sim, RIFT_PORTAL_FIRST_AT + 2);
+    spawnDuePortal(sim);
     const { boss, portalInfo } = runToBossKill(sim);
     tickSeconds(sim, 1.2);
     expect(meta.heroicDaily.marked.has(`rift_${portalInfo.tier}`)).toBe(true);

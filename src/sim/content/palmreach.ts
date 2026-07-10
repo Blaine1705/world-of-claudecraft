@@ -24,6 +24,8 @@ import { emptyZoneProps } from '../types';
 export const PALMREACH_ZONE: ZoneDef = {
   id: 'palmreach',
   name: 'The Palmreach',
+  riftPortalEligible: true,
+  riftTierWeights: { A: 0.4, S: 0.6 },
   zMin: 700,
   zMax: 1260,
   xMin: -540,

@@ -1096,7 +1096,10 @@ export const it_IT: EnTranslations = {
       "label": "Ripristina le posizioni dei riquadri"
     },
     "itemTooltip": {
-      "requiresLevel": "Richiede livello {level}"
+      "requiresLevel": "Richiede livello {level}",
+      "riftTier": "{tier}-rank Rift item",
+      "riftUpgrade": "Rift upgrade {level}/{max}",
+      "riftSockets": "Rift gems {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -3347,7 +3350,13 @@ export const it_IT: EnTranslations = {
       "gateOpen": "The gate grinds open.",
       "orbSealed": "The orb is sealed by the ritual below.",
       "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
-      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open."
+      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open.",
+      "alreadyCleared": "This rift has already been cleared by {names}.",
+      "raceLost": "The rift has already been cleared by {names}. Your run ends.",
+      "raceWorldWin": "{names} won the {tier}-rank Rift race in {seconds}s!",
+      "raceWinBanner": "Rift Race Won - {seconds}s",
+      "raceLostBanner": "Rift Already Cleared",
+      "forgeComplete": "Rift forge {action} completed for {name}."
     },
     "delve": {
       "cannotEnterNow": "Non puoi entrare in un'incursione in questo momento.",
@@ -6390,6 +6399,27 @@ export const it_IT: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Erba Petalosole"
+      },
+      "rift_essence": {
+        "name": "Rift Essence"
+      },
+      "rift_gem_crimson": {
+        "name": "Crimson Rift Gem"
+      },
+      "rift_gem_azure": {
+        "name": "Azure Rift Gem"
+      },
+      "rift_gem_verdant": {
+        "name": "Verdant Rift Gem"
+      },
+      "riftbound_band_of_might": {
+        "name": "Riftbound Band of Might"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Riftbound Band of Insight"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Riftbound Band of Guile"
       },
       "bristleback_maul": {
         "name": "Martello Gallowglass"

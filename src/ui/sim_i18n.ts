@@ -5806,6 +5806,24 @@ const RULES: Rule[] = [
     re: /^The rift shudders\. A way home tears open behind the fallen\.$/,
     build: () => t('sim.rift.exitOpens'),
   },
+  {
+    re: /^This rift has already been cleared by (.+)\.$/,
+    build: (m) => t('sim.rift.alreadyCleared', { names: m[1] }),
+  },
+  {
+    re: /^The rift has already been cleared by (.+)\. Your run ends\.$/,
+    build: (m) => t('sim.rift.raceLost', { names: m[1] }),
+  },
+  {
+    // The localization drift guard substitutes every template interpolation with
+    // "Aki", so tier/time cannot be narrowed here to C/B/A/S and digits.
+    re: /^(.+) won the (.+)-rank Rift race in (.+)s!$/,
+    build: (m) => t('sim.rift.raceWorldWin', { names: m[1], tier: m[2], seconds: m[3] }),
+  },
+  {
+    re: /^Rift forge (upgrade|enchant|socket) completed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeComplete', { action: m[1], name: m[2] }),
+  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },

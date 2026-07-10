@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { DELVE_X_MIN, QUESTS } from '../src/sim/data';
+import { DELVE_X_MIN, QUESTS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -139,7 +139,9 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
 
   it('returns yumiMaze anywhere in the Protect Yumi band, run or not', () => {
     const w = makeWorld('client') as unknown as { player: { pos: { x: number } } };
-    w.player.pos.x = 8400;
+    // Read the band from data.ts: the grid world relocated every instance band onto
+    // the far-east instance plane, so a literal x here would rot on the next move.
+    w.player.pos.x = YUMI_MAZE_X;
     expect(minimapMode(w as unknown as IWorld)).toBe('yumiMaze');
   });
 });

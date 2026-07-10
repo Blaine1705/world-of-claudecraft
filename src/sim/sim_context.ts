@@ -18,7 +18,7 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
-import type { RiftInstance } from './rift/types';
+import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type {
   ArenaMatch,
@@ -106,6 +106,10 @@ export interface SimContextPrimitives {
   // Procedural Rift instance pool (seeded in the Sim ctor). Live view: the backing
   // array stays Sim-owned; rift/runs.ts mutates slot fields in place.
   readonly riftInstances: RiftInstance[];
+  // Shared natural-world Rift events. Multiple group instances can point at one
+  // eventId; race.ts performs the authoritative first-clear claim in place.
+  readonly riftEvents: RiftEvent[];
+  nextRiftInstanceId: number;
   // rift-portal registry, appended to on rift_portal spawn; null until built.
   // Read-write: rift/runs.ts lazily assigns the array on first build (like dungeonDoorIds).
   riftPortalIds: number[] | null;
@@ -115,6 +119,8 @@ export interface SimContextPrimitives {
   // Natural-portal spawn ordinal: seeds each spawn's dedicated Rng and paces the
   // sim-time cadence. Read-write (the scheduler increments it).
   riftPortalSpawnCount: number;
+  // Deterministically sampled next scheduler deadline (sim seconds).
+  riftPortalNextAt: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -765,6 +771,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     get riftInstances() {
       return host.riftInstances;
     },
+    get riftEvents() {
+      return host.riftEvents;
+    },
+    get nextRiftInstanceId() {
+      return host.nextRiftInstanceId;
+    },
+    set nextRiftInstanceId(v) {
+      host.nextRiftInstanceId = v;
+    },
     get riftPortalIds() {
       return host.riftPortalIds;
     },
@@ -779,6 +794,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set riftPortalSpawnCount(v) {
       host.riftPortalSpawnCount = v;
+    },
+    get riftPortalNextAt() {
+      return host.riftPortalNextAt;
+    },
+    set riftPortalNextAt(v) {
+      host.riftPortalNextAt = v;
     },
     get arenaMatches() {
       return host.arenaMatches;

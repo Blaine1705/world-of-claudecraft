@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
 import { terrainHeight, terrainSteepness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
+import { findWallFoot } from './helpers/wall_foot';
 
 // The parity gate for the movement-kernel extraction (MV1) and the foundation
 // of the online self extrapolator: stepPlayerMotion driven with CLIENT-shaped
@@ -196,7 +198,10 @@ describe('player motion kernel parity with the live Sim', () => {
   it('routes terrain wall standoff through the collision sweep', () => {
     const standoffSeed = 20061;
     const sim = new Sim({ seed: standoffSeed, playerClass: 'warrior', autoEquip: true });
-    const start = { x: -150, z: 546.75 };
+    // A real wall foot in whatever world the sim generates (the strip world's western
+    // rim, which this used to hardcode, is open ground in the 2D atlas-grid world).
+    const foot = findWallFoot(standoffSeed, PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE);
+    const start = { x: foot.x, z: foot.z };
     teleport(sim, start.x, start.z);
     expect(terrainSteepnessAt(start.x, start.z, standoffSeed)).toBeLessThan(1.0);
 

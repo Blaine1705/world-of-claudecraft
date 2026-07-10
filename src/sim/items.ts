@@ -28,6 +28,7 @@ import type { SimContext } from './sim_context';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
+  cloneItemInstancePayload,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -81,10 +82,14 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   const slot = resolveEquipSlot(def, meta.equipment);
   if (!slot) return;
   const old = meta.equipment[slot];
-  ctx.removeItem(itemId, 1, meta.entityId);
-  if (old) addItemSilent(old, 1, meta);
+  const oldInstance = meta.equipmentInstances[slot];
+  const consumed = ctx.removeItem(itemId, 1, meta.entityId);
+  const incomingInstance = consumed[0];
+  if (old) addItemSilent(old, 1, meta, oldInstance);
   meta.equipment[slot] = itemId;
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  if (incomingInstance) meta.equipmentInstances[slot] = cloneItemInstancePayload(incomingInstance);
+  else delete meta.equipmentInstances[slot];
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstances);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
 
@@ -103,11 +108,13 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
     return false;
   }
   delete meta.equipment[slot];
+  const instance = meta.equipmentInstances[slot];
+  delete meta.equipmentInstances[slot];
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
   // today keys on an unequip, so there is nothing to award here regardless.
-  addItemSilent(itemId, 1, meta);
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  addItemSilent(itemId, 1, meta, instance);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstances);
   const def = ITEMS[itemId];
   ctx.emit({
     type: 'log',
@@ -430,6 +437,15 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
   });
 }
 
-function addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
+function addItemSilent(
+  itemId: string,
+  count: number,
+  meta: PlayerMeta,
+  instance?: import('./types').ItemInstancePayload,
+): void {
+  if (instance) {
+    meta.inventory.push({ itemId, count: 1, instance: cloneItemInstancePayload(instance) });
+    return;
+  }
   addStacked(meta.inventory, itemId, count);
 }

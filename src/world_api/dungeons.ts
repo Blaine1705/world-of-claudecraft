@@ -10,13 +10,19 @@ export interface RaidLockout {
 // The local player's active procedural Rift floor, or null when not in a rift.
 // The renderer regenerates the floor's geometry + visual style from the descriptor
 // (seed + baseLevel + floorIndex) via the same pure generator the server ran, so
-// no geometry travels over the wire. The origin is derived render-side from the
-// player position (riftOriginAt); this view is purely the descriptor + labels.
+// no geometry travels over the wire. Instance origin and content identity are
+// explicit so two groups racing identical content never alias runtime identity.
 export interface RiftFloorView {
+  eventId: string | null;
+  instanceId: number;
   seed: number;
   baseLevel: number;
   floorIndex: number;
   floorCount: number;
+  origin: { x: number; z: number };
+  contentId: string;
+  contentHash: string;
+  upgrade: import('../sim/rift/types').RiftUpgradeManifest | null;
   name: string;
   themeName: string;
   /** C/B/A/S rank of the run (null for dev-portal runs), for the minimap label. */

@@ -27,6 +27,8 @@ import type { LootTier } from '../lockpick';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
+import { addRiftProgressionLoot } from './progression';
+import { claimRiftFirstClear, markRiftEventActive } from './race';
 import { generateRiftFloor, riftPlatformLift } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
@@ -89,6 +91,10 @@ function riftKeyFor(ctx: SimContext, pid: number): string {
   return party ? `party:${party.id}` : `solo:${pid}`;
 }
 
+function floorForInstance(inst: RiftInstance, floorIndex = inst.floorIndex) {
+  return generateRiftFloor(inst.seed, inst.baseLevel, floorIndex, inst.upgrade);
+}
+
 /** The rift instance whose region contains `pos`, or null. */
 export function riftInstanceAtPos(ctx: SimContext, pos: Vec3): RiftInstance | null {
   for (const inst of ctx.riftInstances) {
@@ -105,15 +111,26 @@ export function riftInstanceAtPos(ctx: SimContext, pos: Vec3): RiftInstance | nu
 }
 
 function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active: boolean): void {
-  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  const floor = floorForInstance(inst);
+  const event =
+    inst.eventId === null
+      ? null
+      : (ctx.riftEvents.find((candidate) => candidate.eventId === inst.eventId) ?? null);
+  const contentId = event?.contentId ?? `procedural-v1:${inst.seed}:${inst.baseLevel}`;
   ctx.emit({
     type: 'riftState',
     pid,
     active,
+    eventId: inst.eventId,
+    instanceId: inst.instanceId,
     seed: inst.seed >>> 0,
     baseLevel: inst.baseLevel,
     floorIndex: inst.floorIndex,
     floorCount: inst.floorCount,
+    origin: riftInstanceOrigin(inst.slot, inst.floorIndex),
+    contentId,
+    contentHash: event?.contentHash ?? contentId,
+    upgrade: inst.upgrade,
     name: floor.name,
     themeName: floor.themeName,
     tier: inst.tier,
@@ -124,7 +141,7 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
 
 function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  const floor = floorForInstance(inst);
 
   // Publish the generated collision so movement/pathing/LoS/camera respect it.
   setRiftRegion(ctx.riftCollisionToken, origin.x, origin.z, layoutColliders(floor.layout));
@@ -164,6 +181,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
       spawn.level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
+    if (spawn.name) mob.name = spawn.name;
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
     // template reads as a different creature across rifts. Model + mechanics are
     // unchanged (both read from the static template by id).
@@ -296,8 +314,16 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
 }
 
 function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
+  const eventId = inst.eventId;
   freeRiftFloorEntities(ctx, inst);
+  inst.instanceId = 0;
+  inst.eventId = null;
   inst.partyKey = null;
+  inst.memberIds = new Set();
+  inst.startedAt = 0;
+  inst.finishedAt = null;
+  inst.outcome = 'abandoned';
+  inst.upgrade = null;
   inst.floorIndex = 0;
   inst.descentOpen = false;
   inst.descentAt = null;
@@ -305,6 +331,15 @@ function freeRiftInstance(ctx: SimContext, inst: RiftInstance): void {
   inst.tier = null;
   inst.portalId = null;
   inst.rewarded = false;
+  if (eventId !== null) {
+    const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
+    const anotherRun = ctx.riftInstances.some(
+      (candidate) => candidate.partyKey !== null && candidate.eventId === eventId,
+    );
+    if (event?.status === 'active' && event.portalId === null && !anotherRun) {
+      event.status = 'collapsed';
+    }
+  }
 }
 
 // ---- Enter / descend / leave ------------------------------------------------
@@ -336,9 +371,30 @@ export function enterRift(
     return;
   }
   const key = riftKeyFor(ctx, r.meta.entityId);
+  const eventId = portal?.riftEventId ?? null;
+  if (eventId !== null) {
+    const event = ctx.riftEvents.find((candidate) => candidate.eventId === eventId);
+    if (!event || event.status === 'cleared' || event.status === 'collapsed') {
+      const winner = event?.firstClear?.memberNames.join(', ') || 'another party';
+      ctx.error(r.meta.entityId, `This rift has already been cleared by ${winner}.`);
+      return;
+    }
+    if (event.upgradeStatus === 'pending') event.upgradeStatus = 'fallback';
+    event.contentLocked = true;
+  }
 
-  // A party member joining the same portal shares the instance (matched by seed).
-  let inst = ctx.riftInstances.find((i) => i.partyKey === key && i.seed === seed >>> 0) ?? null;
+  // Members of one group share an instance. Every other group entering the same
+  // event receives another slot with identical generated content.
+  let inst =
+    ctx.riftInstances.find(
+      (candidate) =>
+        candidate.partyKey !== null &&
+        candidate.outcome === 'active' &&
+        (candidate.memberIds.has(r.meta.entityId) || candidate.partyKey === key) &&
+        (eventId !== null
+          ? candidate.eventId === eventId
+          : candidate.eventId === null && candidate.seed === seed >>> 0),
+    ) ?? null;
   if (!inst) {
     const free = ctx.riftInstances.find((i) => i.partyKey === null);
     if (!free) {
@@ -346,11 +402,21 @@ export function enterRift(
       return;
     }
     inst = free;
+    inst.instanceId = ctx.nextRiftInstanceId++;
+    inst.eventId = eventId;
     inst.partyKey = key;
+    inst.memberIds = new Set();
+    inst.startedAt = ctx.time;
+    inst.finishedAt = null;
+    inst.outcome = 'active';
+    inst.upgrade =
+      eventId === null
+        ? null
+        : (ctx.riftEvents.find((candidate) => candidate.eventId === eventId)?.upgrade ?? null);
     inst.seed = seed >>> 0;
     inst.baseLevel = Math.max(1, Math.min(60, Math.round(baseLevel)));
     inst.floorIndex = 0;
-    inst.floorCount = generateRiftFloor(inst.seed, inst.baseLevel, 0).floorCount;
+    inst.floorCount = floorForInstance(inst, 0).floorCount;
     // Return spot: never inside the portal's walk-in radius, or leaving the
     // rift would drop the player onto the portal and bounce them straight back
     // in. Push the entry position away from the portal to a safe distance.
@@ -370,11 +436,14 @@ export function enterRift(
     inst.tier = portal?.riftTier ?? null;
     inst.portalId = portal?.id ?? null;
     inst.rewarded = false;
+    markRiftEventActive(ctx, eventId);
     spawnRiftFloor(ctx, inst);
   }
 
+  inst.memberIds.add(r.meta.entityId);
+
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  const floor = floorForInstance(inst);
   const p = r.e;
   p.pos = ctx.groundPos(origin.x + floor.entry.x, origin.z + floor.entry.z);
   p.prevPos = { ...p.pos };
@@ -390,6 +459,17 @@ export function enterRift(
     color: '#b9f',
     pid: r.meta.entityId,
   });
+  if (inst.upgrade) {
+    const detail = floor.isBoss
+      ? inst.upgrade.boss.concept
+      : inst.upgrade.floors[inst.floorIndex]?.environmentalDetails[0];
+    ctx.emit({
+      type: 'log',
+      text: [inst.upgrade.synopsis, detail].filter(Boolean).join(' '),
+      color: '#d9c7ff',
+      pid: r.meta.entityId,
+    });
+  }
 }
 
 export function descendRift(ctx: SimContext, pid?: number): void {
@@ -401,18 +481,7 @@ export function descendRift(ctx: SimContext, pid?: number): void {
 
   // Collect everyone currently standing in this floor's region before we tear it
   // down, so the whole party descends together.
-  const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const descenders: number[] = [];
-  for (const meta of ctx.players.values()) {
-    const e = ctx.entities.get(meta.entityId);
-    if (!e) continue;
-    if (
-      Math.abs(e.pos.x - origin.x) <= RIFT_REGION_HALF_X &&
-      Math.abs(e.pos.z - origin.z) <= RIFT_REGION_HALF_Z
-    ) {
-      descenders.push(meta.entityId);
-    }
-  }
+  const descenders = instancePlayerIds(ctx, inst);
 
   freeRiftFloorEntities(ctx, inst);
   inst.floorIndex += 1;
@@ -420,7 +489,7 @@ export function descendRift(ctx: SimContext, pid?: number): void {
 
   // The next floor has its own z-stacked origin: teleport descenders THERE.
   const newOrigin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  const floor = floorForInstance(inst);
   for (const id of descenders) {
     const e = ctx.entities.get(id);
     if (!e) continue;
@@ -437,6 +506,13 @@ export function descendRift(ctx: SimContext, pid?: number): void {
       color: '#b9f',
       pid: id,
     });
+    if (inst.upgrade) {
+      const directive = inst.upgrade.floors[inst.floorIndex];
+      const narrative = floor.isBoss
+        ? inst.upgrade.boss.concept
+        : directive?.environmentalDetails[0];
+      if (narrative) ctx.emit({ type: 'log', text: narrative, color: '#d9c7ff', pid: id });
+    }
   }
 }
 
@@ -449,8 +525,31 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   if (!inst) return;
   // Tear down any lock attempt in progress so a half-picked cache doesn't linger.
   if (inst.lockpick) riftLockpickAbort(ctx, inst, r.meta.entityId);
+  forceExitRiftPlayer(ctx, inst, r.meta.entityId, false);
+  ctx.emit({
+    type: 'log',
+    text: 'You step back through the rift.',
+    color: '#b9f',
+    pid: r.meta.entityId,
+  });
+}
+
+/** Return one participant to the overworld. `forced` also handles dead/ghost
+ * entities and is used when another group wins the shared event. */
+function forceExitRiftPlayer(
+  ctx: SimContext,
+  inst: RiftInstance,
+  pid: number,
+  forced: boolean,
+): void {
+  const p = ctx.entities.get(pid);
+  if (!p) return;
+  const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+  const isInside =
+    Math.abs(p.pos.x - origin.x) <= RIFT_REGION_HALF_X &&
+    Math.abs(p.pos.z - origin.z) <= RIFT_REGION_HALF_Z;
+  if (!isInside && forced) return;
   const dest = inst.returnPos;
-  const p = r.e;
   // Walk-in grace so the overworld portal cannot re-swallow the player the
   // tick they land next to it (clicking it deliberately still re-enters).
   p.riftReentryGraceUntil = ctx.time + 3;
@@ -462,13 +561,7 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   p.riftSliding = false; // never carry a stale slide pose out to the overworld
   p.riftSlideDirX = 0;
   p.riftSlideDirZ = 0;
-  if (inst) emitRiftState(ctx, r.meta.entityId, inst, false);
-  ctx.emit({
-    type: 'log',
-    text: 'You step back through the rift.',
-    color: '#b9f',
-    pid: r.meta.entityId,
-  });
+  emitRiftState(ctx, pid, inst, false);
 }
 
 // ---- Per-tick drivers -------------------------------------------------------
@@ -480,7 +573,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
     const inst = riftInstanceAtPos(ctx, p.pos);
     if (!inst) return;
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    const floor = floorForInstance(inst);
 
     // Way out: the entry beacon returns you to the overworld any time, so a run
     // is never a dead end (too hard / stuck / lost).
@@ -791,7 +884,7 @@ export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number
   const r = ctx.resolve(pid);
   if (!r) return;
   const chest = ctx.entities.get(objectId);
-  if (!chest || chest.templateId !== 'rift_treasure') return; // already opened / gone
+  if (chest?.templateId !== 'rift_treasure') return; // already opened / gone
   if (dist2d(r.e.pos, chest.pos) > 3.5) {
     ctx.error(r.meta.entityId, 'Move closer to the chest.');
     return;
@@ -820,7 +913,7 @@ export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number
 function openExit(ctx: SimContext, inst: RiftInstance): void {
   if (inst.exitId !== null) return;
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  const floor = floorForInstance(inst);
   const chest = floor.objects.find((o) => o.kind === 'chest');
   const pos = chest ?? { x: 0, z: floor.layout.dais.z + 6 };
   const exit = createGroundObject(
@@ -862,51 +955,166 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   }
 }
 
-// Closing a ranked rift (final boss down) seals its overworld portal and pays
-// Heroic Marks scaled by rank onto the boss corpse (personal loot slots), gated
-// once per rank per host UTC day via the same meta.heroicDaily set the heroic
-// dungeons use (key `rift_<tier>`, disjoint from dungeon ids). Dev-portal runs
-// (tier null) seal nothing and pay nothing.
-function rewardRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): void {
-  if (inst.rewarded) return;
-  inst.rewarded = true;
-  if (inst.tier === null) return;
-  if (inst.portalId !== null) closeNaturalRiftPortal(ctx, inst.portalId, 'sealed');
-  if (!boss) return;
-  const marks = RIFT_TIER_INFO[inst.tier].marks;
+/** Put normal rank marks plus the one-off race bonus on the winner's boss corpse
+ * as personal loot. Normal marks retain the existing daily-per-rank gate; race
+ * marks are event-specific and therefore always paid to a legitimate winner. */
+function rewardRiftWinner(
+  ctx: SimContext,
+  inst: RiftInstance,
+  boss: Entity | null,
+  participants: readonly number[],
+  raceWinner: boolean,
+): Map<number, number> {
+  const awardedByPlayer = new Map<number, number>();
+  if (inst.tier === null || !boss) return awardedByPlayer;
+  const info = RIFT_TIER_INFO[inst.tier];
   const loot = boss.loot ?? { copper: 0, items: [] };
   const dailyKey = `rift_${inst.tier}`;
-  let awarded = false;
-  for (const pid of instancePlayerIds(ctx, inst)) {
+  for (const pid of participants) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
+    let marks = raceWinner ? info.raceMarks : 0;
     const today = ctx.utcDay;
     if (today && meta.heroicDaily.date !== today) {
       meta.heroicDaily = { date: today, marked: new Set() };
     }
-    if (meta.heroicDaily.marked.has(dailyKey)) continue;
-    meta.heroicDaily.marked.add(dailyKey);
+    if (!meta.heroicDaily.marked.has(dailyKey)) {
+      meta.heroicDaily.marked.add(dailyKey);
+      marks += info.marks;
+    }
     for (let i = 0; i < marks; i++) {
       loot.items.push({ itemId: HEROIC_MARK_ITEM_ID, count: 1, personalFor: [pid] });
     }
-    awarded = true;
+    awardedByPlayer.set(pid, marks);
   }
-  if (!awarded) return;
-  boss.loot = loot;
-  boss.lootable = true;
+  if (awardedByPlayer.size > 0) {
+    boss.loot = loot;
+    boss.lootable = true;
+  }
+  return awardedByPlayer;
+}
+
+function terminateLosingInstance(ctx: SimContext, inst: RiftInstance): void {
+  const event =
+    inst.eventId === null
+      ? null
+      : (ctx.riftEvents.find((candidate) => candidate.eventId === inst.eventId) ?? null);
+  const winnerNames = event?.firstClear?.memberNames ?? [];
+  const clearTime = event?.firstClear?.duration ?? 0;
+  const tier = event?.tier ?? inst.tier;
+  inst.outcome = 'lost';
+  inst.finishedAt = ctx.time;
+  if (inst.lockpick) riftLockpickAbort(ctx, inst);
+  for (const pid of instancePlayerIds(ctx, inst)) {
+    if (event && tier) {
+      ctx.emit({
+        type: 'riftRaceResult',
+        pid,
+        eventId: event.eventId,
+        outcome: 'lost',
+        tier,
+        winnerNames,
+        clearTime,
+        rewardMarks: 0,
+      });
+    }
+    ctx.emit({
+      type: 'log',
+      text: `The rift has already been cleared by ${winnerNames.join(', ') || 'another party'}. Your run ends.`,
+      color: '#f99',
+      pid,
+    });
+    forceExitRiftPlayer(ctx, inst, pid, true);
+  }
+  freeRiftInstance(ctx, inst);
+}
+
+/** Resolve the authoritative first-clear claim. The winning instance remains open
+ * for loot and egress; every competing group is notified, ejected, and torn down. */
+function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): boolean {
+  if (inst.rewarded) return inst.outcome === 'won';
+  const present = instancePlayerIds(ctx, inst);
+  const participants = present.length > 0 ? present : [...inst.memberIds];
+  const claim = claimRiftFirstClear(ctx, inst, participants);
+  if (!claim.won) {
+    terminateLosingInstance(ctx, inst);
+    return false;
+  }
+
+  inst.rewarded = true;
+  inst.outcome = 'won';
+  inst.finishedAt = ctx.time;
+  const raceWinner = claim.event !== null;
+  const rewards = rewardRiftWinner(ctx, inst, boss, participants, raceWinner);
+
+  if (claim.event) {
+    if (boss) {
+      addRiftProgressionLoot(
+        ctx,
+        boss,
+        claim.event.eventId,
+        claim.event.tier,
+        participants,
+        inst.upgrade?.rewards.lootMultiplier,
+        inst.upgrade?.rewards.craftingMaterialBias,
+      );
+    }
+    const portalId = claim.event.portalId ?? inst.portalId;
+    if (portalId !== null) closeNaturalRiftPortal(ctx, portalId, 'sealed');
+    const firstClear = claim.event.firstClear;
+    const winnerNames = firstClear?.memberNames ?? [];
+    const clearTime = firstClear?.duration ?? Math.max(0, ctx.time - inst.startedAt);
+    for (const pid of participants) {
+      ctx.emit({
+        type: 'riftRaceResult',
+        pid,
+        eventId: claim.event.eventId,
+        outcome: 'won',
+        tier: claim.event.tier,
+        winnerNames,
+        clearTime,
+        rewardMarks: rewards.get(pid) ?? 0,
+      });
+    }
+    ctx.emit({
+      type: 'riftRaceWorld',
+      eventId: claim.event.eventId,
+      tier: claim.event.tier,
+      winnerNames,
+      clearTime,
+    });
+    ctx.emit({
+      type: 'log',
+      text: `${winnerNames.join(', ') || 'A party'} won the ${claim.event.tier}-rank Rift race in ${clearTime.toFixed(1)}s!`,
+      color: '#ffd76a',
+    });
+
+    const competitors = ctx.riftInstances.filter(
+      (candidate) =>
+        candidate !== inst &&
+        candidate.partyKey !== null &&
+        candidate.eventId === claim.event?.eventId,
+    );
+    for (const competitor of competitors) terminateLosingInstance(ctx, competitor);
+  }
+  return true;
 }
 
 function instancePlayerIds(ctx: SimContext, inst: RiftInstance): number[] {
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const out: number[] = [];
-  for (const meta of ctx.players.values()) {
-    const e = ctx.entities.get(meta.entityId);
+  const candidates =
+    inst.memberIds.size > 0
+      ? inst.memberIds
+      : new Set([...ctx.players.values()].map((m) => m.entityId));
+  for (const pid of candidates) {
+    const e = ctx.entities.get(pid);
     if (
       e &&
       Math.abs(e.pos.x - origin.x) <= RIFT_REGION_HALF_X &&
       Math.abs(e.pos.z - origin.z) <= RIFT_REGION_HALF_Z
     ) {
-      out.push(meta.entityId);
+      out.push(pid);
     }
   }
   return out;
@@ -1009,7 +1217,7 @@ function tickRiftRollers(
 export function advanceRiftRollers(ctx: SimContext): void {
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null || inst.rollerIds.length === 0) continue;
-    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    const floor = floorForInstance(inst);
     if (floor.rollers.length === 0) continue;
     tickRiftRollers(ctx, inst, riftInstanceOrigin(inst.slot, inst.floorIndex), floor.rollers);
   }
@@ -1024,7 +1232,7 @@ export function riftPlayerLift(ctx: SimContext, p: Entity): number {
   const inst = riftInstanceAtPos(ctx, p.pos);
   if (!inst) return 0;
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
-  const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+  const floor = floorForInstance(inst);
   return riftPlatformLift(floor.platform, p.pos.z - origin.z);
 }
 
@@ -1034,7 +1242,7 @@ export function riftPlayerLift(ctx: SimContext, p: Entity): number {
 export function liftRiftEntities(ctx: SimContext): void {
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
-    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    const floor = floorForInstance(inst);
     if (!floor.platform) continue;
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
     const lift = (id: number): void => {
@@ -1065,7 +1273,7 @@ export function updateRiftInstances(ctx: SimContext): void {
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
 
     // Gate progression.
-    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    const floor = floorForInstance(inst);
 
     // Environmental hazards (lava/blackwater): unblockable damage to any player
     // standing in a zone, skipped while airborne (jump across). 1 Hz, like delves.
@@ -1128,8 +1336,8 @@ export function updateRiftInstances(ctx: SimContext): void {
     if (floor.isBoss) {
       const boss = inst.bossId !== null ? ctx.entities.get(inst.bossId) : null;
       if ((boss === null || boss === undefined || boss.dead) && inst.exitId === null) {
+        if (!completeRiftClear(ctx, inst, boss ?? null)) continue;
         openExit(ctx, inst);
-        rewardRiftClear(ctx, inst, boss ?? null);
       }
     } else if (!inst.descentOpen) {
       const puzzleDone =
@@ -1140,18 +1348,7 @@ export function updateRiftInstances(ctx: SimContext): void {
     }
 
     // Empty-slot cleanup.
-    let occupied = false;
-    for (const meta of ctx.players.values()) {
-      const e = ctx.entities.get(meta.entityId);
-      if (
-        e &&
-        Math.abs(e.pos.x - origin.x) <= RIFT_REGION_HALF_X &&
-        Math.abs(e.pos.z - origin.z) <= RIFT_REGION_HALF_Z
-      ) {
-        occupied = true;
-        break;
-      }
-    }
+    const occupied = instancePlayerIds(ctx, inst).length > 0;
     if (occupied) {
       inst.emptyFor = 0;
     } else {

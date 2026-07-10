@@ -475,6 +475,12 @@ export const en = {
       orbSealed: 'The orb is sealed by the ritual below.',
       orbWakes: "The pentagram's flame gutters out. Something wakes on the altar.",
       orbOpensGate: 'The Blood Orb flares. The gates of the temple grind open.',
+      alreadyCleared: 'This rift has already been cleared by {names}.',
+      raceLost: 'The rift has already been cleared by {names}. Your run ends.',
+      raceWorldWin: '{names} won the {tier}-rank Rift race in {seconds}s!',
+      raceWinBanner: 'Rift Race Won - {seconds}s',
+      raceLostBanner: 'Rift Already Cleared',
+      forgeComplete: 'Rift forge {action} completed for {name}.',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',

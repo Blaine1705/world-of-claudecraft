@@ -51,7 +51,14 @@ import {
   rollCorpseMaterialRarity,
 } from './professions/gathering';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
+import {
+  cloneItemInstancePayload,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  OBJECT_RESPAWN,
+} from './types';
 import { markWorldBossLooted } from './world_boss';
 
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
@@ -121,7 +128,11 @@ export function lootCorpse(
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
       while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+        if (s.instance) {
+          ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        } else {
+          ctx.addItem(s.itemId, 1, meta.entityId);
+        }
         s.count--;
       }
       if (s.count > 0) bagsFull = true;
@@ -132,14 +143,26 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
-      ctx.addItem(s.itemId, 1, meta.entityId);
+      if (s.instance) {
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+      } else {
+        ctx.addItem(s.itemId, 1, meta.entityId);
+      }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
       continue;
     }
     if (!rights.shared) continue;
-    while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta)) {
-      s.count--;
+    while (s.count > 0) {
+      if (s.instance) {
+        if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) break;
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        s.count--;
+      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+        s.count--;
+      } else {
+        break;
+      }
     }
     if (s.count > 0) bagsFull = true;
   }

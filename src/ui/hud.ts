@@ -80,6 +80,7 @@ import type {
   CalendarResultCode,
   EquipSlot,
   InvSlot,
+  ItemInstancePayload,
   ItemSlot,
   LootRollChoice,
   MailResultCode,
@@ -3492,7 +3493,7 @@ export class Hud {
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
     moneyHtml: (copper) => this.moneyHtml(copper),
-    itemTooltip: (item) => this.itemTooltip(item),
+    itemTooltip: (item, instance) => this.itemTooltip(item, true, instance),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // The interactive talents window. Hud stays the coordinator (closeOtherWindows
@@ -4247,7 +4248,7 @@ export class Hud {
     this.hideTooltip();
   }
 
-  private itemTooltip(item: ItemDef, compare = true): string {
+  private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
     const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
     html += `<div class="tt-sub">${esc(
@@ -4311,6 +4312,34 @@ export class Hud {
           )}</div>`;
         }
       }
+    }
+    if (instance?.rolled?.stats) {
+      for (const [stat, value] of Object.entries(instance.rolled.stats)) {
+        if (!Number.isFinite(value) || value === 0) continue;
+        html += `<div class="tt-green">${esc(
+          t('itemUi.tooltip.stat', {
+            value: itemNumber(value),
+            stat: itemStatName(stat),
+          }),
+        )}</div>`;
+      }
+    }
+    if (instance?.rift) {
+      html += `<div class="tt-sub">${esc(
+        t('hudChrome.itemTooltip.riftTier', { tier: instance.rift.tier }),
+      )}</div>`;
+      html += `<div class="tt-sub">${esc(
+        t('hudChrome.itemTooltip.riftUpgrade', {
+          level: itemNumber(instance.rift.upgradeLevel),
+          max: itemNumber(instance.rift.maxUpgradeLevel),
+        }),
+      )}</div>`;
+      html += `<div class="tt-sub">${esc(
+        t('hudChrome.itemTooltip.riftSockets', {
+          used: itemNumber(instance.rift.gems.length),
+          total: itemNumber(instance.rift.gemSlots),
+        }),
+      )}</div>`;
     }
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
@@ -9553,6 +9582,22 @@ export class Hud {
         case 'delveFailed':
           this.showBanner(t('delveUi.run.failed'));
           break;
+        case 'riftRaceResult':
+          if (ev.outcome === 'won') {
+            this.showBanner(
+              t('sim.rift.raceWinBanner', {
+                seconds: formatNumber(ev.clearTime, { maximumFractionDigits: 1 }),
+              }),
+            );
+            audio.duelEnd();
+          } else {
+            this.showBanner(t('sim.rift.raceLostBanner'));
+            audio.death();
+          }
+          break;
+        case 'riftRaceWorld':
+        case 'riftForgeResult':
+          break; // their localized log line carries the non-modal detail
         case 'companionBark': {
           // Acolyte Tessa's voice line: overhead bubble over her (when on-screen),
           // plus an attributed combat-log line so it is never missed off-screen.

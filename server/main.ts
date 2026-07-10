@@ -2241,6 +2241,7 @@ export async function startServer(): Promise<http.Server> {
     );
   await game.loadMarket();
   await game.loadMail();
+  await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
@@ -2387,6 +2388,7 @@ export async function startServer(): Promise<http.Server> {
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();
+    await game.saveRifts();
     await game.endAllPlaySessions();
     // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
     // sweep: once the leases drop, a replacement process can load the same character

@@ -933,6 +933,7 @@ export class ClientWorld implements IWorld {
   bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  equipmentInstances: import('../sim/entity').PlayerEquipmentInstances = {};
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1834,6 +1835,7 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.einst !== undefined) this.equipmentInstances = s.einst;
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
       // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
@@ -2118,6 +2120,18 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  salvageItem(itemId: string): void {
+    this.cmd({ cmd: 'salvage_item', item: itemId });
+  }
+  upgradeRiftItem(itemId: string): void {
+    this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+  }
+  enchantRiftItem(itemId: string, stat: string): void {
+    this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+  }
+  socketRiftGem(itemId: string, gemId: string): void {
+    this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
@@ -2550,10 +2564,16 @@ export class ClientWorld implements IWorld {
     if (ev.type !== 'riftState') return;
     this.riftFloor = ev.active
       ? {
+          eventId: ev.eventId,
+          instanceId: ev.instanceId,
           seed: ev.seed,
           baseLevel: ev.baseLevel,
           floorIndex: ev.floorIndex,
           floorCount: ev.floorCount,
+          origin: ev.origin,
+          contentId: ev.contentId,
+          contentHash: ev.contentHash,
+          upgrade: ev.upgrade,
           name: ev.name,
           themeName: ev.themeName,
           tier: ev.tier,

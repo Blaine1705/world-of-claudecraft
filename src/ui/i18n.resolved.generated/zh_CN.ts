@@ -1096,7 +1096,10 @@ export const zh_CN: EnTranslations = {
       "label": "重置框体位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等级 {level}"
+      "requiresLevel": "需要等级 {level}",
+      "riftTier": "{tier}级裂隙物品",
+      "riftUpgrade": "裂隙强化 {level}/{max}",
+      "riftSockets": "裂隙宝石 {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -3347,7 +3350,13 @@ export const zh_CN: EnTranslations = {
       "gateOpen": "闸门轰隆隆地开启了。",
       "orbSealed": "宝珠被下方的仪式封印着。",
       "orbWakes": "五芒星阵的火焰熄灭了。祭坛上有什么苏醒了。",
-      "orbOpensGate": "血色宝珠骤然爆发。神殿之门轰然开启。"
+      "orbOpensGate": "血色宝珠骤然爆发。神殿之门轰然开启。",
+      "alreadyCleared": "该裂隙已被 {names} 清除。",
+      "raceLost": "该裂隙已被 {names} 清除。你的挑战结束了。",
+      "raceWorldWin": "{names} 用时 {seconds} 秒赢得了 {tier} 级裂隙竞速！",
+      "raceWinBanner": "裂隙竞速胜利 — {seconds} 秒",
+      "raceLostBanner": "裂隙已被清除",
+      "forgeComplete": "{name} 的裂隙锻造{action}已完成。"
     },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",
@@ -6390,6 +6399,27 @@ export const zh_CN: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "阳瓣草"
+      },
+      "rift_essence": {
+        "name": "裂隙精华"
+      },
+      "rift_gem_crimson": {
+        "name": "猩红裂隙宝石"
+      },
+      "rift_gem_azure": {
+        "name": "蔚蓝裂隙宝石"
+      },
+      "rift_gem_verdant": {
+        "name": "翠绿裂隙宝石"
+      },
+      "riftbound_band_of_might": {
+        "name": "力量裂隙之戒"
+      },
+      "riftbound_band_of_insight": {
+        "name": "洞察裂隙之戒"
+      },
+      "riftbound_band_of_guile": {
+        "name": "诡诈裂隙之戒"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"

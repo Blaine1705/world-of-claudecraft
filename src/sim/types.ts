@@ -575,6 +575,39 @@ export interface ItemInstancePayload {
   rolled?: { quality?: string; stats?: Record<string, number> };
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
+  /** Long-term Rift gear progression. `rolled.stats` is the authoritative
+   * aggregate bonus consumed by recalcPlayerStats; this record explains how it
+   * was earned and lets forge operations rebuild it deterministically. */
+  rift?: {
+    sourceEventId: string;
+    tier: RiftTier;
+    power: number;
+    upgradeLevel: number;
+    maxUpgradeLevel: number;
+    baseStats: Record<string, number>;
+    enchant?: { stat: string; value: number };
+    gemSlots: number;
+    gems: string[];
+  };
+}
+
+export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
+  const instance: ItemInstancePayload = { ...src };
+  if (src.charges) instance.charges = { ...src.charges };
+  if (src.rolled)
+    instance.rolled = {
+      ...src.rolled,
+      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
+    };
+  if (src.rift) {
+    instance.rift = {
+      ...src.rift,
+      baseStats: { ...src.rift.baseStats },
+      ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
+      gems: [...src.rift.gems],
+    };
+  }
+  return instance;
 }
 
 export interface InvSlot {
@@ -589,15 +622,7 @@ export interface InvSlot {
 // one would silently mutate the other. Deep-clone at every save/load boundary instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };
-  const src = slot.instance;
-  const instance: ItemInstancePayload = { ...src };
-  if (src.charges) instance.charges = { ...src.charges };
-  if (src.rolled)
-    instance.rolled = {
-      ...src.rolled,
-      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
-    };
-  return { ...slot, instance };
+  return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
 }
 
 export interface LootSlot extends InvSlot {
@@ -1583,6 +1608,12 @@ export type BiomeId =
 export interface ZoneDef {
   id: string;
   name: string;
+  /** Natural Rift portals may only select zones explicitly opted in. */
+  riftPortalEligible?: boolean;
+  /** Relative C/B/A/S weights for portals in this zone. Missing/zero ranks are
+   * never selected. Kept on content data so adding/reordering zones cannot
+   * silently change endgame difficulty. */
+  riftTierWeights?: Partial<Record<RiftTier, number>>;
   zMin: number;
   /**
    * Optional east-west extent (a world GRID column). Omitted = the original
@@ -1969,6 +2000,10 @@ export interface Entity {
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;
   riftBaseLevel?: number;
+  // Stable identity of the shared natural Rift event. Two groups entering the
+  // same portal receive separate instances tied to this one race record.
+  // Absent on legacy/dev portals that are not global events.
+  riftEventId?: string;
   // Rank of a world-spawned rift portal (rift/portals.ts); drives the rank badge
   // both hosts render above the portal and the Heroic Mark payout on sealing.
   // Absent on dev-spawned portals.
@@ -2477,13 +2512,53 @@ export type SimEvent = { pid?: number } & (
       type: 'riftState';
       pid: number;
       active: boolean;
+      eventId: string | null;
+      instanceId: number;
       seed: number;
       baseLevel: number;
       floorIndex: number;
       floorCount: number;
+      origin: { x: number; z: number };
+      contentId: string;
+      contentHash: string;
+      upgrade: import('./rift/types').RiftUpgradeManifest | null;
       name: string;
       themeName: string;
       tier: RiftTier | null;
+    }
+  | {
+      type: 'riftRaceResult';
+      pid: number;
+      eventId: string;
+      outcome: 'won' | 'lost';
+      tier: RiftTier;
+      winnerNames: string[];
+      clearTime: number;
+      rewardMarks: number;
+    }
+  | {
+      type: 'riftRaceWorld';
+      eventId: string;
+      tier: RiftTier;
+      winnerNames: string[];
+      clearTime: number;
+    }
+  | {
+      type: 'riftForgeResult';
+      pid: number;
+      ok: boolean;
+      action: 'upgrade' | 'enchant' | 'socket';
+      itemId: string;
+      reason?:
+        | 'not_found'
+        | 'not_rift_gear'
+        | 'max_upgrade'
+        | 'insufficient_essence'
+        | 'invalid_stat'
+        | 'invalid_gem'
+        | 'sockets_full';
+      upgradeLevel?: number;
+      essenceSpent?: number;
     }
 );
 

@@ -2548,6 +2548,20 @@ export async function saveMailState(save: MailSave): Promise<void> {
   await saveWorldState(mailStateKey(REALM), save);
 }
 
+// Shared Rift event history/scheduler, realm-scoped. Runtime group instances are
+// intentionally absent from this blob (see sim/rift/persistence.ts).
+export function riftStateKey(realm: string): string {
+  return `rifts:${realm}`;
+}
+
+export async function loadRiftState(): Promise<unknown | null> {
+  return loadWorldState<unknown>(riftStateKey(REALM));
+}
+
+export async function saveRiftState(save: unknown): Promise<void> {
+  await saveWorldState(riftStateKey(REALM), save);
+}
+
 // ---------------------------------------------------------------------------
 // Play sessions: one row per character login, closed on logout. Powers the
 // admin dashboard's playtime / DAU / sessions-per-day metrics.

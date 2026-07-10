@@ -35,6 +35,7 @@ import {
   terrainWallStandoff,
   WATER_LEVEL,
 } from '../src/sim/world';
+import { findWallFoot } from './helpers/wall_foot';
 
 const SEED = 20061;
 
@@ -275,11 +276,16 @@ describe('terrain wall standoff', () => {
     expect(s).toEqual({ x: 0, z: 0 });
   });
 
-  it('eases a body off the rim wall, bounded by one body radius', () => {
+  it('eases a body off a terrain wall, bounded by one body radius', () => {
+    // Sweep the neighbourhood of a REAL wall in whatever world the sim generates,
+    // rather than the strip world's western rim (which the grid world replaced with
+    // sealed border ridges elsewhere; the old literals sat on open ground and the
+    // "it pushes" assertion could never fire).
+    const foot = findWallFoot(SEED, R, SLOPE);
     let pushed = 0;
     let maxMove = 0;
-    for (let x = -175; x <= -148; x += 0.5) {
-      for (let z = 555; z <= 645; z += 0.5) {
+    for (let x = foot.x - 6; x <= foot.x + 6; x += 0.5) {
+      for (let z = foot.z - 6; z <= foot.z + 6; z += 0.5) {
         // only positions a player could actually stand on
         if (terrainSteepness(x, z, SEED) > SLOPE) continue;
         const s = terrainWallStandoff(x, z, SEED, R, SLOPE);
@@ -315,7 +321,7 @@ describe('terrain wall standoff', () => {
     // wall within a body radius. A no-input grounded tick therefore moves the
     // player ONLY via the standoff in the shared movement kernel, isolating it
     // from the slide: without the standoff the player would not move at all.
-    const cell = { x: -150, z: 546.75 };
+    const cell = findWallFoot(SEED, R, SLOPE);
     expect(terrainSteepnessAt(cell.x, cell.z, SEED)).toBeLessThan(1.0); // flat footing: no slide
     const sim = makeSim();
     teleportTo(sim, cell.x, cell.z);
@@ -333,23 +339,32 @@ describe('terrain wall standoff', () => {
     );
   });
 
-  it('does not sawtooth when holding forward into the western wall', () => {
+  it('does not sawtooth when holding forward into a terrain wall', () => {
+    // Hold forward straight into a real wall: the standoff must settle the body at
+    // the wall foot, not bounce it in and out every tick.
+    const foot = findWallFoot(SEED, R, SLOPE);
     const sim = makeSim();
-    teleportTo(sim, -90, -154);
-    sim.player.facing = Math.PI;
+    teleportTo(sim, foot.x, foot.z);
+    sim.player.facing = foot.facingIntoWall;
     const meta = sim.players.get(sim.playerId);
     if (!meta) throw new Error('missing player meta');
     meta.moveInput.forward = true;
 
     sim.tick(); // allow the body-width standoff to clear the initial wall overlap
+    // Sawtooth is oscillation ALONG THE WALL NORMAL (shoved out, walks back in, shoved
+    // out again). Sliding sideways along a wall whose normal is not axis-aligned is
+    // correct behaviour, so measure only the into-wall component.
     let totalJitter = 0;
     let largestStep = 0;
     for (let i = 0; i < 60; i++) {
+      const beforeX = sim.player.pos.x;
       const beforeZ = sim.player.pos.z;
       sim.tick();
-      const dz = Math.abs(sim.player.pos.z - beforeZ);
-      totalJitter += dz;
-      largestStep = Math.max(largestStep, dz);
+      const dInto =
+        (sim.player.pos.x - beforeX) * foot.intoWallX +
+        (sim.player.pos.z - beforeZ) * foot.intoWallZ;
+      totalJitter += Math.abs(dInto);
+      largestStep = Math.max(largestStep, Math.abs(dInto));
     }
 
     expect(largestStep).toBeLessThan(0.02);
@@ -357,17 +372,29 @@ describe('terrain wall standoff', () => {
   });
 
   it('still preserves tangential wall slide when pushing into the western wall at an angle', () => {
+    // Push into the wall at a slight angle: the body must not climb it, and must
+    // still slide ALONG it instead of sticking.
+    const foot = findWallFoot(SEED, R, SLOPE);
     const sim = makeSim();
-    teleportTo(sim, -90, -154);
-    sim.player.facing = Math.PI - 0.2;
+    teleportTo(sim, foot.x, foot.z);
+    sim.player.facing = foot.facingIntoWall - 0.2;
     const meta = sim.players.get(sim.playerId);
     if (!meta) throw new Error('missing player meta');
     meta.moveInput.forward = true;
 
     for (let i = 0; i < 20; i++) sim.tick();
 
-    expect(sim.player.pos.x).toBeGreaterThan(-88.5);
-    expect(Math.abs(sim.player.pos.z + 153.65)).toBeLessThan(0.25);
+    // Never shoved onto the wall itself (it would slide straight back off).
+    expect(terrainSteepnessAt(sim.player.pos.x, sim.player.pos.z, SEED)).toBeLessThanOrEqual(
+      SLOPE + 1e-6,
+    );
+    // Progress is TANGENTIAL: it travelled along the wall, not into it.
+    const dx = sim.player.pos.x - foot.x;
+    const dz = sim.player.pos.z - foot.z;
+    const intoWall = dx * foot.intoWallX + dz * foot.intoWallZ;
+    const along = Math.hypot(dx - intoWall * foot.intoWallX, dz - intoWall * foot.intoWallZ);
+    expect(along, 'slid along the wall').toBeGreaterThan(0.5);
+    expect(intoWall, 'never pushed into the wall').toBeLessThan(0.1);
   });
 });
 

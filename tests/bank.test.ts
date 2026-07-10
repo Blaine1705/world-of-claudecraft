@@ -20,9 +20,15 @@ import {
   moveBetweenContainers,
   sanitizeBankState,
 } from '../src/sim/bank';
-import { ITEMS, QUESTS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity, InvSlot, ItemInstancePayload, SimEvent } from '../src/sim/types';
+import type {
+  Entity,
+  InvSlot,
+  ItemInstancePayload,
+  SimEvent,
+  WorldContent,
+} from '../src/sim/types';
 
 // The full 12-tier ladder, pinned as literals (never compared to the exported
 // constant, which would be a zero-protection self-comparison).
@@ -32,6 +38,17 @@ const CAPS = [30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96]; // 24 + 6*(tier+1
 
 // The three Gilded Strongbox bursars (banker NPCs), one per town hub.
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'] as const;
+
+// Bank command tests need real banker definitions and terrain, not the hundreds
+// of unrelated ambient entities spawned by the full continent. In particular,
+// the 50-seed conservation property used to spend almost all of its time in
+// Sim construction instead of exercising a bank operation.
+const BANK_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: Object.fromEntries(BANKERS.map((id) => [id, BUILTIN_WORLD.npcs[id]])),
+  groundObjects: [],
+};
 
 // Resolve a banker's LIVE entity by templateId: content coords run through
 // findSafePos/groundPos at spawn, so the runtime position can differ from the
@@ -71,7 +88,12 @@ function moveFarFromBankers(sim: Sim, pid = sim.playerId): void {
 // The command-suite assertions never read position, so the move is invisible to them; the
 // far-refusal cases below move away explicitly.
 const makeSim = (seed = 42) => {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: BANK_TEST_WORLD,
+  });
   moveToBanker(sim);
   return sim;
 };
@@ -79,7 +101,8 @@ const meta = (sim: Sim, pid = sim.playerId) => sim.meta(pid)!;
 
 // A multiplayer world (no default player) for the banker interaction
 // tests, mirroring the tests/mail.test.ts makeWorld idiom.
-const makeBankWorld = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+const makeBankWorld = (seed = 42) =>
+  new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: BANK_TEST_WORLD });
 
 // Distinct gear ids (stackSize 1) for filling containers with non-mergeable entries.
 const GEAR_IDS = Object.values(ITEMS)
@@ -562,9 +585,18 @@ describe('conservation seed sweeps', () => {
     let sawBagsFullRefusal = false;
     let sawCannotAfford = false;
 
+    // The bank operations do not consume Sim RNG and every scripted sequence has
+    // its own test-side seed. Reuse one real Sim/banker and reset only the state
+    // under test; constructing 50 identical continents adds no coverage.
+    const sim = makeSim(1);
+    const m = meta(sim);
+    const initialInventory = clone(m.inventory);
+
     for (let seed = 1; seed <= 50; seed++) {
-      const sim = makeSim(seed);
-      const m = meta(sim);
+      m.inventory = clone(initialInventory);
+      m.bank = { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
+      m.copper = 0;
+      sim.drainEvents();
       sim.addItem('wolf_fang', 12);
       sim.addItem('linen_scrap', 7);
       sim.addItem('baked_bread', 5);

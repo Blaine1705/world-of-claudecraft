@@ -166,6 +166,7 @@ import {
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
   TOOL_RECIPES as TOOL_RECIPES_CONTENT,
 } from './content/recipes';
+import { RIFT_ITEMS } from './content/rift/items';
 import { RIFT_MOBS } from './content/rift/mobs';
 import {
   TEMPLE_CAMPS,
@@ -307,6 +308,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
   HEROIC_ITEMS,
+  RIFT_ITEMS,
   REALM_ITEMS,
   DRAKELANDS_ITEMS,
   FROSTVEIL_ITEMS,

@@ -33,6 +33,8 @@ const MOAT: { x: number; z: number; radius: number }[] = [
 export const WILLOWFEN_ZONE: ZoneDef = {
   id: 'willowfen',
   name: 'The Willowfen',
+  riftPortalEligible: true,
+  riftTierWeights: { B: 0.1, A: 0.55, S: 0.35 },
   zMin: 180,
   zMax: 700,
   xMin: -540,

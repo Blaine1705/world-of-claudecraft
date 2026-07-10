@@ -55,6 +55,9 @@ function makeCtx() {
   const host: SimContextHost = {
     riftCollisionToken: 1,
     naturalRiftPortals: [],
+    riftEvents: [],
+    nextRiftInstanceId: 1,
+    riftPortalNextAt: 120,
     riftPortalSpawnCount: 0,
     get rng() {
       return rng;

@@ -118,6 +118,7 @@ import {
   NPCS,
   QUESTS,
   RIFT_SLOT_COUNT,
+  riftInstanceOrigin,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
@@ -135,6 +136,7 @@ import {
   createNpc,
   createPlayer,
   type PlayerEquipment,
+  type PlayerEquipmentInstances,
   recalcPlayerStats,
 } from './entity';
 import {
@@ -314,7 +316,18 @@ import {
   onInventoryChangedForQuests,
   onMobKilledForQuests,
 } from './quests/quest_credit';
-import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
+import {
+  type NaturalRiftPortal,
+  RIFT_PORTAL_FIRST_AT,
+  updateRiftPortals as updateRiftPortalsImpl,
+} from './rift/portals';
+import {
+  enchantRiftItem as enchantRiftItemImpl,
+  type RiftForgeResult,
+  sanitizeRiftGearInstance,
+  socketRiftGem as socketRiftGemImpl,
+  upgradeRiftItem as upgradeRiftItemImpl,
+} from './rift/progression';
 import { generateRiftFloor } from './rift/rift_gen';
 import {
   riftLockpickAbort as riftLockpickAbortImpl,
@@ -334,7 +347,7 @@ import {
   updateRiftInstances as updateRiftInstancesImpl,
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
-import type { RiftInstance } from './rift/types';
+import type { RiftEvent, RiftInstance } from './rift/types';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
 // re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
@@ -389,6 +402,7 @@ import {
   armorReduction,
   type CrowdControlDrCategory,
   cloneInvSlot,
+  cloneItemInstancePayload,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DelveDef,
   type DelveModuleDef,
@@ -397,6 +411,7 @@ import {
   type DungeonDifficulty,
   dist2d,
   type Entity,
+  EQUIP_SLOTS,
   type EquipSlot,
   type ErrorReason,
   emptyMoveInput,
@@ -833,6 +848,7 @@ export interface PlayerMeta {
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
+  equipmentInstances: PlayerEquipmentInstances;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -1030,6 +1046,8 @@ export interface CharacterState {
   pos: { x: number; z: number };
   facing: number;
   equipment: PlayerEquipment;
+  /** Optional for backward compatibility with saves from before instanced Rift gear. */
+  equipmentInstances?: PlayerEquipmentInstances;
   inventory: InvSlot[];
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
@@ -1252,12 +1270,17 @@ export class Sim {
   instances: InstanceSlot[] = [];
   // procedural rift instances (separate slot pool + coordinate band from dungeons)
   riftInstances: RiftInstance[] = [];
+  // Shared natural-world events. Group instances point here by eventId and race
+  // for one authoritative first-clear claim.
+  riftEvents: RiftEvent[] = [];
+  nextRiftInstanceId = 1;
   // rift-portal registry (built lazily by updateRiftTriggers, appended on rift_portal spawn)
   private riftPortalIds: number[] | null = null;
   // Open world-spawned ranked rift portals + the spawn ordinal (rift/portals.ts
   // scheduler; both live SimContext views).
   naturalRiftPortals: NaturalRiftPortal[] = [];
   riftPortalSpawnCount = 0;
+  riftPortalNextAt = RIFT_PORTAL_FIRST_AT;
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -1543,7 +1566,14 @@ export class Sim {
     for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
       this.riftInstances.push({
         slot: i,
+        instanceId: 0,
+        eventId: null,
         partyKey: null,
+        memberIds: new Set(),
+        startedAt: 0,
+        finishedAt: null,
+        outcome: 'abandoned',
+        upgrade: null,
         seed: 0,
         baseLevel: 1,
         floorIndex: 0,
@@ -1774,6 +1804,7 @@ export class Sim {
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
+      equipmentInstances: {},
       xp: 0,
       lifetimeXp: 0,
       prestigeRank: 0,
@@ -1865,7 +1896,21 @@ export class Sim {
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
+      meta.equipmentInstances = {};
+      for (const [slot, instance] of Object.entries(s.equipmentInstances ?? {})) {
+        if (!(EQUIP_SLOTS as readonly string[]).includes(slot) || !instance) continue;
+        const itemId = meta.equipment[slot as EquipSlot];
+        if (!itemId) continue;
+        const clean = sanitizeRiftGearInstance(itemId, instance, player.id);
+        if (clean) meta.equipmentInstances[slot as EquipSlot] = clean;
+      }
       meta.inventory = s.inventory.map(cloneInvSlot);
+      for (const slot of meta.inventory) {
+        if (!slot.instance?.rift) continue;
+        const clean = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
+        if (clean) slot.instance = clean;
+        else delete slot.instance;
+      }
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
         // inventory, so grant + equip bags that cover it (lowest quality tier
@@ -1958,7 +2003,7 @@ export class Sim {
     // resolver below consume it (they only ever read these flat numbers).
     meta.talentMods = computeTalentModifiers(cls, meta.talents);
     this.refreshKnownAbilities(meta, false);
-    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
+    recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstances);
     if (savedState) {
       player.hp = Math.max(1, Math.min(player.maxHp, savedState.hp));
       player.resource =
@@ -2168,6 +2213,14 @@ export class Sim {
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       equipment: { ...meta.equipment },
+      ...(Object.keys(meta.equipmentInstances).length > 0 && {
+        equipmentInstances: Object.fromEntries(
+          Object.entries(meta.equipmentInstances).map(([slot, instance]) => [
+            slot,
+            instance ? cloneItemInstancePayload(instance) : undefined,
+          ]),
+        ),
+      }),
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
       bank: {
@@ -2400,6 +2453,9 @@ export class Sim {
   }
   get equipment(): PlayerEquipment {
     return this.primary.equipment;
+  }
+  get equipmentInstances(): PlayerEquipmentInstances {
+    return this.primary.equipmentInstances;
   }
   get copper(): number {
     return this.primary.copper;
@@ -2681,6 +2737,15 @@ export class Sim {
       get riftInstances() {
         return sim.riftInstances;
       },
+      get riftEvents() {
+        return sim.riftEvents;
+      },
+      get nextRiftInstanceId() {
+        return sim.nextRiftInstanceId;
+      },
+      set nextRiftInstanceId(v) {
+        sim.nextRiftInstanceId = v;
+      },
       get naturalRiftPortals() {
         return sim.naturalRiftPortals;
       },
@@ -2689,6 +2754,12 @@ export class Sim {
       },
       set riftPortalSpawnCount(v: number) {
         sim.riftPortalSpawnCount = v;
+      },
+      get riftPortalNextAt() {
+        return sim.riftPortalNextAt;
+      },
+      set riftPortalNextAt(v: number) {
+        sim.riftPortalNextAt = v;
       },
       get riftPortalIds() {
         return sim.riftPortalIds;
@@ -3182,7 +3253,13 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
-    recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, this.playerMods(r.meta));
+    recalcPlayerStats(
+      r.e,
+      r.meta.cls,
+      r.meta.equipment,
+      this.playerMods(r.meta),
+      r.meta.equipmentInstances,
+    );
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
@@ -3904,7 +3981,13 @@ export class Sim {
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
     if (auraAffectsStats(removed)) {
-      recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta));
+      recalcPlayerStats(
+        e,
+        meta.cls,
+        meta.equipment,
+        this.playerMods(meta),
+        meta.equipmentInstances,
+      );
     }
   }
 
@@ -4003,7 +4086,14 @@ export class Sim {
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, this.playerMods(meta));
+      if (meta)
+        recalcPlayerStats(
+          target,
+          meta.cls,
+          meta.equipment,
+          this.playerMods(meta),
+          meta.equipmentInstances,
+        );
     }
   }
 
@@ -4651,7 +4741,8 @@ export class Sim {
   // module never reaches into the Sim players map directly.
   private recalcPlayer(target: Entity): void {
     const meta = this.players.get(target.id);
-    if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods);
+    if (meta)
+      recalcPlayerStats(target, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstances);
   }
 
   private updateRangedPetAttack(
@@ -5521,6 +5612,18 @@ export class Sim {
     return this.players.get(this.primaryId)?.lastSalvageResult ?? null;
   }
 
+  upgradeRiftItem(itemId: string, pid?: number): RiftForgeResult {
+    return upgradeRiftItemImpl(this.ctx, itemId, pid);
+  }
+
+  enchantRiftItem(itemId: string, stat: string, pid?: number): RiftForgeResult {
+    return enchantRiftItemImpl(this.ctx, itemId, stat, pid);
+  }
+
+  socketRiftGem(itemId: string, gemId: string, pid?: number): RiftForgeResult {
+    return socketRiftGemImpl(this.ctx, itemId, gemId, pid);
+  }
+
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
     const def = ITEMS[itemId];
     if (!def?.slot) return;
@@ -5979,7 +6082,14 @@ export class Sim {
     }
     if (statsDirty && target.kind === 'player') {
       const meta = this.players.get(target.id);
-      if (meta) recalcPlayerStats(target, meta.cls, meta.equipment, this.playerMods(meta));
+      if (meta)
+        recalcPlayerStats(
+          target,
+          meta.cls,
+          meta.equipment,
+          this.playerMods(meta),
+          meta.equipmentInstances,
+        );
     }
   }
 
@@ -7260,12 +7370,23 @@ export class Sim {
     if (!p) return null;
     const inst = riftInstanceAtPos(this.ctx, p.pos);
     if (!inst || inst.partyKey === null) return null;
-    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex);
+    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex, inst.upgrade);
+    const event =
+      inst.eventId === null
+        ? null
+        : (this.riftEvents.find((candidate) => candidate.eventId === inst.eventId) ?? null);
+    const contentId = event?.contentId ?? `procedural-v1:${inst.seed}:${inst.baseLevel}`;
     return {
+      eventId: inst.eventId,
+      instanceId: inst.instanceId,
       seed: inst.seed,
       baseLevel: inst.baseLevel,
       floorIndex: inst.floorIndex,
       floorCount: inst.floorCount,
+      origin: riftInstanceOrigin(inst.slot, inst.floorIndex),
+      contentId,
+      contentHash: event?.contentHash ?? contentId,
+      upgrade: inst.upgrade,
       name: floor.name,
       themeName: floor.themeName,
       tier: inst.tier,

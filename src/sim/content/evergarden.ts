@@ -27,6 +27,8 @@ import { emptyZoneProps } from '../types';
 export const EVERGARDEN_ZONE: ZoneDef = {
   id: 'evergarden',
   name: 'The Evergarden',
+  riftPortalEligible: true,
+  riftTierWeights: { A: 0.35, S: 0.65 },
   zMin: 700,
   zMax: 1260,
   xMin: 180,

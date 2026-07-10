@@ -1096,7 +1096,10 @@ export const ru_RU: EnTranslations = {
       "label": "Сбросить положение рамок"
     },
     "itemTooltip": {
-      "requiresLevel": "Требуется уровень {level}"
+      "requiresLevel": "Требуется уровень {level}",
+      "riftTier": "Предмет разлома ранга {tier}",
+      "riftUpgrade": "Улучшение разлома {level}/{max}",
+      "riftSockets": "Самоцветы разлома {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -3347,7 +3350,13 @@ export const ru_RU: EnTranslations = {
       "gateOpen": "Врата с грохотом отворяются.",
       "orbSealed": "Сфера запечатана ритуалом внизу.",
       "orbWakes": "Пламя пентаграммы гаснет. Нечто пробуждается на алтаре.",
-      "orbOpensGate": "Кровавая сфера вспыхивает. Врата храма с грохотом отворяются."
+      "orbOpensGate": "Кровавая сфера вспыхивает. Врата храма с грохотом отворяются.",
+      "alreadyCleared": "Этот разлом уже закрыла группа {names}.",
+      "raceLost": "Этот разлом уже закрыла группа {names}. Ваш поход завершён.",
+      "raceWorldWin": "{names} победили в гонке разлома ранга {tier} за {seconds} с!",
+      "raceWinBanner": "Победа в гонке разлома — {seconds} с",
+      "raceLostBanner": "Разлом уже закрыт",
+      "forgeComplete": "Операция «{action}» в кузнице разлома завершена для {name}."
     },
     "delve": {
       "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",
@@ -6390,6 +6399,27 @@ export const ru_RU: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "Трава солнцелепест"
+      },
+      "rift_essence": {
+        "name": "Эссенция разлома"
+      },
+      "rift_gem_crimson": {
+        "name": "Багровый самоцвет разлома"
+      },
+      "rift_gem_azure": {
+        "name": "Лазурный самоцвет разлома"
+      },
+      "rift_gem_verdant": {
+        "name": "Зелёный самоцвет разлома"
+      },
+      "riftbound_band_of_might": {
+        "name": "Кольцо разлома могущества"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Кольцо разлома прозрения"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Кольцо разлома хитрости"
       },
       "bristleback_maul": {
         "name": "Молот Гэллоугласа"

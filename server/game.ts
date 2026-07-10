@@ -18,6 +18,7 @@ import { parseRelayCommand } from '../src/sim/discord_relay';
 import type { PickAction } from '../src/sim/lockpick';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
@@ -66,6 +67,7 @@ import {
   insertChatLogs,
   loadMailState,
   loadMarketState,
+  loadRiftState,
   markAccountQuestComplete,
   openPlaySession,
   pool,
@@ -75,6 +77,7 @@ import {
   saveCharacterState,
   saveMailState,
   saveMarketState,
+  saveRiftState,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -105,6 +108,8 @@ import {
 import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
+import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
+import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
 import { createSerialWriter } from './serial_writer';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
@@ -279,6 +284,8 @@ type ClientMessage = Record<string, unknown> & {
   skin?: number;
   slot?: number | string;
   spec?: string;
+  stat?: string;
+  gem?: string;
   t?: string;
   text?: string;
   tierId?: string;
@@ -355,6 +362,10 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'unequip_item',
+  'salvage_item',
+  'rift_upgrade_item',
+  'rift_enchant_item',
+  'rift_socket_gem',
   'equip_bag',
   'unequip_bag',
   'use',
@@ -910,6 +921,7 @@ export class GameServer {
   // older snapshot over a newer one. Snapshots are captured inside the queued
   // thunk, so commit order equals capture order equals freshness order.
   private readonly enqueueMarketWrite = createSerialWriter();
+  private readonly enqueueRiftWrite = createSerialWriter();
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -969,6 +981,8 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  private readonly riftUpgrader: RiftUpgradeCoordinator;
+  private readonly riftAssets: RiftAssetCoordinator;
 
   constructor() {
     this.sim = new Sim({
@@ -997,6 +1011,8 @@ export class GameServer {
       },
       valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     });
+    this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
+    this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
     this.social = new SocialService(this.socialDb, this.socialTransport());
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
@@ -1273,8 +1289,12 @@ export class GameServer {
           while (acc >= DT) {
             this.clearStaleInputs();
             lap('stale');
+            this.riftUpgrader.drain(this.sim.ctx);
+            this.riftAssets.drain(this.sim.ctx);
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            this.riftUpgrader.observe(this.sim.ctx);
+            this.riftAssets.observe(this.sim.ctx);
             lap('tick');
             this.routeEvents(events);
             this.detectActivity(events);
@@ -1345,6 +1365,7 @@ export class GameServer {
       void this.saveAll('autosave');
       void this.saveMarket();
       void this.saveMail();
+      void this.saveRifts();
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
   }
@@ -2262,6 +2283,24 @@ export class GameServer {
     }
   }
 
+  async loadRifts(): Promise<void> {
+    try {
+      loadRiftWorldState(this.sim.ctx, await loadRiftState(), Date.now());
+    } catch (err) {
+      console.error('failed to load shared Rift state:', err);
+    }
+  }
+
+  async saveRifts(): Promise<void> {
+    try {
+      await this.enqueueRiftWrite(() =>
+        saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
+      );
+    } catch (err) {
+      console.error('failed to save shared Rift state:', err);
+    }
+  }
+
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
   }
@@ -2999,6 +3038,22 @@ export class GameServer {
         break;
       case 'craft_item':
         if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        break;
+      case 'salvage_item':
+        if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        break;
+      case 'rift_upgrade_item':
+        if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
+        break;
+      case 'rift_enchant_item':
+        if (typeof msg.item === 'string' && typeof msg.stat === 'string') {
+          sim.enchantRiftItem(msg.item, msg.stat, pid);
+        }
+        break;
+      case 'rift_socket_gem':
+        if (typeof msg.item === 'string' && typeof msg.gem === 'string') {
+          sim.socketRiftGem(msg.item, msg.gem, pid);
+        }
         break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
@@ -4116,6 +4171,7 @@ export class GameServer {
       maybe('bags', meta.bags);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
+      maybe('einst', meta.equipmentInstances);
       maybe('cosmetics', anchorSession.accountCosmetics);
       maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);

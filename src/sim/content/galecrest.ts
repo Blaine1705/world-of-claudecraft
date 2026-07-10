@@ -25,6 +25,8 @@ import { emptyZoneProps } from '../types';
 export const GALECREST_ZONE: ZoneDef = {
   id: 'galecrest',
   name: 'The Galecrest',
+  riftPortalEligible: true,
+  riftTierWeights: { A: 0.4, S: 0.6 },
   zMin: 180,
   zMax: 700,
   xMin: 180,

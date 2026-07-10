@@ -1,13 +1,36 @@
 import { describe, expect, it } from 'vitest';
-import { resolveMovement, resolvePosition } from '../src/sim/colliders';
-import { isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import {
+  allocRiftCollisionToken,
+  clearRiftRegion,
+  resolveMovement,
+  resolvePosition,
+  setRiftRegion,
+} from '../src/sim/colliders';
+import { BUILTIN_WORLD, isRiftPos, riftInstanceOrigin } from '../src/sim/data';
+import { layoutColliders } from '../src/sim/dungeon_layout';
+import { generateRiftFloor } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import { dist2d, type Entity, type SimEvent, type WorldContent } from '../src/sim/types';
 
 const SEED = 4242;
 
-function makeSim() {
-  return new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, devCommands: true });
+// Rift geometry and collision are generated in the instance band. Ambient
+// overworld entities are irrelevant, especially to the 30-seed clearance sweep.
+const RIFT_SIM_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+function makeSim(seed = SEED) {
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: RIFT_SIM_TEST_WORLD,
+  });
 }
 
 // Tick while keeping the player alive, so the dev tester survives the elites long
@@ -253,19 +276,26 @@ describe('rift sim: generator clearance matches runtime collision', () => {
     // Covers many floor-0 shapes (incl. tilted-wall apse/rotunda/cavern), so a
     // mismatch between the generator's isClear and colliders.ts pushOut (e.g. a
     // rotated-OBB sign flip) would surface as a spawn getting shoved on tick 1.
-    for (let seed = 0; seed < 30; seed++) {
-      const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
-      sim.enterRift(seed, 20, sim.player.id);
-      const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
-      for (const id of inst.mobIds) {
-        const e = sim.entities.get(id)!;
-        const res = resolvePosition(seed, e.pos.x, e.pos.z, 0.6);
-        const moved = Math.hypot(res.x - e.pos.x, res.z - e.pos.z);
-        expect(
-          moved,
-          `seed ${seed} mob ${e.templateId} @${e.pos.x},${e.pos.z} pushed ${moved}`,
-        ).toBeLessThan(0.1);
+    const token = allocRiftCollisionToken();
+    const origin = riftInstanceOrigin(0, 0);
+    try {
+      for (let seed = 0; seed < 30; seed++) {
+        const floor = generateRiftFloor(seed, 20, 0);
+        // This is the exact publication path spawnRiftFloor uses at runtime.
+        setRiftRegion(token, origin.x, origin.z, layoutColliders(floor.layout));
+        for (const spawn of floor.spawns) {
+          const x = origin.x + spawn.x;
+          const z = origin.z + spawn.z;
+          const res = resolvePosition(seed, x, z, 0.6, false, undefined, token);
+          const moved = Math.hypot(res.x - x, res.z - z);
+          expect(
+            moved,
+            `seed ${seed} mob ${spawn.templateId} @${x},${z} pushed ${moved}`,
+          ).toBeLessThan(0.1);
+        }
       }
+    } finally {
+      clearRiftRegion(token, origin.x, origin.z);
     }
   });
 });

@@ -14,7 +14,9 @@
 // Math.random/Date.now, host-agnostic so it runs offline, on the server, and
 // in the headless RL env unchanged.
 
+import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { riftSalvageYield } from '../rift/progression';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
@@ -87,7 +89,16 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
-  ctx.removeItem(itemId, 1, pid);
+  // removeItem is highest-index first and returns the payload it ACTUALLY
+  // consumed. Never inspect a different copy before removal: a plain shell and
+  // an upgraded Rift copy may legally share one itemId.
+  const [consumedInstance] = ctx.removeItem(itemId, 1, pid);
+  const riftInstance = consumedInstance?.rift ? consumedInstance : null;
+  if (riftInstance) {
+    const count = riftSalvageYield(riftInstance);
+    ctx.addItem(RIFT_ESSENCE_ITEM_ID, count, pid);
+    return { ok: true, itemId, materialItemId: RIFT_ESSENCE_ITEM_ID, count };
+  }
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   const count = salvageYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);

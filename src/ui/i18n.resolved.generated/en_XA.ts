@@ -1096,7 +1096,10 @@ export const en_XA: EnTranslations = {
       "label": "[Ŕéšéţ Ƒŕáɱé Þóšíţíóñš]"
     },
     "itemTooltip": {
-      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
+      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
+      "riftTier": "[{tier}-ŕáñķ Ŕíƒţ íţéɱ]",
+      "riftUpgrade": "[Ŕíƒţ úþĝŕáðé {level}/{max}]",
+      "riftSockets": "[Ŕíƒţ ĝéɱš {used}/{total}]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -3347,7 +3350,13 @@ export const en_XA: EnTranslations = {
       "gateOpen": "[Ţĥé ĝáţé ĝŕíñðš óþéñ.]",
       "orbSealed": "[Ţĥé óŕƀ íš šéáļéð ƀý ţĥé ŕíţúáļ ƀéļóŵ.]",
       "orbWakes": "[Ţĥé þéñţáĝŕáɱ'š ƒļáɱé ĝúţţéŕš óúţ. Šóɱéţĥíñĝ ŵáķéš óñ ţĥé áļţáŕ.]",
-      "orbOpensGate": "[Ţĥé Ɓļóóð Óŕƀ ƒļáŕéš. Ţĥé ĝáţéš óƒ ţĥé ţéɱþļé ĝŕíñð óþéñ.]"
+      "orbOpensGate": "[Ţĥé Ɓļóóð Óŕƀ ƒļáŕéš. Ţĥé ĝáţéš óƒ ţĥé ţéɱþļé ĝŕíñð óþéñ.]",
+      "alreadyCleared": "[Ţĥíš ŕíƒţ ĥáš áļŕéáðý ƀééñ çļéáŕéð ƀý {names}.]",
+      "raceLost": "[Ţĥé ŕíƒţ ĥáš áļŕéáðý ƀééñ çļéáŕéð ƀý {names}. Ýóúŕ ŕúñ éñðš.]",
+      "raceWorldWin": "[{names} ŵóñ ţĥé {tier}-ŕáñķ Ŕíƒţ ŕáçé íñ {seconds}š!]",
+      "raceWinBanner": "[Ŕíƒţ Ŕáçé Ŵóñ - {seconds}š]",
+      "raceLostBanner": "[Ŕíƒţ Áļŕéáðý Çļéáŕéð]",
+      "forgeComplete": "[Ŕíƒţ ƒóŕĝé {action} çóɱþļéţéð ƒóŕ {name}.]"
     },
     "delve": {
       "cannotEnterNow": "[Ýóú çáññóţ éñţéŕ á ðéļʋé ŕíĝĥţ ñóŵ.]",
@@ -6390,6 +6399,27 @@ export const en_XA: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "[Šúñþéţáļ Ĥéŕƀ]"
+      },
+      "rift_essence": {
+        "name": "[Ŕíƒţ Éššéñçé]"
+      },
+      "rift_gem_crimson": {
+        "name": "[Çŕíɱšóñ Ŕíƒţ Ĝéɱ]"
+      },
+      "rift_gem_azure": {
+        "name": "[Ážúŕé Ŕíƒţ Ĝéɱ]"
+      },
+      "rift_gem_verdant": {
+        "name": "[Ʋéŕðáñţ Ŕíƒţ Ĝéɱ]"
+      },
+      "riftbound_band_of_might": {
+        "name": "[Ŕíƒţƀóúñð Ɓáñð óƒ Ɱíĝĥţ]"
+      },
+      "riftbound_band_of_insight": {
+        "name": "[Ŕíƒţƀóúñð Ɓáñð óƒ Íñšíĝĥţ]"
+      },
+      "riftbound_band_of_guile": {
+        "name": "[Ŕíƒţƀóúñð Ɓáñð óƒ Ĝúíļé]"
       },
       "bristleback_maul": {
         "name": "[Ĝáļļóŵĝļášš Ĥáɱɱéŕ]"

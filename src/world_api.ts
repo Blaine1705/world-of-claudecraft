@@ -341,6 +341,10 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'salvage_item',
+  'rift_upgrade_item',
+  'rift_enchant_item',
+  'rift_socket_gem',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -428,6 +432,13 @@ export const COMMAND_FACETS = {
   tabFriendly: 'IWorldTargeting',
   // IWorldLoot: need-greed roll submit.
   lootRoll: 'IWorldLoot',
+  // IWorldInventory: non-fungible Rift gear progression. These mutate the
+  // authoritative inventory copy; every cost and payload is validated again
+  // in the sim before the item instance is changed.
+  salvage_item: 'IWorldInventory',
+  rift_upgrade_item: 'IWorldInventory',
+  rift_enchant_item: 'IWorldInventory',
+  rift_socket_gem: 'IWorldInventory',
   // IWorldTelemetry: fire-and-forget metrics sink.
   telemetry: 'IWorldTelemetry',
   // IWorldProgressionXp: opt-in cosmetic prestige (leaderboard is a REST GET, no

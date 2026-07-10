@@ -24,6 +24,8 @@ import { emptyZoneProps } from '../types';
 export const NIGHTBLOOM_ZONE: ZoneDef = {
   id: 'nightbloom',
   name: 'The Nightbloom',
+  riftPortalEligible: true,
+  riftTierWeights: { A: 0.4, S: 0.6 },
   zMin: 1260,
   zMax: 1820,
   xMin: -540,

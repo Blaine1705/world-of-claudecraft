@@ -7,16 +7,9 @@
 // assertion here compares exact inventories; the kit round-trip compares the
 // ABILITY list, not bags.
 
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { SPORT_KITS, VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
-
-// The full-match bot sims here run thousands of deterministic ticks; the 5s
-// vitest default is too tight for them under CI's parallel load (they complete
-// in well under a second locally). Give the file the headroom the other heavy
-// sim suites use (climb_slope, sim, dungeons).
-vi.setConfig({ testTimeout: 30000 });
-
-import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   endCupMatch,
@@ -27,7 +20,7 @@ import {
   VC_MATCH_DURATION,
   vcupPackTeams,
 } from '../src/sim/social/vale_cup';
-import type { SimEvent } from '../src/sim/types';
+import type { SimConfig, SimEvent, WorldContent } from '../src/sim/types';
 import {
   GOAL_LINE_EAST_X,
   GOAL_LINE_WEST_X,
@@ -37,8 +30,27 @@ import {
 } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
 
-function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+// Vale Cup tests need the real terrain, pitch and instance-plane geometry, but
+// none of the hundreds of unrelated overworld mobs/NPCs/objects. Full-match
+// scenarios advance up to 8,400 ticks; spawning the entire 14-zone continent
+// made every one of those ticks pay for the whole MMO and turned one lifecycle
+// assertion into a 36-second test. Keep every terrain-relevant field identical
+// to BUILTIN_WORLD while stripping only constructor-spawned ambient entities.
+const VALE_CUP_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+function makeWorld(overrides: Partial<SimConfig> = {}) {
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    ...overrides,
+    world: VALE_CUP_TEST_WORLD,
+  });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -394,7 +406,7 @@ describe('Vale Cup: parimutuel betting', () => {
   // Stage a bot showcase in the briefing window, then seat two spectators at the
   // Sowfield with copper to wager.
   function stageBettableMatch() {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Host' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Host' });
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
     const match = sim.vcup.match!;
@@ -470,7 +482,7 @@ describe('Vale Cup: bot showcase', () => {
   it('auto-stages a 3v3 bot exhibition after 60s idle when showcase is enabled', () => {
     // A human is online (so someone can watch), nobody queues: after the idle
     // stretch the Sowfield stages a full bot-vs-bot match with distinct nations.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Watcher' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
     const match = sim.vcup.match!;
@@ -487,13 +499,13 @@ describe('Vale Cup: bot showcase', () => {
   });
 
   it('does not stage a showcase when the flag is off (tests/goldens stay quiet)', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Watcher' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
     for (let i = 0; i < 20 * 65; i++) sim.tick();
     expect(sim.vcup.match).toBe(null);
   });
 
   it('preempts a live bot exhibition the moment two humans can form a rated match', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Watcher' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
     const showcase = sim.vcup.match!;
@@ -519,7 +531,7 @@ describe('Vale Cup: bot showcase', () => {
   });
 
   it('does not preempt a bot-backfilled match (a human is playing in it)', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     // A lone human queues and gets bot-backfilled after the wait: that match has
     // a human seated, so a second late queuer must NOT tear it down.
@@ -538,7 +550,7 @@ describe('Vale Cup: bot showcase', () => {
   });
 
   it('bots use the pass mechanic to build up in a showcase match', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Watcher' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Watcher' });
     (sim as unknown as { cfg: { valeCupShowcase: boolean } }).cfg.valeCupShowcase = true;
     for (let i = 0; i < 20 * 60 + 2 && !sim.vcup.match; i++) sim.tick();
     expect(sim.vcup.match).toBeTruthy();
@@ -587,7 +599,7 @@ describe('Vale Cup: bot backfill and practice', () => {
   });
 
   it('practice seats you on a PRIVATE instanced pitch, not the physical slot', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(3);
     // The one physical Sowfield slot stays free; practice lives in its own list.
     expect(sim.vcup.match).toBe(null);
@@ -605,7 +617,7 @@ describe('Vale Cup: bot backfill and practice', () => {
   });
 
   it('a full practice bout plays itself out and cleans up, returning me home', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'hunter', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerClass: 'hunter', playerName: 'Solo' });
     const home = { ...sim.entities.get(sim.primaryId)!.pos };
     sim.vcupPracticeStart(1);
     expect(sim.vcup.practices.length).toBe(1);
@@ -973,7 +985,7 @@ describe('Vale Cup: sport moves', () => {
     // Live-balance pin: keepers line up ON their goal line at every kickoff and
     // the whistle grace clamps a charged shot to the short-touch profile, so an
     // instant unchallenged shot from the center spot is savable, not a goal.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(3); // the bot side's seat 0 keeps goal
     const match = sim.vcup.practices[0];
     readyAll(sim);
@@ -1092,7 +1104,7 @@ describe('Vale Cup: sport moves', () => {
     // the human idle, the all-bot attack must not run away. Shot range gate +
     // deterministic aim error + a slower decision cadence keep the scoreline
     // human-playable. Deterministic (zero rng), so these are hard bounds.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Idle' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Idle' });
     sim.vcupPracticeStart(3);
     const match = sim.vcup.practices[0];
     readyAll(sim);
@@ -1225,7 +1237,7 @@ describe('Vale Cup: determinism', () => {
 
   it('the same seed and script replays an identical match (run-twice trace)', () => {
     const run = () => {
-      const sim = new Sim({ seed: 5, playerClass: 'warrior', playerName: 'Solo' });
+      const sim = makeWorld({ seed: 5, noPlayer: false, playerName: 'Solo' });
       sim.vcupPracticeStart(2);
       const trace: unknown[] = [];
       for (let i = 0; i < 20 * 45; i++) {
@@ -1248,7 +1260,7 @@ describe('Vale Cup: determinism', () => {
 
   it('draws ZERO shared rng anywhere on the queue + match path (draw-value accounting)', () => {
     const script = (withCup: boolean): number[] => {
-      const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+      const sim = makeWorld({ seed: 7 });
       const a = addAt(sim, 'warrior', 'Aleph');
       const b = addAt(sim, 'mage', 'Bet', 6, -40);
       const values: number[] = [];
@@ -1274,7 +1286,7 @@ describe('Vale Cup: determinism', () => {
 
   it('the BOT path (practice: spawn, chase, kicks, shoulders, dives) also draws zero shared rng', () => {
     const script = (withCup: boolean): number[] => {
-      const sim = new Sim({ seed: 11, playerClass: 'warrior', playerName: 'Solo' });
+      const sim = makeWorld({ seed: 11, noPlayer: false, playerName: 'Solo' });
       const values: number[] = [];
       sim.rng.setObserver((v) => values.push(v));
       if (withCup) sim.vcupPracticeStart(3);
@@ -1326,7 +1338,7 @@ describe('Vale Cup: parallel private practice', () => {
   });
 
   it('a practice bout plays a real match of football (kickoff, ball moves)', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ seed: 7, noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(3, sim.primaryId);
     const match = sim.vcup.practices[0];
     tickUntil(sim, () => match.phase === 'active', 20 * 40);
@@ -1345,7 +1357,7 @@ describe('Vale Cup: parallel private practice', () => {
   it('a human Shoot fires toward the practice goal, not back toward the Sowfield', () => {
     // Regression: sport landmarks are Sowfield-frame; on an offset practice pitch
     // the shot aim must add match.origin or it fires the wrong way (toward x=0).
-    const sim = new Sim({ seed: 3, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ seed: 3, noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(1, sim.primaryId);
     const match = sim.vcup.practices[0];
     readyAll(sim);
@@ -1360,7 +1372,7 @@ describe('Vale Cup: parallel private practice', () => {
   });
 
   it('refuses to double-seat a player already practicing', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', playerName: 'Solo' });
+    const sim = makeWorld({ noPlayer: false, playerName: 'Solo' });
     sim.vcupPracticeStart(1, sim.primaryId);
     expect(sim.vcup.practices.length).toBe(1);
     sim.vcupPracticeStart(2, sim.primaryId);

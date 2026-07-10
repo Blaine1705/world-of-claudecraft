@@ -31,6 +31,8 @@ import { emptyZoneProps } from '../types';
 export const FARSHORE_ZONE: ZoneDef = {
   id: 'farshore_isle',
   name: 'The Farshore',
+  riftPortalEligible: true,
+  riftTierWeights: { C: 0.7, B: 0.3 },
   zMin: -180,
   zMax: 180,
   xMin: 180,

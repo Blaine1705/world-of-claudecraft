@@ -11,6 +11,90 @@ import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
 
+export type RiftEventStatus = 'open' | 'active' | 'cleared' | 'collapsed';
+export type RiftInstanceOutcome = 'active' | 'won' | 'lost' | 'abandoned';
+export type RiftUpgradeStatus = 'heuristic' | 'pending' | 'ready' | 'fallback';
+export type RiftEncounterPacing = 'breather' | 'pressure' | 'climax';
+
+export interface RiftFloorUpgrade {
+  floorIndex: number;
+  themeId: string;
+  pacing: RiftEncounterPacing;
+  monsterIds: string[];
+  specialEvent: 'none' | 'ambush' | 'ritual' | 'hazard' | 'treasure';
+  environmentalDetails: string[];
+}
+
+export interface RiftAssetRequest {
+  requestId: string;
+  kind: 'boss_model' | 'prop_model' | 'texture';
+  prompt: string;
+  required: boolean;
+}
+
+export interface RiftAssetPipelineState {
+  status: 'none' | 'pending' | 'queued' | 'failed';
+  jobId: string | null;
+  requestIds: string[];
+}
+
+/** Bounded, data-only output accepted from an AI/heuristic Dungeon Upgrader.
+ * It can select from indexed mechanics and visual kits, but can never inject
+ * executable code, arbitrary stats, or untrusted asset URLs into the sim. */
+export interface RiftUpgradeManifest {
+  schemaVersion: 1;
+  title: string;
+  synopsis: string;
+  lore: string[];
+  floors: RiftFloorUpgrade[];
+  boss: {
+    templateId: string;
+    name: string;
+    concept: string;
+  };
+  rewards: {
+    lootMultiplier: number;
+    craftingMaterialBias: number;
+  };
+  assetRequests: RiftAssetRequest[];
+}
+
+/** The one shared world event behind a natural portal. Every group receives a
+ * separate RiftInstance, but all of those instances race against this record. */
+export interface RiftEvent {
+  eventId: string;
+  ordinal: number;
+  portalId: number | null;
+  status: RiftEventStatus;
+  tier: RiftTier;
+  zoneId: string;
+  zoneName: string;
+  riftName: string;
+  seed: number;
+  baseLevel: number;
+  openedAt: number;
+  expiresAt: number;
+  position: { x: number; z: number };
+  contentId: string;
+  contentHash: string;
+  /** Fairness lock: once any party enters, every competing instance must keep
+   * this exact artifact even if a late AI response arrives. */
+  contentLocked: boolean;
+  upgradeStatus: RiftUpgradeStatus;
+  upgrade: RiftUpgradeManifest | null;
+  /** Optional external generation job. Generated binaries are not hot-loaded:
+   * they must first land in the immutable asset manifest, preserving graphics
+   * fairness and preventing untrusted runtime URLs. */
+  assetPipeline: RiftAssetPipelineState;
+  firstClear: {
+    partyKey: string;
+    memberIds: number[];
+    memberNames: string[];
+    duration: number;
+    clearedAt: number;
+  } | null;
+}
+
 /** The whole wire/persistence footprint of a rift instance. Both hosts turn this
  * into identical content via rift_gen. `origin` is the instance-space anchor the
  * floor's local coordinates are offset by (see rift/runs.ts). */
@@ -26,6 +110,9 @@ export interface RiftDescriptor {
  * omitted the template's own values are used. `level` is already resolved. */
 export interface RiftSpawn {
   templateId: string;
+  /** Optional safe display override from a validated upgrade artifact. Combat
+   * mechanics still come exclusively from templateId. */
+  name?: string;
   x: number;
   z: number;
   level: number;
@@ -171,7 +258,19 @@ export interface RiftFloorPlan {
  * place. `partyKey` null = the slot is free. */
 export interface RiftInstance {
   slot: number;
+  /** Monotonic runtime identity. A seed is content, never instance identity. */
+  instanceId: number;
+  /** Shared natural-world event this group is racing in; null for dev runs. */
+  eventId: string | null;
   partyKey: string | null;
+  /** Players who actually entered this instance. Party membership may change
+   * while a run is live, so runtime ownership cannot be reconstructed later. */
+  memberIds: Set<number>;
+  startedAt: number;
+  finishedAt: number | null;
+  outcome: RiftInstanceOutcome;
+  /** Snapshot of the event artifact at entry. Never changes mid-race. */
+  upgrade: RiftUpgradeManifest | null;
   seed: number;
   baseLevel: number;
   floorIndex: number;

@@ -34,7 +34,9 @@ import type {
   RiftPuzzle,
   RiftRoller,
   RiftSpawn,
+  RiftUpgradeManifest,
 } from './types';
+import { applyRiftUpgrade } from './upgrade';
 
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
@@ -713,10 +715,11 @@ export function generateRiftFloor(
   seed: number,
   baseLevel: number,
   floorIndex: number,
+  upgrade?: RiftUpgradeManifest | null,
 ): RiftFloorPlan {
   const key = `${seed >>> 0}:${Math.round(baseLevel)}:${floorIndex}`;
   const cached = FLOOR_CACHE.get(key);
-  if (cached) return cached;
+  if (cached) return applyRiftUpgrade(cached, upgrade);
 
   // Authored set-piece seeds short-circuit the whole procedural chain BEFORE any
   // draw is made, so the procedural draw order for every other seed is untouched.
@@ -724,7 +727,7 @@ export function generateRiftFloor(
     const setPiece = buildInfernalCitadelFloor(seed, baseLevel, floorLevelFor(baseLevel, 0));
     if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
     FLOOR_CACHE.set(key, setPiece);
-    return setPiece;
+    return applyRiftUpgrade(setPiece, upgrade);
   }
 
   const floorCount = riftFloorCount(seed);
@@ -790,7 +793,7 @@ export function generateRiftFloor(
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
   FLOOR_CACHE.set(key, plan);
-  return plan;
+  return applyRiftUpgrade(plan, upgrade);
 }
 
 /** Instance-local collider set for a rift floor (pure, from the generated layout). */

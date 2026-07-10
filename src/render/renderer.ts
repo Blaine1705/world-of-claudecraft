@@ -25,7 +25,6 @@ import {
   isYumiMazePos,
   MOBS,
   NPCS,
-  riftOriginAt,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   YUMI_MAZE_SLOT_COUNT,
@@ -4183,12 +4182,12 @@ export class Renderer {
       const rf = this.sim.riftFloor;
       if (rf) {
         void ensureDungeonAssets().catch(() => undefined);
-        const key = `rift:${rf.seed}:${rf.floorIndex}`;
+        const key = `rift:${rf.instanceId}:${rf.contentHash}:${rf.floorIndex}`;
         if (!this.builtInteriors.has(key)) {
-          const o = riftOriginAt(pz);
+          const o = rf.origin;
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
-            const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex);
+            const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
             void this.buildInterior(floor.style.kit, o.x, o.z, {
               layout: floor.layout,
               style: floor.style,
@@ -4243,13 +4242,14 @@ export class Renderer {
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
     const riftFloor = inside && isRiftPos(px) ? this.sim.riftFloor : null;
     if (riftFloor) {
-      const fogKey = `${riftFloor.seed}:${riftFloor.floorIndex}`;
+      const fogKey = `${riftFloor.contentHash}:${riftFloor.floorIndex}`;
       if (fogKey !== this.riftFogKey) {
         this.riftFogKey = fogKey;
         const style = generateRiftFloor(
           riftFloor.seed,
           riftFloor.baseLevel,
           riftFloor.floorIndex,
+          riftFloor.upgrade,
         ).style;
         fog.color.setHex(style.fog.color);
         fog.near = style.fog.near;
@@ -5013,8 +5013,8 @@ export class Renderer {
       let effGround = groundHeight(ax, az, this.sim.cfg.seed);
       if (inRift) {
         const rf = this.sim.riftFloor!;
-        const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex);
-        effGround += riftPlatformLift(floor.platform, az - riftOriginAt(az).z);
+        const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
+        effGround += riftPlatformLift(floor.platform, az - rf.origin.z);
       }
       if (e.kind === 'player' && e.onGround && !swimming && ay - effGround > AIRBORNE_EPS) {
         v.airborneHeurFrames++;

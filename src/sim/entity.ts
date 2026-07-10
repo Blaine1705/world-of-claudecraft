@@ -1,7 +1,15 @@
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
-import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
+import type {
+  Entity,
+  EquipSlot,
+  ItemInstancePayload,
+  MobTemplate,
+  PlayerClass,
+  Stats,
+  Vec3,
+} from './types';
 import {
   critFractionFromRating,
   EQUIP_SLOTS,
@@ -163,6 +171,7 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
 }
 
 export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
+export type PlayerEquipmentInstances = Partial<Record<EquipSlot, ItemInstancePayload>>;
 
 // Classic-era rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
 // First 20 intellect gives 1 mana each, the rest 15 mana each.
@@ -187,6 +196,7 @@ export function recalcPlayerStats(
   cls: PlayerClass,
   equipment: PlayerEquipment,
   mods?: TalentModifiers,
+  equipmentInstances?: PlayerEquipmentInstances,
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -217,13 +227,27 @@ export function recalcPlayerStats(
     bonusSp += item.spellPower ?? 0;
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
-    if (!item.stats) continue;
-    s.str += item.stats.str ?? 0;
-    s.agi += item.stats.agi ?? 0;
-    s.sta += item.stats.sta ?? 0;
-    s.int += item.stats.int ?? 0;
-    s.spi += item.stats.spi ?? 0;
-    s.armor += item.stats.armor ?? 0;
+    if (item.stats) {
+      s.str += item.stats.str ?? 0;
+      s.agi += item.stats.agi ?? 0;
+      s.sta += item.stats.sta ?? 0;
+      s.int += item.stats.int ?? 0;
+      s.spi += item.stats.spi ?? 0;
+      s.armor += item.stats.armor ?? 0;
+    }
+    const equippedInstance = equipmentInstances?.[slot];
+    const rolled = equippedInstance?.rift ? equippedInstance.rolled?.stats : undefined;
+    if (rolled) {
+      s.str += Number.isFinite(rolled.str) ? rolled.str : 0;
+      s.agi += Number.isFinite(rolled.agi) ? rolled.agi : 0;
+      s.sta += Number.isFinite(rolled.sta) ? rolled.sta : 0;
+      s.int += Number.isFinite(rolled.int) ? rolled.int : 0;
+      s.spi += Number.isFinite(rolled.spi) ? rolled.spi : 0;
+      s.armor += Number.isFinite(rolled.armor) ? rolled.armor : 0;
+      bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
+      bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
+      bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
+    }
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at

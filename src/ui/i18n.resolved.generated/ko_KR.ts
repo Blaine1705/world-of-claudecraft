@@ -1096,7 +1096,10 @@ export const ko_KR: EnTranslations = {
       "label": "프레임 위치 초기화"
     },
     "itemTooltip": {
-      "requiresLevel": "필요 레벨 {level}"
+      "requiresLevel": "필요 레벨 {level}",
+      "riftTier": "{tier} 등급 균열 아이템",
+      "riftUpgrade": "균열 강화 {level}/{max}",
+      "riftSockets": "균열 보석 {used}/{total}"
     },
     "discord": {
       "title": "Discord",
@@ -3347,7 +3350,13 @@ export const ko_KR: EnTranslations = {
       "gateOpen": "문이 삐걱거리며 열립니다.",
       "orbSealed": "구슬은 아래의 의식에 봉인되어 있습니다.",
       "orbWakes": "펜타그램의 불꽃이 꺼집니다. 제단에서 무언가가 깨어납니다.",
-      "orbOpensGate": "피의 구슬이 타오릅니다. 신전의 문이 삐걱거리며 열립니다."
+      "orbOpensGate": "피의 구슬이 타오릅니다. 신전의 문이 삐걱거리며 열립니다.",
+      "alreadyCleared": "이 균열은 이미 {names} 님이 정복했습니다.",
+      "raceLost": "이 균열은 이미 {names} 님이 정복했습니다. 도전이 종료됩니다.",
+      "raceWorldWin": "{names} 님이 {seconds}초 만에 {tier} 등급 균열 경주에서 승리했습니다!",
+      "raceWinBanner": "균열 경주 승리 — {seconds}초",
+      "raceLostBanner": "이미 정복된 균열",
+      "forgeComplete": "{name}의 균열 제련 {action} 작업을 완료했습니다."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
@@ -6390,6 +6399,27 @@ export const ko_KR: EnTranslations = {
       },
       "sunpetal_herb": {
         "name": "태양꽃잎 약초"
+      },
+      "rift_essence": {
+        "name": "균열 정수"
+      },
+      "rift_gem_crimson": {
+        "name": "진홍빛 균열 보석"
+      },
+      "rift_gem_azure": {
+        "name": "푸른빛 균열 보석"
+      },
+      "rift_gem_verdant": {
+        "name": "초록빛 균열 보석"
+      },
+      "riftbound_band_of_might": {
+        "name": "힘의 균열결속 반지"
+      },
+      "riftbound_band_of_insight": {
+        "name": "통찰의 균열결속 반지"
+      },
+      "riftbound_band_of_guile": {
+        "name": "기민함의 균열결속 반지"
       },
       "bristleback_maul": {
         "name": "갤로글래스 망치"
