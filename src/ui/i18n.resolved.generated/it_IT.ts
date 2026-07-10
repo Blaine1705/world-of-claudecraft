@@ -1299,6 +1299,8 @@ export const it_IT: EnTranslations = {
       "parcelsLabel": "Pacchi",
       "parcelsHint": "Clicca un oggetto nelle tue borse per allegarlo.",
       "removeParcelAria": "Rimuovi {item} dalla lettera",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Invia lettera",
       "postageNote": "Affrancatura: {amount}. Il corvo vola per circa {seconds}s.",
       "arrivedBanner": "Il corvo è atterrato: posta da {name}.",

@@ -1299,6 +1299,8 @@ export const ja_JP: EnTranslations = {
       "parcelsLabel": "小包",
       "parcelsHint": "バッグ内のアイテムをクリックして添付します。",
       "removeParcelAria": "手紙から{item}を取り除く",
+      "parcelQtyDecreaseAria": "{item}を1つ減らして送る",
+      "parcelQtyIncreaseAria": "{item}を1つ増やして送る",
       "sendButton": "手紙を送る",
       "postageNote": "郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。",
       "arrivedBanner": "ワタリガラスが到着：{name}からの手紙。",

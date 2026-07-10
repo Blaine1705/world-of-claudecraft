@@ -1299,6 +1299,8 @@ export const zh_TW: EnTranslations = {
       "parcelsLabel": "包裹",
       "parcelsHint": "點擊背包中的物品即可附上。",
       "removeParcelAria": "從信件中移除 {item}",
+      "parcelQtyDecreaseAria": "少寄一個{item}",
+      "parcelQtyIncreaseAria": "多寄一個{item}",
       "sendButton": "寄出信件",
       "postageNote": "郵資：{amount}。渡鴉飛行約 {seconds} 秒。",
       "arrivedBanner": "渡鴉已降落：來自 {name} 的郵件。",

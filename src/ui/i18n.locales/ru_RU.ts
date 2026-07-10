@@ -6565,6 +6565,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': 'Посылки',
   'hudChrome.mailbox.parcelsHint': 'Нажмите на предмет в сумке, чтобы приложить его.',
   'hudChrome.mailbox.removeParcelAria': 'Убрать {item} из письма',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Отправить на один {item} меньше',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Отправить на один {item} больше',
   'hudChrome.mailbox.sendButton': 'Отправить письмо',
   'hudChrome.mailbox.postageNote': 'Почтовый сбор: {amount}. Ворон летит около {seconds} с.',
   'hudChrome.mailbox.arrivedBanner': 'Ворон прилетел: письмо от {name}.',

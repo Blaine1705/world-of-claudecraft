@@ -6126,6 +6126,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '包裹',
   'hudChrome.mailbox.parcelsHint': '点击背包中的物品即可附上。',
   'hudChrome.mailbox.removeParcelAria': '从信件中移除 {item}',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '少寄一个{item}',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '多寄一个{item}',
   'hudChrome.mailbox.sendButton': '寄出信件',
   'hudChrome.mailbox.postageNote': '邮资：{amount}。渡鸦飞行约 {seconds} 秒。',
   'hudChrome.mailbox.arrivedBanner': '渡鸦已降落：来自 {name} 的邮件。',

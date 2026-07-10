@@ -1299,6 +1299,8 @@ export const id_ID: EnTranslations = {
       "parcelsLabel": "Bingkisan",
       "parcelsHint": "Klik barang di tasmu untuk melampirkannya.",
       "removeParcelAria": "Keluarkan {item} dari surat",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Kirim surat",
       "postageNote": "Perangko: {amount}. Gagak terbang selama sekitar {seconds} detik.",
       "arrivedBanner": "Gagak telah mendarat: surat dari {name}.",

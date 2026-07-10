@@ -6437,6 +6437,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '소포',
   'hudChrome.mailbox.parcelsHint': '가방의 아이템을 클릭하면 첨부됩니다.',
   'hudChrome.mailbox.removeParcelAria': '편지에서 {item} 제거',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '{item} 하나 적게 보내기',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '{item} 하나 더 보내기',
   'hudChrome.mailbox.sendButton': '편지 보내기',
   'hudChrome.mailbox.postageNote': '우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.',
   'hudChrome.mailbox.arrivedBanner': '까마귀가 도착했습니다: {name}의 우편.',

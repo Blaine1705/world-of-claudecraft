@@ -1299,6 +1299,8 @@ export const pt_BR: EnTranslations = {
       "parcelsLabel": "Encomendas",
       "parcelsHint": "Clique em um item nas suas bolsas para anexá-lo.",
       "removeParcelAria": "Remover {item} da carta",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Enviar carta",
       "postageNote": "Postagem: {amount}. O corvo voa por cerca de {seconds}s.",
       "arrivedBanner": "O corvo pousou: correspondência de {name}.",

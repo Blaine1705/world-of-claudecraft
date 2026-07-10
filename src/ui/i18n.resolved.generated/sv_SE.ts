@@ -1299,6 +1299,8 @@ export const sv_SE: EnTranslations = {
       "parcelsLabel": "Paket",
       "parcelsHint": "Klicka på ett föremål i dina väskor för att bifoga det.",
       "removeParcelAria": "Ta bort {item} från brevet",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Skicka brev",
       "postageNote": "Porto: {amount}. Korpen flyger i ungefär {seconds}s.",
       "arrivedBanner": "Korpen har landat: post från {name}.",

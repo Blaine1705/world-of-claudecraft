@@ -1299,6 +1299,8 @@ export const cs_CZ: EnTranslations = {
       "parcelsLabel": "Balíky",
       "parcelsHint": "Klikni na předmět v batozích a přilož ho.",
       "removeParcelAria": "Odebrat {item} z dopisu",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Odeslat dopis",
       "postageNote": "Poštovné: {amount}. Havran poletí asi {seconds} s.",
       "arrivedBanner": "Havran přistál: pošta od {name}.",

@@ -1299,6 +1299,8 @@ export const fr_CA: EnTranslations = {
       "parcelsLabel": "Colis",
       "parcelsHint": "Cliquez sur un objet dans vos sacs pour le joindre.",
       "removeParcelAria": "Retirer {item} de la lettre",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Envoyer la lettre",
       "postageNote": "Affranchissement : {amount}. Le corbeau vole environ {seconds}s.",
       "arrivedBanner": "Le corbeau s'est posé : du courrier de {name}.",

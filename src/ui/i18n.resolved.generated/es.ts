@@ -1299,6 +1299,8 @@ export const es: EnTranslations = {
       "parcelsLabel": "Paquetes",
       "parcelsHint": "Haz clic en un objeto de tus bolsas para adjuntarlo.",
       "removeParcelAria": "Quitar {item} de la carta",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Enviar carta",
       "postageNote": "Franqueo: {amount}. El cuervo vuela durante unos {seconds}s.",
       "arrivedBanner": "El cuervo ha aterrizado: correo de {name}.",

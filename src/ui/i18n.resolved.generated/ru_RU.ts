@@ -1299,6 +1299,8 @@ export const ru_RU: EnTranslations = {
       "parcelsLabel": "Посылки",
       "parcelsHint": "Нажмите на предмет в сумке, чтобы приложить его.",
       "removeParcelAria": "Убрать {item} из письма",
+      "parcelQtyDecreaseAria": "Отправить на один {item} меньше",
+      "parcelQtyIncreaseAria": "Отправить на один {item} больше",
       "sendButton": "Отправить письмо",
       "postageNote": "Почтовый сбор: {amount}. Ворон летит около {seconds} с.",
       "arrivedBanner": "Ворон прилетел: письмо от {name}.",
