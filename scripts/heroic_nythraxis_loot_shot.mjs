@@ -38,6 +38,17 @@ await jsClick('#offline-select .mini-class[data-class="warrior"]');
 await jsClick('#btn-start-offline');
 await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 45000 });
 await new Promise((r) => setTimeout(r, 2000));
+// Skip the intro cinematic, which otherwise keeps #ui hidden (display:none).
+for (let i = 0; i < 3; i++) {
+  await page.keyboard.press('Escape');
+  await new Promise((r) => setTimeout(r, 400));
+}
+await page.waitForFunction(
+  () => getComputedStyle(document.querySelector('#ui')).display !== 'none',
+  {
+    timeout: 15000,
+  },
+);
 
 // Level the character so the level-20 raid gear is not inert, then drop the
 // pairs we want to compare.
@@ -50,7 +61,6 @@ const ITEMS = [
 ];
 const inv = await page.evaluate((ids) => {
   const sim = window.__game.sim;
-  if (sim.setPlayerLevel) sim.setPlayerLevel(sim.player.id, 20);
   for (const id of ids) sim.addItem(id, 1, sim.player.id);
   return sim.inventory.map((s) => s.itemId).filter(Boolean);
 }, ITEMS);
@@ -66,13 +76,13 @@ await new Promise((r) => setTimeout(r, 400));
 await page.keyboard.press('b');
 await new Promise((r) => setTimeout(r, 700));
 
-async function hoverShot(nameNeedle, file, nth = 0) {
+async function hoverShot(nameNeedle, nth, file) {
   await page.mouse.move(10, 10);
   await new Promise((r) => setTimeout(r, 150));
   const ok = await page.evaluate(
     ({ nm, idx }) => {
-      const rows = [...document.querySelectorAll('#bags .bag-item')].filter((r) =>
-        r.textContent.includes(nm),
+      const rows = [...document.querySelectorAll('#bags button.bag-item')].filter((b) =>
+        (b.getAttribute('aria-label') || '').startsWith(nm),
       );
       const row = rows[idx];
       if (!row) return false;
@@ -109,13 +119,12 @@ async function hoverShot(nameNeedle, file, nth = 0) {
   });
 }
 
-// Same name, but the heroic copy carries [HEROIC] and higher stats. The two
-// Bonewrought Dreadhelm rows are ordered normal-then-heroic by insertion.
-await hoverShot('Bonewrought Dreadhelm', 'heroic_loot_dreadhelm_normal.png', 0);
-await hoverShot('Bonewrought Dreadhelm', 'heroic_loot_dreadhelm_heroic.png', 1);
-await hoverShot('Deathless Greatblade', 'heroic_loot_bespoke_greatblade.png', 0);
-await hoverShot('Thronebane', 'heroic_loot_legendary_normal.png', 0);
-await hoverShot('Thronebane', 'heroic_loot_legendary_heroic.png', 1);
+// Same name, but the heroic copy (added second) carries [HEROIC] and higher stats.
+await hoverShot('Bonewrought Dreadhelm', 0, 'heroic_loot_dreadhelm_normal.png');
+await hoverShot('Bonewrought Dreadhelm', 1, 'heroic_loot_dreadhelm_heroic.png');
+await hoverShot('Deathless Greatblade', 0, 'heroic_loot_bespoke_greatblade.png');
+await hoverShot('Thronebane', 0, 'heroic_loot_legendary_normal.png');
+await hoverShot('Thronebane', 1, 'heroic_loot_legendary_heroic.png');
 
 // Full bag context shot.
 await page.mouse.move(10, 10);
