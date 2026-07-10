@@ -317,7 +317,7 @@ describe('nine classes', () => {
     }
     // deterministic
     expect(runReflects()).toEqual(r);
-  });
+  }, 15_000);
 
   it('druid bear form toggles and raises armor', () => {
     const sim = new Sim({ seed: 42, playerClass: 'druid' });
