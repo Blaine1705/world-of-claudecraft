@@ -1819,7 +1819,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     '상처 입은 적을 끝내려 시도해 {damage}의 피해를 입힙니다. 생명력이 20% 미만인 적에게만 사용할 수 있습니다.',
   'entities.abilities.slam.name': '우악스러운 휘두르기',
-  'entities.abilities.slam.description': '상대에게 무기 피해에 {damage}를 더한 피해를 입힙니다.',
+  'entities.abilities.slam.description':
+    '상대에게 무기 피해의 50%에 {damage}를 더한 피해를 입히고 분노를 {rage} 생성합니다.',
   'entities.abilities.cleave.name': '수확의 호',
   'entities.abilities.cleave.description': '전방의 모든 적을 휩쓸어 {damage}의 피해를 입힙니다.',
   'entities.abilities.defensive_stance.name': '방어 태세',
@@ -6513,7 +6514,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '받는 피해가 {pct}% 감소합니다 (생명력 {hpPct}% 미만일 때 {lowPct}%)',
   'hudChrome.auraEffect.sanguine': '공격 속도가 {hastePct}%, 입히는 피해가 {dmgPct}% 증가합니다',
   'hudChrome.auraEffect.battleTrance':
-    '다음 약탈자의 일격 또는 우악스러운 휘두르기가 분노를 소모하지 않습니다',
+    '다음 약탈자의 일격 또는 불구의 일격이 분노를 소모하지 않습니다',
   'hudChrome.auraEffect.revengeFree': '다음 복수가 분노를 소모하지 않습니다',
   'hudChrome.auraEffect.victoryRush': '연전연승을 사용할 수 있습니다',
   'hudChrome.auraEffect.maxHpPct': '최대 생명력이 {pct}% 증가합니다',
@@ -6539,16 +6540,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무모한 전투 태세입니다. 치명타 확률이 3% 증가하고 치명타 피해가 3% 증가합니다. 분노 전사는 항상 이 태세로 싸웁니다.',
   'entities.abilities.sweeping_strikes.name': '넓어지는 호',
   'entities.abilities.sweeping_strikes.description':
-    '12초 동안 단일 대상 공격이 주위 적 1명에게도 75% 피해로 적중합니다. (무기 특성)',
+    '12초 동안 단일 대상 공격이 주위 적 1명에게도 100% 피해로 적중합니다. (무기 특성)',
   'entities.abilities.deep_wounds.name': '벌어진 상처',
   'entities.abilities.deep_wounds.description':
     '지속 효과: 불구의 일격이 대상에게 6초에 걸쳐 물리 피해를 입히는 출혈을 남깁니다. (무기 특성)',
   'entities.abilities.enrage_passive.name': '아수라장',
   'entities.abilities.enrage_passive.description':
-    '지속 효과: 격노 상태일 때 4초 동안 입히는 피해가 11% 증가하고 공격 속도가 25%, 이동 속도가 10% 빨라집니다. 사혈은 30% 확률로 격노시키며, 붉은 수확은 항상 격노시킵니다. (분노 특성)',
+    '지속 효과: 격노 상태일 때 4초 동안 입히는 피해가 7% 증가하고 공격 속도가 25%, 이동 속도가 10% 빨라집니다. 사혈은 30% 확률로 격노시키며, 붉은 수확은 항상 격노시킵니다. (분노 특성)',
   'entities.abilities.raging_gale.name': '쌍격',
   'entities.abilities.raging_gale.description':
-    '무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 60%에 {damage}를 더한 피해를 입히고 분노 {rage}를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)',
+    '무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 40%에 {damage}를 더한 피해를 입히고 분노 {rage}를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)',
   'entities.abilities.red_harvest.name': '붉은 수확',
   'entities.abilities.red_harvest.description':
     '모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해에 {damage}를 더한 피해를 입힙니다. (분노 특성)',

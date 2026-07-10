@@ -679,7 +679,11 @@ const classAbilityNamesEn = {
         'Early Grave',
         'Attempt to finish off a wounded foe, causing {damage} damage. Only usable on enemies below 20% health.',
       ],
-      ['slam', 'Brute Swing', 'Slams the opponent for weapon damage plus {damage}.'],
+      [
+        'slam',
+        'Brute Swing',
+        'Slams the opponent for 50% weapon damage plus {damage}, generating {rage} rage.',
+      ],
       [
         'cleave',
         'Reaping Arc',

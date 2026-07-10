@@ -33,11 +33,17 @@ describe('Early Grave (execute) is a rage builder for Fury only', () => {
     expect(k!.effects).toContainEqual({ type: 'gainResource', amount: 20 });
   });
 
-  it('arms, prot and no-spec: keep the 15-rage finisher cost and mint no rage', () => {
-    for (const spec of ['arms', 'prot', null]) {
+  it('arms, prot and no-spec: keep a rage finisher cost and mint no rage', () => {
+    // Arms pays 10 since the round-3 buff (owner 2026-07-10 balance, was 15);
+    // prot and no-spec keep the baseline 15.
+    for (const [spec, cost] of [
+      ['arms', 10],
+      ['prot', 15],
+      [null, 15],
+    ] as const) {
       const k = resolved('execute', spec);
       expect(k, `${spec}`).toBeTruthy();
-      expect(k!.cost, `${spec} cost`).toBe(15);
+      expect(k!.cost, `${spec} cost`).toBe(cost);
       expect(
         k!.effects.some((e) => e.type === 'gainResource'),
         `${spec} gainResource`,

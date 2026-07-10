@@ -24,9 +24,10 @@ export function consumeNextCastFree(ctx: SimContext, e: Entity): boolean {
 // proc glow / usable state, so sim and UI can never disagree on scope.
 // Maiming Strike is Arms-granted, so it only participates for committed Arms
 // (its owner restructure 2026-07-08 free-proc), never for Fury / no-spec.
+// Brute Swing (slam) left the scope 2026-07-10 with its redesign into the free
+// Arms rage builder: a 0-cost ability can never spend a free-cost proc.
 export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set([
   'heroic_strike',
-  'slam',
   'mortal_strike',
 ]);
 

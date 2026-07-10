@@ -1090,7 +1090,7 @@ export const en: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
-      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "battleTrance": "Your next Reaver Strike or Maiming Strike costs no Rage",
       "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
@@ -5196,7 +5196,7 @@ export const en: EnTranslations = {
       },
       "slam": {
         "name": "Brute Swing",
-        "description": "Slams the opponent for weapon damage plus {damage}."
+        "description": "Slams the opponent for 50% weapon damage plus {damage}, generating {rage} rage."
       },
       "cleave": {
         "name": "Reaping Arc",

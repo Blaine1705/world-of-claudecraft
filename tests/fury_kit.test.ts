@@ -107,14 +107,16 @@ describe('fury kit content defs', () => {
       { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
       { type: 'enrageChance', chance: 1, duration: 4 },
     ]);
-    // Post-nerf design: each strike sits BELOW Maiming Strike's single wpn+40
+    // Post-nerf design: each strike sits BELOW Maiming Strike's single bonus
     // (the pre-nerf 3x full-weapon+55 out-damaged everything by far); the
-    // spender's weight now comes from landing three of them.
+    // spender's weight now comes from landing three of them. Maiming's bonus
+    // is 50 since the Arms round-3 buff (owner 2026-07-10, was 40).
     const mortal = ABILITIES.mortal_strike.effects.find((e) => e.type === 'weaponStrike');
-    expect(mortal?.type === 'weaponStrike' && mortal.bonus).toBe(40);
+    const mortalBonus = mortal?.type === 'weaponStrike' ? mortal.bonus : 0;
+    expect(mortalBonus).toBe(50);
     for (const eff of def.effects) {
       if (eff.type !== 'weaponStrike') continue;
-      expect(eff.bonus).toBeLessThan(40);
+      expect(eff.bonus).toBeLessThan(mortalBonus);
       expect(eff.weaponMult).toBeLessThan(1);
     }
   });

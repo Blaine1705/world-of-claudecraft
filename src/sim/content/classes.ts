@@ -732,16 +732,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Arms-only (owner 2026-07-08): Protection dropped Brute Swing since Revenge
     // is already its filler; a generic mandoble adds nothing for a tank.
     specs: ['arms'],
-    cost: 15,
+    // Redesigned 2026-07-10 (owner): from a 15-rage spender into the Arms rage
+    // BUILDER (free, generates 8 rage, 4s cooldown, stays on the GCD). Dropped
+    // from Battle Trance's free-cost scope in the same change: a 0-cost ability
+    // can never spend a free-cost proc (see empower_next.ts).
+    cost: 0,
     // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
     // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
     castTime: 0,
-    cooldown: 0,
+    cooldown: 4,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 25 }],
-    description: 'Slams the opponent for weapon damage plus $d.',
+    effects: [
+      { type: 'weaponStrike', bonus: 15, weaponMult: 0.5 },
+      { type: 'gainResource', amount: 8 },
+    ],
+    description: 'Slams the opponent for 50% weapon damage plus $d, generating 8 rage.',
   },
   // Fury's dump-everything spender (operator design, Desenfreno): three full
   // weapon hits, each carrying a Maiming Strike-scale bonus (era table:
@@ -1066,7 +1073,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
   },
   // Arms restructure 2026-07-08. Sweeping Strikes: a 12s window where your
-  // single-target strikes also clip one nearby enemy (75%). Deep Wounds: a
+  // single-target strikes also clip one nearby enemy at full damage. Deep Wounds: a
   // passive marker; the bleed itself rides Maiming Strike's effects.
   sweeping_strikes: {
     id: 'sweeping_strikes',
@@ -4022,12 +4029,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     threat: { mult: 1.2 },
     effects: [
-      { type: 'weaponStrike', bonus: 40 },
+      // Balance 2026-07-10 (owner): 40 -> 50 bonus and the bleed 24 -> 30, the
+      // Arms round-3 buff after Brute Swing became the free builder.
+      { type: 'weaponStrike', bonus: 50 },
       { type: 'buffTarget', kind: 'mortal_wound', value: 0.5, duration: 10 },
       // Deep Wounds passive (Arms restructure 2026-07-08): Maiming Strike leaves
       // a bleed. Arms-scoped naturally (mortal_strike is Arms-granted). A distinct
       // auraId keeps it from overwriting the mortal_wound healing debuff above.
-      { type: 'dot', total: 24, duration: 6, interval: 3, auraId: 'deep_wounds' },
+      { type: 'dot', total: 30, duration: 6, interval: 3, auraId: 'deep_wounds' },
     ],
     description:
       'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',

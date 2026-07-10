@@ -1854,7 +1854,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     'Попытка добить раненого врага, нанося {damage} ед. урона. Можно использовать только против врагов с менее чем 20% здоровья.',
   'entities.abilities.slam.name': 'Грубый замах',
-  'entities.abilities.slam.description': 'Бьет противника, нанося урон оружием плюс {damage}.',
+  'entities.abilities.slam.description':
+    'Бьет противника, нанося 50% урона оружием плюс {damage} и генерируя {rage} ед. ярости.',
   'entities.abilities.cleave.name': 'Жатвенная дуга',
   'entities.abilities.cleave.description':
     'Широкий удар, поражающий всех врагов перед вами на {damage} ед. урона.',
@@ -6654,7 +6655,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sanguine':
     'Повышает скорость атаки на {hastePct}% и наносимый урон на {dmgPct}%',
   'hudChrome.auraEffect.battleTrance':
-    'Ваш следующий Удар разорителя или Грубый замах не потребует ярости',
+    'Ваш следующий Удар разорителя или Калечащий удар не потребует ярости',
   'hudChrome.auraEffect.revengeFree': 'Ваша следующая Месть не потребует ярости',
   'hudChrome.auraEffect.victoryRush': '«Порыв победы» готов',
   'hudChrome.auraEffect.maxHpPct': 'Повышает максимальное здоровье на {pct}%',
@@ -6680,16 +6681,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Безрассудная боевая стойка: ваши критические удары проходят на 3% чаще и бьют на 3% сильнее. Воин ветки «Неистовство» всегда сражается в этой стойке.',
   'entities.abilities.sweeping_strikes.name': 'Расширяющаяся дуга',
   'entities.abilities.sweeping_strikes.description':
-    'В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага на 75% урона. (ветка «Оружие»)',
+    'В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага с полным уроном. (ветка «Оружие»)',
   'entities.abilities.deep_wounds.name': 'Зияющие раны',
   'entities.abilities.deep_wounds.description':
     'Пассивно: ваш Калечащий удар оставляет на цели кровотечение, нанося физический урон за 6 сек. (ветка «Оружие»)',
   'entities.abilities.enrage_passive.name': 'Буйство',
   'entities.abilities.enrage_passive.description':
-    'Пассивно: пока вы в Бешенстве, вы наносите на 11% больше урона, атакуете на 25% быстрее и двигаетесь на 10% быстрее в течение 4 сек. Кровопускание с вероятностью 30% приводит вас в Бешенство; Кровавая жатва делает это всегда. (ветка «Неистовство»)',
+    'Пассивно: пока вы в Бешенстве, вы наносите на 7% больше урона, атакуете на 25% быстрее и двигаетесь на 10% быстрее в течение 4 сек. Кровопускание с вероятностью 30% приводит вас в Бешенство; Кровавая жатва делает это всегда. (ветка «Неистовство»)',
   'entities.abilities.raging_gale.name': 'Двойной удар',
   'entities.abilities.raging_gale.description':
-    'Мгновенно бьет оружием дважды, каждый удар наносит 60% урона оружием плюс {damage}, и создает {rage} ярости. Хранит до 2 зарядов. (ветка «Неистовство»)',
+    'Мгновенно бьет оружием дважды, каждый удар наносит 40% урона оружием плюс {damage}, и создает {rage} ярости. Хранит до 2 зарядов. (ветка «Неистовство»)',
   'entities.abilities.red_harvest.name': 'Кровавая жатва',
   'entities.abilities.red_harvest.description':
     'Отдайте все: наносит три удара в исступлении, каждый на урон оружием плюс {damage}. (ветка «Неистовство»)',

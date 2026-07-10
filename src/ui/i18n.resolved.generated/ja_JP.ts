@@ -1090,7 +1090,7 @@ export const ja_JP: EnTranslations = {
       "bloodbath": "クリティカル率と与えるダメージを{pct}%上昇させる",
       "dieBySword": "受けるダメージを{pct}%軽減する（体力{hpPct}%未満では{lowPct}%）",
       "sanguine": "攻撃速度を{hastePct}%、与えるダメージを{dmgPct}%上昇させる",
-      "battleTrance": "次のレイヴァーストライクまたはブルートスイングの怒りコストが0になる",
+      "battleTrance": "次のレイヴァーストライクまたは重傷の一撃の怒りコストが0になる",
       "revengeFree": "次の意趣返しの怒りコストが0になる",
       "victoryRush": "勝利の追撃が使用可能",
       "maxHpPct": "最大体力を{pct}%上昇させる",
@@ -5196,7 +5196,7 @@ export const ja_JP: EnTranslations = {
       },
       "slam": {
         "name": "力任せの一振り",
-        "description": "相手を叩きつけ、武器ダメージに {damage} を加えたダメージを与えます。"
+        "description": "相手を叩きつけ、武器ダメージの50%に {damage} を加えたダメージを与え、怒りを {rage} 生成します。"
       },
       "cleave": {
         "name": "刈り取りの弧",
@@ -5704,7 +5704,7 @@ export const ja_JP: EnTranslations = {
       },
       "sweeping_strikes": {
         "name": "広がる弧",
-        "description": "12秒間、単体攻撃が近くの敵1体にも75%のダメージで命中します。（武器）"
+        "description": "12秒間、単体攻撃が近くの敵1体にも100%のダメージで命中します。（武器）"
       },
       "deep_wounds": {
         "name": "抉れた傷",
@@ -5712,7 +5712,7 @@ export const ja_JP: EnTranslations = {
       },
       "enrage_passive": {
         "name": "狂乱",
-        "description": "パッシブ: 激昂している間、与えるダメージが11%増加し、攻撃速度が25%、移動速度が10%上昇します（4秒間）。瀉血には30%の確率で激昂させる効果があり、赤い収穫は必ず激昂させます。（狂怒）"
+        "description": "パッシブ: 激昂している間、与えるダメージが7%増加し、攻撃速度が25%、移動速度が10%上昇します（4秒間）。瀉血には30%の確率で激昂させる効果があり、赤い収穫は必ず激昂させます。（狂怒）"
       },
       "bloodthirst": {
         "name": "瀉血",
@@ -5720,7 +5720,7 @@ export const ja_JP: EnTranslations = {
       },
       "raging_gale": {
         "name": "双撃",
-        "description": "武器で即座に2回攻撃し、それぞれ武器ダメージの60%に{damage}を加えたダメージを与え、怒りを{rage}生成します。最大2チャージまで蓄積します。（狂怒）"
+        "description": "武器で即座に2回攻撃し、それぞれ武器ダメージの40%に{damage}を加えたダメージを与え、怒りを{rage}生成します。最大2チャージまで蓄積します。（狂怒）"
       },
       "red_harvest": {
         "name": "赤い収穫",
