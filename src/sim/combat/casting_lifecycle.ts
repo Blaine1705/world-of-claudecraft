@@ -718,13 +718,14 @@ function spendAbilityCost(
   // off the tracked offensive cooldowns (deleting one that reaches zero, like
   // the updateTimers decrement does). 0 for everyone without the capstone.
   const rate = ctx.playerMods(meta).global.cdrPerRage;
-  if (spentRage <= 0 || rate <= 0) return;
-  const refund = spentRage * rate;
-  for (const id of COLOSSAL_MIGHT_COOLDOWNS) {
-    const cur = p.cooldowns.get(id);
-    if (cur === undefined) continue;
-    if (cur <= refund) p.cooldowns.delete(id);
-    else p.cooldowns.set(id, cur - refund);
+  if (spentRage > 0 && rate > 0) {
+    const refund = spentRage * rate;
+    for (const id of COLOSSAL_MIGHT_COOLDOWNS) {
+      const cur = p.cooldowns.get(id);
+      if (cur === undefined) continue;
+      if (cur <= refund) p.cooldowns.delete(id);
+      else p.cooldowns.set(id, cur - refund);
+    }
   }
   // Hardened Blood (choice-row talent): every FULL 10 rage this one cast spends
   // grants a stack of +hardenedBloodPct% armor (per-cast floor, no carryover:
