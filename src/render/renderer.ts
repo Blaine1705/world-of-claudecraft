@@ -100,8 +100,8 @@ import {
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
-import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { buildJailScene } from './jail_scene';
+import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
