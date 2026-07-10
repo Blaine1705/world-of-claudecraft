@@ -55,6 +55,22 @@ export const WINTERS_CHILL_SPENDERS: ReadonlySet<string> = new Set(['ice_lance']
 export const BLIZZARD_ORB_CDR_PER_ENEMY = 0.5;
 export const BLIZZARD_ORB_CDR_CAP = 3;
 
+/** Pure aura-list predicate for the action bar (the freeCostAuraActive
+ *  idiom): does a worn frost proc empower this ability right now? Ice Lance
+ *  glows while Fingers of Frost is banked; Flurry glows while Brain Freeze
+ *  is armed. Structural input so the UI drives it with a mirrored aura list
+ *  and bar and combat can never disagree on the scope. */
+export function frostProcGlowActive(
+  auras: readonly { kind: string }[],
+  abilityId: string,
+): boolean {
+  for (const a of auras) {
+    if (a.kind === 'fingers_of_frost' && abilityId === 'ice_lance') return true;
+    if (a.kind === 'brain_freeze' && abilityId === 'flurry') return true;
+  }
+  return false;
+}
+
 function isCommittedFrost(ctx: SimContext, meta: PlayerMeta): boolean {
   return meta.cls === 'mage' && ctx.playerMods(meta).spec === 'frost';
 }

@@ -446,6 +446,10 @@ export function createActionBarView(
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
+        // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
+        // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
+        // sim predicate idiom as freeCostAuraActive above).
+        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
         slot.empowered = hasEmpoweringAura(player.auras, ability);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,

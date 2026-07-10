@@ -2291,7 +2291,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // Frost spec kit (owner design 2026-07-11): procedural recipes; distinct
   // silhouettes from frostbolt (bolt+flake) and frost_nova (flake+arcs).
   ice_lance: r('frost', 'ice', [{ p: 'dagger', rot: -Math.PI / 4 }], ['glow', 'motion']),
-  glacial_spike: r('frost', 'ice', [{ p: 'dagger', rot: 0 }], ['glow']),
   flurry: r(
     'frost',
     'ice',
@@ -2320,16 +2319,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
       { p: 'snowflake', x: -2, y: 12, s: 0.45 },
     ],
     ['motion'],
-  ),
-  glacial_front: r(
-    'frost',
-    'ice',
-    [
-      { p: 'snowflake', x: 0, y: -10, s: 0.55 },
-      { p: 'bolt', x: -11, y: 6, s: 0.6, rot: -0.55 },
-      { p: 'bolt', x: 11, y: 6, s: 0.6, rot: 0.55 },
-    ],
-    ['arcs', 'motion', 'glow'],
   ),
   fingers_of_frost: r('frost', 'ice', ['claw_slash', { p: 'snowflake', ...BR }], ['glow']),
   brain_freeze: r('frost', 'ice', ['eye', { p: 'snowflake', ...BR }], ['sparkle']),

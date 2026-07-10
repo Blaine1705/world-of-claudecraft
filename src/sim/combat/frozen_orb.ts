@@ -59,6 +59,16 @@ export function spawnFrozenOrb(
   abilityName: string,
   spBonus: number,
 ): void {
+  // Release feedback at the caster; each pulse then draws its own nova ring
+  // along the drift, so the player can read where the orb is.
+  ctx.emit({
+    type: 'spellfxAt',
+    x: p.pos.x,
+    z: p.pos.z,
+    school: 'frost',
+    fx: 'nova',
+    radius: eff.radius,
+  });
   ctx.frozenOrbs.push({
     sourceId: p.id,
     x: p.pos.x,
