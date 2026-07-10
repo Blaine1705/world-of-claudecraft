@@ -6918,4 +6918,32 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Ihr verlasst die Warteschlange für Yumi beschützen.',
   'yumi.queue.teamLeave': 'Euer Team verlässt die Warteschlange für Yumi beschützen.',
   'yumi.respawn.title': 'AM BODEN!',
+  'entities.abilities.chain_heal.name': 'Kettenheilung',
+  'entities.abilities.chain_heal.description':
+    'Heilt ein verbündetes Ziel stark und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Mit jedem Sprung wird 50 % weniger geheilt. (Signatur von Wiederherstellung)',
+  'entities.abilities.razor_howl.name': 'Klingenheulen',
+  'entities.abilities.razor_howl.description':
+    'Ein Ruf, der Gegner im Umkreis von 15 m 8 Sek. lang um 50 % verlangsamt. (Kriegertalent)',
+  'entities.abilities.stormthrow.name': 'Sturmwurf',
+  'entities.abilities.stormthrow.description':
+    'Schleudert Eure Waffe, um ein Ziel 3 Sek. lang zu betäuben. (Kriegertalent)',
+  'entities.abilities.reckless_vow.name': 'Tollkühner Schwur',
+  'entities.abilities.reckless_vow.description':
+    'Erhöht 12 Sek. lang sämtliche Wuterzeugung um 50 % und die kritische Trefferchance um 20 %. (Kriegertalent)',
+  'entities.abilities.red_banner.name': 'Rotes Banner',
+  'entities.abilities.red_banner.description':
+    'Ihr und Verbündete in der Nähe erhaltet 20 Sek. lang 10 % Angriffstempo und 10 % Schaden. (Kriegertalent)',
+  'entities.items.chunk_of_ore.name': 'Erzbrocken',
+  'entities.quests.q_prof_intro.title': 'Ein Handwerk für jede Hand',
+  'entities.quests.q_prof_intro.text':
+    'Jede Seele in Eastbrook geht neben dem Schwert einem Handwerk nach, {playerName}. Rund um die Stadt liegen Erzadern verstreut. Nehmt also eine Spitzhacke und bringt mir 5 Brocken. Baut sie selbst ab; ich erkenne den Unterschied.',
+  'entities.quests.q_prof_intro.completion':
+    'Seht Ihr? Erz im Beutel und Schwielen an den Händen. Baut auf Euren Reisen weiter Erz ab, fällt Holz und sammelt Kräuter. Wenn Ihr wieder in der Stadt seid, denkt an die Tafel für den Stadtfokus beim Markt und an die Werkbank daneben. In all dem wartet ein ehrliches Handwerk, wenn Ihr es wollt.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Erzbrocken',
+  'game.talents.readout.rowsSummary':
+    'Talente: {head}, {picked}/{unlocked} Entscheidungsreihen gewählt.',
+  'hudChrome.fct.absorbed': '{amount} absorbiert',
+  'hudChrome.fct.cheap': 'Günstiger!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Ein {item} weniger senden',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Ein {item} mehr senden',
 };

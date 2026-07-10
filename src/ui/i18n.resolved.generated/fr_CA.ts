@@ -146,7 +146,7 @@ export const fr_CA: EnTranslations = {
         "noTree": "Votre classe n'a pas encore d'arbre de talents.",
         "locked": "Vous n'avez pas encore débloqué les talents — ils commencent au niveau {level}.",
         "noSpec": "aucune spécialisation",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talents : {head}, {picked}/{unlocked} rangées de choix sélectionnées.",
         "summary": "Talents: {head} — {spent}/{total} points dépensés ({breakdown}).",
         "breakdownClass": "Classe {classPts}",
         "breakdownSpec": "Classe {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const fr_CA: EnTranslations = {
       "spiritHealerAlive": "Le Veilleur pâle veille sur les morts. Vous êtes encore parmi les vivants."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Absorbé : {amount}",
+      "cheap": "Coût réduit !"
     },
     "emotes": {
       "wave": "Saluer de la main",
@@ -1304,8 +1304,8 @@ export const fr_CA: EnTranslations = {
       "parcelsLabel": "Colis",
       "parcelsHint": "Cliquez sur un objet dans vos sacs pour le joindre.",
       "removeParcelAria": "Retirer {item} de la lettre",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Envoyer un {item} de moins",
+      "parcelQtyIncreaseAria": "Envoyer un {item} de plus",
       "sendButton": "Envoyer la lettre",
       "postageNote": "Affranchissement : {amount}. Le corbeau vole environ {seconds}s.",
       "arrivedBanner": "Le corbeau s'est posé : du courrier de {name}.",
@@ -5648,8 +5648,8 @@ export const fr_CA: EnTranslations = {
         "description": "Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Soins en chaîne",
+        "description": "Soigne grandement une cible alliée, puis rebondit vers jusqu'à 2 autres alliés proches, avec 50 % de soins en moins à chaque rebond. (Technique signature de Restauration)"
       },
       "metamorphosis": {
         "name": "Métamorphose",
@@ -5788,20 +5788,20 @@ export const fr_CA: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a proches ennemis cada segundo por {damage}. (talent de guerrier)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Hurlement tranchant",
+        "description": "Un cri qui ralentit de 50 % les ennemis à moins de 15 m pendant 8 s. (Talent de guerrier)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Lancer-tempête",
+        "description": "Lance votre arme pour étourdir une cible pendant 3 s. (Talent de guerrier)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Vœu téméraire",
+        "description": "Augmente toute la génération de rage de 50 % et les chances de coup critique de 20 % pendant 12 s. (Talent de guerrier)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Bannière rouge",
+        "description": "Vous et les alliés proches gagnez 10 % de vitesse d’attaque et 10 % de dégâts pendant 20 s. (Talent de guerrier)"
       },
       "blink": {
         "name": "Pas scintillant",
@@ -6145,7 +6145,7 @@ export const fr_CA: EnTranslations = {
         "name": "Croc du vieux Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Morceau de minerai"
       },
       "weathered_ledger_page": {
         "name": "Page de registre usée"
@@ -7819,12 +7819,12 @@ export const fr_CA: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Un métier pour chaque main",
+        "text": "À Eastbrook, chacun exerce un métier en plus du maniement de l'épée, {playerName}. Des filons de minerai sont disséminés autour de la ville, alors prenez une pioche et rapportez-moi 5 morceaux. Extrayez-les vous-même; je saurai faire la différence.",
+        "completion": "Vous voyez? Du minerai dans votre sac et des durillons aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l'établi voisin. Un métier honnête vous attend dans chacune de ces activités, si vous le souhaitez.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Morceau de minerai"
           }
         }
       },

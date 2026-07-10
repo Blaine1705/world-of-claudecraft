@@ -6765,4 +6765,35 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': "Yumi'yi Koru kuyruğundan ayrılıyorsun.",
   'yumi.queue.teamLeave': "Takımın Yumi'yi Koru kuyruğundan ayrılıyor.",
   'yumi.respawn.title': 'DÜŞTÜN!',
+  'entities.abilities.chain_heal.name': 'Zincirleme İyileştirme',
+  'entities.abilities.chain_heal.description':
+    'Dost bir hedefi büyük miktarda iyileştirir, ardından yakındaki en fazla 2 başka müttefike sıçrar ve her sıçrayışta %50 daha az iyileştirir. (Restorasyon imza yeteneği)',
+  'entities.abilities.razor_howl.name': 'Keskin Uluma',
+  'entities.abilities.razor_howl.description':
+    '15 m içindeki düşmanları 8 sn. boyunca %50 yavaşlatan bir haykırış. (Savaşçı yeteneği)',
+  'entities.abilities.stormthrow.name': 'Fırtına Atışı',
+  'entities.abilities.stormthrow.description':
+    'Bir hedefi 3 sn. sersemletmek için silahını fırlat. (Savaşçı yeteneği)',
+  'entities.abilities.reckless_vow.name': 'Pervasız Yemin',
+  'entities.abilities.reckless_vow.description':
+    'Tüm öfke üretimini %50 ve kritik vuruş şansını %20 artırır, 12 sn. sürer. (Savaşçı yeteneği)',
+  'entities.abilities.red_banner.name': 'Kızıl Sancak',
+  'entities.abilities.red_banner.description':
+    'Sen ve yakındaki müttefikler 20 sn. boyunca %10 saldırı hızı ve %10 hasar kazanırsınız. (Savaşçı yeteneği)',
+  'entities.items.chunk_of_ore.name': 'Cevher Parçası',
+  'entities.quests.q_prof_intro.title': 'Her Ele Bir Zanaat',
+  'entities.quests.q_prof_intro.text':
+    'Eastbrook’taki herkes kılıç dışında bir zanaatla uğraşır, {playerName}. Kasabanın çevresinde cevher damarları var; bir kazma salla ve bana 5 parça getir. Kendin çıkar; aradaki farkı anlarım.',
+  'entities.quests.q_prof_intro.completion':
+    'Gördün mü? Çantanda cevher, ellerinde nasır. Yollarda ilerlerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosunu ve yakındaki çalışma tezgâhını unutma. İstersen bunların hepsinde dürüst bir zanaat seni bekliyor.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Cevher Parçası',
+  'game.talents.readout.rowsSummary':
+    'Yetenekler: {head}, {picked}/{unlocked} seçim satırı seçildi.',
+  'hudChrome.fct.absorbed': '{amount} soğuruldu',
+  'hudChrome.fct.cheap': 'Daha ucuz!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Bir eksik {item} gönder',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Bir fazla {item} gönder',
+  'game.talents.choicesTab': 'Seçimler',
+  'game.talents.rowUnlockToast': 'Yeni bir yetenek seçimi açıldı!',
+  'game.talents.rowUnlocks': '{level}. seviyede açılır',
 };

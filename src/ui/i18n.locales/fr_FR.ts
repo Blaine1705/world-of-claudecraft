@@ -6946,4 +6946,32 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Vous quittez la file de Protégez Yumi.',
   'yumi.queue.teamLeave': 'Votre équipe quitte la file de Protégez Yumi.',
   'yumi.respawn.title': 'À TERRE !',
+  'entities.abilities.chain_heal.name': 'Soins en chaîne',
+  'entities.abilities.chain_heal.description':
+    "Soigne grandement une cible alliée, puis rebondit vers jusqu'à 2 autres alliés proches, avec 50 % de soins en moins à chaque rebond. (Technique signature de Restauration)",
+  'entities.abilities.razor_howl.name': 'Hurlement tranchant',
+  'entities.abilities.razor_howl.description':
+    'Un cri qui ralentit de 50 % les ennemis à moins de 15 m pendant 8 s. (Talent de guerrier)',
+  'entities.abilities.stormthrow.name': 'Lancer-tempête',
+  'entities.abilities.stormthrow.description':
+    'Lance votre arme pour étourdir une cible pendant 3 s. (Talent de guerrier)',
+  'entities.abilities.reckless_vow.name': 'Vœu téméraire',
+  'entities.abilities.reckless_vow.description':
+    'Augmente toute la génération de rage de 50 % et les chances de coup critique de 20 % pendant 12 s. (Talent de guerrier)',
+  'entities.abilities.red_banner.name': 'Bannière rouge',
+  'entities.abilities.red_banner.description':
+    'Vous et les alliés proches gagnez 10 % de vitesse d’attaque et 10 % de dégâts pendant 20 s. (Talent de guerrier)',
+  'entities.items.chunk_of_ore.name': 'Morceau de minerai',
+  'entities.quests.q_prof_intro.title': 'Un métier pour chaque main',
+  'entities.quests.q_prof_intro.text':
+    "À Eastbrook, chacun exerce un métier en plus du maniement de l'épée, {playerName}. Des filons de minerai sont disséminés autour de la ville, alors prenez une pioche et rapportez-moi 5 morceaux. Extrayez-les vous-même; je saurai faire la différence.",
+  'entities.quests.q_prof_intro.completion':
+    "Vous voyez? Du minerai dans votre sac et des durillons aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l'établi voisin. Un métier honnête vous attend dans chacune de ces activités, si vous le souhaitez.",
+  'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
+  'game.talents.readout.rowsSummary':
+    'Talents : {head}, {picked}/{unlocked} rangées de choix sélectionnées.',
+  'hudChrome.fct.absorbed': 'Absorbé : {amount}',
+  'hudChrome.fct.cheap': 'Coût réduit !',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Envoyer un {item} de moins',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Envoyer un {item} de plus',
 };

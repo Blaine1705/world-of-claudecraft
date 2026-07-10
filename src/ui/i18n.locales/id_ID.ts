@@ -6848,4 +6848,34 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Kau keluar dari antrean Lindungi Yumi.',
   'yumi.queue.teamLeave': 'Timmu keluar dari antrean Lindungi Yumi.',
   'yumi.respawn.title': 'TUMBANG!',
+  'entities.abilities.chain_heal.name': 'Penyembuhan Berantai',
+  'entities.abilities.chain_heal.description':
+    'Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu tambahan di dekatnya. Setiap lompatan menyembuhkan 50% lebih sedikit. (Kemampuan khas Pemulihan)',
+  'entities.abilities.razor_howl.name': 'Raungan Tajam',
+  'entities.abilities.razor_howl.description':
+    'Teriakan yang memperlambat musuh dalam jarak 15 m sebesar 50% selama 8 dtk. (Talenta petarung)',
+  'entities.abilities.stormthrow.name': 'Lemparan Badai',
+  'entities.abilities.stormthrow.description':
+    'Lemparkan senjatamu untuk membuat target pingsan selama 3 dtk. (Talenta petarung)',
+  'entities.abilities.reckless_vow.name': 'Sumpah Nekat',
+  'entities.abilities.reckless_vow.description':
+    'Meningkatkan semua perolehan amarah sebesar 50% dan peluang serangan kritis sebesar 20% selama 12 dtk. (Talenta petarung)',
+  'entities.abilities.red_banner.name': 'Panji Merah',
+  'entities.abilities.red_banner.description':
+    'Kamu dan sekutu di dekatmu memperoleh 10% kecepatan serangan dan 10% kerusakan selama 20 dtk. (Talenta petarung)',
+  'entities.items.chunk_of_ore.name': 'Bongkahan Bijih',
+  'entities.quests.q_prof_intro.title': 'Keahlian untuk Setiap Tangan',
+  'entities.quests.q_prof_intro.text':
+    'Setiap orang di Eastbrook memiliki keahlian selain bermain pedang, {playerName}. Urat bijih tersebar di sekitar kota, jadi ambil beliung dan bawakan 5 bongkahan untukku. Tambang sendiri; aku akan tahu bedanya.',
+  'entities.quests.q_prof_intro.completion':
+    'Lihat? Bijih di dalam tas dan kapalan di tanganmu. Teruslah menambang, menebang kayu, dan memetik herba sepanjang perjalanan. Saat kembali ke kota, ingat papan Fokus Kota di dekat pasar dan meja kerja di sebelahnya. Ada keahlian yang jujur dalam semua pekerjaan itu, jika kamu menginginkannya.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Bongkahan Bijih',
+  'game.talents.readout.rowsSummary': 'Talenta: {head}, {picked}/{unlocked} baris pilihan dipilih.',
+  'hudChrome.fct.absorbed': '{amount} diserap',
+  'hudChrome.fct.cheap': 'Lebih murah!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Kirim satu {item} lebih sedikit',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Kirim satu {item} lebih banyak',
+  'game.talents.choicesTab': 'Pilihan',
+  'game.talents.rowUnlockToast': 'Pilihan talenta baru terbuka!',
+  'game.talents.rowUnlocks': 'Terbuka pada level {level}',
 };

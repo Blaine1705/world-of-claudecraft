@@ -6850,4 +6850,34 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Je verlaat de Bescherm Yumi-wachtrij.',
   'yumi.queue.teamLeave': 'Je team verlaat de Bescherm Yumi-wachtrij.',
   'yumi.respawn.title': 'NEERGEHAALD!',
+  'entities.abilities.chain_heal.name': 'Kettinggenezing',
+  'entities.abilities.chain_heal.description':
+    'Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 extra bondgenoten in de buurt. Elke sprong geneest 50% minder. (Kenmerkende vaardigheid van Restauratie)',
+  'entities.abilities.razor_howl.name': 'Messcherpe huil',
+  'entities.abilities.razor_howl.description':
+    'Een kreet die vijanden binnen 15 m gedurende 8 sec. met 50% vertraagt. (Krijgertalent)',
+  'entities.abilities.stormthrow.name': 'Stormworp',
+  'entities.abilities.stormthrow.description':
+    'Slinger je wapen om een doelwit 3 sec. te verdoven. (Krijgertalent)',
+  'entities.abilities.reckless_vow.name': 'Roekeloze gelofte',
+  'entities.abilities.reckless_vow.description':
+    'Verhoogt alle woedeopwekking met 50% en de kans op een kritieke treffer met 20% gedurende 12 sec. (Krijgertalent)',
+  'entities.abilities.red_banner.name': 'Rode banier',
+  'entities.abilities.red_banner.description':
+    'Jij en nabije bondgenoten krijgen 10% aanvalssnelheid en 10% schade gedurende 20 sec. (Krijgertalent)',
+  'entities.items.chunk_of_ore.name': 'Brok erts',
+  'entities.quests.q_prof_intro.title': 'Een vak voor elke hand',
+  'entities.quests.q_prof_intro.text':
+    'Iedereen in Eastbrook beoefent naast het zwaard een vak, {playerName}. Er liggen overal rond de stad ertsaders, dus pak een houweel en breng me 5 brokken. Delf ze zelf; ik merk het verschil.',
+  'entities.quests.q_prof_intro.completion':
+    'Zie je wel? Erts in je tas en eelt op je handen. Blijf onderweg mijnen, houthakken en kruiden plukken. Denk bij terugkomst in de stad aan het bord voor Stadsfocus bij de markt en de werkbank ernaast. In al dat werk wacht een eerlijk vak, als je het wilt.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Brok erts',
+  'game.talents.readout.rowsSummary': 'Talenten: {head}, {picked}/{unlocked} keuzerijen gekozen.',
+  'hudChrome.fct.absorbed': '{amount} geabsorbeerd',
+  'hudChrome.fct.cheap': 'Goedkoper!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Eén {item} minder verzenden',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Eén {item} meer verzenden',
+  'game.talents.choicesTab': 'Keuzes',
+  'game.talents.rowUnlockToast': 'Een nieuwe talentkeuze is ontgrendeld!',
+  'game.talents.rowUnlocks': 'Wordt ontgrendeld op niveau {level}',
 };

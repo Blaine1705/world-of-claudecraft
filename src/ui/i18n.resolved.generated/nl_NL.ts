@@ -85,9 +85,9 @@ export const nl_NL: EnTranslations = {
       "title": "Talenten",
       "classTab": "Klasse",
       "specTab": "Specialisatie",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Keuzes",
+      "rowUnlockToast": "Een nieuwe talentkeuze is ontgrendeld!",
+      "rowUnlocks": "Wordt ontgrendeld op niveau {level}",
       "available": "Beschikbaar",
       "spent": "Besteed",
       "pointSource": "Verdien 1 talentpunt per level van level {first} tot {cap}. Level omhoog om meer punten te krijgen.",
@@ -146,7 +146,7 @@ export const nl_NL: EnTranslations = {
         "noTree": "Je klasse heeft nog geen talentenboom.",
         "locked": "Je hebt nog geen talenten ontgrendeld — die beginnen op niveau {level}.",
         "noSpec": "geen specialisatie",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talenten: {head}, {picked}/{unlocked} keuzerijen gekozen.",
         "summary": "Talenten: {head} — {spent}/{total} punten besteed ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const nl_NL: EnTranslations = {
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} geabsorbeerd",
+      "cheap": "Goedkoper!"
     },
     "emotes": {
       "wave": "Zwaaien",
@@ -1304,8 +1304,8 @@ export const nl_NL: EnTranslations = {
       "parcelsLabel": "Pakketten",
       "parcelsHint": "Klik op een voorwerp in je tassen om het bij te voegen.",
       "removeParcelAria": "Verwijder {item} uit de brief",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Eén {item} minder verzenden",
+      "parcelQtyIncreaseAria": "Eén {item} meer verzenden",
       "sendButton": "Brief versturen",
       "postageNote": "Porto: {amount}. De raaf vliegt ongeveer {seconds}s.",
       "arrivedBanner": "De raaf is geland: post van {name}.",
@@ -5648,8 +5648,8 @@ export const nl_NL: EnTranslations = {
         "description": "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Kettinggenezing",
+        "description": "Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 extra bondgenoten in de buurt. Elke sprong geneest 50% minder. (Kenmerkende vaardigheid van Restauratie)"
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -5788,20 +5788,20 @@ export const nl_NL: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a nabije vijanden cada segundo por {damage}. (krijgerstalent)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Messcherpe huil",
+        "description": "Een kreet die vijanden binnen 15 m gedurende 8 sec. met 50% vertraagt. (Krijgertalent)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Stormworp",
+        "description": "Slinger je wapen om een doelwit 3 sec. te verdoven. (Krijgertalent)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Roekeloze gelofte",
+        "description": "Verhoogt alle woedeopwekking met 50% en de kans op een kritieke treffer met 20% gedurende 12 sec. (Krijgertalent)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Rode banier",
+        "description": "Jij en nabije bondgenoten krijgen 10% aanvalssnelheid en 10% schade gedurende 20 sec. (Krijgertalent)"
       },
       "blink": {
         "name": "Flikkerstap",
@@ -6145,7 +6145,7 @@ export const nl_NL: EnTranslations = {
         "name": "Tand van Oude Grijskaak"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Brok erts"
       },
       "weathered_ledger_page": {
         "name": "Verweerd Grootboekblad"
@@ -7819,12 +7819,12 @@ export const nl_NL: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Een vak voor elke hand",
+        "text": "Iedereen in Eastbrook beoefent naast het zwaard een vak, {playerName}. Er liggen overal rond de stad ertsaders, dus pak een houweel en breng me 5 brokken. Delf ze zelf; ik merk het verschil.",
+        "completion": "Zie je wel? Erts in je tas en eelt op je handen. Blijf onderweg mijnen, houthakken en kruiden plukken. Denk bij terugkomst in de stad aan het bord voor Stadsfocus bij de markt en de werkbank ernaast. In al dat werk wacht een eerlijk vak, als je het wilt.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Brok erts"
           }
         }
       },

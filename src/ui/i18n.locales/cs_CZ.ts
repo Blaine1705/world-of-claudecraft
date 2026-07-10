@@ -6623,4 +6623,103 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Opouštíš frontu Ochraňte Yumi.',
   'yumi.queue.teamLeave': 'Tvůj tým opouští frontu Ochraňte Yumi.',
   'yumi.respawn.title': 'K ZEMI!',
+  'entities.abilities.crusader_strike.name': 'Křižácký úder',
+  'entities.abilities.crusader_strike.description':
+    'Zasáhne cíl za poškození zbraní plus {damage} bodů Svatého poškození. (Paladinský talent)',
+  'entities.abilities.metamorphosis.name': 'Děsivá podoba',
+  'entities.abilities.metamorphosis.description':
+    'Promění tě na 20 sek. v obludného démona, zvýší poškození kouzel o 20 % a rychlost sesílání o 20 %. Tvůj démon získá 50 % k poškození a 20 % k rychlosti sesílání. (Charakteristická schopnost démonologie)',
+  'entities.abilities.aura_surge.name': 'Zářivý příboj',
+  'entities.abilities.aura_surge.description':
+    'Přetíží tvou auru a zpevní tě 160 body brnění na 10 sek. (Paladinský talent)',
+  'entities.abilities.holy_shock.name': 'Svatý šok',
+  'entities.abilities.holy_shock.description':
+    'Šokuje spřátelený cíl Svatou energií a vyléčí ho, nebo nepříteli způsobí {damage} bodů Svatého poškození. (Charakteristická schopnost svatosti)',
+  'entities.abilities.holy_shield.name': 'Posvátná hradba',
+  'entities.abilities.holy_shield.description':
+    'Vrhně zářivou záštitu na nepřítele, způsobí Svaté poškození a odrazí se na 2 nepřátele poblíž. (Charakteristická schopnost ochrany)',
+  'entities.abilities.bestial_wrath.name': 'Vyjící zuřivost',
+  'entities.abilities.bestial_wrath.description':
+    'Uvrhne tě do zvířecí zuřivosti, která na 15 sek. zvýší tvou útočnou sílu o 20 % a poškození tvého mazlíčka o 100 %. (Charakteristická schopnost znalce zvířat)',
+  'entities.abilities.trueshot_aura.name': 'Aura jistého letu',
+  'entities.abilities.trueshot_aura.description':
+    'Povzbudí spojence poblíž a zvýší jejich útočnou sílu o 10 % na 30 min. (Charakteristická schopnost střelby)',
+  'entities.abilities.wyvern_sting.name': 'Bodnutí wyverny',
+  'entities.abilities.wyvern_sting.description':
+    'Bodne nepřítele na dálku a vyřadí ho až na 4 sek. Jakékoli poškození účinek zruší. (Charakteristická schopnost přežití)',
+  'entities.abilities.arcane_power.name': 'Příval éteru',
+  'entities.abilities.arcane_power.description':
+    'Na 10 sek. zvýší poškození kouzel o 20 % a rychlost kouzlení o 10 %. (Charakteristická schopnost arkánní magie)',
+  'entities.abilities.combustion.name': 'Bleskový oheň',
+  'entities.abilities.combustion.description':
+    'Na 15 sek. zvýší šanci na kritický zásah kouzlem o 50 %. (Charakteristická schopnost ohně)',
+  'entities.abilities.icy_veins.name': 'Ledové žíly',
+  'entities.abilities.icy_veins.description':
+    'Na 10 sek. zvýší rychlost kouzlení o 30 % a zabrání přerušení či zpomalení sesílání. (Charakteristická schopnost mrazu)',
+  'entities.abilities.cold_blood.name': 'Klid zabijáka',
+  'entities.abilities.cold_blood.description':
+    'Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritický zásah. (Charakteristická schopnost vraždění)',
+  'entities.abilities.blade_flurry.name': 'Zrcadlené čepele',
+  'entities.abilities.blade_flurry.description':
+    'Rozpoutá smršť čepelí a na 12 sek. zvýší rychlost útoku o 20 %. (Charakteristická schopnost boje)',
+  'entities.abilities.hemorrhage.name': 'Rudá stuha',
+  'entities.abilities.hemorrhage.description':
+    'Zasáhne nepřítele za poškození zbraní plus {damage}, způsobí krvácení po dobu 12 sek. a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 bod komba. (Charakteristická schopnost lstivosti)',
+  'entities.abilities.power_infusion.name': 'Pomazání',
+  'entities.abilities.power_infusion.description':
+    'Naplní spřátelený cíl mocí a na 15 sek. zvýší jeho rychlost kouzlení o 20 %. (Charakteristická schopnost disciplíny)',
+  'entities.abilities.holy_nova.name': 'Svatá nova',
+  'entities.abilities.holy_nova.description':
+    'Vyvolá výbuch Svaté záře, který vyléčí spojence poblíž za {damage} a poškodí nepřátele poblíž. (Charakteristická schopnost svatosti)',
+  'entities.abilities.shadowform.name': 'Podoba šerého závoje',
+  'entities.abilities.shadowform.description':
+    'Přijme stínovou podobu, zvýší tvé Stínové poškození o 15 a posílí stínovou magii, dokud se neproměníš zpět. Opětovným sesláním se vrátíš do běžné podoby. (Charakteristická schopnost stínu)',
+  'entities.abilities.elemental_mastery.name': 'Prvotní mistrovství',
+  'entities.abilities.elemental_mastery.description':
+    'Povolá bouři, díky níž bude tvé příští kouzlo okamžité. (Charakteristická schopnost živlů)',
+  'entities.abilities.siphon_life.name': 'Vysávání žil',
+  'entities.abilities.siphon_life.description':
+    'Vysává z nepřítele život, způsobí {damage} bodů Stínového poškození za 30 sek. a vyléčí tě za způsobené poškození. (Charakteristická schopnost utrpení)',
+  'entities.abilities.conflagrate.name': 'Požár',
+  'entities.abilities.conflagrate.description':
+    'Spotřebuje tvé Zapálení na nepříteli a zažehne ho za {damage} bodů Ohnivého poškození. (Charakteristická schopnost zkázy)',
+  'entities.abilities.moonkin_form.name': 'Podoba měsíčního křídla',
+  'entities.abilities.moonkin_form.description':
+    'Promění tě v děsivého sovodlaka, zvýší poškození kouzel o 20 % a brnění o 50 %. Trvá, dokud podobu neopustíš. Opětovným sesláním se vrátíš do podoby sesilatele. (Charakteristická schopnost rovnováhy)',
+  'entities.abilities.feral_charge.name': 'Prvotní příval',
+  'entities.abilities.feral_charge.description':
+    'Rozpoutá prvotní příval. Ve Vlčí podobě se na 10 sek. zvýší obnova energie o 100 %. V Medvědí podobě okamžitě vytvoří 50 bodů zuřivosti. (Charakteristická schopnost divokosti)',
+  'entities.abilities.swiftmend.name': 'Rychlé uzdravení',
+  'entities.abilities.swiftmend.description':
+    'Spotřebuje efekt průběžného léčení na spřáteleném cíli a vyléčí ho za {damage}. (Charakteristická schopnost obnovy)',
+  'entities.abilities.chain_heal.name': 'Řetězové léčení',
+  'entities.abilities.chain_heal.description':
+    'Silně vyléčí spřátelený cíl a pak přeskočí až na 2 další spojence poblíž. Každý skok léčí o 50 % méně. (Charakteristická schopnost obnovy)',
+  'entities.abilities.razor_howl.name': 'Břitký řev',
+  'entities.abilities.razor_howl.description':
+    'Výkřik, který na 8 sek. zpomalí nepřátele do 15 m o 50 %. (Válečnický talent)',
+  'entities.abilities.stormthrow.name': 'Bouřný hod',
+  'entities.abilities.stormthrow.description':
+    'Mrští tvou zbraní a omráčí cíl na 3 sek. (Válečnický talent)',
+  'entities.abilities.reckless_vow.name': 'Lehkomyslná přísaha',
+  'entities.abilities.reckless_vow.description':
+    'Na 12 sek. zvýší veškerou tvorbu zuřivosti o 50 % a šanci na kritický zásah o 20 %. (Válečnický talent)',
+  'entities.abilities.red_banner.name': 'Rudý prapor',
+  'entities.abilities.red_banner.description':
+    'Ty a spojenci poblíž získáte na 20 sek. 10 % k rychlosti útoku a 10 % k poškození. (Válečnický talent)',
+  'entities.items.chunk_of_ore.name': 'Kus rudy',
+  'entities.quests.q_prof_intro.title': 'Řemeslo pro každou ruku',
+  'entities.quests.q_prof_intro.text':
+    'Každý v Eastbrooku se kromě meče živí i řemeslem, {playerName}. Kolem města jsou rozeseté rudné žíly, tak vezmi krumpáč a přines mi 5 kusů. Vytěž je sám; poznám rozdíl.',
+  'entities.quests.q_prof_intro.completion':
+    'Vidíš? Ruda v brašně a mozoly na rukou. Při cestách dál těž, kácej dřevo a sbírej byliny. Až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a nedaleký pracovní stůl. Ve všem tom čeká poctivé řemeslo, pokud o něj stojíš.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Kus rudy',
+  'game.talents.choicesTab': 'Volby',
+  'game.talents.readout.rowsSummary': 'Talenty: {head}, vybráno {picked}/{unlocked} řádků voleb.',
+  'game.talents.rowUnlockToast': 'Odemkla se nová volba talentu!',
+  'game.talents.rowUnlocks': 'Odemkne se na úrovni {level}',
+  'hudChrome.fct.absorbed': 'Pohlceno {amount}',
+  'hudChrome.fct.cheap': 'Levnější!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Odeslat o jeden {item} méně',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Odeslat o jeden {item} více',
 };

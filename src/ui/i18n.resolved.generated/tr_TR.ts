@@ -85,9 +85,9 @@ export const tr_TR: EnTranslations = {
       "title": "Yetenekler",
       "classTab": "Sınıf",
       "specTab": "Uzmanlık",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Seçimler",
+      "rowUnlockToast": "Yeni bir yetenek seçimi açıldı!",
+      "rowUnlocks": "{level}. seviyede açılır",
       "available": "Mevcut",
       "spent": "Harcanan",
       "pointSource": "{first}. seviyeden {cap}. seviyeye kadar her seviyede 1 yetenek puanı kazanırsın. Daha fazla puan için seviye atla.",
@@ -146,7 +146,7 @@ export const tr_TR: EnTranslations = {
         "noTree": "Sınıfının henüz bir yetenek ağacı yok.",
         "locked": "Henüz yetenekleri açmadın — {level}. seviyede başlarlar.",
         "noSpec": "uzmanlık yok",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Yetenekler: {head}, {picked}/{unlocked} seçim satırı seçildi.",
         "summary": "Yetenekler: {head} — {spent}/{total} puan harcandı ({breakdown}).",
         "breakdownClass": "Sınıf {classPts}",
         "breakdownSpec": "Sınıf {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const tr_TR: EnTranslations = {
       "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "{amount} soğuruldu",
+      "cheap": "Daha ucuz!"
     },
     "emotes": {
       "wave": "El Salla",
@@ -1304,8 +1304,8 @@ export const tr_TR: EnTranslations = {
       "parcelsLabel": "Paketler",
       "parcelsHint": "Eklemek için çantandaki bir eşyaya tıkla.",
       "removeParcelAria": "{item} paketini mektuptan çıkar",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Bir eksik {item} gönder",
+      "parcelQtyIncreaseAria": "Bir fazla {item} gönder",
       "sendButton": "Mektubu Gönder",
       "postageNote": "Posta ücreti: {amount}. Kuzgun yaklaşık {seconds} saniye uçar.",
       "arrivedBanner": "Kuzgun kondu: {name} sana posta gönderdi.",
@@ -5648,8 +5648,8 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Zincirleme İyileştirme",
+        "description": "Dost bir hedefi büyük miktarda iyileştirir, ardından yakındaki en fazla 2 başka müttefike sıçrar ve her sıçrayışta %50 daha az iyileştirir. (Restorasyon imza yeteneği)"
       },
       "metamorphosis": {
         "name": "Metamorfoz",
@@ -5788,20 +5788,20 @@ export const tr_TR: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a yakındaki düşmanları cada segundo por {damage}. (savaşçı yeteneği)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Keskin Uluma",
+        "description": "15 m içindeki düşmanları 8 sn. boyunca %50 yavaşlatan bir haykırış. (Savaşçı yeteneği)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Fırtına Atışı",
+        "description": "Bir hedefi 3 sn. sersemletmek için silahını fırlat. (Savaşçı yeteneği)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Pervasız Yemin",
+        "description": "Tüm öfke üretimini %50 ve kritik vuruş şansını %20 artırır, 12 sn. sürer. (Savaşçı yeteneği)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Kızıl Sancak",
+        "description": "Sen ve yakındaki müttefikler 20 sn. boyunca %10 saldırı hızı ve %10 hasar kazanırsınız. (Savaşçı yeteneği)"
       },
       "blink": {
         "name": "Titreşim Adımı",
@@ -6145,7 +6145,7 @@ export const tr_TR: EnTranslations = {
         "name": "Yaşlı Greyjaw'un Dişi"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Cevher Parçası"
       },
       "weathered_ledger_page": {
         "name": "Yıpranmış Defter Sayfası"
@@ -7819,12 +7819,12 @@ export const tr_TR: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Her Ele Bir Zanaat",
+        "text": "Eastbrook’taki herkes kılıç dışında bir zanaatla uğraşır, {playerName}. Kasabanın çevresinde cevher damarları var; bir kazma salla ve bana 5 parça getir. Kendin çıkar; aradaki farkı anlarım.",
+        "completion": "Gördün mü? Çantanda cevher, ellerinde nasır. Yollarda ilerlerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosunu ve yakındaki çalışma tezgâhını unutma. İstersen bunların hepsinde dürüst bir zanaat seni bekliyor.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Cevher Parçası"
           }
         }
       },

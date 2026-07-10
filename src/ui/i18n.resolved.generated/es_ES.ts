@@ -146,7 +146,7 @@ export const es_ES: EnTranslations = {
         "noTree": "Tu clase aún no tiene árbol de talentos.",
         "locked": "Aún no has desbloqueado los talentos; comienzan en el nivel {level}.",
         "noSpec": "sin especialización",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Talentos: {head}, elegidas {picked}/{unlocked} filas de opciones.",
         "summary": "Talentos: {head} — {spent}/{total} puntos gastados ({breakdown}).",
         "breakdownClass": "Clase {classPts}",
         "breakdownSpec": "Clase {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const es_ES: EnTranslations = {
       "spiritHealerAlive": "El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Absorbido {amount}",
+      "cheap": "¡Coste reducido!"
     },
     "emotes": {
       "wave": "Saludar",
@@ -1304,8 +1304,8 @@ export const es_ES: EnTranslations = {
       "parcelsLabel": "Paquetes",
       "parcelsHint": "Haz clic en un objeto de tus bolsas para adjuntarlo.",
       "removeParcelAria": "Quitar {item} de la carta",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Enviar un {item} menos",
+      "parcelQtyIncreaseAria": "Enviar un {item} más",
       "sendButton": "Enviar carta",
       "postageNote": "Franqueo: {amount}. El cuervo vuela durante unos {seconds}s.",
       "arrivedBanner": "El cuervo ha aterrizado: correo de {name}.",
@@ -5648,8 +5648,8 @@ export const es_ES: EnTranslations = {
         "description": "Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Sanación en cadena",
+        "description": "Sana una gran cantidad a un objetivo amistoso y luego salta hasta 2 aliados cercanos adicionales, con un 50% menos de sanación en cada salto. (Habilidad distintiva de Restauración)"
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -5788,20 +5788,20 @@ export const es_ES: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a cercanos enemigos cada segundo por {damage}. (talento de guerrero)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Aullido cortante",
+        "description": "Un grito que ralentiza un 50% a los enemigos en un radio de 15 m durante 8 s. (Talento de guerrero)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Lanzamiento tormentoso",
+        "description": "Lanza tu arma para aturdir a un objetivo durante 3 s. (Talento de guerrero)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Voto temerario",
+        "description": "Aumenta un 50% toda la generación de ira y un 20% la probabilidad de golpe crítico durante 12 s. (Talento de guerrero)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Estandarte rojo",
+        "description": "Tú y los aliados cercanos obtenéis un 10% de velocidad de ataque y un 10% de daño durante 20 s. (Talento de guerrero)"
       },
       "blink": {
         "name": "Paso Fugaz",
@@ -6145,7 +6145,7 @@ export const es_ES: EnTranslations = {
         "name": "Colmillo del viejo Greyjaw"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Trozo de mena"
       },
       "weathered_ledger_page": {
         "name": "Página de libro mayor ajada"
@@ -7819,12 +7819,12 @@ export const es_ES: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Un oficio para cada mano",
+        "text": "Todos en Eastbrook tienen un oficio además de la espada, {playerName}. Hay vetas de mineral en los alrededores del pueblo, así que empuña un pico y tráeme 5 trozos. Extráelos tú mismo; sabré distinguirlos.",
+        "completion": "¿Ves? Mena en la bolsa y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos y, cuando vuelvas al pueblo, no olvides el tablón de Enfoque del pueblo junto al mercado ni el banco de trabajo cercano. Cada una de esas labores ofrece un oficio honrado, si lo quieres.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Trozo de mena"
           }
         }
       },

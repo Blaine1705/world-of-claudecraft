@@ -85,9 +85,9 @@ export const vi_VN: EnTranslations = {
       "title": "Thiên phú",
       "classTab": "Lớp",
       "specTab": "Chuyên môn",
-      "choicesTab": "Choices",
-      "rowUnlockToast": "New talent choice available!",
-      "rowUnlocks": "Unlocks at level {level}",
+      "choicesTab": "Lựa chọn",
+      "rowUnlockToast": "Đã mở khóa một lựa chọn tài năng mới!",
+      "rowUnlocks": "Mở khóa ở cấp {level}",
       "available": "Khả dụng",
       "spent": "Đã dùng",
       "pointSource": "Nhận 1 điểm tài năng mỗi cấp từ cấp {first} đến {cap}. Lên cấp để có thêm điểm.",
@@ -146,7 +146,7 @@ export const vi_VN: EnTranslations = {
         "noTree": "Lớp nhân vật của bạn chưa có cây thiên phú.",
         "locked": "Bạn chưa mở khóa thiên phú — chúng bắt đầu ở cấp {level}.",
         "noSpec": "chưa có chuyên môn",
-        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "rowsSummary": "Tài năng: {head}, đã chọn {picked}/{unlocked} hàng lựa chọn.",
         "summary": "Thiên phú: {head} — đã dùng {spent}/{total} điểm ({breakdown}).",
         "breakdownClass": "Lớp {classPts}",
         "breakdownSpec": "Lớp {classPts}, {spec} {specPts}",
@@ -164,8 +164,8 @@ export const vi_VN: EnTranslations = {
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống."
     },
     "fct": {
-      "absorbed": "Absorbed {amount}",
-      "cheap": "Cheap!"
+      "absorbed": "Đã hấp thụ {amount}",
+      "cheap": "Giảm chi phí!"
     },
     "emotes": {
       "wave": "Vẫy Tay",
@@ -1304,8 +1304,8 @@ export const vi_VN: EnTranslations = {
       "parcelsLabel": "Bưu Kiện",
       "parcelsHint": "Nhấp một vật phẩm trong túi để đính kèm.",
       "removeParcelAria": "Gỡ {item} khỏi lá thư",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Gửi bớt một {item}",
+      "parcelQtyIncreaseAria": "Gửi thêm một {item}",
       "sendButton": "Gửi thư",
       "postageNote": "Bưu phí: {amount}. Quạ thư bay mất khoảng {seconds} giây.",
       "arrivedBanner": "Quạ thư đã đáp xuống: thư từ {name}.",
@@ -5648,8 +5648,8 @@ export const vi_VN: EnTranslations = {
         "description": "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)"
       },
       "chain_heal": {
-        "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 40% less with each jump. (Restoration signature)"
+        "name": "Hồi Máu Chuỗi",
+        "description": "Hồi một lượng lớn máu cho mục tiêu đồng minh, rồi truyền sang tối đa 2 đồng minh khác ở gần. Mỗi lần truyền hồi ít hơn 50%. (Kỹ năng đặc trưng của Hồi phục)"
       },
       "metamorphosis": {
         "name": "Biến Hình",
@@ -5788,20 +5788,20 @@ export const vi_VN: EnTranslations = {
         "description": "Te convierte en una tormenta de acero que golpea a gần đó kẻ địch cada segundo por {damage}. (thiên phú chiến binh)"
       },
       "razor_howl": {
-        "name": "Razor Howl",
-        "description": "A shout that slows enemies within 15 yards by 50% for 8 sec. (Warrior talent)"
+        "name": "Tiếng Hú Sắc Lẻm",
+        "description": "Một tiếng hét làm chậm kẻ địch trong phạm vi 15 m đi 50% trong 8 giây. (Tài năng chiến binh)"
       },
       "stormthrow": {
-        "name": "Stormthrow",
-        "description": "Hurl your weapon to stun a target for 3 sec. (Warrior talent)"
+        "name": "Ném Bão",
+        "description": "Ném vũ khí để làm choáng mục tiêu trong 3 giây. (Tài năng chiến binh)"
       },
       "reckless_vow": {
-        "name": "Reckless Vow",
-        "description": "Increases all rage generation by 50% and critical strike chance by 20% for 12 sec. (Warrior talent)"
+        "name": "Lời Thề Liều Lĩnh",
+        "description": "Tăng 50% toàn bộ lượng nộ tạo ra và 20% tỉ lệ chí mạng trong 12 giây. (Tài năng chiến binh)"
       },
       "red_banner": {
-        "name": "Red Banner",
-        "description": "You and nearby allies gain 10% attack speed and 10% damage for 20 sec. (Warrior talent)"
+        "name": "Chiến Kỳ Đỏ",
+        "description": "Bạn và đồng minh ở gần nhận 10% tốc độ đánh và 10% sát thương trong 20 giây. (Tài năng chiến binh)"
       },
       "blink": {
         "name": "Bước Chớp",
@@ -6145,7 +6145,7 @@ export const vi_VN: EnTranslations = {
         "name": "Nanh Của Greyjaw Già"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Mẩu Quặng"
       },
       "weathered_ledger_page": {
         "name": "Trang Sổ Cái Phong Sương"
@@ -7819,12 +7819,12 @@ export const vi_VN: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Một Nghề Cho Mỗi Bàn Tay",
+        "text": "Ai ở Eastbrook cũng làm một nghề bên cạnh việc cầm kiếm, {playerName}. Những mạch quặng nằm rải rác quanh thị trấn, vậy hãy cầm cuốc và mang về cho tôi 5 mẩu. Tự tay khai thác chúng; tôi sẽ nhận ra sự khác biệt.",
+        "completion": "Thấy chưa? Quặng trong túi và vết chai trên tay. Hãy tiếp tục đào quặng, đốn gỗ và hái thảo dược trên đường đi. Khi trở lại thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn gần chợ và bàn chế tác bên cạnh. Nếu muốn, bạn sẽ tìm thấy một nghề lương thiện trong tất cả những việc đó.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Mẩu Quặng"
           }
         }
       },

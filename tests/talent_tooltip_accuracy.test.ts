@@ -321,4 +321,21 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(survival).toContain('15%');
     expect(survival).toContain('physical ability damage');
   });
+
+  it('localized thorns procs identify the ward and reflected melee strike trigger', async () => {
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    const entry = effects.find(
+      (candidate) =>
+        candidate.cls === 'shaman' && candidate.id.endsWith('sha_r5_improved_lightning_shield'),
+    );
+    if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
+
+    const rendered = entry.render();
+    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_shield', field: 'name' }));
+    expect(rendered).toContain(
+      'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
+    );
+    setLanguage('en');
+  });
 });

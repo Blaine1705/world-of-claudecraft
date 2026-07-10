@@ -6764,4 +6764,34 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Du lämnar kön till Skydda Yumi.',
   'yumi.queue.teamLeave': 'Ditt lag lämnar kön till Skydda Yumi.',
   'yumi.respawn.title': 'NEDSLAGEN!',
+  'entities.abilities.chain_heal.name': 'Kedjeläkning',
+  'entities.abilities.chain_heal.description':
+    'Helar ett vänligt mål kraftigt och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp helar 50% mindre. (Restaureringens signaturförmåga)',
+  'entities.abilities.razor_howl.name': 'Rakbladsvrål',
+  'entities.abilities.razor_howl.description':
+    'Ett stridsrop som saktar ned fiender inom 15 m med 50% i 8 sek. (Krigartalang)',
+  'entities.abilities.stormthrow.name': 'Stormkast',
+  'entities.abilities.stormthrow.description':
+    'Kasta ditt vapen för att bedöva ett mål i 3 sek. (Krigartalang)',
+  'entities.abilities.reckless_vow.name': 'Hänsynslöst löfte',
+  'entities.abilities.reckless_vow.description':
+    'Ökar all generering av raseri med 50% och chansen till kritiska träffar med 20% i 12 sek. (Krigartalang)',
+  'entities.abilities.red_banner.name': 'Rött baner',
+  'entities.abilities.red_banner.description':
+    'Du och allierade i närheten får 10% attackhastighet och 10% skada i 20 sek. (Krigartalang)',
+  'entities.items.chunk_of_ore.name': 'Malmbit',
+  'entities.quests.q_prof_intro.title': 'Ett yrke för varje hand',
+  'entities.quests.q_prof_intro.text':
+    'Alla i Eastbrook har ett yrke vid sidan av svärdet, {playerName}. Malmådror ligger spridda runt staden, så ta en hacka och hämta 5 bitar åt mig. Bryt dem själv; jag märker skillnaden.',
+  'entities.quests.q_prof_intro.completion':
+    'Ser du? Malm i väskan och valkar på händerna. Fortsätt bryta malm, hugga timmer och plocka örter längs vägarna. När du återvänder till staden, kom ihåg tavlan för Stadsfokus vid marknaden och arbetsbänken intill. I allt detta väntar ett hederligt yrke, om du vill ha det.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Malmbit',
+  'game.talents.readout.rowsSummary': 'Talanger: {head}, {picked}/{unlocked} valrader valda.',
+  'hudChrome.fct.absorbed': '{amount} absorberat',
+  'hudChrome.fct.cheap': 'Billigare!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Skicka en {item} mindre',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Skicka en {item} mer',
+  'game.talents.choicesTab': 'Val',
+  'game.talents.rowUnlockToast': 'Ett nytt talangval har låsts upp!',
+  'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
 };

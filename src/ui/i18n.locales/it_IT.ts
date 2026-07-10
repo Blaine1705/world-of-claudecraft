@@ -6883,4 +6883,32 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Lasci la coda di Proteggi Yumi.',
   'yumi.queue.teamLeave': 'La tua squadra lascia la coda di Proteggi Yumi.',
   'yumi.respawn.title': 'ABBATTUTO!',
+  'entities.abilities.chain_heal.name': 'Cura concatenata',
+  'entities.abilities.chain_heal.description':
+    'Cura notevolmente un bersaglio alleato, poi rimbalza su un massimo di altri 2 alleati vicini, con il 50% di cure in meno a ogni rimbalzo. (Abilità distintiva di Rigenerazione)',
+  'entities.abilities.razor_howl.name': 'Ululato tagliente',
+  'entities.abilities.razor_howl.description':
+    'Un grido che rallenta del 50% i nemici entro 15 m per 8 s. (Talento del guerriero)',
+  'entities.abilities.stormthrow.name': 'Lancio tempestoso',
+  'entities.abilities.stormthrow.description':
+    'Scaglia la tua arma per stordire un bersaglio per 3 s. (Talento del guerriero)',
+  'entities.abilities.reckless_vow.name': 'Voto spericolato',
+  'entities.abilities.reckless_vow.description':
+    'Aumenta del 50% tutta la generazione di rabbia e del 20% la probabilità di colpo critico per 12 s. (Talento del guerriero)',
+  'entities.abilities.red_banner.name': 'Stendardo rosso',
+  'entities.abilities.red_banner.description':
+    'Tu e gli alleati vicini ottenete il 10% di velocità d’attacco e il 10% di danni per 20 s. (Talento del guerriero)',
+  'entities.items.chunk_of_ore.name': 'Pezzo di minerale',
+  'entities.quests.q_prof_intro.title': 'Un mestiere per ogni mano',
+  'entities.quests.q_prof_intro.text':
+    'Ogni anima di Eastbrook pratica un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale sparsi attorno alla città, quindi impugna un piccone e portami 5 pezzi. Estraili di persona; saprò riconoscere la differenza.',
+  'entities.quests.q_prof_intro.completion':
+    'Vedi? Minerale nella borsa e calli sulle mani. Continua a estrarre, tagliare legna e raccogliere erbe lungo le strade e, quando torni in città, ricorda il tabellone delle Priorità della città vicino al mercato e il banco da lavoro lì accanto. In tutto questo ti aspetta un mestiere onesto, se lo desideri.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Pezzo di minerale',
+  'game.talents.readout.rowsSummary':
+    'Talenti: {head}, selezionate {picked}/{unlocked} righe di scelta.',
+  'hudChrome.fct.absorbed': 'Assorbito {amount}',
+  'hudChrome.fct.cheap': 'Costo ridotto!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Invia un {item} in meno',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Invia un {item} in più',
 };

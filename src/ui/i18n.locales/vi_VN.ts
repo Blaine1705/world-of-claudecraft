@@ -6788,4 +6788,35 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Bạn rời hàng chờ Bảo Vệ Yumi.',
   'yumi.queue.teamLeave': 'Đội của bạn rời hàng chờ Bảo Vệ Yumi.',
   'yumi.respawn.title': 'GỤC NGÃ!',
+  'entities.abilities.chain_heal.name': 'Hồi Máu Chuỗi',
+  'entities.abilities.chain_heal.description':
+    'Hồi một lượng lớn máu cho mục tiêu đồng minh, rồi truyền sang tối đa 2 đồng minh khác ở gần. Mỗi lần truyền hồi ít hơn 50%. (Kỹ năng đặc trưng của Hồi phục)',
+  'entities.abilities.razor_howl.name': 'Tiếng Hú Sắc Lẻm',
+  'entities.abilities.razor_howl.description':
+    'Một tiếng hét làm chậm kẻ địch trong phạm vi 15 m đi 50% trong 8 giây. (Tài năng chiến binh)',
+  'entities.abilities.stormthrow.name': 'Ném Bão',
+  'entities.abilities.stormthrow.description':
+    'Ném vũ khí để làm choáng mục tiêu trong 3 giây. (Tài năng chiến binh)',
+  'entities.abilities.reckless_vow.name': 'Lời Thề Liều Lĩnh',
+  'entities.abilities.reckless_vow.description':
+    'Tăng 50% toàn bộ lượng nộ tạo ra và 20% tỉ lệ chí mạng trong 12 giây. (Tài năng chiến binh)',
+  'entities.abilities.red_banner.name': 'Chiến Kỳ Đỏ',
+  'entities.abilities.red_banner.description':
+    'Bạn và đồng minh ở gần nhận 10% tốc độ đánh và 10% sát thương trong 20 giây. (Tài năng chiến binh)',
+  'entities.items.chunk_of_ore.name': 'Mẩu Quặng',
+  'entities.quests.q_prof_intro.title': 'Một Nghề Cho Mỗi Bàn Tay',
+  'entities.quests.q_prof_intro.text':
+    'Ai ở Eastbrook cũng làm một nghề bên cạnh việc cầm kiếm, {playerName}. Những mạch quặng nằm rải rác quanh thị trấn, vậy hãy cầm cuốc và mang về cho tôi 5 mẩu. Tự tay khai thác chúng; tôi sẽ nhận ra sự khác biệt.',
+  'entities.quests.q_prof_intro.completion':
+    'Thấy chưa? Quặng trong túi và vết chai trên tay. Hãy tiếp tục đào quặng, đốn gỗ và hái thảo dược trên đường đi. Khi trở lại thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn gần chợ và bàn chế tác bên cạnh. Nếu muốn, bạn sẽ tìm thấy một nghề lương thiện trong tất cả những việc đó.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Mẩu Quặng',
+  'game.talents.readout.rowsSummary':
+    'Tài năng: {head}, đã chọn {picked}/{unlocked} hàng lựa chọn.',
+  'hudChrome.fct.absorbed': 'Đã hấp thụ {amount}',
+  'hudChrome.fct.cheap': 'Giảm chi phí!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Gửi bớt một {item}',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Gửi thêm một {item}',
+  'game.talents.choicesTab': 'Lựa chọn',
+  'game.talents.rowUnlockToast': 'Đã mở khóa một lựa chọn tài năng mới!',
+  'game.talents.rowUnlocks': 'Mở khóa ở cấp {level}',
 };

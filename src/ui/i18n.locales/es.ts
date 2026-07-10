@@ -6898,4 +6898,32 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Sales de la cola de Protege a Yumi.',
   'yumi.queue.teamLeave': 'Tu equipo sale de la cola de Protege a Yumi.',
   'yumi.respawn.title': '¡ABATIDO!',
+  'entities.abilities.chain_heal.name': 'Sanación en cadena',
+  'entities.abilities.chain_heal.description':
+    'Sana una gran cantidad a un objetivo amistoso y luego salta hasta 2 aliados cercanos adicionales, con un 50% menos de sanación en cada salto. (Habilidad distintiva de Restauración)',
+  'entities.abilities.razor_howl.name': 'Aullido cortante',
+  'entities.abilities.razor_howl.description':
+    'Un grito que ralentiza un 50% a los enemigos en un radio de 15 m durante 8 s. (Talento de guerrero)',
+  'entities.abilities.stormthrow.name': 'Lanzamiento tormentoso',
+  'entities.abilities.stormthrow.description':
+    'Lanza tu arma para aturdir a un objetivo durante 3 s. (Talento de guerrero)',
+  'entities.abilities.reckless_vow.name': 'Voto temerario',
+  'entities.abilities.reckless_vow.description':
+    'Aumenta un 50% toda la generación de ira y un 20% la probabilidad de golpe crítico durante 12 s. (Talento de guerrero)',
+  'entities.abilities.red_banner.name': 'Estandarte rojo',
+  'entities.abilities.red_banner.description':
+    'Tú y los aliados cercanos obtenéis un 10% de velocidad de ataque y un 10% de daño durante 20 s. (Talento de guerrero)',
+  'entities.items.chunk_of_ore.name': 'Trozo de mena',
+  'entities.quests.q_prof_intro.title': 'Un oficio para cada mano',
+  'entities.quests.q_prof_intro.text':
+    'Todos en Eastbrook tienen un oficio además de la espada, {playerName}. Hay vetas de mineral en los alrededores del pueblo, así que empuña un pico y tráeme 5 trozos. Extráelos tú mismo; sabré distinguirlos.',
+  'entities.quests.q_prof_intro.completion':
+    '¿Ves? Mena en la bolsa y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos y, cuando vuelvas al pueblo, no olvides el tablón de Enfoque del pueblo junto al mercado ni el banco de trabajo cercano. Cada una de esas labores ofrece un oficio honrado, si lo quieres.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Trozo de mena',
+  'game.talents.readout.rowsSummary':
+    'Talentos: {head}, elegidas {picked}/{unlocked} filas de opciones.',
+  'hudChrome.fct.absorbed': 'Absorbido {amount}',
+  'hudChrome.fct.cheap': '¡Coste reducido!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Enviar un {item} menos',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Enviar un {item} más',
 };

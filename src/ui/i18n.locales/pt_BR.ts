@@ -6855,4 +6855,32 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Você sai da fila do Proteja a Yumi.',
   'yumi.queue.teamLeave': 'Sua equipe sai da fila do Proteja a Yumi.',
   'yumi.respawn.title': 'ABATIDO!',
+  'entities.abilities.chain_heal.name': 'Cura Encadeada',
+  'entities.abilities.chain_heal.description':
+    'Cura bastante um alvo aliado e depois salta para até 2 aliados próximos adicionais, curando 50% menos a cada salto. (Habilidade exclusiva de Restauração)',
+  'entities.abilities.razor_howl.name': 'Uivo Cortante',
+  'entities.abilities.razor_howl.description':
+    'Um grito que reduz em 50% a velocidade dos inimigos em um raio de 15 m por 8 s. (Talento de guerreiro)',
+  'entities.abilities.stormthrow.name': 'Arremesso da Tempestade',
+  'entities.abilities.stormthrow.description':
+    'Arremessa sua arma para atordoar um alvo por 3 s. (Talento de guerreiro)',
+  'entities.abilities.reckless_vow.name': 'Juramento Imprudente',
+  'entities.abilities.reckless_vow.description':
+    'Aumenta em 50% toda a geração de raiva e em 20% a chance de acerto crítico por 12 s. (Talento de guerreiro)',
+  'entities.abilities.red_banner.name': 'Estandarte Vermelho',
+  'entities.abilities.red_banner.description':
+    'Você e os aliados próximos recebem 10% de velocidade de ataque e 10% de dano por 20 s. (Talento de guerreiro)',
+  'entities.items.chunk_of_ore.name': 'Pedaço de Minério',
+  'entities.quests.q_prof_intro.title': 'Um Ofício para Cada Mão',
+  'entities.quests.q_prof_intro.text':
+    'Toda alma em Eastbrook pratica um ofício além da espada, {playerName}. Há veios de minério espalhados pela cidade, então pegue uma picareta e traga 5 pedaços para mim. Minere você mesmo; eu saberei a diferença.',
+  'entities.quests.q_prof_intro.completion':
+    'Viu só? Minério na bolsa e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, lembre-se do quadro de Foco da Cidade perto do mercado e da bancada de trabalho ao lado. Há um ofício honesto esperando em tudo isso, se você quiser.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Pedaço de Minério',
+  'game.talents.readout.rowsSummary':
+    'Talentos: {head}, escolhidas {picked}/{unlocked} linhas de opções.',
+  'hudChrome.fct.absorbed': '{amount} absorvido',
+  'hudChrome.fct.cheap': 'Custo reduzido!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Enviar um {item} a menos',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Enviar um {item} a mais',
 };

@@ -6747,4 +6747,34 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Du forlader Beskyt Yumi-køen.',
   'yumi.queue.teamLeave': 'Dit hold forlader Beskyt Yumi-køen.',
   'yumi.respawn.title': 'SLÅET NED!',
+  'entities.abilities.chain_heal.name': 'Kædeheling',
+  'entities.abilities.chain_heal.description':
+    'Helbreder et venligt mål kraftigt og springer derefter til op til 2 yderligere allierede i nærheden. Hvert spring helbreder 50% mindre. (Restaurerings signaturfærdighed)',
+  'entities.abilities.razor_howl.name': 'Skarpt hyl',
+  'entities.abilities.razor_howl.description':
+    'Et råb, der sænker fjender inden for 15 m med 50% i 8 sek. (Kriger-talent)',
+  'entities.abilities.stormthrow.name': 'Stormkast',
+  'entities.abilities.stormthrow.description':
+    'Kast dit våben for at bedøve et mål i 3 sek. (Kriger-talent)',
+  'entities.abilities.reckless_vow.name': 'Dumdristigt løfte',
+  'entities.abilities.reckless_vow.description':
+    'Øger al generering af raseri med 50% og chancen for kritiske træffere med 20% i 12 sek. (Kriger-talent)',
+  'entities.abilities.red_banner.name': 'Rødt banner',
+  'entities.abilities.red_banner.description':
+    'Du og allierede i nærheden får 10% angrebshastighed og 10% skade i 20 sek. (Kriger-talent)',
+  'entities.items.chunk_of_ore.name': 'Stykke malm',
+  'entities.quests.q_prof_intro.title': 'Et håndværk til hver hånd',
+  'entities.quests.q_prof_intro.text':
+    'Alle i Eastbrook har et håndværk ved siden af sværdet, {playerName}. Der ligger malmårer spredt rundt om byen, så tag en hakke og hent 5 stykker til mig. Bryd dem selv; jeg kan se forskellen.',
+  'entities.quests.q_prof_intro.completion':
+    'Kan du se det? Malm i tasken og hård hud på hænderne. Fortsæt med at bryde malm, hugge træ og samle urter langs vejene. Når du vender tilbage til byen, så husk tavlen for Byfokus ved markedet og arbejdsbænken ved siden af. I alt dette venter et ærligt håndværk, hvis du vil have det.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Stykke malm',
+  'game.talents.readout.rowsSummary': 'Talenter: {head}, {picked}/{unlocked} valgrupper valgt.',
+  'hudChrome.fct.absorbed': '{amount} absorberet',
+  'hudChrome.fct.cheap': 'Billigere!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Send én {item} mindre',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Send én {item} mere',
+  'game.talents.choicesTab': 'Valg',
+  'game.talents.rowUnlockToast': 'Et nyt talentvalg er låst op!',
+  'game.talents.rowUnlocks': 'Låses op på niveau {level}',
 };

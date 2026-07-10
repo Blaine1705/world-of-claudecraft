@@ -6802,4 +6802,34 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Opuszczasz kolejkę Ochrony Yumi.',
   'yumi.queue.teamLeave': 'Twoja drużyna opuszcza kolejkę Ochrony Yumi.',
   'yumi.respawn.title': 'POWALONY!',
+  'entities.abilities.chain_heal.name': 'Łańcuchowe leczenie',
+  'entities.abilities.chain_heal.description':
+    'Leczy sojuszniczy cel za dużą wartość, a następnie przeskakuje na maksymalnie 2 dodatkowych pobliskich sojuszników. Każdy przeskok leczy o 50% mniej. (Umiejętność specjalna Odnowy)',
+  'entities.abilities.razor_howl.name': 'Tnący ryk',
+  'entities.abilities.razor_howl.description':
+    'Okrzyk, który spowalnia wrogów w promieniu 15 m o 50% na 8 sek. (Talent wojownika)',
+  'entities.abilities.stormthrow.name': 'Burzowy rzut',
+  'entities.abilities.stormthrow.description':
+    'Rzuć bronią, aby ogłuszyć cel na 3 sek. (Talent wojownika)',
+  'entities.abilities.reckless_vow.name': 'Lekkomyślna przysięga',
+  'entities.abilities.reckless_vow.description':
+    'Zwiększa całe generowanie szału o 50% i szansę na trafienie krytyczne o 20% na 12 sek. (Talent wojownika)',
+  'entities.abilities.red_banner.name': 'Czerwony sztandar',
+  'entities.abilities.red_banner.description':
+    'Ty i pobliscy sojusznicy zyskujecie 10% szybkości ataku i 10% obrażeń na 20 sek. (Talent wojownika)',
+  'entities.items.chunk_of_ore.name': 'Bryła rudy',
+  'entities.quests.q_prof_intro.title': 'Fach dla każdej dłoni',
+  'entities.quests.q_prof_intro.text':
+    'Każdy w Eastbrook poza władaniem mieczem zna jakiś fach, {playerName}. Wokół miasta rozsiane są żyły rudy, więc chwyć kilof i przynieś mi 5 brył. Wydobądź je samodzielnie; poznam różnicę.',
+  'entities.quests.q_prof_intro.completion':
+    'Widzisz? Ruda w torbie i odciski na dłoniach. W drodze dalej wydobywaj rudę, ścinaj drewno i zbieraj zioła. Po powrocie do miasta pamiętaj o tablicy Priorytetów miasta przy rynku i pobliskim warsztacie. W każdej z tych prac czeka uczciwy fach, jeśli go zechcesz.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Bryła rudy',
+  'game.talents.readout.rowsSummary': 'Talenty: {head}, wybrano {picked}/{unlocked} rzędów wyboru.',
+  'hudChrome.fct.absorbed': 'Pochłonięto {amount}',
+  'hudChrome.fct.cheap': 'Taniej!',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Wyślij o jeden {item} mniej',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Wyślij o jeden {item} więcej',
+  'game.talents.choicesTab': 'Wybory',
+  'game.talents.rowUnlockToast': 'Odblokowano nowy wybór talentu!',
+  'game.talents.rowUnlocks': 'Odblokowuje się na poziomie {level}',
 };
