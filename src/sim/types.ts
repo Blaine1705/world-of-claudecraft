@@ -754,6 +754,11 @@ export interface MobTemplate {
   // who damaged it (gated to once per day per boss). The spawn schedule + location
   // live in src/sim/world_boss.ts; the loot roll runs through rollWorldBossLoot.
   worldBoss?: boolean;
+  // Suppresses the per-mechanic combat-log barks ("<Name> unleashes <Mechanic>!"
+  // and "<Name> becomes enraged!") for a mob whose only voice should be its
+  // periodic zone-wide battle cry (a world boss). The mechanics still fire, with
+  // their spellfx and damage: only the noisy log line is silenced.
+  quietMechanics?: boolean;
   // Elite scaling, classic-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
   // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP

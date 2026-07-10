@@ -3258,8 +3258,8 @@ export class Hud {
     document.getElementById('ui') as HTMLElement,
     (x, y, z) => this.renderer.worldToScreen(x, y, z),
     getUiScale,
-    // Tier the pool cap / TTL / drop-non-crit from the STATIC preset (data-fx-level),
-    // never the governor. spawn() reads this per event.
+    // Tier the pool cap / TTL from the STATIC preset (data-fx-level), never the
+    // governor. spawn() reads this per event.
     { getFxTier: () => this.fxTier() },
   );
   // The player frame is the FIRST instance of the unit_frame family. It owns
