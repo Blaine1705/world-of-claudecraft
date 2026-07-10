@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 659,
-      "state": "ca815ce2",
+      "state": "573bba04",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,6 +49,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -122,7 +123,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 659,
-      "state": "dfd626f3",
+      "state": "f661acd9",
       "events": "fce9a281",
       "rng": {
         "draws": 0,
@@ -155,6 +156,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -241,7 +243,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 667,
-      "state": "f2aa1acc",
+      "state": "0e888e82",
       "events": "c90d8bb2",
       "rng": {
         "draws": 40,
@@ -278,6 +280,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -365,7 +368,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 667,
-      "state": "5654bc19",
+      "state": "e5ddbc7f",
       "events": "8eaf13bb",
       "rng": {
         "draws": 40,
@@ -405,6 +408,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -484,7 +488,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 667,
-      "state": "a5a03dd1",
+      "state": "8d27c057",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -524,6 +528,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

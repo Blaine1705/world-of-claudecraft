@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 667,
-      "state": "63b97dce",
+      "state": "a39af814",
       "events": "b8f9c56b",
       "rng": {
         "draws": 6,
@@ -66,6 +66,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -110,6 +111,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -154,6 +156,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -198,6 +201,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "training_mace"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -242,6 +246,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -759,7 +764,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 667,
-      "state": "ed6c1741",
+      "state": "1cba846b",
       "events": "5e43dc2c",
       "rng": {
         "draws": 6,
@@ -791,6 +796,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -835,6 +841,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -881,6 +888,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -925,6 +933,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "training_mace"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -969,6 +978,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1504,7 +1514,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 667,
-      "state": "2d166881",
+      "state": "3014e7ab",
       "events": "3c2e167d",
       "rng": {
         "draws": 10,
@@ -1515,7 +1525,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 667,
-      "state": "d6ce489f",
+      "state": "f35d6c71",
       "events": "3c2e167d",
       "rng": {
         "draws": 10,
@@ -1547,6 +1557,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1591,6 +1602,7 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1637,6 +1649,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "gnarled_staff"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1681,6 +1694,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "training_mace"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1725,6 +1739,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "equipmentInstances": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
