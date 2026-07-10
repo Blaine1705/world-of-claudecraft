@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------
 
 import type { PlayerClass } from '../types';
+import { bridgedRowTrees } from './choice_row_tree_bridge';
 import {
   accumulate,
   computeTalentModifiers,
@@ -130,6 +131,32 @@ export function sanitizeRowPicks(
   return clean;
 }
 
+/** Double-apply guard. The OLD model's saved rows (alloc.rows, folded inside
+ *  computeTalentModifiers via CHOICE_ROWS) and the NEW model's rowPicks now
+ *  describe the SAME options for every bridged class, so folding both would
+ *  count one option twice (or stack two options in one row). Per row, the new
+ *  model wins: a row with a rowPick has its alloc.rows entry dropped; a row
+ *  without one keeps honoring the old save (the convention the warrior
+ *  overhaul shipped: legacy saved rows keep applying until re-picked, pinned
+ *  by the old-model Sim suites). Returns a fresh allocation, never mutates. */
+function withSupersededRowsDropped(
+  alloc: TalentAllocation,
+  tree: RowTree,
+  picks: RowPicks,
+): TalentAllocation {
+  const saved: Record<string, unknown> = alloc.rows ?? {};
+  const savedLevels = Object.keys(saved);
+  if (savedLevels.length === 0 || picks.every((p) => !p)) return alloc;
+  const rows: Record<string, unknown> = {};
+  for (const rawLevel of savedLevels) {
+    const level = Number(rawLevel);
+    const rowIndex = tree.findIndex((row) => row.level === level);
+    if (rowIndex >= 0 && picks[rowIndex]) continue; // superseded by the new pick
+    rows[rawLevel] = saved[rawLevel];
+  }
+  return { spec: alloc.spec ?? null, rows };
+}
+
 /** The full bake used everywhere a player's REAL build is resolved: the point
  *  tree's modifiers plus the choice-row picks folded on top, into one flat
  *  struct. (Fiesta's standardized bouts deliberately skip the row fold.) */
@@ -141,8 +168,9 @@ export function computeModifiersWithRows(
   // inside computeTalentModifiers); omitted callers get the max-level bake.
   level?: number,
 ): TalentModifiers {
-  const mods = computeTalentModifiers(cls, alloc, level);
   const tree = rowTreeFor(cls);
+  const effective = tree ? withSupersededRowsDropped(alloc, tree, picks) : alloc;
+  const mods = computeTalentModifiers(cls, effective, level);
   if (tree) accumulateRowPicks(mods, tree, picks);
   return mods;
 }
@@ -152,7 +180,11 @@ export function computeModifiersWithRows(
 // at import so a malformed tree fails loudly at boot rather than in play.
 // ---------------------------------------------------------------------------
 
+// Bridged trees first (every class's old-model rows converted 1:1, including
+// warrior_classic), then the authored trees override their bridged stand-ins
+// (the warrior keeps its hand-authored overhaul rows).
 export const ROW_TREES: Partial<Record<PlayerClass, RowTree>> = {
+  ...bridgedRowTrees(),
   warrior: WARRIOR_ROWS,
 };
 

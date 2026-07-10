@@ -25,6 +25,7 @@ import {
   exportBuild,
   importBuild,
   type SavedLoadout,
+  type SpecDef,
   type TalentAllocation,
   talentsFor,
   validateAllocation,
@@ -144,11 +145,20 @@ function signatureName(abilityId: string): string {
     : abilityId;
 }
 
-function specIconHtml(cls: PlayerClass, specId: string, fallbackIcon: string): string {
-  const url = specIconUrl(cls, specId);
-  return url
-    ? `<div class="ts-icon ts-icon-art" style="background-image:url(${url})" aria-hidden="true"></div>`
-    : `<div class="ts-icon">${esc(fallbackIcon)}</div>`;
+function specIconHtml(cls: PlayerClass, sp: SpecDef): string {
+  const url = specIconUrl(cls, sp.id);
+  if (url) {
+    return `<div class="ts-icon ts-icon-art" style="background-image:url(${url})" aria-hidden="true"></div>`;
+  }
+  // No authored spec art: render the spec's signature ability through the shared
+  // procedural icon pipeline (the same iconDataUrl the example abilities and the
+  // guide's spec cards use), so a shaman/mage/... card shows real icon art. The
+  // bare text glyph (sp.icon) survives only as the last resort for a signature
+  // id with no ability definition.
+  if (ABILITIES[sp.signature]) {
+    return `<div class="ts-icon ts-icon-art" style="background-image:url(${iconDataUrl('ability', sp.signature)})" aria-hidden="true"></div>`;
+  }
+  return `<div class="ts-icon">${esc(sp.icon)}</div>`;
 }
 
 export class TalentsWindow {
@@ -315,7 +325,7 @@ export class TalentsWindow {
       panel.setAttribute('aria-checked', String(selected));
       panel.setAttribute('aria-label', `${specName}, ${roleLabel(sp.role)}`);
       let html =
-        `<div class="ts-panel-head">${specIconHtml(cls, sp.id, sp.icon)}` +
+        `<div class="ts-panel-head">${specIconHtml(cls, sp)}` +
         `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(sp.role)}</div></div></div>` +
         `<div class="ts-det-desc">${esc(specDesc)}</div>`;
       if (info) {
