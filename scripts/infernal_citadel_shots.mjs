@@ -132,15 +132,22 @@ await page.evaluate(() => {
 await tick(45); // let the 1 Hz driver arm the orb
 await shoot('07_altar_orb_active', 0, 18, 0);
 
-// Touch it: the portcullis opens.
+// Touch it: the portcullis opens. Both transitions ride 1 Hz driver slots, so
+// poll rather than trust one fixed wait, and fail hard if they never land.
 await shoot('08_gate_opens', 0, 21.8, 0);
-await tick(25);
-const gate = await page.evaluate(() => {
-  const w = window.__game.world;
-  const inst = w.riftInstances.find((i) => i.partyKey !== null);
-  return { orbActive: inst.orbActive, gateOpen: inst.gateOpen };
-});
+let gate = { orbActive: false, gateOpen: false };
+for (let i = 0; i < 30 && (!gate.orbActive || !gate.gateOpen); i++) {
+  await tick(20);
+  gate = await page.evaluate(() => {
+    const w = window.__game.world;
+    const inst = w.riftInstances.find((i) => i.partyKey !== null);
+    return { orbActive: inst.orbActive, gateOpen: inst.gateOpen };
+  });
+}
 console.log(`gate state: ${JSON.stringify(gate)}`);
+if (!gate.orbActive || !gate.gateOpen) {
+  throw new Error(`orb/gate never opened: ${JSON.stringify(gate)}`);
+}
 
 await shoot('09_bone_chamber', -27, 54, 0);
 await shoot('10_hell_forge', 27, 52, 0);
@@ -166,16 +173,22 @@ await page.evaluate(() => {
   if (!boss) throw new Error('Azgorath is missing');
   w.dealDamage(w.player, boss, 1, false, 'physical', 'Dev Smite', 'hit');
 });
-await tick(45);
-const victory = await page.evaluate(() => {
-  const w = window.__game.world;
-  const inst = w.riftInstances.find((i) => i.partyKey !== null);
-  return {
-    bossDead: inst?.bossId != null ? w.entities.get(inst.bossId)?.dead : false,
-    exitId: inst?.exitId ?? null,
-    cacheId: inst?.cacheId ?? null,
-  };
-});
+// The rift driver that opens the way home runs at 1 Hz, so one fixed frame wait
+// can straddle its slot; poll until the exit and cache exist (or give up).
+let victory = { bossDead: false, exitId: null, cacheId: null };
+for (let i = 0; i < 30; i++) {
+  await tick(20);
+  victory = await page.evaluate(() => {
+    const w = window.__game.world;
+    const inst = w.riftInstances.find((i) => i.partyKey !== null);
+    return {
+      bossDead: inst?.bossId != null ? w.entities.get(inst.bossId)?.dead : false,
+      exitId: inst?.exitId ?? null,
+      cacheId: inst?.cacheId ?? null,
+    };
+  });
+  if (victory.bossDead && victory.exitId !== null && victory.cacheId !== null) break;
+}
 if (!victory.bossDead || victory.exitId === null || victory.cacheId === null) {
   throw new Error(`citadel victory did not complete: ${JSON.stringify(victory)}`);
 }

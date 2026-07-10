@@ -94,6 +94,9 @@ const R_FORGE = 1.3;
 const R_CAGE = 1.0;
 const R_BONES = 0.5;
 const R_FANG = 0.85;
+const R_STATUE = 0.75;
+const R_CAULDRON = 0.7;
+const R_THRONE = 0.83;
 
 /** A standing brazier: the map's ring of firelights. */
 const brazier = (x: number, z: number): AuthoredDecor => ({
@@ -136,6 +139,9 @@ export const INFERNAL_DECOR: readonly AuthoredDecor[] = [
   brazier(-22, 18),
   { key: 'obsidian_fang', x: -33, z: 8, yaw: 0.8, r: R_FANG },
   { key: 'obsidian_fang', x: -21, z: 13, yaw: 2.2, r: R_FANG },
+  // Hooded sentinels flank the processional, staring across the aisle.
+  { key: 'infernal_statue', x: -31.5, z: 2, yaw: Math.PI / 2, r: R_STATUE },
+  { key: 'infernal_statue', x: -22.5, z: 2, yaw: -Math.PI / 2, r: R_STATUE },
   // R4 Pentagram Rotunda: the sigil, ringed by five flames.
   { key: 'pentagram', x: ROTUNDA.x, z: ROTUNDA.z, yaw: 0, scale: 6.5 },
   { key: 'obsidian_fang', x: -33, z: 25, yaw: 1.1, r: R_FANG },
@@ -148,6 +154,8 @@ export const INFERNAL_DECOR: readonly AuthoredDecor[] = [
   { key: 'bone_pile', x: -32, z: 60, yaw: 0.3, r: R_BONES },
   { key: 'bone_pile', x: -22, z: 64, yaw: 1.9, r: R_BONES },
   { key: 'bone_pile', x: -27, z: 68, yaw: 3.0, r: R_BONES },
+  // A bone throne against the north wall faces the room: someone RULED this pit.
+  { key: 'bone_throne', x: -27, z: 71.5, yaw: Math.PI, r: R_THRONE },
   // R6 Great Temple: the long nave, the idol looming over the dais.
   brazier(-14, 34),
   brazier(14, 34),
@@ -164,6 +172,11 @@ export const INFERNAL_DECOR: readonly AuthoredDecor[] = [
   { key: 'demon_idol', x: 0, z: 93.5, yaw: Math.PI, r: R_IDOL },
   { key: 'obsidian_fang', x: -13, z: 58, yaw: 0.5, r: R_FANG },
   { key: 'obsidian_fang', x: 13, z: 74, yaw: 2.4, r: R_FANG },
+  // Two pairs of hooded sentinels watch the nave between the brazier lines.
+  { key: 'infernal_statue', x: -13, z: 42, yaw: Math.PI / 2, r: R_STATUE },
+  { key: 'infernal_statue', x: 13, z: 42, yaw: -Math.PI / 2, r: R_STATUE },
+  { key: 'infernal_statue', x: -13, z: 64, yaw: Math.PI / 2, r: R_STATUE },
+  { key: 'infernal_statue', x: 13, z: 64, yaw: -Math.PI / 2, r: R_STATUE },
   // R7 Hell Forge
   brazier(22, 50),
   brazier(32, 50),
@@ -171,6 +184,8 @@ export const INFERNAL_DECOR: readonly AuthoredDecor[] = [
   brazier(32, 74),
   { key: 'hell_forge', x: 30, z: 67, yaw: Math.PI, r: R_FORGE },
   { key: 'bone_pile', x: 22, z: 66, yaw: 1.2, r: R_BONES },
+  // A slag cauldron glowing with molten runoff between the forge and the door.
+  { key: 'slag_cauldron', x: 27, z: 58, yaw: 0.6, r: R_CAULDRON },
 ];
 
 /** Trash placements: (templateId, x, z). Kept inside their rooms and off every

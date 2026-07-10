@@ -24,6 +24,9 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
   hanging_cage: { url: '/models/props/hanging_cage.glb', height: 2.4 },
   bone_pile: { url: '/models/props/bone_pile.glb', height: 0.7 },
   obsidian_fang: { url: '/models/props/obsidian_fang.glb', height: 1.5 },
+  infernal_statue: { url: '/models/props/infernal_statue.glb', height: 2.6 },
+  slag_cauldron: { url: '/models/props/slag_cauldron.glb', height: 1.3 },
+  bone_throne: { url: '/models/props/bone_throne.glb', height: 2.2 },
 };
 
 /** The arcane flame the rune pylons already use, re-tinted for the citadel's
@@ -215,6 +218,8 @@ export function buildInfernalDecor(
       glow(d.x, d.z, torch.light, def.height * 0.8, 1.2);
     } else if (d.key === 'hell_forge') {
       glow(d.x, d.z, torch.light, 1.0, 2.0); // the maw glows from inside
+    } else if (d.key === 'slag_cauldron') {
+      glow(d.x, d.z, torch.light, def.height * 0.85, 1.4); // the molten surface
     } else if (d.key === 'obsidian_fang') {
       glow(d.x, d.z, torch.light, 0.2, 0.6); // lava veins
     }
