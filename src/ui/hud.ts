@@ -1,7 +1,12 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { Keybinds } from '../game/keybinds';
-import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
+import {
+  music,
+  musicZoneForLocation,
+  riftMusicZoneForTheme,
+  shouldResetMusicForDungeonEntry,
+} from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
@@ -6942,18 +6947,29 @@ export class Hud {
       // override inside Eastbrook Vale; the zone LABEL stays Eastbrook Vale,
       // the Sowfield is a poi, not a zone).
       const atSowfield = !inDungeon && isAtSowfield(p.pos.x, p.pos.z);
+      // A procedural Rift floor scores by its environment archetype (the
+      // RiftTheme the generator rolled for that floor), not the dungeon
+      // fallback. Each floor counts as its own instance entry so the crawl
+      // cue re-phrases from the top even when two floors roll the same theme.
+      const riftFloor = sim.riftFloor;
       const zone = atSowfield
         ? 'vale_cup'
-        : musicZoneForLocation(
-            currentZone.id,
-            currentZone.biome,
-            inHub,
-            inDungeon || inNythraxisArena,
-            instanceId,
-          );
-      const musicDungeonId = inDungeon || inNythraxisArena ? instanceId : null;
+        : riftFloor
+          ? riftMusicZoneForTheme(riftFloor.themeName)
+          : musicZoneForLocation(
+              currentZone.id,
+              currentZone.biome,
+              inHub,
+              inDungeon || inNythraxisArena,
+              instanceId,
+            );
+      const musicDungeonId = riftFloor
+        ? `rift:${riftFloor.instanceId}:${riftFloor.floorIndex}`
+        : inDungeon || inNythraxisArena
+          ? instanceId
+          : null;
       if (shouldResetMusicForDungeonEntry(this.lastMusicDungeonId, musicDungeonId)) {
-        music.resetForDungeonEntry(musicDungeonId);
+        music.resetForDungeonEntry(musicDungeonId, zone);
       }
       this.lastMusicDungeonId = musicDungeonId;
       music.update(zone, musicCombat);
