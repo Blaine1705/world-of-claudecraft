@@ -171,11 +171,14 @@ export function buildInfernalDecor(
   decor: readonly AuthoredDecor[],
   torch: { flame: number; light: number },
   glow: (x: number, z: number, color: number, y?: number, scale?: number) => void,
+  liftAt?: (x: number, z: number) => number,
 ): void {
   for (const d of decor) {
+    const y0 = liftAt?.(d.x, d.z) ?? 0;
     if (d.key === 'pentagram') {
       const sigil = buildPentagram(d.scale ?? 6, torch.flame);
-      sigil.position.set(d.x, 0, d.z);
+      sigil.position.set(d.x, y0 + 0.03, d.z); // keep the anti-z-fight hair
+
       group.add(sigil);
       // Five candle flames on the star's points.
       const vr = (d.scale ?? 6) * 0.86;
@@ -185,17 +188,17 @@ export function buildInfernalDecor(
         const fz = d.z + Math.sin(a) * vr;
         const flame = buildFlame(0.9, torch.flame);
         if (flame) {
-          flame.position.set(fx, 0, fz);
+          flame.position.set(fx, y0, fz);
           group.add(flame);
         }
-        glow(fx, fz, torch.light, 0.5, 0.7);
+        glow(fx, fz, torch.light, y0 + 0.5, 0.7);
       }
-      glow(d.x, d.z, torch.light, 0.06, 3.2);
+      glow(d.x, d.z, torch.light, y0 + 0.06, 3.2);
       continue;
     }
     if (d.key === 'rug') {
       const rug = buildRug(0x4a1015);
-      rug.position.set(d.x, rug.position.y, d.z);
+      rug.position.set(d.x, rug.position.y + y0, d.z);
       rug.rotation.y = d.yaw;
       group.add(rug);
       continue;
@@ -204,7 +207,7 @@ export function buildInfernalDecor(
     const gltf = def ? cache.get(def.url) : null;
     if (!def || !gltf) continue;
     const model = fitted(gltf, def.height * (d.scale ?? 1));
-    model.position.set(d.x, 0, d.z);
+    model.position.set(d.x, y0, d.z);
     model.rotation.y = d.yaw;
     group.add(model);
 
@@ -212,16 +215,16 @@ export function buildInfernalDecor(
       // Embers in the bowl (the bowl rim sits at ~0.75 of the model's height).
       const flame = buildFlame(0.7, torch.flame);
       if (flame) {
-        flame.position.set(d.x, def.height * 0.75, d.z);
+        flame.position.set(d.x, y0 + def.height * 0.75, d.z);
         group.add(flame);
       }
-      glow(d.x, d.z, torch.light, def.height * 0.8, 1.2);
+      glow(d.x, d.z, torch.light, y0 + def.height * 0.8, 1.2);
     } else if (d.key === 'hell_forge') {
-      glow(d.x, d.z, torch.light, 1.0, 2.0); // the maw glows from inside
+      glow(d.x, d.z, torch.light, y0 + 1.0, 2.0); // the maw glows from inside
     } else if (d.key === 'slag_cauldron') {
-      glow(d.x, d.z, torch.light, def.height * 0.85, 1.4); // the molten surface
+      glow(d.x, d.z, torch.light, y0 + def.height * 0.85, 1.4); // the molten surface
     } else if (d.key === 'obsidian_fang') {
-      glow(d.x, d.z, torch.light, 0.2, 0.6); // lava veins
+      glow(d.x, d.z, torch.light, y0 + 0.2, 0.6); // lava veins
     }
   }
 }

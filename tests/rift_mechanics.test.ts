@@ -209,6 +209,9 @@ describe('rift mechanics: switch-gate', () => {
   it('some floors have a gate + switch; the gate spawns closed', () => {
     let withGate = 0;
     for (let s = 1; s <= 220; s++) {
+      // The citadel's portcullis is orb-opened (no pressure plate); its own
+      // suite covers it, this scan describes procedural switch-gates only.
+      if (isSetPieceSeed(s)) continue;
       const fc = generateRiftFloor(s, 20, 0).floorCount;
       for (let fi = 0; fi < fc - 1; fi++) {
         const f = generateRiftFloor(s, 20, fi);

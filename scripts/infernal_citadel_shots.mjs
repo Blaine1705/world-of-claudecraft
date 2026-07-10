@@ -150,11 +150,36 @@ if (!gate.orbActive || !gate.gateOpen) {
 }
 
 await shoot('09_bone_chamber', -27, 54, 0);
-await shoot('10_hell_forge', 27, 52, 0);
-await shoot('11_great_temple', 0, 36, 0);
-// Stand in front of the pit lord and face him.
-await shoot('12_pitlord', 0, 70, 0);
-await shoot('13_demon_idol', 0, 86, 0);
+await shoot('10_stairhead_descent', 0, 33, 0);
+
+// Ride the Rift Descent down to the pit floor: walk onto it and wait for the
+// floor swap, then re-anchor instance-local coords on the new floor's entry.
+const descended = await page.evaluate(async () => {
+  const w = window.__game.world;
+  const inst = w.riftInstances.find((i) => i.partyKey !== null);
+  const descent = inst?.descentId != null ? w.entities.get(inst.descentId) : null;
+  if (!descent) return { ok: false, why: 'descent object missing' };
+  w.player.pos = { ...descent.pos };
+  w.player.prevPos = { ...descent.pos };
+  w.rebucket(w.player);
+  for (let i = 0; i < 200 && inst.floorIndex === 0; i++) {
+    await new Promise((r) => requestAnimationFrame(r));
+  }
+  if (inst.floorIndex !== 1) return { ok: false, why: 'floor swap never happened' };
+  // Floor 1 entry is (0, -26): origin = pos - entry.
+  window.__riftOrigin = { x: w.player.pos.x, z: w.player.pos.z + 26 };
+  return { ok: true, floorIndex: inst.floorIndex };
+});
+console.log(`descent: ${JSON.stringify(descended)}`);
+if (!descended.ok) throw new Error(`descent failed: ${descended.why}`);
+await tick(60); // let the pit floor's interior + props build
+
+await shoot('11_pit_landing', 0, -22, 0);
+await shoot('12_pit_nave', 0, 0, 0);
+await shoot('13_hell_forge', 25, 8, 0);
+// Down the last stairs: the arena drops away below the nave tier.
+await shoot('14_pit_arena', 0, 40, 0);
+await shoot('15_demon_idol', 0, 63, 0);
 
 const bossInfo = await page.evaluate(() => {
   const w = window.__game.world;
@@ -192,7 +217,7 @@ for (let i = 0; i < 30; i++) {
 if (!victory.bossDead || victory.exitId === null || victory.cacheId === null) {
   throw new Error(`citadel victory did not complete: ${JSON.stringify(victory)}`);
 }
-await shoot('14_victory_egress', 0, 80, 0);
+await shoot('16_victory_egress', 0, 50, 0);
 await page.evaluate(() => {
   const w = window.__game.world;
   const inst = w.riftInstances.find((i) => i.partyKey !== null);

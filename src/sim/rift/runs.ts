@@ -29,7 +29,7 @@ import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
-import { generateRiftFloor, riftPlatformLift } from './rift_gen';
+import { generateRiftFloor, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
 
@@ -818,11 +818,11 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         ctx.rebucket(p);
       }
     }
-    // Verticality: stand the player on the raised sanctum tier. This is a
-    // post-movement Y lift; updatePlayerMovement stripped the prior tick's lift
-    // first, so the kernel integrated jumps/gravity against the true flat floor.
-    // Zero when the floor has no platform.
-    p.pos.y += riftPlatformLift(floor.platform, p.pos.z - origin.z);
+    // Verticality: stand the player on the raised tier (procedural platform or
+    // authored per-room lift). This is a post-movement Y lift;
+    // updatePlayerMovement stripped the prior tick's lift first, so the kernel
+    // integrated jumps/gravity against the true flat floor. Zero on flat floors.
+    p.pos.y += riftLiftAt(floor, p.pos.x - origin.x, p.pos.z - origin.z);
     return;
   }
 
@@ -1243,7 +1243,7 @@ export function riftPlayerLift(ctx: SimContext, p: Entity): number {
   if (!inst) return 0;
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
-  return riftPlatformLift(floor.platform, p.pos.z - origin.z);
+  return riftLiftAt(floor, p.pos.x - origin.x, p.pos.z - origin.z);
 }
 
 /** Stand every rift MOB and OBJECT on the raised sanctum tier each tick (an absolute
@@ -1253,11 +1253,11 @@ export function liftRiftEntities(ctx: SimContext): void {
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
     const floor = floorForInstance(inst);
-    if (!floor.platform) continue;
+    if (!floor.platform && !floor.layout.rooms?.some((r) => (r.lift ?? 0) !== 0)) continue;
     const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
     const lift = (id: number): void => {
       const e = ctx.entities.get(id);
-      if (e) e.pos.y = DUNGEON_FLOOR_Y + riftPlatformLift(floor.platform, e.pos.z - origin.z);
+      if (e) e.pos.y = DUNGEON_FLOOR_Y + riftLiftAt(floor, e.pos.x - origin.x, e.pos.z - origin.z);
     };
     for (const id of inst.mobIds) lift(id);
     for (const id of inst.objectIds) lift(id);

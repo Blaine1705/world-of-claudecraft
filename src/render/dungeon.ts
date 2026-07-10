@@ -34,7 +34,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
-import { authoredWallSegments } from '../sim/rift/authored';
+import { authoredLiftAt, authoredWallSegments, doorRampHalf } from '../sim/rift/authored';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
@@ -730,12 +730,19 @@ export class DungeonInteriors {
       await ensureInfernalDecorAssets();
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
-      buildInfernalDecor(group, layout.decor ?? [], torch, (x, z, color, y, scale) =>
-        this.addInfernalLight(group, x, z, color, y, scale),
+      this.placeAuthoredRelief(group, layout);
+      const liftAt = (x: number, z: number): number =>
+        authoredLiftAt(layout.rooms ?? [], layout.doors ?? [], x, z);
+      buildInfernalDecor(
+        group,
+        layout.decor ?? [],
+        torch,
+        (x, z, color, y, scale) => this.addInfernalLight(group, x, z, color, y, scale),
+        liftAt,
       );
       this.placeDais(group, p, layout, variant, torch, daisRaised);
       if (opts?.hazards?.length) {
-        this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'lava');
+        this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'lava', liftAt);
       }
       if (layout.illusionWalls?.length) {
         this.placeIllusionWalls(group, layout.illusionWalls, variant);
@@ -854,6 +861,7 @@ export class DungeonInteriors {
     group: THREE.Group,
     hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
     style: 'blackwater' | 'lava' = 'blackwater',
+    liftAt?: (x: number, z: number) => number,
   ): void {
     // Rift lava reuses the delve blackwater overlay with a molten palette: the
     // sim damage model (tickRiftHazards) mirrors tickDelveBlackwater, so the
@@ -866,11 +874,12 @@ export class DungeonInteriors {
     for (const h of hazards) {
       const rx = h.rx ?? h.r;
       const rz = h.rz ?? h.r;
+      const y0 = liftAt?.(h.x, h.z) ?? 0;
       const pool = new THREE.Mesh(
         new THREE.CircleGeometry(1, 28)
           .rotateX(-Math.PI / 2)
           .scale(rx, 1, rz)
-          .translate(h.x, 0.12, h.z),
+          .translate(h.x, 0.12 + y0, h.z),
         new THREE.MeshBasicMaterial({
           color: pal.pool,
           transparent: true,
@@ -885,7 +894,7 @@ export class DungeonInteriors {
         new THREE.RingGeometry(0.82, 1, 32)
           .rotateX(-Math.PI / 2)
           .scale(rx, 1, rz)
-          .translate(h.x, 0.14, h.z),
+          .translate(h.x, 0.14 + y0, h.z),
         new THREE.MeshBasicMaterial({
           color: pal.rim,
           transparent: true,
@@ -902,7 +911,7 @@ export class DungeonInteriors {
         h.x,
         h.z,
         pal.glow,
-        style === 'lava' ? 0.55 : 0.3,
+        (style === 'lava' ? 0.55 : 0.3) + y0,
         Math.max(rx, rz) * 0.6,
       );
     }
@@ -968,6 +977,70 @@ export class DungeonInteriors {
       panel.castShadow = true;
       panel.receiveShadow = true;
       group.add(panel);
+    }
+  }
+
+  /** Solid risers under every lifted authored room, plus stair runs across each
+   * door that joins rooms of different lift. Box tops follow the same linear
+   * ramp authoredLiftAt gives the sim, so what you climb is what the sim
+   * stands you on (the sub-step mismatch is the platform stairs' own). */
+  private placeAuthoredRelief(group: THREE.Group, layout: DungeonLayout): void {
+    const rooms = layout.rooms ?? [];
+    const doors = layout.doors ?? [];
+    if (!rooms.some((r) => (r.lift ?? 0) !== 0)) return;
+    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
+    for (const r of rooms) {
+      const lift = r.lift ?? 0;
+      if (lift <= 0) continue;
+      // Top sits a hair below the tile tops so the slab never z-fights them.
+      const riser = new THREE.Mesh(
+        new THREE.BoxGeometry(r.x1 - r.x0 + 2, lift - 0.02, r.z1 - r.z0 + 2),
+        mat,
+      );
+      riser.position.set((r.x0 + r.x1) / 2, (lift - 0.02) / 2, (r.z0 + r.z1) / 2);
+      riser.receiveShadow = true;
+      group.add(riser);
+    }
+    for (const d of doors) {
+      const south = rooms.find((r) => r.z1 === d.z && d.x >= r.x0 && d.x <= r.x1);
+      const north = rooms.find((r) => r.z0 === d.z && d.x >= r.x0 && d.x <= r.x1);
+      if (south && north) {
+        const a = south.lift ?? 0;
+        const b = north.lift ?? 0;
+        if (a === b) continue;
+        const h = doorRampHalf(d.hd, b - a);
+        const width = d.hw * 2 + 1;
+        const steps = Math.max(4, Math.min(16, Math.round((2 * h) / 0.9)));
+        const depth = (2 * h) / steps;
+        for (let i = 0; i < steps; i++) {
+          const zMid = d.z - h + (i + 0.5) * depth;
+          const top = Math.max(0.05, a + ((b - a) * (i + 0.5)) / steps);
+          const step = new THREE.Mesh(new THREE.BoxGeometry(width, top, depth + 0.05), mat);
+          step.position.set(d.x, top / 2, zMid);
+          step.receiveShadow = true;
+          group.add(step);
+        }
+        continue;
+      }
+      const west = rooms.find((r) => r.x1 === d.x && d.z >= r.z0 && d.z <= r.z1);
+      const east = rooms.find((r) => r.x0 === d.x && d.z >= r.z0 && d.z <= r.z1);
+      if (west && east) {
+        const a = west.lift ?? 0;
+        const b = east.lift ?? 0;
+        if (a === b) continue;
+        const h = doorRampHalf(d.hw, b - a);
+        const width = d.hd * 2 + 1;
+        const steps = Math.max(4, Math.min(16, Math.round((2 * h) / 0.9)));
+        const depth = (2 * h) / steps;
+        for (let i = 0; i < steps; i++) {
+          const xMid = d.x - h + (i + 0.5) * depth;
+          const top = Math.max(0.05, a + ((b - a) * (i + 0.5)) / steps);
+          const step = new THREE.Mesh(new THREE.BoxGeometry(depth + 0.05, top, width), mat);
+          step.position.set(xMid, top / 2, d.z);
+          step.receiveShadow = true;
+          group.add(step);
+        }
+      }
     }
   }
 
@@ -1415,31 +1488,40 @@ export class DungeonInteriors {
   private placeAuthoredFloor(p: Placements, layout: DungeonLayout, variant: Variant): void {
     const rooms = layout.rooms ?? [];
     if (rooms.length === 0) return;
+    const doors = layout.doors ?? [];
     const quarter = Math.PI / 2;
     const inside = (x: number, z: number): boolean =>
       rooms.some((r) => x >= r.x0 - 1 && x <= r.x1 + 1 && z >= r.z0 - 1 && z <= r.z1 + 1);
+    // Per-room raised floors: a tile sits at its room's lift; a cell whose exact
+    // lift differs (a door ramp band) is left to the relief stairs instead.
+    const roomLift = (x: number, z: number): number =>
+      rooms.find((r) => x >= r.x0 - 1 && x <= r.x1 + 1 && z >= r.z0 - 1 && z <= r.z1 + 1)?.lift ??
+      0;
+    const inRampBand = (x: number, z: number): boolean =>
+      Math.abs(authoredLiftAt(rooms, doors, x, z) - roomLift(x, z)) > 0.01;
     const minX = Math.min(...rooms.map((r) => r.x0)) - 2;
     const maxX = Math.max(...rooms.map((r) => r.x1)) + 2;
     const minZ = Math.min(...rooms.map((r) => r.z0)) - 2;
     const maxZ = Math.max(...rooms.map((r) => r.z1)) + 2;
     for (let z = minZ; z <= maxZ; z += FLOOR_CELL) {
       for (let x = minX; x <= maxX; x += FLOOR_CELL) {
-        if (!inside(x, z)) continue;
+        if (!inside(x, z) || inRampBand(x, z)) continue;
+        const y = FLOOR_Y + roomLift(x, z);
         let kind = this.floorKind(variant, hash2(x * 1.31, z));
         if (kind === 'grate') kind = 'floor_tile_large'; // no pits in an authored floor
         if (kind === 'quad') {
           for (const dx of [-1, 1]) {
             for (const dz of [-1, 1]) {
-              if (!inside(x + dx, z + dz)) continue;
+              if (!inside(x + dx, z + dz) || inRampBand(x + dx, z + dz)) continue;
               const sub = this.floorQuadKind(variant, hash2(x + dx, z + dz));
               const rot = Math.floor(hash2(z + dz, x + dx) * 4) * quarter;
-              p.add(sub, x + dx, FLOOR_Y, z + dz, rot);
+              p.add(sub, x + dx, FLOOR_Y + roomLift(x + dx, z + dz), z + dz, rot);
             }
           }
           continue;
         }
         const rot = Math.floor(hash2(z, x) * 4) * quarter;
-        p.add(kind, x, FLOOR_Y, z, rot);
+        p.add(kind, x, y, z, rot);
       }
     }
   }

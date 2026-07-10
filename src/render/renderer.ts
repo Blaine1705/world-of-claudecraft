@@ -32,7 +32,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import { generateRiftFloor, riftPlatformLift } from '../sim/rift/rift_gen';
+import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
@@ -5206,7 +5206,7 @@ export class Renderer {
       if (inRift) {
         const rf = this.sim.riftFloor!;
         const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-        effGround += riftPlatformLift(floor.platform, az - rf.origin.z);
+        effGround += riftLiftAt(floor, ax - rf.origin.x, az - rf.origin.z);
       }
       if (e.kind === 'player' && e.onGround && !swimming && ay - effGround > AIRBORNE_EPS) {
         v.airborneHeurFrames++;
@@ -6122,7 +6122,14 @@ export class Renderer {
     cx = px + (cx - px) * ct;
     cy = eyeY + (cy - eyeY) * ct;
     cz = pz + (cz - pz) * ct;
-    const groundY = groundHeight(cx, cz, seed) + 0.6;
+    let groundY = groundHeight(cx, cz, seed) + 0.6;
+    // On a raised rift tier the flat ground clamp would let the camera sink
+    // into the riser: add the same lift the sim stands entities on.
+    const rfCam = this.sim.riftFloor;
+    if (rfCam && isRiftPos(cx)) {
+      const floor = generateRiftFloor(rfCam.seed, rfCam.baseLevel, rfCam.floorIndex, rfCam.upgrade);
+      groundY += riftLiftAt(floor, cx - rfCam.origin.x, cz - rfCam.origin.z);
+    }
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
     if (Math.abs(this.camera.fov - this.camOcclusion.fov) > 0.01) {
       this.camera.fov = this.camOcclusion.fov;

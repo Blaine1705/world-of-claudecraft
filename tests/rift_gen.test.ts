@@ -54,10 +54,10 @@ describe('rift generator: determinism', () => {
 
   it('floor count is stable and within bounds', () => {
     for (let s = 0; s < 300; s++) {
-      // The authored set-piece citadel is deliberately a single self-contained
-      // floor; the procedural bounds below only describe generated descents.
+      // The authored set-piece citadel is deliberately a fixed two-floor
+      // descent; the procedural bounds below only describe generated descents.
       if (isSetPieceSeed(s)) {
-        expect(riftFloorCount(s)).toBe(1);
+        expect(riftFloorCount(s)).toBe(2);
         continue;
       }
       const n = riftFloorCount(s);
