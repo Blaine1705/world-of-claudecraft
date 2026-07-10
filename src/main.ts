@@ -2172,7 +2172,7 @@ async function startGame(
 
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
-    if (zoneWarmup || renderer.isZonePreparedAt(player.pos.x, player.pos.z)) return;
+    if (zoneWarmup || renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
     const resumeInput = gameInputReady;

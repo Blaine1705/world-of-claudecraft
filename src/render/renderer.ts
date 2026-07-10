@@ -152,6 +152,7 @@ import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+import { ZONE_STREAM_RECHECK_DISTANCE, zonesWithinStreamingHorizon } from './zone_streaming';
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -1005,6 +1006,15 @@ export class Renderer {
   private envOutdoorIntensity = ENV_INTENSITY;
   private preparedZones = new Set<string>();
   private pendingZonePrepares = new Map<string, Promise<void>>();
+  // Static terrain/water/features just beyond the current zone are built in a
+  // single background lane when their rectangles enter the fog horizon. The
+  // queue is recomputed after meaningful camera travel, so teleports discard
+  // stale not-yet-started work instead of walking an old route first.
+  private visibleZonePrepareQueue: ZoneDef[] = [];
+  private visibleZonePrepareActive = false;
+  private visibleZoneCheckX = Number.NaN;
+  private visibleZoneCheckZ = Number.NaN;
+  private visibleZoneCheckFar = Number.NaN;
   private lastZonePrepareStats: {
     zoneId: string;
     totalMs: number;
@@ -1702,6 +1712,11 @@ export class Renderer {
     return id === null || this.preparedZones.has(id);
   }
 
+  isZoneReadyAt(x: number, z: number): boolean {
+    const id = this.zoneIdAt(x, z);
+    return id === null || (this.preparedZones.has(id) && this.prewarmedZonePrograms.has(id));
+  }
+
   zoneStreamingStats(): {
     prepared: number;
     pending: number;
@@ -1716,7 +1731,7 @@ export class Renderer {
   } {
     return {
       prepared: this.preparedZones.size,
-      pending: this.pendingZonePrepares.size,
+      pending: this.pendingZonePrepares.size + this.visibleZonePrepareQueue.length,
       last: this.lastZonePrepareStats,
     };
   }
@@ -1792,6 +1807,59 @@ export class Renderer {
     })().finally(() => this.pendingZonePrepares.delete(zoneId));
     this.pendingZonePrepares.set(zoneId, task);
     return task;
+  }
+
+  private queueVisibleZonePrepares(fogFar: number): void {
+    const player = this.sim.player;
+    if (this.fogState !== 'outdoor' || this.zoneIdAt(player.pos.x, player.pos.z) === null) {
+      this.visibleZonePrepareQueue = [];
+      return;
+    }
+    const cameraX = this.camera.position.x;
+    const cameraZ = this.camera.position.z;
+    const moved = Math.hypot(cameraX - this.visibleZoneCheckX, cameraZ - this.visibleZoneCheckZ);
+    if (
+      Number.isFinite(this.visibleZoneCheckX) &&
+      moved < ZONE_STREAM_RECHECK_DISTANCE &&
+      Math.abs(fogFar - this.visibleZoneCheckFar) < 1
+    ) {
+      return;
+    }
+    this.visibleZoneCheckX = cameraX;
+    this.visibleZoneCheckZ = cameraZ;
+    this.visibleZoneCheckFar = fogFar;
+    const forwardX = this.cameraLookAt.x - cameraX;
+    const forwardZ = this.cameraLookAt.z - cameraZ;
+    this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
+      ZONES,
+      cameraX,
+      cameraZ,
+      fogFar,
+      forwardX,
+      forwardZ,
+    ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
+    this.pumpVisibleZonePrepareQueue();
+  }
+
+  private pumpVisibleZonePrepareQueue(): void {
+    if (this.visibleZonePrepareActive) return;
+    const zone = this.visibleZonePrepareQueue.shift();
+    if (!zone) return;
+    if (this.preparedZones.has(zone.id) || this.pendingZonePrepares.has(zone.id)) {
+      this.pumpVisibleZonePrepareQueue();
+      return;
+    }
+    this.visibleZonePrepareActive = true;
+    void this.prepareZoneAt(zone.hub.x, zone.hub.z)
+      .catch((err) => {
+        console.warn(`Visible-zone preparation failed: ${zone.id}`, err);
+        // Permit a retry on the next frame even if the camera has not moved.
+        this.visibleZoneCheckX = Number.NaN;
+      })
+      .finally(() => {
+        this.visibleZonePrepareActive = false;
+        this.pumpVisibleZonePrepareQueue();
+      });
   }
 
   async prewarmZoneAt(x: number, z: number): Promise<void> {
@@ -5481,6 +5549,7 @@ export class Renderer {
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
+    this.queueVisibleZonePrepares(fogFar);
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     worldStart = markWorldPhase('terrain', worldStart);
     this.propsView.update(
