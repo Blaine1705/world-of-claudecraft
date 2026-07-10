@@ -896,6 +896,11 @@ export interface PlayerMeta {
   // sim.time when this character entered the world; powers /played. Session-only
   // (sim.time resets to 0 each server boot), so it reports time this session.
   joinedAt: number;
+  // Seconds played across every session BEFORE this one (loaded from the save;
+  // powers /playtime). Combined with `this.time - joinedAt` for the running
+  // lifetime total; folded into a new persisted baseline by serializeCharacter
+  // on save, so it only ever advances while the character is actually in the world.
+  totalPlayedSeconds: number;
   // Tick of the player's last deliberate action (movement, ability cast, or pet
   // command). Session-only, never persisted. Powers the anti-AFK gate on
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
@@ -1032,6 +1037,12 @@ export interface CharacterState {
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
+  // Lifetime played time in seconds (unfloored, for drift-free accumulation; only
+  // the display floors), accumulated across every prior session (this session's
+  // elapsed time is folded in at save; see PlayerMeta.totalPlayedSeconds and
+  // /playtime in social/chat.ts). Optional so pre-/playtime saves load cleanly
+  // (defaults to 0).
+  totalPlayedSeconds?: number;
   // Gathering profession proficiency (JSONB; optional so pre-professions saves
   // load cleanly, defaulting every profession to 0). `professions` is the legacy
   // pre-rename key, kept for back-compat with old saves; `gatheringProficiency`
@@ -1825,6 +1836,7 @@ export class Sim {
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
+      totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
       lastActiveTick: this.tickCount,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
@@ -2194,6 +2206,10 @@ export class Sim {
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
+      // Fold this session's elapsed time into the persisted baseline (see
+      // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
+      // same way without waiting for a save.
+      totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
       professions: { ...meta.gatheringProficiency },
       gatheringProficiency: { ...meta.gatheringProficiency },
       copper: meta.copper,
