@@ -1,26 +1,16 @@
 // Tests for the overworld map window pure core (map_window_view.ts):
 //  - the mode discriminator (delve vs overworld) under both world shapes,
 //  - the pure overworld draw model: Sim-vs-ClientWorld parity + determinism,
-//  - per-state geometry: the framed-continent square + cursor at zoom 1, the
-//    zoomed sub-rect above it, the zoomed-detail overlay when zoomed to a realm,
-//    the player arrow, multi-realm markers, and ally dedup/order.
+//  - per-state geometry: the current-zone square + cursor at zoom 1, the zoomed
+//    sub-rect above it, current-zone-only markers/detail, the player arrow, and
+//    ally dedup/order.
 //
 // DOM/Three/2D-context-free, so this Node suite drives the core directly. The
 // painter's canvas draws (map_window_painter.ts) need a real 2D context +
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
-import {
-  CAMPS,
-  DELVE_X_MIN,
-  DUNGEON_LIST,
-  QUESTS,
-  WORLD_MAX_X,
-  WORLD_MAX_Z,
-  WORLD_MIN_X,
-  WORLD_MIN_Z,
-  ZONES,
-} from '../src/sim/data';
+import { CAMPS, DELVE_X_MIN, QUESTS, STRIP_MAX_X, STRIP_MIN_X, ZONES } from '../src/sim/data';
 import { isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
 import {
@@ -36,14 +26,11 @@ import type { IWorld } from '../src/world_api';
 const ZONE = ZONES[0];
 const ZONE_CZ = (ZONE.zMin + ZONE.zMax) / 2; // a z inside the committed zone band
 const CANVAS = 560;
-// The map is world-relative: zoom 1 frames the whole continent as a square
-// (continent height + WORLD_MARGIN, which is 120 in map_window_view.ts).
-const FULL_SPAN = WORLD_MAX_Z - WORLD_MIN_Z + 120;
-const WORLD_CX = (WORLD_MIN_X + WORLD_MAX_X) / 2;
-const WORLD_CZ = (WORLD_MIN_Z + WORLD_MAX_Z) / 2;
-// A zoom whose visible span is under LABEL_SPAN (900), so the POI/NPC/ally
-// labels draw (FULL_SPAN / 4 = 680 < 900).
-const LABELS_ZOOM = 4;
+const ZONE_MIN_X = ZONE.xMin ?? STRIP_MIN_X;
+const ZONE_MAX_X = ZONE.xMax ?? STRIP_MAX_X;
+const FULL_SPAN = Math.max(ZONE_MAX_X - ZONE_MIN_X, ZONE.zMax - ZONE.zMin);
+const ZONE_CX = (ZONE_MIN_X + ZONE_MAX_X) / 2;
+const LABELS_ZOOM = 1;
 // A quest giver with a real giverNpcId, so the npc-marker branch exercises real
 // content rather than an undefined === undefined accident.
 function requireQuestWithGiver() {
@@ -184,26 +171,26 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(a).toEqual(b);
   });
 
-  it('at zoom 1 frames the whole continent square and is not draggable', () => {
+  it('at zoom 1 frames only the current zone square and is not draggable', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
     expect(model.cursor).toBe('default');
-    expect(model.detail).toBeNull();
-    // zoom 1 = the whole continent framed as a square (open ocean east/west),
-    // centred on the world; the visible region equals the framed bounds.
+    expect(model.detail).not.toBeNull();
+    // zoom 1 = the current zone framed as a square; no global world bounds are
+    // involved. The visible region equals that zone-local frame.
     expect(model.view.spanX).toBe(model.view.spanZ);
     expect(model.view).toEqual({
       spanX: FULL_SPAN,
       spanZ: FULL_SPAN,
-      minX: WORLD_CX - FULL_SPAN / 2,
-      maxX: WORLD_CX + FULL_SPAN / 2,
-      minZ: WORLD_CZ - FULL_SPAN / 2,
-      maxZ: WORLD_CZ + FULL_SPAN / 2,
+      minX: ZONE_CX - FULL_SPAN / 2,
+      maxX: ZONE_CX + FULL_SPAN / 2,
+      minZ: ZONE_CZ - FULL_SPAN / 2,
+      maxZ: ZONE_CZ + FULL_SPAN / 2,
     });
     expect(model.region).toEqual({
-      minX: WORLD_CX - FULL_SPAN / 2,
-      maxX: WORLD_CX + FULL_SPAN / 2,
-      minZ: WORLD_CZ - FULL_SPAN / 2,
-      maxZ: WORLD_CZ + FULL_SPAN / 2,
+      minX: ZONE_CX - FULL_SPAN / 2,
+      maxX: ZONE_CX + FULL_SPAN / 2,
+      minZ: ZONE_CZ - FULL_SPAN / 2,
+      maxZ: ZONE_CZ + FULL_SPAN / 2,
     });
     expect(model.zoneId).toBe(ZONE.id);
   });
@@ -217,18 +204,13 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.region.maxZ - model.region.minZ).toBeCloseTo(FULL_SPAN / 3, 6);
   });
 
-  it('builds the zoomed-detail overlay only when zoomed in to a realm', () => {
+  it('builds the detail overlay from current-zone content at zone scale', () => {
     const decor: Decoration[] = [
       { kind: 'rock', x: 0, z: ZONE_CZ, scale: 1, variant: 0, biome: ZONE.biome },
       { kind: 'tree', x: 1, z: ZONE_CZ, scale: 1, variant: 0, biome: ZONE.biome },
       { kind: 'tree2', x: -1, z: ZONE_CZ, scale: 1, variant: 0, biome: ZONE.biome },
     ];
-    // continent / multi-realm zoom: no detail overlay
-    expect(buildOverworldMapModel(input(makeOverworldWorld('sim'), 1, decor)).detail).toBeNull();
-    // zoomed in to a single realm (max zoom): the overlay draws
-    const detail = buildOverworldMapModel(
-      input(makeOverworldWorld('sim'), MAP_MAX_ZOOM, decor),
-    ).detail;
+    const detail = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1, decor)).detail;
     expect(detail).not.toBeNull();
     // rock/tree(pine)/tree2(oak) map to the three decoration color keys, in order.
     expect(detail?.decorations.map((d) => d.kind)).toEqual(['rock', 'tree', 'oak']);
@@ -250,7 +232,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
       player: { pos: { x: number; z: number } };
     };
     world.player.pos.x = 394;
-    world.player.pos.z = 697;
+    world.player.pos.z = 500;
     const model = buildOverworldMapModel({
       world: world as unknown as IWorld,
       zone: col,
@@ -260,7 +242,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
       decorations: NO_DECOR,
     });
     expect(model.player).not.toBeNull();
-    // centred within a pixel at max zoom, since (394, 697) is interior
+    // centred within a pixel at max zoom, since (394, 500) is interior
     expect(model.player?.mx).toBeCloseTo(CANVAS / 2, 0);
     expect(model.player?.my).toBeCloseTo(CANVAS / 2, 0);
     // matches the world region transform exactly (+X is map-left)
@@ -305,20 +287,18 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.npcs[0].ready).toBe(true);
   });
 
-  it('projects the in-view realm POIs and dungeon portals by the world transform', () => {
+  it('projects only current-zone POIs and portals by the zone-local transform', () => {
     // ZONE (eastbrook_vale) carries POIs and one overworld dungeon entrance.
-    // Zoomed in over the vale, all its POIs are present (tagged with its own zone
-    // id) and projected by the world region flip (+X is map-left). The map is
-    // multi-realm now, so a neighbour's POIs may also be in view; we assert the
-    // vale's set specifically.
+    // At the opening zoom all vale POIs are present and no neighbouring zone can
+    // contribute a marker.
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
-    const valePois = model.pois.filter((p) => p.zoneId === ZONE.id);
-    expect(valePois).toHaveLength(ZONE.pois.length);
-    expect(valePois.map((p) => p.poiIndex)).toEqual(ZONE.pois.map((_, i) => i));
+    expect(model.pois).toHaveLength(ZONE.pois.length);
+    expect(new Set(model.pois.map((p) => p.zoneId))).toEqual(new Set([ZONE.id]));
+    expect(model.pois.map((p) => p.poiIndex)).toEqual(ZONE.pois.map((_, i) => i));
     const r = model.region;
     const poi0 = ZONE.pois[0];
-    expect(valePois[0].mx).toBeCloseTo(((r.maxX - poi0.x) / (r.maxX - r.minX)) * CANVAS, 6);
-    expect(valePois[0].my).toBeCloseTo(((r.maxZ - poi0.z) / (r.maxZ - r.minZ)) * CANVAS, 6);
+    expect(model.pois[0].mx).toBeCloseTo(((r.maxX - poi0.x) / (r.maxX - r.minX)) * CANVAS, 6);
+    expect(model.pois[0].my).toBeCloseTo(((r.maxZ - poi0.z) / (r.maxZ - r.minZ)) * CANVAS, 6);
     // dungeon portals in view are finite-projected (portals show at every zoom)
     expect(model.portals.every((p) => Number.isFinite(p.mx) && Number.isFinite(p.my))).toBe(true);
   });
@@ -329,11 +309,51 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(model.allies.map((a) => a.name)).toEqual(['FriendA', 'GuildB']);
   });
 
-  it('drops the player marker when standing east past the world edge', () => {
-    const world = makeOverworldWorld('client') as unknown as { player: { pos: { x: number } } };
-    world.player.pos.x = WORLD_MAX_X + 50;
+  it('drops player, NPC, and ally markers outside the committed zone', () => {
+    const world = makeOverworldWorld('client') as unknown as {
+      player: { pos: { x: number; z: number } };
+      entities: Map<number, { pos: { x: number; z: number } }>;
+      socialInfo: {
+        friends: { x?: number; z?: number }[];
+        guild: { members: { x?: number; z?: number }[] };
+      };
+    };
+    const outsideX = ZONE_MAX_X + 50;
+    world.player.pos.x = outsideX;
+    const npc = world.entities.get(2);
+    if (!npc) throw new Error('expected seeded npc');
+    npc.pos.x = outsideX;
+    for (const friend of world.socialInfo.friends) friend.x = outsideX;
+    for (const member of world.socialInfo.guild.members) member.x = outsideX;
     const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
     expect(model.player).toBeNull();
+    expect(model.npcs).toEqual([]);
+    expect(model.allies).toEqual([]);
+  });
+
+  it('uses a rectangular column zone as the sole frame, with ocean letterboxing', () => {
+    const col = ZONES.find((z) => z.id === 'galecrest');
+    if (!col || col.xMin === undefined || col.xMax === undefined)
+      throw new Error('expected galecrest column bounds');
+    const world = makeOverworldWorld('client') as unknown as {
+      player: { pos: { x: number; z: number } };
+    };
+    world.player.pos = { x: (col.xMin + col.xMax) / 2, z: (col.zMin + col.zMax) / 2 };
+    const model = buildOverworldMapModel({
+      world: world as unknown as IWorld,
+      zone: col,
+      zoom: 1,
+      center: null,
+      canvasSize: CANVAS,
+      decorations: NO_DECOR,
+    });
+    const span = Math.max(col.xMax - col.xMin, col.zMax - col.zMin);
+    expect(model.view.spanX).toBe(span);
+    expect(model.view.spanZ).toBe(span);
+    expect(model.pois).toHaveLength(col.pois.length);
+    expect(model.pois.every((poi) => poi.zoneId === col.id)).toBe(true);
+    expect(model.player?.mx).toBeCloseTo(CANVAS / 2, 6);
+    expect(model.player?.my).toBeCloseTo(CANVAS / 2, 6);
   });
 
   it('exposes the zoom ceiling used by the zoom control', () => {

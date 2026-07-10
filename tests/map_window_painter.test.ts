@@ -67,8 +67,11 @@ describe('map_window_painter: no magic values', () => {
     }
   });
 
-  it('caches the whole-world decorations once instead of regenerating per redraw', () => {
-    expect(code).toContain('if (!this.decorations) this.decorations = generateDecorations(');
+  it('caches bounded decorations per zone instead of generating the whole world', () => {
+    expect(code).toContain('decorationsByZone.get(opts.zone.id)');
+    expect(code).toContain('generateDecorationsInBounds(world.cfg.seed, opts.zoneBg.region)');
+    expect(code).toContain('decorationsByZone.set(opts.zone.id, decorations)');
+    expect(code).not.toContain('generateDecorations(world.cfg.seed)');
   });
 });
 
@@ -80,14 +83,14 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(hud).toContain('this.mapPainter.paintOverworld(ctx, this.sim, {');
   });
 
-  it('composites the Hud-owned cached realm backgrounds rather than rebuilding them', () => {
-    // The painter receives the cached bgs and only drawImages them (no terrain build).
+  it('accepts only the current Hud-owned zone background and never prewarms all zones', () => {
+    // The painter receives one cached bg and only drawImages it (no terrain build).
     expect(code).toContain('ctx.drawImage(');
     expect(code).not.toContain('paintTerrainRows');
     expect(code).not.toContain('renderTerrainCanvas');
-    // Hud keeps the bg cache + prewarm and passes the cached canvases (world map
-    // composites every cached realm; the current realm is forced ready).
-    expect(hud).toContain('this.mapBgCache.get(zn.id)');
-    expect(hud).toContain('prewarmAllZones');
+    expect(code).toContain('zoneBg: MapZoneBg');
+    expect(code).not.toContain('zoneBgs');
+    expect(hud).toContain('canvas: this.mapZoneBg(zone)');
+    expect(hud).not.toContain('prewarmAllZones');
   });
 });
