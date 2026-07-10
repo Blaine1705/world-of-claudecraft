@@ -3123,11 +3123,11 @@ export const BERSERKER_CRIT_DAMAGE = 0.03; // Berserker Stance: +3% crit damage
 
 // Fury Enrage: a short self-buff (Bloodletting has a 30% chance, Desenfreno /
 // Rampage always). One 'enrage' aura carries all three halves: outgoing damage
-// +11% (the aura's value, summed in dealDamage), +25% HASTE (ENRAGE_HASTE_PCT is
+// +7% (the aura's value, summed in dealDamage; balance pass 2026-07-10, was 11%), +25% HASTE (ENRAGE_HASTE_PCT is
 // folded into meleeHaste/rangedHaste/spellHaste in recalcPlayerStats, so it reads
 // as real haste: faster swings AND casts, and it shows in the Haste stat), and
 // move speed +10% (ENRAGE_MOVE_MULT). Note: haste never shortens the GCD here.
-export const ENRAGE_DMG_DONE = 0.11;
+export const ENRAGE_DMG_DONE = 0.07;
 export const ENRAGE_HASTE_PCT = 0.25;
 export const ENRAGE_MOVE_MULT = 1.1;
 export const ENRAGE_DURATION = 4; // seconds

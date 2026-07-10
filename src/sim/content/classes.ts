@@ -701,12 +701,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       // Balance pass 2026-07-10: was 0.6 weapon + 24 per hit (too efficient for a
       // free, rage-generating, 2-charge spell); retuned to 0.45 weapon + 16.
-      { type: 'weaponStrike', bonus: 16, weaponMult: 0.45 },
-      { type: 'weaponStrike', bonus: 16, weaponMult: 0.45 },
+      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
+      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
       { type: 'gainResource', amount: 8 },
     ],
     description:
-      'Instantly strike with your weapon twice, each hit dealing 45% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
+      'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
   },
   execute: {
     id: 'execute',
@@ -788,7 +788,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+      'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
   },
   // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
   // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
@@ -4041,7 +4041,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
+      { type: 'weaponStrike', bonus: 30, weaponMult: 0.5 },
       { type: 'selfHealPctMax', pct: 0.03 },
       { type: 'gainResource', amount: 12 },
       // 30% chance to Enrage for 4 sec (the classic Bloodthirst proc).

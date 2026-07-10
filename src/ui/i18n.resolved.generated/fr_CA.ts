@@ -5712,7 +5712,7 @@ export const fr_CA: EnTranslations = {
       },
       "enrage_passive": {
         "name": "Mayhem",
-        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "bloodthirst": {
         "name": "Saignée",
@@ -5720,7 +5720,7 @@ export const fr_CA: EnTranslations = {
       },
       "raging_gale": {
         "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
         "name": "Red Harvest",

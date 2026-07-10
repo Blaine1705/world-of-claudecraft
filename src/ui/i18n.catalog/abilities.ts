@@ -1195,7 +1195,7 @@ const classAbilityNamesEn = {
       [
         'enrage_passive',
         'Mayhem',
-        'Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+        'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
       ],
       [
         'bloodthirst',
@@ -1205,7 +1205,7 @@ const classAbilityNamesEn = {
       [
         'raging_gale',
         'Twinstrike',
-        'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)',
+        'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)',
       ],
       [
         'red_harvest',
