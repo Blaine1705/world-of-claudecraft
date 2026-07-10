@@ -570,6 +570,56 @@ describe('infernal citadel: lifecycle', () => {
     expect(isSetPieceSeed(afterRandom[afterRandom.length - 1])).toBe(false);
   });
 
+  it('seals the entry portal on victory: a cleared run cannot be walked into again', () => {
+    // Own Sim: the shared fixture already sits in a programmatic (portal-less)
+    // instance of the same seed, which a walk-in would silently rejoin.
+    const s2 = new Sim({ seed: 99, playerClass: 'warrior', autoEquip: true, devCommands: true });
+    const p2 = s2.player.id;
+    s2.player.level = 22;
+    s2.chat('/dev portal 5 22 A infernal', p2);
+    const portal = [...s2.entities.values()]
+      .filter((e) => e.templateId === 'rift_portal')
+      .at(-1) as Entity;
+    const portalId = portal.id;
+    const portalPos = { ...portal.pos };
+    const walkIn = () => {
+      const e = s2.entities.get(p2) as Entity;
+      e.prevPos = { ...e.pos };
+      e.pos = { ...portalPos };
+      s2.rebucket(e);
+      for (let t = 0; t < 40 && s2.riftFloor === null; t++) s2.tick();
+    };
+    // First run: enter through the portal, clear everything out.
+    walkIn();
+    expect(s2.riftFloor).not.toBeNull();
+    const run = s2.riftInstances.find((i) => i.memberIds.has(p2) && i.outcome === 'active');
+    expect(run).toBeDefined();
+    const i = run as NonNullable<typeof run>;
+    expect(i.portalId).toBe(portalId);
+    for (const id of i.mobIds) {
+      const m = s2.entities.get(id);
+      if (m && !m.dead) {
+        m.hp = 0;
+        m.dead = true;
+      }
+    }
+    for (let t = 0; t < 22; t++) s2.tick();
+    expect(i.outcome).toBe('won');
+    // The way in is gone the moment the run is won.
+    expect(s2.entities.has(portalId)).toBe(false);
+    expect(i.portalId).toBeNull();
+    const exit = s2.entities.get(i.exitId as number) as Entity;
+    const e = s2.entities.get(p2) as Entity;
+    e.prevPos = { ...e.pos };
+    e.pos = s2.groundPos(exit.pos.x, exit.pos.z);
+    s2.rebucket(e);
+    s2.tick();
+    expect(s2.riftFloor).toBeNull();
+    // Standing where the portal used to be re-enters nothing.
+    walkIn();
+    expect(s2.riftFloor).toBeNull();
+  });
+
   it('kills nothing on entry: every mob spawns clear of the walls it fights in', () => {
     const i = inst() as NonNullable<ReturnType<typeof inst>>;
     const floor = generateRiftFloor(seed, 22, 0);

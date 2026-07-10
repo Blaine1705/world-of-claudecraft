@@ -1047,6 +1047,16 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   const raceWinner = claim.event !== null;
   const rewards = rewardRiftWinner(ctx, inst, boss, participants, raceWinner);
 
+  // A cleared rift seals its way in: the entry portal despawns, so a finished
+  // run can never be walked into and re-farmed. Ranked natural portals seal
+  // through the race claim below (closeNaturalRiftPortal); this arm covers
+  // portals outside the race (dev portals), whose entity would otherwise stay
+  // open forever.
+  if (!claim.event && inst.portalId !== null) {
+    if (ctx.entities.has(inst.portalId)) ctx.dropEntity(inst.portalId);
+    inst.portalId = null;
+  }
+
   if (claim.event) {
     if (boss) {
       addRiftProgressionLoot(
