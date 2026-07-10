@@ -7233,31 +7233,61 @@ export const ja_JP: EnTranslations = {
       "deathless_heartwood": {
         "name": "不死王冠の心材"
       },
+      "deathless_heartwood_heroic": {
+        "name": "不死王冠の心材"
+      },
       "kingsbane_last_oath": {
+        "name": "スロウンベイン、ソーンピーク最後の誓い"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "スロウンベイン、ソーンピーク最後の誓い"
       },
       "crownforged_dreadhelm": {
         "name": "ボーンロートの恐怖兜"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "ボーンロートの恐怖兜"
+      },
       "crownforged_warspaulders": {
+        "name": "ボーンロートの戦肩当て"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "ボーンロートの戦肩当て"
       },
       "nighttalon_crown": {
         "name": "ダイアファングの冠"
       },
+      "nighttalon_crown_heroic": {
+        "name": "ダイアファングの冠"
+      },
       "nighttalon_shoulderguards": {
+        "name": "ダイアファングの肩守り"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "ダイアファングの肩守り"
       },
       "soulflame_cowl": {
         "name": "レイスファイアの頭巾"
       },
+      "soulflame_cowl_heroic": {
+        "name": "レイスファイアの頭巾"
+      },
       "soulflame_mantle": {
+        "name": "レイスファイアのマント"
+      },
+      "soulflame_mantle_heroic": {
         "name": "レイスファイアのマント"
       },
       "stormcallers_crown": {
         "name": "ゲイルコールの冠"
       },
+      "stormcallers_crown_heroic": {
+        "name": "ゲイルコールの冠"
+      },
       "stormcallers_spaulders": {
+        "name": "ゲイルコールの肩当て"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "ゲイルコールの肩当て"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "蘇った王家の衛兵"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "死なずの戦衛オルドレン"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "死なずの司祭長マルリック"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "死なずの刃ヴォス"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"

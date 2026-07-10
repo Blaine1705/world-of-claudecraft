@@ -7233,31 +7233,61 @@ export const id_ID: EnTranslations = {
       "deathless_heartwood": {
         "name": "Inti Kayu Mahkota Baka"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Inti Kayu Mahkota Baka"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Sumpah Terakhir Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Sumpah Terakhir Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Helm Seram Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Helm Seram Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Bahu Perang Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bahu Perang Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Mahkota Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Mahkota Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Pelindung Bahu Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Pelindung Bahu Direfang"
       },
       "soulflame_cowl": {
         "name": "Tudung Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Tudung Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Mantel Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Mantel Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Mahkota Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Mahkota Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Pelindung Bahu Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Pelindung Bahu Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const id_ID: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Pengawal Kerajaan Bangkit"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Garda Perang Nirmaut"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hierofan Nirmaut"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Belati Nirmaut"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"

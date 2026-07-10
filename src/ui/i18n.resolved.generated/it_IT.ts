@@ -7233,31 +7233,61 @@ export const it_IT: EnTranslations = {
       "deathless_heartwood": {
         "name": "Cuorlegno della Corona immortale"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Cuorlegno della Corona immortale"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, ultimo giuramento di Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, ultimo giuramento di Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Elmo del terrore Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Elmo del terrore Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Spallacci da guerra Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Spallacci da guerra Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Corona Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Corona Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Guardaspalle Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Guardaspalle Direfang"
       },
       "soulflame_cowl": {
         "name": "Cappuccio Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Cappuccio Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Manto Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Manto Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Corona Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Corona Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Spallacci Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Spallacci Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const it_IT: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Guardia reale risorta"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Guardiaguerra senza morte"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Ierofante senza morte"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lama senza morte"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagello di Thornpeak"

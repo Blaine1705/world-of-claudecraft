@@ -7233,31 +7233,61 @@ export const cs_CZ: EnTranslations = {
       "deathless_heartwood": {
         "name": "Jádrové dřevo nesmrtelné koruny"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Jádrové dřevo nesmrtelné koruny"
+      },
       "kingsbane_last_oath": {
+        "name": "Trůnobijec, poslední přísaha Thornpeaku"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Trůnobijec, poslední přísaha Thornpeaku"
       },
       "crownforged_dreadhelm": {
         "name": "Děsivá helma z kosti"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Děsivá helma z kosti"
+      },
       "crownforged_warspaulders": {
+        "name": "Válečné nárameníky z kosti"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Válečné nárameníky z kosti"
       },
       "nighttalon_crown": {
         "name": "Koruna děsivého tesáku"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Koruna děsivého tesáku"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Ramenní chrániče děsivého tesáku"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Ramenní chrániče děsivého tesáku"
       },
       "soulflame_cowl": {
         "name": "Kápě přízračného ohně"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Kápě přízračného ohně"
+      },
       "soulflame_mantle": {
+        "name": "Plášť přízračného ohně"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Plášť přízračného ohně"
       },
       "stormcallers_crown": {
         "name": "Koruna volání vichru"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Koruna volání vichru"
+      },
       "stormcallers_spaulders": {
+        "name": "Nárameníky volání vichru"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Nárameníky volání vichru"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const cs_CZ: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Povstalá královská stráž"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, nesmrtelná válečná stráž"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, nesmrtelný hierofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, nesmrtelný nůž"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, metla Thornpeaku"

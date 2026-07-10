@@ -7233,31 +7233,61 @@ export const fr_FR: EnTranslations = {
       "deathless_heartwood": {
         "name": "Bois-coeur de la Couronne immortelle"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Bois-coeur de la Couronne immortelle"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, dernier serment de Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, dernier serment de Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Heaume d'effroi Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Heaume d'effroi Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Spallières de guerre Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Spallières de guerre Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Couronne de Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Couronne de Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Garde-épaules de Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Garde-épaules de Direfang"
       },
       "soulflame_cowl": {
         "name": "Capuche Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Capuche Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Mantelet Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Mantelet Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Couronne de Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Couronne de Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Spallières de Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Spallières de Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const fr_FR: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Garde royal relevé"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Garde immortel"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Hiérophante immortel"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Lame immortelle"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"

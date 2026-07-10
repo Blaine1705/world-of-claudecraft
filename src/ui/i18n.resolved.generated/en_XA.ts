@@ -7233,31 +7233,61 @@ export const en_XA: EnTranslations = {
       "deathless_heartwood": {
         "name": "[Ĥéáŕţŵóóð óƒ ţĥé Ðéáţĥļéšš Çŕóŵñ]"
       },
+      "deathless_heartwood_heroic": {
+        "name": "[Ĥéáŕţŵóóð óƒ ţĥé Ðéáţĥļéšš Çŕóŵñ]"
+      },
       "kingsbane_last_oath": {
+        "name": "[Ţĥŕóñéƀáñé, Ļášţ Óáţĥ óƒ Ţĥóŕñþéáķ]"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "[Ţĥŕóñéƀáñé, Ļášţ Óáţĥ óƒ Ţĥóŕñþéáķ]"
       },
       "crownforged_dreadhelm": {
         "name": "[Ɓóñéŵŕóúĝĥţ Ðŕéáðĥéļɱ]"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "[Ɓóñéŵŕóúĝĥţ Ðŕéáðĥéļɱ]"
+      },
       "crownforged_warspaulders": {
+        "name": "[Ɓóñéŵŕóúĝĥţ Ŵáŕšþáúļðéŕš]"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "[Ɓóñéŵŕóúĝĥţ Ŵáŕšþáúļðéŕš]"
       },
       "nighttalon_crown": {
         "name": "[Ðíŕéƒáñĝ Çŕóŵñ]"
       },
+      "nighttalon_crown_heroic": {
+        "name": "[Ðíŕéƒáñĝ Çŕóŵñ]"
+      },
       "nighttalon_shoulderguards": {
+        "name": "[Ðíŕéƒáñĝ Šĥóúļðéŕĝúáŕðš]"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "[Ðíŕéƒáñĝ Šĥóúļðéŕĝúáŕðš]"
       },
       "soulflame_cowl": {
         "name": "[Ŵŕáíţĥƒíŕé Çóŵļ]"
       },
+      "soulflame_cowl_heroic": {
+        "name": "[Ŵŕáíţĥƒíŕé Çóŵļ]"
+      },
       "soulflame_mantle": {
+        "name": "[Ŵŕáíţĥƒíŕé Ɱáñţļé]"
+      },
+      "soulflame_mantle_heroic": {
         "name": "[Ŵŕáíţĥƒíŕé Ɱáñţļé]"
       },
       "stormcallers_crown": {
         "name": "[Ĝáļéçáļļ Çŕóŵñ]"
       },
+      "stormcallers_crown_heroic": {
+        "name": "[Ĝáļéçáļļ Çŕóŵñ]"
+      },
       "stormcallers_spaulders": {
+        "name": "[Ĝáļéçáļļ Šþáúļðéŕš]"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "[Ĝáļéçáļļ Šþáúļðéŕš]"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const en_XA: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "[Ŕíšéñ Ŕóýáļ Ĝúáŕð]"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "[Áļðŕéñ, Ðéáţĥļéšš Ŵáŕĝúáŕð]"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "[Ɱáļŕíç, Ðéáţĥļéšš Ĥíéŕóþĥáñţ]"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "[Ʋóšš, Ðéáţĥļéšš Ķñíƒé]"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "[Ñýţĥŕáẋíš, Šçóúŕĝé óƒ Ţĥóŕñþéáķ]"

@@ -7233,31 +7233,61 @@ export const de_DE: EnTranslations = {
       "deathless_heartwood": {
         "name": "Herzholz der todlosen Krone"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Herzholz der todlosen Krone"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, letzter Eid von Thornpeak"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, letzter Eid von Thornpeak"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought-Schreckenshelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought-Schreckenshelm"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought-Kriegsschultern"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought-Kriegsschultern"
       },
       "nighttalon_crown": {
         "name": "Direfang-Krone"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang-Krone"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang-Schulterschützer"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang-Schulterschützer"
       },
       "soulflame_cowl": {
         "name": "Wraithfire-Kapuze"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire-Kapuze"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire-Mantel"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire-Mantel"
       },
       "stormcallers_crown": {
         "name": "Galecall-Krone"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall-Krone"
+      },
       "stormcallers_spaulders": {
+        "name": "Galecall-Schulterplatten"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Galecall-Schulterplatten"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const de_DE: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Auferstandene Königswache"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Todlose Kriegswache"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Todloser Hierophant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Todlose Klinge"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Geißel von Thornpeak"

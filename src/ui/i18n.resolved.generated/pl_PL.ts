@@ -7233,31 +7233,61 @@ export const pl_PL: EnTranslations = {
       "deathless_heartwood": {
         "name": "Twardziel Nieśmiertelnej Korony"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Twardziel Nieśmiertelnej Korony"
+      },
       "kingsbane_last_oath": {
+        "name": "Thronebane, Ostatnia Przysięga Ciernistego Szczytu"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Thronebane, Ostatnia Przysięga Ciernistego Szczytu"
       },
       "crownforged_dreadhelm": {
         "name": "Hełm grozy Bonewrought"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Hełm grozy Bonewrought"
+      },
       "crownforged_warspaulders": {
+        "name": "Naramienniki bojowe Bonewrought"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Naramienniki bojowe Bonewrought"
       },
       "nighttalon_crown": {
         "name": "Korona Direfang"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Korona Direfang"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Naramienniki Direfang"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Naramienniki Direfang"
       },
       "soulflame_cowl": {
         "name": "Kaptur Wraithfire"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Kaptur Wraithfire"
+      },
       "soulflame_mantle": {
+        "name": "Płaszcz Wraithfire"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Płaszcz Wraithfire"
       },
       "stormcallers_crown": {
         "name": "Korona Galecall"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Korona Galecall"
+      },
       "stormcallers_spaulders": {
+        "name": "Naramienniki Galecall"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Naramienniki Galecall"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const pl_PL: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Powstały Strażnik Królewski"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Nieśmiertelny Strażnik Wojenny"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Nieśmiertelny Hierofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Nieśmiertelny Nóż"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Plaga Ciernistego Szczytu"

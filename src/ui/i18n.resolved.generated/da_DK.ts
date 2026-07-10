@@ -7233,31 +7233,61 @@ export const da_DK: EnTranslations = {
       "deathless_heartwood": {
         "name": "Kerneved fra Den Udødelige Krone"
       },
+      "deathless_heartwood_heroic": {
+        "name": "Kerneved fra Den Udødelige Krone"
+      },
       "kingsbane_last_oath": {
+        "name": "Tronebane, Tornetops Sidste Ed"
+      },
+      "kingsbane_last_oath_heroic": {
         "name": "Tronebane, Tornetops Sidste Ed"
       },
       "crownforged_dreadhelm": {
         "name": "Bonewrought Rædselshjelm"
       },
+      "crownforged_dreadhelm_heroic": {
+        "name": "Bonewrought Rædselshjelm"
+      },
       "crownforged_warspaulders": {
+        "name": "Bonewrought Krigsskulderplader"
+      },
+      "crownforged_warspaulders_heroic": {
         "name": "Bonewrought Krigsskulderplader"
       },
       "nighttalon_crown": {
         "name": "Direfang-Krone"
       },
+      "nighttalon_crown_heroic": {
+        "name": "Direfang-Krone"
+      },
       "nighttalon_shoulderguards": {
+        "name": "Direfang-Skulderværn"
+      },
+      "nighttalon_shoulderguards_heroic": {
         "name": "Direfang-Skulderværn"
       },
       "soulflame_cowl": {
         "name": "Wraithfire-Hætte"
       },
+      "soulflame_cowl_heroic": {
+        "name": "Wraithfire-Hætte"
+      },
       "soulflame_mantle": {
+        "name": "Wraithfire-Kappe"
+      },
+      "soulflame_mantle_heroic": {
         "name": "Wraithfire-Kappe"
       },
       "stormcallers_crown": {
         "name": "Galecall-Krone"
       },
+      "stormcallers_crown_heroic": {
+        "name": "Galecall-Krone"
+      },
       "stormcallers_spaulders": {
+        "name": "Galecall-Skulderplader"
+      },
+      "stormcallers_spaulders_heroic": {
         "name": "Galecall-Skulderplader"
       },
       "unknown_alien_weaponry": {
@@ -7507,6 +7537,15 @@ export const da_DK: EnTranslations = {
       },
       "nythraxis_skeleton_warrior": {
         "name": "Genopstanden Kongelig Garder"
+      },
+      "nythraxis_heroic_warrior_add": {
+        "name": "Aldren, Den Udødelige Krigsvagt"
+      },
+      "nythraxis_heroic_priest_add": {
+        "name": "Malric, Den Udødelige Hierofant"
+      },
+      "nythraxis_heroic_rogue_add": {
+        "name": "Voss, Den Udødelige Kniv"
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tornetops Svøbe"
