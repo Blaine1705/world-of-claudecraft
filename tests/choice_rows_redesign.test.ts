@@ -167,7 +167,8 @@ describe('shaman redesign', () => {
     addTargetMob(sim, 100000, 8);
     for (let i = 0; i < 3; i++) castAndSettle(sim, 'lightning_bolt');
     expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    const before = (p.resource = p.maxResource);
+    const before = p.maxResource;
+    p.resource = before;
     sim.castAbility('earth_shock');
     for (let i = 0; i < 20; i++) sim.tick();
     expect(p.resource).toBe(before);
