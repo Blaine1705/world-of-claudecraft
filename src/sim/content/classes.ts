@@ -76,6 +76,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'iron_resolve',
       'slam',
       'red_harvest',
+      'whirlwind',
       'faultline',
       'heroic_leap',
       'cleave',
@@ -650,11 +651,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner decision 2026-07-09: baseline early rage SPENDER (learned at level 2),
     // costing 20 rage per use. The classic dodge-proc gate stays gone (too RNG);
     // the requiresDodgeProc machinery itself remains for hunter mongoose_bite.
-    // Fury hands it off at 10 (owner 2026-07-10): it stays the spec's only real
-    // rage spender through 5-9 (Bloodletting/Twinstrike cost 0), then retires
-    // the moment Red Harvest (its learnLevel, 10) takes the rage-dump role,
-    // since its empower rider feeds the Arms-granted Maiming Strike.
-    excludeSpecs: ['fury'],
+    // Fury AND Prot hand it off at 10 (owner 2026-07-10): it stays the early
+    // rage spender through 5-9, then retires when each spec's own kit fills
+    // out (Fury: Red Harvest takes the rage-dump role at 10; Prot: its empower
+    // rider feeds the Arms-granted Maiming Strike, a dead rider beside
+    // Shieldcrack/Revenge, review round 2 item on Prot coherence). Arms keeps
+    // it: the Maiming Strike empower is its whole point.
+    excludeSpecs: ['fury', 'prot'],
     excludeSpecsAtLevel: 10,
     effects: [
       { type: 'weaponStrike', bonus: 5, cannotBeDodged: true },
@@ -696,12 +699,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
-      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
+      // Balance pass 2026-07-10: was 0.6 weapon + 24 per hit (too efficient for a
+      // free, rage-generating, 2-charge spell); retuned to 0.45 weapon + 16.
+      { type: 'weaponStrike', bonus: 16, weaponMult: 0.45 },
+      { type: 'weaponStrike', bonus: 16, weaponMult: 0.45 },
       { type: 'gainResource', amount: 8 },
     ],
     description:
-      'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
+      'Instantly strike with your weapon twice, each hit dealing 45% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
   },
   execute: {
     id: 'execute',
@@ -754,14 +759,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
+      // Balance pass 2026-07-10: was 3x full-weapon + 55 each (=165 bonus), far
+      // too much for a 5x/min spender; retuned to 0.65 weapon + 25 each.
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
       // Always Enrages for 4 sec (Rampage / Desenfreno, the guaranteed proc).
       { type: 'enrageChance', chance: 1, duration: 4 },
     ],
     description:
-      'Spend everything: strike three times in a frenzy for weapon damage plus $d each, always Enraging you. (Fury)',
+      'Spend everything: strike three times in a frenzy for 65% weapon damage plus $d each, always Enraging you. (Fury)',
   },
   // Spellbook-only passive trait (owner 2026-07-08): documents the Enrage buff
   // that Bloodletting / Red Harvest apply (the actual mechanic is the enrageChance
@@ -4072,6 +4079,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Bladed Gyre',
     class: 'warrior',
     learnLevel: 10,
+    // Fury-only (balance pass 2026-07-10): Fury had no baseline AoE, so it gets
+    // Bladed Gyre back as its spec AoE tool. Arms/Prot keep their own AoE
+    // (Reaping Arc / Quaking Blow); no-spec never learns it.
+    specs: ['fury'],
     // Bladed Gyre GENERATES rage instead of costing it (operator, Batch
     // 2026-07-08): cost 0, and the aoeDamage's rageOnHit grants 5 rage plus 1
     // per enemy struck (capped at +5), so 5 to 10 rage per spin.
@@ -4955,16 +4966,22 @@ export function abilitiesKnownAt(
     // classic rage-costing execute. Resolved here (not via a talent mod) so the
     // cast-time cost gate sees 0 and the appended gainResource flows through the
     // normal dispatch scaling (abilityRagePct / rage-gen auras).
+    let cooldown = def.cooldown;
     if (id === 'execute' && mods?.spec === 'fury') {
       cost = 0;
       effects = [...effects, { type: 'gainResource', amount: 20 }];
+      // Balance pass 2026-07-10: the free, rage-minting Fury execute had no
+      // cooldown, an infinite rage engine in the sub-20% phase. A 6s cooldown
+      // keeps the free execute fantasy without the loop. Arms/Prot (a rage
+      // SPENDER, no mint) keep the classic no-cooldown execute.
+      cooldown = 6;
     }
     const entry: KnownAbility = {
       def,
       rank,
       cost,
       castTime,
-      cooldown: def.cooldown,
+      cooldown,
       effects,
       threatFlat,
       threatMult,
