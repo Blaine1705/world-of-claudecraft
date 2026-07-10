@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
+  'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Создайте новую учётную запись или привяжите Apple к существующей.',
+  'hudChrome.auth.appleChoiceExpired': 'Вход через Apple истёк. Войдите через Apple ещё раз.',
   'hudChrome.vcup.guildBoardWl': '{wins} побед, {losses} поражений',
   'hudChrome.vcup.shootPower': 'СИЛА',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',
@@ -32,6 +37,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': 'Кому',
   'itemUi.kind.bag': 'Сумка',
   'itemUi.tooltip.bagSlots': 'Сумка на {slots} ячеек',
+  'hudChrome.auth.forgotPrompt': 'Забыли пароль?',
+  'hudChrome.auth.forgotTitle': 'Сброс пароля',
+  'hudChrome.auth.forgotHint':
+    'Введите имя пользователя, и мы отправим ссылку для сброса на указанный адрес электронной почты.',
+  'hudChrome.auth.forgotUsername': 'Имя пользователя',
+  'hudChrome.auth.forgotSubmit': 'Отправить ссылку для сброса',
+  'hudChrome.auth.forgotSent':
+    'Если для этого имени пользователя есть аккаунт с указанной почтой, мы отправили ссылку для сброса. Проверьте свой почтовый ящик.',
+  'hudChrome.auth.forgotBack': 'Вернуться ко входу',
+  'hudChrome.auth.resetTitle': 'Выберите новый пароль',
+  'hudChrome.auth.resetNewPassword': 'Новый пароль',
+  'hudChrome.auth.resetConfirm': 'Подтвердите новый пароль',
+  'hudChrome.auth.resetSubmit': 'Обновить пароль',
+  'hudChrome.auth.resetDone': 'Ваш пароль обновлён. Теперь вы можете войти.',
+  'hudChrome.auth.resetMismatch': 'Пароли не совпадают.',
+  'hudChrome.auth.resetErrInvalid':
+    'Эта ссылка для сброса недействительна или истекла. Запросите новую.',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': 'Последний вход: {when}',
   'hudChrome.social.lastSeenNever': 'никогда',
   'hudChrome.dailyRewards.title': 'Ежедневные награды',
@@ -2319,6 +2342,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': 'Шёлковая железа Сейблвеба',
   'entities.items.supply_crate.name': 'Украденный ящик припасов',
   'entities.items.greyjaw_fang.name': 'Клык старого Серочелюста',
+  'entities.items.chunk_of_ore.name': 'Кусок руды',
   'entities.items.weathered_ledger_page.name': 'Выветренная страница книги учета',
   'entities.items.morthen_grimoire.name': 'Гримуар Мортена',
   'entities.items.wolf_fang.name': 'Треснувший волчий клык',
@@ -2333,6 +2357,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': 'Жирный кусок сала',
   'entities.items.spider_leg.name': 'Дергающаяся нога паука',
   'entities.items.bone_fragments.name': 'Фрагменты костей',
+  'entities.items.arcane_dust.name': 'Тайная пыль',
+  'entities.items.arcane_essence.name': 'Тайная эссенция',
+  'entities.items.arcane_shard.name': 'Тайный осколок',
   'entities.items.linen_scrap.name': 'Лоскут льна',
   'entities.items.fen_muster_order.name': 'Приказ о сборе в Фенбридже',
   'entities.items.mire_prowler_pelt.name': 'Шкура болотного хищника',
@@ -2694,6 +2721,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': 'Страж приливов',
   'entities.npcs.tidewatcher_ondrel.greeting':
     'Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты.',
+  'entities.quests.q_prof_intro.title': 'Ремесло для каждой руки',
+  'entities.quests.q_prof_intro.text':
+    'Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.',
+  'entities.quests.q_prof_intro.completion':
+    'Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Кусок руды',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -3627,7 +3660,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s} сек.',
   'hudChrome.mobile.actionPageToggle': 'Переключить страницу действий',
   'hudChrome.mobile.actionRing': 'Боевые действия',
-  'hudChrome.mobile.autorun': 'Автобег',
   'hudChrome.mobile.haptics': 'Вибрация',
   'hudChrome.mobile.hapticsOff': 'Вибрация выкл.',
   'hudChrome.mobile.hotbarPage': 'Навыки',
@@ -5353,6 +5385,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ловкость повышается на 15, вероятность критического удара на 2%.',
   'entities.itemSets.wyrmshadow.bonus4':
     'Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 25% на 8 сек.',
+  'hudChrome.itemSoulbound': 'Персональный',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
@@ -6181,6 +6214,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': 'Посылки',
   'hudChrome.mailbox.parcelsHint': 'Нажмите на предмет в сумке, чтобы приложить его.',
   'hudChrome.mailbox.removeParcelAria': 'Убрать {item} из письма',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Отправить на один {item} меньше',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Отправить на один {item} больше',
   'hudChrome.mailbox.sendButton': 'Отправить письмо',
   'hudChrome.mailbox.postageNote': 'Почтовый сбор: {amount}. Ворон летит около {seconds} с.',
   'hudChrome.mailbox.arrivedBanner': 'Ворон прилетел: письмо от {name}.',

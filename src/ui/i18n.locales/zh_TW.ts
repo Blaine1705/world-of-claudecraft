@@ -14,6 +14,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': '透過 Apple 繼續',
+  'hudChrome.auth.appleError': '無法透過 Apple 登入。請再試一次。',
+  'hudChrome.auth.appleChoiceIntro': '建立新帳戶，或將 Apple 連結到現有帳戶。',
+  'hudChrome.auth.appleChoiceExpired': 'Apple 登入已過期。請再次使用 Apple 登入。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝，{losses} 敗',
   'hudChrome.vcup.shootPower': '力道',
   'hudChrome.discord.roleTag.coredevs': '核心開發者',
@@ -32,6 +36,22 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '收件人',
   'itemUi.kind.bag': '背包',
   'itemUi.tooltip.bagSlots': '{slots}格背包',
+  'hudChrome.auth.forgotPrompt': '忘記密碼？',
+  'hudChrome.auth.forgotTitle': '重設密碼',
+  'hudChrome.auth.forgotHint': '輸入您的使用者名稱，我們會將重設連結寄送到登記的電子郵件。',
+  'hudChrome.auth.forgotUsername': '使用者名稱',
+  'hudChrome.auth.forgotSubmit': '傳送重設連結',
+  'hudChrome.auth.forgotSent':
+    '如果該使用者名稱對應的帳戶已登記電子郵件，我們已寄出重設連結。請查看您的收件匣。',
+  'hudChrome.auth.forgotBack': '返回登入',
+  'hudChrome.auth.resetTitle': '設定新密碼',
+  'hudChrome.auth.resetNewPassword': '新密碼',
+  'hudChrome.auth.resetConfirm': '確認新密碼',
+  'hudChrome.auth.resetSubmit': '更新密碼',
+  'hudChrome.auth.resetDone': '您的密碼已更新。現在可以登入了。',
+  'hudChrome.auth.resetMismatch': '兩次輸入的密碼不一致。',
+  'hudChrome.auth.resetErrInvalid': '此重設連結無效或已過期。請重新申請一個。',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': '最後上線: {when}',
   'hudChrome.social.lastSeenNever': '從未',
   'hudChrome.dailyRewards.title': '每日獎勵',
@@ -2190,6 +2210,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': '玄網絲腺',
   'entities.items.supply_crate.name': '被盜補給箱',
   'entities.items.greyjaw_fang.name': '老灰顎的尖牙',
+  'entities.items.chunk_of_ore.name': '礦石塊',
   'entities.items.weathered_ledger_page.name': '風化帳頁',
   'entities.items.morthen_grimoire.name': '莫森的魔典',
   'entities.items.wolf_fang.name': '裂開的狼牙',
@@ -2204,6 +2225,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': '油膩獸脂塊',
   'entities.items.spider_leg.name': '抽搐的蜘蛛腿',
   'entities.items.bone_fragments.name': '骨頭碎片',
+  'entities.items.arcane_dust.name': '奧術之塵',
+  'entities.items.arcane_essence.name': '奧術精華',
+  'entities.items.arcane_shard.name': '奧術碎片',
   'entities.items.linen_scrap.name': '亞麻碎布',
   'entities.items.fen_muster_order.name': '芬橋集結令',
   'entities.items.mire_prowler_pelt.name': '泥沼潛伏者毛皮',
@@ -2557,6 +2581,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '守潮者',
   'entities.npcs.tidewatcher_ondrel.greeting':
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
+  'entities.quests.q_prof_intro.title': '人人都有一技之長',
+  'entities.quests.q_prof_intro.text':
+    '伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。',
+  'entities.quests.q_prof_intro.completion':
+    '看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，這裡面都有正經買賣等著你。',
+  'entities.quests.q_prof_intro.objectives.0.label': '礦石塊',
   'entities.quests.q_wolves.title': '門前群狼',
   'entities.quests.q_wolves.text':
     '森林狼已敢撲咬北路旅人，{playerName}。擊敗8隻森林狼，讓東溪能鬆一口氣。',
@@ -3445,7 +3475,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.mobile.actionPageToggle': '切換動作頁',
   'hudChrome.mobile.actionRing': '戰鬥動作',
-  'hudChrome.mobile.autorun': '自動奔跑',
   'hudChrome.mobile.haptics': '觸覺回饋',
   'hudChrome.mobile.hapticsOff': '觸覺回饋已關閉',
   'hudChrome.mobile.hotbarPage': '技能',
@@ -4995,6 +5024,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
   'entities.itemSets.wyrmshadow.bonus4':
     '你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 25%，持續 8 秒。',
+  'hudChrome.itemSoulbound': '靈魂綁定',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',
@@ -5753,6 +5783,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '包裹',
   'hudChrome.mailbox.parcelsHint': '點擊背包中的物品即可附上。',
   'hudChrome.mailbox.removeParcelAria': '從信件中移除 {item}',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '少寄一個{item}',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '多寄一個{item}',
   'hudChrome.mailbox.sendButton': '寄出信件',
   'hudChrome.mailbox.postageNote': '郵資：{amount}。渡鴉飛行約 {seconds} 秒。',
   'hudChrome.mailbox.arrivedBanner': '渡鴉已降落：來自 {name} 的郵件。',

@@ -568,6 +568,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
+    e.queuedCastAbility = null;
+    e.queuedCastAim = null;
     e.comboPoints = 0;
     e.eating = null;
     e.drinking = null;
@@ -752,7 +754,7 @@ export function grantXp(
     meta.xp -= xpForLevel(p.level);
     p.level++;
     meta.counters.levelUps++;
-    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+    recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
     ctx.emit({ type: 'levelup', level: p.level, pid: p.id });
