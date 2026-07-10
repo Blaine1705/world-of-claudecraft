@@ -64,6 +64,7 @@ import {
   SHATTER_CRIT_BONUS,
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
+import { spawnFrozenOrb } from './frozen_orb';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
@@ -1298,6 +1299,18 @@ export function runEffects(
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
           ctx.applyHeal(p, m, healAmount, ability.name);
         }
+        break;
+      }
+      case 'frozenOrb': {
+        // Frozen Orb (combat/frozen_orb.ts): release the drifting orb from the
+        // caster, snapshotting the per-pulse spell-power rider like a groundAoE.
+        spawnFrozenOrb(
+          ctx,
+          p,
+          eff,
+          ability.name,
+          directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
+        );
         break;
       }
       case 'groundAoE': {

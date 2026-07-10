@@ -741,6 +741,16 @@ const classAbilityNamesEn = {
         "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Flurry instant, 30% harder, and skips its cooldown. (Frost)",
       ],
       [
+        'frozen_orb',
+        'Frozen Orb',
+        'Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
+      ],
+      [
+        'blizzard',
+        'Blizzard',
+        'Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+      ],
+      [
         'fingers_of_frost',
         'Fingers of Frost',
         'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',

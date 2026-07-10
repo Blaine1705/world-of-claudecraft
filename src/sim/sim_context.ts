@@ -12,6 +12,7 @@
 // game/net/DOM/Three, no `Math.random`/`Date.now`), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import type { FrozenOrbState } from './combat/frozen_orb';
 import type { TalentModifiers } from './content/talents';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
@@ -94,6 +95,10 @@ export interface SimContextPrimitives {
   // delayedEvents.
   pendingProjectiles: PendingProjectile[];
   readonly groundAoEs: GroundAoE[];
+  // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): released by the cast's
+  // frozenOrb effect, drifted/pulsed by tickFrozenOrbs in the tick prologue.
+  // Mutated in place (push/splice) like groundAoEs, so read-only.
+  readonly frozenOrbs: FrozenOrbState[];
   // dungeon-door registry (I1) appended to on dungeon_door spawn; null until built.
   // Read-write: I1's updateDoorTriggers lazily assigns the array on first build.
   dungeonDoorIds: number[] | null;
@@ -763,6 +768,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get groundAoEs() {
       return host.groundAoEs;
+    },
+    get frozenOrbs() {
+      return host.frozenOrbs;
     },
     get dungeonDoorIds() {
       return host.dungeonDoorIds;

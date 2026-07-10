@@ -592,6 +592,9 @@ export const guideStrings = {
       'Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.',
     brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and harder-hitting.',
     shatter: 'Your spells crit far more often against frozen targets.',
+    frozen_orb:
+      'Rolls a slow orb through the pack that chills everything and feeds your frost procs.',
+    blizzard: 'Blankets an area in ice to wear down and slow a whole pack.',
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',

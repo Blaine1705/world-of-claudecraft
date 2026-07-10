@@ -50,6 +50,11 @@ export const ICE_LANCE_FROZEN_MULT = 3;
 // charges it just applied. The UI reads this same set for its glow scope.
 export const WINTERS_CHILL_SPENDERS: ReadonlySet<string> = new Set(['ice_lance']);
 
+// Blizzard feeds Frozen Orb: each enemy a pulse strikes shaves this off the
+// orb's running cooldown, capped per Blizzard cast (owner design 2026-07-11).
+export const BLIZZARD_ORB_CDR_PER_ENEMY = 0.5;
+export const BLIZZARD_ORB_CDR_CAP = 3;
+
 function isCommittedFrost(ctx: SimContext, meta: PlayerMeta): boolean {
   return meta.cls === 'mage' && ctx.playerMods(meta).spec === 'frost';
 }
@@ -220,6 +225,33 @@ export function frostMageAfterCast(
   } else if (ability.id === 'flurry' && isCommittedFrost(ctx, meta)) {
     if (target && !target.dead) applyWintersChill(ctx, p, target);
   }
+}
+
+/** Channel-start hook (casting_lifecycle's channel block): a fresh Blizzard
+ *  gets a fresh Frozen Orb refund budget. Inert for every other channel. */
+export function frostMageChannelStart(p: Entity, abilityId: string): void {
+  if (abilityId === 'blizzard') p.blizzardOrbCdr = 0;
+}
+
+/** Position-channel pulse hook: every enemy a Blizzard pulse struck shaves
+ *  BLIZZARD_ORB_CDR_PER_ENEMY off Frozen Orb's RUNNING cooldown, at most
+ *  BLIZZARD_ORB_CDR_CAP per cast (the budget frostMageChannelStart reset).
+ *  Deterministic tick math, no rng; a no-op without a running orb cooldown. */
+export function frostMageChannelPulse(
+  ctx: SimContext,
+  p: Entity,
+  abilityId: string,
+  struck: number,
+): void {
+  if (abilityId !== 'blizzard' || struck <= 0) return;
+  const spent = p.blizzardOrbCdr ?? 0;
+  const refund = Math.min(struck * BLIZZARD_ORB_CDR_PER_ENEMY, BLIZZARD_ORB_CDR_CAP - spent);
+  if (refund <= 0) return;
+  p.blizzardOrbCdr = spent + refund;
+  const cur = p.cooldowns.get('frozen_orb');
+  if (cur === undefined) return;
+  if (cur <= refund) p.cooldowns.delete('frozen_orb');
+  else p.cooldowns.set('frozen_orb', cur - refund);
 }
 
 /** Brain Freeze's cast-time override, applied in castAbility AFTER every

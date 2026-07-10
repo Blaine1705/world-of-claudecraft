@@ -90,6 +90,7 @@ function makeCtx() {
     get groundAoEs() {
       return groundAoEs;
     },
+    frozenOrbs: [],
     get dungeonDoorIds() {
       return dungeonDoorIds;
     },

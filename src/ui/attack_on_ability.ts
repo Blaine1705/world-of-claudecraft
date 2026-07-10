@@ -38,6 +38,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   aoeDamage: 'damage',
   aoeHeal: 'other',
   groundAoE: 'damage',
+  frozenOrb: 'damage',
   aoeRoot: 'damage',
   consumeAura: 'other',
   drainTick: 'damage',

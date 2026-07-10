@@ -60,7 +60,11 @@ import {
   hasFreeCostFor,
 } from './empower_next';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
-import { applyBrainFreezeOverride } from './frost_mage';
+import {
+  applyBrainFreezeOverride,
+  frostMageChannelPulse,
+  frostMageChannelStart,
+} from './frost_mage';
 import {
   hasCastShield,
   noteSpellHit,
@@ -632,6 +636,8 @@ export function castAbility(
   if (ability.channel) {
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
+    // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
+    frostMageChannelStart(p, ability.id);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
     const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
@@ -791,6 +797,9 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       radius,
     });
     const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    // How many enemies this pulse actually struck: Blizzard's Frozen Orb
+    // refund (frostMageChannelPulse below) scales with it.
+    let struck = 0;
     for (const eff of res.effects) {
       if (eff.type !== 'aoeDamage') continue;
       for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
@@ -800,8 +809,30 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         // mirroring the instant aoeDamage path in effect_dispatch.
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
         ctx.dealDamage(p, m, Math.round(dmg), false, res.def.school, res.def.name, 'hit');
+        struck++;
       }
     }
+    // A position channel may also carry an aoeSlow rider (Blizzard): each
+    // pulse re-applies the snare at the aimed point, refresh-by-id like the
+    // instant aoeSlow case in effect_dispatch.
+    for (const eff of res.effects) {
+      if (eff.type !== 'aoeSlow') continue;
+      for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
+        if (m.dead) continue;
+        if (!ctx.hasLineOfSight(p, m)) continue;
+        ctx.applyAura(m, {
+          id: `${res.def.id}_slow`,
+          name: res.def.name,
+          kind: 'slow',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.mult,
+          sourceId: p.id,
+          school: res.def.school,
+        });
+      }
+    }
+    frostMageChannelPulse(ctx, p, res.def.id, struck);
     return;
   }
 

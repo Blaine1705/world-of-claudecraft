@@ -47,6 +47,7 @@ import {
   handleDeath as handleDeathImpl,
 } from './combat/damage';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -1313,6 +1314,9 @@ export class Sim {
   readonly devCommands: boolean;
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
+  // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
+  // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
+  private frozenOrbs: FrozenOrbState[] = [];
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
   // (null once none is alive). Driven by updateWorldBosses() in the tick prologue.
@@ -2686,6 +2690,9 @@ export class Sim {
       get groundAoEs() {
         return sim.groundAoEs;
       },
+      get frozenOrbs() {
+        return sim.frozenOrbs;
+      },
       get dungeonDoorIds() {
         return sim.dungeonDoorIds;
       },
@@ -3350,6 +3357,8 @@ export class Sim {
     lap?.('worldBosses');
     tickGroundAoEs(this.ctx);
     lap?.('groundAoEs');
+    tickFrozenOrbs(this.ctx);
+    lap?.('frozenOrbs');
 
     runDespawnDecay(this.ctx);
     lap?.('despawnDecay');

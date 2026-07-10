@@ -1658,6 +1658,17 @@ export type AbilityEffect =
   | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
+  // caster that pulses frost damage + a snare every `interval` for `duration`
+  // seconds and feeds Fingers of Frost (frost mage spec kit).
+  | {
+      type: 'frozenOrb';
+      min: number;
+      max: number;
+      radius: number;
+      duration: number;
+      interval: number;
+    }
   // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
   // match ball toward the caster's castAim (power = ground speed yd/s, loft =
   // initial vertical speed); sportDash is a targetless directional lunge along
@@ -2107,6 +2118,10 @@ export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
+  // Transient per-cast budget: how much Frozen Orb cooldown this Blizzard
+  // channel has already refunded (combat/frost_mage.ts, reset at channel
+  // start). Never serialized or wired.
+  blizzardOrbCdr?: number;
   abilityCharges?: Record<
     string,
     {

@@ -250,6 +250,7 @@ function makeFakeHost() {
     delayedEvents: [],
     pendingProjectiles: [],
     groundAoEs: [],
+    frozenOrbs: [],
     dungeonDoorIds: null,
     instances: [],
     arenaMatches: new Map(),
