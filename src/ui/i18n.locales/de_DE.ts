@@ -348,6 +348,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Heroische Marken: {count}',
   'heroicShop.buyAria': '{item} für {marks} Heroische Marken kaufen',
   'hudChrome.bags.cannotDestroy': 'Dieser Gegenstand kann nicht zerstört werden.',
+  'hudChrome.bags.rightClickDestroy': 'Rechtsklick zum Zerstören',
   'hudChrome.crafting.comboRequirementUnmet':
     'Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.',
   'hudChrome.discord.roleTag.coredevs': 'Kernentwickler',
@@ -5019,7 +5020,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Interface',
   'guide.controls.groupMovement': 'Bewegung',
   'guide.controls.intro':
-    'Standardtasten für den Desktop. Jede Belegung lässt sich in den Optionen des Spiels ändern, außer Esc, das stets das Spielmenü öffnet, und eine Belegung kann eine Modifikatorkombination wie Shift+Z sein.',
+    'Standardtasten für den Desktop. Jede Belegung lässt sich in den Optionen des Spiels ändern.',
   'guide.controls.keyHeader': 'Taste',
   'guide.controls.leaderboard': 'Bestenliste',
   'guide.controls.mobileBody':
@@ -5274,7 +5275,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wähle eine Klasse und ein Aussehen, gib deinem Helden einen Namen und betritt die Welt. Du kannst später weitere Charaktere erstellen.',
   'guide.howToPlay.step1Title': 'Erstelle einen Charakter',
   'guide.howToPlay.step2Body':
-    'Marschall Redbrook wartet in der Startstadt mit Wölfe vor der Tür, und der nahe Vorarbeiter Odell hat ebenfalls Arbeit. Sprich mit einem von beiden, um deine erste Quest anzunehmen.',
+    'Marschall Redbrook wartet in der Startstadt. Sprich mit ihm und nimm Wölfe vor der Tür an.',
   'guide.howToPlay.step2Title': 'Finde deine erste Quest',
   'guide.howToPlay.step3Body':
     'Bewege dich mit W, A, S, D. Halte die rechte Maustaste gedrückt und ziehe, um dich umzusehen. Das ist schon fast alles.',
@@ -6883,6 +6884,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Entnehmen',
   'hudChrome.bank.withdrawQuantityInput': 'Zu entnehmende Menge',
   'hudChrome.bank.withdrawQuantityTitle': '{item} entnehmen',
+  'hud.core.mobileSettings': 'Einstellungen',
+  'entities.abilities.faerie_fire.description':
+    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar.',
   'abilityUi.tooltip.selfOnly': 'Nur auf Euch selbst',
   'itemUi.lootRoll.rolled': '{answered}/{total} gewürfelt',
   'entities.abilities.sunder_armor.description':

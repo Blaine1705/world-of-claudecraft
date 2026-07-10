@@ -49,7 +49,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.nav.professions': 'Professioni',
   'guide.nav.valeCup': 'Coppa della Valle',
   'guide.professions.archetypeChooseBody':
-    "Dichiarare un archetipo sarà un momento di trama: una missione che ti accoglie formalmente in quell'identità. Quella strada è ancora in costruzione, perciò per ora ogni personaggio percorre il mondo con la scelta ancora davanti a sé, e nel frattempo ogni mestiere avanza fino al grado di qualità raro.",
+    "Dichiari il tuo primo archetipo tramite una missione di trama iniziale della prima zona, che ti accoglie formalmente in quell'identità. Finché non completi quella missione, non hai ancora scelto alcun archetipo.",
   'guide.professions.archetypeChooseTitle': 'Scegliere il tuo archetipo',
   'guide.professions.archetypeIdentityBody':
     "L'archetipo attivo è una dichiarazione su chi è il tuo personaggio nel mondo, riconosciuta nel modo in cui gli altri e il mondo si rivolgono a te. Le ricompense e i riconoscimenti esatti che lo accompagnano sono ancora in via di definizione; torna a controllare man mano che il sistema prende forma.",
@@ -61,25 +61,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypeSwitchTitle': 'Cambiare idea',
   'guide.professions.archetypeTitle': 'I dieci archetipi',
   'guide.professions.craftComboBody':
-    "Oltre alla lista di ricette di un singolo mestiere, la ruota supporta anche ricette combinate che richiedono due mestieri vicini allo stesso tempo, premiando un personaggio che ha investito in mestieri adiacenti sull'anello anziché in uno solo isolato. L'artigiano deve possedere entrambi i mestieri di persona; l'abilità di un partner non può sostituire nessuna delle due metà.",
+    "Oltre alla lista di ricette di un singolo mestiere, la ruota supporta anche ricette combinate che richiedono due mestieri vicini allo stesso tempo, premiando un personaggio (o una coppia di partner commerciali) che ha investito in mestieri adiacenti sull'anello anziché in uno solo isolato.",
   'guide.professions.craftComboTitle': 'Ricette combinate',
   'guide.professions.craftIntro':
     'Dieci mestieri artigiani trasformano i materiali raccolti in equipaggiamento e beni finiti: Fabbricazione di armature, Fabbricazione di armi e Gioielleria danno forma alla materia grezza in equipaggiamento indossabile; Alchimia e Ingegneria procedono per tentativi ed errori; Cucina, Inscrizione e Incantamento toccano ciascuno il prodotto di altri mestieri; Sartoria e Conciatura lavorano da modelli esatti. Insieme formano una ruota, con ogni mestiere accanto a due vicini e opposto a un altro.',
   'guide.professions.craftMasteryBody':
-    "Creare con successo accresce l'abilità in quel mestiere, e l'abilità non blocca mai le ricette di un mestiere: se conosci una ricetta e ne possiedi i materiali, puoi tentarla. Ciò che l'abilità ti dà è invece la qualità, una mano esperta produce lavori più fini. L'unica eccezione sono le ricette combinate, che ti chiedono di esserti dimostrato valido in entrambi i loro mestieri prima di aprirsi.",
+    "Creare con successo accresce l'abilità in quel mestiere, e le ricette più ricche sono riservate a un'abilità più alta: quelle di base sono aperte a chiunque, mentre quelle via via più avanzate richiedono via via più maestria per essere tentate. Far crescere la tua abilità in un mestiere è il percorso dai semplici beni iniziali alle sue ricette più ambiziose.",
   'guide.professions.craftMasteryTitle': 'Abilità e maestria',
   'guide.professions.craftRecipesBody':
-    "Ogni ricetta richiede reagenti specifici da raccogliere o comprare. Le ricette più semplici non chiedono altro che materiali comuni e si possono creare fin dall'inizio, così puoi cominciare a esercitare un mestiere nel momento in cui lo scegli. Le liste delle ricette si stanno ancora completando: alcuni mestieri sono in attesa delle loro prime ricette, e altre ne arrivano man mano che i mestieri crescono.",
+    "Ogni mestiere ha le proprie ricette, ognuna delle quali richiede reagenti specifici da raccogliere o comprare. Le ricette più basilari di ogni mestiere non chiedono altro che materiali comuni e si possono creare fin dall'inizio, così puoi cominciare a esercitare un mestiere nel momento in cui lo scegli, senza dover aspettare di sbloccarlo.",
   'guide.professions.craftRecipesTitle': 'Ricette e reagenti',
   'guide.professions.craftRingBody':
     "I dieci mestieri sono disposti in un anello fisso, e la posizione di un mestiere su quell'anello conta: i mestieri vicini tra loro sulla ruota hanno più cose in comune di quelli sui lati opposti. Impegnarsi in un mestiere deve dare la sensazione di entrare in una famiglia di mestieri affini, non di scegliere un'abilità isolata.",
   'guide.professions.craftRingTitle': 'Una ruota di specialità',
   'guide.professions.craftTitle': 'I dieci mestieri artigiani',
   'guide.professions.gatherIntro':
-    "Tre mestieri di raccolta ti permettono di estrarre materie prime direttamente dal mondo: l'Estrazione mineraria cava minerale e pietra dalle vene, il Taglio del legname abbatte tronchi dai gruppi di alberi e l'Erbalismo raccoglie erbe e piante selvatiche. Ognuno è tracciato separatamente, quindi esercitarne uno non rallenta mai i tuoi progressi in un altro. Sei alle prime armi? Il Capomastro Odell a Eastbrook ha un breve incarico, Un Mestiere per Ogni Mano, che ti guida attraverso la tua prima raccolta.",
+    "Tre mestieri di raccolta ti permettono di estrarre materie prime direttamente dal mondo: l'Estrazione mineraria cava minerale e pietra dalle vene, il Taglio del legname abbatte tronchi dai gruppi di alberi e l'Erbalismo raccoglie erbe e piante selvatiche. Ognuno è tracciato separatamente, quindi esercitarne uno non rallenta mai i tuoi progressi in un altro.",
   'guide.professions.gatherProficiencyBody':
-    'Ogni raccolto riuscito accresce la tua competenza in quel mestiere di raccolta, e la scheda del personaggio tiene traccia di ogni mestiere per conto suo. Più pratica non peggiora mai i tuoi progressi, non fa che aggiungervisi.',
-  'guide.professions.gatherProficiencyTitle': 'Competenza',
+    'Ogni raccolto riuscito accresce la tua competenza in quel mestiere di raccolta. Una competenza più alta sposta ciò che estrai da un nodo verso gradi di materiale più rari, dal comune in su, anche se i gradi più rari restano rari perfino ad alta competenza. Più pratica non peggiora mai le tue probabilità, le migliora soltanto.',
+  'guide.professions.gatherProficiencyTitle': 'Competenza e qualità dei materiali',
   'guide.professions.gatherTitle':
     'Raccolta: Estrazione mineraria, Taglio del legname ed Erbalismo',
   'guide.professions.gatherToolsBody':
@@ -89,7 +89,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Vene di minerale, gruppi di alberi e macchie di erbe sono collocati nella Valle e nella palude come elementi visibili e senza padrone. Avvicinati a uno e interagisci per raccogliere ciò che contiene. Una volta raccolto un nodo, serve tempo perché si riprenda prima che tu, personalmente, possa raccoglierlo di nuovo, ma non blocca mai nessun altro: un altro giocatore può raccogliere lo stesso identico nodo nel frattempo.',
   'guide.professions.gatherWhatTitle': 'Nodi di risorse',
   'guide.professions.intro':
-    "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
+    "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento alle postazioni artigiane di dieci mestieri diversi e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
   'guide.valeCupPage.heading': 'La Coppa della Valle',
   'guide.valeCupPage.howHeading': 'Come si gioca',
   'guide.valeCupPage.howMatch':
@@ -128,7 +128,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Le regole della tregua significano niente esperienza e niente bottino: una partita decisa conta per il tuo bilancio e per il tabellone dei vincitori, e una vittoria conta anche per i compiti delle ricompense del giorno. Disertare una partita mette in panchina il tuo posto, e il Guardacampo non dimentica.',
   'guide.valeCupPage.rewardsHeading': 'Le regole della tregua',
   'guide.valeCupPage.rolesBody':
-    'Il tuo ruolo decide il kit che porti in campo. Tutti calciano; il resto è temperamento. Nelle categorie a uno e a due per squadra tutti giocano con il kit tuttofare, perciò le scelte di ruolo entrano in gioco davvero dalle tre per squadra in su.',
+    'Il tuo ruolo decide il kit che porti in campo. Tutti calciano; il resto è temperamento.',
   'guide.valeCupPage.rolesHeading': 'Ruoli sportivi',
   'guide.valeCupPage.spectateBody':
     'Allo stadio si gioca una partita alla volta, e chiunque può avvicinarsi e guardare dagli spalti.',
@@ -310,6 +310,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmetto della madre del coro',
   'entities.items.cryptplate_helm.name': 'Elmo della corazza della cripta',
   'entities.items.deathless_greatblade.name': 'Spadone senza morte',
+  'entities.items.deathless_warguard_legmail.name':
+    'Cosciali di maglia del guardiaguerra senza morte',
   'entities.items.gravescale_girdle.name': 'Cintura scagliatomba',
   'entities.items.gravewyrm_claws.name': 'Artigli del wyrm tombale',
   'entities.items.gravewyrm_cleaver.name': 'Mannaia del wyrm tombale',
@@ -329,6 +331,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.shadowpulse_handwraps.name': 'Bende ombrapulsante',
   'entities.items.shadowpulse_slippers.name': 'Calzari ombrapulsante',
   'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del wyrm tombale',
+  'entities.items.soulforged_warplate.name': 'Corazza da guerra forgianima',
+  'entities.items.soulrend_diadem.name': 'Diadema straccianima',
   'entities.items.stormcallers_focus.name': "Focus dell'evocatempesta",
   'entities.items.sunken_court_mantle.name': 'Mantello della corte sommersa',
   'entities.items.sutils_gambit.name': 'Gambetto di Sutil',
@@ -348,6 +352,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Marchi Eroici: {count}',
   'heroicShop.buyAria': 'Compra {item} per {marks} Marchi Eroici',
   'hudChrome.bags.cannotDestroy': 'Questo oggetto non può essere distrutto.',
+  'hudChrome.bags.rightClickDestroy': 'Clic destro per distruggere',
   'hudChrome.crafting.comboRequirementUnmet':
     'Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.',
   'hudChrome.discord.roleTag.coredevs': 'Sviluppatore Principale',
@@ -1157,25 +1162,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDevBadges': 'Mostra distintivi sviluppatore',
   'hudChrome.options.groundReticle': 'Reticolo di puntamento a terra',
   'hudChrome.options.startAttackOnAbility': "Attacco automatico all'uso dell'abilita",
-  'hudChrome.playerMenu.info': 'Info giocatore',
-  'hudChrome.playerMenu.block': 'Blocca',
-  'hudChrome.playerMenu.unblock': 'Sblocca',
-  'hudChrome.playerMenu.openFor': 'Apri il menu giocatore di {name}',
-  'hudChrome.playerMenu.profileUnavailable': 'Nessun profilo trovato per {name}.',
-  'hudChrome.playerMenu.aiTag': '[AI]',
-  'hudChrome.playerMenu.aiTagTitle': 'Account gestito da IA',
-  'hudChrome.playerMenu.watchTwitch': 'Guarda su Twitch',
-  'hudChrome.playerMenu.watchX': 'Vedi su X',
-  'hudChrome.playerMenu.watchKick': 'Guarda su Kick',
-  'hudChrome.playerMenu.watchYouTube': 'Guarda su YouTube',
-  'hudChrome.social.ignoredTab': 'Ignorati',
-  'hudChrome.social.ignoredEmpty': 'Non stai ignorando nessuno.',
-  'hudChrome.social.blockedEmpty': 'Non hai bloccato nessuno.',
-  'hudChrome.social.blockSearchPlaceholder': 'Nome del giocatore',
-  'hudChrome.social.blockAction': 'Blocca',
-  'hudChrome.social.nowBlocking': '{name} bloccato.',
-  'hudChrome.social.blockedTab': 'Bloccati',
-  'hudChrome.social.stopBlockingTitle': 'Sblocca {name}',
   'hudChrome.party.promoteLeader': 'Promuovi a Capo',
   'hudChrome.statInfo.desc.spellPower':
     "Aumenta il danno dei tuoi incantesimi e la potenza delle tue cure. Ogni punto di Intelletto conferisce un po' di Potere Magico, in aggiunta a quello dell'equipaggiamento o dei potenziamenti.",
@@ -4927,7 +4913,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "La modalità automatica attenua gli effetti CSS pesanti (sfocatura, bagliore, movimento dello sfondo) in base al tuo browser e dispositivo. Riducila manualmente se l'interfaccia sembra lenta.",
   'guide.bestiary.heading': 'Bestiario',
   'guide.bestiary.intro':
-    "Le creature del mondo, raggruppate per famiglia. Sono i nemici di tutti i giorni che incontri all'aperto. I nemici elite e i loro signori della guerra restano fuori da queste pagine, e le cose più letali di tutte attendono dietro le porte dei dungeon.",
+    "Le creature del mondo, raggruppate per famiglia. Sono i nemici che incontri all'aperto. Le cose più letali attendono, non elencate, dietro le porte dei dungeon.",
   'guide.bestiary.levels': 'Livelli da {min} a {max}',
   'guide.bestiary.levelsSame': 'Livello {min}',
   'guide.bestiary.rare': 'Raro',
@@ -4989,7 +4975,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Interfaccia',
   'guide.controls.groupMovement': 'Movimento',
   'guide.controls.intro':
-    "Tasti predefiniti per il desktop. Ogni associazione può essere cambiata nelle opzioni di gioco, tranne Esc, che apre sempre il menu di gioco, e un'associazione può essere una combinazione con tasto modificatore come Maiusc+Z.",
+    'Tasti predefiniti per il desktop. Ogni associazione può essere cambiata nelle opzioni di gioco.',
   'guide.controls.keyHeader': 'Tasto',
   'guide.controls.leaderboard': 'Classifica',
   'guide.controls.mobileBody':
@@ -4998,7 +4984,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.controls.talents': 'Talenti',
   'guide.controls.targetFriendly': "Bersaglia l'amico più vicino",
   'guide.delvesPage.affixesBody':
-    "Le incursioni più difficili estraggono un modificatore che cambia come si svolge la discesa, dai morti inquieti all'aria viziata fino alle volte cadenti. Alzano insieme il pericolo e la ricompensa. Ogni incursione attinge ai modificatori adatti al proprio tema; in tutto il reame, l'insieme si presenta così:",
+    "Le incursioni più difficili estraggono un modificatore che cambia come si svolge la discesa, dai morti inquieti all'aria viziata fino alle volte cadenti. Alzano insieme il pericolo e la ricompensa. Un'incursione a tema cripta può estrarne uno qualsiasi tra questi:",
   'guide.delvesPage.affixesHeading': "Modificatori dell'incursione",
   'guide.delvesPage.affixesLabel': 'Modificatori possibili',
   'guide.delvesPage.companionBody':
@@ -5090,11 +5076,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a1':
     "Sì. L'intero gioco è gratuito fino al livello massimo, e il codice sorgente è aperto su GitHub.",
   'guide.faqPage.a2':
-    'No. Il gioco è pienamente giocabile senza. Il token comunitario opzionale aggiunge solo fronzoli estetici e una quota del montepremi delle ricompense giornaliere, e non influisce mai su potere o progressione.',
+    'No. Il gioco è pienamente giocabile senza. Il token comunitario opzionale sblocca solo fronzoli estetici e non influisce mai su potere o progressione.',
   'guide.faqPage.a3':
     "Sì. Il gioco gira in un browser mobile con comandi touch, e c'è anche un launcher per desktop.",
   'guide.faqPage.a4':
-    "Sì. C'è una modalità offline per giocatore singolo immediata, e il mondo online è pienamente affrontabile in solitaria a parte i dungeon, l'incursione e il boss del mondo.",
+    "Sì. C'è una modalità offline per giocatore singolo immediata, e il mondo online è pienamente affrontabile in solitaria a parte dungeon e incursione.",
   'guide.faqPage.a5':
     'Nove, che coprono i ruoli classici di tank, guaritore e danno, ognuna con un sistema di risorse (ira, mana o energia) e le proprie abilità distintive.',
   'guide.faqPage.a6':
@@ -5434,13 +5420,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     'Potenziamenti e bonus durano solo per la partita. Sono pensati per costruzioni giocose e improvvisate, non per un potere duraturo, così nessuno si compra la vittoria.',
   'guide.arenaPage.coliseumBody':
-    "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate, uno contro uno o due contro due. Ogni categoria mantiene la propria classifica, perciò una vittoria ti fa salire in quella graduatoria sotto gli occhi di tutto il reame. Apri la finestra dell'Arena per iscriverti a una categoria, da solo o con il tuo compagno.",
+    "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate, uno contro uno o due contro due. Ogni categoria mantiene la propria classifica, perciò una vittoria ti fa salire in quella graduatoria sotto gli occhi di tutto il reame.",
   'guide.arenaPage.coliseumHeading': 'Il Colosseo di Cenere',
   'guide.arenaPage.duelsBody':
     "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
   'guide.arenaPage.duelsHeading': 'Duelli',
   'guide.arenaPage.fiestaBody':
-    'Fiesta è una rissa rapida due contro due giocata come un unico incontro continuo, con ogni combattente portato su un piano di parità. Man mano che lo scontro procede arruoli potenziamenti, boost veloci che rimodellano il tuo arsenale al volo, così non ci sono due partite uguali.',
+    "Fiesta è una modalità rapida due contro due giocata in round brevi. Tra un round e l'altro arruoli potenziamenti, boost veloci che rimodellano il tuo arsenale al volo, così non ci sono due partite uguali.",
   'guide.arenaPage.fiestaHeading': 'Fiesta due contro due',
   'guide.arenaPage.heading': 'Arena e PvP',
   'guide.arenaPage.intro':
@@ -5464,7 +5450,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.style': 'Stile',
   'guide.classPage.fullKitHeading': "L'arsenale completo",
   'guide.classPage.fullKitNote':
-    "L'arsenale che questa classe impara salendo di livello, nell'ordine in cui diventa disponibile. I talenti concedono qualche abilità in più e decidono quali sorreggono la tua costruzione.",
+    "Tutte le abilità che questa classe può imparare, nell'ordine in cui diventano disponibili. Sono i talenti a decidere quali sorreggono la tua costruzione.",
   'guide.classPage.masteryLabel': 'Maestria',
   'guide.classPage.petsHeading': 'Demoni',
   'guide.classPage.petsNote':
@@ -5472,7 +5458,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.levelBand': 'Livelli da {min} a {max}',
   'guide.dungeonsPage.partySize': '{n} giocatori',
   'guide.faqPage.a10':
-    "Il limite è il livello {cap}. Da lì affronti i dungeon a cinque giocatori e l'incursione a dieci, li ripeti in modalità eroica per bottino potenziato, sfidi il boss del mondo quando si erge, ti metti alla prova nell'arena, ti cali nelle esplorazioni con un compagno al fianco e insegui le imprese nel Libro delle Imprese per scalare le graduatorie del reame.",
+    "Il limite è il livello {cap}. Da lì affronti i dungeon a cinque giocatori e l'incursione a dieci, vai a caccia di equipaggiamento migliore e ti metti alla prova nell'arena.",
   'guide.faqPage.a11':
     'Invita nel gruppo chiunque incontri, chiedi in chat o fai squadra a un dungeon. Gran parte del mondo è affrontabile da soli, quindi fare gruppo è una scelta, non un obbligo.',
   'guide.faqPage.a9':
@@ -5552,7 +5538,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Adatta al gioco in solitaria',
   'guide.talentsPage.heading': 'Talenti e specializzazioni',
   'guide.talentsPage.howBody':
-    "I talenti si sbloccano al livello 10, e continui a guadagnare punti man mano che sali verso il limite. Li spendi nel pannello dei talenti della tua classe, dove le file più profonde si aprono man mano che investi e sali di livello, e puoi salvare più di una configurazione per passare da una costruzione all'altra.",
+    "I talenti si sbloccano al livello 10, e continui a guadagnare punti man mano che sali verso il limite. Li spendi nel pannello dei talenti della tua classe, e puoi salvare più di una configurazione per passare da una costruzione all'altra.",
   'guide.talentsPage.howHeading': 'Come funzionano',
   'guide.talentsPage.intro':
     'I talenti sono il modo in cui rendi una classe tua. Sono facoltativi, indulgenti e facili da cambiare, così puoi sperimentare senza timori.',
@@ -5562,7 +5548,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.shareNote':
     'Una configurazione finita può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla direttamente nel proprio pannello dei talenti per caricarla.',
   'guide.talentsPage.specsBody':
-    "Ogni classe ha una manciata di specializzazioni, ciascuna con il proprio ruolo e un'impronta caratteristica. Sceglierne una nel pannello dei talenti concede un'abilità distintiva e una maestria duratura tutta sua. Ecco la forma di tutte quante. Apri una classe per il suo arsenale completo.",
+    "Ogni classe ha una manciata di specializzazioni, ciascuna con il proprio ruolo e un'impronta caratteristica. Ecco la forma di tutte quante. Apri una classe per il suo arsenale completo.",
   'guide.talentsPage.specsHeading': 'Specializzazioni per classe',
   'guide.talentsPage.whatBody':
     'Salendo di livello, guadagni punti talento da spendere in piccoli, permanenti miglioramenti alle tue abilità e statistiche. Plasmano il modo in cui una classe si sente, orientandola verso più danno, una difesa più solida o cure più potenti.',
@@ -5613,7 +5599,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "L'ondata d'apertura: potenziamenti netti a singola statistica che affinano le basi della tua classe.",
   'guide.arenaPage.waveSilverTitle': 'Argento',
   'guide.arenaPage.wavesBody':
-    "Un incontro di Fiesta ti offre nuove scelte man mano che procede, e le scelte si fanno più audaci quanto più a lungo dura lo scontro. Costruisci da un'ondata alla successiva, scegliendo ogni volta una tra poche opzioni e tenendola per il resto dell'incontro.",
+    "Ogni round di una Fiesta ti offre una nuova scelta, e le scelte si fanno più audaci man mano che la partita procede. Costruisci da un'ondata alla successiva, scegliendo ogni volta una tra poche opzioni e tenendola per il resto dell'incontro.",
   'guide.arenaPage.wavesTitle': 'I potenziamenti arrivano a ondate',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Servi incappucciati del culto della morte la cui opera profana le tombe dalla Valle alle vette. Dove si radunano, i morti non riposano.',
@@ -5627,12 +5613,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un elementale della tempesta dotato di spalle, che cammina sulle creste lontane sopra Stormcrag con una scheggia del cuore che vale la pena di sfidare i fulmini.',
   'guide.bestiary.notedLabel': 'Da notare',
   'guide.combat.ccBody':
-    'Il controllo della folla è un tipo speciale di malus che limita ciò che un bersaglio può fare: stordimenti, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure e trasformazioni che rendono un nemico inoffensivo per un momento. Contro gli altri giocatori, il controllo si logora con la ripetizione: lo stesso tipo riapplicato troppo in fretta si indebolisce e poi fallisce del tutto, e uno stordimento che apre dalla furtività viene conteggiato a parte rispetto agli stordimenti che seguono, così nessuno può essere incatenato indifeso per sempre. Le creature del mondo non serbano un tale rancore: su di loro il controllo non si indebolisce mai con la ripetizione, anche se molti dei nemici più possenti, gli elite dotati di nome e i boss più forti tra loro, non possono essere controllati affatto.',
+    "Il controllo della folla è un tipo speciale di malus che limita ciò che un bersaglio può fare: stordimenti, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure e trasformazioni che rendono un nemico inoffensivo per un momento. Alcuni di questi, come radicamenti, paure e trasformazioni, perdono presa se riapplicati troppo in fretta, perciò non possono essere concatenati all'infinito.",
   'guide.combat.deathBody':
-    "Se la tua salute arriva a zero, cadi a terra dove ti trovi, e il tuo corpo resta lì. Libera il tuo spirito e risorgi come spettro al cimitero più vicino: più rapido dei vivi, fuori dalla portata dei tuoi nemici, ma incapace di combattere, saccheggiare o parlare con chiunque tranne il Custode Pallido che aleggia sulle pietre. Da lì scegli. Riporta il tuo spettro fino al corpo e rivivi sul posto con parte della salute e del mana ripristinati e senza alcuna penalità. Oppure accetta dal Custode Pallido un risveglio immediato dove ti trovi, al prezzo del Mal di resurrezione: un indebolimento temporaneo di tutto ciò che sei, che dura più a lungo quanto più sei navigato e risparmia del tutto i personaggi appena creati. Cadi dentro un dungeon e il tuo spirito ti attende al cimitero all'esterno; riporta lo spettro oltre la soglia e rivivi all'ingresso. Le esplorazioni fanno eccezione: se cadi lì vieni semplicemente rimesso in piedi all'ingresso dell'esplorazione, anche se una seconda caduta pone fine alla spedizione. In un modo o nell'altro, non perdi esperienza, equipaggiamento o monete. Tra uno scontro e l'altro, siediti a mangiare e bere così affronti il prossimo a piena forza.",
+    "Se la tua salute arriva a zero, cadi. Libera il tuo spirito per risorgere al cimitero più vicino a piena salute, poi torna sui tuoi passi, così una morte ti costa un po' di tempo, non i tuoi progressi. Tra uno scontro e l'altro, siediti a mangiare e bere così affronti il prossimo a piena forza.",
   'guide.combat.deathTitle': 'Quando cadi',
   'guide.combat.effectsBody':
-    "Molte abilità applicano un effetto che permane. Quelli benefici (potenziamenti) aumentano le tue statistiche, ti proteggono o ti curano un po' alla volta; quelli dannosi (malus) ti prosciugano la salute con danno nel tempo o ti indeboliscono. Tieni d'occhio le piccole icone nell'angolo in alto dello schermo, accanto alla minimappa, per vedere cosa hai addosso e quanto dura.",
+    "Molte abilità applicano un effetto che permane. Quelli benefici (potenziamenti) aumentano le tue statistiche, ti proteggono o ti curano un po' alla volta; quelli dannosi (malus) ti prosciugano la salute con danno nel tempo o ti indeboliscono. Tieni d'occhio le piccole icone vicino alla barra delle azioni per vedere cosa hai addosso e quanto dura.",
   'guide.combat.effectsTitle': 'Potenziamenti, malus e controllo della folla',
   'guide.dungeonsPage.cryptLeadBody':
     'In alto sulle vette, lontano dallo scontro principale, giace un mistero più gelido. Vecchie tombe portano una corona di cui nessuna cronaca conserva memoria, e i morti che le custodiscono servirono un tempo un re dimenticato. Leggi le loro lapidi, raccogli le chiavi di volta che custodivano, e potrai dissigillare un sepolcro che tre anime fedeli morirono per tenere chiuso: la prova facoltativa che apre il reame alla sua incursione per dieci giocatori, per chi segue gli indizi fino in fondo.',
@@ -5652,7 +5638,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Anche gli oggetti che non ti servono si vendono a qualunque venditore, perciò svuota le borse ogni volta che passi per la città invece di lasciarle riempire. La scheda Vendi del venditore tiene persino un pulsante che con un solo clic vende in blocco ogni cianfrusaglia di qualità Scadente. Le cianfrusaglie davvero senza valore possono anche essere scartate del tutto per far spazio.',
   'guide.economy.junkTitle': 'Liberarsi delle cianfrusaglie',
   'guide.economy.marketBody':
-    "Il Mercante gestisce il Mercato Mondiale, una piazza di scambio guidata dai giocatori dove puoi comprare e vendere con persone che forse non incontrerai mai. Parla con il Mercante a Eastbrook, o con il Banditore Voss lassù a Highwatch, per aprirlo: entrambi i custodi servono l'unico mercato condiviso. Il Mercante tiene anche una scorta fissa di merce propria in vendita lì, così c'è sempre qualcosa da comprare anche quando nessun altro giocatore ha messo in vendita nulla.",
+    "Il Mercante gestisce il Mercato Mondiale, una piazza di scambio guidata dai giocatori dove puoi comprare e vendere con persone che forse non incontrerai mai. Parla con il Mercante per aprirlo. Il Mercante tiene anche una scorta fissa di merce propria in vendita lì, così c'è sempre qualcosa da comprare anche quando nessun altro giocatore ha messo in vendita nulla.",
   'guide.economy.marketBrowse':
     "Sfogliare: scorri gli annunci o cerca per nome per trovare ciò che è in vendita. Ogni annuncio mostra la merce, il venditore e il prezzo richiesto per l'intera pila.",
   'guide.economy.marketCollect':
@@ -5663,8 +5649,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Il prezzo lo decidi tu. Elencare a un po' meno di quanto chiedono gli altri tende a vendere più in fretta, mentre un prezzo esagerato può restare intatto. Sfoglia prima per vedere qual è la quotazione corrente prima di mettere in vendita.",
   'guide.economy.marketTitle': 'Il Mercato Mondiale',
   'guide.economy.marksBody':
-    "Le monete non sono l'unica cosa che metti da parte. Le incursioni pagano in Sigilli d'Incursione, spesi solo dal custode delle incursioni in potenziamenti per la compagna ed equipaggiamento che non troverai altrove. Le versioni eroiche dei dungeon lasciano Marchi Eroici sul boss finale, spesi presso il Quartiermastro Eroico a Highwatch in gioielli che nessun altro angolo del reame vende. Nessuna delle due si mescola mai con le tue monete.",
-  'guide.economy.marksTitle': 'Sigilli e Marchi: le valute oltre le monete',
+    "Le monete non sono l'unica cosa che metti da parte. Le incursioni pagano in Sigilli d'Incursione, una valuta separata che spendi solo dal custode delle incursioni, in potenziamenti per la compagna ed equipaggiamento che non troverai altrove. Non si mescolano mai con le tue monete.",
+  'guide.economy.marksTitle': "Una seconda valuta: i Sigilli d'Incursione",
   'guide.economy.tradeBody':
     'Puoi scambiare faccia a faccia con chiunque ti stia vicino. Entrambi mettete oggetti e monete in una finestra condivisa e lo scambio avviene solo dopo che entrambi lo confermate, così nessuno dei due può essere ingannato. È il modo semplice per passare un bottino a un amico o concludere un accordo.',
   'guide.economy.tradeTitle': 'Scambiare con altri giocatori',
@@ -5701,7 +5687,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     "L'equipaggiamento è ciò che il tuo personaggio indossa e gli oggetti che porta con sé. Un equipaggiamento migliore è il modo più costante per diventare più forte, e ne raccogli gran parte semplicemente giocando.",
   'guide.gear.itemLevelBody':
-    "Se vuoi un modo rapido per confrontare due pezzi, attiva Mostra livello oggetto nelle opzioni. L'equipaggiamento conquistato nel mondo, da nemici e missioni, mostra allora un livello oggetto, un singolo numero che indica all'incirca quanto è potente in base alla sua provenienza, così puoi capire a colpo d'occhio quale miglioramento conta di più, anche tra slot diversi. I pezzi privi di tale origine, come le basi comuni dei venditori e l'equipaggiamento iniziale, non mostrano alcun livello oggetto, perciò un numero mancante è normale, non un difetto.",
+    "Se vuoi un modo rapido per confrontare due pezzi, attiva Mostra livello oggetto nelle opzioni. Ogni arma e ogni pezzo d'armatura mostrerà allora un livello oggetto, un singolo numero che indica all'incirca quanto è potente in base alla sua provenienza, così puoi capire a colpo d'occhio quale miglioramento conta di più, anche tra slot diversi.",
   'guide.gear.qualityBody':
     "Ogni oggetto ha una qualità, e il suo nome è colorato di conseguenza così puoi leggerne il valore a colpo d'occhio. Dal più comune al più pregiato:",
   'guide.gear.qualityCommon': 'Comune',
@@ -5714,7 +5700,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityTitle': "La qualità, a colpo d'occhio",
   'guide.gear.qualityUncommon': 'Non comune',
   'guide.gear.setsBody':
-    'Alcune armature arrivano in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello; le più grandi arrivano dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.',
+    "L'armatura più rara arriva in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Cadono dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.",
   'guide.gear.setsTitle': 'Le tenute e i loro bonus',
   'guide.gear.slotChest': 'Petto',
   'guide.gear.slotFeet': 'Piedi',
@@ -5725,10 +5711,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': 'Spalle',
   'guide.gear.slotWaist': 'Vita',
   'guide.gear.slotsBody':
-    "Hai uno slot per l'arma, sette slot per l'armatura e tre slot per i gioielli: un collo e due dita. Ogni classe può usare solo certe armi e indossa armatura fino al proprio peso, stoffa, cuoio o maglia, perciò i miglioramenti adatti a te sono quelli fatti per la tua classe. I gioielli non hanno alcun peso: qualsiasi classe indossa ciò che guadagna. Detto questo, riempi ogni slot con il pezzo migliore che trovi.",
+    "Hai uno slot per l'arma e sette slot per l'armatura. Ogni classe può usare solo certe armi e indossa armatura fino al proprio peso, stoffa, cuoio o maglia, perciò i miglioramenti adatti a te sono quelli fatti per la tua classe. Detto questo, riempi ogni slot con il pezzo migliore che trovi.",
   'guide.gear.slotsTitle': 'Cosa puoi equipaggiare',
   'guide.gear.sourcesBody':
-    "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
+    'Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, e il mercato dei giocatori ti permette di comprare da altri avventurieri.',
   'guide.gear.sourcesTitle': "Da dove arriva l'equipaggiamento",
   'guide.gear.upgradeBody':
     'Sostituire un vecchio pezzo con un miglioramento fresco fa di più per te che giocare alla perfezione con un equipaggiamento che hai superato. Quando cade qualcosa di migliore o una missione te lo offre, prendilo. Non conservare i tuoi oggetti buoni per dopo.',
@@ -5764,7 +5750,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.progression.capBody':
     'Ogni livello ti rende più resistente e porta nuove abilità, fino al limite del livello {cap}.',
   'guide.progression.capJourneyBody':
-    "Il livello {cap} è il limite, la fine della crescita di livello ma non della crescita in sé. Da lì affronti i dungeon e l'incursione in modalità normale ed eroica, sfidi il boss del mondo quando si erge, insegui un equipaggiamento migliore e ti metti alla prova nell'arena.",
+    "Il livello {cap} è il limite, la fine della crescita di livello ma non della crescita in sé. Da lì affronti i dungeon e l'incursione, insegui un equipaggiamento migliore e ti metti alla prova nell'arena.",
   'guide.progression.capTitle': 'Raggiungere il livello {cap}',
   'guide.progression.intro':
     'Ogni scontro, ogni missione e ogni passo verso nord rende più forte il tuo eroe. Ecco come funziona la crescita di livello e cosa ti mantiene in crescita una volta raggiunta la cima.',
@@ -5774,7 +5760,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     "Non c'è fretta. Il mondo è lì per essere goduto al tuo ritmo, perciò vaga, prendi le missioni che attirano il tuo sguardo e lascia che il tuo eroe cresca lungo il cammino.",
   'guide.progression.prestigeBody':
-    "L'esperienza continua a contare anche dopo il limite. Alimenta un livello virtuale estetico, così la tua barra dell'esperienza continua a salire, e un grado di prestigio a lungo termine che puoi reclamare dalla scheda del personaggio una volta arrivato. Superare grandi traguardi di esperienza totale fa guadagnare anche imprese nel tuo Libro delle Imprese, con titoli estetici e bordi della targhetta che compaiono sulla scheda del personaggio. È tutto puramente facoltativo e non concede mai potere, solo un segno della strada che hai percorso.",
+    "L'esperienza continua a contare anche dopo il limite. Alimenta un livello virtuale puramente estetico, così la tua barra dell'esperienza continua a salire, e un grado di prestigio a lungo termine che puoi guadagnare per il riconoscimento. Superare grandi traguardi di esperienza totale sblocca anche titoli estetici e bordi della targhetta che compaiono sulla tua scheda del personaggio. È tutto del tutto facoltativo e non concede mai potere, solo un segno della strada che hai percorso.",
   'guide.progression.restedBody':
     'Entra in una locanda e resta fuori dal combattimento, e il tuo personaggio accumula esperienza da riposo mentre aspetti. Ogni città ne ha una. La prossima volta che esci a combattere, quella riserva dà alle tue uccisioni una spinta extra finché non si esaurisce. Una pausa alla locanda non è mai tempo sprecato; accelera il tuo prossimo tratto di salita di livello.',
   'guide.progression.restedTitle': 'Esperienza da riposo',
@@ -5848,7 +5834,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'La chat è divisa in canali, ciascuno mostrato nella propria scheda. Scrivi un messaggio per inviarlo sul canale attivo, oppure usa un comando barra per dirigere una riga altrove. Questi sono i canali su cui puoi parlare:',
   'guide.social.chatHeading': 'Canali di chat',
   'guide.social.etiquetteBody':
-    "Fare gruppo è una scelta, non un dovere. Saluta quando ti unisci, tira Bisogno solo sull'equipaggiamento che userai davvero, e avvisa il gruppo prima di andartene. Un po' di cortesia fa molta strada, e la maggior parte dei giocatori è lieta della compagnia. I moderatori mantengono l'ordine, e un giocatore che non lascia gli altri godersi il gioco può essere spostato in una cella di prigione finché un moderatore non lo fa uscire.",
+    "Fare gruppo è una scelta, non un dovere. Saluta quando ti unisci, tira Bisogno solo sull'equipaggiamento che userai davvero, e avvisa il gruppo prima di andartene. Un po' di cortesia fa molta strada, e la maggior parte dei giocatori è lieta della compagnia.",
   'guide.social.etiquetteHeading': 'Galateo di gruppo',
   'guide.social.friendsBody':
     'Aggiungi giocatori alla tua lista amici per vedere quando sono online e dove si trovano, così puoi fare gruppo nel momento in cui si connettono.',
@@ -5888,13 +5874,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "L'Agilità ti affina in vari modi: aumenta la tua probabilità di mettere a segno un colpo critico e la tua probabilità di schivare, e aggiunge un po' di armatura. Per ladri e cacciatori alimenta anche la potenza d'attacco, e regge i tiri a distanza di un cacciatore.",
   'guide.stats.agiTitle': 'Agilità',
   'guide.stats.apBody':
-    "La potenza d'attacco misura quanto forte colpisce la tua arma. I tuoi attributi primari la alimentano, e l'equipaggiamento che porta quegli attributi la innalza ulteriormente, mentre un'arma più forte aumenta direttamente il tuo danno, ed è per questo che un miglioramento può essere un vero salto di danno.",
+    "La potenza d'attacco misura quanto forte colpisce la tua arma. I tuoi attributi primari la alimentano, e armi ed equipaggiamento più forti la innalzano ulteriormente, ed è per questo che un miglioramento può essere un vero salto di danno.",
   'guide.stats.apTitle': "Potenza d'attacco",
   'guide.stats.armorBody':
     "L'armatura riduce il danno fisico che subisci. Proviene per lo più da ciò che indossi, e le classi con armatura più pesante ne portano molta di più. Più armatura contro un nemico vicino al tuo livello significa che ognuno dei suoi colpi arriva più attenuato.",
   'guide.stats.armorTitle': 'Armatura',
   'guide.stats.critBody':
-    "La tua probabilità di colpo critico è quanto spesso un attacco arriva infliggendo danno extra. Tutti partono con una piccola probabilità di base, e l'Agilità (più alcuni talenti ed equipaggiamento) la accresce. La tua scheda mostra sia la probabilità stessa sia l'indice di colpo critico con cui il tuo equipaggiamento vi contribuisce.",
+    "La tua probabilità di colpo critico è quanto spesso un attacco arriva infliggendo danno extra. Tutti partono con una piccola probabilità di base, e l'Agilità (più alcuni talenti ed equipaggiamento) la accresce.",
   'guide.stats.critTitle': 'Colpo critico',
   'guide.stats.dodgeBody':
     "La schivata è la tua probabilità di evitare del tutto un attacco in mischia in arrivo. Inizi con una piccola probabilità di base, e l'Agilità la accresce, così le classi più agili scansano più colpi.",
@@ -5920,7 +5906,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "La potenza magica è la controparte da incantatore della potenza d'attacco: aumenta i danni che infliggono i tuoi incantesimi. L'Intelletto la alimenta, ed equipaggiamento e potenziamenti da incantatore ne aggiungono ancora, perciò un incantatore tiene d'occhio la potenza magica come un combattente in mischia tiene d'occhio la potenza d'attacco.",
   'guide.stats.spTitle': 'Potenza magica',
   'guide.stats.spiBody':
-    "Lo Spirito governa la rapidità con cui torna il mana di un incantatore ogni volta che interrompe il lancio, cioè per la maggior parte del tempo tra uno scontro e l'altro. Come l'Intelletto, serve le classi a mana e conta poco per le altre.",
+    "Lo Spirito governa la rapidità con cui torna il mana di un incantatore fuori dal combattimento. Come l'Intelletto, serve le classi a mana e conta poco per le altre.",
   'guide.stats.spiTitle': 'Spirito',
   'guide.stats.staBody':
     "La Costituzione è la tua tenuta. Più Costituzione significa una riserva di salute più ampia, e accelera la salute che recuperi mentre riposi fuori dal combattimento. Ogni classe ne vuole un po'.",
@@ -5941,12 +5927,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.marshGreeting':
     "Fermati al cancello. Oltre quelle canne, l'acquitrino uccide al posto nostro.",
   'guide.worldPage.marshPlaceNotes':
-    "Fenbridge custodisce l'unica strada asciutta. Le Canne del Predatore e le Secche di Deepfen brulicano di bestie di palude e mudfin; il Roveto della Vedova è fittamente intessuto di ragnatele; la Cappella Annegata e i Tumuli dei Troll custodiscono pericoli più antichi, con La Litania Annegata, l'incursione della palude, che si apre appena a nord dei tumuli; l'Accampamento del Gravecaller è il culto trincerato, e il Bastione Sommerso è il cuore istanziato della palude.",
+    "Fenbridge custodisce l'unica strada asciutta. Le Canne del Predatore e le Secche di Deepfen brulicano di bestie di palude e mudfin; il Roveto della Vedova è fittamente intessuto di ragnatele; la Cappella Annegata e i Tumuli dei Troll custodiscono pericoli più antichi; l'Accampamento del Gravecaller è il culto trincerato, e il Bastione Sommerso è il cuore istanziato della palude.",
   'guide.worldPage.peaksGreeter': 'Capitano Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Duecento anni ha retto questo muro. Non cederà sotto la mia guardia, ma geme.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch tiene il muro. La Cresta del Cacciatore e le Tane di Deeprock appartengono ai felini di cresta e agli scavatori; le Pendici degli Ogre e l'Accampamento di Guerra di Drogmar ai bruti a pagamento; Stormcrag crepita di elementali, e sotto di esso risplende il Glimmermere, il laghetto la cui riva custodisce il portale di luce pallida che scende al Tempio Annegato; le Tende del Culto del Wyrm e i Campi dei Revenant cingono l'altura del culto, con il Santuario del Gravewyrm alla sua sommità.",
+    "Highwatch tiene il muro. La Cresta del Cacciatore e le Tane di Deeprock appartengono ai felini di cresta e agli scavatori; le Pendici degli Ogre e l'Accampamento di Guerra di Drogmar ai bruti a pagamento; Stormcrag crepita di elementali e il Glimmermere risplende sotto di esso; le Tende del Culto del Wyrm e i Campi dei Revenant cingono l'altura del culto, con il Santuario del Gravewyrm alla sua sommità.",
   'guide.worldPage.valeGreeter': 'Maresciallo Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Tieni la lama a portata. La Valle non è più quella di un tempo.',
   'guide.worldPage.valePlaceNotes':
@@ -6745,7 +6731,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Pioggia ambientale e neve. Solo atmosfera e spegnendolo si risparmia un po' durante i temporali.",
   'guide.settingsPage.tableFoot':
     "Cerchi uno slider per la distanza di visualizzazione o un cap FPS? Non c'è niente da cercare: la distanza di visualizzazione fa parte di ogni livello di qualità e il ritmo dei fotogrammi segue la visualizzazione.",
-  'guide.settingsPage.tableHeading': 'Ogni opzione grafica, spiegata',
+  'guide.settingsPage.tableHeading': 'Ogni opzione, spiegata',
   'guide.settingsPage.tagReload': 'dopo la ricarica',
   'guide.settingsPage.value100': '100%',
   'guide.settingsPage.value50to70': 'dal 50 al 70%',
@@ -6850,6 +6836,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Invita un amico: quando raggiunge il livello 10 guadagnate 2 spazi ciascuno, fino a 5 amici.',
   'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'hud.core.mobileSettings': 'Impostazioni',
+  'entities.abilities.faerie_fire.description':
+    "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura.",
   'abilityUi.tooltip.selfOnly': 'Solo su di sé',
   'itemUi.lootRoll.rolled': '{answered}/{total} hanno tirato',
   'entities.abilities.sunder_armor.description':

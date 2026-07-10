@@ -2,53 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
-  'loading.tips.classes':
-    'İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.',
-  'loading.tips.dungeons':
-    'İpucu: normal zorluk için fazla güçlü hale geldiğinde, daha çetin ve daha ödüllendirici bir mücadele için zindanı kahramanca zorlukta dene.',
-  'loading.tips.guilds':
-    'İpucu: bir loncaya katılmak sana özel bir sohbet kanalı ve lonca arkadaşlarınla ortak bir üye listesi verir.',
-  'loading.tips.loadouts':
-    'İpucu: puanları iki kez harcamadan farklı dizilimler arasında geçmek için birden fazla yetenek düzeni kaydet.',
-  'loading.tips.market':
-    'İpucu: Dünya Pazarı, dünya genelindeki oyuncularla alım satım yapmanı sağlar.',
-  'loading.tips.professions':
-    'İpucu: toplama ve üretim mesleklerini savaş sınıfının yanında geliştirebilirsin.',
-  'loading.tips.pvp':
-    'İpucu: dizilimini sınamak için başka bir oyuncuya dostça düello teklif et veya Kül Koliseumu arenası sırasına gir.',
-  'loading.tips.talents':
-    'İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.',
-  'entities.items.chunk_of_ore.name': 'Maden Parçası',
-  'entities.quests.q_prof_intro.completion':
-    'Gördün mü? Çantanda maden, ellerinde nasır. Yollarda gezerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosuna ve yakındaki üretim tezgahına göz at. İstersen bunların hepsinde iyi bir geçim var.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Maden Parçası',
-  'entities.quests.q_prof_intro.text':
-    "Doğudere'de herkes kılıcın yanında bir zanaatla uğraşır, {playerName}. Kasabanın etrafına dağılmış maden damarları var; git kazmanı salla ve bana 5 parça getir. Kendin çıkar, unutma; farkı anlarım.",
-  'entities.quests.q_prof_intro.title': 'Her Ele Bir Zanaat',
-  'hudChrome.auth.appleChoiceExpired':
-    'Bu Apple oturum açma işleminin süresi doldu. Lütfen Apple ile yeniden oturum aç.',
-  'hudChrome.auth.appleChoiceIntro':
-    'Yeni bir hesap oluştur veya Apple hesabını mevcut hesabına bağla.',
-  'hudChrome.auth.appleError': 'Apple ile oturum açılamadı. Lütfen tekrar dene.',
-  'hudChrome.auth.appleLoginCta': 'Apple ile Devam Et',
-  'hudChrome.dailyRewards.reason.banned': 'Günlük Ödüllerden yasaklandın. Gerekçe: {reason}',
-  'hudChrome.itemHeroicTag': '[KAHRAMANCA]',
-  'hudChrome.itemSoulbound': 'Ruha Bağlı',
-  'hudChrome.keybinds.categoryPet': 'Yoldaş',
-  'hudChrome.keybinds.petAggressive': 'Yoldaş: Saldırgan',
-  'hudChrome.keybinds.petAttack': 'Yoldaş: Saldır',
-  'hudChrome.keybinds.petDefensive': 'Yoldaş: Savunmacı',
-  'hudChrome.keybinds.petStop': 'Yoldaş: Dur',
-  'hudChrome.keybinds.petTaunt': 'Yoldaş: Kışkırt',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Bir adet daha az {item} gönder',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Bir adet daha fazla {item} gönder',
-  'hudChrome.readyCheck.notReady': 'Hazır Değil',
-  'hudChrome.readyCheck.prompt': '{name} bir hazır kontrolü başlattı. Hazır mısın?',
-  'hudChrome.readyCheck.ready': 'Hazır',
-  'hudChrome.readyCheck.result':
-    'Hazır kontrolü: {ready} hazır, {notReady} hazır değil, {noResponse} yanıt vermedi.',
-  'hudChrome.readyCheck.notInPartyError': 'Hazır kontrolü başlatmak için bir grupta olmalısın.',
-  'hudChrome.readyCheck.inProgressError': 'Bir hazır kontrolü zaten sürüyor.',
   'entities.abilities.sport_boot.description':
     'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',
@@ -374,6 +327,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Kahramanca Nişanlar: {count}',
   'heroicShop.buyAria': '{item} ürününü {marks} Kahramanca Nişan karşılığında satın al',
   'hudChrome.bags.cannotDestroy': 'Bu eşya yok edilemez.',
+  'hudChrome.bags.rightClickDestroy': 'Yok etmek için sağ tıkla',
   'hudChrome.crafting.comboRequirementUnmet':
     'O tarif için gereken iki zanaata da gereken kademede sahip değilsin.',
   'hudChrome.discord.roleTag.coredevs': 'Çekirdek Geliştirici',
@@ -2165,7 +2119,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.deacon_reliquary_helm.name': "Diyakoz'un Kutsal Emanet Miğferi",
   'entities.items.deacons_cleaver.name': "Diyakoz'un Satırı",
   'entities.items.deathless_heartwood.name': "Ölümsüz Taç'ın Öz Odunu",
-  'entities.items.deathless_heartwood_heroic.name': "Ölümsüz Taç'ın Öz Odunu",
   'entities.items.deathlord_legguards.name': 'Barrowlord Bacaklığı',
   'entities.items.deathlord_sabatons.name': 'Barrowlord Demir Çizmeleri',
   'entities.items.deathlord_warplate.name': 'Barrowlord Savaş Zırhı',
@@ -2256,7 +2209,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.keen_dirk.name': 'Keskin Hançer',
   'entities.items.kings_signet.name': "Kral'ın Mühür Yüzüğü",
   'entities.items.kingsbane_last_oath.name': "Thronebane, Dikenzirve'nin Son Yemini",
-  'entities.items.kingsbane_last_oath_heroic.name': "Thronebane, Dikenzirve'nin Son Yemini",
   'entities.items.knight_commanders_greaves.name': 'Şövalye-Komutan Dizlikleri',
   'entities.items.korgaths_chainwraps.name': "Korgath'ın Zincir Sargıları",
   'entities.items.lesser_healing_potion.name': 'Küçük İyileştirme İksiri',
@@ -3692,7 +3644,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Açılış dalgası: sınıfının temellerini keskinleştiren temiz, tek istatistikli takviyeler.',
   'guide.arenaPage.waveSilverTitle': 'Gümüş',
   'guide.arenaPage.wavesBody':
-    'Bir Fiesta müsabakası ilerledikçe sana taze seçimler sunar ve dövüş uzadıkça seçimler cüretkarlaşır. Bir dalgadan diğerine kurgunu inşa edersin, her seferinde birkaç seçenekten birini seçer ve müsabakanın geri kalanı için onu elinde tutarsın.',
+    "Bir Fiesta'nın her raundu sana taze bir seçim sunar, ve maç ilerledikçe seçimler cüretkarlaşır. Bir dalgadan diğerine kurgunu inşa edersin, her seferinde birkaç seçenekten birini seçer ve dövüşün geri kalanı için onu elinde tutarsın.",
   'guide.arenaPage.wavesTitle': 'Güçlendirmeler dalgalar halinde gelir',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Vadiden zirvelere kadar mezarları kirleten ölüm tarikatının cüppeli hizmetkarları. Toplandıkları yerde, ölüler huzur bulmaz.',
@@ -3797,7 +3749,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Arayüz',
   'guide.controls.groupMovement': 'Hareket',
   'guide.controls.intro':
-    'Masaüstü için varsayılan tuşlar. Esc dışında her atama oyunun seçenekler menüsünden değiştirilebilir; Esc ise her zaman oyun menüsünü açar. Bir atama Shift+Z gibi bir değiştirici kombinasyonu da olabilir.',
+    'Masaüstü için varsayılan tuşlar. Her atama oyunun seçenekler menüsünden değiştirilebilir.',
   'guide.controls.keyHeader': 'Tuş',
   'guide.controls.leaderboard': 'Lider Tablosu',
   'guide.controls.mobileBody':
@@ -3838,7 +3790,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir mağara seferi, yalnızca sizin ve en fazla bir müttefikiniz için oluşturulmuş küçük, kopya alanlı bir zindandır; rahatsız edilemeyeceğiniz özel bir kopya. Onu, dünyada bir mağara seferi bekçisinin tuttuğu bir panodan başlatır, içeri dalar, bir avuç odanın içinden savaşarak iner ve tek bir muhafızda bitirirsiniz. Seferler hızlıdır ve tekrarlanmak için tasarlanmıştır, bu yüzden açık dünya kuruduğunda bir mağara seferi güvenilir bir ilerleme parçasıdır.',
   'guide.delvesPage.whatHeading': 'Mağara seferi nedir',
   'guide.delvesPage.whereBody':
-    "İlk mağara seferi olan Çökmüş Emanetlik, Doğudere Vadisi'nin başlangıç vadisindeki Emanetlik Tepesi'nde açılır. Panoyu orada Birader Halven tutar ve hazır olduğunuzda sizi aşağı gönderir. Turları orada bitmez: Mirefen Bataklığı'nın kuzey kıyısındaki Trol Höyükleri'nin ötesinde, aynı bekçi ayaklarının üzerinde durmayı öğrenmiş seferciler için Boğulmuş Litanya'yı açar.",
+    "İlk mağara seferi olan Çökmüş Emanetlik, Doğudere Vadisi'nin başlangıç vadisindeki Emanetlik Tepesi'nde açılır. Panoyu orada Birader Halven tutar ve hazır olduğunuzda sizi aşağı gönderir.",
   'guide.delvesPage.whereHeading': 'Nerede bulunur',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
@@ -3886,7 +3838,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'İşinize yaramayan ganimetler yine de herhangi bir satıcıya satılır, bu yüzden çantalarınızın dolmasına izin vermek yerine kasabadan her geçtiğinizde onları boşaltın. Satıcının Sat sekmesi, her Kötü kaliteli ıvır zıvırı tek seferde satan tek tıklık bir düğme bile tutar. Gerçekten değersiz öteberi yer açmak için doğrudan atılabilir de.',
   'guide.economy.junkTitle': 'Hurdaları temizleme',
   'guide.economy.marketBody':
-    "Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Doğudere'deki Tüccar'la ya da Highwatch'taki Müzayedeci Voss ile konuşun: iki görevli de aynı ortak pazara hizmet eder. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.",
+    "Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Tüccar'la konuşun. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.",
   'guide.economy.marketBrowse':
     'Göz atma: satışta neyin olduğunu bulmak için ilanları kaydırın ya da isme göre arayın. Her ilan malları, satıcıyı ve tüm yığın için istenen fiyatı gösterir.',
   'guide.economy.marketCollect':
@@ -4116,7 +4068,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     "Evet. Oyunun tamamı seviye sınırına kadar ücretsiz ve GitHub'da açık kaynak.",
   'guide.home.faq.a2':
-    'Hayır. Oyun, cüzdan olmadan da tümüyle oynanabilir. İsteğe bağlı topluluk jetonu yalnızca görsel süsler ve günlük ödül havuzundan bir pay ekler; gücü asla etkilemez.',
+    'Hayır. Oyun, cüzdan olmadan da tümüyle oynanabilir. İsteğe bağlı topluluk jetonu yalnızca görsel süsler açar ve gücü asla etkilemez.',
   'guide.home.faq.a3':
     'Evet. Tarayıcında anında başlayan bir tek oyunculu mod, ayrıca paylaşılan çevrim içi dünya var.',
   'guide.home.faq.a4':
@@ -4298,7 +4250,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Tecrübeyi görevleri tamamlayarak, düşmanları yenerek ve mağara seferlerini temizleyerek kazanırsın. Görevler açık ara en çoğunu verir, bu yüzden görev izini takip etmek tırmanmanın en hızlı yoludur. Yol boyunca öldürdüklerin ve mağara seferleri geri kalanı tamamlar.',
   'guide.progression.xpTitle': 'Tecrübeyi nasıl kazanırsın',
   'guide.questsPage.acceptBody':
-    "Başının üzerinde bir işaret olan kişilerin sana işi vardır. Bir görev kabul etmek için onlarla konuş. Doğudere'de Mareşal Redbrook, alabileceğin ilk görevlerden biri olan Kapıdaki Kurtlar'la bekliyor.",
+    "Başının üzerinde bir işaret olan kişilerin sana işi vardır. Bir görev kabul etmek için onlarla konuş. İlk görevin, Doğudere'deki Mareşal Redbrook'tan alacağın Kapıdaki Kurtlar'dır.",
   'guide.questsPage.acceptTitle': 'Bulmak ve kabul etmek',
   'guide.questsPage.heading': 'Görevler',
   'guide.questsPage.intro':
@@ -4383,7 +4335,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Çevrimiçi herkese ulaşan, her zaman açık, diyar çapında bir kanal; bir soru sormak ya da genel sohbet için iyidir. World ve Looking for Group'un aksine, asla katılmayı seçmek zorunda değilsin.",
   'guide.social.chanGuild': 'Lonca ve Subay.',
   'guide.social.chanGuildBody':
-    'Loncan için kanallar. Lonca sohbeti her üyeye ulaşır; subay kanalı subaylar ve lonca lideri içindir.',
+    'Loncan için kanallar. Lonca sohbeti her üyeye ulaşır; subay kanalı yalnızca subaylar içindir.',
   'guide.social.chanLfg': 'Grup Arıyor.',
   'guide.social.chanLfgBody':
     'Bir zindan koşmak için insan bulmaya yarayan, isteğe bağlı, diyar çapında bir kanal. Katılmak için sekmesini aç.',
@@ -4581,7 +4533,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'Mareşal Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Kılıcını yakın tut. Vadi eski Vadi değil.',
   'guide.worldPage.valePlaceNotes':
-    "Doğudere ilk ana üssünüzdür. Kurt Koşusu ve Yaban Domuzu Çayırı yumuşak av sahalarıdır; Ayna Gölü balık tutulacak güzel sulardır, gerçi sığlıklarında çamuryüzgeçler kaynar; Sableweb ve Bakır Kazısı örümcekleri ve cevhere aç kazıcıları saklar; bir Haydut Kampı ve Yıkık Şapel daha çetin işler barındırır; Emanetlik Tepesi, diyarın ilk mağara seferi olan Çökmüş Emanetlik'e iner; Parlakorman Açıklığı kuzeydeki sakin, güneşli bir korudur; ve Domuz Tarlası, Doğudere'nin surla çevrili domuztopu sahasıdır, orada Vadi Kupası bir hasat ateşkesi altında oynanır.",
+    "Eastbrook ilk ana üssünüzdür. Wolf Run ve Boar Meadow yumuşak av sahalarıdır; Mirror Lake balık tutulacak sakin sulardır; Sableweb ve Copper Dig örümcekleri ve cevhere aç kazıcıları saklar; bir Bandit Camp ve Fallen Chapel daha çetin işler barındırır; Reliquary Hill, diyarın ilk delvesi olan Collapsed Reliquary'ye iner; ve Brightwood Glade kuzeydeki sakin, güneşli bir korudur.",
   'highscores.desc': 'Dünyanın en büyük şampiyonlarını takip et ve ilerlemeni kıyasla.',
   'highscores.title': 'Yüksek Skorlar Liderlik Tablosu',
   'hud.arena.close': 'Arenayı kapat',
@@ -6691,7 +6643,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.visualsWhy':
     "Ultra, ekranınızın sunduğu en zengin ışıklandırmayla en yüksek çözünürlükte oluşturulur. Ayrıca güvenlik ağını da kapatır ve yalnızca masaüstünde kullanılabilir: telefonlar ve uygulama High'de zirveye çıkar.",
   'guide.settingsPage.wherePath':
-    'Bu sayfadaki her şey oyunun içindedir: seçenekleri açmak için Esc tuşuna basın. Menü, sabitlenmiş temel ayarların bir Genel Bakış ekranıyla açılır ve kategoriler onun yanındaki bir rayda yer alır: aşağıdaki ayarlar Ekran grubundaki Grafikler, Arayüz ve Erişilebilirlik başlıkları altında, Performans Arayüzü ise Sistem altında bulunur. Daha da hızlısı, üstteki arama kutusuna bir ad yazıp doğrudan ona atlayın.',
+    "Bu sayfadaki her şey oyunda mevcuttur: Esc tuşuna basın ve Grafikler, Arayüz ve Performans Arayüzü'ne bakın.",
   'guide.settingsPage.whyLabel': 'Neden işe yarıyor:',
   'hudChrome.crafting.close': 'İşçiliği kapat',
   'hudChrome.crafting.craft': 'Zanaat',
@@ -6784,6 +6736,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Bir arkadaşını davet et: arkadaşın 10. seviyeye ulaştığında ikiniz de 2 yuva kazanırsınız (en fazla 5 arkadaş).',
   'hudChrome.bank.bonusSectionAria': 'Bonus banka yuvaları ve daha fazlasını kazanmanın yolları',
+  'entities.abilities.faerie_fire.description':
+    'Hedefin zırhını 40 saniye boyunca %{damage} azaltır. Zırh Kesme ile birlikte istiflenmez.',
+  'hud.core.mobileSettings': 'Ayarlar',
   'abilityUi.tooltip.selfOnly': 'Yalnızca kendine',
   'itemUi.lootRoll.rolled': '{answered}/{total} zar attı',
   'entities.abilities.sunder_armor.description':

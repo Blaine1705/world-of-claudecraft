@@ -114,7 +114,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a výhra se počítá i do denních úkolů o odměny. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje.',
   'guide.valeCupPage.rewardsHeading': 'Pravidla příměří',
   'guide.valeCupPage.rolesBody':
-    'Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha. V bracketech jeden na jednoho a dva na dva hrají všichni všestrannou výbavu, takže volba role přijde ke slovu až od tří na tři výš.',
+    'Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha.',
   'guide.valeCupPage.rolesHeading': 'Sportovní role',
   'guide.valeCupPage.spectateBody':
     'Na stadionu se hraje vždy jen jeden zápas a kdokoli může přijít a sledovat ho z tribun.',
@@ -327,6 +327,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Hrdinské značky: {count}',
   'heroicShop.buyAria': 'Koupit {item} za {marks} hrdinských značek',
   'hudChrome.bags.cannotDestroy': 'Tento předmět nelze zničit.',
+  'hudChrome.bags.rightClickDestroy': 'Zničíš pravým kliknutím',
   'hudChrome.crafting.comboRequirementUnmet':
     'Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.',
   'hudChrome.discord.roleTag.coredevs': 'Hlavní dev',
@@ -5608,7 +5609,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyber třídu a vzhled, dej hrdinovi jméno a vstup do světa. Další postavy si můžeš vytvořit později.',
   'guide.howToPlay.step2Title': 'Najdi první úkol',
   'guide.howToPlay.step2Body':
-    'Maršál Redbrook čeká v počátečním městě s úkolem Vlci u dveří a předák Odell opodál má taky práci. Promluv s kterýmkoli z nich a vezmi si svůj první úkol.',
+    'Maršál Redbrook čeká v počátečním městě. Promluv s ním a přijmi Vlci u dveří.',
   'guide.howToPlay.step3Title': 'Pohyb a rozhlížení',
   'guide.howToPlay.step3Body':
     'Pohybuj se klávesami W, A, S, D. Podrž pravé tlačítko myši a táhni pro rozhlížení. To je skoro všechno.',
@@ -6279,7 +6280,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Když padneš, povstaneš jako duch na nejbližším hřbitově. Doběhni zpět ke svému tělu a oživíš se zdarma, nebo přijmi okamžité vzkříšení od Bledého strážce a za to pohodlí si odnes krátce trvající slabost. Nikdy nepřijdeš o žádné zkušenosti, výbavu ani mince, takže je bezpečné riskovat a učit se.',
   'guide.wishPage.i3Title': 'Talenty nejsou past',
   'guide.wishPage.i3Body':
-    'Odemykají se na úrovni 10 a resetuješ je, kdykoli chceš, mimo boj, takže rané volby nejsou nikdy trvalé.',
+    'Odemykají se na úrovni 10 a resetuješ je, kdykoli chceš, takže rané volby nejsou nikdy trvalé.',
   'guide.wishPage.i4Title': 'Sleduj stopu úkolů',
   'guide.wishPage.i4Body':
     'Úkoly jsou nejrychlejší cesta k levelování a vedou tě světem. Když nevíš, kam jít, najdi další značku.',
@@ -6450,7 +6451,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Peníze ze zabití mohou jít tomu, kdo lootuje, nebo se rovnoměrně rozdělit po partě.',
   'guide.social.lootCommonTitle': 'Předměty.',
   'guide.social.lootCommonBody':
-    'Běžné dropy mohou kolovat po partě nebo připadnout tomu, kdo lootuje, zatímco lepší dropy jdou do hodu, aby měl každý férovou šanci.',
+    'Běžné dropy mohou jít lootujícímu, zatímco lepší dropy jdou do hodu, aby měl každý férovou šanci.',
   'guide.social.lootRollTitle': 'Need, Greed nebo Pass.',
   'guide.social.lootRollBody':
     'Když předmět jde do hodu, každý způsobilý člen zvolí Need, pokud ho chce používat, Greed, pokud by ho vzal jen navíc, nebo Pass, pokud ustupuje. Nejvyšší hod vyhrává.',
@@ -6518,7 +6519,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý boj, úkol a krok na sever posiluje hrdinu. Takhle funguje levelování a co tě drží v růstu, když dosáhneš vrcholu.',
   'guide.progression.xpTitle': 'Jak získáváš zkušenosti',
   'guide.progression.xpBody':
-    'Zkušenosti získáváš dokončováním úkolů, porážením nepřátel a čištěním výprav. Úkoly dávají zdaleka nejvíc, takže sledování stopy úkolů je nejrychlejší cesta vzhůru. Zabíjení a běhy výprav po cestě doplní zbytek.',
+    'Zkušenosti získáváš dokončováním úkolů a porážením nepřátel. Úkoly dávají zdaleka nejvíc, takže sledování stopy úkolů je nejrychlejší cesta vzhůru. Zabíjení po cestě doplní zbytek.',
   'guide.progression.capBody':
     'Každá úroveň tě posílí a přinese nové schopnosti až po maximum na úrovni {cap}.',
   'guide.progression.journeyTitle': 'Cesta na sever',

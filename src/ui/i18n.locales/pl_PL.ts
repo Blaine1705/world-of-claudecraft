@@ -330,6 +330,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Znaki heroiczne: {count}',
   'heroicShop.buyAria': 'Kup {item} za {marks} Znaków heroicznych',
   'hudChrome.bags.cannotDestroy': 'Tego przedmiotu nie można zniszczyć.',
+  'hudChrome.bags.rightClickDestroy': 'Kliknij prawym, aby zniszczyć',
   'hudChrome.crafting.comboRequirementUnmet':
     'Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu.',
   'hudChrome.discord.roleTag.coredevs': 'Główny deweloper',
@@ -3756,7 +3757,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Interfejs',
   'guide.controls.groupMovement': 'Poruszanie się',
   'guide.controls.intro':
-    'Domyślne klawisze dla komputera. Każde przypisanie można zmienić w opcjach gry, poza Esc, które zawsze otwiera menu gry, a przypisaniem może być kombinacja z modyfikatorem, na przykład Shift+Z.',
+    'Domyślne klawisze dla komputera. Każde przypisanie można zmienić w opcjach gry.',
   'guide.controls.keyHeader': 'Klawisz',
   'guide.controls.leaderboard': 'Tabela wyników',
   'guide.controls.mobileBody':
@@ -4077,7 +4078,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Tak. Cała gra jest darmowa aż do maksymalnego poziomu, a jej kod źródłowy jest otwarty na GitHubie.',
   'guide.home.faq.a2':
-    'Nie. W grę można w pełni grać bez niego. Opcjonalny żeton społeczności dodaje jedynie kosmetyczny akcent i udział w puli dziennych nagród, i nigdy nie wpływa na siłę.',
+    'Nie. W grę można grać w pełni bez niego. Opcjonalny token społecznościowy odblokowuje jedynie kosmetyczne ozdoby i nigdy nie wpływa na moc.',
   'guide.home.faq.a3':
     'Tak. Jest natychmiastowy tryb dla jednego gracza w przeglądarce, a także wspólny świat online.',
   'guide.home.faq.a4':
@@ -6775,6 +6776,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Wyjmij',
   'hudChrome.bank.withdrawQuantityInput': 'Liczba do wyjęcia',
   'hudChrome.bank.withdrawQuantityTitle': 'Wyjmij: {item}',
+  'entities.abilities.faerie_fire.description':
+    'Zmniejsza pancerz celu o {damage}% na 40 sek. Nie kumuluje się z Rozdarciem pancerza.',
+  'hud.core.mobileSettings': 'Ustawienia',
   'abilityUi.tooltip.selfOnly': 'Tylko na siebie',
   'itemUi.lootRoll.rolled': '{answered}/{total} rzuciło',
   'entities.abilities.sunder_armor.description':

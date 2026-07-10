@@ -129,7 +129,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'As regras da trégua significam nada de experiência e nada de saque: uma partida decidida conta para o seu histórico e para o quadro de vencedores, e uma vitória também conta para as tarefas de recompensa do dia. Desertar de uma partida suspende sua vaga, e o Zelador não esquece.',
   'guide.valeCupPage.rewardsHeading': 'Regras da trégua',
   'guide.valeCupPage.rolesBody':
-    'Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento. Nas categorias de um contra um e dois contra dois, todos jogam com o kit versátil, então a escolha de função ganha peso a partir do três contra três.',
+    'Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento.',
   'guide.valeCupPage.rolesHeading': 'Funções esportivas',
   'guide.valeCupPage.spectateBody':
     'Uma partida acontece por vez no estádio, e qualquer um pode chegar e assistir das arquibancadas.',
@@ -348,6 +348,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Marcas Heroicas: {count}',
   'heroicShop.buyAria': 'Comprar {item} por {marks} Marcas Heroicas',
   'hudChrome.bags.cannotDestroy': 'Este item não pode ser destruído.',
+  'hudChrome.bags.rightClickDestroy': 'Clique com o botão direito para destruir',
   'hudChrome.crafting.comboRequirementUnmet':
     'Você não possui os dois ofícios exigidos no nível necessário para essa receita.',
   'hudChrome.discord.roleTag.coredevs': 'Dev Principal',
@@ -4975,7 +4976,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Interface',
   'guide.controls.groupMovement': 'Movimento',
   'guide.controls.intro':
-    'Teclas padrão para desktop. Cada atalho pode ser alterado nas opções do jogo, exceto Esc, que sempre abre o menu do jogo, e um atalho pode ser uma combinação com modificador, como Shift+Z.',
+    'Teclas padrão para desktop. Cada atalho pode ser alterado nas opções do jogo.',
   'guide.controls.keyHeader': 'Tecla',
   'guide.controls.leaderboard': 'Placar de líderes',
   'guide.controls.mobileBody':
@@ -5154,7 +5155,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Sim. O jogo inteiro é gratuito até o nível máximo, e é de código aberto no GitHub.',
   'guide.home.faq.a2':
-    'Não. O jogo é totalmente jogável sem um. O token comunitário opcional apenas acrescenta adornos cosméticos e uma fatia do fundo de prêmios das recompensas diárias, e nunca afeta o poder.',
+    'Não. O jogo é totalmente jogável sem um. O token comunitário opcional libera apenas adornos cosméticos e nunca afeta o poder.',
   'guide.home.faq.a3':
     'Sim. Há um modo instantâneo para um jogador no seu navegador, além do mundo online compartilhado.',
   'guide.home.faq.a4':
@@ -5228,7 +5229,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Escolha uma classe e um visual, dê um nome ao seu herói e entre no mundo. Você pode criar mais personagens depois.',
   'guide.howToPlay.step1Title': 'Crie um personagem',
   'guide.howToPlay.step2Body':
-    'O Marechal Redbrook está esperando na cidade inicial com Lobos à Porta, e o Capataz Odell, ali perto, também tem trabalho. Fale com um deles para pegar sua primeira missão.',
+    'O Marechal Redbrook está esperando na cidade inicial. Fale com ele e aceite Lobos à Porta.',
   'guide.howToPlay.step2Title': 'Encontre sua primeira missão',
   'guide.howToPlay.step3Body':
     'Mova-se com W, A, S, D. Segure o botão direito do mouse e arraste para olhar ao redor. É quase tudo.',
@@ -6823,6 +6824,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Retirar',
   'hudChrome.bank.withdrawQuantityInput': 'Quantidade a retirar',
   'hudChrome.bank.withdrawQuantityTitle': 'Retirar {item}',
+  'hud.core.mobileSettings': 'Configurações',
+  'entities.abilities.faerie_fire.description':
+    'Reduz a armadura do alvo em {damage}% por 40 s. Não acumula com Retalhar Armadura.',
   'abilityUi.tooltip.selfOnly': 'Apenas em si mesmo',
   'itemUi.lootRoll.rolled': '{answered}/{total} rolaram',
   'entities.abilities.sunder_armor.description':

@@ -2,54 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
-  'loading.tips.classes':
-    'Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.',
-  'loading.tips.dungeons':
-    'Kiat: cobalah ruang bawah tanah pada tingkat kesulitan heroik setelah perlengkapanmu melampaui tingkat normal, untuk pertarungan yang lebih sulit dan lebih menguntungkan.',
-  'loading.tips.guilds':
-    'Kiat: bergabung dengan guild memberimu saluran obrolan pribadi dan daftar bersama anggota guildmu.',
-  'loading.tips.loadouts':
-    'Kiat: simpan lebih dari satu set talenta agar dapat bertukar build tanpa menggunakan poin dua kali.',
-  'loading.tips.market':
-    'Kiat: Pasar Dunia memungkinkanmu membeli dan menjual dengan pemain di seluruh dunia.',
-  'loading.tips.professions':
-    'Kiat: profesi pengumpulan dan kerajinan dapat dilatih bersamaan dengan kelas tempurmu.',
-  'loading.tips.pvp':
-    'Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu.',
-  'loading.tips.talents':
-    'Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.',
-  'entities.items.chunk_of_ore.name': 'Bongkahan Bijih',
-  'entities.quests.q_prof_intro.completion':
-    'Lihat? Bijih di tasmu dan kapalan di tanganmu. Teruslah menambang, menebang, dan memetik herba selama menjelajahi jalanan. Saat kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sebelahnya. Semua itu bisa menjadi mata pencaharian yang layak, jika kamu menginginkannya.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Bongkahan Bijih',
-  'entities.quests.q_prof_intro.text':
-    'Setiap orang di Eastbrook menekuni pekerjaan selain mengayunkan pedang, {playerName}. Urat bijih tersebar di sekitar kota, jadi ayunkan beliung dan bawakan aku 5 bongkahan. Tambang sendiri, ingat, aku tahu bedanya.',
-  'entities.quests.q_prof_intro.title': 'Pekerjaan untuk Setiap Tangan',
-  'hudChrome.auth.appleChoiceExpired':
-    'Sesi masuk dengan Apple itu telah kedaluwarsa. Silakan masuk lagi dengan Apple.',
-  'hudChrome.auth.appleChoiceIntro':
-    'Buat akun baru, atau tautkan Apple ke akun yang sudah kamu miliki.',
-  'hudChrome.auth.appleError': 'Tidak dapat masuk dengan Apple. Silakan coba lagi.',
-  'hudChrome.auth.appleLoginCta': 'Lanjutkan dengan Apple',
-  'hudChrome.dailyRewards.reason.banned': 'Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}',
-  'hudChrome.itemHeroicTag': '[HEROIK]',
-  'hudChrome.itemSoulbound': 'Terikat Jiwa',
-  'hudChrome.keybinds.categoryPet': 'Peliharaan',
-  'hudChrome.keybinds.petAggressive': 'Peliharaan: Agresif',
-  'hudChrome.keybinds.petAttack': 'Peliharaan: Serang',
-  'hudChrome.keybinds.petDefensive': 'Peliharaan: Defensif',
-  'hudChrome.keybinds.petStop': 'Peliharaan: Berhenti',
-  'hudChrome.keybinds.petTaunt': 'Peliharaan: Ejek',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Kirim satu {item} lebih sedikit',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Kirim satu {item} lebih banyak',
-  'hudChrome.readyCheck.notReady': 'Belum Siap',
-  'hudChrome.readyCheck.prompt': '{name} memulai pemeriksaan kesiapan. Apakah kamu siap?',
-  'hudChrome.readyCheck.ready': 'Siap',
-  'hudChrome.readyCheck.result':
-    'Pemeriksaan kesiapan: {ready} siap, {notReady} belum siap, {noResponse} tidak merespons.',
-  'hudChrome.readyCheck.notInPartyError':
-    'Kamu harus berada dalam grup untuk memulai pemeriksaan kesiapan.',
-  'hudChrome.readyCheck.inProgressError': 'Pemeriksaan kesiapan sedang berlangsung.',
   'entities.abilities.sport_boot.description':
     'Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya.',
   'entities.abilities.sport_boot.name': 'Tendangan Jauh',
@@ -162,7 +114,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Aturan gencatan berarti tanpa pengalaman dan tanpa jarahan: pertandingan yang tuntas dihitung ke dalam rekormu dan papan pemenang, dan kemenangan juga dihitung untuk tugas hadiah hari itu. Meninggalkan pertandingan membekukan slotmu, dan Sang Penjaga Lapangan mengingatnya.',
   'guide.valeCupPage.rewardsHeading': 'Aturan gencatan',
   'guide.valeCupPage.rolesBody':
-    'Peranmu menentukan perangkat yang kau bawa ke lapangan. Semua orang menendang; sisanya soal watak. Di bracket satu lawan satu dan dua lawan dua semua orang memainkan perangkat serba bisa, jadi pemilihan peran baru benar-benar berperan mulai dari tiga lawan tiga ke atas.',
+    'Peranmu menentukan perangkat yang kau bawa ke lapangan. Semua orang menendang; sisanya soal watak.',
   'guide.valeCupPage.rolesHeading': 'Peran olahraga',
   'guide.valeCupPage.spectateBody':
     'Satu pertandingan berlangsung pada satu waktu di stadion, dan siapa pun bisa datang menonton dari tribun.',
@@ -380,6 +332,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Tanda Heroik: {count}',
   'heroicShop.buyAria': 'Beli {item} seharga {marks} Tanda Heroik',
   'hudChrome.bags.cannotDestroy': 'Item ini tidak dapat dihancurkan.',
+  'hudChrome.bags.rightClickDestroy': 'Klik kanan untuk menghancurkan',
   'hudChrome.crafting.comboRequirementUnmet':
     'Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.',
   'hudChrome.discord.roleTag.coredevs': 'Dev Inti',
@@ -3860,7 +3813,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Antarmuka',
   'guide.controls.groupMovement': 'Pergerakan',
   'guide.controls.intro':
-    'Tombol bawaan untuk desktop. Setiap pengaturan tombol dapat diubah di opsi permainan, kecuali Esc, yang selalu membuka menu permainan, dan sebuah pengaturan tombol bisa berupa kombinasi pengubah seperti Shift+Z.',
+    'Tombol bawaan untuk desktop. Setiap pengaturan tombol dapat diubah di menu opsi permainan.',
   'guide.controls.keyHeader': 'Tombol',
   'guide.controls.leaderboard': 'Papan Peringkat',
   'guide.controls.mobileBody':
@@ -4182,7 +4135,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Ya. Seluruh permainan gratis hingga batas level, dan ini sumber terbuka di GitHub.',
   'guide.home.faq.a2':
-    'Tidak. Permainan ini sepenuhnya bisa dimainkan tanpa itu. Token komunitas opsional hanya menambah hiasan kosmetik dan sebagian dari kumpulan hadiah harian, dan ia tak pernah memengaruhi kekuatan.',
+    'Tidak. Permainan ini sepenuhnya bisa dimainkan tanpa itu. Token komunitas opsional hanya membuka hiasan kosmetik dan tidak pernah memengaruhi kekuatan.',
   'guide.home.faq.a3':
     'Ya. Ada mode pemain tunggal instan di browser-mu, ditambah dunia daring bersama.',
   'guide.home.faq.a4':
@@ -4257,7 +4210,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pilih kelas dan tampilan, beri pahlawanmu nama, lalu masuk ke dunia. Kamu bisa membuat lebih banyak karakter nanti.',
   'guide.howToPlay.step1Title': 'Buat karakter',
   'guide.howToPlay.step2Body':
-    'Marshal Redbrook menunggu di kota awal dengan Wolves at the Door, dan Foreman Odell di dekatnya juga punya pekerjaan. Bicaralah dengan salah satunya untuk mengambil misi pertamamu.',
+    'Marshal Redbrook menunggu di kota awal. Bicaralah dengannya dan terima Wolves at the Door.',
   'guide.howToPlay.step2Title': 'Temukan misi pertamamu',
   'guide.howToPlay.step3Body':
     'Bergerak dengan W, A, S, D. Tahan tombol kanan mouse dan seret untuk melihat sekeliling. Itu hampir semuanya.',
@@ -4639,7 +4592,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Dua ratus tahun tembok ini bertahan. Ia tidak akan jebol dalam tugas jagaku, tetapi ia merintih.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental, dan di bawahnya bersinar Glimmermere, tasik yang tepiannya menyimpan gerbang cahaya pucat menuju Kuil Tenggelam; Wyrmcult Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
+    "Highwatch menjaga tembok. Stalker Ridge dan Deeprock Burrows milik kucing punggung bukit dan penggali liang; Ogre Foothills dan Drogmar's War-Camp milik para bedebah bayaran; Stormcrag berderak oleh elemental dan Glimmermere bersinar di bawahnya; Wyrmcult Tents dan Revenant Fields mengelilingi dataran tinggi kultus, dengan Sanktum Gravewyrm di puncaknya.",
   'guide.worldPage.places': 'Tempat-tempat menonjol',
   'guide.worldPage.residents': 'Siapa yang akan kamu temui',
   'guide.worldPage.valeBlurb':
@@ -6868,6 +6821,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Undang seorang teman: saat ia mencapai level 10, kalian masing-masing mendapat 2 slot, hingga 5 teman.',
   'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'entities.abilities.faerie_fire.description':
+    'Mengurangi zirah target sebesar {damage}% selama 40 detik. Tidak menumpuk dengan Robek Zirah.',
+  'hud.core.mobileSettings': 'Pengaturan',
   'abilityUi.tooltip.selfOnly': 'Hanya diri sendiri',
   'itemUi.lootRoll.rolled': '{answered}/{total} sudah melempar dadu',
   'entities.abilities.sunder_armor.description':

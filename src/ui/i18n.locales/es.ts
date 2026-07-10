@@ -349,6 +349,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Marcas Heroicas: {count}',
   'heroicShop.buyAria': 'Comprar {item} por {marks} Marcas Heroicas',
   'hudChrome.bags.cannotDestroy': 'Este elemento no se puede destruir.',
+  'hudChrome.bags.rightClickDestroy': 'Clic derecho para destruir',
   'hudChrome.crafting.comboRequirementUnmet':
     'No tienes las dos profesiones requeridas al nivel necesario para esa receta.',
   'hudChrome.discord.roleTag.coredevs': 'Desarrollador principal',
@@ -2876,15 +2877,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': 'Dardos de Éter',
   'entities.abilities.arcane_missiles.description':
     'Lanza Dardos de Éter al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
-  'entities.abilities.temporal_mend.name': 'Remiendo temporal',
-  'entities.abilities.temporal_mend.description':
-    'Adelanta a un aliado un instante en el tiempo y repara {damage} de salud mientras su cuerpo se asienta en su yo futuro más sano. (habilidad distintiva de Cronomancia)',
-  'entities.abilities.temporal_barrier.name': 'Barrera temporal',
-  'entities.abilities.temporal_barrier.description':
-    'Desplaza al objetivo un latido fuera del presente: un caparazón temporal absorbe {damage} de daño durante 10 s antes de que la línea temporal vuelva a encajar.',
-  'entities.abilities.temporal_echo.name': 'Eco temporal',
-  'entities.abilities.temporal_echo.description':
-    'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo.',
   'entities.abilities.polymorph.name': 'Embrujar',
   'entities.abilities.polymorph.description':
     'Transforma al enemigo en sapo durante hasta {duration} s. El sapo deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
@@ -2896,7 +2888,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una explosión de energía Arcana golpea a todos los enemigos cercanos por {damage} de daño Arcano.',
   'entities.abilities.scorch.name': 'Escaldar',
   'entities.abilities.scorch.description':
-    'Agosta al enemigo por {damage} de daño de Fuego y te acelera un 20% durante 3 s. Lanzamiento rápido, y se puede lanzar en movimiento.',
+    'Agosta al enemigo por {damage} de daño de Fuego. Lanzamiento rápido.',
   'entities.abilities.pyroblast.name': 'Lanza Ígnea',
   'entities.abilities.pyroblast.description':
     'Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
@@ -5209,7 +5201,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Sí. El juego completo es gratuito hasta el nivel máximo, y es de código abierto en GitHub.',
   'guide.home.faq.a2':
-    'No. El juego se puede jugar por completo sin ella. El token comunitario opcional solo añade adornos cosméticos y una parte del fondo de premios de las recompensas diarias, y nunca afecta al poder.',
+    'No. El juego se puede jugar por completo sin ella. El token comunitario opcional solo desbloquea adornos cosméticos y nunca afecta al poder.',
   'guide.home.faq.a3':
     'Sí. Hay un modo de un jugador instantáneo en tu navegador, además del mundo en línea compartido.',
   'guide.home.faq.a4':
@@ -5284,7 +5276,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Elige una clase y un aspecto, ponle nombre a tu héroe y entra en el mundo. Más adelante puedes crear más personajes.',
   'guide.howToPlay.step1Title': 'Crea un personaje',
   'guide.howToPlay.step2Body':
-    'El mariscal Redbrook te espera en el pueblo inicial con Lobos a las puertas, y el capataz Odell, cerca, también tiene trabajo. Habla con cualquiera de los dos para aceptar tu primera misión.',
+    'El mariscal Redbrook te espera en el pueblo inicial. Habla con él y acepta Lobos a las puertas.',
   'guide.howToPlay.step2Title': 'Encuentra tu primera misión',
   'guide.howToPlay.step3Body':
     'Muévete con W, A, S, D. Mantén pulsado el botón derecho del ratón y arrastra para mirar alrededor. Eso es casi cuanto necesitas saber.',
@@ -6420,8 +6412,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': 'Aumenta el poder de ataque en 40.',
   'entities.itemSets.wyrmshadow.bonus3':
     'Aumenta la agilidad en 15 y la probabilidad de crítico en 2%.',
-  'hudChrome.itemHeroicTag': '[HEROICO]',
-  'hudChrome.itemSoulbound': 'Ligado al alma',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistido',

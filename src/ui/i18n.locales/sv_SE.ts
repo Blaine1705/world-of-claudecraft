@@ -112,7 +112,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Fredsreglerna innebär ingen erfarenhet och inget byte: en avgjord match räknas in i ditt facit och på vinnartavlan, och en seger räknas också mot dagens belöningsuppgifter. Att överge en match bänkar din plats, och Vaktmästaren minns.',
   'guide.valeCupPage.rewardsHeading': 'Fredsregler',
   'guide.valeCupPage.rolesBody':
-    'Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament. I divisionerna en mot en och två mot två spelar alla allroundsuppsättningen, så rollval kommer till sin rätt först från tre mot tre och uppåt.',
+    'Din roll avgör vilken uppsättning du bär in på planen. Alla sparkar; resten är temperament.',
   'guide.valeCupPage.rolesHeading': 'Sportroller',
   'guide.valeCupPage.spectateBody':
     'En match i taget spelas på stadion, och vem som helst kan gå fram och titta från läktarna.',
@@ -321,6 +321,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Heroiska märken: {count}',
   'heroicShop.buyAria': 'Köp {item} för {marks} heroiska märken',
   'hudChrome.bags.cannotDestroy': 'Det här föremålet kan inte förstöras.',
+  'hudChrome.bags.rightClickDestroy': 'Högerklicka för att förstöra',
   'hudChrome.crafting.comboRequirementUnmet':
     'Du har inte båda de hantverk som krävs på den nivå receptet kräver.',
   'hudChrome.discord.roleTag.coredevs': 'Kärnutvecklare',
@@ -3743,7 +3744,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Gränssnitt',
   'guide.controls.groupMovement': 'Förflyttning',
   'guide.controls.intro':
-    'Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar, utom Esc, som alltid öppnar spelmenyn, och en bindning kan vara en modifierarkombination som Shift+Z.',
+    'Standardtangenter för dator. Varje bindning kan ändras i spelets inställningar.',
   'guide.controls.keyHeader': 'Tangent',
   'guide.controls.leaderboard': 'Topplista',
   'guide.controls.mobileBody':
@@ -3887,7 +3888,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a11':
     'Bjud in vem du än möter till en grupp, fråga i chatten, eller slå er ihop vid en fängelsehåla. Det mesta av världen går att klara ensam, så att gruppera sig är ett val, inte ett krav.',
   'guide.faqPage.a2':
-    'Nej. Spelet är fullt spelbart utan en sådan. Den valfria community-token lägger bara till kosmetisk flärd och en andel av prispotten för dagliga belöningar, och den påverkar aldrig styrka eller progression.',
+    'Nej. Spelet är fullt spelbart utan en sådan. Den valfria community-token låser bara upp kosmetiska detaljer och påverkar aldrig styrka eller progression.',
   'guide.faqPage.a3':
     'Ja. Spelet körs i en mobilwebbläsare med pekkontroller, och det finns även en datorklient.',
   'guide.faqPage.a4':
@@ -4063,7 +4064,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Ja. Hela spelet är gratis upp till nivåtaket, och det är öppen källkod på GitHub.',
   'guide.home.faq.a2':
-    'Nej. Spelet är fullt spelbart utan en. Den valfria community-token lägger bara till kosmetisk flärd och en andel av prispotten för dagliga belöningar, och den påverkar aldrig styrkan.',
+    'Nej. Spelet är fullt spelbart utan en. Den valfria community-token låser bara upp kosmetisk flärd och påverkar aldrig styrkan.',
   'guide.home.faq.a3':
     'Ja. Det finns ett omedelbart enspelarläge i din webbläsare, plus den delade onlinevärlden.',
   'guide.home.faq.a4':
@@ -4134,7 +4135,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Välj en klass och ett utseende, ge din hjälte ett namn och gå in i världen. Du kan skapa fler karaktärer senare.',
   'guide.howToPlay.step1Title': 'Skapa en karaktär',
   'guide.howToPlay.step2Body':
-    'Marskalk Redbrook väntar i startbyn med Vargar vid dörren, och Foreman Odell i närheten har arbete också. Prata med endera för att anta ditt första uppdrag.',
+    'Marskalk Redbrook väntar i startbyn. Prata med honom och anta Vargar vid dörren.',
   'guide.howToPlay.step2Title': 'Hitta ditt första uppdrag',
   'guide.howToPlay.step3Body':
     'Rör dig med W, A, S, D. Håll ner höger musknapp och dra för att se dig omkring. Det är ungefär allt.',
@@ -4325,7 +4326,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En ständigt påslagen rikstäckande kanal som når alla som är online, bra för att ställa en fråga eller småprata. Till skillnad från World och Looking for Group behöver du aldrig välja att gå med.',
   'guide.social.chanGuild': 'Gille och officer.',
   'guide.social.chanGuildBody':
-    'Kanaler för ditt gille. Gilleschatten når varje medlem; officerskanalen är för officerare och gilleledaren.',
+    'Kanaler för ditt gille. Gilleschatten når varje medlem; officerskanalen är bara för officerare.',
   'guide.social.chanLfg': 'Söker grupp.',
   'guide.social.chanLfgBody':
     'En frivillig rikestäckande kanal för att hitta folk till en fängelsehåla. Öppna dess flik för att gå med.',
@@ -4473,7 +4474,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'När du faller reser du dig som en gengångare vid närmaste kyrkogård. Spring tillbaka till din kropp för att återupplivas utan påföljd, eller ta Den bleka väktarens omedelbara uppståndelse och bär en kortvarig försvagning för bekvämligheten. Ingen erfarenhet, utrustning eller mynt går någonsin förlorad, så det är tryggt att ta risker och lära sig.',
   'guide.wishPage.i2Title': 'Att dö kostar dig knappt något',
   'guide.wishPage.i3Body':
-    'De låses upp vid nivå 10 och återställs när du vill, så länge du är utanför strid, så dina tidiga val är aldrig permanenta.',
+    'De låses upp vid nivå 10 och återställs när du vill, så dina tidiga val är aldrig permanenta.',
   'guide.wishPage.i3Title': 'Talanger är ingen fälla',
   'guide.wishPage.i4Body':
     'Uppdrag är det snabbaste sättet att levla och de leder dig tvärs över världen. När du är osäker på vart du ska, leta upp nästa markör.',
@@ -4515,7 +4516,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer, och nedanför den lyser Skimmertjärnen, tjärnen vars strand vaktar porten av blekt ljus ner till Det dränkta templet; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
+    "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer och Glimmermere lyser nedanför den; Wyrmcult Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
   'guide.worldPage.places': 'Anmärkningsvärda platser',
   'guide.worldPage.residents': 'Vem du kommer att möta',
   'guide.worldPage.valeBlurb':
@@ -6736,6 +6737,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Ta ut',
   'hudChrome.bank.withdrawQuantityInput': 'Antal att ta ut',
   'hudChrome.bank.withdrawQuantityTitle': 'Ta ut {item}',
+  'entities.abilities.faerie_fire.description':
+    'Sänker målets rustning med {damage}% i 40 sek. Stackas inte med Rustningsklipp.',
+  'hud.core.mobileSettings': 'Inställningar',
   'abilityUi.tooltip.selfOnly': 'Endast dig själv',
   'itemUi.lootRoll.rolled': '{answered}/{total} har rullat',
   'entities.abilities.sunder_armor.description':

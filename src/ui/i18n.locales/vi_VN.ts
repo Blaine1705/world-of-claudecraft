@@ -2,54 +2,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
-  'loading.tips.classes':
-    'Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.',
-  'loading.tips.dungeons':
-    'Mẹo: khi trang bị đã vượt mức thường, hãy thử hầm ngục ở độ khó anh hùng để có trận chiến khó hơn và phần thưởng hậu hĩnh hơn.',
-  'loading.tips.guilds':
-    'Mẹo: gia nhập bang hội cho bạn một kênh trò chuyện riêng và danh sách chung các thành viên trong bang.',
-  'loading.tips.loadouts':
-    'Mẹo: lưu nhiều hơn một bộ tài năng để chuyển đổi giữa các lối xây dựng mà không phải dùng điểm hai lần.',
-  'loading.tips.market':
-    'Mẹo: Chợ Thế Giới cho phép bạn mua bán với người chơi trên toàn thế giới.',
-  'loading.tips.professions':
-    'Mẹo: có thể rèn luyện nghề thu thập và chế tác song song với lớp chiến đấu của bạn.',
-  'loading.tips.pvp':
-    'Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn.',
-  'loading.tips.talents':
-    'Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.',
-  'entities.items.chunk_of_ore.name': 'Khối Quặng',
-  'entities.quests.q_prof_intro.completion':
-    'Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Khối Quặng',
-  'entities.quests.q_prof_intro.text':
-    'Mọi người ở Đông Khê đều làm một nghề bên cạnh việc cầm kiếm, {playerName}. Các mạch quặng nằm rải rác quanh thị trấn, nên hãy vung cuốc và mang về cho ta 5 khối. Tự tay khai thác nhé, ta sẽ biết nếu không phải vậy.',
-  'entities.quests.q_prof_intro.title': 'Nghề Cho Mọi Đôi Tay',
-  'hudChrome.auth.appleChoiceExpired':
-    'Lần đăng nhập bằng Apple đó đã hết hạn. Vui lòng đăng nhập lại bằng Apple.',
-  'hudChrome.auth.appleChoiceIntro':
-    'Tạo tài khoản mới, hoặc liên kết Apple với tài khoản bạn đã có.',
-  'hudChrome.auth.appleError': 'Không thể đăng nhập bằng Apple. Vui lòng thử lại.',
-  'hudChrome.auth.appleLoginCta': 'Tiếp Tục với Apple',
-  'hudChrome.dailyRewards.reason.banned':
-    'Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}',
-  'hudChrome.itemHeroicTag': '[ANH HÙNG]',
-  'hudChrome.itemSoulbound': 'Ràng Buộc Linh Hồn',
-  'hudChrome.keybinds.categoryPet': 'Thú Cưng',
-  'hudChrome.keybinds.petAggressive': 'Thú Cưng: Hung Hăng',
-  'hudChrome.keybinds.petAttack': 'Thú Cưng: Tấn Công',
-  'hudChrome.keybinds.petDefensive': 'Thú Cưng: Phòng Thủ',
-  'hudChrome.keybinds.petStop': 'Thú Cưng: Dừng',
-  'hudChrome.keybinds.petTaunt': 'Thú Cưng: Khiêu Khích',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Gửi bớt một {item}',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Gửi thêm một {item}',
-  'hudChrome.readyCheck.notReady': 'Chưa Sẵn Sàng',
-  'hudChrome.readyCheck.prompt': '{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?',
-  'hudChrome.readyCheck.ready': 'Sẵn Sàng',
-  'hudChrome.readyCheck.result':
-    'Kiểm tra sẵn sàng: {ready} sẵn sàng, {notReady} chưa sẵn sàng, {noResponse} không phản hồi.',
-  'hudChrome.readyCheck.notInPartyError': 'Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.',
-  'hudChrome.readyCheck.inProgressError': 'Một lượt kiểm tra sẵn sàng đang diễn ra.',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
   'entities.abilities.sport_boot.name': 'Cú Sút Lớn',
@@ -162,7 +114,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Luật hưu chiến nghĩa là không kinh nghiệm và không chiến lợi phẩm: một trận có kết quả được tính vào thành tích của bạn và bảng vô địch, và một chiến thắng còn được tính vào các nhiệm vụ phần thưởng của ngày. Bỏ trận sẽ khiến bạn bị treo lượt, và Quản Sân sẽ nhớ đấy.',
   'guide.valeCupPage.rewardsHeading': 'Luật hưu chiến',
   'guide.valeCupPage.rolesBody':
-    'Vai trò quyết định bộ kỹ năng bạn mang vào sân. Ai cũng đá được; phần còn lại là khí chất. Ở các hạng đấu một người và hai người mỗi bên, mọi người đều chơi bộ kỹ năng toàn diện, nên các lựa chọn vai trò mới thực sự phát huy từ ba người mỗi bên trở lên.',
+    'Vai trò quyết định bộ kỹ năng bạn mang vào sân. Ai cũng đá được; phần còn lại là khí chất.',
   'guide.valeCupPage.rolesHeading': 'Vai trò thi đấu',
   'guide.valeCupPage.spectateBody':
     'Mỗi lần chỉ có một trận diễn ra tại sân vận động, và bất kỳ ai cũng có thể tới xem từ khán đài.',
@@ -374,6 +326,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Dấu Ấn Anh Hùng: {count}',
   'heroicShop.buyAria': 'Mua {item} với giá {marks} Dấu Ấn Anh Hùng',
   'hudChrome.bags.cannotDestroy': 'Không thể phá hủy vật phẩm này.',
+  'hudChrome.bags.rightClickDestroy': 'Nhấp phải để phá hủy',
   'hudChrome.crafting.comboRequirementUnmet':
     'Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.',
   'hudChrome.discord.roleTag.coredevs': 'Nhà Phát Triển Chính',
@@ -3831,7 +3784,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Giao diện',
   'guide.controls.groupMovement': 'Di chuyển',
   'guide.controls.intro':
-    'Phím mặc định cho máy tính. Mọi phím gán đều có thể thay đổi trong phần tùy chọn của trò chơi, trừ Esc vốn luôn mở menu trò chơi, và một phím gán có thể là một tổ hợp phím bổ trợ như Shift+Z.',
+    'Phím mặc định cho máy tính. Mọi phím gán đều có thể thay đổi trong phần tùy chọn của trò chơi.',
   'guide.controls.keyHeader': 'Phím',
   'guide.controls.leaderboard': 'Bảng xếp hạng',
   'guide.controls.mobileBody':
@@ -4611,7 +4564,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Hai trăm năm bức tường này đã đứng vững. Nó sẽ không sụp đổ dưới phiên gác của ta, nhưng nó đang rền rĩ.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố, và bên dưới nó Hồ Lung Linh phát sáng, hồ nước trên núi mà bờ của nó giữ cánh cổng ánh sáng nhợt nhạt dẫn xuống Ngôi Đền Chết Chìm; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
+    "Highwatch giữ vững bức tường. Stalker Ridge và Deeprock Burrows thuộc về mèo núi và lũ đào hang; Ogre Foothills và Drogmar's War-Camp thuộc về lũ côn đồ đánh thuê; Stormcrag lách tách tiếng các nguyên tố và Glimmermere phát sáng bên dưới nó; Wyrmcult Tents và Revenant Fields bao quanh vùng đất cao của giáo phái, với Thánh Đường Mộ Long ở đỉnh của nó.",
   'guide.worldPage.places': 'Những địa điểm đáng chú ý',
   'guide.worldPage.residents': 'Những người bạn sẽ gặp',
   'guide.worldPage.valeBlurb':
@@ -4619,7 +4572,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeter': 'Cảnh Sát Trưởng Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting': 'Hãy giữ lưỡi kiếm bên mình. Thung Lũng không còn như xưa nữa.',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước câu cá lý tưởng, dù lũ cá bùn lúc nhúc nơi vùng nước nông của nó; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của vương quốc; Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc; và Sân Heo Nái là sân bóng heo rừng có tường bao của Eastbrook, nơi Cúp Thung Lũng thi đấu dưới một lệnh hưu chiến mùa gặt.',
+    'Eastbrook là căn cứ nhà đầu tiên của bạn. Wolf Run và Boar Meadow là vùng săn bắn hiền hòa; Mirror Lake là vùng nước tĩnh lặng để câu cá; Sableweb và Copper Dig giấu lũ nhện và đám đào mỏ tham quặng; một Bandit Camp và Fallen Chapel chứa những công việc gai góc hơn; Reliquary Hill dẫn xuống Collapsed Reliquary, delve đầu tiên của thế giới; và Brightwood Glade là một khu rừng thưa ngập nắng, tĩnh lặng ở phía bắc.',
   'highscores.desc':
     'Theo dõi những nhà vô địch vĩ đại nhất của thế giới và so sánh tiến độ của bạn.',
   'highscores.title': 'Bảng Xếp Hạng Điểm Cao',
@@ -6808,6 +6761,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Rút Ra',
   'hudChrome.bank.withdrawQuantityInput': 'Số lượng cần rút',
   'hudChrome.bank.withdrawQuantityTitle': 'Rút {item}',
+  'entities.abilities.faerie_fire.description':
+    'Giảm giáp của mục tiêu đi {damage}% trong 40 giây. Không cộng dồn với Xẻ Giáp.',
+  'hud.core.mobileSettings': 'Cài Đặt',
   'abilityUi.tooltip.selfOnly': 'Chỉ bản thân',
   'itemUi.lootRoll.rolled': 'Đã tung {answered}/{total}',
   'entities.abilities.sunder_armor.description':

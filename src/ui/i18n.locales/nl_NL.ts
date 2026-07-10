@@ -113,7 +113,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Bestandsregels betekenen geen ervaring en geen buit: een besliste wedstrijd telt mee voor je staat van dienst en het winnaarsbord, en een overwinning telt ook mee voor de beloningstaken van de dag. Wie een wedstrijd in de steek laat, zet zijn plek op de bank, en de Terreinmeester onthoudt het.',
   'guide.valeCupPage.rewardsHeading': 'Bestandsregels',
   'guide.valeCupPage.rolesBody':
-    'Je rol bepaalt de uitrusting die je het veld op draagt. Iedereen trapt; de rest is temperament. In de categorieën één-tegen-één en twee-tegen-twee speelt iedereen de allrounder-uitrusting, dus rolkeuzes komen pas vanaf drie-tegen-drie tot hun recht.',
+    'Je rol bepaalt de uitrusting die je het veld op draagt. Iedereen trapt; de rest is temperament.',
   'guide.valeCupPage.rolesHeading': 'Sportrollen',
   'guide.valeCupPage.spectateBody':
     'Er wordt één wedstrijd tegelijk gespeeld in het stadion, en iedereen kan aan komen lopen en toekijken vanaf de tribunes.',
@@ -330,6 +330,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Heroïsche Merken: {count}',
   'heroicShop.buyAria': 'Koop {item} voor {marks} Heroïsche Merken',
   'hudChrome.bags.cannotDestroy': 'Dit voorwerp kan niet worden vernietigd.',
+  'hudChrome.bags.rightClickDestroy': 'Rechtsklik om te vernietigen',
   'hudChrome.crafting.comboRequirementUnmet':
     'Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.',
   'hudChrome.discord.roleTag.coredevs': 'Kernontwikkelaar',
@@ -3794,7 +3795,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.controls.actionHeader': 'Actie',
   'guide.controls.arena': 'Arena',
   'guide.controls.controllerBody':
-    'Gamepads werken ook, en controllerondersteuning staat standaard aan. De linkerstick beweegt, de rechterstick richt de camera, en de gezichts- en schouderknoppen dekken je vaardigheden, springen en interageren. Open een venster zoals je tassen om een aanwijzer op het scherm op te roepen, en door het spelmenu navigeer je rechtstreeks met de D-pad en de gezichtsknoppen. Je kunt de knoppen opnieuw toewijzen en de stickdeadzone, camerasnelheid, trilling en omgekeerd kijken aanpassen bij de controllerinstellingen in de opties.',
+    "Gamepads werken ook, en controllerondersteuning staat standaard aan. De linkerstick beweegt, de rechterstick richt de camera, en de gezichts- en schouderknoppen dekken je vaardigheden, springen en interageren. Open een venster om een aanwijzer op het scherm op te roepen voor menu's. Je kunt de knoppen opnieuw toewijzen en de stickdeadzone, camerasnelheid, trilling en omgekeerd kijken aanpassen bij de controllerinstellingen in de opties.",
   'guide.controls.controllerHeading': 'Op een controller',
   'guide.controls.cycleFriendly': 'Door bondgenoten bladeren',
   'guide.controls.gameMenu': 'Spelmenu en opties openen',
@@ -3803,11 +3804,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Interface',
   'guide.controls.groupMovement': 'Beweging',
   'guide.controls.intro':
-    'Standaardtoetsen voor desktop. Elke toewijzing kun je aanpassen in de opties van het spel, behalve Esc, die altijd het spelmenu opent, en een toewijzing kan een combinatie met een modificatietoets zijn, zoals Shift+Z.',
+    'Standaardtoetsen voor desktop. Elke toewijzing kun je aanpassen in de opties van het spel.',
   'guide.controls.keyHeader': 'Toets',
   'guide.controls.leaderboard': 'Ranglijst',
   'guide.controls.mobileBody':
-    "Aanraakbediening verschijnt automatisch op telefoons en tablets: een bewegingsstick aan de linkerkant, sleep ergens anders om rond te kijken, knijp met twee vingers om de camera te zoomen, en knoppen op het scherm voor je vaardigheden en menu's. Een klein pijltje in de linkerbovenhoek toont of verbergt de menuknoppen, en de knop Meer daar bevat de rest van je vensters.",
+    "Aanraakbediening verschijnt automatisch op telefoons en tablets: een bewegingsstick aan de linkerkant, sleep ergens aan de rechterkant om rond te kijken, en knoppen op het scherm voor je vaardigheden en menu's.",
   'guide.controls.mobileHeading': 'Op mobiel',
   'guide.controls.talents': 'Talenten',
   'guide.controls.targetFriendly': 'Dichtstbijzijnde bondgenoot aanwijzen',
@@ -3947,7 +3948,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a11':
     'Nodig iedereen die je tegenkomt uit voor een groep, vraag het in de chat, of werk samen bij een kerker. Het grootste deel van de wereld is solo speelbaar, dus groepen is een keuze, geen vereiste.',
   'guide.faqPage.a2':
-    'Nee. Het spel is volledig speelbaar zonder. Het optionele community-token voegt alleen cosmetische opsmuk en een aandeel in de prijzenpot van de dagelijkse beloningen toe, en heeft nooit invloed op kracht of voortgang.',
+    'Nee. Het spel is volledig speelbaar zonder. De optionele community-token ontgrendelt alleen cosmetische opsmuk en heeft nooit invloed op kracht of voortgang.',
   'guide.faqPage.a3':
     'Ja. Het spel draait in een mobiele browser met aanraakbediening, en er is ook een desktop-starter.',
   'guide.faqPage.a4':
@@ -4122,7 +4123,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Ja. Het hele spel is gratis tot het maximale niveau, en het is open source op GitHub.',
   'guide.home.faq.a2':
-    'Nee. Het spel is volledig speelbaar zonder. Het optionele community-token voegt alleen cosmetische opsmuk en een aandeel in de prijzenpot van de dagelijkse beloningen toe, en heeft nooit invloed op kracht.',
+    'Nee. Het spel is volledig speelbaar zonder. Het optionele community-token ontgrendelt alleen cosmetische opsmuk en heeft nooit invloed op kracht.',
   'guide.home.faq.a3':
     'Ja. Er is een directe singleplayermodus in je browser, plus de gedeelde online wereld.',
   'guide.home.faq.a4':
@@ -4197,7 +4198,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Kies een klasse en een uiterlijk, geef je held een naam en betreed de wereld. Je kunt later meer personages maken.',
   'guide.howToPlay.step1Title': 'Maak een personage',
   'guide.howToPlay.step2Body':
-    'Maarschalk Redbrook wacht in het startdorp met Wolven aan de Deur, en Voorman Odell in de buurt heeft ook werk. Praat met een van beiden om je eerste quest aan te nemen.',
+    'Maarschalk Redbrook wacht in het startdorp. Praat met hem en accepteer Wolven aan de Deur.',
   'guide.howToPlay.step2Title': 'Vind je eerste quest',
   'guide.howToPlay.step3Body':
     'Beweeg met W, A, S, D. Houd de rechtermuisknop ingedrukt en sleep om rond te kijken. Dat is het grootste deel.',
@@ -4388,7 +4389,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een altijd actief kanaal voor het hele rijk dat iedereen die online is bereikt, handig om een vraag te stellen of te kletsen. Anders dan World en Looking for Group hoef je je nooit aan te melden.',
   'guide.social.chanGuild': 'Gilde en Officier.',
   'guide.social.chanGuildBody':
-    'Kanalen voor je gilde. Gildechat bereikt elk lid; het officierskanaal is voor officieren en de gildeleider.',
+    'Kanalen voor je gilde. Gildechat bereikt elk lid; het officierskanaal is alleen voor officieren.',
   'guide.social.chanLfg': 'Op zoek naar groep.',
   'guide.social.chanLfgBody':
     'Een optioneel kanaal voor het hele rijk om mensen te vinden voor een dungeon. Open het tabblad om mee te doen.',
@@ -4533,7 +4534,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Elke klasse kan zich staande houden en het maximum bereiken. Kies de fantasie die je leuk vindt, niet die een ander de beste noemt.',
   'guide.wishPage.i1Title': 'Je kunt geen verkeerde klasse kiezen',
   'guide.wishPage.i2Body':
-    "Wanneer je valt, herrijs je als een geest bij de dichtstbijzijnde begraafplaats. Loop terug naar je lichaam om gratis te herleven, of neem de onmiddellijke herrijzenis van de Bleke Hoeder aan en draag voor het gemak een kortstondige verzwakking. Er gaat nooit ervaring, uitrusting of munten verloren, dus het is veilig om risico's te nemen en te leren.",
+    "Wanneer je sneuvelt, laat je je geest los en herleef je bij de dichtstbijzijnde begraafplaats, en loop je vervolgens terug. Er gaat geen ervaring verloren, dus het is veilig om risico's te nemen en te leren.",
   'guide.wishPage.i2Title': 'Sterven kost je nauwelijks iets',
   'guide.wishPage.i3Body':
     'Ze gaan open op niveau 10 en resetten wanneer je maar wilt, buiten gevecht, dus je vroege keuzes zijn nooit permanent.',
@@ -4578,7 +4579,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'Tweehonderd jaar heeft deze muur standgehouden. Hij breekt niet onder mijn wacht, maar hij kreunt.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch houdt de muur. Stalker Ridge en de Dieprots-Holen behoren tot bergkatten en gravers; de Ogre Foothills en Drogmar's War-Camp tot ingehuurde bruten; Stormcrag knettert van de elementalen, en daaronder gloeit De Glinstermeer, het bergmeer waarvan de oever de poort van bleek licht bewaart naar De Verdronken Tempel; de Wyrmcult Tents en Revenant Fields omsluiten het hoge terrein van de sekte, met het Grafwurm-Heiligdom op de top.",
+    "Highwatch houdt de muur. Stalker Ridge en de Dieprots-Holen behoren tot bergkatten en gravers; de Ogre Foothills en Drogmar's War-Camp tot ingehuurde bruten; Stormcrag knettert van de elementalen en de Glimmermere gloeit eronder; de Wyrmcult Tents en Revenant Fields omsluiten het hoge terrein van de sekte, met het Grafwurm-Heiligdom op de top.",
   'guide.worldPage.places': 'Opmerkelijke plekken',
   'guide.worldPage.residents': 'Wie je zult ontmoeten',
   'guide.worldPage.valeBlurb':

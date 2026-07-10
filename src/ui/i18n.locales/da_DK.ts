@@ -112,7 +112,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Fredens regler betyder ingen erfaring og intet bytte: en afgjort kamp tæller med i din statistik og på vindertavlen, og en sejr tæller også med i dagens belønningsopgaver. Deserterer du en kamp, sættes din plads på bænken, og Banemesteren husker det.',
   'guide.valeCupPage.rewardsHeading': 'Fredens regler',
   'guide.valeCupPage.rolesBody':
-    'Din rolle afgør det sæt, du bærer med ind på banen. Alle sparker; resten er temperament. I kategorierne en-mod-en og to-mod-to spiller alle allround-sættet, så rollevalg kommer først til deres ret fra tre-mod-tre og opefter.',
+    'Din rolle afgør det sæt, du bærer med ind på banen. Alle sparker; resten er temperament.',
   'guide.valeCupPage.rolesHeading': 'Sportsroller',
   'guide.valeCupPage.spectateBody':
     'Én kamp spilles ad gangen på stadion, og enhver kan gå hen og se med fra tribunerne.',
@@ -322,6 +322,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Heroiske Mærker: {count}',
   'heroicShop.buyAria': 'Køb {item} for {marks} Heroiske Mærker',
   'hudChrome.bags.cannotDestroy': 'Denne genstand kan ikke ødelægges.',
+  'hudChrome.bags.rightClickDestroy': 'Højreklik for at ødelægge',
   'hudChrome.crafting.comboRequirementUnmet':
     'Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.',
   'hudChrome.discord.roleTag.coredevs': 'Kerneudvikler',
@@ -3733,7 +3734,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupInterface': 'Brugerflade',
   'guide.controls.groupMovement': 'Bevægelse',
   'guide.controls.intro':
-    'Standardtaster til computer. Hver tildeling kan ændres i spillets indstillinger, undtagen Esc, der altid åbner spillets menu, og en tildeling kan være en modifikatorkombination som Shift+Z.',
+    'Standardtaster til computer. Hver tildeling kan ændres i spillets indstillinger.',
   'guide.controls.keyHeader': 'Tast',
   'guide.controls.leaderboard': 'Resultattavle',
   'guide.controls.mobileBody':
@@ -3877,7 +3878,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a11':
     'Inviter enhver, du møder, til et følge, spørg i chatten, eller slå jer sammen ved et fangehul. Det meste af verden kan klares alene, så at danne grupper er et valg, ikke et krav.',
   'guide.faqPage.a2':
-    'Nej. Spillet kan spilles fuldt ud uden. Det valgfrie fællesskabstoken tilføjer kun kosmetisk pynt og en andel af præmiepuljen for daglige belønninger, og det påvirker aldrig styrke eller fremgang.',
+    'Nej. Spillet kan spilles fuldt ud uden. Det valgfrie fællesskabstoken låser kun kosmetisk pynt op og påvirker aldrig styrke eller fremgang.',
   'guide.faqPage.a3':
     'Ja. Spillet kører i en mobilbrowser med berøringsstyring, og der er også en computer-launcher.',
   'guide.faqPage.a4':
@@ -4052,7 +4053,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a1':
     'Ja. Hele spillet er gratis til maksniveauet, og det er open source på GitHub.',
   'guide.home.faq.a2':
-    'Nej. Spillet er fuldt spilbart uden en. Det valgfrie fællesskabstoken tilføjer kun kosmetisk pynt og en andel af præmiepuljen for daglige belønninger, og det påvirker aldrig styrke.',
+    'Nej. Spillet er fuldt spilbart uden en. Den valgfrie community-token låser kun op for kosmetisk pynt og påvirker aldrig styrke.',
   'guide.home.faq.a3':
     'Ja. Der er en øjeblikkelig enkeltspillertilstand i din browser, plus den delte online-verden.',
   'guide.home.faq.a4':
@@ -4123,7 +4124,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Vælg en klasse og et udseende, giv din helt et navn, og træd ind i verden. Du kan lave flere karakterer senere.',
   'guide.howToPlay.step1Title': 'Lav en karakter',
   'guide.howToPlay.step2Body':
-    'Marskal Redbrook venter i startbyen med Ulve ved Døren, og Formand Odell i nærheden har også arbejde. Tal med en af dem for at tage dit første opdrag.',
+    'Marskal Redbrook venter i startbyen. Tal med ham og tag imod Ulve ved Døren.',
   'guide.howToPlay.step2Title': 'Find din første quest',
   'guide.howToPlay.step3Body':
     'Bevæg dig med W, A, S, D. Hold højre museknap nede og træk for at se dig omkring. Det er stort set det hele.',
@@ -4314,7 +4315,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'En altid-tændt rigsdækkende kanal, der når alle online, god til at stille et spørgsmål eller småsnakke. I modsætning til World og Looking for Group behøver du aldrig at melde dig til.',
   'guide.social.chanGuild': 'Laug og Officer.',
   'guide.social.chanGuildBody':
-    'Kanaler for dit laug. Laugschat når hvert medlem; officerkanalen er for officerer og lauglederen.',
+    'Kanaler for dit laug. Laugschat når hvert medlem; officerkanalen er kun for officerer.',
   'guide.social.chanLfg': 'Søger Gruppe.',
   'guide.social.chanLfgBody':
     'En tilvalgs rige-dækkende kanal til at finde folk til at løbe en fangekælder. Åbn dens fane for at deltage.',
@@ -4462,7 +4463,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Når du falder, rejser du dig som et genfærd ved den nærmeste kirkegård. Løb tilbage til dit lig for at genopstå gratis, eller tag Den Blege Vogters øjeblikkelige genopstandelse og bær en kortvarig svækkelse for nemhedens skyld. Ingen erfaring, intet udstyr og ingen mønter går nogensinde tabt, så det er trygt at tage chancer og lære.',
   'guide.wishPage.i2Title': 'Døden koster dig knap nok noget',
   'guide.wishPage.i3Body':
-    'De låses op på niveau 10 og nulstilles, når du vil, uden for kamp, så dine tidlige valg er aldrig permanente.',
+    'De låses op på niveau 10 og nulstilles, når du vil, så dine tidlige valg er aldrig permanente.',
   'guide.wishPage.i3Title': 'Talenter er ikke en fælde',
   'guide.wishPage.i4Body':
     'Quests er den hurtigste vej til at stige i niveau, og de fører dig rundt i verden. Når du er i tvivl om, hvor du skal hen, så find den næste markør.',
@@ -4503,7 +4504,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksGreeting':
     'I to hundrede år har denne mur holdt. Den brister ikke på min vagt, men den knager.',
   'guide.worldPage.peaksPlaceNotes':
-    "Highwatch holder muren. Stalker Ridge og Deeprock Burrows tilhører ryg-katte og gravere; Ogre Foothills og Drogmar's War-Camp tilhører lejede bøller; Stormcrag knitrer med elementaler, og nedenfor gløder Glimmersøen, tjernet hvis bred holder porten af blegt lys ned til Det Druknede Tempel; Wyrmcult Tents og Revenant Fields omkranser kultens høje grund, med Gravormens Helligdom på dens top.",
+    "Highwatch holder muren. Stalker Ridge og Deeprock Burrows tilhører ryg-katte og gravere; Ogre Foothills og Drogmar's War-Camp tilhører lejede bøller; Stormcrag knitrer med elementaler, og Glimmermere gløder nedenfor; Wyrmcult Tents og Revenant Fields omkranser kultens høje grund, med Gravormens Helligdom på dens top.",
   'guide.worldPage.places': 'Bemærkelsesværdige steder',
   'guide.worldPage.residents': 'Hvem du vil møde',
   'guide.worldPage.valeBlurb':
@@ -6626,7 +6627,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.visualsWhy':
     'Ultra gengiver med den højeste opløsning, din skærm tilbyder med den rigeste belysning. Det slukker også for sikkerhedsnettet, og det er kun til desktop: telefoner og appen topper ud ved High.',
   'guide.settingsPage.wherePath':
-    'Alt på denne side lever i spillet: tryk på Esc for at åbne indstillingerne. Menuen åbner på en Oversigt over fastgjorte essentielle valg, med kategorierne på en skinne ved siden: indstillingerne nedenfor bor under Grafik, Interface og Tilgængelighed i Skærm-gruppen, og Performance Overlay under System. Endnu hurtigere, skriv et navn i søgefeltet øverst og spring direkte hen til det.',
+    'Alt på denne side lever i spillet: Tryk på Esc og kig i Grafik, Interface og Performance Overlay.',
   'guide.settingsPage.whyLabel': 'Hvorfor virker det:',
   'hudChrome.crafting.close': 'Tæt håndværk',
   'hudChrome.crafting.craft': 'Håndværk',
@@ -6719,6 +6720,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Tag ud',
   'hudChrome.bank.withdrawQuantityInput': 'Antal at tage ud',
   'hudChrome.bank.withdrawQuantityTitle': 'Tag {item} ud',
+  'entities.abilities.faerie_fire.description':
+    'Sænker målets rustning med {damage}% i 40 sek. Stakker ikke med Rustningsskær.',
+  'hud.core.mobileSettings': 'Indstillinger',
   'abilityUi.tooltip.selfOnly': 'Kun på dig selv',
   'itemUi.lootRoll.rolled': '{answered}/{total} har slået',
   'entities.abilities.sunder_armor.description':
