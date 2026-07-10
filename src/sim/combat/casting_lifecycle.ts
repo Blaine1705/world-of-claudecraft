@@ -59,7 +59,6 @@ import {
   consumeFreeCostFor,
   consumeNextAttackCrit,
   consumeNextCastCheap,
-  consumeNextCastFree,
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
