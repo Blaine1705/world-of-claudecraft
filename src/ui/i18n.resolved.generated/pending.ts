@@ -305,6 +305,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -632,6 +634,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -959,6 +963,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -1286,6 +1292,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -1614,6 +1622,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -1941,6 +1951,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -1974,19 +1986,23 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "hud.core.riftLabel",
-    "hud.core.riftLabelRanked"
+    "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag"
   ],
   "zh_TW": [
     "hud.core.riftLabel",
-    "hud.core.riftLabelRanked"
+    "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag"
   ],
   "ko_KR": [
     "hud.core.riftLabel",
-    "hud.core.riftLabelRanked"
+    "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag"
   ],
   "ja_JP": [
     "hud.core.riftLabel",
-    "hud.core.riftLabelRanked"
+    "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag"
   ],
   "pt_BR": [
     "entities.items.chunk_of_ore.name",
@@ -2284,6 +2300,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -2317,7 +2335,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "hud.core.riftLabel",
-    "hud.core.riftLabelRanked"
+    "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag"
   ],
   "cs_CZ": [
     "entities.items.chunk_of_ore.name",
@@ -2635,6 +2654,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -2962,6 +2983,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -3289,6 +3312,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -3616,6 +3641,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -3943,6 +3970,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -4270,6 +4299,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -4597,6 +4628,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
@@ -4924,6 +4957,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.worldPage.duskPlaceNotes",
     "hud.core.riftLabel",
     "hud.core.riftLabelRanked",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
     "hudChrome.itemTooltip.riftSockets",
     "hudChrome.itemTooltip.riftTier",
     "hudChrome.itemTooltip.riftUpgrade",
