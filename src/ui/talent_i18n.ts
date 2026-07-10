@@ -60,6 +60,9 @@ type DisplayGlobalKey = Exclude<
   | 'battleRhythm'
   | 'bloodbathPct'
   | 'cdrPerRage'
+  // Hardened Blood's armor stacks: applied at runtime (casting_lifecycle's
+  // spendAbilityCost), its prose is the hand-written row description.
+  | 'hardenedBloodPct'
   | 'fearBreakPct'
   // Master Armorer's 2H-gated damage: applied at runtime (combat/damage.ts), its
   // prose is the hand-written mastery description, so no generated label.
@@ -7477,6 +7480,7 @@ function effectDescription(
       key === 'battleRhythm' ||
       key === 'bloodbathPct' ||
       key === 'cdrPerRage' ||
+      key === 'hardenedBloodPct' ||
       key === 'fearBreakPct' ||
       key === 'masteryTwoHandDmgPct'
     )

@@ -98,6 +98,10 @@ export interface GlobalModEffect {
   battleRhythm?: number;
   bloodbathPct?: number;
   cdrPerRage?: number;
+  // Hardened Blood (choice-row talent): armor percent gained per stack. Each
+  // full 10 rage spent on one ability grants a stack (casting_lifecycle's
+  // spendAbilityCost), up to HARDENED_BLOOD_MAX_STACKS for HARDENED_BLOOD_DURATION.
+  hardenedBloodPct?: number;
   // Lingering Dread: fraction of the target's max health a fear the player
   // applies can soak before breaking (0 = classic break on any damage).
   fearBreakPct?: number;
@@ -581,6 +585,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
     battleRhythm: 0,
     bloodbathPct: 0,
     cdrPerRage: 0,
+    hardenedBloodPct: 0,
     fearBreakPct: 0,
     masteryTwoHandDmgPct: 0,
   };
@@ -653,6 +658,7 @@ export function accumulate(
     g.battleRhythm += (e.battleRhythm ?? 0) * mult;
     g.bloodbathPct += (e.bloodbathPct ?? 0) * mult;
     g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
+    g.hardenedBloodPct += (e.hardenedBloodPct ?? 0) * mult;
     g.fearBreakPct += (e.fearBreakPct ?? 0) * mult;
     g.masteryTwoHandDmgPct += (e.masteryTwoHandDmgPct ?? 0) * mult;
   }

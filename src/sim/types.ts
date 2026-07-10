@@ -3142,6 +3142,13 @@ export function rageGenAuraMult(e: Entity): number {
   return mult;
 }
 
+// Hardened Blood (choice-row talent): each full 10 rage spent on one ability
+// grants a stack of +hardenedBloodPct% armor (the aura is a plain
+// buff_armor_pct, folded by recalcPlayerStats and auto-recalced on expiry).
+export const HARDENED_BLOOD_RAGE_PER_STACK = 10;
+export const HARDENED_BLOOD_MAX_STACKS = 5;
+export const HARDENED_BLOOD_DURATION = 8;
+
 // Berserker Stance's crit-damage bonus: an extra fraction on a CRITICAL hit,
 // folded once in combat/damage.ts (mirroring the critVuln amp). 0 when the
 // source is not in Berserker Stance.
