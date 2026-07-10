@@ -222,6 +222,10 @@ function crowdLodScaleSq(visibleRigs: number): number {
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
+// Rift portal-family template ids (module-hoisted: createView is a hot path and
+// allocated this Set per view).
+const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit']);
+
 const AIRBORNE_EPS = 0.4;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
@@ -3620,7 +3624,6 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit']);
     if (
       e.kind === 'object' &&
       (e.templateId === 'dungeon_door' ||
@@ -3801,6 +3804,15 @@ export class Renderer {
       body?.traverse((o) => {
         o.userData.entityId = e.id;
       });
+      // Prop builders hang their ambience handles (rolling rock, orbiting
+      // shards, pulsing veins, pylon flame, the mail votive) on the BODY they
+      // return, but the per-frame animation pass reads them from the view
+      // GROUP: hoist them across or every one of those animations sits inert.
+      if (body) {
+        for (const key of ['rollRock', 'riftOrbiters', 'riftPulse', 'riftFlame', 'mailGlow']) {
+          if (body.userData[key] !== undefined) group.userData[key] = body.userData[key];
+        }
+      }
       clickTarget = body!;
     }
     group.scale.setScalar(e.scale);
@@ -4092,6 +4104,15 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
+  // Rift interiors are the one interior class whose world origin is REUSED: an
+  // empty slot frees after 60s and the next run rebuilds at the same z-stacked
+  // origin, so a stale group would overlap the new build and its torch lights
+  // would stack into the per-frame fire-light budget forever. Tracked per key;
+  // every build retires the others (a descended-from floor included: there is
+  // no way back up). Geometries/materials are NOT disposed here: kit meshes
+  // share the loader cache and the instance-held kit materials, so only the
+  // scene-graph nodes and the light/flame registries are reclaimed.
+  private riftInteriorGroups = new Map<string, THREE.Group>();
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
   private yumiMazeViews = new Map<number, YumiMazeView>();
@@ -4116,6 +4137,21 @@ export class Renderer {
     | 'underwater'
     | 'rift'
     | 'practice' = 'outdoor';
+
+  /** Drop a retired interior's scene nodes and prune its lights/flames out of
+   * the per-frame registries. See riftInteriorGroups for why nothing here
+   * calls dispose(): the meshes share cached kit geometry and materials. */
+  private retireInteriorGroup(group: THREE.Group): void {
+    this.scene.remove(group);
+    const doomed = new Set<THREE.Object3D>();
+    group.traverse((o) => doomed.add(o));
+    for (let i = this.fireLights.length - 1; i >= 0; i--) {
+      if (doomed.has(this.fireLights[i])) this.fireLights.splice(i, 1);
+    }
+    for (let i = this.flames.length - 1; i >= 0; i--) {
+      if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
+    }
+  }
 
   private buildInterior(
     interior: string,
@@ -4365,14 +4401,33 @@ export class Renderer {
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
             const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-            void this.buildInterior(floor.style.kit, o.x, o.z, {
-              layout: floor.layout,
-              style: floor.style,
-              hazards: floor.hazards,
-              hazardStyle: 'lava',
-              iceZone: floor.iceZone,
-              platform: floor.platform,
-            });
+            this.dungeons ??= new DungeonInteriors(
+              this.scene,
+              this.lowGfx,
+              this.flames,
+              this.fireLights,
+            );
+            void this.dungeons
+              .buildInterior(floor.style.kit, o.x, o.z, {
+                layout: floor.layout,
+                style: floor.style,
+                hazards: floor.hazards,
+                hazardStyle: 'lava',
+                iceZone: floor.iceZone,
+                platform: floor.platform,
+              })
+              .then((group) => {
+                for (const [staleKey, staleGroup] of this.riftInteriorGroups) {
+                  if (staleKey === key) continue;
+                  this.retireInteriorGroup(staleGroup);
+                  this.riftInteriorGroups.delete(staleKey);
+                  this.builtInteriors.delete(staleKey);
+                }
+                this.riftInteriorGroups.set(key, group);
+              })
+              .catch((err) => {
+                console.error('Failed to build rift interior:', err);
+              });
           }
         }
       }

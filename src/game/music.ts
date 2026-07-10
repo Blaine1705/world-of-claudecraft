@@ -94,6 +94,8 @@ const RIFT_MUSIC: Record<string, MusicZone> = {
   Voidscar: 'rift_void',
   Stormspire: 'rift_storm',
   Sunken: 'rift_tide',
+  // The authored set piece: hellfire halls read as the forge archetype.
+  'Infernal Citadel': 'rift_ember',
 };
 
 /** Crawl cue for a procedural Rift floor, from RiftFloorView.themeName. */

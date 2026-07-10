@@ -3379,7 +3379,9 @@ export const ja_JP: EnTranslations = {
       "raceWorldWin": "{names} が {seconds}秒で{tier}ランク・リフトレースに勝利！",
       "raceWinBanner": "リフトレース勝利 — {seconds}秒",
       "raceLostBanner": "リフト攻略済み",
-      "forgeComplete": "{name} のリフト鍛造「{action}」が完了しました。"
+      "forgeUpgraded": "{name} のリフト強化が完了しました。",
+      "forgeEnchanted": "{name} のリフト付与が完了しました。",
+      "forgeSocketed": "{name} にリフトの宝石をはめ込みました。"
     },
     "delve": {
       "cannotEnterNow": "今はデルヴに入れない。",

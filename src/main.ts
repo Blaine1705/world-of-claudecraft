@@ -1108,6 +1108,10 @@ async function startGame(
   const tryDayNightDevCommand = (raw: string): boolean => {
     const m = raw.trim().match(/^\/(?:dev\s+time|dev\s+daynight|daynight)\b\s*(.*)$/i);
     if (!m) return false;
+    // Dev builds only: a per-client phase override is brighter-night-for-me,
+    // exactly the actionable-visibility class the graphics-fairness rule bans.
+    // Harmless while DAY_ONLY pins day, but gate it before that ever flips.
+    if (!import.meta.env.DEV) return false;
     const arg = m[1].trim().toLowerCase();
     if (!arg) {
       hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');

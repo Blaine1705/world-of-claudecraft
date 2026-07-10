@@ -3379,7 +3379,9 @@ export const ru_RU: EnTranslations = {
       "raceWorldWin": "{names} победили в гонке разлома ранга {tier} за {seconds} с!",
       "raceWinBanner": "Победа в гонке разлома — {seconds} с",
       "raceLostBanner": "Разлом уже закрыт",
-      "forgeComplete": "Операция «{action}» в кузнице разлома завершена для {name}."
+      "forgeUpgraded": "Улучшение разлома завершено для {name}.",
+      "forgeEnchanted": "Зачарование разлома завершено для {name}.",
+      "forgeSocketed": "Самоцвет разлома вставлен в {name}."
     },
     "delve": {
       "cannotEnterNow": "Сейчас вы не можете войти в вылазку.",

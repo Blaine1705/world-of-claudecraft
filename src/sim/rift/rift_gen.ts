@@ -693,6 +693,26 @@ export function riftLiftAt(floor: RiftFloorPlan, localX: number, localZ: number)
 // ---- Public generation ------------------------------------------------------
 
 const FLOOR_CACHE = new Map<string, RiftFloorPlan>();
+
+// applyRiftUpgrade builds a FRESH floor object (deep-ish clone) on every call;
+// the renderer regenerates the floor per frame (camera clamp, ground-reference
+// heuristic), so an upgraded floor would otherwise allocate a full spawn-mapped
+// clone per read. Manifests are stable per event, so memoise by identity.
+const UPGRADED_CACHE = new WeakMap<RiftFloorPlan, WeakMap<RiftUpgradeManifest, RiftFloorPlan>>();
+
+function upgradedFloor(base: RiftFloorPlan, upgrade?: RiftUpgradeManifest | null): RiftFloorPlan {
+  if (!upgrade) return applyRiftUpgrade(base, upgrade);
+  let per = UPGRADED_CACHE.get(base);
+  if (!per) {
+    per = new WeakMap();
+    UPGRADED_CACHE.set(base, per);
+  }
+  const hit = per.get(upgrade);
+  if (hit) return hit;
+  const built = applyRiftUpgrade(base, upgrade);
+  per.set(upgrade, built);
+  return built;
+}
 const CACHE_LIMIT = 128;
 
 function floorLevelFor(baseLevel: number, floorIndex: number): number {
@@ -734,7 +754,7 @@ export function generateRiftFloor(
 ): RiftFloorPlan {
   const key = `${seed >>> 0}:${Math.round(baseLevel)}:${floorIndex}`;
   const cached = FLOOR_CACHE.get(key);
-  if (cached) return applyRiftUpgrade(cached, upgrade);
+  if (cached) return upgradedFloor(cached, upgrade);
 
   // Authored set-piece seeds short-circuit the whole procedural chain BEFORE any
   // draw is made, so the procedural draw order for every other seed is untouched.
@@ -748,7 +768,7 @@ export function generateRiftFloor(
     );
     if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
     FLOOR_CACHE.set(key, setPiece);
-    return applyRiftUpgrade(setPiece, upgrade);
+    return upgradedFloor(setPiece, upgrade);
   }
 
   const floorCount = riftFloorCount(seed);
@@ -814,7 +834,7 @@ export function generateRiftFloor(
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
   FLOOR_CACHE.set(key, plan);
-  return applyRiftUpgrade(plan, upgrade);
+  return upgradedFloor(plan, upgrade);
 }
 
 /** Instance-local collider set for a rift floor (pure, from the generated layout). */

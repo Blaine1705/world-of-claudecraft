@@ -222,9 +222,15 @@ function emitResult(ctx: SimContext, pid: number, result: RiftForgeResult): Rift
   ctx.emit({ type: 'riftForgeResult', pid, ...result });
   if (result.ok) {
     const name = ITEMS[result.itemId]?.name ?? result.itemId;
+    const line =
+      result.action === 'upgrade'
+        ? `Rift upgrade completed for ${name}.`
+        : result.action === 'enchant'
+          ? `Rift enchant completed for ${name}.`
+          : `Rift gem socketed for ${name}.`;
     ctx.emit({
       type: 'log',
-      text: `Rift forge ${result.action} completed for ${name}.`,
+      text: line,
       color: '#c9f',
       pid,
     });

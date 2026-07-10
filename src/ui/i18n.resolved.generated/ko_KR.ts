@@ -3379,7 +3379,9 @@ export const ko_KR: EnTranslations = {
       "raceWorldWin": "{names} 님이 {seconds}초 만에 {tier} 등급 균열 경주에서 승리했습니다!",
       "raceWinBanner": "균열 경주 승리 — {seconds}초",
       "raceLostBanner": "이미 정복된 균열",
-      "forgeComplete": "{name}의 균열 제련 {action} 작업을 완료했습니다."
+      "forgeUpgraded": "{name}의 균열 강화가 완료되었습니다.",
+      "forgeEnchanted": "{name}의 균열 마법부여가 완료되었습니다.",
+      "forgeSocketed": "{name}에 균열 보석을 장착했습니다."
     },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",

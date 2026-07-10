@@ -10,6 +10,7 @@ import {
   type RiftDungeonDraft,
 } from '../src/sim/rift/upgrader_draft';
 import type { SimContext } from '../src/sim/sim_context';
+import { readBodyCapped } from './bounded_body';
 
 const DEFAULT_TIMEOUT_MS = 20_000;
 const MAX_RESPONSE_BYTES = 128 * 1024;
@@ -186,8 +187,7 @@ async function fetchJson(
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetch(url, { ...init, signal: controller.signal });
-    const body = await response.text();
-    if (body.length > MAX_RESPONSE_BYTES) throw new Error('response exceeds byte limit');
+    const body = await readBodyCapped(response, MAX_RESPONSE_BYTES);
     if (!response.ok) throw new Error(`upgrader HTTP ${response.status}`);
     const parsed = JSON.parse(body) as unknown;
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {

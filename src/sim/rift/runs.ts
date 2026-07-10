@@ -151,6 +151,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.pylonIds = [];
   inst.litPylons = new Set();
   inst.bossId = null;
+  inst.bossDiedAtTick = null;
   inst.exitId = null;
   inst.descentId = null;
   inst.descentOpen = false;
@@ -296,6 +297,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.descentId = null;
   inst.exitId = null;
   inst.bossId = null;
+  inst.bossDiedAtTick = null;
   inst.boulderIds = [];
   inst.boulderPads = [];
   inst.seqRuneIds = [];
@@ -1277,6 +1279,14 @@ export function tickRiftLockpicks(ctx: SimContext): void {
 }
 
 export function updateRiftInstances(ctx: SimContext): void {
+  // Pre-pass at TICK resolution: stamp the moment each floor boss is first seen
+  // dead. The sweep below runs once a second, so without the stamp two groups
+  // whose bosses fall inside the same window would be ranked by slot order and
+  // the earlier kill could lose the shared race.
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null || inst.bossDiedAtTick !== null || inst.bossId === null) continue;
+    if (ctx.entities.get(inst.bossId)?.dead) inst.bossDiedAtTick = ctx.tickCount;
+  }
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
@@ -1344,11 +1354,7 @@ export function updateRiftInstances(ctx: SimContext): void {
     }
 
     if (floor.isBoss) {
-      const boss = inst.bossId !== null ? ctx.entities.get(inst.bossId) : null;
-      if ((boss === null || boss === undefined || boss.dead) && inst.exitId === null) {
-        if (!completeRiftClear(ctx, inst, boss ?? null)) continue;
-        openExit(ctx, inst);
-      }
+      // Clears are claimed AFTER this loop, in boss-death order (see below).
     } else if (!inst.descentOpen) {
       const puzzleDone =
         floor.puzzle.kind === 'rune_pylons'
@@ -1365,5 +1371,27 @@ export function updateRiftInstances(ctx: SimContext): void {
       inst.emptyFor += 1;
       if (inst.emptyFor >= RIFT_EMPTY_TIMEOUT) freeRiftInstance(ctx, inst);
     }
+  }
+
+  // Boss clears claim in DEATH order, not slot order: every candidate whose
+  // boss has a recorded kill tick ranks by that tick (slot only breaks exact
+  // ties), so the group that actually finished first wins the shared race.
+  // A boss floor whose boss never spawned has no recorded death and can never
+  // claim (fails closed instead of handing out a free clear).
+  const cleared = ctx.riftInstances
+    .filter(
+      (inst) =>
+        inst.partyKey !== null &&
+        inst.exitId === null &&
+        inst.bossDiedAtTick !== null &&
+        floorForInstance(inst).isBoss,
+    )
+    .sort((a, b) => (a.bossDiedAtTick as number) - (b.bossDiedAtTick as number) || a.slot - b.slot);
+  for (const inst of cleared) {
+    // An earlier claim this sweep may have torn this competitor down already.
+    if (inst.partyKey === null) continue;
+    const boss = inst.bossId !== null ? ctx.entities.get(inst.bossId) : null;
+    if (!completeRiftClear(ctx, inst, boss ?? null)) continue;
+    openExit(ctx, inst);
   }
 }

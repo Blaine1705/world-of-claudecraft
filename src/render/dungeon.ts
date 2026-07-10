@@ -699,7 +699,7 @@ export class DungeonInteriors {
       // overrides the torch/light colours. Undefined for authored dungeons/delves.
       style?: InteriorStyle;
     },
-  ): Promise<void> {
+  ): Promise<THREE.Group> {
     await ensureDungeonAssets();
     // Delve modules pass an explicit per-module layout so render geometry matches
     // the SAME layout sim/colliders.ts derives collision from (what you see is
@@ -756,7 +756,7 @@ export class DungeonInteriors {
       });
       group.position.set(ox, 0, oz);
       this.scene.add(group);
-      return;
+      return group;
     }
 
     this.placeFloor(p, layout, variant);
@@ -798,6 +798,7 @@ export class DungeonInteriors {
     }
     group.position.set(ox, 0, oz);
     this.scene.add(group);
+    return group;
   }
 
   update(camX: number, camY: number, camZ: number, eyeX: number, eyeY: number, eyeZ: number): void {

@@ -3379,7 +3379,9 @@ export const en_XA: EnTranslations = {
       "raceWorldWin": "[{names} ŵóñ ţĥé {tier}-ŕáñķ Ŕíƒţ ŕáçé íñ {seconds}š!]",
       "raceWinBanner": "[Ŕíƒţ Ŕáçé Ŵóñ - {seconds}š]",
       "raceLostBanner": "[Ŕíƒţ Áļŕéáðý Çļéáŕéð]",
-      "forgeComplete": "[Ŕíƒţ ƒóŕĝé {action} çóɱþļéţéð ƒóŕ {name}.]"
+      "forgeUpgraded": "[Ŕíƒţ úþĝŕáðé çóɱþļéţéð ƒóŕ {name}.]",
+      "forgeEnchanted": "[Ŕíƒţ éñçĥáñţ çóɱþļéţéð ƒóŕ {name}.]",
+      "forgeSocketed": "[Ŕíƒţ ĝéɱ šóçķéţéð ƒóŕ {name}.]"
     },
     "delve": {
       "cannotEnterNow": "[Ýóú çáññóţ éñţéŕ á ðéļʋé ŕíĝĥţ ñóŵ.]",

@@ -278,6 +278,10 @@ export interface RiftInstance {
   mobIds: number[];
   objectIds: number[];
   bossId: number | null;
+  /** Tick the floor boss was first seen dead (stamped at TICK resolution by
+   * updateRiftInstances' pre-pass, so same-window race clears rank by who
+   * actually killed first, not by slot order). Null until the kill. */
+  bossDiedAtTick: number | null;
   exitId: number | null;
   /** Planned descent-portal position (instance-local), spawned on clear. */
   descentAt: { x: number; z: number } | null;

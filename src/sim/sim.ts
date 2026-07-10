@@ -1615,6 +1615,7 @@ export class Sim {
         mobIds: [],
         objectIds: [],
         bossId: null,
+        bossDiedAtTick: null,
         exitId: null,
         descentAt: null,
         descentId: null,
@@ -7508,6 +7509,19 @@ export class Sim {
   // The primary player's active procedural Rift floor (offline IWorld read). The
   // renderer regenerates geometry/style from this descriptor; null outside a rift.
   get riftFloor(): import('../world_api/dungeons').RiftFloorView | null {
+    // The renderer reads this per frame (camera clamp, per-entity ground
+    // reference): cache the derived view per tick instead of reallocating it
+    // and re-searching riftEvents on every read.
+    if (this.riftFloorViewTick === this.tickCount) return this.riftFloorView;
+    this.riftFloorViewTick = this.tickCount;
+    this.riftFloorView = this.buildRiftFloorView();
+    return this.riftFloorView;
+  }
+
+  private riftFloorViewTick = -1;
+  private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
+
+  private buildRiftFloorView(): import('../world_api/dungeons').RiftFloorView | null {
     const p = this.entities.get(this.primaryId);
     if (!p) return null;
     const inst = riftInstanceAtPos(this.ctx, p.pos);
