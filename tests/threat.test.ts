@@ -1,19 +1,32 @@
 // Classic threat mechanics + the class kit that drives them (stances/forms,
 // stealth, pets).
 import { describe, expect, it } from 'vitest';
-import { abilitiesKnownAt } from '../src/sim/data';
+import { abilitiesKnownAt, BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
   BEAR_FORM_THREAT_MULT,
   DEFENSIVE_STANCE_THREAT_MULT,
   RIGHTEOUS_FURY_THREAT_MULT,
 } from '../src/sim/threat';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
+// These suites only ever reach for wolves, boars, and murlocs (plus dungeon
+// content, which the spread keeps), so drop every other ambient camp and all
+// npcs/ground objects to keep sim.tick() cheap (subsystem-world pattern from
+// tests/fiesta.test.ts).
+const THREAT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) =>
+    ['forest_wolf', 'wild_boar', 'mudfin_murloc'].includes(camp.mobId),
+  ),
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(cls: Parameters<typeof simClass>[0] = 'warrior', seed = 42) {
-  return new Sim({ seed, playerClass: cls, autoEquip: true });
+  return new Sim({ seed, playerClass: cls, autoEquip: true, world: THREAT_TEST_WORLD });
 }
 // type helper only — keeps makeSim's signature honest without importing PlayerClass
 function simClass(
@@ -167,7 +180,12 @@ describe('threat from damage', () => {
 
 describe('healing threat', () => {
   function partyOfTwo() {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const tank = sim.addPlayer('warrior', 'Tank');
     const healer = sim.addPlayer('priest', 'Healer');
     sim.partyInvite(healer, tank);
@@ -220,7 +238,12 @@ describe('healing threat', () => {
   });
 
   it('healing a non-party player creates threat on mobs already fighting them', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const tank = sim.entities.get(sim.addPlayer('warrior', 'Tank'))!;
     const healer = sim.entities.get(sim.addPlayer('priest', 'OutsideHealer'))!;
     const wolf = nearestMob(sim, 'forest_wolf', tank);
@@ -244,7 +267,12 @@ describe('healing threat', () => {
 
 describe('classic pull-over rules (110% melee / 130% ranged)', () => {
   function aggroSetup() {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const a = sim.entities.get(sim.addPlayer('warrior', 'A'))!;
     const b = sim.entities.get(sim.addPlayer('mage', 'B'))!;
     const wolf = nearestMob(sim, 'forest_wolf', a);
@@ -367,7 +395,12 @@ describe('classic pull-over rules (110% melee / 130% ranged)', () => {
 
 describe('taunt and growl', () => {
   it('taunt matches the top threat and forces 3 seconds of attention', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const tank = sim.entities.get(sim.addPlayer('warrior', 'Tank'))!;
     const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
     sim.setPlayerLevel(10, tank.id);
@@ -482,7 +515,12 @@ describe('rogue stealth', () => {
     // A stealthed player standing closest shrank the detection radius and, being
     // nearest, was the only candidate considered — so a visible groupmate well
     // inside the normal aggro radius was silently ignored.
-    const sim = new Sim({ seed: 42, playerClass: 'rogue', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'rogue',
+      noPlayer: true,
+      world: THREAT_TEST_WORLD,
+    });
     const rogue = sim.entities.get(sim.addPlayer('rogue', 'Sneak'))!;
     const warrior = sim.entities.get(sim.addPlayer('warrior', 'Visible'))!;
     sim.setPlayerLevel(5, rogue.id);
@@ -721,7 +759,13 @@ describe('hunter pets', () => {
   });
 
   it('a tamed beast that dies stays owned until revived or abandoned', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'hunter', respawnSeconds: 2, autoEquip: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'hunter',
+      respawnSeconds: 2,
+      autoEquip: true,
+      world: THREAT_TEST_WORLD,
+    });
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
     const originalWolfId = wolf.id;
@@ -780,7 +824,13 @@ describe('hunter pets', () => {
       autoTaunt: true,
     });
 
-    const restored = new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true, autoEquip: true });
+    const restored = new Sim({
+      seed: 42,
+      playerClass: 'hunter',
+      noPlayer: true,
+      autoEquip: true,
+      world: THREAT_TEST_WORLD,
+    });
     const pid = restored.addPlayer('hunter', 'Hunter', { state });
     const pet = restored.petOf(pid, true)!;
     expect(pet).toBeTruthy();

@@ -1,10 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Aura, Entity, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+// Duels are player-vs-player; the only ambient dependency is givePet, which
+// adopts a wild mob. Keep the real forest_wolf camps as that mob supply and
+// strip the rest of the ambient world (subsystem-world pattern, see
+// tests/dot_final_tick.test.ts).
+const DUEL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((c) => c.mobId === 'forest_wolf'),
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: DUEL_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

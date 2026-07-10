@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import type { Entity, MoveInput } from '../src/sim/types';
+import type { Entity, MoveInput, WorldContent } from '../src/sim/types';
 import { terrainHeight, terrainSteepness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
 import { wallFootFixture } from './helpers/wall_foot';
 
@@ -16,8 +17,23 @@ import { wallFootFixture } from './helpers/wall_foot';
 const SEED = 42;
 const CLIMB_LIMIT = 1.5;
 
+// Every assertion here compares the live player pose against the kernel mirror
+// (terrain, colliders, water); ambient camps/npcs/ground objects never appear in
+// an assertion, so strip them (dot_final_tick pattern) to keep each tick cheap.
+const MOTION_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(): Sim {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: MOTION_TEST_WORLD,
+  });
   sim.setPlayerLevel(60); // mobs along the routes must not decide these tests
   return sim;
 }
@@ -197,7 +213,12 @@ describe('player motion kernel parity with the live Sim', () => {
 
   it('routes terrain wall standoff through the collision sweep', () => {
     const standoffSeed = 20061;
-    const sim = new Sim({ seed: standoffSeed, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: standoffSeed,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: MOTION_TEST_WORLD,
+    });
     // A pinned wall foot validated against the generated heightfield (the strip
     // world's old western-rim literal is open ground in the 2D atlas-grid world).
     const foot = wallFootFixture(standoffSeed, PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE);

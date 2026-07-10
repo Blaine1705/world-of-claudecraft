@@ -61,8 +61,14 @@ auto-attack + base `mobSwing`; a frenzy + on-hit affix cascade (old_greyjaw +
 ridge_stalker); a hunter ranged pet (`updateRangedPetAttack`) and a warlock melee
 pet (`mobSwing` pet arm + `applyTaunt`); a ground AoE (`updateGroundAoEs` first +
 `pulseGroundAoE` both callers); an arena 1v1 match; a fiesta match; a delve +
-lockpick; and loot rolls (solo death-roll + party need/greed). `coverage.test.ts`
-asserts each subsystem actually FIRES (not merely named in a comment).
+lockpick; and loot rolls (solo death-roll + party need/greed). The coverage
+shards (`coverage_a..c.test.ts`) assert each subsystem actually FIRES (not
+merely named in a comment).
+
+Layout note: the gate is SHARDED for wall-time (`parity_a..g.test.ts` +
+`coverage_a..c.test.ts`, contiguous scenario slices over the shared runner in
+`run_scenarios.ts`); `npx vitest run tests/parity` and `UPDATE_PARITY=1` work
+unchanged, and a shard minting run touches only its own slice's goldens.
 
 ## Known boundaries (what is NOT pinned, read before extracting these)
 

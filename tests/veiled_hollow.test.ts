@@ -1,7 +1,8 @@
-// The Veiled Hollow: zone registration and the sealed southern border.
-// The realm is reachable only through its portal, so the border ridge at the
-// Thornpeak boundary must beat the climbable slope on a straight approach
-// from EVERY x, in BOTH directions, with no road pass through it.
+// The Veiled Hollow: the live-sim movement wall, the coastline's fixed
+// features, swim fatigue, and the Pale Causeway. See
+// tests/veiled_hollow_shared.ts; the zone registration and the terrain
+// gradient scans of the sealed ridge live in veiled_hollow_a/_b (split so no
+// single file carries both heavy terrain sweeps).
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -12,107 +13,11 @@ import {
   REALM_ROADS,
   REALM_ZONE,
 } from '../src/sim/content/realm';
-import { WORLD_MAX_Z, ZONES, zoneAt } from '../src/sim/data';
+import { zoneAt } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { hollowLandness, terrainHeight, WATER_LEVEL } from '../src/sim/world';
-
-const SEED = 1337; // matches the fixed client seed in src/main.ts
-
-describe('Veiled Hollow zone registration', () => {
-  it('sits fourth in the band order, tiled against Thornpeak', () => {
-    // Once the world's last band, now the gateway to the northern realms:
-    // the Drakelands tile against its north edge, the Frostveil past them.
-    expect(ZONES[3].id).toBe('veiled_hollow');
-    expect(ZONES[3].zMin).toBe(900);
-    // the continent: the strip column stacks vale to garden; the columns
-    // sit beside their rows (fire and ice, dream and nightmare, and so on)
-    const byId = (id: string) => ZONES.find((zn) => zn.id === id)!;
-    expect(byId('frostveil').zMin).toBe(ZONES[3].zMax); // the strip's north cap
-    expect(byId('drakelands').xMin).toBe(180); // east beside the Reach
-    expect(byId('amberfall').xMax).toBe(-180); // west beside the Reach
-    expect(byId('galecrest').zMin).toBe(180); // the east column's south end
-    expect(byId('evergarden').zMin).toBe(byId('galecrest').zMax);
-    expect(byId('wraithwood').zMin).toBe(byId('evergarden').zMax);
-    expect(byId('drakelands').zMin).toBe(byId('wraithwood').zMax);
-    expect(byId('willowfen').zMin).toBe(180); // the west column's south end
-    expect(byId('palmreach').zMin).toBe(byId('willowfen').zMax);
-    expect(byId('nightbloom').zMin).toBe(byId('palmreach').zMax);
-    expect(byId('amberfall').zMin).toBe(byId('nightbloom').zMax);
-    // append order is rng-stream order, not stack order, since the grid:
-    // the world's north end is the MAX zMax over all zones
-    expect(WORLD_MAX_Z).toBe(Math.max(...ZONES.map((zn) => zn.zMax)));
-    expect(zoneAt(0, 1000).id).toBe('veiled_hollow');
-    expect(zoneAt(0, 899).id).toBe('thornpeak_heights');
-    expect(zoneAt(0, 1500).id).toBe('frostveil');
-    expect(zoneAt(360, 2000).id).toBe('drakelands');
-  });
-
-  it('declares its southern border sealed', () => {
-    expect(REALM_ZONE.sealedSouthBorder).toBe(true);
-  });
-
-  it('keeps its hub and graveyard on dry, in-zone ground', () => {
-    const { hub, graveyard } = REALM_ZONE;
-    expect(hub.z).toBeGreaterThan(REALM_ZONE.zMin);
-    expect(hub.z).toBeLessThan(REALM_ZONE.zMax);
-    expect(terrainHeight(hub.x, hub.z, SEED)).toBeGreaterThan(WATER_LEVEL);
-    expect(terrainHeight(graveyard.x, graveyard.z, SEED)).toBeGreaterThan(WATER_LEVEL);
-  });
-});
-
-describe('the sealed border wall', () => {
-  // Steepest straight-line gradient found walking north across the wall band
-  // at a fixed x, sampled at the footstep scale the sim's climb check uses.
-  function maxNorthGradient(x: number, seed: number): number {
-    const step = 0.5;
-    let steepest = 0;
-    for (let z = 880; z < 955; z += step) {
-      const rise = terrainHeight(x, z + step, seed) - terrainHeight(x, z, seed);
-      if (rise / step > steepest) steepest = rise / step;
-    }
-    return steepest;
-  }
-
-  // Same, walking south (the way back out without the portal).
-  function maxSouthGradient(x: number, seed: number): number {
-    const step = 0.5;
-    let steepest = 0;
-    for (let z = 955; z > 880; z -= step) {
-      const rise = terrainHeight(x, z - step, seed) - terrainHeight(x, z, seed);
-      if (rise / step > steepest) steepest = rise / step;
-    }
-    return steepest;
-  }
-
-  it('blocks a straight walk in from Thornpeak at every x (several seeds)', () => {
-    for (const seed of [SEED, 1, 42, 99999]) {
-      for (let x = -170; x <= 170; x += 1) {
-        expect(maxNorthGradient(x, seed), `x=${x} seed=${seed}`).toBeGreaterThan(
-          PLAYER_MAX_CLIMB_SLOPE,
-        );
-      }
-    }
-  });
-
-  it('blocks a straight walk back out at every x (several seeds)', () => {
-    for (const seed of [SEED, 1, 42, 99999]) {
-      for (let x = -170; x <= 170; x += 1) {
-        expect(maxSouthGradient(x, seed), `x=${x} seed=${seed}`).toBeGreaterThan(
-          PLAYER_MAX_CLIMB_SLOPE,
-        );
-      }
-    }
-  });
-
-  it('leaves the Gravewyrm Sanctum approach essentially unchanged', () => {
-    // The sealed crest sits 15yd inside the realm band with a narrow sigma,
-    // so the raid gate at (0, 880) must not have been shoved upward.
-    const atSanctum = terrainHeight(0, 880, SEED);
-    const nearby = terrainHeight(0, 860, SEED);
-    expect(Math.abs(atSanctum - nearby)).toBeLessThan(12);
-  });
-});
+import { SEED, VEILED_HOLLOW_TEST_WORLD } from './veiled_hollow_shared';
 
 describe('the sealed border is a hard movement wall', () => {
   // The climb gate projects rise along the movement direction, so a smooth
@@ -123,7 +28,7 @@ describe('the sealed border is a hard movement wall', () => {
   const CREST = 915; // ZONES[2].zMax + 15 (the sealed ridge shift)
 
   function walker(seed: number, startX: number, yawOffNorth: number, jump: boolean): number {
-    const sim = new Sim({ seed, playerClass: 'warrior' });
+    const sim = new Sim({ seed, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
     const p = sim.player;
     p.pos.x = startX;
     p.pos.z = 890;
@@ -167,7 +72,7 @@ describe('the sealed border is a hard movement wall', () => {
   }, 60000);
 
   it('still lets the portal deliver players across', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
     const p = sim.player;
     p.pos.x = -140;
     p.pos.z = 844.5;
@@ -220,7 +125,7 @@ describe('the Hollow coastline keeps every fixed feature on dry land', () => {
 
 describe('open-sea swim fatigue', () => {
   it('warns, then deals rising damage far offshore, and relents ashore', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
     const p = sim.player;
     p.maxHp = 1000;
     p.hp = 1000;
@@ -289,7 +194,7 @@ describe('the Pale Causeway', () => {
   });
 
   it('leaves the interior sound fatigue-free (only the map edges drown)', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
     const p = sim.player;
     p.maxHp = 1000;
     p.hp = 1000;

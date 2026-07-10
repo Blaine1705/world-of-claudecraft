@@ -3,10 +3,24 @@
 // polymorphed into a baby llama" griefing path can never regress.
 import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { AbilityDef, Entity, Vec3 } from '../src/sim/types';
+import type { AbilityDef, Entity, Vec3, WorldContent } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
+
+// Duel / diminishing-returns tests need two players and nothing else: the DR
+// timelines tick a minute-plus of world time, and spawning the whole 14-zone
+// continent made every one of those ticks pay for the full MMO. Keep every
+// terrain-relevant field identical to BUILTIN_WORLD while stripping only the
+// constructor-spawned ambient entities. The two tests that DO need real world
+// content (a non-hostile NPC, a hostile camp mob) build their own full Sim.
+const DUEL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 function twoPlayers(clsA = 'mage', clsB = 'warrior') {
   const sim = new Sim({
@@ -14,6 +28,7 @@ function twoPlayers(clsA = 'mage', clsB = 'warrior') {
     playerClass: clsA as any,
     playerName: 'Caster',
     autoEquip: true,
+    world: DUEL_TEST_WORLD,
   });
   const aPid = sim.primaryId;
   const bPid = sim.addPlayer(clsB as any, 'Victim', { autoEquip: true });

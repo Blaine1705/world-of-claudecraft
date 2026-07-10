@@ -1,14 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { zoneAt } from '../src/sim/data';
+import { BUILTIN_WORLD, zoneAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import * as chatMod from '../src/sim/social/chat';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+// Chat/emote/presence tests only ever talk between hand-added players (the
+// /played and /playtime timelines tick a minute-plus of world time), so none
+// of the hundreds of ambient overworld mobs/NPCs/objects matter. Keep every
+// terrain- and zone-relevant field identical to BUILTIN_WORLD while stripping
+// only the constructor-spawned entity content.
+const CHAT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: CHAT_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

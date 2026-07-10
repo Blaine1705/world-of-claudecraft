@@ -668,7 +668,12 @@ describe('conservation seed sweeps', () => {
 describe('determinism', () => {
   it('the same fixed bank-op script over 300 ticks yields identical state + events', () => {
     function run() {
-      const sim = new Sim({ seed: 123, playerClass: 'warrior', autoEquip: false });
+      const sim = new Sim({
+        seed: 123,
+        playerClass: 'warrior',
+        autoEquip: false,
+        world: BANK_TEST_WORLD,
+      });
       moveToBanker(sim); // proximity gate: the scripted bank ops need a banker in reach
       const m = sim.meta(sim.playerId)!;
       m.copper = LADDER_TOTAL;
@@ -717,7 +722,12 @@ describe('persistence and back-compat', () => {
     m.copper = 4242;
 
     const s1 = sim.serializeCharacter(sim.playerId)!;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const s2 = sim2.serializeCharacter(pid2)!;
     expect(s2).toEqual(s1);
@@ -735,7 +745,12 @@ describe('persistence and back-compat', () => {
       { itemId: 'worn_sword', count: 1, instance: { signer: 'Cyd', charges: { z: 2 } } },
     ];
     const s1 = sim.serializeCharacter(sim.playerId)!;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const m2 = meta(sim2, pid2);
     // Mutate the SOURCE sim's banked payload; the loaded copy must be untouched.
@@ -786,7 +801,12 @@ describe('persistence and back-compat', () => {
     const state = sim.serializeCharacter(sim.playerId)!;
     const legacy = JSON.parse(JSON.stringify(state)) as Record<string, unknown>;
     delete legacy.bank;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     let pid = -1;
     expect(() => {
       pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy as never });
@@ -805,7 +825,12 @@ describe('persistence and back-compat', () => {
     const sim = makeSim();
     const state = sim.serializeCharacter(sim.playerId)! as { bank?: unknown };
     state.bank = { inventory: gearSlots(30), purchasedSlots: 0, bonusSlots: 0 };
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Hoarder', { state: state as never });
     const m2 = meta(sim2, pid);
     moveToBanker(sim2, pid); // proximity gate: the deposit/withdraw below need a banker in reach
@@ -846,7 +871,12 @@ describe('persistence and back-compat', () => {
       purchasedSlots: 7, // floored to the 6-grid
       bonusSlots: -2, // clamped to 0
     };
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid = sim2.addPlayer('warrior', 'Tampered', { state: state as never });
     expect(meta(sim2, pid).bank).toEqual({
       inventory: [
@@ -1274,14 +1304,19 @@ describe('server-stamped bank bonus', () => {
     meta(sim).bank.bonusSlots = 6;
     const saved = sim.serializeCharacter(sim.playerId)!;
 
-    const up = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const up = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true, world: BANK_TEST_WORLD });
     const upPid = up.addPlayer('warrior', 'Linked', {
       state: saved,
       bankBonus: { bonusSlots: 16, sources: SOURCES },
     });
     expect(meta(up, upPid).bank.bonusSlots).toBe(16);
 
-    const down = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const down = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const downPid = down.addPlayer('warrior', 'Unlinked', {
       state: saved,
       bankBonus: { bonusSlots: 2, sources: [] },
@@ -1301,7 +1336,12 @@ describe('server-stamped bank bonus', () => {
     const sim = makeSim();
     meta(sim).bank.bonusSlots = 5;
     const saved = sim.serializeCharacter(sim.playerId)!;
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Offline', { state: saved });
     expect(meta(sim2, pid2).bank.bonusSlots).toBe(5);
     expect(meta(sim2, pid2).bankBonusSources).toEqual([]);
@@ -1311,7 +1351,12 @@ describe('server-stamped bank bonus', () => {
     const sim = makeSim();
     const saved = sim.serializeCharacter(sim.playerId)!;
     delete (saved as { bank?: unknown }).bank; // a save from before the bank existed
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Ancient', {
       state: saved,
       bankBonus: { bonusSlots: 4, sources: SOURCES.slice(0, 2) },
@@ -1331,7 +1376,12 @@ describe('server-stamped bank bonus', () => {
 
     // Rejoin after every account fact was unlinked: the stamp drops to 0, so the
     // 30 banked stacks now sit over the 24-slot capacity. Tolerated, never trimmed.
-    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
     const pid2 = sim2.addPlayer('warrior', 'Shrunk', {
       state: saved,
       bankBonus: { bonusSlots: 0, sources: [] },

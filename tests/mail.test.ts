@@ -461,7 +461,14 @@ describe('unread index equivalence (finding 4)', () => {
 
 describe('quest thank-you letters', () => {
   it('the giver writes after an authored quest turn-in', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    // QUESTS is a static data table (src/sim/data), not world content, so the
+    // dev turn-in and its thank-you letter work in the mailbox-only world too.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: true,
+      world: MAIL_TEST_WORLD,
+    });
     const pid = sim.primaryId;
     expect(QUEST_LETTERS.q_wolves).toBeDefined();
     expect(sim.completeQuestForDev('q_wolves', pid)).toBe(true);

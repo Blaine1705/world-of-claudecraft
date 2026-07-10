@@ -19,13 +19,25 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
-import { DELVES } from '../src/sim/data';
+import { BUILTIN_WORLD, DELVES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass } from '../src/sim/types';
+import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
+
+// Wire round-trip fixtures only read the player entity they build, never ambient
+// world content, so strip camps/npcs/ground objects to keep each direct Sim cheap
+// (dot_final_tick pattern). The aura-decode suites near the end of this file grab
+// a real camp mob and the GameServer harness ships its own full world; both keep
+// the builtin content.
+const WIRE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 const DELTA_KEYS = [
   'inv',
@@ -313,7 +325,7 @@ describe('raid lockouts over the wire', () => {
 // mech weapon (and rogue dual-wield) is proven to work online, not just offline.
 describe('Combat Mech held weapon over the wire', () => {
   it('mirrors class + mech skin + equipped weapon so a rogue mech dual-wields client-side', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
+    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true, world: WIRE_TEST_WORLD });
     const pid = sim.playerId;
     sim.setPlayerSkin(pid, 0, 'mech');
     sim.addItem('keen_dirk', 1, pid);
@@ -342,7 +354,12 @@ describe('Combat Mech held weapon over the wire', () => {
   });
 
   it('keeps a non-dual class (warrior) mech to a single mainhand over the wire', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.playerId;
     sim.setPlayerSkin(pid, 0, 'mech');
     sim.addItem('worn_sword', 1, pid);
@@ -361,7 +378,12 @@ describe('Combat Mech held weapon over the wire', () => {
 
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'hunter',
+      autoEquip: true,
+      world: WIRE_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     sim.tick();
     const e = sim.player;
@@ -1427,7 +1449,12 @@ describe('client-side delta merge', () => {
     // would silently decode every online aura to sourceId 0, degrading the
     // target strip's ownFirst dot/hot prominence online while offline keeps it
     // (the stacks/charges sibling pins above follow the same pattern).
-    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: WIRE_TEST_WORLD,
+    });
     const e = sim.entities.get(sim.playerId)!;
     e.auras.push(
       {
@@ -1673,7 +1700,12 @@ describe('despawn grace (anti-flicker)', () => {
 // offline/headless never call it, so the field stays ''.
 describe('guild nameplate wire', () => {
   it('carries the guild name through wireEntity only when set', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
 
     expect(wireEntity(sim.entities.get(pid)!).gd).toBeUndefined();
@@ -1716,7 +1748,12 @@ describe('guild nameplate wire', () => {
 // recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
 describe('held weapon wire (mainhandItemId)', () => {
   it('carries the equipped mainhand item through wireEntity', () => {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
     const e = sim.entities.get(pid)!;
     // a fresh warrior starts holding its class startWeapon
@@ -2390,7 +2427,12 @@ describe('delta-key contract pins (anti-drift)', () => {
 // (ClientWorld.applySnapshot).
 describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   function roundTrip(aura: Aura): { wire: Record<string, unknown>; mirror: Aura } {
-    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Sapped');
     const e = sim.entities.get(pid)!;
     e.auras.push(aura);
