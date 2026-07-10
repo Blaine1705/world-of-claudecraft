@@ -35,7 +35,7 @@ import {
   terrainWallStandoff,
   WATER_LEVEL,
 } from '../src/sim/world';
-import { findWallFoot } from './helpers/wall_foot';
+import { wallFootFixture } from './helpers/wall_foot';
 
 const SEED = 20061;
 
@@ -277,11 +277,10 @@ describe('terrain wall standoff', () => {
   });
 
   it('eases a body off a terrain wall, bounded by one body radius', () => {
-    // Sweep the neighbourhood of a REAL wall in whatever world the sim generates,
-    // rather than the strip world's western rim (which the grid world replaced with
-    // sealed border ridges elsewhere; the old literals sat on open ground and the
-    // "it pushes" assertion could never fire).
-    const foot = findWallFoot(SEED, R, SLOPE);
+    // Sweep the neighbourhood of a pinned, validated REAL wall rather than the
+    // strip world's western rim (which the grid world replaced; the old literals
+    // sat on open ground and the "it pushes" assertion could never fire).
+    const foot = wallFootFixture(SEED, R, SLOPE);
     let pushed = 0;
     let maxMove = 0;
     for (let x = foot.x - 6; x <= foot.x + 6; x += 0.5) {
@@ -321,7 +320,7 @@ describe('terrain wall standoff', () => {
     // wall within a body radius. A no-input grounded tick therefore moves the
     // player ONLY via the standoff in the shared movement kernel, isolating it
     // from the slide: without the standoff the player would not move at all.
-    const cell = findWallFoot(SEED, R, SLOPE);
+    const cell = wallFootFixture(SEED, R, SLOPE);
     expect(terrainSteepnessAt(cell.x, cell.z, SEED)).toBeLessThan(1.0); // flat footing: no slide
     const sim = makeSim();
     teleportTo(sim, cell.x, cell.z);
@@ -342,7 +341,7 @@ describe('terrain wall standoff', () => {
   it('does not sawtooth when holding forward into a terrain wall', () => {
     // Hold forward straight into a real wall: the standoff must settle the body at
     // the wall foot, not bounce it in and out every tick.
-    const foot = findWallFoot(SEED, R, SLOPE);
+    const foot = wallFootFixture(SEED, R, SLOPE);
     const sim = makeSim();
     teleportTo(sim, foot.x, foot.z);
     sim.player.facing = foot.facingIntoWall;
@@ -374,7 +373,7 @@ describe('terrain wall standoff', () => {
   it('still preserves tangential wall slide when pushing into the western wall at an angle', () => {
     // Push into the wall at a slight angle: the body must not climb it, and must
     // still slide ALONG it instead of sticking.
-    const foot = findWallFoot(SEED, R, SLOPE);
+    const foot = wallFootFixture(SEED, R, SLOPE);
     const sim = makeSim();
     teleportTo(sim, foot.x, foot.z);
     sim.player.facing = foot.facingIntoWall - 0.2;
