@@ -2763,16 +2763,26 @@ export type SimEvent = { pid?: number } & (
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
-  // on the caster). The renderer drapes it onto the terrain at (x, z).
+  // on the caster). The renderer drapes it onto the terrain at (x, z). An 'orb'
+  // is the roaming Frozen Orb release: its flight is a straight line at fixed
+  // speed, so this ONE event carries the whole path (origin, direction, speed,
+  // duration) and the client animates the sphere locally; the sim's orb state
+  // (ctx.frozenOrbs) is never wired.
   | {
       type: 'spellfxAt';
       x: number;
       z: number;
       school: string;
-      fx: 'burst' | 'nova';
+      fx: 'burst' | 'nova' | 'orb';
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
+      // 'orb' only: unit drift direction, yards-per-second speed, and lifetime
+      // in seconds of the roaming visual
+      dirX?: number;
+      dirZ?: number;
+      speed?: number;
+      duration?: number;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

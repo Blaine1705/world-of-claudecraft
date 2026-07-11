@@ -64,6 +64,7 @@ import {
   type FoliageView,
 } from './foliage';
 import { activeFormTint } from './form_tint';
+import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
@@ -1039,6 +1040,7 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  private frozenOrbFx!: FrozenOrbFx;
   private lightPulses!: LightPulses;
   private pulseAt!: (id: number, school: string, intensity: number, duration: number) => void;
   private weather: Weather;
@@ -1591,6 +1593,9 @@ export class Renderer {
 
     // particle system: projectiles, impacts, heal glows, ambience
     this.lightPulses = new LightPulses(this.scene);
+    // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
+    // 'orb' release event (see src/render/frozen_orb_fx.ts).
+    this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
     this.vfx = new Vfx(this.scene, (id, frac) => {
       const v = this.views.get(id);
       if (!v) return null;
@@ -2260,6 +2265,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    this.frozenOrbFx.update(dt);
     this.lightPulses.update(dt);
     const pv = this.views.get(p.id);
     if (pv) {
@@ -3069,6 +3075,20 @@ export class Renderer {
         }
         break;
       case 'spellfxAt': {
+        // The Frozen Orb release: one event carries the whole straight-line
+        // flight, animated locally (the pulse novas below stay the area
+        // telegraph, so no actionable information rides on this mesh).
+        if (ev.fx === 'orb') {
+          this.frozenOrbFx.spawn({
+            x: ev.x,
+            z: ev.z,
+            dirX: ev.dirX ?? 0,
+            dirZ: ev.dirZ ?? 1,
+            speed: ev.speed ?? 2.5,
+            duration: ev.duration ?? 8,
+          });
+          break;
+        }
         // Ground-targeted impact: burst draped onto the terrain where the spell
         // was aimed (not on the caster), so an aimed blast reads at its landing
         // spot. A 'nova' aim is the heavier detonation; 'burst' the lighter one.
@@ -5012,6 +5032,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.frozenOrbFx.update(dt);
     this.lightPulses.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);

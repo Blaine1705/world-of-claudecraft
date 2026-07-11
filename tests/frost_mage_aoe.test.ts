@@ -120,6 +120,26 @@ describe('AoE content defs', () => {
 });
 
 describe('Frozen Orb in combat', () => {
+  it('release emits the one orb-flight visual event carrying the whole path', () => {
+    const { sim, p } = makeSim();
+    const near = spawnDummy(sim, p, 4);
+    face(p, near);
+    sim.drainEvents();
+    p.resource = p.maxResource;
+    sim.castAbility('frozen_orb');
+    const events = tickFor(sim, 0.2);
+    const orb = events.filter((e: any) => e.type === 'spellfxAt' && e.fx === 'orb') as any[];
+    // Exactly one release event: the client animates the straight-line flight
+    // locally from it (src/render/frozen_orb_fx.ts), no per-tick sync.
+    expect(orb).toHaveLength(1);
+    expect(orb[0].school).toBe('frost');
+    expect(orb[0].dirX).toBeCloseTo(Math.sin(p.facing), 6);
+    expect(orb[0].dirZ).toBeCloseTo(Math.cos(p.facing), 6);
+    expect(orb[0].speed).toBe(FROZEN_ORB_SPEED);
+    expect(orb[0].duration).toBe(8);
+    expect(orb[0].radius).toBe(6);
+  });
+
   it('pulses damage and a 30% snare on nearby enemies, first strike guarantees Fingers', () => {
     const { sim, p } = makeSim();
     const near = spawnDummy(sim, p, 4);
