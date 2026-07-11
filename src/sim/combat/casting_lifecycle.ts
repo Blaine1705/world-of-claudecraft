@@ -921,6 +921,18 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
+  // Targetless SELF channel (Aetherwell): no aim point, no area, no enemy;
+  // each tick applies the ability's self restore, spell-power scaled like the
+  // instant gainResource dispatch. Draws no rng.
+  if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'gainResource')) {
+    for (const eff of res.effects) {
+      if (eff.type !== 'gainResource') continue;
+      const spTerm = eff.spPct ? Math.round(abilityScalingPower(p, res.def) * eff.spPct) : 0;
+      p.resource = Math.min(p.maxResource, p.resource + eff.amount + spTerm);
+    }
+    return;
+  }
+
   const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
     cancelCast(ctx, p);

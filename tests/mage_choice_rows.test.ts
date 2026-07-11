@@ -145,6 +145,9 @@ describe('mage choice rows (owner tree)', () => {
     sim.castAbility('greater_invisibility');
     expect(p.auras.filter((a) => a.kind === 'dot')).toHaveLength(1); // 2 removed
     expect(p.stealthed).toBe(true);
+    // The stealth kind doubles as a movement factor (rogues sneak slower); an
+    // invisible mage keeps FULL speed (owner playtest: value 0 pinned them).
+    expect(p.auras.find((a) => a.kind === 'stealth')?.value).toBe(1);
     const dr = p.auras.find((a) => a.id === 'greater_invisibility_dr');
     expect(dr?.kind).toBe('buff_dr');
     expect(dr?.value).toBeCloseTo(0.9);
@@ -230,12 +233,18 @@ describe('mage choice rows (owner tree)', () => {
     expect(cap?.value).toBeCloseTo(shave, 5);
   });
 
-  it('Aetherwell (Evocation) is granted and restores mana', () => {
+  it('Aetherwell channels mana back over 6 sec, each pulse scaling with spell power', () => {
     const { sim, p } = rig({ 20: 'mag_r20_evocation' });
     p.resource = 10;
     sim.castAbility('evocation');
-    tickFor(sim, 4);
-    expect(p.resource).toBeGreaterThan(10);
+    expect(p.castingAbility).toBe('evocation'); // a real channel, not a dump
+    tickFor(sim, 2);
+    const early = p.resource;
+    expect(early).toBeGreaterThan(10); // pulses land while channeling
+    tickFor(sim, 5); // ride the channel out
+    expect(p.resource).toBeGreaterThan(early);
+    // Six pulses of 40 + 60% spell power each: at least the flat floor landed.
+    expect(p.resource - 10).toBeGreaterThanOrEqual(6 * 40);
   });
 
   it('the five coming-soon options are pickable and inert', () => {

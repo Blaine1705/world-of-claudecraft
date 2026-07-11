@@ -1533,13 +1533,16 @@ export function runEffects(
           removed++;
           ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
         }
+        // The stealth kind doubles as a MOVEMENT factor in moveSpeedMult
+        // (rogue stealth walks slower); an invisible mage keeps full speed,
+        // so the aura value must be 1, never 0 (0 pins the caster in place).
         ctx.applyAura(p, {
           id: ability.id,
           name: ability.name,
           kind: 'stealth',
           remaining: eff.duration,
           duration: eff.duration,
-          value: 0,
+          value: 1,
           sourceId: p.id,
           school: ability.school,
         });
@@ -1911,10 +1914,13 @@ export function runEffects(
         // (Recklessness / Battle Rhythm; rageGenAuraMult sums the buff_rage_gen
         // auras). Non-rage resources (energy from Adrenaline Rush, etc.) are
         // deliberately untouched.
+        // Aetherwell: a mana restore may scale with spell power (spPct), so the
+        // channel's ticks grow with gear. Flat for everyone else. Draws no rng.
+        const spTerm = eff.spPct ? Math.round(abilityScalingPower(p, ability) * eff.spPct) : 0;
         const gainAmt =
           p.resourceType === 'rage'
             ? eff.amount * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p)
-            : eff.amount;
+            : eff.amount + spTerm;
         p.resource = Math.min(p.maxResource, p.resource + gainAmt);
         break;
       }

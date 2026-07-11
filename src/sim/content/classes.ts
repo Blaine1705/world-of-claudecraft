@@ -5326,8 +5326,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    effects: [{ type: 'gainResource', amount: 220 }],
-    description: 'Rapidly restores mana. (Mage talent)',
+    // Owner design (calculator): a CHANNEL that restores mana while you
+    // channel, each pulse scaling with your spell power (was a flat instant
+    // +220 dump in the first draft).
+    channel: { duration: 6, ticks: 6 },
+    effects: [{ type: 'gainResource', amount: 40, spPct: 0.6 }],
+    description:
+      'Channel for 6 sec, restoring mana every second; each pulse scales with your spell power. (Mage talent)',
   },
   frenzied_regeneration: {
     id: 'frenzied_regeneration',
