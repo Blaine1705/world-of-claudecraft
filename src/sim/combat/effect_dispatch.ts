@@ -1419,6 +1419,18 @@ export function runEffects(
             duration: eff.duration,
           });
         }
+        // A snaring frost zone (Blizzard) snows over its area for its life.
+        if (eff.slowMult && ability.school === 'frost') {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'snowZone',
+            radius: eff.radius,
+            duration: eff.duration,
+          });
+        }
         if (p.castAim) {
           ctx.emit({
             type: 'spellfxAt',

@@ -99,6 +99,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return flatStat('ap', -Math.abs(a.value));
     case 'buff_armor':
       return flatStat('armor', a.value);
+    case 'buff_spellpower':
+      return { key: `${KEY}.increase.sp`, nums: { value: round(a.value) } };
     // Mage empowerment moments (owner playtest: every worn buff should read).
     case 'combustion':
       return { key: `${KEY}.combustionCrit`, nums: {} };

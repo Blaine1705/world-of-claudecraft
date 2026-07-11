@@ -1340,6 +1340,7 @@ export const ja_JP: EnTranslations = {
       "cheapCast": "次の呪文のコストが{pct}%減少する",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
+        "sp": "呪文の威力を{value}上昇させる",
         "armor": "防御力を{value}上昇させる",
         "int": "知力を{value}上昇させる",
         "agi": "敏捷性を{value}上昇させる",

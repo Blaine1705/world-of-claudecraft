@@ -343,6 +343,8 @@ import {
 import { chatPlayerContextActions, selfPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
+import { ProcOverlayPainter } from './proc_overlay_painter';
+import { procOverlayState } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { QuestProgressBanner } from './quest_progress_banner';
@@ -3268,24 +3270,21 @@ export class Hud {
     this.swingFillEl,
     this.swingLabelEl,
   );
-  // The spell-activation proc overlay (the Rising Phoenix, owner design
-  // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
-  // (proc_overlay_drag), class-toggled per frame via the elided writers
-  // (proc_overlay_painter + the pure proc_overlay_view rule).
+  // The spell-activation proc overlay (curved arcs beside the character, owner
+  // request 2026-07-11): built ONCE here, class-toggled per frame via the
+  // elided writers (proc_overlay_painter + the pure proc_overlay_view rule).
   private readonly procOverlayEl = (() => {
-    const el = buildProcOverlay();
+    const el = document.createElement('div');
+    el.id = 'proc-overlay';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<div class="arc left"></div><div class="arc right"></div>';
     document.body.appendChild(el);
-    // Owner request: grab the phoenix while it burns and park it anywhere;
-    // the spot persists (viewport fractions, so a resize keeps it sensible).
-    attachOverlayDrag(el, 'procOverlayAnchor', { fx: 0.5, fy: 0.42 });
     return el;
   })();
   private readonly procOverlayPainter = new ProcOverlayPainter(
     this.writerFacet,
     this.procOverlayEl,
   );
-  // One-shot login preview gate for the phoenix (see update()).
-  private procOverlayPreviewed = false;
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
   // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
@@ -7187,33 +7186,9 @@ export class Hud {
     this.swingPeriod = swing.nextPeriod;
     this.lastSwingTimer = swing.nextTimer;
     this.swingTimerPainter.paint(swing);
-    // The phoenix: Heating Up lights its left half, Hot Streak completes it,
-    // spending puts it out (pure rule in proc_overlay_view; an unchanged state
-    // writes nothing). On the FIRST frame in-world, preview the unlit bird for
-    // a few seconds so the player can find it and drag it into place (one-shot
-    // timer, not per-frame work; the painter's two classes never conflict).
-    // The login preview only makes sense where the bird is otherwise RARE: the
-    // fire mage (Hot Streak procs occasionally). It is gated to fire so it never
-    // flashes on a warrior/other class, and never on a Chronomancer (whose bird
-    // is on screen constantly, one quarter per Aether Surge charge, so a preview
-    // would just be noise). Gated inside the one-shot guard so a mage whose spec
-    // loads a frame late still previews once.
-    if (!this.procOverlayPreviewed && this.sim.talentSpec === 'fire') {
-      this.procOverlayPreviewed = true;
-      this.procOverlayEl.classList.add('preview');
-      window.setTimeout(() => this.procOverlayEl.classList.remove('preview'), 8000);
-    }
-    // Chronomancy (arcane spec) drives the same bird from its Aether Surge
-    // charges (one quarter per charge); every other spec/class keeps the fire
-    // Heating Up / Hot Streak rule. Both routes clear the other's classes, so a
-    // spec swap never strands a half-lit bird.
-    if (this.sim.talentSpec === 'arcane') {
-      this.procOverlayPainter.paintChronoCharges(chronoOverlayCharges(p.auras));
-    } else if (this.sim.talentSpec === 'frost') {
-      this.procOverlayPainter.paintFrostCharges(frostOverlayCharges(p.auras));
-    } else {
-      this.procOverlayPainter.paint(procOverlayState(p.auras), combustionOverlayActive(p.auras));
-    }
+    // Proc arcs: Heating Up shows them, Hot Streak burns them bright, spending
+    // hides them (pure rule in proc_overlay_view; unchanged state writes nothing).
+    this.procOverlayPainter.paint(procOverlayState(p.auras));
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write

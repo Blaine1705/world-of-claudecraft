@@ -6306,6 +6306,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.instantCast':
     'Tu siguiente hechizo con tiempo de lanzamiento es instantáneo',
   'hudChrome.auraEffect.cheapCast': 'Tu siguiente hechizo cuesta un {pct}% menos',
+  'hudChrome.auraEffect.increase.sp': 'Aumenta el poder con hechizos en {value}',
   'hudChrome.auraEffect.increase.armor': 'Aumenta la armadura en {value}',
   'hudChrome.auraEffect.increase.int': 'Aumenta el intelecto en {value}',
   'hudChrome.auraEffect.increase.agi': 'Aumenta la agilidad en {value}',

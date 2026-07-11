@@ -1340,6 +1340,7 @@ export const ko_KR: EnTranslations = {
       "cheapCast": "다음 주문의 소모량이 {pct}% 감소합니다",
       "increase": {
         "ap": "공격력을 {value} 증가시킵니다",
+        "sp": "주문력을 {value} 증가시킵니다",
         "armor": "방어도를 {value} 증가시킵니다",
         "int": "지능을 {value} 증가시킵니다",
         "agi": "민첩성을 {value} 증가시킵니다",

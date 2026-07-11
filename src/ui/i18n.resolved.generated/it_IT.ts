@@ -1340,6 +1340,7 @@ export const it_IT: EnTranslations = {
       "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Aumenta la potenza di attacco di {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Aumenta l'armatura di {value}",
         "int": "Aumenta l'intelletto di {value}",
         "agi": "Aumenta l'agilità di {value}",

@@ -5672,6 +5672,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': 'Следующее заклинание ничего не стоит',
   'hudChrome.auraEffect.instantCast': 'Следующее заклинание с временем чтения станет мгновенным',
   'hudChrome.auraEffect.cheapCast': 'Следующее заклинание стоит на {pct}% меньше',
+  'hudChrome.auraEffect.increase.sp': 'Повышает силу заклинаний на {value}',
   'hudChrome.auraEffect.increase.armor': 'Повышает броню на {value}',
   'hudChrome.auraEffect.increase.int': 'Повышает интеллект на {value}',
   'hudChrome.auraEffect.increase.agi': 'Повышает ловкость на {value}',

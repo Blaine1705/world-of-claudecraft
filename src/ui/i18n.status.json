@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6961,
-    "rows": 146181,
-    "translated": 143684,
-    "pending": 2304,
+    "keys": 6962,
+    "rows": 146202,
+    "translated": 143692,
+    "pending": 2317,
     "blocked": 193,
     "blockedSource": 95
   },

@@ -1671,6 +1671,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     // Owner playtest 2026-07-11: pressable in the middle of another cast.
     usableWhileCasting: true,
+    // Owner playtest 2026-07-11: two stored charges, back to back if banked.
+    maxCharges: 2,
     effects: [{ type: 'directDamage', min: 27, max: 35 }],
     ranks: [
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },

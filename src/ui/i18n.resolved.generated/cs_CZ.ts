@@ -1340,6 +1340,7 @@ export const cs_CZ: EnTranslations = {
       "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Zvyšuje brnění o {value}",
         "int": "Zvyšuje Intelekt o {value}",
         "agi": "Zvyšuje Obratnost o {value}",

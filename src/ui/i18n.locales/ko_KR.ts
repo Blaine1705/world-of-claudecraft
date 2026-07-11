@@ -5551,6 +5551,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': '다음 시전에 자원이 들지 않습니다',
   'hudChrome.auraEffect.instantCast': '시전 시간이 있는 다음 주문이 즉시 시전됩니다',
   'hudChrome.auraEffect.cheapCast': '다음 주문의 소모량이 {pct}% 감소합니다',
+  'hudChrome.auraEffect.increase.sp': '주문력을 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.armor': '방어도를 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.int': '지능을 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.agi': '민첩성을 {value} 증가시킵니다',

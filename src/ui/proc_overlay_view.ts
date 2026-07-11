@@ -15,31 +15,3 @@ export function procOverlayState(auras: ReadonlyArray<{ id: string }>): ProcOver
   }
   return heating ? 'heating' : 'none';
 }
-
-export function combustionOverlayActive(auras: ReadonlyArray<{ id: string }>): boolean {
-  return auras.some((a) => a.id === 'combustion');
-}
-
-// Chronomancy (arcane spec) drives the SAME phoenix overlay from its Aether
-// Surge charges instead of fire's two auras: one quarter of the bird lights per
-// held charge (0-4), so the player reads the charge count from the bird instead
-// of a buff. Aether Darts spends the charges (aura gone) -> 0 -> the bird fades.
-// The charge count lives in the caster's `arcane_surge` aura value (1-4).
-export function chronoOverlayCharges(auras: ReadonlyArray<{ id: string; value?: number }>): number {
-  for (const a of auras) {
-    if (a.id === 'arcane_surge') return Math.max(0, Math.min(4, Math.round(a.value ?? 0)));
-  }
-  return 0;
-}
-
-// Frost uses the phoenix as a five-part Icicle bank for Glacial Spike. The
-// server omits an aura's `stacks` field when it equals one, so a present
-// `icicles` aura with no mirrored count is deliberately read as the first
-// stack. The view clamps defensive wire input without owning any gameplay.
-export function frostOverlayCharges(auras: ReadonlyArray<{ id: string; stacks?: number }>): number {
-  for (const aura of auras) {
-    if (aura.id !== 'icicles') continue;
-    return Math.max(0, Math.min(5, Math.round(aura.stacks ?? 1)));
-  }
-  return 0;
-}
