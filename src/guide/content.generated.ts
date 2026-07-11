@@ -903,6 +903,26 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Flickerstep"
       },
       {
+        "id": "ignition",
+        "name": "Ignition"
+      },
+      {
+        "id": "hot_streak",
+        "name": "Hot Streak"
+      },
+      {
+        "id": "blazing_barrier",
+        "name": "Blazing Barrier"
+      },
+      {
+        "id": "meteor",
+        "name": "Meteor"
+      },
+      {
+        "id": "summon_water_elemental",
+        "name": "Summon Water Elemental"
+      },
+      {
         "id": "ice_lance",
         "name": "Ice Lance"
       },

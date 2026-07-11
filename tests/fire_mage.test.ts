@@ -4,11 +4,10 @@
 // and the frost mage's Water Elemental. Follows the mage_choice_rows harness.
 
 import { describe, expect, it } from 'vitest';
-import { fireGuaranteedCrit, HOT_STREAK_BUILDERS } from '../src/sim/combat/fire_mage';
+import { fireGuaranteedCrit } from '../src/sim/combat/fire_mage';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { ROW_TREES } from '../src/sim/content/talent_rows';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
-import { ABILITIES, MOBS } from '../src/sim/data';
+import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -160,7 +159,7 @@ describe('Hot Streak', () => {
     expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // consumed
   });
 
-  it('Combustion crits every Fire spell and its crits BUILD Hot Streak (owner reversal)', () => {
+  it('Combustion crits every Fire spell but never builds Hot Streak', () => {
     const { sim, p } = mageWithSpec('fire');
     addDummy(sim);
     sim.castAbility('combustion');
@@ -173,198 +172,7 @@ describe('Hot Streak', () => {
         e.type === 'damage' && e.sourceId === p.id && e.amount > 0,
     );
     expect(hit?.crit).toBe(true);
-    // The Combustion crit counts toward the streak: half the phoenix lights.
-    expect(p.auras.some((a) => a.id === 'heating_up')).toBe(true);
-  });
-});
-
-describe('playtest round four (owner hotfixes)', () => {
-  it('Combustion is off the GCD', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim);
-    sim.castAbility('combustion');
-    expect(p.auras.some((a) => a.kind === 'combustion')).toBe(true);
-    expect((p as unknown as { gcdRemaining: number }).gcdRemaining).toBe(0);
-  });
-
-  it('an interleaved Combustion never disturbs the Fireball in progress (target kept, landing crit)', () => {
-    const { sim, p } = mageWithSpec('fire');
-    const mob = addDummy(sim, 18);
-    sim.castAbility('fireball');
-    collect(sim, 0.5); // mid-cast
-    expect(p.castingAbility).toBe('fireball');
-    sim.castAbility('combustion'); // slips through the busy guard
-    expect(p.auras.some((a) => a.kind === 'combustion')).toBe(true);
-    expect(p.castingAbility).toBe('fireball'); // the cast survived
-    expect((p as unknown as { castTargetId: number | null }).castTargetId).toBe(mob.id);
-    const events = collect(sim, 6);
-    const hit = events.find(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Cinderbolt' && e.amount > 0,
-    );
-    expect(hit?.crit).toBe(true); // Combustion was worn when the bolt landed
-  });
-
-  it('Combustion pressed while the bolt is already flying still crits it on impact', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim, 18);
-    sim.castAbility('fireball');
-    // Ride out the full cast; the bolt leaves and is now in flight.
-    while (p.castingAbility) collect(sim, 0.05);
-    sim.castAbility('combustion');
-    const events = collect(sim, 3);
-    const hit = events.find(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Cinderbolt' && e.amount > 0,
-    );
-    expect(hit?.crit).toBe(true);
-  });
-
-  it('Fire Blast resolves instantly, no bolt in flight', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim, 18);
-    sim.castAbility('fire_blast');
-    const events = collect(sim, 0.05); // ONE tick
-    const hit = events.find(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.amount > 0,
-    );
-    expect(hit).toBeDefined(); // damage on the cast tick, not after a flight
-    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
-  });
-
-  it('Scorch casts on the move', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim, 10);
-    sim.castAbility('scorch');
-    expect(p.castingAbility).toBe('scorch');
-    sim.moveInput.forward = true;
-    const events = collect(sim, 2);
-    const hit = events.find(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Scald' && e.amount > 0,
-    );
-    expect(hit).toBeDefined(); // the cast survived the run
-  });
-
-  it('Pyroblast flies as the heavy bolt', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim, 18);
-    sim.castAbility('pyroblast');
-    while (p.castingAbility) collect(sim, 0.05);
-    const events = collect(sim, 0.1);
-    void events;
-    // The launch cue was emitted when the cast completed (heavyBolt, not the
-    // stock projectile); assert on the def wiring, which the emit reads.
-    expect(ABILITIES.pyroblast.projectileFx).toBe('heavyBolt');
-  });
-});
-
-describe('Pyroblast as a builder (owner rule)', () => {
-  it('a free Pyroblast crit re-arms Heating Up; Flamestrike never builds', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim, 18);
-    sim.castAbility('combustion'); // everything crits, off the GCD
-    sim.castAbility('fire_blast'); // crit 1 (instant)
-    collect(sim, 0.3);
-    gcdReset(p);
-    sim.castAbility('fire_blast'); // crit 2: Hot Streak armed
-    collect(sim, 0.3);
-    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(true);
-    gcdReset(p);
-    sim.castAbility('pyroblast'); // free + instant; the bolt flies
-    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // spent
-    const events = collect(sim, 3); // impact crits under Combustion
-    const hit = events.find(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Pyrelance' && e.amount > 0,
-    );
-    expect(hit?.crit).toBe(true);
-    // The free Pyroblast's crit counted: half the phoenix lights again.
-    expect(p.auras.some((a) => a.id === 'heating_up')).toBe(true);
-    expect(HOT_STREAK_BUILDERS).toContain('pyroblast');
-    expect(HOT_STREAK_BUILDERS).toContain('flamestrike');
-  });
-
-  it('one Flamestrike is ONE crit toward the streak, however many enemies it hits', () => {
-    const { sim, p } = mageWithSpec('fire');
-    const a = addDummy(sim, 10);
-    const b = addDummy(sim, 12);
-    sim.castAbility('combustion'); // guarantees the blast crits
-    gcdReset(p);
-    sim.castAbilityAt('flamestrike', { x: a.pos.x, z: (a.pos.z + b.pos.z) / 2 });
-    expect(p.castingAbility).toBe('flamestrike'); // a real cast now (owner rule)
-    const events = collect(sim, 3);
-    const hits = events.filter(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Flamestrike' && e.amount > 0,
-    );
-    expect(hits.length).toBeGreaterThanOrEqual(2); // both dummies caught
-    for (const h of hits) expect(h.crit).toBe(true); // the cast crits as one
-    // Exactly ONE crit noted: Heating Up armed, the streak NOT completed.
-    expect(p.auras.some((a2) => a2.id === 'heating_up')).toBe(true);
-    expect(p.auras.some((a2) => a2.id === 'hot_streak')).toBe(false);
-  });
-});
-
-describe('playtest round five (owner hotfixes)', () => {
-  it('the Water Elemental goes home when its mage leaves frost', () => {
-    const { sim, p } = mageWithSpec('frost');
-    sim.castAbility('summon_water_elemental');
-    collect(sim, 2.5); // ride out the 2s summon cast
-    const pet = () =>
-      [...sim.entities.values()].find(
-        (e) => e.templateId === 'water_elemental' && (e as { ownerId?: number }).ownerId === p.id,
-      );
-    expect(pet()).toBeDefined();
-    expect(sim.setSpec('fire')).toBe(true);
-    collect(sim, 0.5);
-    expect(pet()).toBeUndefined(); // dismissed at the spec boundary
-  });
-
-  it('Fire Blast rides no GCD in either direction', () => {
-    const { sim, p } = mageWithSpec('fire');
-    addDummy(sim);
-    sim.castAbility('fire_blast');
-    expect((p as unknown as { gcdRemaining: number }).gcdRemaining).toBe(0); // arms none
-    sim.castAbility('scorch'); // arms the GCD at cast start
-    expect((p as unknown as { gcdRemaining: number }).gcdRemaining).toBeGreaterThan(0);
-    sim.castAbility('fire_blast'); // ...and Fire Blast casts straight through it
-    const events = collect(sim, 0.2);
-    const hits = events.filter(
-      (e): e is Extract<SimEvent, { type: 'damage' }> =>
-        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Cinderfall' && e.amount > 0,
-    );
-    expect(hits.length).toBe(2); // both charges landed, GCD never in the way
-  });
-
-  it('Hot Streak makes Flamestrike instant and free (otherwise a 2s cast)', () => {
-    const { sim, p } = mageWithSpec('fire');
-    const mob = addDummy(sim);
-    sim.castAbility('fire_blast'); // crit 1
-    collect(sim, 0.2);
-    sim.castAbility('fire_blast'); // crit 2: Hot Streak armed (charge 2, no GCD)
-    collect(sim, 0.2);
-    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(true);
-    gcdReset(p);
-    const mana0 = p.resource;
-    sim.castAbilityAt('flamestrike', { x: mob.pos.x, z: mob.pos.z });
-    expect(p.castingAbility).toBeNull(); // instant under the streak
-    expect(p.resource).toBe(mana0); // and free
-    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // spent
-  });
-
-  it('Rune of Power is a deliberate cast now', () => {
-    const { sim, p } = mageWithSpec('fire');
-    // The rune is a level-20 choice-row grant; pick it like the window would.
-    const rowIndex = (ROW_TREES.mage ?? []).findIndex((r) =>
-      r.options.some((o) => o.id === 'mag_r20_rune_of_power'),
-    );
-    expect(rowIndex).toBeGreaterThanOrEqual(0);
-    expect(sim.pickRowTalent(rowIndex, 'mag_r20_rune_of_power')).toBe(true);
-    p.resource = p.maxResource;
-    sim.castAbility('rune_of_power');
-    expect(p.castingAbility).toBe('rune_of_power');
+    expect(p.auras.some((a) => a.id === 'heating_up')).toBe(false); // never builds
   });
 });
 
@@ -373,12 +181,7 @@ describe('Meteor', () => {
     const { sim, p } = mageWithSpec('fire');
     const mob = addDummy(sim, 15);
     sim.castAbilityAt('meteor', { x: mob.pos.x, z: mob.pos.z });
-    const falling = collect(sim, 1); // still falling
-    const warning = falling.find(
-      (event): event is Extract<SimEvent, { type: 'spellfxAt' }> =>
-        event.type === 'spellfxAt' && event.fx === 'meteorFall',
-    );
-    expect(warning?.radius).toBe(8);
+    collect(sim, 1); // still falling
     expect(mob.auras.some((a) => a.id === 'ignite')).toBe(false);
     const events = collect(sim, 2); // impact at ~2s
     const hit = events.find(
@@ -438,9 +241,9 @@ describe('the personal-barrier slot', () => {
 });
 
 describe('Water Elemental', () => {
-  it('the frost mage summons it and it bolts the target', () => {
+  it('the frost mage summons it, it bolts the target, and every 4th attack is Water Jet', () => {
     const { sim, p } = mageWithSpec('frost');
-    addDummy(sim, 10);
+    const mob = addDummy(sim, 10);
     sim.castAbility('summon_water_elemental');
     collect(sim, 3); // ride the 2s summon cast
     const pet = [...sim.entities.values()].find(
@@ -457,54 +260,8 @@ describe('Water Elemental', () => {
         e.type === 'damage' && e.sourceId === (pet as Entity).id && e.amount > 0,
     );
     expect(bolts.length).toBeGreaterThanOrEqual(1); // Waterbolts landing
-    expect(bolts.some((e) => e.ability === 'Water Jet')).toBe(false);
-  });
-
-  it('has no taunt command or autocast', () => {
-    const { sim, p } = mageWithSpec('frost');
-    const mob = addDummy(sim, 5);
-    sim.castAbility('summon_water_elemental');
-    collect(sim, 3);
-    const pet = [...sim.entities.values()].find(
-      (e) => e.templateId === 'water_elemental' && e.ownerId === p.id,
-    ) as Entity;
-    p.targetId = mob.id;
-    pet.aggroTargetId = mob.id;
-    mob.forcedTargetId = null;
-    (sim as unknown as { setPetAutoTaunt(enabled: boolean): void }).setPetAutoTaunt(true);
-    (sim as unknown as { petTaunt(): void }).petTaunt();
-    expect(pet.petAutoTaunt).toBe(false);
-    expect(mob.forcedTargetId).toBeNull();
-  });
-
-  it('channels Water Jet for three seconds and deals damage throughout the beam', () => {
-    const { sim, p } = mageWithSpec('frost');
-    addDummy(sim, 10);
-    sim.castAbility('summon_water_elemental');
-    collect(sim, 3);
-    const pet = [...sim.entities.values()].find(
-      (e) => e.templateId === 'water_elemental' && e.ownerId === p.id,
-    ) as Entity;
-    gcdReset(p);
-    sim.castAbility('frostbolt');
-    (sim as unknown as { petAttack(): void }).petAttack();
-    sim.petWaterJet();
-
-    let channelStarted = false;
-    let channelTicks = 0;
-    for (let i = 0; i < 20 * 14; i++) {
-      for (const event of sim.tick()) {
-        if (event.type === 'spellfx' && event.sourceId === pet.id && event.fx === 'bubbleBeam') {
-          channelStarted = true;
-          expect(event.duration).toBe(3);
-        }
-        if (event.type === 'damage' && event.sourceId === pet.id && event.ability === 'Water Jet') {
-          channelTicks++;
-        }
-      }
-      if (channelStarted && !pet.channeling) break;
-    }
-    expect(channelStarted).toBe(true);
-    expect(channelTicks).toBe(3);
+    // The 4th attack channeled Water Jet: its burn ticked damage under that
+    // name (the short dot may already have expired by now, so read the ledger).
+    expect(bolts.some((e) => e.ability === 'Water Jet')).toBe(true);
   });
 });

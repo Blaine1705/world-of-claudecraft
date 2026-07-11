@@ -4,8 +4,8 @@ import type { MobTemplate } from '../types';
 // Elemental: a ranged Waterbolt caster in the Emberkin mold, summoned (never
 // tamed) and owned like a warlock demon (Sim.updatePet drives it). Its
 // Waterbolt autos fire against the owner's target with no rotation input, and
-// Water Jet is a commanded pet-bar channel: a sustained beam that leaves a
-// slowing frost burn ticking on the target (pet_ai's jet rider).
+// every WATER_JET_EVERY-th attack it channels Water Jet instead: a beam that
+// leaves a frost burn ticking on the target (pet_ai's jet rider).
 export const MAGE_PET_MOBS: Record<string, MobTemplate> = {
   water_elemental: {
     id: 'water_elemental',
@@ -30,10 +30,7 @@ export const MAGE_PET_MOBS: Record<string, MobTemplate> = {
       school: 'frost',
       // Water Jet: every 4th attack channels a beam instead of a bolt, leaving
       // `total` frost damage ticking over `duration` (pet_ai, deterministic).
-      // Three seconds of visibly sustained pressure: one damage tick per second
-      // while the elemental remains locked into the bubble-beam channel.
-      jet: { total: 30, duration: 3, interval: 1, slow: 0.6, cooldown: 8 },
+      jet: { every: 4, total: 30, duration: 4, interval: 1 },
     },
-    petCanTaunt: false,
   },
 };

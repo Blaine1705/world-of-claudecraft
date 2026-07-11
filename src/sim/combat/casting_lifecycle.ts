@@ -893,7 +893,12 @@ function spendAbilityCost(
 // Overflowing Power (mage choice row): the Colossal Might pattern on mana. The
 // defensive set it shaves, the seconds cap, and the rolling window; the cap
 // accumulator rides an 'internal_cd' aura the player can watch tick down.
-const MAGE_DEFENSIVE_COOLDOWNS = ['blink', 'ice_barrier', 'greater_invisibility'] as const;
+const MAGE_DEFENSIVE_COOLDOWNS = [
+  'blink',
+  'ice_barrier',
+  'blazing_barrier',
+  'greater_invisibility',
+] as const;
 const OVERFLOW_CAP_SECONDS = 10;
 const OVERFLOW_CAP_WINDOW = 30;
 
@@ -1160,7 +1165,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
-        noteSpellHit(ctx, src, crit);
+        noteSpellHit(ctx, src, crit, res.def.id);
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');

@@ -1377,8 +1377,8 @@ const classAbilityNamesEn = {
       ],
       [
         'combustion',
-        'Flashfire',
-        'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+        'Combustion',
+        'Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)',
       ],
       [
         'icy_veins',
@@ -2386,7 +2386,7 @@ export const classAbilityNames = {
         [
           'combustion',
           'Combustión',
-          'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
+          'Combustiona: durante 10 s tus hechizos de Fuego siempre golpean de crítico. Estos críticos garantizados no generan Buena Racha. (habilidad distintiva de Fuego)',
         ],
         [
           'icy_veins',
