@@ -989,6 +989,10 @@ async function startGame(
     perf.setRenderer(renderer);
     hud = new Hud(world, renderer, keybinds);
     perf.setHud(hud);
+    // Every zone the renderer makes resident (boot, teleport warmup, or the
+    // background streaming lane) also prewarms its world-map background, so
+    // opening the map right after a crossing never pays the terrain render.
+    renderer.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the

@@ -287,7 +287,12 @@ import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
-import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
+import {
+  type MapRegion,
+  mapCanvasHeight,
+  type PaintRowCarry,
+  paintTerrainRows,
+} from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
   MAP_MAX_ZOOM,
@@ -1123,7 +1128,14 @@ export class Hud {
     H: number;
     row: number;
     region: MapRegion;
+    carry: PaintRowCarry;
   } | null = null;
+  // Zones waiting for their background prewarm behind the single in-flight
+  // job: fed by zone streaming (every zone the renderer prepares also gets its
+  // map background rendered ahead of the first open). The committed-zone
+  // prewarm (prewarmMapBg on a crossing) preempts; the preempted zone returns
+  // to the front of this queue.
+  private mapPrewarmQueue: string[] = [];
   private mapPrewarmHandle = 0;
   // Which scheduler produced mapPrewarmHandle. requestIdleCallback and setTimeout
   // hand out ids from separate pools, so the handle must be cancelled with the
@@ -7866,12 +7878,48 @@ export class Hud {
   private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
     const cached = this.mapBgCache.get(zone.id);
     if (cached) return cached;
+    // Cache miss with the map ALREADY open: never render synchronously (a
+    // full zone background is seconds of terrain sampling over the grid
+    // world). Prioritize this zone's prewarm and hand back its in-progress
+    // canvas: the open map redraws on the medium HUD cadence, so the plate
+    // fills in top-down as the sliced prewarm publishes rows.
+    if (this.mapPrewarm?.zoneId !== zone.id) this.prewarmMapBg(zone.id);
+    if (this.mapPrewarm?.zoneId === zone.id) return this.mapPrewarm.canvas;
+    // prewarmMapBg only declines when the id is unknown; keep the old
+    // synchronous fallback for that impossible-in-practice case
     const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
     this.mapBgCache.set(zone.id, bg);
     this.compositeMapArt(zone.id, bg);
-    // a redundant in-flight prewarm for this same zone can be dropped now
-    if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
     return bg;
+  }
+
+  /**
+   * Enqueue a zone's map background for the idle prewarm lane. Wired by
+   * main.ts to the renderer's zone streaming, so every zone that becomes
+   * resident also gets its map background rendered ahead of the first open
+   * (opening the map must never pay the ~200ms terrain render on the click).
+   * One job runs at a time; the committed-zone prewarm preempts the lane and
+   * the preempted zone resumes from the queue.
+   */
+  queueMapBgPrewarm(zoneId: string): void {
+    if (this.mapBgCache.has(zoneId)) return;
+    if (this.mapPrewarm?.zoneId === zoneId) return;
+    if (this.mapPrewarmQueue.includes(zoneId)) return;
+    if (this.mapPrewarm) {
+      this.mapPrewarmQueue.push(zoneId);
+      return;
+    }
+    this.prewarmMapBg(zoneId);
+  }
+
+  private startNextMapPrewarm(): void {
+    while (!this.mapPrewarm) {
+      const next = this.mapPrewarmQueue.shift();
+      if (next === undefined) return;
+      if (this.mapBgCache.has(next)) continue;
+      this.prewarmMapBg(next);
+      return;
+    }
   }
 
   // Kick off (or no-op) an idle, time-sliced render of a zone's map background
@@ -7882,6 +7930,11 @@ export class Hud {
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
     const zone = ZONES.find((z) => z.id === zoneId);
     if (!zone) return;
+    // Preempt any in-flight prewarm (the committed zone is the most urgent
+    // open), but keep the preempted zone: it resumes from the queue front.
+    if (this.mapPrewarm && !this.mapPrewarmQueue.includes(this.mapPrewarm.zoneId)) {
+      this.mapPrewarmQueue.unshift(this.mapPrewarm.zoneId);
+    }
     this.cancelMapPrewarm(); // drop any prewarm for a now-stale zone
     const region = this.mapZoneRegion(zone);
     const W = MAP_BG_RES;
@@ -7890,6 +7943,11 @@ export class Hud {
     c.width = W;
     c.height = H;
     const ctx = require2dContext(c);
+    // A neutral parchment underlay: a cache-miss open blits this canvas while
+    // it fills top-down (see mapZoneBg), so the unpainted remainder reads as
+    // blank map paper rather than black.
+    ctx.fillStyle = '#3c3a30';
+    ctx.fillRect(0, 0, W, H);
     this.mapPrewarm = {
       zoneId,
       canvas: c,
@@ -7899,6 +7957,7 @@ export class Hud {
       H,
       row: 0,
       region,
+      carry: { prevRow: null },
     };
     this.scheduleMapPrewarm();
   }
@@ -7939,23 +7998,34 @@ export class Hud {
     }
   }
 
-  // Paint a budgeted slice of the in-flight prewarm, then reschedule until the
-  // zone is fully rendered. Whole rows per slice keeps it byte-identical to a
-  // one-shot render (the only per-row state, hillshade, resets each row).
-  // With an idle deadline we paint as many slices as fit; without one (the
-  // setTimeout fallback) we paint a single slice and let the reschedule pace it,
-  // so the no-requestIdleCallback path stays sliced instead of rendering the
-  // whole canvas in one ~200ms hitch.
+  // Paint a TIME-budgeted slice of the in-flight prewarm, then reschedule
+  // until the zone is fully rendered. Whole rows per step keep it
+  // byte-identical to a one-shot render; the carry threads the previous row's
+  // heights between pumps so one-row steps never pay a chunk-start recompute.
+  // Rows are expensive (~5ms each at MAP_BG_RES over the grid world), so the
+  // budget is wall time, never a fixed row count: a pump stops after
+  // MAP_PREWARM_SLICE_MS or when the idle deadline runs dry. Each pump also
+  // publishes its rows to the canvas, so a cache-miss open (mapZoneBg) shows
+  // the map filling in top-down instead of freezing on a full render.
   private pumpMapPrewarm = (deadline?: { timeRemaining(): number }): void => {
     const job = this.mapPrewarm;
     if (!job) return;
     const seed = this.sim.cfg.seed;
-    const ROWS_PER_SLICE = 16; // ~6ms at MAP_BG_RES; one frame fits several
+    const MAP_PREWARM_SLICE_MS = 6;
+    const start = performance.now();
+    const firstRow = job.row;
     do {
-      const end = Math.min(job.H, job.row + ROWS_PER_SLICE);
-      paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end);
+      const end = Math.min(job.H, job.row + 1);
+      paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end, job.carry);
       job.row = end;
-    } while (job.row < job.H && deadline !== undefined && deadline.timeRemaining() > 3);
+    } while (
+      job.row < job.H &&
+      performance.now() - start < MAP_PREWARM_SLICE_MS &&
+      (deadline === undefined || deadline.timeRemaining() > 3)
+    );
+    if (job.row > firstRow) {
+      job.ctx.putImageData(job.img, 0, 0, 0, firstRow, job.W, job.row - firstRow);
+    }
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
       this.mapBgCache.set(job.zoneId, job.canvas);
@@ -7963,6 +8033,7 @@ export class Hud {
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
+      this.startNextMapPrewarm(); // drain the streamed-zone backlog
       return;
     }
     this.scheduleMapPrewarm();

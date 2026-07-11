@@ -171,6 +171,15 @@ function landColorAt(x: number, z: number, out: [number, number, number]): void 
 
 const _land: [number, number, number] = [0, 0, 0];
 
+export interface PaintRowCarry {
+  // Heights of the row just above y0, saved by the previous chunk. When a
+  // caller paints consecutive chunks (the HUD's sliced prewarm), threading
+  // this through skips the chunk-start recompute of that row: with one-row
+  // slices the recompute would otherwise DOUBLE the total work. The values
+  // are the exact ones the recompute would produce, so output is unchanged.
+  prevRow: Float64Array<ArrayBufferLike> | null;
+}
+
 export function paintTerrainRows(
   data: Uint8ClampedArray,
   W: number,
@@ -179,6 +188,7 @@ export function paintTerrainRows(
   seed: number,
   y0: number,
   y1: number,
+  carry?: PaintRowCarry,
 ): void {
   const spanX = region.maxX - region.minX;
   const spanZ = region.maxZ - region.minZ;
@@ -186,13 +196,20 @@ export function paintTerrainRows(
   const worldZ = (iy: number) => region.maxZ - (iy / H) * spanZ;
 
   // Heights of the row ABOVE the one being painted, for the north-south
-  // hillshade component and the coastline stroke. Seeded from a real sample
-  // pass at a chunk's first row so chunked output never drifts.
-  let prevRow = new Float64Array(W);
-  let curRow = new Float64Array(W);
-  if (y0 > 0) {
-    const zUp = worldZ(y0 - 1);
-    for (let ix = 0; ix < W; ix++) prevRow[ix] = terrainHeight(worldX(ix), zUp, seed);
+  // hillshade component and the coastline stroke. Seeded from the carry when
+  // the caller threaded one through, else from a real sample pass at a
+  // chunk's first row (same math, same values), so chunked output never
+  // drifts from a single-pass render either way.
+  let prevRow: Float64Array<ArrayBufferLike>;
+  let curRow: Float64Array<ArrayBufferLike> = new Float64Array(W);
+  if (y0 > 0 && carry?.prevRow && carry.prevRow.length === W) {
+    prevRow = carry.prevRow;
+  } else {
+    prevRow = new Float64Array(W);
+    if (y0 > 0) {
+      const zUp = worldZ(y0 - 1);
+      for (let ix = 0; ix < W; ix++) prevRow[ix] = terrainHeight(worldX(ix), zUp, seed);
+    }
   }
 
   for (let iy = y0; iy < y1; iy++) {
@@ -547,4 +564,6 @@ export function paintTerrainRows(
     prevRow = curRow;
     curRow = swap;
   }
+  // hand the last painted row's heights to the caller's next chunk
+  if (carry) carry.prevRow = prevRow;
 }

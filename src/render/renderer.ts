@@ -103,6 +103,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
+import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
@@ -186,6 +187,9 @@ const VIEW_PREWARM_MAX_MS = 12000;
 // stalls the parallel-compile queue; keep it modest, since a long hold here is
 // itself worse than the freeze it prevents.
 const PREWARM_COMPILE_MAX_MS = 10000;
+// A background prewarm waits for a browser idle slot between its per-group
+// compile chunks; the timeout forces progress under sustained frame load.
+const IDLE_PREWARM_TIMEOUT_MS = 250;
 // Safety ceiling for the per-view async-compile gate: if KHR_parallel_shader_compile
 // somehow never reports a program ready, show the view anyway (degrading to the old
 // synchronous first-use compile) rather than stranding an entity invisible.
@@ -1039,6 +1043,10 @@ export class Renderer {
   // clamped live fog would only start preparing a zone once its boundary is
   // already close enough to clamp the fog, i.e. too late.
   private lastRequestedFogFar = MAX_OUTDOOR_FOG_FAR;
+  /** Fired whenever a zone becomes resident (any prepare path). Wired by
+   *  main.ts so presentation caches outside the renderer (the HUD's world-map
+   *  background) prewarm alongside the zone itself. */
+  onZonePrepared: ((zoneId: string) => void) | null = null;
   private lastZonePrepareStats: {
     zoneId: string;
     totalMs: number;
@@ -1186,6 +1194,17 @@ export class Renderer {
     this.viewport = this.measureViewport();
     this.webgl.setPixelRatio(Math.min(window.devicePixelRatio, GFX.pixelRatioCap));
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
+    // Three's default checkShaderErrors=true queries getShader/ProgramInfoLog
+    // after every link: a SYNCHRONOUS GPU-process roundtrip that blocks until
+    // the driver finishes compiling. Measured on a zone-streaming walk it was
+    // 25% of ALL main-thread time (multi-second stalls per new zone's program
+    // batch), so it stays off unless a shader author opts back in for
+    // diagnostics with ?shaderdebug=1.
+    try {
+      this.webgl.debug.checkShaderErrors = new URLSearchParams(location.search).has('shaderdebug');
+    } catch {
+      this.webgl.debug.checkShaderErrors = false;
+    }
     this.webgl.shadowMap.enabled = !LOW_GFX;
     this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
@@ -1831,9 +1850,29 @@ export class Renderer {
       for (const mesh of waterMeshes) freezeStaticMatrices(mesh);
       const waterDone = performance.now();
       onProgress?.(96, 100);
+      this.lastAttachedFeatureGroups = [];
       this.ensureZoneFeatures(zone);
+      // A background prepare precompiles every program this zone just added
+      // (water lakes, bespoke biome features), one idle slot apart: a program
+      // whose driver link has not finished BLOCKS the main thread at its first
+      // draw (getUniforms queries ACTIVE_UNIFORMS synchronously), which was a
+      // measured multi-hundred-ms stall per new biome. compileAsync resolves
+      // only once the programs report ready, so the live render never pays it.
+      if (opts?.pace === 'idle' && this.asyncCompileSupported) {
+        for (const obj of [...waterMeshes, ...this.lastAttachedFeatureGroups]) {
+          await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
+          await Promise.race([
+            this.webgl.compileAsync(obj, this.camera, this.scene),
+            sleep(PREWARM_COMPILE_MAX_MS),
+          ]);
+        }
+      }
       const featuresDone = performance.now();
       this.preparedZones.add(zone.id);
+      // Presentation layers beyond the renderer (main.ts wires the HUD's map
+      // background prewarm here) piggyback on zone residency, so their own
+      // caches are warm before the player can interact with the new zone.
+      this.onZonePrepared?.(zone.id);
       this.lastZonePrepareStats = {
         zoneId: zone.id,
         totalMs: Math.round((featuresDone - started) * 10) / 10,
@@ -1848,28 +1887,56 @@ export class Renderer {
     return task;
   }
 
+  /** Stage wall-times of the most recent prewarmZoneAt, for perf tooling. */
+  lastZonePrewarmStats: {
+    zoneId: string;
+    buildMs: number;
+    compileMs: number;
+    passMs: number;
+  } | null = null;
+
   async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
     const zone = zoneAt(x, z);
     const deadline = performance.now() + 5000;
+    const t0 = performance.now();
     const mobGroup = this.buildEntityPrewarmGroup(zone);
     const npcGroup = this.buildNpcPrewarmGroup(zone, deadline);
     this.scene.add(mobGroup, npcGroup);
+    const tBuild = performance.now();
+    let tCompile = tBuild;
     try {
       // A background prewarm (the visible-zone streaming lane) links the new
       // programs off-thread BEFORE the warm pass renders with them, so the
-      // pass never compiles inside a live gameplay frame. The gating path
-      // (behind the loading screen) keeps render-first, which also covers
-      // renderers without KHR_parallel_shader_compile.
+      // pass never compiles inside a live gameplay frame. Compile the PREWARM
+      // GROUPS, one idle slot apart, never the whole scene: compileAsync's
+      // synchronous prologue walks and re-initializes every material it is
+      // handed, and a full-scene walk was a measured multi-hundred-ms stall
+      // per streamed zone. The gating path (behind the loading screen) keeps
+      // render-first, which also covers renderers without
+      // KHR_parallel_shader_compile.
       if (opts?.background && this.asyncCompileSupported) {
-        await Promise.race([
-          this.webgl.compileAsync(this.scene, this.camera),
-          sleep(PREWARM_COMPILE_MAX_MS),
-        ]);
+        // One TEMPLATE per idle slot: even compileAsync's synchronous prologue
+        // (shader-string assembly per program) is a measured multi-hundred-ms
+        // stall when handed a whole zone's batch at once.
+        for (const group of [mobGroup, npcGroup]) {
+          for (const child of [...group.children]) {
+            await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
+            await Promise.race([
+              this.webgl.compileAsync(child, this.camera, this.scene),
+              sleep(PREWARM_COMPILE_MAX_MS),
+            ]);
+          }
+        }
+        await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
       }
+      tCompile = performance.now();
       this.renderPrewarmPass(1 / 60);
-      if (this.asyncCompileSupported) {
+      // The background path precompiled both groups above, so the pass ran on
+      // ready programs and there is nothing left to link. The gating path
+      // compiles after the pass, exactly as before.
+      if (!opts?.background && this.asyncCompileSupported) {
         await Promise.race([
           this.webgl.compileAsync(this.scene, this.camera),
           sleep(PREWARM_COMPILE_MAX_MS),
@@ -1879,6 +1946,12 @@ export class Renderer {
     } finally {
       mobGroup.removeFromParent();
       npcGroup.removeFromParent();
+      this.lastZonePrewarmStats = {
+        zoneId,
+        buildMs: Math.round(tBuild - t0),
+        compileMs: Math.round(tCompile - tBuild),
+        passMs: Math.round(performance.now() - tCompile),
+      };
     }
   }
 
@@ -1962,6 +2035,11 @@ export class Renderer {
       });
   }
 
+  // Groups attachZoneFeature added during the current ensureZoneFeatures pass:
+  // a background prepare precompiles their programs (see prepareZoneAt), so a
+  // new biome's bespoke feature shaders never first-draw inside a live frame.
+  private lastAttachedFeatureGroups: THREE.Group[] = [];
+
   private attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[] },
     freeze = true,
@@ -1971,6 +2049,7 @@ export class Renderer {
     if (freeze) freezeStaticMatrices(view.group);
     for (const light of view.glowLights ?? []) this.fireLights.push(light);
     this.lightRankDirty = true;
+    this.lastAttachedFeatureGroups.push(view.group);
   }
 
   private ensureZoneFeatures(zone: ZoneDef): void {

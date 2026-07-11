@@ -313,6 +313,47 @@ const HOLLOW_SEA_FLOOR = WATER_LEVEL - 5;
 // shipped with, extracted verbatim when the Drakelands and the Frostveil
 // added their own lobe tables).
 type CoastBlob = { readonly x: number; readonly z: number; readonly r: number };
+// One terrainHeight sample evaluates SEVERAL realms' landness at the same
+// (x, z) (its own coast, seam neighbours, the border seaGate, the open-sea
+// check), and the three fixed-seed fbm terms below depend only on (x, z),
+// never on the lobe tables. A last-point memo shares them across those calls:
+// pure caching of identical inputs, so every result stays bit-identical.
+let mbMemoX = Number.NaN;
+let mbMemoZ = Number.NaN;
+let mbMemoWX = 0;
+let mbMemoWZ = 0;
+let mbMemoRag = 0;
+// Per-table bounding box of every blob's reach, cached by array identity. A
+// warped point outside the box contributes zero from every blob (all d2 >= 1),
+// so the whole loop can be skipped bit-identically. terrainHeight consults
+// far realms' landness on most samples (border seaGates, the open-sea check),
+// which is exactly the always-outside case this gate removes.
+interface BlobBounds {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+const blobBoundsCache = new WeakMap<readonly CoastBlob[], BlobBounds>();
+function blobBounds(blobs: readonly CoastBlob[]): BlobBounds {
+  let b = blobBoundsCache.get(blobs);
+  if (!b) {
+    b = {
+      minX: Number.POSITIVE_INFINITY,
+      maxX: Number.NEGATIVE_INFINITY,
+      minZ: Number.POSITIVE_INFINITY,
+      maxZ: Number.NEGATIVE_INFINITY,
+    };
+    for (const blob of blobs) {
+      b.minX = Math.min(b.minX, blob.x - blob.r);
+      b.maxX = Math.max(b.maxX, blob.x + blob.r);
+      b.minZ = Math.min(b.minZ, blob.z - blob.r);
+      b.maxZ = Math.max(b.maxZ, blob.z + blob.r);
+    }
+    blobBoundsCache.set(blobs, b);
+  }
+  return b;
+}
 function metaballLandness(
   lobes: readonly CoastBlob[],
   bays: readonly CoastBlob[],
@@ -325,18 +366,38 @@ function metaballLandness(
   // raggedness term (small capes and inlets). The seeds are CONSTANTS, not
   // the world seed: landness must stay a pure fn of (x, z) because content
   // tables, tests, and the sim's open-sea check were all placed against it.
-  const wx = x + (fbm2(x * 0.015, z * 0.015, 9101, 3) - 0.5) * 46;
-  const wz = z + (fbm2(x * 0.015 + 73, z * 0.015 - 41, 9103, 3) - 0.5) * 46;
+  if (x !== mbMemoX || z !== mbMemoZ) {
+    mbMemoX = x;
+    mbMemoZ = z;
+    mbMemoWX = x + (fbm2(x * 0.015, z * 0.015, 9101, 3) - 0.5) * 46;
+    mbMemoWZ = z + (fbm2(x * 0.015 + 73, z * 0.015 - 41, 9103, 3) - 0.5) * 46;
+    mbMemoRag = (fbm2(x * 0.05, z * 0.05, 9107, 2) - 0.5) * 0.2;
+  }
+  const wx = mbMemoWX;
+  const wz = mbMemoWZ;
   let land = 0;
-  for (const b of lobes) {
-    const d2 = ((wx - b.x) / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
-    if (d2 < 1) land += (1 - d2) ** 2;
+  const lb = blobBounds(lobes);
+  if (wx >= lb.minX && wx <= lb.maxX && wz >= lb.minZ && wz <= lb.maxZ) {
+    for (const b of lobes) {
+      // |dx| >= r means d2 >= 1 regardless of dz: skip the divisions early
+      const dx = wx - b.x;
+      if (dx >= b.r || -dx >= b.r) continue;
+      const d2 = (dx / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
+      if (d2 < 1) land += (1 - d2) ** 2;
+    }
   }
-  for (const b of bays) {
-    const d2 = ((wx - b.x) / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
-    if (d2 < 1) land -= 1.4 * (1 - d2) ** 2;
+  if (bays.length > 0) {
+    const bb = blobBounds(bays);
+    if (wx >= bb.minX && wx <= bb.maxX && wz >= bb.minZ && wz <= bb.maxZ) {
+      for (const b of bays) {
+        const dx = wx - b.x;
+        if (dx >= b.r || -dx >= b.r) continue;
+        const d2 = (dx / b.r) ** 2 + ((wz - b.z) / b.r) ** 2;
+        if (d2 < 1) land -= 1.4 * (1 - d2) ** 2;
+      }
+    }
   }
-  land += (fbm2(x * 0.05, z * 0.05, 9107, 2) - 0.5) * 0.2;
+  land += mbMemoRag;
   return land - 0.06;
 }
 
@@ -1903,6 +1964,12 @@ function baseHeight(x: number, z: number, seed: number): number {
   for (const zone of ZONES) {
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;
+    // Conservative squared-distance gate (one spare yard of margin) before
+    // the sqrt: a point past it can never pass the dHub < radius*1.6 test
+    // below, so skipping it is bit-identical. This loop runs for EVERY
+    // terrainHeight sample, and sqrt per zone per sample was real cost.
+    const hubGate = zone.hub.radius * 1.6 + 1;
+    if (dx * dx + dz * dz >= hubGate * hubGate) continue;
     const dHub = Math.sqrt(dx * dx + dz * dz);
     if (dHub < zone.hub.radius * 1.6) {
       const blend = smoothstep(zone.hub.radius * 0.7, zone.hub.radius * 1.6, dHub);
@@ -1915,6 +1982,15 @@ function baseHeight(x: number, z: number, seed: number): number {
   // ...except the carved lake basins
   for (const zone of ZONES) {
     for (const lake of zone.lakes) {
+      // Conservative squared-distance gate before the noise + sqrt: the shore
+      // wobble is bounded by radius*0.225 (|noise2 - 0.5| <= 0.5), so a point
+      // farther than radius*1.84 can never pass the dLake < radius*1.6 carve
+      // test below. Skipping it is bit-identical, and it matters: the wobble
+      // noise used to run for every lake in the WORLD on every height sample.
+      const ldx = x - lake.x,
+        ldz = z - lake.z;
+      const lakeGate = lake.radius * 1.84;
+      if (ldx * ldx + ldz * ldz >= lakeGate * lakeGate) continue;
       // organic shores: the carve distance wobbles with fixed-seed noise so
       // lakes read as real waterbodies instead of stamped discs. Northern
       // realms only (z > 900): the three original zones keep their exact
@@ -2083,10 +2159,15 @@ export function groundHeight(x: number, z: number, seed: number): number {
 export function terrainHeight(x: number, z: number, seed: number): number {
   let h = baseHeight(x, z, seed);
 
-  // Flatten each camp a little so mobs don't stand on cliffs
+  // Flatten each camp a little so mobs don't stand on cliffs. The squared
+  // gate (one spare yard) before the sqrt is bit-identical: a point past it
+  // can never pass the d < radius*1.8 test, and this loop runs over all 150
+  // camps for EVERY height sample.
   for (const camp of CAMPS) {
     const dx = x - camp.center.x,
       dz = z - camp.center.z;
+    const campGate = camp.radius * 1.8 + 1;
+    if (dx * dx + dz * dz >= campGate * campGate) continue;
     const d = Math.sqrt(dx * dx + dz * dz);
     if (d < camp.radius * 1.8) {
       const ch = baseHeight(camp.center.x, camp.center.z, seed);
