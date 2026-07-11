@@ -3051,18 +3051,25 @@ export class Renderer {
         }
         break;
       case 'spellfxAt': {
-        // The Frozen Orb release: one event carries the whole straight-line
-        // flight, animated locally (the pulse novas below stay the area
-        // telegraph, so no actionable information rides on this mesh).
+        // The Frozen Orb flight, animated locally from its three moments:
+        // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
+        // the server's real coordinates when the orb latches onto an enemy.
+        // The pulse novas below stay the area telegraph, so no actionable
+        // information rides on this mesh.
         if (ev.fx === 'orb') {
-          this.frozenOrbFx.spawn({
-            x: ev.x,
-            z: ev.z,
-            dirX: ev.dirX ?? 0,
-            dirZ: ev.dirZ ?? 1,
-            speed: ev.speed ?? 2.5,
-            duration: ev.duration ?? 8,
-          });
+          const orbSource = ev.sourceId ?? -1;
+          if (ev.phase === 'halt') this.frozenOrbFx.halt(orbSource, ev.x, ev.z);
+          else if (ev.phase === 'resume') this.frozenOrbFx.resume(orbSource, ev.x, ev.z);
+          else
+            this.frozenOrbFx.spawn({
+              sourceId: orbSource,
+              x: ev.x,
+              z: ev.z,
+              dirX: ev.dirX ?? 0,
+              dirZ: ev.dirZ ?? 1,
+              speed: ev.speed ?? 2.5,
+              duration: ev.duration ?? 8,
+            });
           break;
         }
         // Ground-targeted impact: burst draped onto the terrain where the spell
