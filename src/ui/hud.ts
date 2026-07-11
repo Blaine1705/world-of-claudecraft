@@ -344,6 +344,8 @@ import {
 import { chatPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
+import { buildProcOverlay } from './proc_overlay_dom';
+import { attachOverlayDrag } from './proc_overlay_drag';
 import { ProcOverlayPainter } from './proc_overlay_painter';
 import { procOverlayState } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
@@ -3280,15 +3282,16 @@ export class Hud {
     this.swingFillEl,
     this.swingLabelEl,
   );
-  // The spell-activation proc overlay (curved arcs beside the character, owner
-  // request 2026-07-11): built ONCE here, class-toggled per frame via the
-  // elided writers (proc_overlay_painter + the pure proc_overlay_view rule).
+  // The spell-activation proc overlay (the Rising Phoenix, owner design
+  // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
+  // (proc_overlay_drag), class-toggled per frame via the elided writers
+  // (proc_overlay_painter + the pure proc_overlay_view rule).
   private readonly procOverlayEl = (() => {
-    const el = document.createElement('div');
-    el.id = 'proc-overlay';
-    el.setAttribute('aria-hidden', 'true');
-    el.innerHTML = '<div class="arc left"></div><div class="arc right"></div>';
+    const el = buildProcOverlay();
     document.body.appendChild(el);
+    // Owner request: grab the phoenix while it burns and park it anywhere;
+    // the spot persists (viewport fractions, so a resize keeps it sensible).
+    attachOverlayDrag(el, 'procOverlayAnchor', { fx: 0.5, fy: 0.42 });
     return el;
   })();
   private readonly procOverlayPainter = new ProcOverlayPainter(
