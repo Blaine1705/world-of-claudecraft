@@ -1709,7 +1709,9 @@ export type AbilityEffect =
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'enrageChance'; chance: number; duration: number } // Fury Enrage (Bloodletting / Rampage)
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
-  | { type: 'gainResource'; amount: number } // bloodrage immediate
+  // bloodrage immediate; spPct (Aetherwell) adds spellPower * spPct per
+  // application, so a channeled restore scales with the caster's spell power
+  | { type: 'gainResource'; amount: number; spPct?: number }
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
   // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
