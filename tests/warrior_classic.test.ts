@@ -79,6 +79,28 @@ describe('warrior_classic: the pre-overhaul kit as a second class', () => {
     ).toBe(false);
   });
 
+  it('right-click equipping actually dual-wields: the second one-hander auto-routes to the offhand', () => {
+    // 2026-07-11 PBE bug: desiredEquipSlot gated offhand routing on its OWN
+    // copy of the dual-wield rule (rogue || fury warrior) instead of
+    // canDualWield, so a classic warrior's second one-hander kept replacing
+    // the mainhand and 1H+1H was unreachable by right-click.
+    const sim = new Sim({ seed: 9, playerClass: 'warrior_classic', playerName: 'Dwclassic' });
+    const pid = sim.playerId;
+    sim.setPlayerLevel(20, pid);
+    // The boosted spawn state: a two-hander in the mainhand, the pair in bags.
+    sim.addItem('bonewrought_greatsword', 1, pid);
+    sim.addItem('kingsbane_last_oath', 1, pid);
+    sim.addItem('drownedmoon_maul', 1, pid);
+    sim.equipItem('bonewrought_greatsword', pid);
+    // First 1H cannot sit beside the 2H (no Titan's Grip), so it swaps the
+    // mainhand; the second then auto-routes to the empty offhand.
+    sim.equipItem('kingsbane_last_oath', pid);
+    sim.equipItem('drownedmoon_maul', pid);
+    const equipment = sim.meta(pid)?.equipment;
+    expect(equipment?.mainhand).toBe('kingsbane_last_oath');
+    expect(equipment?.offhand).toBe('drownedmoon_maul');
+  });
+
   it('equips shields through the warrior gear alias; caster held offhands stay out', () => {
     expect(canEquipItem('warrior_classic', ITEMS.highwatch_wallshield)).toBe(true);
     expect(canEquipItem('warrior_classic', ITEMS.bonewrought_bulwark)).toBe(true);
