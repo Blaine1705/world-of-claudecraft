@@ -284,10 +284,13 @@ describe('bags, gold, and alternate role kits', () => {
       // The alternate role must actually add SOMETHING (at minimum its weapon);
       // otherwise a regression that stops bagging alt kits passes silently.
       expect(distinctAltPieces, `${cls} distinct alt pieces`).toBeGreaterThanOrEqual(1);
-      // Dedupe: nothing the character wears rides in the bags as a copy, and
-      // no alt piece was added twice.
+      // Dedupe: nothing the character wears rides in the bags as a copy
+      // (except a role's DELIBERATE extras, e.g. fury's second greatsword),
+      // and no alt piece was added twice.
+      const extras = new Set(CLASS_ROLES[cls].flatMap((r) => [...(r.extras ?? [])]));
       for (const id of equipped) {
-        if (id) expect(carriedSet.has(id), `${cls} equipped ${id} duplicated in bags`).toBe(false);
+        if (!id || extras.has(id)) continue;
+        expect(carriedSet.has(id), `${cls} equipped ${id} duplicated in bags`).toBe(false);
       }
       expect(carried.length, `${cls} inventory has stack-level duplicates`).toBe(carriedSet.size);
     }
@@ -348,6 +351,30 @@ describe('tank, dual-wield, and shadow kits', () => {
     );
     expect(kit.mainhand).toBe('bonewrought_greatsword');
     expect(kit.offhand).toBe('kingsbane_last_oath');
+  });
+
+  it('the fury kit carries the dual-wield test extras: every hand layout is testable', () => {
+    const fury = roleOf('warrior', 'fury');
+    // A second greatsword (Titan's Grip 2H+2H) and a spare epic one-hander
+    // (classic 1H+1H); with the worn greatsword and the bagged Thronebane
+    // that makes all three dual-wield layouts testable without farming.
+    expect(fury.extras).toEqual(['bonewrought_greatsword', 'wyrmfang_greatblade']);
+    for (const id of fury.extras ?? []) {
+      const item = ITEMS[id];
+      expect(item.heroic ?? false, `${id} heroic`).toBe(false);
+      expect(item.heroicOf, `${id} heroicOf`).toBeUndefined();
+      expect(id in HEROIC_ITEMS, `${id} bespoke heroic`).toBe(false);
+      expect(canEquipItem('warrior', item), `${id} canEquip`).toBe(true);
+      expect(meetsLevelRequirement(BOOST_LEVEL, item), `${id} level`).toBe(true);
+      expect(canEquipItemInSlot('warrior', item, 'offhand', 'fury'), `${id} offhand`).toBe(true);
+    }
+    const state = buildBoostedCharacterState('warrior', 'Pbetestdw', 0);
+    const carried = state.inventory.map((s) => s.itemId);
+    expect(state.equipment.mainhand).toBe('bonewrought_greatsword');
+    // The bagged SECOND copy of the worn greatsword is deliberate.
+    expect(carried, 'bagged second greatsword').toContain('bonewrought_greatsword');
+    expect(carried, 'bagged spare one-hander').toContain('wyrmfang_greatblade');
+    expect(carried, 'bagged legendary').toContain('kingsbane_last_oath');
   });
 
   it('the holy kit IS the shadow kit: the cloth pool stays undifferentiated (tripwire)', () => {

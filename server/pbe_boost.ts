@@ -190,6 +190,11 @@ export interface BoostRole {
    *  hands with the two best spec-legal weapons (fury / Titan's Grip).
    *  Default: best weapon overall, offhand filled opportunistically. */
   hands?: 'shield' | 'dualWield';
+  /** Extra bagged items granted alongside this kit, allowed to DUPLICATE a
+   *  worn kit piece: fury carries a second greatsword and a spare epic
+   *  one-hander so every dual-wield layout (2H+2H via Titan's Grip, 2H+1H,
+   *  1H+1H) is testable without farming. */
+  extras?: readonly string[];
 }
 
 // One kit per DISTINCT gear identity, not per spec: specs that share a gear
@@ -203,7 +208,13 @@ export interface BoostRole {
 export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   warrior: [
     { id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true },
-    { id: 'fury', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true, hands: 'dualWield' },
+    {
+      id: 'fury',
+      weights: { str: 1, sta: 0.8, agi: 0.4 },
+      melee: true,
+      hands: 'dualWield',
+      extras: ['bonewrought_greatsword', 'wyrmfang_greatblade'],
+    },
     {
       id: 'prot',
       weights: { sta: 1, str: 0.6, agi: 0.3 },
@@ -513,6 +524,16 @@ export function buildBoostedCharacterState(
       if (!itemId || equipped.has(itemId) || bagged.has(itemId)) continue;
       bagged.add(itemId);
       sim.addItem(itemId, 1, pid);
+    }
+  }
+  // Deliberate extras (see BoostRole.extras) skip the equipped-dedup on
+  // purpose: a WORN kit piece may still earn one bagged spare copy (fury's
+  // second greatsword). Only an already-bagged copy short-circuits.
+  for (const role of CLASS_ROLES[cls]) {
+    for (const extraId of role.extras ?? []) {
+      if (bagged.has(extraId)) continue;
+      bagged.add(extraId);
+      sim.addItem(extraId, 1, pid);
     }
   }
   const meta = sim.ctx.resolve(pid)?.meta;
