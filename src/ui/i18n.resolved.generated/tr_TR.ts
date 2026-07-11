@@ -597,6 +597,7 @@ export const tr_TR: EnTranslations = {
       "complexityHigh": "High",
       "exampleAbilities": "Example abilities",
       "viewTalents": "View talents",
+      "selectSpec": "Select specialization",
       "specUnlockBanner": "Specialization Unlocked!",
       "specUnlockHint": "Press N to choose your specialization."
     },

@@ -691,6 +691,7 @@ export const hudChromeStrings = {
     complexityHigh: 'High',
     exampleAbilities: 'Example abilities',
     viewTalents: 'View talents',
+    selectSpec: 'Select specialization',
     specUnlockBanner: 'Specialization Unlocked!',
     specUnlockHint: 'Press N to choose your specialization.',
   },

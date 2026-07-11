@@ -3583,6 +3583,7 @@ export class Hud {
     },
     rowPicks: () => this.sim.rowPicks,
     pickRow: (rowIndex, optionId) => this.sim.pickRowTalent(rowIndex, optionId),
+    commitSpec: (specId) => this.sim.setSpec(specId),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
     switchLoadout: (i) => this.sim.switchLoadout(i),

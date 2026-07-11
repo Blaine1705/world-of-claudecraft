@@ -6403,6 +6403,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': '中等',
   'hudChrome.specPanel.exampleAbilities': '範例技能',
   'hudChrome.specPanel.viewTalents': '檢視天賦',
+  'hudChrome.specPanel.selectSpec': '選擇專精',
   'hudChrome.specPanel.specUnlockBanner': '專精已解鎖！',
   'hudChrome.specPanel.specUnlockHint': '按 N 選擇你的專精。',
   'hudChrome.statInfo.names.haste': '急速',

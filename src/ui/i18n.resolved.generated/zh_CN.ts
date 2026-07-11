@@ -597,6 +597,7 @@ export const zh_CN: EnTranslations = {
       "complexityHigh": "High",
       "exampleAbilities": "示例技能",
       "viewTalents": "查看天赋",
+      "selectSpec": "选择专精",
       "specUnlockBanner": "专精已解锁！",
       "specUnlockHint": "按 N 键选择你的专精。"
     },

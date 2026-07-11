@@ -6882,6 +6882,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': 'Средняя',
   'hudChrome.specPanel.exampleAbilities': 'Примеры способностей',
   'hudChrome.specPanel.viewTalents': 'Смотреть таланты',
+  'hudChrome.specPanel.selectSpec': 'Выбрать специализацию',
   'hudChrome.specPanel.specUnlockBanner': 'Специализация открыта!',
   'hudChrome.specPanel.specUnlockHint': 'Нажмите N, чтобы выбрать специализацию.',
   'hudChrome.statInfo.names.haste': 'Скорость',

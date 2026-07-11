@@ -6742,6 +6742,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': '중간',
   'hudChrome.specPanel.exampleAbilities': '대표 능력',
   'hudChrome.specPanel.viewTalents': '특성 보기',
+  'hudChrome.specPanel.selectSpec': '전문화 선택',
   'hudChrome.specPanel.specUnlockBanner': '전문화 해제!',
   'hudChrome.specPanel.specUnlockHint': 'N을 눌러 전문화를 선택하세요.',
   'hudChrome.statInfo.names.haste': '가속',

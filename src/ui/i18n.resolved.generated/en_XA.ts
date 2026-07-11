@@ -597,6 +597,7 @@ export const en_XA: EnTranslations = {
       "complexityHigh": "[Ĥíĝĥ]",
       "exampleAbilities": "[Éẋáɱþļé áƀíļíţíéš]",
       "viewTalents": "[Ʋíéŵ ţáļéñţš]",
+      "selectSpec": "[Šéļéçţ šþéçíáļížáţíóñ]",
       "specUnlockBanner": "[Šþéçíáļížáţíóñ Úñļóçķéð!]",
       "specUnlockHint": "[Þŕéšš Ñ ţó çĥóóšé ýóúŕ šþéçíáļížáţíóñ.]"
     },

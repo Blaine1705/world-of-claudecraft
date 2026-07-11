@@ -597,6 +597,7 @@ export const ru_RU: EnTranslations = {
       "complexityHigh": "High",
       "exampleAbilities": "Примеры способностей",
       "viewTalents": "Смотреть таланты",
+      "selectSpec": "Выбрать специализацию",
       "specUnlockBanner": "Специализация открыта!",
       "specUnlockHint": "Нажмите N, чтобы выбрать специализацию."
     },

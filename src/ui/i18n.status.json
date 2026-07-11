@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6984,
-    "rows": 146664,
-    "translated": 144593,
-    "pending": 1878,
+    "keys": 6985,
+    "rows": 146685,
+    "translated": 144599,
+    "pending": 1893,
     "blocked": 193,
     "blockedSource": 96
   },
@@ -555573,6 +555573,88 @@
         "ru_RU": {
           "state": "translated",
           "srcHash": "e6e0d27edfa21843",
+          "by": "human"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
+    "main:hudChrome.specPanel.selectSpec": {
+      "scope": "main",
+      "enHash": "04258d4789ce931b",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "04258d4789ce931b",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "translated",
+          "srcHash": "04258d4789ce931b",
+          "by": "human"
+        },
+        "zh_TW": {
+          "state": "translated",
+          "srcHash": "04258d4789ce931b",
+          "by": "human"
+        },
+        "ko_KR": {
+          "state": "translated",
+          "srcHash": "04258d4789ce931b",
+          "by": "human"
+        },
+        "ja_JP": {
+          "state": "translated",
+          "srcHash": "04258d4789ce931b",
+          "by": "human"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "translated",
+          "srcHash": "04258d4789ce931b",
           "by": "human"
         },
         "cs_CZ": {

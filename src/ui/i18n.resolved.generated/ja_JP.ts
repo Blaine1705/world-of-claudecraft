@@ -597,6 +597,7 @@ export const ja_JP: EnTranslations = {
       "complexityHigh": "High",
       "exampleAbilities": "代表的なアビリティ",
       "viewTalents": "タレントを見る",
+      "selectSpec": "スペシャライゼーションを選択",
       "specUnlockBanner": "スペシャライゼーション解放！",
       "specUnlockHint": "Nキーを押してスペシャライゼーションを選択してください。"
     },

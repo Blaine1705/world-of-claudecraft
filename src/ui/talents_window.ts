@@ -81,6 +81,14 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   rowPicks(): RowPicks;
   playerLevel(): number;
   pickRow(rowIndex: number, optionId: string | null): void;
+  /**
+   * Commit a specialization to the server-authoritative IWorld (IWorld.setSpec).
+   * Mirrors pickRow: a fire-and-forget command the sim re-validates (combat
+   * lock, spec unlock level); a rejection surfaces through the shared
+   * error-event toast, never a local decision. Used by the nine talents-2.0
+   * classes' Select specialization button; the warrior never calls it.
+   */
+  commitSpec(specId: string): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
   // Loadout commit surface (server-authoritative IWorld; the only commit path).
@@ -360,16 +368,25 @@ export class TalentsWindow {
         exEl.setAttribute('aria-label', signatureName(id));
         this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
       }
-      // Every panel gets a View talents button: clicking it SELECTS that spec (it
-      // stages the choice, exactly like clicking the panel) and jumps to the
-      // Choices tab, so a new player picks a spec and lands on its talents in one
-      // click. The selected spec's button reads as the primary action.
+      // Every panel gets a primary action button. For the nine talents-2.0
+      // classes (every class EXCEPT the overhauled 'warrior'; warrior_classic is
+      // one of the nine) a spec that is NOT the committed one reads Select
+      // specialization and COMMITS it via deps.commitSpec (IWorld.setSpec, sim
+      // re-validated) before staging + jumping to the Choices tab, so the spec
+      // choice actually grants the signature ability + mastery. The committed
+      // spec's button, and every warrior panel, keeps the View talents
+      // navigation-only behavior (stage + jump, exactly as before).
+      const committed = this.deps.currentAllocation().spec === sp.id;
+      const commits = cls !== 'warrior' && !committed;
       const viewBtn = document.createElement('button');
       viewBtn.type = 'button';
       viewBtn.className = `btn ts-view-talents${selected ? ' primary' : ''}${info?.examples.length ? ' has-ex' : ''}`;
-      viewBtn.textContent = t('hudChrome.specPanel.viewTalents');
+      viewBtn.textContent = commits
+        ? t('hudChrome.specPanel.selectSpec')
+        : t('hudChrome.specPanel.viewTalents');
       viewBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (commits) this.deps.commitSpec(sp.id);
         if (stage.spec !== sp.id) this.setSpec(stage, sp.id);
         this.tab = 'rows';
         this.render();

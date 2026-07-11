@@ -597,6 +597,7 @@ export const ko_KR: EnTranslations = {
       "complexityHigh": "High",
       "exampleAbilities": "대표 능력",
       "viewTalents": "특성 보기",
+      "selectSpec": "전문화 선택",
       "specUnlockBanner": "전문화 해제!",
       "specUnlockHint": "N을 눌러 전문화를 선택하세요."
     },
