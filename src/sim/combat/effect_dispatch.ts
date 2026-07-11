@@ -75,6 +75,11 @@ const TELEPORT_MIN_GROUND = WATER_LEVEL - PLAYER_SWIM_DEPTH;
 // touchdown.
 const LEAP_DURATION = 0.6;
 const LEAP_APEX = 3.2;
+// Sweeping Strikes (Arms): a worn window makes each single-target strike clip
+// one nearby enemy. Scales the already-rolled hit (no rng moved). Owner buff
+// 2026-07-10: the copy deals FULL damage (was 75%), Arms' two-enemy specialty;
+// the tooltip (Widening Arc) had already said "full damage", the const lagged.
+export const SWEEP_MULT = 1;
 
 function isStealthToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -211,10 +216,8 @@ export function runEffects(
   // actually dealt single-target hostile damage; gates the charge consumption
   // after the loop (a fully whiffed cast keeps its charge).
   let areaEchoDealt = false;
-  // Sweeping Strikes (Arms): a worn window makes each single-target strike clip
-  // one nearby enemy for 75%. Aura-driven (no charge), resolved once per cast
-  // like the echo. SWEEP_MULT is the reduced fraction.
-  const SWEEP_MULT = 0.75;
+  // Sweeping Strikes: aura-driven (no charge), resolved once per cast like the
+  // echo; SWEEP_MULT (module const above) is the copied fraction.
   const sweeping = hasSweepingStrikes(p) && abilityQualifiesForAreaEcho(ability.effects);
   // Emboldened (combat/sure_crit.ts): resolved ONCE per cast, so a
   // multi-strike cast (Red Harvest) crits every strike and spends a single
@@ -553,25 +556,30 @@ export function runEffects(
           // so it is independent of grid iteration order (no rng here).
           // Arc reach: content uses either jumpRange (warrior overhaul) or radius
           // (PTR); read whichever is set.
-          ctx.grid.forEachInRadius(from.pos.x, from.pos.z, eff.jumpRange ?? eff.radius ?? 0, (e, d2) => {
-            if (e.dead || chain.includes(e)) return;
-            // Allies only: players and player-owned pets (what a friendly-target
-            // heal may hit), never a hostile or an NPC bystander.
-            if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
-            // hp/maxHp are integers, so equal fractions compute the identical float:
-            // an EXACT ladder (frac, then distance, then id) is transitive and thus
-            // order-independent, no epsilon window needed.
-            const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
-            const better =
-              best === null ||
-              frac < bestFrac ||
-              (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
-            if (better) {
-              best = e;
-              bestFrac = frac;
-              bestD2 = d2;
-            }
-          });
+          ctx.grid.forEachInRadius(
+            from.pos.x,
+            from.pos.z,
+            eff.jumpRange ?? eff.radius ?? 0,
+            (e, d2) => {
+              if (e.dead || chain.includes(e)) return;
+              // Allies only: players and player-owned pets (what a friendly-target
+              // heal may hit), never a hostile or an NPC bystander.
+              if (e.id !== p.id && !ctx.isFriendlyTo(p, e)) return;
+              // hp/maxHp are integers, so equal fractions compute the identical float:
+              // an EXACT ladder (frac, then distance, then id) is transitive and thus
+              // order-independent, no epsilon window needed.
+              const frac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
+              const better =
+                best === null ||
+                frac < bestFrac ||
+                (frac === bestFrac && (d2 < bestD2 || (d2 === bestD2 && e.id < best.id)));
+              if (better) {
+                best = e;
+                bestFrac = frac;
+                bestD2 = d2;
+              }
+            },
+          );
           if (best === null) break;
           chain.push(best);
         }

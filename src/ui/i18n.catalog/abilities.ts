@@ -772,7 +772,11 @@ const classAbilityNamesEn = {
         'Early Grave',
         'Attempt to finish off a wounded foe, causing {damage} damage. Only usable on enemies below 20% health.',
       ],
-      ['slam', 'Brute Swing', 'Slams the opponent for weapon damage plus {damage}.'],
+      [
+        'slam',
+        'Brute Swing',
+        'Slams the opponent for 50% weapon damage plus {damage}, generating {rage} rage.',
+      ],
       [
         'cleave',
         'Reaping Arc',
@@ -1278,7 +1282,7 @@ const classAbilityNamesEn = {
       [
         'sweeping_strikes',
         'Widening Arc',
-        'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
+        'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
       ],
       [
         'deep_wounds',
@@ -1288,7 +1292,7 @@ const classAbilityNamesEn = {
       [
         'enrage_passive',
         'Mayhem',
-        'Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+        'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
       ],
       [
         'bloodthirst',
@@ -1298,7 +1302,7 @@ const classAbilityNamesEn = {
       [
         'raging_gale',
         'Twinstrike',
-        'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)',
+        'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)',
       ],
       [
         'red_harvest',

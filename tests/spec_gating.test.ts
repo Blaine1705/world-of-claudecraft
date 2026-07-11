@@ -71,20 +71,24 @@ describe('spec-gated warrior base kit (content table)', () => {
     expect(ABILITIES.revenge?.excludeSpecs).toBeUndefined();
   });
 
-  it('Redhand hands off for Fury at 10 (owner 2026-07-10): kept while it is the only spender, retired when Red Harvest lands', () => {
+  it('Redhand hands off for Fury AND Prot at 10: kept as the early spender, retired when each kit fills out', () => {
     expect(ABILITIES.overpower?.specs).toBeUndefined();
-    expect(ABILITIES.overpower?.excludeSpecs).toEqual(['fury']);
+    expect(ABILITIES.overpower?.excludeSpecs).toEqual(['fury', 'prot']);
     // The hand-off is pinned to Red Harvest's arrival: Bloodletting/Twinstrike
     // cost 0, so through 5-9 Redhand is committed Fury's only real rage spender.
+    // Prot shares the hand-off (balance pass 2026-07-10): its Maiming Strike
+    // empower is a dead rider beside Shieldcrack/Revenge.
     expect(ABILITIES.overpower?.excludeSpecsAtLevel).toBe(ABILITIES.red_harvest.learnLevel);
-    expect(knownIds('fury', 5).has('overpower')).toBe(true);
-    expect(knownIds('fury', 9).has('overpower')).toBe(true);
-    expect(knownIds('fury', 10).has('overpower')).toBe(false);
-    expect(knownIds('fury').has('overpower')).toBe(false); // and stays gone at 20
-    // no-spec keeps it as the early rage spender; Arms and Prot keep it committed.
+    for (const spec of ['fury', 'prot'] as const) {
+      expect(knownIds(spec, 5).has('overpower'), spec).toBe(true);
+      expect(knownIds(spec, 9).has('overpower'), spec).toBe(true);
+      expect(knownIds(spec, 10).has('overpower'), spec).toBe(false);
+      expect(knownIds(spec).has('overpower'), spec).toBe(false); // and stays gone at 20
+    }
+    // no-spec keeps it as the early rage spender; Arms keeps it committed
+    // (the Maiming Strike empower is its whole point).
     expect(knownIds(null).has('overpower')).toBe(true);
     expect(knownIds('arms').has('overpower')).toBe(true);
-    expect(knownIds('prot').has('overpower')).toBe(true);
   });
 });
 
@@ -202,11 +206,13 @@ describe('spec gating end to end in the sim', () => {
       return sim.known.map((k) => k.def.id).join(',');
     };
     const a = run();
-    // Tank staple present; retired Bolstering Cry (commanding_shout) absent, but
-    // Redhand (overpower) is now a baseline spender so prot has it too.
+    // Tank staple present; retired Bolstering Cry (commanding_shout) absent, and
+    // Redhand (overpower) hands off at 10 for Prot too (balance pass 2026-07-10:
+    // its empower rider feeds the Arms-granted Maiming Strike, a dead rider
+    // beside Shieldcrack/Revenge), so a level-20 Prot no longer has it.
     expect(a).toContain('shield_slam');
     expect(a).not.toContain('commanding_shout');
-    expect(a).toContain('overpower');
+    expect(a).not.toContain('overpower');
     expect(run()).toBe(a);
   });
 });

@@ -1932,7 +1932,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.description':
     'Silah hasarı artı {damage} için anlık bir vuruş. 1 kombo puanı kazandırır.',
   'entities.abilities.sinister_strike.name': 'Kötücül Kesik',
-  'entities.abilities.slam.description': 'Rakibe silah hasarı artı {damage} için çarpar.',
+  'entities.abilities.slam.description':
+    'Rakibe %50 silah hasarı artı {damage} verir ve {rage} öfke üretir.',
   'entities.abilities.slam.name': 'Kaba Savuruş',
   'entities.abilities.slice_and_dice.description':
     'Yakın dövüş saldırı hızını %30 artıran bitirici hamle. Kombo puanı başına daha uzun sürer.',

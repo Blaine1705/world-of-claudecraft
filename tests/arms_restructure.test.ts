@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SWEEP_MULT } from '../src/sim/combat/effect_dispatch';
 import { BATTLE_TRANCE_ABILITIES } from '../src/sim/combat/empower_next';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
@@ -139,9 +140,52 @@ describe('Arms restructure: Sweeping Strikes (the cleave window)', () => {
     const sim = makeArms();
     sim.castAbility('sweeping_strikes');
     sim.tick();
-    // The 75% reduction lives in the effect-dispatch SWEEP_MULT const, not the
-    // aura value, so we only assert the window is up.
     expect(sim.player.auras.some((a) => a.kind === 'sweeping_strikes')).toBe(true);
+  });
+
+  it('the copied strike deals FULL damage (owner buff 2026-07-10; the tooltip says so)', () => {
+    // Pinned as a constant: the d1d55dc15 buff changed the Widening Arc tooltip
+    // to "full damage" but left the const at 0.75; this keeps them in lockstep.
+    expect(SWEEP_MULT).toBe(1);
+  });
+});
+
+describe('Arms restructure: Brute Swing, the free rage builder (owner redesign 2026-07-10)', () => {
+  it('pins the def: costs 0, 4s cooldown on the GCD, 50% weapon + 15, generates 8 rage', () => {
+    const def = ABILITIES.slam;
+    expect(def.specs).toEqual(['arms']);
+    expect(def.cost).toBe(0);
+    expect(def.cooldown).toBe(4);
+    expect(def.castTime).toBe(0);
+    expect(def.offGcd).toBeUndefined(); // stays on the GCD
+    expect(def.effects).toEqual([
+      { type: 'weaponStrike', bonus: 15, weaponMult: 0.5 },
+      { type: 'gainResource', amount: 8 },
+    ]);
+    // A 0-cost ability can never spend a free-cost proc, so it left the
+    // Battle Trance scope with the redesign (see empower_next.ts).
+    expect(BATTLE_TRANCE_ABILITIES.has('slam')).toBe(false);
+  });
+
+  it('casts free at 0 rage, builds 8 rage, and arms its 4s cooldown', () => {
+    const sim = makeArms();
+    const mob = nearestMob(sim);
+    mob.maxHp = 100000;
+    mob.hp = mob.maxHp;
+    approach(sim, mob);
+    sim.targetEntity(mob.id);
+    const p = sim.player;
+    p.resource = 0;
+    const hp0 = mob.hp;
+    sim.castAbility('slam');
+    expect(mob.hp).toBeLessThan(hp0); // landed with an empty rage bar
+    // 8 base, scaled by Battle Stance's +10% rage generation (STANCE_RAGE_GEN).
+    expect(p.resource).toBeCloseTo(8.8, 5);
+    expect(p.cooldowns.get('slam')).toBe(4);
+    // On cooldown: an immediate re-cast is rejected, no extra rage minted.
+    p.gcdRemaining = 0;
+    sim.castAbility('slam');
+    expect(p.resource).toBeCloseTo(8.8, 5);
   });
 });
 

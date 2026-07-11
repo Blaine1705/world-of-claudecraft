@@ -77,6 +77,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'iron_resolve',
       'slam',
       'red_harvest',
+      'whirlwind',
       'faultline',
       'heroic_leap',
       'cleave',
@@ -638,7 +639,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redhand',
     class: 'warrior',
     learnLevel: 2,
-    cost: 20,
+    cost: 15,
     castTime: 0,
     cooldown: 5,
     // Two charges (owner 2026-07-08, like Twinstrike): usable twice back to back,
@@ -648,13 +649,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     // Owner decision 2026-07-09: baseline early rage SPENDER (learned at level 2),
-    // costing 20 rage per use. The classic dodge-proc gate stays gone (too RNG);
+    // costing 15 rage per use. The classic dodge-proc gate stays gone (too RNG);
     // the requiresDodgeProc machinery itself remains for hunter mongoose_bite.
-    // Fury hands it off at 10 (owner 2026-07-10): it stays the spec's only real
-    // rage spender through 5-9 (Bloodletting/Twinstrike cost 0), then retires
-    // the moment Red Harvest (its learnLevel, 10) takes the rage-dump role,
-    // since its empower rider feeds the Arms-granted Maiming Strike.
-    excludeSpecs: ['fury'],
+    // Fury AND Prot hand it off at 10 (owner 2026-07-10): it stays the early
+    // rage spender through 5-9, then retires when each spec's own kit fills
+    // out (Fury: Red Harvest takes the rage-dump role at 10; Prot: its empower
+    // rider feeds the Arms-granted Maiming Strike, a dead rider beside
+    // Shieldcrack/Revenge, review round 2 item on Prot coherence). Arms keeps
+    // it: the Maiming Strike empower is its whole point.
+    excludeSpecs: ['fury', 'prot'],
     excludeSpecsAtLevel: 10,
     effects: [
       { type: 'weaponStrike', bonus: 5, cannotBeDodged: true },
@@ -667,7 +670,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 2,
         level: 16,
-        cost: 20,
+        cost: 15,
         effects: [
           { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
           { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
@@ -696,12 +699,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
-      { type: 'weaponStrike', bonus: 24, weaponMult: 0.6 },
+      // Balance pass 2026-07-10: was 0.6 weapon + 24 per hit (too efficient for a
+      // free, rage-generating, 2-charge spell); retuned to 0.45 weapon + 16.
+      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
+      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
       { type: 'gainResource', amount: 8 },
     ],
     description:
-      'Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
+      'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
   },
   execute: {
     id: 'execute',
@@ -727,16 +732,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Arms-only (owner 2026-07-08): Protection dropped Brute Swing since Revenge
     // is already its filler; a generic mandoble adds nothing for a tank.
     specs: ['arms'],
-    cost: 15,
+    // Redesigned 2026-07-10 (owner): from a 15-rage spender into the Arms rage
+    // BUILDER (free, generates 8 rage, 4s cooldown, stays on the GCD). Dropped
+    // from Battle Trance's free-cost scope in the same change: a 0-cost ability
+    // can never spend a free-cost proc (see empower_next.ts).
+    cost: 0,
     // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
     // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
     castTime: 0,
-    cooldown: 0,
+    cooldown: 4,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 25 }],
-    description: 'Slams the opponent for weapon damage plus $d.',
+    effects: [
+      { type: 'weaponStrike', bonus: 15, weaponMult: 0.5 },
+      { type: 'gainResource', amount: 8 },
+    ],
+    description: 'Slams the opponent for 50% weapon damage plus $d, generating 8 rage.',
   },
   // Fury's dump-everything spender (operator design, Desenfreno): three full
   // weapon hits, each carrying a Maiming Strike-scale bonus (era table:
@@ -754,14 +766,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
+      // Balance pass 2026-07-10: was 3x full-weapon + 55 each (=165 bonus), far
+      // too much for a 5x/min spender; retuned to 0.65 weapon + 25 each.
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
       // Always Enrages for 4 sec (Rampage / Desenfreno, the guaranteed proc).
       { type: 'enrageChance', chance: 1, duration: 4 },
     ],
     description:
-      'Spend everything: strike three times in a frenzy for weapon damage plus $d each, always Enraging you. (Fury)',
+      'Spend everything: strike three times in a frenzy for 65% weapon damage plus $d each, always Enraging you. (Fury)',
   },
   // Spellbook-only passive trait (owner 2026-07-08): documents the Enrage buff
   // that Bloodletting / Red Harvest apply (the actual mechanic is the enrageChance
@@ -781,7 +795,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+      'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
   },
   // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
   // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
@@ -1059,7 +1073,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
   },
   // Arms restructure 2026-07-08. Sweeping Strikes: a 12s window where your
-  // single-target strikes also clip one nearby enemy (75%). Deep Wounds: a
+  // single-target strikes also clip one nearby enemy at full damage. Deep Wounds: a
   // passive marker; the bleed itself rides Maiming Strike's effects.
   sweeping_strikes: {
     id: 'sweeping_strikes',
@@ -1074,9 +1088,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 0.75, duration: 12 }],
+    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 1, duration: 12 }],
     description:
-      'For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)',
+      'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
   },
   deep_wounds: {
     id: 'deep_wounds',
@@ -1101,14 +1115,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'warrior',
     learnLevel: 14,
     specs: ['arms'],
-    cost: 20,
+    // Balance pass 2026-07-10 (Arms buff round): 20 rage / 20-26 -> 15 rage /
+    // 30-38, soft-capped at 5 targets (the Revenge mechanism: above 5 the
+    // total holds at 5x per-target, scaling already-rolled hits, no rng moved).
+    cost: 15,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     threat: { flat: 30 }, // classic 100 at rank 5/level 58, scaled to the 1-20 band
-    effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
+    effects: [{ type: 'aoeDamage', min: 30, max: 38, radius: 5, softCap: 5 }],
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
   },
   // Protection's frontal-arc filler, replacing Reaver Strike for committed prot
@@ -4013,12 +4030,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     threat: { mult: 1.2 },
     effects: [
-      { type: 'weaponStrike', bonus: 40 },
+      // Balance 2026-07-10 (owner): 40 -> 50 bonus and the bleed 24 -> 30, the
+      // Arms round-3 buff after Brute Swing became the free builder.
+      { type: 'weaponStrike', bonus: 50 },
       { type: 'buffTarget', kind: 'mortal_wound', value: 0.5, duration: 10 },
       // Deep Wounds passive (Arms restructure 2026-07-08): Maiming Strike leaves
       // a bleed. Arms-scoped naturally (mortal_strike is Arms-granted). A distinct
       // auraId keeps it from overwriting the mortal_wound healing debuff above.
-      { type: 'dot', total: 24, duration: 6, interval: 3, auraId: 'deep_wounds' },
+      { type: 'dot', total: 30, duration: 6, interval: 3, auraId: 'deep_wounds' },
     ],
     description:
       'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
@@ -4035,7 +4054,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [
-      { type: 'weaponStrike', bonus: 35, weaponMult: 0.6 },
+      { type: 'weaponStrike', bonus: 30, weaponMult: 0.5 },
       { type: 'selfHealPctMax', pct: 0.03 },
       { type: 'gainResource', amount: 12 },
       // 30% chance to Enrage for 4 sec (the classic Bloodthirst proc).
@@ -4073,6 +4092,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Bladed Gyre',
     class: 'warrior',
     learnLevel: 10,
+    // Fury-only (balance pass 2026-07-10): Fury had no baseline AoE, so it gets
+    // Bladed Gyre back as its spec AoE tool. Arms/Prot keep their own AoE
+    // (Reaping Arc / Quaking Blow); no-spec never learns it.
+    specs: ['fury'],
     // Bladed Gyre GENERATES rage instead of costing it (operator, Batch
     // 2026-07-08): cost 0, and the aoeDamage's rageOnHit grants 5 rage plus 1
     // per enemy struck (capped at +5), so 5 to 10 rage per spin.
@@ -5835,16 +5858,27 @@ export function abilitiesKnownAt(
     // classic rage-costing execute. Resolved here (not via a talent mod) so the
     // cast-time cost gate sees 0 and the appended gainResource flows through the
     // normal dispatch scaling (abilityRagePct / rage-gen auras).
+    let cooldown = def.cooldown;
+    // Arms' execute is cheaper (balance pass 2026-07-10, Arms buff round): at
+    // 15 it competed head-on with Maiming Strike and Redhand for the same bar.
+    if (id === 'execute' && mods?.spec === 'arms') {
+      cost = 10;
+    }
     if (id === 'execute' && mods?.spec === 'fury') {
       cost = 0;
       effects = [...effects, { type: 'gainResource', amount: 20 }];
+      // Balance pass 2026-07-10: the free, rage-minting Fury execute had no
+      // cooldown, an infinite rage engine in the sub-20% phase. A 6s cooldown
+      // keeps the free execute fantasy without the loop. Arms/Prot (a rage
+      // SPENDER, no mint) keep the classic no-cooldown execute.
+      cooldown = 6;
     }
     const entry: KnownAbility = {
       def,
       rank,
       cost,
       castTime,
-      cooldown: def.cooldown,
+      cooldown,
       effects,
       threatFlat,
       threatMult,

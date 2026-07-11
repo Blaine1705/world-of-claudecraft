@@ -2855,7 +2855,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     'Intenta rematar a un enemigo herido e inflige {damage} de daño. Solo usable contra enemigos con menos del 20% de salud.',
   'entities.abilities.slam.name': 'Mandoble Brutal',
-  'entities.abilities.slam.description': 'Golpea al oponente e inflige daño de arma más {damage}.',
+  'entities.abilities.slam.description':
+    'Golpea al oponente e inflige un 50% de daño de arma más {damage}, generando {rage} de ira.',
   'entities.abilities.cleave.name': 'Arco Segador',
   'entities.abilities.cleave.description':
     'Un golpe amplio que alcanza a todos los enemigos frente a ti por {damage} de daño.',

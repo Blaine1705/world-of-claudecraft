@@ -4073,7 +4073,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.description':
     'Okamžitý úder za poškození zbraně plus {damage}. Udělí 1 combo bod.',
   'entities.abilities.sinister_strike.name': 'Zlý sek',
-  'entities.abilities.slam.description': 'Praští protivníka za poškození zbraně plus {damage}.',
+  'entities.abilities.slam.description':
+    'Praští protivníka za 50 % poškození zbraně plus {damage} a vygeneruje {rage} zuřivosti.',
   'entities.abilities.slam.name': 'Hrubý švih',
   'entities.abilities.slice_and_dice.description':
     'Dokončovací útok, který zvýší rychlost útoků na blízko o 30 %. Trvá déle za každý combo bod.',

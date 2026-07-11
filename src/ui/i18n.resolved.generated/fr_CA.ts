@@ -1099,7 +1099,7 @@ export const fr_CA: EnTranslations = {
       "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
       "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
       "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
-      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "battleTrance": "Your next Reaver Strike or Maiming Strike costs no Rage",
       "revengeFree": "Your next Revenge costs no Rage",
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
@@ -5298,7 +5298,7 @@ export const fr_CA: EnTranslations = {
       },
       "slam": {
         "name": "Coup brutal",
-        "description": "Frappe l'adversaire pour les dégâts de l'arme plus {damage}."
+        "description": "Frappe l'adversaire pour 50 % des dégâts de l'arme plus {damage}, générant {rage} points de rage."
       },
       "cleave": {
         "name": "Arc faucheur",
@@ -5806,7 +5806,7 @@ export const fr_CA: EnTranslations = {
       },
       "sweeping_strikes": {
         "name": "Widening Arc",
-        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for 75% damage. (Arms)"
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
         "name": "Gaping Wounds",
@@ -5814,7 +5814,7 @@ export const fr_CA: EnTranslations = {
       },
       "enrage_passive": {
         "name": "Mayhem",
-        "description": "Passive: while Enraged you deal 11% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "bloodthirst": {
         "name": "Saignée",
@@ -5822,7 +5822,7 @@ export const fr_CA: EnTranslations = {
       },
       "raging_gale": {
         "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 60% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
         "name": "Red Harvest",

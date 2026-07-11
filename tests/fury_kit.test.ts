@@ -98,20 +98,26 @@ describe('fury kit content defs', () => {
     expect(def.school).toBe('physical');
     expect(def.requiresTarget).toBe(true);
     expect(def.specs).toEqual(['fury']);
-    // Red Harvest is the hardest-hitting warrior ability: three weapon strikes
-    // each carrying a +55 bonus, above every other warrior hit including
-    // Maiming Strike's single wpn+40. Plus it always Enrages (owner 2026-07-08).
+    // Red Harvest: three 65% weapon strikes each carrying a +25 bonus (balance
+    // pass 2026-07-10: was 3x full weapon + 55, far too much for a 5x/min
+    // spender). Plus it always Enrages (owner 2026-07-08).
     expect(def.effects).toEqual([
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
-      { type: 'weaponStrike', bonus: 55 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
       { type: 'enrageChance', chance: 1, duration: 4 },
     ]);
+    // Post-nerf design: each strike sits BELOW Maiming Strike's single bonus
+    // (the pre-nerf 3x full-weapon+55 out-damaged everything by far); the
+    // spender's weight now comes from landing three of them. Maiming's bonus
+    // is 50 since the Arms round-3 buff (owner 2026-07-10, was 40).
     const mortal = ABILITIES.mortal_strike.effects.find((e) => e.type === 'weaponStrike');
-    expect(mortal?.type === 'weaponStrike' && mortal.bonus).toBe(40);
+    const mortalBonus = mortal?.type === 'weaponStrike' ? mortal.bonus : 0;
+    expect(mortalBonus).toBe(50);
     for (const eff of def.effects) {
       if (eff.type !== 'weaponStrike') continue;
-      expect(eff.bonus).toBeGreaterThan(40);
+      expect(eff.bonus).toBeLessThan(mortalBonus);
+      expect(eff.weaponMult).toBeLessThan(1);
     }
   });
 });
@@ -238,5 +244,37 @@ describe('determinism', () => {
       return JSON.stringify([amounts, mob.hp, p.hp, p.resource]);
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('balance pass 2026-07-10: Fury execute cooldown + Fury-only Bladed Gyre', () => {
+  const knownEntry = (spec: string | null, id: string) =>
+    abilitiesKnownAt('warrior', 20, computeTalentModifiers('warrior', alloc(spec))).find(
+      (k) => k.def.id === id,
+    );
+
+  it("Fury's free rage-minting Early Grave carries a 6s cooldown; Arms/Prot keep no-CD", () => {
+    const fury = knownEntry('fury', 'execute');
+    expect(fury?.cost).toBe(0);
+    expect(fury?.cooldown).toBe(6); // the infinite-rage-engine fix
+    expect(fury?.effects.some((e) => e.type === 'gainResource' && e.amount === 20)).toBe(true);
+    // Arms pays 10 (balance pass 2026-07-10: at 15 it competed head-on with
+    // Maiming Strike and Redhand), Prot keeps the classic 15; both no-CD.
+    const arms = knownEntry('arms', 'execute');
+    expect(arms?.cost).toBe(10);
+    expect(arms?.cooldown).toBe(0);
+    expect(arms?.effects.some((e) => e.type === 'gainResource')).toBe(false);
+    const prot = knownEntry('prot', 'execute');
+    expect(prot?.cost).toBe(15);
+    expect(prot?.cooldown).toBe(0);
+    expect(prot?.effects.some((e) => e.type === 'gainResource')).toBe(false);
+  });
+
+  it('Bladed Gyre (whirlwind) is base-kit for committed Fury and for nobody else', () => {
+    expect(ABILITIES.whirlwind.specs).toEqual(['fury']);
+    expect(knownIds('fury').has('whirlwind')).toBe(true);
+    expect(knownIds('arms').has('whirlwind')).toBe(false);
+    expect(knownIds('prot').has('whirlwind')).toBe(false);
+    expect(knownIds(null).has('whirlwind')).toBe(false);
   });
 });

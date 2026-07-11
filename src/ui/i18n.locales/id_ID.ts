@@ -1967,7 +1967,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin kombo.',
   'entities.abilities.sinister_strike.name': 'Tebasan Keji',
   'entities.abilities.slam.description':
-    'Menghantam lawan sebesar kerusakan senjata ditambah {damage}.',
+    'Menghantam lawan sebesar 50% kerusakan senjata ditambah {damage}, menghasilkan {rage} amarah.',
   'entities.abilities.slam.name': 'Ayunan Brutal',
   'entities.abilities.slice_and_dice.description':
     'Gerakan penutup yang meningkatkan kecepatan serangan jarak dekat sebesar 30%. Bertahan lebih lama per poin kombo.',

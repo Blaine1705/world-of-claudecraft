@@ -1,5 +1,5 @@
 // Battle Trance (the warrior baseline free-strike proc: connected auto swings
-// have a chance to make the next Reaver Strike or Brute Swing free) plus the
+// have a chance to make the next Reaver Strike or Maiming Strike free) plus the
 // Redhand rework into the kit's active rage builder (no cost, +10 rage, no
 // dodge-proc gate). Sim-level and deterministic; the proc scope predicate is
 // also unit-driven directly (the action bar imports the same one).
@@ -107,9 +107,23 @@ describe('Battle Trance: arming', () => {
 });
 
 describe('Battle Trance: consumption scope', () => {
-  it('makes Brute Swing (slam) free at zero rage and is consumed by it', () => {
+  it('makes Maiming Strike (mortal_strike) free at zero rage and is consumed by it', () => {
     const sim = warriorAtCap(62);
-    expect(sim.setSpec('arms')).toBe(true); // Brute Swing is arms/prot-gated base kit
+    expect(sim.setSpec('arms')).toBe(true); // Maiming Strike is the Arms-granted strike
+    swingUntilProc(sim);
+    const p = sim.player;
+    p.gcdRemaining = 0;
+    p.resource = 0;
+    const mob = nearestMob(sim);
+    const hp0 = mob.hp;
+    sim.castAbility('mortal_strike');
+    expect(mob.hp).toBeLessThan(hp0); // the strike landed despite 0 rage
+    expect(hasTrance(sim)).toBe(false); // one charge, consumed
+  });
+
+  it('Brute Swing (slam, the free Arms rage builder since 2026-07-10) never spends it', () => {
+    const sim = warriorAtCap(62);
+    expect(sim.setSpec('arms')).toBe(true);
     swingUntilProc(sim);
     const p = sim.player;
     p.gcdRemaining = 0;
@@ -117,8 +131,10 @@ describe('Battle Trance: consumption scope', () => {
     const mob = nearestMob(sim);
     const hp0 = mob.hp;
     sim.castAbility('slam');
-    expect(mob.hp).toBeLessThan(hp0); // the strike landed despite 0 rage
-    expect(hasTrance(sim)).toBe(false); // one charge, consumed
+    expect(mob.hp).toBeLessThan(hp0); // free by design, lands at 0 rage
+    // Builds 8 rage, scaled by Battle Stance's +10% rage generation.
+    expect(p.resource).toBeCloseTo(8.8, 5);
+    expect(hasTrance(sim)).toBe(true); // the proc is untouched (0-cost cast)
   });
 
   it('covers Reaver Strike (heroic_strike) through the on-swing queue', () => {
@@ -148,11 +164,13 @@ describe('Battle Trance: consumption scope', () => {
   it('the shared scope predicate matches sim behavior (the action bar imports it)', () => {
     const trance = [{ kind: 'battle_trance' }];
     expect(freeCostAuraActive(trance, 'heroic_strike')).toBe(true);
-    expect(freeCostAuraActive(trance, 'slam')).toBe(true);
+    expect(freeCostAuraActive(trance, 'mortal_strike')).toBe(true);
+    // Brute Swing left the scope with its 2026-07-10 redesign (itself 0-cost).
+    expect(freeCostAuraActive(trance, 'slam')).toBe(false);
     expect(freeCostAuraActive(trance, 'hamstring')).toBe(false);
     // The generic fiesta-style charge stays ability-agnostic.
     expect(freeCostAuraActive([{ kind: 'next_cast_free' }], 'hamstring')).toBe(true);
-    expect(freeCostAuraActive([], 'slam')).toBe(false);
+    expect(freeCostAuraActive([], 'mortal_strike')).toBe(false);
     // Sudden Death (Arms): the same predicate frees Early Grave (execute) ONLY, so
     // the action bar lights the execute proc glow (procGlow = freeByProc) exactly
     // when the sim lets it fire free.

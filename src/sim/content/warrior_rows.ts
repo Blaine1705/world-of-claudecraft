@@ -124,22 +124,16 @@ export const WARRIOR_ROWS: RowTree = [
         effect: { global: { autoRagePct: 0.25, abilityRagePct: 0.15 } },
       },
       {
+        // Balance pass 2026-07-10 (owner): the Blood Toll empower was a rage
+        // GENERATION talent, dead for Fury (which never learns Blood Toll and
+        // swims in rage anyway). Reworked into Hardened Blood: spending rage
+        // hardens you, useful for all three specs and adding zero damage. The
+        // row id stays so saved row picks survive the rework.
         id: 'war_row_blood_offering',
-        name: 'Blood Offering',
+        name: 'Hardened Blood',
         description:
-          'Empowers Blood Toll: it grants 30 rage (up from 10) and recharges twice as fast.',
-        // LIVE: upgrades the BASE health-for-rage ability instead of granting a
-        // duplicate (owner call: "que mejore la ira sangrienta existente").
-        // Blood Toll base: 8% max hp, 10 rage, 60s cd; talented: 30 rage, 30s.
-        effect: {
-          ability: [
-            {
-              ability: 'bloodrage',
-              cooldownPct: -0.5,
-              addEffects: [{ type: 'gainResource', amount: 20 }],
-            },
-          ],
-        },
+          'Every 10 rage you spend on an ability hardens your blood: +2% armor for 8 sec, stacking up to 5 times.',
+        effect: { global: { hardenedBloodPct: 2 } },
       },
       {
         id: 'war_row_battle_rhythm',

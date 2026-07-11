@@ -1325,9 +1325,10 @@ export const hudChromeStrings = {
     bloodbath: 'Increases critical strike chance and damage dealt by {pct}%',
     dieBySword: 'Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)',
     sanguine: 'Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%',
-    // The two ability names are the locale's own (Reaver Strike / Brute Swing
-    // here; each fill uses its locale's translated names).
-    battleTrance: 'Your next Reaver Strike or Brute Swing costs no Rage',
+    // The two ability names are the locale's own (Reaver Strike / Maiming
+    // Strike here; each fill uses its locale's translated names). Brute Swing
+    // left the scope 2026-07-10 (it is now itself free, see empower_next.ts).
+    battleTrance: 'Your next Reaver Strike or Maiming Strike costs no Rage',
     revengeFree: 'Your next Revenge costs no Rage',
     victoryRush: 'Victory Rush is ready',
     maxHpPct: 'Increases maximum health by {pct}%',

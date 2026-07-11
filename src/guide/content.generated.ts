@@ -201,6 +201,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Red Harvest"
       },
       {
+        "id": "whirlwind",
+        "name": "Bladed Gyre"
+      },
+      {
         "id": "faultline",
         "name": "Faultline"
       },

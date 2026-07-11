@@ -1950,7 +1950,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een ogenblikkelijke slag voor wapenschade plus {damage}. Levert 1 combopunt op.',
   'entities.abilities.sinister_strike.name': 'Kwaadaardige Houw',
   'entities.abilities.slam.description':
-    'Dreunt op de tegenstander in voor wapenschade plus {damage}.',
+    'Dreunt op de tegenstander in voor 50% wapenschade plus {damage} en genereert {rage} woede.',
   'entities.abilities.slam.name': 'Botte Zwaai',
   'entities.abilities.slice_and_dice.description':
     'Afmaakzet die de melee-aanvalssnelheid met 30% verhoogt. Duurt langer per combopunt.',

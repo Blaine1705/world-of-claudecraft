@@ -1099,7 +1099,7 @@ export const zh_TW: EnTranslations = {
       "bloodbath": "暴擊機率與造成的傷害提高 {pct}%",
       "dieBySword": "受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）",
       "sanguine": "攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%",
-      "battleTrance": "你的下一次劫掠打擊或蠻力揮擊不消耗怒氣",
+      "battleTrance": "你的下一次劫掠打擊或致殘打擊不消耗怒氣",
       "revengeFree": "你的下一次復仇不消耗怒氣",
       "victoryRush": "乘勝追擊已就緒",
       "maxHpPct": "最大生命值提高 {pct}%",
@@ -5298,7 +5298,7 @@ export const zh_TW: EnTranslations = {
       },
       "slam": {
         "name": "蠻力揮擊",
-        "description": "猛擊對手，造成武器傷害加 {damage}。"
+        "description": "猛擊對手，造成 50% 武器傷害加 {damage}，並產生 {rage} 點怒氣。"
       },
       "cleave": {
         "name": "收割弧斬",
@@ -5806,7 +5806,7 @@ export const zh_TW: EnTranslations = {
       },
       "sweeping_strikes": {
         "name": "擴弧斬",
-        "description": "持續 12 秒，你的單體攻擊還會以 75% 傷害額外打擊 1 名附近的敵人。（武器）"
+        "description": "持續 12 秒，你的單體攻擊還會以全額傷害額外打擊 1 名附近的敵人。（武器）"
       },
       "deep_wounds": {
         "name": "撕裂創傷",
@@ -5814,7 +5814,7 @@ export const zh_TW: EnTranslations = {
       },
       "enrage_passive": {
         "name": "狂亂",
-        "description": "被動：處於激怒狀態時，你造成的傷害提高 11%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）"
+        "description": "被動：處於激怒狀態時，你造成的傷害提高 7%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）"
       },
       "bloodthirst": {
         "name": "放血",
@@ -5822,7 +5822,7 @@ export const zh_TW: EnTranslations = {
       },
       "raging_gale": {
         "name": "雙擊",
-        "description": "立即以武器攻擊兩次，每擊造成 60% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）"
+        "description": "立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）"
       },
       "red_harvest": {
         "name": "血色收割",

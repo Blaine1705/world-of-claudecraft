@@ -2883,7 +2883,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Tente d'achever un ennemi blessé et inflige {damage} points de dégâts. Utilisable seulement sur les ennemis sous 20% de points de vie.",
   'entities.abilities.slam.name': 'Coup brutal',
   'entities.abilities.slam.description':
-    "Frappe l'adversaire pour les dégâts de l'arme plus {damage}.",
+    "Frappe l'adversaire pour 50 % des dégâts de l'arme plus {damage}, générant {rage} points de rage.",
   'entities.abilities.cleave.name': 'Arc faucheur',
   'entities.abilities.cleave.description':
     'Une frappe circulaire qui touche tous les ennemis devant vous pour {damage} points de dégâts.',

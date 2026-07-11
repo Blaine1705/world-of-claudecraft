@@ -2836,7 +2836,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     'Tenta finalizar um inimigo ferido, causando {damage} de dano. Só pode ser usado em inimigos com menos de 20% de vida.',
   'entities.abilities.slam.name': 'Golpe Brutal',
-  'entities.abilities.slam.description': 'Atinge o oponente com dano de arma mais {damage}.',
+  'entities.abilities.slam.description':
+    'Atinge o oponente com 50% do dano da arma mais {damage}, gerando {rage} de raiva.',
   'entities.abilities.cleave.name': 'Arco Ceifante',
   'entities.abilities.cleave.description':
     'Um golpe amplo que atinge todos os inimigos à sua frente com {damage} de dano.',

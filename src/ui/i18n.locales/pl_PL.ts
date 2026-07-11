@@ -1919,7 +1919,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.description':
     'Natychmiastowe uderzenie zadające obrażenia broni plus {damage}. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.sinister_strike.name': 'Nikczemne cięcie',
-  'entities.abilities.slam.description': 'Wali przeciwnika, zadając obrażenia broni plus {damage}.',
+  'entities.abilities.slam.description':
+    'Wali przeciwnika, zadając 50% obrażeń broni plus {damage} i generując {rage} furii.',
   'entities.abilities.slam.name': 'Brutalny zamach',
   'entities.abilities.slice_and_dice.description':
     'Cios kończący zwiększający szybkość ataków wręcz o 30%. Trwa dłużej za każdy punkt kombinacji.',

@@ -66,33 +66,79 @@ describe('Storm Bolt', () => {
   });
 });
 
-describe('Blood Offering', () => {
-  it('empowers the base Blood Toll: 30 rage and half its cooldown', () => {
-    const run = (pick: boolean) => {
-      const sim = warriorAtCap(42);
-      // Blood Toll (bloodrage) is arms/prot-gated base kit (2026-07-07).
-      expect(sim.setSpec('prot')).toBe(true);
-      if (pick) sim.pickRowTalent(3, 'war_row_blood_offering');
-      const p = sim.player;
-      p.hp = p.maxHp;
-      p.resource = 0;
-      sim.castAbility('bloodrage');
-      return {
-        hpLost: p.maxHp - p.hp,
-        maxHp: p.maxHp,
-        rage: p.resource,
-        cd: p.cooldowns.get('bloodrage'),
-      };
+describe('Hardened Blood (the reworked Blood Offering row pick)', () => {
+  // Balance pass 2026-07-10: the Blood Toll empower was a rage-GENERATION
+  // talent, dead for Fury; the row pick (same id, saved picks survive) is now
+  // Hardened Blood: every full 10 rage spent on one ability grants a stack of
+  // +2% armor for 8s, up to 5 stacks. Per-cast floor, no carryover.
+  function armsWithPick(pick: boolean): {
+    sim: Sim;
+    cast: (rage: number) => void;
+    aura: () => any;
+  } {
+    const sim = warriorAtCap(42);
+    expect(sim.setSpec('arms')).toBe(true);
+    if (pick) expect(sim.pickRowTalent(3, 'war_row_blood_offering')).toBe(true);
+    const mob = mobsNear(sim, 1)[0];
+    standOff(sim, mob, 2);
+    sim.targetEntity(mob.id);
+    const p = sim.player;
+    const cast = (rage: number) => {
+      p.resource = rage;
+      (p as any).gcdRemaining = 0;
+      p.cooldowns.delete('mortal_strike');
+      sim.castAbility('mortal_strike'); // 30-rage spender: 3 full stacks per cast
     };
-    const base = run(false);
-    // The arms/prot warrior stands in Battle Stance, so every mint is +10%.
-    expect(base.rage).toBeCloseTo(10 * (1 + STANCE_RAGE_GEN));
-    expect(base.cd).toBe(60);
-    const talented = run(true);
-    // Same health price (8% max), triple the rage, twice the availability.
-    expect(talented.hpLost).toBe(Math.round(talented.maxHp * 0.08));
-    expect(talented.rage).toBeCloseTo(30 * (1 + STANCE_RAGE_GEN));
-    expect(talented.cd).toBe(30);
+    return { sim, cast, aura: () => p.auras.find((a: any) => a.id === 'hardened_blood') };
+  }
+
+  it('spending rage grants a stack per full 10 actually spent, raising live armor', () => {
+    const { sim, cast, aura } = armsWithPick(true);
+    const p = sim.player;
+    const armor0 = p.stats.armor;
+    cast(100);
+    const a = aura();
+    expect(a).toBeTruthy();
+    // Maiming Strike lists 30 rage, but committed Arms bakes Measured Fury
+    // (-10% rage costs), so the RESOLVED spend is 27: floor(27 / 10) = 2 stacks.
+    // The hook reads the resolved cost, which is exactly what left the bar.
+    expect(a.stacks).toBe(2);
+    expect(a.value).toBe(4); // 2% x 2 stacks (buff_armor_pct reads whole percent)
+    expect(a.kind).toBe('buff_armor_pct');
+    expect(p.stats.armor).toBeGreaterThan(armor0); // recalced live, not on next tick
+  });
+
+  it('an 80-rage Red Harvest caps the stacks at 5 (+10%) in one cast', () => {
+    const sim = warriorAtCap(42);
+    expect(sim.setSpec('fury')).toBe(true);
+    expect(sim.pickRowTalent(3, 'war_row_blood_offering')).toBe(true);
+    const mob = mobsNear(sim, 1)[0];
+    standOff(sim, mob, 2);
+    sim.targetEntity(mob.id);
+    const p = sim.player;
+    p.resource = 100;
+    (p as any).gcdRemaining = 0;
+    sim.castAbility('red_harvest'); // 80 spent -> floor(80/10) = 8, capped at 5
+    const a = p.auras.find((x: any) => x.id === 'hardened_blood');
+    expect(a?.stacks).toBe(5);
+    expect(a?.value).toBe(10);
+  });
+
+  it('the armor falls off when the aura expires (buff* expiry recalc)', () => {
+    const { sim, cast, aura } = armsWithPick(true);
+    const p = sim.player;
+    const armor0 = p.stats.armor;
+    cast(100);
+    expect(p.stats.armor).toBeGreaterThan(armor0);
+    for (let i = 0; i < 20 * 9 && aura(); i++) sim.tick(); // > 8s duration
+    expect(aura()).toBeUndefined();
+    expect(p.stats.armor).toBe(armor0);
+  });
+
+  it('without the pick, spending rage grants nothing', () => {
+    const { cast, aura } = armsWithPick(false);
+    cast(100);
+    expect(aura()).toBeUndefined();
   });
 });
 

@@ -106,10 +106,12 @@ function faceMelee(sim: AnySim, p: Entity, mob: Entity): void {
 }
 
 describe('Diabolical Twinstrike (Fury): Twinstrike hits 15% harder while Enraged', () => {
-  it('raging_gale deals 1.15x enraged-with-passive vs enraged-without (Enrage 11% cancels in the ratio)', () => {
+  it('raging_gale deals 1.15x enraged-with-passive vs enraged-without (the Enrage bonus cancels in the ratio)', () => {
     const { sim, p, mob } = makeWarrior('fury');
     const meta = requireMeta(sim, p.id);
-    p.weapon = { min: 30, max: 30, speed: 2 };
+    // A large fixed weapon so per-hit integer rounding cannot skew the ratio
+    // (with the retuned 0.4W+14 a 30/30 weapon rounds 32/28 = 1.143).
+    p.weapon = { min: 300, max: 300, speed: 2 };
     p.attackPower = 0;
     p.critChance = 0;
     mob.dodgeChance = 0;

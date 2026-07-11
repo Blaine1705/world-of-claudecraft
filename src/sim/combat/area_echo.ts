@@ -28,8 +28,16 @@ import type { AbilityDef, AbilityEffect, Entity } from '../types';
 export const AOE_ECHO_RADIUS = 8;
 
 // Fraction of the primary hit each ECHOED target takes (owner 2026-07-09: the echo
-// used to replay the full 100%; the extra targets now take 65%, like a cleave).
-export const AOE_ECHO_MULT = 0.65;
+// used to replay the full 100%, like a cleave). Balance pass 2026-07-10: dropped
+// 0.65 -> 0.40 now that only Fury owns whirlwind and echoes its heavy spenders
+// (Twinstrike, Red Harvest), which made 65% far too much AoE.
+export const AOE_ECHO_MULT = 0.4;
+
+// Cap on how many SECONDARY targets one echoed hit fans to (balance pass
+// 2026-07-10): the echo used to hit every enemy in radius; capping at 4 keeps
+// Fury's cleave strong without scaling into huge packs. Deterministic:
+// hostilesInRadius grid order picks the same first 4 every time.
+export const AOE_ECHO_MAX_TARGETS = 4;
 
 /** Does this cast's resolved effect list make it a single-target damaging
  *  ability? Needs at least one weaponStrike/directDamage and no area damage
@@ -62,10 +70,12 @@ export function echoAreaDamage(
   threatOpts: { flat?: number; mult?: number },
 ): void {
   const scaled = Math.max(1, Math.round(amount * AOE_ECHO_MULT));
+  let hit = 0;
   for (const m of ctx.hostilesInRadius(p, primary.pos, AOE_ECHO_RADIUS)) {
     if (m.id === primary.id) continue; // never onto the primary target twice
     if (!ctx.hasLineOfSight(p, m)) continue; // mirror the aoeDamage LoS gate
     ctx.dealDamage(p, m, scaled, false, school, abilityName, 'hit', false, threatOpts);
+    if (++hit >= AOE_ECHO_MAX_TARGETS) return; // cap the secondary fan-out
   }
 }
 

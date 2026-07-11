@@ -1901,7 +1901,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.description':
     'Et øjeblikkeligt slag for våbenskade plus {damage}. Giver 1 kombopoint.',
   'entities.abilities.sinister_strike.name': 'Ondsindet Hug',
-  'entities.abilities.slam.description': 'Drøner modstanderen for våbenskade plus {damage}.',
+  'entities.abilities.slam.description':
+    'Drøner modstanderen for 50 % våbenskade plus {damage} og genererer {rage} raseri.',
   'entities.abilities.slam.name': 'Brutalt Sving',
   'entities.abilities.slice_and_dice.description':
     'Afslutningsangreb der øger nærkampsangrebshastighed med 30 %. Varer længere per kombopoint.',

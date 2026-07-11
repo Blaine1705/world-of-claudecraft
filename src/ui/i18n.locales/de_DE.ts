@@ -2864,7 +2864,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',
   'entities.abilities.slam.name': 'Roher Schwung',
   'entities.abilities.slam.description':
-    'Zerschmettert den Gegner für Waffenschaden plus {damage}.',
+    'Zerschmettert den Gegner für 50 % Waffenschaden plus {damage} und erzeugt {rage} Wut.',
   'entities.abilities.cleave.name': 'Sichelschwung',
   'entities.abilities.cleave.description':
     'Ein weiter Hieb, der alle Gegner vor euch für {damage} Schaden trifft.',

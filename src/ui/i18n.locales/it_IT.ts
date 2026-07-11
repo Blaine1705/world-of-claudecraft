@@ -2846,7 +2846,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     'Tenta di finire un nemico ferito, infliggendo {damage} danni. Utilizzabile solo sui nemici sotto il 20% di salute.',
   'entities.abilities.slam.name': 'Colpo Brutale',
-  'entities.abilities.slam.description': "Schianta l'avversario per danni dell'arma più {damage}.",
+  'entities.abilities.slam.description':
+    "Schianta l'avversario per il 50% dei danni dell'arma più {damage}, generando {rage} rabbia.",
   'entities.abilities.cleave.name': 'Arco Mietitore',
   'entities.abilities.cleave.description':
     'Un colpo ampio che raggiunge tutti i nemici davanti a te per {damage} danni.',

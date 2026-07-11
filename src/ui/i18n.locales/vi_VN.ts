@@ -1941,7 +1941,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một đòn đánh tức thì gây sát thương vũ khí cộng thêm {damage}. Tích 1 điểm liên hoàn.',
   'entities.abilities.sinister_strike.name': 'Nhát Chém Gian Tà',
   'entities.abilities.slam.description':
-    'Giáng đòn vào đối thủ gây sát thương vũ khí cộng thêm {damage}.',
+    'Giáng đòn vào đối thủ gây 50% sát thương vũ khí cộng thêm {damage} và tạo {rage} nộ.',
   'entities.abilities.slam.name': 'Cú Vung Thô Bạo',
   'entities.abilities.slice_and_dice.description':
     'Đòn kết liễu tăng 30% tốc độ đánh cận chiến. Kéo dài hơn theo mỗi điểm liên hoàn.',

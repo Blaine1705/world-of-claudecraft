@@ -1908,7 +1908,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sinister_strike.description':
     'Ett omedelbart hugg för vapenskada plus {damage}. Ger 1 kombopoäng.',
   'entities.abilities.sinister_strike.name': 'Ondsint hugg',
-  'entities.abilities.slam.description': 'Smäller till motståndaren för vapenskada plus {damage}.',
+  'entities.abilities.slam.description':
+    'Smäller till motståndaren för 50 % vapenskada plus {damage} och genererar {rage} raseri.',
   'entities.abilities.slam.name': 'Brutalt sving',
   'entities.abilities.slice_and_dice.description':
     'Avslutande manöver som ökar attackhastigheten i närstrid med 30 %. Varar längre per kombopoäng.',

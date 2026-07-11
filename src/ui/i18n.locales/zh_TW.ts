@@ -1818,7 +1818,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.execute.description':
     '嘗試終結受傷的敵人，造成 {damage} 點傷害。只能對生命值低於 20% 的敵人使用。',
   'entities.abilities.slam.name': '蠻力揮擊',
-  'entities.abilities.slam.description': '猛擊對手，造成武器傷害加 {damage}。',
+  'entities.abilities.slam.description':
+    '猛擊對手，造成 50% 武器傷害加 {damage}，並產生 {rage} 點怒氣。',
   'entities.abilities.cleave.name': '收割弧斬',
   'entities.abilities.cleave.description': '橫掃一擊，對你前方所有敵人造成 {damage} 點傷害。',
   'entities.abilities.defensive_stance.name': '戒備姿態',
@@ -6423,7 +6424,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.bloodbath': '暴擊機率與造成的傷害提高 {pct}%',
   'hudChrome.auraEffect.dieBySword': '受到的傷害降低 {pct}%（生命值低於 {hpPct}% 時為 {lowPct}%）',
   'hudChrome.auraEffect.sanguine': '攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%',
-  'hudChrome.auraEffect.battleTrance': '你的下一次劫掠打擊或蠻力揮擊不消耗怒氣',
+  'hudChrome.auraEffect.battleTrance': '你的下一次劫掠打擊或致殘打擊不消耗怒氣',
   'hudChrome.auraEffect.revengeFree': '你的下一次復仇不消耗怒氣',
   'hudChrome.auraEffect.victoryRush': '乘勝追擊已就緒',
   'hudChrome.auraEffect.maxHpPct': '最大生命值提高 {pct}%',
@@ -6447,16 +6448,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一種魯莽的戰鬥姿態：你的暴擊機率提高 3%，暴擊傷害提高 3%。狂怒戰士總是以這個姿態作戰。',
   'entities.abilities.sweeping_strikes.name': '擴弧斬',
   'entities.abilities.sweeping_strikes.description':
-    '持續 12 秒，你的單體攻擊還會以 75% 傷害額外打擊 1 名附近的敵人。（武器）',
+    '持續 12 秒，你的單體攻擊還會以全額傷害額外打擊 1 名附近的敵人。（武器）',
   'entities.abilities.deep_wounds.name': '撕裂創傷',
   'entities.abilities.deep_wounds.description':
     '被動：你的致殘打擊使目標在 6 秒內流血並受到物理傷害。（武器）',
   'entities.abilities.enrage_passive.name': '狂亂',
   'entities.abilities.enrage_passive.description':
-    '被動：處於激怒狀態時，你造成的傷害提高 11%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）',
+    '被動：處於激怒狀態時，你造成的傷害提高 7%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）',
   'entities.abilities.raging_gale.name': '雙擊',
   'entities.abilities.raging_gale.description':
-    '立即以武器攻擊兩次，每擊造成 60% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）',
+    '立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）',
   'entities.abilities.red_harvest.name': '血色收割',
   'entities.abilities.red_harvest.description':
     '傾盡所有：在狂亂中攻擊三次，每擊造成武器傷害外加 {damage}。（狂怒）',
