@@ -823,10 +823,7 @@ export function castAbility(
   }
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
-  const instantResolved = ability.empowerStages
-    ? { ...res, empowerLevel: ability.empowerStages }
-    : res;
-  applyAbility(ctx, p, meta, instantResolved, castTargetId);
+  applyAbility(ctx, p, meta, res, castTargetId);
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;

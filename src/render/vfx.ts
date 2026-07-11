@@ -179,15 +179,6 @@ interface Projectile {
   scale?: number;
 }
 
-interface BubbleBeam {
-  sourceId: number;
-  targetId: number;
-  remaining: number;
-  group: THREE.Group;
-  core: THREE.Mesh;
-  water: THREE.Mesh;
-}
-
 // fire reads as flame tongues; everything else as sparkling magic
 function projectileSprites(school: string): { core: number; trail: number } {
   return school === 'fire'

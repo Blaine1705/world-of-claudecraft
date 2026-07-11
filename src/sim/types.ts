@@ -2783,6 +2783,9 @@ export type SimEvent = { pid?: number } & (
       school: string;
       fx:
         | 'projectile'
+        // The same homing bolt drawn heavier (Pyroblast's boulder): mechanics
+        // identical to 'projectile', only the renderer scales it up.
+        | 'heavyBolt'
         | 'beam'
         | 'tick'
         | 'nova'

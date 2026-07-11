@@ -1673,6 +1673,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableWhileCasting: true,
     // Owner playtest 2026-07-11: two stored charges, back to back if banked.
     maxCharges: 2,
+    // Owner playtest round four: no bolt, the embers bite the moment you press.
+    projectile: false,
     effects: [{ type: 'directDamage', min: 27, max: 35 }],
     ranks: [
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },
@@ -1862,13 +1864,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    // Owner playtest 2026-07-11: casting it also quickens your feet.
+    // Owner playtest 2026-07-11: casting it also quickens your feet; round
+    // four made the cast itself mobile (the fire mage's on-the-run filler).
+    castWhileMoving: true,
     effects: [
       { type: 'directDamage', min: 32, max: 40 },
       { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 3 },
     ],
     description:
-      'Scorches the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast.',
+      'Scorches the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast, and castable while moving.',
   },
   pyroblast: {
     id: 'pyroblast',
@@ -4794,13 +4798,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: false,
     usableWhileCasting: true,
+    // Owner playtest round four: a burst button rides no GCD.
+    offGcd: true,
     // Owner decision 2026-07-11: the NEW Combustion replaces the old +50% crit
     // Flashfire. While worn every Fire spell critically strikes (the crit roll
     // outcome is overridden in combat/fire_mage.ts, the roll still drawn), and
     // those guaranteed crits never build Hot Streak.
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)',
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These guaranteed crits do not build Hot Streak. (Fire signature)',
   },
   icy_veins: {
     id: 'icy_veins',

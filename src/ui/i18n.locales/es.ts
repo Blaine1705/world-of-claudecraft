@@ -2888,7 +2888,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una explosión de energía Arcana golpea a todos los enemigos cercanos por {damage} de daño Arcano.',
   'entities.abilities.scorch.name': 'Escaldar',
   'entities.abilities.scorch.description':
-    'Agosta al enemigo por {damage} de daño de Fuego. Lanzamiento rápido.',
+    'Agosta al enemigo por {damage} de daño de Fuego y te acelera un 20% durante 3 s. Lanzamiento rápido, y se puede lanzar en movimiento.',
   'entities.abilities.pyroblast.name': 'Lanza Ígnea',
   'entities.abilities.pyroblast.description':
     'Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
@@ -3269,7 +3269,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
   'entities.abilities.combustion.name': 'Combustión',
   'entities.abilities.combustion.description':
-    'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
+    'Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos garantizados no acumulan Buena Racha. (habilidad distintiva de Fuego)',
   'entities.abilities.icy_veins.name': 'Venas heladas',
   'entities.abilities.icy_veins.description':
     'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',

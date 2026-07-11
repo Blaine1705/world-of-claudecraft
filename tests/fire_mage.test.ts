@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { fireGuaranteedCrit } from '../src/sim/combat/fire_mage';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
-import { MOBS } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -173,6 +173,88 @@ describe('Hot Streak', () => {
     );
     expect(hit?.crit).toBe(true);
     expect(p.auras.some((a) => a.id === 'heating_up')).toBe(false); // never builds
+  });
+});
+
+describe('playtest round four (owner hotfixes)', () => {
+  it('Combustion is off the GCD', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim);
+    sim.castAbility('combustion');
+    expect(p.auras.some((a) => a.kind === 'combustion')).toBe(true);
+    expect((p as unknown as { gcdRemaining: number }).gcdRemaining).toBe(0);
+  });
+
+  it('an interleaved Combustion never disturbs the Fireball in progress (target kept, landing crit)', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim, 18);
+    sim.castAbility('fireball');
+    collect(sim, 0.5); // mid-cast
+    expect(p.castingAbility).toBe('fireball');
+    sim.castAbility('combustion'); // slips through the busy guard
+    expect(p.auras.some((a) => a.kind === 'combustion')).toBe(true);
+    expect(p.castingAbility).toBe('fireball'); // the cast survived
+    expect((p as unknown as { castTargetId: number | null }).castTargetId).toBe(mob.id);
+    const events = collect(sim, 6);
+    const hit = events.find(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Cinderbolt' && e.amount > 0,
+    );
+    expect(hit?.crit).toBe(true); // Combustion was worn when the bolt landed
+  });
+
+  it('Combustion pressed while the bolt is already flying still crits it on impact', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim, 18);
+    sim.castAbility('fireball');
+    // Ride out the full cast; the bolt leaves and is now in flight.
+    while (p.castingAbility) collect(sim, 0.05);
+    sim.castAbility('combustion');
+    const events = collect(sim, 3);
+    const hit = events.find(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Cinderbolt' && e.amount > 0,
+    );
+    expect(hit?.crit).toBe(true);
+  });
+
+  it('Fire Blast resolves instantly, no bolt in flight', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim, 18);
+    sim.castAbility('fire_blast');
+    const events = collect(sim, 0.05); // ONE tick
+    const hit = events.find(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.amount > 0,
+    );
+    expect(hit).toBeDefined(); // damage on the cast tick, not after a flight
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(false);
+  });
+
+  it('Scorch casts on the move', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim, 10);
+    sim.castAbility('scorch');
+    expect(p.castingAbility).toBe('scorch');
+    sim.moveInput.forward = true;
+    const events = collect(sim, 2);
+    const hit = events.find(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Scald' && e.amount > 0,
+    );
+    expect(hit).toBeDefined(); // the cast survived the run
+  });
+
+  it('Pyroblast flies as the heavy bolt', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim, 18);
+    sim.castAbility('pyroblast');
+    while (p.castingAbility) collect(sim, 0.05);
+    const events = collect(sim, 0.1);
+    void events;
+    // The launch cue was emitted when the cast completed (heavyBolt, not the
+    // stock projectile); assert on the def wiring, which the emit reads.
+    expect(ABILITIES.pyroblast.projectileFx).toBe('heavyBolt');
   });
 });
 

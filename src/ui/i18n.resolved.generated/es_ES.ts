@@ -5828,7 +5828,7 @@ export const es_ES: EnTranslations = {
       },
       "scorch": {
         "name": "Escaldar",
-        "description": "Agosta al enemigo por {damage} de daño de Fuego. Lanzamiento rápido."
+        "description": "Agosta al enemigo por {damage} de daño de Fuego y te acelera un 20% durante 3 s. Lanzamiento rápido, y se puede lanzar en movimiento."
       },
       "pyroblast": {
         "name": "Lanza Ígnea",
@@ -6324,7 +6324,7 @@ export const es_ES: EnTranslations = {
       },
       "combustion": {
         "name": "Combustión",
-        "description": "Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)"
+        "description": "Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos garantizados no acumulan Buena Racha. (habilidad distintiva de Fuego)"
       },
       "icy_veins": {
         "name": "Venas heladas",
