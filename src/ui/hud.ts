@@ -996,6 +996,10 @@ export class Hud {
   // Bind the tab-strip wheel-to-horizontal-scroll listener exactly once (renderChatTabs
   // rebuilds the strip's children but the bar element itself persists).
   private chatTabsWheelBound = false;
+  // Bind the category-strip wheel-to-horizontal-scroll listener exactly once,
+  // mirroring chatTabsWheelBound above (renderChatCategoryStrip rebuilds the
+  // strip's children but the strip element itself persists).
+  private chatCategoryStripWheelBound = false;
   // The control that opened the shared #ctx-menu (the chat "+" button), so the
   // outside-click closer can defer to that opener's own toggle click. Cleared on
   // every close path (closeContextMenu + item activation).
@@ -2392,6 +2396,18 @@ export class Hud {
   private renderChatCategoryStrip(): void {
     const strip = document.getElementById('chat-category-strip');
     if (!strip) return;
+    if (!this.chatCategoryStripWheelBound) {
+      this.chatCategoryStripWheelBound = true;
+      strip.addEventListener(
+        'wheel',
+        (ev) => {
+          if (ev.deltaY === 0 || strip.scrollWidth <= strip.clientWidth) return;
+          ev.preventDefault();
+          strip.scrollLeft += ev.deltaY;
+        },
+        { passive: false },
+      );
+    }
     strip.innerHTML = '';
     for (const cat of CHAT_CATEGORIES) {
       const btn = document.createElement('button');
