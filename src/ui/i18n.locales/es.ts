@@ -3269,7 +3269,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
   'entities.abilities.combustion.name': 'Combustión',
   'entities.abilities.combustion.description':
-    'Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos garantizados no acumulan Buena Racha. (habilidad distintiva de Fuego)',
+    'Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos acumulan Buena Racha como cualquier otro. (habilidad distintiva de Fuego)',
   'entities.abilities.icy_veins.name': 'Venas heladas',
   'entities.abilities.icy_veins.description':
     'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',

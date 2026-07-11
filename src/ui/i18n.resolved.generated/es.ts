@@ -6324,7 +6324,7 @@ export const es: EnTranslations = {
       },
       "combustion": {
         "name": "Combustión",
-        "description": "Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos garantizados no acumulan Buena Racha. (habilidad distintiva de Fuego)"
+        "description": "Combustión: durante 10 s tus hechizos de Fuego siempre asestan golpes críticos, incluidos los proyectiles ya en vuelo. No activa el tiempo de reutilización global. Estos críticos acumulan Buena Racha como cualquier otro. (habilidad distintiva de Fuego)"
       },
       "icy_veins": {
         "name": "Venas heladas",

@@ -4803,10 +4803,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner decision 2026-07-11: the NEW Combustion replaces the old +50% crit
     // Flashfire. While worn every Fire spell critically strikes (the crit roll
     // outcome is overridden in combat/fire_mage.ts, the roll still drawn), and
-    // those guaranteed crits never build Hot Streak.
+    // those guaranteed crits BUILD Hot Streak like any other (owner reversal
+    // same day: the Combustion window is meant to chain free Pyroblasts).
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These guaranteed crits do not build Hot Streak. (Fire signature)',
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other. (Fire signature)',
   },
   icy_veins: {
     id: 'icy_veins',

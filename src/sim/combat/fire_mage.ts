@@ -9,9 +9,11 @@
 //    Blast / Scorch) make the next Pyroblast OR Flamestrike free AND instant
 //    (the empower_next machinery, ability-scoped). The counter READS crits
 //    already rolled (fireMageOnSpellHit, wired through noteSpellHit) and never
-//    draws dice. Guaranteed crits never build it: Combustion's crits are
-//    skipped, and the spenders are not builders, so a free Pyroblast can never
-//    loop back into another Hot Streak.
+//    draws dice. Guaranteed crits BUILD it too, Combustion included (owner
+//    reversal 2026-07-11 of the earlier skip: Combustion windows are meant to
+//    chain Hot Streaks, the classic Combustion fantasy). The spenders are not
+//    builders, so a free Pyroblast can never loop back into another Hot
+//    Streak by itself.
 //  - GUARANTEED CRITS (fireGuaranteedCrit, read at the spell-crit roll sites in
 //    effect_dispatch): Fire Blast ALWAYS crits; Scorch always crits against
 //    targets at or below SCORCH_EXECUTE_HP; while Combustion is worn, every
@@ -68,7 +70,7 @@ export function fireGuaranteedCrit(
 
 /** Hot Streak: two consecutive BUILDER crits arm a free, instant Pyroblast or
  *  Flamestrike. Wired through noteSpellHit so it READS every resolved spell
- *  hit; draws no rng. Combustion's guaranteed crits never build. */
+ *  hit; draws no rng. Every crit builds, Combustion's guaranteed ones too. */
 export function fireMageOnSpellHit(
   ctx: SimContext,
   p: Entity,
@@ -77,7 +79,6 @@ export function fireMageOnSpellHit(
 ): void {
   if (!abilityId || !HOT_STREAK_BUILDERS.includes(abilityId)) return;
   if (!fireSpecMods(ctx, p)) return;
-  if (p.auras.some((a) => a.kind === 'combustion')) return;
   const heatingIdx = p.auras.findIndex((a) => a.id === 'heating_up');
   if (!crit) {
     // A non-crit builder breaks the streak.
