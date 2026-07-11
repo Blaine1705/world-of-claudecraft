@@ -80,6 +80,11 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   rowPicks(): RowPicks;
   playerLevel(): number;
   pickRow(rowIndex: number, optionId: string | null): void;
+  /** Server-validated spec commit (IWorld.setSpec), pickRow's sibling: clicking
+   *  a spec card commits it immediately. Before this, the pick only mutated the
+   *  local stage and NEVER reached the world: the spec's kit and mastery never
+   *  arrived unless the player took the save-a-loadout detour. */
+  commitSpec(specId: string | null): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
   // Loadout commit surface (server-authoritative IWorld; the only commit path).
@@ -387,6 +392,9 @@ export class TalentsWindow {
     // (rows are spec-scoped, so none carry over).
     stage.spec = specId;
     stage.rows = {};
+    // Commit the pick to the world (server re-validates level/spec): rows
+    // commit on click via pickRow, and the spec card behaves the same way.
+    this.deps.commitSpec(specId);
     this.render();
   }
 
