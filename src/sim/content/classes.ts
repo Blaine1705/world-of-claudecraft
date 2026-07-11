@@ -1739,9 +1739,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: false,
     targetMode: 'position',
-    effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7 }],
+    // canCrit: the initial blast rolls ONE crit for the whole cast (owner rule:
+    // a Flamestrike is a single Hot Streak crit however many enemies it hits).
+    effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7, canCrit: true }],
     description:
-      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast.',
+      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast. Can critically strike (one strike for the whole blast).',
   },
   // Ground-targeted thematic spells (targetMode 'position'), one per caster/ranged
   // class, all built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
@@ -5888,7 +5890,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: two critical strikes in a row with Fireball, Fire Blast or Scorch make your next Pyroblast or Flamestrike instant and free. Those free casts do not build Hot Streak. (Fire)',
+      'Passive: two critical strikes in a row with your Fire spells (Fireball, Fire Blast, Scorch, Pyroblast or Flamestrike) make your next Pyroblast or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
   },
   summon_water_elemental: {
     id: 'summon_water_elemental',

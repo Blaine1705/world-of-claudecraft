@@ -1286,9 +1286,20 @@ export function runEffects(
         // rolled amount, so it draws no extra rng.
         const capScale =
           eff.softCap && aoeTargets.length > eff.softCap ? eff.softCap / aoeTargets.length : 1;
+        // canCrit (Flamestrike): ONE crit decision for the whole cast, rolled
+        // only when something was struck (a whiff draws nothing and feeds the
+        // streak counter nothing), outcome overridable by Combustion. Every
+        // struck enemy crits together, mirroring the owner rule that a single
+        // Flamestrike is a single crit toward Hot Streak however many it hits.
+        const aoeCrit =
+          (eff.canCrit ?? false) &&
+          aoeTargets.length > 0 &&
+          (ctx.rng.chance(ctx.spellCrit(p)) ||
+            fireGuaranteedCrit(ctx, p, ability.id, ability.school, null));
         for (const m of aoeTargets) {
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
+          if (aoeCrit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -1300,7 +1311,7 @@ export function runEffects(
             p,
             m,
             Math.round(dmg),
-            false,
+            aoeCrit,
             ability.school,
             ability.name,
             'hit',
@@ -1343,6 +1354,11 @@ export function runEffects(
             rageBase * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p);
           p.resource = Math.min(p.maxResource, p.resource + rageGain);
         }
+        // The Hot Streak feed, ONCE per cast (owner rule): a canCrit blast that
+        // struck anything counts as exactly one hit, crit or not, however many
+        // enemies it caught. A whiff feeds nothing (no draw happened either).
+        if ((eff.canCrit ?? false) && aoeTargets.length > 0 && isSpell)
+          noteSpellHit(ctx, p, aoeCrit, ability.id);
         break;
       }
       case 'aoeHeal': {

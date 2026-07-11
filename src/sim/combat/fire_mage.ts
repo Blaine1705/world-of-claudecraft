@@ -11,9 +11,10 @@
 //    already rolled (fireMageOnSpellHit, wired through noteSpellHit) and never
 //    draws dice. Guaranteed crits BUILD it too, Combustion included (owner
 //    reversal 2026-07-11 of the earlier skip: Combustion windows are meant to
-//    chain Hot Streaks, the classic Combustion fantasy). The spenders are not
-//    builders, so a free Pyroblast can never loop back into another Hot
-//    Streak by itself.
+//    chain Hot Streaks, the classic Combustion fantasy). The spenders are
+//    also builders (free casts included): one spender crit is still only ONE
+//    crit, never a whole new streak by itself, and a Flamestrike counts once
+//    per cast however many enemies it strikes.
 //  - GUARANTEED CRITS (fireGuaranteedCrit, read at the spell-crit roll sites in
 //    effect_dispatch): Fire Blast ALWAYS crits; Scorch always crits against
 //    targets at or below SCORCH_EXECUTE_HP; while Combustion is worn, every
@@ -32,7 +33,18 @@ import type { Entity } from '../types';
 export const IGNITE_DURATION = 6;
 export const IGNITE_INTERVAL = 2;
 export const SCORCH_EXECUTE_HP = 0.3; // Scorch always crits at or below this
-export const HOT_STREAK_BUILDERS: readonly string[] = ['fireball', 'fire_blast', 'scorch'];
+// The spenders are ALSO builders (owner rule 2026-07-11, final form): their
+// crits, free casts included, count toward the NEXT streak. A Flamestrike is
+// one crit per CAST however many enemies it strikes (the aoeDamage canCrit
+// path notes exactly once), and only the initial impact counts: ground-zone
+// pulses, DoT ticks and Ignite never reach noteSpellHit.
+export const HOT_STREAK_BUILDERS: readonly string[] = [
+  'fireball',
+  'fire_blast',
+  'scorch',
+  'pyroblast',
+  'flamestrike',
+];
 export const HOT_STREAK_SPENDERS: readonly string[] = ['pyroblast', 'flamestrike'];
 export const HEATING_UP_WINDOW = 10; // seconds the first crit is remembered
 export const HOT_STREAK_DURATION = 12; // seconds to spend the free instant

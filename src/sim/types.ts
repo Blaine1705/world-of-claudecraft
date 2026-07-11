@@ -1648,6 +1648,13 @@ export type AbilityEffect =
       min: number;
       max: number;
       radius: number;
+      // The blast can critically strike: ONE crit decision per CAST (a single
+      // rng draw once at least one target is struck; fireGuaranteedCrit
+      // overrides the outcome), applied to every struck enemy together, and
+      // fed to noteSpellHit exactly once, so an AoE builder (Flamestrike)
+      // counts a whole cast as a single crit toward Hot Streak (owner rule).
+      // Absent: the classic never-crits AoE path, zero extra rng.
+      canCrit?: boolean;
       frontal?: boolean;
       stunSec?: number;
       // Classic AoE soft target cap (Revenge): once more than `softCap` targets

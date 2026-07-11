@@ -4,7 +4,7 @@
 // and the frost mage's Water Elemental. Follows the mage_choice_rows harness.
 
 import { describe, expect, it } from 'vitest';
-import { fireGuaranteedCrit } from '../src/sim/combat/fire_mage';
+import { fireGuaranteedCrit, HOT_STREAK_BUILDERS } from '../src/sim/combat/fire_mage';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -256,6 +256,52 @@ describe('playtest round four (owner hotfixes)', () => {
     // The launch cue was emitted when the cast completed (heavyBolt, not the
     // stock projectile); assert on the def wiring, which the emit reads.
     expect(ABILITIES.pyroblast.projectileFx).toBe('heavyBolt');
+  });
+});
+
+describe('Pyroblast as a builder (owner rule)', () => {
+  it('a free Pyroblast crit re-arms Heating Up; Flamestrike never builds', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim, 18);
+    sim.castAbility('combustion'); // everything crits, off the GCD
+    sim.castAbility('fire_blast'); // crit 1 (instant)
+    collect(sim, 0.3);
+    gcdReset(p);
+    sim.castAbility('fire_blast'); // crit 2: Hot Streak armed
+    collect(sim, 0.3);
+    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(true);
+    gcdReset(p);
+    sim.castAbility('pyroblast'); // free + instant; the bolt flies
+    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // spent
+    const events = collect(sim, 3); // impact crits under Combustion
+    const hit = events.find(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Pyrelance' && e.amount > 0,
+    );
+    expect(hit?.crit).toBe(true);
+    // The free Pyroblast's crit counted: half the phoenix lights again.
+    expect(p.auras.some((a) => a.id === 'heating_up')).toBe(true);
+    expect(HOT_STREAK_BUILDERS).toContain('pyroblast');
+    expect(HOT_STREAK_BUILDERS).toContain('flamestrike');
+  });
+
+  it('one Flamestrike is ONE crit toward the streak, however many enemies it hits', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const a = addDummy(sim, 10);
+    const b = addDummy(sim, 12);
+    sim.castAbility('combustion'); // guarantees the blast crits
+    gcdReset(p);
+    sim.castAbilityAt('flamestrike', { x: a.pos.x, z: (a.pos.z + b.pos.z) / 2 });
+    const events = collect(sim, 0.5);
+    const hits = events.filter(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Flamestrike' && e.amount > 0,
+    );
+    expect(hits.length).toBeGreaterThanOrEqual(2); // both dummies caught
+    for (const h of hits) expect(h.crit).toBe(true); // the cast crits as one
+    // Exactly ONE crit noted: Heating Up armed, the streak NOT completed.
+    expect(p.auras.some((a2) => a2.id === 'heating_up')).toBe(true);
+    expect(p.auras.some((a2) => a2.id === 'hot_streak')).toBe(false);
   });
 });
 
