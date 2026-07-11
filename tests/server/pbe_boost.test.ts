@@ -171,13 +171,22 @@ describe('nonHeroicBisKit', () => {
       expect(canEquipItemInSlot(cls, off, 'offhand', null), `${cls} offhand ${off.id}`).toBe(true);
       expect(kit.offhand).not.toBe(kit.mainhand);
     }
-    // Concrete pins for today's content: the shield classes raise the
-    // Wallshield (including the elemental shaman), the rogue dual-wields a
-    // second real weapon, and cloth casters (no shield, no held offhand
-    // content yet, no dual wield) keep both hands on the staff.
-    expect(nonHeroicBisKit('warrior').offhand).toBe('highwatch_wallshield');
-    expect(nonHeroicBisKit('paladin').offhand).toBe('highwatch_wallshield');
-    expect(nonHeroicBisKit('shaman').offhand).toBe('highwatch_wallshield');
+    // Concrete pins for today's content: the melee str classes raise the raid
+    // 2H greatsword over Thronebane and drop the offhand entirely (classic hand
+    // exclusivity), the hunter takes the agi greatblade, the elemental shaman
+    // pairs the staff with the epic raid shield, cloth casters (and the balance
+    // druid) hold the Wraithfire Orb, and the rogue still dual-wields a second
+    // real weapon.
+    for (const cls of ['warrior', 'warrior_classic', 'paladin'] as const) {
+      expect(nonHeroicBisKit(cls).mainhand, cls).toBe('bonewrought_greatsword');
+      expect(nonHeroicBisKit(cls).offhand, cls).toBeUndefined();
+    }
+    expect(nonHeroicBisKit('hunter').mainhand).toBe('direfang_greatblade');
+    expect(nonHeroicBisKit('hunter').offhand).toBeUndefined();
+    expect(nonHeroicBisKit('shaman').offhand).toBe('bonewrought_bulwark');
+    for (const cls of ['mage', 'priest', 'warlock', 'druid'] as const) {
+      expect(nonHeroicBisKit(cls).offhand, cls).toBe('wraithfire_orb');
+    }
     const rogue = nonHeroicBisKit('rogue');
     expect(ITEMS[rogue.offhand as string]?.kind).toBe('weapon');
   });

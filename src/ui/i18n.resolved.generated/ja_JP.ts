@@ -7577,6 +7577,18 @@ export const ja_JP: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "ゲイルコールの肩当て"
       },
+      "bonewrought_greatsword": {
+        "name": "ボーンロートの大剣"
+      },
+      "direfang_greatblade": {
+        "name": "ダイアファングの大刀"
+      },
+      "bonewrought_bulwark": {
+        "name": "ボーンロートの大盾"
+      },
+      "wraithfire_orb": {
+        "name": "レイスファイアのオーブ"
+      },
       "unknown_alien_weaponry": {
         "name": "未知の異星武装"
       },

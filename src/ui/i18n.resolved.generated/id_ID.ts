@@ -7577,6 +7577,18 @@ export const id_ID: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Pelindung Bahu Galecall"
       },
+      "bonewrought_greatsword": {
+        "name": "Pedang Besar Bonewrought"
+      },
+      "direfang_greatblade": {
+        "name": "Bilah Besar Direfang"
+      },
+      "bonewrought_bulwark": {
+        "name": "Perisai Benteng Bonewrought"
+      },
+      "wraithfire_orb": {
+        "name": "Orb Wraithfire"
+      },
       "unknown_alien_weaponry": {
         "name": "Persenjataan Alien Tak Dikenal"
       },

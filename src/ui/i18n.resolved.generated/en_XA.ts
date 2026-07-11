@@ -7577,6 +7577,18 @@ export const en_XA: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "[Ĝáļéçáļļ Šþáúļðéŕš]"
       },
+      "bonewrought_greatsword": {
+        "name": "[Ɓóñéŵŕóúĝĥţ Ĝŕéáţšŵóŕð]"
+      },
+      "direfang_greatblade": {
+        "name": "[Ðíŕéƒáñĝ Ĝŕéáţƀļáðé]"
+      },
+      "bonewrought_bulwark": {
+        "name": "[Ɓóñéŵŕóúĝĥţ Ɓúļŵáŕķ]"
+      },
+      "wraithfire_orb": {
+        "name": "[Ŵŕáíţĥƒíŕé Óŕƀ]"
+      },
       "unknown_alien_weaponry": {
         "name": "[Úñķñóŵñ Áļíéñ Ŵéáþóñŕý]"
       },

@@ -2869,6 +2869,10 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   yumis_keepsake_locket: r('storm', 'sky', ['gem'], ['sparkle', 'glow']),
   zense_meridian: r('arcane', 'arcanePink', ['moon', 'gem'], ['glow']),
   medallion_of_endless_profit: r('treasure', 'gold', ['coin', 'sunburst'], ['sparkle']),
+  // Nythraxis raid offhand epics (the two 2H weapons ship rendered thumbnails
+  // via ITEM_WEAPON_VARIANTS like every other weapon).
+  bonewrought_bulwark: r('steel', 'bone', ['shield', { p: 'skull', ...TR }], ['glow', 'sparkle']),
+  wraithfire_orb: r('shadow', 'shadowPurple', ['gem'], ['glow', 'sparkle']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),

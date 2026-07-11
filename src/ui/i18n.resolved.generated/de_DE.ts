@@ -7577,6 +7577,18 @@ export const de_DE: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Galecall-Schulterplatten"
       },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought-Großschwert"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang-Großklinge"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought-Bollwerk"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire-Kugel"
+      },
       "unknown_alien_weaponry": {
         "name": "Unbekannte Alien-Waffen"
       },

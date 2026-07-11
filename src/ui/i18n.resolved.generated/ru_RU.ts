@@ -7577,6 +7577,18 @@ export const ru_RU: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Наплечники Зова Бури"
       },
+      "bonewrought_greatsword": {
+        "name": "Костокованый двуручный меч"
+      },
+      "direfang_greatblade": {
+        "name": "Великий клинок Лютого Клыка"
+      },
+      "bonewrought_bulwark": {
+        "name": "Костокованый бастион"
+      },
+      "wraithfire_orb": {
+        "name": "Сфера Призрачного пламени"
+      },
       "unknown_alien_weaponry": {
         "name": "Неизвестное инопланетное вооружение"
       },

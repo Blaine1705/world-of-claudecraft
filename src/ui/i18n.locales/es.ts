@@ -4863,6 +4863,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': '¡{name} se alza sobre las Alturas de Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'entities.items.stormcallers_spaulders_heroic.name': 'Bufas de Galecall',
+  'entities.items.bonewrought_greatsword.name': 'Espadón Bonewrought',
+  'entities.items.direfang_greatblade.name': 'Gran hoja Direfang',
+  'entities.items.bonewrought_bulwark.name': 'Baluarte Bonewrought',
+  'entities.items.wraithfire_orb.name': 'Orbe Wraithfire',
   'hud.chat.context.convertToRaid': 'Convertir en banda',
   'hud.chat.context.convertToParty': 'Convertir en grupo',
   'hudChrome.raidConvert.leaderOnly':

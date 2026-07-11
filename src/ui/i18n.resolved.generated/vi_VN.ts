@@ -7577,6 +7577,18 @@ export const vi_VN: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Giáp Vai Galecall"
       },
+      "bonewrought_greatsword": {
+        "name": "Đại Kiếm Bonewrought"
+      },
+      "direfang_greatblade": {
+        "name": "Đại Đao Direfang"
+      },
+      "bonewrought_bulwark": {
+        "name": "Khiên Lũy Bonewrought"
+      },
+      "wraithfire_orb": {
+        "name": "Quả Cầu Wraithfire"
+      },
       "unknown_alien_weaponry": {
         "name": "Vũ Khí Ngoài Hành Tinh Bí Ẩn"
       },

@@ -63,6 +63,12 @@ export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).
 export const STAT_PER_ILVL = 0.7;
 
+// A two-handed weapon occupies both hands, so it carries BOTH hands' stat
+// budgets: twice the one-hand mainhand line (the classic convention that a 2H
+// matches a mainhand + offhand pair's total stats). Applied by
+// item_level.expectedStatBudget for kind 'weapon' with hand 'twohand'.
+export const TWOHAND_STAT_MULT = 2;
+
 // The source level the "Heroic X" upgraded drop variants read as: one heroic tier
 // above the level-20 dungeons, so epics land at item level 28 (22 + the epic bump
 // of 6) and rares at 25 (22 + 3). content/heroic_variants.ts scales each variant's

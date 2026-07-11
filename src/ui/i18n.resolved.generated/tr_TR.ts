@@ -7577,6 +7577,18 @@ export const tr_TR: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Galecall Omuzlukları"
       },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought Büyük Kılıcı"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang Palası"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought Siperi"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire Küresi"
+      },
       "unknown_alien_weaponry": {
         "name": "Bilinmeyen Uzaylı Silahı"
       },

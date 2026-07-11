@@ -61,12 +61,20 @@ describe('warrior_classic: the pre-overhaul kit as a second class', () => {
     expect(canDualWield('warrior_classic', 'fury')).toBe(false);
     expect(canDualWieldTwoHand('warrior_classic', 'fury')).toBe(false);
     expect(canEquipItem('warrior_classic', ITEMS.highwatch_wallshield)).toBe(false);
+    // The old kit has no offhand at all: the raid epic shield and the caster
+    // held offhand are both out (kind shield/held_offhand equips by the
+    // LITERAL class, never the gearCls alias).
+    expect(canEquipItem('warrior_classic', ITEMS.bonewrought_bulwark)).toBe(false);
+    expect(canEquipItem('warrior_classic', ITEMS.wraithfire_orb)).toBe(false);
   });
 
   it('shares warrior gear proficiency (mail rank, warrior-locked epics)', () => {
     expect(maxArmorTypeForClass('warrior_classic')).toBe('mail');
     expect(canEquipItem('warrior_classic', ITEMS.crownforged_dreadhelm)).toBe(true);
     expect(canEquipItem('warrior_classic', ITEMS.kingsbane_last_oath)).toBe(true);
+    // Weapons resolve via the gearCls alias: the raid 2H greatsword's warrior
+    // proficiency group covers the classic warrior too.
+    expect(canEquipItem('warrior_classic', ITEMS.bonewrought_greatsword)).toBe(true);
   });
 
   it('parries like every melee class in the new engine', () => {

@@ -7687,7 +7687,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 418,
-      "state": "76ca6416",
+      "state": "8e031e64",
       "events": "f964cba6",
       "rng": {
         "draws": 2995,
@@ -8299,11 +8299,11 @@
               },
               {
                 "count": 1,
-                "itemId": "nighttalon_crown"
+                "itemId": "crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "nighttalon_crown"
+                "itemId": "crownforged_dreadhelm"
               }
             ]
           },
@@ -8679,7 +8679,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 418,
-      "state": "faf143ac",
+      "state": "a30cd9aa",
       "events": "741638a5",
       "rng": {
         "draws": 3006,
@@ -8690,7 +8690,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 418,
-      "state": "ffed5df2",
+      "state": "467595e0",
       "events": "741638a5",
       "rng": {
         "draws": 3050,
@@ -8701,7 +8701,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 418,
-      "state": "1417035c",
+      "state": "453c5dfe",
       "events": "741638a5",
       "rng": {
         "draws": 3101,
@@ -8712,7 +8712,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 418,
-      "state": "5e3e3826",
+      "state": "52c9bcb8",
       "events": "741638a5",
       "rng": {
         "draws": 3153,
@@ -8723,7 +8723,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 418,
-      "state": "169d6ddc",
+      "state": "9f1dbb02",
       "events": "741638a5",
       "rng": {
         "draws": 3194,
@@ -8734,7 +8734,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 418,
-      "state": "413e42ca",
+      "state": "8acfc3a8",
       "events": "741638a5",
       "rng": {
         "draws": 3247,
@@ -8745,7 +8745,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 418,
-      "state": "19b3c012",
+      "state": "3787ec6c",
       "events": "4b50c590",
       "rng": {
         "draws": 3276,
@@ -9357,11 +9357,11 @@
               },
               {
                 "count": 1,
-                "itemId": "nighttalon_crown"
+                "itemId": "crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "nighttalon_crown"
+                "itemId": "crownforged_dreadhelm"
               }
             ]
           },

@@ -7577,6 +7577,18 @@ export const cs_CZ: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Nárameníky volání vichru"
       },
+      "bonewrought_greatsword": {
+        "name": "Obouruční meč z kosti"
+      },
+      "direfang_greatblade": {
+        "name": "Velká čepel děsivého tesáku"
+      },
+      "bonewrought_bulwark": {
+        "name": "Hradba z kosti"
+      },
+      "wraithfire_orb": {
+        "name": "Koule přízračného ohně"
+      },
       "unknown_alien_weaponry": {
         "name": "Neznámé mimozemské zbraně"
       },

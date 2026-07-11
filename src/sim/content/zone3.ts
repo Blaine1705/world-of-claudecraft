@@ -2969,6 +2969,78 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 12000,
     requiredClass: ['shaman'],
   },
+  // --- Nythraxis raid (normal): the missing offhand-slot + two-hander epics.
+  // All four register at item level 29 (source 20 + epic 6 + raid 3), the same
+  // tier as the set pieces above. ---
+  bonewrought_greatsword: {
+    id: 'bonewrought_greatsword',
+    name: 'Bonewrought Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    // Two-handers trade the offhand for a slow, heavy swing at the top of the
+    // 10-to-15% DPS premium band over the one-hand line (the Eastbrook/Highwatch
+    // greatsword rule): weaponDpsBudget(29) = 15.4, x1.15 -> 17.65 dps here.
+    weapon: { min: 45, max: 75, speed: 3.4 },
+    // A 2H carries BOTH hands' stat budgets: 2x primaryStatBudget(29, epic,
+    // mainhand) = 2 x 20 = 40 points (TWOHAND_STAT_MULT in item_budget.ts).
+    stats: { str: 22, sta: 18 },
+    sellValue: 12000,
+    // The full warrior weapon-proficiency group (WARRIOR_WEAPON_CLASSES), so
+    // weaponArchetypeForItem matches and the classic warrior equips via gearCls.
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+  },
+  direfang_greatblade: {
+    id: 'direfang_greatblade',
+    name: 'Direfang Greatblade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    // Same 2H rules as the Bonewrought Greatsword: weaponDpsBudget(29) x 1.15
+    // -> 17.67 dps at a faster 3.0 swing, and the doubled 40-point stat budget.
+    weapon: { min: 40, max: 66, speed: 3.0 },
+    stats: { agi: 22, sta: 18 },
+    sellValue: 12000,
+    // A bespoke hunter lock (not a proficiency group): the agi identity is the
+    // hunter's, and handing it to the rogue group would trade away dual wield.
+    requiredClass: ['hunter'],
+  },
+  bonewrought_bulwark: {
+    id: 'bonewrought_bulwark',
+    name: 'Bonewrought Bulwark',
+    kind: 'shield',
+    slot: 'offhand',
+    quality: 'epic',
+    // Shield armor is ~2x a same-tier epic chest (the common-tier rule:
+    // Wallshield 112 vs chain vest 60): the ilvl-29 epic mail chest
+    // extrapolates to ~340 (deathlord_warplate 270 at 26, scaled by the 29-tier
+    // helm ratio 310/245), so 680 here. blockValue extrapolates the common
+    // ladder (buckler 6, Wallshield 14) to the epic tier: 30. Stats are the
+    // exact offhand budget, primaryStatBudget(29, epic, offhand) = 15,
+    // sta-heavy for the tank identity.
+    blockValue: 30,
+    stats: { armor: 680, sta: 10, str: 5 },
+    sellValue: 12000,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  wraithfire_orb: {
+    id: 'wraithfire_orb',
+    name: 'Wraithfire Orb',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'epic',
+    // Held-in-offhand caster stat stick: no weapon damage, stats on the exact
+    // offhand budget, primaryStatBudget(29, epic, offhand) = 15 (the budget
+    // model's 0.75x mainhand line), int/spi identity with minor sta.
+    stats: { int: 7, spi: 5, sta: 3 },
+    sellValue: 12000,
+    // The caster weapon-proficiency group list (CASTER_WEAPON_CLASSES); kind
+    // held_offhand equips by the literal requiredClass, so the old-kit classic
+    // warrior stays excluded.
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+  },
   // --- vendor food & drink (Quartermaster Bree) ---
   trail_hardtack: {
     id: 'trail_hardtack',

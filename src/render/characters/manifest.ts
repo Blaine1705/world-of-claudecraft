@@ -277,6 +277,7 @@ const WEAPONS = 'models/weapons';
 const ITEM_OFFHAND_MODELS: Record<string, string> = {
   eastbrook_buckler: 'shield_round',
   highwatch_wallshield: 'shield_square',
+  bonewrought_bulwark: 'shield_square',
 };
 
 /** GLB url for an equipped held item model, or null if the item has no mapped

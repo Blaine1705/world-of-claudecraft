@@ -7577,6 +7577,18 @@ export const sv_SE: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "Galecall-axelskydd"
       },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought storsvärd"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang-storklinga"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought bålverk"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire-sfär"
+      },
       "unknown_alien_weaponry": {
         "name": "Okänd främmande vapenutrustning"
       },

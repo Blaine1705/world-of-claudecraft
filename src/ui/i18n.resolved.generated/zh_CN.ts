@@ -7577,6 +7577,18 @@ export const zh_CN: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "唤风肩甲"
       },
+      "bonewrought_greatsword": {
+        "name": "骨铸巨剑"
+      },
+      "direfang_greatblade": {
+        "name": "恐牙巨刃"
+      },
+      "bonewrought_bulwark": {
+        "name": "骨铸壁垒"
+      },
+      "wraithfire_orb": {
+        "name": "魂焰宝珠"
+      },
       "unknown_alien_weaponry": {
         "name": "未知异星武器"
       },

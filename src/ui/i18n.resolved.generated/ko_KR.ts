@@ -7577,6 +7577,18 @@ export const ko_KR: EnTranslations = {
       "stormcallers_spaulders_heroic": {
         "name": "강풍부름 어깨갑옷"
       },
+      "bonewrought_greatsword": {
+        "name": "뼈벼림 대검"
+      },
+      "direfang_greatblade": {
+        "name": "흉포송곳니 대도"
+      },
+      "bonewrought_bulwark": {
+        "name": "뼈벼림 방벽"
+      },
+      "wraithfire_orb": {
+        "name": "망령불꽃 보주"
+      },
       "unknown_alien_weaponry": {
         "name": "알 수 없는 외계 무기"
       },
