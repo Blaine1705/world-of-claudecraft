@@ -315,8 +315,24 @@ describe('Nythraxis raid encounter', () => {
 
     expect(ITEMS.crownforged_dreadhelm.requiredClass).toEqual(['warrior', 'paladin']);
     expect(ITEMS.crownforged_warspaulders.requiredClass).toEqual(['warrior', 'paladin']);
-    expect(ITEMS.soulflame_cowl.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
-    expect(ITEMS.soulflame_mantle.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
+    // Caster cloth carries the full six-class caster group (the mail casters,
+    // elemental/resto shaman and holy paladin, wear cloth down-rank).
+    expect(ITEMS.soulflame_cowl.requiredClass).toEqual([
+      'mage',
+      'priest',
+      'warlock',
+      'shaman',
+      'paladin',
+      'druid',
+    ]);
+    expect(ITEMS.soulflame_mantle.requiredClass).toEqual([
+      'mage',
+      'priest',
+      'warlock',
+      'shaman',
+      'paladin',
+      'druid',
+    ]);
     expect(ITEMS.stormcallers_crown.requiredClass).toEqual(['shaman']);
     expect(ITEMS.stormcallers_spaulders.requiredClass).toEqual(['shaman']);
   });

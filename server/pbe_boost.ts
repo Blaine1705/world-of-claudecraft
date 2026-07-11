@@ -2,8 +2,10 @@
 // registered account is pre-populated with one level-20 character per class,
 // each wearing the non-heroic best-in-slot kit for its primary role under a
 // random generated name, with four best-in-slot bags, 10 gold of pocket money,
-// and (for the hybrid classes) the alternate role's kit carried in the bags,
-// so public-beta testers land straight in endgame testing instead of leveling.
+// every alternate role's kit carried in the bags (tank, healer, and off-dps
+// playstyles included), and the Nythraxis attunement quest chain completed,
+// so public-beta testers land straight in endgame raid testing instead of
+// leveling, farming gear, or re-running the attunement.
 //
 // The flag is read live per registration (the PERF_TICK_LOG pattern, not the
 // boot-time config object) so tests and operators can flip it without a
@@ -172,19 +174,55 @@ const HEROIC_VENDOR_IDS: ReadonlySet<string> = new Set(HEROIC_VENDOR_STOCK.map((
 // shaman, druid) can test their other playstyle without farming gear.
 type WeightableStat = 'str' | 'agi' | 'sta' | 'int' | 'spi';
 export interface BoostRole {
-  /** Spec identity this kit gears for (matches the talent spec naming). */
+  /** Spec identity this kit gears for (matches the talent spec naming). Also
+   *  the spec the kit's equip legality is evaluated under: fury's dual wield
+   *  is spec-conditional in canDualWield / canEquipItemInSlot. */
   id: string;
   weights: Partial<Record<WeightableStat, number>>;
   /** Melee roles value weapon dps; caster roles value spell power. */
   melee: boolean;
+  /** Tank kits: armor always counts as an identity stat and shield block
+   *  value scores, so a sta-first kit never discounts the armor it exists
+   *  for (sta is deliberately not in IDENTITY_STATS). */
+  tank?: boolean;
+  /** Hand layout. 'shield' forces the best one-hander plus the best shield
+   *  (the overhauled Shieldcrack requiresShield); 'dualWield' fills both
+   *  hands with the two best spec-legal weapons (fury / Titan's Grip).
+   *  Default: best weapon overall, offhand filled opportunistically. */
+  hands?: 'shield' | 'dualWield';
 }
 
+// One kit per DISTINCT gear identity, not per spec: specs that share a gear
+// profile share a kit (hunter/rogue/mage/warlock specs all wear their class
+// kit; priest shadow/discipline wear the holy kit because the caster cloth
+// pool is undifferentiated, a tripwire in the boost test re-checks that;
+// shaman restoration wears the elemental kit; druid restoration wears the
+// balance kit and feral covers both cat and bear). The classic warrior
+// deliberately has no shields (cw_shield_slam carries no requiresShield), so
+// its arms mail IS its tank gear and it stays single-kit.
 export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
-  warrior: [{ id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true }],
+  warrior: [
+    { id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true },
+    { id: 'fury', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true, hands: 'dualWield' },
+    {
+      id: 'prot',
+      weights: { sta: 1, str: 0.6, agi: 0.3 },
+      melee: true,
+      tank: true,
+      hands: 'shield',
+    },
+  ],
   warrior_classic: [{ id: 'arms', weights: { str: 1, sta: 0.8, agi: 0.4 }, melee: true }],
   paladin: [
     { id: 'retribution', weights: { str: 1, sta: 0.8, int: 0.3, spi: 0.2 }, melee: true },
     { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
+    {
+      id: 'protection',
+      weights: { sta: 1, str: 0.5, int: 0.2 },
+      melee: true,
+      tank: true,
+      hands: 'shield',
+    },
   ],
   hunter: [{ id: 'marksmanship', weights: { agi: 1, sta: 0.6, int: 0.2 }, melee: true }],
   rogue: [{ id: 'combat', weights: { agi: 1, sta: 0.6, str: 0.4 }, melee: true }],
@@ -206,6 +244,8 @@ const MELEE_DPS_WEIGHT = 0.5;
 const CASTER_DPS_WEIGHT = 0.1;
 const SPELL_POWER_WEIGHT = 0.9;
 const RATING_WEIGHT = 0.3;
+// Flat damage a shield's block prevents per blocked hit; only tank roles care.
+const BLOCK_VALUE_WEIGHT = 0.5;
 // Armor on a piece with NONE of the role's identity stats (the weighted
 // str/agi/int/spi, or spell power for casters; sta is universal so it never
 // counts as identity) is heavily discounted: without this a healer role picks
@@ -223,6 +263,8 @@ export function roleItemScore(role: BoostRole, item: ItemDef): number {
     identity += (item.stats?.[stat] ?? 0) * (role.weights[stat] ?? 0);
   }
   if (!role.melee) identity += item.spellPower ?? 0;
+  // Tanks exist for armor: it is their identity stat, never a dead stat.
+  if (role.tank) identity += item.stats?.armor ?? 0;
   score +=
     ((item.stats?.armor ?? 0) / ARMOR_PER_POINT) * (identity > 0 ? 1 : DEAD_STAT_ARMOR_FACTOR);
   if (item.weapon) {
@@ -230,6 +272,7 @@ export function roleItemScore(role: BoostRole, item: ItemDef): number {
     score += dps * (role.melee ? MELEE_DPS_WEIGHT : CASTER_DPS_WEIGHT);
   }
   if (!role.melee) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
+  if (role.tank && item.kind === 'shield') score += (item.blockValue ?? 0) * BLOCK_VALUE_WEIGHT;
   score += ((item.critRating ?? 0) + (item.hasteRating ?? 0)) * RATING_WEIGHT;
   return score;
 }
@@ -286,6 +329,7 @@ export function bisKitForRole(
   const bestBySlot = new Map<string, { id: string; score: number }>();
   const rings: { id: string; score: number }[] = [];
   const weapons: { id: string; score: number; twoHand: boolean }[] = [];
+  const shields: { id: string; score: number }[] = [];
   for (const item of Object.values(ITEMS)) {
     if (!eligibleForBoost(cls, item)) continue;
     const score = roleItemScore(role, item);
@@ -297,6 +341,7 @@ export function bisKitForRole(
       rings.push({ id: item.id, score });
       continue;
     }
+    if (item.kind === 'shield') shields.push({ id: item.id, score });
     // Shields and held offhands declare slot 'offhand' and land in that bucket.
     const slot = item.slot as string;
     const best = bestBySlot.get(slot);
@@ -304,6 +349,7 @@ export function bisKitForRole(
   }
   rings.sort((a, b) => b.score - a.score);
   weapons.sort((a, b) => b.score - a.score);
+  shields.sort((a, b) => b.score - a.score);
   const kit: Partial<Record<EquipSlot, string>> = {};
   for (const slot of KIT_SLOTS) {
     if (slot === 'mainhand' || slot === 'offhand' || slot === 'ring1' || slot === 'ring2') {
@@ -312,6 +358,53 @@ export function bisKitForRole(
     const best = bestBySlot.get(slot);
     if (best) kit[slot] = best.id;
   }
+  fillHands(cls, role, kit, weapons, shields, bestBySlot.get('offhand'));
+  if (rings[0]) kit.ring1 = rings[0].id;
+  if (rings[1]) kit.ring2 = rings[1].id;
+  return kit;
+}
+
+type ScoredItem = { id: string; score: number };
+type ScoredWeapon = ScoredItem & { twoHand: boolean };
+
+/** Resolve the weapon slots by the role's hand layout. Alternate-role kits
+ *  ride in the bags and are equipped AFTER the tester commits the spec, so
+ *  their legality is checked under role.id; the default layout keeps the
+ *  spec-less check because the primary kit is equipped at spawn, before any
+ *  spec exists. Every layout falls back to the default when its pieces do
+ *  not exist, so a content change can never produce a weaponless kit. */
+function fillHands(
+  cls: PlayerClass,
+  role: BoostRole,
+  kit: Partial<Record<EquipSlot, string>>,
+  weapons: readonly ScoredWeapon[],
+  shields: readonly ScoredItem[],
+  held: ScoredItem | undefined,
+): void {
+  if (role.hands === 'shield') {
+    // A tank holds the best one-hander plus the best shield (Shieldcrack
+    // requiresShield; a two-hander would displace the shield on equip).
+    const main = weapons.find((w) => !w.twoHand);
+    const shield = shields[0];
+    if (main && shield) {
+      kit.mainhand = main.id;
+      kit.offhand = shield.id;
+      return;
+    }
+  }
+  if (role.hands === 'dualWield') {
+    // Both hands get the best distinct spec-legal weapons; under Titan's
+    // Grip (fury) canEquipItemInSlot admits two-handers in either hand.
+    const main = weapons.find((w) => canEquipItemInSlot(cls, ITEMS[w.id], 'mainhand', role.id));
+    const off = weapons.find(
+      (w) => w.id !== main?.id && canEquipItemInSlot(cls, ITEMS[w.id], 'offhand', role.id),
+    );
+    if (main && off) {
+      kit.mainhand = main.id;
+      kit.offhand = off.id;
+      return;
+    }
+  }
   const mainhand = weapons[0];
   if (mainhand) kit.mainhand = mainhand.id;
   // A two-handed mainhand occupies both hands (equipping any offhand would
@@ -319,7 +412,6 @@ export function bisKitForRole(
   // best of a shield / held offhand, or, for a dual-wielder (rogue at spawn:
   // no spec is chosen yet), the second-best one-hand weapon.
   if (mainhand && !mainhand.twoHand) {
-    const held = bestBySlot.get('offhand');
     // The second weapon must be offhand-legal (canEquipItemInSlot excludes
     // two-handers and mainhand-only weapons for a spec-less dual-wielder);
     // anything else would displace the mainhand pick on equip.
@@ -329,13 +421,10 @@ export function bisKitForRole(
         )
       : undefined;
     const off = [held, second]
-      .filter((c): c is { id: string; score: number } => c !== undefined)
+      .filter((c): c is ScoredItem => c !== undefined)
       .sort((a, b) => b.score - a.score)[0];
     if (off) kit.offhand = off.id;
   }
-  if (rings[0]) kit.ring1 = rings[0].id;
-  if (rings[1]) kit.ring2 = rings[1].id;
-  return kit;
 }
 
 /** The class's PRIMARY (spawn-equipped) role kit. */
@@ -366,6 +455,17 @@ export function bestBoostBag(): string {
 export const BOOST_BAG_SOCKETS = BAG_SOCKETS;
 /** Pocket money for consumables, repairs, and the auction house: 10 gold. */
 export const BOOST_COPPER = 100_000;
+/** The Nythraxis attunement chain, in prerequisite order. The raid door
+ *  (canEnterNythraxisRaid, src/sim/instances/dungeons.ts) opens on the final
+ *  quest, so boosted characters walk straight into the raid. Completed via
+ *  the real accept/turn-in cores (completeQuestForDev reuses them), so the
+ *  rewards match a genuinely attuned player. */
+export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
+  'q_nythraxis_restless_dead',
+  'q_nythraxis_graves',
+  'q_nythraxis_sealed_crypt',
+  'q_nythraxis_bound_guardian',
+];
 
 export function buildBoostedCharacterState(
   cls: PlayerClass,
@@ -381,6 +481,13 @@ export function buildBoostedCharacterState(
   for (let socket = 0; socket < BOOST_BAG_SOCKETS; socket++) {
     sim.addItem(bagId, 1, pid);
     sim.equipBag(bagId, socket, pid);
+  }
+  // Nythraxis attunement: run the whole chain through the real quest cores
+  // (accept, satisfy objectives, turn in), never by poking questsDone, so XP,
+  // copper, and the signet memento land exactly as a real attunement would.
+  // The chain is in prerequisite order; each completion unlocks the next.
+  for (const questId of NYTHRAXIS_ATTUNEMENT_QUESTS) {
+    sim.completeQuestForDev(questId, pid);
   }
   const [primary, ...altRoles] = CLASS_ROLES[cls];
   const kit = bisKitForRole(cls, primary);
@@ -423,6 +530,11 @@ export function buildBoostedCharacterState(
   const bags = state.bags ?? [];
   if (bags.length !== BOOST_BAG_SOCKETS || bags.some((b) => b !== bagId)) {
     throw new Error(`boost bag equip failed for ${cls}`);
+  }
+  for (const questId of NYTHRAXIS_ATTUNEMENT_QUESTS) {
+    if (!state.questsDone.includes(questId)) {
+      throw new Error(`boost attunement failed for ${cls}: ${questId}`);
+    }
   }
   return state;
 }

@@ -18,19 +18,21 @@ import {
   BOOST_LEVEL,
   type BoostCreateResult,
   type BoostDeps,
+  type BoostRole,
   bestBoostBag,
   bisKitForRole,
   boostAccountCharacters,
   buildBoostedCharacterState,
   CLASS_ROLES,
   classItemScore,
+  NYTHRAXIS_ATTUNEMENT_QUESTS,
   nonHeroicBisKit,
   pbeBoostEnabled,
   randomBoostName,
 } from '../../server/pbe_boost';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
-import { ITEMS } from '../../src/sim/data';
+import { ITEMS, QUESTS } from '../../src/sim/data';
 import { canEquipItem, canEquipItemInSlot } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
@@ -233,19 +235,31 @@ describe('bags, gold, and alternate role kits', () => {
     expect(state.bags).toEqual(Array(BOOST_BAG_SOCKETS).fill(bagId));
   });
 
-  it('grants exactly 10 gold of pocket money (fresh characters start at zero)', () => {
+  it('grants exactly 10 gold of pocket money on top of the attunement quest rewards', () => {
     expect(BOOST_COPPER).toBe(100000);
+    const questCopper = NYTHRAXIS_ATTUNEMENT_QUESTS.reduce(
+      (sum, id) => sum + (QUESTS[id].copperReward ?? 0),
+      0,
+    );
     const state = buildBoostedCharacterState('rogue', 'Pbetestgold', 0);
-    expect(state.copper).toBe(BOOST_COPPER);
+    expect(state.copper).toBe(BOOST_COPPER + questCopper);
   });
 
-  it('exactly the hybrid classes define an alternate role', () => {
+  it('exactly the multi-kit classes define alternate roles, and spawn roles are stable', () => {
     const hybrids = BOOST_CLASSES.filter((c) => CLASS_ROLES[c].length > 1);
-    expect([...hybrids].sort()).toEqual(['druid', 'paladin', 'shaman']);
+    expect([...hybrids].sort()).toEqual(['druid', 'paladin', 'shaman', 'warrior']);
     for (const cls of BOOST_CLASSES) {
       expect(CLASS_ROLES[cls].length, cls).toBeGreaterThanOrEqual(1);
-      expect(CLASS_ROLES[cls].length, cls).toBeLessThanOrEqual(2);
+      expect(CLASS_ROLES[cls].length, cls).toBeLessThanOrEqual(3);
     }
+    // The spawn-equipped identity (roles[0]) never changes silently: charselect
+    // and the side-by-side warrior comparison both lean on these.
+    expect(CLASS_ROLES.warrior[0].id).toBe('arms');
+    expect(CLASS_ROLES.warrior_classic[0].id).toBe('arms');
+    expect(CLASS_ROLES.paladin[0].id).toBe('retribution');
+    expect(CLASS_ROLES.priest[0].id).toBe('holy');
+    expect(CLASS_ROLES.shaman[0].id).toBe('elemental');
+    expect(CLASS_ROLES.druid[0].id).toBe('balance');
   });
 
   it('hybrid classes carry their full alternate-role kit in the bags, without duplicates', () => {
@@ -290,6 +304,134 @@ describe('bags, gold, and alternate role kits', () => {
     const altDef = ITEMS[altMain];
     expect((altDef.stats?.agi ?? 0) + (altDef.stats?.str ?? 0), 'melee stats').toBeGreaterThan(0);
     expect(state.inventory.some((s) => s.itemId === altMain)).toBe(true);
+  });
+});
+
+function roleOf(cls: PlayerClass, id: string): BoostRole {
+  const role = CLASS_ROLES[cls].find((r) => r.id === id);
+  expect(role, `${cls} has a ${id} role`).toBeDefined();
+  return role as BoostRole;
+}
+
+describe('tank, dual-wield, and shadow kits', () => {
+  it('the warrior prot kit tanks with a one-hander and the raid shield', () => {
+    const kit = bisKitForRole('warrior', roleOf('warrior', 'prot'));
+    const main = ITEMS[kit.mainhand as string];
+    expect(main.kind).toBe('weapon');
+    // Shieldcrack (the prot signature) requiresShield, so the kit must leave
+    // the offhand free of a two-hander and actually hold a shield.
+    expect(main.kind === 'weapon' && main.hand === 'twohand', 'prot mainhand is 1H').toBe(false);
+    expect(kit.mainhand).toBe('kingsbane_last_oath');
+    expect(kit.offhand).toBe('bonewrought_bulwark');
+    expect(ITEMS[kit.offhand as string].kind).toBe('shield');
+  });
+
+  it('the paladin protection kit tanks with a one-hander and a shield', () => {
+    const kit = bisKitForRole('paladin', roleOf('paladin', 'protection'));
+    const main = ITEMS[kit.mainhand as string];
+    expect(main.kind).toBe('weapon');
+    expect(main.kind === 'weapon' && main.hand === 'twohand', 'protection MH is 1H').toBe(false);
+    expect(kit.mainhand).toBe('kingsbane_last_oath');
+    expect(kit.offhand).toBe('bonewrought_bulwark');
+    expect(ITEMS[kit.offhand as string].kind).toBe('shield');
+  });
+
+  it('the warrior fury kit fills both hands with distinct spec-legal weapons', () => {
+    const kit = bisKitForRole('warrior', roleOf('warrior', 'fury'));
+    expect(ITEMS[kit.mainhand as string].kind).toBe('weapon');
+    expect(ITEMS[kit.offhand as string].kind).toBe('weapon');
+    expect(kit.mainhand).not.toBe(kit.offhand);
+    // Titan's Grip: the 2H greatsword pairs with the one-hand legendary; the
+    // offhand pick must be legal under the fury spec specifically.
+    expect(canEquipItemInSlot('warrior', ITEMS[kit.offhand as string], 'offhand', 'fury')).toBe(
+      true,
+    );
+    expect(kit.mainhand).toBe('bonewrought_greatsword');
+    expect(kit.offhand).toBe('kingsbane_last_oath');
+  });
+
+  it('the holy kit IS the shadow kit: the cloth pool stays undifferentiated (tripwire)', () => {
+    // Priest deliberately defines a single kit. This pins the reason: a
+    // shadow-weighted pass over the same pool (int-first, sta over spi) picks
+    // the identical kit, so a second bagged kit would add zero pieces. If
+    // this ever fails, shadow cloth has diverged from healer cloth: add a
+    // real shadow role to CLASS_ROLES.
+    const shadowStyle: BoostRole = {
+      id: 'shadow',
+      weights: { int: 1, sta: 0.6, spi: 0.1 },
+      melee: false,
+    };
+    const holy = bisKitForRole('priest', roleOf('priest', 'holy'));
+    const shadow = bisKitForRole('priest', shadowStyle);
+    expect(shadow).toEqual(holy);
+    for (const [slot, itemId] of Object.entries(holy) as [EquipSlot, string][]) {
+      expect(ITEMS[itemId].stats?.int ?? 0, `priest ${slot} carries int`).toBeGreaterThan(0);
+    }
+  });
+
+  it('boosted warriors and paladins carry the tank and fury pieces in their bags', () => {
+    const war = buildBoostedCharacterState('warrior', 'Pbetesttank', 0);
+    const warCarried = new Set(war.inventory.map((s) => s.itemId));
+    expect(warCarried.has('bonewrought_bulwark'), 'warrior carries the shield').toBe(true);
+    expect(warCarried.has('kingsbane_last_oath'), 'warrior carries the 1H').toBe(true);
+    const pala = buildBoostedCharacterState('paladin', 'Pbetestpala', 0);
+    const palaCarried = new Set(pala.inventory.map((s) => s.itemId));
+    expect(palaCarried.has('bonewrought_bulwark'), 'paladin carries the shield').toBe(true);
+  });
+});
+
+describe('caster cloth for the mail casters', () => {
+  it('the caster cloth pool declares the full six-class caster group', () => {
+    // canEquipItem gates cloth armor by armor RANK only, so the mail casters
+    // could always physically wear it; requiredClass on armor is the intent
+    // the loot and boost eligibility layers honor. The widening is the change
+    // under test: pin the literal six-class list on a piece of each line.
+    const casterGroup = ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'];
+    expect(ITEMS.necromancers_starshroud.requiredClass).toEqual(casterGroup);
+    expect(ITEMS.necromancers_legwraps.requiredClass).toEqual(casterGroup);
+    expect(ITEMS.necromancers_soulsteps.requiredClass).toEqual(casterGroup);
+    expect(ITEMS.soulflame_cowl.requiredClass).toEqual(casterGroup);
+    expect(ITEMS.soulflame_cord.requiredClass).toEqual(casterGroup);
+  });
+
+  it('the holy paladin and elemental shaman kits pick the widened cloth body pieces', () => {
+    const holy = bisKitForRole('paladin', roleOf('paladin', 'holy'));
+    const ele = bisKitForRole('shaman', CLASS_ROLES.shaman[0]);
+    // Concrete ids, per slot: reverting any single body-slot widening (e.g.
+    // just the legwraps) must fail its dimension, so int>0 is not enough
+    // (a reverted legs slot falls back to a low int piece and would pass).
+    for (const kit of [holy, ele]) {
+      expect(kit.chest).toBe('necromancers_starshroud');
+      expect(kit.legs).toBe('necromancers_legwraps');
+      expect(kit.feet).toBe('necromancers_soulsteps');
+    }
+  });
+});
+
+describe('Nythraxis attunement', () => {
+  it('every boosted character has completed the whole attunement chain', () => {
+    expect(NYTHRAXIS_ATTUNEMENT_QUESTS).toEqual([
+      'q_nythraxis_restless_dead',
+      'q_nythraxis_graves',
+      'q_nythraxis_sealed_crypt',
+      'q_nythraxis_bound_guardian',
+    ]);
+    for (const cls of BOOST_CLASSES) {
+      const state = buildBoostedCharacterState(cls, 'Pbetestattn', 0);
+      for (const questId of NYTHRAXIS_ATTUNEMENT_QUESTS) {
+        expect(state.questsDone, `${cls} ${questId}`).toContain(questId);
+      }
+    }
+  });
+
+  it('attunement survives the server login round-trip (the raid door reads questsDone)', () => {
+    const state = buildBoostedCharacterState('warlock', 'Pbetestdoor', 0);
+    const revived = JSON.parse(JSON.stringify(state)) as CharacterState;
+    const sim = new Sim({ seed: 7, playerClass: 'warlock', playerName: 'unused', noPlayer: true });
+    const pid = sim.addPlayer('warlock', 'Pbetestdoor', { state: revived });
+    // canEnterNythraxisRaid (src/sim/instances/dungeons.ts) gates on exactly
+    // this quest id in the loaded meta.
+    expect(sim.meta(pid)?.questsDone.has('q_nythraxis_bound_guardian')).toBe(true);
   });
 });
 

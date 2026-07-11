@@ -2190,6 +2190,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 800,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },
+  // Caster cloth carries the same six-class list as the caster weapon group:
+  // the mail casters (elemental/restoration shaman, holy paladin) wear cloth
+  // down-rank, classic-style, because no int mail exists for most body slots.
   revenant_silk_robe: {
     id: 'revenant_silk_robe',
     name: 'Revenant Silk Robe',
@@ -2199,7 +2202,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 60, int: 5, spi: 3 },
     sellValue: 800,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   nightwalk_jerkin: {
     id: 'nightwalk_jerkin',
@@ -2471,7 +2474,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 75, int: 9, spi: 4 },
     sellValue: 3000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmscale_jerkin: {
     id: 'wyrmscale_jerkin',
@@ -2515,7 +2518,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 68, int: 5, spi: 3 },
     sellValue: 3200,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   deathlord_warplate: {
     id: 'deathlord_warplate',
@@ -2539,7 +2542,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 92, int: 11, spi: 7 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmshadow_harness: {
     id: 'wyrmshadow_harness',
@@ -2587,7 +2590,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 80, int: 8, spi: 4 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   necromancers_legwraps: {
     id: 'necromancers_legwraps',
@@ -2599,7 +2602,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 86, int: 13, spi: 7 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmshadow_treads: {
     id: 'wyrmshadow_treads',
@@ -2685,7 +2688,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 70, int: 9, spi: 5 },
     sellValue: 9000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   wyrmshadow_talongrips: {
     id: 'wyrmshadow_talongrips',
@@ -2735,7 +2738,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 60, int: 8, sta: 5 },
     sellValue: 3600,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     set: 'soulflame', // 3rd Wraithfire piece, unlocks the set's 3-piece bonus
   },
   stormcallers_handguards: {
@@ -2785,7 +2788,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 50, int: 8, spi: 5 },
     sellValue: 3600,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
     set: 'soulflame',
   },
   stormcallers_waistguard: {
@@ -2931,7 +2934,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 105, int: 11, sta: 6 },
     sellValue: 12000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   soulflame_mantle: {
     id: 'soulflame_mantle',
@@ -2943,7 +2946,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 92, int: 9, sta: 6 },
     sellValue: 12000,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   stormcallers_crown: {
     id: 'stormcallers_crown',
