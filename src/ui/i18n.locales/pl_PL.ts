@@ -6933,4 +6933,174 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'Hasła nie są zgodne.',
   'hudChrome.auth.resetErrInvalid':
     'Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy.',
+  'classDetails.lore.warriorClassic':
+    'Wojownik dokładnie taki, jakim grało się przed przebudową walki: pierwotny zestaw umiejętności i dawne tempo wściekłości, zachowane obok nowego wojownika, byś mógł wypróbować obie wersje i dać nam znać, którą gra się lepiej.',
+  'entities.abilities.battle_stance.name': 'Postawa bojowa',
+  'entities.abilities.battle_stance.description':
+    'Agresywna postawa bojowa: generujesz o 10% więcej wściekłości. Domyślna postawa specjalizacji Broń i Ochrona.',
+  'entities.abilities.berserker_stance.name': 'Postawa berserkera',
+  'entities.abilities.berserker_stance.description':
+    'Brawurowa postawa bojowa: twoje trafienia krytyczne zdarzają się o 3% częściej i zadają o 3% większe obrażenia. Wojownik specjalizacji Furia zawsze walczy w tej postawie.',
+  'entities.abilities.breachmaker.name': 'Wyłom',
+  'entities.abilities.breachmaker.description':
+    'Młóci cel za obrażenia broni plus {damage} i kruszy jego gardę: twoje ataki przeciwko niemu zadają o 20% większe obrażenia przez 8 sek. (specjalizacja Broń)',
+  'entities.abilities.chain_heal.description':
+    'Leczy cel za {damage}, a następnie przeskakuje na maksymalnie 2 pobliskich sojuszników, przy czym każdy przeskok leczy o połowę mniej niż poprzedni.',
+  'entities.abilities.cleaving_blows.name': 'Rozcinające ciosy',
+  'entities.abilities.cleaving_blows.description':
+    'Krwawe żniwo zawsze zwraca ładunek Bliźniaczego ciosu. (specjalizacja Furia)',
+  'entities.abilities.deep_wounds.name': 'Ziejące rany',
+  'entities.abilities.deep_wounds.description':
+    'Pasywne: twoje Okaleczające uderzenie pozostawia na celu krwawienie zadające obrażenia fizyczne przez 6 sek. (specjalizacja Broń)',
+  'entities.abilities.defiant_bellow.name': 'Wyzywający ryk',
+  'entities.abilities.defiant_bellow.description':
+    'Wyzywający ryk: każdy wróg w promieniu 10 jardów zostaje sprowokowany i zmuszony do atakowania ciebie przez 3 sek. (specjalizacja Ochrona)',
+  'entities.abilities.diabolical_twinstrike.name': 'Diabelski bliźniaczy cios',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Gdy jesteś w Szale, twój Bliźniaczy cios zadaje o 15% większe obrażenia. (specjalizacja Furia)',
+  'entities.abilities.die_by_sword.name': 'Śmierć od miecza',
+  'entities.abilities.die_by_sword.description':
+    'Umiejętność obronna: przez 8 sek. otrzymujesz o 30% mniejsze obrażenia i unikasz znacznie większej liczby ataków.',
+  'entities.abilities.emboldening_roar.name': 'Ośmielający ryk',
+  'entities.abilities.emboldening_roar.description':
+    'Wydajesz ośmielający ryk: ty i przyjaźni gracze w promieniu 40 jardów zostajecie Ośmieleni, a twoje następne 3 umiejętności są gwarantowanymi trafieniami krytycznymi. (specjalizacja Furia)',
+  'entities.abilities.enrage_passive.name': 'Rzeź',
+  'entities.abilities.enrage_passive.description':
+    'Pasywne: gdy jesteś w Szale, przez 4 sek. zadajesz o 7% większe obrażenia, atakujesz o 25% szybciej i poruszasz się o 10% szybciej. Upust krwi ma 30% szansy na wprawienie cię w Szał; Krwawe żniwo robi to zawsze. (specjalizacja Furia)',
+  'entities.abilities.faultline.name': 'Uskok',
+  'entities.abilities.faultline.description':
+    'Posyłasz falę uderzeniową przez ziemię: wrogowie przed tobą w promieniu 8 jardów otrzymują {damage} obrażeń i zostają ogłuszeni na 3 sek. (specjalizacja Ochrona)',
+  'entities.abilities.fel_domination.name': 'Plugawa dominacja',
+  'entities.abilities.fel_domination.description':
+    'Ujarzmia plugawe energie, sprawiając, że twoje następne zaklęcie jest natychmiastowe. (specjalizacja Demonologia)',
+  'entities.abilities.furious_mending.name': 'Wściekłe gojenie',
+  'entities.abilities.furious_mending.description':
+    'Przez 10 sek. otrzymujesz o 20% mniejsze obrażenia, a póki efekt trwa, twój Upust krwi leczy cię o 20% maksymalnego zdrowia. (specjalizacja Furia)',
+  'entities.abilities.intimidating_shout.name': 'Zastraszający okrzyk',
+  'entities.abilities.intimidating_shout.description':
+    'Przerażający okrzyk, który zmusza maksymalnie 5 wrogów w promieniu 8 jardów do panicznej ucieczki na 8 sek. Obrażenia mogą przerwać efekt.',
+  'entities.abilities.iron_resolve.name': 'Żelazny hart',
+  'entities.abilities.iron_resolve.description':
+    'Zaciskasz zęby i ignorujesz ból: zużywa całą twoją wściekłość (co najmniej 20), aby pochłaniać 4 punkty obrażeń za każdy wydany punkt wściekłości, przez maksymalnie 10 sek. (specjalizacja Ochrona)',
+  'entities.abilities.measured_fury.name': 'Wyważona furia',
+  'entities.abilities.measured_fury.description':
+    'Wyważona furia uczy cię oszczędności: twoje umiejętności kosztują o 10% mniej wściekłości. (specjalizacja Broń)',
+  'entities.abilities.natures_swiftness.name': 'Szybkość natury',
+  'entities.abilities.natures_swiftness.description':
+    'Wzywa naturę, aby twoje następne zaklęcie było natychmiastowe. (specjalizacja Odnowienie)',
+  'entities.abilities.piercing_howl.name': 'Przeszywające wycie',
+  'entities.abilities.piercing_howl.description':
+    'Przeszywający okrzyk, który spowalnia wszystkich wrogów w promieniu 15 jardów o 50% na 8 sek.',
+  'entities.abilities.raging_gale.name': 'Bliźniaczy cios',
+  'entities.abilities.raging_gale.description':
+    'Natychmiast uderzasz bronią dwukrotnie, każde trafienie zadaje 40% obrażeń broni plus {damage}, a ty generujesz {rage} wściekłości. Gromadzi maksymalnie 2 ładunki. (specjalizacja Furia)',
+  'entities.abilities.raised_guard.name': 'Podniesiona garda',
+  'entities.abilities.raised_guard.description':
+    'Zapierasz się za tarczą: otrzymujesz o 50% mniejsze obrażenia fizyczne przez 6 sek. Gromadzi maksymalnie 2 ładunki. (specjalizacja Ochrona)',
+  'entities.abilities.recklessness.name': 'Brawura',
+  'entities.abilities.recklessness.description':
+    'Szał: twoje generowanie wściekłości zwiększa się o 50%, a szansa na trafienie krytyczne o 20% na 12 sek.',
+  'entities.abilities.red_harvest.name': 'Krwawe żniwo',
+  'entities.abilities.red_harvest.description':
+    'Stawiasz wszystko: w amoku uderzasz trzykrotnie, każdy cios zadaje 65% obrażeń broni plus {damage}, a ty zawsze wpadasz w Szał. (specjalizacja Furia)',
+  'entities.abilities.repentance.name': 'Pokuta',
+  'entities.abilities.repentance.description':
+    'Wprowadza wroga w stan medytacji na maksymalnie 6 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Odpłata)',
+  'entities.abilities.revenge.name': 'Odwet',
+  'entities.abilities.revenge.description':
+    'Atakujesz szerokim łukiem, zadając obrażenia fizyczne wszystkim wrogom przed tobą. Powyżej 5 celów obrażenia są zmniejszone. Gdy unikniesz ciosu lub go sparujesz, twój następny Odwet może nie kosztować wściekłości.',
+  'entities.abilities.sanguine_aura.name': 'Aura krwi',
+  'entities.abilities.sanguine_aura.description':
+    'Nasycasz swój oręż krwią wrogów: ty i twoi sojusznicy walczący wręcz zyskujecie 10% szybkości ataku i 10% obrażeń na 20 sek.',
+  'entities.abilities.seasoned_soldier.name': 'Zaprawiony żołnierz',
+  'entities.abilities.seasoned_soldier.description':
+    'Twoje krytyczne ataki automatyczne generują o 10% więcej wściekłości. (specjalizacja Broń)',
+  'entities.abilities.shamanistic_rage.name': 'Szamański gniew',
+  'entities.abilities.shamanistic_rage.description':
+    'Uwalnia szamański gniew, przywracając 160 many. (specjalizacja Wzmocnienie żywiołów)',
+  'entities.abilities.storm_bolt.name': 'Burzowy pocisk',
+  'entities.abilities.storm_bolt.description':
+    'Ciskasz bronią w cel, zadając {damage} obrażeń i ogłuszając go na 3 sek.',
+  'entities.abilities.sudden_death.name': 'Nagła śmierć',
+  'entities.abilities.sudden_death.description':
+    'Twoje ataki automatyczne mają szansę pozwolić ci użyć Przedwczesnego grobu na celu o dowolnym poziomie zdrowia, bez kosztu wściekłości. (specjalizacja Broń)',
+  'entities.abilities.sweeping_strikes.name': 'Poszerzony łuk',
+  'entities.abilities.sweeping_strikes.description':
+    'Przez 12 sek. twoje ataki na pojedynczy cel trafiają dodatkowo 1 pobliskiego wroga za pełne obrażenia. (specjalizacja Broń)',
+  'entities.abilities.victory_rush.name': 'Zryw zwycięstwa',
+  'entities.abilities.victory_rush.description':
+    'Uderzasz za obrażenia broni plus {damage} i leczysz się o 20% maksymalnego zdrowia. Można użyć tylko w ciągu 20 sek. od zabicia wroga.',
+  'entities.items.eastbrook_buckler.name': 'Puklerz ze Wschodniego Strumienia',
+  'entities.items.eastbrook_greatsword.name': 'Wielki miecz ze Wschodniego Strumienia',
+  'entities.items.highwatch_greatsword.name': 'Wielki miecz z Wysokiej Strażnicy',
+  'entities.items.highwatch_wallshield.name': 'Pawęż z Wysokiej Strażnicy',
+  'guide.abilityHook.cw_battle_shout':
+    'Mobilizujący okrzyk, który zwiększa siłę ataku całej drużyny.',
+  'guide.abilityHook.cw_charge':
+    'Szarżujesz na odległego wroga, otwierając walkę krótkim ogłuszeniem.',
+  'guide.abilityHook.cw_commanding_shout':
+    'Wzmacnia wytrzymałość, by każdy dłużej wytrzymał w walce.',
+  'guide.abilityHook.cw_heroic_strike':
+    'Kolejkuje cięższy zamach, który zużywa wściekłość przy następnym ciosie.',
+  'guide.abilityHook.cw_rend': 'Otwiera krwawienie, które z czasem wyczerpuje cel.',
+  'guide.abilityHook.cw_thunder_clap':
+    'Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.',
+  'guide.abilityHook.hamstring': 'Tnie nogi celu, spowalniając go, by nie mógł cię dogonić.',
+  'guide.abilityHook.revenge':
+    'Zamaszysty kontratak, który trafia wszystko przed tobą, a tuż po odbiciu ciosu kosztuje mniej.',
+  'hud.combat.floatingParry': 'Parowanie',
+  'hud.combat.parried': 'Twój {ability} zostaje sparowany przez {target}.',
+  'hud.errors.needShield': 'Musisz mieć założoną tarczę.',
+  'hud.errors.nothingToConsume': 'Nie ma nic do zużycia.',
+  'hudChrome.auraEffect.avatar': 'Kolos: zadawane obrażenia zwiększone o {pct}%',
+  'hudChrome.auraEffect.battleStance': 'Postawa bojowa: generowanie wściekłości zwiększone o 10%',
+  'hudChrome.auraEffect.battleTrance':
+    'Następny Cios łupieżcy lub Okaleczające uderzenie nie kosztuje wściekłości',
+  'hudChrome.auraEffect.berserkerStance':
+    'Postawa berserkera: trafienia krytyczne o 3% częstsze i o 3% silniejsze',
+  'hudChrome.auraEffect.bloodbath':
+    'Zwiększa szansę na trafienie krytyczne i zadawane obrażenia o {pct}%',
+  'hudChrome.auraEffect.crit': 'Zwiększa szansę na trafienie krytyczne o {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Zmniejsza otrzymywane obrażenia o {pct}% ({lowPct}% poniżej {hpPct}% zdrowia)',
+  'hudChrome.auraEffect.dmgDone': 'Zwiększa zadawane obrażenia o {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Zmniejsza zadawane obrażenia o {pct}%',
+  'hudChrome.auraEffect.maxHpPct': 'Zwiększa maksymalne zdrowie o {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Zwiększa generowanie wściekłości o {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Zwiększa szansę na trafienie krytyczne o {pct}%, a generowanie wściekłości o {ragePct}%',
+  'hudChrome.auraEffect.revengeFree': 'Twój następny Odwet nie kosztuje wściekłości',
+  'hudChrome.auraEffect.sanguine':
+    'Zwiększa szybkość ataku o {hastePct}%, a zadawane obrażenia o {dmgPct}%',
+  'hudChrome.auraEffect.victoryRush': 'Zryw zwycięstwa jest gotowy',
+  'hudChrome.auth.appleChoiceExpired':
+    'To logowanie przez Apple wygasło. Zaloguj się przez Apple jeszcze raz.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Utwórz nowe konto lub połącz Apple z kontem, które już masz.',
+  'hudChrome.auth.appleError': 'Nie udało się zalogować przez Apple. Spróbuj ponownie.',
+  'hudChrome.auth.appleLoginCta': 'Kontynuuj z Apple',
+  'hudChrome.options.mouseoverCast': 'Rzucanie po najechaniu na ramki drużyny',
+  'hudChrome.options.showTargetOfTarget': 'Pokaż cel celu',
+  'hudChrome.paperdoll.offhand': 'Druga ręka',
+  'hudChrome.specPanel.complexity': 'Złożoność',
+  'hudChrome.specPanel.complexityHigh': 'Wysoka',
+  'hudChrome.specPanel.complexityLow': 'Niska',
+  'hudChrome.specPanel.complexityMedium': 'Średnia',
+  'hudChrome.specPanel.exampleAbilities': 'Przykładowe umiejętności',
+  'hudChrome.specPanel.primaryAttr': 'Główny atrybut',
+  'hudChrome.specPanel.selectSpec': 'Wybierz specjalizację',
+  'hudChrome.specPanel.specUnlockBanner': 'Odblokowano specjalizację!',
+  'hudChrome.specPanel.specUnlockHint': 'Naciśnij N, aby wybrać specjalizację.',
+  'hudChrome.specPanel.viewTalents': 'Zobacz talenty',
+  'hudChrome.statInfo.desc.haste':
+    'Przyspiesza twoje zamachy bronią i rzucanie zaklęć. Nie skraca globalnego czasu odnowienia.',
+  'hudChrome.statInfo.desc.parry':
+    'Twoja szansa na całkowite sparowanie ataku wręcz z przodu, bez otrzymania obrażeń. Ciosu zadanego od tyłu nie można sparować.',
+  'hudChrome.statInfo.names.haste': 'Pośpiech',
+  'hudChrome.statInfo.names.parry': 'Parowanie',
+  'hudChrome.talentRows.comingSoon': 'Wkrótce',
+  'hudChrome.talentRows.defaultLoadout': 'Domyślny zestaw',
+  'hudChrome.talentRows.tab': 'Wybory',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',
+  'itemUi.slots.twoHand': 'Dwuręczna',
 };

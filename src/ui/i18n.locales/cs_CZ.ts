@@ -6820,4 +6820,169 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'Hesla se neshodují.',
   'hudChrome.auth.resetErrInvalid':
     'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
+  'hud.combat.floatingParry': 'Odraženo',
+  'hud.combat.parried': '{target} odráží tvoji schopnost {ability}.',
+  'hud.errors.needShield': 'Musíš mít nasazený štít.',
+  'hud.errors.nothingToConsume': 'Není co pohltit.',
+  'itemUi.slots.twoHand': 'Obouruční',
+  'classDetails.lore.warriorClassic':
+    'Válečník přesně tak, jak se hrál před přepracováním boje: původní sada schopností i tempo vzteku, zachované vedle nového válečníka, aby sis mohl(a) vyzkoušet oba a říct nám, který ti sedí víc.',
+  'entities.abilities.battle_stance.name': 'Bojový postoj',
+  'entities.abilities.battle_stance.description':
+    'Útočný bojový postoj: vytváříš o 10 % více vzteku. Výchozí postoj pro Arms a Protection.',
+  'entities.abilities.berserker_stance.name': 'Postoj berserka',
+  'entities.abilities.berserker_stance.description':
+    'Lehkomyslný bojový postoj: tvoje kritické zásahy padají o 3 % častěji a udeří o 3 % silněji. Válečník Fury bojuje vždy v tomto postoji.',
+  'entities.abilities.breachmaker.name': 'Prolamovač',
+  'entities.abilities.breachmaker.description':
+    'Ztluče cíl za poškození zbraně plus {damage} a prolomí jeho kryt: tvoje vlastní útoky proti němu způsobují o 20 % více poškození po dobu 8 s. (Arms)',
+  'entities.abilities.chain_heal.description':
+    'Vyléčí cíl za {damage}, poté přeskočí až na 2 blízké spojence a každý skok vyléčí polovinu předchozího množství.',
+  'entities.abilities.cleaving_blows.name': 'Rozpolcující údery',
+  'entities.abilities.cleaving_blows.description':
+    'Rudá žeň vždy vrátí jedno nabití Dvojúderu. (Fury)',
+  'entities.abilities.deep_wounds.name': 'Zející rány',
+  'entities.abilities.deep_wounds.description':
+    'Pasivní: tvůj Mrzačící úder nechá cíl krvácet a působí mu fyzické poškození během 6 s. (Arms)',
+  'entities.abilities.defiant_bellow.name': 'Vzdorný řev',
+  'entities.abilities.defiant_bellow.description':
+    'Vzdorný řev: každý nepřítel do 10 yardů je vyprovokován a nucen na tebe 3 s útočit. (Protection)',
+  'entities.abilities.diabolical_twinstrike.name': 'Ďábelský dvojúder',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Když jsi rozzuřen(a), tvůj Dvojúder způsobuje o 15 % více poškození. (Fury)',
+  'entities.abilities.die_by_sword.name': 'Smrt s mečem v ruce',
+  'entities.abilities.die_by_sword.description':
+    'Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům.',
+  'entities.abilities.emboldening_roar.name': 'Osmělující řev',
+  'entities.abilities.emboldening_roar.description':
+    'Vydáš osmělující řev: ty a spřátelení hráči do 40 yardů jste Osměleni a vaše další 3 schopnosti budou zaručeně kritické zásahy. (Fury)',
+  'entities.abilities.enrage_passive.name': 'Vřava',
+  'entities.abilities.enrage_passive.description':
+    'Pasivní: když jsi rozzuřen(a), způsobuješ o 7 % více poškození, útočíš o 25 % rychleji a pohybuješ se o 10 % rychleji po dobu 4 s. Pouštění žilou má 30% šanci tě rozzuřit; Rudá žeň tě rozzuří vždy. (Fury)',
+  'entities.abilities.faultline.name': 'Zlomová linie',
+  'entities.abilities.faultline.description':
+    'Vyšle zemí tlakovou vlnu: nepřátelé před tebou do 8 yardů utrpí {damage} poškození a jsou na 3 s omráčeni. (Protection)',
+  'entities.abilities.fel_domination.name': 'Běsovská nadvláda',
+  'entities.abilities.fel_domination.description':
+    'Ovládne běsovské energie a tvé příští kouzlo bude okamžité. (Charakteristická schopnost démonologie)',
+  'entities.abilities.furious_mending.name': 'Zuřivé zacelení',
+  'entities.abilities.furious_mending.description':
+    'Po dobu 10 s utrpíš o 20 % méně poškození, a dokud efekt trvá, Pouštění žilou tě léčí za 20 % tvého maximálního zdraví. (Fury)',
+  'entities.abilities.intimidating_shout.name': 'Zastrašující pokřik',
+  'entities.abilities.intimidating_shout.description':
+    'Děsivý pokřik, který až 5 nepřátel do 8 yardů zažene na 8 s na útěk hrůzou. Poškození může efekt přerušit.',
+  'entities.abilities.iron_resolve.name': 'Železné odhodlání',
+  'entities.abilities.iron_resolve.description':
+    'Zatni zuby a ignoruj bolest: spotřebuje všechen tvůj vztek (nejméně 20) a pohltí 4 poškození za každý utracený bod vzteku, trvá až 10 s. (Protection)',
+  'entities.abilities.measured_fury.name': 'Odměřená zuřivost',
+  'entities.abilities.measured_fury.description':
+    'Tvá odměřená zuřivost zostřuje tvé hospodaření: schopnosti tě stojí o 10 % méně vzteku. (Arms)',
+  'entities.abilities.natures_swiftness.name': 'Svižnost přírody',
+  'entities.abilities.natures_swiftness.description':
+    'Povolá přírodu, aby tvé příští kouzlo bylo okamžité. (Charakteristická schopnost obnovy)',
+  'entities.abilities.piercing_howl.name': 'Pronikavé zavytí',
+  'entities.abilities.piercing_howl.description':
+    'Pronikavý pokřik, který na 8 s zpomalí všechny nepřátele do 15 yardů o 50 %.',
+  'entities.abilities.raging_gale.name': 'Dvojúder',
+  'entities.abilities.raging_gale.description':
+    'Okamžitě dvakrát udeříš zbraní, každý zásah způsobí 40 % poškození zbraně plus {damage}, a vygeneruješ {rage} vzteku. Ukládá až 2 nabití. (Fury)',
+  'entities.abilities.raised_guard.name': 'Zvednutý kryt',
+  'entities.abilities.raised_guard.description':
+    'Zapři se za štítem: po dobu 6 s utrpíš o 50 % méně fyzického poškození. Ukládá až 2 nabití. (Protection)',
+  'entities.abilities.recklessness.name': 'Bezhlavost',
+  'entities.abilities.recklessness.description':
+    'Rozzuření: tvoje generování vzteku se zvýší o 50 % a šance na kritický zásah o 20 % na 12 s.',
+  'entities.abilities.red_harvest.name': 'Rudá žeň',
+  'entities.abilities.red_harvest.description':
+    'Vydej ze sebe vše: v šílenství třikrát udeříš, každý úder za 65 % poškození zbraně plus {damage}, a vždy tě to rozzuří. (Fury)',
+  'entities.abilities.repentance.name': 'Pokání',
+  'entities.abilities.repentance.description':
+    'Uvede nepřítele do stavu rozjímání až na 6 s. Jakékoli poškození efekt přeruší. (Charakteristická schopnost odplaty)',
+  'entities.abilities.revenge.name': 'Odveta',
+  'entities.abilities.revenge.description':
+    'Zaútočíš širokým obloukem a způsobíš fyzické poškození všem nepřátelům před tebou. Při více než 5 cílech je poškození sníženo. Když se vyhneš útoku nebo ho odrazíš, tvá příští Odveta nemusí stát žádný vztek.',
+  'entities.abilities.sanguine_aura.name': 'Krvavá aura',
+  'entities.abilities.sanguine_aura.description':
+    'Naplň svou zbraň krví nepřátel: ty a tvoji spojenci na blízko získáte na 20 s o 10 % vyšší rychlost útoku a o 10 % vyšší poškození.',
+  'entities.abilities.seasoned_soldier.name': 'Ostřílený voják',
+  'entities.abilities.seasoned_soldier.description':
+    'Tvoje kritické automatické útoky generují o 10 % více vzteku. (Arms)',
+  'entities.abilities.shamanistic_rage.name': 'Šamanská zuřivost',
+  'entities.abilities.shamanistic_rage.description':
+    'Uvolní šamanskou zuřivost a obnoví 160 many. (Charakteristická schopnost posílení)',
+  'entities.abilities.storm_bolt.name': 'Bouřná střela',
+  'entities.abilities.storm_bolt.description':
+    'Mrštíš zbraní po cíli za {damage} poškození a omráčíš ho na 3 s.',
+  'entities.abilities.sudden_death.name': 'Náhlá smrt',
+  'entities.abilities.sudden_death.description':
+    'Tvoje automatické útoky mají šanci ti dovolit seslat Předčasný hrob na cíl s libovolným zdravím, a to zcela bez ceny vzteku. (Arms)',
+  'entities.abilities.sweeping_strikes.name': 'Široký oblouk',
+  'entities.abilities.sweeping_strikes.description':
+    'Po dobu 12 s tvoje útoky na jeden cíl zasáhnou také 1 blízkého nepřítele za plné poškození. (Arms)',
+  'entities.abilities.victory_rush.name': 'Vítězný nápor',
+  'entities.abilities.victory_rush.description':
+    'Udeříš za poškození zbraně plus {damage} a vyléčíš se za 20 % svého maximálního zdraví. Použitelné jen do 20 s od zabití nepřítele.',
+  'entities.items.eastbrook_buckler.name': 'Eastbrookský pukléř',
+  'entities.items.eastbrook_greatsword.name': 'Eastbrookský obouruční meč',
+  'entities.items.highwatch_greatsword.name': 'Highwatchský obouruční meč',
+  'entities.items.highwatch_wallshield.name': 'Highwatchský hradební štít',
+  'guide.abilityHook.cw_heroic_strike': 'Zařadí těžší švih, který utratí vztek při příštím zásahu.',
+  'guide.abilityHook.cw_battle_shout': 'Povzbuzující pokřik, který zvedne sílu útoku party.',
+  'guide.abilityHook.cw_commanding_shout': 'Posílí výdrž, aby všichni v boji vydrželi déle.',
+  'guide.abilityHook.cw_charge': 'Vyrazí k vzdálenému nepříteli a otevře boj krátkým omráčením.',
+  'guide.abilityHook.cw_rend': 'Otevře krvácení, které cíl postupně opotřebuje.',
+  'guide.abilityHook.cw_thunder_clap': 'Zasáhne vše kolem tebe a zpomalí jejich útoky.',
+  'guide.abilityHook.hamstring': 'Sekne cíl do nohou a zpomalí ho, aby tě nemohl doběhnout.',
+  'guide.abilityHook.revenge':
+    'Rozmáchlý protiútok, který zasáhne vše před tebou a je levnější hned poté, co odvrátíš úder.',
+  'hudChrome.auraEffect.avatar': 'Kolos: způsobené poškození zvýšeno o {pct} %',
+  'hudChrome.auraEffect.battleStance': 'Bojový postoj: o 10 % vyšší generování vzteku',
+  'hudChrome.auraEffect.battleTrance':
+    'Tvůj příští Nájezdnický úder nebo Mrzačící úder nestojí žádný vztek',
+  'hudChrome.auraEffect.berserkerStance':
+    'Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší',
+  'hudChrome.auraEffect.bloodbath':
+    'Zvyšuje šanci na kritický zásah a způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.crit': 'Zvyšuje šanci na kritický zásah o {pct} %',
+  'hudChrome.auraEffect.dieBySword':
+    'Snižuje obdržené poškození o {pct} % (o {lowPct} % pod {hpPct} % zdraví)',
+  'hudChrome.auraEffect.dmgDone': 'Zvyšuje způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Snižuje způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.maxHpPct': 'Zvyšuje maximální zdraví o {pct} %',
+  'hudChrome.auraEffect.rageGen': 'Zvyšuje generování vzteku o {pct} %',
+  'hudChrome.auraEffect.reckless':
+    'Zvyšuje šanci na kritický zásah o {pct} % a generování vzteku o {ragePct} %',
+  'hudChrome.auraEffect.revengeFree': 'Tvá příští Odveta nestojí žádný vztek',
+  'hudChrome.auraEffect.sanguine':
+    'Zvyšuje rychlost útoku o {hastePct} % a způsobené poškození o {dmgPct} %',
+  'hudChrome.auraEffect.victoryRush': 'Vítězný nápor je připraven',
+  'hudChrome.auth.appleChoiceExpired':
+    'Platnost přihlášení přes Apple vypršela. Přihlaste se přes Apple znovu.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Vytvořte si nový účet, nebo propojte Apple s účtem, který už máte.',
+  'hudChrome.auth.appleError': 'Přihlášení přes Apple se nezdařilo. Zkuste to prosím znovu.',
+  'hudChrome.auth.appleLoginCta': 'Pokračovat přes Apple',
+  'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
+  'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
+  'hudChrome.paperdoll.offhand': 'Vedlejší ruka',
+  'hudChrome.specPanel.complexity': 'Složitost',
+  'hudChrome.specPanel.complexityHigh': 'Vysoká',
+  'hudChrome.specPanel.complexityLow': 'Nízká',
+  'hudChrome.specPanel.complexityMedium': 'Střední',
+  'hudChrome.specPanel.exampleAbilities': 'Ukázkové schopnosti',
+  'hudChrome.specPanel.primaryAttr': 'Hlavní vlastnost',
+  'hudChrome.specPanel.selectSpec': 'Vybrat specializaci',
+  'hudChrome.specPanel.specUnlockBanner': 'Specializace odemčena!',
+  'hudChrome.specPanel.specUnlockHint': 'Stiskni N a vyber si svou specializaci.',
+  'hudChrome.specPanel.viewTalents': 'Zobrazit talenty',
+  'hudChrome.statInfo.desc.haste':
+    'Zrychluje tvoje údery zbraní i sesílání kouzel. Nezkracuje globální dobu obnovy.',
+  'hudChrome.statInfo.desc.parry':
+    'Tvoje šance zcela odrazit čelní útok na blízko a neutrpět žádné poškození. Úder zezadu odrazit nelze.',
+  'hudChrome.statInfo.names.haste': 'Rychlost',
+  'hudChrome.statInfo.names.parry': 'Odražení',
+  'hudChrome.talentRows.comingSoon': 'Již brzy',
+  'hudChrome.talentRows.defaultLoadout': 'Výchozí rozložení',
+  'hudChrome.talentRows.tab': 'Volby',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',
 };

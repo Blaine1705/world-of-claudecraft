@@ -195,6 +195,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': '你的角色',
   'hudChrome.unitFrame.targetAnnounce': '目標：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目標',
+  'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',
   'seo.officialLabel': 'World of ClaudeCraft 官方網站',
   'seo.officialBody':
     'worldofclaudecraft.com 是 Claudemoon 世界的官方免費瀏覽器 MMO。你可以用持久角色線上遊玩，也可以離線單人探索、閱讀 wiki，並從本站前往已驗證的社群連結。',
@@ -6401,7 +6402,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.comingSoon': '敬請期待',
   'hudChrome.specPanel.primaryAttr': '主要屬性',
   'hudChrome.specPanel.complexity': '複雜度',
+  'hudChrome.specPanel.complexityLow': '低',
   'hudChrome.specPanel.complexityMedium': '中等',
+  'hudChrome.specPanel.complexityHigh': '高',
   'hudChrome.specPanel.exampleAbilities': '範例技能',
   'hudChrome.specPanel.viewTalents': '檢視天賦',
   'hudChrome.specPanel.selectSpec': '選擇專精',

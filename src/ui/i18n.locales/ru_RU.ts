@@ -204,6 +204,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
   'hudChrome.unitFrame.targetAnnounce': 'Цель: {name}',
   'hudChrome.unitFrame.targetLabel': 'Ваша цель',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
   'seo.officialLabel': 'Официальный сайт World of ClaudeCraft',
   'seo.officialBody':
     'worldofclaudecraft.com - официальная бесплатная браузерная MMO для мира Claudemoon. Играйте онлайн с постоянным персонажем, исследуйте мир в одиночку офлайн, читайте wiki и переходите по проверенным ссылкам сообщества с этого сайта.',
@@ -6880,7 +6881,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.comingSoon': 'Скоро',
   'hudChrome.specPanel.primaryAttr': 'Основная характеристика',
   'hudChrome.specPanel.complexity': 'Сложность',
+  'hudChrome.specPanel.complexityLow': 'Низкая',
   'hudChrome.specPanel.complexityMedium': 'Средняя',
+  'hudChrome.specPanel.complexityHigh': 'Высокая',
   'hudChrome.specPanel.exampleAbilities': 'Примеры способностей',
   'hudChrome.specPanel.viewTalents': 'Смотреть таланты',
   'hudChrome.specPanel.selectSpec': 'Выбрать специализацию',
