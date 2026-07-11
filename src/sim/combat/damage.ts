@@ -54,6 +54,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // Choice-row on-kill talent tuning (owner design draft: Pursuit +30% speed for
@@ -238,7 +239,7 @@ export function dealDamage(
     source.id !== target.id &&
     amount > 0 &&
     target.kind === 'player' &&
-    target.auras.some((a) => a.kind === 'absorb' && a.id === 'ice_barrier')
+    target.auras.some((a) => a.kind === 'absorb' && PERSONAL_BARRIER_IDS.includes(a.id))
   ) {
     const wardedMeta = ctx.players.get(target.id);
     const wardedCut = wardedMeta ? ctx.playerMods(wardedMeta).global.barrierDrPct : 0;
@@ -280,6 +281,11 @@ export function dealDamage(
     const cd = berserkerCritDamage(source);
     if (cd > 0) amount = Math.round(amount * (1 + cd));
   }
+
+  // Ignition (fire mage mastery, combat/fire_mage.ts): a Fire-school ABILITY
+  // crit banks a stacking burn of the RESOLVED amount. Guards inside; a burn
+  // tick carries crit=false so it can never re-ignite itself. Draws no rng.
+  igniteOnCrit(ctx, source, target, amount, crit, school, ability);
 
   // absorb shields soak damage first
   let totalAbsorbed = 0;

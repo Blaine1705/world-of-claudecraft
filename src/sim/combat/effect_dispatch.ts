@@ -57,6 +57,7 @@ import { isRootedOrChilled } from './cc';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { fireGuaranteedCrit } from './fire_mage';
 import { isFormAuraKind } from './forms';
 import {
   frostMageAfterCast,
@@ -410,7 +411,12 @@ export function runEffects(
         if (vsDotted > 0 && target.auras.some((a) => a.kind === 'dot' && a.sourceId === p.id))
           dmg *= 1 + vsDotted;
         // Emboldened: the roll is still drawn; only the outcome is overridden.
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit;
+        const crit =
+          ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) ||
+          sureCrit ||
+          // Fire spec (combat/fire_mage.ts): Combustion / Fire Blast / Scorch
+          // execute override the OUTCOME; the roll above is still drawn.
+          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target);
         if (sureCrit) sureCritRolled = true;
         if (crit)
           dmg *=
@@ -475,7 +481,7 @@ export function runEffects(
             }
           }
         }
-        if (isSpell) noteSpellHit(ctx, p, crit);
+        if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
@@ -495,7 +501,10 @@ export function runEffects(
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
         // Emboldened: the roll is still drawn; only the outcome is overridden.
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) || sureCrit;
+        const crit =
+          ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
+          sureCrit ||
+          fireGuaranteedCrit(ctx, p, ability.id, ability.school, target ?? null);
         if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= 2 + p.critDmgBonus;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
@@ -745,7 +754,7 @@ export function runEffects(
         if (sureCrit) sureCritRolled = true;
         if (crit) dmg *= 1.5 + p.critDmgBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
-        noteSpellHit(ctx, p, crit);
+        noteSpellHit(ctx, p, crit, ability.id);
         break;
       }
       case 'extendDot': {
@@ -1367,6 +1376,7 @@ export function runEffects(
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
           spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
           allyBuffPct: eff.allyBuffPct,
+          igniteFrac: eff.igniteFrac,
         };
         if (p.castAim) {
           ctx.emit({
@@ -1386,7 +1396,9 @@ export function runEffects(
             fx: 'nova',
           });
         }
-        ctx.pulseGroundAoE(groundEffect, threatOpts, true);
+        // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
+        // hit lands one interval later, exactly the fall time.
+        if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
         break;
       }
@@ -1791,7 +1803,7 @@ export function runEffects(
           if (sureCrit) sureCritRolled = true;
           if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
-          if (isSpell) noteSpellHit(ctx, p, crit);
+          if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
           ctx.dealDamage(
             p,
             target,

@@ -62,6 +62,8 @@ const PCT_FIELDS = new Set([
   // Warded (mage choice row): fraction less damage while the barrier is up,
   // applied at runtime in combat/damage.ts, shown as "15%".
   'barrierDrPct',
+  // Ignition (fire mage mastery): the burn fraction, shown as "40%".
+  'ignitionPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {

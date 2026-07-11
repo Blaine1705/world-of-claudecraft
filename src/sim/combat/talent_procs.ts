@@ -9,6 +9,7 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
+import { PERSONAL_BARRIER_IDS } from './fire_mage';
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
@@ -206,7 +207,15 @@ export function onShieldConsumed(
 ): void {
   for (const def of procsFor(ctx, p)) {
     const t = def.trigger;
-    if (t.on !== 'shieldConsumed' || t.ability !== shieldAbilityId) continue;
+    if (t.on !== 'shieldConsumed') continue;
+    // 'personal_barrier' is the SLOT sentinel (owner rule): a row talent keyed
+    // to it fires for whichever personal barrier the player's spec provides
+    // (Frostveil or Blazing Barrier), never one hardcoded id.
+    const matches =
+      t.ability === 'personal_barrier'
+        ? PERSONAL_BARRIER_IDS.includes(shieldAbilityId)
+        : t.ability === shieldAbilityId;
+    if (!matches) continue;
     fire(ctx, p, def, owner);
   }
 }

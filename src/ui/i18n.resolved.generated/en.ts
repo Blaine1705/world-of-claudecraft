@@ -5871,8 +5871,8 @@ export const en: EnTranslations = {
         "description": "Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)"
       },
       "combustion": {
-        "name": "Flashfire",
-        "description": "Increases spell critical chance by 50% for 15 sec. (Fire signature)"
+        "name": "Combustion",
+        "description": "Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)"
       },
       "icy_veins": {
         "name": "Icy Veins",

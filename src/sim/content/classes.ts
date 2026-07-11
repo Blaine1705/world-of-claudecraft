@@ -128,8 +128,17 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // two level-5 choice-row options modify it, so it can no longer live
       // behind a row grant of its own.
       'blink',
+      // Fire spec kit (owner design 2026-07-11, `specs: ['fire']` gated):
+      // the Ignition mastery + Hot Streak passives at the pick, Blazing
+      // Barrier at 10, Meteor at 17. Combustion is the shared signature slot.
+      'ignition',
+      'hot_streak',
+      'blazing_barrier',
+      'meteor',
       // Frost spec kit (owner design 2026-07-11, `specs: ['frost']` gated):
-      // Ice Lance + its three spec passives at the spec pick, Flurry at 8.
+      // Ice Lance + its three spec passives at the spec pick, Flurry at 8,
+      // the Water Elemental at 12.
+      'summon_water_elemental',
       'ice_lance',
       'fingers_of_frost',
       'brain_freeze',
@@ -4697,17 +4706,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   combustion: {
     id: 'combustion',
-    name: 'Flashfire',
+    name: 'Combustion',
     class: 'mage',
-    learnLevel: 5,
-    cost: 0,
+    learnLevel: 10,
+    cost: 100,
     castTime: 0,
     cooldown: 120,
     range: 0,
     school: 'fire',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_spellcrit', value: 0.5, duration: 15 }],
-    description: 'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+    // Owner decision 2026-07-11: the NEW Combustion replaces the old +50% crit
+    // Flashfire. While worn every Fire spell critically strikes (the crit roll
+    // outcome is overridden in combat/fire_mage.ts, the roll still drawn), and
+    // those guaranteed crits never build Hot Streak.
+    effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
+    description:
+      'Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',
@@ -5541,9 +5555,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   meteor: {
     id: 'meteor',
-    name: 'Skystone',
+    name: 'Meteor',
     class: 'mage',
-    learnLevel: 5,
+    learnLevel: 17,
+    specs: ['fire'],
     cost: 120,
     castTime: 0,
     cooldown: 45,
@@ -5551,12 +5566,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: false,
     targetMode: 'position',
+    // Owner design: aimed at the ground with a FALL DELAY, then one impact
+    // that Ignites everything it strikes (a single delayed groundAoE pulse at
+    // interval; igniteFrac copies each target's resolved damage into its burn).
     effects: [
-      { type: 'aoeDamage', min: 100, max: 130, radius: 8 },
-      { type: 'groundAoE', min: 12, max: 18, radius: 8, duration: 6, interval: 2 },
+      {
+        type: 'groundAoE',
+        min: 90,
+        max: 120,
+        radius: 8,
+        duration: 2.5,
+        interval: 2,
+        igniteFrac: 0.4,
+        delayed: true,
+      },
     ],
     description:
-      'Calls down a meteor at the target area, dealing $d Fire damage and burning the ground. (Mage talent)',
+      'Calls a meteor down on the target area: after a 2 sec fall it deals 90 to 120 Fire damage and Ignites everything it strikes. (Fire)',
   },
   mind_sear: {
     id: 'mind_sear',
@@ -5705,7 +5731,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     offGcd: true,
     effects: [
-      { type: 'clearCooldowns', abilities: ['blink', 'ice_barrier', 'greater_invisibility'] },
+      {
+        type: 'clearCooldowns',
+        abilities: ['blink', 'ice_barrier', 'blazing_barrier', 'greater_invisibility'],
+      },
     ],
     description:
       'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
@@ -5775,6 +5804,73 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)',
+  },
+  blazing_barrier: {
+    id: 'blazing_barrier',
+    name: 'Blazing Barrier',
+    class: 'mage',
+    learnLevel: 10,
+    specs: ['fire'],
+    cost: 90,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    // The fire spec's PERSONAL BARRIER slot (Frost carries Frostveil): the
+    // shared row talents hook either id via PERSONAL_BARRIER_IDS.
+    effects: [{ type: 'absorb', amount: 130, duration: 60 }],
+    description: 'Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)',
+  },
+  ignition: {
+    id: 'ignition',
+    name: 'Ignition',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['fire'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+  },
+  hot_streak: {
+    id: 'hot_streak',
+    name: 'Hot Streak',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['fire'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: two critical strikes in a row with Fireball, Fire Blast or Scorch make your next Pyroblast or Flamestrike instant and free. Those free casts do not build Hot Streak. (Fire)',
+  },
+  summon_water_elemental: {
+    id: 'summon_water_elemental',
+    name: 'Summon Water Elemental',
+    class: 'mage',
+    learnLevel: 12,
+    specs: ['frost'],
+    cost: 150,
+    castTime: 2,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'summonDemon', mobId: 'water_elemental' }],
+    description:
+      'Summon a Water Elemental to fight beside you, hurling Waterbolts at your target and channeling Water Jet. (Frost)',
   },
   psychic_scream: {
     id: 'psychic_scream',

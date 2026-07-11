@@ -281,16 +281,18 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r8_warded',
           name: 'Warded',
           description:
-            'While Frostveil is up you take 15% less damage, and it heals you for 39 when it breaks after absorbing.',
+            'While your personal barrier is up you take 15% less damage, and it heals you for 39 when it breaks after absorbing.',
           icon: 'ice_barrier',
           effect: {
             global: { barrierDrPct: 0.15 },
             // The heal is 30% of the shield's absorb budget (130), a flat 39:
             // the shield only ever breaks after soaking its full amount.
+            // 'personal_barrier' is the SLOT sentinel: Frostveil for Frost,
+            // Blazing Barrier for Fire (owner barrier-slot rule).
             proc: {
               id: 'mag_warded',
               name: 'Warded',
-              trigger: { on: 'shieldConsumed', ability: 'ice_barrier' },
+              trigger: { on: 'shieldConsumed', ability: 'personal_barrier' },
               responses: [{ kind: 'heal', amount: 39 }],
             },
           },

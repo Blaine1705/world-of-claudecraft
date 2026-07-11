@@ -131,9 +131,12 @@ const MAGE_SPECS: SpecDef[] = [
     'x',
     'A volatile caster built around fast, high-damage Fire spells.',
     'combustion',
-    'Afterflame',
-    'Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
-    { global: { critDmgPct: 0.5 }, stats: { crit: 0.02 } },
+    'Ignition',
+    'Your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
+    // The burn fraction is the scalable mastery axis (runtime: fire_mage's
+    // igniteOnCrit copies the resolved crit damage); crit chance is the static
+    // secondary.
+    { global: { ignitionPct: 0.4 }, stats: { crit: 0.02 } },
   ),
   spec(
     'frost',

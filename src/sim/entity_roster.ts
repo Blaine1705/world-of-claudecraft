@@ -54,6 +54,9 @@ export type GroundAoE = {
   // near) instead of damaging hostiles; min/max are ignored and the pulse
   // draws NO rng (the damage roll is skipped entirely).
   allyBuffPct?: number;
+  // Meteor: Ignite each struck enemy for this fraction of the resolved pulse
+  // damage (fire_mage.applyIgnite copies the number; no re-roll).
+  igniteFrac?: number;
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-

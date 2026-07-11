@@ -160,6 +160,10 @@ export interface GlobalModEffect {
   // opens the surge window (casting_lifecycle convergenceOnCast, marker +
   // ICD carried by auras so no entity field enters the parity hash).
   convergence?: number;
+  // Ignition (fire mage mastery): fraction of a spell crit's damage banked as
+  // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
+  // amount). Scales with level like every spec mastery.
+  ignitionPct?: number;
 }
 
 export interface TalentEffect {
@@ -447,6 +451,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
     manaDefCdrPer10: 0,
     blinkCast: 0,
     convergence: 0,
+    ignitionPct: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -551,6 +556,7 @@ export function accumulate(
     g.manaDefCdrPer10 += (e.manaDefCdrPer10 ?? 0) * mult;
     g.blinkCast += (e.blinkCast ?? 0) * mult;
     g.convergence += (e.convergence ?? 0) * mult;
+    g.ignitionPct += (e.ignitionPct ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

@@ -386,6 +386,10 @@ export type AuraKind =
   // damage at `value` fraction on the same target (effect_dispatch, beside
   // Bladed Echo); consumed before the repeat so a copy can never re-echo.
   | 'power_echo'
+  // Combustion (fire mage signature): while worn, every Fire spell crit roll's
+  // OUTCOME is overridden to true (combat/fire_mage.ts fireGuaranteedCrit; the
+  // roll is still drawn). Guaranteed crits never build Hot Streak.
+  | 'combustion'
   // Inert timer marker: NO combat reader keys on this kind, so it is pure
   // visible state (an internal cooldown or a capped-window accumulator the
   // player can watch tick). Kept apart per user by the aura id (Temporal
@@ -1421,7 +1425,14 @@ export interface MobTemplate {
   // Pet mechanic: this creature is a ranged caster (warlock Emberkin) — instead of
   // closing to melee, it stays at `range` and hurls bolts of `school` damage.
   // updatePet reads this; the bolt damage comes from the mob's weapon range.
-  petRanged?: { range: number; school: Aura['school'] };
+  petRanged?: {
+    range: number;
+    school: Aura['school'];
+    // Water Jet (mage water elemental): every `every`-th attack the pet
+    // channels a beam instead of a bolt, leaving `total` damage ticking over
+    // `duration` at `interval` (pet_ai, deterministic counter on an aura).
+    jet?: { every: number; total: number; duration: number; interval: number };
+  };
   petRole?: PetRole;
   petSpell?: {
     name: string;
@@ -1660,6 +1671,13 @@ export type AbilityEffect =
       // buffs allies inside (+allyBuffPct damage done) instead of damaging
       // hostiles; min/max are ignored.
       allyBuffPct?: number;
+      // Meteor (fire mage): each struck enemy is also Ignited for this
+      // fraction of the RESOLVED pulse damage (combat/fire_mage.ts applyIgnite
+      // copies the number; no re-roll).
+      igniteFrac?: number;
+      // Meteor: skip the on-cast pulse so the FIRST hit lands one interval
+      // after placement (the fall delay); a plain zone still pulses on cast.
+      delayed?: boolean;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
