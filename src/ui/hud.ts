@@ -287,9 +287,11 @@ import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
+import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import {
   type MapRegion,
   mapCanvasHeight,
+  mapZoneRegion,
   type PaintRowCarry,
   paintTerrainRows,
 } from './map_terrain';
@@ -1136,6 +1138,9 @@ export class Hud {
   // prewarm (prewarmMapBg on a crossing) preempts; the preempted zone returns
   // to the front of this queue.
   private mapPrewarmQueue: string[] = [];
+  // Blank-paper placeholders handed to an open map while a baked plate is
+  // still decoding; dropped the moment the real background commits.
+  private mapBgPending = new Map<string, HTMLCanvasElement>();
   private mapPrewarmHandle = 0;
   // Which scheduler produced mapPrewarmHandle. requestIdleCallback and setTimeout
   // hand out ids from separate pools, so the handle must be cancelled with the
@@ -7851,14 +7856,11 @@ export class Hud {
     return c;
   }
 
-  // The full-zone band used by the world map (and prewarm), keyed only on z.
+  // The full-zone band used by the world map (and prewarm): the shared
+  // map_terrain helper, so the HUD, the build-time plate bake, and the
+  // freshness guard can never disagree about a plate's bounds.
   private mapZoneRegion(zone: ZoneDef): MapRegion {
-    return {
-      minX: zone.xMin ?? STRIP_MIN_X,
-      maxX: zone.xMax ?? STRIP_MAX_X,
-      minZ: zone.zMin,
-      maxZ: zone.zMax,
-    };
+    return mapZoneRegion(zone);
   }
 
   // The cached terrain background for a zone, rendering it synchronously only if
@@ -7880,17 +7882,28 @@ export class Hud {
     if (cached) return cached;
     // Cache miss with the map ALREADY open: never render synchronously (a
     // full zone background is seconds of terrain sampling over the grid
-    // world). Prioritize this zone's prewarm and hand back its in-progress
+    // world). Prioritize this zone's plate (the baked image on the shipped
+    // world, else the sliced procedural prewarm) and hand back an interim
     // canvas: the open map redraws on the medium HUD cadence, so the plate
-    // fills in top-down as the sliced prewarm publishes rows.
+    // appears the moment the image decodes, or fills in top-down as the
+    // sliced prewarm publishes rows.
     if (this.mapPrewarm?.zoneId !== zone.id) this.prewarmMapBg(zone.id);
+    const rechecked = this.mapBgCache.get(zone.id);
+    if (rechecked) return rechecked; // an already-decoded baked plate commits synchronously
     if (this.mapPrewarm?.zoneId === zone.id) return this.mapPrewarm.canvas;
-    // prewarmMapBg only declines when the id is unknown; keep the old
-    // synchronous fallback for that impossible-in-practice case
-    const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
-    this.mapBgCache.set(zone.id, bg);
-    this.compositeMapArt(zone.id, bg);
-    return bg;
+    // A baked plate is still decoding: show blank map paper for a frame or two.
+    let placeholder = this.mapBgPending.get(zone.id);
+    if (!placeholder) {
+      const region = mapZoneRegion(zone);
+      placeholder = document.createElement('canvas');
+      placeholder.width = MAP_BG_RES;
+      placeholder.height = mapCanvasHeight(MAP_BG_RES, region);
+      const ctx = require2dContext(placeholder);
+      ctx.fillStyle = '#3c3a30';
+      ctx.fillRect(0, 0, placeholder.width, placeholder.height);
+      this.mapBgPending.set(zone.id, placeholder);
+    }
+    return placeholder;
   }
 
   /**
@@ -7922,14 +7935,55 @@ export class Hud {
     }
   }
 
-  // Kick off (or no-op) an idle, time-sliced render of a zone's map background
-  // so opening the map never pays the ~200ms terrain cost on the click. Called
-  // when the committed zone changes and once at startup for the spawn zone.
+  // Commit a ready background (baked plate or finished prewarm) to the cache
+  // and let the map-art overlay land on it.
+  private commitMapBg(zoneId: string, canvas: HTMLCanvasElement): void {
+    this.mapBgCache.set(zoneId, canvas);
+    this.mapBgPending.delete(zoneId);
+    this.compositeMapArt(zoneId, canvas);
+  }
+
+  // Ready a zone's map background so opening the map never pays terrain
+  // rendering on the click. On the shipped world this only DECODES the baked
+  // plate (public/map_bg, see scripts/build_map_backgrounds.mjs); custom
+  // seeds, edited worlds, and missing plates fall back to the idle-sliced
+  // procedural painter. Called when the committed zone changes, once at
+  // startup for the spawn zone, and for every zone the streaming lane
+  // prepares (queueMapBgPrewarm).
   private prewarmMapBg(zoneId: string): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
     const zone = ZONES.find((z) => z.id === zoneId);
     if (!zone) return;
+    if (bakedMapBgEligible(this.sim.cfg.seed, zoneId)) {
+      loadBakedMapBg(
+        zoneId,
+        (img) => {
+          if (this.mapBgCache.has(zoneId)) return;
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          require2dContext(canvas).drawImage(img, 0, 0);
+          this.commitMapBg(zoneId, canvas);
+          // a redundant procedural job or queue entry for this zone can stop
+          if (this.mapPrewarm?.zoneId === zoneId) {
+            this.cancelMapPrewarm();
+            this.startNextMapPrewarm();
+          }
+        },
+        () => this.prewarmMapBgProcedural(zone),
+      );
+      return;
+    }
+    this.prewarmMapBgProcedural(zone);
+  }
+
+  // The runtime fallback painter: an idle, time-sliced render of the zone's
+  // background through the single prewarm lane.
+  private prewarmMapBgProcedural(zone: ZoneDef): void {
+    const zoneId = zone.id;
+    if (this.mapBgCache.has(zoneId)) return;
+    if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
     // Preempt any in-flight prewarm (the committed zone is the most urgent
     // open), but keep the preempted zone: it resumes from the queue front.
     if (this.mapPrewarm && !this.mapPrewarmQueue.includes(this.mapPrewarm.zoneId)) {
@@ -8028,8 +8082,7 @@ export class Hud {
     }
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
-      this.mapBgCache.set(job.zoneId, job.canvas);
-      this.compositeMapArt(job.zoneId, job.canvas);
+      this.commitMapBg(job.zoneId, job.canvas);
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;

@@ -15,9 +15,16 @@
 // lines, depth-graded water with shallow foam, wet and dry sand shorelines,
 // hypsometric tinting, fbm vegetation mottling, rock exposure on steep
 // slopes, and worn dirt tracks with wobbling width and inked edges.
-import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES, ZONES } from '../sim/data';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  STRIP_ZONES,
+  ZONES,
+} from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
-import type { BiomeId } from '../sim/types';
+import type { BiomeId, ZoneDef } from '../sim/types';
 import {
   inHollowOpenSea,
   roadDistance,
@@ -36,6 +43,35 @@ export interface MapRegion {
 // Pixel height of a W-wide terrain canvas covering `region` (square-pixel).
 export function mapCanvasHeight(W: number, region: MapRegion): number {
   return Math.round((W * (region.maxZ - region.minZ)) / (region.maxX - region.minX));
+}
+
+/** The full-zone band a world-map plate covers. ONE definition shared by the
+ *  HUD painter, the build-time plate bake (scripts/build_map_backgrounds.mjs),
+ *  and the freshness guard, so they can never drift apart. */
+export function mapZoneRegion(zone: ZoneDef): MapRegion {
+  return {
+    minX: zone.xMin ?? STRIP_MIN_X,
+    maxX: zone.xMax ?? STRIP_MAX_X,
+    minZ: zone.zMin,
+    maxZ: zone.zMax,
+  };
+}
+
+/** FNV-1a hash (hex) of the first `rows` painted rows of a zone plate: the
+ *  cheap freshness fingerprint the bake stores and the guard test recomputes,
+ *  so a world-generation change reddens CI until the plates are re-baked. */
+export function hashPaintedRows(region: MapRegion, seed: number, W: number, rows: number): string {
+  const H = mapCanvasHeight(W, region);
+  const n = Math.min(rows, H);
+  const data = new Uint8ClampedArray(W * H * 4);
+  paintTerrainRows(data, W, H, region, seed, 0, n);
+  let h = 0x811c9dc5;
+  const end = W * n * 4;
+  for (let i = 0; i < end; i++) {
+    h ^= data[i];
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16).padStart(8, '0');
 }
 
 // How thick the tree cover stipples per biome (chance per ~1.3yd hash cell).
