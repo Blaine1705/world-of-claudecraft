@@ -6804,7 +6804,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '무기로 즉시 두 번 공격하여 각 타격마다 무기 피해의 40%에 {damage}를 더한 피해를 입히고 분노 {rage}를 생성합니다. 최대 2회까지 충전됩니다. (분노 특성)',
   'entities.abilities.red_harvest.name': '붉은 수확',
   'entities.abilities.red_harvest.description':
-    '모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해에 {damage}를 더한 피해를 입힙니다. (분노 특성)',
+    '모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해의 65%에 {damage}를 더한 피해를 입히고 반드시 격노합니다. (분노 특성)',
   'entities.abilities.furious_mending.name': '분노의 회복',
   'entities.abilities.furious_mending.description':
     '10초 동안 받는 피해가 20% 감소하며, 지속되는 동안 사혈이 최대 생명력의 20%만큼 자신을 치유합니다. (분노 특성)',

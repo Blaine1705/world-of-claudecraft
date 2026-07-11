@@ -5826,7 +5826,7 @@ export const ko_KR: EnTranslations = {
       },
       "red_harvest": {
         "name": "붉은 수확",
-        "description": "모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해에 {damage}를 더한 피해를 입힙니다. (분노 특성)"
+        "description": "모든 것을 쏟아부어 광란에 휩싸여 세 번 공격하며, 각 타격마다 무기 피해의 65%에 {damage}를 더한 피해를 입히고 반드시 격노합니다. (분노 특성)"
       },
       "furious_mending": {
         "name": "분노의 회복",

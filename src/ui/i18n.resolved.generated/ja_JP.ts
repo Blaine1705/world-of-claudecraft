@@ -5826,7 +5826,7 @@ export const ja_JP: EnTranslations = {
       },
       "red_harvest": {
         "name": "赤い収穫",
-        "description": "すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージに{damage}を加えたダメージを与えます。（狂怒）"
+        "description": "すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージの65%に{damage}を加えたダメージを与え、必ず激怒状態になります。（狂怒）"
       },
       "furious_mending": {
         "name": "憤怒の癒し",

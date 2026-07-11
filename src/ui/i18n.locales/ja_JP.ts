@@ -6815,7 +6815,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '武器で即座に2回攻撃し、それぞれ武器ダメージの40%に{damage}を加えたダメージを与え、怒りを{rage}生成します。最大2チャージまで蓄積します。（狂怒）',
   'entities.abilities.red_harvest.name': '赤い収穫',
   'entities.abilities.red_harvest.description':
-    'すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージに{damage}を加えたダメージを与えます。（狂怒）',
+    'すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージの65%に{damage}を加えたダメージを与え、必ず激怒状態になります。（狂怒）',
   'entities.abilities.furious_mending.name': '憤怒の癒し',
   'entities.abilities.furious_mending.description':
     '10秒間、受けるダメージが20%減少し、効果中は瀉血が最大体力の20%を回復します。（狂怒）',

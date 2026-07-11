@@ -6460,7 +6460,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 {rage} 點怒氣。最多儲存 2 次充能。（狂怒）',
   'entities.abilities.red_harvest.name': '血色收割',
   'entities.abilities.red_harvest.description':
-    '傾盡所有：在狂亂中攻擊三次，每擊造成武器傷害外加 {damage}。（狂怒）',
+    '傾盡所有：在狂亂中攻擊三次，每擊造成65%武器傷害外加 {damage}，並必定使你激怒。（狂怒）',
   'entities.abilities.furious_mending.name': '狂怒療傷',
   'entities.abilities.furious_mending.description':
     '持續 10 秒，你受到的傷害降低 20%，且在效果持續期間，你的深切裂傷會治療你 20% 的最大生命值。（狂怒）',

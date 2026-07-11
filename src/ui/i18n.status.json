@@ -136284,7 +136284,7 @@
     },
     "main:entities.abilities.red_harvest.description": {
       "scope": "main",
-      "enHash": "ff3c361c903f4027",
+      "enHash": "a77158f721845e23",
       "placeholders": [
         "damage"
       ],
@@ -136303,7 +136303,7 @@
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "ff3c361c903f4027",
+          "srcHash": "a77158f721845e23",
           "by": "human"
         },
         "it_IT": {
@@ -136314,22 +136314,22 @@
         },
         "zh_CN": {
           "state": "translated",
-          "srcHash": "ff3c361c903f4027",
+          "srcHash": "a77158f721845e23",
           "by": "human"
         },
         "zh_TW": {
           "state": "translated",
-          "srcHash": "ff3c361c903f4027",
+          "srcHash": "a77158f721845e23",
           "by": "human"
         },
         "ko_KR": {
           "state": "translated",
-          "srcHash": "ff3c361c903f4027",
+          "srcHash": "a77158f721845e23",
           "by": "human"
         },
         "ja_JP": {
           "state": "translated",
-          "srcHash": "ff3c361c903f4027",
+          "srcHash": "a77158f721845e23",
           "by": "human"
         },
         "pt_BR": {
@@ -136337,7 +136337,7 @@
         },
         "ru_RU": {
           "state": "translated",
-          "srcHash": "ff3c361c903f4027",
+          "srcHash": "a77158f721845e23",
           "by": "human"
         },
         "cs_CZ": {

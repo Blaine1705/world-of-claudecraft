@@ -5826,7 +5826,7 @@ export const zh_TW: EnTranslations = {
       },
       "red_harvest": {
         "name": "血色收割",
-        "description": "傾盡所有：在狂亂中攻擊三次，每擊造成武器傷害外加 {damage}。（狂怒）"
+        "description": "傾盡所有：在狂亂中攻擊三次，每擊造成65%武器傷害外加 {damage}，並必定使你激怒。（狂怒）"
       },
       "furious_mending": {
         "name": "狂怒療傷",

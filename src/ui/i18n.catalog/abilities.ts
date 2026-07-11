@@ -1307,7 +1307,7 @@ const classAbilityNamesEn = {
       [
         'red_harvest',
         'Red Harvest',
-        'Spend everything: strike three times in a frenzy for weapon damage plus {damage} each. (Fury)',
+        'Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)',
       ],
       [
         'furious_mending',
