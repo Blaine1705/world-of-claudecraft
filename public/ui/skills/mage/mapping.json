@@ -123,6 +123,114 @@
       "sourcePack": "custom-user",
       "sourceFile": "C:/Users/joseg/Desktop/q.png",
       "output": "icy_veins.webp"
+    },
+    {
+      "abilityId": "ice_floes",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Ice Floes.png",
+      "output": "ice_floes.webp"
+    },
+    {
+      "abilityId": "double_blink",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Double blink.png",
+      "output": "double_blink.webp"
+    },
+    {
+      "abilityId": "blink_while_casting",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Blink while casting.png",
+      "output": "blink_while_casting.webp"
+    },
+    {
+      "abilityId": "warded",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Warded.png",
+      "output": "warded.webp"
+    },
+    {
+      "abilityId": "temporal_rift",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Temporal rift.png",
+      "output": "temporal_rift.webp"
+    },
+    {
+      "abilityId": "greater_invisibility",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Greater invis.png",
+      "output": "greater_invisibility.webp"
+    },
+    {
+      "abilityId": "rings_of_frost",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Ring of frost.png",
+      "output": "rings_of_frost.webp"
+    },
+    {
+      "abilityId": "snap_polymorph",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Snap Polymorph.png",
+      "output": "snap_polymorph.webp"
+    },
+    {
+      "abilityId": "twin_frost_nova",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Twin Frost nova.png",
+      "output": "twin_frost_nova.webp"
+    },
+    {
+      "abilityId": "power_echo",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Power echo.png",
+      "output": "power_echo.webp"
+    },
+    {
+      "abilityId": "overload",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Overload.png",
+      "output": "overload.webp"
+    },
+    {
+      "abilityId": "presence_of_mind",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Racing mind.png",
+      "output": "presence_of_mind.webp"
+    },
+    {
+      "abilityId": "elemental_convergence",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Elemental Convergence.png",
+      "output": "elemental_convergence.webp"
+    },
+    {
+      "abilityId": "cold_snap",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Cold snap.png",
+      "output": "cold_snap.webp"
+    },
+    {
+      "abilityId": "mass_barrier",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Mass barrier.png",
+      "output": "mass_barrier.webp"
+    },
+    {
+      "abilityId": "rune_of_power",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Rune of power.png",
+      "output": "rune_of_power.webp"
+    },
+    {
+      "abilityId": "overflowing_power",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Overflowing Power.png",
+      "output": "overflowing_power.webp"
+    },
+    {
+      "abilityId": "evocation",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Aetherwell.png",
+      "output": "evocation.webp"
     }
   ],
   "deferredStayProcedural": {}

@@ -28,6 +28,22 @@ export function talentEffectIconRef(
   effect: TalentEffect | undefined,
   kind: TalentNode['kind'] | 'choice',
 ): TalentIconRef {
+  const firstAbility = effect?.ability?.[0];
+  if (firstAbility?.ability === 'blink' && firstAbility.bonusCharges) {
+    return { kind: 'ability', id: 'double_blink' };
+  }
+  if (effect?.global?.blinkCast) return { kind: 'ability', id: 'blink_while_casting' };
+  if (effect?.global?.barrierDrPct) return { kind: 'ability', id: 'warded' };
+  if (effect?.global?.temporalRift) return { kind: 'ability', id: 'temporal_rift' };
+  if (effect?.global?.convergence) return { kind: 'ability', id: 'elemental_convergence' };
+  if (effect?.global?.manaDefCdrPer10) return { kind: 'ability', id: 'overflowing_power' };
+  if (firstAbility?.ability === 'polymorph' && firstAbility.castPct === -1) {
+    return { kind: 'ability', id: 'snap_polymorph' };
+  }
+  if (firstAbility?.ability === 'frost_nova' && firstAbility.bonusCharges) {
+    return { kind: 'ability', id: 'twin_frost_nova' };
+  }
+
   const abilityId = effect?.grant?.ability ?? effect?.ability?.[0]?.ability;
   if (abilityId && ABILITIES[abilityId]) return { kind: 'ability', id: abilityId };
 
