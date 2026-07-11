@@ -33,7 +33,7 @@ import {
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../../src/sim/content/heroic_vendor';
 import { ITEMS, QUESTS } from '../../src/sim/data';
-import { canEquipItem, canEquipItemInSlot } from '../../src/sim/equipment_rules';
+import { canEquipItem, canEquipItemInSlot, weaponHand } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import type { CharacterState } from '../../src/sim/sim';
 import { Sim } from '../../src/sim/sim';
@@ -368,6 +368,14 @@ describe('tank, dual-wield, and shadow kits', () => {
       expect(meetsLevelRequirement(BOOST_LEVEL, item), `${id} level`).toBe(true);
       expect(canEquipItemInSlot('warrior', item, 'offhand', 'fury'), `${id} offhand`).toBe(true);
     }
+    // INTENT pin: the second extra exists to make the classic 1H+1H layout
+    // testable, so it must BE one-handed. Titan's Grip makes a two-hander
+    // offhand-LEGAL for fury, so the legality pin above cannot catch a hand
+    // flip (PR #1762 declares wyrmfang two-handed: when that lands, swap this
+    // extra to the best remaining warrior-legal epic/rare one-hander, e.g.
+    // emberfang_warblade, instead of deleting this assertion).
+    const spare = ITEMS[(fury.extras ?? [])[1] as string];
+    expect(spare.kind === 'weapon' && weaponHand(spare)).toBe('onehand');
     const state = buildBoostedCharacterState('warrior', 'Pbetestdw', 0);
     const carried = state.inventory.map((s) => s.itemId);
     expect(state.equipment.mainhand).toBe('bonewrought_greatsword');
