@@ -1407,12 +1407,35 @@ export class Hud {
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
-    this.minimapBg = this.renderTerrainCanvas(140, {
+    // The whole-world minimap strip: on the shipped world it is a baked plate
+    // (public/map_bg/world_strip.webp) blitted in as soon as it decodes, so
+    // boot skips ~50k pixels of synchronous terrain painting; other worlds
+    // keep the procedural render.
+    const worldStripRegion = {
       minX: WORLD_MIN_X,
       maxX: WORLD_MAX_X,
       minZ: WORLD_MIN_Z,
       maxZ: WORLD_MAX_Z,
-    });
+    };
+    if (bakedMapBgEligible(this.sim.cfg.seed, 'world_strip')) {
+      const stripCanvas = document.createElement('canvas');
+      stripCanvas.width = 140;
+      stripCanvas.height = mapCanvasHeight(140, worldStripRegion);
+      const stripCtx = require2dContext(stripCanvas);
+      stripCtx.fillStyle = '#163058'; // the painter's deep-sea tone until the plate lands
+      stripCtx.fillRect(0, 0, stripCanvas.width, stripCanvas.height);
+      this.minimapBg = stripCanvas;
+      loadBakedMapBg(
+        'world_strip',
+        (img) =>
+          require2dContext(stripCanvas).drawImage(img, 0, 0, stripCanvas.width, stripCanvas.height),
+        () => {
+          this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
+        },
+      );
+    } else {
+      this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
+    }
     // hand-painted plates land in the world strip too, each over its own band
     {
       const stripH = this.minimapBg.height;

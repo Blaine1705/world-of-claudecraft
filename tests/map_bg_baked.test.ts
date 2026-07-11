@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ZONES } from '../src/sim/data';
+import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES } from '../src/sim/data';
 import { BAKED_MAP_BG } from '../src/ui/map_bg_manifest.generated';
 import { hashPaintedRows, mapCanvasHeight, mapZoneRegion } from '../src/ui/map_terrain';
 
@@ -11,9 +11,9 @@ import { hashPaintedRows, mapCanvasHeight, mapZoneRegion } from '../src/ui/map_t
 // recomputes the manifest's per-zone fingerprint (the first N painted rows)
 // and reds until `npm run assets:mapbg` is rerun.
 describe('baked map backgrounds', () => {
-  it('covers every zone and every plate file exists', () => {
+  it('covers every zone (plus the minimap world strip) and every plate file exists', () => {
     const baked = Object.keys(BAKED_MAP_BG.zones).sort();
-    expect(baked).toEqual(ZONES.map((z) => z.id).sort());
+    expect(baked).toEqual([...ZONES.map((z) => z.id), 'world_strip'].sort());
     for (const zoneId of baked) {
       expect(
         fs.existsSync(path.join(__dirname, '..', 'public', 'map_bg', `${zoneId}.webp`)),

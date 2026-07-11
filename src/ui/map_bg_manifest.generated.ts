@@ -76,6 +76,11 @@ export const BAKED_MAP_BG = {
     "w": 480,
     "h": 480,
     "rowHash": "e0be782a"
+  },
+  "world_strip": {
+    "w": 140,
+    "h": 337,
+    "rowHash": "6008eb5a"
   }
 },
 } as const;

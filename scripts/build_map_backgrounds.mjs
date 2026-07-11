@@ -21,7 +21,7 @@ const PLATE_W = 480; // MAP_BG_RES in src/ui/hud.ts
 const HASH_ROWS = 16; // freshness fingerprint rows (see hashPaintedRows)
 
 const entrySource = `
-  export { ZONES } from './src/sim/data.ts';
+  export { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES } from './src/sim/data.ts';
   export {
     mapCanvasHeight,
     mapZoneRegion,
@@ -44,9 +44,17 @@ const built = await esbuild.build({
   logLevel: 'silent',
 });
 const dataUrl = `data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString('base64')}`;
-const { ZONES, mapCanvasHeight, mapZoneRegion, hashPaintedRows, paintTerrainRows } = await import(
-  dataUrl
-);
+const {
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+  ZONES,
+  mapCanvasHeight,
+  mapZoneRegion,
+  hashPaintedRows,
+  paintTerrainRows,
+} = await import(dataUrl);
 
 const outDir = path.join(root, 'public', 'map_bg');
 fs.mkdirSync(outDir, { recursive: true });
@@ -69,6 +77,28 @@ for (const zone of ZONES) {
   };
   const kb = Math.round(fs.statSync(file).size / 1024);
   console.log(`baked ${zone.id}: ${PLATE_W}x${H} ${kb}KB in ${Date.now() - started}ms`);
+}
+
+// The minimap's whole-world strip (140px wide today) bakes as one extra
+// plate, sea between the zones included, so the HUD's synchronous boot render
+// of ~50k terrain pixels becomes an image decode too.
+const MINIMAP_W = 140;
+{
+  const region = { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: WORLD_MIN_Z, maxZ: WORLD_MAX_Z };
+  const H = mapCanvasHeight(MINIMAP_W, region);
+  const data = new Uint8ClampedArray(MINIMAP_W * H * 4);
+  const started = Date.now();
+  paintTerrainRows(data, MINIMAP_W, H, region, WORLD_SEED, 0, H);
+  const file = path.join(outDir, 'world_strip.webp');
+  await sharp(Buffer.from(data.buffer), { raw: { width: MINIMAP_W, height: H, channels: 4 } })
+    .webp({ quality: 88 })
+    .toFile(file);
+  zones.world_strip = {
+    w: MINIMAP_W,
+    h: H,
+    rowHash: hashPaintedRows(region, WORLD_SEED, MINIMAP_W, HASH_ROWS),
+  };
+  console.log(`baked world_strip: ${MINIMAP_W}x${H} in ${Date.now() - started}ms`);
 }
 
 const manifestPath = path.join(root, 'src', 'ui', 'map_bg_manifest.generated.ts');
