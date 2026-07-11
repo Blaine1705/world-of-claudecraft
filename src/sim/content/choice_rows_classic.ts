@@ -261,14 +261,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r5_double_blink',
           name: 'Double Blink',
           description: 'Flickerstep stores 2 charges, but each recharges 30% more slowly.',
-          icon: 'blink',
+          icon: 'double_blink',
           effect: { ability: [{ ability: 'blink', bonusCharges: 1, cooldownPct: 0.3 }] },
         },
         {
           id: 'mag_r5_blink_cast',
           name: 'Blink While Casting',
           description: 'You can use Flickerstep in the middle of a cast without interrupting it.',
-          icon: 'blink',
+          icon: 'blink_while_casting',
           effect: { global: { blinkCast: 1 } },
         },
       ],
@@ -282,7 +282,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Warded',
           description:
             'While your personal barrier is up you take 15% less damage, and it heals you for 39 when it breaks after absorbing.',
-          icon: 'ice_barrier',
+          icon: 'warded',
           effect: {
             global: { barrierDrPct: 0.15 },
             // The heal is 30% of the shield's absorb budget (130), a flat 39:
@@ -302,7 +302,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Temporal Rift',
           description:
             'Every 20 sec, the next stun, root or silence to hit you is cleansed instantly.',
-          icon: 'arcane_intellect',
+          icon: 'temporal_rift',
           effect: { global: { temporalRift: 1 } },
         },
         {
@@ -334,14 +334,14 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r11_snap_polymorph',
           name: 'Snap Polymorph',
           description: 'Bewitch becomes instant, on a 20 sec cooldown.',
-          icon: 'polymorph',
+          icon: 'snap_polymorph',
           effect: { ability: [{ ability: 'polymorph', castPct: -1, cooldownFlat: 20 }] },
         },
         {
           id: 'mag_r11_twin_nova',
           name: 'Twin Frost Nova',
           description: 'Frost Nova stores 2 charges that recharge independently.',
-          icon: 'frost_nova',
+          icon: 'twin_frost_nova',
           effect: { ability: [{ ability: 'frost_nova', bonusCharges: 1 }] },
         },
       ],
@@ -355,7 +355,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Power Echo',
           description:
             'Grants Power Echo: your next direct spell repeats at 50% power on the same target.',
-          icon: 'arcane_missiles',
+          icon: 'power_echo',
           effect: { grant: { ability: 'power_echo' } },
         },
         {
@@ -363,7 +363,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Overload',
           description:
             'Grants Overload: your next spell is amplified by 40% but costs 50% more mana.',
-          icon: 'pyroblast',
+          icon: 'overload',
           effect: { grant: { ability: 'overload' } },
         },
         {
@@ -384,7 +384,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Elemental Convergence',
           description:
             'Alternating a Fire and a Frost spell opens an 8 sec surge of power, once per 30 sec.',
-          icon: 'fireball',
+          icon: 'elemental_convergence',
           effect: { global: { convergence: 1 } },
         },
         {
@@ -413,7 +413,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Rune of Power',
           description:
             'Grants Rune of Power: inscribe a rune; allies standing near it deal 10% more damage.',
-          icon: 'flamestrike',
+          icon: 'rune_of_power',
           effect: { grant: { ability: 'rune_of_power' } },
         },
         {
@@ -421,7 +421,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Overflowing Power',
           description:
             'Spending mana shaves the cooldown of your defensives: 2 sec per tenth of your maximum mana spent, up to 10 sec every 30 sec.',
-          icon: 'evocation',
+          icon: 'overflowing_power',
           effect: { global: { manaDefCdrPer10: 2 } },
         },
         {
