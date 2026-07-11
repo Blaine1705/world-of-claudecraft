@@ -69,6 +69,10 @@ interface SnowFx {
   points: THREE.Points;
   mat: THREE.PointsMaterial;
   pos: Float32Array;
+  // The zone-edge PERIMETER ring (owner request: show how far the storm
+  // reaches), an icy circle inscribed on the ground for the zone's life.
+  ring: THREE.Mesh;
+  ringMat: THREE.MeshBasicMaterial;
   x: number;
   z: number;
   groundY: number;
@@ -242,10 +246,28 @@ export class MageGroundFx {
     const points = new THREE.Points(geo, mat);
     points.frustumCulled = false;
     this.scene.add(points);
+    // The perimeter: a crisp frost ring at the zone edge so the player reads
+    // the storm's exact reach at a glance (reuses the rune ring geometry).
+    this.runeRingGeo ??= new THREE.RingGeometry(0.82, 1, 48);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: frost.clone().lerp(new THREE.Color(0xffffff), 0.45).multiplyScalar(1.4),
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const ring = new THREE.Mesh(this.runeRingGeo, ringMat);
+    ring.rotation.x = -Math.PI / 2;
+    ring.scale.setScalar(opts.radius);
+    ring.position.set(opts.x, gy + 0.12, opts.z);
+    this.scene.add(ring);
     this.snows.push({
       points,
       mat,
       pos,
+      ring,
+      ringMat,
       x: opts.x,
       z: opts.z,
       groundY: gy,
@@ -302,6 +324,8 @@ export class MageGroundFx {
         this.scene.remove(sfx.points);
         sfx.mat.dispose();
         sfx.points.geometry.dispose();
+        this.scene.remove(sfx.ring);
+        sfx.ringMat.dispose();
         this.snows.splice(i, 1);
         continue;
       }
@@ -318,7 +342,10 @@ export class MageGroundFx {
         }
       }
       sfx.points.geometry.attributes.position.needsUpdate = true;
-      sfx.mat.opacity = 0.9 * Math.min(1, (sfx.duration - sfx.elapsed) / 0.6);
+      const snowFade = Math.min(1, (sfx.duration - sfx.elapsed) / 0.6);
+      sfx.mat.opacity = 0.9 * snowFade;
+      sfx.ringMat.opacity = 0.55 * snowFade;
+      sfx.ring.rotation.z += 0.15 * dt; // a lazy drift so the edge reads alive
     }
   }
 }

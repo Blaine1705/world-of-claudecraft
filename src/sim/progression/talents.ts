@@ -32,7 +32,6 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { stripTemporalEchoes } from '../combat/chronomancy';
 import { abilitiesKnownAt } from '../content/classes';
 import { computeModifiersWithRows, rowTreeFor } from '../content/talent_rows';
 import {
@@ -123,13 +122,6 @@ export function applyTalentAllocation(
   // companion returns home. Tamed hunter pets are never spec-gated, so they
   // are untouched; deterministic, no rng.
   dismissSpecLockedPet(ctx, r.e, r.meta);
-  // Chronomancy: leaving the healer spec (the new build no longer knows Temporal
-  // Echo) clears any Temporal Echo marks this mage placed, so a fire/frost mage
-  // never keeps feeding a stale echo. Keyed by sourceId; marks the mage carries
-  // from another chronomancer are untouched. No-op for every non-mage build.
-  if (!r.meta.known.some((k) => k.def.id === 'temporal_echo')) {
-    stripTemporalEchoes(ctx, r.e.id);
-  }
   // A committed spec can make a held offhand illegal (a Titan's Grip two-hander,
   // or a Fury dual-wield one-hander, under a spec that allows neither): bench it
   // so the spec boundary never persists a state the equip path refuses. No-op
@@ -137,6 +129,28 @@ export function applyTalentAllocation(
   revalidateOffhandForSpec(ctx, pid);
   ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents updated.', color: '#ffd100' });
   return true;
+}
+
+// The active pet's summoning ability under the OLD build may be gone under
+// the new one (Summon Water Elemental is frost-only): send the pet home. The
+// summon->pet link is data-driven: any known summonDemon ability whose mobId
+// matches the live pet keeps it; no match, no pet.
+function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): void {
+  const pet = petOf(ctx, e.id);
+  if (!pet) return;
+  const summons = (def: (typeof ABILITIES)[string]) =>
+    def.effects.some(
+      (eff) =>
+        (eff.type === 'summonDemon' && eff.mobId === pet.templateId) ||
+        (eff.type === 'summonPet' && eff.templateId === pet.templateId),
+    );
+  // A pet no class summon creates (a tamed hunter beast) is never spec-bound.
+  const summonable = Object.values(ABILITIES).some((d) => d.class === meta.cls && summons(d));
+  if (!summonable) return;
+  const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
+  if (known.some((k) => summons(k.def))) return;
+  despawnPersistentPet(ctx, pet);
+  ctx.emit({ type: 'log', pid: e.id, text: `${pet.name} returns home.`, color: '#b894ff' });
 }
 
 // Legacy incremental API retained for old scripts. The node system is gone, so

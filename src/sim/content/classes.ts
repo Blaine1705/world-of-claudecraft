@@ -1671,6 +1671,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     // Owner playtest 2026-07-11: pressable in the middle of another cast.
     usableWhileCasting: true,
+    // Owner rule (round five): fully off the GCD, like Combustion: castable
+    // during one and it never arms one for the other abilities.
+    offGcd: true,
     // Owner playtest 2026-07-11: two stored charges, back to back if banked.
     maxCharges: 2,
     // Owner playtest round four: no bolt, the embers bite the moment you press.
@@ -5887,7 +5890,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'mage',
     learnLevel: 20,
     cost: 100,
-    castTime: 0,
+    // Owner rule 2026-07-11: inscribing the rune is a deliberate cast too.
+    castTime: 1.5,
     cooldown: 45,
     range: 0,
     school: 'arcane',

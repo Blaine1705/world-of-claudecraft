@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { fireGuaranteedCrit, HOT_STREAK_BUILDERS } from '../src/sim/combat/fire_mage';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { ROW_TREES } from '../src/sim/content/talent_rows';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -292,7 +293,8 @@ describe('Pyroblast as a builder (owner rule)', () => {
     sim.castAbility('combustion'); // guarantees the blast crits
     gcdReset(p);
     sim.castAbilityAt('flamestrike', { x: a.pos.x, z: (a.pos.z + b.pos.z) / 2 });
-    const events = collect(sim, 0.5);
+    expect(p.castingAbility).toBe('flamestrike'); // a real cast now (owner rule)
+    const events = collect(sim, 3);
     const hits = events.filter(
       (e): e is Extract<SimEvent, { type: 'damage' }> =>
         e.type === 'damage' && e.sourceId === p.id && e.ability === 'Flamestrike' && e.amount > 0,
@@ -302,6 +304,67 @@ describe('Pyroblast as a builder (owner rule)', () => {
     // Exactly ONE crit noted: Heating Up armed, the streak NOT completed.
     expect(p.auras.some((a2) => a2.id === 'heating_up')).toBe(true);
     expect(p.auras.some((a2) => a2.id === 'hot_streak')).toBe(false);
+  });
+});
+
+describe('playtest round five (owner hotfixes)', () => {
+  it('the Water Elemental goes home when its mage leaves frost', () => {
+    const { sim, p } = mageWithSpec('frost');
+    sim.castAbility('summon_water_elemental');
+    collect(sim, 2.5); // ride out the 2s summon cast
+    const pet = () =>
+      [...sim.entities.values()].find(
+        (e) => e.templateId === 'water_elemental' && (e as { ownerId?: number }).ownerId === p.id,
+      );
+    expect(pet()).toBeDefined();
+    expect(sim.setSpec('fire')).toBe(true);
+    collect(sim, 0.5);
+    expect(pet()).toBeUndefined(); // dismissed at the spec boundary
+  });
+
+  it('Fire Blast rides no GCD in either direction', () => {
+    const { sim, p } = mageWithSpec('fire');
+    addDummy(sim);
+    sim.castAbility('fire_blast');
+    expect((p as unknown as { gcdRemaining: number }).gcdRemaining).toBe(0); // arms none
+    sim.castAbility('scorch'); // arms the GCD at cast start
+    expect((p as unknown as { gcdRemaining: number }).gcdRemaining).toBeGreaterThan(0);
+    sim.castAbility('fire_blast'); // ...and Fire Blast casts straight through it
+    const events = collect(sim, 0.2);
+    const hits = events.filter(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.ability === 'Cinderfall' && e.amount > 0,
+    );
+    expect(hits.length).toBe(2); // both charges landed, GCD never in the way
+  });
+
+  it('Hot Streak makes Flamestrike instant and free (otherwise a 2s cast)', () => {
+    const { sim, p } = mageWithSpec('fire');
+    const mob = addDummy(sim);
+    sim.castAbility('fire_blast'); // crit 1
+    collect(sim, 0.2);
+    sim.castAbility('fire_blast'); // crit 2: Hot Streak armed (charge 2, no GCD)
+    collect(sim, 0.2);
+    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(true);
+    gcdReset(p);
+    const mana0 = p.resource;
+    sim.castAbilityAt('flamestrike', { x: mob.pos.x, z: mob.pos.z });
+    expect(p.castingAbility).toBeNull(); // instant under the streak
+    expect(p.resource).toBe(mana0); // and free
+    expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // spent
+  });
+
+  it('Rune of Power is a deliberate cast now', () => {
+    const { sim, p } = mageWithSpec('fire');
+    // The rune is a level-20 choice-row grant; pick it like the window would.
+    const rowIndex = (ROW_TREES.mage ?? []).findIndex((r) =>
+      r.options.some((o) => o.id === 'mag_r20_rune_of_power'),
+    );
+    expect(rowIndex).toBeGreaterThanOrEqual(0);
+    expect(sim.pickRowTalent(rowIndex, 'mag_r20_rune_of_power')).toBe(true);
+    p.resource = p.maxResource;
+    sim.castAbility('rune_of_power');
+    expect(p.castingAbility).toBe('rune_of_power');
   });
 });
 
