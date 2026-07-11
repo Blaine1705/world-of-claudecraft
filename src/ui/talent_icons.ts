@@ -40,6 +40,8 @@ export function talentEffectIconRef(
     return { kind: 'ability', id: 'anger_management' };
   }
   if (effect?.global?.battleRhythm) return { kind: 'ability', id: 'battle_rhythm' };
+  // Combat Mastery: the stance-rider row pick wears the Battle Stance icon.
+  if (effect?.global?.stanceMastery) return { kind: 'ability', id: 'battle_stance' };
 
   const stat = effect?.stats ? Object.keys(effect.stats)[0] : undefined;
   if (stat) return { kind: 'crest', id: TALENT_STAT_CREST[stat] ?? 'talent_generic' };
