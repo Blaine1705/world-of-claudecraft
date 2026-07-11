@@ -4265,7 +4265,11 @@ export class Sim {
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
-    if (MOBS[mob.templateId]?.ignoreTaunt) {
+    // A training dummy takes the threat (it shows on the meters) but never
+    // turns, forces, or fights: without this guard a taunt (or an area taunt
+    // like Defiant Bellow in range) force-aggroed the dummy permanently and
+    // the aggro pinned the attacker in combat forever (2026-07-11 PBE bug).
+    if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
       this.enterCombat(p, mob);
       return;
     }
