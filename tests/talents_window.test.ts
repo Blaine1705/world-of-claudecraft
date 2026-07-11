@@ -58,15 +58,16 @@ describe('talents_window: no magic values', () => {
     expect(rowsTab).toContain('deps.pickRow(rowIndex, wasPicked ? null : optId);');
   });
 
-  // The spec-commit fix: the nine talents-2.0 classes (every class except the
-  // overhauled 'warrior') commit an uncommitted spec through deps.commitSpec
-  // (IWorld.setSpec via Hud) from the Select specialization button; the committed
-  // spec, and every warrior panel, keeps the navigation-only View talents button.
+  // The spec-commit fix: ALL TEN classes (the overhauled 'warrior' included,
+  // operator decision 2026-07-11) commit an uncommitted spec through
+  // deps.commitSpec (IWorld.setSpec via Hud) from the Select specialization
+  // button; the committed spec keeps the navigation-only View talents button.
   // Behavior is pinned functionally in talents_window_spec_commit.test.ts; these
   // pins keep the source shape (the gate + the two labels + the dep) from drifting.
-  it('gates the spec commit on cls !== warrior and the committed allocation', () => {
+  it('gates the spec commit on the committed allocation only (no class exclusion)', () => {
     expect(painter).toContain('const committed = this.deps.currentAllocation().spec === sp.id;');
-    expect(painter).toContain("const commits = cls !== 'warrior' && !committed;");
+    expect(painter).toContain('const commits = !committed;');
+    expect(painter).not.toContain("cls !== 'warrior'");
     expect(painter).toContain('if (commits) this.deps.commitSpec(sp.id);');
   });
 

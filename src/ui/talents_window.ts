@@ -85,13 +85,14 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
    * Commit a specialization to the server-authoritative IWorld (IWorld.setSpec).
    * Mirrors pickRow: a fire-and-forget command the sim re-validates (combat
    * lock, spec unlock level); a rejection surfaces through the shared
-   * error-event toast, never a local decision. Used by the nine talents-2.0
-   * classes' Select specialization button; the warrior never calls it.
+   * error-event toast, never a local decision. Used by every class's Select
+   * specialization button (the warrior included since 2026-07-11).
    */
   commitSpec(specId: string): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
-  // Loadout commit surface (server-authoritative IWorld; the only commit path).
+  // Loadout commit surface (server-authoritative IWorld; commits the full
+  // build, spec included, alongside the Select specialization button).
   saveLoadout(name: string, bar: (string | null)[], alloc: TalentAllocation): void;
   switchLoadout(index: number): void;
   deleteLoadout(index: number): void;
@@ -368,16 +369,19 @@ export class TalentsWindow {
         exEl.setAttribute('aria-label', signatureName(id));
         this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
       }
-      // Every panel gets a primary action button. For the nine talents-2.0
-      // classes (every class EXCEPT the overhauled 'warrior'; warrior_classic is
-      // one of the nine) a spec that is NOT the committed one reads Select
-      // specialization and COMMITS it via deps.commitSpec (IWorld.setSpec, sim
-      // re-validated) before staging + jumping to the Choices tab, so the spec
-      // choice actually grants the signature ability + mastery. The committed
-      // spec's button, and every warrior panel, keeps the View talents
-      // navigation-only behavior (stage + jump, exactly as before).
+      // Every panel gets a primary action button. For ALL TEN classes a spec
+      // that is NOT the committed one reads Select specialization and COMMITS
+      // it via deps.commitSpec (IWorld.setSpec, sim re-validated) before
+      // staging + jumping to the Choices tab, so the spec choice actually
+      // grants the signature ability + mastery (and, for the warrior, unlocks
+      // the spec-gated kit and fury dual wield). The committed spec's button
+      // keeps the View talents navigation-only behavior. The warrior's old
+      // staged-edit-plus-loadout-Save rule was superseded 2026-07-11: it left
+      // the window with no discoverable committing control at all (see
+      // docs/prd/warrior-talents.md). The sim already handles a warrior spec
+      // swap safely (kit re-gate + revalidateOffhandForSpec).
       const committed = this.deps.currentAllocation().spec === sp.id;
-      const commits = cls !== 'warrior' && !committed;
+      const commits = !committed;
       const viewBtn = document.createElement('button');
       viewBtn.type = 'button';
       viewBtn.className = `btn ts-view-talents${selected ? ' primary' : ''}${info?.examples.length ? ' has-ex' : ''}`;
@@ -413,8 +417,10 @@ export class TalentsWindow {
 
   private setSpec(stage: TalentAllocation, specId: string): void {
     if (stage.spec === specId) return;
-    // Rows model: switching spec picks the new spec and clears every chosen row
-    // (rows are spec-scoped, so none carry over).
+    // Staged buffer only. Clearing stage.rows touches the LEGACY allocation
+    // rows nothing here reads (the Choices tab reads deps.rowPicks(), which
+    // commit instantly via pickRow); committed row picks are class-wide and
+    // spec-independent sim-side, so a spec switch never clears them.
     stage.spec = specId;
     stage.rows = {};
     this.render();

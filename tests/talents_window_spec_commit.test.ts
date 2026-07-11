@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 //
-// Spec-commit behavior of the talents window (the fix for the nine talents-2.0
-// classes whose spec choice only ever STAGED and never committed):
-//   - For every class EXCEPT the overhauled 'warrior' (warrior_classic IS one of
-//     the nine), an UNCOMMITTED spec panel's button reads the selectSpec label and
-//     clicking it COMMITS through deps.commitSpec (Hud wires it to IWorld.setSpec)
-//     before staging + jumping to the Choices tab.
+// Spec-commit behavior of the talents window (the fix for the reworked window
+// whose spec choice only ever STAGED and never committed):
+//   - For ALL TEN classes (the overhauled 'warrior' included since the
+//     2026-07-11 operator decision superseded the staged-edit-plus-Save rule;
+//     see docs/prd/warrior-talents.md), an UNCOMMITTED spec panel's button reads
+//     the selectSpec label and clicking it COMMITS through deps.commitSpec (Hud
+//     wires it to IWorld.setSpec) before staging + jumping to the Choices tab.
 //   - The ALREADY-COMMITTED spec keeps the navigation-only viewTalents button.
-//   - The warrior keeps viewTalents on every panel and never calls commitSpec.
 //   - The online wire: ClientWorld.setSpec sends the existing setSpec command.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -27,8 +27,8 @@ import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 import { t } from '../src/ui/i18n';
 import { TalentsWindow, type TalentsWindowDeps } from '../src/ui/talents_window';
 
-// The nine talents-2.0 classes: every class except the overhauled 'warrior'.
-const NINE_CLASSIC_STYLE = ALL_CLASSES.filter((c) => c !== 'warrior');
+// Every class commits through the same button, the overhauled warrior included.
+const COMMIT_CLASSES = ALL_CLASSES;
 
 interface Harness {
   win: TalentsWindow;
@@ -86,17 +86,17 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('spec commit: the nine talents-2.0 classes', () => {
-  it('covers exactly the nine classes (every class except warrior; warrior_classic included)', () => {
-    expect(NINE_CLASSIC_STYLE).toHaveLength(9);
-    expect(NINE_CLASSIC_STYLE).toContain('warrior_classic');
-    expect(NINE_CLASSIC_STYLE).not.toContain('warrior');
-    for (const cls of NINE_CLASSIC_STYLE) {
+describe('spec commit: all ten classes', () => {
+  it('covers every class, the overhauled warrior and warrior_classic included', () => {
+    expect(COMMIT_CLASSES).toHaveLength(10);
+    expect(COMMIT_CLASSES).toContain('warrior');
+    expect(COMMIT_CLASSES).toContain('warrior_classic');
+    for (const cls of COMMIT_CLASSES) {
       expect(talentsFor(cls), `${cls} must have authored specs`).not.toBeNull();
     }
   });
 
-  for (const cls of NINE_CLASSIC_STYLE) {
+  for (const cls of COMMIT_CLASSES) {
     it(`${cls}: uncommitted specs render the selectSpec label and the click commits that spec`, () => {
       const { win, root, commits } = makeHarness(cls, null);
       win.open();
@@ -134,22 +134,36 @@ describe('spec commit: the nine talents-2.0 classes', () => {
   });
 });
 
-describe('spec commit: the overhauled warrior keeps its existing flow', () => {
-  it('renders View talents on every panel and never calls commitSpec', () => {
+describe('spec commit: the overhauled warrior (the 2026-07-11 bug report)', () => {
+  it('commits fury on the Select specialization click, so dual wield can unlock', () => {
+    // The original exclusion left the warrior with NO committing control in
+    // the window (the only path was a buried loadout Save), so a warrior
+    // could never gain a spec, and canDualWield never saw 'fury'.
     const { win, root, commits } = makeHarness('warrior', null);
     win.open();
     const specs = talentsFor('warrior')?.specs ?? [];
+    const furyIdx = specs.findIndex((s) => s.id === 'fury');
+    expect(furyIdx).toBeGreaterThanOrEqual(0);
     const buttons = panelButtons(root);
     expect(buttons.length).toBe(specs.length);
-    expect(buttons.length).toBeGreaterThan(0);
     for (const btn of buttons) {
-      expect(btn.textContent).toBe(t('hudChrome.specPanel.viewTalents'));
+      expect(btn.textContent).toBe(t('hudChrome.specPanel.selectSpec'));
     }
-    buttons[0].click();
-    expect(commits).toEqual([]);
-    // Navigation still works: the click stages + jumps to the Choices tab.
+    buttons[furyIdx].click();
+    expect(commits).toEqual(['fury']);
     const rowsTab = root.querySelector('.tal-tab[data-tab="rows"]');
     expect(rowsTab?.classList.contains('active')).toBe(true);
+  });
+
+  it('the committed warrior spec reverts to the navigation-only View talents button', () => {
+    const { win, root, commits } = makeHarness('warrior', 'fury');
+    win.open();
+    const specs = talentsFor('warrior')?.specs ?? [];
+    const furyIdx = specs.findIndex((s) => s.id === 'fury');
+    const buttons = panelButtons(root);
+    expect(buttons[furyIdx].textContent).toBe(t('hudChrome.specPanel.viewTalents'));
+    buttons[furyIdx].click();
+    expect(commits).toEqual([]);
   });
 });
 

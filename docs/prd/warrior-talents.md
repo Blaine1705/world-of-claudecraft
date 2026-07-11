@@ -80,9 +80,11 @@ Spec-gating keys off the COMMITTED spec (`mods.spec`); default is NO spec. RULE 
 a spec-restricted ability shows ONLY when the committed spec matches, so a NO-SPEC warrior sees
 only the ungated shared base kit and gains a spec's exclusives by committing that spec. This is why
 a specless warrior briefly "saw everything" (the old rule was "no spec = full kit"); fixed.
-Committing a spec today: talents panel (N) -> pick a spec card -> Save a loadout (level 10+
-required; `saveTalentLoadout` sets `meta.talents` + recomputes known). A simpler one-click spec
-commit is still open, but deferred to ryze's #1614 engine (that UX is its territory).
+Committing a spec today (2026-07-11): talents panel (N) -> the Select specialization button on an
+uncommitted spec panel commits instantly via `IWorld.setSpec` (the same one-click path every class
+uses; spec unlocks at level 5, `SPEC_UNLOCK_LEVEL`). Saving a loadout still commits the full build
+(spec included) as before. The one-click commit originally deferred to ryze's #1614 engine landed
+inside that engine's window.
 
 ### Arms (PENDING as of this writing; being built)
 - `breachmaker` "Breachmaker" (Aplastar Coloso): lvl 16, 10 rage, 45s cd. Weapon strike + marks the
@@ -103,8 +105,11 @@ commit is still open, but deferred to ryze's #1614 engine (that UX is its territ
 - `sunder_armor` (Armor Shear) threat: the HIGH tank threat applies ONLY when the caster's committed
   spec is Protection. For Arms it is a plain armor-shred with normal threat (no tank threat bonus).
 - Choosing a spec must be a STAGED edit that requires an explicit Save, like talent points; it must
-  NOT apply the instant it is clicked. STATUS: spec selection is ALREADY staged in our engine
-  (`talents_window.ts` `setSpec` mutates the staged allocation, committed only on loadout save).
+  NOT apply the instant it is clicked. SUPERSEDED (operator, 2026-07-11): in practice the rule left
+  the N window with no discoverable committing control (card clicks staged locally, the only commit
+  was the buried loadout Save), so warriors could not select a spec at all on PBE. The dedicated
+  Select specialization button now commits on click for every class, the warrior included; the
+  explicit-action intent is carried by the clearly-labeled button rather than a separate Save.
 - Choice-row picks should ALSO require an explicit Save instead of applying instantly (they are
   respec-free/instant today via `pickRow` -> `sim.pickRowTalent`). DEFERRED to the ryze #1614
   consolidation on purpose: making row picks staged means folding them into the build/loadout system,
