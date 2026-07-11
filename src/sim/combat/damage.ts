@@ -256,7 +256,7 @@ export function dealDamage(
     source.id !== target.id &&
     amount > 0 &&
     target.kind === 'player' &&
-    target.auras.some((a) => a.kind === 'absorb' && PERSONAL_BARRIER_IDS.includes(a.id))
+    target.auras.some((a) => a.kind === 'absorb' && a.id === 'ice_barrier')
   ) {
     const wardedMeta = ctx.players.get(target.id);
     const wardedCut = wardedMeta ? ctx.playerMods(wardedMeta).global.barrierDrPct : 0;

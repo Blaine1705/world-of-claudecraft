@@ -62,12 +62,6 @@ const PCT_FIELDS = new Set([
   // Warded (mage choice row): fraction less damage while the barrier is up,
   // applied at runtime in combat/damage.ts, shown as "15%".
   'barrierDrPct',
-  // Ignition (fire mage mastery): the burn fraction, shown as "40%".
-  'ignitionPct',
-  // Chronoweave (arcane mage mastery): the mana cushion + regen, applied in
-  // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
-  'manaPct',
-  'manaRegenPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -78,6 +72,9 @@ function expectedTokens(effect: unknown): string[] {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
+        // Temporal Rift (mage choice row) is a picked/not-picked flag like
+        // battleRhythm; its 20s ICD is stated as a duration, not this 1.
+        if (key === 'temporalRift') continue;
         if (key === 'critDmgPct' && value === 0.5) {
           toks.push('double');
           continue;

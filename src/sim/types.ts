@@ -385,18 +385,6 @@ export type AuraKind =
   // hard cast decrements the value and removes the aura at 0
   // (casting_lifecycle). Draws no rng.
   | 'ice_floes'
-  // Overload (mage choice row): armed amplifier; the next mana spell is baked
-  // 40% stronger and 50% costlier from a scaled copy of its resolved ability
-  // (casting_lifecycle consumeOverload). value = the output fraction (0.4).
-  | 'overload'
-  // Power Echo (mage choice row): the next direct spell repeats its RESOLVED
-  // damage at `value` fraction on the same target (effect_dispatch, beside
-  // Bladed Echo); consumed before the repeat so a copy can never re-echo.
-  | 'power_echo'
-  // Combustion (fire mage signature): while worn, every Fire spell crit roll's
-  // OUTCOME is overridden to true (combat/fire_mage.ts fireGuaranteedCrit; the
-  // roll is still drawn). Guaranteed crits build Hot Streak like any other.
-  | 'combustion'
   // Inert timer marker: NO combat reader keys on this kind, so it is pure
   // visible state (an internal cooldown or a capped-window accumulator the
   // player can watch tick). Kept apart per user by the aura id (Temporal
@@ -1723,7 +1711,33 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
-  | { type: 'selfHealPctMax'; pct: number }
+  | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
+  // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
+  // fraction of the caster's MAXIMUM health over the duration (the pct-of-max
+  // sibling of the flat 'hot' effect; carries no spell-power rider).
+  | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
+  // Rallying Cry (owner rework): the caster and party members within radius
+  // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
+  // hp FRACTION, so current health rises and falls with the buff, WoW-style).
+  | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
+  // Mass Barrier (mage choice row): the caster and every friendly within radius
+  // gain an absorb shield (the aoeAlly* family shape with an 'absorb' aura).
+  | { type: 'aoeAllyAbsorb'; amount: number; duration: number; radius: number }
+  // Greater Invisibility (mage choice row): one dispatch applies the whole
+  // package (a 'stealth'-kind vanish for `duration`, a buff_dr damage cut for
+  // `duration` + `linger` so it survives an early break, and strips up to
+  // `removeDotCount` damage-over-time auras). One effect so the two self-auras
+  // get distinct ids (the selfBuff case keys auras by the ability id alone).
+  | {
+      type: 'greaterInvisibility';
+      duration: number;
+      drValue: number;
+      linger: number;
+      removeDotCount: number;
+    }
+  // Sanguine Aura: buff the caster and every MELEE party member (MELEE_CLASSES)
+  // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
+  | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }
   | { type: 'charge' }
   // Druid Feral signature (Feral Instinct): a form-gated resource burst. In Cat Form it
   // grants an Energy-regeneration buff; in Bear Form it instantly generates Rage.

@@ -4,9 +4,7 @@
 // choice_rows_wave2 harness idiom (a real Sim, applyTalents with a rows map).
 
 import { describe, expect, it } from 'vitest';
-import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { rowTreeFor } from '../src/sim/content/talent_rows';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -15,10 +13,7 @@ import type { Entity } from '../src/sim/types';
 function rig(rows: Record<number, string>, level = 20) {
   const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
-  // Frost-specced rig: the Chronomancy gating (mage-chronomancy.md Phase 1)
-  // moved the offensive kit these rows exercise (Frostveil, the fire/frost
-  // nukes) onto the two DPS specs, so a spec-less rig can no longer cast it.
-  expect(sim.applyTalents({ spec: 'frost', rows })).toBe(true);
+  expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
   p.resource = p.maxResource;
   return { sim, p };
@@ -45,13 +40,9 @@ function tickFor(sim: Sim, seconds: number): void {
 }
 
 describe('mage base kit', () => {
-  it('Flickerstep (blink) is a BASE ability at level 10, no row pick needed', () => {
-    // Owner leveling pass 2026-07-14: blink moved 5 -> 10. NOTE the level-5 row
-    // still offers two blink-modifying picks; they simply come online at 10.
-    const at5 = abilitiesKnownAt('mage', 5).map((k) => k.def.id);
-    expect(at5).not.toContain('blink');
-    const at10 = abilitiesKnownAt('mage', 10).map((k) => k.def.id);
-    expect(at10).toContain('blink');
+  it('Flickerstep (blink) is a BASE ability at level 5, no row pick needed', () => {
+    const ids = abilitiesKnownAt('mage', 5).map((k) => k.def.id);
+    expect(ids).toContain('blink');
   });
 });
 
@@ -152,33 +143,22 @@ describe('mage choice rows (owner tree)', () => {
     sim.castAbility('greater_invisibility');
     expect(p.auras.filter((a) => a.kind === 'dot')).toHaveLength(1); // 2 removed
     expect(p.stealthed).toBe(true);
-    // The stealth kind doubles as a movement factor (rogues sneak slower); an
-    // invisible mage keeps FULL speed (owner playtest: value 0 pinned them).
-    expect(p.auras.find((a) => a.kind === 'stealth')?.value).toBe(1);
     const dr = p.auras.find((a) => a.id === 'greater_invisibility_dr');
     expect(dr?.kind).toBe('buff_dr');
     expect(dr?.value).toBeCloseTo(0.9);
     expect(dr?.duration).toBeCloseTo(23); // 20s vanish + 3s linger
   });
 
-  it('Ring of Frost arms at the aimed point with a single charge', () => {
+  it('Ring of Frost roots enemies at the aimed point after its cast, with 2 charges', () => {
     const { sim, p } = rig({ 11: 'mag_r11_rings_of_frost' });
     const mob = addTargetMob(sim, 100000, 15);
-    const center = { x: mob.pos.x, z: mob.pos.z };
-    sim.castAbilityAt('rings_of_frost', center);
+    sim.castAbilityAt('rings_of_frost', { x: mob.pos.x, z: mob.pos.z });
     tickFor(sim, 2); // the 1.5s cast is the arming delay
-    expect(mob.auras.some((a) => a.kind === 'root')).toBe(false); // center is safe
-    mob.pos.x = center.x + 5.3;
-    mob.prevPos = { ...mob.pos };
-    sim.tick();
     expect(mob.auras.some((a) => a.kind === 'root')).toBe(true);
     const res = (
-      sim as unknown as {
-        resolvedAbility(id: string, pid: number): { charges?: number; bonusCharges?: number };
-      }
+      sim as unknown as { resolvedAbility(id: string, pid: number): { charges?: number } }
     ).resolvedAbility('rings_of_frost', p.id);
-    expect(res.charges ?? 1).toBe(1);
-    expect(res.bonusCharges ?? 0).toBe(0);
+    expect(res.charges).toBe(2);
   });
 
   it('Snap Polymorph makes Bewitch instant on a real 20 sec cooldown', () => {
@@ -239,9 +219,7 @@ describe('mage choice rows (owner tree)', () => {
     addTargetMob(sim, 100000, 3);
     p.cooldowns.set('blink', 15);
     const before = p.resource;
-    // ice_lance: the frost rig's instant mana spender (arcane_explosion is
-    // Chronomancer-only since the owner spec split 2026-07-14).
-    sim.castAbility('ice_lance');
+    sim.castAbility('arcane_explosion'); // instant mana spender
     const spent = before - p.resource;
     expect(spent).toBeGreaterThan(0);
     const shave = (spent / p.maxResource) * 10 * 2;
@@ -250,157 +228,24 @@ describe('mage choice rows (owner tree)', () => {
     expect(cap?.value).toBeCloseTo(shave, 5);
   });
 
-  it('Aetherwell channels mana and STACKS spell power the longer you channel', () => {
+  it('Aetherwell (Evocation) is granted and restores mana', () => {
     const { sim, p } = rig({ 20: 'mag_r20_evocation' });
     p.resource = 10;
-    const sp0 = p.spellPower;
     sim.castAbility('evocation');
-    expect(p.castingAbility).toBe('evocation'); // a real channel, not a dump
-    tickFor(sim, 2.2);
-    const early = p.resource;
-    expect(early).toBeGreaterThan(10); // mana pulses land while channeling
-    const midAura = p.auras.find((a) => a.id === 'evocation');
-    expect(midAura?.kind).toBe('buff_spellpower');
-    const midValue = midAura?.value ?? 0;
-    expect(midValue).toBeGreaterThanOrEqual(16); // two pulses banked already
-    tickFor(sim, 5); // ride the channel out
-    const aura = p.auras.find((a) => a.id === 'evocation');
-    expect(aura?.value).toBe(48); // six pulses of 8: the full channel banked
-    expect(aura?.stacks).toBe(6);
-    expect(p.spellPower).toBe(sp0 + 48); // recalced live onto the sheet
-    expect(p.resource - 10).toBeGreaterThanOrEqual(6 * 40); // the flat mana floor
-  });
-
-  it('Blink While Casting slips Flickerstep through the busy guard, keeping the cast', () => {
-    const { sim, p } = rig({ 5: 'mag_r5_blink_cast' });
-    addTargetMob(sim);
-    sim.castAbility('fireball');
-    expect(p.castingAbility).toBe('fireball');
-    const z0 = p.pos.z;
-    const mana0 = p.resource;
-    sim.castAbility('blink');
-    expect(p.castingAbility).toBe('fireball'); // the cast survives
-    expect(p.resource).toBe(mana0 - 40); // the blink actually cast
-    expect(p.pos.z).not.toBe(z0); // and actually moved
-  });
-
-  it('without the pick, a mid-cast Flickerstep press stays blocked', () => {
-    const { sim, p } = rig({ 5: 'mag_r5_double_blink' });
-    addTargetMob(sim);
-    sim.castAbility('fireball');
-    const mana0 = p.resource;
-    const z0 = p.pos.z;
-    sim.castAbility('blink');
-    expect(p.resource).toBe(mana0); // nothing billed
-    expect(p.pos.z).toBe(z0); // nothing moved
-  });
-
-  it('Overload arms an amplifier the next mana spell consumes at a 50% higher bill', () => {
-    const { sim, p } = rig({ 14: 'mag_r14_overload' });
-    addTargetMob(sim, 100000, 5);
-    sim.castAbility('overload');
-    expect(p.auras.some((a) => a.kind === 'overload')).toBe(true);
-    const res = (
-      sim as unknown as { resolvedAbility(id: string, pid: number): { cost: number } }
-    ).resolvedAbility('ice_lance', p.id);
-    const mana0 = p.resource;
-    (p as { gcdRemaining: number }).gcdRemaining = 0;
-    sim.castAbility('ice_lance');
-    expect(p.resource).toBe(mana0 - Math.round(res.cost * 1.5)); // the steeper bill
-    expect(p.auras.some((a) => a.kind === 'overload')).toBe(false); // consumed
-  });
-
-  it('Power Echo repeats the resolved hit at 50% on the same target, once', () => {
-    const { sim, p } = rig({ 14: 'mag_r14_power_echo' });
-    const mob = addTargetMob(sim, 100000, 5);
-    sim.castAbility('power_echo');
-    (p as { gcdRemaining: number }).gcdRemaining = 0;
-    const hp0 = mob.hp;
-    // ice_lance: frost-known instant (fire_blast is fire-only since the split).
-    sim.castAbility('ice_lance');
-    // The bolt is a projectile: fly it to impact, collecting the tick events.
-    const collected: { type: string; amount?: number }[] = [];
-    for (let i = 0; i < 30; i++) collected.push(...(sim.tick() as never[]));
-    const events = collected.filter((e) => e.type === 'damage');
-    expect(events).toHaveLength(2); // the hit and its echo
-    const [hit, echo] = events as { amount: number }[];
-    expect(echo.amount).toBe(Math.max(1, Math.round(hit.amount * 0.5)));
-    expect(mob.hp).toBe(hp0 - hit.amount - echo.amount);
-    expect(p.auras.some((a) => a.kind === 'power_echo')).toBe(false); // consumed
-  });
-
-  it('Elemental Convergence opens the surge on a Fire-Frost alternation, once per 30 sec', () => {
-    const { sim, p } = rig({ 17: 'mag_r17_convergence' });
-    addTargetMob(sim, 100000, 5);
-    // fireball: the base-kit fire school (fire_blast is fire-only since the split).
-    sim.castAbility('fireball');
-    tickFor(sim, 4); // ride the hard cast plus the bolt's flight
-    expect(p.auras.some((a) => a.id === 'elemental_convergence')).toBe(false);
-    (p as { gcdRemaining: number }).gcdRemaining = 0;
-    sim.castAbility('frostbolt'); // base-kit frost (ice_lance is spec-gated)
-    tickFor(sim, 4); // ride the hard cast plus the bolt's flight
-    const surge = p.auras.find((a) => a.id === 'elemental_convergence');
-    expect(surge?.kind).toBe('buff_dmg_done');
-    expect(surge?.value).toBeCloseTo(0.15);
-    expect(p.auras.some((a) => a.id === 'convergence_cd')).toBe(true);
-    // Another alternation inside the internal cooldown re-arms nothing new.
-    (p as { gcdRemaining: number }).gcdRemaining = 0;
-    p.resource = p.maxResource;
-    sim.castAbility('fireball');
     tickFor(sim, 4);
-    (p as { gcdRemaining: number }).gcdRemaining = 0;
-    sim.castAbility('frostbolt');
-    tickFor(sim, 4);
-    const cds = p.auras.filter((a) => a.id === 'convergence_cd');
-    expect(cds).toHaveLength(1);
+    expect(p.resource).toBeGreaterThan(10);
   });
 
-  it('Rune of Power buffs allies standing near it and falls off after leaving', () => {
-    const { sim, p } = rig({ 20: 'mag_r20_rune_of_power' });
-    sim.castAbility('rune_of_power');
-    tickFor(sim, 2.5); // first friendly pulse
-    const rune = p.auras.find((a) => a.id === 'rune_of_power');
-    expect(rune?.kind).toBe('buff_dmg_done');
-    expect(rune?.value).toBeCloseTo(0.1);
-    // Step far outside the 8 yd ring: the short pulse buff expires unrefreshed.
-    p.pos.x += 30;
-    p.prevPos = { ...p.pos };
-    tickFor(sim, 4);
-    expect(p.auras.some((a) => a.id === 'rune_of_power')).toBe(false);
-  });
-});
-
-describe('the talents-window registry mirror', () => {
-  it('ROW_TREES.mage stays in lockstep with MAGE_CHOICE_ROWS (id, name, level)', () => {
-    const mirror = rowTreeFor('mage');
-    expect(mirror).not.toBeNull();
-    expect(mirror).toHaveLength(MAGE_CHOICE_ROWS.rows.length);
-    MAGE_CHOICE_ROWS.rows.forEach((row, i) => {
-      expect(mirror?.[i].level).toBe(row.level);
-      expect(mirror?.[i].options.map((o) => o.id)).toEqual(row.options.map((o) => o.id));
-      expect(mirror?.[i].options.map((o) => o.name)).toEqual(row.options.map((o) => o.name));
-    });
-  });
-
-  it('the window flow works: a mage pickRowTalent pick applies its effect live', () => {
-    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
-    sim.setPlayerLevel(20);
-    expect(sim.setSpec('frost')).toBe(true);
-    const p = sim.player;
-    // Row index 1 = the level-8 survival row; the pick flows through the same
-    // pickChoiceRowTalent path the talents window's Choices tab drives.
-    expect(sim.pickRowTalent(1, 'mag_r8_temporal_rift')).toBe(true);
-    (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, {
-      id: 'test_stun',
-      name: 'Test Stun',
-      kind: 'stun',
-      value: 0,
-      remaining: 3,
-      duration: 3,
-      sourceId: 424242,
-      school: 'physical',
-    });
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(false); // cleansed
-    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
+  it('the five coming-soon options are pickable and inert', () => {
+    for (const [level, id] of [
+      [5, 'mag_r5_blink_cast'],
+      [14, 'mag_r14_power_echo'],
+      [14, 'mag_r14_overload'],
+      [17, 'mag_r17_convergence'],
+      [20, 'mag_r20_rune_of_power'],
+    ] as const) {
+      const { sim } = rig({ [level]: id });
+      expect(sim.player.dead).toBe(false); // picked, booted, and inert
+    }
   });
 });

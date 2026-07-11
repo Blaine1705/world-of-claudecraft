@@ -116,7 +116,18 @@ export interface GlobalModEffect {
   bloodbathPct?: number;
   bloodbathDuration?: number;
   bloodbathMaxPct?: number;
-  cdrPerRage?: number;
+  // Mage choice rows (owner tree 2026-07-11):
+  // Warded: fraction less damage taken while the caster's own personal barrier
+  // (an ice_barrier absorb aura) is up. Folded target-side in combat/damage.ts.
+  barrierDrPct?: number;
+  // Temporal Rift: 1 when picked. Every 20 sec the next stun/root/silence to
+  // land on the wearer is cleansed instantly (the applyAura funnel in sim.ts,
+  // ICD carried by a 'temporal_rift_cd' aura). Draws no rng.
+  temporalRift?: number;
+  // Overflowing Power: seconds shaved off the mage defensive cooldowns per 10%
+  // of maximum mana spent, capped at 10 sec per 30 sec (casting_lifecycle's
+  // spendAbilityCost, the Colossal Might pattern on mana).
+  manaDefCdrPer10?: number;
 }
 
 export interface TalentEffect {
@@ -380,7 +391,9 @@ function zeroGlobal(): Required<GlobalModEffect> {
     bloodbathPct: 0,
     bloodbathDuration: 0,
     bloodbathMaxPct: 0,
-    cdrPerRage: 0,
+    barrierDrPct: 0,
+    temporalRift: 0,
+    manaDefCdrPer10: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -470,6 +483,9 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.cdrPerRage += (e.cdrPerRage ?? 0) * mult;
     // An ICD is a duration, not a rate: take the longest granted, ignore mult.
     g.cheatDeathIcd = Math.max(g.cheatDeathIcd, e.cheatDeathIcd ?? 0);
+    g.barrierDrPct += (e.barrierDrPct ?? 0) * mult;
+    g.temporalRift += (e.temporalRift ?? 0) * mult;
+    g.manaDefCdrPer10 += (e.manaDefCdrPer10 ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

@@ -124,6 +124,10 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'arcane_intellect',
       'frostbolt',
       'conjure_water',
+      // Blink joins the BASE kit at 5 (owner core-kit decision 2026-07-11):
+      // two level-5 choice-row options modify it, so it can no longer live
+      // behind a row grant of its own.
+      'blink',
       // Frost spec kit (owner design 2026-07-11, `specs: ['frost']` gated):
       // Ice Lance + its three spec passives at the spec pick, Flurry at 8.
       'ice_lance',
@@ -5703,6 +5707,97 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
     description: 'Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)',
+  },
+  // --- Mage choice-row actives (owner tree, Artifact calculator 2026-07-11).
+  // WoW development names, renamed with the final localization pass like the
+  // frost spec kit. Numbers are the calculator's provisional values.
+  ice_floes: {
+    id: 'ice_floes',
+    name: 'Ice Floes',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 25,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    offGcd: true,
+    // value = protected casts left; player_motion skips its cast-cancel while
+    // worn and finishing a hard cast decrements it (casting_lifecycle).
+    effects: [{ type: 'selfBuff', kind: 'ice_floes', value: 2, duration: 15 }],
+    description:
+      'Your next two spells with a cast time can be cast while moving. Lasts 15 sec. (Mage talent)',
+  },
+  greater_invisibility: {
+    id: 'greater_invisibility',
+    name: 'Greater Invisibility',
+    class: 'mage',
+    learnLevel: 8,
+    cost: 60,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    // One dispatch applies the vanish, the damage cut (duration + linger so it
+    // survives an early break), and strips up to two DoTs (effect_dispatch).
+    effects: [
+      { type: 'greaterInvisibility', duration: 20, drValue: 0.9, linger: 3, removeDotCount: 2 },
+    ],
+    description:
+      'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+  },
+  rings_of_frost: {
+    id: 'rings_of_frost',
+    name: 'Ring of Frost',
+    class: 'mage',
+    learnLevel: 11,
+    cost: 60,
+    castTime: 1.5,
+    cooldown: 30,
+    range: 25,
+    school: 'frost',
+    requiresTarget: false,
+    // Aimed at the ground; the cast time IS the arming delay, then the ring
+    // roots everything inside (the aoeRoot case centers on castAim when aimed).
+    targetMode: 'position',
+    effects: [{ type: 'aoeRoot', duration: 4, radius: 6, min: 0, max: 0 }],
+    description:
+      'Summons a ring of frost, rooting enemies in the target area for 4 sec. (Mage talent)',
+  },
+  cold_snap: {
+    id: 'cold_snap',
+    name: 'Cold Snap',
+    class: 'mage',
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'clearCooldowns', abilities: ['blink', 'ice_barrier', 'greater_invisibility'] },
+    ],
+    description:
+      'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+  },
+  mass_barrier: {
+    id: 'mass_barrier',
+    name: 'Mass Barrier',
+    class: 'mage',
+    learnLevel: 17,
+    cost: 150,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'aoeAllyAbsorb', amount: 130, duration: 60, radius: 30 }],
+    description:
+      'Shields you and all allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
   },
   psychic_scream: {
     id: 'psychic_scream',

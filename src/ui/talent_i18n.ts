@@ -79,6 +79,16 @@ type DisplayGlobalKey = Exclude<
   | 'bloodbathDuration'
   | 'bloodbathMaxPct'
   | 'cdrPerRage'
+  | 'fearBreakPct'
+  // Master Armorer's 2H-gated damage: applied at runtime (combat/damage.ts), its
+  // prose is the hand-written mastery description, so no generated label.
+  | 'masteryTwoHandDmgPct'
+  // Mage choice-row runtime globals (Warded / Temporal Rift / Overflowing
+  // Power): applied at their combat hooks, prose is the hand-written row
+  // description, so no generated label.
+  | 'barrierDrPct'
+  | 'temporalRift'
+  | 'manaDefCdrPer10'
 >;
 
 export interface TalentLocaleText {
@@ -933,8 +943,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Concentración espiritual',
     Quietude: 'Reflexión',
     'Racing Mind': 'Presencia mental',
-    Ignition: 'Ignición',
-    Combustion: 'Combustión',
     'Ice Floes': 'Témpanos',
     'Double Blink': 'Traslación doble',
     'Blink While Casting': 'Traslación al lanzar',
@@ -1375,8 +1383,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Enfoque espiritual',
     Quietude: 'Reflexión',
     'Racing Mind': 'Presencia mental',
-    Ignition: 'Ignición',
-    Combustion: 'Combustión',
     'Ice Floes': 'Témpanos',
     'Double Blink': 'Traslación doble',
     'Blink While Casting': 'Traslación al lanzar',
@@ -1817,8 +1823,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Concentration spirituelle',
     Quietude: 'Réflexion',
     'Racing Mind': "Présence d'esprit",
-    Ignition: 'Embrasement',
-    Combustion: 'Combustion lente',
     'Ice Floes': 'Blocs de glace',
     'Double Blink': 'Double transfert',
     'Blink While Casting': 'Transfert en incantation',
@@ -2259,8 +2263,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Focalisation spirituelle',
     Quietude: 'Réflexion',
     'Racing Mind': "Présence d'esprit",
-    Ignition: 'Embrasement',
-    Combustion: 'Combustion lente',
     'Ice Floes': 'Blocs de glace',
     'Double Blink': 'Double transfert',
     'Blink While Casting': 'Transfert en incantation',
@@ -2701,8 +2703,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Concentrazione spirituale',
     Quietude: 'Riflessione',
     'Racing Mind': 'Presenza di spirito',
-    Ignition: 'Ignizione',
-    Combustion: 'Combustione',
     'Ice Floes': 'Lastre di ghiaccio',
     'Double Blink': 'Doppio lampo',
     'Blink While Casting': 'Lampo in lancio',
@@ -3143,8 +3143,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Spiritueller Fokus',
     Quietude: 'Reflexion',
     'Racing Mind': 'Geistesgegenwart',
-    Ignition: 'Entzündung',
-    Combustion: 'Verbrennung',
     'Ice Floes': 'Eisschollen',
     'Double Blink': 'Doppelblinzeln',
     'Blink While Casting': 'Blinzeln beim Zaubern',
@@ -3585,8 +3583,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '精神专注',
     Quietude: '反射',
     'Racing Mind': '气定神闲',
-    Ignition: '点燃',
-    Combustion: '燃烧',
     'Ice Floes': '浮冰',
     'Double Blink': '双重闪现',
     'Blink While Casting': '施法闪现',
@@ -4027,8 +4023,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '精神專注',
     Quietude: '反射',
     'Racing Mind': '心靈專注',
-    Ignition: '點燃',
-    Combustion: '燃燒',
     'Ice Floes': '浮冰',
     'Double Blink': '雙重閃現',
     'Blink While Casting': '施法閃現',
@@ -4469,8 +4463,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '정신 집중',
     Quietude: '반사',
     'Racing Mind': '정신 집중',
-    Ignition: '점화',
-    Combustion: '연소',
     'Ice Floes': '유빙',
     'Double Blink': '이중 점멸',
     'Blink While Casting': '시전 중 점멸',
@@ -4911,8 +4903,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '精神集中',
     Quietude: '反射',
     'Racing Mind': '明鏡止水',
-    Ignition: '発火',
-    Combustion: '燃焼',
     'Ice Floes': '流氷',
     'Double Blink': '二重ブリンク',
     'Blink While Casting': '詠唱中ブリンク',
@@ -5353,8 +5343,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Foco Espiritual',
     Quietude: 'Reflexão',
     'Racing Mind': 'Presença de Espírito',
-    Ignition: 'Ignição',
-    Combustion: 'Combustão',
     'Ice Floes': 'Placas de Gelo',
     'Double Blink': 'Piscada Dupla',
     'Blink While Casting': 'Piscada ao Conjurar',
@@ -5795,8 +5783,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Духовное сосредоточение',
     Quietude: 'Отражение',
     'Racing Mind': 'Присутствие духа',
-    Ignition: 'Воспламенение',
-    Combustion: 'Возгорание',
     'Ice Floes': 'Льдины',
     'Double Blink': 'Двойной скачок',
     'Blink While Casting': 'Скачок при чтении заклинаний',
@@ -6157,8 +6143,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Tichá horlivost',
     Quietude: 'Poklid',
     'Racing Mind': 'Uhánějící mysl',
-    Ignition: 'Vznícení',
-    Combustion: 'Vzplanutí',
     'Ice Floes': 'Ledové kry',
     'Double Blink': 'Dvojitý skok',
     'Blink While Casting': 'Skok při sesílání',
@@ -6519,8 +6503,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Spirituele Focus',
     Quietude: 'Weerkaatsing',
     'Racing Mind': 'Tegenwoordigheid van Geest',
-    Ignition: 'Ontbranding',
-    Combustion: 'Verbranding',
     'Ice Floes': 'IJsschotsen',
     'Double Blink': 'Dubbele flits',
     'Blink While Casting': 'Flitsen tijdens bezwering',
@@ -6881,8 +6863,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Duchowe skupienie',
     Quietude: 'Odbicie',
     'Racing Mind': 'Przytomność umysłu',
-    Ignition: 'Zapłon',
-    Combustion: 'Spalanie',
     'Ice Floes': 'Kry lodowe',
     'Double Blink': 'Podwójny skok',
     'Blink While Casting': 'Skok w trakcie rzucania',
@@ -7243,8 +7223,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Fokus Spiritual',
     Quietude: 'Pemantulan',
     'Racing Mind': 'Ketenangan Pikiran',
-    Ignition: 'Penyulutan',
-    Combustion: 'Pembakaran',
     'Ice Floes': 'Bongkahan Es',
     'Double Blink': 'Kelip Ganda',
     'Blink While Casting': 'Kelip Saat Merapal',
@@ -7605,8 +7583,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Ruhani Odak',
     Quietude: 'Yansıtma',
     'Racing Mind': 'Zihin Açıklığı',
-    Ignition: 'Tutuşma',
-    Combustion: 'Yanma',
     'Ice Floes': 'Buz Kütleleri',
     'Double Blink': 'Çifte Işınlanma',
     'Blink While Casting': 'Büyü Sırasında Işınlanma',
@@ -7967,8 +7943,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Andligt fokus',
     Quietude: 'Reflektion',
     'Racing Mind': 'Sinnesnärvaro',
-    Ignition: 'Antändning',
-    Combustion: 'Förbränning',
     'Ice Floes': 'Isflak',
     'Double Blink': 'Dubbelblink',
     'Blink While Casting': 'Blink under besvärjelse',
@@ -8329,8 +8303,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Tập Trung Tâm Linh',
     Quietude: 'Phản Chiếu',
     'Racing Mind': 'Tĩnh Tâm',
-    Ignition: 'Bốc Cháy',
-    Combustion: 'Thiêu Đốt',
     'Ice Floes': 'Tảng Băng Trôi',
     'Double Blink': 'Dịch Chuyển Kép',
     'Blink While Casting': 'Dịch Chuyển Khi Niệm Chú',
@@ -8691,8 +8663,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Åndeligt Fokus',
     Quietude: 'Refleksion',
     'Racing Mind': 'Åndsnærværelse',
-    Ignition: 'Antændelse',
-    Combustion: 'Forbrænding',
     'Ice Floes': 'Isflager',
     'Double Blink': 'Dobbeltblink',
     'Blink While Casting': 'Blink under besværgelse',
@@ -9582,7 +9552,15 @@ function effectDescription(
       key === 'bloodbathPct' ||
       key === 'bloodbathDuration' ||
       key === 'bloodbathMaxPct' ||
-      key === 'cdrPerRage'
+      key === 'cdrPerRage' ||
+      key === 'fearBreakPct' ||
+      key === 'cheatDeathIcd' ||
+      key === 'masteryTwoHandDmgPct' ||
+      key === 'barrierDrPct' ||
+      key === 'temporalRift' ||
+      key === 'manaDefCdrPer10' ||
+      // critVsRooted is not a plain statLabels key; it gets its own "@ root" line below.
+      key === 'critVsRooted'
     )
       continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));

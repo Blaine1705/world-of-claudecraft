@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6953,
-    "rows": 146013,
-    "translated": 143627,
-    "pending": 2193,
+    "keys": 6954,
+    "rows": 146034,
+    "translated": 143628,
+    "pending": 2213,
     "blocked": 193,
     "blockedSource": 95
   },
@@ -303465,6 +303465,78 @@
           "state": "translated",
           "srcHash": "c08533ccaad1fe08",
           "by": "human"
+        }
+      }
+    },
+    "main:guide.abilityHook.blink": {
+      "scope": "main",
+      "enHash": "2ed2ae4e3fd496c3",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "2ed2ae4e3fd496c3",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
         }
       }
     },

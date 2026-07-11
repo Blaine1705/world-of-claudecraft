@@ -873,8 +873,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Waterbind"
       },
       {
-        "id": "ice_lance",
-        "name": "Ice Lance"
+        "id": "blink",
+        "name": "Flickerstep"
       }
     ],
     "abilities": [
@@ -897,6 +897,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "conjure_water",
         "name": "Waterbind"
+      },
+      {
+        "id": "blink",
+        "name": "Flickerstep"
       },
       {
         "id": "ice_lance",

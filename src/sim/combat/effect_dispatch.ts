@@ -1770,6 +1770,23 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyAbsorb': {
+        // Mass Barrier: the aoeAlly* loop shape with an absorb shield on the
+        // caster and every friendly in radius. Draws no rng.
+        for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+          ctx.applyAura(mE, {
+            id: ability.id,
+            name: ability.name,
+            kind: 'absorb',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.amount,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
       case 'greaterInvisibility': {
         // One dispatch applies the whole package so the two self-auras carry
         // distinct ids (the selfBuff case keys auras by the ability id alone):
@@ -1784,16 +1801,13 @@ export function runEffects(
           removed++;
           ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
         }
-        // The stealth kind doubles as a MOVEMENT factor in moveSpeedMult
-        // (rogue stealth walks slower); an invisible mage keeps full speed,
-        // so the aura value must be 1, never 0 (0 pins the caster in place).
         ctx.applyAura(p, {
           id: ability.id,
           name: ability.name,
           kind: 'stealth',
           remaining: eff.duration,
           duration: eff.duration,
-          value: 1,
+          value: 0,
           sourceId: p.id,
           school: ability.school,
         });
@@ -1941,17 +1955,6 @@ export function runEffects(
         // center. Mirrors the aoeDamage castAim convention, including the
         // world-anchored fx for an aimed ring.
         const rootCenter = p.castAim ?? p.pos;
-        if (eff.ring) {
-          spawnRingOfFrost(
-            ctx,
-            p,
-            rootCenter,
-            { ...eff, ring: eff.ring },
-            ability.name,
-            ability.id,
-          );
-          break;
-        }
         if (p.castAim) {
           ctx.emit({
             type: 'spellfxAt',

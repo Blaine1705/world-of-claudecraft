@@ -871,6 +871,14 @@ function spendAbilityCost(
     return;
   }
   spendResource(p, res.cost);
+  // Overflowing Power (mage choice row): every 10% of maximum mana actually
+  // spent shaves manaDefCdrPer10 seconds off the mage defensive cooldowns,
+  // capped per rolling window (the 'internal_cd' aura carries the window's
+  // running total, so no new entity field enters the parity state hash).
+  overflowingPowerCdr(ctx, p, meta, res.cost);
+  // Colossal Might: each point of rage actually spent shaves cdrPerRage seconds
+  // off the tracked offensive cooldowns (deleting one that reaches zero, like
+  // the updateTimers decrement does). 0 for everyone without the capstone.
   const rate = ctx.playerMods(meta).global.cdrPerRage;
   if (spentRage <= 0 || rate <= 0) return;
   const refund = spentRage * rate;
@@ -879,6 +887,43 @@ function spendAbilityCost(
     if (cur === undefined) continue;
     if (cur <= refund) p.cooldowns.delete(id);
     else p.cooldowns.set(id, cur - refund);
+  }
+}
+
+// Overflowing Power (mage choice row): the Colossal Might pattern on mana. The
+// defensive set it shaves, the seconds cap, and the rolling window; the cap
+// accumulator rides an 'internal_cd' aura the player can watch tick down.
+const MAGE_DEFENSIVE_COOLDOWNS = ['blink', 'ice_barrier', 'greater_invisibility'] as const;
+const OVERFLOW_CAP_SECONDS = 10;
+const OVERFLOW_CAP_WINDOW = 30;
+
+function overflowingPowerCdr(ctx: SimContext, p: Entity, meta: PlayerMeta, cost: number): void {
+  if (cost <= 0 || p.resourceType !== 'mana' || p.maxResource <= 0) return;
+  const per10 = ctx.playerMods(meta).global.manaDefCdrPer10;
+  if (per10 <= 0) return;
+  const capAura = p.auras.find((a) => a.id === 'overflowing_power_cap');
+  const used = capAura?.value ?? 0;
+  const shave = Math.min((cost / p.maxResource) * 10 * per10, OVERFLOW_CAP_SECONDS - used);
+  if (shave <= 0) return;
+  if (capAura) {
+    capAura.value += shave;
+  } else {
+    ctx.applyAura(p, {
+      id: 'overflowing_power_cap',
+      name: 'Overflowing Power',
+      kind: 'internal_cd',
+      value: shave,
+      remaining: OVERFLOW_CAP_WINDOW,
+      duration: OVERFLOW_CAP_WINDOW,
+      sourceId: p.id,
+      school: 'arcane',
+    });
+  }
+  for (const id of MAGE_DEFENSIVE_COOLDOWNS) {
+    const cur = p.cooldowns.get(id);
+    if (cur === undefined) continue;
+    if (cur <= shave) p.cooldowns.delete(id);
+    else p.cooldowns.set(id, cur - shave);
   }
 }
 

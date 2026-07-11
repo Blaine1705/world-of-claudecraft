@@ -237,205 +237,168 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
   ],
 };
 
+// The mage tree is the owner's design (bilingual Artifact calculator,
+// 2026-07-11), replacing the first-draft rows wholesale: six class-wide
+// utility rows that serve Fire, Frost AND the future third spec. Five options
+// are declared with an EMPTY effect (a visible "coming soon" card): Blink
+// While Casting, Power Echo, Overload, Elemental Convergence and Rune of
+// Power each need a new mechanic and land in a later phase. Numbers are the
+// calculator's provisional values, tuned in playtest.
 export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'spellcraft',
+      theme: 'mobility',
       options: [
         {
-          id: 'mag_r5_firestarter',
-          name: 'Firestarter',
-          description: 'Every 3rd Fireball makes your next Fire Blast within 8 sec free.',
-          icon: 'scorch',
-          effect: {
-            proc: {
-              id: 'mag_firestarter',
-              name: 'Firestarter',
-              trigger: { on: 'castNth', n: 3, abilities: ['fireball'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['fire_blast'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'mag_r5_impulse',
-          name: 'Impulse',
-          description: 'Fire Blast cooldown reduced by 50%.',
-          icon: 'fire_blast',
-          effect: { ability: [{ ability: 'fire_blast', cooldownPct: -0.5 }] },
-        },
-        {
-          id: 'mag_r5_mana_attunement',
-          name: 'Mana Attunement',
+          id: 'mag_r5_ice_floes',
+          name: 'Ice Floes',
           description:
-            'Every 3rd mana spell restores 20 mana and makes your next spell within 8 sec cost 50% less.',
-          icon: 'arcane_intellect',
-          effect: {
-            proc: {
-              id: 'mag_mana_attunement',
-              name: 'Mana Attunement',
-              trigger: { on: 'castNth', n: 3, abilities: mageSpellAbilityIds },
-              responses: [
-                { kind: 'resource', amount: 20 },
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: mageSpellAbilityIds,
-                  duration: 8,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
+            'Grants Ice Floes: your next two spells with a cast time can be cast while moving.',
+          icon: 'ice_floes',
+          effect: { grant: { ability: 'ice_floes' } },
+        },
+        {
+          id: 'mag_r5_double_blink',
+          name: 'Double Blink',
+          description: 'Flickerstep stores 2 charges, but each recharges 30% more slowly.',
+          icon: 'blink',
+          effect: { ability: [{ ability: 'blink', bonusCharges: 1, cooldownPct: 0.3 }] },
+        },
+        {
+          id: 'mag_r5_blink_cast',
+          name: 'Blink While Casting',
+          description: 'Coming soon: Flickerstep no longer interrupts your cast in progress.',
+          icon: 'blink',
+          effect: {},
         },
       ],
     },
     {
       level: 8,
-      theme: 'counterplay',
+      theme: 'survival',
       options: [
         {
-          id: 'mag_r8_counterspell',
-          name: 'Spellbreak',
-          description: 'Grants Counterspell.',
-          icon: 'counterspell',
-          effect: { grant: { ability: 'counterspell' } },
+          id: 'mag_r8_warded',
+          name: 'Warded',
+          description:
+            'While Frostveil is up you take 15% less damage, and it heals you for 39 when it breaks after absorbing.',
+          icon: 'ice_barrier',
+          effect: {
+            global: { barrierDrPct: 0.15 },
+            // The heal is 30% of the shield's absorb budget (130), a flat 39:
+            // the shield only ever breaks after soaking its full amount.
+            proc: {
+              id: 'mag_warded',
+              name: 'Warded',
+              trigger: { on: 'shieldConsumed', ability: 'ice_barrier' },
+              responses: [{ kind: 'heal', amount: 39 }],
+            },
+          },
         },
         {
-          id: 'mag_r8_ice_nova',
-          name: 'Ice Nova',
-          description: 'Frost Nova cooldown reduced by 40% and damage increased by 50%.',
-          icon: 'frost_nova',
-          effect: { ability: [{ ability: 'frost_nova', cooldownPct: -0.4, dmgPct: 0.5 }] },
+          id: 'mag_r8_temporal_rift',
+          name: 'Temporal Rift',
+          description:
+            'Every 20 sec, the next stun, root or silence to hit you is cleansed instantly.',
+          icon: 'arcane_intellect',
+          effect: { global: { temporalRift: 1 } },
         },
         {
-          id: 'mag_r8_quick_wits',
-          name: 'Quick Wits',
-          description: 'Polymorph cast time reduced by 50%.',
-          icon: 'polymorph',
-          effect: { ability: [{ ability: 'polymorph', castPct: -0.5 }] },
+          id: 'mag_r8_greater_invis',
+          name: 'Greater Invisibility',
+          description:
+            'Grants Greater Invisibility: vanish for 20 sec, removing 2 damage-over-time effects and taking 90% less damage while invisible and shortly after.',
+          icon: 'greater_invisibility',
+          effect: { grant: { ability: 'greater_invisibility' } },
         },
       ],
     },
     {
       level: 11,
-      theme: 'shatter',
+      theme: 'control',
       options: [
         {
-          id: 'mag_r11_cone_of_cold',
-          name: 'Frostsweep',
-          description: 'Grants Cone of Cold.',
-          icon: 'cone_of_cold',
-          effect: { grant: { ability: 'cone_of_cold' } },
-        },
-        {
-          id: 'mag_r11_shatter',
-          name: 'Coldsnap Break',
-          description: 'Spell critical chance against rooted targets increased by 30%.',
-          icon: 'frostbolt',
-          effect: { global: { critVsRooted: 0.3 } },
-        },
-        {
-          id: 'mag_r11_permafrost',
-          name: 'Deep Rime',
-          description: 'Each Frost Nova grants you a shield absorbing 50 damage for 8 sec.',
-          icon: 'ice_barrier',
+          id: 'mag_r11_rings_of_frost',
+          name: 'Ring of Frost',
+          description:
+            'Grants Ring of Frost with 2 charges: root enemies in the target area for 4 sec.',
+          icon: 'rings_of_frost',
           effect: {
-            proc: {
-              id: 'mag_deep_rime',
-              name: 'Deep Rime',
-              trigger: { on: 'castNth', n: 1, abilities: ['frost_nova'] },
-              responses: [{ kind: 'absorb', amount: 50, duration: 8, name: 'Deep Rime' }],
-            },
+            grant: { ability: 'rings_of_frost' },
+            ability: [{ ability: 'rings_of_frost', bonusCharges: 1 }],
           },
+        },
+        {
+          id: 'mag_r11_snap_polymorph',
+          name: 'Snap Polymorph',
+          description: 'Bewitch becomes instant, on a 20 sec cooldown.',
+          icon: 'polymorph',
+          effect: { ability: [{ ability: 'polymorph', castPct: -1, cooldownFlat: 20 }] },
+        },
+        {
+          id: 'mag_r11_twin_nova',
+          name: 'Twin Frost Nova',
+          description: 'Frost Nova stores 2 charges that recharge independently.',
+          icon: 'frost_nova',
+          effect: { ability: [{ ability: 'frost_nova', bonusCharges: 1 }] },
         },
       ],
     },
     {
       level: 14,
-      theme: 'tempo',
+      theme: 'amplify',
       options: [
+        {
+          id: 'mag_r14_power_echo',
+          name: 'Power Echo',
+          description:
+            'Coming soon: your next direct spell repeats at reduced power on the same target.',
+          icon: 'arcane_missiles',
+          effect: {},
+        },
+        {
+          id: 'mag_r14_overload',
+          name: 'Overload',
+          description: 'Coming soon: amplify any one spell heavily, at a steeper mana cost.',
+          icon: 'pyroblast',
+          effect: {},
+        },
         {
           id: 'mag_r14_presence_of_mind',
           name: 'Racing Mind',
-          description: 'Grants Presence of Mind.',
+          description: 'Grants Racing Mind: your next spell with a cast time is cast instantly.',
           icon: 'presence_of_mind',
           effect: { grant: { ability: 'presence_of_mind' } },
-        },
-        {
-          id: 'mag_r14_hot_streak',
-          name: 'Slow Burn',
-          description:
-            'Every 3rd Fire spell makes your next Fireball or Pyroblast within 8 sec instant.',
-          icon: 'pyroblast',
-          effect: {
-            proc: {
-              id: 'mag_slow_burn',
-              name: 'Slow Burn',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: ['fireball', 'fire_blast', 'scorch', 'pyroblast'],
-              },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['fireball', 'pyroblast'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'mag_r14_netherwind',
-          name: 'Netherwind',
-          description: 'Arcane Missiles is channelable while moving.',
-          icon: 'arcane_missiles',
-          effect: { ability: [{ ability: 'arcane_missiles', castWhileMoving: true }] },
         },
       ],
     },
     {
       level: 17,
-      theme: 'survival',
+      theme: 'cooldown',
       options: [
         {
-          id: 'mag_r17_blink',
-          name: 'Flickerstep',
-          description: 'Grants Blink.',
-          icon: 'blink',
-          effect: { grant: { ability: 'blink' } },
-        },
-        {
-          id: 'mag_r17_ice_block',
-          name: 'Cold Coffin',
-          description: 'Grants Cold Coffin.',
-          icon: 'ice_block',
-          effect: { grant: { ability: 'ice_block' } },
-        },
-        {
-          id: 'mag_r17_battlemage_armor',
-          name: 'Battlemage Armor',
+          id: 'mag_r17_convergence',
+          name: 'Elemental Convergence',
           description:
-            'Taking a hit above 15% of your maximum health raises a ward absorbing 90 damage for 8 sec. 20 sec internal cooldown.',
-          icon: 'frost_armor',
-          effect: {
-            proc: {
-              id: 'mag_battlemage_armor',
-              name: 'Battlemage Armor',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [{ kind: 'absorb', amount: 90, duration: 8, name: 'Battlemage Armor' }],
-            },
-          },
+            'Coming soon: alternating a Fire and a Frost spell opens an 8 sec surge of power.',
+          icon: 'fireball',
+          effect: {},
+        },
+        {
+          id: 'mag_r17_cold_snap',
+          name: 'Cold Snap',
+          description:
+            'Grants Cold Snap: instantly finishes the cooldown of Flickerstep, Frostveil and Greater Invisibility.',
+          icon: 'cold_snap',
+          effect: { grant: { ability: 'cold_snap' } },
+        },
+        {
+          id: 'mag_r17_mass_barrier',
+          name: 'Mass Barrier',
+          description: 'Grants Mass Barrier: shield you and all allies within 30 yd.',
+          icon: 'mass_barrier',
+          effect: { grant: { ability: 'mass_barrier' } },
         },
       ],
     },
@@ -444,23 +407,25 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'capstone',
       options: [
         {
-          id: 'mag_r20_deep_freeze',
-          name: 'Deadfrost',
-          description: 'Grants Deep Freeze.',
-          icon: 'deep_freeze',
-          effect: { grant: { ability: 'deep_freeze' } },
+          id: 'mag_r20_rune_of_power',
+          name: 'Rune of Power',
+          description:
+            'Coming soon: place a rune; allies near it deal more spell damage and healing.',
+          icon: 'flamestrike',
+          effect: {},
         },
         {
-          id: 'mag_r20_meteor',
-          name: 'Skystone',
-          description: 'Grants Meteor.',
-          icon: 'meteor',
-          effect: { grant: { ability: 'meteor' } },
+          id: 'mag_r20_overflowing_power',
+          name: 'Overflowing Power',
+          description:
+            'Spending mana shaves the cooldown of your defensives: 2 sec per tenth of your maximum mana spent, up to 10 sec every 30 sec.',
+          icon: 'evocation',
+          effect: { global: { manaDefCdrPer10: 2 } },
         },
         {
           id: 'mag_r20_evocation',
           name: 'Aetherwell',
-          description: 'Grants Evocation.',
+          description: 'Grants Aetherwell: channel to rapidly restore mana.',
           icon: 'evocation',
           effect: { grant: { ability: 'evocation' } },
         },
