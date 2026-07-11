@@ -11,7 +11,7 @@ import {
   toggleChatCategory,
 } from '../src/ui/chat_categories';
 
-describe('chat category filter — pure model', () => {
+describe('chat category filter, pure model', () => {
   it('exposes the five system categories and four player-channel groups', () => {
     expect(SYSTEM_CHAT_CATEGORIES).toEqual(['game', 'loot', 'xp', 'quest', 'event']);
     expect(CHAT_CATEGORIES).toEqual([

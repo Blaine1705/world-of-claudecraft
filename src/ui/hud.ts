@@ -2903,7 +2903,7 @@ export class Hud {
   }
 
   // A line is hidden when either an active CHANNEL tab excludes it (exact
-  // chan match, unchanged), or — only on the combined All view — its
+  // chan match, unchanged), or, only on the combined All view, its
   // CATEGORY is toggled off in the filter strip. A channel tab always shows
   // exactly its own channel regardless of the category strip (issue #1670).
   private isChatLineFiltered(chan: string, cat: ChatCategory): boolean {
