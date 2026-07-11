@@ -30,11 +30,13 @@ export const FROZEN_ORB_SPEED = 2.5; // yards per second
 export const FROZEN_ORB_SLOW_MULT = 0.7; // -30% move speed
 export const FROZEN_ORB_SLOW_DURATION = 2.5; // refreshed every pulse it keeps hitting
 export const FROZEN_ORB_FINGERS_CHANCE = 0.2; // per pulse that struck someone
-// The orb LATCHES onto prey (owner design 2026-07-11): while any living hostile
-// stands within this reach of the orb's BODY (not the pulse radius) it holds
-// position, grinding its pulses into them; the moment nothing lives in reach it
-// resumes its drift with whatever lifetime remains. The life clock never pauses.
-export const FROZEN_ORB_CONTACT_RADIUS = 2; // yards, orb body + a mob's body
+// The orb LATCHES onto prey (owner design 2026-07-11, revised same day): while
+// any living hostile its PULSES can strike (inside the pulse radius, with the
+// pulse's own line-of-sight gate) remains, the orb holds position and grinds;
+// the moment nothing strikeable lives it resumes its drift with whatever
+// lifetime remains. "It is hitting someone" and "it is stopped" are the same
+// condition, so the orb can never drift away from a target it is damaging.
+// The life clock never pauses while latched.
 
 export interface FrozenOrbState {
   sourceId: number;
@@ -52,9 +54,9 @@ export interface FrozenOrbState {
   abilityName: string;
   // The first strike's guaranteed Fingers of Frost has been granted.
   firstHitDone: boolean;
-  // Latched onto a living enemy within FROZEN_ORB_CONTACT_RADIUS: the orb holds
-  // position until nothing lives in reach. Transitions emit the halt/resume
-  // visual events so the client-side flight animation tracks the real path.
+  // Latched: a living enemy the pulses can strike is in reach, so the orb
+  // holds position until nothing strikeable lives. Transitions emit the
+  // halt/resume visual events so the client flight animation tracks the path.
   halted: boolean;
 }
 
@@ -131,10 +133,10 @@ export function tickFrozenOrbs(ctx: SimContext): void {
       ctx.frozenOrbs.splice(i, 1);
       continue;
     }
-    // Latch check: any living hostile within contact reach pins the orb in
-    // place (grid radius query, draws no rng). Only the TRANSITION emits a
-    // visual event, so the client flight animation freezes and resumes at the
-    // server's real coordinates without per-tick traffic.
+    // Latch check: any living hostile the pulses can strike pins the orb in
+    // place (grid radius query + the pulse's LoS gate, draws no rng). Only the
+    // TRANSITION emits a visual event, so the client flight animation freezes
+    // and resumes at the server's real coordinates without per-tick traffic.
     const latched = hasOrbContact(ctx, orb, source);
     if (latched !== orb.halted) {
       orb.halted = latched;
@@ -162,12 +164,16 @@ export function tickFrozenOrbs(ctx: SimContext): void {
   }
 }
 
-// True while any living hostile stands within the orb body's contact reach.
-// Physical touch: no line-of-sight gate (the damage pulses keep their own).
+// True while any living hostile the pulses can strike is in reach: the SAME
+// radius and caster-line-of-sight gate as pulseOrb, so the latch condition is
+// exactly "the orb is hitting someone" (owner: it must never drift onward
+// while its area is still damaging a target).
 function hasOrbContact(ctx: SimContext, orb: FrozenOrbState, source: Entity): boolean {
   const center = { x: orb.x, y: source.pos.y, z: orb.z };
-  for (const t of ctx.hostilesInRadius(source, center, FROZEN_ORB_CONTACT_RADIUS)) {
-    if (!t.dead) return true;
+  for (const t of ctx.hostilesInRadius(source, center, orb.radius)) {
+    if (t.dead) continue;
+    if (!ctx.hasLineOfSight(source, t)) continue;
+    return true;
   }
   return false;
 }

@@ -4,11 +4,7 @@ import {
   BLIZZARD_ORB_CDR_PER_ENEMY,
   FINGERS_OF_FROST_MAX_STACKS,
 } from '../src/sim/combat/frost_mage';
-import {
-  FROZEN_ORB_CONTACT_RADIUS,
-  FROZEN_ORB_SLOW_MULT,
-  FROZEN_ORB_SPEED,
-} from '../src/sim/combat/frozen_orb';
+import { FROZEN_ORB_SLOW_MULT, FROZEN_ORB_SPEED } from '../src/sim/combat/frozen_orb';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   computeTalentModifiers,
@@ -149,24 +145,29 @@ describe('Frozen Orb in combat', () => {
 
   it('latches onto a living enemy, holds until it dies, then resumes its drift', () => {
     const { sim, p } = makeSim();
-    const prey = spawnDummy(sim, p, 8);
+    // Beyond the 6yd pulse radius, so the orb must travel before it latches:
+    // the latch reach IS the pulse radius (owner: hitting someone = stopped).
+    const prey = spawnDummy(sim, p, 10);
     face(p, prey);
     sim.drainEvents();
     p.resource = p.maxResource;
     sim.castAbility('frozen_orb');
     const orbState = () => (sim as any).ctx.frozenOrbs[0];
-    // Reach contact: (8 - contact 2) / speed seconds of travel, plus slack.
-    const approach = tickFor(sim, (8 - FROZEN_ORB_CONTACT_RADIUS) / FROZEN_ORB_SPEED + 0.3);
+    // Reach the pulse radius: (10 - 6) / speed seconds of travel, plus slack.
+    const approach = tickFor(sim, (10 - 6) / FROZEN_ORB_SPEED + 0.3);
     const halts = approach.filter((e: any) => e.type === 'spellfxAt' && e.phase === 'halt');
     expect(halts).toHaveLength(1); // one transition, not one event per tick
     expect(orbState().halted).toBe(true);
     // Latched: the orb grinds in place while the prey lives (the clock runs on).
     const xHeld = orbState().x;
     const zHeld = orbState().z;
-    tickFor(sim, 1);
+    const held = tickFor(sim, 1);
     expect(orbState().halted).toBe(true);
     expect(orbState().x).toBe(xHeld);
     expect(orbState().z).toBe(zHeld);
+    // The owner's rule verbatim: if the pulses are hitting someone, the orb is
+    // stopped; the held second pulses the prey while the position stays pinned.
+    expect(damageEvents(held, 'Frozen Orb').length).toBeGreaterThanOrEqual(1);
     // Kill the prey: the next tick frees the orb and it drifts on.
     prey.hp = 1;
     (sim as any).dealDamage(p, prey, 5, false, 'frost', null, 'hit', true);
