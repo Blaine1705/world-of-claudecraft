@@ -116,18 +116,49 @@ describe('progressive terrain build', () => {
     }
   });
 
-  it('builds the chunks nearest a given priority point before farther ones', async () => {
+  it('an idle-paced background build completes and matches the fast build', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+
+    const zone = zoneAt(0, 0);
+    const fast = buildTerrain(20061);
+    const fastTask = fast.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await fastTask;
+
+    // No requestIdleCallback in plain Node, so idleSlot falls back to
+    // setTimeout(0); fake timers drain it the same way. The pin is that the
+    // idle-paced arm reaches full coverage (zone marked loaded) without
+    // stalling or dropping work; it emits MORE meshes than the fast arm
+    // because dense-band cells split into four half-size sub-chunks (the
+    // per-idle-slot hitch bound), never fewer.
+    const idle = buildTerrain(20061);
+    const idleTask = idle.ensureZone(zone, undefined, { pace: 'idle' });
+    await vi.runAllTimersAsync();
+    await idleTask;
+
+    expect(idle.group.children.length).toBeGreaterThanOrEqual(fast.group.children.length);
+    expect(idle.isZoneLoaded(zone.id)).toBe(true);
+    fast.cancelStreaming();
+    idle.cancelStreaming();
+  });
+
+  it('builds the chunks nearest a per-call priority point before farther ones', async () => {
     vi.resetModules();
     mockEmptyAssetLoads();
     const { buildTerrain } = await import('../src/render/terrain');
     const { zoneAt } = await import('../src/sim/data');
 
     // Anchor away from the zone's row-major origin so the ordering effect is
-    // unambiguous: the first built chunks must hug the entry point.
+    // unambiguous: the first built chunks must hug the entry point. The point
+    // rides the ensureZone call (a walked crossing's entry), NOT the view's
+    // construction point, which deliberately stays unset here.
     const zone = zoneAt(0, 0);
     const point = { x: 0, z: (zone.zMin + zone.zMax) / 2 };
-    const terrain = buildTerrain(20061, point);
-    const task = terrain.ensureZone(zone);
+    const terrain = buildTerrain(20061);
+    const task = terrain.ensureZone(zone, undefined, { priority: point });
 
     // Advance a couple of yield slices only, mid-build.
     await vi.advanceTimersByTimeAsync(0);

@@ -5,14 +5,58 @@ import {
   MAX_OUTDOOR_FOG_FAR,
   MIN_OUTDOOR_FOG_FAR,
   UNPREPARED_ZONE_FOG_GUARD,
+  ZONE_STREAM_RECHECK_DISTANCE,
+  zonesWithinStreamingHorizon,
 } from '../src/render/zone_streaming';
 import { ZONES } from '../src/sim/data';
+
+describe('renderer zone-streaming horizon', () => {
+  it('keeps a zero-radius query scoped to the containing zone', () => {
+    expect(zonesWithinStreamingHorizon(ZONES, 0, 0, 0).map((zone) => zone.id)).toEqual([
+      'eastbrook_vale',
+    ]);
+  });
+
+  it('includes a neighbouring column before the player crosses its boundary', () => {
+    const ids = zonesWithinStreamingHorizon(ZONES, 150, 0, 80, 1, 0).map((zone) => zone.id);
+    expect(ids).toEqual(['eastbrook_vale', 'farshore_isle']);
+    const farshore = ZONES.find((zone) => zone.id === 'farshore_isle');
+    if (!farshore) throw new Error('expected Farshore in built-in zones');
+    expect(distanceSqToZone(farshore, 150, 0)).toBe(30 * 30);
+  });
+
+  it('limits the spawn horizon to nearby regions instead of the whole world', () => {
+    const ids = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 1, 0).map((zone) => zone.id);
+    expect(ids).toEqual([
+      'eastbrook_vale',
+      'farshore_isle',
+      'mirefen_marsh',
+      'galecrest',
+      'willowfen',
+    ]);
+    expect(ids.length).toBeLessThan(ZONES.length / 2);
+  });
+
+  it('prioritizes the camera-facing zone when adjacent boundaries tie', () => {
+    const east = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 1, 0).map((zone) => zone.id);
+    const north = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 0, 1).map((zone) => zone.id);
+    expect(east.indexOf('farshore_isle')).toBeLessThan(east.indexOf('mirefen_marsh'));
+    expect(north.indexOf('mirefen_marsh')).toBeLessThan(north.indexOf('farshore_isle'));
+  });
+
+  it('uses a non-zero movement threshold for cheap frame-loop rechecks', () => {
+    expect(ZONE_STREAM_RECHECK_DISTANCE).toBeGreaterThan(0);
+  });
+});
 
 describe('renderer zone-residency fog', () => {
   const eastbrookOnly = new Set(['eastbrook_vale']);
 
-  it('uses the normal bounded view distance at the Eastbrook spawn', () => {
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 2, -2, 500)).toBe(MAX_OUTDOOR_FOG_FAR);
+  it('clamps ahead of the nearest unprepared zone at the Eastbrook spawn', () => {
+    // Farshore sits 178 yd from (2, -2) and is the closest unprepared zone,
+    // so the fog is held at 178 - guard = 170 no matter what was requested.
+    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 2, -2, 500)).toBe(170);
+    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 2, -2, 900)).toBe(170);
   });
 
   it('contracts before Farshore can enter the visible envelope', () => {
@@ -31,12 +75,18 @@ describe('renderer zone-residency fog', () => {
     expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 179, 0, 500)).toBe(MIN_OUTDOOR_FOG_FAR);
   });
 
-  it('opens the view again after the destination becomes resident', () => {
+  it('opens the view to the full request after the destination becomes resident', () => {
     const withFarshore = new Set(['eastbrook_vale', 'farshore_isle']);
-    expect(fogFarForPreparedZones(ZONES, withFarshore, 179, 0, 500)).toBe(MAX_OUTDOOR_FOG_FAR);
+    // The next unprepared zone is farther than the request, so the biome
+    // preset wins outright once the crossing target is resident.
+    expect(fogFarForPreparedZones(ZONES, withFarshore, 179, 0, 170)).toBe(170);
   });
 
-  it('respects a denser biome request below the global cap', () => {
-    expect(fogFarForPreparedZones(ZONES, eastbrookOnly, 2, -2, 80)).toBe(80);
+  it('caps every request at the rendering envelope even with the world resident', () => {
+    const all = new Set(ZONES.map((zone) => zone.id));
+    expect(fogFarForPreparedZones(ZONES, all, 0, 0, MAX_OUTDOOR_FOG_FAR + 500)).toBe(
+      MAX_OUTDOOR_FOG_FAR,
+    );
+    expect(fogFarForPreparedZones(ZONES, all, 0, 0, 80)).toBe(80);
   });
 });

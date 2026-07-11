@@ -16,6 +16,7 @@ import { inGardenMaze, roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } f
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
@@ -43,6 +44,9 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 const CHUNK_SIZE = 60;
 const SKIRT_DROP = 0.3;
 const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
+// An 'idle'-paced zone build waits for a browser idle slot between batches;
+// this timeout forces one batch through anyway under sustained frame load.
+const IDLE_BUILD_TIMEOUT_MS = 200;
 
 // ---------------------------------------------------------------------------
 // Real PBR splat layers (ambientCG 1K, shipped under public/textures/terrain).
@@ -1070,10 +1074,26 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
 // Entry point
 // ---------------------------------------------------------------------------
 
+export interface EnsureZoneOptions {
+  /** Build the cells nearest this point first (e.g. the entry position).
+   *  Falls back to buildTerrain's priorityPoint when omitted. */
+  priority?: { x: number; z: number };
+  /** 'fast' (default): the caller is gating on the result (boot, a teleport
+   *  behind the loading screen), so yield only between small batches.
+   *  'idle': a background prepare; every batch waits for a browser idle slot
+   *  (requestIdleCallback with a forced-progress timeout) so the build never
+   *  steals time an interactive frame needs. */
+  pace?: 'fast' | 'idle';
+}
+
 export interface TerrainView {
   group: THREE.Group;
   /** Materialize one overworld zone. Repeated calls share the cached task. */
-  ensureZone(zone: ZoneDef, onProgress?: (done: number, total: number) => void): Promise<void>;
+  ensureZone(
+    zone: ZoneDef,
+    onProgress?: (done: number, total: number) => void,
+    opts?: EnsureZoneOptions,
+  ): Promise<void>;
   isZoneLoaded(zoneId: string): boolean;
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
@@ -1235,6 +1255,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     return out;
   };
   const yieldBuild = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+  // Background ('idle') builds advance one batch per idle slot instead: the
+  // timeout still forces progress under sustained load, so a later gating
+  // caller awaiting the same shared task is never starved indefinitely.
+  const yieldIdle = (): Promise<void> => idleSlot(IDLE_BUILD_TIMEOUT_MS);
   const normalBoundsFor = (zone: ZoneDef) =>
     normalTexelBounds(
       zone.xMin ?? STRIP_MIN_X,
@@ -1252,6 +1276,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const ensureZone = (
     zone: ZoneDef,
     onProgress?: (done: number, total: number) => void,
+    opts?: EnsureZoneOptions,
   ): Promise<void> => {
     if (loadedZones.has(zone.id)) {
       onProgress?.(1, 1);
@@ -1259,19 +1284,29 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     }
     const pending = pendingZones.get(zone.id);
     if (pending) return pending;
+    const idlePace = opts?.pace === 'idle';
+    const yieldSlice = idlePace ? yieldIdle : yieldBuild;
+    // An idle build works one cell per idle slot (a gating build races in
+    // batches of four): measured on the walked-crossing harness, dense-band
+    // 60 yd chunks cost ~75 ms of main-thread geometry each, so idle pace
+    // additionally quarters them below (4 x 30 yd sub-chunks of ~20 ms).
+    const cellsPerSlice = idlePace ? 1 : 4;
     const task = (async () => {
       const cells = zoneCells(zone);
-      // A returning character can log out anywhere, not just at a zone hub, so
-      // row-major order alone can leave them standing on not-yet-built terrain.
-      // Pull the cells around the actual entry point (when one was given) to
-      // the front, sorted by distance, so the chunk directly underfoot builds
-      // first. Only that bounded neighbourhood is reordered: the rest keeps
-      // row-major order so the far-band 2x2 super-chunk merge still forms.
-      if (priorityPoint) {
+      // A player can enter a zone anywhere, not just at its hub (a returning
+      // character's logout spot, a walked boundary crossing), so row-major
+      // order alone can leave them standing on not-yet-built terrain. Pull the
+      // cells around the actual entry point (this call's priority, falling
+      // back to the view's construction point) to the front, sorted by
+      // distance, so the chunk directly underfoot builds first. Only that
+      // bounded neighbourhood is reordered: the rest keeps row-major order so
+      // the far-band 2x2 super-chunk merge still forms.
+      const entryPoint = opts?.priority ?? priorityPoint;
+      if (entryPoint) {
         const cellDist = ([cx, cz]: [number, number]): number =>
           Math.hypot(
-            -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE - priorityPoint.x,
-            WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE - priorityPoint.z,
+            -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE - entryPoint.x,
+            WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE - entryPoint.z,
           );
         const nearby = cells.filter((cell) => cellDist(cell) <= CHUNK_SIZE * 3);
         if (nearby.length > 0) {
@@ -1301,13 +1336,38 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
             Math.min(normalBounds.j1, j + rowsPerSlice - 1),
           );
           onProgress?.(++done, total);
-          await yieldBuild();
+          await yieldSlice();
         }
         normalTex.needsUpdate = true;
       }
       for (const [cx, cz] of cells) {
         if (cancelled) return;
         const cell = cz * chunksX + cx;
+        // Idle pace splits a dense-band (near or mid LOD) cell into four
+        // half-size sub-chunks, one per idle slot: a full dense 60 yd chunk
+        // costs ~75 ms of geometry on the main thread (the walked-crossing
+        // hitch), a 30 yd quarter ~20 ms. Skirts make the extra seams
+        // invisible, exactly like the far-band super-chunk merge in reverse;
+        // only the handful of dense cells per zone pay the extra draw calls.
+        const bandIdx = bandIndexAt(cx, cz);
+        if (idlePace && bandIdx < farBand && !built.has(cell)) {
+          built.add(cell);
+          const half = CHUNK_SIZE / 2;
+          const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+          const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+          for (const [qx, qz] of [
+            [0, 0],
+            [1, 0],
+            [0, 1],
+            [1, 1],
+          ] as const) {
+            if (cancelled) return;
+            addChunk(x0 + qx * half, z0 + qz * half, half, bands[bandIdx].spacing);
+            await yieldSlice();
+          }
+          onProgress?.(++done, total);
+          continue;
+        }
         if (!built.has(cell)) {
           const superCells = [
             [cx, cz],
@@ -1345,7 +1405,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
           }
         }
         onProgress?.(++done, total);
-        if (done % 4 === 0) await yieldBuild();
+        if (done % cellsPerSlice === 0) await yieldSlice();
       }
       loadedZones.add(zone.id);
       onProgress?.(total, total);

@@ -26,6 +26,8 @@ import {
   isYumiMazePos,
   MOBS,
   NPCS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   YUMI_MAZE_SLOT_COUNT,
   yumiMazeOrigin,
   ZONES,
@@ -157,7 +159,12 @@ import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
-import { fogFarForPreparedZones, MAX_OUTDOOR_FOG_FAR } from './zone_streaming';
+import {
+  fogFarForPreparedZones,
+  MAX_OUTDOOR_FOG_FAR,
+  ZONE_STREAM_RECHECK_DISTANCE,
+  zonesWithinStreamingHorizon,
+} from './zone_streaming';
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -1018,6 +1025,21 @@ export class Renderer {
   private envOutdoorIntensity = ENV_INTENSITY;
   private preparedZones = new Set<string>();
   private pendingZonePrepares = new Map<string, Promise<void>>();
+  // Static terrain/water/features just beyond the current zone are built in a
+  // single background lane when their rectangles enter the relaxed fog
+  // horizon, so a walked boundary crossing lands on already-resident ground.
+  // The queue is recomputed after meaningful camera travel, so teleports
+  // discard stale not-yet-started work instead of walking an old route first.
+  private visibleZonePrepareQueue: ZoneDef[] = [];
+  private visibleZonePrepareActive = false;
+  private visibleZoneCheckX = Number.NaN;
+  private visibleZoneCheckZ = Number.NaN;
+  private visibleZoneCheckFar = Number.NaN;
+  // The biome preset's requested fog far BEFORE fogFarForPreparedZones clamps
+  // it. The streaming horizon keys off this relaxed value: keying off the
+  // clamped live fog would only start preparing a zone once its boundary is
+  // already close enough to clamp the fog, i.e. too late.
+  private lastRequestedFogFar = MAX_OUTDOOR_FOG_FAR;
   private lastZonePrepareStats: {
     zoneId: string;
     totalMs: number;
@@ -1199,10 +1221,11 @@ export class Renderer {
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 
+    // Boot values match the vale/low presets; updateAmbience eases from here.
     this.scene.fog = new THREE.Fog(
       LOW_GFX ? 0xb6cddd : 0xa6c6e0,
-      LOW_GFX ? 50 : 55,
-      MAX_OUTDOOR_FOG_FAR,
+      LOW_GFX ? 90 : 190,
+      LOW_GFX ? 325 : 700,
     );
 
     // sky dome — follows the camera so the world strip never outruns it.
@@ -1741,7 +1764,7 @@ export class Renderer {
   } {
     return {
       prepared: this.preparedZones.size,
-      pending: this.pendingZonePrepares.size,
+      pending: this.pendingZonePrepares.size + this.visibleZonePrepareQueue.length,
       last: this.lastZonePrepareStats,
     };
   }
@@ -1767,12 +1790,17 @@ export class Renderer {
    * Materialize the terrain, water and bespoke render layer for one overworld
    * zone. Calls for an already-loaded (or currently-loading) zone are cheap and
    * share the same promise, so teleports and boundary jitter cannot duplicate
-   * geometry.
+   * geometry. `opts.pace: 'idle'` marks a background prepare (the visible-zone
+   * streaming lane): the terrain build then advances one small batch per
+   * browser idle slot instead of racing, so it never steals interactive frame
+   * time. (x, z) doubles as the build's priority point, so the chunks nearest
+   * the expected entry land first.
    */
   prepareZoneAt(
     x: number,
     z: number,
     onProgress?: (done: number, total: number) => void,
+    opts?: { pace?: 'fast' | 'idle' },
   ): Promise<void> {
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
@@ -1789,8 +1817,10 @@ export class Renderer {
       this.ensureEnvironmentBiome(zone.biome);
       const skyDone = performance.now();
       onProgress?.(5, 100);
-      await this.terrainView.ensureZone(zone, (done, total) =>
-        onProgress?.(5 + Math.round((done / Math.max(1, total)) * 83), 100),
+      await this.terrainView.ensureZone(
+        zone,
+        (done, total) => onProgress?.(5 + Math.round((done / Math.max(1, total)) * 83), 100),
+        { priority: { x, z }, pace: opts?.pace },
       );
       // The group itself was frozen while still empty in the constructor.
       // Freeze the children added by this zone as well; subsequent zones are
@@ -1819,7 +1849,7 @@ export class Renderer {
     return task;
   }
 
-  async prewarmZoneAt(x: number, z: number): Promise<void> {
+  async prewarmZoneAt(x: number, z: number, opts?: { background?: boolean }): Promise<void> {
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.prewarmedZonePrograms.has(zoneId)) return;
     const zone = zoneAt(x, z);
@@ -1828,6 +1858,17 @@ export class Renderer {
     const npcGroup = this.buildNpcPrewarmGroup(zone, deadline);
     this.scene.add(mobGroup, npcGroup);
     try {
+      // A background prewarm (the visible-zone streaming lane) links the new
+      // programs off-thread BEFORE the warm pass renders with them, so the
+      // pass never compiles inside a live gameplay frame. The gating path
+      // (behind the loading screen) keeps render-first, which also covers
+      // renderers without KHR_parallel_shader_compile.
+      if (opts?.background && this.asyncCompileSupported) {
+        await Promise.race([
+          this.webgl.compileAsync(this.scene, this.camera),
+          sleep(PREWARM_COMPILE_MAX_MS),
+        ]);
+      }
       this.renderPrewarmPass(1 / 60);
       if (this.asyncCompileSupported) {
         await Promise.race([
@@ -1840,6 +1881,86 @@ export class Renderer {
       mobGroup.removeFromParent();
       npcGroup.removeFromParent();
     }
+  }
+
+  // Recompute the background prepare queue from the RELAXED fog horizon (the
+  // biome preset request, not the clamped live fog: the clamp only engages
+  // because a zone is unprepared, which is exactly what this lane fixes).
+  // Cheap frame-loop guard: skip until the camera has travelled a bit or the
+  // horizon changed. Runs from sync(), one zone in flight at a time.
+  private queueVisibleZonePrepares(horizon: number): void {
+    const player = this.sim.player;
+    if (this.fogState !== 'outdoor' || this.zoneIdAt(player.pos.x, player.pos.z) === null) {
+      this.visibleZonePrepareQueue = [];
+      return;
+    }
+    const cameraX = this.camera.position.x;
+    const cameraZ = this.camera.position.z;
+    const moved = Math.hypot(cameraX - this.visibleZoneCheckX, cameraZ - this.visibleZoneCheckZ);
+    if (
+      Number.isFinite(this.visibleZoneCheckX) &&
+      moved < ZONE_STREAM_RECHECK_DISTANCE &&
+      Math.abs(horizon - this.visibleZoneCheckFar) < 1
+    ) {
+      return;
+    }
+    this.visibleZoneCheckX = cameraX;
+    this.visibleZoneCheckZ = cameraZ;
+    this.visibleZoneCheckFar = horizon;
+    const forwardX = this.cameraLookAt.x - cameraX;
+    const forwardZ = this.cameraLookAt.z - cameraZ;
+    this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
+      ZONES,
+      cameraX,
+      cameraZ,
+      horizon,
+      forwardX,
+      forwardZ,
+    ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
+    this.pumpVisibleZonePrepareQueue();
+  }
+
+  private pumpVisibleZonePrepareQueue(): void {
+    if (this.visibleZonePrepareActive) return;
+    const zone = this.visibleZonePrepareQueue.shift();
+    if (!zone) return;
+    if (this.preparedZones.has(zone.id) || this.pendingZonePrepares.has(zone.id)) {
+      this.pumpVisibleZonePrepareQueue();
+      return;
+    }
+    this.visibleZonePrepareActive = true;
+    // The likely entry point is where the zone's rectangle sits closest to the
+    // camera, so prioritize the build there (not at the hub, which can be on
+    // the far side of the zone). Inset by a yard: zone rectangles are
+    // exclusive on their max edges (zoneAt resolves the exact boundary to the
+    // neighbour), and an entry point that resolves to the wrong zone would
+    // no-op the prepare and silently starve this queue entry.
+    const minX = zone.xMin ?? STRIP_MIN_X;
+    const maxX = zone.xMax ?? STRIP_MAX_X;
+    const entryX = Math.max(minX + 1, Math.min(maxX - 1, this.camera.position.x));
+    const entryZ = Math.max(zone.zMin + 1, Math.min(zone.zMax - 1, this.camera.position.z));
+    void this.prepareZoneAt(entryX, entryZ, undefined, { pace: 'idle' })
+      // Prewarm the zone's shader programs too: isZoneReadyAt() requires both,
+      // so without this a walked crossing would still trip the blocking warmup
+      // just to compile programs.
+      .then(() => {
+        if (!this.preparedZones.has(zone.id)) {
+          // The entry point resolved to some other zone: this queue entry was
+          // consumed without making its zone resident (the starvation class
+          // the entry-point inset above exists to prevent).
+          console.warn(`Visible-zone prepare resolved without residency: ${zone.id}`);
+        }
+        return this.prewarmZoneAt(entryX, entryZ, { background: true });
+      })
+      .catch((err) => {
+        console.warn(`Visible-zone preparation failed: ${zone.id}`, err);
+        // Permit a retry on the next frame even if the camera has not moved.
+        this.visibleZoneCheckX = Number.NaN;
+      })
+      .finally(() => {
+        this.visibleZonePrepareActive = false;
+        this.pumpVisibleZonePrepareQueue();
+      });
   }
 
   private attachZoneFeature(
@@ -4179,40 +4300,49 @@ export class Renderer {
     });
   }
 
-  // Outdoor fog is also the streaming/rendering envelope: no biome may expose
-  // geometry beyond MAX_OUTDOOR_FOG_FAR. Distinct colors and near distances
-  // preserve each climate while the bounded far plane keeps remote unloaded
-  // regions fully hidden and out of terrain/prop/foliage culling sets.
+  // Outdoor fog presets per biome (high tier eases between them as the player
+  // crosses zone bands; low keeps one preset everywhere). Distances are the
+  // pre-residency-clamp table opened back up (roughly x1.5): with the
+  // visible-zone streaming lane keeping neighbours resident before they can
+  // be seen, the fog no longer has to hide unloaded regions itself, so the
+  // sky and real vistas read again. fogFarForPreparedZones stays as the
+  // safety clamp for the brief window a build is still catching up. The
+  // near:far ratio is kept roughly constant per biome so the fog gradient
+  // itself does not change shape, and no far exceeds MAX_OUTDOOR_FOG_FAR
+  // (the rendering/culling envelope).
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    marsh: { color: 0xa3b294, near: 45, far: 110 },
-    peaks: { color: 0xbdd3ec, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    beach: { color: 0xbcd6e6, near: 50, far: MAX_OUTDOOR_FOG_FAR },
-    desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
-    volcano: { color: 0x8a7468, near: 38, far: 100 },
-    cave: { color: 0x76807c, near: 32, far: 90 },
+    vale: { color: 0xa6c6e0, near: 190, far: 700 },
+    marsh: { color: 0xa3b294, near: 115, far: 495 },
+    peaks: { color: 0xbdd3ec, near: 230, far: 840 },
+    beach: { color: 0xbcd6e6, near: 150, far: 555 },
+    desert: { color: 0xd8c9a8, near: 145, far: 540 },
+    volcano: { color: 0x8a7468, near: 75, far: 330 },
+    cave: { color: 0x76807c, near: 65, far: 285 },
     // permanent dusk: dense rose-mauve murk, the realm's signature
-    dusk: { color: 0xc9a3bd, near: 40, far: 105 },
+    dusk: { color: 0xc9a3bd, near: 80, far: 375 },
     // scorched haze south, thicker toward the volcanic north (looks pass)
-    ember: { color: 0x9a5844, near: 38, far: 100 },
+    ember: { color: 0x9a5844, near: 80, far: 360 },
     // the Frostveil: dense icy mist, visibility closes right in
-    frost: { color: 0xa9bed2, near: 30, far: 90 },
+    frost: { color: 0xa9bed2, near: 55, far: 285 },
     // the Amberfall: warm golden haze under an endless afternoon
-    amber: { color: 0xdec18e, near: 45, far: 110 },
+    amber: { color: 0xdec18e, near: 95, far: 405 },
     // the Willowfen: clear airy morning, the lightest fog in the world
-    fen: { color: 0xcfe2dc, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    fen: { color: 0xcfe2dc, near: 140, far: 510 },
     // the Nightbloom: a soft lavender dream-haze over the violet downs
-    night: { color: 0xbfb0e8, near: 50, far: 115 },
+    night: { color: 0xbfb0e8, near: 130, far: 495 },
     // the Wraithwood: dense dead-grey murk, sightlines close right in
-    haunt: { color: 0x454c46, near: 24, far: 80 },
+    haunt: { color: 0x454c46, near: 45, far: 225 },
     // the Palmreach: bright humid haze, the clearest air in the world
-    jungle: { color: 0xd6efe2, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    jungle: { color: 0xd6efe2, near: 165, far: 600 },
     // the Evergarden: crystal parkland air with the faintest green cast
-    garden: { color: 0xdcefdc, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    garden: { color: 0xdcefdc, near: 175, far: 630 },
     // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
-    gale: { color: 0xe2dee4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    gale: { color: 0xe2dee4, near: 170, far: 645 },
   };
-  private static LOW_FOG = { color: 0xa6c6e0, near: 50, far: MAX_OUTDOOR_FOG_FAR };
+  // Low tier trades view distance for draw count (its own perf knob, never a
+  // gameplay one: entities draw within their own much shorter ranges on every
+  // tier, so fog distance sheds only cosmetic scenery).
+  private static LOW_FOG = { color: 0xa6c6e0, near: 90, far: 325 };
 
   // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
   // The three original biomes keep the exact constants the lights were
@@ -4605,6 +4735,7 @@ export class Renderer {
       const preset = this.outdoorFogPreset();
       const k = 1 - Math.exp(-dt * 1.5);
       const requestedFar = preset.far * (this.lowGfx ? 1 : g.farScale);
+      this.lastRequestedFogFar = requestedFar;
       const targetFar = fogFarForPreparedZones(
         ZONES,
         this.preparedZones,
@@ -5587,6 +5718,7 @@ export class Renderer {
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
+    this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     worldStart = markWorldPhase('terrain', worldStart);
     this.propsView.update(

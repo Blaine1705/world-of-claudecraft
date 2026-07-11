@@ -82,6 +82,7 @@ import {
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { zoneWarmupMode } from './game/zone_transition';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -2231,11 +2232,43 @@ async function startGame(
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
+  let lastWarmCheckX = Number.NaN;
+  let lastWarmCheckZ = Number.NaN;
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
+    const displacement = Number.isFinite(lastWarmCheckX)
+      ? Math.hypot(player.pos.x - lastWarmCheckX, player.pos.z - lastWarmCheckZ)
+      : 0;
+    lastWarmCheckX = player.pos.x;
+    lastWarmCheckZ = player.pos.z;
     if (zoneWarmup || renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
+    if (zoneWarmupMode(displacement) === 'background') {
+      // A walked crossing: the visible-zone streaming lane normally has the
+      // destination resident long before the boundary, so landing here means
+      // the build is still catching up (or a prepare failed). Finish it in the
+      // background: no loading screen, no input freeze. Sim collision is
+      // procedural math, so gameplay on not-yet-rendered ground stays correct;
+      // the chunks under the player stream in first (prepareZoneAt priority),
+      // and the fog residency clamp keeps the unbuilt remainder hidden.
+      zoneWarmup = renderer
+        .prepareZoneAt(zoneX, zoneZ)
+        .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
+        .catch((err) => {
+          console.warn('Background zone warmup failed', err);
+          // Back off before the frame loop may retry, so a persistent failure
+          // (e.g. an asset fetch while offline) does not re-kick every frame.
+          return new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
+        })
+        .finally(() => {
+          zoneWarmup = null;
+        });
+      return;
+    }
+    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land
+    // anywhere: keep the classic blocking loading screen instead of dropping
+    // the player into a not-yet-built void.
     const resumeInput = gameInputReady;
     gameInputReady = false;
     showLoadingScreen(t('loading.world'));
