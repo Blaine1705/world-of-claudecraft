@@ -22,6 +22,9 @@ export interface AuthoredRoom {
   x1: number;
   z0: number;
   z1: number;
+  /** Raised-floor height (world units) for the whole room. Omitted = 0 (flat).
+   * A door joining rooms of different lift becomes a ramp (authoredLiftAt). */
+  lift?: number;
 }
 
 /** A doorway: a box straddling one wall line. The extent ACROSS the wall (`hw` for
@@ -90,6 +93,59 @@ function subtractIntervals(from: readonly Interval[], cuts: readonly Interval[])
     acc = next;
   }
   return acc.filter(([a, b]) => b - a > MIN_SEG);
+}
+
+/** Half-length (along the crossing axis) of the ramp band a door with a lift
+ * difference spans: long enough to read as a stair run, never shorter than the
+ * door's own across-extent. Pure so sim and render agree exactly. */
+export function doorRampHalf(across: number, dLift: number): number {
+  return Math.max(across, 1.5 * Math.abs(dLift), 3);
+}
+
+/** The raised-floor height at instance-local (x, z) for an authored layout.
+ * Inside a room: that room's lift. Inside a door's ramp band (joining rooms of
+ * different lift): a linear ramp between the two floors along the crossing
+ * axis. Single-valued and pure, the same contract as riftPlatformLift, so the
+ * authoritative sim, the offline sim, and the renderer regenerate identical
+ * verticality from the same plan. */
+export function authoredLiftAt(
+  rooms: readonly AuthoredRoom[],
+  doors: readonly AuthoredDoor[],
+  x: number,
+  z: number,
+): number {
+  for (const d of doors) {
+    // Recover the two joined rooms from the shared wall line the door sits on.
+    const south = rooms.find((r) => r.z1 === d.z && d.x >= r.x0 && d.x <= r.x1);
+    const north = rooms.find((r) => r.z0 === d.z && d.x >= r.x0 && d.x <= r.x1);
+    if (south && north && Math.abs(x - d.x) <= d.hw + 0.5) {
+      const a = south.lift ?? 0;
+      const b = north.lift ?? 0;
+      if (a !== b) {
+        const h = doorRampHalf(d.hd, b - a);
+        if (Math.abs(z - d.z) <= h) {
+          const t01 = Math.min(1, Math.max(0, (z - (d.z - h)) / (2 * h)));
+          return a + (b - a) * t01;
+        }
+      }
+      continue;
+    }
+    const west = rooms.find((r) => r.x1 === d.x && d.z >= r.z0 && d.z <= r.z1);
+    const east = rooms.find((r) => r.x0 === d.x && d.z >= r.z0 && d.z <= r.z1);
+    if (west && east && Math.abs(z - d.z) <= d.hd + 0.5) {
+      const a = west.lift ?? 0;
+      const b = east.lift ?? 0;
+      if (a !== b) {
+        const h = doorRampHalf(d.hw, b - a);
+        if (Math.abs(x - d.x) <= h) {
+          const t01 = Math.min(1, Math.max(0, (x - (d.x - h)) / (2 * h)));
+          return a + (b - a) * t01;
+        }
+      }
+    }
+  }
+  const room = rooms.find((r) => x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1);
+  return room?.lift ?? 0;
 }
 
 /** Every wall run of an authored layout: the union of all room edges that share a

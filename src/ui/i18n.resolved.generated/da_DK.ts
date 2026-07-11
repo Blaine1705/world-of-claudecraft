@@ -3478,7 +3478,9 @@ export const da_DK: EnTranslations = {
       "raceWorldWin": "{names} won the {tier}-rank Rift race in {seconds}s!",
       "raceWinBanner": "Rift Race Won - {seconds}s",
       "raceLostBanner": "Rift Already Cleared",
-      "forgeComplete": "Rift forge {action} completed for {name}."
+      "forgeUpgraded": "Rift upgrade completed for {name}.",
+      "forgeEnchanted": "Rift enchant completed for {name}.",
+      "forgeSocketed": "Rift gem socketed for {name}."
     },
     "delve": {
       "cannotEnterNow": "Du kan ikke gå ind i et delve lige nu.",

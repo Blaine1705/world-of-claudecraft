@@ -636,7 +636,8 @@ export interface InvSlot {
 }
 
 // A shallow `{ ...slot }` aliases `instance` between the live slot and a
-// serialized/loaded copy; see cloneItemInstancePayload above for why that is
+// serialized/loaded copy; see cloneItemInstancePayload above (shared with the
+// equipped-instance map, src/sim/professions/enchanting.ts) for why that is
 // unsafe and what this clones instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };

@@ -3478,7 +3478,9 @@ export const zh_TW: EnTranslations = {
       "raceWorldWin": "{names} 以 {seconds} 秒贏得了 {tier} 級裂隙競速！",
       "raceWinBanner": "裂隙競速勝利 — {seconds} 秒",
       "raceLostBanner": "裂隙已被清除",
-      "forgeComplete": "{name} 的裂隙鍛造{action}已完成。"
+      "forgeUpgraded": "{name} 的裂隙強化已完成。",
+      "forgeEnchanted": "{name} 的裂隙附魔已完成。",
+      "forgeSocketed": "已為 {name} 鑲嵌裂隙寶石。"
     },
     "delve": {
       "cannotEnterNow": "你現在無法進入秘探。",

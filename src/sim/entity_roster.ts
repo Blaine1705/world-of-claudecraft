@@ -85,6 +85,18 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   if (!e) return;
   ctx.grid.remove(e);
   if (e.kind === 'player') ctx.playerGrid.remove(e);
+  // Mirror addEntityToRoster's trigger registries: natural rift portals expire
+  // and reopen for the world's whole lifetime, so an unspliced id would leak
+  // (and cost the walk-in scan) forever. Doors are never dropped today, but the
+  // registries must stay symmetric either way.
+  if (e.templateId === 'rift_portal' && ctx.riftPortalIds) {
+    const at = ctx.riftPortalIds.indexOf(id);
+    if (at >= 0) ctx.riftPortalIds.splice(at, 1);
+  }
+  if (e.templateId === 'dungeon_door' && ctx.dungeonDoorIds) {
+    const at = ctx.dungeonDoorIds.indexOf(id);
+    if (at >= 0) ctx.dungeonDoorIds.splice(at, 1);
+  }
   ctx.entities.delete(id);
 }
 

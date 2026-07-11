@@ -32,7 +32,7 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import { generateRiftFloor, riftPlatformLift } from '../sim/rift/rift_gen';
+import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { isAtSowfield } from '../sim/vale_cup_layout';
@@ -156,7 +156,7 @@ import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
-import { ZONE_STREAM_RECHECK_DISTANCE, zonesWithinStreamingHorizon } from './zone_streaming';
+import { fogFarForPreparedZones, MAX_OUTDOOR_FOG_FAR } from './zone_streaming';
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -226,6 +226,10 @@ function crowdLodScaleSq(visibleRigs: number): number {
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
+// Rift portal-family template ids (module-hoisted: createView is a hot path and
+// allocated this Set per view).
+const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit']);
+
 const AIRBORNE_EPS = 0.4;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
@@ -291,6 +295,13 @@ const ENV_INTENSITY = 0.5;
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
 const DUNGEON_SUN_INTENSITY = 0.3;
 const DUNGEON_ENV_INTENSITY = 0.05;
+// The authored Infernal Citadel is larger than a procedural floor and carries
+// real budgeted brazier lights. A stronger ambient floor preserves the black-red
+// infernal grade while keeping its loops, bosses, and doors readable between pools.
+const INFERNAL_SUN_INTENSITY = 0.48;
+const INFERNAL_HEMI_INTENSITY = 0.36;
+const INFERNAL_ENV_INTENSITY = 0.12;
+const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away —
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
@@ -1022,15 +1033,6 @@ export class Renderer {
   private envOutdoorIntensity = ENV_INTENSITY;
   private preparedZones = new Set<string>();
   private pendingZonePrepares = new Map<string, Promise<void>>();
-  // Static terrain/water/features just beyond the current zone are built in a
-  // single background lane when their rectangles enter the fog horizon. The
-  // queue is recomputed after meaningful camera travel, so teleports discard
-  // stale not-yet-started work instead of walking an old route first.
-  private visibleZonePrepareQueue: ZoneDef[] = [];
-  private visibleZonePrepareActive = false;
-  private visibleZoneCheckX = Number.NaN;
-  private visibleZoneCheckZ = Number.NaN;
-  private visibleZoneCheckFar = Number.NaN;
   private lastZonePrepareStats: {
     zoneId: string;
     totalMs: number;
@@ -1214,8 +1216,8 @@ export class Renderer {
 
     this.scene.fog = new THREE.Fog(
       LOW_GFX ? 0xb6cddd : 0xa6c6e0,
-      LOW_GFX ? 150 : 130,
-      LOW_GFX ? 520 : 470,
+      LOW_GFX ? 50 : 55,
+      MAX_OUTDOOR_FOG_FAR,
     );
 
     // sky dome — follows the camera so the world strip never outruns it.
@@ -1754,7 +1756,7 @@ export class Renderer {
   } {
     return {
       prepared: this.preparedZones.size,
-      pending: this.pendingZonePrepares.size + this.visibleZonePrepareQueue.length,
+      pending: this.pendingZonePrepares.size,
       last: this.lastZonePrepareStats,
     };
   }
@@ -1830,59 +1832,6 @@ export class Renderer {
     })().finally(() => this.pendingZonePrepares.delete(zoneId));
     this.pendingZonePrepares.set(zoneId, task);
     return task;
-  }
-
-  private queueVisibleZonePrepares(fogFar: number): void {
-    const player = this.sim.player;
-    if (this.fogState !== 'outdoor' || this.zoneIdAt(player.pos.x, player.pos.z) === null) {
-      this.visibleZonePrepareQueue = [];
-      return;
-    }
-    const cameraX = this.camera.position.x;
-    const cameraZ = this.camera.position.z;
-    const moved = Math.hypot(cameraX - this.visibleZoneCheckX, cameraZ - this.visibleZoneCheckZ);
-    if (
-      Number.isFinite(this.visibleZoneCheckX) &&
-      moved < ZONE_STREAM_RECHECK_DISTANCE &&
-      Math.abs(fogFar - this.visibleZoneCheckFar) < 1
-    ) {
-      return;
-    }
-    this.visibleZoneCheckX = cameraX;
-    this.visibleZoneCheckZ = cameraZ;
-    this.visibleZoneCheckFar = fogFar;
-    const forwardX = this.cameraLookAt.x - cameraX;
-    const forwardZ = this.cameraLookAt.z - cameraZ;
-    this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
-      ZONES,
-      cameraX,
-      cameraZ,
-      fogFar,
-      forwardX,
-      forwardZ,
-    ).filter((zone) => !this.preparedZones.has(zone.id) && !this.pendingZonePrepares.has(zone.id));
-    this.pumpVisibleZonePrepareQueue();
-  }
-
-  private pumpVisibleZonePrepareQueue(): void {
-    if (this.visibleZonePrepareActive) return;
-    const zone = this.visibleZonePrepareQueue.shift();
-    if (!zone) return;
-    if (this.preparedZones.has(zone.id) || this.pendingZonePrepares.has(zone.id)) {
-      this.pumpVisibleZonePrepareQueue();
-      return;
-    }
-    this.visibleZonePrepareActive = true;
-    void this.prepareZoneAt(zone.hub.x, zone.hub.z)
-      .catch((err) => {
-        console.warn(`Visible-zone preparation failed: ${zone.id}`, err);
-        // Permit a retry on the next frame even if the camera has not moved.
-        this.visibleZoneCheckX = Number.NaN;
-      })
-      .finally(() => {
-        this.visibleZonePrepareActive = false;
-        this.pumpVisibleZonePrepareQueue();
-      });
   }
 
   async prewarmZoneAt(x: number, z: number): Promise<void> {
@@ -3701,7 +3650,6 @@ export class Renderer {
     // (rift_portal) and the in-rift descent are "entering" portals; the egress is a
     // "leaving" portal. Pylons and the other puzzle props are bespoke procedural
     // bodies (handled in the next branch).
-    const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit']);
     if (
       e.kind === 'object' &&
       (e.templateId === 'dungeon_door' ||
@@ -3882,6 +3830,15 @@ export class Renderer {
       body?.traverse((o) => {
         o.userData.entityId = e.id;
       });
+      // Prop builders hang their ambience handles (rolling rock, orbiting
+      // shards, pulsing veins, pylon flame, the mail votive) on the BODY they
+      // return, but the per-frame animation pass reads them from the view
+      // GROUP: hoist them across or every one of those animations sits inert.
+      if (body) {
+        for (const key of ['rollRock', 'riftOrbiters', 'riftPulse', 'riftFlame', 'mailGlow']) {
+          if (body.userData[key] !== undefined) group.userData[key] = body.userData[key];
+        }
+      }
       clickTarget = body!;
     }
     group.scale.setScalar(e.scale);
@@ -4176,6 +4133,15 @@ export class Renderer {
   // ---------------------------------------------------------------------
 
   private builtInteriors = new Set<string>();
+  // Rift interiors are the one interior class whose world origin is REUSED: an
+  // empty slot frees after 60s and the next run rebuilds at the same z-stacked
+  // origin, so a stale group would overlap the new build and its torch lights
+  // would stack into the per-frame fire-light budget forever. Tracked per key;
+  // every build retires the others (a descended-from floor included: there is
+  // no way back up). Geometries/materials are NOT disposed here: kit meshes
+  // share the loader cache and the instance-held kit materials, so only the
+  // scene-graph nodes and the light/flame registries are reclaimed.
+  private riftInteriorGroups = new Map<string, THREE.Group>();
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
   private yumiMazeViews = new Map<number, YumiMazeView>();
@@ -4187,6 +4153,9 @@ export class Renderer {
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
+  // Cached with riftFogKey: whether the current rift floor is an authored set
+  // piece, so the per-frame lighting read avoids regenerating the floor.
+  private riftFogAuthored = false;
   private fogState:
     | 'outdoor'
     | 'dungeon'
@@ -4197,6 +4166,21 @@ export class Renderer {
     | 'underwater'
     | 'rift'
     | 'practice' = 'outdoor';
+
+  /** Drop a retired interior's scene nodes and prune its lights/flames out of
+   * the per-frame registries. See riftInteriorGroups for why nothing here
+   * calls dispose(): the meshes share cached kit geometry and materials. */
+  private retireInteriorGroup(group: THREE.Group): void {
+    this.scene.remove(group);
+    const doomed = new Set<THREE.Object3D>();
+    group.traverse((o) => doomed.add(o));
+    for (let i = this.fireLights.length - 1; i >= 0; i--) {
+      if (doomed.has(this.fireLights[i])) this.fireLights.splice(i, 1);
+    }
+    for (let i = this.flames.length - 1; i >= 0; i--) {
+      if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
+    }
+  }
 
   private buildInterior(
     interior: string,
@@ -4210,42 +4194,40 @@ export class Renderer {
     });
   }
 
-  // Outdoor fog presets per biome (high tier eases between them as the
-  // player crosses zone bands; low keeps the legacy vale fog everywhere).
-  // far/near trimmed from the original release so a zone's own mountains (the
-  // rim wall, the inter-zone ridges) fade into haze instead of standing out
-  // crisp when viewed from the zone's hub/centre; ratio near:far kept roughly
-  // constant per biome so the fog gradient itself doesn't change shape.
+  // Outdoor fog is also the streaming/rendering envelope: no biome may expose
+  // geometry beyond MAX_OUTDOOR_FOG_FAR. Distinct colors and near distances
+  // preserve each climate while the bounded far plane keeps remote unloaded
+  // regions fully hidden and out of terrain/prop/foliage culling sets.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 130, far: 470 },
-    marsh: { color: 0xa3b294, near: 80, far: 330 },
-    peaks: { color: 0xbdd3ec, near: 160, far: 560 },
-    beach: { color: 0xbcd6e6, near: 105, far: 370 },
-    desert: { color: 0xd8c9a8, near: 100, far: 360 },
-    volcano: { color: 0x8a7468, near: 50, far: 220 },
-    cave: { color: 0x76807c, near: 45, far: 190 },
+    vale: { color: 0xa6c6e0, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    marsh: { color: 0xa3b294, near: 45, far: 110 },
+    peaks: { color: 0xbdd3ec, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    beach: { color: 0xbcd6e6, near: 50, far: MAX_OUTDOOR_FOG_FAR },
+    desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
+    volcano: { color: 0x8a7468, near: 38, far: 100 },
+    cave: { color: 0x76807c, near: 32, far: 90 },
     // permanent dusk: dense rose-mauve murk, the realm's signature
-    dusk: { color: 0xc9a3bd, near: 55, far: 250 },
+    dusk: { color: 0xc9a3bd, near: 40, far: 105 },
     // scorched haze south, thicker toward the volcanic north (looks pass)
-    ember: { color: 0x9a5844, near: 55, far: 240 },
+    ember: { color: 0x9a5844, near: 38, far: 100 },
     // the Frostveil: dense icy mist, visibility closes right in
-    frost: { color: 0xa9bed2, near: 38, far: 190 },
+    frost: { color: 0xa9bed2, near: 30, far: 90 },
     // the Amberfall: warm golden haze under an endless afternoon
-    amber: { color: 0xdec18e, near: 65, far: 270 },
+    amber: { color: 0xdec18e, near: 45, far: 110 },
     // the Willowfen: clear airy morning, the lightest fog in the world
-    fen: { color: 0xcfe2dc, near: 95, far: 340 },
+    fen: { color: 0xcfe2dc, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     // the Nightbloom: a soft lavender dream-haze over the violet downs
-    night: { color: 0xbfb0e8, near: 90, far: 330 },
+    night: { color: 0xbfb0e8, near: 50, far: 115 },
     // the Wraithwood: dense dead-grey murk, sightlines close right in
-    haunt: { color: 0x454c46, near: 30, far: 150 },
+    haunt: { color: 0x454c46, near: 24, far: 80 },
     // the Palmreach: bright humid haze, the clearest air in the world
-    jungle: { color: 0xd6efe2, near: 115, far: 400 },
+    jungle: { color: 0xd6efe2, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     // the Evergarden: crystal parkland air with the faintest green cast
-    garden: { color: 0xdcefdc, near: 120, far: 420 },
+    garden: { color: 0xdcefdc, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
-    gale: { color: 0xe2dee4, near: 118, far: 430 },
+    gale: { color: 0xe2dee4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
   };
-  private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
+  private static LOW_FOG = { color: 0xa6c6e0, near: 50, far: MAX_OUTDOOR_FOG_FAR };
 
   // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
   // The three original biomes keep the exact constants the lights were
@@ -4448,14 +4430,33 @@ export class Renderer {
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
             const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-            void this.buildInterior(floor.style.kit, o.x, o.z, {
-              layout: floor.layout,
-              style: floor.style,
-              hazards: floor.hazards,
-              hazardStyle: 'lava',
-              iceZone: floor.iceZone,
-              platform: floor.platform,
-            });
+            this.dungeons ??= new DungeonInteriors(
+              this.scene,
+              this.lowGfx,
+              this.flames,
+              this.fireLights,
+            );
+            void this.dungeons
+              .buildInterior(floor.style.kit, o.x, o.z, {
+                layout: floor.layout,
+                style: floor.style,
+                hazards: floor.hazards,
+                hazardStyle: 'lava',
+                iceZone: floor.iceZone,
+                platform: floor.platform,
+              })
+              .then((group) => {
+                for (const [staleKey, staleGroup] of this.riftInteriorGroups) {
+                  if (staleKey === key) continue;
+                  this.retireInteriorGroup(staleGroup);
+                  this.riftInteriorGroups.delete(staleKey);
+                  this.builtInteriors.delete(staleKey);
+                }
+                this.riftInteriorGroups.set(key, group);
+              })
+              .catch((err) => {
+                console.error('Failed to build rift interior:', err);
+              });
           }
         }
       }
@@ -4505,22 +4506,25 @@ export class Renderer {
       const fogKey = `${riftFloor.contentHash}:${riftFloor.floorIndex}`;
       if (fogKey !== this.riftFogKey) {
         this.riftFogKey = fogKey;
-        const style = generateRiftFloor(
+        const floor = generateRiftFloor(
           riftFloor.seed,
           riftFloor.baseLevel,
           riftFloor.floorIndex,
           riftFloor.upgrade,
-        ).style;
+        );
+        this.riftFogAuthored = floor.authored === true;
+        const style = floor.style;
         fog.color.setHex(style.fog.color);
         fog.near = style.fog.near;
         fog.far = style.fog.far;
       }
       this.fogState = 'rift';
       if (!this.lowGfx) {
-        this.sun.intensity = DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = DUNGEON_RIM_BOOST;
+        const authored = this.riftFogAuthored;
+        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
+        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
+        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
+        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
       }
       return;
     }
@@ -4608,21 +4612,33 @@ export class Renderer {
       }
       return;
     }
-    // outdoors: ease fog toward the current biome's preset (~2s), then fold in
-    // the day/night grade so the world darkens and cools after dusk.
-    if (desired === 'outdoor' && !this.lowGfx) {
+    // Outdoors, fog is also the residency boundary. Pull it inward immediately
+    // before an unloaded zone can become visible; once that zone has been
+    // loaded by the boundary transition, ease the view distance back out.
+    if (desired === 'outdoor') {
       const g = this.dnGrade;
       const preset = this.outdoorFogPreset();
       const k = 1 - Math.exp(-dt * 1.5);
+      const requestedFar = preset.far * (this.lowGfx ? 1 : g.farScale);
+      const targetFar = fogFarForPreparedZones(
+        ZONES,
+        this.preparedZones,
+        this.camera.position.x,
+        this.camera.position.z,
+        requestedFar,
+      );
+      const targetNear = Math.min(preset.near, targetFar * 0.55);
+      fog.near += (targetNear - fog.near) * k;
+      if (fog.far > targetFar) fog.far = targetFar;
+      else fog.far += (targetFar - fog.far) * k;
+      if (this.lowGfx) return;
       // fog color: the biome hue multiplied by the day/night color (a dark
-      // dusk-blue by night); far pulls in a little once it is dark
+      // dusk-blue by night)
       this.fogScratch.setHex(preset.color);
       this.fogScratch.r *= g.fog[0];
       this.fogScratch.g *= g.fog[1];
       this.fogScratch.b *= g.fog[2];
       fog.color.lerp(this.fogScratch, k);
-      fog.near += (preset.near - fog.near) * k;
-      fog.far += (preset.far * g.farScale - fog.far) * k;
       // ...and the light grade with it (the dusk realm's warm sun and rose sky
       // bounce, a no-op elsewhere by day since the presets match the ctor hues):
       // the sun and sky hues cool toward moonlight at night, and the sun + sky
@@ -5274,7 +5290,7 @@ export class Renderer {
       if (inRift) {
         const rf = this.sim.riftFloor!;
         const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-        effGround += riftPlatformLift(floor.platform, az - rf.origin.z);
+        effGround += riftLiftAt(floor, ax - rf.origin.x, az - rf.origin.z);
       }
       if (e.kind === 'player' && e.onGround && !swimming && ay - effGround > AIRBORNE_EPS) {
         v.airborneHeurFrames++;
@@ -5578,7 +5594,6 @@ export class Renderer {
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
-    this.queueVisibleZonePrepares(fogFar);
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     worldStart = markWorldPhase('terrain', worldStart);
     this.propsView.update(
@@ -6194,7 +6209,14 @@ export class Renderer {
     cx = px + (cx - px) * ct;
     cy = eyeY + (cy - eyeY) * ct;
     cz = pz + (cz - pz) * ct;
-    const groundY = groundHeight(cx, cz, seed) + 0.6;
+    let groundY = groundHeight(cx, cz, seed) + 0.6;
+    // On a raised rift tier the flat ground clamp would let the camera sink
+    // into the riser: add the same lift the sim stands entities on.
+    const rfCam = this.sim.riftFloor;
+    if (rfCam && isRiftPos(cx)) {
+      const floor = generateRiftFloor(rfCam.seed, rfCam.baseLevel, rfCam.floorIndex, rfCam.upgrade);
+      groundY += riftLiftAt(floor, cx - rfCam.origin.x, cz - rfCam.origin.z);
+    }
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
     if (Math.abs(this.camera.fov - this.camOcclusion.fov) > 0.01) {
       this.camera.fov = this.camOcclusion.fov;

@@ -8539,6 +8539,18 @@ export class Hud {
         }
         return;
       }
+      case 'spellfxAt': {
+        // Ground-anchored bursts (ground-target detonations, the citadel's Blood
+        // Orb flare, the portcullis release nova) were silent: give novas the
+        // shared burst layered with a school-flavored impact, so the orb's fire
+        // flare reads differently from the gate's holy release. The listener is
+        // on the same floor, so the player's own y is the right height anchor.
+        if (ev.fx !== 'nova') return;
+        const y = sim.player.pos.y;
+        this.combat('spell_nova', ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
+        this.combat(`impact_${ev.school}`, ev.x, y, ev.z, 0.5, { rate: 0.8, cooldown: 0.08 });
+        return;
+      }
       case 'heal':
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);

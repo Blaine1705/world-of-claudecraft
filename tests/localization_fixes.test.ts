@@ -919,8 +919,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // range, respawn timer, bag-full pre-check).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
     // Procedural Rifts: the run lifecycle's player-facing emits (enter/descend/
-    // exit, pylons, "all rifts unstable"), re-localized via the sim.rift.* rules.
+    // exit, pylons, "all rifts unstable"), the forge/lockpick result lines, and
+    // the portal announcements, re-localized via the sim.rift.* rules.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/runs.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/progression.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/rift_lockpick.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/rift/portals.ts'), 'utf8'),
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.

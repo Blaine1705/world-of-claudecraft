@@ -1,11 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { zoneAt } from '../src/sim/data';
+import { BUILTIN_WORLD, zoneAt } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+// /graveyard reads the zone table (kept on the fixture); ambient camps, npcs
+// and quest objects play no part, so strip them to keep the ctor and
+// sim.tick() cheap (same subsystem-world pattern as tests/dot_final_tick.test.ts).
+const GRAVEYARD_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: GRAVEYARD_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

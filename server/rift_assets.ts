@@ -6,6 +6,7 @@
 
 import type { RiftAssetRequest, RiftEvent } from '../src/sim/rift/types';
 import type { SimContext } from '../src/sim/sim_context';
+import { readBodyCapped } from './bounded_body';
 
 const MAX_RESPONSE_BYTES = 32 * 1024;
 
@@ -69,8 +70,7 @@ async function submitAssetJob(
         },
       }),
     });
-    const body = await response.text();
-    if (body.length > MAX_RESPONSE_BYTES) throw new Error('asset response exceeds byte limit');
+    const body = await readBodyCapped(response, MAX_RESPONSE_BYTES);
     if (!response.ok) throw new Error(`asset pipeline HTTP ${response.status}`);
     const parsed = JSON.parse(body) as { jobId?: unknown };
     if (typeof parsed.jobId !== 'string' || !/^[a-zA-Z0-9_.:-]{1,128}$/.test(parsed.jobId)) {

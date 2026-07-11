@@ -92,15 +92,14 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
-  // Plain copies are consumed before instanced ones (an enchanted copy is
-  // never silently eaten while a plain shell sits in the bags), and the call
-  // returns the payload it ACTUALLY consumed. Never inspect a different copy
-  // before removal: a plain shell and an upgraded Rift copy may legally share
-  // one itemId. When the consumed copy IS a Rift piece, salvage yields Rift
-  // essence scaled by its progression instead of the quality-table material.
+  // Prefer consuming a plain (fungible) copy so an enchanted or rift-upgraded
+  // instance is never salvaged while an interchangeable shell exists. When only
+  // instanced copies remain, removePreferFungible consumes one and returns the
+  // payload it ACTUALLY consumed: a rift-upgraded copy pays out rift essence.
   const [consumedInstance] = removePreferFungible(ctx, itemId, 1, pid);
-  if (consumedInstance?.rift) {
-    const count = riftSalvageYield(consumedInstance);
+  const riftInstance = consumedInstance?.rift ? consumedInstance : null;
+  if (riftInstance) {
+    const count = riftSalvageYield(riftInstance);
     ctx.addItem(RIFT_ESSENCE_ITEM_ID, count, pid);
     return { ok: true, itemId, materialItemId: RIFT_ESSENCE_ITEM_ID, count };
   }

@@ -631,7 +631,10 @@ export function buildRiftPuzzleProp(
       // enough that its ends tuck into the walls on a narrow nave.
       const open = templateId === 'rift_gate_open';
       const halfW = 16;
-      const H = 4.4;
+      // Keep the raised gate and its lintel above the third-person camera path.
+      // At the old 4.4 height the camera could pass through the still-visible
+      // lintel after opening, filling the screen with its rune band.
+      const H = 7.2;
       const barMat = new THREE.MeshLambertMaterial({ color: 0x6a6a72, emissive: 0x0c0c12 });
       const lintel = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2 + 1.4, 0.9, 1.0), stone);
       lintel.position.set(0, H + 0.4, 0);

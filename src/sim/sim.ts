@@ -868,9 +868,9 @@ export interface PlayerMeta {
   equipment: PlayerEquipment;
   // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
   // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts, or a
-  // Rift gear piece's, see src/sim/rift/progression.ts).
-  // Sparse: a slot with a plain (uninstanced) piece has no entry.
-  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>;
+  // rift-forged upgrade's payload, see src/sim/rift/progression.ts). Sparse: a
+  // slot with a plain piece has no entry.
+  equipmentInstance: PlayerEquipmentInstances;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -1085,13 +1085,10 @@ export interface CharacterState {
   facing: number;
   equipment: PlayerEquipment;
   // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
-  // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts, or a
-  // Rift gear piece's, see src/sim/rift/progression.ts).
-  // Optional so saves from before instanced equipment load cleanly.
+  // enchanted item's rolled.stats or a rift-forged upgrade's payload).
+  // Optional so pre-Enchanting saves load cleanly (defaults to no instances).
   equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>;
-  // Legacy plural key from pre-v0.24.0-merge feature-branch saves (the rift
-  // branch persisted the same map as equipmentInstances before the two systems
-  // unified on the singular name). Read once at load as a fallback, never written.
+  /** Legacy plural key written by this branch's earlier rift-gear saves. */
   equipmentInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
   inventory: InvSlot[];
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
@@ -1642,6 +1639,7 @@ export class Sim {
         mobIds: [],
         objectIds: [],
         bossId: null,
+        bossDiedAtTick: null,
         exitId: null,
         descentAt: null,
         descentId: null,
@@ -1960,10 +1958,6 @@ export class Sim {
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
-      // Rift payloads are rebuilt from bounded progression inputs (rolled stats
-      // are never trusted from a save); any other instanced payload (e.g. an
-      // enchanted piece) deep-clones through the shared rules. Entries for
-      // unknown slots or slots with no equipped item are dropped.
       meta.equipmentInstance = {};
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
@@ -1971,12 +1965,12 @@ export class Sim {
         if (!(EQUIP_SLOTS as readonly string[]).includes(slot) || !instance) continue;
         const itemId = meta.equipment[slot as EquipSlot];
         if (!itemId) continue;
-        if (instance.rift) {
-          const clean = sanitizeRiftGearInstance(itemId, instance, player.id);
-          if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
-        } else {
-          meta.equipmentInstance[slot as EquipSlot] = cloneItemInstancePayload(instance);
-        }
+        // A rift payload is validated against the worn item (anti-tamper); any
+        // other instance (an enchant) deep-clones through the shared rules.
+        const clean = instance.rift
+          ? sanitizeRiftGearInstance(itemId, instance, player.id)
+          : cloneItemInstancePayload(instance);
+        if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
       }
       meta.inventory = s.inventory.map(cloneInvSlot);
       for (const slot of meta.inventory) {
@@ -7563,6 +7557,19 @@ export class Sim {
   // The primary player's active procedural Rift floor (offline IWorld read). The
   // renderer regenerates geometry/style from this descriptor; null outside a rift.
   get riftFloor(): import('../world_api/dungeons').RiftFloorView | null {
+    // The renderer reads this per frame (camera clamp, per-entity ground
+    // reference): cache the derived view per tick instead of reallocating it
+    // and re-searching riftEvents on every read.
+    if (this.riftFloorViewTick === this.tickCount) return this.riftFloorView;
+    this.riftFloorViewTick = this.tickCount;
+    this.riftFloorView = this.buildRiftFloorView();
+    return this.riftFloorView;
+  }
+
+  private riftFloorViewTick = -1;
+  private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
+
+  private buildRiftFloorView(): import('../world_api/dungeons').RiftFloorView | null {
     const p = this.entities.get(this.primaryId);
     if (!p) return null;
     const inst = riftInstanceAtPos(this.ctx, p.pos);

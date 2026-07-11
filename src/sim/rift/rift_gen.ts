@@ -12,6 +12,7 @@
 import type { Collider } from '../colliders';
 import {
   buildInfernalCitadelFloor,
+  INFERNAL_FLOOR_COUNT,
   INFERNAL_THEME_ID,
   infernalCitadelName,
 } from '../content/rift/infernal_citadel';
@@ -24,6 +25,7 @@ import {
 } from '../dungeon_layout';
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
+import { authoredLiftAt } from './authored';
 import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
@@ -74,9 +76,9 @@ export function isSetPieceSeed(seed: number): boolean {
 }
 
 /** How many floors this rift runs (deterministic from the seed). The authored
- * set-piece is a single, self-contained citadel. */
+ * set-piece descends from the citadel halls into the pit. */
 export function riftFloorCount(seed: number): number {
-  if (isSetPieceSeed(seed)) return 1;
+  if (isSetPieceSeed(seed)) return INFERNAL_FLOOR_COUNT;
   return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
 }
 
@@ -675,9 +677,42 @@ export function riftPlatformLift(platform: RiftPlatform | null, localZ: number):
   return (platform.height * (localZ - platform.rampZ0)) / (platform.rampZ1 - platform.rampZ0);
 }
 
+/** Vertical floor lift at instance-local (x, z): authored layouts use per-room
+ * lifts with door ramps (authoredLiftAt); procedural floors use the z-band
+ * platform. The one entry point every lift consumer (player/mob/object lift,
+ * the movement kernel strip, the renderer's ground reference and camera clamp)
+ * reads, so all hosts regenerate identical verticality. */
+export function riftLiftAt(floor: RiftFloorPlan, localX: number, localZ: number): number {
+  const rooms = floor.layout.rooms;
+  if (rooms && rooms.length > 0) {
+    return authoredLiftAt(rooms, floor.layout.doors ?? [], localX, localZ);
+  }
+  return riftPlatformLift(floor.platform, localZ);
+}
+
 // ---- Public generation ------------------------------------------------------
 
 const FLOOR_CACHE = new Map<string, RiftFloorPlan>();
+
+// applyRiftUpgrade builds a FRESH floor object (deep-ish clone) on every call;
+// the renderer regenerates the floor per frame (camera clamp, ground-reference
+// heuristic), so an upgraded floor would otherwise allocate a full spawn-mapped
+// clone per read. Manifests are stable per event, so memoise by identity.
+const UPGRADED_CACHE = new WeakMap<RiftFloorPlan, WeakMap<RiftUpgradeManifest, RiftFloorPlan>>();
+
+function upgradedFloor(base: RiftFloorPlan, upgrade?: RiftUpgradeManifest | null): RiftFloorPlan {
+  if (!upgrade) return applyRiftUpgrade(base, upgrade);
+  let per = UPGRADED_CACHE.get(base);
+  if (!per) {
+    per = new WeakMap();
+    UPGRADED_CACHE.set(base, per);
+  }
+  const hit = per.get(upgrade);
+  if (hit) return hit;
+  const built = applyRiftUpgrade(base, upgrade);
+  per.set(upgrade, built);
+  return built;
+}
 const CACHE_LIMIT = 128;
 
 function floorLevelFor(baseLevel: number, floorIndex: number): number {
@@ -692,7 +727,7 @@ export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
       baseLevel,
       name: infernalCitadelName(seed),
       themeId: INFERNAL_THEME_ID,
-      floorCount: 1,
+      floorCount: INFERNAL_FLOOR_COUNT,
     };
   }
   const floorCount = riftFloorCount(seed);
@@ -719,15 +754,21 @@ export function generateRiftFloor(
 ): RiftFloorPlan {
   const key = `${seed >>> 0}:${Math.round(baseLevel)}:${floorIndex}`;
   const cached = FLOOR_CACHE.get(key);
-  if (cached) return applyRiftUpgrade(cached, upgrade);
+  if (cached) return upgradedFloor(cached, upgrade);
 
   // Authored set-piece seeds short-circuit the whole procedural chain BEFORE any
   // draw is made, so the procedural draw order for every other seed is untouched.
   if (isSetPieceSeed(seed)) {
-    const setPiece = buildInfernalCitadelFloor(seed, baseLevel, floorLevelFor(baseLevel, 0));
+    const setIndex = Math.max(0, Math.min(INFERNAL_FLOOR_COUNT - 1, floorIndex));
+    const setPiece = buildInfernalCitadelFloor(
+      seed,
+      baseLevel,
+      floorLevelFor(baseLevel, setIndex),
+      setIndex,
+    );
     if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
     FLOOR_CACHE.set(key, setPiece);
-    return applyRiftUpgrade(setPiece, upgrade);
+    return upgradedFloor(setPiece, upgrade);
   }
 
   const floorCount = riftFloorCount(seed);
@@ -793,7 +834,7 @@ export function generateRiftFloor(
 
   if (FLOOR_CACHE.size >= CACHE_LIMIT) FLOOR_CACHE.clear();
   FLOOR_CACHE.set(key, plan);
-  return applyRiftUpgrade(plan, upgrade);
+  return upgradedFloor(plan, upgrade);
 }
 
 /** Instance-local collider set for a rift floor (pure, from the generated layout). */

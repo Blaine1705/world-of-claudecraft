@@ -111,6 +111,46 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
     expect((boss.loot?.items ?? []).some((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toBe(true);
   });
 
+  it('ranks same-window clears by boss-death tick, not slot order', () => {
+    const sim = makeSim();
+    sim.utcDay = '2026-07-10';
+    const slow = sim.addPlayer('warrior', 'Gimel'); // enters first: LOWER slot
+    const fast = sim.addPlayer('mage', 'Dalet'); // enters second: higher slot
+    sim.setPlayerLevel(20, slow);
+    sim.setPlayerLevel(20, fast);
+    expect(spawnNaturalRiftPortal(sim.ctx, 0)).toBe(true);
+    const portalInfo = sim.naturalRiftPortals[0];
+    const portal = sim.entities.get(portalInfo.id)!;
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, slow, undefined, portal);
+    sim.enterRift(portal.riftSeed!, portal.riftBaseLevel!, fast, undefined, portal);
+    const slowRun = sim.riftInstances.find((instance) => instance.memberIds.has(slow))!;
+    const fastRun = sim.riftInstances.find((instance) => instance.memberIds.has(fast))!;
+    expect(slowRun.slot).toBeLessThan(fastRun.slot);
+    clearToBoss(sim, slowRun, slow);
+    clearToBoss(sim, fastRun, fast);
+
+    // Both bosses die inside ONE sweep window, the higher slot one tick EARLIER:
+    // the recorded kill tick, not the slot iteration order, must pick the winner.
+    sim.tickCount += (20 - (sim.tickCount % 20)) % 20;
+    sim.tickCount += 1;
+    sim.entities.get(fastRun.bossId!)!.dead = true;
+    updateRiftInstances(sim.ctx); // pre-pass stamps fast's kill this tick
+    sim.tickCount += 1;
+    sim.entities.get(slowRun.bossId!)!.dead = true;
+    updateRiftInstances(sim.ctx); // pre-pass stamps slow's kill one tick later
+    expect(fastRun.bossDiedAtTick).not.toBeNull();
+    expect(slowRun.bossDiedAtTick).not.toBeNull();
+    expect(fastRun.bossDiedAtTick as number).toBeLessThan(slowRun.bossDiedAtTick as number);
+
+    sim.tickCount += (20 - (sim.tickCount % 20)) % 20;
+    updateRiftInstances(sim.ctx); // the sweep claims in death order
+    const event = sim.riftEvents.find((candidate) => candidate.eventId === portalInfo.eventId)!;
+    expect(event.status).toBe('cleared');
+    expect(event.firstClear?.memberIds).toEqual([fast]);
+    expect(fastRun.outcome).toBe('won');
+    expect(slowRun.partyKey).toBeNull(); // torn down as the race loser
+  });
+
   it('freezes the upgraded artifact when the first group enters', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Aleph');

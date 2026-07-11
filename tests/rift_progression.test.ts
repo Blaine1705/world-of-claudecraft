@@ -38,7 +38,7 @@ describe('Rift gear progression', () => {
     if (!state) throw new Error('Failed to serialize the Rift character');
     const restored = new Sim({ seed: 731, playerClass: 'warrior', noPlayer: true });
     const pid = restored.addPlayer('warrior', 'Restored', { state });
-    expect(restored.players.get(pid)?.equipmentInstance.ring1?.rift).toEqual(
+    expect(restored.players.get(pid)?.equipmentInstance?.ring1?.rift).toEqual(
       sim.equipmentInstances.ring1?.rift,
     );
 
@@ -51,7 +51,7 @@ describe('Rift gear progression', () => {
     };
     const legacyRestored = new Sim({ seed: 731, playerClass: 'warrior', noPlayer: true });
     const legacyPid = legacyRestored.addPlayer('warrior', 'Legado', { state: legacyState });
-    expect(legacyRestored.players.get(legacyPid)?.equipmentInstance.ring1?.rift).toEqual(
+    expect(legacyRestored.players.get(legacyPid)?.equipmentInstance?.ring1?.rift).toEqual(
       sim.equipmentInstances.ring1?.rift,
     );
   });
@@ -115,7 +115,7 @@ describe('Rift gear progression', () => {
 
     const restored = new Sim({ seed: 733, playerClass: 'warrior', noPlayer: true });
     const pid = restored.addPlayer('warrior', 'Safe', { state });
-    const clean = restored.players.get(pid)?.equipmentInstance.ring1;
+    const clean = restored.players.get(pid)?.equipmentInstance?.ring1;
     expect(clean).toEqual(
       expect.objectContaining({
         boundTo: pid,

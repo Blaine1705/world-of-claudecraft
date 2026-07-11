@@ -8,13 +8,26 @@
 // session/timeout guards still reject stale input.
 
 import { describe, expect, it } from 'vitest';
-import { DELVES } from '../src/sim/data';
+import { BUILTIN_WORLD, DELVES } from '../src/sim/data';
 import { solveLockActions } from '../src/sim/lockpick';
 import { Sim } from '../src/sim/sim';
-import type { SimEvent } from '../src/sim/types';
+import type { SimEvent, WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+// The delve boss, reward chest, and lockpick session all come from DELVES data
+// (spawnDelveModule), never ambient overworld content, so strip camps/npcs/
+// ground objects: the 30-seed jam sweep builds a fresh Sim per seed and used to
+// spend nearly all of its budget constructing the full continent
+// (dot_final_tick subsystem-world pattern).
+const LOCKPICK_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
+const makeSim = (seed = 42) =>
+  new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: LOCKPICK_TEST_WORLD });
 const BOUNTIFUL_STRESS_TIMEOUT_MS = 60_000; // 80 Sim ctors of a 13-zone world, under parallel suite load
 
 function enterBountifulFinale(sim: Sim) {

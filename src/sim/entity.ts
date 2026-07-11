@@ -198,7 +198,7 @@ export function recalcPlayerStats(
   cls: PlayerClass,
   equipment: PlayerEquipment,
   mods: TalentModifiers | undefined,
-  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>,
+  equipmentInstance: PlayerEquipmentInstances,
 ): void {
   const def = CLASSES[cls];
   const lvl = e.level;
@@ -237,12 +237,11 @@ export function recalcPlayerStats(
       s.spi += item.stats.spi ?? 0;
       s.armor += item.stats.armor ?? 0;
     }
-    // Per-instance bonus: additive on top of the item's own base stats, from
-    // this specific instance's rolled.stats. Two producers share the shape: an
-    // enchanted piece (src/sim/professions/enchanting.ts applyEnchant) and Rift
-    // gear (src/sim/rift/progression.ts rebuildRolledStats). A plain piece has
-    // no entry here, so this is a no-op for the common case. Number.isFinite
-    // guards each channel because rolled.stats crosses the JSONB load boundary.
+    // Instance bonus, additive on top of the item's own base stats, from this
+    // specific instance's rolled.stats: an enchanted piece (Enchanting,
+    // src/sim/professions/enchanting.ts applyEnchant) or a rift-forged upgrade
+    // (the rift payload keeps rolled.stats as its authoritative aggregate).
+    // A plain piece has no entry here, so this is a no-op for the common case.
     const rolled = equipmentInstance?.[slot]?.rolled?.stats;
     if (rolled) {
       s.str += Number.isFinite(rolled.str) ? rolled.str : 0;

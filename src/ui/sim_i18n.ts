@@ -5827,8 +5827,16 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.raceWorldWin', { names: m[1], tier: m[2], seconds: m[3] }),
   },
   {
-    re: /^Rift forge (upgrade|enchant|socket) completed for (.+)\.$/,
-    build: (m) => t('sim.rift.forgeComplete', { action: m[1], name: m[2] }),
+    re: /^Rift upgrade completed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeUpgraded', { name: m[1] }),
+  },
+  {
+    re: /^Rift enchant completed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeEnchanted', { name: m[1] }),
+  },
+  {
+    re: /^Rift gem socketed for (.+)\.$/,
+    build: (m) => t('sim.rift.forgeSocketed', { name: m[1] }),
   },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
