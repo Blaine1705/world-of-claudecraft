@@ -118,6 +118,21 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return flatStat('ap', -Math.abs(a.value));
     case 'buff_armor':
       return flatStat('armor', a.value);
+    // Mage empowerment moments (owner playtest: every worn buff should read).
+    case 'combustion':
+      return { key: `${KEY}.combustionCrit`, nums: {} };
+    case 'overload':
+      return { key: `${KEY}.overloadNext`, nums: { pct: pctFromFrac(a.value) } };
+    case 'power_echo':
+      return { key: `${KEY}.powerEchoNext`, nums: { pct: pctFromFrac(a.value) } };
+    case 'ice_floes':
+      return { key: `${KEY}.iceFloesCasts`, nums: { n: round(a.value) } };
+    case 'next_cast_free':
+      return { key: `${KEY}.freeCast`, nums: {} };
+    case 'next_cast_instant':
+      return { key: `${KEY}.instantCast`, nums: {} };
+    case 'next_cast_cheap':
+      return { key: `${KEY}.cheapCast`, nums: { pct: pctFromFrac(a.value) } };
     case 'buff_int':
       return flatStat('int', a.value);
     case 'buff_agi':

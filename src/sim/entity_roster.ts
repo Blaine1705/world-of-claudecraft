@@ -57,6 +57,10 @@ export type GroundAoE = {
   // Meteor: Ignite each struck enemy for this fraction of the resolved pulse
   // damage (fire_mage.applyIgnite copies the number; no re-roll).
   igniteFrac?: number;
+  // Blizzard riders: the per-pulse snare and the Frozen Orb cooldown shave.
+  slowMult?: number;
+  slowDuration?: number;
+  orbCdr?: boolean;
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-

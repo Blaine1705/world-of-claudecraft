@@ -26,7 +26,7 @@ import { spellDamageMultFromAuras } from './spell_combat';
 
 // Slow drift, WoW-style: fast enough to sweep a pack, slow enough that a
 // kiting target walks out of it.
-export const FROZEN_ORB_SPEED = 2.5; // yards per second
+export const FROZEN_ORB_SPEED = 4; // yards per second (owner playtest: 2.5 crawled)
 export const FROZEN_ORB_SLOW_MULT = 0.7; // -30% move speed
 export const FROZEN_ORB_SLOW_DURATION = 2.5; // refreshed every pulse it keeps hitting
 export const FROZEN_ORB_FINGERS_CHANCE = 0.2; // per pulse that struck someone

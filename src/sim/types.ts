@@ -91,10 +91,11 @@ export type PlayerClass =
   | 'warlock'
   | 'druid';
 
-// Classes that command a persistent pet (hunter beast, warlock demon). Pure
-// predicate, here so the pet-command slice imports it without a sim.ts cycle.
+// Classes that command a persistent pet (hunter beast, warlock demon, the
+// frost mage's Water Elemental). Pure predicate, here so the pet-command slice
+// imports it without a sim.ts cycle.
 export function isPetClass(cls: PlayerClass): boolean {
-  return cls === 'hunter' || cls === 'warlock';
+  return cls === 'hunter' || cls === 'warlock' || cls === 'mage';
 }
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
@@ -1678,6 +1679,12 @@ export type AbilityEffect =
       // Meteor: skip the on-cast pulse so the FIRST hit lands one interval
       // after placement (the fall delay); a plain zone still pulses on cast.
       delayed?: boolean;
+      // Blizzard: each pulse also snares everyone struck (kind 'slow').
+      slowMult?: number;
+      slowDuration?: number;
+      // Blizzard: each struck enemy shaves the running Frozen Orb cooldown
+      // (frost_mage's per-cast budget, reset when the zone is placed).
+      orbCdr?: boolean;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
@@ -1883,6 +1890,10 @@ export interface AbilityDef {
   // Harvest arrives, then retires). Without it exclusion applies at any level.
   excludeSpecsAtLevel?: number;
   // friendly = self or allied player; 'any' = either (defaults to enemy)
+  // An INSTANT that may be pressed in the middle of another cast without
+  // touching it (Fire Blast, Combustion; casting_lifecycle's through-cast
+  // path, the same door Blink While Casting opens by talent).
+  usableWhileCasting?: boolean;
   targetType?: 'enemy' | 'friendly' | 'any';
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
@@ -2831,7 +2842,7 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
       school: string;
-      fx: 'burst' | 'nova' | 'orb';
+      fx: 'burst' | 'nova' | 'orb' | 'meteorFall' | 'runeCircle';
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;

@@ -357,10 +357,10 @@ export function castAbility(
   // casts on MOVE INPUT). Everything else keeps the classic rules. No rng.
   const blinkThrough =
     p.castingAbility !== null &&
-    abilityId === 'blink' &&
+    p.castingAbility !== FISHING_CAST_ID &&
     ability.castTime === 0 &&
-    ctx.playerMods(meta).global.blinkCast > 0 &&
-    p.castingAbility !== FISHING_CAST_ID;
+    (ability.usableWhileCasting === true ||
+      (abilityId === 'blink' && ctx.playerMods(meta).global.blinkCast > 0));
   if (p.castingAbility) {
     if (!blinkThrough) {
       // classic-era spell queue: a press during the tail of the current cast

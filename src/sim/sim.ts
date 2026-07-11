@@ -48,6 +48,7 @@ import {
 } from './combat/damage';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
+import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
 import {
   applyHeal as applyHealImpl,
@@ -3926,11 +3927,26 @@ export class Sim {
       }
       return;
     }
+    let zoneStruck = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
+      zoneStruck++;
       const isSpell = effect.school !== 'physical';
       const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
       const dmg = Math.round(isSpell ? rawDmg * spellDamageMultFromAuras(source) : rawDmg);
+      // Blizzard: the zone snares everyone it strikes, pulse by pulse.
+      if (effect.slowMult && effect.slowDuration && !target.dead) {
+        this.applyAura(target, {
+          id: 'blizzard_slow',
+          name: effect.ability,
+          kind: 'slow',
+          value: effect.slowMult,
+          remaining: effect.slowDuration,
+          duration: effect.slowDuration,
+          sourceId: source.id,
+          school: effect.school as Aura['school'],
+        });
+      }
       // Meteor (fire mage): each struck enemy is also Ignited for a fraction
       // of THIS resolved pulse damage (applyIgnite copies it, no re-roll).
       if (effect.igniteFrac && dmg > 0 && !target.dead) {
@@ -3948,6 +3964,12 @@ export class Sim {
         threatOpts,
         direct,
       );
+    }
+    // Blizzard: every enemy this pulse struck shaves the running Frozen Orb
+    // cooldown, bounded by the per-cast budget reset at zone placement
+    // (frost_mage owns the math; deterministic, no rng).
+    if (effect.orbCdr && zoneStruck > 0 && source.kind === 'player') {
+      frostMageChannelPulse(this.ctx, source, 'blizzard', zoneStruck);
     }
   }
 

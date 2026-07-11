@@ -19,6 +19,7 @@ import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -61,6 +62,7 @@ import { fireGuaranteedCrit } from './fire_mage';
 import { isFormAuraKind } from './forms';
 import {
   frostMageAfterCast,
+  frostMageChannelStart,
   resolveFrozenCast,
   SHATTER_CRIT_BONUS,
   SHATTER_CRIT_DMG_BONUS,
@@ -467,17 +469,31 @@ export function runEffects(
             p.auras.splice(echoIdx, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
             if (!target.dead) {
-              ctx.dealDamage(
-                p,
-                target,
-                Math.max(1, Math.round(finalDamage * echoAura.value)),
-                crit,
-                ability.school,
-                ability.name,
-                'hit',
-                false,
-                threatOpts,
-              );
+              // The echo is a REAL second projectile (owner playtest: the
+              // instant copy looked superimposed): it visibly leaves the
+              // caster when the first hit lands and deals the copied amount
+              // on arrival, fizzling if the target dies in flight.
+              const echoAmt = Math.max(1, Math.round(finalDamage * echoAura.value));
+              ctx.emit({
+                type: 'spellfx',
+                sourceId: p.id,
+                targetId: target.id,
+                school: ability.school,
+                fx: 'projectile',
+              });
+              scheduleProjectile(ctx, p, target, (src, tgt) => {
+                ctx.dealDamage(
+                  src,
+                  tgt,
+                  echoAmt,
+                  crit,
+                  ability.school,
+                  ability.name,
+                  'hit',
+                  false,
+                  threatOpts,
+                );
+              });
             }
           }
         }
@@ -1377,7 +1393,37 @@ export function runEffects(
           spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
           allyBuffPct: eff.allyBuffPct,
           igniteFrac: eff.igniteFrac,
+          slowMult: eff.slowMult,
+          slowDuration: eff.slowDuration,
+          orbCdr: eff.orbCdr,
         };
+        // A fresh Blizzard zone gets a fresh Frozen Orb refund budget (the
+        // same per-cast budget the old channel reset at channel start).
+        if (eff.orbCdr) frostMageChannelStart(p, ability.id);
+        // Visual riders (owner playtest): a delayed FIRE zone is a falling
+        // meteor (the ball drops over the fall delay); a friendly zone is an
+        // inscribed rune circle for its whole life. Cosmetic only.
+        if (eff.delayed && ability.school === 'fire') {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'meteorFall',
+            duration: eff.interval,
+          });
+        }
+        if (eff.allyBuffPct) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'runeCircle',
+            radius: eff.radius,
+            duration: eff.duration,
+          });
+        }
         if (p.castAim) {
           ctx.emit({
             type: 'spellfxAt',

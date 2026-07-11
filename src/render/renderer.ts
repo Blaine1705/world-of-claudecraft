@@ -81,6 +81,7 @@ import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
+import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
 import { COMBO_PIP_MAX } from './nameplate_combo';
@@ -1041,6 +1042,7 @@ export class Renderer {
   private asyncCompileSupported = false;
   vfx: Vfx;
   private frozenOrbFx!: FrozenOrbFx;
+  private mageGroundFx!: MageGroundFx;
   private lightPulses!: LightPulses;
   private pulseAt!: (id: number, school: string, intensity: number, duration: number) => void;
   private weather: Weather;
@@ -1596,6 +1598,16 @@ export class Renderer {
     // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
+    // Meteor falls + Rune of Power circles (see src/render/mage_ground_fx.ts);
+    // a landing meteor detonates with the same burst an aimed blast uses.
+    this.mageGroundFx = new MageGroundFx(
+      this.scene,
+      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      (x, z) => {
+        const gy = groundHeight(x, z, this.sim.cfg.seed);
+        this.vfx.burst(new THREE.Vector3(x, gy + 0.4, z), 'fire', 34, 1.4);
+      },
+    );
     this.vfx = new Vfx(this.scene, (id, frac) => {
       const v = this.views.get(id);
       if (!v) return null;
@@ -2266,6 +2278,7 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.update(dt);
     this.lightPulses.update(dt);
     const pv = this.views.get(p.id);
     if (pv) {
@@ -3091,6 +3104,19 @@ export class Renderer {
         // the server's real coordinates when the orb latches onto an enemy.
         // The pulse novas below stay the area telegraph, so no actionable
         // information rides on this mesh.
+        if (ev.fx === 'meteorFall') {
+          this.mageGroundFx.spawnMeteor({ x: ev.x, z: ev.z, duration: ev.duration ?? 2 });
+          break;
+        }
+        if (ev.fx === 'runeCircle') {
+          this.mageGroundFx.spawnRune({
+            x: ev.x,
+            z: ev.z,
+            radius: ev.radius ?? 8,
+            duration: ev.duration ?? 15,
+          });
+          break;
+        }
         if (ev.fx === 'orb') {
           const orbSource = ev.sourceId ?? -1;
           if (ev.phase === 'halt') this.frozenOrbFx.halt(orbSource, ev.x, ev.z);
@@ -5051,6 +5077,7 @@ export class Renderer {
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
     this.frozenOrbFx.update(dt);
+    this.mageGroundFx.update(dt);
     this.lightPulses.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);

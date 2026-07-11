@@ -92,18 +92,30 @@ describe('AoE content defs', () => {
     ]);
   });
 
-  it('pins Blizzard: 6s/6-tick ground channel with damage + snare, 8s cooldown', () => {
+  it('pins Blizzard: a 2s cast placing a 6s self-pulsing storm, 8s cooldown', () => {
     const def = ABILITIES.blizzard;
     expect(def).toBeDefined();
     expect(def.name).toBe('Blizzard');
     expect(def.learnLevel).toBe(14);
     expect(def.specs).toEqual(['frost']);
     expect(def.targetMode).toBe('position');
-    expect(def.channel).toEqual({ duration: 6, ticks: 6 });
+    // Owner playtest 2026-07-11: no longer a channel; the cast IS the wind-up.
+    expect(def.channel).toBeUndefined();
+    expect(def.castTime).toBe(2);
     expect(def.cooldown).toBe(8);
     expect(def.effects).toEqual([
-      { type: 'aoeDamage', min: 12, max: 16, radius: 7 },
-      { type: 'aoeSlow', mult: 0.6, duration: 2, radius: 7 },
+      {
+        type: 'groundAoE',
+        min: 12,
+        max: 16,
+        radius: 7,
+        duration: 6.5,
+        interval: 1,
+        delayed: true,
+        slowMult: 0.6,
+        slowDuration: 2,
+        orbCdr: true,
+      },
     ]);
   });
 
@@ -271,7 +283,7 @@ describe('Blizzard in combat', () => {
     sim.drainEvents();
     p.resource = p.maxResource;
     sim.castAbility('blizzard', undefined, { x: p.pos.x, z: p.pos.z + 11 });
-    const events = tickFor(sim, 6.6);
+    const events = tickFor(sim, 2 + 6.6); // the 2s cast, then the storm's life
     const hits = damageEvents(events, 'Blizzard');
     // 6 pulses x 3 enemies (the storm covers the whole pack).
     expect(hits).toHaveLength(18);
@@ -291,7 +303,7 @@ describe('Blizzard in combat', () => {
     p.resource = p.maxResource;
     p.cooldowns.set('frozen_orb', 30);
     sim.castAbility('blizzard', undefined, { x: p.pos.x, z: p.pos.z + 11 });
-    const seconds = 6.6;
+    const seconds = 2 + 6.6; // the cast, then the storm's pulses
     tickFor(sim, seconds);
     // Natural tick-down (elapsed) + the capped refund, never more.
     const expected = 30 - seconds - BLIZZARD_ORB_CDR_CAP;
@@ -308,7 +320,7 @@ describe('Blizzard in combat', () => {
   });
 
   it('scales the refund with pack size: one enemy refunds slower than three', () => {
-    const midChannel = 2.4; // two pulses in
+    const midChannel = 2 + 2.4; // ride the cast, then two pulses in
     const run = (packSize: number): number => {
       const { sim, p } = makeSim(2718);
       for (let i = 0; i < packSize; i++) spawnDummy(sim, p, 10 + i);

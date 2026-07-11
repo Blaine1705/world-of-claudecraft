@@ -1030,6 +1030,13 @@ export const ko_KR: EnTranslations = {
       "attackSpeedFast": "공격 속도를 {pct}% 증가시킵니다",
       "haste": "공격 속도와 시전 속도를 {pct}% 증가시킵니다",
       "tongues": "시전 시간을 {pct}% 증가시킵니다",
+      "combustionCrit": "화염 주문이 항상 치명타로 적중합니다",
+      "overloadNext": "다음 주문이 {pct}% 강화되지만 마나 소모가 50% 증가합니다",
+      "powerEchoNext": "다음 직접 주문이 같은 대상에게 {pct}%의 위력으로 반복됩니다",
+      "iceFloesCasts": "다음 {n}개의 시전 주문을 이동하면서 시전할 수 있습니다",
+      "freeCast": "다음 시전에 자원이 들지 않습니다",
+      "instantCast": "시전 시간이 있는 다음 주문이 즉시 시전됩니다",
+      "cheapCast": "다음 주문의 소모량이 {pct}% 감소합니다",
       "increase": {
         "ap": "공격력을 {value} 증가시킵니다",
         "armor": "방어도를 {value} 증가시킵니다",
