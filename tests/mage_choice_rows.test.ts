@@ -4,7 +4,9 @@
 // choice_rows_wave2 harness idiom (a real Sim, applyTalents with a rows map).
 
 import { describe, expect, it } from 'vitest';
+import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { rowTreeFor } from '../src/sim/content/talent_rows';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -247,5 +249,40 @@ describe('mage choice rows (owner tree)', () => {
       const { sim } = rig({ [level]: id });
       expect(sim.player.dead).toBe(false); // picked, booted, and inert
     }
+  });
+});
+
+describe('the talents-window registry mirror', () => {
+  it('ROW_TREES.mage stays in lockstep with MAGE_CHOICE_ROWS (id, name, level)', () => {
+    const mirror = rowTreeFor('mage');
+    expect(mirror).not.toBeNull();
+    expect(mirror).toHaveLength(MAGE_CHOICE_ROWS.rows.length);
+    MAGE_CHOICE_ROWS.rows.forEach((row, i) => {
+      expect(mirror?.[i].level).toBe(row.level);
+      expect(mirror?.[i].options.map((o) => o.id)).toEqual(row.options.map((o) => o.id));
+      expect(mirror?.[i].options.map((o) => o.name)).toEqual(row.options.map((o) => o.name));
+    });
+  });
+
+  it('the window flow works: a mage pickRowTalent pick applies its effect live', () => {
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('frost')).toBe(true);
+    const p = sim.player;
+    // Row index 1 = the level-8 survival row; the pick flows through the same
+    // pickChoiceRowTalent path the talents window's Choices tab drives.
+    expect(sim.pickRowTalent(1, 'mag_r8_temporal_rift')).toBe(true);
+    (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, {
+      id: 'test_stun',
+      name: 'Test Stun',
+      kind: 'stun',
+      value: 0,
+      remaining: 3,
+      duration: 3,
+      sourceId: 424242,
+      school: 'physical',
+    });
+    expect(p.auras.some((a) => a.kind === 'stun')).toBe(false); // cleansed
+    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
   });
 });

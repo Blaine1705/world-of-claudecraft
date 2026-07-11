@@ -16,6 +16,7 @@
 // ---------------------------------------------------------------------------
 
 import type { PlayerClass } from '../types';
+import { MAGE_CHOICE_ROWS } from './choice_rows_classic';
 import {
   accumulate,
   computeTalentModifiers,
@@ -152,8 +153,25 @@ export function computeModifiersWithRows(
 // at import so a malformed tree fails loudly at boot rather than in play.
 // ---------------------------------------------------------------------------
 
+// The owner's mage tree is authored ONCE in choice_rows_classic.ts (the
+// Talents 2.0 registry, where the tooltip-accuracy and i18n guards live) and
+// MIRRORED into this registry so the talents window's Choices tab, which reads
+// rowTreeFor(), can render and pick it. Same option ids, names, descriptions
+// and effects; only the icon field (unused here) is dropped. A sync guard in
+// tests/mage_choice_rows.test.ts pins the two registries together.
+const MAGE_ROWS: RowTree = MAGE_CHOICE_ROWS.rows.map((row) => ({
+  level: row.level,
+  options: row.options.map(({ id, name, description, effect }) => ({
+    id,
+    name,
+    description,
+    effect,
+  })),
+}));
+
 export const ROW_TREES: Partial<Record<PlayerClass, RowTree>> = {
   warrior: WARRIOR_ROWS,
+  mage: MAGE_ROWS,
 };
 
 export function rowTreeFor(cls: PlayerClass): RowTree | null {
