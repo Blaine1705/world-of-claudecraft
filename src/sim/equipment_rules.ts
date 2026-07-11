@@ -74,7 +74,11 @@ export function weaponArchetypeForItem(item: ItemDef): WeaponArchetype | null {
 }
 
 export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
-  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+  // The classic warrior dual-wields unconditionally, classic-era style (the
+  // trainer skill, no spec gate); the overhauled warrior gates it behind the
+  // Bloodrush (fury) spec. Equal weapon footing is an operator decision
+  // (2026-07-11) so the head-to-head compares ABILITY kits, not weapon access.
+  return cls === 'rogue' || cls === 'warrior_classic' || (cls === 'warrior' && spec === 'fury');
 }
 
 // Titan's Grip (owner decision 2026-07-10): a Fury warrior dual-wields
@@ -90,14 +94,15 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   // The classic warrior (the pre-overhaul side-by-side test class) shares the
-  // warrior's WEAPON and ARMOR proficiencies: authored requiredClass lists
-  // predate it and say 'warrior'. It does NOT inherit shields or dual-wield
-  // (the old kit had neither), so those checks below use the literal cls.
+  // warrior's WEAPON, ARMOR, and SHIELD proficiencies: authored requiredClass
+  // lists predate it and say 'warrior'. Shields joined the alias 2026-07-11
+  // (equal weapon footing for the head-to-head); held offhands still resolve
+  // by their own caster-group lists, which exclude both warrior spellings.
   const gearCls: PlayerClass = cls === 'warrior_classic' ? 'warrior' : cls;
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
   if (item.kind === 'shield' || item.kind === 'held_offhand') {
-    if (item.requiredClass) return item.requiredClass.includes(cls);
+    if (item.requiredClass) return item.requiredClass.includes(gearCls);
     return true;
   }
   const weaponArchetype = weaponArchetypeForItem(item);

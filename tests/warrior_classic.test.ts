@@ -2,8 +2,11 @@
 // as its own class (src/sim/content/classes_warrior_classic.ts) so PTR testers
 // can compare the two warrior designs side by side. These tests pin what makes
 // it CLASSIC: the old ability list under cw_ ids, the old rage coefficients,
-// the defensive-stance-only stance model, and the absence of every
-// overhaul-only mechanic (dual wield, shields, new passives).
+// and the defensive-stance-only stance model. Weapon access is deliberately
+// EQUAL footing (operator decision 2026-07-11): the classic warrior always
+// dual-wields one-handers (classic-era rules, no spec gate), equips shields,
+// and swings two-handers, so the head-to-head isolates ABILITY design; only
+// Titan's Grip (a 2H in each hand) stays Bloodrush-warrior exclusive.
 
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
@@ -13,6 +16,7 @@ import {
   canDualWield,
   canDualWieldTwoHand,
   canEquipItem,
+  canEquipItemInSlot,
   maxArmorTypeForClass,
 } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
@@ -57,14 +61,32 @@ describe('warrior_classic: the pre-overhaul kit as a second class', () => {
     expect(specs[0].mastery.name).toBe('Sharpened Blades');
   });
 
-  it('never dual-wields (even on the fury spec) and never equips shields', () => {
-    expect(canDualWield('warrior_classic', 'fury')).toBe(false);
+  it("always dual-wields one-handers (classic-era rules: no spec gate, no Titan's Grip)", () => {
+    // Operator decision 2026-07-11: equal weapon footing for the head-to-head.
+    // Classic dual wield is unconditional (like the classic-era trainer skill),
+    // while the overhauled warrior gates it behind Bloodrush.
+    expect(canDualWield('warrior_classic', null)).toBe(true);
+    expect(canDualWield('warrior_classic', 'arms')).toBe(true);
+    expect(canDualWield('warrior_classic', 'prot')).toBe(true);
+    // Titan's Grip stays Bloodrush-warrior exclusive: a classic offhand must
+    // be one-handed.
     expect(canDualWieldTwoHand('warrior_classic', 'fury')).toBe(false);
-    expect(canEquipItem('warrior_classic', ITEMS.highwatch_wallshield)).toBe(false);
-    // The old kit has no offhand at all: the raid epic shield and the caster
-    // held offhand are both out (kind shield/held_offhand equips by the
-    // LITERAL class, never the gearCls alias).
-    expect(canEquipItem('warrior_classic', ITEMS.bonewrought_bulwark)).toBe(false);
+    expect(canEquipItemInSlot('warrior_classic', ITEMS.kingsbane_last_oath, 'offhand', null)).toBe(
+      true,
+    );
+    expect(
+      canEquipItemInSlot('warrior_classic', ITEMS.bonewrought_greatsword, 'offhand', 'fury'),
+    ).toBe(false);
+  });
+
+  it('equips shields through the warrior gear alias; caster held offhands stay out', () => {
+    expect(canEquipItem('warrior_classic', ITEMS.highwatch_wallshield)).toBe(true);
+    expect(canEquipItem('warrior_classic', ITEMS.bonewrought_bulwark)).toBe(true);
+    expect(canEquipItemInSlot('warrior_classic', ITEMS.bonewrought_bulwark, 'offhand', null)).toBe(
+      true,
+    );
+    // The caster stat stick is a held_offhand with a caster-group class list
+    // that includes neither warrior_classic nor its warrior alias.
     expect(canEquipItem('warrior_classic', ITEMS.wraithfire_orb)).toBe(false);
   });
 

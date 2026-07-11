@@ -211,7 +211,7 @@ const localeTextByBase = {
       `Especialización de ${className} centrada en ${role}. Habilidad distintiva: ${abilityName}.`,
     specDescriptions: {
       arms: 'Un maestro de las armas que convierte la disciplina y la técnica en su mayor fortaleza. Cada golpe está calculado para romper la defensa del enemigo, explotar sus puntos débiles y preparar un remate devastador. Su combate es preciso, metódico y letal, recompensando a quienes dominan el ritmo de la batalla.',
-      fury: 'Un berserker que lucha con un arma en cada mano y deja que la rabia guíe cada movimiento. Cuanto más combate, mayor es su Enfurecimiento, desatando una lluvia incesante de ataques que apenas da respiro a sus enemigos. Un estilo frenético, salvaje y agresivo, donde la ofensiva nunca se detiene.',
+      fury: 'Un berserker que lucha con un arma en cada mano y deja que la rabia guíe cada movimiento. Cuanto más combate, mayor es su Enfurecimiento, desatando una lluvia incesante de ataques que apenas da respiro a sus enemigos. Un estilo frenético, salvaje y agresivo, donde la ofensiva nunca se detiene. Consagrarse a esta especialización desbloquea la lucha con dos armas y, gracias al Agarre de Titán, incluso un arma a dos manos en cada mano.',
       prot: 'El guardián que lidera la primera línea del combate con un escudo en alto y una voluntad inquebrantable. Resiste el asalto de innumerables enemigos, protege a sus aliados y controla el campo de batalla con autoridad. Convierte cada golpe bloqueado en una oportunidad para responder con contundencia.',
     },
     masteryDescriptions: {
