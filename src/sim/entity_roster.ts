@@ -49,6 +49,11 @@ export type GroundAoE = {
   ability: string;
   // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
   spBonus?: number;
+  // Rune of Power (mage choice row): a FRIENDLY zone. When set, each pulse
+  // buffs allies inside (+allyBuffPct damage done, refreshed while they stand
+  // near) instead of damaging hostiles; min/max are ignored and the pulse
+  // draws NO rng (the damage roll is skipped entirely).
+  allyBuffPct?: number;
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-

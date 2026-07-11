@@ -233,31 +233,121 @@ describe('mage choice rows (owner tree)', () => {
     expect(cap?.value).toBeCloseTo(shave, 5);
   });
 
-  it('Aetherwell channels mana back over 6 sec, each pulse scaling with spell power', () => {
+  it('Aetherwell channels mana and STACKS spell power the longer you channel', () => {
     const { sim, p } = rig({ 20: 'mag_r20_evocation' });
     p.resource = 10;
+    const sp0 = p.spellPower;
     sim.castAbility('evocation');
     expect(p.castingAbility).toBe('evocation'); // a real channel, not a dump
-    tickFor(sim, 2);
+    tickFor(sim, 2.2);
     const early = p.resource;
-    expect(early).toBeGreaterThan(10); // pulses land while channeling
+    expect(early).toBeGreaterThan(10); // mana pulses land while channeling
+    const midAura = p.auras.find((a) => a.id === 'evocation');
+    expect(midAura?.kind).toBe('buff_spellpower');
+    const midValue = midAura?.value ?? 0;
+    expect(midValue).toBeGreaterThanOrEqual(16); // two pulses banked already
     tickFor(sim, 5); // ride the channel out
-    expect(p.resource).toBeGreaterThan(early);
-    // Six pulses of 40 + 60% spell power each: at least the flat floor landed.
-    expect(p.resource - 10).toBeGreaterThanOrEqual(6 * 40);
+    const aura = p.auras.find((a) => a.id === 'evocation');
+    expect(aura?.value).toBe(48); // six pulses of 8: the full channel banked
+    expect(aura?.stacks).toBe(6);
+    expect(p.spellPower).toBe(sp0 + 48); // recalced live onto the sheet
+    expect(p.resource - 10).toBeGreaterThanOrEqual(6 * 40); // the flat mana floor
   });
 
-  it('the five coming-soon options are pickable and inert', () => {
-    for (const [level, id] of [
-      [5, 'mag_r5_blink_cast'],
-      [14, 'mag_r14_power_echo'],
-      [14, 'mag_r14_overload'],
-      [17, 'mag_r17_convergence'],
-      [20, 'mag_r20_rune_of_power'],
-    ] as const) {
-      const { sim } = rig({ [level]: id });
-      expect(sim.player.dead).toBe(false); // picked, booted, and inert
-    }
+  it('Blink While Casting slips Flickerstep through the busy guard, keeping the cast', () => {
+    const { sim, p } = rig({ 5: 'mag_r5_blink_cast' });
+    addTargetMob(sim);
+    sim.castAbility('fireball');
+    expect(p.castingAbility).toBe('fireball');
+    const z0 = p.pos.z;
+    const mana0 = p.resource;
+    sim.castAbility('blink');
+    expect(p.castingAbility).toBe('fireball'); // the cast survives
+    expect(p.resource).toBe(mana0 - 40); // the blink actually cast
+    expect(p.pos.z).not.toBe(z0); // and actually moved
+  });
+
+  it('without the pick, a mid-cast Flickerstep press stays blocked', () => {
+    const { sim, p } = rig({ 5: 'mag_r5_double_blink' });
+    addTargetMob(sim);
+    sim.castAbility('fireball');
+    const mana0 = p.resource;
+    const z0 = p.pos.z;
+    sim.castAbility('blink');
+    expect(p.resource).toBe(mana0); // nothing billed
+    expect(p.pos.z).toBe(z0); // nothing moved
+  });
+
+  it('Overload arms an amplifier the next mana spell consumes at a 50% higher bill', () => {
+    const { sim, p } = rig({ 14: 'mag_r14_overload' });
+    addTargetMob(sim, 100000, 5);
+    sim.castAbility('overload');
+    expect(p.auras.some((a) => a.kind === 'overload')).toBe(true);
+    const res = (
+      sim as unknown as { resolvedAbility(id: string, pid: number): { cost: number } }
+    ).resolvedAbility('fire_blast', p.id);
+    const mana0 = p.resource;
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.castAbility('fire_blast');
+    expect(p.resource).toBe(mana0 - Math.round(res.cost * 1.5)); // the steeper bill
+    expect(p.auras.some((a) => a.kind === 'overload')).toBe(false); // consumed
+  });
+
+  it('Power Echo repeats the resolved hit at 50% on the same target, once', () => {
+    const { sim, p } = rig({ 14: 'mag_r14_power_echo' });
+    const mob = addTargetMob(sim, 100000, 5);
+    sim.castAbility('power_echo');
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    const hp0 = mob.hp;
+    sim.castAbility('fire_blast');
+    // The bolt is a projectile: fly it to impact, collecting the tick events.
+    const collected: { type: string; amount?: number }[] = [];
+    for (let i = 0; i < 30; i++) collected.push(...(sim.tick() as never[]));
+    const events = collected.filter((e) => e.type === 'damage');
+    expect(events).toHaveLength(2); // the hit and its echo
+    const [hit, echo] = events as { amount: number }[];
+    expect(echo.amount).toBe(Math.max(1, Math.round(hit.amount * 0.5)));
+    expect(mob.hp).toBe(hp0 - hit.amount - echo.amount);
+    expect(p.auras.some((a) => a.kind === 'power_echo')).toBe(false); // consumed
+  });
+
+  it('Elemental Convergence opens the surge on a Fire-Frost alternation, once per 30 sec', () => {
+    const { sim, p } = rig({ 17: 'mag_r17_convergence' });
+    addTargetMob(sim, 100000, 5);
+    sim.castAbility('fire_blast');
+    tickFor(sim, 1); // the bolt lands; alternation is measured at impact
+    expect(p.auras.some((a) => a.id === 'elemental_convergence')).toBe(false);
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.castAbility('frostbolt'); // base-kit frost (ice_lance is spec-gated)
+    tickFor(sim, 4); // ride the hard cast plus the bolt's flight
+    const surge = p.auras.find((a) => a.id === 'elemental_convergence');
+    expect(surge?.kind).toBe('buff_dmg_done');
+    expect(surge?.value).toBeCloseTo(0.15);
+    expect(p.auras.some((a) => a.id === 'convergence_cd')).toBe(true);
+    // Another alternation inside the internal cooldown re-arms nothing new.
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    p.cooldowns.delete('fire_blast');
+    sim.castAbility('fire_blast');
+    tickFor(sim, 1);
+    (p as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.castAbility('frostbolt');
+    tickFor(sim, 4);
+    const cds = p.auras.filter((a) => a.id === 'convergence_cd');
+    expect(cds).toHaveLength(1);
+  });
+
+  it('Rune of Power buffs allies standing near it and falls off after leaving', () => {
+    const { sim, p } = rig({ 20: 'mag_r20_rune_of_power' });
+    sim.castAbility('rune_of_power');
+    tickFor(sim, 2.5); // first friendly pulse
+    const rune = p.auras.find((a) => a.id === 'rune_of_power');
+    expect(rune?.kind).toBe('buff_dmg_done');
+    expect(rune?.value).toBeCloseTo(0.1);
+    // Step far outside the 8 yd ring: the short pulse buff expires unrefreshed.
+    p.pos.x += 30;
+    p.prevPos = { ...p.pos };
+    tickFor(sim, 4);
+    expect(p.auras.some((a) => a.id === 'rune_of_power')).toBe(false);
   });
 });
 

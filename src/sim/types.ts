@@ -378,6 +378,14 @@ export type AuraKind =
   // hard cast decrements the value and removes the aura at 0
   // (casting_lifecycle). Draws no rng.
   | 'ice_floes'
+  // Overload (mage choice row): armed amplifier; the next mana spell is baked
+  // 40% stronger and 50% costlier from a scaled copy of its resolved ability
+  // (casting_lifecycle consumeOverload). value = the output fraction (0.4).
+  | 'overload'
+  // Power Echo (mage choice row): the next direct spell repeats its RESOLVED
+  // damage at `value` fraction on the same target (effect_dispatch, beside
+  // Bladed Echo); consumed before the repeat so a copy can never re-echo.
+  | 'power_echo'
   // Inert timer marker: NO combat reader keys on this kind, so it is pure
   // visible state (an internal cooldown or a capped-window accumulator the
   // player can watch tick). Kept apart per user by the aura id (Temporal
@@ -1648,6 +1656,10 @@ export type AbilityEffect =
       radius: number;
       duration: number;
       interval: number;
+      // Rune of Power (mage choice row): a FRIENDLY zone. When set, each pulse
+      // buffs allies inside (+allyBuffPct damage done) instead of damaging
+      // hostiles; min/max are ignored.
+      allyBuffPct?: number;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   // Demoralizing roar/shout. `amount` = the legacy flat attack-power drain
@@ -1721,9 +1733,7 @@ export type AbilityEffect =
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'enrageChance'; chance: number; duration: number } // Fury Enrage (Bloodletting / Rampage)
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
-  // bloodrage immediate; spPct (Aetherwell) adds spellPower * spPct per
-  // application, so a channeled restore scales with the caster's spell power
-  | { type: 'gainResource'; amount: number; spPct?: number }
+  | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'selfHealPctMax'; pct: number } // victory rush's self-heal rider
   // Furious Mending's heal-over-time half: a self 'hot' aura ticking a
@@ -2783,7 +2793,10 @@ export type SimEvent = { pid?: number } & (
         | 'procSurge'
         | 'wardBloom'
         | 'echoBurst'
-        | 'detonate';
+        | 'detonate'
+        // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
+        // mover instead of arcing the reposition like a leap.
+        | 'blinkStep';
       // The casting ability's id, carried only by fx kinds whose visual varies per
       // ability (shouts pick their wave colour; weapon auras identify the buff).
       ability?: string;

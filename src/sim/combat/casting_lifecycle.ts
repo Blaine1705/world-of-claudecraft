@@ -28,6 +28,7 @@
 // tests/architecture.test.ts.
 
 import { ITEMS, isDelvePos, MOBS } from '../data';
+import { recalcPlayerStats } from '../entity';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -350,25 +351,37 @@ export function castAbility(
     ctx.error(p.id, 'You are silenced!');
     return;
   }
+  // Blink While Casting (mage choice row): Flickerstep slips through the busy
+  // guard AND the GCD, an escape button that never touches the cast in
+  // progress (the cast survives the relocation: player_motion only breaks
+  // casts on MOVE INPUT). Everything else keeps the classic rules. No rng.
+  const blinkThrough =
+    p.castingAbility !== null &&
+    abilityId === 'blink' &&
+    ability.castTime === 0 &&
+    ctx.playerMods(meta).global.blinkCast > 0 &&
+    p.castingAbility !== FISHING_CAST_ID;
   if (p.castingAbility) {
-    // classic-era spell queue: a press during the tail of the current cast
-    // queues instead of erroring, and updateCasting fires it on cast completion.
-    // Fishing is exempt (like the silence/lockout guards above): completeFishing
-    // never calls fireQueuedCast, so a press queued against it would strand and
-    // misfire on a later, unrelated cast.
-    if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && p.castingAbility !== FISHING_CAST_ID) {
-      p.queuedCastAbility = abilityId;
-      p.queuedCastAim = aim ?? null;
+    if (!blinkThrough) {
+      // classic-era spell queue: a press during the tail of the current cast
+      // queues instead of erroring, and updateCasting fires it on cast completion.
+      // Fishing is exempt (like the silence/lockout guards above): completeFishing
+      // never calls fireQueuedCast, so a press queued against it would strand and
+      // misfire on a later, unrelated cast.
+      if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && p.castingAbility !== FISHING_CAST_ID) {
+        p.queuedCastAbility = abilityId;
+        p.queuedCastAim = aim ?? null;
+        return;
+      }
+      ctx.error(p.id, 'You are busy.');
       return;
     }
-    ctx.error(p.id, 'You are busy.');
-    return;
   }
   // note: a queued press fires here, re-running the full castAbility gate set
   // (including this GCD check). fireQueuedCast holds the slot instead of calling
   // in when the GCD is still running, so this early return only fires for a
   // same-tick player press racing the GCD, not for a queued follow-up.
-  if (!ability.offGcd && p.gcdRemaining > 0) return; // silent, classic spams this
+  if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) return; // silent, classic spams this
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
@@ -795,6 +808,31 @@ function overflowingPowerCdr(ctx: SimContext, p: Entity, meta: PlayerMeta, cost:
   }
 }
 
+// Overload (mage choice row): consume the armed amplifier on a mana spell,
+// returning a scaled copy of the resolved ability (numeric effect fields ride
+// the output amp; the bill rides the cost amp). The original resolved struct
+// is never mutated. Draws no rng.
+const OVERLOAD_COST_MULT = 1.5;
+
+function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): ResolvedAbility {
+  if (res.def.school === 'physical' || res.cost <= 0) return res;
+  const idx = p.auras.findIndex((a) => a.kind === 'overload');
+  if (idx < 0) return res;
+  const aura = p.auras[idx];
+  const amp = 1 + aura.value;
+  p.auras.splice(idx, 1);
+  ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  const effects = res.effects.map((eff) => {
+    const scaled: Record<string, unknown> = { ...eff };
+    for (const key of ['min', 'max', 'amount', 'bonus', 'total', 'value'] as const) {
+      const v = scaled[key];
+      if (typeof v === 'number' && v > 0) scaled[key] = Math.round(v * amp);
+    }
+    return scaled as typeof eff;
+  });
+  return { ...res, cost: Math.round(res.cost * OVERLOAD_COST_MULT), effects };
+}
+
 function armAbilityCooldown(
   p: Entity,
   abilityId: string,
@@ -921,14 +959,46 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
-  // Targetless SELF channel (Aetherwell): no aim point, no area, no enemy;
-  // each tick applies the ability's self restore, spell-power scaled like the
-  // instant gainResource dispatch. Draws no rng.
+  // Targetless SELF channel (Aetherwell): no aim point, no area, no enemy.
+  // Each tick restores the flat mana AND stacks the channel's spell-power
+  // buff (owner design: the longer you channel, the more spell power), the
+  // aura value growing by the effect value per pulse with its clock
+  // refreshed; the recalc applies the new power at once. Draws no rng.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'gainResource')) {
     for (const eff of res.effects) {
-      if (eff.type !== 'gainResource') continue;
-      const spTerm = eff.spPct ? Math.round(abilityScalingPower(p, res.def) * eff.spPct) : 0;
-      p.resource = Math.min(p.maxResource, p.resource + eff.amount + spTerm);
+      if (eff.type === 'gainResource') {
+        p.resource = Math.min(p.maxResource, p.resource + eff.amount);
+      } else if (eff.type === 'selfBuff' && eff.kind === 'buff_spellpower') {
+        const existing = p.auras.find((a) => a.id === res.def.id && a.kind === 'buff_spellpower');
+        if (existing) {
+          existing.value += eff.value;
+          existing.stacks = (existing.stacks ?? 1) + 1;
+          existing.remaining = eff.duration;
+          existing.duration = eff.duration;
+        } else {
+          ctx.applyAura(p, {
+            id: res.def.id,
+            name: res.def.name,
+            kind: 'buff_spellpower',
+            value: eff.value,
+            remaining: eff.duration,
+            duration: eff.duration,
+            sourceId: p.id,
+            school: res.def.school,
+            stacks: 1,
+          });
+        }
+        const channelMeta = ctx.players.get(p.id);
+        if (channelMeta) {
+          recalcPlayerStats(
+            p,
+            channelMeta.cls,
+            channelMeta.equipment,
+            ctx.playerMods(channelMeta),
+            channelMeta.equipmentInstance,
+          );
+        }
+      }
     }
     return;
   }
@@ -1003,6 +1073,11 @@ function applyAbility(
   // passes nothing). Cleared here so it can never leak into a later cast.
   const castTarget = castTargetId ?? p.castTargetId;
   p.castTargetId = null;
+  // Overload (mage choice row): the armed amplifier bakes the next MANA spell
+  // 40% stronger and 50% costlier into a scaled COPY of the resolved ability
+  // before cost and effects resolve (channels are exempt: they bill in the
+  // castAbility channel branch and resolve per tick). Draws no rng.
+  res = consumeOverload(ctx, p, res);
   const ability = res.def;
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // The free charge is consumed exactly where a cost is actually billed; the

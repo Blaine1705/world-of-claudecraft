@@ -3016,6 +3016,17 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx':
+        if (ev.fx === 'blinkStep') {
+          // A teleport step (Flickerstep / Shadowstep): SNAP the self body to
+          // the new spot instead of letting the reposition heuristic read the
+          // jump as a leap and play an arc. A short pulse sells the pop.
+          if (ev.sourceId === this.sim.player.id) {
+            this.selfRenderPositionReady = false;
+            this.selfLeapArc = null;
+          }
+          this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
+          break;
+        }
         if (ev.fx === 'windup') {
           // A petSpell windup telegraph: start the throw animation NOW; the
           // projectile for this throw follows petSpell.windup later, timed to

@@ -72,9 +72,10 @@ function expectedTokens(effect: unknown): string[] {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
-        // Temporal Rift (mage choice row) is a picked/not-picked flag like
-        // battleRhythm; its 20s ICD is stated as a duration, not this 1.
-        if (key === 'temporalRift') continue;
+        // Temporal Rift / Blink While Casting / Elemental Convergence (mage
+        // choice rows) are picked/not-picked flags like battleRhythm; their
+        // timings are stated as durations, not this 1.
+        if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
         if (key === 'critDmgPct' && value === 0.5) {
           toks.push('double');
           continue;

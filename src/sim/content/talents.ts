@@ -153,6 +153,13 @@ export interface GlobalModEffect {
   // of maximum mana spent, capped at 10 sec per 30 sec (casting_lifecycle's
   // spendAbilityCost, the Colossal Might pattern on mana).
   manaDefCdrPer10?: number;
+  // Blink While Casting: 1 when picked; Flickerstep slips through the busy
+  // guard without touching the cast in progress (casting_lifecycle).
+  blinkCast?: number;
+  // Elemental Convergence: 1 when picked; alternating a Fire and a Frost cast
+  // opens the surge window (casting_lifecycle convergenceOnCast, marker +
+  // ICD carried by auras so no entity field enters the parity hash).
+  convergence?: number;
 }
 
 export interface TalentEffect {
@@ -438,6 +445,8 @@ function zeroGlobal(): Required<GlobalModEffect> {
     barrierDrPct: 0,
     temporalRift: 0,
     manaDefCdrPer10: 0,
+    blinkCast: 0,
+    convergence: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -540,6 +549,8 @@ export function accumulate(
     g.barrierDrPct += (e.barrierDrPct ?? 0) * mult;
     g.temporalRift += (e.temporalRift ?? 0) * mult;
     g.manaDefCdrPer10 += (e.manaDefCdrPer10 ?? 0) * mult;
+    g.blinkCast += (e.blinkCast ?? 0) * mult;
+    g.convergence += (e.convergence ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

@@ -8,6 +8,7 @@
 
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { convergenceOnCast } from './convergence';
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
@@ -163,6 +164,9 @@ export function onCastCompleted(
   abilityId: string,
   target?: Entity | null,
 ): void {
+  // Elemental Convergence (mage choice row): school-alternation memory, kept
+  // here because every completed cast funnels through this hook. Draws no rng.
+  convergenceOnCast(ctx, p, abilityId);
   for (const def of procsFor(ctx, p)) {
     const t = def.trigger;
     if (t.on !== 'castNth' || !t.abilities.includes(abilityId)) continue;
