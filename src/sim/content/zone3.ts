@@ -2641,7 +2641,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // PR #1762 hand declaration re-statted 18 -> 36 points at ilvl 26.
     stats: { str: 22, sta: 14 },
     sellValue: 8000,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    // Rogue dropped with the no-rogue-two-handers rule (2026-07-11): the
+    // requiredClass list must honestly name who can equip.
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
   },
   staff_of_the_gravewyrm: {
     id: 'staff_of_the_gravewyrm',
@@ -2993,9 +2995,12 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // mainhand) = 2 x 20 = 40 points (TWOHAND_STAT_MULT in item_budget.ts).
     stats: { str: 22, sta: 18 },
     sellValue: 12000,
-    // The full warrior weapon-proficiency group (WARRIOR_WEAPON_CLASSES), so
-    // weaponArchetypeForItem matches and the classic warrior equips via gearCls.
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    // The warrior weapon group MINUS rogue: rogues never equip two-handers
+    // (equipment_rules, 2026-07-11), and requiredClass must honestly list who
+    // can equip (the equipment_proficiency guard). The list no longer matches
+    // WARRIOR_WEAPON_CLASSES, so it resolves by literal membership; the
+    // classic warrior still equips via the gearCls alias.
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
   },
   direfang_greatblade: {
     id: 'direfang_greatblade',

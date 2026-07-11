@@ -105,6 +105,11 @@ export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
     if (item.requiredClass) return item.requiredClass.includes(gearCls);
     return true;
   }
+  // Rogues never equip two-handers (operator decision 2026-07-11). Their
+  // weapon GROUP list still names them (it grants the group's one-handers,
+  // e.g. Thronebane, a rogue BiS), so the exclusion is a rule here rather
+  // than per-item data: it covers every future two-hander automatically.
+  if (cls === 'rogue' && item.kind === 'weapon' && weaponHand(item) === 'twohand') return false;
   const weaponArchetype = weaponArchetypeForItem(item);
   if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(gearCls);
   if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(gearCls);
