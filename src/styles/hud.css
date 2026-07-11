@@ -3003,7 +3003,14 @@
   }
   /* Reduce Motion, drop HUD animations/transitions (mirrors prefers-reduced-motion). */
   body.reduce-motion .fct {
-    animation-duration: 0.01ms !important;
+    /* NOT the 0.01ms shed below: fct-rise/fct-crit fill forwards and END at opacity 0,
+       so finishing the rise instantly freezes every damage number on its invisible end
+       keyframe for its whole pooled lifetime. Combat numbers are actionable feedback
+       no comfort/tier knob may hide (the same rule that keeps them on the low tier):
+       drop the MOTION outright and hold the number visible; the painter's TTL recycle
+       still removes the node on schedule. */
+    animation: none !important;
+    opacity: 1;
   }
   body.reduce-motion *,
   body.reduce-motion *::before,

@@ -2516,6 +2516,22 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   arcane_explosion: r('arcane', 'arcanePink', ['sunburst'], ['arcs']),
   scorch: r('fire', 'ember', ['flame'], ['motion']),
   ice_barrier: r('frost', 'ice', ['shield'], ['glow']),
+  // The mage redesign's new kit (owner playtest 2026-07): every ability gets an
+  // explicit recipe (the ability_icons guard forbids the procedural fallback),
+  // each visually distinct from its neighbours.
+  ice_floes: r('frost', 'ice', ['boot', { p: 'snowflake', ...TR }], ['motion']),
+  greater_invisibility: r('arcane', 'pink', ['eye', { p: 'moon', ...TR }], ['motion']),
+  rings_of_frost: r('frost', 'ice', ['sigil_rune', { p: 'snowflake', ...TR }]),
+  cold_snap: r('frost', 'ice', ['sunburst', { p: 'snowflake', ...BIG }], ['glow']),
+  mass_barrier: r('arcane', 'arcanePink', ['shield', { p: 'sunburst', ...TR }], ['glow']),
+  overload: r('arcane', 'pink', ['bolt', { p: 'sunburst', ...TR }], ['glow']),
+  // Power Echo: the doubled cast, two bolts chasing each other.
+  power_echo: r('fire', 'ember', ['bolt', { p: 'bolt', ...BR }], ['motion']),
+  rune_of_power: r('arcane', 'arcanePink', ['sigil_rune', { p: 'sunburst', ...TL }], ['glow']),
+  blazing_barrier: r('fire', 'ember', ['shield', { p: 'flame', ...TR }], ['glow']),
+  ignition: r('fire', 'ember', ['flame', { p: 'droplet', ...BR }], ['drips']),
+  hot_streak: r('fire', 'gold', ['flame', { p: 'sunburst', ...TR }], ['sparkle']),
+  summon_water_elemental: r('frost', 'ice', ['droplet', { p: 'snowflake', ...TR }], ['glow']),
   crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),
@@ -2885,6 +2901,25 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  // Inert rolling-window markers (kind 'internal_cd': Heating Up, the temporal
+  // accumulator, the Water Jet counter). A single ember-on-gold "charging" look;
+  // without it every marker warned to the console and fell back, once per frame.
+  aura_internal_cd: r('fire', 'gold', ['flame', { p: 'sunburst', ...TR }], ['glow']),
+  // The mage proc/buff kinds (all worn on the player buff bar; each fell back
+  // to the unknown icon before these).
+  aura_fingers_of_frost: r('frost', 'ice', ['snowflake'], ['glow']),
+  aura_brain_freeze: r('frost', 'ice', ['snowflake', { p: 'sunburst', ...TR }], ['sparkle']),
+  aura_winters_chill: r('frost', 'ice', ['snowflake', { p: 'skull', ...BR }]),
+  // Hot Streak (the armed free instant): the blazing counterpart of Heating Up.
+  aura_next_cast_free: r('fire', 'ember', ['flame', { p: 'sunburst', ...BIG }], ['glow']),
+  aura_next_cast_instant: r('storm', 'sky', ['lightning'], ['glow']),
+  aura_buff_dmg_done: r('arcane', 'arcanePink', ['sunburst'], ['glow']),
+  // Aetherwell's stacking spell power.
+  aura_buff_spellpower: r('arcane', 'arcanePink', ['gem'], ['glow']),
+  aura_buff_spellhaste: r('storm', 'sky', ['lightning'], ['motion']),
+  aura_overload: r('arcane', 'pink', ['bolt', { p: 'sunburst', ...TR }], ['glow']),
+  aura_power_echo: r('fire', 'ember', ['bolt'], ['motion']),
+  aura_ice_floes: r('frost', 'ice', ['boot', { p: 'snowflake', ...TR }], ['motion']),
   // Bladed Echo (whirlwind's armed area-echo buff, aura id 'bladed_echo')
   aura_aoe_echo: r('fury', 'steel', ['sword'], ['motion']),
   // Emboldened (Emboldening Roar's armed guaranteed-crit buff, aura id
@@ -3442,6 +3477,24 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'frozen_orb',
   'blizzard',
   'icy_veins',
+  'ice_floes',
+  'double_blink',
+  'blink_while_casting',
+  'warded',
+  'temporal_rift',
+  'greater_invisibility',
+  'rings_of_frost',
+  'snap_polymorph',
+  'twin_frost_nova',
+  'power_echo',
+  'overload',
+  'presence_of_mind',
+  'elemental_convergence',
+  'cold_snap',
+  'mass_barrier',
+  'rune_of_power',
+  'overflowing_power',
+  'evocation',
   // druid (CraftPix premium "RPG Druid" pack). moonfire (no moon), bear_charge, pounce,
   // demoralizing_roar, hibernate (no sleep), insect_swarm have no fitting art — procedural.
   'wrath',
@@ -3521,7 +3574,16 @@ export function abilityImageUrl(id: string): string | null {
     id === 'battle_rhythm' ||
     id === 'attack'
       ? 'warrior'
-      : null);
+      : id === 'double_blink' ||
+          id === 'blink_while_casting' ||
+          id === 'warded' ||
+          id === 'temporal_rift' ||
+          id === 'snap_polymorph' ||
+          id === 'twin_frost_nova' ||
+          id === 'elemental_convergence' ||
+          id === 'overflowing_power'
+        ? 'mage'
+        : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
