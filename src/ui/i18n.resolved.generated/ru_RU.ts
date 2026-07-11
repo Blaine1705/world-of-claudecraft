@@ -1039,6 +1039,7 @@ export const ru_RU: EnTranslations = {
       "cheapCast": "Следующее заклинание стоит на {pct}% меньше",
       "increase": {
         "ap": "Повышает силу атаки на {value}",
+        "sp": "Повышает силу заклинаний на {value}",
         "armor": "Повышает броню на {value}",
         "int": "Повышает интеллект на {value}",
         "agi": "Повышает ловкость на {value}",

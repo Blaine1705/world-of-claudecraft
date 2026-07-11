@@ -344,6 +344,8 @@ import {
 import { chatPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
+import { ProcOverlayPainter } from './proc_overlay_painter';
+import { procOverlayState } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { QuestProgressBanner } from './quest_progress_banner';
@@ -3277,6 +3279,21 @@ export class Hud {
     this.swingbarEl,
     this.swingFillEl,
     this.swingLabelEl,
+  );
+  // The spell-activation proc overlay (curved arcs beside the character, owner
+  // request 2026-07-11): built ONCE here, class-toggled per frame via the
+  // elided writers (proc_overlay_painter + the pure proc_overlay_view rule).
+  private readonly procOverlayEl = (() => {
+    const el = document.createElement('div');
+    el.id = 'proc-overlay';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<div class="arc left"></div><div class="arc right"></div>';
+    document.body.appendChild(el);
+    return el;
+  })();
+  private readonly procOverlayPainter = new ProcOverlayPainter(
+    this.writerFacet,
+    this.procOverlayEl,
   );
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
@@ -7013,6 +7030,9 @@ export class Hud {
     this.swingPeriod = swing.nextPeriod;
     this.lastSwingTimer = swing.nextTimer;
     this.swingTimerPainter.paint(swing);
+    // Proc arcs: Heating Up shows them, Hot Streak burns them bright, spending
+    // hides them (pure rule in proc_overlay_view; unchanged state writes nothing).
+    this.procOverlayPainter.paint(procOverlayState(p.auras));
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write

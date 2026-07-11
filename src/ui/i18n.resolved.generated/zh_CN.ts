@@ -1039,6 +1039,7 @@ export const zh_CN: EnTranslations = {
       "cheapCast": "下一个法术消耗降低{pct}%",
       "increase": {
         "ap": "攻击强度提高 {value}",
+        "sp": "法术强度提高 {value}",
         "armor": "护甲提高 {value}",
         "int": "智力提高 {value}",
         "agi": "敏捷提高 {value}",

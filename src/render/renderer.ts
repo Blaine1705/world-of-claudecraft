@@ -3108,6 +3108,15 @@ export class Renderer {
           this.mageGroundFx.spawnMeteor({ x: ev.x, z: ev.z, duration: ev.duration ?? 2 });
           break;
         }
+        if (ev.fx === 'snowZone') {
+          this.mageGroundFx.spawnSnow({
+            x: ev.x,
+            z: ev.z,
+            radius: ev.radius ?? 7,
+            duration: ev.duration ?? 6,
+          });
+          break;
+        }
         if (ev.fx === 'runeCircle') {
           this.mageGroundFx.spawnRune({
             x: ev.x,

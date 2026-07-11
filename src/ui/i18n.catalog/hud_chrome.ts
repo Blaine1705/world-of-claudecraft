@@ -1260,6 +1260,7 @@ export const hudChromeStrings = {
     cheapCast: 'Your next spell costs {pct}% less',
     increase: {
       ap: 'Increases attack power by {value}',
+      sp: 'Increases spell power by {value}',
       armor: 'Increases armor by {value}',
       int: 'Increases Intellect by {value}',
       agi: 'Increases Agility by {value}',

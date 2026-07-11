@@ -5363,6 +5363,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': '次の詠唱のコストがゼロになる',
   'hudChrome.auraEffect.instantCast': '次の詠唱時間のある呪文が即時発動になる',
   'hudChrome.auraEffect.cheapCast': '次の呪文のコストが{pct}%減少する',
+  'hudChrome.auraEffect.increase.sp': '呪文の威力を{value}上昇させる',
   'hudChrome.auraEffect.increase.armor': '防御力を{value}上昇させる',
   'hudChrome.auraEffect.increase.int': '知力を{value}上昇させる',
   'hudChrome.auraEffect.increase.agi': '敏捷性を{value}上昇させる',

@@ -5096,6 +5096,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.freeCast': '下一次施法不消耗任何资源',
   'hudChrome.auraEffect.instantCast': '下一个有施法时间的法术变为瞬发',
   'hudChrome.auraEffect.cheapCast': '下一个法术消耗降低{pct}%',
+  'hudChrome.auraEffect.increase.sp': '法术强度提高 {value}',
   'hudChrome.auraEffect.increase.armor': '护甲提高 {value}',
   'hudChrome.auraEffect.increase.int': '智力提高 {value}',
   'hudChrome.auraEffect.increase.agi': '敏捷提高 {value}',

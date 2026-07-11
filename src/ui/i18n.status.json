@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6961,
-    "rows": 146181,
-    "translated": 143684,
-    "pending": 2304,
+    "keys": 6962,
+    "rows": 146202,
+    "translated": 143692,
+    "pending": 2317,
     "blocked": 193,
     "blockedSource": 96
   },
@@ -466529,6 +466529,94 @@
           "state": "translated",
           "srcHash": "0007658bc3c673d4",
           "by": "human"
+        }
+      }
+    },
+    "main:hudChrome.auraEffect.increase.sp": {
+      "scope": "main",
+      "enHash": "249065df33670e4c",
+      "placeholders": [
+        "value"
+      ],
+      "locales": {
+        "es": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "es_ES": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "zh_TW": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "ko_KR": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "ja_JP": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "translated",
+          "srcHash": "249065df33670e4c",
+          "by": "human"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
         }
       }
     },

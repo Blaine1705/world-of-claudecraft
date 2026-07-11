@@ -3,7 +3,9 @@
 //    aimed point over the ability's real fall delay, so the impact the sim
 //    schedules (the delayed groundAoE pulse) lands exactly when the ball does;
 //  - the Rune of Power CIRCLE: a glowing arcane ring inscribed on the terrain
-//    for the rune's full duration, so the zone the sim pulses is visible.
+//    for the rune's full duration, so the zone the sim pulses is visible;
+//  - the Blizzard SNOWFALL: a recycled pool of snowflakes drifting down over
+//    the storm's area for its life ('snowZone' cue).
 // Both are cosmetic riders on one 'meteorFall' / 'runeCircle' spellfxAt cue;
 // the sim's pulses remain the authoritative gameplay telegraph.
 //
@@ -33,6 +35,17 @@ export interface RuneCircleSpawn {
   duration: number;
 }
 
+export interface SnowZoneSpawn {
+  x: number;
+  z: number;
+  radius: number;
+  duration: number;
+}
+
+const SNOW_COUNT = 90;
+const SNOW_TOP = 9; // yards above ground the flakes spawn
+const SNOW_FALL = 3.2; // yards per second
+
 interface MeteorFx {
   group: THREE.Group;
   shellMat: THREE.MeshStandardMaterial;
@@ -52,12 +65,25 @@ interface RuneFx {
   baseOpacities: number[];
 }
 
+interface SnowFx {
+  points: THREE.Points;
+  mat: THREE.PointsMaterial;
+  pos: Float32Array;
+  x: number;
+  z: number;
+  groundY: number;
+  radius: number;
+  duration: number;
+  elapsed: number;
+}
+
 export class MageGroundFx {
   private readonly scene: THREE.Scene;
   private readonly groundY: (x: number, z: number) => number;
   private readonly onMeteorLand: (x: number, z: number) => void;
   private readonly meteors: MeteorFx[] = [];
   private readonly runes: RuneFx[] = [];
+  private readonly snows: SnowFx[] = [];
   private meteorGeo: THREE.SphereGeometry | null = null;
   private meteorCoreGeo: THREE.SphereGeometry | null = null;
   private runeRingGeo: THREE.RingGeometry | null = null;
@@ -154,9 +180,79 @@ export class MageGroundFx {
       mats.push(mat);
       baseOpacities.push(0.4);
     }
+    // A soft filled glow at the center plus a ring of orbiting motes: the
+    // inscription reads as living magic, not a chalk outline (owner playtest).
+    const glowGeo = new THREE.CircleGeometry(opts.radius * 0.5, 32);
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: arcane.clone().multiplyScalar(0.9),
+      transparent: true,
+      opacity: 0.18,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const glow = new THREE.Mesh(glowGeo, glowMat);
+    glow.rotation.x = -Math.PI / 2;
+    glow.position.y = 0.005;
+    group.add(glow);
+    mats.push(glowMat);
+    baseOpacities.push(0.18);
+    const moteGeo = new THREE.SphereGeometry(0.12, 8, 6);
+    for (let i = 0; i < 6; i++) {
+      const moteMat = new THREE.MeshBasicMaterial({
+        color: arcane.clone().multiplyScalar(1.9),
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const mote = new THREE.Mesh(moteGeo, moteMat);
+      const a = (i / 6) * Math.PI * 2;
+      mote.position.set(Math.cos(a) * opts.radius * 0.8, 0.5, Math.sin(a) * opts.radius * 0.8);
+      group.add(mote);
+      mats.push(moteMat);
+      baseOpacities.push(0.85);
+    }
     group.position.set(opts.x, this.groundY(opts.x, opts.z) + 0.15, opts.z);
     this.scene.add(group);
     this.runes.push({ group, mats, duration: opts.duration, elapsed: 0, baseOpacities });
+  }
+
+  spawnSnow(opts: SnowZoneSpawn): void {
+    const frost = new THREE.Color(SCHOOL_COLORS.frost);
+    const pos = new Float32Array(SNOW_COUNT * 3);
+    const gy = this.groundY(opts.x, opts.z);
+    for (let i = 0; i < SNOW_COUNT; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.sqrt(Math.random()) * opts.radius;
+      pos[i * 3] = opts.x + Math.cos(a) * r;
+      pos[i * 3 + 1] = gy + Math.random() * SNOW_TOP;
+      pos[i * 3 + 2] = opts.z + Math.sin(a) * r;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({
+      color: frost.clone().lerp(new THREE.Color(0xffffff), 0.6),
+      size: 0.18,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    const points = new THREE.Points(geo, mat);
+    points.frustumCulled = false;
+    this.scene.add(points);
+    this.snows.push({
+      points,
+      mat,
+      pos,
+      x: opts.x,
+      z: opts.z,
+      groundY: gy,
+      radius: opts.radius,
+      duration: opts.duration,
+      elapsed: 0,
+    });
   }
 
   update(dt: number): void {
@@ -198,6 +294,31 @@ export class MageGroundFx {
       r.mats.forEach((mat, idx) => {
         (mat as THREE.MeshBasicMaterial).opacity = r.baseOpacities[idx] * fade * breath;
       });
+    }
+    for (let i = this.snows.length - 1; i >= 0; i--) {
+      const sfx = this.snows[i];
+      sfx.elapsed += dt;
+      if (sfx.elapsed >= sfx.duration) {
+        this.scene.remove(sfx.points);
+        sfx.mat.dispose();
+        sfx.points.geometry.dispose();
+        this.snows.splice(i, 1);
+        continue;
+      }
+      // Every flake sinks; one that reaches the ground respawns at the top of
+      // the column at a fresh scatter, so the fall never runs dry.
+      for (let f = 0; f < SNOW_COUNT; f++) {
+        sfx.pos[f * 3 + 1] -= SNOW_FALL * dt;
+        if (sfx.pos[f * 3 + 1] <= sfx.groundY + 0.1) {
+          const a = Math.random() * Math.PI * 2;
+          const r = Math.sqrt(Math.random()) * sfx.radius;
+          sfx.pos[f * 3] = sfx.x + Math.cos(a) * r;
+          sfx.pos[f * 3 + 1] = sfx.groundY + SNOW_TOP;
+          sfx.pos[f * 3 + 2] = sfx.z + Math.sin(a) * r;
+        }
+      }
+      sfx.points.geometry.attributes.position.needsUpdate = true;
+      sfx.mat.opacity = 0.9 * Math.min(1, (sfx.duration - sfx.elapsed) / 0.6);
     }
   }
 }

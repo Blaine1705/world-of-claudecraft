@@ -1039,6 +1039,7 @@ export const es: EnTranslations = {
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
+        "sp": "Aumenta el poder con hechizos en {value}",
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
