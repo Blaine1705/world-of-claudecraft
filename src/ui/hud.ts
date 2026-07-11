@@ -8632,7 +8632,7 @@ export class Hud {
         this.castLoopIds.delete(ev.entityId);
         return;
       case 'spellfx': {
-        if (ev.fx === 'projectile') {
+        if (ev.fx === 'projectile' || ev.fx === 'heavyBolt') {
           const s = sim.entities.get(ev.sourceId);
           if (s) this.combat(`proj_${ev.school}`, s.pos.x, s.pos.y, s.pos.z, 0.55);
         } else if (ev.fx === 'nova') {

@@ -1849,11 +1849,14 @@ export interface AbilityDef {
   // casting_lifecycle); a PHYSICAL ranged shot (hunter Aimed / Concussive Shot) must
   // set this explicitly, or it would deal its damage instantly while the arrow is
   // still visibly in flight. Melee physical attacks leave it unset.
+  // Projectile opt-IN for physical ranged shots (hunter Aimed/Concussive), and
+  // opt-OUT for spells: `projectile: false` on a non-physical spell resolves its
+  // damage instantly at cast completion instead of on bolt arrival (Fire Blast).
   projectile?: boolean;
   // Overrides the flying-projectile VISUAL for this spell (the mechanic is
   // unchanged): 'lightning' draws a jagged electric bolt from caster to target
   // instead of the default glowing bolt. Renderer-only; the sim just forwards it.
-  projectileFx?: 'lightning';
+  projectileFx?: 'lightning' | 'heavyBolt';
   // Instant-cast VISUAL cue (renderer-only; the sim just emits a spellfx with it):
   // 'shout' plays the caster's roar one-shot + an expanding ground shockwave ring
   // (the warrior shouts); 'flourish' plays the ability-mapped one-shot clip
@@ -2807,6 +2810,9 @@ export type SimEvent = { pid?: number } & (
       school: string;
       fx:
         | 'projectile'
+        // The same homing bolt drawn heavier (Pyroblast's boulder): mechanics
+        // identical to 'projectile', only the renderer scales it up.
+        | 'heavyBolt'
         | 'beam'
         | 'tick'
         | 'nova'

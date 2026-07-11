@@ -614,6 +614,14 @@ export function castAbility(
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
     ctx.breakGhostWolf(p);
   }
+  // An instant slipping through a RUNNING cast (usableWhileCasting /
+  // Flickerstep) must not disturb that cast's aim: castTargetId/castAim belong
+  // to the spell in progress (its finish path re-validates them), so they are
+  // stashed here and restored after the interleaved resolution below. Without
+  // this the running Fireball lost its target (fizzling at completion, the
+  // owner's round-four report) and an aimed Blizzard fell back to the feet.
+  const heldCastTarget = blinkThrough ? p.castTargetId : null;
+  const heldCastAim = blinkThrough ? p.castAim : null;
   // Stash the (clamped) aim so the resolved area effects read it, both for an
   // instant cast (resolved just below) and a cast-time spell (resolved on
   // completion in updateCasting). Cleared there / on cancel.
@@ -709,9 +717,10 @@ export function castAbility(
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
   applyAbility(ctx, p, meta, res, castTargetId);
-  // instant ground-targeted cast: its effects have consumed the aim point.
-  p.castAim = null;
-  p.castTargetId = null;
+  // instant ground-targeted cast: its effects have consumed the aim point. An
+  // interleaved instant instead hands the aim back to the cast still running.
+  p.castAim = blinkThrough ? heldCastAim : null;
+  p.castTargetId = blinkThrough ? heldCastTarget : null;
 }
 
 export function spendResource(p: Entity, cost: number): void {
@@ -1249,7 +1258,8 @@ function applyAbility(
   // opts in with projectile:true. Without this a physical shot deals its damage
   // instantly while the arrow is still visibly in flight (health drops, or the mob
   // dies, before it arrives).
-  const firesProjectile = ability.school !== 'physical' || ability.projectile === true;
+  // `projectile: false` opts a spell OUT (Fire Blast bites instantly).
+  const firesProjectile = ability.projectile ?? ability.school !== 'physical';
   if (target && firesProjectile) {
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res);

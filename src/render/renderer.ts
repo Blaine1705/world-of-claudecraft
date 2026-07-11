@@ -3064,6 +3064,9 @@ export class Renderer {
           break;
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'heavyBolt')
+          // Pyroblast's boulder: the same homing comet, doubled up.
+          this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
         else if (ev.fx === 'procSurge') {

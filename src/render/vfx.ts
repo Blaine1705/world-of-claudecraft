@@ -174,6 +174,9 @@ interface Projectile {
   // When set, the flying head renders as a short jagged electric bolt streak
   // (a lightning "bolt-shaped" projectile) instead of a smooth glowing comet.
   lightning?: boolean;
+  // Visual heft multiplier (Pyroblast's heavyBolt = 2): scales the comet core,
+  // trail and impact flash; mechanics and speed are untouched.
+  scale?: number;
 }
 
 // fire reads as flame tongues; everything else as sparkling magic
@@ -391,7 +394,7 @@ export class Vfx {
   // High-level effects
   // ---------------------------------------------------------------------
 
-  projectile(sourceId: number, targetId: number, school: string): void {
+  projectile(sourceId: number, targetId: number, school: string, scale = 1): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     const colors = projectileSchoolColors(school);
@@ -406,6 +409,7 @@ export class Vfx {
       ttl: 3,
       coreSprite: sprites.core,
       trailSprite: sprites.trail,
+      scale,
     });
   }
 
@@ -1121,7 +1125,20 @@ export class Vfx {
       if (dist <= Math.max(0.7, step)) {
         // impact: school-tinted cross-flash + burst that survives a 30fps frame
         this.tmpColor.copy(pr.color).multiplyScalar(hdr(1.6));
-        this.spawn(target.x, target.y, target.z, 0, 0.5, 0, this.tmpColor, 1.1, 0.22, 0, SPR.flash);
+        const sc = pr.scale ?? 1;
+        this.spawn(
+          target.x,
+          target.y,
+          target.z,
+          0,
+          0.5,
+          0,
+          this.tmpColor,
+          1.1 * sc,
+          0.22,
+          0,
+          SPR.flash,
+        );
         for (let k = 0; k < this.scaledCount(22); k++) {
           const a = Math.random() * Math.PI * 2;
           const sp = 2.5 + Math.random() * 4;
@@ -1205,7 +1222,7 @@ export class Vfx {
           0,
           0,
           pr.coreColor,
-          1.0,
+          1.0 * (pr.scale ?? 1),
           0.12,
           0,
           pr.coreSprite,
@@ -1219,7 +1236,7 @@ export class Vfx {
             0.4,
             (Math.random() - 0.5) * 0.8,
             pr.trailColor,
-            0.32,
+            0.32 * (pr.scale ?? 1),
             0.6,
             1.5,
             pr.trailSprite,
