@@ -5392,13 +5392,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    // Owner design (calculator): a CHANNEL that restores mana while you
-    // channel, each pulse scaling with your spell power (was a flat instant
-    // +220 dump in the first draft).
+    // Owner design (playtest 2026-07-11): a CHANNEL that restores mana every
+    // second AND builds stacking spell power the longer you keep channeling
+    // (the buff lingers after the channel ends).
     channel: { duration: 6, ticks: 6 },
-    effects: [{ type: 'gainResource', amount: 40, spPct: 0.6 }],
+    effects: [
+      { type: 'gainResource', amount: 40 },
+      { type: 'selfBuff', kind: 'buff_spellpower', value: 8, duration: 15 },
+    ],
     description:
-      'Channel for 6 sec, restoring mana every second; each pulse scales with your spell power. (Mage talent)',
+      'Channel for 6 sec: each second restores 40 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
   },
   frenzied_regeneration: {
     id: 'frenzied_regeneration',
@@ -5803,6 +5806,57 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeAllyAbsorb', amount: 130, duration: 60, radius: 30 }],
     description:
       'Shields you and all allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+  },
+  overload: {
+    id: 'overload',
+    name: 'Overload',
+    class: 'mage',
+    learnLevel: 14,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'overload', value: 0.4, duration: 10 }],
+    description:
+      'Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)',
+  },
+  power_echo: {
+    id: 'power_echo',
+    name: 'Power Echo',
+    class: 'mage',
+    learnLevel: 14,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'power_echo', value: 0.5, duration: 10 }],
+    description:
+      'Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)',
+  },
+  rune_of_power: {
+    id: 'rune_of_power',
+    name: 'Rune of Power',
+    class: 'mage',
+    learnLevel: 20,
+    cost: 100,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    // A FRIENDLY ground zone at the caster's feet: each pulse buffs allies
+    // standing inside (the groundAoE allyBuffPct rider; no damage, no rng).
+    effects: [
+      { type: 'groundAoE', min: 0, max: 0, radius: 8, duration: 15, interval: 2, allyBuffPct: 0.1 },
+    ],
+    description:
+      'Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)',
   },
   psychic_scream: {
     id: 'psychic_scream',

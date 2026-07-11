@@ -377,6 +377,31 @@ export function runEffects(
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
           spentAreaEcho = true;
         }
+        // Power Echo (mage choice row): the armed echo repeats the SAME
+        // resolved amount at its fraction on the same target (already rolled,
+        // post crit; no new rng draw), consumed BEFORE the repeat so a copy
+        // can never re-echo. Mirrors the Bladed Echo copy rule above.
+        if (isSpell) {
+          const echoIdx = p.auras.findIndex((a) => a.kind === 'power_echo');
+          if (echoIdx >= 0) {
+            const echoAura = p.auras[echoIdx];
+            p.auras.splice(echoIdx, 1);
+            ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
+            if (!target.dead) {
+              ctx.dealDamage(
+                p,
+                target,
+                Math.max(1, Math.round(finalDamage * echoAura.value)),
+                crit,
+                ability.school,
+                ability.name,
+                'hit',
+                false,
+                threatOpts,
+              );
+            }
+          }
+        }
         if (isSpell) noteSpellHit(ctx, p, crit);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -921,7 +946,17 @@ export function runEffects(
         }
         const x = p.pos.x + Math.sin(facing) * distance;
         const z = p.pos.z + Math.cos(facing) * distance;
-        sweptReposition(ctx, p, x, z);
+        sweptRelocate(ctx, p, x, z);
+        // The step is INSTANT: the renderer snaps the mover on this cue
+        // (without it, the self-reposition heuristic reads the jump as a
+        // leap and plays an arc, owner playtest 2026-07-11).
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'blinkStep',
+        });
         break;
       }
       case 'lifeTap': {
@@ -1327,10 +1362,6 @@ export function runEffects(
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
           spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
           allyBuffPct: eff.allyBuffPct,
-          igniteFrac: eff.igniteFrac,
-          slowMult: eff.slowMult,
-          slowDuration: eff.slowDuration,
-          orbCdr: eff.orbCdr,
         };
         // A fresh Blizzard zone gets a fresh Frozen Orb refund budget (the
         // same per-cast budget the old channel reset at channel start).
@@ -2181,13 +2212,10 @@ export function runEffects(
         // (Recklessness / Battle Rhythm; rageGenAuraMult sums the buff_rage_gen
         // auras). Non-rage resources (energy from Adrenaline Rush, etc.) are
         // deliberately untouched.
-        // Aetherwell: a mana restore may scale with spell power (spPct), so the
-        // channel's ticks grow with gear. Flat for everyone else. Draws no rng.
-        const spTerm = eff.spPct ? Math.round(abilityScalingPower(p, ability) * eff.spPct) : 0;
         const gainAmt =
           p.resourceType === 'rage'
             ? eff.amount * (1 + ctx.playerMods(meta).global.abilityRagePct) * rageGenAuraMult(p)
-            : eff.amount + spTerm;
+            : eff.amount;
         p.resource = Math.min(p.maxResource, p.resource + gainAmt);
         break;
       }

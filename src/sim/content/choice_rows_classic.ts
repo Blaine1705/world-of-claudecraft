@@ -239,11 +239,10 @@ export const WARRIOR_CHOICE_ROWS: ClassChoiceRows = {
 
 // The mage tree is the owner's design (bilingual Artifact calculator,
 // 2026-07-11), replacing the first-draft rows wholesale: six class-wide
-// utility rows that serve Fire, Frost AND the future third spec. Five options
-// are declared with an EMPTY effect (a visible "coming soon" card): Blink
-// While Casting, Power Echo, Overload, Elemental Convergence and Rune of
-// Power each need a new mechanic and land in a later phase. Numbers are the
-// calculator's provisional values, tuned in playtest.
+// utility rows that serve Fire, Frost AND the future third spec. All eighteen
+// options are live (phase 2 landed the five new mechanics: Blink While
+// Casting, Power Echo, Overload, Elemental Convergence, Rune of Power).
+// Numbers are the calculator's provisional values, tuned in playtest.
 export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
@@ -268,9 +267,9 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r5_blink_cast',
           name: 'Blink While Casting',
-          description: 'Coming soon: Flickerstep no longer interrupts your cast in progress.',
+          description: 'You can use Flickerstep in the middle of a cast without interrupting it.',
           icon: 'blink',
-          effect: {},
+          effect: { global: { blinkCast: 1 } },
         },
       ],
     },
@@ -353,16 +352,17 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r14_power_echo',
           name: 'Power Echo',
           description:
-            'Coming soon: your next direct spell repeats at reduced power on the same target.',
+            'Grants Power Echo: your next direct spell repeats at 50% power on the same target.',
           icon: 'arcane_missiles',
-          effect: {},
+          effect: { grant: { ability: 'power_echo' } },
         },
         {
           id: 'mag_r14_overload',
           name: 'Overload',
-          description: 'Coming soon: amplify any one spell heavily, at a steeper mana cost.',
+          description:
+            'Grants Overload: your next spell is amplified by 40% but costs 50% more mana.',
           icon: 'pyroblast',
-          effect: {},
+          effect: { grant: { ability: 'overload' } },
         },
         {
           id: 'mag_r14_presence_of_mind',
@@ -381,9 +381,9 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r17_convergence',
           name: 'Elemental Convergence',
           description:
-            'Coming soon: alternating a Fire and a Frost spell opens an 8 sec surge of power.',
+            'Alternating a Fire and a Frost spell opens an 8 sec surge of power, once per 30 sec.',
           icon: 'fireball',
-          effect: {},
+          effect: { global: { convergence: 1 } },
         },
         {
           id: 'mag_r17_cold_snap',
@@ -410,9 +410,9 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r20_rune_of_power',
           name: 'Rune of Power',
           description:
-            'Coming soon: place a rune; allies near it deal more spell damage and healing.',
+            'Grants Rune of Power: inscribe a rune; allies standing near it deal 10% more damage.',
           icon: 'flamestrike',
-          effect: {},
+          effect: { grant: { ability: 'rune_of_power' } },
         },
         {
           id: 'mag_r20_overflowing_power',

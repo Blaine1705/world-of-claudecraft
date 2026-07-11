@@ -3923,7 +3923,6 @@ export class Sim {
       }
       return;
     }
-    let zoneStruck = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
       const isSpell = effect.school !== 'physical';

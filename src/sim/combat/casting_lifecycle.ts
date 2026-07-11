@@ -457,10 +457,10 @@ export function castAbility(
   // casts on MOVE INPUT). Everything else keeps the classic rules. No rng.
   const blinkThrough =
     p.castingAbility !== null &&
-    p.castingAbility !== FISHING_CAST_ID &&
+    abilityId === 'blink' &&
     ability.castTime === 0 &&
-    (ability.usableWhileCasting === true ||
-      (abilityId === 'blink' && ctx.playerMods(meta).global.blinkCast > 0));
+    ctx.playerMods(meta).global.blinkCast > 0 &&
+    p.castingAbility !== FISHING_CAST_ID;
   if (p.castingAbility) {
     if (!blinkThrough) {
       // classic-era spell queue: a press during the tail of the current cast
@@ -927,6 +927,31 @@ function overflowingPowerCdr(ctx: SimContext, p: Entity, meta: PlayerMeta, cost:
   }
 }
 
+// Overload (mage choice row): consume the armed amplifier on a mana spell,
+// returning a scaled copy of the resolved ability (numeric effect fields ride
+// the output amp; the bill rides the cost amp). The original resolved struct
+// is never mutated. Draws no rng.
+const OVERLOAD_COST_MULT = 1.5;
+
+function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): ResolvedAbility {
+  if (res.def.school === 'physical' || res.cost <= 0) return res;
+  const idx = p.auras.findIndex((a) => a.kind === 'overload');
+  if (idx < 0) return res;
+  const aura = p.auras[idx];
+  const amp = 1 + aura.value;
+  p.auras.splice(idx, 1);
+  ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  const effects = res.effects.map((eff) => {
+    const scaled: Record<string, unknown> = { ...eff };
+    for (const key of ['min', 'max', 'amount', 'bonus', 'total', 'value'] as const) {
+      const v = scaled[key];
+      if (typeof v === 'number' && v > 0) scaled[key] = Math.round(v * amp);
+    }
+    return scaled as typeof eff;
+  });
+  return { ...res, cost: Math.round(res.cost * OVERLOAD_COST_MULT), effects };
+}
+
 function armAbilityCooldown(
   p: Entity,
   abilityId: string,
@@ -1048,14 +1073,46 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
-  // Targetless SELF channel (Aetherwell): no aim point, no area, no enemy;
-  // each tick applies the ability's self restore, spell-power scaled like the
-  // instant gainResource dispatch. Draws no rng.
+  // Targetless SELF channel (Aetherwell): no aim point, no area, no enemy.
+  // Each tick restores the flat mana AND stacks the channel's spell-power
+  // buff (owner design: the longer you channel, the more spell power), the
+  // aura value growing by the effect value per pulse with its clock
+  // refreshed; the recalc applies the new power at once. Draws no rng.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'gainResource')) {
     for (const eff of res.effects) {
-      if (eff.type !== 'gainResource') continue;
-      const spTerm = eff.spPct ? Math.round(abilityScalingPower(p, res.def) * eff.spPct) : 0;
-      p.resource = Math.min(p.maxResource, p.resource + eff.amount + spTerm);
+      if (eff.type === 'gainResource') {
+        p.resource = Math.min(p.maxResource, p.resource + eff.amount);
+      } else if (eff.type === 'selfBuff' && eff.kind === 'buff_spellpower') {
+        const existing = p.auras.find((a) => a.id === res.def.id && a.kind === 'buff_spellpower');
+        if (existing) {
+          existing.value += eff.value;
+          existing.stacks = (existing.stacks ?? 1) + 1;
+          existing.remaining = eff.duration;
+          existing.duration = eff.duration;
+        } else {
+          ctx.applyAura(p, {
+            id: res.def.id,
+            name: res.def.name,
+            kind: 'buff_spellpower',
+            value: eff.value,
+            remaining: eff.duration,
+            duration: eff.duration,
+            sourceId: p.id,
+            school: res.def.school,
+            stacks: 1,
+          });
+        }
+        const channelMeta = ctx.players.get(p.id);
+        if (channelMeta) {
+          recalcPlayerStats(
+            p,
+            channelMeta.cls,
+            channelMeta.equipment,
+            ctx.playerMods(channelMeta),
+            channelMeta.equipmentInstance,
+          );
+        }
+      }
     }
     return;
   }

@@ -89,6 +89,8 @@ type DisplayGlobalKey = Exclude<
   | 'barrierDrPct'
   | 'temporalRift'
   | 'manaDefCdrPer10'
+  | 'blinkCast'
+  | 'convergence'
 >;
 
 export interface TalentLocaleText {
@@ -9559,6 +9561,8 @@ function effectDescription(
       key === 'barrierDrPct' ||
       key === 'temporalRift' ||
       key === 'manaDefCdrPer10' ||
+      key === 'blinkCast' ||
+      key === 'convergence' ||
       // critVsRooted is not a plain statLabels key; it gets its own "@ root" line below.
       key === 'critVsRooted'
     )

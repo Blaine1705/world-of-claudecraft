@@ -2963,40 +2963,6 @@ export class Renderer {
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
         }
-        if (ev.fx === 'frostCone') {
-          const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
-            this.glacialFrontVisual.spawn(
-              source.pos.x,
-              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
-              source.pos.z,
-              source.facing,
-              ev.range ?? 7,
-              ev.level ?? 1,
-              ev.angle ?? 70,
-              ev.fx,
-            );
-            this.triggerAttack(ev.sourceId, 'glacial_front');
-          }
-          break;
-        }
-        if (ev.fx === 'fireCone') {
-          const source = this.sim.entities.get(ev.sourceId);
-          if (source) {
-            this.glacialFrontVisual.spawn(
-              source.pos.x,
-              groundHeight(source.pos.x, source.pos.z, this.sim.cfg.seed),
-              source.pos.z,
-              source.facing,
-              ev.range ?? 6,
-              ev.level ?? 1,
-              ev.angle ?? 55,
-              ev.fx,
-            );
-            this.triggerAttack(ev.sourceId, 'dragons_breath');
-          }
-          break;
-        }
         if (ev.fx === 'windup') {
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to

@@ -55,23 +55,6 @@ export type GroundAoE = {
   // near) instead of damaging hostiles; min/max are ignored and the pulse
   // draws NO rng (the damage roll is skipped entirely).
   allyBuffPct?: number;
-  // Meteor: Ignite each struck enemy for this fraction of the resolved pulse
-  // damage (fire_mage.applyIgnite copies the number; no re-roll).
-  igniteFrac?: number;
-  // Blizzard riders: the per-pulse snare and the Frozen Orb cooldown shave.
-  slowMult?: number;
-  slowDuration?: number;
-  orbCdr?: boolean;
-  // Ring of Frost: annular contact trap state. Its duration uses `remaining`;
-  // targets are remembered so standing on or re-entering one ring cannot chain-root.
-  frostRing?: {
-    id: string;
-    abilityId: string;
-    duration: number;
-    freezeDuration: number;
-    innerRadius: number;
-    triggeredIds: Set<number>;
-  };
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-
