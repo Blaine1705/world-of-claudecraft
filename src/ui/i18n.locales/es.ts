@@ -3376,7 +3376,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description':
     'Ata a la tierra a cercanos enemigos y los inmoviliza durante 2 s. (talento de chamán)',
   'entities.abilities.evocation.name': 'Pozo de Éter',
-  'entities.abilities.evocation.description': 'Restaura maná rápidamente. (talento de mago)',
+  'entities.abilities.evocation.description':
+    'Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)',
   'entities.abilities.frenzied_regeneration.name': 'Remiendo Salvaje',
   'entities.abilities.frenzied_regeneration.description':
     'Regenera salud durante 10 s. Solo en Forma de oso. (talento de druida)',
@@ -6305,7 +6306,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.instantCast':
     'Tu siguiente hechizo con tiempo de lanzamiento es instantáneo',
   'hudChrome.auraEffect.cheapCast': 'Tu siguiente hechizo cuesta un {pct}% menos',
-  'hudChrome.auraEffect.increase.sp': 'Aumenta el poder con hechizos en {value}',
   'hudChrome.auraEffect.increase.armor': 'Aumenta la armadura en {value}',
   'hudChrome.auraEffect.increase.int': 'Aumenta el intelecto en {value}',
   'hudChrome.auraEffect.increase.agi': 'Aumenta la agilidad en {value}',

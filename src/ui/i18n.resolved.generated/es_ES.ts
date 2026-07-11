@@ -1331,6 +1331,13 @@ export const es_ES: EnTranslations = {
       "attackSpeedFast": "Incrementa la velocidad de ataque un {pct}%",
       "haste": "Incrementa la velocidad de ataque y lanzamiento un {pct}%",
       "tongues": "Incrementa el tiempo de lanzamiento un {pct}%",
+      "combustionCrit": "Tus hechizos de Fuego siempre golpean de crítico",
+      "overloadNext": "Tu siguiente hechizo se potencia un {pct}% pero cuesta un 50% más de maná",
+      "powerEchoNext": "Tu siguiente hechizo directo se repite al {pct}% de potencia sobre el mismo objetivo",
+      "iceFloesCasts": "Tus próximos {n} hechizos con tiempo de lanzamiento pueden lanzarse en movimiento",
+      "freeCast": "Tu siguiente lanzamiento no cuesta nada",
+      "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
+      "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
       "increase": {
         "ap": "Incrementa el poder de ataque en {value}",
         "armor": "Incrementa la armadura en {value}",
@@ -6496,7 +6503,7 @@ export const es_ES: EnTranslations = {
       },
       "evocation": {
         "name": "Pozo de Éter",
-        "description": "Restaura maná rápidamente. (talento de mago)"
+        "description": "Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)"
       },
       "frenzied_regeneration": {
         "name": "Remiendo Salvaje",

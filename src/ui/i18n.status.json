@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6954,
-    "rows": 146034,
-    "translated": 143628,
-    "pending": 2213,
+    "keys": 6961,
+    "rows": 146181,
+    "translated": 143684,
+    "pending": 2304,
     "blocked": 193,
     "blockedSource": 95
   },
@@ -108261,112 +108261,112 @@
     },
     "main:entities.abilities.evocation.description": {
       "scope": "main",
-      "enHash": "a7467e83419aa7c3",
+      "enHash": "239e6cc3cf20d5a3",
       "placeholders": [],
       "locales": {
         "es": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "es_ES": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "fr_FR": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "fr_CA": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "it_IT": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "de_DE": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "zh_CN": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "zh_TW": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "ko_KR": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "ja_JP": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "pt_BR": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "ru_RU": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "cs_CZ": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "nl_NL": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "pl_PL": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "id_ID": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "tr_TR": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "sv_SE": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "vi_VN": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         },
         "da_DK": {
           "state": "translated",
-          "srcHash": "a7467e83419aa7c3",
+          "srcHash": "239e6cc3cf20d5a3",
           "by": "human"
         }
       }

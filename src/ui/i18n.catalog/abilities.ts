@@ -1584,7 +1584,11 @@ const classAbilityNamesEn = {
         'Gripping Earth',
         'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
       ],
-      ['evocation', 'Aetherwell', 'Rapidly restores mana. (Mage talent)'],
+      [
+        'evocation',
+        'Aetherwell',
+        'Channel for 6 sec: each second restores 40 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
+      ],
       [
         'frenzied_regeneration',
         'Savage Mending',

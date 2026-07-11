@@ -1638,6 +1638,12 @@ export type AbilityEffect =
       // Meteor: skip the on-cast pulse so the FIRST hit lands one interval
       // after placement (the fall delay); a plain zone still pulses on cast.
       delayed?: boolean;
+      // Blizzard: each pulse also snares everyone struck (kind 'slow').
+      slowMult?: number;
+      slowDuration?: number;
+      // Blizzard: each struck enemy shaves the running Frozen Orb cooldown
+      // (frost_mage's per-cast budget, reset when the zone is placed).
+      orbCdr?: boolean;
     }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
@@ -1809,7 +1815,33 @@ export interface AbilityDef {
   // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
   scalesWith?: 'ranged';
   requiresTarget: boolean;
-  targetType?: 'enemy' | 'friendly' | 'any'; // friendly = self or allied player (defaults to enemy)
+  // Passive ability (Measured Fury): known and shown in the spellbook, but never
+  // castable and never auto-placed on the action bar. Its benefit is folded
+  // wherever the flat known list is read (e.g. the cost choke point in
+  // resolvedAbility); castAbility refuses it silently.
+  passive?: boolean;
+  // Spec-gated base kit: when set, only players whose CHOSEN spec id is in the
+  // list keep this ability in their known list (abilitiesKnownAt). A player who
+  // has not committed to a spec keeps the full kit, and talent/row GRANTS are
+  // never filtered (the tree they come from is already spec-scoped).
+  specs?: readonly string[];
+  // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
+  // spec id is in the list DROPS this ability from their known list, even though
+  // it is otherwise ungated. Used to swap one ability for a spec-exclusive
+  // replacement (heroic_strike excludeSpecs ['prot'], since prot uses revenge).
+  // A no-spec player and any non-listed spec keep it. Grants are never filtered.
+  excludeSpecs?: readonly string[];
+  // When set alongside excludeSpecs, the exclusion only kicks in at this player
+  // level: below it the listed specs still know the ability. Models a kit
+  // hand-off (Redhand serves committed Fury as its rage spender until Red
+  // Harvest arrives, then retires). Without it exclusion applies at any level.
+  excludeSpecsAtLevel?: number;
+  // friendly = self or allied player; 'any' = either (defaults to enemy)
+  // An INSTANT that may be pressed in the middle of another cast without
+  // touching it (Fire Blast, Combustion; casting_lifecycle's through-cast
+  // path, the same door Blink While Casting opens by talent).
+  usableWhileCasting?: boolean;
+  targetType?: 'enemy' | 'friendly' | 'any';
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
@@ -2783,7 +2815,7 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
       school: string;
-      fx: 'burst' | 'nova' | 'orb';
+      fx: 'burst' | 'nova' | 'orb' | 'meteorFall' | 'runeCircle';
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;

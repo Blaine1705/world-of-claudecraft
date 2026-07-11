@@ -1331,6 +1331,13 @@ export const ja_JP: EnTranslations = {
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
       "tongues": "詠唱時間を{pct}%増加させる",
+      "combustionCrit": "火炎呪文が必ずクリティカルになる",
+      "overloadNext": "次の呪文の効果が{pct}%増加するが、マナ消費が50%増える",
+      "powerEchoNext": "次の直接呪文が同じ対象に{pct}%の威力で再発動する",
+      "iceFloesCasts": "次の{n}回の詠唱呪文を移動しながら唱えられる",
+      "freeCast": "次の詠唱のコストがゼロになる",
+      "instantCast": "次の詠唱時間のある呪文が即時発動になる",
+      "cheapCast": "次の呪文のコストが{pct}%減少する",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
         "armor": "防御力を{value}上昇させる",

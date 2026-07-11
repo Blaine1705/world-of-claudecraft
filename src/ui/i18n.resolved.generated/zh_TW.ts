@@ -1331,6 +1331,13 @@ export const zh_TW: EnTranslations = {
       "attackSpeedFast": "攻擊速度提高 {pct}%",
       "haste": "攻擊與施法速度提高 {pct}%",
       "tongues": "施法時間增加 {pct}%",
+      "combustionCrit": "你的火焰法術必定造成致命一擊",
+      "overloadNext": "下一個法術效果提高{pct}%，但法力消耗增加50%",
+      "powerEchoNext": "下一個直接法術以{pct}%的威力對同一目標重複施放",
+      "iceFloesCasts": "接下來{n}個有施法時間的法術可在移動中施放",
+      "freeCast": "下一次施法不消耗任何資源",
+      "instantCast": "下一個有施法時間的法術變為瞬發",
+      "cheapCast": "下一個法術消耗降低{pct}%",
       "increase": {
         "ap": "攻擊強度提高 {value}",
         "armor": "護甲提高 {value}",

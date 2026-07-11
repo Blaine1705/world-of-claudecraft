@@ -427,7 +427,8 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r20_evocation',
           name: 'Aetherwell',
-          description: 'Grants Aetherwell: channel to rapidly restore mana.',
+          description:
+            'Grants Aetherwell: channel to restore mana, building spell power the longer you channel.',
           icon: 'evocation',
           effect: { grant: { ability: 'evocation' } },
         },

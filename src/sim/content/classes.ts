@@ -1530,19 +1530,34 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 14,
     specs: ['frost'],
     cost: 70,
-    castTime: 0,
     cooldown: 8,
     range: 30,
     school: 'frost',
     requiresTarget: false,
     targetMode: 'position',
-    channel: { duration: 6, ticks: 6 },
+    // Owner playtest 2026-07-11: no longer a channel. A 2 sec cast places the
+    // storm, which then pulses on its own for 6 sec (a groundAoE with the
+    // snare + Frozen Orb refund riders; delayed skips the on-cast pulse so
+    // the first wave lands as the storm visibly forms).
+    castTime: 2,
     effects: [
-      { type: 'aoeDamage', min: 12, max: 16, radius: 7 },
-      { type: 'aoeSlow', mult: 0.6, duration: 2, radius: 7 },
+      {
+        type: 'groundAoE',
+        min: 12,
+        max: 16,
+        radius: 7,
+        // 6 one-second waves; the extra half second keeps the LAST wave from
+        // dying on the zone clock's exact edge (delayed drops the on-cast one).
+        duration: 6.5,
+        interval: 1,
+        delayed: true,
+        slowMult: 0.6,
+        slowDuration: 2,
+        orbCdr: true,
+      },
     ],
     description:
-      'Calls an ice storm onto the target area for 6 sec, dealing $d Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
   },
   // The three frost spec passives: spellbook/spec-screen documentation of the
   // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
@@ -1656,13 +1671,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     // Owner playtest 2026-07-11: pressable in the middle of another cast.
     usableWhileCasting: true,
-    // Owner rule (round five): fully off the GCD, like Combustion: castable
-    // during one and it never arms one for the other abilities.
-    offGcd: true,
-    // Owner playtest 2026-07-13: three stored charges (was two), back to back if banked.
-    maxCharges: 3,
-    // Owner playtest round four: no bolt, the embers bite the moment you press.
-    projectile: false,
     effects: [{ type: 'directDamage', min: 27, max: 35 }],
     ranks: [
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },
@@ -1852,18 +1860,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    // Owner playtest 2026-07-13: Scald lands instantly, no traveling bolt (projectile
-    // false), so the damage resolves the moment the cast finishes.
-    projectile: false,
-    // Owner playtest 2026-07-11: casting it also quickens your feet; round
-    // four made the cast itself mobile (the fire mage's on-the-run filler).
-    castWhileMoving: true,
+    // Owner playtest 2026-07-11: casting it also quickens your feet.
     effects: [
       { type: 'directDamage', min: 32, max: 40 },
       { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 3 },
     ],
     description:
-      'Scorches the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast, and castable while moving.',
+      'Scorches the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast.',
   },
   pyroblast: {
     id: 'pyroblast',
@@ -4788,6 +4791,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'fire',
     requiresTarget: false,
+    usableWhileCasting: true,
     // Owner decision 2026-07-11: the NEW Combustion replaces the old +50% crit
     // Flashfire. While worn every Fire spell critically strikes (the crit roll
     // outcome is overridden in combat/fire_mage.ts, the roll still drawn), and
