@@ -3288,6 +3288,8 @@ export class Hud {
     this.writerFacet,
     this.procOverlayEl,
   );
+  // One-shot login preview gate for the phoenix (see update()).
+  private procOverlayPreviewed = false;
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
   // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
@@ -7189,8 +7191,16 @@ export class Hud {
     this.swingPeriod = swing.nextPeriod;
     this.lastSwingTimer = swing.nextTimer;
     this.swingTimerPainter.paint(swing);
-    // Proc arcs: Heating Up shows them, Hot Streak burns them bright, spending
-    // hides them (pure rule in proc_overlay_view; unchanged state writes nothing).
+    // The phoenix: Heating Up lights its left half, Hot Streak completes it,
+    // spending puts it out (pure rule in proc_overlay_view; an unchanged state
+    // writes nothing). On the FIRST frame in-world, preview the unlit bird for
+    // a few seconds so the player can find it and drag it into place (one-shot
+    // timer, not per-frame work; the painter's two classes never conflict).
+    if (!this.procOverlayPreviewed) {
+      this.procOverlayPreviewed = true;
+      this.procOverlayEl.classList.add('preview');
+      window.setTimeout(() => this.procOverlayEl.classList.remove('preview'), 8000);
+    }
     this.procOverlayPainter.paint(procOverlayState(p.auras));
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin

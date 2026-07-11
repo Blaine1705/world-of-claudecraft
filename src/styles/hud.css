@@ -4567,6 +4567,19 @@
   height: 100%;
   overflow: visible;
 }
+/* The login preview: for a few seconds after entering the world the whole
+   bird glows dimly, so the player can see where it lives and drag it BEFORE
+   any proc lights it for real. Placed before the proc rules so a real proc
+   arriving mid-preview wins the cascade. */
+#proc-overlay.preview {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.preview .ph-half,
+#proc-overlay.preview .ph-core-g {
+  opacity: 0.4;
+}
 #proc-overlay.heating,
 #proc-overlay.hot {
   opacity: 1;
