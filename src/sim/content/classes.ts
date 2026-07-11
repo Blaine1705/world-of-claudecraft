@@ -5949,7 +5949,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: two critical strikes in a row with Fireball, Fire Blast or Scorch make your next Pyroblast or Flamestrike instant and free. Those free casts do not build Hot Streak. (Fire)',
+      'Passive: two critical strikes in a row with your Fire spells (Fireball, Fire Blast, Scorch, Pyroblast or Flamestrike) make your next Pyroblast or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
   },
   summon_water_elemental: {
     id: 'summon_water_elemental',

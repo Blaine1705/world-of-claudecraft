@@ -1275,6 +1275,7 @@ export function runEffects(
         for (const m of aoeTargets) {
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
+          if (aoeCrit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.

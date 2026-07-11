@@ -1618,7 +1618,33 @@ export type AbilityEffect =
   | { type: 'stun'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
-  | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  // `frontal` restricts the blast to enemies within the melee facing arc
+  // (MELEE_ARC, the castAbility facing gate); `stunSec` is a paired stun rider
+  // applied to each enemy actually hit (Faultline). Neither draws extra rng.
+  | {
+      type: 'aoeDamage';
+      min: number;
+      max: number;
+      radius: number;
+      // The blast can critically strike: ONE crit decision per CAST (a single
+      // rng draw once at least one target is struck; fireGuaranteedCrit
+      // overrides the outcome), applied to every struck enemy together, and
+      // fed to noteSpellHit exactly once, so an AoE builder (Flamestrike)
+      // counts a whole cast as a single crit toward Hot Streak (owner rule).
+      // Absent: the classic never-crits AoE path, zero extra rng.
+      canCrit?: boolean;
+      frontal?: boolean;
+      stunSec?: number;
+      // Classic AoE soft target cap (Revenge): once more than `softCap` targets
+      // are struck, each rolled hit is scaled by softCap/targets so the TOTAL
+      // damage caps at softCap x per-target. Scales the already-rolled amount, so
+      // it draws no extra rng.
+      softCap?: number;
+      // Rage-generating AoE (Bladed Gyre): after the blast, the caster gains
+      // `base + perTarget * min(targetsHit, capTargets)` rage (e.g. 5 + 1 per
+      // enemy struck, capped at +5). Deterministic state change, no extra rng.
+      rageOnHit?: { base: number; perTarget: number; capTargets: number };
+    }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';
