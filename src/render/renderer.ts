@@ -26,8 +26,6 @@ import {
   isYumiMazePos,
   MOBS,
   NPCS,
-  STRIP_MAX_X,
-  STRIP_MIN_X,
   YUMI_MAZE_SLOT_COUNT,
   yumiMazeOrigin,
   ZONES,
@@ -163,6 +161,7 @@ import {
   fogFarForPreparedZones,
   MAX_OUTDOOR_FOG_FAR,
   ZONE_STREAM_RECHECK_DISTANCE,
+  zoneEntryPoint,
   zonesWithinStreamingHorizon,
 } from './zone_streaming';
 
@@ -1931,14 +1930,14 @@ export class Renderer {
     this.visibleZonePrepareActive = true;
     // The likely entry point is where the zone's rectangle sits closest to the
     // camera, so prioritize the build there (not at the hub, which can be on
-    // the far side of the zone). Inset by a yard: zone rectangles are
-    // exclusive on their max edges (zoneAt resolves the exact boundary to the
-    // neighbour), and an entry point that resolves to the wrong zone would
-    // no-op the prepare and silently starve this queue entry.
-    const minX = zone.xMin ?? STRIP_MIN_X;
-    const maxX = zone.xMax ?? STRIP_MAX_X;
-    const entryX = Math.max(minX + 1, Math.min(maxX - 1, this.camera.position.x));
-    const entryZ = Math.max(zone.zMin + 1, Math.min(zone.zMax - 1, this.camera.position.z));
+    // the far side of the zone). zoneEntryPoint's one-yard inset keeps the
+    // point resolving to THIS zone (see its doc: an entry point resolving to
+    // the neighbour would no-op the prepare and starve this queue entry).
+    const { x: entryX, z: entryZ } = zoneEntryPoint(
+      zone,
+      this.camera.position.x,
+      this.camera.position.z,
+    );
     void this.prepareZoneAt(entryX, entryZ, undefined, { pace: 'idle' })
       // Prewarm the zone's shader programs too: isZoneReadyAt() requires both,
       // so without this a walked crossing would still trip the blocking warmup

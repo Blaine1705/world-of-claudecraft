@@ -6,9 +6,10 @@ import {
   MIN_OUTDOOR_FOG_FAR,
   UNPREPARED_ZONE_FOG_GUARD,
   ZONE_STREAM_RECHECK_DISTANCE,
+  zoneEntryPoint,
   zonesWithinStreamingHorizon,
 } from '../src/render/zone_streaming';
-import { ZONES } from '../src/sim/data';
+import { ZONES, zoneAt } from '../src/sim/data';
 
 describe('renderer zone-streaming horizon', () => {
   it('keeps a zero-radius query scoped to the containing zone', () => {
@@ -46,6 +47,25 @@ describe('renderer zone-streaming horizon', () => {
 
   it('uses a non-zero movement threshold for cheap frame-loop rechecks', () => {
     expect(ZONE_STREAM_RECHECK_DISTANCE).toBeGreaterThan(0);
+  });
+
+  it('every entry point resolves back to its own zone, even from a boundary camera', () => {
+    // Regression for the willowfen starvation: the un-inset nearest rectangle
+    // point of a zone west of the camera lands exactly on its exclusive max-x
+    // edge, zoneAt resolves it to the neighbour, the prepare no-ops, and the
+    // streaming queue entry is consumed without ever building the zone.
+    const cameras = [
+      { x: 25, z: -16 }, // the vale spawn camera that starved willowfen live
+      { x: 0, z: 0 },
+      { x: 500, z: 2000 },
+      { x: -500, z: 900 },
+    ];
+    for (const zone of ZONES) {
+      for (const cam of cameras) {
+        const entry = zoneEntryPoint(zone, cam.x, cam.z);
+        expect(zoneAt(entry.x, entry.z).id, `${zone.id} from (${cam.x}, ${cam.z})`).toBe(zone.id);
+      }
+    }
   });
 });
 

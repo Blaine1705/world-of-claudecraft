@@ -75,6 +75,24 @@ export function zonesWithinStreamingHorizon(
 }
 
 /**
+ * The point of `zone`'s rectangle nearest (x, z), inset one yard inside every
+ * edge. This is the likely entry point of an approaching camera, used as a
+ * zone prepare's build-priority anchor. The inset is load-bearing: zone
+ * rectangles are exclusive on their max edges (zoneAt resolves the exact
+ * boundary to the neighbour), so an un-inset nearest point can resolve to the
+ * WRONG zone, no-op the prepare, and silently starve the streaming queue
+ * entry it was consumed by.
+ */
+export function zoneEntryPoint(zone: ZoneDef, x: number, z: number): { x: number; z: number } {
+  const minX = zone.xMin ?? STRIP_MIN_X;
+  const maxX = zone.xMax ?? STRIP_MAX_X;
+  return {
+    x: Math.max(minX + 1, Math.min(maxX - 1, x)),
+    z: Math.max(zone.zMin + 1, Math.min(zone.zMax - 1, z)),
+  };
+}
+
+/**
  * Cap outdoor visibility before the closest unloaded zone rectangle. The cap
  * drops immediately as the camera approaches a boundary and may ease back out
  * after the destination becomes resident; the renderer owns that temporal
