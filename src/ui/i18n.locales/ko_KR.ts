@@ -202,6 +202,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
   'hudChrome.unitFrame.targetAnnounce': '대상: {name}',
   'hudChrome.unitFrame.targetLabel': '내 대상',
+  'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
   'seo.officialLabel': 'World of ClaudeCraft 공식 웹사이트',
   'seo.officialBody':
     'worldofclaudecraft.com은 Claudemoon 월드의 공식 무료 브라우저 MMO입니다. 지속 캐릭터로 온라인 플레이를 하거나, 오프라인에서 혼자 탐험하고, 위키를 읽고, 이 사이트에서 검증된 커뮤니티 링크를 확인하세요.',
@@ -6740,7 +6741,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.comingSoon': '준비 중',
   'hudChrome.specPanel.primaryAttr': '주요 능력치',
   'hudChrome.specPanel.complexity': '복잡도',
+  'hudChrome.specPanel.complexityLow': '낮음',
   'hudChrome.specPanel.complexityMedium': '중간',
+  'hudChrome.specPanel.complexityHigh': '높음',
   'hudChrome.specPanel.exampleAbilities': '대표 능력',
   'hudChrome.specPanel.viewTalents': '특성 보기',
   'hudChrome.specPanel.selectSpec': '전문화 선택',

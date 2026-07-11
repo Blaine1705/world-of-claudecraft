@@ -298,7 +298,7 @@ export const it_IT: EnTranslations = {
       "playerLabel": "Il tuo personaggio",
       "targetLabel": "Il tuo bersaglio",
       "targetAnnounce": "Bersaglio: {name}",
-      "targetOfTargetLabel": "Mark's Mark",
+      "targetOfTargetLabel": "Il bersaglio del bersaglio",
       "partyLabel": "Il tuo gruppo",
       "partyChip": "Gruppo",
       "partyGroup": "Gruppo {n}",
@@ -574,32 +574,32 @@ export const it_IT: EnTranslations = {
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
       "walkByAutoloot": "Raccolta automatica al passaggio",
       "groundReticle": "Reticolo di puntamento a terra",
-      "mouseoverCast": "Mouseover Cast on Party Frames",
+      "mouseoverCast": "Lancio al passaggio del mouse sui riquadri del gruppo",
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
-      "showTargetOfTarget": "Show Target of Target",
+      "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",
       "mobileLeftHanded": "Disposizione per mancini"
     },
     "talentRows": {
-      "tab": "Choices",
-      "defaultLoadout": "Default Loadout",
-      "comingSoon": "Coming soon"
+      "tab": "Scelte",
+      "defaultLoadout": "Assetto predefinito",
+      "comingSoon": "In arrivo"
     },
     "specPanel": {
-      "primaryAttr": "Primary attribute",
-      "complexity": "Complexity",
-      "complexityLow": "Low",
-      "complexityMedium": "Medium",
-      "complexityHigh": "High",
-      "exampleAbilities": "Example abilities",
-      "viewTalents": "View talents",
-      "selectSpec": "Select specialization",
-      "specUnlockBanner": "Specialization Unlocked!",
-      "specUnlockHint": "Press N to choose your specialization."
+      "primaryAttr": "Attributo primario",
+      "complexity": "Complessità",
+      "complexityLow": "Bassa",
+      "complexityMedium": "Media",
+      "complexityHigh": "Alta",
+      "exampleAbilities": "Abilità di esempio",
+      "viewTalents": "Vedi i talenti",
+      "selectSpec": "Seleziona la specializzazione",
+      "specUnlockBanner": "Specializzazione sbloccata!",
+      "specUnlockHint": "Premi N per scegliere la tua specializzazione."
     },
     "controller": {
       "title": "Controller",
@@ -698,8 +698,8 @@ export const it_IT: EnTranslations = {
         "spellPower": "Potere Magico",
         "critRating": "Indice di critico",
         "hasteRating": "Indice di celerità",
-        "haste": "Haste",
-        "parry": "Parry"
+        "haste": "Celerità",
+        "parry": "Parata"
       },
       "desc": {
         "str": "Aumenta la tua potenza d'attacco, così i colpi della tua arma sono più potenti.",
@@ -715,8 +715,8 @@ export const it_IT: EnTranslations = {
         "dodge": "La tua probabilità di evitare completamente un attacco in mischia in arrivo, senza subire danni.",
         "critRating": "Indice di critico dal tuo equipaggiamento e dai bonus di set, che aumenta la tua probabilità di colpo critico. Circa 10 punti conferiscono l'1% di critico.",
         "hasteRating": "Indice di celerità dal tuo equipaggiamento e dai bonus di set, che accelera i tuoi attacchi e i tuoi lanci. Circa 10 punti conferiscono l'1% di celerità.",
-        "haste": "Speeds up your weapon swings and spell casts. It does not reduce the global cooldown.",
-        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried."
+        "haste": "Accelera i colpi della tua arma e il lancio dei tuoi incantesimi. Non riduce il recupero globale.",
+        "parry": "La tua probabilità di parare completamente un attacco in mischia frontale, senza subire danni. Un colpo alle spalle non può essere parato."
       },
       "effects": {
         "attackPower": "+{value} Potenza d'attacco",
@@ -834,7 +834,7 @@ export const it_IT: EnTranslations = {
       "failed": "Impossibile inviare la segnalazione del bug. Riprova."
     },
     "paperdoll": {
-      "offhand": "Offhand",
+      "offhand": "Mano secondaria",
       "unequipAria": "Rimuovi {item}",
       "unequipHint": "Clicca su ×, clic destro o trascina nelle borse per rimuovere"
     },
@@ -1085,24 +1085,24 @@ export const it_IT: EnTranslations = {
       "formCat": "Forma felina: danni in mischia ed energia",
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "defensiveStance": "Posizione Guardinga: danni subiti ridotti, più minaccia",
-      "battleStance": "Battle Stance: 10% more rage generation",
-      "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
+      "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
+      "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
       "righteousFury": "Giuramento Ardente: minaccia da danni Sacri molto aumentata",
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
-      "dmgDone": "Increases damage dealt by {pct}%",
-      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
-      "crit": "Increases critical strike chance by {pct}%",
-      "rageGen": "Increases Rage generation by {pct}%",
-      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
-      "avatar": "Colossus: damage dealt increased by {pct}%",
-      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
-      "dieBySword": "Reduces damage taken by {pct}% ({lowPct}% while below {hpPct}% health)",
-      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
-      "battleTrance": "Your next Reaver Strike or Maiming Strike costs no Rage",
-      "revengeFree": "Your next Revenge costs no Rage",
-      "victoryRush": "Victory Rush is ready",
-      "maxHpPct": "Increases maximum health by {pct}%",
+      "dmgDone": "Aumenta i danni inflitti del {pct}%",
+      "dmgDoneReduce": "Riduce i danni inflitti del {pct}%",
+      "crit": "Aumenta la probabilità di colpo critico del {pct}%",
+      "rageGen": "Aumenta la generazione di rabbia del {pct}%",
+      "reckless": "Aumenta la probabilità di colpo critico del {pct}% e la generazione di rabbia del {ragePct}%",
+      "avatar": "Colosso: danni inflitti aumentati del {pct}%",
+      "bloodbath": "Aumenta la probabilità di colpo critico e i danni inflitti del {pct}%",
+      "dieBySword": "Riduce i danni subiti del {pct}% ({lowPct}% mentre sei sotto il {hpPct}% di salute)",
+      "sanguine": "Aumenta la velocità d'attacco del {hastePct}% e i danni inflitti del {dmgPct}%",
+      "battleTrance": "Il tuo prossimo Colpo del Predone o Colpo Mutilante non costa rabbia",
+      "revengeFree": "La tua prossima Vendetta non costa rabbia",
+      "victoryRush": "Impeto della Vittoria è pronto",
+      "maxHpPct": "Aumenta la salute massima del {pct}%",
       "school": {
         "physical": "Fisico",
         "fire": "Fuoco",
@@ -1117,10 +1117,10 @@ export const it_IT: EnTranslations = {
       "spawn": "{name} si erge sulle Alture di Thornpeak!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Continua con Apple",
+      "appleError": "Impossibile accedere con Apple. Riprova.",
+      "appleChoiceIntro": "Crea un nuovo account oppure collega Apple a un account che hai già.",
+      "appleChoiceExpired": "Quell'accesso con Apple è scaduto. Accedi di nuovo con Apple.",
       "forgotPrompt": "Password dimenticata?",
       "forgotTitle": "Reimposta la password",
       "forgotHint": "Inserisci il tuo nome utente e invieremo un link di reimpostazione all’indirizzo e-mail registrato.",
@@ -2027,19 +2027,19 @@ export const it_IT: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.",
-      "revenge": "A sweeping counterattack that hits everything in front of you, and comes cheaper right after you turn a blow aside.",
+      "revenge": "Un contrattacco ad arco che colpisce tutto ciò che hai davanti, e costa meno subito dopo aver deviato un colpo.",
       "battle_shout": "Un grido di incitamento che aumenta la potenza d'attacco del gruppo.",
       "commanding_shout": "Rafforza la vigoria, così tutti hanno più resistenza in combattimento.",
       "charge": "Si scaglia su un nemico distante per aprire lo scontro con un breve stordimento.",
       "rend": "Apre un'emorragia che logora il bersaglio nel tempo.",
       "thunder_clap": "Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.",
-      "cw_heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
-      "cw_battle_shout": "A rallying cry that raises attack power for the party.",
-      "cw_commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
-      "cw_charge": "Rushes a distant enemy to open the fight with a brief stun.",
-      "cw_rend": "Opens a bleed that wears the target down over time.",
-      "cw_thunder_clap": "Hits everything around you and slows their attacks.",
-      "hamstring": "Slashes the target's legs to slow it so it cannot run you down.",
+      "cw_heroic_strike": "Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.",
+      "cw_battle_shout": "Un grido di incitamento che aumenta la potenza d'attacco del gruppo.",
+      "cw_commanding_shout": "Rafforza la vigoria, così tutti hanno più resistenza in combattimento.",
+      "cw_charge": "Si scaglia su un nemico distante per aprire lo scontro con un breve stordimento.",
+      "cw_rend": "Apre un'emorragia che logora il bersaglio nel tempo.",
+      "cw_thunder_clap": "Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.",
+      "hamstring": "Taglia le gambe del bersaglio per rallentarlo, così non riesce a raggiungerti.",
       "seal_of_righteousness": "Imbeve i tuoi colpi di danno Sacro, poi spendilo con Verdict.",
       "holy_light": "Una cura costante e di buona entità per rimettere in piedi un alleato o te stesso.",
       "devotion_aura": "Un potenziamento personale duraturo che aumenta la corazza, così i colpi feriscono meno.",
@@ -4139,7 +4139,7 @@ export const it_IT: EnTranslations = {
     },
     "lore": {
       "warrior": "I guerrieri sono combattenti temprati che accumulano rabbia infliggendo o subendo danni. Incassano colpi pesanti o schiacciano i nemici.",
-      "warriorClassic": "The warrior exactly as it played before the combat rework: the original ability kit and rage pacing, kept alongside the new warrior so you can try both and tell us which one feels better.",
+      "warriorClassic": "Il guerriero esattamente come si giocava prima della revisione del combattimento: il kit di abilità originale e il ritmo della rabbia, mantenuti accanto al nuovo guerriero, così puoi provare entrambi e dirci quale ti sembra migliore.",
       "paladin": "I paladini sono crociati sacri che aiutano gli alleati con benedizioni, curano le ferite con la Luce Risanatrice e proteggono i deboli con armature robuste.",
       "hunter": "I cacciatori sono specialisti a distanza che combattono al fianco di una bestia addomesticata, tempestando i nemici con tiri mirati e rapidi, rallentandoli con punture e tiri storditori, e cambiando aspetto a seconda del momento.",
       "rogue": "I ladri sono assassini furtivi che spendono energia e punti combo per colpire dalle ombre.",
@@ -4440,7 +4440,7 @@ export const it_IT: EnTranslations = {
     "combat": {
       "floatingMiss": "Mancato",
       "floatingDodge": "Schivata",
-      "floatingParry": "Parry",
+      "floatingParry": "Parata",
       "floatingResist": "Resistito",
       "cannotMove": "Non puoi muoverti!",
       "attack": "attacco",
@@ -4450,7 +4450,7 @@ export const it_IT: EnTranslations = {
       "damageTakenCrit": "{source} ti colpisce criticamente per {amount}.",
       "miss": "Il tuo {ability} manca {target}.",
       "dodged": "{target} schiva il tuo {ability}.",
-      "parried": "Your {ability} is parried by {target}.",
+      "parried": "{target} para il tuo {ability}.",
       "resisted": "{target} resiste al tuo {ability}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
@@ -4493,7 +4493,7 @@ export const it_IT: EnTranslations = {
       "notEnoughMana": "Mana insufficiente!",
       "notEnoughResource": "{resource} insufficiente!",
       "notEnoughHealth": "Salute insufficiente.",
-      "nothingToConsume": "Nothing to consume.",
+      "nothingToConsume": "Niente da consumare.",
       "targetMustDodge": "Il bersaglio deve prima schivare.",
       "requiresCombo": "Quell'abilità richiede punti combo.",
       "requiresForm": "Devi essere in Forma di {form}.",
@@ -4510,7 +4510,7 @@ export const it_IT: EnTranslations = {
       "facing": "Devi guardare il bersaglio.",
       "targetHealthBelow": "Quell'abilità richiede il bersaglio sotto il {percent}% di salute.",
       "dagger": "Devi impugnare un pugnale.",
-      "needShield": "You must have a shield equipped.",
+      "needShield": "Devi avere uno scudo equipaggiato.",
       "behindTarget": "Devi essere dietro al bersaglio.",
       "polymorph": "Questa creatura non può essere trasformata.",
       "noSeal": "Non hai un Sigillo attivo.",
@@ -4886,7 +4886,7 @@ export const it_IT: EnTranslations = {
     },
     "slots": {
       "mainhand": "Mano principale",
-      "twoHand": "Two-Hand",
+      "twoHand": "Due mani",
       "helmet": "Testa",
       "neck": "Collo",
       "shoulder": "Spalle",
@@ -5162,7 +5162,7 @@ export const it_IT: EnTranslations = {
       },
       "chain_heal": {
         "name": "Cura concatenata",
-        "description": "Heals the target for {damage}, then arcs to up to 2 nearby allies, each arc healing half the previous amount."
+        "description": "Cura il bersaglio di {damage}, poi rimbalza su un massimo di 2 alleati vicini, e ogni rimbalzo cura la metà della quantità precedente."
       },
       "heroic_strike": {
         "name": "Colpo del Predone",
@@ -5253,8 +5253,8 @@ export const it_IT: EnTranslations = {
         "description": "Entri in una furia ribollente, generando 20 punti rabbia. (talento del guerriero)"
       },
       "revenge": {
-        "name": "Revenge",
-        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage."
+        "name": "Vendetta",
+        "description": "Attacchi con un arco ampio, infliggendo danni fisici a tutti i nemici davanti a te. Oltre i 5 bersagli i danni si riducono. Quando schivi o pari, la tua prossima Vendetta può non costare rabbia."
       },
       "battle_shout": {
         "name": "Urlo di Ferro",
@@ -5309,12 +5309,12 @@ export const it_IT: EnTranslations = {
         "description": "Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lanciala di nuovo per uscire dalla posizione."
       },
       "battle_stance": {
-        "name": "Battle Stance",
-        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
+        "name": "Posizione di Battaglia",
+        "description": "Posizione di combattimento aggressiva: generi il 10% di rabbia in più. La posizione predefinita per Armi e Protezione."
       },
       "berserker_stance": {
-        "name": "Berserker Stance",
-        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
+        "name": "Posizione del Berserker",
+        "description": "Posizione di combattimento temeraria: i tuoi colpi critici vanno a segno il 3% più spesso e colpiscono il 3% più forte. Il guerriero Furia combatte sempre in questa posizione."
       },
       "sunder_armor": {
         "name": "Trancia Armatura",
@@ -5805,76 +5805,76 @@ export const it_IT: EnTranslations = {
         "description": "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)"
       },
       "sweeping_strikes": {
-        "name": "Widening Arc",
-        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
+        "name": "Arco Crescente",
+        "description": "Per 12 sec i tuoi attacchi a bersaglio singolo colpiscono anche 1 nemico vicino per il danno completo. (Armi)"
       },
       "deep_wounds": {
-        "name": "Gaping Wounds",
-        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
+        "name": "Ferite Aperte",
+        "description": "Passiva: il tuo Colpo Mutilante lascia il bersaglio sanguinante, infliggendo danni fisici in 6 sec. (Armi)"
       },
       "enrage_passive": {
-        "name": "Mayhem",
-        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+        "name": "Carneficina",
+        "description": "Passiva: mentre sei Infuriato infliggi il 7% di danni in più, attacchi il 25% più velocemente e ti muovi il 10% più velocemente per 4 sec. Salasso ha il 30% di probabilità di renderti Infuriato; Mietitura Rossa lo fa sempre. (Furia)"
       },
       "bloodthirst": {
         "name": "Salasso",
         "description": "Attacca istantaneamente in una frenesia sanguigna per il 60% dei danni dell'arma più {damage}. (firma Furia)"
       },
       "raging_gale": {
-        "name": "Twinstrike",
-        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate {rage} rage. Stores up to 2 charges. (Fury)"
+        "name": "Colpo Gemello",
+        "description": "Colpisci istantaneamente due volte con la tua arma: ogni colpo infligge il 40% dei danni dell'arma più {damage}, e generi {rage} rabbia. Accumula fino a 2 cariche. (Furia)"
       },
       "red_harvest": {
-        "name": "Red Harvest",
-        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
+        "name": "Mietitura Rossa",
+        "description": "Spendi tutto: colpisci tre volte in una frenesia per il 65% dei danni dell'arma più {damage} ciascuno, e diventi sempre Infuriato. (Furia)"
       },
       "furious_mending": {
-        "name": "Furious Mending",
-        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
+        "name": "Rammendo Furioso",
+        "description": "Per 10 sec subisci il 20% di danni in meno e, finché dura, il tuo Salasso ti cura del 20% della tua salute massima. (Furia)"
       },
       "emboldening_roar": {
-        "name": "Emboldening Roar",
-        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
+        "name": "Ruggito Ardimentoso",
+        "description": "Liberi un ruggito ardimentoso: tu e i giocatori alleati entro 40 metri diventate Ardimentosi, e le vostre 3 abilità successive sono colpi critici garantiti. (Furia)"
       },
       "raised_guard": {
-        "name": "Raised Guard",
-        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
+        "name": "Guardia Alzata",
+        "description": "Ti pianti dietro il tuo scudo: subisci il 50% di danni fisici in meno per 6 sec. Accumula fino a 2 cariche. (Protezione)"
       },
       "iron_resolve": {
-        "name": "Iron Resolve",
-        "description": "Grit your teeth and ignore the pain: consumes all of your rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
+        "name": "Fermezza di Ferro",
+        "description": "Stringi i denti e ignori il dolore: consuma tutta la tua rabbia (minimo 20) per assorbire 4 danni per punto di rabbia speso, per un massimo di 10 sec. (Protezione)"
       },
       "faultline": {
-        "name": "Faultline",
-        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
+        "name": "Faglia",
+        "description": "Scagli un'onda d'urto attraverso il terreno: i nemici davanti a te entro 8 metri subiscono {damage} danni e sono storditi per 3 sec. (Protezione)"
       },
       "defiant_bellow": {
-        "name": "Defiant Bellow",
-        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
+        "name": "Urlo di Sfida",
+        "description": "Un urlo di sfida: ogni nemico entro 10 metri viene provocato e costretto ad attaccarti per 3 sec. (Protezione)"
       },
       "breachmaker": {
-        "name": "Breachmaker",
-        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
+        "name": "Apribreccia",
+        "description": "Martella il bersaglio per danni dell'arma più {damage} e ne incrina la guardia: i tuoi attacchi contro di esso infliggono il 20% di danni in più per 8 sec. (Armi)"
       },
       "measured_fury": {
-        "name": "Measured Fury",
-        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
+        "name": "Furia Misurata",
+        "description": "La tua furia misurata affina la tua economia: le tue abilità costano il 10% di rabbia in meno. (Armi)"
       },
       "seasoned_soldier": {
-        "name": "Seasoned Soldier",
-        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
+        "name": "Soldato Veterano",
+        "description": "I tuoi attacchi automatici critici generano il 10% di rabbia in più. (Armi)"
       },
       "diabolical_twinstrike": {
-        "name": "Diabolical Twinstrike",
-        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
+        "name": "Colpo Gemello Diabolico",
+        "description": "Mentre sei Infuriato, il tuo Colpo Gemello infligge il 15% di danni in più. (Furia)"
       },
       "cleaving_blows": {
-        "name": "Cleaving Blows",
-        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
+        "name": "Colpi Fendenti",
+        "description": "Mietitura Rossa rimborsa sempre una carica di Colpo Gemello. (Furia)"
       },
       "sudden_death": {
-        "name": "Sudden Death",
-        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
+        "name": "Morte Improvvisa",
+        "description": "I tuoi attacchi automatici hanno una probabilità di permetterti di lanciare Tomba Prematura su un bersaglio a qualsiasi livello di salute, senza costo di rabbia. (Armi)"
       },
       "shield_slam": {
         "name": "Frantumascudo",
@@ -5909,8 +5909,8 @@ export const it_IT: EnTranslations = {
         "description": "Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)"
       },
       "repentance": {
-        "name": "Repentance",
-        "description": "Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)"
+        "name": "Pentimento",
+        "description": "Mette il nemico in uno stato di meditazione per un massimo di 6 sec. Qualsiasi danno interrompe l'effetto. (firma Castigo)"
       },
       "bestial_wrath": {
         "name": "Ira Bestiale",
@@ -5965,20 +5965,20 @@ export const it_IT: EnTranslations = {
         "description": "Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)"
       },
       "shamanistic_rage": {
-        "name": "Shamanistic Rage",
-        "description": "Releases shamanistic rage, restoring 160 mana. (Enhancement signature)"
+        "name": "Furia Sciamanica",
+        "description": "Libera la furia sciamanica, ripristinando 160 mana. (firma Potenziamento)"
       },
       "natures_swiftness": {
-        "name": "Nature's Swiftness",
-        "description": "Calls on nature to make your next spell instant. (Restoration signature)"
+        "name": "Rapidità della Natura",
+        "description": "Invoca la natura per rendere istantaneo il tuo prossimo incantesimo. (firma Guarigione)"
       },
       "siphon_life": {
         "name": "Risucchio Vitale",
         "description": "Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)"
       },
       "fel_domination": {
-        "name": "Fel Domination",
-        "description": "Dominates fel energies, making your next spell instant. (Demonology signature)"
+        "name": "Dominio Vile",
+        "description": "Domina le energie vili, rendendo istantaneo il tuo prossimo incantesimo. (firma Demonologia)"
       },
       "conflagrate": {
         "name": "Conflagrazione",
@@ -5997,32 +5997,32 @@ export const it_IT: EnTranslations = {
         "description": "Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)"
       },
       "storm_bolt": {
-        "name": "Storm Bolt",
-        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+        "name": "Dardo della Tempesta",
+        "description": "Scagli la tua arma contro il bersaglio, infliggendo {damage} danni e stordendolo per 3 sec."
       },
       "piercing_howl": {
-        "name": "Piercing Howl",
-        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+        "name": "Ululato Penetrante",
+        "description": "Un urlo penetrante che rallenta del 50% tutti i nemici entro 15 metri per 8 sec."
       },
       "die_by_sword": {
-        "name": "Die by the Sword",
-        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+        "name": "Morte per la Spada",
+        "description": "Tempo di recupero difensivo: per 8 sec subisci il 30% di danni in meno e schivi molti più attacchi."
       },
       "recklessness": {
-        "name": "Recklessness",
-        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+        "name": "Temerarietà",
+        "description": "Ti infuri: la tua generazione di rabbia aumenta del 50% e la tua probabilità di colpo critico del 20% per 12 sec."
       },
       "sanguine_aura": {
-        "name": "Sanguine Aura",
-        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+        "name": "Aura Sanguigna",
+        "description": "Intridi la tua arma del sangue dei tuoi nemici: tu e i tuoi alleati in mischia ottenete il 10% di velocità d'attacco e il 10% di danni per 20 sec."
       },
       "victory_rush": {
-        "name": "Victory Rush",
-        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+        "name": "Impeto della Vittoria",
+        "description": "Colpisci per danni dell'arma più {damage} e recuperi il 20% della tua salute massima. Utilizzabile solo entro 20 sec dall'uccisione di un nemico."
       },
       "intimidating_shout": {
-        "name": "Intimidating Shout",
-        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+        "name": "Urlo Intimidatorio",
+        "description": "Un urlo terrificante che fa fuggire in preda alla paura fino a 5 nemici entro 8 metri per 8 sec. I danni possono interrompere l'effetto."
       },
       "summon_imp": {
         "name": "Evoca Emberkin",
@@ -6463,13 +6463,13 @@ export const it_IT: EnTranslations = {
         "name": "Ritaglio di lino"
       },
       "arcane_dust": {
-        "name": "Arcane Dust"
+        "name": "Polvere arcana"
       },
       "arcane_essence": {
-        "name": "Arcane Essence"
+        "name": "Essenza arcana"
       },
       "arcane_shard": {
-        "name": "Arcane Shard"
+        "name": "Frammento arcano"
       },
       "fen_muster_order": {
         "name": "Ordine di raduno di Fenbridge"
@@ -7384,16 +7384,16 @@ export const it_IT: EnTranslations = {
         "name": "Marchio Eroico"
       },
       "eastbrook_buckler": {
-        "name": "Eastbrook Buckler"
+        "name": "Brocchiero di Eastbrook"
       },
       "highwatch_wallshield": {
-        "name": "Highwatch Wallshield"
+        "name": "Scudo da muro di Highwatch"
       },
       "eastbrook_greatsword": {
-        "name": "Eastbrook Greatsword"
+        "name": "Spadone di Eastbrook"
       },
       "highwatch_greatsword": {
-        "name": "Highwatch Greatsword"
+        "name": "Spadone di Highwatch"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Usbergo forgiacripta di Morthen"

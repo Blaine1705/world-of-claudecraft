@@ -208,6 +208,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'あなたのキャラクター',
   'hudChrome.unitFrame.targetAnnounce': 'ターゲット：{name}',
   'hudChrome.unitFrame.targetLabel': 'あなたのターゲット',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
   'seo.officialLabel': 'World of ClaudeCraft 公式サイト',
   'seo.officialBody':
     'worldofclaudecraft.com は Claudemoon ワールドの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。',
@@ -6751,7 +6752,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talentRows.comingSoon': '近日公開',
   'hudChrome.specPanel.primaryAttr': '主要能力値',
   'hudChrome.specPanel.complexity': '複雑さ',
+  'hudChrome.specPanel.complexityLow': '低',
   'hudChrome.specPanel.complexityMedium': '中',
+  'hudChrome.specPanel.complexityHigh': '高',
   'hudChrome.specPanel.exampleAbilities': '代表的なアビリティ',
   'hudChrome.specPanel.viewTalents': 'タレントを見る',
   'hudChrome.specPanel.selectSpec': 'スペシャライゼーションを選択',

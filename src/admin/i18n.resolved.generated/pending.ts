@@ -10,85 +10,25 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "es_ES": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "fr_FR": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "fr_CA": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "de_DE": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "zh_CN": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "zh_TW": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "ko_KR": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "ja_JP": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "pt_BR": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "ru_RU": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "cs_CZ": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "nl_NL": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "pl_PL": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "id_ID": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "tr_TR": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "sv_SE": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "vi_VN": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ],
-  "da_DK": [
-    "moderationHistory.actionJail",
-    "moderationHistory.actionUnjail"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

@@ -107,7 +107,11 @@ describe('i18n Localization Key Coverage', () => {
     await Promise.all(supportedLanguages.map((lang) => ensureLocaleLoaded(lang)));
   });
 
-  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/i;
+  // Case-SENSITIVE on purpose: leftover markers are uppercase by convention
+  // (TODO, FIXME), while lowercase "todo" is ordinary Spanish/Portuguese/
+  // Italian prose ("everything"); the /i flag false-failed the es locales on
+  // a legitimate translation (2026-07-11).
+  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/;
   const shellKeys: TranslationKey[] = [
     'seo.title',
     'seo.description',

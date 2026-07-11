@@ -65,6 +65,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cw_berserker_rage.description':
     'Bước vào cơn thịnh nộ sục sôi, tạo 20 nộ khí. (Tài năng Chiến Binh)',
   'classDetails.roles.warriorClassic': 'Đỡ Đòn / DPS Cận Chiến',
+  'classDetails.lore.warriorClassic':
+    'Chiến Binh đúng như cách nó vận hành trước đợt làm lại hệ thống chiến đấu: bộ kỹ năng nguyên bản cùng nhịp nộ khí cũ, được giữ song song với Chiến Binh mới để bạn thử cả hai và cho chúng tôi biết bản nào tạo cảm giác tốt hơn.',
   'classes.warriorClassic': 'Chiến Binh',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
@@ -419,8 +421,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chỉ số chí mạng từ trang bị và phần thưởng bộ trang bị của bạn, nâng tỉ lệ chí mạng của bạn. Khoảng 10 điểm chỉ số ban 1% chí mạng.',
   'hudChrome.statInfo.desc.hasteRating':
     'Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.',
+  'hudChrome.statInfo.desc.haste':
+    'Đẩy nhanh các cú vung vũ khí và việc thi triển phép của bạn. Nó không làm giảm thời gian hồi chung.',
+  'hudChrome.statInfo.desc.parry':
+    'Cơ hội để bạn gạt trọn vẹn một đòn cận chiến từ phía trước, không nhận chút sát thương nào. Đòn đánh từ phía sau không thể bị gạt.',
   'hudChrome.statInfo.names.critRating': 'Chỉ Số Chí Mạng',
+  'hudChrome.statInfo.names.haste': 'Thần Tốc',
   'hudChrome.statInfo.names.hasteRating': 'Chỉ Số Thần Tốc',
+  'hudChrome.statInfo.names.parry': 'Gạt Đòn',
   'itemUi.slots.neck': 'Cổ',
   'itemUi.slots.ring': 'Ngón Tay',
   'auth.email': 'Email',
@@ -1107,6 +1115,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'Hiện Rương Phần Thưởng Hằng Ngày',
   'hudChrome.options.showOwnNameplate': 'Hiện Bảng Tên Của Tôi',
   'hudChrome.options.targetFrameScale': 'Tỷ Lệ Khung Mục Tiêu',
+  'hudChrome.options.mouseoverCast': 'Thi Triển Khi Rê Chuột Trên Khung Tổ Đội',
+  'hudChrome.options.showTargetOfTarget': 'Hiện Mục Tiêu Của Mục Tiêu',
   'hudChrome.options.walkByAutoloot': 'Tự Nhặt Đồ Khi Đi Ngang',
   'hudChrome.party.inviteUsage': 'Mời ai? Cách dùng: /invite <name>.',
   'hudChrome.playerFrame.lock': 'Khóa khung người chơi',
@@ -2083,6 +2093,99 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': 'Biến Hình',
   'entities.abilities.metamorphosis.description':
     'Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)',
+  'entities.abilities.battle_stance.name': 'Thế Công',
+  'entities.abilities.battle_stance.description':
+    'Thế đứng tấn công hung hãn: bạn tạo nộ khí nhiều hơn 10%. Thế đứng mặc định của nhánh Vũ Khí và nhánh Hộ Vệ.',
+  'entities.abilities.berserker_stance.name': 'Thế Cuồng Chiến',
+  'entities.abilities.berserker_stance.description':
+    'Thế đứng liều lĩnh: các đòn chí mạng của bạn xuất hiện thường xuyên hơn 3% và đánh mạnh hơn 3%. Chiến Binh nhánh Cuồng Nộ luôn chiến đấu trong thế đứng này.',
+  'entities.abilities.breachmaker.name': 'Đòn Công Thành',
+  'entities.abilities.breachmaker.description':
+    'Nện mục tiêu gây sát thương vũ khí cộng thêm {damage} và phá vỡ thế thủ của nó: các đòn tấn công của chính bạn lên mục tiêu này gây thêm 20% sát thương trong 8 giây. (nhánh Vũ Khí)',
+  'entities.abilities.cleaving_blows.name': 'Đòn Chém Bổ',
+  'entities.abilities.cleaving_blows.description':
+    'Mùa Gặt Đỏ luôn hoàn lại một lượt dùng Song Kích. (nhánh Cuồng Nộ)',
+  'entities.abilities.deep_wounds.name': 'Vết Thương Toác Rộng',
+  'entities.abilities.deep_wounds.description':
+    'Nội tại: Đòn Tàn Phế của bạn khiến mục tiêu chảy máu, nhận sát thương Vật Lý trong 6 giây. (nhánh Vũ Khí)',
+  'entities.abilities.defiant_bellow.name': 'Tiếng Gầm Thách Thức',
+  'entities.abilities.defiant_bellow.description':
+    'Một tiếng gầm thách thức: mọi kẻ địch trong vòng 10 thước bị khiêu khích, buộc phải tấn công bạn trong 3 giây. (nhánh Hộ Vệ)',
+  'entities.abilities.diabolical_twinstrike.name': 'Song Kích Hiểm Ác',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Khi đang Cuồng Hóa, Song Kích của bạn gây thêm 15% sát thương. (nhánh Cuồng Nộ)',
+  'entities.abilities.die_by_sword.name': 'Sống Chết Cùng Kiếm',
+  'entities.abilities.die_by_sword.description':
+    'Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn.',
+  'entities.abilities.emboldening_roar.name': 'Tiếng Gầm Khích Lệ',
+  'entities.abilities.emboldening_roar.description':
+    'Bật lên một tiếng gầm khích lệ: bạn và những người chơi thân thiện trong vòng 40 thước được Khích Lệ, và 3 kỹ năng tiếp theo của bạn chắc chắn là đòn chí mạng. (nhánh Cuồng Nộ)',
+  'entities.abilities.enrage_passive.name': 'Cuồng Loạn',
+  'entities.abilities.enrage_passive.description':
+    'Nội tại: khi Cuồng Hóa, bạn gây thêm 7% sát thương, tấn công nhanh hơn 25% và di chuyển nhanh hơn 10% trong 4 giây. Trích Huyết có 30% cơ hội khiến bạn Cuồng Hóa; Mùa Gặt Đỏ thì luôn luôn. (nhánh Cuồng Nộ)',
+  'entities.abilities.faultline.name': 'Vết Nứt Địa Tầng',
+  'entities.abilities.faultline.description':
+    'Truyền một chấn động xuyên qua mặt đất: kẻ địch phía trước bạn trong vòng 8 thước nhận {damage} sát thương và bị choáng trong 3 giây. (nhánh Hộ Vệ)',
+  'entities.abilities.fel_domination.name': 'Thống Trị Tà Năng',
+  'entities.abilities.fel_domination.description':
+    'Thống trị nguồn tà năng, khiến phép tiếp theo của bạn thi triển tức thời. (dấu ấn Quỷ Thuật)',
+  'entities.abilities.furious_mending.name': 'Hồi Phục Cuồng Nộ',
+  'entities.abilities.furious_mending.description':
+    'Trong 10 giây bạn nhận ít hơn 20% sát thương, và trong lúc hiệu ứng còn hiệu lực, Trích Huyết của bạn hồi cho bạn 20% máu tối đa. (nhánh Cuồng Nộ)',
+  'entities.abilities.intimidating_shout.name': 'Tiếng Hét Uy Hiếp',
+  'entities.abilities.intimidating_shout.description':
+    'Một tiếng hét kinh hoàng khiến tối đa 5 kẻ địch trong vòng 8 thước bỏ chạy trong sợ hãi suốt 8 giây. Sát thương có thể phá vỡ hiệu ứng.',
+  'entities.abilities.iron_resolve.name': 'Ý Chí Sắt Đá',
+  'entities.abilities.iron_resolve.description':
+    'Nghiến răng phớt lờ cơn đau: tiêu hao toàn bộ nộ khí của bạn (tối thiểu 20) để hấp thụ 4 sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (nhánh Hộ Vệ)',
+  'entities.abilities.measured_fury.name': 'Thịnh Nộ Chừng Mực',
+  'entities.abilities.measured_fury.description':
+    'Cơn thịnh nộ chừng mực giúp bạn chi tiêu khôn ngoan hơn: các kỹ năng của bạn tốn ít hơn 10% nộ khí. (nhánh Vũ Khí)',
+  'entities.abilities.natures_swiftness.name': 'Thần Tốc Thiên Nhiên',
+  'entities.abilities.natures_swiftness.description':
+    'Kêu gọi thiên nhiên để phép tiếp theo của bạn thi triển tức thời. (dấu ấn Phục Hồi)',
+  'entities.abilities.piercing_howl.name': 'Tiếng Hú Xuyên Thấu',
+  'entities.abilities.piercing_howl.description':
+    'Một tiếng hét xuyên thấu làm chậm mọi kẻ địch trong vòng 15 thước đi 50% trong 8 giây.',
+  'entities.abilities.raging_gale.name': 'Song Kích',
+  'entities.abilities.raging_gale.description':
+    'Lập tức vung vũ khí đánh hai lần, mỗi đòn gây 40% sát thương vũ khí cộng thêm {damage}, và tạo {rage} nộ khí. Tích trữ tối đa 2 lượt dùng. (nhánh Cuồng Nộ)',
+  'entities.abilities.raised_guard.name': 'Giương Khiên',
+  'entities.abilities.raised_guard.description':
+    'Ghì chặt sau tấm khiên: bạn nhận ít hơn 50% sát thương Vật Lý trong 6 giây. Tích trữ tối đa 2 lượt dùng. (nhánh Hộ Vệ)',
+  'entities.abilities.recklessness.name': 'Liều Lĩnh',
+  'entities.abilities.recklessness.description':
+    'Cuồng Hóa: lượng nộ khí bạn tạo ra tăng 50% và tỉ lệ chí mạng tăng 20% trong 12 giây.',
+  'entities.abilities.red_harvest.name': 'Mùa Gặt Đỏ',
+  'entities.abilities.red_harvest.description':
+    'Dốc cạn tất cả: chém ba lần trong cơn điên cuồng, mỗi đòn gây 65% sát thương vũ khí cộng thêm {damage}, và luôn khiến bạn Cuồng Hóa. (nhánh Cuồng Nộ)',
+  'entities.abilities.repentance.name': 'Sám Hối',
+  'entities.abilities.repentance.description':
+    'Đưa kẻ địch vào trạng thái thiền định tối đa 6 giây. Bất kỳ sát thương nào cũng phá vỡ hiệu ứng. (dấu ấn Trừng Phạt)',
+  'entities.abilities.revenge.name': 'Phục Thù',
+  'entities.abilities.revenge.description':
+    'Tấn công theo một vòng cung rộng, gây sát thương Vật Lý lên mọi kẻ địch phía trước bạn. Trên 5 mục tiêu thì sát thương bị giảm. Khi bạn né hoặc gạt đòn, Phục Thù tiếp theo của bạn có thể không tốn nộ khí.',
+  'entities.abilities.sanguine_aura.name': 'Hào Quang Huyết Sắc',
+  'entities.abilities.sanguine_aura.description':
+    'Tẩm máu quân thù lên vũ khí của bạn: bạn và các đồng minh cận chiến nhận thêm 10% tốc độ tấn công và 10% sát thương trong 20 giây.',
+  'entities.abilities.seasoned_soldier.name': 'Người Lính Dày Dạn',
+  'entities.abilities.seasoned_soldier.description':
+    'Các đòn đánh thường chí mạng của bạn tạo nộ khí nhiều hơn 10%. (nhánh Vũ Khí)',
+  'entities.abilities.shamanistic_rage.name': 'Thịnh Nộ Shaman',
+  'entities.abilities.shamanistic_rage.description':
+    'Giải phóng cơn thịnh nộ shaman, phục hồi 160 mana. (dấu ấn Cường Hóa)',
+  'entities.abilities.storm_bolt.name': 'Cú Ném Bão Tố',
+  'entities.abilities.storm_bolt.description':
+    'Ném vũ khí của bạn vào mục tiêu gây {damage} sát thương, làm choáng nó trong 3 giây.',
+  'entities.abilities.sudden_death.name': 'Đột Tử',
+  'entities.abilities.sudden_death.description':
+    'Các đòn đánh thường của bạn có cơ hội cho phép bạn tung Nấm Mồ Sớm lên mục tiêu ở bất kỳ mức máu nào mà không tốn nộ khí. (nhánh Vũ Khí)',
+  'entities.abilities.sweeping_strikes.name': 'Vòng Cung Mở Rộng',
+  'entities.abilities.sweeping_strikes.description':
+    'Trong 12 giây, các đòn tấn công đơn mục tiêu của bạn cũng đánh trúng 1 kẻ địch lân cận với toàn bộ sát thương. (nhánh Vũ Khí)',
+  'entities.abilities.victory_rush.name': 'Đà Chiến Thắng',
+  'entities.abilities.victory_rush.description':
+    'Giáng đòn gây sát thương vũ khí cộng thêm {damage} và hồi 20% máu tối đa của bạn. Chỉ dùng được trong vòng 20 giây sau khi hạ gục một kẻ địch.',
   'entities.delves.collapsed_reliquary.enterText': 'Bạn đi xuống thánh tích sụp đổ.',
   'entities.delves.collapsed_reliquary.leaveText':
     'Bạn trèo trở lại chỗ Tu Huynh Halven tại tàn tích thánh tích.',
@@ -2199,6 +2302,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.drownstep_treads.name': 'Giày Đế Bước Chìm',
   'entities.items.eastbrook_arming_sword.name': 'Kiếm Chiến Đông Khê',
   'entities.items.eastbrook_chain_vest.name': 'Áo Giáp Xích Đông Khê',
+  'entities.items.eastbrook_buckler.name': 'Khiên Nhỏ Đông Khê',
+  'entities.items.eastbrook_greatsword.name': 'Đại Kiếm Đông Khê',
   'entities.items.eastbrook_wool_trousers.name': 'Quần Len Đông Khê',
   'entities.items.eelscale_leggings.name': 'Quần Vảy Lươn',
   'entities.items.eelscale_treads.name': 'Giày Vảy Lươn',
@@ -2252,6 +2357,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.hickory_shortstaff.name': 'Đoản Trượng Gỗ Hồ Đào',
   'entities.items.highwatch_breastplate.name': 'Giáp Ngực Highwatch',
   'entities.items.highwatch_summons.name': 'Triệu Tập Lệnh Highwatch',
+  'entities.items.highwatch_greatsword.name': 'Đại Kiếm Highwatch',
+  'entities.items.highwatch_wallshield.name': 'Khiên Tường Highwatch',
   'entities.items.highwatch_warblade.name': 'Chiến Đao Highwatch',
   'entities.items.hobnail_boots.name': 'Giày Đinh Tán',
   'entities.items.hollow_vigil_staff.name': 'Trượng Của Cuộc Canh Rỗng',
@@ -3632,6 +3739,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tạo ra đồ uống hồi mana, để bạn nạp lại giữa các đợt kéo quái.',
   'guide.abilityHook.corruption':
     'Làm mục rữa mục tiêu bằng bóng tối, gây sát thương theo thời gian trong khi bạn làm việc khác.',
+  'guide.abilityHook.cw_battle_shout': 'Một tiếng hô cổ vũ giúp tăng sức tấn công cho cả tổ đội.',
+  'guide.abilityHook.cw_charge':
+    'Lao tới kẻ địch ở xa để mở màn trận đấu bằng một cú choáng ngắn.',
+  'guide.abilityHook.cw_commanding_shout':
+    'Tăng cường thể lực để mọi người trụ vững lâu hơn trong trận.',
+  'guide.abilityHook.cw_heroic_strike':
+    'Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.',
+  'guide.abilityHook.cw_rend': 'Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian.',
+  'guide.abilityHook.cw_thunder_clap': 'Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.',
   'guide.abilityHook.demon_skin':
     'Một buff bản thân lâu dài giúp da bạn cứng cáp hơn và tăng giáp.',
   'guide.abilityHook.devotion_aura':
@@ -3653,6 +3769,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mở đòn từ ẩn thân với một sợi dây gây chảy máu mục tiêu theo thời gian.',
   'guide.abilityHook.gouge':
     'Vô hiệu hóa mục tiêu trong chốc lát để bạn đổi vị trí hoặc tách địch.',
+  'guide.abilityHook.hamstring':
+    'Chém vào chân mục tiêu để làm chậm nó, khiến nó không thể đuổi kịp bạn.',
   'guide.abilityHook.healing_touch':
     'Một đòn trị liệu đơn mục tiêu lớn với thời gian niệm dài, dùng để hồi đầy cho ai đó.',
   'guide.abilityHook.healing_wave':
@@ -3685,6 +3803,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.rejuvenation':
     'Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.',
   'guide.abilityHook.rend': 'Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian.',
+  'guide.abilityHook.revenge':
+    'Một đòn phản kích quét rộng đánh trúng mọi thứ trước mặt bạn, và rẻ hơn ngay sau khi bạn vừa gạt được một đòn.',
   'guide.abilityHook.renew':
     'Một đòn trị liệu hồi theo thời gian, hữu dụng để niệm rồi tiếp tục di chuyển.',
   'guide.abilityHook.rockbiter_weapon':
@@ -4698,11 +4818,13 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.dodged': '{ability} của bạn bị {target} né.',
   'hud.combat.floatingDodge': 'Né',
   'hud.combat.floatingMiss': 'Trượt',
+  'hud.combat.floatingParry': 'Gạt Đòn',
   'hud.combat.healOther': '{ability} của bạn hồi {amount} máu cho {target}.',
   'hud.combat.healOtherCrit': '{ability} của bạn chí mạng hồi {amount} máu cho {target}.',
   'hud.combat.healSelf': '{ability} của bạn hồi {amount} máu cho bạn.',
   'hud.combat.healSelfCrit': '{ability} của bạn chí mạng hồi {amount} máu cho bạn.',
   'hud.combat.miss': '{ability} của bạn trượt {target}.',
+  'hud.combat.parried': '{ability} của bạn bị {target} gạt đòn.',
   'hud.core.boss': 'BOSS',
   'hud.core.chatChannels.add': 'Thêm kênh trò chuyện',
   'hud.core.chatChannels.addTitle': 'Thêm kênh',
@@ -4787,6 +4909,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.inCombat': 'Bạn không thể làm điều đó khi đang chiến đấu.',
   'hud.errors.invalidAttackTarget': 'Mục tiêu tấn công không hợp lệ.',
   'hud.errors.invitationExpired': 'Lời mời đã hết hạn.',
+  'hud.errors.needShield': 'Bạn phải trang bị một tấm khiên.',
   'hud.errors.noPet': 'Bạn không có thú nuôi.',
   'hud.errors.noRecentWhisper': 'Gần đây không có ai thì thầm với bạn.',
   'hud.errors.noSeal': 'Bạn không có Ấn nào đang kích hoạt.',
@@ -4796,6 +4919,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': 'Không đủ mana!',
   'hud.errors.notEnoughRage': 'Không đủ nộ khí!',
   'hud.errors.notEnoughResource': 'Không đủ {resource}!',
+  'hud.errors.nothingToConsume': 'Không có gì để tiêu hao.',
   'hud.errors.notInParty': 'Bạn không ở trong một nhóm.',
   'hud.errors.outOfRange': 'Ngoài tầm.',
   'hud.errors.partyFull': 'Nhóm của bạn đã đầy.',
@@ -5375,6 +5499,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Hiện Ví Tiền Ở Màn Hình Nhân Vật',
   'hudChrome.options.showWalletOnPlayerCard': 'Hiện Ví Tiền Trên Thẻ Người Chơi',
   'hudChrome.options.uiScale': 'Tỷ Lệ Giao Diện',
+  'hudChrome.paperdoll.offhand': 'Tay Phụ',
   'hudChrome.paperdoll.unequipAria': 'Tháo {item}',
   'hudChrome.paperdoll.unequipHint': 'Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị',
   'hudChrome.perf.badges.backgrounded': 'Chạy Nền',
@@ -5702,6 +5827,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.legs': 'Quần Giáp',
   'itemUi.slots.mainhand': 'Tay Chính',
   'itemUi.slots.shoulder': 'Giáp Vai',
+  'itemUi.slots.twoHand': 'Hai Tay',
   'itemUi.slots.waist': 'Thắt Lưng',
   'itemUi.stats.agi': 'Nhanh Nhẹn',
   'itemUi.stats.armor': 'Giáp',
@@ -6843,6 +6969,26 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Tăng giáp thêm {pct}%',
   'hudChrome.auraEffect.increasePct.int': 'Tăng Trí Tuệ thêm {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Tăng Thể Lực thêm {pct}%',
+  'hudChrome.auraEffect.avatar': 'Khổng Tượng: sát thương gây ra tăng {pct}%',
+  'hudChrome.auraEffect.battleStance': 'Thế Công: tạo nộ khí nhiều hơn 10%',
+  'hudChrome.auraEffect.battleTrance':
+    'Đòn Cướp Phá hoặc Đòn Tàn Phế tiếp theo của bạn không tốn nộ khí',
+  'hudChrome.auraEffect.berserkerStance':
+    'Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%',
+  'hudChrome.auraEffect.bloodbath': 'Tăng tỉ lệ chí mạng và sát thương gây ra thêm {pct}%',
+  'hudChrome.auraEffect.crit': 'Tăng tỉ lệ chí mạng thêm {pct}%',
+  'hudChrome.auraEffect.dieBySword':
+    'Giảm sát thương phải chịu đi {pct}% ({lowPct}% khi dưới {hpPct}% máu)',
+  'hudChrome.auraEffect.dmgDone': 'Tăng sát thương gây ra thêm {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Giảm sát thương gây ra đi {pct}%',
+  'hudChrome.auraEffect.maxHpPct': 'Tăng máu tối đa thêm {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Tăng lượng nộ khí tạo ra thêm {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Tăng tỉ lệ chí mạng thêm {pct}% và lượng nộ khí tạo ra thêm {ragePct}%',
+  'hudChrome.auraEffect.revengeFree': 'Phục Thù tiếp theo của bạn không tốn nộ khí',
+  'hudChrome.auraEffect.sanguine':
+    'Tăng tốc độ tấn công thêm {hastePct}% và sát thương gây ra thêm {dmgPct}%',
+  'hudChrome.auraEffect.victoryRush': 'Đà Chiến Thắng đã sẵn sàng',
   'hudChrome.crafting.notAtHub':
     'Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.',
   'hudChrome.crafting.recipeNotLearned': 'Bạn chưa học công thức đó.',
@@ -6874,6 +7020,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.teamLeave': 'Đội của bạn rời hàng chờ Bảo Vệ Yumi.',
   'yumi.respawn.title': 'GỤC NGÃ!',
   'entities.abilities.chain_heal.name': 'Hồi Máu Chuỗi',
+  'entities.abilities.chain_heal.description':
+    'Hồi {damage} máu cho mục tiêu, rồi lan tới tối đa 2 đồng minh lân cận, mỗi lần lan hồi bằng một nửa lượng trước đó.',
   'entities.abilities.razor_howl.name': 'Tiếng Hú Sắc Lẻm',
   'entities.abilities.razor_howl.description':
     'Một tiếng hét làm chậm kẻ địch trong phạm vi 15 m đi 50% trong 8 giây. (Tài năng chiến binh)',
@@ -6919,4 +7067,24 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'Mật khẩu không khớp.',
   'hudChrome.auth.resetErrInvalid':
     'Liên kết đặt lại này không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới.',
+  'hudChrome.auth.appleChoiceExpired':
+    'Lượt đăng nhập Apple đó đã hết hạn. Vui lòng đăng nhập bằng Apple lần nữa.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Tạo tài khoản mới, hoặc liên kết Apple với tài khoản bạn đã có.',
+  'hudChrome.auth.appleError': 'Không thể đăng nhập bằng Apple. Vui lòng thử lại.',
+  'hudChrome.auth.appleLoginCta': 'Tiếp tục với Apple',
+  'hudChrome.specPanel.complexity': 'Độ Phức Tạp',
+  'hudChrome.specPanel.complexityHigh': 'Cao',
+  'hudChrome.specPanel.complexityLow': 'Thấp',
+  'hudChrome.specPanel.complexityMedium': 'Trung Bình',
+  'hudChrome.specPanel.exampleAbilities': 'Kỹ năng tiêu biểu',
+  'hudChrome.specPanel.primaryAttr': 'Thuộc tính chính',
+  'hudChrome.specPanel.selectSpec': 'Chọn chuyên môn',
+  'hudChrome.specPanel.specUnlockBanner': 'Đã Mở Khóa Chuyên Môn!',
+  'hudChrome.specPanel.specUnlockHint': 'Nhấn N để chọn chuyên môn của bạn.',
+  'hudChrome.specPanel.viewTalents': 'Xem tài năng',
+  'hudChrome.talentRows.comingSoon': 'Sắp ra mắt',
+  'hudChrome.talentRows.defaultLoadout': 'Cấu Hình Mặc Định',
+  'hudChrome.talentRows.tab': 'Lựa Chọn',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Mục Tiêu Của Mục Tiêu',
 };
