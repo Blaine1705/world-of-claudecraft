@@ -2765,7 +2765,7 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
       school: string;
-      fx: 'burst' | 'nova' | 'orb' | 'meteorFall' | 'runeCircle' | 'snowZone';
+      fx: 'burst' | 'nova' | 'orb';
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
@@ -2775,13 +2775,6 @@ export type SimEvent = { pid?: number } & (
       dirZ?: number;
       speed?: number;
       duration?: number;
-      // 'orb' only: which flight moment this is. 'release' starts the local
-      // animation; 'halt'/'resume' freeze and restart it at the server's real
-      // coordinates when the orb latches onto (and outlives) an enemy.
-      phase?: 'release' | 'halt' | 'resume';
-      // 'orb' only: the casting entity, keying halt/resume to their live orb
-      // (one orb per caster: the cooldown far outlasts the flight).
-      sourceId?: number;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

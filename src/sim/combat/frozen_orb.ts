@@ -59,6 +59,8 @@ export function spawnFrozenOrb(
   abilityName: string,
   spBonus: number,
 ): void {
+  const dirX = Math.sin(p.facing);
+  const dirZ = Math.cos(p.facing);
   // Release feedback at the caster; each pulse then draws its own nova ring
   // along the drift, so the player can read where the orb is.
   ctx.emit({
@@ -69,12 +71,28 @@ export function spawnFrozenOrb(
     fx: 'nova',
     radius: eff.radius,
   });
+  // The visible sphere: the flight is a straight line at fixed speed, so this
+  // ONE event carries the whole path and the client animates the orb locally
+  // (src/render/frozen_orb_fx.ts). Visual only; the pulses above stay the
+  // authoritative area telegraph.
+  ctx.emit({
+    type: 'spellfxAt',
+    x: p.pos.x,
+    z: p.pos.z,
+    school: 'frost',
+    fx: 'orb',
+    radius: eff.radius,
+    dirX,
+    dirZ,
+    speed: FROZEN_ORB_SPEED,
+    duration: eff.duration,
+  });
   ctx.frozenOrbs.push({
     sourceId: p.id,
     x: p.pos.x,
     z: p.pos.z,
-    dirX: Math.sin(p.facing),
-    dirZ: Math.cos(p.facing),
+    dirX,
+    dirZ,
     radius: eff.radius,
     min: eff.min,
     max: eff.max,

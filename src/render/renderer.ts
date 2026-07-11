@@ -74,11 +74,6 @@ import {
   type FoliageView,
 } from './foliage';
 import { activeFormTint } from './form_tint';
-import {
-  type FrostNovaRootVisual,
-  isFrostNovaRootAura,
-  syncFrostNovaRootVisual,
-} from './frost_nova_root_visual';
 import { FrozenOrbFx } from './frozen_orb_fx';
 import { buildGatherNodes } from './gather_nodes';
 import {
@@ -976,6 +971,7 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  private frozenOrbFx!: FrozenOrbFx;
   private lightPulses!: LightPulses;
   private pulseAt!: (id: number, school: string, intensity: number, duration: number) => void;
   private weather: Weather;
@@ -1534,6 +1530,9 @@ export class Renderer {
 
     // particle system: projectiles, impacts, heal glows, ambience
     this.lightPulses = new LightPulses(this.scene);
+    // Frozen Orb: the roaming ice-sphere visual, animated locally from the one
+    // 'orb' release event (see src/render/frozen_orb_fx.ts).
+    this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
     this.vfx = new Vfx(this.scene, (id, frac) => {
       const v = this.views.get(id);
       if (!v) return null;
@@ -2202,6 +2201,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    this.frozenOrbFx.update(dt);
     this.lightPulses.update(dt);
     const pv = this.views.get(p.id);
     if (pv) {
@@ -3051,52 +3051,18 @@ export class Renderer {
         }
         break;
       case 'spellfxAt': {
-        // The Frozen Orb flight, animated locally from its three moments:
-        // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
-        // the server's real coordinates when the orb latches onto an enemy.
-        // The pulse novas below stay the area telegraph, so no actionable
-        // information rides on this mesh.
-        if (ev.fx === 'meteorFall') {
-          this.mageGroundFx.spawnMeteor({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 8,
-            duration: ev.duration ?? 2,
-          });
-          break;
-        }
-        if (ev.fx === 'snowZone') {
-          this.mageGroundFx.spawnSnow({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 7,
-            duration: ev.duration ?? 6,
-          });
-          break;
-        }
-        if (ev.fx === 'runeCircle') {
-          this.mageGroundFx.spawnRune({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 8,
-            duration: ev.duration ?? 15,
-          });
-          break;
-        }
+        // The Frozen Orb release: one event carries the whole straight-line
+        // flight, animated locally (the pulse novas below stay the area
+        // telegraph, so no actionable information rides on this mesh).
         if (ev.fx === 'orb') {
-          const orbSource = ev.sourceId ?? -1;
-          if (ev.phase === 'halt') this.frozenOrbFx.halt(orbSource, ev.x, ev.z);
-          else if (ev.phase === 'resume') this.frozenOrbFx.resume(orbSource, ev.x, ev.z);
-          else
-            this.frozenOrbFx.spawn({
-              sourceId: orbSource,
-              x: ev.x,
-              z: ev.z,
-              dirX: ev.dirX ?? 0,
-              dirZ: ev.dirZ ?? 1,
-              speed: ev.speed ?? 2.5,
-              duration: ev.duration ?? 8,
-            });
+          this.frozenOrbFx.spawn({
+            x: ev.x,
+            z: ev.z,
+            dirX: ev.dirX ?? 0,
+            dirZ: ev.dirZ ?? 1,
+            speed: ev.speed ?? 2.5,
+            duration: ev.duration ?? 8,
+          });
           break;
         }
         // Ground-targeted impact: burst draped onto the terrain where the spell
@@ -5119,6 +5085,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.frozenOrbFx.update(dt);
     this.lightPulses.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
