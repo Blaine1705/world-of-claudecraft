@@ -2074,6 +2074,7 @@ export const ko_KR: EnTranslations = {
       "shatter": "Your spells crit far more often against frozen targets.",
       "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
       "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "마나를 회복시켜 주는 음료를 창조하여 전투 사이에 채울 수 있습니다.",
       "conjure_food": "앉아서 먹으면 생명력을 회복시켜 주는 음식을 창조합니다.",
       "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",

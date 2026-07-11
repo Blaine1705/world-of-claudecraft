@@ -595,6 +595,7 @@ export const guideStrings = {
     frozen_orb:
       'Rolls a slow orb through the pack that chills everything and feeds your frost procs.',
     blizzard: 'Blankets an area in ice to wear down and slow a whole pack.',
+    blink: 'Teleports you a short distance forward, breaking roots on the way out.',
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',

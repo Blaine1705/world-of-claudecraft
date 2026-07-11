@@ -71,6 +71,9 @@ export interface AbilityModEffect {
   flatDmg?: number; // flat add to the primary damage/bonus
   costPct?: number; // -0.20 = 20% cheaper
   cooldownPct?: number; // -0.50 = half cooldown
+  // Flat cooldown ADD in seconds (Snap Polymorph: an instant cast gains a real
+  // cooldown). Applied after cooldownPct at the resolve site in classes.ts.
+  cooldownFlat?: number;
   castPct?: number; // -0.50 = half cast time
   buffPct?: number; // +0.20 = +20% to this ability's selfBuff/buffTarget value (e.g. Improved Devotion Aura)
   // Conditional damage: bonus multiplier when the CASTER'S damage-over-time
@@ -138,6 +141,18 @@ export interface GlobalModEffect {
   onKillSpeedDuration?: number;
   bloodbathDuration?: number;
   bloodbathMaxPct?: number;
+  // Mage choice rows (owner tree 2026-07-11):
+  // Warded: fraction less damage taken while the caster's own personal barrier
+  // (an ice_barrier absorb aura) is up. Folded target-side in combat/damage.ts.
+  barrierDrPct?: number;
+  // Temporal Rift: 1 when picked. Every 20 sec the next stun/root/silence to
+  // land on the wearer is cleansed instantly (the applyAura funnel in sim.ts,
+  // ICD carried by a 'temporal_rift_cd' aura). Draws no rng.
+  temporalRift?: number;
+  // Overflowing Power: seconds shaved off the mage defensive cooldowns per 10%
+  // of maximum mana spent, capped at 10 sec per 30 sec (casting_lifecycle's
+  // spendAbilityCost, the Colossal Might pattern on mana).
+  manaDefCdrPer10?: number;
 }
 
 export interface TalentEffect {
@@ -205,6 +220,7 @@ export interface ResolvedAbilityMod {
   flatDmg: number;
   costPct: number;
   cooldownPct: number;
+  cooldownFlat: number;
   castPct: number;
   buffPct: number;
   castWhileMoving: boolean;
@@ -419,6 +435,9 @@ function zeroGlobal(): Required<GlobalModEffect> {
     onKillSpeedDuration: 0,
     bloodbathDuration: 0,
     bloodbathMaxPct: 0,
+    barrierDrPct: 0,
+    temporalRift: 0,
+    manaDefCdrPer10: 0,
   };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
@@ -428,6 +447,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     flatDmg: 0,
     costPct: 0,
     cooldownPct: 0,
+    cooldownFlat: 0,
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
@@ -517,6 +537,9 @@ export function accumulate(
     g.masteryTwoHandDmgPct += (e.masteryTwoHandDmgPct ?? 0) * mult;
     // An ICD is a duration, not a rate: take the longest granted, ignore mult.
     g.cheatDeathIcd = Math.max(g.cheatDeathIcd, e.cheatDeathIcd ?? 0);
+    g.barrierDrPct += (e.barrierDrPct ?? 0) * mult;
+    g.temporalRift += (e.temporalRift ?? 0) * mult;
+    g.manaDefCdrPer10 += (e.manaDefCdrPer10 ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];
@@ -529,6 +552,7 @@ export function accumulate(
     cur.flatDmg += (am.flatDmg ?? 0) * mult;
     cur.costPct += (am.costPct ?? 0) * mult;
     cur.cooldownPct += (am.cooldownPct ?? 0) * mult;
+    cur.cooldownFlat += (am.cooldownFlat ?? 0) * mult;
     cur.castPct += (am.castPct ?? 0) * mult;
     cur.buffPct += (am.buffPct ?? 0) * mult;
     cur.bonusCharges += (am.bonusCharges ?? 0) * mult;

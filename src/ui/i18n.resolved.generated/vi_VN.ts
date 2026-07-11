@@ -2074,6 +2074,7 @@ export const vi_VN: EnTranslations = {
       "shatter": "Your spells crit far more often against frozen targets.",
       "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
       "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Tạo ra đồ uống hồi mana, để bạn nạp lại giữa các đợt kéo quái.",
       "conjure_food": "Tạo ra thức ăn hồi máu khi bạn ngồi xuống dùng bữa.",
       "shadow_bolt": "Một tia bóng tối bạn niệm vào mục tiêu, đòn chủ lực quen thuộc của bạn.",

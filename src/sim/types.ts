@@ -373,6 +373,16 @@ export type AuraKind =
   // like Red Harvest crits every strike on one charge). Plain auto-attack
   // swings neither benefit nor consume.
   | 'sure_crit'
+  // Ice Floes (mage choice row): `value` = cast-time spells left that may be
+  // cast while moving. player_motion skips its cancel while worn; finishing a
+  // hard cast decrements the value and removes the aura at 0
+  // (casting_lifecycle). Draws no rng.
+  | 'ice_floes'
+  // Inert timer marker: NO combat reader keys on this kind, so it is pure
+  // visible state (an internal cooldown or a capped-window accumulator the
+  // player can watch tick). Kept apart per user by the aura id (Temporal
+  // Rift's 20s ICD, Overflowing Power's 30s shave window).
+  | 'internal_cd'
   // Furious Mending's damage-reduction half: the wearer takes `value` fraction
   // less damage from any external source while worn (summed across auras,
   // floored at a zero multiplier; the cut lives in combat/damage.ts beside the
@@ -1722,6 +1732,21 @@ export type AbilityEffect =
   // gain a percentage of maximum health (buff_maxhp_pct aura; recalc keeps the
   // hp FRACTION, so current health rises and falls with the buff, WoW-style).
   | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
+  // Mass Barrier (mage choice row): the caster and every friendly within radius
+  // gain an absorb shield (the aoeAlly* family shape with an 'absorb' aura).
+  | { type: 'aoeAllyAbsorb'; amount: number; duration: number; radius: number }
+  // Greater Invisibility (mage choice row): one dispatch applies the whole
+  // package (a 'stealth'-kind vanish for `duration`, a buff_dr damage cut for
+  // `duration` + `linger` so it survives an early break, and strips up to
+  // `removeDotCount` damage-over-time auras). One effect so the two self-auras
+  // get distinct ids (the selfBuff case keys auras by the ability id alone).
+  | {
+      type: 'greaterInvisibility';
+      duration: number;
+      drValue: number;
+      linger: number;
+      removeDotCount: number;
+    }
   // Sanguine Aura: buff the caster and every MELEE party member (MELEE_CLASSES)
   // with an attack-speed multiplier (<1 = faster swings) and a damage-done amp.
   | { type: 'partyMeleeBuff'; attackSpeedMult: number; dmgPct: number; duration: number }

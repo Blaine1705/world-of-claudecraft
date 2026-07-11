@@ -30,6 +30,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   silence: 'breakCC',
   aoeFear: 'breakCC',
   clearCooldowns: 'other',
+  aoeAllyAbsorb: 'other',
+  greaterInvisibility: 'other',
   breakControl: 'other',
   repositionToAim: 'other',
   blinkForward: 'other',

@@ -1502,6 +1502,59 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyAbsorb': {
+        // Mass Barrier: the aoeAlly* loop shape with an absorb shield on the
+        // caster and every friendly in radius. Draws no rng.
+        for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+          ctx.applyAura(mE, {
+            id: ability.id,
+            name: ability.name,
+            kind: 'absorb',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.amount,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
+      case 'greaterInvisibility': {
+        // One dispatch applies the whole package so the two self-auras carry
+        // distinct ids (the selfBuff case keys auras by the ability id alone):
+        // strip up to N DoTs (newest first), vanish via the stealth machinery
+        // (applyAura sets stealthed), and a buff_dr cut that outlives the
+        // vanish by `linger` so it survives an early break. Draws no rng.
+        let removed = 0;
+        for (let i = p.auras.length - 1; i >= 0 && removed < eff.removeDotCount; i--) {
+          if (p.auras[i].kind !== 'dot') continue;
+          const gone = p.auras[i];
+          p.auras.splice(i, 1);
+          removed++;
+          ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
+        }
+        ctx.applyAura(p, {
+          id: ability.id,
+          name: ability.name,
+          kind: 'stealth',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: 0,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        ctx.applyAura(p, {
+          id: `${ability.id}_dr`,
+          name: ability.name,
+          kind: 'buff_dr',
+          remaining: eff.duration + eff.linger,
+          duration: eff.duration + eff.linger,
+          value: eff.drValue,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
       case 'aoeAllyDamage': {
         for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
           ctx.applyAura(mE, {
@@ -1629,20 +1682,36 @@ export function runEffects(
         break;
       }
       case 'aoeRoot': {
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'nova',
-        });
+        // A ground-targeted cast (Ring of Frost) roots where it was AIMED; the
+        // self-centered novas (Frost Nova, Gripping Earth) keep the caster
+        // center. Mirrors the aoeDamage castAim convention, including the
+        // world-anchored fx for an aimed ring.
+        const rootCenter = p.castAim ?? p.pos;
+        if (p.castAim) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: rootCenter.x,
+            z: rootCenter.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+        } else {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'nova',
+          });
+        }
         const aoeRootSp = directHitBonus(
           abilityScalingPower(p, ability),
           ability,
           res.castTime,
           true,
         );
-        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+        for (const m of ctx.hostilesInRadius(p, rootCenter, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
           ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');

@@ -2074,6 +2074,7 @@ export const pt_BR: EnTranslations = {
       "shatter": "Your spells crit far more often against frozen targets.",
       "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
       "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Conjura bebidas que restauram mana, para você reabastecer entre as puxadas.",
       "conjure_food": "Conjura comida que restaura vida quando você se senta para comer.",
       "shadow_bolt": "Uma seta de sombra que você lança no alvo, sua magia de ataque preferida.",

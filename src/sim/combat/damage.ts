@@ -229,6 +229,22 @@ export function dealDamage(
     if (drCut > 0) amount = Math.round(amount * Math.max(0, 1 - drCut));
   }
 
+  // Warded (mage choice row): the wearer takes barrierDrPct less damage while
+  // their own personal barrier (an ice_barrier absorb aura) is up. Checked
+  // target-side beside the buff_dr fold above, BEFORE absorb shields soak, so
+  // the cut stretches the barrier it is anchored to. Draws no rng.
+  if (
+    source &&
+    source.id !== target.id &&
+    amount > 0 &&
+    target.kind === 'player' &&
+    target.auras.some((a) => a.kind === 'absorb' && a.id === 'ice_barrier')
+  ) {
+    const wardedMeta = ctx.players.get(target.id);
+    const wardedCut = wardedMeta ? ctx.playerMods(wardedMeta).global.barrierDrPct : 0;
+    if (wardedCut > 0) amount = Math.round(amount * Math.max(0, 1 - wardedCut));
+  }
+
   // Physical-only damage-reduction buffs (buff_dr_phys): Raised Guard's 50%
   // cut applies only when the incoming school is physical; every other school
   // passes untouched. Same fold shape as buff_dr above (summed, floored at a

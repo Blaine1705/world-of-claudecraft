@@ -59,6 +59,9 @@ const PCT_FIELDS = new Set([
   // Master Armorer (warrior arms mastery): fraction of extra damage while wielding
   // a two-handed weapon, applied at runtime in combat/damage.ts, shown as "10%".
   'masteryTwoHandDmgPct',
+  // Warded (mage choice row): fraction less damage while the barrier is up,
+  // applied at runtime in combat/damage.ts, shown as "15%".
+  'barrierDrPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -69,6 +72,9 @@ function expectedTokens(effect: unknown): string[] {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
+        // Temporal Rift (mage choice row) is a picked/not-picked flag like
+        // battleRhythm; its 20s ICD is stated as a duration, not this 1.
+        if (key === 'temporalRift') continue;
         if (key === 'critDmgPct' && value === 0.5) {
           toks.push('double');
           continue;

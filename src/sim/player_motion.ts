@@ -158,8 +158,15 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     if (p.castingAbility) {
       // A mobile cast (def flag, or talent-granted via the resolved ability)
       // survives its caster's movement; everything else breaks, fishing included.
+      // Ice Floes (mage choice row) also protects: while its aura is worn the
+      // cast survives, and COMPLETING the hard cast spends one of the aura's
+      // protected uses (casting_lifecycle), so moving mid-cast never overspends.
       const casting = deps.resolvedAbility(p.castingAbility, p.id);
-      const mobile = casting != null && (casting.def.castWhileMoving || casting.castWhileMoving);
+      const mobile =
+        casting != null &&
+        (casting.def.castWhileMoving ||
+          casting.castWhileMoving ||
+          p.auras.some((a) => a.kind === 'ice_floes'));
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);

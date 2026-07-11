@@ -2074,6 +2074,7 @@ export const zh_CN: EnTranslations = {
       "shatter": "Your spells crit far more often against frozen targets.",
       "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
       "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "制造饮品以恢复法力，让你在两次开怪之间补给。",
       "conjure_food": "制造食物，坐下进食时可以恢复生命值。",
       "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
