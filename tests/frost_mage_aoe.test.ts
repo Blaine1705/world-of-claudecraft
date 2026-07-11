@@ -4,7 +4,11 @@ import {
   BLIZZARD_ORB_CDR_PER_ENEMY,
   FINGERS_OF_FROST_MAX_STACKS,
 } from '../src/sim/combat/frost_mage';
-import { FROZEN_ORB_SLOW_MULT, FROZEN_ORB_SPEED } from '../src/sim/combat/frozen_orb';
+import {
+  FROZEN_ORB_CONTACT_RADIUS,
+  FROZEN_ORB_SLOW_MULT,
+  FROZEN_ORB_SPEED,
+} from '../src/sim/combat/frozen_orb';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   computeTalentModifiers,
@@ -128,16 +132,62 @@ describe('Frozen Orb in combat', () => {
     p.resource = p.maxResource;
     sim.castAbility('frozen_orb');
     const events = tickFor(sim, 0.2);
-    const orb = events.filter((e: any) => e.type === 'spellfxAt' && e.fx === 'orb') as any[];
+    const orb = events.filter(
+      (e: any) => e.type === 'spellfxAt' && e.fx === 'orb' && e.phase === 'release',
+    ) as any[];
     // Exactly one release event: the client animates the straight-line flight
     // locally from it (src/render/frozen_orb_fx.ts), no per-tick sync.
     expect(orb).toHaveLength(1);
     expect(orb[0].school).toBe('frost');
+    expect(orb[0].sourceId).toBe(p.id);
     expect(orb[0].dirX).toBeCloseTo(Math.sin(p.facing), 6);
     expect(orb[0].dirZ).toBeCloseTo(Math.cos(p.facing), 6);
     expect(orb[0].speed).toBe(FROZEN_ORB_SPEED);
     expect(orb[0].duration).toBe(8);
     expect(orb[0].radius).toBe(6);
+  });
+
+  it('latches onto a living enemy, holds until it dies, then resumes its drift', () => {
+    const { sim, p } = makeSim();
+    const prey = spawnDummy(sim, p, 8);
+    face(p, prey);
+    sim.drainEvents();
+    p.resource = p.maxResource;
+    sim.castAbility('frozen_orb');
+    const orbState = () => (sim as any).ctx.frozenOrbs[0];
+    // Reach contact: (8 - contact 2) / speed seconds of travel, plus slack.
+    const approach = tickFor(sim, (8 - FROZEN_ORB_CONTACT_RADIUS) / FROZEN_ORB_SPEED + 0.3);
+    const halts = approach.filter((e: any) => e.type === 'spellfxAt' && e.phase === 'halt');
+    expect(halts).toHaveLength(1); // one transition, not one event per tick
+    expect(orbState().halted).toBe(true);
+    // Latched: the orb grinds in place while the prey lives (the clock runs on).
+    const xHeld = orbState().x;
+    const zHeld = orbState().z;
+    tickFor(sim, 1);
+    expect(orbState().halted).toBe(true);
+    expect(orbState().x).toBe(xHeld);
+    expect(orbState().z).toBe(zHeld);
+    // Kill the prey: the next tick frees the orb and it drifts on.
+    prey.hp = 1;
+    (sim as any).dealDamage(p, prey, 5, false, 'frost', null, 'hit', true);
+    expect(prey.dead).toBe(true);
+    const after = tickFor(sim, 0.5);
+    const resumes = after.filter((e: any) => e.type === 'spellfxAt' && e.phase === 'resume');
+    expect(resumes).toHaveLength(1);
+    expect(orbState().halted).toBe(false);
+    const drifted = Math.hypot(orbState().x - xHeld, orbState().z - zHeld);
+    expect(drifted).toBeGreaterThan(0.5);
+  });
+
+  it('the latch never pauses the life clock: a held orb still expires on time', () => {
+    const { sim, p } = makeSim();
+    const prey = spawnDummy(sim, p, 3); // inside contact reach almost at once
+    face(p, prey);
+    sim.drainEvents();
+    p.resource = p.maxResource;
+    sim.castAbility('frozen_orb');
+    tickFor(sim, 9); // past the 8s life while latched the whole way
+    expect((sim as any).ctx.frozenOrbs).toHaveLength(0);
   });
 
   it('pulses damage and a 30% snare on nearby enemies, first strike guarantees Fingers', () => {

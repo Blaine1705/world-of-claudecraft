@@ -30,6 +30,11 @@ export const FROZEN_ORB_SPEED = 2.5; // yards per second
 export const FROZEN_ORB_SLOW_MULT = 0.7; // -30% move speed
 export const FROZEN_ORB_SLOW_DURATION = 2.5; // refreshed every pulse it keeps hitting
 export const FROZEN_ORB_FINGERS_CHANCE = 0.2; // per pulse that struck someone
+// The orb LATCHES onto prey (owner design 2026-07-11): while any living hostile
+// stands within this reach of the orb's BODY (not the pulse radius) it holds
+// position, grinding its pulses into them; the moment nothing lives in reach it
+// resumes its drift with whatever lifetime remains. The life clock never pauses.
+export const FROZEN_ORB_CONTACT_RADIUS = 2; // yards, orb body + a mob's body
 
 export interface FrozenOrbState {
   sourceId: number;
@@ -47,6 +52,10 @@ export interface FrozenOrbState {
   abilityName: string;
   // The first strike's guaranteed Fingers of Frost has been granted.
   firstHitDone: boolean;
+  // Latched onto a living enemy within FROZEN_ORB_CONTACT_RADIUS: the orb holds
+  // position until nothing lives in reach. Transitions emit the halt/resume
+  // visual events so the client-side flight animation tracks the real path.
+  halted: boolean;
 }
 
 /** Release an orb from the caster, drifting the way they face. The damage
@@ -81,6 +90,8 @@ export function spawnFrozenOrb(
     z: p.pos.z,
     school: 'frost',
     fx: 'orb',
+    phase: 'release',
+    sourceId: p.id,
     radius: eff.radius,
     dirX,
     dirZ,
@@ -104,6 +115,7 @@ export function spawnFrozenOrb(
     pulseTimer: eff.interval,
     abilityName,
     firstHitDone: false,
+    halted: false,
   });
 }
 
@@ -119,8 +131,27 @@ export function tickFrozenOrbs(ctx: SimContext): void {
       ctx.frozenOrbs.splice(i, 1);
       continue;
     }
-    orb.x += orb.dirX * FROZEN_ORB_SPEED * DT;
-    orb.z += orb.dirZ * FROZEN_ORB_SPEED * DT;
+    // Latch check: any living hostile within contact reach pins the orb in
+    // place (grid radius query, draws no rng). Only the TRANSITION emits a
+    // visual event, so the client flight animation freezes and resumes at the
+    // server's real coordinates without per-tick traffic.
+    const latched = hasOrbContact(ctx, orb, source);
+    if (latched !== orb.halted) {
+      orb.halted = latched;
+      ctx.emit({
+        type: 'spellfxAt',
+        x: orb.x,
+        z: orb.z,
+        school: 'frost',
+        fx: 'orb',
+        phase: latched ? 'halt' : 'resume',
+        sourceId: orb.sourceId,
+      });
+    }
+    if (!orb.halted) {
+      orb.x += orb.dirX * FROZEN_ORB_SPEED * DT;
+      orb.z += orb.dirZ * FROZEN_ORB_SPEED * DT;
+    }
     orb.remaining -= DT;
     orb.pulseTimer -= DT;
     if (orb.pulseTimer <= 0) {
@@ -129,6 +160,16 @@ export function tickFrozenOrbs(ctx: SimContext): void {
     }
     if (orb.remaining <= 0) ctx.frozenOrbs.splice(i, 1);
   }
+}
+
+// True while any living hostile stands within the orb body's contact reach.
+// Physical touch: no line-of-sight gate (the damage pulses keep their own).
+function hasOrbContact(ctx: SimContext, orb: FrozenOrbState, source: Entity): boolean {
+  const center = { x: orb.x, y: source.pos.y, z: orb.z };
+  for (const t of ctx.hostilesInRadius(source, center, FROZEN_ORB_CONTACT_RADIUS)) {
+    if (!t.dead) return true;
+  }
+  return false;
 }
 
 function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
