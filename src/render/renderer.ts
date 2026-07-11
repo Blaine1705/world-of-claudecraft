@@ -2669,6 +2669,9 @@ export class Renderer {
     this.budgetFireLights(p.pos.x, p.pos.z);
     this.waterView.update(this.time);
     const fogFar = (this.scene.fog as THREE.Fog).far;
+    // The foliage LOD swaps real trees for impostors relative to the fog, not at
+    // a fixed distance, so it needs both planes (src/render/foliage_lod.ts).
+    const fogNear = (this.scene.fog as THREE.Fog).near;
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     this.propsView.update(
       this.camera.position.x,
@@ -2688,6 +2691,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
+      fogNear,
       fogFar,
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
@@ -5796,6 +5800,9 @@ export class Renderer {
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
+    // The foliage LOD swaps real trees for impostors relative to the fog, not at
+    // a fixed distance, so it needs both planes (src/render/foliage_lod.ts).
+    const fogNear = (this.scene.fog as THREE.Fog).near;
     this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     worldStart = markWorldPhase('terrain', worldStart);
@@ -5826,6 +5833,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
+      fogNear,
       fogFar,
     );
     worldStart = markWorldPhase('foliage', worldStart);

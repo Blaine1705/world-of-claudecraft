@@ -21,6 +21,7 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { bucketVisible, type LodDists, lodDistsFor, treeDetailDistance } from './foliage_lod';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { grassTuftTexture } from './textures';
 
@@ -271,6 +272,7 @@ export interface FoliageView {
     eyeX: number,
     eyeY: number,
     eyeZ: number,
+    fogNear: number,
     fogFar: number,
   ): void;
   setGrassQuality(level: number): void;
@@ -323,6 +325,12 @@ interface BucketMesh {
   radius: number;
   minDist?: number;
   maxDist?: number;
+  // The real model ends, and the impostor begins, at the RUNTIME tree-detail
+  // distance (it tracks fog, so it is unknown when the bucket is built). These
+  // compose with the numeric caps above rather than replacing them: near-fill
+  // trees cull at treeFillFar OR at the swap, whichever comes first.
+  minAtDetail?: boolean;
+  maxAtDetail?: boolean;
   lod: 'core' | 'near-fill' | 'shadow' | 'proxy' | 'impostor' | 'rock' | 'dressing';
   draws: number;
   triangles: number;
@@ -375,32 +383,11 @@ interface TreeHideable {
 // to cover the gap). Dressing/rocks are sub-pixel long before the fog wall.
 // The low tier (software GL / weak iGPU) pulls everything much closer — it
 // has no shadows or fog-flattering post, and raw triangle rate is its limit.
-interface LodDists {
-  barkFar: number;
-  treeDetailFar: number;
-  dressFar: number;
-  rockFar: number;
-  treeFillFar: number;
-}
-const LOD_HIGH: LodDists = {
-  barkFar: 330,
-  treeDetailFar: 300,
-  dressFar: 200,
-  rockFar: 360,
-  treeFillFar: 310,
-};
-// low caps must clear the worst camera-to-bucket-CENTRE distance (~158u for a
-// 2-column x 240u-band bucket) or nearby dressing vanishes and trunks pop at
-// bucket boundaries — the windows test bucket centres, not instances
-const LOD_LOW: LodDists = {
-  barkFar: 170,
-  treeDetailFar: 250,
-  dressFar: 185,
-  rockFar: 190,
-  treeFillFar: 245,
-};
+// The tables and the window arithmetic live in foliage_lod.ts (pure, Node-tested).
+// The tree-detail boundary is NOT a constant: it follows the zone's fog, so an
+// impostor can never be caught standing in clear air. See that module's header.
 function lodDists(): LodDists {
-  return GFX.leanFoliage ? LOD_LOW : LOD_HIGH;
+  return lodDistsFor(GFX.leanFoliage);
 }
 
 // Wind sway injection for foliage materials (canopies, bushes, grass cards).
@@ -804,6 +791,7 @@ function placeSpecies(
     lod: BucketMesh['lod'],
     minDist?: number,
     maxDist?: number,
+    atDetail?: { min?: boolean; max?: boolean },
   ) => void,
   hideRegistry: TreeHideable[],
 ): void {
@@ -881,7 +869,7 @@ function placeSpecies(
         if (proxy.instanceColor) proxy.instanceColor.needsUpdate = true;
         proxy.receiveShadow = true;
         parent.add(proxy);
-        register(proxy, 'impostor', treeDetailFar, group.maxDist);
+        register(proxy, 'impostor', undefined, group.maxDist, { min: true });
       }
     }
     for (const part of spec.sets[subset[gi]]) {
@@ -912,23 +900,28 @@ function placeSpecies(
         parent.add(im);
         const cullBark =
           GFX.standardMaterials && !part.isLeaf && (spec.cullBarkFar || spec.farTrunkProxy);
-        const detailMaxDist =
-          group.maxDist === undefined ? treeDetailFar : Math.min(group.maxDist, treeDetailFar);
-        const maxDist = cullBark ? Math.min(detailMaxDist, barkFar) : detailMaxDist;
-        register(im, group.lod, undefined, maxDist === Infinity ? undefined : maxDist);
+        // Numeric caps that are NOT the detail swap: the near-fill density cull
+        // and (for species whose canopy covers the trunk) the early bark cull.
+        // The swap itself is symbolic: it follows fog, so only update() knows it.
+        const numericCaps: number[] = [];
+        if (group.maxDist !== undefined) numericCaps.push(group.maxDist);
+        if (cullBark) numericCaps.push(barkFar);
+        const maxDist = numericCaps.length > 0 ? Math.min(...numericCaps) : undefined;
+        register(im, group.lod, undefined, maxDist, { max: true });
         if (GFX.standardMaterials && !GFX.leanFoliage && castsShadow) {
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
           shadow.castShadow = true;
           shadow.receiveShadow = false;
           parent.add(shadow);
-          register(shadow, 'shadow', undefined, maxDist === Infinity ? undefined : maxDist);
+          // The shadow pass does NOT follow the fog-extended detail distance: a
+          // tree's shadow past the old radius contributes nothing the eye can
+          // resolve, and re-drawing that geometry for the depth pass is what the
+          // extension would cost most. Keep it on the build-time radius.
+          const shadowMax =
+            maxDist === undefined ? treeDetailFar : Math.min(maxDist, treeDetailFar);
+          register(shadow, 'shadow', undefined, shadowMax);
         }
-        if (
-          GFX.standardMaterials &&
-          !part.isLeaf &&
-          spec.farTrunkProxy &&
-          detailMaxDist > barkFar
-        ) {
+        if (GFX.standardMaterials && !part.isLeaf && spec.farTrunkProxy) {
           const proxy = cloneInstancedTo(im, farTrunkGeo(part.geometry), part.material);
           proxy.receiveShadow = true;
           for (let i = 0; i < group.items.length; i++) {
@@ -941,7 +934,7 @@ function placeSpecies(
             });
           }
           parent.add(proxy);
-          register(proxy, 'proxy', barkFar, detailMaxDist);
+          register(proxy, 'proxy', barkFar, group.maxDist, { max: true });
         }
       }
     }
@@ -1091,6 +1084,7 @@ function buildTrees(
       lod: BucketMesh['lod'],
       minDist?: number,
       maxDist?: number,
+      atDetail?: { min?: boolean; max?: boolean },
     ): void => {
       registry.push({
         mesh,
@@ -1099,6 +1093,8 @@ function buildTrees(
         radius: bRadius,
         minDist,
         maxDist,
+        minAtDetail: atDetail?.min,
+        maxAtDetail: atDetail?.max,
         lod,
         ...bucketMeshCost(mesh),
       });
@@ -1959,17 +1955,26 @@ export function buildFoliage(seed: number): FoliageView {
       eyeX: number,
       eyeY: number,
       eyeZ: number,
+      fogNear: number,
       fogFar: number,
     ): void {
       grass.update(px, pz);
       updateTreeHides(treeHideables, eyeX, eyeY, eyeZ, camX, camY, camZ);
-      // buckets fully behind the fog wall are pure overdraw; the optional
-      // [minDist, maxDist) window uses the bucket-CENTER distance so a bark
-      // mesh and its far-trunk proxy are never drawn together
+      // Buckets fully behind the fog wall are pure overdraw. The windows
+      // themselves, including the real-model -> impostor swap (which follows the
+      // zone's fog rather than a build-time constant, so a cone is never caught
+      // standing in clear air), are decided in foliage_lod.ts and unit-tested
+      // there.
       const distanceScale = !GFX.leanFoliage
         ? 0.72 + 0.28 * modelQuality
         : 0.56 + 0.44 * modelQuality;
       const fogLimit = fogFar * (0.78 + 0.22 * modelQuality);
+      const detailFar = treeDetailDistance(
+        lodDists().treeDetailFar,
+        fogNear,
+        fogFar,
+        distanceScale,
+      );
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;
@@ -1977,15 +1982,22 @@ export function buildFoliage(seed: number): FoliageView {
       modelVisibleDrawsByLod = {};
       modelVisibleTrianglesByLod = {};
       for (const b of bucketMeshes) {
-        const d = Math.hypot(b.x - camX, b.z - camZ);
-        const minDist = (b.minDist ?? 0) * distanceScale;
         const revealScale =
           GFX.leanFoliage && (b.lod === 'core' || b.lod === 'near-fill')
             ? 0.94 + hashAt(b.x, b.z, 109) * 0.06
             : 1;
-        const maxDist =
-          b.maxDist === undefined ? Infinity : b.maxDist * distanceScale * revealScale;
-        b.mesh.visible = d >= minDist && d < maxDist && d - b.radius < fogLimit;
+        b.mesh.visible = bucketVisible({
+          centerDist: Math.hypot(b.x - camX, b.z - camZ),
+          radius: b.radius,
+          minDist: b.minDist,
+          maxDist: b.maxDist,
+          minAtDetail: b.minAtDetail,
+          maxAtDetail: b.maxAtDetail,
+          distanceScale,
+          detailFar,
+          revealScale,
+          fogLimit,
+        });
         if (b.mesh.visible) {
           modelVisibleBuckets++;
           modelVisibleDraws += b.draws;
