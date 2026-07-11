@@ -355,10 +355,12 @@ describe('tank, dual-wield, and shadow kits', () => {
 
   it('the fury kit carries the dual-wield test extras: every hand layout is testable', () => {
     const fury = roleOf('warrior', 'fury');
-    // A second greatsword (Titan's Grip 2H+2H) and a spare epic one-hander
+    // A second greatsword (Titan's Grip 2H+2H) and a spare one-hander
     // (classic 1H+1H); with the worn greatsword and the bagged Thronebane
     // that makes all three dual-wield layouts testable without farming.
-    expect(fury.extras).toEqual(['bonewrought_greatsword', 'wyrmfang_greatblade']);
+    // (emberfang_warblade replaced wyrmfang_greatblade when PR #1762
+    // declared the latter two-handed.)
+    expect(fury.extras).toEqual(['bonewrought_greatsword', 'emberfang_warblade']);
     for (const id of fury.extras ?? []) {
       const item = ITEMS[id];
       expect(item.heroic ?? false, `${id} heroic`).toBe(false);
@@ -371,9 +373,8 @@ describe('tank, dual-wield, and shadow kits', () => {
     // INTENT pin: the second extra exists to make the classic 1H+1H layout
     // testable, so it must BE one-handed. Titan's Grip makes a two-hander
     // offhand-LEGAL for fury, so the legality pin above cannot catch a hand
-    // flip (PR #1762 declares wyrmfang two-handed: when that lands, swap this
-    // extra to the best remaining warrior-legal epic/rare one-hander, e.g.
-    // emberfang_warblade, instead of deleting this assertion).
+    // flip (exactly how wyrmfang_greatblade silently left this role when
+    // PR #1762 declared it two-handed).
     const spare = ITEMS[(fury.extras ?? [])[1] as string];
     expect(spare.kind === 'weapon' && weaponHand(spare)).toBe('onehand');
     const state = buildBoostedCharacterState('warrior', 'Pbetestdw', 0);
@@ -381,7 +382,7 @@ describe('tank, dual-wield, and shadow kits', () => {
     expect(state.equipment.mainhand).toBe('bonewrought_greatsword');
     // The bagged SECOND copy of the worn greatsword is deliberate.
     expect(carried, 'bagged second greatsword').toContain('bonewrought_greatsword');
-    expect(carried, 'bagged spare one-hander').toContain('wyrmfang_greatblade');
+    expect(carried, 'bagged spare one-hander').toContain('emberfang_warblade');
     expect(carried, 'bagged legendary').toContain('kingsbane_last_oath');
   });
 

@@ -213,7 +213,11 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
       weights: { str: 1, sta: 0.8, agi: 0.4 },
       melee: true,
       hands: 'dualWield',
-      extras: ['bonewrought_greatsword', 'wyrmfang_greatblade'],
+      // The second extra must BE one-handed (the 1H+1H layout with the
+      // bagged Thronebane); wyrmfang_greatblade left this slot when PR #1762
+      // declared it two-handed, and emberfang_warblade is the best remaining
+      // warrior-legal non-heroic one-hander below the legendary.
+      extras: ['bonewrought_greatsword', 'emberfang_warblade'],
     },
     {
       id: 'prot',
