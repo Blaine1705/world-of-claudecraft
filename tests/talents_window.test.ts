@@ -43,6 +43,17 @@ describe('talents_window: no magic values', () => {
     expect(painter.includes('–'), 'en dash found').toBe(false);
   });
 
+  it('commits a spec pick to the world (not just the local stage)', () => {
+    // Regression pin: clicking a spec card must reach IWorld.setSpec. Before
+    // this, the pick only mutated the staged buffer, so the spec (its kit,
+    // signature, and mastery) never actually applied unless the player took
+    // the save-a-loadout detour.
+    expect(painter).toContain('commitSpec(specId: string | null): void;');
+    expect(painter).toContain('this.deps.commitSpec(specId);');
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain('commitSpec: (specId) => this.sim.setSpec(specId),');
+  });
+
   it('wires Choices row radios to roving tabindex and arrow-key selection', () => {
     expect(painter).toContain('const rowOptCards: HTMLElement[] = [];');
     expect(painter).toContain(

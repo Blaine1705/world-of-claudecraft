@@ -78,14 +78,11 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   rowPicks(): RowPicks;
   playerLevel(): number;
   pickRow(rowIndex: number, optionId: string | null): void;
-  /**
-   * Commit a specialization to the server-authoritative IWorld (IWorld.setSpec).
-   * Mirrors pickRow: a fire-and-forget command the sim re-validates (combat
-   * lock, spec unlock level); a rejection surfaces through the shared
-   * error-event toast, never a local decision. Used by every class's Select
-   * specialization button (the warrior included since 2026-07-11).
-   */
-  commitSpec(specId: string): void;
+  /** Server-validated spec commit (IWorld.setSpec), pickRow's sibling: clicking
+   *  a spec card commits it immediately. Before this, the pick only mutated the
+   *  local stage and NEVER reached the world: the spec's kit and mastery never
+   *  arrived unless the player took the save-a-loadout detour. */
+  commitSpec(specId: string | null): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
   // Loadout commit surface (server-authoritative IWorld; commits the full
@@ -420,6 +417,10 @@ export class TalentsWindow {
     // commit instantly via pickRow); committed row picks are class-wide and
     // spec-independent sim-side, so a spec switch never clears them.
     stage.spec = specId;
+    stage.rows = {};
+    // Commit the pick to the world (server re-validates level/spec): rows
+    // commit on click via pickRow, and the spec card behaves the same way.
+    this.deps.commitSpec(specId);
     this.render();
   }
 
