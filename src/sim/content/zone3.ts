@@ -2637,7 +2637,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     hand: 'twohand',
     quality: 'epic',
     weapon: { min: 30, max: 48, speed: 2.6 },
-    stats: { str: 11, sta: 7 },
+    // Two-handers carry both hands' stat budgets (TWOHAND_STAT_MULT): the
+    // PR #1762 hand declaration re-statted 18 -> 36 points at ilvl 26.
+    stats: { str: 22, sta: 14 },
     sellValue: 8000,
     requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
   },
