@@ -159,7 +159,7 @@ describe('Hot Streak', () => {
     expect(p.auras.some((a) => a.id === 'hot_streak')).toBe(false); // consumed
   });
 
-  it('Combustion crits every Fire spell but never builds Hot Streak', () => {
+  it('Combustion crits every Fire spell and its crits BUILD Hot Streak (owner reversal)', () => {
     const { sim, p } = mageWithSpec('fire');
     addDummy(sim);
     sim.castAbility('combustion');
@@ -172,7 +172,8 @@ describe('Hot Streak', () => {
         e.type === 'damage' && e.sourceId === p.id && e.amount > 0,
     );
     expect(hit?.crit).toBe(true);
-    expect(p.auras.some((a) => a.id === 'heating_up')).toBe(false); // never builds
+    // The Combustion crit counts toward the streak: half the phoenix lights.
+    expect(p.auras.some((a) => a.id === 'heating_up')).toBe(true);
   });
 });
 

@@ -389,7 +389,7 @@ export type AuraKind =
   | 'power_echo'
   // Combustion (fire mage signature): while worn, every Fire spell crit roll's
   // OUTCOME is overridden to true (combat/fire_mage.ts fireGuaranteedCrit; the
-  // roll is still drawn). Guaranteed crits never build Hot Streak.
+  // roll is still drawn). Guaranteed crits build Hot Streak like any other.
   | 'combustion'
   // Inert timer marker: NO combat reader keys on this kind, so it is pure
   // visible state (an internal cooldown or a capped-window accumulator the
