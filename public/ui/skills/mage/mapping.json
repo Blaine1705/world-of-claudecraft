@@ -93,6 +93,36 @@
       "sourcePack": "_Missing_Mage",
       "sourceFile": "32.png",
       "output": "polymorph.webp"
+    },
+    {
+      "abilityId": "ice_lance",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Lanza de hielo.png",
+      "output": "ice_lance.webp"
+    },
+    {
+      "abilityId": "flurry",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/e.png",
+      "output": "flurry.webp"
+    },
+    {
+      "abilityId": "frozen_orb",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/d.png",
+      "output": "frozen_orb.webp"
+    },
+    {
+      "abilityId": "blizzard",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/x.png",
+      "output": "blizzard.webp"
+    },
+    {
+      "abilityId": "icy_veins",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/q.png",
+      "output": "icy_veins.webp"
     }
   ],
   "deferredStayProcedural": {}

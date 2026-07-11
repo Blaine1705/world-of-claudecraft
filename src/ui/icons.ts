@@ -3437,6 +3437,11 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'scorch',
   'ice_barrier',
   'pyroblast',
+  'ice_lance',
+  'flurry',
+  'frozen_orb',
+  'blizzard',
+  'icy_veins',
   // druid (CraftPix premium "RPG Druid" pack). moonfire (no moon), bear_charge, pounce,
   // demoralizing_roar, hibernate (no sleep), insect_swarm have no fitting art — procedural.
   'wrath',
