@@ -1089,6 +1089,10 @@ export interface CharacterState {
   // Rift gear piece's, see src/sim/rift/progression.ts).
   // Optional so saves from before instanced equipment load cleanly.
   equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>;
+  // Legacy plural key from pre-v0.24.0-merge feature-branch saves (the rift
+  // branch persisted the same map as equipmentInstances before the two systems
+  // unified on the singular name). Read once at load as a fallback, never written.
+  equipmentInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
   inventory: InvSlot[];
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
@@ -1961,7 +1965,9 @@ export class Sim {
       // enchanted piece) deep-clones through the shared rules. Entries for
       // unknown slots or slots with no equipped item are dropped.
       meta.equipmentInstance = {};
-      for (const [slot, instance] of Object.entries(s.equipmentInstance ?? {})) {
+      for (const [slot, instance] of Object.entries(
+        s.equipmentInstance ?? s.equipmentInstances ?? {},
+      )) {
         if (!(EQUIP_SLOTS as readonly string[]).includes(slot) || !instance) continue;
         const itemId = meta.equipment[slot as EquipSlot];
         if (!itemId) continue;

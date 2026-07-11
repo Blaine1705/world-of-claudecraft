@@ -41,6 +41,19 @@ describe('Rift gear progression', () => {
     expect(restored.players.get(pid)?.equipmentInstance.ring1?.rift).toEqual(
       sim.equipmentInstances.ring1?.rift,
     );
+
+    // Legacy pre-merge saves persisted the same map under the plural key
+    // (equipmentInstances); loading one must not drop the equipped payload.
+    const legacyState = {
+      ...state,
+      equipmentInstance: undefined,
+      equipmentInstances: state.equipmentInstance,
+    };
+    const legacyRestored = new Sim({ seed: 731, playerClass: 'warrior', noPlayer: true });
+    const legacyPid = legacyRestored.addPlayer('warrior', 'Legado', { state: legacyState });
+    expect(legacyRestored.players.get(legacyPid)?.equipmentInstance.ring1?.rift).toEqual(
+      sim.equipmentInstances.ring1?.rift,
+    );
   });
 
   it('salvages Rift gear back into tier-and-upgrade-scaled Rift Essence', () => {

@@ -1402,9 +1402,9 @@ export class Renderer {
     }
 
     // A returning character can log out anywhere in a zone, not only at a
-    // hub, so the far streaming queue is ordered by distance to the actual
-    // entry position (entity_roster.ts: this.sim.player.pos.x/z) rather than
-    // whatever row-major order the chunk grid happens to walk.
+    // hub, so ensureZone builds the cells nearest the actual entry position
+    // first (a bounded reorder inside each zone build) rather than wherever
+    // row-major order happens to reach them.
     this.terrainView = buildTerrain(this.sim.cfg.seed, {
       x: this.sim.player.pos.x,
       z: this.sim.player.pos.z,
