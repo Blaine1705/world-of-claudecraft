@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 661,
-      "state": "92811ed6",
+      "state": "49dda272",
       "events": "716a10b2",
       "rng": {
         "draws": 2,
@@ -60,7 +60,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -101,7 +101,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

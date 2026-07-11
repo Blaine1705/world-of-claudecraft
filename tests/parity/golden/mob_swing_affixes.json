@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 659,
-      "state": "573bba04",
+      "state": "58fef937",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -50,7 +50,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -124,7 +124,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 665,
-      "state": "c946698e",
+      "state": "16b47963",
       "events": "611b64a4",
       "rng": {
         "draws": 62,
@@ -135,7 +135,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 665,
-      "state": "ced16c10",
+      "state": "7887a5e5",
       "events": "3ba693a8",
       "rng": {
         "draws": 107,
@@ -146,7 +146,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 665,
-      "state": "d17fd5ad",
+      "state": "b481bc5a",
       "events": "ea68684f",
       "rng": {
         "draws": 319,
@@ -157,7 +157,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 665,
-      "state": "b778f423",
+      "state": "3689cb60",
       "events": "741638a5",
       "rng": {
         "draws": 319,
@@ -192,7 +192,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -618,7 +618,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 665,
-      "state": "77e99d64",
+      "state": "e70be971",
       "events": "1b0af70e",
       "rng": {
         "draws": 361,
@@ -653,7 +653,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

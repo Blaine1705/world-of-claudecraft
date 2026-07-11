@@ -16,6 +16,8 @@
 
 import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
+import { requiredLevelFor } from '../item_level_req';
+import { removePreferFungible } from '../items';
 import { riftSalvageYield } from '../rift/progression';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
@@ -59,14 +61,15 @@ export function isSalvageable(def: ItemDef | undefined): boolean {
 
 /**
  * The material yield for one salvage of `def`: scales with rarity (the
- * `QUALITY_ORDER` index) and tier (`requiredLevel`, bucketed one point per 10
- * levels), plus one rng-rolled bonus unit (issue #1300 acceptance: "the roll
+ * `QUALITY_ORDER` index) and tier (`requiredLevelFor`, the derived level for
+ * items whose gate isn't explicit, bucketed one point per 10 levels), plus
+ * one rng-rolled bonus unit (issue #1300 acceptance: "the roll
  * uses Rng"), so identical salvages of the same item are not perfectly
  * deterministic. Pure aside from the rng draw.
  */
 export function salvageYield(def: ItemDef, rng: Rng): number {
   const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
-  const tierBonus = Math.floor((def.requiredLevel ?? 0) / 10);
+  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
   const bonus = rng.next() < 0.5 ? 0 : 1;
   return qualityIdx + tierBonus + 1 + bonus;
 }
@@ -89,13 +92,15 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
-  // removeItem is highest-index first and returns the payload it ACTUALLY
-  // consumed. Never inspect a different copy before removal: a plain shell and
-  // an upgraded Rift copy may legally share one itemId.
-  const [consumedInstance] = ctx.removeItem(itemId, 1, pid);
-  const riftInstance = consumedInstance?.rift ? consumedInstance : null;
-  if (riftInstance) {
-    const count = riftSalvageYield(riftInstance);
+  // Plain copies are consumed before instanced ones (an enchanted copy is
+  // never silently eaten while a plain shell sits in the bags), and the call
+  // returns the payload it ACTUALLY consumed. Never inspect a different copy
+  // before removal: a plain shell and an upgraded Rift copy may legally share
+  // one itemId. When the consumed copy IS a Rift piece, salvage yields Rift
+  // essence scaled by its progression instead of the quality-table material.
+  const [consumedInstance] = removePreferFungible(ctx, itemId, 1, pid);
+  if (consumedInstance?.rift) {
+    const count = riftSalvageYield(consumedInstance);
     ctx.addItem(RIFT_ESSENCE_ITEM_ID, count, pid);
     return { ok: true, itemId, materialItemId: RIFT_ESSENCE_ITEM_ID, count };
   }

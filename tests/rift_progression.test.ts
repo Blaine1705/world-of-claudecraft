@@ -38,7 +38,7 @@ describe('Rift gear progression', () => {
     if (!state) throw new Error('Failed to serialize the Rift character');
     const restored = new Sim({ seed: 731, playerClass: 'warrior', noPlayer: true });
     const pid = restored.addPlayer('warrior', 'Restored', { state });
-    expect(restored.players.get(pid)?.equipmentInstances.ring1?.rift).toEqual(
+    expect(restored.players.get(pid)?.equipmentInstance.ring1?.rift).toEqual(
       sim.equipmentInstances.ring1?.rift,
     );
   });
@@ -92,7 +92,7 @@ describe('Rift gear progression', () => {
 
     const state = sim.serializeCharacter(sim.player.id);
     if (!state) throw new Error('Failed to serialize the Rift character');
-    const payload = state.equipmentInstances?.ring1;
+    const payload = state.equipmentInstance?.ring1;
     if (!payload?.rift) throw new Error('Serialized Rift gear payload is missing');
     payload.boundTo = 999_999;
     payload.rolled = { quality: 'epic', stats: { str: 999_999, sta: 999_999 } };
@@ -102,7 +102,7 @@ describe('Rift gear progression', () => {
 
     const restored = new Sim({ seed: 733, playerClass: 'warrior', noPlayer: true });
     const pid = restored.addPlayer('warrior', 'Safe', { state });
-    const clean = restored.players.get(pid)?.equipmentInstances.ring1;
+    const clean = restored.players.get(pid)?.equipmentInstance.ring1;
     expect(clean).toEqual(
       expect.objectContaining({
         boundTo: pid,

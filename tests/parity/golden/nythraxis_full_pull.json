@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 5690,
-  "drawDigest": "38042fc9",
+  "draws": 5760,
+  "drawDigest": "12671df4",
   "frames": [
     {
       "tick": 0,
@@ -34,7 +34,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 668,
-      "state": "e6bbf0f8",
+      "state": "0c1a4f9f",
       "events": "e94a582d",
       "rng": {
         "draws": 2,
@@ -66,7 +66,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -111,7 +111,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -157,7 +157,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -203,7 +203,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -249,7 +249,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -577,7 +577,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 668,
-      "state": "fb05dad9",
+      "state": "bc778a74",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -588,7 +588,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 668,
-      "state": "f08d2d12",
+      "state": "d1ddeca9",
       "events": "08b78af5",
       "rng": {
         "draws": 2,
@@ -599,7 +599,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 668,
-      "state": "bdcee102",
+      "state": "9a4b9319",
       "events": "1315b393",
       "rng": {
         "draws": 3,
@@ -610,7 +610,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 668,
-      "state": "fef5d408",
+      "state": "eb9a352f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -621,7 +621,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 670,
-      "state": "58f7508b",
+      "state": "8bc8a256",
       "events": "99b0c729",
       "rng": {
         "draws": 15,
@@ -655,7 +655,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -700,7 +700,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -746,7 +746,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -792,7 +792,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -838,7 +838,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1274,7 +1274,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 671,
-      "state": "c9c9eb61",
+      "state": "7dafddcc",
       "events": "8812bf53",
       "rng": {
         "draws": 23,
@@ -1308,7 +1308,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1353,7 +1353,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1399,7 +1399,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1445,7 +1445,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1491,7 +1491,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2202,7 +2202,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 671,
-      "state": "2a3d5685",
+      "state": "83ab0f28",
       "events": "741638a5",
       "rng": {
         "draws": 61,
@@ -2213,7 +2213,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 671,
-      "state": "1bd5debe",
+      "state": "bad268fd",
       "events": "741638a5",
       "rng": {
         "draws": 123,
@@ -2224,7 +2224,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 671,
-      "state": "6e696237",
+      "state": "bb2a234a",
       "events": "741638a5",
       "rng": {
         "draws": 210,
@@ -2235,7 +2235,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 671,
-      "state": "e458e052",
+      "state": "92cdb9e9",
       "events": "152d7d95",
       "rng": {
         "draws": 297,
@@ -2246,7 +2246,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 671,
-      "state": "f9455991",
+      "state": "2a872cfc",
       "events": "6c29cd9b",
       "rng": {
         "draws": 393,
@@ -2257,7 +2257,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 671,
-      "state": "bcae2a56",
+      "state": "19e7c385",
       "events": "741638a5",
       "rng": {
         "draws": 502,
@@ -2268,7 +2268,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 671,
-      "state": "32f9ba76",
+      "state": "a426d8a5",
       "events": "741638a5",
       "rng": {
         "draws": 580,
@@ -2279,110 +2279,110 @@
       "tick": 120,
       "time": 6,
       "nextId": 671,
-      "state": "5ed38c85",
+      "state": "adcea128",
       "events": "741638a5",
       "rng": {
-        "draws": 682,
-        "digest": "ac0acfd2"
+        "draws": 683,
+        "digest": "bcfa6773"
       }
     },
     {
       "tick": 130,
       "time": 6.5,
       "nextId": 671,
-      "state": "28d968db",
-      "events": "ce7906e0",
+      "state": "7e288128",
+      "events": "a5e93611",
       "rng": {
-        "draws": 792,
-        "digest": "062b4c0e"
+        "draws": 795,
+        "digest": "1c3375eb"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 671,
-      "state": "0015579d",
-      "events": "f8fa7b69",
+      "state": "c8b4cb94",
+      "events": "0da2ca85",
       "rng": {
-        "draws": 887,
-        "digest": "0f4df269"
+        "draws": 896,
+        "digest": "e62cf419"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 671,
-      "state": "075394ee",
+      "state": "a3c8025a",
       "events": "741638a5",
       "rng": {
-        "draws": 957,
-        "digest": "bf66ba63"
+        "draws": 971,
+        "digest": "2cfec380"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 671,
-      "state": "8de5e200",
+      "state": "7a377863",
       "events": "741638a5",
       "rng": {
-        "draws": 1074,
-        "digest": "9f85e495"
+        "draws": 1092,
+        "digest": "70a524fc"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
       "nextId": 671,
-      "state": "841a6d40",
-      "events": "bd8e662d",
+      "state": "90321925",
+      "events": "2a0c19a9",
       "rng": {
-        "draws": 1197,
-        "digest": "1c4102e9"
+        "draws": 1201,
+        "digest": "20a8f413"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 671,
-      "state": "04f601c1",
-      "events": "57f55b86",
+      "state": "aacbf596",
+      "events": "f10c60ca",
       "rng": {
-        "draws": 1344,
-        "digest": "ee839826"
+        "draws": 1348,
+        "digest": "960d5c70"
       }
     },
     {
       "tick": 190,
       "time": 9.5,
       "nextId": 671,
-      "state": "423cf71d",
-      "events": "d710150c",
+      "state": "896827ff",
+      "events": "8ee3fa90",
       "rng": {
-        "draws": 1488,
-        "digest": "087f0731"
+        "draws": 1477,
+        "digest": "ffdb16c4"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 671,
-      "state": "24730c9e",
+      "state": "0659ddcc",
       "events": "741638a5",
       "rng": {
-        "draws": 1593,
-        "digest": "915a4cc4"
+        "draws": 1596,
+        "digest": "74c30e34"
       }
     },
     {
       "tick": 203,
       "time": 10.15,
       "nextId": 671,
-      "state": "f352efdb",
+      "state": "755d5a37",
       "events": "741638a5",
       "rng": {
-        "draws": 1616,
-        "digest": "7ec083ae"
+        "draws": 1613,
+        "digest": "c5afe85b"
       },
       "label": "phase2",
       "players": [
@@ -2401,7 +2401,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 2645
+            "damageTaken": 2615
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2412,7 +2412,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2457,7 +2457,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2503,7 +2503,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2549,7 +2549,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2595,7 +2595,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2645,7 +2645,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 88.166667,
+          "resource": 87.166667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2789,17 +2789,6 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "auras": [
-            {
-              "duration": 8,
-              "id": "nythraxis_soul_rend",
-              "kind": "vulnerability",
-              "name": "Soul Rend",
-              "remaining": 6.05,
-              "school": "shadow",
-              "sourceId": 663
-            }
-          ],
           "combatTimer": 109.15,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -2848,6 +2837,17 @@
         {
           "aiState": "idle",
           "attackPower": 10,
+          "auras": [
+            {
+              "duration": 8,
+              "id": "nythraxis_soul_rend",
+              "kind": "vulnerability",
+              "name": "Soul Rend",
+              "remaining": 6.05,
+              "school": "shadow",
+              "sourceId": 663
+            }
+          ],
           "combatTimer": 109.15,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -2923,15 +2923,15 @@
             "raiseFallenTimer": 30,
             "soulRendMarks": [
               {
-                "playerId": 659,
-                "remaining": 6.05
-              },
-              {
                 "playerId": 660,
                 "remaining": 6.05
               },
               {
-                "playerId": 661,
+                "playerId": 662,
+                "remaining": 6.05
+              },
+              {
+                "playerId": 659,
                 "remaining": 6.05
               }
             ],
@@ -3267,11 +3267,11 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 671,
-      "state": "4a561fbb",
-      "events": "5dd542a9",
+      "state": "a3e44992",
+      "events": "bd8e662d",
       "rng": {
-        "draws": 1626,
-        "digest": "29c17a64"
+        "draws": 1622,
+        "digest": "0b10a7f5"
       },
       "label": "soulrend",
       "players": [
@@ -3290,7 +3290,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 2645
+            "damageTaken": 2615
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -3301,7 +3301,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3346,7 +3346,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3392,7 +3392,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3438,7 +3438,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3484,7 +3484,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3534,7 +3534,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 88.166667,
+          "resource": 87.166667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -3625,7 +3625,7 @@
               "id": "nythraxis_soul_rend",
               "kind": "vulnerability",
               "name": "Soul Rend",
-              "remaining": 6,
+              "remaining": 8,
               "school": "shadow",
               "sourceId": 663
             }
@@ -3743,7 +3743,7 @@
               "id": "nythraxis_soul_rend",
               "kind": "vulnerability",
               "name": "Soul Rend",
-              "remaining": 8,
+              "remaining": 6,
               "school": "shadow",
               "sourceId": 663
             }
@@ -3827,11 +3827,11 @@
                 "remaining": 8
               },
               {
-                "playerId": 661,
+                "playerId": 660,
                 "remaining": 8
               },
               {
-                "playerId": 662,
+                "playerId": 661,
                 "remaining": 8
               }
             ],
@@ -4167,209 +4167,209 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 671,
-      "state": "fda60a5f",
+      "state": "4c9ad9f2",
       "events": "741638a5",
       "rng": {
-        "draws": 1677,
-        "digest": "d73087ed"
+        "draws": 1668,
+        "digest": "1284872c"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 671,
-      "state": "d8ac63dc",
-      "events": "98f669c3",
+      "state": "ccc160b2",
+      "events": "386203a8",
       "rng": {
-        "draws": 1751,
-        "digest": "c1515046"
+        "draws": 1762,
+        "digest": "b9ff52cf"
       }
     },
     {
       "tick": 230,
       "time": 11.5,
       "nextId": 671,
-      "state": "d9d19b6d",
+      "state": "f1907871",
       "events": "741638a5",
       "rng": {
-        "draws": 1814,
-        "digest": "4c02d710"
+        "draws": 1840,
+        "digest": "14d125fc"
       }
     },
     {
       "tick": 240,
       "time": 12,
       "nextId": 671,
-      "state": "91a0cace",
-      "events": "df6b51c1",
+      "state": "fec05ec5",
+      "events": "d08fca97",
       "rng": {
-        "draws": 1893,
-        "digest": "992b25a1"
+        "draws": 1919,
+        "digest": "bc8bed23"
       }
     },
     {
       "tick": 250,
       "time": 12.5,
       "nextId": 671,
-      "state": "f82300ef",
+      "state": "816af8e1",
       "events": "741638a5",
       "rng": {
-        "draws": 1978,
-        "digest": "58ec9a74"
+        "draws": 1989,
+        "digest": "7c57500d"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 671,
-      "state": "9b549878",
+      "state": "31a5d7f3",
       "events": "741638a5",
       "rng": {
-        "draws": 2057,
-        "digest": "3e314a66"
+        "draws": 2072,
+        "digest": "939005ca"
       }
     },
     {
       "tick": 270,
       "time": 13.5,
       "nextId": 671,
-      "state": "fa19a51b",
-      "events": "4b3a05cc",
+      "state": "ed9084ab",
+      "events": "346424ec",
       "rng": {
-        "draws": 2128,
-        "digest": "e34bb544"
+        "draws": 2159,
+        "digest": "679d1251"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 671,
-      "state": "8334f80d",
+      "state": "3fb09623",
       "events": "741638a5",
       "rng": {
-        "draws": 2217,
-        "digest": "6fcf8d74"
+        "draws": 2234,
+        "digest": "691a67df"
       }
     },
     {
       "tick": 290,
       "time": 14.5,
       "nextId": 671,
-      "state": "3bdf46b5",
-      "events": "a118cfdd",
+      "state": "f8ea5da5",
+      "events": "8bd341b7",
       "rng": {
-        "draws": 2317,
-        "digest": "2930f758"
+        "draws": 2357,
+        "digest": "e979b63f"
       }
     },
     {
       "tick": 300,
       "time": 15,
       "nextId": 671,
-      "state": "2cbcca85",
+      "state": "7e1dbb66",
       "events": "741638a5",
       "rng": {
-        "draws": 2400,
-        "digest": "05861e65"
+        "draws": 2444,
+        "digest": "3c1a4ef9"
       }
     },
     {
       "tick": 310,
       "time": 15.5,
       "nextId": 671,
-      "state": "233039c5",
-      "events": "4600057c",
+      "state": "8ea09739",
+      "events": "45b636f0",
       "rng": {
-        "draws": 2483,
-        "digest": "9a2f3e4d"
+        "draws": 2539,
+        "digest": "369b2e2e"
       }
     },
     {
       "tick": 320,
       "time": 16,
       "nextId": 671,
-      "state": "b01432d3",
+      "state": "723ee66b",
       "events": "741638a5",
       "rng": {
-        "draws": 2580,
-        "digest": "d2a461f0"
+        "draws": 2652,
+        "digest": "e4822cb5"
       }
     },
     {
       "tick": 330,
       "time": 16.5,
       "nextId": 671,
-      "state": "1682e650",
-      "events": "a5ba1efc",
+      "state": "eb9aa26a",
+      "events": "a464cfa6",
       "rng": {
-        "draws": 2679,
-        "digest": "c25f704f"
+        "draws": 2741,
+        "digest": "4fc70521"
       }
     },
     {
       "tick": 340,
       "time": 17,
       "nextId": 671,
-      "state": "18ee2ae2",
-      "events": "b00cf112",
+      "state": "5bac867e",
+      "events": "d08fca97",
       "rng": {
-        "draws": 2789,
-        "digest": "11420b90"
+        "draws": 2834,
+        "digest": "621fc492"
       }
     },
     {
       "tick": 350,
       "time": 17.5,
       "nextId": 671,
-      "state": "eae1971c",
+      "state": "914b4f16",
       "events": "741638a5",
       "rng": {
-        "draws": 2871,
-        "digest": "984c9031"
+        "draws": 2915,
+        "digest": "eb9d122c"
       }
     },
     {
       "tick": 360,
       "time": 18,
       "nextId": 671,
-      "state": "398be903",
-      "events": "6cbdff08",
+      "state": "f9338a14",
+      "events": "6e7046ef",
       "rng": {
-        "draws": 2969,
-        "digest": "9f7050e8"
+        "draws": 3006,
+        "digest": "b178a607"
       }
     },
     {
       "tick": 370,
       "time": 18.5,
       "nextId": 671,
-      "state": "976b027f",
-      "events": "212193bc",
+      "state": "75b228da",
+      "events": "580293d9",
       "rng": {
-        "draws": 3040,
-        "digest": "8fd9ed5b"
+        "draws": 3095,
+        "digest": "eb91dc97"
       }
     },
     {
       "tick": 380,
       "time": 19,
       "nextId": 671,
-      "state": "5e9844b5",
+      "state": "36a615a4",
       "events": "741638a5",
       "rng": {
-        "draws": 3115,
-        "digest": "32e85935"
+        "draws": 3178,
+        "digest": "51d40396"
       }
     },
     {
       "tick": 386,
       "time": 19.3,
       "nextId": 671,
-      "state": "6ecf7969",
+      "state": "86c30368",
       "events": "9abd8cac",
       "rng": {
-        "draws": 3159,
-        "digest": "4f4f3afa"
+        "draws": 3226,
+        "digest": "31a0aef2"
       },
       "label": "deathless-start",
       "players": [
@@ -4389,7 +4389,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 3140,
-            "damageTaken": 5724,
+            "damageTaken": 4303,
             "kills": 2,
             "xpGained": 166
           },
@@ -4402,7 +4402,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4450,7 +4450,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4487,6 +4487,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
+            "damageTaken": 140,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -4498,7 +4499,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4547,7 +4548,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4584,7 +4585,6 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -4596,7 +4596,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -4721,7 +4721,7 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 118.3,
+          "combatTimer": 1.05,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -4729,6 +4729,7 @@
           "fiveSecondRule": 118.3,
           "hp": 418,
           "id": 660,
+          "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4818,7 +4819,7 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 1.05,
+          "combatTimer": 118.3,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -4826,7 +4827,6 @@
           "fiveSecondRule": 118.3,
           "hp": 418,
           "id": 662,
-          "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -5247,143 +5247,143 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 671,
-      "state": "d2cd6ae7",
+      "state": "41d0c626",
       "events": "e6a0977e",
       "rng": {
-        "draws": 3185,
-        "digest": "5580de38"
+        "draws": 3251,
+        "digest": "13609a5e"
       }
     },
     {
       "tick": 400,
       "time": 20,
       "nextId": 671,
-      "state": "036885de",
+      "state": "3b9477f1",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3266,
-        "digest": "1b8e7650"
+        "draws": 3312,
+        "digest": "426cecaa"
       }
     },
     {
       "tick": 410,
       "time": 20.5,
       "nextId": 671,
-      "state": "3ac4295a",
+      "state": "95cf2509",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3367,
-        "digest": "fadacae1"
+        "draws": 3387,
+        "digest": "b7c73573"
       }
     },
     {
       "tick": 420,
       "time": 21,
       "nextId": 671,
-      "state": "239c35b5",
+      "state": "afad89e4",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3456,
-        "digest": "ac7a16c9"
+        "draws": 3493,
+        "digest": "73da5b2c"
       }
     },
     {
       "tick": 430,
       "time": 21.5,
       "nextId": 671,
-      "state": "afd95343",
+      "state": "0372e0fa",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3544,
-        "digest": "7cfe69e2"
+        "draws": 3597,
+        "digest": "1a930963"
       }
     },
     {
       "tick": 440,
       "time": 22,
       "nextId": 671,
-      "state": "d6825a26",
+      "state": "d37ffe41",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3637,
-        "digest": "9bf16d56"
+        "draws": 3674,
+        "digest": "aa8a8a0b"
       }
     },
     {
       "tick": 450,
       "time": 22.5,
       "nextId": 671,
-      "state": "49a94c5e",
+      "state": "6eb68b5d",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3710,
-        "digest": "8ef98649"
+        "draws": 3759,
+        "digest": "3b7a8cf3"
       }
     },
     {
       "tick": 460,
       "time": 23,
       "nextId": 671,
-      "state": "6dfd3e3f",
+      "state": "3efd46ae",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3788,
-        "digest": "56d0e52c"
+        "draws": 3822,
+        "digest": "435f127d"
       }
     },
     {
       "tick": 470,
       "time": 23.5,
       "nextId": 671,
-      "state": "cfdccf5a",
+      "state": "83a437ad",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3869,
-        "digest": "7fe4c663"
+        "draws": 3913,
+        "digest": "154748e9"
       }
     },
     {
       "tick": 480,
       "time": 24,
       "nextId": 671,
-      "state": "5e97cbfb",
+      "state": "5c9b1762",
       "events": "eb0ad487",
       "rng": {
-        "draws": 3955,
-        "digest": "9416a1f8"
+        "draws": 3994,
+        "digest": "1400aa63"
       }
     },
     {
       "tick": 490,
       "time": 24.5,
       "nextId": 671,
-      "state": "e409f7db",
+      "state": "e60cd59a",
       "events": "201545d9",
       "rng": {
-        "draws": 4017,
-        "digest": "34de1cef"
+        "draws": 4079,
+        "digest": "f5a8339d"
       }
     },
     {
       "tick": 500,
       "time": 25,
       "nextId": 671,
-      "state": "078be1e3",
+      "state": "4aa4e7c8",
       "events": "741638a5",
       "rng": {
-        "draws": 4094,
-        "digest": "cef17ed9"
+        "draws": 4155,
+        "digest": "622a2900"
       }
     },
     {
       "tick": 506,
       "time": 25.3,
       "nextId": 671,
-      "state": "3f71e9ce",
+      "state": "fb066ef5",
       "events": "741638a5",
       "rng": {
-        "draws": 4144,
-        "digest": "c2d982c2"
+        "draws": 4206,
+        "digest": "0e198338"
       },
       "label": "deathless-interrupt",
       "players": [
@@ -5403,7 +5403,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 3140,
-            "damageTaken": 5724,
+            "damageTaken": 4303,
             "kills": 2,
             "xpGained": 166
           },
@@ -5416,7 +5416,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5464,7 +5464,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5501,6 +5501,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
+            "damageTaken": 140,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -5512,7 +5513,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5561,7 +5562,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5598,7 +5599,6 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -5610,7 +5610,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -5736,7 +5736,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "channelTickTimer": -5.05,
-          "combatTimer": 124.3,
+          "combatTimer": 7.05,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -5833,7 +5833,7 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 7.05,
+          "combatTimer": 124.3,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -6272,143 +6272,143 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 671,
-      "state": "0e396b09",
+      "state": "ec37b460",
       "events": "741638a5",
       "rng": {
-        "draws": 4175,
-        "digest": "df1925eb"
+        "draws": 4251,
+        "digest": "78ae7ff2"
       }
     },
     {
       "tick": 520,
       "time": 26,
       "nextId": 671,
-      "state": "14213b1d",
+      "state": "beb2fe3e",
       "events": "741638a5",
       "rng": {
-        "draws": 4263,
-        "digest": "117a74bc"
+        "draws": 4347,
+        "digest": "060f44b2"
       }
     },
     {
       "tick": 530,
       "time": 26.5,
       "nextId": 671,
-      "state": "80998f4b",
+      "state": "0c852cfa",
       "events": "741638a5",
       "rng": {
-        "draws": 4355,
-        "digest": "8c37b156"
+        "draws": 4444,
+        "digest": "66908267"
       }
     },
     {
       "tick": 540,
       "time": 27,
       "nextId": 671,
-      "state": "49309307",
+      "state": "144ab36c",
       "events": "741638a5",
       "rng": {
-        "draws": 4458,
-        "digest": "5728d115"
+        "draws": 4530,
+        "digest": "c3218d23"
       }
     },
     {
       "tick": 550,
       "time": 27.5,
       "nextId": 671,
-      "state": "7fb4ae45",
+      "state": "04109274",
       "events": "741638a5",
       "rng": {
-        "draws": 4547,
-        "digest": "02d99c5b"
+        "draws": 4623,
+        "digest": "29fbb767"
       }
     },
     {
       "tick": 560,
       "time": 28,
       "nextId": 671,
-      "state": "3a2e59bd",
+      "state": "5a45bc5e",
       "events": "741638a5",
       "rng": {
-        "draws": 4627,
-        "digest": "971ddb2d"
+        "draws": 4693,
+        "digest": "eeed9675"
       }
     },
     {
       "tick": 570,
       "time": 28.5,
       "nextId": 671,
-      "state": "3b0e1db5",
+      "state": "4e63cd3e",
       "events": "741638a5",
       "rng": {
-        "draws": 4708,
-        "digest": "f1ffbefa"
+        "draws": 4766,
+        "digest": "85a50327"
       }
     },
     {
       "tick": 580,
       "time": 29,
       "nextId": 671,
-      "state": "b432fdb3",
+      "state": "3d5eaace",
       "events": "741638a5",
       "rng": {
-        "draws": 4790,
-        "digest": "8857dd08"
+        "draws": 4855,
+        "digest": "1fcbc0bc"
       }
     },
     {
       "tick": 590,
       "time": 29.5,
       "nextId": 671,
-      "state": "47ec1b56",
+      "state": "2f00969f",
       "events": "c41eee33",
       "rng": {
-        "draws": 4890,
-        "digest": "acd4d4d5"
+        "draws": 4949,
+        "digest": "6b1166a0"
       }
     },
     {
       "tick": 600,
       "time": 30,
       "nextId": 671,
-      "state": "29e37cf3",
-      "events": "7c80aa44",
-      "rng": {
-        "draws": 4974,
-        "digest": "2c84dd96"
-      }
-    },
-    {
-      "tick": 610,
-      "time": 30.5,
-      "nextId": 671,
-      "state": "fff88675",
-      "events": "741638a5",
+      "state": "c2b32ffd",
+      "events": "5c6ff91a",
       "rng": {
         "draws": 5038,
         "digest": "6d703384"
       }
     },
     {
+      "tick": 610,
+      "time": 30.5,
+      "nextId": 671,
+      "state": "469e273d",
+      "events": "741638a5",
+      "rng": {
+        "draws": 5121,
+        "digest": "727a71ab"
+      }
+    },
+    {
       "tick": 620,
       "time": 31,
       "nextId": 671,
-      "state": "55334887",
+      "state": "8918efdf",
       "events": "741638a5",
       "rng": {
-        "draws": 5111,
-        "digest": "dbe59e91"
+        "draws": 5204,
+        "digest": "2c4913b6"
       }
     },
     {
       "tick": 627,
       "time": 31.35,
       "nextId": 671,
-      "state": "fef54536",
+      "state": "7fe0ac58",
       "events": "b9c23802",
       "rng": {
-        "draws": 5175,
-        "digest": "995694e1"
+        "draws": 5249,
+        "digest": "2092fbda"
       },
       "label": "finalstand",
       "players": [
@@ -6428,7 +6428,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 3140,
-            "damageTaken": 6091,
+            "damageTaken": 4720,
             "kills": 2,
             "xpGained": 166
           },
@@ -6441,7 +6441,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6489,7 +6489,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6526,6 +6526,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
+            "damageTaken": 140,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -6537,7 +6538,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6586,7 +6587,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6623,7 +6624,6 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -6635,7 +6635,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -6761,7 +6761,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "channelTickTimer": -5.05,
-          "combatTimer": 130.35,
+          "combatTimer": 13.1,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -6858,7 +6858,7 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 13.1,
+          "combatTimer": 130.35,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -7299,11 +7299,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 671,
-      "state": "70a7f734",
+      "state": "dabdda8c",
       "events": "b8be492d",
       "rng": {
-        "draws": 5193,
-        "digest": "650faa4f"
+        "draws": 5260,
+        "digest": "d05dc693"
       },
       "label": "death",
       "players": [
@@ -7323,7 +7323,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 5540,
-            "damageTaken": 6091,
+            "damageTaken": 4720,
             "kills": 3,
             "xpGained": 249
           },
@@ -7336,7 +7336,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -7390,7 +7390,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -7433,6 +7433,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
+            "damageTaken": 140,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -7444,7 +7445,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -7499,7 +7500,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -7542,7 +7543,6 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -7554,7 +7554,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -7686,7 +7686,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "channelTickTimer": -5.05,
-          "combatTimer": 130.4,
+          "combatTimer": 13.15,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -7783,7 +7783,7 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 13.15,
+          "combatTimer": 130.4,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -7849,23 +7849,23 @@
           },
           "level": 20,
           "loot": {
-            "copper": 108609,
+            "copper": 128949,
             "items": [
               {
                 "count": 1,
-                "itemId": "stormcallers_crown"
+                "itemId": "soulflame_mantle"
               },
               {
                 "count": 1,
-                "itemId": "crownforged_warspaulders"
+                "itemId": "nighttalon_crown"
               },
               {
                 "count": 1,
-                "itemId": "soulflame_cowl"
+                "itemId": "nighttalon_crown"
               },
               {
                 "count": 1,
-                "itemId": "crownforged_dreadhelm"
+                "itemId": "stormcallers_spaulders"
               }
             ]
           },
@@ -8241,77 +8241,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 671,
-      "state": "895b0567",
+      "state": "91e0b35f",
       "events": "741638a5",
       "rng": {
-        "draws": 5210,
-        "digest": "3226d16d"
+        "draws": 5272,
+        "digest": "6baa141d"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 671,
-      "state": "bea6761e",
+      "state": "a15877d8",
       "events": "741638a5",
       "rng": {
-        "draws": 5281,
-        "digest": "679c792b"
+        "draws": 5359,
+        "digest": "d59af61c"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 671,
-      "state": "a7854fbe",
+      "state": "047d2dda",
       "events": "741638a5",
       "rng": {
-        "draws": 5374,
-        "digest": "28511067"
+        "draws": 5444,
+        "digest": "bb21d71b"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 671,
-      "state": "6bafeebf",
+      "state": "66904515",
       "events": "741638a5",
       "rng": {
-        "draws": 5452,
-        "digest": "cb16ff14"
+        "draws": 5521,
+        "digest": "68abbe51"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 671,
-      "state": "9b5c2fd5",
+      "state": "ed3c8a8d",
       "events": "741638a5",
       "rng": {
-        "draws": 5520,
-        "digest": "63c0912d"
+        "draws": 5596,
+        "digest": "37f7fb01"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 671,
-      "state": "55e9ade8",
+      "state": "ef6383d6",
       "events": "741638a5",
       "rng": {
-        "draws": 5618,
-        "digest": "80cd04f2"
+        "draws": 5679,
+        "digest": "51d6493d"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 671,
-      "state": "1b1b919f",
+      "state": "065f865f",
       "events": "595075dc",
       "rng": {
-        "draws": 5690,
-        "digest": "38042fc9"
+        "draws": 5760,
+        "digest": "12671df4"
       },
       "label": "final",
       "players": [
@@ -8331,7 +8331,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 5540,
-            "damageTaken": 6091,
+            "damageTaken": 4720,
             "kills": 3,
             "xpGained": 249
           },
@@ -8344,7 +8344,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -8398,7 +8398,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -8441,6 +8441,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
+            "damageTaken": 140,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -8452,7 +8453,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -8507,7 +8508,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -8550,7 +8551,6 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -8562,7 +8562,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -8694,7 +8694,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "channelTickTimer": -5.05,
-          "combatTimer": 133.4,
+          "combatTimer": 16.15,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -8791,7 +8791,7 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "combatTimer": 16.15,
+          "combatTimer": 133.4,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -8857,23 +8857,23 @@
           },
           "level": 20,
           "loot": {
-            "copper": 108609,
+            "copper": 128949,
             "items": [
               {
                 "count": 1,
-                "itemId": "stormcallers_crown"
+                "itemId": "soulflame_mantle"
               },
               {
                 "count": 1,
-                "itemId": "crownforged_warspaulders"
+                "itemId": "nighttalon_crown"
               },
               {
                 "count": 1,
-                "itemId": "soulflame_cowl"
+                "itemId": "nighttalon_crown"
               },
               {
                 "count": 1,
-                "itemId": "crownforged_dreadhelm"
+                "itemId": "stormcallers_spaulders"
               }
             ]
           },

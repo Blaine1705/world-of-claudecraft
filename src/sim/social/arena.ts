@@ -848,7 +848,7 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   }
   const meta = ctx.players.get(e.id);
   if (meta)
-    recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstances);
+    recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
   e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
   e.targetId = null;

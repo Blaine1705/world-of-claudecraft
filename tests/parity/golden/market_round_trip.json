@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 660,
-      "state": "3aa085eb",
+      "state": "113b9e79",
       "events": "22e986a1",
       "rng": {
         "draws": 0,
@@ -64,7 +64,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -110,7 +110,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -238,7 +238,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 660,
-      "state": "063dd05d",
+      "state": "cc76c14f",
       "events": "b95c00e5",
       "rng": {
         "draws": 0,
@@ -270,7 +270,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -316,7 +316,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -444,7 +444,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 660,
-      "state": "063dd05d",
+      "state": "cc76c14f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -476,7 +476,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -522,7 +522,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -650,7 +650,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 660,
-      "state": "063dd05d",
+      "state": "cc76c14f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -682,7 +682,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -728,7 +728,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -856,7 +856,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 660,
-      "state": "c76104ed",
+      "state": "14725e8b",
       "events": "d0aa6caa",
       "rng": {
         "draws": 0,
@@ -888,7 +888,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -934,7 +934,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1066,7 +1066,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 660,
-      "state": "c76104ed",
+      "state": "14725e8b",
       "events": "491ed5e8",
       "rng": {
         "draws": 0,
@@ -1098,7 +1098,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1144,7 +1144,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1276,7 +1276,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 660,
-      "state": "a047c478",
+      "state": "6117119c",
       "events": "74079667",
       "rng": {
         "draws": 0,
@@ -1287,7 +1287,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 660,
-      "state": "a047c478",
+      "state": "6117119c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1319,7 +1319,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1365,7 +1365,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1497,7 +1497,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 660,
-      "state": "69267573",
+      "state": "7b203339",
       "events": "7c686495",
       "rng": {
         "draws": 0,
@@ -1530,7 +1530,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1576,7 +1576,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1708,7 +1708,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 660,
-      "state": "69267573",
+      "state": "7b203339",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1741,7 +1741,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1787,7 +1787,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

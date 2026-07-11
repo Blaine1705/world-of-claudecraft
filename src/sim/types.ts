@@ -603,6 +603,12 @@ export interface ItemInstancePayload {
   };
 }
 
+// A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats`/`rift`
+// maps between a live payload and a serialized/loaded copy: decrementing a charge
+// on one would silently mutate the other. Deep-clones at every save/load boundary
+// instead. Shared by cloneInvSlot below and the equipped-instance map (an
+// enchanted piece's payload, src/sim/professions/enchanting.ts, or a Rift gear
+// piece's, src/sim/rift/progression.ts), so all copy through the exact same rules.
 export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
   const instance: ItemInstancePayload = { ...src };
   if (src.charges) instance.charges = { ...src.charges };
@@ -629,9 +635,9 @@ export interface InvSlot {
   instance?: ItemInstancePayload;
 }
 
-// A shallow `{ ...slot }` aliases `instance` (and its mutable `charges`/`rolled.stats`
-// maps) between the live slot and a serialized/loaded copy: decrementing a charge on
-// one would silently mutate the other. Deep-clone at every save/load boundary instead.
+// A shallow `{ ...slot }` aliases `instance` between the live slot and a
+// serialized/loaded copy; see cloneItemInstancePayload above for why that is
+// unsafe and what this clones instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };
   return { ...slot, instance: cloneItemInstancePayload(slot.instance) };
@@ -2078,6 +2084,13 @@ export interface Entity {
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,
   // the sim never reads it for gameplay (no effect on stats).
   equippedItems: Partial<Record<EquipSlot, string>>;
+  // Render-only mirror of PlayerMeta.equipmentInstance (Enchanting): the per-slot
+  // ItemInstancePayload of whichever equipped piece carries one (an enchanted
+  // item's `rolled.stats`), keyed the same as equippedItems. Sparse: a slot with
+  // a plain (unenchanted) piece, or nothing equipped, has no entry. Recomputed in
+  // recalcPlayerStats alongside equippedItems; the sim reads the SOURCE
+  // (PlayerMeta.equipmentInstance) for the actual stat bonus, never this mirror.
+  equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   // $WOC holder-tier flair (cosmetic): 0/undefined = none, 1-10 = Ember…Sovereign.
   // Set server-side from the player's connected-wallet balance and synced in
   // identity fields like skin. The sim never reads it (no gameplay effect).
@@ -2175,6 +2188,18 @@ export type CalendarResultCode =
   | 'badInput'
   | 'calendarFull'
   | 'eventGone';
+
+// An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
+// id. Each member is 'pending' until they answer; anyone still 'pending' when the
+// timeout fires is counted as "no response" (there is no separate afk state).
+// Sim-internal state, never wired to the client (the outcome is announced as
+// chat/log lines and the yes/no prompt rides the readyCheckStart event).
+export interface ReadyCheck {
+  partyId: number;
+  initiator: number; // pid who ran /ready
+  endsAt: number; // sim-clock seconds (ctx.time) when the check auto-finalizes
+  responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
+}
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
@@ -2274,6 +2299,9 @@ export type SimEvent = { pid?: number } & (
       to?: string;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
+  // The party/raid leader started a ready check: the recipient's client plays a
+  // sound and shows a yes/no prompt (social/ready_check.ts). Personal (pid set).
+  | { type: 'readyCheckStart'; fromName: string }
   // a guild invitation from an online guild officer/leader; resolved by name
   // server-side so it carries no pid
   | { type: 'guildInvite'; fromName: string; guildName: string }

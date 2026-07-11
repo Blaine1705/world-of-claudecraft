@@ -80,6 +80,9 @@ describe('render asset preload fallbacks', () => {
     const childCount = terrain.group.children.length;
     await terrain.ensureZone(zone);
     expect(terrain.group.children).toHaveLength(childCount);
+    // Real timers, never cancelled: without this an abandoned zone build keeps
+    // running on a setTimeout chain in the background for the rest of the suite.
+    terrain.cancelStreaming();
     // One streamed zone still exercises the complete Lambert fallback mesh.
   }, 90_000);
 });

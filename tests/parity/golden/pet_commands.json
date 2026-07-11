@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 659,
-      "state": "7661d38c",
+      "state": "887decc5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,7 +56,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -136,7 +136,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 661,
-      "state": "3d301192",
+      "state": "56065bbb",
       "events": "89afd223",
       "rng": {
         "draws": 0,
@@ -169,7 +169,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -291,7 +291,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 661,
-      "state": "48f8a54b",
+      "state": "d2bd783c",
       "events": "bfdb77bb",
       "rng": {
         "draws": 0,
@@ -324,7 +324,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -460,7 +460,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 661,
-      "state": "f7f40aad",
+      "state": "6f45381e",
       "events": "1403c1bb",
       "rng": {
         "draws": 0,
@@ -471,7 +471,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 661,
-      "state": "3e2d29bf",
+      "state": "0faf7ea8",
       "events": "8a9cb16e",
       "rng": {
         "draws": 0,
@@ -482,7 +482,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 662,
-      "state": "148ae428",
+      "state": "a0f750d9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -515,7 +515,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -713,7 +713,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 662,
-      "state": "8d5481c2",
+      "state": "6b0711eb",
       "events": "c772f38d",
       "rng": {
         "draws": 0,
@@ -746,7 +746,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -883,7 +883,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 664,
-      "state": "8439cbb4",
+      "state": "d301d60d",
       "events": "46338ec7",
       "rng": {
         "draws": 0,
@@ -916,7 +916,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1094,7 +1094,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 664,
-      "state": "6ec664bc",
+      "state": "2a4fd025",
       "events": "59fe7d8f",
       "rng": {
         "draws": 0,
@@ -1127,7 +1127,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1305,7 +1305,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 664,
-      "state": "8d5481c2",
+      "state": "6b0711eb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1338,7 +1338,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1475,7 +1475,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 665,
-      "state": "8d5481c2",
+      "state": "6b0711eb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1508,7 +1508,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1645,7 +1645,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 667,
-      "state": "18839a83",
+      "state": "cfe6507b",
       "events": "7be04def",
       "rng": {
         "draws": 0,
@@ -1678,7 +1678,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1724,7 +1724,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -1958,7 +1958,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 667,
-      "state": "3ba2f75b",
+      "state": "03040fb3",
       "events": "5c7e325f",
       "rng": {
         "draws": 140,
@@ -1969,7 +1969,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 667,
-      "state": "53d73d2f",
+      "state": "05713e77",
       "events": "a3180f36",
       "rng": {
         "draws": 278,
@@ -1980,7 +1980,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 667,
-      "state": "53d73d2f",
+      "state": "05713e77",
       "events": "741638a5",
       "rng": {
         "draws": 278,
@@ -2015,7 +2015,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2061,7 +2061,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2304,7 +2304,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 669,
-      "state": "dca62635",
+      "state": "52be7a4d",
       "events": "5995c8f8",
       "rng": {
         "draws": 278,
@@ -2339,7 +2339,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2385,7 +2385,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2628,7 +2628,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 671,
-      "state": "3db9d52b",
+      "state": "8dbe4443",
       "events": "dd5eab91",
       "rng": {
         "draws": 278,
@@ -2663,7 +2663,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2709,7 +2709,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -2961,7 +2961,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 671,
-      "state": "3db9d52b",
+      "state": "8dbe4443",
       "events": "741638a5",
       "rng": {
         "draws": 278,
@@ -2996,7 +2996,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -3042,7 +3042,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

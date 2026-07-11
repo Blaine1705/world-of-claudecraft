@@ -1100,9 +1100,15 @@ export interface TerrainView {
   setBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void;
   /** Editor-only: hide the brush ring. */
   clearBrush(): void;
+  /**
+   * Stops any in-flight ensureZone build from adding further chunks. Call
+   * before discarding this view (see renderer rebuildTerrain), or the
+   * abandoned zone builds keep running on a setTimeout chain.
+   */
+  cancelStreaming(): void;
 }
 
-export function buildTerrain(seed: number): TerrainView {
+export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
   const brush = makeBrushUniforms();
   const normalTex = lowGfx ? null : terrainNormalTexture();
@@ -1170,6 +1176,15 @@ export function buildTerrain(seed: number): TerrainView {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
     group.add(mesh);
+    // A chunk's transform never changes after this point (its shape lives in
+    // the geometry, not the mesh matrix), so it can freeze immediately rather
+    // than waiting for the caller's group-wide freezeStaticMatrices pass.
+    // That pass only runs once, right after the synchronous near ring returns,
+    // so every chunk streamed in afterward (the majority, on the far bands)
+    // would otherwise keep matrixAutoUpdate = true and recompose every frame
+    // for the rest of the session.
+    mesh.updateMatrixWorld(true);
+    mesh.matrixAutoUpdate = false;
     chunks.push({
       mesh,
       x: x0 + size / 2,
@@ -1188,6 +1203,11 @@ export function buildTerrain(seed: number): TerrainView {
   const built = new Set<number>();
   const loadedZones = new Set<string>();
   const pendingZones = new Map<string, Promise<void>>();
+  // Set by cancelStreaming(): every in-flight ensureZone loop bails at its next
+  // yield point without marking its zone loaded, so a discarded view (see
+  // renderer rebuildTerrain) stops adding chunks instead of building on a
+  // setTimeout chain for the rest of the session.
+  let cancelled = false;
   const cellOwnerId = (cx: number, cz: number): string | null => {
     const x = -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE;
     const z = WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE;
@@ -1241,6 +1261,27 @@ export function buildTerrain(seed: number): TerrainView {
     if (pending) return pending;
     const task = (async () => {
       const cells = zoneCells(zone);
+      // A returning character can log out anywhere, not just at a zone hub, so
+      // row-major order alone can leave them standing on not-yet-built terrain.
+      // Pull the cells around the actual entry point (when one was given) to
+      // the front, sorted by distance, so the chunk directly underfoot builds
+      // first. Only that bounded neighbourhood is reordered: the rest keeps
+      // row-major order so the far-band 2x2 super-chunk merge still forms.
+      if (priorityPoint) {
+        const cellDist = ([cx, cz]: [number, number]): number =>
+          Math.hypot(
+            -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE - priorityPoint.x,
+            WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE - priorityPoint.z,
+          );
+        const nearby = cells.filter((cell) => cellDist(cell) <= CHUNK_SIZE * 3);
+        if (nearby.length > 0) {
+          nearby.sort((a, b) => cellDist(a) - cellDist(b));
+          const nearbySet = new Set(nearby);
+          const rest = cells.filter((cell) => !nearbySet.has(cell));
+          cells.length = 0;
+          cells.push(...nearby, ...rest);
+        }
+      }
       const normalBounds = normalTex ? normalBoundsFor(zone) : null;
       const rowsPerSlice = 12;
       const normalSlices = normalBounds
@@ -1250,6 +1291,7 @@ export function buildTerrain(seed: number): TerrainView {
       let done = 0;
       if (normalTex && normalBounds) {
         for (let j = normalBounds.j0; j <= normalBounds.j1; j += rowsPerSlice) {
+          if (cancelled) return;
           bakeNormalRegion(
             normalTex.image.data as Uint8Array,
             seed,
@@ -1264,6 +1306,7 @@ export function buildTerrain(seed: number): TerrainView {
         normalTex.needsUpdate = true;
       }
       for (const [cx, cz] of cells) {
+        if (cancelled) return;
         const cell = cz * chunksX + cx;
         if (!built.has(cell)) {
           const superCells = [
@@ -1314,6 +1357,9 @@ export function buildTerrain(seed: number): TerrainView {
     group,
     ensureZone,
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
+    cancelStreaming(): void {
+      cancelled = true;
+    },
     update(camX: number, camZ: number, fogFar: number): void {
       // fully-fogged chunks are pure overdraw; drop them before the frustum
       for (const chunk of chunks) {

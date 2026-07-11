@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 659,
-      "state": "2d694feb",
+      "state": "5b0728b8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,7 +48,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -127,7 +127,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 660,
-      "state": "2041d65b",
+      "state": "db55fbfa",
       "events": "25aadc7e",
       "rng": {
         "draws": 2,
@@ -138,7 +138,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 660,
-      "state": "5db6284e",
+      "state": "a6d78e55",
       "events": "81271662",
       "rng": {
         "draws": 2,
@@ -149,7 +149,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 660,
-      "state": "a210ba6e",
+      "state": "698f7475",
       "events": "fe66a5a5",
       "rng": {
         "draws": 128,
@@ -160,7 +160,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 660,
-      "state": "7dddc56d",
+      "state": "19ad615c",
       "events": "741638a5",
       "rng": {
         "draws": 283,
@@ -171,7 +171,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 660,
-      "state": "0cba77be",
+      "state": "ac5ee3c5",
       "events": "ef030b78",
       "rng": {
         "draws": 478,
@@ -182,7 +182,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 660,
-      "state": "88426180",
+      "state": "4b6089cf",
       "events": "cb2c71a1",
       "rng": {
         "draws": 656,
@@ -193,7 +193,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 660,
-      "state": "bc745da8",
+      "state": "0aa6bcc7",
       "events": "741638a5",
       "rng": {
         "draws": 748,
@@ -229,7 +229,7 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
-          "equipmentInstances": {},
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

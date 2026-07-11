@@ -40,6 +40,8 @@ pr.diff
 !.codex/hooks/
 !.codex/hooks/*.sh
 .playwright-mcp/
+# Local Chrome-for-testing download used by browser E2E sessions (never repo source)
+.chrome/
 # Vitest Browser Mode failure screenshots + attachments (opt-in test:browser suite)
 tests/browser/__screenshots__/
 .vitest-attachments/
