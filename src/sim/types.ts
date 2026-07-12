@@ -1837,6 +1837,10 @@ export interface Entity {
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;
+  // Dev-only (/dev sandbox, dev-command realms): suppress out-of-combat HP regen
+  // for this entity so only a tester's own healing moves its bar. Unlike a fake
+  // `eating` payload, combat damage never clears it. Runtime-only, never serialized.
+  devFreezeRegen?: boolean;
   // mob AI
   aiState: AiState;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit

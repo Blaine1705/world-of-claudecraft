@@ -196,6 +196,10 @@ const CALLBACK_KEYS = [
   'notice',
   'spawnDevBot',
   'startDevSandbox',
+  // dev_sandbox.ts group plumbing + cleanup reach-backs.
+  'partyAccept',
+  'convertPartyToRaid',
+  'removePlayer',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
   'unlockMechChromaFromItem',
@@ -359,6 +363,7 @@ function makeFakeHost() {
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
+    removePlayer: vi.fn(),
     resolve: vi.fn(() => null),
     groundPos: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
     playerMods: vi.fn(),
@@ -437,6 +442,8 @@ function makeFakeHost() {
     lineOfSightBlocked: vi.fn(() => false),
     stopFollow: vi.fn(),
     partyInvite: vi.fn(),
+    partyAccept: vi.fn(),
+    convertPartyToRaid: vi.fn(),
     readyCheckStart: vi.fn(),
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
