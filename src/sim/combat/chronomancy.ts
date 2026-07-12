@@ -351,6 +351,16 @@ export const AETHER_DARTS_FULL_CHARGE_MISSILES = 5;
 export const AETHER_SURGE_FREE_PROC_CHANCE = 0.25;
 export const AETHER_SURGE_FREE_WINDOW = 15; // seconds the armed free cast waits
 const AETHER_SURGE_FREE_ID = 'aether_surge_free';
+// Cast-speed ramp (owner 2026-07-12). Two stacking effects shorten ONLY the Aether
+// Surge cast, so a Chronomancer visibly speeds up as they commit to the spender:
+//  - Each held Arcane Charge trims 5% (max 4 charges => a 20% faster cast), a haste
+//    ramp that pairs with the escalating cost.
+//  - While the free-cast proc (Aether Rush) is armed, the cast is 2x faster (x0.5),
+//    so the proc is felt in the cast bar, not just the mana bar. Stacks with the
+//    charge ramp (4 charges + proc: 0.8 * 0.5 = 0.4x, a 2s cast in 0.8s).
+// Draws no rng and touches no other ability, so parity goldens are unaffected.
+export const AETHER_SURGE_CAST_HASTE_PER_CHARGE = 0.05;
+export const AETHER_SURGE_PROC_CAST_MULT = 0.5;
 
 function aetherSurgeAura(e: Entity): Aura | undefined {
   return e.auras.find((a) => a.id === ARCANE_SURGE_ID);
@@ -373,6 +383,17 @@ export function aetherSurgeCostMult(e: Entity): number {
  *  gently while the cost climbs steeply. */
 export function aetherSurgeDamageMult(e: Entity): number {
   return 1 + AETHER_SURGE_DMG_PER_CHARGE * aetherSurgeStacks(e);
+}
+
+/** Cast-time multiplier for the NEXT Aether Surge from the charges held and the
+ *  free-cast proc (see the constants above): 1 at rest, down to 0.4x at 4 charges
+ *  with Aether Rush armed. Applied ONLY to Aether Surge in casting_lifecycle, and
+ *  draws no rng. */
+export function aetherSurgeCastMult(e: Entity): number {
+  const charges = Math.min(AETHER_SURGE_MAX_CHARGES, aetherSurgeStacks(e));
+  let mult = 1 - AETHER_SURGE_CAST_HASTE_PER_CHARGE * charges;
+  if (e.auras.some((a) => a.id === AETHER_SURGE_FREE_ID)) mult *= AETHER_SURGE_PROC_CAST_MULT;
+  return mult;
 }
 
 /** Bank one Arcane Charge after an Aether Surge lands (cap 4) and refresh the

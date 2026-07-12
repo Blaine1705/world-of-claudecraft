@@ -52,7 +52,12 @@ import {
   normAngle,
 } from '../types';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
-import { aetherDartsBoltBonus, aetherDartsChannelStart } from './chronomancy';
+import {
+  ARCANE_SURGE_ID,
+  aetherDartsBoltBonus,
+  aetherDartsChannelStart,
+  aetherSurgeCastMult,
+} from './chronomancy';
 import {
   ARCANE_SURGE_ID,
   aetherDartsBoltBonus,
@@ -826,7 +831,10 @@ export function castAbility(
     // so meleeHaste always equals spellHaste and the classic melee-haste scaling
     // falls out identically. If the haste channels ever split, give physical casts
     // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
-    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMult(p);
+    // Aether Surge speeds up with held Arcane Charges and while Aether Rush is armed
+    // (combat/chronomancy.ts); 1x for every other cast, so nothing else is touched.
+    const surgeCastMult = ability.id === ARCANE_SURGE_ID ? aetherSurgeCastMult(p) : 1;
+    const stretchedCastTime = (castTime * tonguesMult(p) * surgeCastMult) / spellHasteMult(p);
     p.castingAbility = ability.id;
     // The resolved target (incl. the mouseover-resolved friendly) was captured
     // into p.castTargetId above; the finish path re-validates it.

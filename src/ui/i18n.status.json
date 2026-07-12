@@ -89849,7 +89849,7 @@
     },
     "main:entities.abilities.arcane_surge.description": {
       "scope": "main",
-      "enHash": "b8796946c6651de2",
+      "enHash": "9f975682dca90f61",
       "placeholders": [
         "damage"
       ],
@@ -89868,7 +89868,7 @@
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "b8796946c6651de2",
+          "srcHash": "9f975682dca90f61",
           "by": "human"
         },
         "it_IT": {
