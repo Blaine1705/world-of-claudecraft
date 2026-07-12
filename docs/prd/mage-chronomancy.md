@@ -1,14 +1,25 @@
 # Mago: Cronomancia healer
 
-Estado: BORRADOR DE DISEÑO, no bloqueado ni aprobado para implementación.
+Estado: DIRECCIÓN CERRADA (Opción A), aprobada por el operador el 2026-07-12. Lo bloqueado es
+únicamente el RUMBO de la especialización. Las mecánicas, los nombres y los números siguen siendo
+provisionales y se afinarán por fases.
 
-Este documento recoge la propuesta conversada para convertir una de las tres
-especializaciones del mago en healer. No sustituye todavía las decisiones bloqueadas de
-`talents-2.0.md`, donde Arcano, Fuego y Escarcha siguen definidos como DPS. Si el operador
-aprueba esta dirección, este documento pasará a ser la fuente de verdad del rediseño del mago y
-las secciones incompatibles de Talents 2.0 deberán actualizarse en el mismo cambio.
+## 0. Decisión de dirección (cerrada 2026-07-12)
 
-Los nombres y números son provisionales. Las mecánicas son la parte importante de este borrador.
+Cronomancia es la tercera especialización del mago y su rol es HEALER OFENSIVO: sana convirtiendo
+su daño Arcano en curación. Sustituye a Arcano como DPS dedicado.
+
+Debe tener IDENTIDAD PROPIA y no copiar directamente a un sacerdote de Disciplina. Su
+diferenciación se apoya en tres ideas:
+
+- Preparar el futuro: marcar y proteger por adelantado con Eco, Convergencia, Barrera y Ancla.
+- Sostener: mantener al grupo con una rotación Arcana sujeta a presión de maná, nunca curación
+  gratuita ni automática.
+- Corregir: revertir daño reciente con Rebobinar.
+
+Con esta decisión, el documento pasa a ser la fuente de verdad del rediseño del mago. Las
+secciones de `talents-2.0.md` donde Arcano siga definido como DPS deberán actualizarse cuando esa
+fase se aborde. Los nombres y números de las secciones siguientes son provisionales.
 
 ## 1. Propuesta de especializaciones
 
