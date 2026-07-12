@@ -201,12 +201,10 @@ export type AuraKind =
   | 'buff_spellcrit'
   | 'buff_spelldmg'
   | 'buff_spellhaste'
-  | 'buff_crit'
-  | 'buff_dmg_done'
-  | 'buff_rage_gen'
-  | 'die_by_sword'
-  | 'aoe_echo'
-  | 'sure_crit'
+  // Shared exhaustion marker (Bloodlust / Temporal Acceleration): a pure debuff with
+  // no stat effect. While it rides, a target cannot benefit from another group haste
+  // burst (aoeAllyHaste with exhaust), so the effects can never be chained.
+  | 'sated'
   | 'cast_shield'
   | 'hot'
   | 'absorb'
@@ -1734,7 +1732,21 @@ export type AbilityEffect =
       duration: number;
       radius: number;
     }
-  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
+  // Group haste buff. Base form (Red Banner): buff_haste (attack speed) to every
+  // friendly in radius. `spell` also grants buff_spellhaste (full haste: casts and
+  // channels too). `exhaust` applies the shared `sated` debuff and refuses the buff
+  // on already-sated targets, so Bloodlust / Temporal Acceleration cannot be chained.
+  // `groupOnly` restricts it to the caster's living group/raid (never external
+  // friendlies), so a shared-exhaustion burst never sates a passing stranger.
+  | {
+      type: 'aoeAllyHaste';
+      mult: number;
+      duration: number;
+      radius: number;
+      spell?: boolean;
+      exhaust?: boolean;
+      groupOnly?: boolean;
+    }
   | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
   | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }

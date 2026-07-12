@@ -172,6 +172,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'temporal_reversal',
       // "Correct" pillar raid cooldown: restore recent group/raid damage (Rewind).
       'temporal_rewind',
+      // Group haste cooldown (the Chronomancer's Bloodlust): +30% full haste, shares
+      // the Bloodlust exhaustion.
+      'temporal_acceleration',
     ],
     color: 0x69ccf0,
   },
@@ -2104,6 +2107,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'rewind', fraction: 0.3, maxHpFraction: 0.35, windowSec: 5, radius: 40 }],
     description:
       'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
+  },
+  // ---- Chronomancy (healer) group haste cooldown: Temporal Acceleration, the
+  // Chronomancer's equivalent of the Shaman's Bloodlust. A BASE ability (owner
+  // directive 2026-07-13: not a talent). Instant, no target, 40 yd group/raid, +30%
+  // FULL haste (attack + cast + channel) for 15s on a 5 min cooldown, sharing the
+  // `sated` exhaustion with Bloodlust so the two can never be chained. Runs through
+  // the same aoeAllyHaste effect + combat/haste_burst.ts.
+  temporal_acceleration: {
+    id: 'temporal_acceleration',
+    name: 'Temporal Acceleration',
+    class: 'mage',
+    learnLevel: 20,
+    specs: ['arcane'],
+    cost: 120,
+    castTime: 0,
+    cooldown: 300,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [
+      {
+        type: 'aoeAllyHaste',
+        mult: 1.3,
+        duration: 15,
+        radius: 40,
+        spell: true,
+        exhaust: true,
+        groupOnly: true,
+      },
+    ],
+    description:
+      'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)',
   },
   // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
   // sections 13.4 / 14. The single-target Arcane spender that drives the offensive
@@ -5197,9 +5232,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'aoeAllyHaste', mult: 1.3, duration: 15, radius: 30 }],
+    // Full haste (attack, cast, and channel) to the group/raid, with the shared
+    // exhaustion so it can never be chained with Temporal Acceleration (combat/
+    // haste_burst.ts). Owner directive 2026-07-13: convert the shared effect to full
+    // haste so caster/healer allies benefit, not only melee.
+    effects: [
+      {
+        type: 'aoeAllyHaste',
+        mult: 1.3,
+        duration: 15,
+        radius: 30,
+        spell: true,
+        exhaust: true,
+        groupOnly: true,
+      },
+    ],
     description:
-      'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
+      'Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Bloodlust or Temporal Acceleration are too exhausted to benefit. (Shaman talent)',
   },
   chain_lightning: {
     id: 'chain_lightning',

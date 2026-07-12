@@ -65,6 +65,7 @@ import {
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
+import { applyGroupHaste } from './haste_burst';
 import { applyRewind } from './rewind';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
@@ -1805,44 +1806,6 @@ export function runEffects(
           ability.name,
           ability.school,
         );
-        break;
-      }
-      case 'aoeAllyAbsorb': {
-        // Mass Barrier: an absorb shield on the caster and friendlies in radius.
-        // When eff.maxTargets is set (owner 2026-07-13: 5), only the NEAREST that
-        // many are shielded (the caster is distance 0, so always covered). Draws no rng.
-        let recipients = ctx.friendliesInRadius(p, p.pos, eff.radius);
-        if (eff.maxTargets && recipients.length > eff.maxTargets) {
-          recipients = [...recipients]
-            .sort((a, b) => {
-              if (a.id === p.id) return -1;
-              if (b.id === p.id) return 1;
-              const da = (a.pos.x - p.pos.x) ** 2 + (a.pos.z - p.pos.z) ** 2;
-              const db = (b.pos.x - p.pos.x) ** 2 + (b.pos.z - p.pos.z) ** 2;
-              return da - db || a.id - b.id;
-            })
-            .slice(0, eff.maxTargets);
-        }
-        const resolved = ctx.resolve(p.id);
-        const spec = resolved ? ctx.playerMods(resolved.meta).spec : null;
-        const barrierSchool =
-          ability.id === 'mass_barrier' && spec === 'arcane'
-            ? 'arcane'
-            : ability.id === 'mass_barrier' && spec === 'fire'
-              ? 'fire'
-              : ability.school;
-        for (const mE of recipients) {
-          ctx.applyAura(mE, {
-            id: ability.id,
-            name: ability.name,
-            kind: 'absorb',
-            remaining: eff.duration,
-            duration: eff.duration,
-            value: eff.amount,
-            sourceId: p.id,
-            school: barrierSchool,
-          });
-        }
         break;
       }
       case 'aoeAllyAbsorb': {

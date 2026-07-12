@@ -14,12 +14,12 @@ import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { livingGroupRaidInRadius } from './group_targeting';
 
-// The shared exhaustion debuff. Owner 2026-07-13: 10 minutes, so a raid gets one
-// haste burst per 10 min no matter how many Bloodlust/Temporal Acceleration casters
-// are present (longer than either 5 min cooldown, the classic Sated feel). Tunable.
+// The shared exhaustion debuff. PLAYTEST-provisional: it lasts the ability cooldown
+// (5 min), so the raid gets one haste burst per cooldown window no matter how many
+// Bloodlust/Temporal Acceleration casters are present. Tunable.
 export const SATED_ID = 'sated';
 export const SATED_NAME = 'Temporal Exhaustion';
-export const SATED_DURATION = 600;
+export const SATED_DURATION = 300;
 
 export interface GroupHasteParams {
   mult: number; // e.g. 1.3 for +30%
