@@ -34,6 +34,7 @@ import {
   type Decoration,
   generateDecorationsInBounds,
   groundHeight,
+  reachPalmSpots,
 } from './world';
 import { yumiMazeColliders } from './yumi_maze_layout';
 
@@ -132,6 +133,19 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, t.x, t.z, 7),
       camGhost: true,
     });
+  // The Palmreach strand: a slim trunk collider at the base of every beach
+  // palm, from the same deterministic list the renderer instances the models
+  // from (world.ts). camGhost so the chase cam passes through instead of
+  // slamming in when a palm crosses the eye line.
+  for (const p of reachPalmSpots(seed))
+    out.push({
+      type: 'circle',
+      x: p.x,
+      z: p.z,
+      r: p.r,
+      cameraTopY: topY(seed, p.x, p.z, 7),
+      camGhost: true,
+    });
   for (const s of PROPS.stalls)
     out.push({
       type: 'circle',
@@ -150,8 +164,9 @@ function staticWorldColliders(seed: number): Collider[] {
     out.push({ type: 'circle', x, z, r: 5, cameraTopY: topY(seed, x, z, 5.2), camGhost: true });
   }
 
-  // dock huts
+  // dock huts (hw/hd 0 means no hut on this dock, e.g. the Farshore Landing)
   for (const d of PROPS.docks) {
+    if (d.hutLocal.hw <= 0 || d.hutLocal.hd <= 0) continue;
     const hut = rotY(d.hutLocal.x, d.hutLocal.z, d.rot);
     const x = d.x + hut.x,
       z = d.z + hut.z;

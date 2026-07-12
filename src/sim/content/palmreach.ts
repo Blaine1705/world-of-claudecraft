@@ -217,7 +217,9 @@ export const PALMREACH_PROPS: ZonePropsDef = {
     [-418, 720], // the Tanglemouth's waycamp
   ],
   // a fishing dock running off the village beach into the shallows
-  docks: [{ x: -286, z: 838, rot: 0.6, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
+  // Drifthaven's beach dock (kept on the strand: the flat coast has no open
+  // water nearby to reach). hw/hd 0: no hut, so no thin post floats off it.
+  docks: [{ x: -286, z: 838, rot: 0.6, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
   mudHuts: [
     [-316, 826],
     [-290, 808],
