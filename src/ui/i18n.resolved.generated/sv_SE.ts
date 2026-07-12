@@ -6174,6 +6174,10 @@ export const sv_SE: EnTranslations = {
         "name": "Temporal Echo",
         "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
       },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
+      },
       "mind_sear": {
         "name": "Tankebrand",
         "description": "Canaliza energía de Skugga en el área objetivo e inflige {damage} cada segundo a närliggande fiender. (prästtalang)"

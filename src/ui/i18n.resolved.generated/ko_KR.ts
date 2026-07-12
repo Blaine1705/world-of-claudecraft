@@ -6174,6 +6174,10 @@ export const ko_KR: EnTranslations = {
         "name": "시간의 메아리",
         "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다."
       },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
+      },
       "mind_sear": {
         "name": "생각불꽃",
         "description": "대상 지역에 암흑 기운을 퍼부어 매초 주위 적에게 {damage}의 피해를 입힙니다. (사제 특성)"

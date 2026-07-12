@@ -60,6 +60,7 @@ import {
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
+import { aetherDartsBoltBonus, aetherDartsChannelStart } from './chronomancy';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -674,6 +675,9 @@ export function castAbility(
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
     // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
     frostMageChannelStart(p, ability.id);
+    // Aether Darts arms its one-time Arcane Charge consume for THIS channel
+    // (combat/chronomancy.ts); inert for every other channel.
+    aetherDartsChannelStart(p, ability.id);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
     const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
@@ -1044,10 +1048,19 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
   scheduleProjectile(ctx, p, target, (src, tgt) => {
     const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def);
+    // Aether Darts: the FIRST landed missile consumes the caster's Arcane Charges
+    // and locks a flat per-missile Arcane bonus (combat/chronomancy.ts); later
+    // missiles reuse it. It is plain Arcane damage, so Temporal Echo heals from it
+    // at the normal rate. Draws no rng; a no-op (0) for any other channel and with
+    // no charges held.
+    const surgeBonus =
+      res.def.id === 'arcane_missiles'
+        ? aetherDartsBoltBonus(ctx, src, res.def.channel?.ticks ?? 1)
+        : 0;
     for (const eff of res.effects) {
       if (eff.type === 'directDamage') {
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
-        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
         dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');

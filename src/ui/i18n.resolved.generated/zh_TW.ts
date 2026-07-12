@@ -6174,6 +6174,10 @@ export const zh_TW: EnTranslations = {
         "name": "時光迴響",
         "description": "以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。"
       },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
+      },
       "mind_sear": {
         "name": "灼思",
         "description": "向目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"

@@ -47,6 +47,7 @@ import {
   handleDeath as handleDeathImpl,
 } from './combat/damage';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { aetherSurgeCostMult } from './combat/chronomancy';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -3324,6 +3325,13 @@ export class Sim {
     // ability the victim uses.
     const tax = this.costTaxMult(r.e);
     if (tax > 1 && cost > 0) cost = Math.ceil(cost * tax);
+    // Aether Surge (Chronomancy Phase 3, combat/chronomancy.ts): each held Arcane
+    // Charge steeply multiplies the next cast's cost. Deterministic read of the
+    // caster's own charge aura; no rng. Folded here so the affordability gate and
+    // the spend both see the scaled cost. (docs/prd/mage-chronomancy.md 13.4 / 14)
+    if (abilityId === 'arcane_surge' && cost > 0) {
+      cost = Math.round(cost * aetherSurgeCostMult(r.e));
+    }
     // Return a shallow copy so the cached known-list entry is never mutated.
     if (cost !== found.cost) return { ...found, cost };
     return found;
