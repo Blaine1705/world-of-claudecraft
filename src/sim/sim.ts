@@ -41,13 +41,13 @@ import {
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
 import { isRooted, isStunned } from './combat/cc';
+import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
   handleDeath as handleDeathImpl,
 } from './combat/damage';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
-import { aetherSurgeCostMult } from './combat/chronomancy';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -7099,11 +7099,18 @@ export class Sim {
                 // The mini aura strip under the member's party row: first N in
                 // aura order (buffs and debuffs alike), id + kind + sap flag
                 // only, no countdown (see PartyMemberAura in world_api/party.ts).
-                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
-                  id: a.id,
-                  kind: a.kind,
-                  ...(a.value < 0 ? { neg: 1 as const } : {}),
-                })),
+                // Temporal Echo marks are filtered to the LOCAL player's own (owner
+                // 2026-07-12): other chronomancers' echoes still heal in the sim but
+                // never show in this viewer's group/raid strip. echoVisibleTo reads
+                // the real aura sourceId, so no wire field is added.
+                auras: e.auras
+                  .filter((a) => echoVisibleTo(a, this.primaryId))
+                  .slice(0, PARTY_MEMBER_AURA_CAP)
+                  .map((a) => ({
+                    id: a.id,
+                    kind: a.kind,
+                    ...(a.value < 0 ? { neg: 1 as const } : {}),
+                  })),
               },
             ]
           : [];

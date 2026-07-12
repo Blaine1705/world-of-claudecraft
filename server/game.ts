@@ -1,6 +1,7 @@
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { echoVisibleTo } from '../src/sim/combat/chronomancy';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
@@ -4466,11 +4467,18 @@ export class GameServer {
                 // Sim.partyInfo): first N in aura order, id + kind + sap flag
                 // only, no countdown, so this payload changes only when the
                 // aura SET changes and the party delta elision keeps working.
-                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
-                  id: a.id,
-                  kind: a.kind,
-                  ...(a.value < 0 ? { neg: 1 } : {}),
-                })),
+                // Temporal Echo marks are filtered per-viewer to `pid`'s own, so
+                // other chronomancers' echoes (which still heal in the sim) never
+                // show in this player's group/raid strip. Filtering in-place keeps
+                // sourceId OFF the wire (no protocol change).
+                auras: e.auras
+                  .filter((a) => echoVisibleTo(a, pid))
+                  .slice(0, PARTY_MEMBER_AURA_CAP)
+                  .map((a) => ({
+                    id: a.id,
+                    kind: a.kind,
+                    ...(a.value < 0 ? { neg: 1 } : {}),
+                  })),
               }
             : null;
         })

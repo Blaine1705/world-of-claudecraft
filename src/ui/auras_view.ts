@@ -261,6 +261,16 @@ export function createAurasView(
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
       const fill = (a: AuraInput, own: boolean): void => {
+        // Temporal Echo marks are shown only to the chronomancer who placed them
+        // (owner 2026-07-12): another caster's echo still heals in the sim but never
+        // appears in this viewer's target/focus frame. ONLY the ownFirst views (the
+        // target/focus strip) carry a real sourceId and a meaningful deps.isOwn, so the
+        // filter is scoped to them. The party/raid mini-strips are ownFirst:false with a
+        // sourceId-less PartyMemberAura (isOwn is always false there); their foreign
+        // echoes are already filtered upstream in Sim.partyInfo / the server partyWire
+        // via echoVisibleTo, so re-filtering here would wrongly hide the viewer's OWN
+        // marks too.
+        if (ownFirst && a.kind === 'temporal_echo' && !deps.isOwn(a)) return;
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) return;
         if (mode === 'buffs' && debuff) return;

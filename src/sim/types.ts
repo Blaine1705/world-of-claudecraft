@@ -447,6 +447,15 @@ export interface Aura {
   // the per-application maxBonus cap holds across channel ticks.
   extendedBy?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
+  // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
+  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
+  // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
+  // echoConvertRate stores the single-target coefficient the mark converts at
+  // (0.35 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
+  // combat/chronomancy.ts during Arcane-damage conversion (server-authoritative and
+  // offline), so they never need to ride the wire.
+  echoGroup?: boolean;
+  echoConvertRate?: number;
 }
 
 export type CrowdControlDrCategory =
@@ -1598,6 +1607,20 @@ export type AbilityEffect =
   // ability (so $d shows it); this effect owns only the mark. The Arcane-damage
   // conversion is handled by combat/chronomancy.ts, not by a stored field.
   | { type: 'temporalEcho'; duration: number }
+  // Chronomancy Cascada temporal (docs/prd/mage-chronomancy.md Phase 4): the group
+  // version of Temporal Echo. Centered on the friendly target (which must be the
+  // caster or a living group/raid member and is ALWAYS included), it marks up to
+  // `maxTargets` allies (the target plus the nearest others within `radius`) with a
+  // GROUP echo for `duration` sec and gives each a small initial `heal`. Selection,
+  // the individual-echo overlap rule, and the reduced group conversion all live in
+  // combat/chronomancy.ts.
+  | {
+      type: 'massTemporalEcho';
+      duration: number;
+      radius: number;
+      maxTargets: number;
+      heal: { min: number; max: number };
+    }
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
   // nearby allies, each hop healing `falloff` of the previous hop's amount. The
   // arc reach is given as `jumpRange` on some variants and `radius` on others.
@@ -1921,6 +1944,11 @@ export interface AbilityDef {
   // path, the same door Blink While Casting opens by talent).
   usableWhileCasting?: boolean;
   targetType?: 'enemy' | 'friendly' | 'any';
+  // Restrict a friendly-target ability to the caster or a member of the caster's
+  // group/raid (never an external friendly player, pet, or friendly NPC). Cascada
+  // temporal uses this so the cast is refused (no cost/cooldown) on an out-of-group
+  // target rather than resolving to an empty selection. Checked in casting_lifecycle.
+  partyOnlyTarget?: boolean;
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.

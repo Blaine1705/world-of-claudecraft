@@ -27,6 +27,7 @@ import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './s
 
 const baseEnTable = {
   'error.lineOfSight': 'Line of sight.',
+  'error.notInGroup': 'That ally is not in your group.',
   'error.bagsFull': 'Your bags are full.',
   'error.bagSocketsFull': 'All your bag slots are full.',
   'error.bagSwapTooManyItems': 'You have too many items to swap to that bag.',

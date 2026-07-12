@@ -35,6 +35,31 @@ const TEMPORAL_ECHO_NAME = ABILITIES[TEMPORAL_ECHO_ID]?.name ?? 'Temporal Echo';
 export const TEMPORAL_ECHO_DURATION = 15;
 export const ECHO_CONVERT_SINGLE = 0.35;
 export const ECHO_CONVERT_AOE = 0.15;
+// Cascada temporal (Phase 4 group echo, docs/prd/mage-chronomancy.md): the group
+// version marks up to five allies with a REDUCED conversion, 13% single-target /
+// 6% area Arcane. Each marked ally converts its OWN coefficient independently (no
+// shared budget), so the aggregate across five marks is intentionally larger than a
+// single 35% mark: that is the AoE-healing payoff, gated by cost/cooldown/window.
+export const ECHO_GROUP_CONVERT_SINGLE = 0.13;
+export const ECHO_GROUP_CONVERT_AOE = 0.06;
+
+/** The conversion rate a Temporal Echo mark heals at, from its stored origin.
+ *  Single-target (35% / 13%) reads the coefficient stored on the aura; the area
+ *  rate (15% / 6%) is derived from echoGroup so an AoE hit keeps its reduction. */
+function echoRateFor(a: Aura, aoe: boolean): number {
+  if (aoe) return a.echoGroup ? ECHO_GROUP_CONVERT_AOE : ECHO_CONVERT_AOE;
+  return a.echoConvertRate ?? (a.echoGroup ? ECHO_GROUP_CONVERT_SINGLE : ECHO_CONVERT_SINGLE);
+}
+
+/** UI visibility predicate (owner 2026-07-12): a Temporal Echo mark is shown only
+ *  on the viewer's OWN marks (target/group/raid indicators). Every other aura is
+ *  always visible. Other chronomancers' echoes still exist and heal in the sim;
+ *  they are just hidden from this viewer's frames. Structural input so both the
+ *  offline party strip, the server party wire, and the target strip can share it. */
+export function echoVisibleTo(a: { kind: string; sourceId: number }, viewerId: number): boolean {
+  if (a.kind !== 'temporal_echo') return true;
+  return a.sourceId === viewerId;
+}
 
 /**
  * Remove every Temporal Echo mark THIS mage placed, wherever it currently sits.
@@ -57,6 +82,25 @@ export function stripTemporalEchoes(ctx: SimContext, mageId: number): void {
 }
 
 /**
+ * Strip only the caster's INDIVIDUAL (non-group) Temporal Echo mark, wherever it
+ * sits. Used to MOVE the single-target echo on re-cast WITHOUT clearing the
+ * caster's Cascada group echoes on other allies (those are a separate, wider
+ * window). Group marks (echoGroup) are left untouched; the full stripTemporalEchoes
+ * above still clears everything on death / leaving Chronomancy. Draws no rng.
+ */
+export function stripIndividualEcho(ctx: SimContext, mageId: number): void {
+  for (const e of ctx.entities.values()) {
+    for (let i = e.auras.length - 1; i >= 0; i--) {
+      const a = e.auras[i];
+      if (a.kind === 'temporal_echo' && a.sourceId === mageId && !a.echoGroup) {
+        e.auras.splice(i, 1);
+        ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
+      }
+    }
+  }
+}
+
+/**
  * Apply (or MOVE) the caster's Temporal Echo mark onto `target`. Any existing mark
  * this caster owns is stripped first, so only one own mark is ever active. The
  * mark carries `sourceId` = caster so conversions and cleanup filter by caster,
@@ -71,7 +115,11 @@ export function placeTemporalEcho(
   target: Entity,
   duration: number,
 ): void {
-  stripTemporalEchoes(ctx, caster.id); // one own mark at a time -> re-cast moves it
+  stripIndividualEcho(ctx, caster.id); // one own individual mark -> re-cast moves it
+  // applyAura replaces this caster's existing mark on `target` by (id, sourceId), so
+  // casting the single echo onto an ally that carries this caster's GROUP echo UPGRADES
+  // it to the 35% individual mark (owner rule: group -> individual). If that individual
+  // later moves away, the ally is simply left bare (no group rebuild in v1).
   ctx.applyAura(target, {
     id: TEMPORAL_ECHO_ID,
     name: TEMPORAL_ECHO_NAME,
@@ -81,6 +129,8 @@ export function placeTemporalEcho(
     value: 1,
     sourceId: caster.id,
     school: 'arcane',
+    echoGroup: false,
+    echoConvertRate: ECHO_CONVERT_SINGLE,
   });
   // The identity beat: a temporal glyph blooms directly on the ally. It is
   // target-anchored (no wave, no projectile) and flows to the online client
@@ -110,25 +160,110 @@ export function chronomancyConvertArcaneDamage(
   aoe: boolean,
 ): void {
   if (!source || source.kind !== 'player' || school !== 'arcane' || dealt <= 0) return;
-  // Find the single ally this mage marked (only one own mark can exist). Stable
-  // Map iteration order keeps the pick deterministic even though it is unique.
-  let ally: Entity | null = null;
+  // Heal EVERY ally this mage currently marks, each at its OWN stored coefficient
+  // (single 35%/15%, group 13%/6%). With only the single-target echo this is exactly
+  // one ally as before; the Cascada group version can ride up to five marks at once.
+  // No shared budget: each mark converts independently. Stable Map iteration order
+  // keeps the fan-out deterministic; a dead ally is skipped. Each ally holds at most
+  // one mark from this source (applyAura dedupes by id+sourceId), so break after it.
   for (const e of ctx.entities.values()) {
-    let found = false;
+    if (e.dead) continue;
     for (const a of e.auras) {
       if (a.kind === 'temporal_echo' && a.sourceId === source.id) {
-        found = true;
+        applyEchoHeal(ctx, source, e, dealt, echoRateFor(a, aoe));
         break;
       }
     }
-    if (found) {
-      ally = e;
-      break;
-    }
   }
-  if (!ally || ally.dead) return; // a dead ally never receives the conversion
-  const rate = aoe ? ECHO_CONVERT_AOE : ECHO_CONVERT_SINGLE;
-  applyEchoHeal(ctx, source, ally, dealt, rate);
+}
+
+/**
+ * Resolve and ORDER the full Cascada temporal target list before any heal or aura
+ * is applied (owner rule). Eligible = the caster plus LIVING members of the caster's
+ * group/raid (never external friendlies or NPCs). The `primary` (the ability's
+ * friendly target) must be one of those and is ALWAYS included first; the remaining
+ * slots go to the members nearest to the PRIMARY (not the mage) within `radius`,
+ * ordered by (distance, then stable id), capped at `maxTargets` total. Never random.
+ * Returns [] if the primary is not a valid living group/raid member (the cast is
+ * refused upstream). Draws no rng.
+ */
+export function selectCascadeTargets(
+  ctx: SimContext,
+  caster: Entity,
+  primary: Entity,
+  radius: number,
+  maxTargets: number,
+): Entity[] {
+  const party = ctx.partyOf(caster.id);
+  const memberIds = party ? party.members : [caster.id];
+  const memberSet = new Set(memberIds);
+  // The primary must be the caster or a living member of the caster's group/raid.
+  if (!memberSet.has(primary.id) || primary.dead) return [];
+  const px = primary.pos.x;
+  const pz = primary.pos.z;
+  const r2 = radius * radius;
+  const extras: { e: Entity; d2: number }[] = [];
+  for (const pid of memberIds) {
+    if (pid === primary.id) continue;
+    const e = ctx.entities.get(pid);
+    const meta = ctx.players.get(pid); // players only, no NPC party companions
+    if (!e || !meta || e.dead) continue;
+    const dx = e.pos.x - px;
+    const dz = e.pos.z - pz;
+    const d2 = dx * dx + dz * dz;
+    if (d2 > r2) continue; // outside the radius from the primary
+    extras.push({ e, d2 });
+  }
+  // Nearest to the primary first; ties broken by stable id, never randomly.
+  extras.sort((a, b) => a.d2 - b.d2 || a.e.id - b.e.id);
+  const chosen: Entity[] = [primary];
+  for (const x of extras) {
+    if (chosen.length >= maxTargets) break;
+    chosen.push(x.e);
+  }
+  return chosen;
+}
+
+/**
+ * Place (or refresh) THIS caster's Cascada group echo on one selected ally, honoring
+ * the individual-overlap rule: if the ally already carries the caster's INDIVIDUAL
+ * echo it keeps the 35% mark (never downgraded), and the group cast only EXTENDS it
+ * up to `duration` when it has less left, never refreshing it back to its full 15s.
+ * Otherwise a 13% group echo is applied (applyAura replaces this caster's prior group
+ * mark on the ally by id+sourceId). The small initial heal is applied by the effect
+ * dispatcher, not here. Draws no rng.
+ */
+export function placeGroupEcho(
+  ctx: SimContext,
+  caster: Entity,
+  ally: Entity,
+  duration: number,
+): void {
+  const existing = ally.auras.find((a) => a.kind === 'temporal_echo' && a.sourceId === caster.id);
+  if (existing && !existing.echoGroup) {
+    // Individual echo present: keep 35%, only extend UP TO `duration` (never to 15s).
+    if (existing.remaining < duration) existing.remaining = duration;
+    return;
+  }
+  ctx.applyAura(ally, {
+    id: TEMPORAL_ECHO_ID,
+    name: TEMPORAL_ECHO_NAME,
+    kind: 'temporal_echo',
+    remaining: duration,
+    duration,
+    value: 1,
+    sourceId: caster.id,
+    school: 'arcane',
+    echoGroup: true,
+    echoConvertRate: ECHO_GROUP_CONVERT_SINGLE,
+  });
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: caster.id,
+    targetId: ally.id,
+    school: 'arcane',
+    fx: 'temporalGlyph',
+  });
 }
 
 /**
