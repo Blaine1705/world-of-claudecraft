@@ -178,6 +178,12 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled
+  // Rewind's per-player damage-loss ring (combat/damage_history.ts): a runtime-only
+  // accumulator, never serialized or wired, rebuilt deterministically from dealDamage
+  // on every host. Its EFFECT (Rewind's heal2 events) is pinned by the event digest,
+  // so excluding the raw ring avoids per-combat-frame digest churn without losing
+  // gameplay coverage (like wireRev above).
+  'damageHistory',
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

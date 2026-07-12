@@ -91,9 +91,13 @@ export function applyHeal(
   target: Entity,
   amount: number,
   ability: string,
+  // Some heals can never crit (e.g. Chronomancy Rewind, PRD "no puede hacer
+  // critico"). Passing false SKIPS the crit roll entirely, so it draws NO rng and
+  // keeps the shared stream in the same order as if the heal had not fired at all.
+  canCrit = true,
 ): void {
   if (target.dead) return;
-  const crit = ctx.rng.chance(ctx.spellCrit(source));
+  const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healed = Math.round(
     amount *
       (crit ? 1.5 + source.critDmgBonus : 1) *

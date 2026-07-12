@@ -131,6 +131,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
   it('ENTITY_EXCLUDE membership is exactly the pinned set', () => {
     expect([...ENTITY_EXCLUDE].sort()).toEqual([
       'color',
+      'damageHistory',
       'equippedInstances',
       'equippedItems',
       'guild',
@@ -186,7 +187,13 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
     const entity = sim.player as unknown as Record<string, unknown>;
     const meta = sim.players.get(sim.playerId)! as unknown as Record<string, unknown>;
     // Optional fields that are legitimately absent on a fresh entity/meta.
-    const optionalEntity = new Set(['netUpdatedAt', 'netInterval', 'holderTier', 'holderBalance']);
+    const optionalEntity = new Set([
+      'netUpdatedAt',
+      'netInterval',
+      'holderTier',
+      'holderBalance',
+      'damageHistory', // Rewind's ring; only present after a player takes damage
+    ]);
     const optionalMeta = new Set(['characterId', 'lastWhisperFrom']);
     for (const k of ENTITY_EXCLUDE) {
       if (!optionalEntity.has(k)) expect(k in entity, `Entity.${k} missing (renamed?)`).toBe(true);

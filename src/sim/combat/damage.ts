@@ -55,6 +55,7 @@ import {
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
+import { recordDamageTaken } from './damage_history';
 import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -514,6 +515,11 @@ export function dealDamage(
 
   const preHp = target.hp;
   target.hp = Math.max(0, target.hp - amount);
+  // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
+  // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
+  // (preHp - target.hp) is post-mitigation and post-absorb by construction, so fully
+  // absorbed / avoided / overkill damage never enters the history. Players only.
+  if (target.kind === 'player') recordDamageTaken(target, preHp - target.hp, ctx.tickCount);
   ctx.emit({
     type: 'damage',
     sourceId: source?.id ?? -1,

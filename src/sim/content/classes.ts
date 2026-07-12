@@ -170,6 +170,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'temporal_cascade',
       // Combat resurrection: rewind a dead group/raid member back to life.
       'temporal_reversal',
+      // "Correct" pillar raid cooldown: restore recent group/raid damage (Rewind).
+      'temporal_rewind',
     ],
     color: 0x69ccf0,
   },
@@ -2072,6 +2074,29 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
     description:
       "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+  },
+  // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
+  // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd
+  // AoE on the caster's group/raid. Restores 30% of the REAL damage each living
+  // member took in the last 5s, capped at 35% of their max HP and their missing HP;
+  // never crits, applies no Echo, does not touch the Arcane conversion, and generates
+  // normal heal threat. Runs entirely through combat/rewind.ts + the 5s damage ring
+  // (combat/damage_history.ts). PLAYTEST-provisional cost (150) and 120s cooldown.
+  temporal_rewind: {
+    id: 'temporal_rewind',
+    name: 'Rewind',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 150,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false, // instant, self-centered: no target needed
+    effects: [{ type: 'rewind', fraction: 0.3, maxHpFraction: 0.35, windowSec: 5, radius: 40 }],
+    description:
+      'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
   },
   // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
   // sections 13.4 / 14. The single-target Arcane spender that drives the offensive

@@ -1624,6 +1624,18 @@ export type AbilityEffect =
   // Chronomancy combat resurrection (Temporal Reversal): rewind a DEAD group/raid
   // member back to life at their corpse with `hpFrac` of their pools, no sickness.
   | { type: 'resurrectAlly'; hpFrac: number }
+  // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
+  // the caster. Restores `fraction` of the REAL damage each living group/raid member
+  // within `radius` took in the last `windowSec` seconds, capped per target at
+  // `maxHpFraction` of their max HP and never above their missing health. No crit,
+  // no Echo, normal heal threat. See combat/rewind.ts.
+  | {
+      type: 'rewind';
+      fraction: number;
+      maxHpFraction: number;
+      windowSec: number;
+      radius: number;
+    }
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
   // nearby allies, each hop healing `falloff` of the previous hop's amount. The
   // arc reach is given as `jumpRange` on some variants and `radius` on others.
@@ -2253,10 +2265,24 @@ export interface CascadeDevStats {
   initialHeal: number; // Cascada initial per-target healing applied
 }
 
+// One recorded slice of REAL HP loss for the Rewind damage history: the sim tick
+// it landed on and the post-mitigation/post-absorb amount that actually reduced HP.
+export interface DamageTick {
+  tick: number;
+  amount: number;
+}
+
 export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };
+  // Chronomancy Rewind (combat/damage_history.ts): a bounded ring of the REAL HP
+  // loss this player took, tagged by sim tick, pruned to the last few seconds on
+  // every write. Recorded only for players, only at the canonical post-mitigation/
+  // post-absorb point in dealDamage. Runtime-only: never serialized, wired, or
+  // pinned by the parity digest (excluded in tests/parity/trace.ts ENTITY_EXCLUDE);
+  // it lives on the entity so it is dropped automatically when the entity is removed.
+  damageHistory?: DamageTick[];
   // Transient per-cast budget: how much Frozen Orb cooldown this Blizzard
   // channel has already refunded (combat/frost_mage.ts, reset at channel
   // start). Never serialized or wired.
