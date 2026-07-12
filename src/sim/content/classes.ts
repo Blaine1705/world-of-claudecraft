@@ -162,20 +162,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // granted at the pick like Combustion.
       'temporal_barrier',
       'temporal_echo',
-      // Phase 3: the single-target Arcane spender (charges) that drives the
-      // offensive heal rotation (docs/prd/mage-chronomancy.md sections 13.4 / 14).
-      'arcane_surge',
-      // Phase 4: the group version of Temporal Echo (marks up to five allies with a
-      // reduced group echo), docs/prd/mage-chronomancy.md Phase 4.
-      'temporal_cascade',
-      // Combat resurrection: rewind a dead group/raid member back to life.
-      'temporal_reversal',
-      // "Correct" pillar raid cooldown: restore recent group/raid damage (Rewind).
-      'temporal_rewind',
-      // Group haste cooldown (the Chronomancer's Bloodlust): +30% full haste, shares
-      // the Bloodlust exhaustion.
-      'temporal_acceleration',
-      'perfect_moment',
     ],
     color: 0x69ccf0,
   },
@@ -1659,7 +1645,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'fire_blast',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire'],
+    specs: ['fire', 'frost'],
     name: 'Cinderfall',
     class: 'mage',
     learnLevel: 5,
@@ -1764,7 +1750,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'flamestrike',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire'],
+    specs: ['fire', 'frost'],
     name: 'Flamestrike',
     class: 'mage',
     learnLevel: 5,
@@ -1857,7 +1843,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'scorch',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire'],
+    specs: ['fire', 'frost'],
     name: 'Scald',
     class: 'mage',
     learnLevel: 5,
@@ -1881,7 +1867,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'pyroblast',
     // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
     // both damage specs keep it exactly as before; the healer does not.
-    specs: ['fire'],
+    specs: ['fire', 'frost'],
     name: 'Pyrelance',
     class: 'mage',
     learnLevel: 5,
@@ -1959,7 +1945,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'temporal_echo',
     name: 'Temporal Echo',
     class: 'mage',
-    learnLevel: 8,
+    learnLevel: 5,
     specs: ['arcane'],
     cost: 40,
     castTime: 0,
@@ -1995,151 +1981,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
   },
-  // ---- Chronomancy (healer) Phase 4: Cascada temporal (Temporal Cascade),
-  // docs/prd/mage-chronomancy.md Phase 4. The GROUP version of Temporal Echo: a 2s
-  // cast that centers on the friendly target (which must be the caster or a living
-  // group/raid member and is ALWAYS included) and marks the nearest allies within
-  // 15 yd of it, up to five total. Each takes a small initial heal and a REDUCED
-  // group echo (13% single / 6% area conversion, combat/chronomancy.ts) for 8 sec.
-  // The 15s cooldown plus the 8s window keep five echoes from ever being sustained.
-  // A pre-existing individual echo on a target is kept at 35% (never downgraded),
-  // still initial-healed, and counts within the five. PLAYTEST-provisional values
-  // (owner 2026-07-12), gated by tests/chronomancy_balance.test.ts.
-  temporal_cascade: {
-    id: 'temporal_cascade',
-    name: 'Temporal Cascade',
-    class: 'mage',
-    learnLevel: 12,
-    specs: ['arcane'],
-    cost: 90,
-    castTime: 2,
-    cooldown: 17,
-    range: 30,
-    school: 'arcane',
-    requiresTarget: true,
-    targetType: 'friendly',
-    // Group/raid-only: the cast is refused (no cost/cooldown) on a friendly that is
-    // not the caster or a party/raid member, so an out-of-group target never wastes it.
-    partyOnlyTarget: true,
-    effects: [
-      {
-        type: 'massTemporalEcho',
-        duration: 10,
-        radius: 15,
-        maxTargets: 5,
-        heal: { min: 14, max: 18 },
-      },
-    ],
-    ranks: [
-      {
-        rank: 2,
-        level: 16,
-        cost: 130,
-        effects: [
-          {
-            type: 'massTemporalEcho',
-            duration: 10,
-            radius: 15,
-            maxTargets: 5,
-            heal: { min: 22, max: 28 },
-          },
-        ],
-      },
-      {
-        rank: 3,
-        level: 20,
-        cost: 170,
-        effects: [
-          {
-            type: 'massTemporalEcho',
-            duration: 10,
-            radius: 15,
-            maxTargets: 5,
-            heal: { min: 28, max: 36 },
-          },
-        ],
-      },
-    ],
-    description:
-      'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
-  },
-  // ---- Chronomancy combat resurrection: Temporal Reversal. Rewinds a DEAD group/raid
-  // member's timeline back to life at their corpse, IN COMBAT, with a fraction of their
-  // pools and no resurrection sickness (targetsDead + the resurrectAlly effect, reusing
-  // spirit.ts revivePlayerAt). The long cooldown keeps a death costly. PLAYTEST cooldown
-  // (owner 2026-07-12): a short 120s for testing; a real battle res would be 5-10 min.
-  temporal_reversal: {
-    id: 'temporal_reversal',
-    name: 'Temporal Reversal',
-    class: 'mage',
-    learnLevel: 16,
-    specs: ['arcane'],
-    cost: 60,
-    castTime: 2,
-    cooldown: 120,
-    range: 30,
-    school: 'arcane',
-    requiresTarget: true,
-    targetType: 'friendly',
-    targetsDead: true,
-    effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
-    description:
-      "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
-  },
-  // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
-  // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd
-  // AoE on the caster's group/raid. Restores 30% of the REAL damage each living
-  // member took in the last 5s, capped at 35% of their max HP and their missing HP;
-  // never crits, applies no Echo, does not touch the Arcane conversion, and generates
-  // normal heal threat. Runs entirely through combat/rewind.ts + the 5s damage ring
-  // (combat/damage_history.ts). PLAYTEST-provisional cost (150) and 120s cooldown.
-  temporal_rewind: {
-    id: 'temporal_rewind',
-    name: 'Rewind',
-    class: 'mage',
-    learnLevel: 14,
-    specs: ['arcane'],
-    cost: 150,
-    castTime: 0,
-    cooldown: 120,
-    range: 0,
-    school: 'arcane',
-    requiresTarget: false, // instant, self-centered: no target needed
-    effects: [{ type: 'rewind', fraction: 0.3, maxHpFraction: 0.35, windowSec: 5, radius: 40 }],
-    description:
-      'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
-  },
-  // ---- Chronomancy (healer) group haste cooldown: Temporal Acceleration, the
-  // Chronomancer's equivalent of the Shaman's Bloodlust. A BASE ability (owner
-  // directive 2026-07-13: not a talent). Instant, no target, 40 yd group/raid, +30%
-  // FULL haste (attack + cast + channel) for 15s on a 5 min cooldown, sharing the
-  // `sated` exhaustion with Bloodlust so the two can never be chained. Runs through
-  // the same aoeAllyHaste effect + combat/haste_burst.ts.
-  // Perfect Moment: the Chronomancer's offensive cooldown (owner design
-  // 2026-07-14). Instantly grants FOUR Arcane Charges and freezes them for 10
-  // sec: Aether Darts fires its full-charge five-missile barrage without
-  // spending the stack (combat/chronomancy.ts applyPerfectMoment +
-  // aetherDartsBoltBonus's window guard). Off the GCD, like Combustion.
-  perfect_moment: {
-    id: 'perfect_moment',
-    name: 'Perfect Moment',
-    class: 'mage',
-    learnLevel: 10,
-    specs: ['arcane'],
-    cost: 0,
-    castTime: 0,
-    cooldown: 120,
-    offGcd: true,
-    range: 0,
-    school: 'arcane',
-    requiresTarget: false,
-    effects: [{ type: 'perfectMoment' }],
-    description:
-      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancer)',
-  },
-  temporal_acceleration: {
-    id: 'temporal_acceleration',
-    name: 'Temporal Acceleration',
+  ice_barrier: {
+    id: 'ice_barrier',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire', 'frost'],
+    name: 'Frostveil',
     class: 'mage',
     learnLevel: 5,
     cost: 90,
@@ -5831,7 +5678,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'clearCooldowns',
-        abilities: ['blink', 'ice_barrier', 'blazing_barrier', 'greater_invisibility'],
+        abilities: [
+          'blink',
+          'ice_barrier',
+          'blazing_barrier',
+          'temporal_barrier',
+          'greater_invisibility',
+        ],
       },
     ],
     description:

@@ -6566,6 +6566,18 @@ export const zh_CN: EnTranslations = {
         "name": "天石",
         "description": "唤降一颗陨石轰击目标区域，造成 {damage} 点火焰伤害并点燃地面。（法师天赋）"
       },
+      "temporal_mend": {
+        "name": "时光缝合",
+        "description": "将盟友向前拉动一瞬，在身体安定于更健康的未来形态时治疗{damage}点生命值。(时光术特色技能)"
+      },
+      "temporal_barrier": {
+        "name": "时光屏障",
+        "description": "将目标移出当下一瞬：时光之壳在10秒内吸收{damage}点伤害，随后时间线弹回原位。"
+      },
+      "temporal_echo": {
+        "name": "时光回响",
+        "description": "以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。"
+      },
       "mind_sear": {
         "name": "灼思",
         "description": "向目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"

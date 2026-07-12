@@ -75,6 +75,20 @@ export function abilityDamageBonus(
       if (eff.deal) return directHitBonus(power, def, res.castTime, false);
       if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
       return 0;
+    case 'heal':
+      // Combat adds the direct-heal rider (full cast-time coefficient off Spell
+      // Power, no AP scale-down) to every direct heal in effect_dispatch.
+      return directHealBonus(scaling.spellPower, res.castTime);
+    case 'hot': {
+      // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
+      // direct part already took the coefficient); only pure HoTs (Rejuvenation)
+      // take the per-tick rider. The tooltip shows the TOTAL, so the per-tick
+      // bonus is multiplied across all ticks, mirroring the dot case below.
+      const hybridHeal = res.effects.some((e) => e.type === 'heal');
+      if (hybridHeal) return 0;
+      const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
+      return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
+    }
     case 'drainTick':
       return channelTickBonus(power, def);
     case 'dot': {

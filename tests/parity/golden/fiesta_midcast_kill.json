@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "9718a972",
+      "state": "006af7e6",
       "events": "b8e63708",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "188504b7",
+      "state": "10a3bd0d",
       "events": "90b217f1",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "fd42fa91",
+      "state": "e3cc22a3",
       "events": "d13b86f9",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "e7da220a",
+      "state": "add141a2",
       "events": "669c1069",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "4d8e34ee",
+      "state": "83c95e36",
       "events": "1d077d66",
       "rng": {
         "draws": 300,
@@ -434,7 +434,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.1,
           "spellPower": 41,
           "stats": {
             "agi": 12,
@@ -560,7 +559,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "daf62867",
+      "state": "8d25f923",
       "events": "f8fba87c",
       "rng": {
         "draws": 300,
@@ -919,7 +918,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.1,
           "spellPower": 41,
           "stats": {
             "agi": 12,
@@ -1043,7 +1041,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "98c4076b",
+      "state": "0f7fcf1f",
       "events": "a6f8a49c",
       "rng": {
         "draws": 300,
@@ -1406,7 +1404,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.1,
           "spellPower": 41,
           "stats": {
             "agi": 12,
@@ -1530,7 +1527,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "e15e2d57",
+      "state": "f77001b1",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1541,7 +1538,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 409,
-      "state": "3fdf969c",
+      "state": "2e1d8850",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1905,7 +1902,6 @@
             "y": 1.5,
             "z": -2
           },
-          "spellHaste": 0.1,
           "spellPower": 41,
           "stats": {
             "agi": 12,

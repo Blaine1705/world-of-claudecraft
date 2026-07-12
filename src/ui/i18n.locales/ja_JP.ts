@@ -1917,6 +1917,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': 'エーテルダート',
   'entities.abilities.arcane_missiles.description':
     '敵にエーテルダートを放ち、3秒間、毎秒{damage}の秘術ダメージを与えます。',
+  'entities.abilities.temporal_mend.name': '時の繕い',
+  'entities.abilities.temporal_mend.description':
+    '味方を一瞬だけ未来へ進め、より健やかな未来の体に馴染む間に体力を{damage}回復する。(クロノマンシーの特性)',
+  'entities.abilities.temporal_barrier.name': '時の障壁',
+  'entities.abilities.temporal_barrier.description':
+    '対象を現在から一拍だけずらし、時の殻が10秒間、{damage}のダメージを吸収してから時間軸が元に戻る。',
+  'entities.abilities.temporal_echo.name': '時の残響',
+  'entities.abilities.temporal_echo.description':
+    'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
   'entities.abilities.polymorph.name': '呪化',
   'entities.abilities.polymorph.description':
     '敵を最大{duration}秒間ヒキガエルに変えます。ヒキガエルは歩き回り、急速に回復します。ダメージを受けると効果が切れます。獣と人型のみ。',

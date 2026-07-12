@@ -44,7 +44,9 @@ import {
   hasAreaEchoAura,
 } from './area_echo';
 import { isRootedOrChilled } from './cc';
-import { consumeNextAttackCrit } from './empower_next';
+import { placeTemporalEcho } from './chronomancy';
+import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
+import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { fireGuaranteedCrit } from './fire_mage';
 import { isFormAuraKind } from './forms';
@@ -531,77 +533,6 @@ export function runEffects(
         const echoTarget = target ?? p;
         if (echoTarget !== p && ctx.isHostileTo(p, echoTarget)) break;
         placeTemporalEcho(ctx, p, echoTarget, eff.duration);
-        break;
-      }
-      case 'massTemporalEcho': {
-        // Cascada temporal: the group version of Temporal Echo. The friendly target
-        // is the CENTER and must be the caster or a living group/raid member.
-        // selectCascadeTargets resolves and ORDERS the whole list (primary first,
-        // then the members nearest the primary within radius, capped at maxTargets)
-        // BEFORE any heal or aura is applied. Each target then takes a small initial
-        // heal (Spell-Power-scaled, can crit) and a 13% group echo; the overlap rule
-        // in placeGroupEcho keeps a pre-existing individual mark at 35%. The Arcane
-        // conversion lives in combat/chronomancy.ts. (mage-chronomancy.md Phase 4)
-        const primary = target ?? p;
-        if (primary !== p && ctx.isHostileTo(p, primary)) break;
-        const targets = selectCascadeTargets(ctx, p, primary, eff.radius, eff.maxTargets);
-        // DEV playtest readout only (Entity.cascadeDevStats, set by /dev cascade):
-        // capture the landed initial heal per target so logCascadeCast can print it.
-        // Absent in production, so the capture and log are fully skipped.
-        const devPlaytest = p.cascadeDevStats !== undefined;
-        const initialApplied: number[] = [];
-        for (const ally of targets) {
-          const before = devPlaytest ? ally.hp : 0;
-          const healAmount =
-            ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
-          ctx.applyHeal(p, ally, healAmount, ability.name);
-          if (devPlaytest) {
-            const applied = ally.hp - before;
-            initialApplied.push(applied);
-            recordCascadeInitial(p, applied);
-          }
-          placeGroupEcho(ctx, p, ally, eff.duration);
-        }
-        if (devPlaytest) logCascadeCast(ctx, p, targets, initialApplied);
-        break;
-      }
-      case 'resurrectAlly': {
-        // Temporal Reversal: rewind a dead group/raid member to life at their corpse
-        // (resolved upstream as a dead party/raid member), no resurrection sickness.
-        const ally = target;
-        if (!ally || !ally.dead) break;
-        revivePlayerAt(ctx, ally.id, ally.corpsePos ?? ally.pos, eff.hpFrac);
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: ally.id,
-          school: 'arcane',
-          fx: 'temporalGlyph',
-        });
-        break;
-      }
-      case 'perfectMoment': {
-        // Perfect Moment (combat/chronomancy.ts): slam the caster to full Arcane
-        // Charges and open the window in which Aether Darts stops consuming them.
-        applyPerfectMoment(ctx, p);
-        break;
-      }
-      case 'rewind': {
-        // Chronomancy Rewind (combat/rewind.ts): instant, no target, centered on the
-        // caster. Restores a fraction of the recent REAL damage every living group/
-        // raid member in range took, capped per target. No crit / no rng / no Echo /
-        // no Arcane conversion; normal heal threat via the shared applyHeal route.
-        applyRewind(
-          ctx,
-          p,
-          {
-            fraction: eff.fraction,
-            maxHpFraction: eff.maxHpFraction,
-            windowSec: eff.windowSec,
-            radius: eff.radius,
-          },
-          ability.name,
-        );
         break;
       }
       case 'heal': {

@@ -829,14 +829,15 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "color": "#69ccf0",
     "resource": "mana",
     "roles": [
+      "healer",
       "dps"
     ],
     "specs": [
       {
         "id": "arcane",
-        "name": "Aethermancy",
-        "role": "dps",
-        "signature": "arcane_power"
+        "name": "Chronomancy",
+        "role": "healer",
+        "signature": "temporal_mend"
       },
       {
         "id": "fire",
@@ -991,8 +992,12 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Flamestrike"
       },
       {
-        "id": "counterspell",
-        "name": "Spellbreak"
+        "id": "temporal_barrier",
+        "name": "Temporal Barrier"
+      },
+      {
+        "id": "temporal_echo",
+        "name": "Temporal Echo"
       }
     ],
     "model": "player_mage",

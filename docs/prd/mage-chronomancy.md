@@ -627,3 +627,161 @@ replicación constante de curas directas. La combinación recomendada es:
 Esta dirección produce un healer proactivo y reconocible sin convertirlo en un DPS completo que
 también cura gratis. Sigue siendo viable con la arquitectura actual y puede construirse por fases
 con riesgo controlado.
+
+## 14. Registro de implementacion: Fase 1 (2026-07-11, rama mage/frost-spec)
+
+Estado: Fase 1 IMPLEMENTADA en esta rama. Esta seccion registra las decisiones tomadas al
+construirla. Los numeros son de playtest, no definitivos.
+
+### 14.1 Decision del ID interno
+
+La especializacion conserva el id interno estable `arcane`. Un barrido completo de `src/` y
+`server/` confirmo que ningun codigo lo trata como un caso especial (solo se consume de forma
+generica via `SpecDef.id`, `alloc.spec`, `mods.spec` y `def.specs.includes`), y no existe una
+migracion probada de ids de spec persistidos, asi que personajes, builds y loadouts existentes
+sobreviven sin tocarse. La presentacion cambia por completo: nombre `Chronomancy` /
+`Cronomancia`, rol `healer` (la tarjeta de especializacion ya lo muestra via el `roleLabel`
+generico), y descripcion centrada en reparar, prevenir y revertir.
+
+### 14.2 Kit Fase 1 y valores provisionales
+
+Remiendo temporal (`temporal_mend`, signatura de la spec, concedida al comprometer):
+cura directa aliado/uno mismo, alcance 30 (el estandar de todas las curas), casteo 2.0 s,
+sin cooldown, escuela arcana, critico y amenaza por la canalizacion normal (`applyHeal`).
+Rangos: n1 (5) 62-74 por 45 mana; n2 (12) 105-125 por 70; n3 (18) 150-178 por 95.
+Justificacion: a nivel 20 queda entre la Ola de sanacion del chaman (2.5 s, 90 mana,
+138-164) y el Toque de sanacion del druida (3.0 s, 110, 175-208), con el casteo de 2.0 s
+pedido; su HPS (~82/s antes de poder de hechizo) es deliberadamente algo menor que el de la
+Plegaria solemne del sacerdote (~100/s), el healer de referencia.
+
+Barrera temporal (`temporal_barrier`): escudo individual aliado/uno mismo, instantaneo y
+DENTRO del GCD, cooldown 12 s, duracion 10 s, alcance 30, escuela arcana, canalizacion normal
+de absorciones (aura kind `absorb`). Rangos: n1 (5) 55 por 50 mana; n2 (12) 100 por 75;
+n3 (18) 160 por 105. Justificacion: el Salmo de proteccion del sacerdote absorbe 145 con 6 s
+de cooldown y ventana de 30 s; la Barrera absorbe un bloque mayor con la mitad de cadencia y
+una ventana corta de 10 s, encajando el rol preventivo pedido. Regla de relanzamiento (el
+patron existente de absorciones): el MISMO lanzador REEMPLAZA su escudo por uno fresco a valor
+completo (nunca se acumula consigo mismo); lanzadores DISTINTOS coexisten. El dano absorbido
+nunca reduce vida, asi que queda fuera del registro del futuro Ancla por construccion.
+
+### 14.3 Signatura y maestria provisionales
+
+- Signatura: `temporal_mend` (sustituye a `arcane_power` en el slot de signatura). DEUDA:
+  `arcane_power` (Aether Surge) queda definido pero sin referencia; se decidira su destino en
+  la revision de filas.
+- Maestria provisional: `Chronoweave` / `Cronotejido`, `{ global: { healPct: 0.15 } }`
+  ("Increases all healing you do by 15%."), escalada por nivel/20 como toda maestria. Es el
+  mismo campo generico que usa la maestria del sacerdote sagrado; en la practica solo toca el
+  kit de curacion de Cronomancia porque es la unica fuente de curas de la spec. NOTA: el motor
+  aplica `healPct` tambien al valor de las absorciones propias (la Barrera se beneficia, 160
+  base -> 184 a nivel 20 con maestria completa), registrado en tests. Esta maestria es un
+  marcador de posicion hasta que Eco temporal exista (seccion 13.8).
+- No se creo `src/sim/combat/chronomancy.ts`: la Fase 1 se resuelve entera con `AbilityDef` y
+  los efectos existentes (`heal`, `absorb`) sin logica especifica. El modulo nacera con Eco
+  temporal (Fase 2), como recomienda la seccion 6.
+
+### 14.4 Inventario y clasificacion del gating
+
+Mecanismo: `specs: ['fire', 'frost']` en las definiciones excluye SOLO al healer preservando
+byte a byte los libros de Fuego y Escarcha; `specs: ['arcane']` marca el kit exclusivo del
+healer. Los talentos de filas (utilidad compartida) son independientes de la spec y no se
+tocaron; Cold Snap y la fila Warded/Overflowing Power reconocen ahora `temporal_barrier` en el
+slot de barrera personal, asi que ninguna opcion de fila queda muerta para Cronomancia.
+
+| Habilidad | Clasificacion | Nota |
+|---|---|---|
+| fireball, frostbolt | Compartida | relleno basico de leveleo (niveles 1-4 sin spec) |
+| frost_armor, arcane_intellect, conjure_food/water | Compartida | sostenimiento y buffs |
+| arcane_missiles, arcane_explosion | Compartida | nucleo arcano de fases futuras (13.4/13.5) |
+| polymorph, blink, frost_nova | Compartida | control/escape; frost_nova AMBIGUA, ver 14.5 |
+| fire_blast, scorch, pyroblast, flamestrike | Piromancia+Criomancia | kit ofensivo, fuera del healer |
+| ice_barrier | Piromancia+Criomancia | barrera personal DPS; el healer usa la suya |
+| ice_lance, flurry, frozen_orb, blizzard, water elemental, pasivas frost | Criomancia | ya gateadas |
+| meteor, blazing_barrier, ignition, hot_streak | Piromancia | ya gateadas |
+| combustion / icy_veins | signaturas fire/frost | concedidas por spec, sin cambio |
+| temporal_mend, temporal_barrier | Cronomancia | nuevo kit Fase 1 |
+| filas (evocation, presence_of_mind, ice_floes, greater_invisibility, rings_of_frost, cold_snap, mass_barrier, overload, power_echo, rune_of_power, etc.) | Compartida via filas | utilidad para las tres specs |
+| cone_of_cold, counterspell, deep_freeze, ice_block | HUERFANAS | definidas pero inaprendibles hoy (deuda previa, sin cambio) |
+
+### 14.5 Casos ambiguos pendientes de decision del operador
+
+Clasificados de forma conservadora como COMPARTIDOS (no se excluye nada ambiguo sin
+confirmacion): (1) `frost_nova`, escape universal clasico pero de sabor escarcha; (2)
+`fireball`/`frostbolt` completos hasta el rango maximo (una alternativa seria congelar al
+healer en rangos bajos); (3) las filas de sabor escarcha (`ice_floes`, `rings_of_frost`)
+siguen elegibles para el healer. Cambiar cualquiera es un ajuste de una linea.
+
+## 15. Registro de implementacion: Fase 2 (2026-07-12, rama mage/frost-spec)
+
+Estado: Fase 2 (Eco temporal) IMPLEMENTADA en esta rama, sobre la Fase 1. Esta seccion registra
+las decisiones tomadas al construirla. Los numeros son de playtest, no definitivos.
+
+### 15.1 Eco temporal es DIRECTO, sin proyectil
+
+Al lanzarse, Eco temporal NO dispara ninguna onda ni proyectil que viaje hasta el aliado. Aparece
+directamente un glifo temporal breve SOBRE el objetivo (evento `spellfx` con `fx: 'temporalGlyph'`,
+anclado al `targetId`, color arcano, reutilizando `wardBloom` + un pulso discreto en el renderer).
+La marca queda como un aura de buff discreta (icono propio de `temporal_echo`). Cada curacion de
+conversion emite un `heal2` que produce el numero flotante y un pulso pequeno de curacion sobre el
+aliado (el `healGlow` estandar), sin proyectil hacia el, evitando ruido con Misiles Arcanos. El
+proyectil de Misiles Arcanos sigue viajando al ENEMIGO como siempre; solo la curacion aparece
+directa sobre el aliado marcado.
+
+### 15.2 Kit Fase 2 y valores provisionales
+
+Eco temporal (`temporal_echo`): exclusivo de Cronomancia (`specs: ['arcane']`), en el libro base
+(gateado por spec, NO concedido, para que el filtro de spec aplique). Instantaneo, dentro del GCD,
+sin cooldown, alcance 30, escuela arcana, `targetType: 'friendly'` (aliado o uno mismo). Se
+construye con DOS efectos: un `heal` normal (la cura inicial, alimenta `$d` y puede critear como
+cualquier cura directa) y un efecto nuevo minimo `temporalEcho` (solo lleva `duration`, alimenta
+`$t` y coloca la marca). Rangos: n1 (5) cura 24-30 por 40 mana; n2 (12) 40-50 por 60; n3 (18)
+58-70 por 85. Marca: 15 s. Justificacion: la cura inicial es deliberadamente pequena (~40% de
+Remiendo temporal) porque el grueso de la sanacion viene de la conversion; el maná moderado y el
+GCD, mas la regla de una sola marca propia, limitan el spameo.
+
+Conversion de dano Arcano efectivo (constantes, no almacenadas en la marca): objetivo unico 35%,
+area 15%. Se aplica al dano REALMENTE INFLIGIDO (`preHp - target.hp` en `dealDamage`, es decir tras
+mitigacion, tras absorciones y tras recortar el overkill), de modo que el dano absorbido, evitado,
+inmunizado o que excede la vida del enemigo NO fabrica curacion. Redondeo por impacto (Misiles
+Arcanos cura por cada misil). El daño de wand (arma a distancia del mago, escuela arcana) tambien
+convierte al 35% por ser dano Arcano real del mago; es marginal y coherente.
+
+### 15.3 Arquitectura
+
+- Modulo nuevo `src/sim/combat/chronomancy.ts`: `placeTemporalEcho` (mueve la marca del mismo
+  lanzador y coloca la nueva + glifo), `chronomancyConvertArcaneDamage` (el hook de conversion) y
+  `stripTemporalEchoes` (limpieza por `sourceId`). Todo el estado vive en auras, nunca en variables
+  globales del modulo.
+- Hook en el nucleo de dano: una sola llamada en `dealDamage` (damage.ts), justo tras conocer el
+  dano aplicado. `dealDamage` recibe un parametro nuevo opcional `aoe` (por defecto `false`) que
+  distingue objetivo unico de area; el loop de `aoeDamage` (Aetherburst) lo pasa `true`. Cualquier
+  otro llamante queda byte-identico.
+- Determinismo: la curacion de conversion NO dibuja rng (el critico del dano ya esta resuelto; la
+  cura nunca tira su propio critico). Se aplica por una funcion propia sin critico (`applyEchoHeal`,
+  reutilizando `healingTakenMult`/`consumeHealAbsorb`/`healingThreat` de heal.ts), nunca por
+  `dealDamage`, asi que no puede recursar ni activar otra conversion. La curacion de Eco no puede
+  curar ni resucitar objetivos muertos (guarda `ally.dead`).
+- Separacion por `sourceId`: la marca lleva el id del mago; dos Cronomantes mantienen marcas
+  independientes sobre el mismo aliado y cada uno solo convierte con la suya.
+- Limpieza: al cambiar de spec fuera de Cronomancia (`applyTalentAllocation`) y al morir el mago
+  (`handleDeath`) se retiran las marcas que ese mago coloco (por `sourceId`); la marca sobre un
+  aliado que MUERE ya la retira `aurasSurvivingDeath` por el camino normal de muerte.
+- Paridad offline/online: todo son eventos (`heal2`, `aura`, `spellfx`) y estado de aura que viajan
+  al cliente verbatim (sin allowlist), y una marca nueva se pinta como buff automaticamente. El
+  `fx: 'temporalGlyph'` nuevo se anade a la union en types.ts y a una rama en el renderer.
+
+### 15.4 Maestria y conversion
+
+La maestria de Fase 1 (Chronoweave, `global.healPct`) se aplica dentro de `applyHeal` (curas
+directas y absorciones propias), pero NO se aplica a la curacion de conversion de Eco temporal:
+la conversion usa `Math.round(danoEfectivo * tasa)` limpio. Es una decision consciente para
+mantener el numero de conversion legible y testeable (100 de Arcano single -> 35 exacto) y porque
+la maestria de Fase 1 se definio como refuerzo de la curacion DIRECTA. Cuando se cierre la maestria
+definitiva de Cronomancia (seccion 13.8, potenciar Eco), se decidira si la conversion escala.
+
+### 15.5 No implementado en Fase 2 (deuda por fases posteriores)
+
+Convergencia temporal (aplicacion grupal), acumulaciones nuevas de Explosion Arcana y su presion de
+maná, Misiles Arcanos consumiendo acumulaciones, Ancla temporal, Rebobinar, Preservacion
+cronostatica, reduccion especifica de PvP para la conversion (los early-returns PvP de `dealDamage`,
+duelo/fiesta/arena, NO convierten hoy) y la revision completa de filas de talentos del mago.

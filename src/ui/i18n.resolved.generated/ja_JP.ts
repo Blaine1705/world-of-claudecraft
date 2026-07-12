@@ -6566,6 +6566,18 @@ export const ja_JP: EnTranslations = {
         "name": "天の石",
         "description": "対象地点に隕石を呼び降ろし、{damage} の火炎ダメージを与えて地面を燃やす。（メイジタレント）"
       },
+      "temporal_mend": {
+        "name": "時の繕い",
+        "description": "味方を一瞬だけ未来へ進め、より健やかな未来の体に馴染む間に体力を{damage}回復する。(クロノマンシーの特性)"
+      },
+      "temporal_barrier": {
+        "name": "時の障壁",
+        "description": "対象を現在から一拍だけずらし、時の殻が10秒間、{damage}のダメージを吸収してから時間軸が元に戻る。"
+      },
+      "temporal_echo": {
+        "name": "時の残響",
+        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。"
+      },
       "mind_sear": {
         "name": "思念焼き",
         "description": "対象地点に暗影の力を注ぎ、毎秒周囲の敵に {damage} のダメージを与える。（プリーストタレント）"

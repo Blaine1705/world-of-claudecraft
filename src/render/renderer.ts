@@ -3002,6 +3002,13 @@ export class Renderer {
         } else if (ev.fx === 'detonate') {
           this.vfx.detonate(ev.targetId, ev.school);
           this.pulseAt(ev.targetId, ev.school, 9, 0.5);
+        } else if (ev.fx === 'temporalGlyph') {
+          // Chronomancy Temporal Echo apply: a brief temporal glyph blooms
+          // directly OVER the marked ally (target-anchored, no projectile ever
+          // travels to them). A modest arcane bloom + glow, distinct from the
+          // per-hit heal-glow pulse the conversion heals emit.
+          this.vfx.wardBloom(ev.targetId, 'arcane');
+          this.pulseAt(ev.targetId, 'arcane', 5, 0.45);
         } else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);

@@ -15,7 +15,10 @@ import type { Entity } from '../src/sim/types';
 function rig(rows: Record<number, string>, level = 20) {
   const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
-  expect(sim.applyTalents({ spec: null, rows })).toBe(true);
+  // Frost-specced rig: the Chronomancy gating (mage-chronomancy.md Phase 1)
+  // moved the offensive kit these rows exercise (Frostveil, the fire/frost
+  // nukes) onto the two DPS specs, so a spec-less rig can no longer cast it.
+  expect(sim.applyTalents({ spec: 'frost', rows })).toBe(true);
   const p = sim.player;
   p.resource = p.maxResource;
   return { sim, p };

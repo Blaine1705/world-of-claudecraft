@@ -1909,6 +1909,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': '에테르 화살',
   'entities.abilities.arcane_missiles.description':
     '적에게 에테르 화살을 발사하여 3초 동안 매초 {damage}의 비전 피해를 입힙니다.',
+  'entities.abilities.temporal_mend.name': '시간의 꿰매기',
+  'entities.abilities.temporal_mend.description':
+    '아군을 한순간 미래로 끌어당겨 더 건강한 미래의 몸에 자리 잡는 동안 생명력을 {damage} 회복시킵니다. (시간술 고유 기술)',
+  'entities.abilities.temporal_barrier.name': '시간의 방벽',
+  'entities.abilities.temporal_barrier.description':
+    '대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다.',
+  'entities.abilities.temporal_echo.name': '시간의 메아리',
+  'entities.abilities.temporal_echo.description':
+    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다.',
   'entities.abilities.polymorph.name': '홀리기',
   'entities.abilities.polymorph.description':
     '적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',

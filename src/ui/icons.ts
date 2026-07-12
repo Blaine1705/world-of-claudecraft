@@ -2468,6 +2468,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ignition: r('fire', 'ember', ['flame', { p: 'droplet', ...BR }], ['drips']),
   hot_streak: r('fire', 'gold', ['flame', { p: 'sunburst', ...TR }], ['sparkle']),
   summon_water_elemental: r('frost', 'ice', ['droplet', { p: 'snowflake', ...TR }], ['glow']),
+  // Chronomancy (procedural placeholders until painted art lands).
+  temporal_mend: r('arcane', 'arcanePink', ['heart', { p: 'moon', ...TR }], ['glow']),
+  temporal_barrier: r('arcane', 'arcanePink', ['shield', { p: 'moon', ...TR }], ['glow']),
+  // Phase 2: the Arcane-damage-to-healing mark (heart + a radiating echo).
+  temporal_echo: r('arcane', 'arcanePink', ['heart', { p: 'sunburst', ...TR }], ['sparkle']),
   crusader_strike: r('holy', 'gold', ['sword', { p: 'cross', ...BR }], ['glow']),
   // rogue
   kidney_shot: r('shadow', 'steel', ['dagger', { p: 'boot', ...BR }]),

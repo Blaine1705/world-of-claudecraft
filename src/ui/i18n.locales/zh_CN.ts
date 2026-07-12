@@ -1832,6 +1832,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': '以太飞镖',
   'entities.abilities.arcane_missiles.description':
     '向敌人发射以太飞镖，持续 3 秒，每秒造成 {damage} 点奥术伤害。',
+  'entities.abilities.temporal_mend.name': '时光缝合',
+  'entities.abilities.temporal_mend.description':
+    '将盟友向前拉动一瞬，在身体安定于更健康的未来形态时治疗{damage}点生命值。(时光术特色技能)',
+  'entities.abilities.temporal_barrier.name': '时光屏障',
+  'entities.abilities.temporal_barrier.description':
+    '将目标移出当下一瞬：时光之壳在10秒内吸收{damage}点伤害，随后时间线弹回原位。',
+  'entities.abilities.temporal_echo.name': '时光回响',
+  'entities.abilities.temporal_echo.description':
+    '以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。',
   'entities.abilities.polymorph.name': '蛊惑',
   'entities.abilities.polymorph.description':
     '将敌人变成蟾蜍，最多持续 {duration} 秒。蟾蜍会四处游荡并快速恢复。任何伤害都会打破效果。仅限野兽和人型生物。',

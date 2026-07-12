@@ -54,6 +54,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -345,6 +346,10 @@ export function dealDamage(
           noRage,
           threatOpts,
           direct,
+          // Carry the AoE flag so a redirected slice of an area Arcane hit still
+          // rates its Temporal Echo conversion at the area (15%) coefficient, not
+          // the single-target 35%.
+          aoe,
         );
       }
     }
@@ -508,6 +513,18 @@ export function dealDamage(
       }
     }
   }
+  // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
+  // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
+  // absorb shields already resolved above, so a shielded cat soaks first.
+  if (target.kind === 'mob') {
+    const ymatch = ctx.yumiCatMatches.get(target.id);
+    if (ymatch) {
+      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
+      return;
+    }
+  }
+
+  const preHp = target.hp;
   target.hp = Math.max(0, target.hp - amount);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.

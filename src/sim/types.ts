@@ -411,11 +411,6 @@ export type AuraKind =
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
   // conversion rate is a constant read at damage time, not stored on the aura.
   | 'temporal_echo'
-  // Chronomancy Aether Surge charges (docs/prd/mage-chronomancy.md sections
-  // 13.4 / 14): a self buff whose `value`/`stacks` count the Arcane Charges held
-  // (cap 4). Each charge scales the next Aether Surge's damage and cost; Aether
-  // Darts consumes them. Read by aura id 'arcane_surge' in combat/chronomancy.ts.
-  | 'arcane_charge'
   | 'buff_dr'
   // Raised Guard's physical-only sibling of buff_dr: the wearer takes `value`
   // fraction less PHYSICAL damage while worn (other schools untouched). Same
@@ -1579,9 +1574,24 @@ export type AbilityEffect =
   | { type: 'repositionToAim'; breakRoots?: boolean }
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
-  // Chain Heal: heal the primary friendly target, then bounce to the nearest not-yet-healed
-  // ally within `radius`, up to `jumps` extra targets, each jump healing `falloff`x the last.
-  | { type: 'chainHeal'; min: number; max: number; jumps: number; falloff: number; radius: number }
+  // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13): place a
+  // per-caster mark on the friendly target (or self) for `duration` sec. The
+  // small initial heal is authored as a sibling `heal` effect on the same
+  // ability (so $d shows it); this effect owns only the mark. The Arcane-damage
+  // conversion is handled by combat/chronomancy.ts, not by a stored field.
+  | { type: 'temporalEcho'; duration: number }
+  // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
+  // nearby allies, each hop healing `falloff` of the previous hop's amount. The
+  // arc reach is given as `jumpRange` on some variants and `radius` on others.
+  | {
+      type: 'chainHeal';
+      min: number;
+      max: number;
+      jumps: number;
+      falloff: number;
+      jumpRange?: number;
+      radius?: number;
+    }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
   | { type: 'absorb'; amount: number; duration: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
@@ -2825,6 +2835,10 @@ export type SimEvent = { pid?: number } & (
         | 'wardBloom'
         | 'echoBurst'
         | 'detonate'
+        // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13):
+        // a brief temporal glyph blooming directly OVER the marked ally on apply.
+        // Target-anchored, no projectile travels to the ally. Visual-only.
+        | 'temporalGlyph'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep';

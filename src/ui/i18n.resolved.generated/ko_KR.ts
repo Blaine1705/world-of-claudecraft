@@ -6566,6 +6566,18 @@ export const ko_KR: EnTranslations = {
         "name": "하늘돌",
         "description": "대상 지역에 운석을 떨어뜨려 {damage}의 화염 피해를 입히고 지면을 불태웁니다. (마법사 특성)"
       },
+      "temporal_mend": {
+        "name": "시간의 꿰매기",
+        "description": "아군을 한순간 미래로 끌어당겨 더 건강한 미래의 몸에 자리 잡는 동안 생명력을 {damage} 회복시킵니다. (시간술 고유 기술)"
+      },
+      "temporal_barrier": {
+        "name": "시간의 방벽",
+        "description": "대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다."
+      },
+      "temporal_echo": {
+        "name": "시간의 메아리",
+        "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다."
+      },
       "mind_sear": {
         "name": "생각불꽃",
         "description": "대상 지역에 암흑 기운을 퍼부어 매초 주위 적에게 {damage}의 피해를 입힙니다. (사제 특성)"
