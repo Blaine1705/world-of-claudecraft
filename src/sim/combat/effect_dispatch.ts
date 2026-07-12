@@ -585,6 +585,21 @@ export function runEffects(
         if (devPlaytest) logCascadeCast(ctx, p, targets, initialApplied);
         break;
       }
+      case 'resurrectAlly': {
+        // Temporal Reversal: rewind a dead group/raid member to life at their corpse
+        // (resolved upstream as a dead party/raid member), no resurrection sickness.
+        const ally = target;
+        if (!ally || !ally.dead) break;
+        revivePlayerAt(ctx, ally.id, ally.corpsePos ?? ally.pos, eff.hpFrac);
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: ally.id,
+          school: 'arcane',
+          fx: 'temporalGlyph',
+        });
+        break;
+      }
       case 'heal': {
         const healTarget = target ?? p;
         if (healTarget !== p && ctx.isHostileTo(p, healTarget)) break;

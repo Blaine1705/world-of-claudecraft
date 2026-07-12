@@ -1673,6 +1673,11 @@ const classAbilityNamesEn = {
         'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
       ],
       [
+        'temporal_reversal',
+        'Temporal Reversal',
+        "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+      ],
+      [
         'arcane_surge',
         'Aether Surge',
         'Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges.',

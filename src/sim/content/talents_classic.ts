@@ -125,8 +125,8 @@ const MAGE_SPECS: SpecDef[] = [
     'A temporal healer who repairs, prevents and rewinds harm with time-bending Arcane magic.',
     'temporal_mend',
     'Chronoweave',
-    'Increases all healing you do by 15%.',
-    { global: { healPct: 0.15 } },
+    'Increases all healing you do by 15%, your maximum mana by 5%, and your mana regeneration by 20%.',
+    { global: { healPct: 0.15, manaPct: 0.05, manaRegenPct: 0.2 } },
   ),
   spec(
     'fire',

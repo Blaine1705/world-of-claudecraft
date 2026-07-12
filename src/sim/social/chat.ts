@@ -1021,6 +1021,11 @@ export function handleDevChat(
     // [dev] Controlled Cascada temporal playtest: a non-offensive training dummy plus
     // raid allies at known distances, with a per-cast metrics readout. Dev realms only.
     ctx.startCascadePlaytest(pid);
+    // Dev-channel English diagnostics, routed through a var (like /dev bot) so the S3
+    // emit scanner treats it as dev-channel text, not a localizable UI literal.
+    const cascadeText =
+      '[dev] Cascade scenario ready: training dummy + raid allies (one beyond 15 yd). Target the center, cast Temporal Cascade, then hit the dummy with Arcane spells for the per-cast readout.';
+    ctx.emit({ type: 'log', text: cascadeText, pid });
     return null;
   }
   if (/^\/(?:dev\s+sandbox|devsandbox)\s*$/i.test(raw)) {

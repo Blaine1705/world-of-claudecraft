@@ -91,6 +91,8 @@ export interface GlobalModEffect {
   meleeDmgPct?: number; // physical ability damage
   spellDmgPct?: number; // magic ability damage
   healPct?: number; // healing done
+  manaPct?: number; // max mana multiplier (e.g. Chronoweave mastery cushion)
+  manaRegenPct?: number; // out-of-combat mana regen multiplier
   dotDmgPct?: number; // damage-over-time effects
   hotHealPct?: number; // heal-over-time effects
   absorbPct?: number; // absorb shield strength
@@ -385,6 +387,8 @@ function zeroGlobal(): Required<GlobalModEffect> {
     meleeDmgPct: 0,
     spellDmgPct: 0,
     healPct: 0,
+    manaPct: 0,
+    manaRegenPct: 0,
     dotDmgPct: 0,
     hotHealPct: 0,
     absorbPct: 0,
@@ -478,6 +482,8 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.meleeDmgPct += (e.meleeDmgPct ?? 0) * mult;
     g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
     g.healPct += (e.healPct ?? 0) * mult;
+    g.manaPct += (e.manaPct ?? 0) * mult;
+    g.manaRegenPct += (e.manaRegenPct ?? 0) * mult;
     g.dotDmgPct += (e.dotDmgPct ?? 0) * mult;
     g.hotHealPct += (e.hotHealPct ?? 0) * mult;
     g.absorbPct += (e.absorbPct ?? 0) * mult;

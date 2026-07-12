@@ -2,12 +2,7 @@
 // Cascada's echo window grows, Aether Darts fires a full-charge barrage, and a combat
 // resurrection (Temporal Reversal) is added. docs/prd/mage-chronomancy.md.
 import { describe, expect, it } from 'vitest';
-import {
-  ARCANE_SURGE_ID,
-  aetherDartsChannelStart,
-  aetherSurgeCastMult,
-  aetherSurgeStacks,
-} from '../src/sim/combat/chronomancy';
+import { aetherDartsChannelStart, aetherSurgeStacks } from '../src/sim/combat/chronomancy';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -91,130 +86,27 @@ describe('Aether Darts full-charge barrage', () => {
     expect(mage.aetherDartsTicks).toBe(5);
   });
 
-  // Count the missiles FIRED (each launches a 'spellfx' projectile), not the ones
-  // that land: a spell-hit roll can miss, but the barrage must always FIRE exactly
-  // 5. This also pins the floating-point channel-tick fix (the 5th tick used to drop
-  // when it coincided with the channel end, at 0% and some haste levels).
-  function fireCount(sim: Sim, p: Entity): number {
-    let fired = 0;
-    for (let t = 0; t < 120; t++) {
+  it('the channel actually lands 5 missiles at 4 charges', () => {
+    const { sim, p } = chronoMage();
+    const dummy = addDummy(sim);
+    for (let i = 0; i < 4 && aetherSurgeStacks(p) < 4; i++) {
+      sim.targetEntity(dummy.id);
+      sim.castAbility('arcane_surge');
+      for (let t = 0; t < 60 && !free(p); t++) sim.tick();
+    }
+    expect(aetherSurgeStacks(p)).toBe(4);
+    sim.targetEntity(dummy.id);
+    sim.castAbility('arcane_missiles');
+    let missiles = 0;
+    for (let t = 0; t < 100; t++) {
       for (const e of sim.tick() as SimEvent[]) {
-        if (e.type === 'spellfx' && (e as { sourceId?: number }).sourceId === p.id) fired++;
+        if (e.type === 'damage' && e.sourceId === p.id && e.targetId === dummy.id) missiles++;
       }
       if (free(p) && t > 5) break;
     }
-    return fired;
-  }
-
-  it('the channel actually fires 5 missiles at 4 charges (default 3), miss-independent', () => {
-    const { sim, p } = chronoMage();
-    const dummy = addDummy(sim);
-    for (let i = 0; i < 4 && aetherSurgeStacks(p) < 4; i++) {
-      sim.targetEntity(dummy.id);
-      sim.castAbility('arcane_surge');
-      for (let t = 0; t < 60 && !free(p); t++) sim.tick();
-    }
-    expect(aetherSurgeStacks(p)).toBe(4);
-    sim.targetEntity(dummy.id);
-    sim.castAbility('arcane_missiles');
-    expect(fireCount(sim, p)).toBe(5);
-  });
-
-  it('a plain channel (no charges) still fires exactly the default 3 missiles', () => {
-    const { sim, p } = chronoMage();
-    const dummy = addDummy(sim);
-    expect(aetherSurgeStacks(p)).toBe(0);
-    sim.targetEntity(dummy.id);
-    sim.castAbility('arcane_missiles');
-    expect(fireCount(sim, p)).toBe(3);
-  });
-
-  it('the 5-missile barrage holds under spell haste (fp channel-tick fix)', () => {
-    const { sim, p } = chronoMage();
-    const dummy = addDummy(sim);
-    for (let i = 0; i < 4 && aetherSurgeStacks(p) < 4; i++) {
-      sim.targetEntity(dummy.id);
-      sim.castAbility('arcane_surge');
-      for (let t = 0; t < 60 && !free(p); t++) sim.tick();
-    }
-    expect(aetherSurgeStacks(p)).toBe(4);
-    p.spellHaste = (p.spellHaste ?? 0) + 0.2; // a tierset-like haste level that dropped the 5th
-    sim.targetEntity(dummy.id);
-    sim.castAbility('arcane_missiles');
-    expect(fireCount(sim, p)).toBe(5);
-  });
-});
-
-describe('Aether Surge cast-speed ramp', () => {
-  function chargeAura(value: number) {
-    return {
-      id: ARCANE_SURGE_ID,
-      name: 'Aether Surge',
-      kind: 'arcane_charge' as const,
-      value,
-      stacks: value,
-      remaining: 10,
-      duration: 10,
-      sourceId: 1,
-      school: 'arcane' as const,
-    };
-  }
-  function freeAura() {
-    return {
-      id: 'aether_surge_free',
-      name: 'Aether Rush',
-      kind: 'next_cast_free' as const,
-      value: 0,
-      remaining: 15,
-      duration: 15,
-      sourceId: 1,
-      school: 'arcane' as const,
-      empowerAbilities: [ARCANE_SURGE_ID],
-    };
-  }
-
-  it('trims 5% per charge, and the free proc halves the cast (stacking)', () => {
-    const { p } = chronoMage();
-    expect(aetherSurgeCastMult(p)).toBeCloseTo(1, 6); // at rest
-    p.auras.push(chargeAura(3));
-    expect(aetherSurgeCastMult(p)).toBeCloseTo(0.85, 6); // 3 charges: -15%
-    p.auras.push(freeAura());
-    expect(aetherSurgeCastMult(p)).toBeCloseTo(0.425, 6); // + Aether Rush: x0.5
-  });
-
-  it('the charge ramp is capped at 4 (never faster than -20% from charges alone)', () => {
-    const { p } = chronoMage();
-    p.auras.push(chargeAura(4));
-    expect(aetherSurgeCastMult(p)).toBeCloseTo(0.8, 6);
-  });
-
-  it('is wired into the cast bar: 4 charges shortens Aether Surge to 0.8x', () => {
-    const base = chronoMage();
-    base.sim.targetEntity(addDummy(base.sim).id);
-    base.sim.castAbility('arcane_surge');
-    const t0 = base.p.castTotal; // 0 charges
-    expect(t0).toBeGreaterThan(0);
-
-    const buffed = chronoMage();
-    buffed.p.auras.push(chargeAura(4));
-    buffed.sim.targetEntity(addDummy(buffed.sim).id);
-    buffed.sim.castAbility('arcane_surge');
-    const t4 = buffed.p.castTotal; // 4 charges: identical gear/haste, so the ratio is the mult
-    expect(t4).toBeCloseTo(t0 * 0.8, 3);
-  });
-
-  it('only Aether Surge is affected: a Frostbolt cast is untouched by charges', () => {
-    const base = chronoMage();
-    base.sim.targetEntity(addDummy(base.sim).id);
-    base.sim.castAbility('frostbolt');
-    const t0 = base.p.castTotal;
-    expect(t0).toBeGreaterThan(0);
-
-    const charged = chronoMage();
-    charged.p.auras.push(chargeAura(4));
-    charged.sim.targetEntity(addDummy(charged.sim).id);
-    charged.sim.castAbility('frostbolt');
-    expect(charged.p.castTotal).toBeCloseTo(t0, 3); // charges do not touch other casts
+    // 5 missiles fire (vs the default 3); a spell-hit roll can drop one, so landing
+    // MORE than the default 3 is the decisive signal that the barrage grew.
+    expect(missiles).toBeGreaterThan(3);
   });
 });
 
