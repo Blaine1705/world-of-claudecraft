@@ -1021,58 +1021,6 @@ export function handleDevChat(
     // [dev] Controlled Cascada temporal playtest: a non-offensive training dummy plus
     // raid allies at known distances, with a per-cast metrics readout. Dev realms only.
     ctx.startCascadePlaytest(pid);
-    // Dev-channel English diagnostics, routed through a var (like /dev bot) so the S3
-    // emit scanner treats it as dev-channel text, not a localizable UI literal.
-    const cascadeText =
-      '[dev] Cascade scenario ready: training dummy + raid allies (one beyond 15 yd). Target the center, cast Temporal Cascade, then hit the dummy with Arcane spells for the per-cast readout.';
-    ctx.emit({ type: 'log', text: cascadeText, pid });
-    return null;
-  }
-  if (/^\/(?:dev\s+sandbox|devsandbox)\s*$/i.test(raw)) {
-    // [dev] A generic practice scenario: a non-offensive training dummy plus a raid of
-    // regen-frozen friendly bots (10k pool) for testing any ability threat-free.
-    const allies = ctx.startDevSandbox(pid);
-    const okText = `[dev] Sandbox ready: a training dummy plus ${allies} raid allies (10k HP, started low, regen frozen). Attack the dummy, then practice heals or AoE on the allies threat-free. Re-run /dev sandbox to reset.`;
-    ctx.emit({ type: 'log', text: okText, pid });
-    return null;
-  }
-  if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
-    // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
-    completeAllQuestsForDev(ctx, pid);
-    return null;
-  }
-  // [dev] /dev raid [heroic|normal|reset] (also accepts "/dev tp raid <n> heroic").
-  // Zones a lone tester straight into the Nythraxis raid, bypassing the raid-group
-  // and attunement gates; "reset" clears the raid lockouts so it can be re-run.
-  const raidM = /^\/(?:dev\s+)(?:tp\s+)?raid\b\s*(.*)$/i.exec(raw);
-  if (raidM) {
-    const rest = raidM[1].toLowerCase();
-    const meta = ctx.players.get(pid);
-    if (/\breset\b/.test(rest)) {
-      if (meta) meta.raidLockouts.clear();
-      ctx.emit({ type: 'log', text: '[dev] Raid lockouts cleared.', pid });
-      return null;
-    }
-    const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';
-    ctx.setDungeonDifficulty(difficulty, pid);
-    enterDungeon(ctx, 'nythraxis_boss_arena', pid, true);
-    ctx.emit({ type: 'log', text: `[dev] Entering Nythraxis raid (${difficulty}).`, pid });
-    return null;
-  }
-  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
-    // [dev] Toggle god mode: invulnerable (target.devGod in dealDamage) and 100x
-    // outgoing damage (dev-gated), so a solo tester can survive and down raid bosses
-    // to inspect their drops. Enabling also tops off health and resource. Uses its
-    // OWN devGod flag, never the production gm flag, so it can never touch a real GM.
-    const e = ctx.entities.get(pid);
-    if (e) {
-      e.devGod = !e.devGod;
-      if (e.devGod) {
-        e.hp = e.maxHp;
-        e.resource = e.maxResource;
-      }
-      ctx.emit({ type: 'log', text: `[dev] God mode ${e.devGod ? 'ON' : 'OFF'}.`, pid });
-    }
     return null;
   }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
@@ -1086,7 +1034,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev cascade, /dev kill',
     );
     return null;
   }

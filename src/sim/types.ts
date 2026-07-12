@@ -2213,13 +2213,6 @@ export interface CascadeDevStats {
   initialHeal: number; // Cascada initial per-target healing applied
 }
 
-// One recorded slice of REAL HP loss for the Rewind damage history: the sim tick
-// it landed on and the post-mitigation/post-absorb amount that actually reduced HP.
-export interface DamageTick {
-  tick: number;
-  amount: number;
-}
-
 export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
@@ -2234,6 +2227,11 @@ export interface Entity {
   // Never serialized or wired.
   aetherDartsConsumePending?: boolean;
   aetherDartsBonusPerBolt?: number;
+  // DEV-ONLY (ALLOW_DEV_COMMANDS): the running Cascada temporal playtest tally,
+  // set by /dev cascade and fed by the dev-gated hooks in combat/chronomancy.ts.
+  // Pure observation for the manual playtest readout: it is NEVER read by any
+  // gameplay decision, never serialized, never wired, and is absent in production.
+  cascadeDevStats?: CascadeDevStats;
   abilityCharges?: Record<
     string,
     {

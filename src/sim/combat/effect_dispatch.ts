@@ -565,12 +565,24 @@ export function runEffects(
         const primary = target ?? p;
         if (primary !== p && ctx.isHostileTo(p, primary)) break;
         const targets = selectCascadeTargets(ctx, p, primary, eff.radius, eff.maxTargets);
+        // DEV playtest readout only (Entity.cascadeDevStats, set by /dev cascade):
+        // capture the landed initial heal per target so logCascadeCast can print it.
+        // Absent in production, so the capture and log are fully skipped.
+        const devPlaytest = p.cascadeDevStats !== undefined;
+        const initialApplied: number[] = [];
         for (const ally of targets) {
+          const before = devPlaytest ? ally.hp : 0;
           const healAmount =
             ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
           ctx.applyHeal(p, ally, healAmount, ability.name);
+          if (devPlaytest) {
+            const applied = ally.hp - before;
+            initialApplied.push(applied);
+            recordCascadeInitial(p, applied);
+          }
           placeGroupEcho(ctx, p, ally, eff.duration);
         }
+        if (devPlaytest) logCascadeCast(ctx, p, targets, initialApplied);
         break;
       }
       case 'heal': {
