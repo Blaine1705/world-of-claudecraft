@@ -4663,44 +4663,28 @@ body.reduce-motion #proc-overlay .ph-wing {
 }
 
 /* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
-/* The owner illustration, split into THREE parts (left wing, right wing, centre)
-   so the Aether Surge charges reveal it PART BY PART, not by scaling: c1 lights
-   the LEFT WING, c2 the RIGHT WING, c3 the CENTRAL body/crest/tail, c4 adds an
-   arcane glow. Each part is a violet-gradient div masked to its region; the three
-   overlay in register to rebuild the whole bird. The fire inline-SVG bird is
-   hidden under .chrono. Aether Darts spends the charges (0) and it fades out. */
-#proc-overlay.chrono svg {
+/* A hand-drawn arcane phoenix (its own inline SVG, .chrono-bird) shown only under
+   the arcane spec; the fire bird is hidden here. The Aether Surge charges reveal
+   it PART BY PART (not by scaling): c1 the LEFT wing (+ its tail), c2 the RIGHT
+   wing, c3 the central body + flame crest, c4 an arcane glow. Each part lights
+   quickly and the whole bird fades out gently; Aether Darts spends the charges
+   (0) and it fades. Same mirrored-half seam as the fire bird. */
+#proc-overlay .chrono-bird {
   display: none;
-}
-#proc-overlay .chrono-part {
-  display: none;
-}
-#proc-overlay.chrono .chrono-part {
-  display: block;
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, #efe0ff 0%, #a855f7 52%, #6b21a8 100%);
+}
+#proc-overlay.chrono .fire-bird {
+  display: none;
+}
+#proc-overlay.chrono .chrono-bird {
+  display: block;
+}
+/* The three parts gate on charge: each fades OUT slowly (0.7s), lights ON fast. */
+#proc-overlay.chrono .chrono-bird .ph-half,
+#proc-overlay.chrono .chrono-bird .ph-core-g {
   opacity: 0;
-  /* OFF (fade-out) is gentle; the reveal rules below light each part quickly. */
   transition: opacity 0.7s ease;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-#proc-overlay.chrono .cp-lwing {
-  -webkit-mask-image: url("/ui/phoenix-lwing.png");
-  mask-image: url("/ui/phoenix-lwing.png");
-}
-#proc-overlay.chrono .cp-rwing {
-  -webkit-mask-image: url("/ui/phoenix-rwing.png");
-  mask-image: url("/ui/phoenix-rwing.png");
-}
-#proc-overlay.chrono .cp-center {
-  -webkit-mask-image: url("/ui/phoenix-center.png");
-  mask-image: url("/ui/phoenix-center.png");
 }
 /* Visible and grabbable once any charge is held. */
 #proc-overlay.chrono.c1 {
@@ -4709,14 +4693,14 @@ body.reduce-motion #proc-overlay .ph-wing {
   cursor: grab;
 }
 /* Reveal order: left wing (c1), right wing (c2), centre (c3), quick to light. */
-#proc-overlay.chrono.c1 .cp-lwing,
-#proc-overlay.chrono.c2 .cp-rwing,
-#proc-overlay.chrono.c3 .cp-center {
+#proc-overlay.chrono.c1 .chrono-bird .ph-left,
+#proc-overlay.chrono.c2 .chrono-bird .ph-right,
+#proc-overlay.chrono.c3 .chrono-bird .ph-core-g {
   opacity: 1;
   transition: opacity 0.22s ease;
 }
 /* Full 4/4: an arcane glow over the whole bird. */
-#proc-overlay.chrono.c4 {
+#proc-overlay.chrono.c4 .chrono-bird {
   filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.55))
     drop-shadow(0 0 18px rgba(200, 160, 255, 0.85));
 }
