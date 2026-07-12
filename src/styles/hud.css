@@ -4491,3 +4491,76 @@
 body.reduce-motion #proc-overlay .ph-wing {
   animation: none !important;
 }
+
+/* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
+/* Same bird, arcane VIOLET, revealed one QUARTER per Aether Surge charge
+   (c1..c4) so the player reads the charge count off the bird instead of a buff.
+   Order: left body, right body, left wing, right wing (the body forms, then the
+   wings spread). The full 4/4 bird whitens its core and beats its wings once
+   like the fire streak; Aether Darts spends the charges (0) and it fades out.
+   Every rule is scoped to .chrono, so the fire path is untouched. The generic
+   reduced-motion rule above already stills the chrono wing-beat. */
+#proc-overlay.chrono .ph-fire {
+  fill: url(#ph-chrono-grad);
+}
+#proc-overlay.chrono .ph-core,
+#proc-overlay.chrono .ph-crest {
+  fill: url(#ph-chrono-core);
+}
+/* Visible and grabbable once any charge is held. */
+#proc-overlay.chrono.c1 {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: grab;
+}
+/* The halves stay on; the four quarters (each wing / each lower body) gate on
+   charge instead. */
+#proc-overlay.chrono .ph-half {
+  opacity: 1;
+}
+#proc-overlay.chrono .ph-wing,
+#proc-overlay.chrono .ph-side {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.chrono.c1 .ph-left .ph-side {
+  opacity: 1;
+}
+#proc-overlay.chrono.c2 .ph-right .ph-side {
+  opacity: 1;
+}
+#proc-overlay.chrono.c3 .ph-left .ph-wing {
+  opacity: 1;
+}
+#proc-overlay.chrono.c4 .ph-right .ph-wing {
+  opacity: 1;
+}
+/* The core seam glows dim as the bird builds, full at 4/4. */
+#proc-overlay.chrono.c1 .ph-core-g {
+  opacity: 0.45;
+}
+#proc-overlay.chrono.c4 .ph-core-g {
+  opacity: 1;
+}
+#proc-overlay.chrono.c1 svg {
+  filter: drop-shadow(0 0 9px rgba(168, 85, 247, 0.5));
+}
+#proc-overlay.chrono.c4 svg {
+  filter: drop-shadow(0 0 16px rgba(200, 160, 255, 0.9));
+}
+/* Full 4/4: whiten the core/crest and beat both wings once, like the fire streak. */
+#proc-overlay.chrono.c4 .ph-core,
+#proc-overlay.chrono.c4 .ph-crest {
+  fill: url(#ph-chrono-white);
+}
+#proc-overlay.chrono.c4 .ph-wing {
+  transform-box: fill-box;
+  transform-origin: 92% 62%;
+  animation: ph-wing-beat 0.7s ease-out 1;
+}
+/* Chrono login preview: the whole violet bird glows dimly. */
+#proc-overlay.chrono.preview .ph-wing,
+#proc-overlay.chrono.preview .ph-side,
+#proc-overlay.chrono.preview .ph-core-g {
+  opacity: 0.4;
+}

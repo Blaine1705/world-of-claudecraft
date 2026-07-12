@@ -15,3 +15,15 @@ export function procOverlayState(auras: ReadonlyArray<{ id: string }>): ProcOver
   }
   return heating ? 'heating' : 'none';
 }
+
+// Chronomancy (arcane spec) drives the SAME phoenix overlay from its Aether
+// Surge charges instead of fire's two auras: one quarter of the bird lights per
+// held charge (0-4), so the player reads the charge count from the bird instead
+// of a buff. Aether Darts spends the charges (aura gone) -> 0 -> the bird fades.
+// The charge count lives in the caster's `arcane_surge` aura value (1-4).
+export function chronoOverlayCharges(auras: ReadonlyArray<{ id: string; value?: number }>): number {
+  for (const a of auras) {
+    if (a.id === 'arcane_surge') return Math.max(0, Math.min(4, Math.round(a.value ?? 0)));
+  }
+  return 0;
+}
