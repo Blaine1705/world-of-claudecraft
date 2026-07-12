@@ -46,6 +46,9 @@ describe('chat tab send selection', () => {
 
     state.selectChatTab('world', false);
     expect(hud.composeChatSend('need one healer')).toBe('/world need one healer');
+
+    state.selectChatTab('all', false);
+    expect(hud.composeChatSend('back in chat')).toBe('/s back in chat');
   }, 15_000);
 
   it('selects a channel opened from the add-tab menu', () => {
