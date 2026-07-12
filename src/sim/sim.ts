@@ -51,6 +51,7 @@ import {
 } from './combat/damage';
 import { damageTakenWithin } from './combat/damage_history';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { aetherSurgeCostMult } from './combat/chronomancy';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';

@@ -66,6 +66,7 @@ import {
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
+import { aetherDartsBoltBonus, aetherDartsChannelStart } from './chronomancy';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -773,6 +774,9 @@ export function castAbility(
     armAbilityCooldown(p, ability.id, res.cooldown, false, res.charges ?? 1, res.bonusCharges ?? 0);
     // Blizzard's Frozen Orb refund budget resets per cast (combat/frost_mage.ts).
     frostMageChannelStart(p, ability.id);
+    // Aether Darts arms its one-time Arcane Charge consume for THIS channel
+    // (combat/chronomancy.ts); inert for every other channel.
+    aetherDartsChannelStart(p, ability.id);
     // Spell haste (item-set bonus) shortens the whole channel and so each tick.
     const channelDuration = ability.channel.duration / spellHasteMult(p);
     p.castingAbility = ability.id;
@@ -1158,7 +1162,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     for (const eff of res.effects) {
       if (eff.type === 'directDamage') {
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
-        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
         dmg *= spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');

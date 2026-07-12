@@ -998,6 +998,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "temporal_echo",
         "name": "Temporal Echo"
+      },
+      {
+        "id": "arcane_surge",
+        "name": "Aether Surge"
       }
     ],
     "model": "player_mage",

@@ -162,6 +162,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // granted at the pick like Combustion.
       'temporal_barrier',
       'temporal_echo',
+      // Phase 3: the single-target Arcane spender (charges) that drives the
+      // offensive heal rotation (docs/prd/mage-chronomancy.md sections 13.4 / 14).
+      'arcane_surge',
     ],
     color: 0x69ccf0,
   },
@@ -1980,6 +1983,37 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+  },
+  // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
+  // sections 13.4 / 14. The single-target Arcane spender that drives the offensive
+  // heal rotation. `projectile: false` so cost, damage and the +1 charge all
+  // resolve at cast completion in one controlled order (cost reads N charges,
+  // damage reads N, then banks N+1); a traveling bolt would race a back-to-back
+  // recast. Each held Arcane Charge scales damage (+30%) and cost (x1.9, steep)
+  // via combat/chronomancy.ts; Aether Darts consumes the charges. PLAYTEST-
+  // provisional: the base cost is DERIVED by tests/chronomancy_balance.test.ts to
+  // land the conservative rotation near 70-80s to OOM at the level-20 pool.
+  arcane_surge: {
+    id: 'arcane_surge',
+    name: 'Aether Surge',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 12,
+    castTime: 2,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    // Instant impact at cast completion (no traveling bolt): keeps the charge
+    // read/write in one deterministic order, see combat/chronomancy.ts.
+    projectile: false,
+    // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
+    // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
+    // the payoff is ramping it with charges (and the Echo healing it feeds).
+    effects: [{ type: 'directDamage', min: 10, max: 15 }],
+    description:
+      'Draws a surge of raw Arcane power through the enemy for $d damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges.',
   },
   ice_barrier: {
     id: 'ice_barrier',

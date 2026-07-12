@@ -6578,6 +6578,10 @@ export const zh_CN: EnTranslations = {
         "name": "时光回响",
         "description": "以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。"
       },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
+      },
       "mind_sear": {
         "name": "灼思",
         "description": "向目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"

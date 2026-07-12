@@ -6578,6 +6578,10 @@ export const ru_RU: EnTranslations = {
         "name": "Временное эхо",
         "description": "Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его."
       },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
+      },
       "mind_sear": {
         "name": "Выжигание мыслей",
         "description": "Направляет темную энергию в выбранную область, каждую секунду нанося ближайшим врагам {damage} ед. урона. (Талант жреца)"

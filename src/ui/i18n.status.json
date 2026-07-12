@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6968,
-    "rows": 146328,
-    "translated": 143740,
-    "pending": 2395,
+    "keys": 6970,
+    "rows": 146370,
+    "translated": 143742,
+    "pending": 2435,
     "blocked": 193,
     "blockedSource": 95
   },
@@ -89849,7 +89849,7 @@
     },
     "main:entities.abilities.arcane_surge.description": {
       "scope": "main",
-      "enHash": "9f975682dca90f61",
+      "enHash": "b8796946c6651de2",
       "placeholders": [
         "damage"
       ],
@@ -89868,7 +89868,7 @@
         },
         "en_CA": {
           "state": "translated",
-          "srcHash": "9f975682dca90f61",
+          "srcHash": "b8796946c6651de2",
           "by": "human"
         },
         "it_IT": {

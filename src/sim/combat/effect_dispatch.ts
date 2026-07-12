@@ -44,7 +44,12 @@ import {
   hasAreaEchoAura,
 } from './area_echo';
 import { isRootedOrChilled } from './cc';
-import { placeTemporalEcho } from './chronomancy';
+import {
+  ARCANE_SURGE_ID,
+  aetherSurgeAddStack,
+  aetherSurgeDamageMult,
+  placeTemporalEcho,
+} from './chronomancy';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -371,6 +376,11 @@ export function runEffects(
             (isSpell && frozen.treatAsFrozen ? SHATTER_CRIT_DMG_BONUS : 0);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+        // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
+        // FULL post-spell-power, post-crit damage. The extra damage is what feeds
+        // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
+        // the caster's charge aura (combat/chronomancy.ts).
+        if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
         ctx.dealDamage(
           p,
@@ -427,6 +437,12 @@ export function runEffects(
           }
         }
         if (isSpell) noteSpellHit(ctx, p, crit, ability.id);
+        // Aether Surge (Chronomancy Phase 3): this cast used the pre-cast charges
+        // for cost and damage above; now bank one more Arcane Charge (cap 4) and
+        // refresh the window, so the NEXT cast reads the higher count.
+        // projectile:false guarantees this runs after the damage and before any
+        // recast can read the count (combat/chronomancy.ts).
+        if (ability.id === ARCANE_SURGE_ID) aetherSurgeAddStack(ctx, p);
         if (!target.dead && ability.awardsCombo && !comboAwarded) {
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;

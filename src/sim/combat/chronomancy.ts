@@ -20,7 +20,7 @@
 
 import { ABILITIES } from '../data';
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Aura, Entity } from '../types';
 import { consumeHealAbsorb, healingTakenMult, healingThreat } from './heal';
 
 // The mark aura kind and ability id (they share one string so the buff bar and
@@ -162,4 +162,106 @@ function applyEchoHeal(
     ability: TEMPORAL_ECHO_NAME,
   });
   healingThreat(ctx, source, ally, healed);
+}
+
+// ---- Chronomancy Phase 3: the Arcane rotation engine (Aether Surge charges),
+// docs/prd/mage-chronomancy.md sections 13.4 / 14. Aether Surge (Oleada de éter)
+// is the single-target Arcane spender that drives the offensive heal rotation.
+// Each cast READS the caster's current Arcane Charge count to scale its damage
+// (+30% per charge, moderate) and its mana cost (x1.9 per charge, steep and
+// compounding), THEN banks one more charge (cap 4). The charges ride a caster
+// aura that expires 10s after the last cast (refreshed each cast). Aether Darts
+// (arcane_missiles) CONSUMES every charge on its FIRST landed missile and splits
+// a flat Arcane bonus across its missiles. That bonus is plain Arcane damage, so
+// Temporal Echo heals from it at the normal 35% (NO hidden heal bonus). The
+// damage increase alone is what feeds more Echo healing.
+//
+// Determinism: every function here draws NO rng and keeps all state on the aura
+// (charges) or two per-channel entity flags (the Darts dump). Aether Surge is
+// `projectile: false`, so cost, damage and the +1 charge all resolve at cast
+// completion in one controlled order (cost reads N, damage reads N, then banks
+// N+1); a traveling bolt would let a back-to-back recast read stale charges.
+
+export const ARCANE_SURGE_ID = 'arcane_surge';
+const ARCANE_SURGE_NAME = ABILITIES[ARCANE_SURGE_ID]?.name ?? 'Aether Surge';
+// PLAYTEST-provisional (PRD 13.4 / 14). The base cost lives on the ABILITIES
+// record; it is DERIVED via tests/chronomancy_balance.test.ts to land the
+// conservative rotation near 70-80s to OOM at the real level-20 pool.
+export const AETHER_SURGE_MAX_CHARGES = 4;
+export const AETHER_SURGE_DMG_PER_CHARGE = 0.3; // +30% damage per charge (linear, moderate)
+export const AETHER_SURGE_COST_PER_CHARGE = 0.9; // x1.9 cost per charge (geometric, steep)
+export const AETHER_SURGE_CHARGE_WINDOW = 10; // seconds, refreshed on each cast
+// Aether Darts dump: a flat Arcane bonus of 6 per consumed charge, split evenly
+// across the channel's missiles (24 total at 4 charges, +8 per missile over 3).
+export const AETHER_DARTS_BONUS_PER_CHARGE = 6;
+
+function aetherSurgeAura(e: Entity): Aura | undefined {
+  return e.auras.find((a) => a.id === ARCANE_SURGE_ID);
+}
+
+/** Arcane Charges the caster currently holds (0 if none). Draws no rng. */
+export function aetherSurgeStacks(e: Entity): number {
+  return aetherSurgeAura(e)?.value ?? 0;
+}
+
+/** Cost multiplier for the NEXT Aether Surge, from the charges held right now.
+ *  Geometric (x1.9 per charge) so four charges cost ~13x the base: the mana wall
+ *  that makes holding a full stack a short emergency window, not a rotation. */
+export function aetherSurgeCostMult(e: Entity): number {
+  return (1 + AETHER_SURGE_COST_PER_CHARGE) ** aetherSurgeStacks(e);
+}
+
+/** Damage multiplier for THIS Aether Surge, from the charges held right now.
+ *  Linear (+30% per charge): moderate, so the extra Echo healing it feeds grows
+ *  gently while the cost climbs steeply. */
+export function aetherSurgeDamageMult(e: Entity): number {
+  return 1 + AETHER_SURGE_DMG_PER_CHARGE * aetherSurgeStacks(e);
+}
+
+/** Bank one Arcane Charge after an Aether Surge lands (cap 4) and refresh the
+ *  10s window. applyAura replaces by id, so the timer resets on every cast. */
+export function aetherSurgeAddStack(ctx: SimContext, caster: Entity): void {
+  const next = Math.min(AETHER_SURGE_MAX_CHARGES, aetherSurgeStacks(caster) + 1);
+  ctx.applyAura(caster, {
+    id: ARCANE_SURGE_ID,
+    name: ARCANE_SURGE_NAME,
+    kind: 'arcane_charge',
+    remaining: AETHER_SURGE_CHARGE_WINDOW,
+    duration: AETHER_SURGE_CHARGE_WINDOW,
+    value: next,
+    stacks: next,
+    sourceId: caster.id,
+    school: 'arcane',
+  });
+}
+
+/** Channel-start hook (casting_lifecycle's channel block): arm the Aether Darts
+ *  dump so the FIRST landed missile of THIS channel consumes the charges. Inert
+ *  for every other channel. */
+export function aetherDartsChannelStart(caster: Entity, abilityId: string): void {
+  if (abilityId !== 'arcane_missiles') return;
+  caster.aetherDartsConsumePending = true;
+  caster.aetherDartsBonusPerBolt = 0;
+}
+
+/** Per-missile hook (the Aether Darts bolt callback): on the FIRST landed missile
+ *  of the channel, consume every Arcane Charge and lock in the flat per-missile
+ *  bonus (total 6 per charge split across the channel's `ticks`); later missiles
+ *  reuse the locked value. Returns the flat Arcane damage to add to this missile.
+ *  Consuming on the first LANDED missile (not at channel start) means an
+ *  interrupt before any damage lands never wastes the charges. Draws no rng. */
+export function aetherDartsBoltBonus(ctx: SimContext, caster: Entity, ticks: number): number {
+  if (caster.aetherDartsConsumePending) {
+    caster.aetherDartsConsumePending = false;
+    const stacks = aetherSurgeStacks(caster);
+    const idx = caster.auras.findIndex((a) => a.id === ARCANE_SURGE_ID);
+    if (idx >= 0) {
+      const a = caster.auras[idx];
+      caster.auras.splice(idx, 1);
+      ctx.emit({ type: 'aura', targetId: caster.id, name: a.name, gained: false });
+    }
+    const total = AETHER_DARTS_BONUS_PER_CHARGE * stacks;
+    caster.aetherDartsBonusPerBolt = ticks > 0 ? Math.round(total / ticks) : 0;
+  }
+  return caster.aetherDartsBonusPerBolt ?? 0;
 }

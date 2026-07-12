@@ -411,6 +411,11 @@ export type AuraKind =
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
   // conversion rate is a constant read at damage time, not stored on the aura.
   | 'temporal_echo'
+  // Chronomancy Aether Surge charges (docs/prd/mage-chronomancy.md sections
+  // 13.4 / 14): a self buff whose `value`/`stacks` count the Arcane Charges held
+  // (cap 4). Each charge scales the next Aether Surge's damage and cost; Aether
+  // Darts consumes them. Read by aura id 'arcane_surge' in combat/chronomancy.ts.
+  | 'arcane_charge'
   | 'buff_dr'
   // Raised Guard's physical-only sibling of buff_dr: the wearer takes `value`
   // fraction less PHYSICAL damage while worn (other schools untouched). Same
@@ -2195,6 +2200,12 @@ export interface Entity {
   // channel has already refunded (combat/frost_mage.ts, reset at channel
   // start). Never serialized or wired.
   blizzardOrbCdr?: number;
+  // Transient Aether Darts dump state (combat/chronomancy.ts, reset at channel
+  // start): whether THIS Aether Darts channel still owes the one-time Arcane
+  // Charge consume, and the flat per-missile bonus locked in when it consumed.
+  // Never serialized or wired.
+  aetherDartsConsumePending?: boolean;
+  aetherDartsBonusPerBolt?: number;
   abilityCharges?: Record<
     string,
     {

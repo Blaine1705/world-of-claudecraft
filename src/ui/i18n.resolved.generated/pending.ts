@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -150,6 +152,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "es_ES": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -290,6 +294,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "fr_FR": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -445,6 +451,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "fr_CA": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -601,6 +609,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -755,6 +765,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "de_DE": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -909,6 +921,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "zh_CN": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.blizzard.description",
     "entities.abilities.blizzard.name",
     "entities.abilities.brain_freeze.description",
@@ -936,6 +950,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "zh_TW": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.blizzard.description",
     "entities.abilities.blizzard.name",
     "entities.abilities.brain_freeze.description",
@@ -963,6 +979,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ko_KR": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.blizzard.description",
     "entities.abilities.blizzard.name",
     "entities.abilities.brain_freeze.description",
@@ -990,6 +1008,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "ja_JP": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.blizzard.description",
     "entities.abilities.blizzard.name",
     "entities.abilities.brain_freeze.description",
@@ -1017,6 +1037,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "pt_BR": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -1171,6 +1193,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "ru_RU": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.blizzard.description",
     "entities.abilities.blizzard.name",
     "entities.abilities.brain_freeze.description",
@@ -1198,6 +1222,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.targetOfTargetLabel"
   ],
   "cs_CZ": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -1349,6 +1375,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "nl_NL": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -1500,6 +1528,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "pl_PL": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -1651,6 +1681,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "id_ID": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -1802,6 +1834,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "tr_TR": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -1953,6 +1987,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "sv_SE": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -2104,6 +2140,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "vi_VN": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",
@@ -2255,6 +2293,8 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.slots.twoHand"
   ],
   "da_DK": [
+    "entities.abilities.arcane_surge.description",
+    "entities.abilities.arcane_surge.name",
     "entities.abilities.battle_stance.description",
     "entities.abilities.battle_stance.name",
     "entities.abilities.berserker_stance.description",

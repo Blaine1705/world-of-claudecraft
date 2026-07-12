@@ -6578,6 +6578,10 @@ export const es_ES: EnTranslations = {
         "name": "Eco temporal",
         "description": "Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo."
       },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
+      },
       "mind_sear": {
         "name": "Ardeideas",
         "description": "Canaliza energía de Sombras en el área objetivo e inflige {damage} cada segundo a cercanos enemigos. (talento de sacerdote)"
