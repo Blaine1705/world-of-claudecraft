@@ -78,6 +78,7 @@ import {
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
+import { applyGroupHaste } from './haste_burst';
 import { applyRewind } from './rewind';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
@@ -1712,18 +1713,24 @@ export function runEffects(
         break;
       }
       case 'aoeAllyHaste': {
-        for (const mE of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
-          ctx.applyAura(mE, {
-            id: ability.id,
-            name: ability.name,
-            kind: 'buff_haste',
-            remaining: eff.duration,
+        // Base form (Red Banner): attack-speed haste to friendlies in radius. Bloodlust
+        // and Temporal Acceleration opt into full haste (spell), the shared exhaustion
+        // (exhaust), and group/raid scoping (groupOnly) via combat/haste_burst.ts.
+        applyGroupHaste(
+          ctx,
+          p,
+          {
+            mult: eff.mult,
             duration: eff.duration,
-            value: eff.mult,
-            sourceId: p.id,
-            school: ability.school,
-          });
-        }
+            radius: eff.radius,
+            spell: eff.spell,
+            exhaust: eff.exhaust,
+            groupOnly: eff.groupOnly,
+          },
+          ability.id,
+          ability.name,
+          ability.school,
+        );
         break;
       }
       case 'aoeAllyAbsorb': {

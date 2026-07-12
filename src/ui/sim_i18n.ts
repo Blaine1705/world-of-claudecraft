@@ -203,6 +203,8 @@ const baseEnTable = {
   'aura.tamed': 'Tamed',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
+  // Shared Bloodlust / Temporal Acceleration exhaustion debuff (combat/haste_burst.ts).
+  'aura.temporalExhaustion': 'Temporal Exhaustion',
   'mechanic.warStomp': 'Shuddering Stomp',
   'mechanic.boneCarapace': 'Bone Carapace',
   'mechanic.bansheesWail': 'Keening Wail',
@@ -4577,6 +4579,7 @@ function locPetGrowlAutoState(state: string): string {
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
+  'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Might of the Bear': 'aura.elixirBear',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',

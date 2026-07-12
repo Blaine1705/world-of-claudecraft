@@ -1061,6 +1061,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "temporal_rewind",
         "name": "Rewind"
+      },
+      {
+        "id": "temporal_acceleration",
+        "name": "Temporal Acceleration"
       }
     ],
     "model": "player_mage",

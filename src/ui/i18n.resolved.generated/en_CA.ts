@@ -6044,7 +6044,7 @@ export const en_CA: EnTranslations = {
       },
       "bloodlust": {
         "name": "War Drums",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "description": "Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Bloodlust or Temporal Acceleration are too exhausted to benefit. (Shaman talent)"
       },
       "chain_lightning": {
         "name": "Forked Lightning",
@@ -6185,6 +6185,10 @@ export const en_CA: EnTranslations = {
       "temporal_rewind": {
         "name": "Rewind",
         "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Bloodlust are too exhausted to benefit. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",

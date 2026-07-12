@@ -87,6 +87,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'mortal_wound',
         'polymorph',
         'root',
+        'sated',
         'silence',
         'slow',
         'spellvuln',
