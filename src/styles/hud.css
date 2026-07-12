@@ -4666,78 +4666,44 @@ body.reduce-motion #proc-overlay .ph-wing {
 }
 
 /* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
-/* Same bird, arcane VIOLET, revealed one QUARTER per Aether Surge charge
-   (c1..c4) so the player reads the charge count off the bird instead of a buff.
-   Order: left body, right body, left wing, right wing (the body forms, then the
-   wings spread). The full 4/4 bird whitens its core and beats its wings once
-   like the fire streak; Aether Darts spends the charges (0) and it fades out.
-   Every rule is scoped to .chrono, so the fire path is untouched. The generic
-   reduced-motion rule above already stills the chrono wing-beat. */
-#proc-overlay.chrono .ph-fire {
-  fill: url(#ph-chrono-grad);
+/* A different, detailed phoenix (owner art, public/ui/phoenix-chrono-v2.png). Under
+   the arcane spec the fire inline-SVG bird is hidden and this one is drawn as a
+   MASK over the theme's arcane-violet gradient, so its colour lives in CSS. The
+   Aether Surge charges reveal it by UNFURLING the wings from the centre outward
+   (a clip-path that widens per charge, c1..c4); the full 4/4 bird flares with an
+   arcane glow. Aether Darts spends the charges (0) and it fades out gently. Every
+   rule is scoped to .chrono, so the fire path is untouched. */
+#proc-overlay.chrono svg {
+  display: none;
 }
-#proc-overlay.chrono .ph-core,
-#proc-overlay.chrono .ph-crest {
-  fill: url(#ph-chrono-core);
+#proc-overlay.chrono {
+  background: linear-gradient(to bottom, #efe0ff 0%, #a855f7 52%, #6b21a8 100%);
+  -webkit-mask: url("/ui/phoenix-chrono-v2.png") center / contain no-repeat;
+  mask: url("/ui/phoenix-chrono-v2.png") center / contain no-repeat;
+  /* the unfurl (clip-path) is quick per charge; the fade-out (opacity) is gentle */
+  transition:
+    opacity 0.7s ease,
+    clip-path 0.2s ease,
+    filter 0.2s ease;
+  /* c1 default: only the central column (crest, head, body, tail) shows */
+  clip-path: inset(0 40% 0 40%);
 }
-/* Fade timing: each quarter LIGHTS quickly per cast (0.16s), but when Aether
-   Darts spends the charges the whole bird fades out gently (0.7s), never a hard
-   snap. The container (base #proc-overlay, 0.7s) and every sub-group carry the
-   slow 0.7s as their OFF transition; the reveal rules below override it with the
-   quick 0.16s. */
-/* Visible and grabbable once any charge is held (quick to light). */
+/* Visible and grabbable once any charge is held. */
 #proc-overlay.chrono.c1 {
   opacity: 1;
   pointer-events: auto;
   cursor: grab;
-  transition: opacity 0.16s ease;
 }
-/* The halves stay on; the four quarters (each wing / each lower body) gate on
-   charge instead. */
-#proc-overlay.chrono .ph-half {
-  opacity: 1;
+/* Each further charge unfurls the wings outward. */
+#proc-overlay.chrono.c2 {
+  clip-path: inset(0 30% 0 30%);
 }
-#proc-overlay.chrono .ph-wing,
-#proc-overlay.chrono .ph-side,
-#proc-overlay.chrono .ph-core-g {
-  opacity: 0;
-  transition: opacity 0.7s ease;
+#proc-overlay.chrono.c3 {
+  clip-path: inset(0 20% 0 20%);
 }
-#proc-overlay.chrono.c1 .ph-left .ph-side,
-#proc-overlay.chrono.c2 .ph-right .ph-side,
-#proc-overlay.chrono.c3 .ph-left .ph-wing,
-#proc-overlay.chrono.c4 .ph-right .ph-wing {
-  opacity: 1;
-  transition: opacity 0.16s ease;
-}
-/* The core seam glows dim as the bird builds, full at 4/4 (quick to light too). */
-#proc-overlay.chrono.c1 .ph-core-g {
-  opacity: 0.45;
-  transition: opacity 0.16s ease;
-}
-#proc-overlay.chrono.c4 .ph-core-g {
-  opacity: 1;
-  transition: opacity 0.16s ease;
-}
-#proc-overlay.chrono.c1 svg {
-  filter: drop-shadow(0 0 9px rgba(168, 85, 247, 0.5));
-}
-#proc-overlay.chrono.c4 svg {
-  filter: drop-shadow(0 0 16px rgba(200, 160, 255, 0.9));
-}
-/* Full 4/4: whiten the core/crest and beat both wings once, like the fire streak. */
-#proc-overlay.chrono.c4 .ph-core,
-#proc-overlay.chrono.c4 .ph-crest {
-  fill: url(#ph-chrono-white);
-}
-#proc-overlay.chrono.c4 .ph-wing {
-  transform-box: fill-box;
-  transform-origin: 92% 62%;
-  animation: ph-wing-beat 0.7s ease-out 1;
-}
-/* Chrono login preview: the whole violet bird glows dimly. */
-#proc-overlay.chrono.preview .ph-wing,
-#proc-overlay.chrono.preview .ph-side,
-#proc-overlay.chrono.preview .ph-core-g {
-  opacity: 0.4;
+#proc-overlay.chrono.c4 {
+  clip-path: inset(0 0 0 0);
+  /* full bird: an arcane flare (a raster cannot beat a wing, so it glows). */
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.55))
+    drop-shadow(0 0 18px rgba(200, 160, 255, 0.85));
 }
