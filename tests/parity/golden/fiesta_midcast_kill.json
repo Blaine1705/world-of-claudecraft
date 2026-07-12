@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 409,
-      "state": "006af7e6",
+      "state": "c53fa016",
       "events": "b8e63708",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 409,
-      "state": "10a3bd0d",
+      "state": "16265db5",
       "events": "90b217f1",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 409,
-      "state": "e3cc22a3",
+      "state": "fcdb8513",
       "events": "d13b86f9",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "add141a2",
+      "state": "2ade39ba",
       "events": "669c1069",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "83c95e36",
+      "state": "b83acc7e",
       "events": "1d077d66",
       "rng": {
         "draws": 300,
@@ -424,7 +424,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 418,
-          "maxResource": 1506,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -434,7 +434,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 1506,
+          "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -575,7 +575,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "8d25f923",
+      "state": "b3537b13",
       "events": "f8fba87c",
       "rng": {
         "draws": 300,
@@ -924,7 +924,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 418,
-          "maxResource": 1506,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -934,7 +934,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 1506,
+          "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -1073,7 +1073,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 409,
-      "state": "0f7fcf1f",
+      "state": "11be37ef",
       "events": "a6f8a49c",
       "rng": {
         "draws": 300,
@@ -1424,7 +1424,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 418,
-          "maxResource": 1506,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1434,7 +1434,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 1506,
+          "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -1573,7 +1573,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 409,
-      "state": "f77001b1",
+      "state": "dfe808c1",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1584,7 +1584,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 409,
-      "state": "2e1d8850",
+      "state": "3b596d80",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1936,7 +1936,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 418,
-          "maxResource": 1506,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1946,7 +1946,7 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "resource": 1506,
+          "resource": 1581,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,

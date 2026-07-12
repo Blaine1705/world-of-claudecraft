@@ -93,6 +93,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
+    channelTicksLeft: 0,
     gcdRemaining: 0,
     cooldowns: new Map(),
     queuedOnSwing: null,

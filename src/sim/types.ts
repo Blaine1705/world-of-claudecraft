@@ -2377,6 +2377,12 @@ export interface Entity {
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
+  // Ticks still owed on the current channel. The tick timer and the channel's
+  // end (castRemaining) advance on separate accumulators, so floating-point drift
+  // can leave the final tick a hair short when they coincide; tracking a count and
+  // flushing any remainder on close guarantees a channel lands exactly its ticks
+  // (e.g. Arcane Missiles' 5-missile barrage). 0 when not channeling.
+  channelTicksLeft: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
   // Charge-limited abilities (Double Charge): per-ability spent count plus the

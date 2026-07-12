@@ -2104,7 +2104,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // the payoff is ramping it with charges (and the Echo healing it feeds).
     effects: [{ type: 'directDamage', min: 10, max: 13 }],
     description:
-      'Draws a surge of raw Arcane power through the enemy for $d damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges.',
+      "Draws a surge of raw Arcane power through the enemy for $d damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
   },
   ice_barrier: {
     id: 'ice_barrier',

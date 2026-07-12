@@ -222,16 +222,23 @@ describe('Chronomancy Phase 3 balance targets', () => {
     expect(consReact.oom).toBeLessThanOrEqual(68);
   });
 
-  it('emergency (hold 4 charges) drains mana in ~20-32s', () => {
-    // The Chronoweave mastery's +5% max mana (owner 2026-07-12) nudged the emergency
-    // window up a few seconds; still a short burst vs the ~78s conservative rotation.
-    expect(emer.oom).toBeGreaterThanOrEqual(18);
-    expect(emer.oom).toBeLessThanOrEqual(34);
+  it('emergency (hold 4 charges) drains mana in ~13-24s', () => {
+    // The Aether Surge cast-speed ramp (owner 2026-07-12: -5% per charge) fires the
+    // 4-charge burst faster, so the fixed 16x-cost pool empties sooner: the emergency
+    // window tightened from ~26s to ~15s. Still a short burst vs the ~78s conservative
+    // rotation, which is the point of holding a full stack.
+    expect(emer.oom).toBeGreaterThanOrEqual(13);
+    expect(emer.oom).toBeLessThanOrEqual(24);
   });
 
-  it('Piro and Cryo sustain at least 35% more DPS than conservative Chronomancy', () => {
-    expect(piro.dps).toBeGreaterThanOrEqual(consOff.dps * 1.35);
-    expect(cryo.dps).toBeGreaterThanOrEqual(consOff.dps * 1.35);
+  it('Piro and Cryo sustain clearly more DPS than conservative Chronomancy', () => {
+    // The cast-speed ramp lets the conservative surge-spam rotation (which banks
+    // charges) fire a bit faster, lifting Chronomancy's sustained DPS ~5% and
+    // narrowing the healer-vs-DPS gap from ~35% to ~29% (owner-approved 2026-07-12,
+    // to be re-tuned after playtest). The floor still enforces a clear >=22% gap so
+    // Chronomancy never rivals a pure-DPS spec.
+    expect(piro.dps).toBeGreaterThanOrEqual(consOff.dps * 1.22);
+    expect(cryo.dps).toBeGreaterThanOrEqual(consOff.dps * 1.22);
   });
 
   it('the offensive rotation heals through Echo (maintenance HPS, below Temporal Mend)', () => {

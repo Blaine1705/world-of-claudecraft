@@ -52,7 +52,12 @@ import {
 } from '../types';
 import { abilityQualifiesForAreaEcho, hasAreaEchoAura } from './area_echo';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
-import { aetherDartsBoltBonus, aetherDartsChannelStart } from './chronomancy';
+import {
+  ARCANE_SURGE_ID,
+  aetherDartsBoltBonus,
+  aetherDartsChannelStart,
+  aetherSurgeCastMult,
+} from './chronomancy';
 import {
   consumeFreeCostFor,
   consumeNextAttackCrit,
@@ -196,17 +201,38 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
   p.castRemaining -= DT;
 
   if (p.channeling) {
+    const fireChannelTick = () => {
+      // Read fresh each tick: a tick that cancels the cast (e.g. a LoS block) nulls
+      // castingAbility, and the guard here stops the flush from firing any more.
+      const abilityId = p.castingAbility;
+      if (abilityId == null) return;
+      if (abilityId === DEMON_HEAL_CAST_ID) {
+        ctx.applyDemonHealTick(p);
+      } else {
+        const res = ctx.resolvedAbility(abilityId, p.id);
+        if (res) applyChannelTick(ctx, p, res);
+      }
+    };
     p.channelTickTimer -= DT;
     if (p.channelTickTimer <= 0) {
       p.channelTickTimer += p.channelTickEvery;
-      if (p.castingAbility === DEMON_HEAL_CAST_ID) {
-        ctx.applyDemonHealTick(p);
-      } else {
-        const res = ctx.resolvedAbility(p.castingAbility, p.id);
-        if (res) applyChannelTick(ctx, p, res);
-      }
+      // channelTicksLeft is only tracked for FIXED-count channels (it starts > 0);
+      // duration-based channels (Demon Heal, boss channels) leave it 0, so they
+      // fire unbounded here exactly as before and never flush below.
+      if (p.channelTicksLeft > 0) p.channelTicksLeft -= 1;
+      fireChannelTick();
     }
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
+      // Flush any fixed-count tick the timer has not reached yet: the tick
+      // accumulator and the channel's end advance separately, so floating-point
+      // drift can leave the final tick a hair short exactly when they coincide,
+      // silently dropping the last missile (the Arcane Missiles 5-barrage bug). A
+      // fixed-count channel must always land exactly channelTicks ticks. Inert for
+      // duration-based channels, whose channelTicksLeft is 0.
+      while (p.channelTicksLeft > 0) {
+        p.channelTicksLeft -= 1;
+        fireChannelTick();
+      }
       p.castingAbility = null;
       p.channeling = false;
       // completed ground-targeted channels drop their aim like every other
@@ -270,6 +296,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.castTargetId = null;
   p.castRemaining = 0;
   p.channeling = false;
+  p.channelTicksLeft = 0; // an interrupted channel owes no more ticks
   p.castAim = null;
   p.castTargetId = null;
   // an interrupted cast never completed, so its queued follow-up is dropped too
@@ -732,6 +759,7 @@ export function castAbility(
         : ability.channel.ticks;
     p.channelTickEvery = channelDuration / channelTicks;
     p.channelTickTimer = p.channelTickEvery;
+    p.channelTicksLeft = channelTicks;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
     ctx.emit({
       type: 'castStart',
@@ -754,7 +782,10 @@ export function castAbility(
     // so meleeHaste always equals spellHaste and the classic melee-haste scaling
     // falls out identically. If the haste channels ever split, give physical casts
     // p.meleeHaste here (and mirror `mh` over the wire for the tooltip).
-    const stretchedCastTime = (castTime * tonguesMult(p)) / spellHasteMult(p);
+    // Aether Surge speeds up with held Arcane Charges and while Aether Rush is armed
+    // (combat/chronomancy.ts); 1x for every other cast, so nothing else is touched.
+    const surgeCastMult = ability.id === ARCANE_SURGE_ID ? aetherSurgeCastMult(p) : 1;
+    const stretchedCastTime = (castTime * tonguesMult(p) * surgeCastMult) / spellHasteMult(p);
     p.castingAbility = ability.id;
     // The resolved target (incl. the mouseover-resolved friendly) was captured
     // into p.castTargetId above; the finish path re-validates it.

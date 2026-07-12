@@ -1692,7 +1692,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 409,
-      "state": "bdc95ddd",
+      "state": "61ea626e",
       "events": "da7b67ec",
       "rng": {
         "draws": 896,
@@ -1703,7 +1703,7 @@
       "tick": 205,
       "time": 10.25,
       "nextId": 409,
-      "state": "f4c1737b",
+      "state": "3ec19ea6",
       "events": "c1d039d1",
       "rng": {
         "draws": 916,
@@ -1714,7 +1714,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 409,
-      "state": "7d169722",
+      "state": "bbff168d",
       "events": "741638a5",
       "rng": {
         "draws": 953,
@@ -1725,7 +1725,7 @@
       "tick": 215,
       "time": 10.75,
       "nextId": 409,
-      "state": "cf44977b",
+      "state": "3955157a",
       "events": "741638a5",
       "rng": {
         "draws": 981,
@@ -1736,7 +1736,7 @@
       "tick": 218,
       "time": 10.9,
       "nextId": 409,
-      "state": "ffe42149",
+      "state": "93746a39",
       "events": "f6164b3a",
       "rng": {
         "draws": 999,
@@ -2038,6 +2038,7 @@
           "castingAbility": "drain_life",
           "channelTickEvery": 1,
           "channelTickTimer": 0.9,
+          "channelTicksLeft": 4,
           "channeling": true,
           "comboUntil": -1,
           "critChance": 0.056,
@@ -2170,7 +2171,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 409,
-      "state": "a21d2e7b",
+      "state": "03111407",
       "events": "313a8e89",
       "rng": {
         "draws": 1009,
@@ -2181,7 +2182,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 409,
-      "state": "4eaa5d90",
+      "state": "af330d46",
       "events": "ee0df768",
       "rng": {
         "draws": 1022,
