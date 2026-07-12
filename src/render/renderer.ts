@@ -1057,6 +1057,13 @@ export class Renderer {
   private fiestaPowerupMeshes = new Map<number, THREE.Mesh>();
   // Per-entity power-up glow: emits a coloured swirl around the carrier until it expires.
   private fiestaGlows = new Map<number, { color: number; until: number; nextSwirl: number }>();
+  // Per-target heal-glow throttle (ms since a target last bloomed a heal glow). A
+  // burst of many tiny simultaneous heals on one ally (e.g. Chronomancy's group echo
+  // converting one AoE cast that struck several enemies, five allies x N hits in a
+  // single frame) must not spawn a full particle bloom per heal, or the particle
+  // count spikes and the frame hitches. One bloom per target per HEAL_GLOW_ICD is
+  // plenty of feedback; the FCT numbers are unaffected.
+  private healGlowAt = new Map<number, number>();
 
   // Vale Cup: the Sowfield set piece, the staggered goal-firework volley queue,
   // and the boarball's dust pool (created lazily the first time the ball rolls).
@@ -3175,7 +3182,17 @@ export class Renderer {
         }
         break;
       case 'heal2':
-        if (ev.amount > 0 || ev.crit) this.vfx.healGlow(ev.targetId);
+        // Throttle the particle bloom to one per target per 110ms so a burst of tiny
+        // simultaneous heals (a Chronomancy group echo converting an AoE that hit
+        // several enemies onto five allies in one frame) cannot spike the particle
+        // count. The healing number itself (FCT) is emitted elsewhere and unaffected.
+        if (ev.amount > 0 || ev.crit) {
+          const nowMs = performance.now();
+          if (nowMs - (this.healGlowAt.get(ev.targetId) ?? 0) >= 110) {
+            this.healGlowAt.set(ev.targetId, nowMs);
+            this.vfx.healGlow(ev.targetId);
+          }
+        }
         break;
       case 'aura': {
         const tgt = this.sim.entities.get(ev.targetId);
