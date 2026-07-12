@@ -64,6 +64,10 @@ const PCT_FIELDS = new Set([
   'barrierDrPct',
   // Ignition (fire mage mastery): the burn fraction, shown as "40%".
   'ignitionPct',
+  // Chronoweave (arcane mage mastery): the mana cushion + regen, applied in
+  // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
+  'manaPct',
+  'manaRegenPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {

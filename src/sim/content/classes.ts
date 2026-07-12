@@ -168,6 +168,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // Phase 4: the group version of Temporal Echo (marks up to five allies with a
       // reduced group echo), docs/prd/mage-chronomancy.md Phase 4.
       'temporal_cascade',
+      // Combat resurrection: rewind a dead group/raid member back to life.
+      'temporal_reversal',
     ],
     color: 0x69ccf0,
   },
@@ -1998,7 +2000,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['arcane'],
     cost: 90,
     castTime: 2,
-    cooldown: 15,
+    cooldown: 17,
     range: 30,
     school: 'arcane',
     requiresTarget: true,
@@ -2009,7 +2011,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'massTemporalEcho',
-        duration: 8,
+        duration: 10,
         radius: 15,
         maxTargets: 5,
         heal: { min: 14, max: 18 },
@@ -2023,7 +2025,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           {
             type: 'massTemporalEcho',
-            duration: 8,
+            duration: 10,
             radius: 15,
             maxTargets: 5,
             heal: { min: 22, max: 28 },
@@ -2037,7 +2039,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           {
             type: 'massTemporalEcho',
-            duration: 8,
+            duration: 10,
             radius: 15,
             maxTargets: 5,
             heal: { min: 28, max: 36 },
@@ -2047,6 +2049,29 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
+  },
+  // ---- Chronomancy combat resurrection: Temporal Reversal. Rewinds a DEAD group/raid
+  // member's timeline back to life at their corpse, IN COMBAT, with a fraction of their
+  // pools and no resurrection sickness (targetsDead + the resurrectAlly effect, reusing
+  // spirit.ts revivePlayerAt). The long cooldown keeps a death costly. PLAYTEST cooldown
+  // (owner 2026-07-12): a short 120s for testing; a real battle res would be 5-10 min.
+  temporal_reversal: {
+    id: 'temporal_reversal',
+    name: 'Temporal Reversal',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 60,
+    castTime: 2,
+    cooldown: 120,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    targetsDead: true,
+    effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
+    description:
+      "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
   },
   // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
   // sections 13.4 / 14. The single-target Arcane spender that drives the offensive

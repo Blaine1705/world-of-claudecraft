@@ -320,6 +320,22 @@ function resolveFriendlyTarget(ctx: SimContext, p: Entity, overrideId: number | 
   return cur && !cur.dead && ctx.isFriendlyTo(p, cur) ? cur : p;
 }
 
+// Combat-resurrection target (Temporal Reversal): the mouseover override or current
+// target, but ONLY when it is a DEAD player in the caster's group/raid. No self-cast
+// fallback (you can't rewind yourself). Returns null when there is no valid dead ally.
+function resolveDeadAllyTarget(
+  ctx: SimContext,
+  p: Entity,
+  overrideId: number | null,
+): Entity | null {
+  const id = overrideId ?? p.targetId;
+  if (id === null) return null;
+  const t = ctx.entities.get(id);
+  if (!t || !t.dead || t.kind !== 'player') return null;
+  const party = ctx.partyOf(p.id);
+  return party && party.members.includes(t.id) ? t : null;
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -467,7 +483,19 @@ export function castAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetType === 'friendly') {
+  if (ability.requiresTarget && ability.targetsDead) {
+    // Combat res: the target must be a DEAD group/raid member (no self-cast fallback).
+    const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
+    if (!dead) {
+      ctx.error(p.id, 'You must target a dead ally in your group.');
+      return;
+    }
+    if (dist2d(p.pos, dead.pos) > ability.range) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    target = dead;
+  } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // heals/buffs: the mouseover override when given, else the current
     // friendly target, else yourself
     target = resolveFriendlyTarget(ctx, p, castTargetId);
@@ -695,7 +723,14 @@ export function castAbility(
     p.castTotal = channelDuration;
     p.castRemaining = channelDuration;
     p.channeling = true;
-    p.channelTickEvery = channelDuration / ability.channel.ticks;
+    // Aether Darts fires a full-charge barrage (5 missiles) at max Arcane Charges:
+    // aetherDartsChannelStart set p.aetherDartsTicks; every other channel uses the
+    // ability's default tick count.
+    const channelTicks =
+      ability.id === 'arcane_missiles' && p.aetherDartsTicks
+        ? p.aetherDartsTicks
+        : ability.channel.ticks;
+    p.channelTickEvery = channelDuration / channelTicks;
     p.channelTickTimer = p.channelTickEvery;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
     ctx.emit({
@@ -1171,7 +1206,16 @@ function applyAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetType === 'friendly') {
+  if (ability.requiresTarget && ability.targetsDead) {
+    // Combat res finish: the dead ally's id was stored in castTarget at cast start
+    // (it is auto-deselected from p.targetId once dead, so we cannot re-derive it).
+    const dead = resolveDeadAllyTarget(ctx, p, castTarget);
+    if (!dead) {
+      ctx.error(p.id, 'You must target a dead ally in your group.');
+      return;
+    }
+    target = dead;
+  } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // Keep the branch's mouseover-cast resolution (Clique-style): the explicit
     // override wins while valid, else current-friendly-target-else-self.
     target = resolveFriendlyTarget(ctx, p, castTarget);

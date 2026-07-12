@@ -90,6 +90,10 @@ type DisplayGlobalKey = Exclude<
   | 'blinkCast'
   | 'convergence'
   | 'ignitionPct'
+  // Chronoweave mastery's mana cushion + regen: prose is the hand-written mastery
+  // description, so no generated label.
+  | 'manaPct'
+  | 'manaRegenPct'
 >;
 
 export interface TalentLocaleText {
@@ -9600,6 +9604,8 @@ function effectDescription(
       key === 'blinkCast' ||
       key === 'convergence' ||
       key === 'ignitionPct' ||
+      key === 'manaPct' ||
+      key === 'manaRegenPct' ||
       // critVsRooted is not a plain statLabels key; it gets its own "@ root" line below.
       key === 'critVsRooted'
     )

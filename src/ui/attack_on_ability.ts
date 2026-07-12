@@ -52,6 +52,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   // conversion is separate); the ability itself deals no damage and breaks no CC.
   temporalEcho: 'other',
   massTemporalEcho: 'other',
+  resurrectAlly: 'other',
   chainHeal: 'other',
   feralCharge: 'other',
   hot: 'other',

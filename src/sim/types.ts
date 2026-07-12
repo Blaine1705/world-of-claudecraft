@@ -1621,6 +1621,9 @@ export type AbilityEffect =
       maxTargets: number;
       heal: { min: number; max: number };
     }
+  // Chronomancy combat resurrection (Temporal Reversal): rewind a DEAD group/raid
+  // member back to life at their corpse with `hpFrac` of their pools, no sickness.
+  | { type: 'resurrectAlly'; hpFrac: number }
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
   // nearby allies, each hop healing `falloff` of the previous hop's amount. The
   // arc reach is given as `jumpRange` on some variants and `radius` on others.
@@ -1949,6 +1952,9 @@ export interface AbilityDef {
   // temporal uses this so the cast is refused (no cost/cooldown) on an out-of-group
   // target rather than resolving to an empty selection. Checked in casting_lifecycle.
   partyOnlyTarget?: boolean;
+  // Combat resurrection (Temporal Reversal): the target must be a DEAD group/raid
+  // member (not the living-friendly self-cast path). Resolved in casting_lifecycle.
+  targetsDead?: boolean;
   // Ground-targeted ability: instead of an entity target, the cast is aimed at a
   // world point (the client proposes it, the server clamps it to `range`). Its area
   // effects (aoeDamage / groundAoE) center on that point. Implies requiresTarget:false.
@@ -2261,6 +2267,9 @@ export interface Entity {
   // Never serialized or wired.
   aetherDartsConsumePending?: boolean;
   aetherDartsBonusPerBolt?: number;
+  // Missile count for THIS Aether Darts channel: 0/undefined = the ability default
+  // (3), or a full-charge barrage (5 at max Arcane Charges). Never wired.
+  aetherDartsTicks?: number;
   // DEV-ONLY (ALLOW_DEV_COMMANDS): the running Cascada temporal playtest tally,
   // set by /dev cascade and fed by the dev-gated hooks in combat/chronomancy.ts.
   // Pure observation for the manual playtest readout: it is NEVER read by any

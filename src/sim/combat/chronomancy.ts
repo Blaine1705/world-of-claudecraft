@@ -336,6 +336,10 @@ export const AETHER_SURGE_CHARGE_WINDOW = 10; // seconds, refreshed on each cast
 // across the channel's missiles (36 total at 4 charges, +12 per missile over 3).
 // Owner tuning 2026-07-12: the discharge should hit a bit harder.
 export const AETHER_DARTS_BONUS_PER_CHARGE = 9;
+// Full-charge barrage (owner 2026-07-12): at MAX Arcane Charges, Aether Darts fires
+// this many missiles instead of the ability's default 3, in the same channel time
+// (more base hits + more Echo conversion). Below max charges it stays the default.
+export const AETHER_DARTS_FULL_CHARGE_MISSILES = 5;
 // Free-cast proc (owner 2026-07-12): each Aether Surge has a chance to make the
 // NEXT Aether Surge cost no mana. Softens the escalating mana wall and rewards
 // staying on the spender. Provisional chance; the free window is generous so a
@@ -415,6 +419,10 @@ export function aetherDartsChannelStart(caster: Entity, abilityId: string): void
   if (abilityId !== 'arcane_missiles') return;
   caster.aetherDartsConsumePending = true;
   caster.aetherDartsBonusPerBolt = 0;
+  // Full-charge barrage: at MAX charges, fire AETHER_DARTS_FULL_CHARGE_MISSILES this
+  // channel; 0 leaves casting_lifecycle on the ability's default tick count.
+  caster.aetherDartsTicks =
+    aetherSurgeStacks(caster) >= AETHER_SURGE_MAX_CHARGES ? AETHER_DARTS_FULL_CHARGE_MISSILES : 0;
 }
 
 /** Per-missile hook (the Aether Darts bolt callback): on the FIRST landed missile
@@ -434,7 +442,10 @@ export function aetherDartsBoltBonus(ctx: SimContext, caster: Entity, ticks: num
       ctx.emit({ type: 'aura', targetId: caster.id, name: a.name, gained: false });
     }
     const total = AETHER_DARTS_BONUS_PER_CHARGE * stacks;
-    caster.aetherDartsBonusPerBolt = ticks > 0 ? Math.round(total / ticks) : 0;
+    // Split across the ACTUAL missile count this channel (5 at full charge, else the
+    // passed default), so the flat bonus total is unchanged regardless of barrage size.
+    const bolts = caster.aetherDartsTicks || ticks;
+    caster.aetherDartsBonusPerBolt = bolts > 0 ? Math.round(total / bolts) : 0;
   }
   return caster.aetherDartsBonusPerBolt ?? 0;
 }

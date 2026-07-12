@@ -87,7 +87,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       // out-of-combat mana regen: faster than before and scales with spirit
       // (gear/level) plus a small flat per-level floor so low-spirit casters
       // still recover at a reasonable pace (#103)
-      const regen = p.stats.spi / 3 + 4 + Math.floor(p.level / 5);
+      const regen =
+        (p.stats.spi / 3 + 4 + Math.floor(p.level / 5)) *
+        (1 + ctx.playerMods(meta).global.manaRegenPct);
       p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
     }
   } else if (p.resourceType === 'energy') {

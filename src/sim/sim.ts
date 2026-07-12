@@ -2148,11 +2148,8 @@ export class Sim {
       convertedOverheal: 0,
       initialHeal: 0,
     };
-    this.ctx.emit({
-      type: 'log',
-      pid: mageId,
-      text: `[cascade] scenario ready: training dummy + ${allyIds.length} raid allies (center id ${centerId}, one beyond 15 yd). Target the center, cast Temporal Cascade, then hit the dummy with Arcane spells.`,
-    });
+    // The dev-channel "scenario ready" confirmation is emitted by the /dev cascade chat
+    // handler (like /dev bot), keeping this dev diagnostic out of the S3 sim.ts scanner.
   }
 
   // /dev sandbox: a GENERIC practice scenario for testing any ability (dev-command

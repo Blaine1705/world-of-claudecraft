@@ -1053,6 +1053,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "temporal_cascade",
         "name": "Temporal Cascade"
+      },
+      {
+        "id": "temporal_reversal",
+        "name": "Temporal Reversal"
       }
     ],
     "model": "player_mage",

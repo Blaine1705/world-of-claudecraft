@@ -571,7 +571,10 @@ export function recalcPlayerStats(
     const cameFromForm = e.resourceType !== 'mana';
     const manaFrac = e.maxResource > 0 ? e.resource / e.maxResource : 1;
     e.resourceType = 'mana';
-    e.maxResource = def.baseMana + def.manaPerLevel * (lvl - 1) + manaFromIntellect(s.int);
+    e.maxResource = Math.round(
+      (def.baseMana + def.manaPerLevel * (lvl - 1) + manaFromIntellect(s.int)) *
+        (1 + (mods?.global.manaPct ?? 0)),
+    );
     e.resource = cameFromForm
       ? Math.min(e.savedMana, e.maxResource)
       : Math.round(e.maxResource * manaFrac);
