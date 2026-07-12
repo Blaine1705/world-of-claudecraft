@@ -6578,6 +6578,10 @@ export const ja_JP: EnTranslations = {
         "name": "時の残響",
         "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。"
       },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
       "arcane_surge": {
         "name": "Aether Surge",
         "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."

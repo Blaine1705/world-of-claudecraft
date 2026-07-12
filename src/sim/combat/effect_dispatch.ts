@@ -48,7 +48,9 @@ import {
   ARCANE_SURGE_ID,
   aetherSurgeAddStack,
   aetherSurgeDamageMult,
+  placeGroupEcho,
   placeTemporalEcho,
+  selectCascadeTargets,
 } from './chronomancy';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
@@ -549,6 +551,26 @@ export function runEffects(
         const echoTarget = target ?? p;
         if (echoTarget !== p && ctx.isHostileTo(p, echoTarget)) break;
         placeTemporalEcho(ctx, p, echoTarget, eff.duration);
+        break;
+      }
+      case 'massTemporalEcho': {
+        // Cascada temporal: the group version of Temporal Echo. The friendly target
+        // is the CENTER and must be the caster or a living group/raid member.
+        // selectCascadeTargets resolves and ORDERS the whole list (primary first,
+        // then the members nearest the primary within radius, capped at maxTargets)
+        // BEFORE any heal or aura is applied. Each target then takes a small initial
+        // heal (Spell-Power-scaled, can crit) and a 13% group echo; the overlap rule
+        // in placeGroupEcho keeps a pre-existing individual mark at 35%. The Arcane
+        // conversion lives in combat/chronomancy.ts. (mage-chronomancy.md Phase 4)
+        const primary = target ?? p;
+        if (primary !== p && ctx.isHostileTo(p, primary)) break;
+        const targets = selectCascadeTargets(ctx, p, primary, eff.radius, eff.maxTargets);
+        for (const ally of targets) {
+          const healAmount =
+            ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
+          ctx.applyHeal(p, ally, healAmount, ability.name);
+          placeGroupEcho(ctx, p, ally, eff.duration);
+        }
         break;
       }
       case 'heal': {

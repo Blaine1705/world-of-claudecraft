@@ -1002,6 +1002,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "arcane_surge",
         "name": "Aether Surge"
+      },
+      {
+        "id": "temporal_cascade",
+        "name": "Temporal Cascade"
       }
     ],
     "model": "player_mage",

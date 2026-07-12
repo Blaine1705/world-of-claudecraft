@@ -43,7 +43,7 @@ import {
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
 import { isRooted, isStunned } from './combat/cc';
-import { aetherSurgeCostMult, echoVisibleTo, partyAuraPriority } from './combat/chronomancy';
+import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
@@ -51,7 +51,6 @@ import {
 } from './combat/damage';
 import { damageTakenWithin } from './combat/damage_history';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
-import { aetherSurgeCostMult } from './combat/chronomancy';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -7135,14 +7134,10 @@ export class Sim {
                 // the real aura sourceId, so no wire field is added.
                 auras: e.auras
                   .filter((a) => echoVisibleTo(a, this.primaryId))
-                  .sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b))
                   .slice(0, PARTY_MEMBER_AURA_CAP)
                   .map((a) => ({
                     id: a.id,
                     kind: a.kind,
-                    ...(a.kind === 'temporal_echo'
-                      ? { remaining: Math.max(0, Math.ceil(a.remaining)) }
-                      : {}),
                     ...(a.value < 0 ? { neg: 1 as const } : {}),
                   })),
               },

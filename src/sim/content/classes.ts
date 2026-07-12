@@ -165,6 +165,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       // Phase 3: the single-target Arcane spender (charges) that drives the
       // offensive heal rotation (docs/prd/mage-chronomancy.md sections 13.4 / 14).
       'arcane_surge',
+      // Phase 4: the group version of Temporal Echo (marks up to five allies with a
+      // reduced group echo), docs/prd/mage-chronomancy.md Phase 4.
+      'temporal_cascade',
     ],
     color: 0x69ccf0,
   },
@@ -1983,6 +1986,74 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description:
       'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+  },
+  // ---- Chronomancy (healer) Phase 4: Cascada temporal (Temporal Cascade),
+  // docs/prd/mage-chronomancy.md Phase 4. The GROUP version of Temporal Echo: a 2s
+  // cast that centers on the friendly target (which must be the caster or a living
+  // group/raid member and is ALWAYS included) and marks the nearest allies within
+  // 15 yd of it, up to five total. Each takes a small initial heal and a REDUCED
+  // group echo (13% single / 6% area conversion, combat/chronomancy.ts) for 8 sec.
+  // The 15s cooldown plus the 8s window keep five echoes from ever being sustained.
+  // A pre-existing individual echo on a target is kept at 35% (never downgraded),
+  // still initial-healed, and counts within the five. PLAYTEST-provisional values
+  // (owner 2026-07-12), gated by tests/chronomancy_balance.test.ts.
+  temporal_cascade: {
+    id: 'temporal_cascade',
+    name: 'Temporal Cascade',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 90,
+    castTime: 2,
+    cooldown: 15,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    // Group/raid-only: the cast is refused (no cost/cooldown) on a friendly that is
+    // not the caster or a party/raid member, so an out-of-group target never wastes it.
+    partyOnlyTarget: true,
+    effects: [
+      {
+        type: 'massTemporalEcho',
+        duration: 8,
+        radius: 15,
+        maxTargets: 5,
+        heal: { min: 14, max: 18 },
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 130,
+        effects: [
+          {
+            type: 'massTemporalEcho',
+            duration: 8,
+            radius: 15,
+            maxTargets: 5,
+            heal: { min: 22, max: 28 },
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 170,
+        effects: [
+          {
+            type: 'massTemporalEcho',
+            duration: 8,
+            radius: 15,
+            maxTargets: 5,
+            heal: { min: 28, max: 36 },
+          },
+        ],
+      },
+    ],
+    description:
+      'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
   },
   // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
   // sections 13.4 / 14. The single-target Arcane spender that drives the offensive

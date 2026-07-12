@@ -1,9 +1,7 @@
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
-import { echoVisibleTo, partyAuraPriority } from '../src/sim/combat/chronomancy';
-import { damageTakenWithin } from '../src/sim/combat/damage_history';
-import { rewindHealAmount } from '../src/sim/combat/rewind';
+import { echoVisibleTo } from '../src/sim/combat/chronomancy';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
@@ -4555,14 +4553,10 @@ export class GameServer {
                 // sourceId OFF the wire (no protocol change).
                 auras: e.auras
                   .filter((a) => echoVisibleTo(a, pid))
-                  .sort((a, b) => partyAuraPriority(a) - partyAuraPriority(b))
                   .slice(0, PARTY_MEMBER_AURA_CAP)
                   .map((a) => ({
                     id: a.id,
                     kind: a.kind,
-                    ...(a.kind === 'temporal_echo'
-                      ? { remaining: Math.max(0, Math.ceil(a.remaining)) }
-                      : {}),
                     ...(a.value < 0 ? { neg: 1 } : {}),
                   })),
               }

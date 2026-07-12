@@ -52,6 +52,7 @@ import {
   normAngle,
 } from '../types';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { aetherDartsBoltBonus, aetherDartsChannelStart } from './chronomancy';
 import {
   ARCANE_SURGE_ID,
   aetherDartsBoltBonus,
@@ -66,7 +67,6 @@ import {
   consumeNextCastInstant,
   hasFreeCostFor,
 } from './empower_next';
-import { aetherDartsBoltBonus, aetherDartsChannelStart } from './chronomancy';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -578,6 +578,17 @@ export function castAbility(
     if (ctx.lineOfSightBlocked(p, target, ability)) {
       ctx.error(p.id, 'Line of sight.');
       return;
+    }
+    // Group/raid-only friendly target (Cascada temporal): the target must be the
+    // caster or a member of the caster's party/raid, never an external friendly or
+    // NPC. Refuse before any cost/cooldown is paid, so an out-of-group target never
+    // silently burns the cast on an empty selection.
+    if (ability.partyOnlyTarget && target.id !== p.id) {
+      const party = ctx.partyOf(p.id);
+      if (!party || !party.members.includes(target.id)) {
+        ctx.error(p.id, 'That ally is not in your group.');
+        return;
+      }
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;

@@ -6578,6 +6578,10 @@ export const ko_KR: EnTranslations = {
         "name": "시간의 메아리",
         "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다."
       },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
       "arcane_surge": {
         "name": "Aether Surge",
         "description": "Draws a surge of raw Arcane power through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges."
