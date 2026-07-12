@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 
@@ -48,13 +49,16 @@ describe('Pyroblast (mage)', () => {
   });
 
   it('is learned only at level 5', () => {
-    expect(abilitiesKnownAt('mage', 4).some((k) => k.def.id === 'pyroblast')).toBe(false);
-    expect(abilitiesKnownAt('mage', 5).some((k) => k.def.id === 'pyroblast')).toBe(true);
+    // Pyroblast rides the DPS specs since the Chronomancy gating; resolve as fire.
+    const fire = computeTalentModifiers('mage', { ...emptyAllocation(), spec: 'fire' } as never);
+    expect(abilitiesKnownAt('mage', 4, fire).some((k) => k.def.id === 'pyroblast')).toBe(false);
+    expect(abilitiesKnownAt('mage', 5, fire).some((k) => k.def.id === 'pyroblast')).toBe(true);
   });
 
   it('casts with its cast time and damages the target over time', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);
+    expect(sim.setSpec('fire')).toBe(true);
     const wolf = nearestMob(sim);
     teleportTo(sim, wolf.pos.x + 15, wolf.pos.z);
     sim.targetEntity(wolf.id);

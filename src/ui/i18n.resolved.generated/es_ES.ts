@@ -6162,6 +6162,18 @@ export const es_ES: EnTranslations = {
         "name": "Piedra Celeste",
         "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (talento de mago)"
       },
+      "temporal_mend": {
+        "name": "Remiendo temporal",
+        "description": "Adelanta a un aliado un instante en el tiempo y repara {damage} de salud mientras su cuerpo se asienta en su yo futuro más sano. (habilidad distintiva de Cronomancia)"
+      },
+      "temporal_barrier": {
+        "name": "Barrera temporal",
+        "description": "Desplaza al objetivo un latido fuera del presente: un caparazón temporal absorbe {damage} de daño durante 10 s antes de que la línea temporal vuelva a encajar."
+      },
+      "temporal_echo": {
+        "name": "Eco temporal",
+        "description": "Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo."
+      },
       "mind_sear": {
         "name": "Ardeideas",
         "description": "Canaliza energía de Sombras en el área objetivo e inflige {damage} cada segundo a cercanos enemigos. (talento de sacerdote)"

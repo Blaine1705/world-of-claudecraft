@@ -111,17 +111,22 @@ const HUNTER_SPECS: SpecDef[] = [
 ];
 
 const MAGE_SPECS: SpecDef[] = [
+  // Chronomancy (docs/prd/mage-chronomancy.md Phase 1): the healer that
+  // replaced the Aethermancy DPS. The INTERNAL id stays 'arcane' so existing
+  // characters, loadouts and persisted builds survive untouched (the PRD
+  // records this decision); only the presentation and role changed. The old
+  // signature arcane_power is now unreferenced content debt (PRD, section 14).
   spec(
     'arcane',
     'mage',
-    'Aethermancy',
-    'dps',
+    'Chronomancy',
+    'healer',
     '*',
-    'A precision caster using mana efficiency and focused arcane barrages.',
-    'arcane_power',
-    'Aetheric Flux',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'A temporal healer who repairs, prevents and rewinds harm with time-bending Arcane magic.',
+    'temporal_mend',
+    'Chronoweave',
+    'Increases all healing you do by 15%.',
+    { global: { healPct: 0.15 } },
   ),
   spec(
     'fire',

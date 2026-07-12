@@ -1805,6 +1805,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': '乙太飛鏢',
   'entities.abilities.arcane_missiles.description':
     '向敵人發射乙太飛鏢，持續 3 秒，每秒造成 {damage} 點秘法傷害。',
+  'entities.abilities.temporal_mend.name': '時光縫合',
+  'entities.abilities.temporal_mend.description':
+    '將盟友向前拉動一瞬，在身體安定於更健康的未來形態時治療{damage}點生命值。(時光術特色技能)',
+  'entities.abilities.temporal_barrier.name': '時光屏障',
+  'entities.abilities.temporal_barrier.description':
+    '將目標移出當下一瞬:時光之殼在10秒內吸收{damage}點傷害，隨後時間線彈回原位。',
+  'entities.abilities.temporal_echo.name': '時光迴響',
+  'entities.abilities.temporal_echo.description':
+    '以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。',
   'entities.abilities.polymorph.name': '蠱惑術',
   'entities.abilities.polymorph.description':
     '將敵人變成蟾蜍，最多持續 {duration} 秒。蟾蜍會四處遊蕩並快速恢復。任何傷害都會打破效果。僅限野獸和人型生物。',

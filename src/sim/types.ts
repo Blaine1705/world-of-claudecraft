@@ -400,6 +400,11 @@ export type AuraKind =
   // less damage from any external source while worn (summed across auras,
   // floored at a zero multiplier; the cut lives in combat/damage.ts beside the
   // Die by the Sword arm).
+  // Chronomancy Temporal Echo mark (docs/prd/mage-chronomancy.md section 13): a
+  // per-caster (sourceId) buff on ONE ally; while it rides, a fraction of the
+  // mage's Arcane damage heals the marked ally. Value is unused (1); the
+  // conversion rate is a constant read at damage time, not stored on the aura.
+  | 'temporal_echo'
   | 'buff_dr'
   // Raised Guard's physical-only sibling of buff_dr: the wearer takes `value`
   // fraction less PHYSICAL damage while worn (other schools untouched). Same
@@ -1582,6 +1587,12 @@ export type AbilityEffect =
     }
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
+  // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13): place a
+  // per-caster mark on the friendly target (or self) for `duration` sec. The
+  // small initial heal is authored as a sibling `heal` effect on the same
+  // ability (so $d shows it); this effect owns only the mark. The Arcane-damage
+  // conversion is handled by combat/chronomancy.ts, not by a stored field.
+  | { type: 'temporalEcho'; duration: number }
   // Chain Heal (shaman): heals the friendly target, then arcs to up to `jumps`
   // nearby allies, each hop healing `falloff` of the previous hop's amount. The
   // arc reach is given as `jumpRange` on some variants and `radius` on others.
@@ -2836,6 +2847,10 @@ export type SimEvent = { pid?: number } & (
         | 'wardBloom'
         | 'echoBurst'
         | 'detonate'
+        // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13):
+        // a brief temporal glyph blooming directly OVER the marked ally on apply.
+        // Target-anchored, no projectile travels to the ally. Visual-only.
+        | 'temporalGlyph'
         // A teleport step (Flickerstep / Shadowstep): the renderer SNAPS the
         // mover instead of arcing the reposition like a leap.
         | 'blinkStep';

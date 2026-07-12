@@ -52,7 +52,12 @@ export const HOT_STREAK_DURATION = 12; // seconds to spend the free instant
 // The personal-barrier SLOT (owner rule): each mage spec fills it with its own
 // shield, and the shared row talents (Warded / Cold Snap / Overflowing Power)
 // hook whichever the player's spec provides, never a hardcoded single id.
-export const PERSONAL_BARRIER_IDS: readonly string[] = ['ice_barrier', 'blazing_barrier'];
+export const PERSONAL_BARRIER_IDS: readonly string[] = [
+  'ice_barrier',
+  'blazing_barrier',
+  // Chronomancy's shield fills the same slot (it is also its ally shield).
+  'temporal_barrier',
+];
 
 function fireSpecMods(ctx: SimContext, p: Entity) {
   if (p.kind !== 'player') return null;

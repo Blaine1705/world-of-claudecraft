@@ -233,6 +233,10 @@ export interface SimContextCallbacks {
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
+    // One iteration of an AREA effect (aoeDamage/groundAoE fan-out). Read only by
+    // the Chronomancy Temporal Echo conversion; area Arcane damage heals the
+    // marked ally at a reduced rate. Defaults false.
+    aoe?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;

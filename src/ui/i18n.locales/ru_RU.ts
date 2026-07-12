@@ -1908,6 +1908,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': 'Стрелы эфира',
   'entities.abilities.arcane_missiles.description':
     'Выпускает в противника Стрелы эфира, наносящие {damage} ед. урона от тайной магии каждую секунду в течение 3 сек.',
+  'entities.abilities.temporal_mend.name': 'Временная штопка',
+  'entities.abilities.temporal_mend.description':
+    'Продвигает союзника на мгновение вперед во времени, восстанавливая {damage} здоровья, пока тело принимает свой более здоровый будущий облик. (отличительная способность Хрономантии)',
+  'entities.abilities.temporal_barrier.name': 'Временный барьер',
+  'entities.abilities.temporal_barrier.description':
+    'Смещает цель на мгновение из настоящего: временная оболочка поглощает {damage} урона в течение 10 сек, после чего линия времени возвращается на место.',
+  'entities.abilities.temporal_echo.name': 'Временное эхо',
+  'entities.abilities.temporal_echo.description':
+    'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его.',
   'entities.abilities.polymorph.name': 'Чары',
   'entities.abilities.polymorph.description':
     'Превращает врага в жабу на срок до {duration} сек. Жаба бродит и быстро восстанавливается. Любой урон прерывает эффект. Только звери и гуманоиды.',

@@ -55,6 +55,7 @@ import {
   sweepStrikeDamage,
 } from './area_echo';
 import { isRootedOrChilled } from './cc';
+import { placeTemporalEcho } from './chronomancy';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -595,6 +596,17 @@ export function runEffects(
       }
       case 'weaponDamage':
         break;
+      case 'temporalEcho': {
+        // Chronomancy Temporal Echo: place (or MOVE) the caster's per-caster mark
+        // on a friendly target or self. The small initial heal is the sibling
+        // 'heal' effect on this ability, handled by the 'heal' case; this case
+        // owns only the mark + its glyph. The Arcane-damage conversion lives in
+        // combat/chronomancy.ts. (docs/prd/mage-chronomancy.md section 13)
+        const echoTarget = target ?? p;
+        if (echoTarget !== p && ctx.isHostileTo(p, echoTarget)) break;
+        placeTemporalEcho(ctx, p, echoTarget, eff.duration);
+        break;
+      }
       case 'heal': {
         const healTarget = target ?? p;
         if (healTarget !== p && ctx.isHostileTo(p, healTarget)) break;
@@ -1317,6 +1329,10 @@ export function runEffects(
             'hit',
             false,
             threatOpts,
+            undefined,
+            // aoe: area Arcane damage (Aetherburst) converts to Temporal Echo
+            // healing at the reduced 15% rate. Non-arcane AoE is unaffected.
+            true,
           );
           // Paired stun rider (Faultline): each enemy actually struck is also
           // stunned, mirroring the single-target 'stun' case (shared PvP DR,

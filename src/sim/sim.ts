@@ -4539,6 +4539,7 @@ export class Sim {
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
+    aoe = false,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -4552,6 +4553,7 @@ export class Sim {
       noRage,
       threatOpts,
       direct,
+      aoe,
     );
   }
 

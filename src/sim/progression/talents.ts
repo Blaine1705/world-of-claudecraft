@@ -32,6 +32,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { stripTemporalEchoes } from '../combat/chronomancy';
 import { abilitiesKnownAt } from '../content/classes';
 import { computeModifiersWithRows, rowTreeFor } from '../content/talent_rows';
 import {
@@ -123,6 +124,13 @@ export function applyTalentAllocation(
   // companion returns home. Tamed hunter pets are never spec-gated, so they
   // are untouched; deterministic, no rng.
   dismissSpecLockedPet(ctx, r.e, r.meta);
+  // Chronomancy: leaving the healer spec (the new build no longer knows Temporal
+  // Echo) clears any Temporal Echo marks this mage placed, so a fire/frost mage
+  // never keeps feeding a stale echo. Keyed by sourceId; marks the mage carries
+  // from another chronomancer are untouched. No-op for every non-mage build.
+  if (!r.meta.known.some((k) => k.def.id === 'temporal_echo')) {
+    stripTemporalEchoes(ctx, r.e.id);
+  }
   // A committed spec can make a held offhand illegal (a Titan's Grip two-hander,
   // or a Fury dual-wield one-hander, under a spec that allows neither): bench it
   // so the spec boundary never persists a state the equip path refuses. No-op
@@ -151,7 +159,14 @@ function dismissSpecLockedPet(ctx: SimContext, e: Entity, meta: PlayerMeta): voi
   const known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   if (known.some((k) => summons(k.def))) return;
   despawnPersistentPet(ctx, pet);
-  ctx.emit({ type: 'log', pid: e.id, text: `${pet.name} returns home.`, color: '#b894ff' });
+  // The registered despawn line (log.petFadesVoid, localized for every locale
+  // in sim_i18n), the same farewell a warlock demon gives.
+  ctx.emit({
+    type: 'log',
+    pid: e.id,
+    text: `${pet.name} fades back into the void.`,
+    color: '#b894ff',
+  });
 }
 
 // Legacy incremental API retained for old scripts. The node system is gone, so

@@ -156,6 +156,12 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'ice_barrier',
       'pyroblast',
       'flamestrike',
+      // Chronomancy healer kit (docs/prd/mage-chronomancy.md, `specs: ['arcane']`
+      // gated): the single-target shield (Phase 1) and Temporal Echo (Phase 2, the
+      // Arcane-damage-to-healing mark). Temporal Mend is the spec signature,
+      // granted at the pick like Combustion.
+      'temporal_barrier',
+      'temporal_echo',
     ],
     color: 0x69ccf0,
   },
@@ -1630,6 +1636,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   fire_blast: {
     id: 'fire_blast',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire', 'frost'],
     name: 'Cinderfall',
     class: 'mage',
     learnLevel: 5,
@@ -1732,6 +1741,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // spell built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
   flamestrike: {
     id: 'flamestrike',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire', 'frost'],
     name: 'Flamestrike',
     class: 'mage',
     learnLevel: 5,
@@ -1822,6 +1834,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   scorch: {
     id: 'scorch',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire', 'frost'],
     name: 'Scald',
     class: 'mage',
     learnLevel: 5,
@@ -1843,6 +1858,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   pyroblast: {
     id: 'pyroblast',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire', 'frost'],
     name: 'Pyrelance',
     class: 'mage',
     learnLevel: 5,
@@ -1861,8 +1879,106 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
   },
+  // ---- Chronomancy (healer) Phase 1 kit, docs/prd/mage-chronomancy.md ----
+  temporal_mend: {
+    id: 'temporal_mend',
+    name: 'Temporal Mend',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 45,
+    // The reliable efficient heal (owner spec: ~2s): quicker than the priest
+    // and paladin big heals (2.5s), paying for the speed with a slightly
+    // lower top-end roll. Values are PLAYTEST-provisional (PRD section 14).
+    castTime: 2,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'heal', min: 62, max: 74 }],
+    ranks: [
+      { rank: 2, level: 12, cost: 70, effects: [{ type: 'heal', min: 105, max: 125 }] },
+      { rank: 3, level: 18, cost: 95, effects: [{ type: 'heal', min: 150, max: 178 }] },
+    ],
+    description:
+      'Draws an ally a moment forward in time, mending $d health as the body settles into its healthier future self. (Chronomancy signature)',
+  },
+  temporal_barrier: {
+    id: 'temporal_barrier',
+    name: 'Temporal Barrier',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 50,
+    castTime: 0,
+    // Instant, on the GCD, 12s cooldown (owner spec). Sized against the
+    // priest Psalm of Warding (145 absorb, 6s cd, 30s window): a bigger chunk
+    // on half the cadence and a much shorter 10s window. PLAYTEST values.
+    cooldown: 12,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'absorb', amount: 55, duration: 10 }],
+    ranks: [
+      { rank: 2, level: 12, cost: 75, effects: [{ type: 'absorb', amount: 100, duration: 10 }] },
+      { rank: 3, level: 18, cost: 105, effects: [{ type: 'absorb', amount: 160, duration: 10 }] },
+    ],
+    description:
+      'Shifts the target a heartbeat out of the present, a temporal shell absorbing $d damage for 10 sec before the timeline snaps back.',
+  },
+  // ---- Chronomancy (healer) Phase 2: Temporal Echo, docs/prd/mage-chronomancy.md
+  // section 13. Instant, on the GCD, no cooldown. A small initial heal (the sibling
+  // `heal` effect, feeds $d) plus the per-caster mark (the `temporalEcho` effect,
+  // feeds $t). While marked, 35% of the mage's single-target Arcane damage and 15%
+  // of area Arcane damage heals the ally (combat/chronomancy.ts). Re-casting MOVES
+  // the mark. Values are PLAYTEST-provisional (PRD section 13.14 / 14).
+  temporal_echo: {
+    id: 'temporal_echo',
+    name: 'Temporal Echo',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [
+      { type: 'heal', min: 24, max: 30 },
+      { type: 'temporalEcho', duration: 15 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 60,
+        effects: [
+          { type: 'heal', min: 40, max: 50 },
+          { type: 'temporalEcho', duration: 15 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 85,
+        effects: [
+          { type: 'heal', min: 58, max: 70 },
+          { type: 'temporalEcho', duration: 15 },
+        ],
+      },
+    ],
+    description:
+      'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+  },
   ice_barrier: {
     id: 'ice_barrier',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire', 'frost'],
     name: 'Frostveil',
     class: 'mage',
     learnLevel: 5,
@@ -5774,7 +5890,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'clearCooldowns',
-        abilities: ['blink', 'ice_barrier', 'blazing_barrier', 'greater_invisibility'],
+        abilities: [
+          'blink',
+          'ice_barrier',
+          'blazing_barrier',
+          'temporal_barrier',
+          'greater_invisibility',
+        ],
       },
     ],
     description:

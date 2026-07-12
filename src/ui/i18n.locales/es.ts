@@ -2841,6 +2841,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_missiles.name': 'Dardos de Éter',
   'entities.abilities.arcane_missiles.description':
     'Lanza Dardos de Éter al enemigo, causando {damage} de daño Arcano cada segundo durante 3 s.',
+  'entities.abilities.temporal_mend.name': 'Remiendo temporal',
+  'entities.abilities.temporal_mend.description':
+    'Adelanta a un aliado un instante en el tiempo y repara {damage} de salud mientras su cuerpo se asienta en su yo futuro más sano. (habilidad distintiva de Cronomancia)',
+  'entities.abilities.temporal_barrier.name': 'Barrera temporal',
+  'entities.abilities.temporal_barrier.description':
+    'Desplaza al objetivo un latido fuera del presente: un caparazón temporal absorbe {damage} de daño durante 10 s antes de que la línea temporal vuelva a encajar.',
+  'entities.abilities.temporal_echo.name': 'Eco temporal',
+  'entities.abilities.temporal_echo.description':
+    'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo.',
   'entities.abilities.polymorph.name': 'Embrujar',
   'entities.abilities.polymorph.description':
     'Transforma al enemigo en sapo durante hasta {duration} s. El sapo deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',

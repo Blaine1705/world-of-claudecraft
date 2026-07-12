@@ -6162,6 +6162,18 @@ export const vi_VN: EnTranslations = {
         "name": "Đá Trời",
         "description": "Hace caer un meteoro en el área objetivo, inflige {damage} de daño de Lửa y quema el suelo. (thiên phú pháp sư)"
       },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
       "mind_sear": {
         "name": "Thiêu Ý Nghĩ",
         "description": "Canaliza energía de Bóng tối en el área objetivo e inflige {damage} cada segundo a gần đó kẻ địch. (thiên phú tu sĩ)"

@@ -54,6 +54,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -95,6 +96,12 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  // Whether this dealDamage call is one iteration of an AREA effect (an
+  // aoeDamage/groundAoE fan-out) rather than a single-target hit. Only read by
+  // the Chronomancy Temporal Echo conversion (combat/chronomancy.ts): area
+  // Arcane damage converts to healing at a reduced rate. Defaults false, so
+  // every single-target caller is unchanged and byte-identical.
+  aoe = false,
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
@@ -327,6 +334,10 @@ export function dealDamage(
           noRage,
           threatOpts,
           direct,
+          // Carry the AoE flag so a redirected slice of an area Arcane hit still
+          // rates its Temporal Echo conversion at the area (15%) coefficient, not
+          // the single-target 35%.
+          aoe,
         );
       }
     }
@@ -501,6 +512,7 @@ export function dealDamage(
     }
   }
 
+  const preHp = target.hp;
   target.hp = Math.max(0, target.hp - amount);
   ctx.emit({
     type: 'damage',
@@ -513,6 +525,15 @@ export function dealDamage(
     kind,
     absorbed: totalAbsorbed || undefined,
   });
+
+  // Chronomancy Temporal Echo (combat/chronomancy.ts): siphon a fraction of the
+  // caster's LANDED Arcane damage into the ally they marked. Uses (preHp -
+  // target.hp), the amount that actually reduced health, so absorbed, avoided,
+  // and overkill damage never fabricate healing. Draws no rng. Non-arcane damage
+  // and non-player sources are filtered inside. The PvP-context early returns
+  // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
+  // tuning to a later phase).
+  chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
 
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {
@@ -806,6 +827,11 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   }
 
   if (e.kind === 'player') {
+    // Chronomancy: a dead mage feeds no more Arcane damage, so drop any Temporal
+    // Echo marks it placed on living allies (a mark on a dying ally is already
+    // shed by aurasSurvivingDeath above). Keyed by sourceId, so marks THIS player
+    // carries from another chronomancer are left alone.
+    stripTemporalEchoes(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
     e.autoAttack = false;
