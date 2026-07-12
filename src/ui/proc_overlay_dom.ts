@@ -65,6 +65,9 @@ export function buildProcOverlay(doc: Document = document): HTMLElement {
     <path class="ph-core" d="M110,58 C104,72 100,86 100,100 C100,118 104,130 110,138 C116,130 120,118 120,100 C120,86 116,72 110,58 Z"/>
     <path class="ph-crest" d="M110,56 C106,48 106,38 110,28 C114,38 114,48 110,56 Z"/>
   </g>
-</svg>`;
+</svg>
+<div class="chrono-part cp-lwing"></div>
+<div class="chrono-part cp-rwing"></div>
+<div class="chrono-part cp-center"></div>`;
   return el;
 }
