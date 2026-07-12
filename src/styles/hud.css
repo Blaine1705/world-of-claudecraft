@@ -3014,10 +3014,7 @@
      wing-beat ANIMATION still stops (animation-duration stays snapped; that is
      real motion). */
   body.reduce-motion #proc-overlay,
-  body.reduce-motion #proc-overlay .ph-half,
-  body.reduce-motion #proc-overlay .ph-wing,
-  body.reduce-motion #proc-overlay .ph-side,
-  body.reduce-motion #proc-overlay .ph-core-g {
+  body.reduce-motion #proc-overlay * {
     transition-duration: 0.7s !important;
   }
   /* Frosted Panels, opt-in backdrop blur behind HUD panels & windows. */
@@ -4666,27 +4663,44 @@ body.reduce-motion #proc-overlay .ph-wing {
 }
 
 /* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
-/* A different, detailed phoenix (owner art, public/ui/phoenix-chrono-v2.png). Under
-   the arcane spec the fire inline-SVG bird is hidden and this one is drawn as a
-   MASK over the theme's arcane-violet gradient, so its colour lives in CSS. The
-   Aether Surge charges reveal it by UNFURLING the wings from the centre outward
-   (a clip-path that widens per charge, c1..c4); the full 4/4 bird flares with an
-   arcane glow. Aether Darts spends the charges (0) and it fades out gently. Every
-   rule is scoped to .chrono, so the fire path is untouched. */
+/* The owner illustration, split into THREE parts (left wing, right wing, centre)
+   so the Aether Surge charges reveal it PART BY PART, not by scaling: c1 lights
+   the LEFT WING, c2 the RIGHT WING, c3 the CENTRAL body/crest/tail, c4 adds an
+   arcane glow. Each part is a violet-gradient div masked to its region; the three
+   overlay in register to rebuild the whole bird. The fire inline-SVG bird is
+   hidden under .chrono. Aether Darts spends the charges (0) and it fades out. */
 #proc-overlay.chrono svg {
   display: none;
 }
-#proc-overlay.chrono {
+#proc-overlay .chrono-part {
+  display: none;
+}
+#proc-overlay.chrono .chrono-part {
+  display: block;
+  position: absolute;
+  inset: 0;
   background: linear-gradient(to bottom, #efe0ff 0%, #a855f7 52%, #6b21a8 100%);
-  -webkit-mask: url("/ui/phoenix-chrono-v2.png") center / contain no-repeat;
-  mask: url("/ui/phoenix-chrono-v2.png") center / contain no-repeat;
-  /* the unfurl (clip-path) is quick per charge; the fade-out (opacity) is gentle */
-  transition:
-    opacity 0.7s ease,
-    clip-path 0.2s ease,
-    filter 0.2s ease;
-  /* c1 default: only the central column (crest, head, body, tail) shows */
-  clip-path: inset(0 40% 0 40%);
+  opacity: 0;
+  /* OFF (fade-out) is gentle; the reveal rules below light each part quickly. */
+  transition: opacity 0.7s ease;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+#proc-overlay.chrono .cp-lwing {
+  -webkit-mask-image: url("/ui/phoenix-lwing.png");
+  mask-image: url("/ui/phoenix-lwing.png");
+}
+#proc-overlay.chrono .cp-rwing {
+  -webkit-mask-image: url("/ui/phoenix-rwing.png");
+  mask-image: url("/ui/phoenix-rwing.png");
+}
+#proc-overlay.chrono .cp-center {
+  -webkit-mask-image: url("/ui/phoenix-center.png");
+  mask-image: url("/ui/phoenix-center.png");
 }
 /* Visible and grabbable once any charge is held. */
 #proc-overlay.chrono.c1 {
@@ -4694,16 +4708,15 @@ body.reduce-motion #proc-overlay .ph-wing {
   pointer-events: auto;
   cursor: grab;
 }
-/* Each further charge unfurls the wings outward. */
-#proc-overlay.chrono.c2 {
-  clip-path: inset(0 30% 0 30%);
+/* Reveal order: left wing (c1), right wing (c2), centre (c3), quick to light. */
+#proc-overlay.chrono.c1 .cp-lwing,
+#proc-overlay.chrono.c2 .cp-rwing,
+#proc-overlay.chrono.c3 .cp-center {
+  opacity: 1;
+  transition: opacity 0.22s ease;
 }
-#proc-overlay.chrono.c3 {
-  clip-path: inset(0 20% 0 20%);
-}
+/* Full 4/4: an arcane glow over the whole bird. */
 #proc-overlay.chrono.c4 {
-  clip-path: inset(0 0 0 0);
-  /* full bird: an arcane flare (a raster cannot beat a wing, so it glows). */
   filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.55))
     drop-shadow(0 0 18px rgba(200, 160, 255, 0.85));
 }
