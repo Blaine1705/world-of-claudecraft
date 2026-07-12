@@ -1023,6 +1023,14 @@ export function handleDevChat(
     ctx.startCascadePlaytest(pid);
     return null;
   }
+  if (/^\/(?:dev\s+sandbox|devsandbox)\s*$/i.test(raw)) {
+    // [dev] A generic practice scenario: a non-offensive training dummy plus a raid of
+    // regen-frozen friendly bots (10k pool) for testing any ability threat-free.
+    const allies = ctx.startDevSandbox(pid);
+    const okText = `[dev] Sandbox ready: a training dummy plus ${allies} raid allies (10k HP, started low, regen frozen). Attack the dummy, then practice heals or AoE on the allies threat-free. Re-run /dev sandbox to reset.`;
+    ctx.emit({ type: 'log', text: okText, pid });
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -1034,7 +1042,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev cascade, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev cascade, /dev sandbox, /dev kill',
     );
     return null;
   }

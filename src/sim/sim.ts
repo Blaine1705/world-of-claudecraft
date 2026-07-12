@@ -2147,6 +2147,79 @@ export class Sim {
     });
   }
 
+  // /dev sandbox: a GENERIC practice scenario for testing any ability (dev-command
+  // realms only). Spawns a non-offensive training dummy in front (aggroRadius 0 /
+  // moveSpeed 0, so nothing chases you) plus a raid of friendly level-20 allies with a
+  // roomy 10k health pool, started LOW, and out-of-combat regen FROZEN, so a healer can
+  // top them off for a good while (and the bar visibly climbs) with nothing but your own
+  // abilities moving it. Re-running RESETS it (clears the previous dummy + bots).
+  // Returns the number of allies spawned. (The Cascada-specific readout stays in
+  // startCascadePlaytest; this one is class-agnostic.)
+  startDevSandbox(pid?: number): number {
+    const casterId = pid ?? this.primaryId;
+    const me = this.entities.get(casterId);
+    if (!me) return 0;
+    for (const id of this.devSandboxIds) {
+      if (this.players.has(id)) this.removePlayer(id);
+      else this.dropEntity(id);
+    }
+    this.devSandboxIds = [];
+    const cfg = {
+      dummyX: -3,
+      dummyZ: 4,
+      bots: 5,
+      botZ: 2,
+      botX0: 2,
+      botGap: 1.5,
+      maxHp: 10_000,
+      hp: 0.15,
+    };
+    const dummy = createMob(
+      this.nextId++,
+      MOBS.training_dummy,
+      20,
+      this.groundPos(me.pos.x + cfg.dummyX, me.pos.z + cfg.dummyZ),
+    );
+    dummy.hostile = true;
+    this.addEntity(dummy);
+    const botIds: number[] = [];
+    for (let i = 0; i < cfg.bots; i++) {
+      botIds.push(
+        this.spawnScenarioAlly(
+          `Practice${i + 1}`,
+          me.pos.x + cfg.botX0 + i * cfg.botGap,
+          me.pos.z + cfg.botZ,
+        ),
+      );
+    }
+    for (const id of botIds.slice(0, 4)) {
+      this.partyInvite(id, casterId);
+      this.partyAccept(id);
+    }
+    if (botIds.length >= 5) this.party.convertPartyToRaid(casterId);
+    for (const id of botIds.slice(4)) {
+      this.partyInvite(id, casterId);
+      this.partyAccept(id);
+    }
+    for (const id of botIds) {
+      const e = this.entities.get(id);
+      if (!e) continue;
+      // A roomy 10k pool (not the dummy's near-infinite one), started low: heal for a
+      // good while AND watch the bar climb.
+      e.maxHp = cfg.maxHp;
+      e.hp = Math.max(1, Math.round(cfg.maxHp * cfg.hp));
+      e.eating = {
+        itemId: 'dev_sandbox_freeze',
+        kind: 'food',
+        hpPer2s: 0,
+        manaPer2s: 0,
+        remaining: 1_000_000,
+      };
+    }
+    this.devSandboxIds = [dummy.id, ...botIds];
+    return botIds.length;
+  }
+
   removePlayer(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
@@ -3192,6 +3265,7 @@ export class Sim {
       spawnDevBot: sim.spawnDevBot.bind(sim),
       spawnDevVendor: sim.spawnDevVendor.bind(sim),
       startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
+      startDevSandbox: sim.startDevSandbox.bind(sim),
       // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
       // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
       // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests
