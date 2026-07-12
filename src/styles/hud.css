@@ -4731,3 +4731,16 @@ body.reduce-motion #proc-overlay .ph-wing {
 #proc-overlay.chrono.preview .ph-core-g {
   opacity: 0.4;
 }
+/* Reduce-motion normally snaps EVERY transition to ~0 (the global
+   `body.reduce-motion *` rule), which turned the phoenix fade-out into a hard
+   cut (owner report). A pure OPACITY fade is vestibular-safe (no transform,
+   scale, or parallax), so keep the phoenix's gentle fade even under
+   reduce-motion; the wing-beat ANIMATION still stops above (that IS motion).
+   Higher specificity + !important beats the blanket. */
+body.reduce-motion #proc-overlay,
+body.reduce-motion #proc-overlay .ph-half,
+body.reduce-motion #proc-overlay .ph-wing,
+body.reduce-motion #proc-overlay .ph-side,
+body.reduce-motion #proc-overlay .ph-core-g {
+  transition-duration: 0.5s !important;
+}
