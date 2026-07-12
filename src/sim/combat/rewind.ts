@@ -19,7 +19,6 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { damageTakenWithin } from './damage_history';
-import { livingGroupRaidInRadius } from './group_targeting';
 
 export interface RewindParams {
   fraction: number; // of recent real damage restored (0.30)
@@ -28,10 +27,27 @@ export interface RewindParams {
   radius: number; // yards from the caster (40)
 }
 
-// Rewind's targets are the living group/raid in range of the caster (the shared
-// resolver). Kept as a named export for readability at the call site and focused tests.
+// Living group/raid PLAYERS within `radius` of the caster, the caster included;
+// solo, just the caster. Excludes the dead, pets / NPC companions (no PlayerMeta),
+// enemies, and anyone out of range. Deterministic order (by entity id); no rng.
 export function selectRewindTargets(ctx: SimContext, caster: Entity, radius: number): Entity[] {
-  return livingGroupRaidInRadius(ctx, caster, radius);
+  const party = ctx.partyOf(caster.id);
+  const memberIds = party ? party.members : [caster.id];
+  const cx = caster.pos.x;
+  const cz = caster.pos.z;
+  const r2 = radius * radius;
+  const targets: Entity[] = [];
+  for (const pid of memberIds) {
+    const e = ctx.entities.get(pid);
+    const meta = ctx.players.get(pid); // players only: pets / NPC companions are excluded
+    if (!e || !meta || e.dead) continue;
+    const dx = e.pos.x - cx;
+    const dz = e.pos.z - cz;
+    if (dx * dx + dz * dz > r2) continue;
+    targets.push(e);
+  }
+  targets.sort((a, b) => a.id - b.id);
+  return targets;
 }
 
 // The per-target Rewind heal, before healingTakenMult / absorb (which applyHeal
@@ -39,20 +55,9 @@ export function selectRewindTargets(ctx: SimContext, caster: Entity, radius: num
 // HP ). 0 when the ally took no recent damage or is already at full health. No rng.
 export function rewindHealFor(ctx: SimContext, ally: Entity, p: RewindParams): number {
   const recent = damageTakenWithin(ally, ctx.tickCount, Math.round(p.windowSec * 20));
-  return rewindHealAmount(recent, ally.hp, ally.maxHp, p.fraction, p.maxHpFraction);
-}
-
-/** Pure preview shared by Rewind and party-frame wire projection. */
-export function rewindHealAmount(
-  recentDamage: number,
-  hp: number,
-  maxHp: number,
-  fraction = 0.3,
-  maxHpFraction = 0.35,
-): number {
-  const fromDamage = Math.round(recentDamage * fraction);
-  const maxHpCap = Math.round(maxHp * maxHpFraction);
-  const missing = maxHp - hp;
+  const fromDamage = Math.round(recent * p.fraction);
+  const maxHpCap = Math.round(ally.maxHp * p.maxHpFraction);
+  const missing = ally.maxHp - ally.hp;
   return Math.max(0, Math.min(fromDamage, maxHpCap, missing));
 }
 

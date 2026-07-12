@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6976,
-    "rows": 146496,
-    "translated": 143788,
-    "pending": 2515,
+    "keys": 6978,
+    "rows": 146538,
+    "translated": 143790,
+    "pending": 2555,
     "blocked": 193,
     "blockedSource": 95
   },
@@ -147617,6 +147617,150 @@
         "en_CA": {
           "state": "translated",
           "srcHash": "6ae37f3aa4b3e9a4",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
+    "main:entities.abilities.temporal_rewind.description": {
+      "scope": "main",
+      "enHash": "4a3c69955a191ee4",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "4a3c69955a191ee4",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
+    "main:entities.abilities.temporal_rewind.name": {
+      "scope": "main",
+      "enHash": "92c3910cefad0a3f",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "92c3910cefad0a3f",
           "by": "human"
         },
         "it_IT": {

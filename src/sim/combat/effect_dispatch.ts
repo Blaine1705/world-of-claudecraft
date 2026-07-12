@@ -65,6 +65,7 @@ import {
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
+import { applyRewind } from './rewind';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 
@@ -598,6 +599,24 @@ export function runEffects(
           school: 'arcane',
           fx: 'temporalGlyph',
         });
+        break;
+      }
+      case 'rewind': {
+        // Chronomancy Rewind (combat/rewind.ts): instant, no target, centered on the
+        // caster. Restores a fraction of the recent REAL damage every living group/
+        // raid member in range took, capped per target. No crit / no rng / no Echo /
+        // no Arcane conversion; normal heal threat via the shared applyHeal route.
+        applyRewind(
+          ctx,
+          p,
+          {
+            fraction: eff.fraction,
+            maxHpFraction: eff.maxHpFraction,
+            windowSec: eff.windowSec,
+            radius: eff.radius,
+          },
+          ability.name,
+        );
         break;
       }
       case 'heal': {

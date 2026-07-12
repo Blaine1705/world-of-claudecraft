@@ -55,6 +55,7 @@ import {
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
+import { recordDamageTaken } from './damage_history';
 import { igniteOnCrit, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 

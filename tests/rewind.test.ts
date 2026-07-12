@@ -4,7 +4,6 @@
 // approved design (docs/prd/mage-chronomancy.md) and the 14 mandatory checks.
 import { describe, expect, it } from 'vitest';
 import { REWIND_WINDOW_TICKS } from '../src/sim/combat/damage_history';
-import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -83,11 +82,6 @@ function castRewind(sim: Sim, caster: Entity): SimEvent[] {
 }
 
 describe('Rewind: healing math', () => {
-  it('uses the same capped math for the raid-frame preview', () => {
-    expect(rewindHealAmount(1000, 500, 1000)).toBe(300);
-    expect(rewindHealAmount(10_000, 0, 1000)).toBe(350);
-    expect(rewindHealAmount(1000, 900, 1000)).toBe(100);
-  });
   it('1. heals exactly 30% of the real damage taken within the last 5s', () => {
     const { sim, p } = chronoMage();
     const ally = addAlly(sim, 'A', 3, 0);
@@ -176,9 +170,7 @@ describe('Rewind: targeting', () => {
     const before = allies.map((a) => a.hp);
     castRewind(sim, p);
     // All eight allies healed (a party-only cap of five would have left three dry).
-    allies.forEach((a, i) => {
-      expect(a.hp).toBeGreaterThan(before[i]);
-    });
+    allies.forEach((a, i) => expect(a.hp).toBeGreaterThan(before[i]));
   });
 
   it('7. excludes out-of-range, dead, enemies, and non-group players (and pets/NPCs)', () => {
