@@ -117,6 +117,16 @@ export function composeWhisperReply(typed: string): string {
   return `/r ${text}`;
 }
 
+// Compose against the tab selected at send time. Keeping this decision in the
+// pure model prevents the composer from retaining a previously selected channel
+// when the player moves between tabs. The built-in views remain unbound, while
+// Whisper keeps its reply behavior. Explicit slash commands still win.
+export function composeChatTabLine(tab: ChatTabId, typed: string): string {
+  if (tab === WHISPER_TAB) return composeWhisperReply(typed);
+  if (isChatTabChannel(tab)) return composeChatLine(tab, typed);
+  return typed.trim();
+}
+
 // Persistence: the ordered list of channel tabs the player has opened. The
 // built-in `all` / `combat` views are implicit and not stored. Parsing is
 // defensive: unknown, duplicate, or malformed entries are dropped so a corrupt
