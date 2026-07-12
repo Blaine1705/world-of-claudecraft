@@ -131,6 +131,7 @@ import {
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
+import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -2064,6 +2065,76 @@ export class Sim {
     return npc.id;
   }
 
+  // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
+  // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
+  private spawnScenarioAlly(name: string, x: number, z: number): number {
+    const id = this.addPlayer('mage', name);
+    const meta = this.players.get(id);
+    if (meta) meta.isDevBot = true;
+    const e = this.entities.get(id);
+    if (e) {
+      e.pos = this.groundPos(x, z);
+      e.prevPos = { ...e.pos };
+      this.rebucket(e);
+    }
+    return id;
+  }
+
+  // /dev cascade: a controlled Cascada temporal playtest scenario (dev-command realms
+  // only). Spawns a NON-offensive training dummy in front (aggroRadius 0 / moveSpeed 0
+  // => it never chases the healer) plus a center ally and additional friendly allies at
+  // KNOWN distances from that center (one deliberately beyond the 15 yd radius), all in a
+  // raid with the mage and at reduced health. Starts the per-cast metrics session on the
+  // caster. Target the center, cast Temporal Cascade, then attack the dummy with Arcane
+  // spells to watch the Echo conversion heal the marked allies without any aggro.
+  startCascadePlaytest(pid?: number): void {
+    const mageId = pid ?? this.primaryId;
+    const mage = this.entities.get(mageId);
+    if (!mage) return;
+    const dummyPos = this.groundPos(mage.pos.x, mage.pos.z + CASCADE_SCENARIO.dummyFromMage);
+    const dummy = createMob(this.nextId++, MOBS.training_dummy, 20, dummyPos);
+    dummy.hostile = true;
+    this.addEntity(dummy);
+    const cx = mage.pos.x + CASCADE_SCENARIO.centerFromMage;
+    const cz = mage.pos.z;
+    const centerId = this.spawnScenarioAlly('EchoCenter', cx, cz);
+    const allyIds: number[] = [centerId];
+    CASCADE_SCENARIO.allyDistances.forEach((d, i) => {
+      const angle = (i * Math.PI) / 2; // spread the allies on the four cardinal axes
+      allyIds.push(
+        this.spawnScenarioAlly(`EchoAlly${d}`, cx + Math.cos(angle) * d, cz + Math.sin(angle) * d),
+      );
+    });
+    // Raid so Cascada (party/raid-only) can select every ally. A 5-cap party would drop
+    // bodies, so fill a party of five, convert, then add the rest.
+    for (const id of allyIds.slice(0, 4)) {
+      this.partyInvite(id, mageId);
+      this.partyAccept(id);
+    }
+    this.party.convertPartyToRaid(mageId);
+    for (const id of allyIds.slice(4)) {
+      this.partyInvite(id, mageId);
+      this.partyAccept(id);
+    }
+    for (const id of allyIds) {
+      const e = this.entities.get(id);
+      if (e) e.hp = Math.max(1, Math.round(e.maxHp * CASCADE_SCENARIO.allyHpFraction));
+    }
+    mage.cascadeDevStats = {
+      startTime: this.time,
+      centerId,
+      arcaneDamage: 0,
+      convertedHeal: 0,
+      convertedOverheal: 0,
+      initialHeal: 0,
+    };
+    this.ctx.emit({
+      type: 'log',
+      pid: mageId,
+      text: `[cascade] scenario ready: training dummy + ${allyIds.length} raid allies (center id ${centerId}, one beyond 15 yd). Target the center, cast Temporal Cascade, then hit the dummy with Arcane spells.`,
+    });
+  }
+
   removePlayer(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
@@ -3108,6 +3179,7 @@ export class Sim {
       // Dev-only test-dummy spawner backing "/dev bot <name>" in social/chat.ts.
       spawnDevBot: sim.spawnDevBot.bind(sim),
       spawnDevVendor: sim.spawnDevVendor.bind(sim),
+      startCascadePlaytest: sim.startCascadePlaytest.bind(sim),
       // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved items.useItem
       // dispatches to. Late-bound arrows (looked up at call time, not `.bind`d at ctor)
       // so they preserve the pre-move `this.X` dynamic-dispatch semantics, including tests

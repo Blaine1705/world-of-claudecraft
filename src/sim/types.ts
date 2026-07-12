@@ -2234,6 +2234,19 @@ export interface LeapFlight {
   ability: string;
 }
 
+// DEV-ONLY Cascada temporal playtest tally (see Entity.cascadeDevStats). All sums
+// are since the /dev cascade session began; DPS/HPS derive from `startTime` against
+// the deterministic sim clock. `centerId` is the scenario's primary ally, used to
+// log each selected target's distance to the center.
+export interface CascadeDevStats {
+  startTime: number; // sim seconds at session start
+  centerId: number; // the scenario primary/center ally
+  arcaneDamage: number; // effective Arcane damage the mage has dealt
+  convertedHeal: number; // Echo conversion healing applied
+  convertedOverheal: number; // Echo conversion healing lost to the missing-hp clamp
+  initialHeal: number; // Cascada initial per-target healing applied
+}
+
 export interface Entity {
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
@@ -2248,6 +2261,11 @@ export interface Entity {
   // Never serialized or wired.
   aetherDartsConsumePending?: boolean;
   aetherDartsBonusPerBolt?: number;
+  // DEV-ONLY (ALLOW_DEV_COMMANDS): the running Cascada temporal playtest tally,
+  // set by /dev cascade and fed by the dev-gated hooks in combat/chronomancy.ts.
+  // Pure observation for the manual playtest readout: it is NEVER read by any
+  // gameplay decision, never serialized, never wired, and is absent in production.
+  cascadeDevStats?: CascadeDevStats;
   abilityCharges?: Record<
     string,
     {

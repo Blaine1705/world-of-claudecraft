@@ -197,6 +197,7 @@ const CALLBACK_KEYS = [
   'notice',
   'spawnDevBot',
   'spawnDevVendor',
+  'startCascadePlaytest',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
   'unlockMechChromaFromItem',
@@ -461,6 +462,7 @@ function makeFakeHost() {
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
     spawnDevVendor: vi.fn(),
+    startCascadePlaytest: vi.fn(),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),

@@ -983,6 +983,12 @@ export function handleDevChat(
     else ctx.emit({ type: 'log', text: okText, pid });
     return null;
   }
+  if (/^\/(?:dev\s+cascade|devcascade)\s*$/i.test(raw)) {
+    // [dev] Controlled Cascada temporal playtest: a non-offensive training dummy plus
+    // raid allies at known distances, with a per-cast metrics readout. Dev realms only.
+    ctx.startCascadePlaytest(pid);
+    return null;
+  }
   if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
     // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
     // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
@@ -994,7 +1000,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev kill',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev cascade, /dev kill',
     );
     return null;
   }

@@ -19,6 +19,7 @@
 // Date.now/performance.now (enforced by tests/architecture.test.ts).
 
 import { ABILITIES } from '../data';
+import { recordCascadeConversion, recordCascadeDamage } from '../dev/cascade_playtest';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { consumeHealAbsorb, healingTakenMult, healingThreat } from './heal';
@@ -160,6 +161,7 @@ export function chronomancyConvertArcaneDamage(
   aoe: boolean,
 ): void {
   if (!source || source.kind !== 'player' || school !== 'arcane' || dealt <= 0) return;
+  recordCascadeDamage(source, dealt); // DEV playtest tally (no-op without a session)
   // Heal EVERY ally this mage currently marks, each at its OWN stored coefficient
   // (single 35%/15%, group 13%/6%). With only the single-target echo this is exactly
   // one ally as before; the Cascada group version can ride up to five marks at once.
@@ -285,7 +287,11 @@ function applyEchoHeal(
   let healed = Math.round(dealt * rate * healingTakenMult(ctx, ally));
   if (healed <= 0) return;
   healed = consumeHealAbsorb(ctx, ally, healed);
+  const preClamp = healed;
   healed = Math.min(healed, ally.maxHp - ally.hp);
+  // DEV playtest tally (no-op without an active session): the applied heal plus the
+  // portion lost to the missing-hp clamp (overheal). Never alters the healed value.
+  recordCascadeConversion(source, healed, preClamp - healed);
   if (healed <= 0) return;
   ally.hp += healed;
   ctx.emit({
