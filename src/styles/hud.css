@@ -4507,6 +4507,13 @@ body.reduce-motion #proc-overlay .ph-wing {
 #proc-overlay.chrono .ph-crest {
   fill: url(#ph-chrono-core);
 }
+/* Fade timing: each quarter LIGHTS quickly per cast (0.16s), but when Aether
+   Darts spends the charges the whole bird fades out gently (0.5s), never a hard
+   snap. The container and every sub-group carry the slow 0.5s as their OFF
+   transition; the reveal rules below override it with the quick 0.16s. */
+#proc-overlay.chrono {
+  transition: opacity 0.5s ease;
+}
 /* Visible and grabbable once any charge is held. */
 #proc-overlay.chrono.c1 {
   opacity: 1;
@@ -4519,28 +4526,26 @@ body.reduce-motion #proc-overlay .ph-wing {
   opacity: 1;
 }
 #proc-overlay.chrono .ph-wing,
-#proc-overlay.chrono .ph-side {
+#proc-overlay.chrono .ph-side,
+#proc-overlay.chrono .ph-core-g {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.5s ease;
 }
-#proc-overlay.chrono.c1 .ph-left .ph-side {
-  opacity: 1;
-}
-#proc-overlay.chrono.c2 .ph-right .ph-side {
-  opacity: 1;
-}
-#proc-overlay.chrono.c3 .ph-left .ph-wing {
-  opacity: 1;
-}
+#proc-overlay.chrono.c1 .ph-left .ph-side,
+#proc-overlay.chrono.c2 .ph-right .ph-side,
+#proc-overlay.chrono.c3 .ph-left .ph-wing,
 #proc-overlay.chrono.c4 .ph-right .ph-wing {
   opacity: 1;
+  transition: opacity 0.16s ease;
 }
-/* The core seam glows dim as the bird builds, full at 4/4. */
+/* The core seam glows dim as the bird builds, full at 4/4 (quick to light too). */
 #proc-overlay.chrono.c1 .ph-core-g {
   opacity: 0.45;
+  transition: opacity 0.16s ease;
 }
 #proc-overlay.chrono.c4 .ph-core-g {
   opacity: 1;
+  transition: opacity 0.16s ease;
 }
 #proc-overlay.chrono.c1 svg {
   filter: drop-shadow(0 0 9px rgba(168, 85, 247, 0.5));

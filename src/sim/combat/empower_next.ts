@@ -50,9 +50,22 @@ export const REVENGE_FREE_ABILITIES: ReadonlySet<string> = new Set(['revenge']);
 
 /** Pure aura-list predicate: is `abilityId`'s cost covered by a free-cost
  *  proc? Structural input so the UI drives it with a mirrored aura list. */
-export function freeCostAuraActive(auras: readonly { kind: string }[], abilityId: string): boolean {
+export function freeCostAuraActive(
+  auras: readonly { kind: string; empowerAbilities?: readonly string[] }[],
+  abilityId: string,
+): boolean {
   for (const a of auras) {
-    if (a.kind === 'next_cast_free') return true;
+    // next_cast_free is SCOPED by empowerAbilities, so only the abilities the
+    // proc actually empowers glow / cast free: Hot Streak -> Pyroblast +
+    // Flamestrike, Aether Rush -> Aether Surge. An unscoped aura (item set /
+    // fiesta powerup, no empowerAbilities) still covers every cast. This mirrors
+    // the consume scope in consumeNextCastFree, so the bar glow, the usable
+    // state, and the actual free cast can never disagree.
+    if (
+      a.kind === 'next_cast_free' &&
+      (!a.empowerAbilities || a.empowerAbilities.includes(abilityId))
+    )
+      return true;
     if (a.kind === 'battle_trance' && BATTLE_TRANCE_ABILITIES.has(abilityId)) return true;
     if (a.kind === 'revenge_free' && REVENGE_FREE_ABILITIES.has(abilityId)) return true;
     // Sudden Death (Arms): a free Early Grave (execute); the HP gate is bypassed
