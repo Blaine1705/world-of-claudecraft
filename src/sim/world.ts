@@ -796,6 +796,63 @@ export function reachLandness(x: number, z: number): number {
   return metaballLandness(REACH_LAND_LOBES, REACH_BAYS, x, z);
 }
 
+// The Palmreach strand: the three shipped beach-palm models scattered on a
+// deterministic grid over the beach shelf. The renderer draws them
+// (render/jungle_features.ts) and the sim gives each a trunk collider
+// (sim/colliders.ts) from THIS one list, so what you bump into is exactly the
+// trunk you see. Pure function of the world seed, memoized (both hosts call it
+// with the same seed and must agree byte-for-byte).
+export interface ReachPalm {
+  x: number;
+  z: number;
+  y: number; // trunk base, sunk slightly into the sand
+  rot: number; // yaw
+  variant: number; // 0..2 -> beach_palm_{1,2,3}
+  scale: number; // uniform world scale applied to the model
+  r: number; // trunk collider radius, world units
+}
+
+// Native trunk heights of beach_palm_{1,2,3}.glb (pivot on the ground) and the
+// native trunk radius near the base, measured from the shipped GLBs. The
+// per-variant height normalizes all three to PALM_TARGET_H before the
+// per-spot size jitter, so the strand reads as one canopy height like the
+// neighbouring pines rather than three different species sizes.
+const PALM_NATIVE_H = [2.685, 2.689, 3.587];
+const PALM_TRUNK_R = 0.17; // native trunk radius (all three ~equal)
+const PALM_TARGET_H = 9; // rendered trunk height at size factor 1.0
+
+let reachPalmCache: { seed: number; spots: ReachPalm[] } | null = null;
+
+export function reachPalmSpots(seed: number): ReachPalm[] {
+  if (reachPalmCache && reachPalmCache.seed === seed) return reachPalmCache.spots;
+  const spots: ReachPalm[] = [];
+  for (let gx = -536; gx <= -184; gx += 8) {
+    for (let gz = REACH_ZMIN + 10; gz <= REACH_ZMAX - 10; gz += 8) {
+      if (hash2(gx, gz, seed + 5101) > 0.62) continue; // thin the grid (~38% kept)
+      const x = gx + (hash2(gx, gz, seed + 5111) - 0.5) * 7;
+      const z = gz + (hash2(gz, gx, seed + 5121) - 0.5) * 7;
+      const land = reachLandness(x, z);
+      if (land < 0.045 || land > 0.24) continue; // the beach band only
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.5 || y > 3.6) continue; // out of the surf, off the bluff
+      const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
+      const scale =
+        (PALM_TARGET_H / PALM_NATIVE_H[variant]) * (0.85 + hash2(x, z, seed + 5131) * 0.5);
+      spots.push({
+        x,
+        z,
+        y: y - 0.15,
+        rot: hash2(z, x, seed + 5141) * Math.PI * 2,
+        variant,
+        scale,
+        r: PALM_TRUNK_R * scale,
+      });
+    }
+  }
+  reachPalmCache = { seed, spots };
+  return spots;
+}
+
 // The tropical coast: the fen recipe, then every low shore flattened into a
 // broad sand shelf (the beach cap) so the strand runs wide and walkable.
 function applyReachCoast(x: number, z: number, h: number): number {

@@ -204,8 +204,8 @@ export const GALECREST_PROPS: ZonePropsDef = {
     [420, 356],
     [196, 434], // the Windway's waycamp
   ],
-  // the harbor: a working dock running into the cove east of town
-  docks: [{ x: 436, z: 372, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
+  // the harbor: a working dock running into the cove east of town (hw/hd 0: no hut)
+  docks: [{ x: 436, z: 372, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
   fences: [
     // windbreak lines, the only fences that matter here
     { x1: 406, z1: 346, x2: 434, z2: 346 },

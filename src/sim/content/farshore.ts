@@ -301,7 +301,9 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { x: 314, z: 70, rot: -1.8, scale: 1 },
     { x: 292, z: 62, rot: 2.3, scale: 1 },
   ],
-  // the Landing's fishing pier, at the island end of the causeway
-  docks: [{ x: 246, z: 12, rot: -1.7, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
+  // the Landing's fishing pier, at the island end of the causeway. No stone
+  // hut on this dock: hw/hd 0 collapse the optional hut to nothing (with the
+  // old 0.1/0.1 it drew as a thin post floating out over the water).
+  docks: [{ x: 246, z: 12, rot: -1.7, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
   graveyards: [{ x: 290, z: 86 }],
 };
