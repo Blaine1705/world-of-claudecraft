@@ -41,6 +41,23 @@ export function buildProcOverlay(doc: Document = document): HTMLElement {
       <stop offset="0.6" stop-color="#fff3c4"/>
       <stop offset="1" stop-color="#ffc45e"/>
     </radialGradient>
+    <!-- Chronomancy (arcane) variant: the same bird in arcane violet, used under
+         the .chrono theme class. Inert until referenced, so the fire path is
+         byte-identical. -->
+    <linearGradient id="ph-chrono-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9d5ff"/>
+      <stop offset="0.55" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#6b21a8"/>
+    </linearGradient>
+    <radialGradient id="ph-chrono-core" cx="0.5" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#f3e8ff"/>
+      <stop offset="1" stop-color="#9333ea"/>
+    </radialGradient>
+    <radialGradient id="ph-chrono-white" cx="0.5" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#f3e8ff"/>
+      <stop offset="1" stop-color="#c084fc"/>
+    </radialGradient>
   </defs>
   <g class="ph-half ph-left">${HALF}</g>
   <g class="ph-half ph-right" transform="translate(220,0) scale(-1,1)">${HALF}</g>

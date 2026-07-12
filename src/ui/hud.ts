@@ -346,7 +346,7 @@ import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fc
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
 import { ProcOverlayPainter } from './proc_overlay_painter';
-import { procOverlayState } from './proc_overlay_view';
+import { chronoOverlayCharges, procOverlayState } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { QuestProgressBanner } from './quest_progress_banner';
@@ -7201,7 +7201,15 @@ export class Hud {
       this.procOverlayEl.classList.add('preview');
       window.setTimeout(() => this.procOverlayEl.classList.remove('preview'), 8000);
     }
-    this.procOverlayPainter.paint(procOverlayState(p.auras));
+    // Chronomancy (arcane spec) drives the same bird from its Aether Surge
+    // charges (one quarter per charge); every other spec/class keeps the fire
+    // Heating Up / Hot Streak rule. Both routes clear the other's classes, so a
+    // spec swap never strands a half-lit bird.
+    if (this.sim.talentSpec === 'arcane') {
+      this.procOverlayPainter.paintChronoCharges(chronoOverlayCharges(p.auras));
+    } else {
+      this.procOverlayPainter.paint(procOverlayState(p.auras));
+    }
 
     // action bar: the slot row, driven by the pure action_bar_view core + the thin
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write
