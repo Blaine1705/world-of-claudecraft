@@ -56,11 +56,15 @@ describe('/dev cascade scenario', () => {
     }
     expect(allyDists.some((ad) => ad > CASCADE_SCENARIO.radius)).toBe(true);
 
-    // Allies are at reduced health so converted heals visibly land.
+    // Allies are LEVEL 20 (not level-1 with a tiny pool), at reduced health, and have
+    // out-of-combat regen frozen (a zero-value "food"), so only the Echo healing moves
+    // their bars.
     for (const m of party.members) {
       if (m.pid === p.id) continue;
       const e = sim.entities.get(m.pid)!;
+      expect(e.level).toBe(20);
       expect(e.hp).toBeLessThan(e.maxHp);
+      expect(e.eating?.hpPer2s).toBe(0); // regen frozen, heals nothing
     }
   });
 
