@@ -2004,7 +2004,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
     // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
     // the payoff is ramping it with charges (and the Echo healing it feeds).
-    effects: [{ type: 'directDamage', min: 10, max: 15 }],
+    effects: [{ type: 'directDamage', min: 10, max: 13 }],
     description:
       'Draws a surge of raw Arcane power through the enemy for $d damage. Each cast leaves an Arcane Charge that raises the damage of your next Aether Surge but sharply raises its mana cost, stacking up to 4. Aether Darts spends the charges.',
   },

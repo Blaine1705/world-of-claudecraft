@@ -11,6 +11,7 @@ import {
   aetherSurgeCostMult,
   aetherSurgeDamageMult,
   aetherSurgeStacks,
+  armAetherSurgeFree,
 } from '../src/sim/combat/chronomancy';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
@@ -84,12 +85,12 @@ describe('Aether Surge charge multipliers (pure)', () => {
     expect(aetherSurgeDamageMult(withCharges(4))).toBeCloseTo(2.2);
   });
 
-  it('cost scales x1.9 per charge, geometric (much steeper than damage)', () => {
-    expect(AETHER_SURGE_COST_PER_CHARGE).toBe(0.9);
+  it('cost doubles per charge, geometric (much steeper than damage)', () => {
+    expect(AETHER_SURGE_COST_PER_CHARGE).toBe(1);
     expect(aetherSurgeCostMult(withCharges(0))).toBe(1);
-    expect(aetherSurgeCostMult(withCharges(1))).toBeCloseTo(1.9);
-    expect(aetherSurgeCostMult(withCharges(2))).toBeCloseTo(3.61);
-    expect(aetherSurgeCostMult(withCharges(4))).toBeCloseTo(13.0321);
+    expect(aetherSurgeCostMult(withCharges(1))).toBeCloseTo(2);
+    expect(aetherSurgeCostMult(withCharges(2))).toBeCloseTo(4);
+    expect(aetherSurgeCostMult(withCharges(4))).toBeCloseTo(16);
   });
 });
 
@@ -100,7 +101,7 @@ describe('Aether Surge cost at each charge level (resolvedAbility choke point)',
     for (let k = 0; k <= 4; k++) {
       p.auras = p.auras.filter((a) => a.id !== 'arcane_surge');
       if (k > 0) p.auras.push(chargeAura(k));
-      expect(sim.resolvedAbility('arcane_surge')?.cost).toBe(Math.round(base * 1.9 ** k));
+      expect(sim.resolvedAbility('arcane_surge')?.cost).toBe(Math.round(base * 2 ** k));
     }
   });
 });
@@ -234,5 +235,57 @@ describe('Aether Darts consumes the charges', () => {
     collect(sim, 3.5);
     // No missile ever landed, so the charges are untouched.
     expect(aetherSurgeStacks(p)).toBe(4);
+  });
+});
+
+describe('Aether Surge free-cast proc', () => {
+  it('an armed free Aether Surge waives its charged cost but still banks a charge', () => {
+    const { sim, p } = chronoMage();
+    const mob = addHostile(sim);
+    // Build 2 charges with real casts (strip any free proc they roll, so the
+    // measured cast below is the only free one).
+    castResolve(sim, p, 'arcane_surge', mob.id); // 0 -> 1
+    castResolve(sim, p, 'arcane_surge', mob.id); // 1 -> 2
+    expect(aetherSurgeStacks(p)).toBe(2);
+    p.auras = p.auras.filter((a) => a.kind !== 'next_cast_free');
+
+    // Arm the free proc deterministically (the sim rolls it at 15%; force it
+    // here) and cast WITHOUT refilling mana: it spends nothing and still banks
+    // the third charge.
+    armAetherSurgeFree(sim.ctx, p);
+    const before = p.resource;
+    (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.targetEntity(mob.id);
+    sim.castAbility('arcane_surge');
+    collect(sim, 2.3);
+    expect(before - p.resource).toBe(0); // charged cost waived
+    expect(aetherSurgeStacks(p)).toBe(3); // still banked a charge
+
+    // Single-use: strip any fresh proc the free cast may have rolled, then the
+    // FOLLOWING cast pays mana again.
+    p.auras = p.auras.filter((a) => a.kind !== 'next_cast_free');
+    const before2 = p.resource;
+    (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.targetEntity(mob.id);
+    sim.castAbility('arcane_surge');
+    collect(sim, 2.3);
+    expect(before2 - p.resource).toBeGreaterThan(0);
+  });
+
+  it('the free proc only covers Aether Surge, not other casts', () => {
+    const { sim, p } = chronoMage();
+    const allyId = sim.addPlayer('warrior', 'Aliado');
+    const ally = sim.entities.get(allyId)!;
+    ally.pos.x = p.pos.x + 4;
+    ally.pos.z = p.pos.z;
+    ally.hp = Math.floor(ally.maxHp * 0.4);
+    armAetherSurgeFree(sim.ctx, p);
+    // Temporal Mend is NOT empowered by the Aether Surge free proc: it pays.
+    const before = p.resource;
+    (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
+    sim.targetEntity(allyId);
+    sim.castAbility('temporal_mend');
+    collect(sim, 2.3);
+    expect(before - p.resource).toBeGreaterThan(0);
   });
 });

@@ -189,11 +189,23 @@ const ARCANE_SURGE_NAME = ABILITIES[ARCANE_SURGE_ID]?.name ?? 'Aether Surge';
 // conservative rotation near 70-80s to OOM at the real level-20 pool.
 export const AETHER_SURGE_MAX_CHARGES = 4;
 export const AETHER_SURGE_DMG_PER_CHARGE = 0.3; // +30% damage per charge (linear, moderate)
-export const AETHER_SURGE_COST_PER_CHARGE = 0.9; // x1.9 cost per charge (geometric, steep)
+export const AETHER_SURGE_COST_PER_CHARGE = 1.0; // x2 cost per charge (geometric: each charge DOUBLES the cost)
 export const AETHER_SURGE_CHARGE_WINDOW = 10; // seconds, refreshed on each cast
-// Aether Darts dump: a flat Arcane bonus of 6 per consumed charge, split evenly
-// across the channel's missiles (24 total at 4 charges, +8 per missile over 3).
-export const AETHER_DARTS_BONUS_PER_CHARGE = 6;
+// Aether Darts dump: a flat Arcane bonus of 9 per consumed charge, split evenly
+// across the channel's missiles (36 total at 4 charges, +12 per missile over 3).
+// Owner tuning 2026-07-12: the discharge should hit a bit harder.
+export const AETHER_DARTS_BONUS_PER_CHARGE = 9;
+// Free-cast proc (owner 2026-07-12): each Aether Surge has a chance to make the
+// NEXT Aether Surge cost no mana. Softens the escalating mana wall and rewards
+// staying on the spender. Provisional chance; the free window is generous so a
+// proc landed mid-rotation is almost always spent by the next cast. Reuses the
+// shared next_cast_free machinery (combat/empower_next.ts), scoped to Aether
+// Surge, consumed at cast completion in casting_lifecycle. Draws rng ONLY on an
+// Aether Surge cast (an arcane-spec ability absent from every parity golden), so
+// the shared stream and the goldens are untouched for other specs.
+export const AETHER_SURGE_FREE_PROC_CHANCE = 0.15;
+export const AETHER_SURGE_FREE_WINDOW = 15; // seconds the armed free cast waits
+const AETHER_SURGE_FREE_ID = 'aether_surge_free';
 
 function aetherSurgeAura(e: Entity): Aura | undefined {
   return e.auras.find((a) => a.id === ARCANE_SURGE_ID);
@@ -205,7 +217,7 @@ export function aetherSurgeStacks(e: Entity): number {
 }
 
 /** Cost multiplier for the NEXT Aether Surge, from the charges held right now.
- *  Geometric (x1.9 per charge) so four charges cost ~13x the base: the mana wall
+ *  Geometric (x2 per charge) so four charges cost 16x the base: the mana wall
  *  that makes holding a full stack a short emergency window, not a rotation. */
 export function aetherSurgeCostMult(e: Entity): number {
   return (1 + AETHER_SURGE_COST_PER_CHARGE) ** aetherSurgeStacks(e);
@@ -219,7 +231,9 @@ export function aetherSurgeDamageMult(e: Entity): number {
 }
 
 /** Bank one Arcane Charge after an Aether Surge lands (cap 4) and refresh the
- *  10s window. applyAura replaces by id, so the timer resets on every cast. */
+ *  10s window (applyAura replaces by id, so the timer resets on every cast), then
+ *  roll the free-cast proc. Draws exactly one rng chance, AFTER the cast's own
+ *  damage draws, only for Aether Surge. */
 export function aetherSurgeAddStack(ctx: SimContext, caster: Entity): void {
   const next = Math.min(AETHER_SURGE_MAX_CHARGES, aetherSurgeStacks(caster) + 1);
   ctx.applyAura(caster, {
@@ -232,6 +246,24 @@ export function aetherSurgeAddStack(ctx: SimContext, caster: Entity): void {
     stacks: next,
     sourceId: caster.id,
     school: 'arcane',
+  });
+  if (ctx.rng.chance(AETHER_SURGE_FREE_PROC_CHANCE)) armAetherSurgeFree(ctx, caster);
+}
+
+/** Arm the "next Aether Surge is free" proc: a next_cast_free aura scoped to
+ *  Aether Surge (consumed at cast completion by casting_lifecycle via
+ *  consumeFreeCostFor). applyAura replaces by id, so a re-proc just refreshes it. */
+export function armAetherSurgeFree(ctx: SimContext, caster: Entity): void {
+  ctx.applyAura(caster, {
+    id: AETHER_SURGE_FREE_ID,
+    name: 'Aether Rush',
+    kind: 'next_cast_free',
+    value: 0,
+    remaining: AETHER_SURGE_FREE_WINDOW,
+    duration: AETHER_SURGE_FREE_WINDOW,
+    sourceId: caster.id,
+    school: 'arcane',
+    empowerAbilities: [ARCANE_SURGE_ID],
   });
 }
 
