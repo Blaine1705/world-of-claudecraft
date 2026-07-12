@@ -7196,7 +7196,13 @@ export class Hud {
     // writes nothing). On the FIRST frame in-world, preview the unlit bird for
     // a few seconds so the player can find it and drag it into place (one-shot
     // timer, not per-frame work; the painter's two classes never conflict).
-    if (!this.procOverlayPreviewed) {
+    // The login preview only makes sense where the bird is otherwise RARE: the
+    // fire mage (Hot Streak procs occasionally). It is gated to fire so it never
+    // flashes on a warrior/other class, and never on a Chronomancer (whose bird
+    // is on screen constantly, one quarter per Aether Surge charge, so a preview
+    // would just be noise). Gated inside the one-shot guard so a mage whose spec
+    // loads a frame late still previews once.
+    if (!this.procOverlayPreviewed && this.sim.talentSpec === 'fire') {
       this.procOverlayPreviewed = true;
       this.procOverlayEl.classList.add('preview');
       window.setTimeout(() => this.procOverlayEl.classList.remove('preview'), 8000);

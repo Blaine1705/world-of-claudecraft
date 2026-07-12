@@ -333,6 +333,25 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(state.slots[1].empowered).toBe(false);
   });
 
+  it('glows ONLY the free-proc-scoped abilities, not every button', () => {
+    // A Hot Streak / Aether Rush style next_cast_free names its spenders; only
+    // those slots may show the gold proc glow (freeCostAuraActive is scoped).
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('pyroblast', { cost: 20 }) }),
+        slot(2, { ability: ability('fireball', { cost: 20 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        auras: [{ kind: 'next_cast_free', value: 0, empowerAbilities: ['pyroblast'] }],
+      }),
+    );
+    expect(state.slots[0].procGlow).toBe(true); // named -> glows
+    expect(state.slots[1].procGlow).toBe(false); // not named -> no glow
+  });
+
   it('lets unscoped next-cast auras empower every eligible ability slot', () => {
     const view = createActionBarView(
       descriptor(
