@@ -3033,7 +3033,7 @@
   body.reduce-motion #proc-overlay .ph-wing,
   body.reduce-motion #proc-overlay .ph-side,
   body.reduce-motion #proc-overlay .ph-core-g {
-    transition-duration: 0.5s !important;
+    transition-duration: 0.7s !important;
   }
   /* Frosted Panels, opt-in backdrop blur behind HUD panels & windows. */
   body.frosted-panels .panel,
@@ -4413,7 +4413,10 @@
   z-index: 30;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);
+     the lit rules below override it with a quick ON transition so the bird still
+     lights crisply. Shared by the fire and the Chronomancy variants. */
+  transition: opacity 0.7s ease;
 }
 #proc-overlay svg {
   width: 100%;
@@ -4439,6 +4442,8 @@
   /* Grabbable only while it burns; hidden it can never eat a click. */
   pointer-events: auto;
   cursor: grab;
+  /* Quick to light (the ON transition); the slow OFF fade lives on the base. */
+  transition: opacity 0.2s ease;
 }
 #proc-overlay.dragging {
   cursor: grabbing;
@@ -4450,23 +4455,26 @@
 #proc-overlay .ph-crest {
   fill: url(#ph-core-grad);
 }
-/* The halves: each fades in as its crit lands. */
+/* The halves: quick to light as each crit lands (ON), slow to fade out (OFF). */
 #proc-overlay .ph-half,
 #proc-overlay .ph-core-g {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.7s ease;
 }
 #proc-overlay.heating .ph-left,
 #proc-overlay.hot .ph-left,
 #proc-overlay.hot .ph-right {
   opacity: 1;
+  transition: opacity 0.2s ease;
 }
 /* The half-lit bird glows embers; the whole bird burns. */
 #proc-overlay.heating .ph-core-g {
   opacity: 0.55;
+  transition: opacity 0.2s ease;
 }
 #proc-overlay.hot .ph-core-g {
   opacity: 1;
+  transition: opacity 0.2s ease;
 }
 #proc-overlay.heating svg {
   filter: drop-shadow(0 0 9px rgba(255, 122, 31, 0.55));
@@ -4523,17 +4531,16 @@ body.reduce-motion #proc-overlay .ph-wing {
   fill: url(#ph-chrono-core);
 }
 /* Fade timing: each quarter LIGHTS quickly per cast (0.16s), but when Aether
-   Darts spends the charges the whole bird fades out gently (0.5s), never a hard
-   snap. The container and every sub-group carry the slow 0.5s as their OFF
-   transition; the reveal rules below override it with the quick 0.16s. */
-#proc-overlay.chrono {
-  transition: opacity 0.5s ease;
-}
-/* Visible and grabbable once any charge is held. */
+   Darts spends the charges the whole bird fades out gently (0.7s), never a hard
+   snap. The container (base #proc-overlay, 0.7s) and every sub-group carry the
+   slow 0.7s as their OFF transition; the reveal rules below override it with the
+   quick 0.16s. */
+/* Visible and grabbable once any charge is held (quick to light). */
 #proc-overlay.chrono.c1 {
   opacity: 1;
   pointer-events: auto;
   cursor: grab;
+  transition: opacity 0.16s ease;
 }
 /* The halves stay on; the four quarters (each wing / each lower body) gate on
    charge instead. */
@@ -4544,7 +4551,7 @@ body.reduce-motion #proc-overlay .ph-wing {
 #proc-overlay.chrono .ph-side,
 #proc-overlay.chrono .ph-core-g {
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.7s ease;
 }
 #proc-overlay.chrono.c1 .ph-left .ph-side,
 #proc-overlay.chrono.c2 .ph-right .ph-side,
