@@ -1992,7 +1992,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'mage',
     learnLevel: 5,
     specs: ['arcane'],
-    cost: 12,
+    cost: 16,
     castTime: 2,
     cooldown: 0,
     range: 30,
@@ -2001,6 +2001,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Instant impact at cast completion (no traveling bolt): keeps the charge
     // read/write in one deterministic order, see combat/chronomancy.ts.
     projectile: false,
+    // (base cost is `cost: 16` above; DERIVED via the balance harness so the
+    // targets hold WITH the 25% free-cast proc's mana relief.)
     // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
     // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
     // the payoff is ramping it with charges (and the Echo healing it feeds).

@@ -203,7 +203,7 @@ export const AETHER_DARTS_BONUS_PER_CHARGE = 9;
 // Surge, consumed at cast completion in casting_lifecycle. Draws rng ONLY on an
 // Aether Surge cast (an arcane-spec ability absent from every parity golden), so
 // the shared stream and the goldens are untouched for other specs.
-export const AETHER_SURGE_FREE_PROC_CHANCE = 0.15;
+export const AETHER_SURGE_FREE_PROC_CHANCE = 0.25;
 export const AETHER_SURGE_FREE_WINDOW = 15; // seconds the armed free cast waits
 const AETHER_SURGE_FREE_ID = 'aether_surge_free';
 
