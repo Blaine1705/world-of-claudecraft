@@ -13,6 +13,7 @@
 //   - Piro and Cryo sustained DPS each at least 35% above conservative Chronomancy.
 import { describe, expect, it } from 'vitest';
 import { aetherSurgeStacks } from '../src/sim/combat/chronomancy';
+import { hasFreeCostFor } from '../src/sim/combat/empower_next';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -92,7 +93,9 @@ function runRotation(spec: Spec, policy: Policy, capSec: number, pinAllyLow: boo
     if (free(p)) {
       const next = policy(p, dummy, ally, i / 20);
       if (next) {
-        const cost = sim.resolvedAbility(next.id)?.cost ?? 0;
+        // The Aether Surge free-cast proc covers the charged cost (consumed at
+        // completion), so mirror the engine's affordability gate: free => 0.
+        const cost = hasFreeCostFor(p, next.id) ? 0 : (sim.resolvedAbility(next.id)?.cost ?? 0);
         if (p.resource < cost) {
           oomTick = i;
           break;
