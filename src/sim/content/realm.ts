@@ -1127,8 +1127,8 @@ export const REALM_PROPS: ZonePropsDef = {
     { key: 'kkWall', x: 108.3, z: 977.18, rot: 3.36, r: 1.1, h: 2.4, scale: 0.55 },
     { key: 'kkWall', x: 106.26, z: 977.93, rot: 3.63, r: 1.1, h: 2.4, scale: 0.55 },
     { key: 'kkWall', x: 104.49, z: 979.2, rot: 3.9, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkPillar', x: 102.98, z: 988.84, rot: -1.07, r: 0.7, h: 3, scale: 0.6 },
-    { key: 'kkPillar', x: 102.57, z: 982.03, rot: 4.33, r: 0.7, h: 3, scale: 0.6 },
+    { key: 'kkPillar', x: 102.7, z: 988.26, rot: -1.15, r: 0.7, h: 3, scale: 0.6 },
+    { key: 'kkPillar', x: 102.7, z: 981.74, rot: -1.99, r: 0.7, h: 3, scale: 0.6 },
     { key: 'stagShrine', x: 4, z: 1112, rot: 0.79, r: 2.0, h: 4.2 },
   ],
 };
