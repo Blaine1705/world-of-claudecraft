@@ -246,6 +246,9 @@ const HOLLOW_SHAPING = [
     h: HOLLOW_FALLS.terrace.height,
   },
   { x: -135, z: 1090, r: 45, h: 7 }, // western highlands (the Mirrormere sits in them)
+  // the Star's Cradle islet: a dry rise at Starfall Basin's heart, so the
+  // fallen star sits ringed by a swimmable moat of lake water
+  { x: 110, z: 985, r: 14, h: 8 },
   { x: 20, z: 1005, r: 35, h: -2.2 }, // soft meadow bowl south of the town road
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
   // the Tablecrag's bulk (its flat crown is leveled after the rims, below)

@@ -1062,6 +1062,9 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: 112, z: 1098, ringR: 5, columns: 4 },
     // the Duskfall Overlook: a broken vantage ring at the first viewpoint
     { x: -118, z: 988, ringR: 4, columns: 3 },
+    // the Star's Cradle: an ancient shrine ring built around the fallen star
+    // on its islet at the heart of Starfall Basin
+    { x: 110, z: 985, ringR: 6.2, columns: 6 },
     // a lone forgotten monument in the far northeast (no POI: a secret)
     { x: 160, z: 1230, ringR: 4, columns: 3 },
   ],
@@ -1094,7 +1097,7 @@ export const REALM_PROPS: ZonePropsDef = {
     // -- Starfall Basin: the Star's Cradle on the southern rim (the fallen
     //    star's open face turned toward the road approach) and the stags'
     //    antler shrine on the meadow where the herd grazes --
-    { key: 'starHeartCrystal', x: 110, z: 962, rot: -1.6, r: 4.2, h: 5.5 },
+    { key: 'starHeartCrystal', x: 110, z: 985, rot: -1.6, r: 4.2, h: 5.5 },
     { key: 'stagShrine', x: 86, z: 948, rot: 0.4, r: 1.5, h: 3.2 },
   ],
 };
