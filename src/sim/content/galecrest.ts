@@ -40,13 +40,13 @@ export const GALECREST_ZONE: ZoneDef = {
     { x: 300, z: 560, radius: 10 }, // the Mirror Tarn, up on the downs
   ],
   pois: [
-    { x: 420, z: 360, label: 'Wickharbor' },
-    { x: 200, z: 440, label: 'The Windway' },
-    { x: 280, z: 320, label: 'The Howling Downs' },
-    { x: 498, z: 308, label: 'The Old Beacon' },
-    { x: 455, z: 535, label: 'The Shear' },
-    { x: 340, z: 645, label: 'The Wreckfields' },
-    { x: 300, z: 560, label: 'The Mirror Tarn' },
+    { x: 420, z: 360, label: 'Wickharbor', id: 'wickharbor' },
+    { x: 200, z: 440, label: 'The Windway', id: 'the_windway' },
+    { x: 280, z: 320, label: 'The Howling Downs', id: 'the_howling_downs' },
+    { x: 498, z: 308, label: 'The Old Beacon', id: 'the_old_beacon' },
+    { x: 455, z: 535, label: 'The Shear', id: 'the_shear' },
+    { x: 340, z: 645, label: 'The Wreckfields', id: 'the_wreckfields' },
+    { x: 300, z: 560, label: 'The Mirror Tarn', id: 'the_mirror_tarn' },
   ],
   welcome:
     'The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.',

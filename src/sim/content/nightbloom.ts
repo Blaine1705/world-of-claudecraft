@@ -43,12 +43,12 @@ export const NIGHTBLOOM_ZONE: ZoneDef = {
     { x: -336, z: 1682, radius: 12 }, // the Barrowmere below the Sleepless Barrow
   ],
   pois: [
-    { x: -370, z: 1420, label: 'Moonrest' },
-    { x: -390, z: 1292, label: 'The Nightgate' },
-    { x: -290, z: 1380, label: 'The Moonwell' },
-    { x: -444, z: 1496, label: 'Gloamfield' },
-    { x: -272, z: 1538, label: 'The Standing Vigil' },
-    { x: -360, z: 1650, label: 'The Sleepless Barrow' },
+    { x: -370, z: 1420, label: 'Moonrest', id: 'moonrest' },
+    { x: -390, z: 1292, label: 'The Nightgate', id: 'the_nightgate' },
+    { x: -290, z: 1380, label: 'The Moonwell', id: 'the_moonwell' },
+    { x: -444, z: 1496, label: 'Gloamfield', id: 'gloamfield' },
+    { x: -272, z: 1538, label: 'The Standing Vigil', id: 'the_standing_vigil' },
+    { x: -360, z: 1650, label: 'The Sleepless Barrow', id: 'the_sleepless_barrow' },
   ],
   welcome:
     'Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.',

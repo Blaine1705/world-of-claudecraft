@@ -41,13 +41,13 @@ export const AMBERFALL_ZONE: ZoneDef = {
     { x: -264, z: 2246, radius: 9 }, // the Monolith tarn
   ],
   pois: [
-    { x: -360, z: 2072, label: 'Lanternmere' },
-    { x: -350, z: 1848, label: 'The Goldmelt' },
-    { x: -432, z: 1992, label: 'The Gilded Orchard' },
-    { x: -290, z: 1960, label: 'Harvest Hollow' },
-    { x: -360, z: 2132, label: 'The Great Mere' },
-    { x: -430, z: 2210, label: 'Cindermaple Rise' },
-    { x: -276, z: 2230, label: 'The Leaning Monolith' },
+    { x: -360, z: 2072, label: 'Lanternmere', id: 'lanternmere' },
+    { x: -350, z: 1848, label: 'The Goldmelt', id: 'the_goldmelt' },
+    { x: -432, z: 1992, label: 'The Gilded Orchard', id: 'the_gilded_orchard' },
+    { x: -290, z: 1960, label: 'Harvest Hollow', id: 'harvest_hollow' },
+    { x: -360, z: 2132, label: 'The Great Mere', id: 'the_great_mere' },
+    { x: -430, z: 2210, label: 'Cindermaple Rise', id: 'cindermaple_rise' },
+    { x: -276, z: 2230, label: 'The Leaning Monolith', id: 'the_leaning_monolith' },
   ],
   welcome:
     'Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.',

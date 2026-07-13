@@ -15,7 +15,9 @@
 
 import { type AssistCandidate, resolveAssist } from '../assist';
 import { GATHERING_PROFESSIONS } from '../content/professions';
+import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { CLASSES, ITEMS, zoneAt } from '../data';
+import * as deedsMod from '../deeds';
 import { createGroundObject } from '../entity';
 import { graveyardReadout } from '../entity_roster';
 import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
@@ -43,6 +45,15 @@ import * as readouts from './chat_readouts';
 const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const OVERHEAD_EMOTE_DURATION = 3.2;
+
+// The speaker's selected Book of Deeds title, spread into every PLAYER-sourced
+// chat emit as the optional `fromTitle` field: a deed id the client localizes
+// through deed_i18n, never display text. Untitled players omit the key
+// entirely (the event stays byte-identical to the pre-title shape), and the
+// mob/boss yell emitters (mob/yells.ts, encounters/*) never call this.
+function speakerTitle(meta: PlayerMeta): { fromTitle?: string } {
+  return meta.activeTitle ? { fromTitle: meta.activeTitle } : {};
+}
 
 // Predefined social emotes. Each entry maps a command (and its aliases) to the
 // third-person action text shown to everyone in /say range. `solo` is used with
@@ -203,6 +214,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       return null;
     }
     const result = ctx.rng.int(lo, hi);
+    deedsMod.onChatRollForDeeds(ctx, r.meta.entityId, lo, hi, result);
     const text = `${result} (${lo}-${hi})`;
     const party = ctx.partyOf(r.meta.entityId);
     if (party) {
@@ -211,6 +223,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           text,
           channel: 'roll',
           pid: mPid,
@@ -224,6 +237,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           text,
           channel: 'roll',
           pid: meta.entityId,
@@ -675,6 +689,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           to: target.name,
           text: msg,
           channel: 'whisper',
@@ -695,6 +710,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         type: 'chat',
         fromPid: r.meta.entityId,
         from: r.meta.name,
+        ...speakerTitle(r.meta),
         text: msg,
         channel: 'whisper',
         pid: target.entityId,
@@ -703,6 +719,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       type: 'chat',
       fromPid: r.meta.entityId,
       from: r.meta.name,
+      ...speakerTitle(r.meta),
       to: target.name,
       text: msg,
       channel: 'whisper',
@@ -719,6 +736,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         type: 'chat',
         fromPid: target.entityId,
         from: target.name,
+        ...speakerTitle(target),
         text: reply,
         channel: 'whisper',
         pid: r.meta.entityId,
@@ -741,6 +759,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         type: 'chat',
         fromPid: r.meta.entityId,
         from: r.meta.name,
+        ...speakerTitle(r.meta),
         text: clean,
         channel: 'party',
         pid: mPid,
@@ -757,6 +776,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       type: 'chat',
       fromPid: r.meta.entityId,
       from: r.meta.name,
+      ...speakerTitle(r.meta),
       text: clean,
       channel: 'general',
     });
@@ -796,6 +816,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           type: 'chat',
           fromPid: r.meta.entityId,
           from: r.meta.name,
+          ...speakerTitle(r.meta),
           text: clean,
           channel,
           pid: subPid,
@@ -845,6 +866,8 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         if (t) text = def.target.replace('%t', t.name === r.meta.name ? 'themselves' : t.name);
       }
       broadcastEmote(ctx, r.meta, r.e, text);
+      // A cheer with a live Yumi in earshot counts; range matches the /say emote.
+      if (key === 'cheer') deedsMod.onCheerForDeeds(ctx, r.meta, r.e, YUMI_TEMPLATE_ID, SAY_RANGE);
       return null;
     }
   }
@@ -871,6 +894,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       type: 'chat',
       fromPid: r.meta.entityId,
       from: r.meta.name,
+      ...speakerTitle(r.meta),
       text: clean,
       channel,
       entityId: r.e.id,
@@ -1178,6 +1202,7 @@ export function broadcastEmote(
       type: 'chat',
       fromPid: actor.entityId,
       from: actor.name,
+      ...speakerTitle(actor),
       text: body,
       channel: 'emote',
       entityId: actorEntity.id,

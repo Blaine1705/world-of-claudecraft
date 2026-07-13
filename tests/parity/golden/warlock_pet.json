@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 659,
-      "state": "d80c0868",
+      "nextId": 662,
+      "state": "3ca9a08d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,9 +42,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 661,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -83,7 +93,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 57,
-          "id": 658,
+          "id": 661,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -127,9 +137,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 659,
-      "state": "9001ead6",
-      "events": "69fb2dba",
+      "nextId": 662,
+      "state": "cc5dd7c6",
+      "events": "4a7834f7",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -138,8 +148,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 659,
-      "state": "35c5c134",
+      "nextId": 662,
+      "state": "f4aa4da0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -149,8 +159,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 659,
-      "state": "9e379d03",
+      "nextId": 662,
+      "state": "95b1b885",
       "events": "741638a5",
       "rng": {
         "draws": 142,
@@ -160,8 +170,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 659,
-      "state": "2aac1e8e",
+      "nextId": 662,
+      "state": "8a0bb2ee",
       "events": "741638a5",
       "rng": {
         "draws": 313,
@@ -171,9 +181,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 660,
-      "state": "e8f9e08a",
-      "events": "2f552471",
+      "nextId": 663,
+      "state": "caaeaa86",
+      "events": "cfe5af17",
       "rng": {
         "draws": 465,
         "digest": "60a721b3"
@@ -182,9 +192,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 661,
-      "state": "f374865b",
-      "events": "f2c644bd",
+      "nextId": 664,
+      "state": "ac5465a0",
+      "events": "14e7c05f",
       "rng": {
         "draws": 644,
         "digest": "f4fd4d37"
@@ -193,9 +203,9 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 661,
-      "state": "a51b9d20",
-      "events": "a3f7651d",
+      "nextId": 664,
+      "state": "f4501b0b",
+      "events": "81e8f86e",
       "rng": {
         "draws": 864,
         "digest": "186dfd6e"
@@ -204,9 +214,9 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 661,
-      "state": "899d5919",
-      "events": "62351817",
+      "nextId": 664,
+      "state": "d7e21422",
+      "events": "1ce43722",
       "rng": {
         "draws": 1069,
         "digest": "f01d011a"
@@ -215,9 +225,9 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 661,
-      "state": "40c083ac",
-      "events": "6e4345a5",
+      "nextId": 664,
+      "state": "4dfa3656",
+      "events": "ac5d0bc7",
       "rng": {
         "draws": 1331,
         "digest": "3c7dd57a"
@@ -226,9 +236,9 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 661,
-      "state": "2df4e378",
-      "events": "c6bb0d73",
+      "nextId": 664,
+      "state": "e09c6176",
+      "events": "4ba0fdb3",
       "rng": {
         "draws": 1572,
         "digest": "cb61b2a7"
@@ -237,9 +247,9 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 661,
-      "state": "c593aed3",
-      "events": "6e4345a5",
+      "nextId": 664,
+      "state": "6b0fa9c3",
+      "events": "ac5d0bc7",
       "rng": {
         "draws": 1707,
         "digest": "985cb3cb"
@@ -248,8 +258,8 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 661,
-      "state": "6d0d5e54",
+      "nextId": 664,
+      "state": "c70fe8e4",
       "events": "741638a5",
       "rng": {
         "draws": 1707,
@@ -277,9 +287,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 15
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 661,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -300,6 +339,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -321,7 +361,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 6.05,
           "hp": 50000,
-          "id": 658,
+          "id": 661,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -355,7 +395,7 @@
             "str": 11
           },
           "swingTimer": 1.25,
-          "targetId": 660,
+          "targetId": 663,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -364,7 +404,7 @@
           }
         },
         {
-          "aggroTargetId": 660,
+          "aggroTargetId": 663,
           "aiState": "idle",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -374,7 +414,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 357,
-          "id": 659,
+          "id": 662,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -383,7 +423,7 @@
           "moveSpeed": 5,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 658,
+          "ownerId": 661,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 10,
@@ -410,7 +450,7 @@
           }
         },
         {
-          "aggroTargetId": 659,
+          "aggroTargetId": 662,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -419,11 +459,11 @@
           "facing": -1.249046,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "forcedTargetId": 659,
+          "forcedTargetId": 662,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 49948,
-          "id": 660,
+          "id": 663,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -453,16 +493,16 @@
             "armor": 70
           },
           "swingTimer": 0.05,
-          "tappedById": 658,
-          "targetId": 658,
+          "tappedById": 661,
+          "targetId": 661,
           "templateId": "forest_wolf",
           "threat": [
             [
-              658,
+              661,
               16
             ],
             [
-              659,
+              662,
               39
             ]
           ],
@@ -477,9 +517,9 @@
     {
       "tick": 224,
       "time": 11.2,
-      "nextId": 661,
-      "state": "b88a655a",
-      "events": "c6bb0d73",
+      "nextId": 664,
+      "state": "2e76f53e",
+      "events": "4ba0fdb3",
       "rng": {
         "draws": 1738,
         "digest": "56d5f42f"
@@ -506,9 +546,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 15
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 661,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -529,6 +598,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -550,7 +620,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 6.25,
           "hp": 50000,
-          "id": 658,
+          "id": 661,
           "inCombat": true,
           "kind": "player",
           "level": 12,
@@ -584,7 +654,7 @@
             "str": 11
           },
           "swingTimer": 1.05,
-          "targetId": 660,
+          "targetId": 663,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -593,7 +663,7 @@
           }
         },
         {
-          "aggroTargetId": 660,
+          "aggroTargetId": 663,
           "aiState": "idle",
           "combatTimer": 0.15,
           "comboUntil": -1,
@@ -604,7 +674,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 357,
-          "id": 659,
+          "id": 662,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -613,7 +683,7 @@
           "moveSpeed": 5,
           "onGround": true,
           "overpowerUntil": -1,
-          "ownerId": 658,
+          "ownerId": 661,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 9.8,
@@ -640,7 +710,7 @@
           }
         },
         {
-          "aggroTargetId": 659,
+          "aggroTargetId": 662,
           "aiState": "attack",
           "combatTimer": 0.2,
           "comboUntil": -1,
@@ -650,11 +720,11 @@
           "facing": -1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "forcedTargetId": 659,
+          "forcedTargetId": 662,
           "forcedTargetTimer": 2.8,
           "hostile": true,
           "hp": 49936,
-          "id": 660,
+          "id": 663,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -684,16 +754,16 @@
             "armor": 70
           },
           "swingTimer": 1.85,
-          "tappedById": 658,
-          "targetId": 658,
+          "tappedById": 661,
+          "targetId": 661,
           "templateId": "forest_wolf",
           "threat": [
             [
-              658,
+              661,
               16
             ],
             [
-              659,
+              662,
               51
             ]
           ],

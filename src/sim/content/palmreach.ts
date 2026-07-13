@@ -42,13 +42,13 @@ export const PALMREACH_ZONE: ZoneDef = {
     { x: -336, z: 1158, radius: 11 }, // the northern tarn
   ],
   pois: [
-    { x: -300, z: 820, label: 'Drifthaven' },
-    { x: -420, z: 732, label: 'The Tanglemouth' },
-    { x: -460, z: 890, label: 'The Palmstrand' },
-    { x: -360, z: 980, label: 'The Emerald Tangle' },
-    { x: -400, z: 1080, label: 'The Vinefall' },
-    { x: -270, z: 950, label: 'The Sapphire Lagoon' },
-    { x: -256, z: 1090, label: 'The Sunken Idol' },
+    { x: -300, z: 820, label: 'Drifthaven', id: 'drifthaven' },
+    { x: -420, z: 732, label: 'The Tanglemouth', id: 'the_tanglemouth' },
+    { x: -460, z: 890, label: 'The Palmstrand', id: 'the_palmstrand' },
+    { x: -360, z: 980, label: 'The Emerald Tangle', id: 'the_emerald_tangle' },
+    { x: -400, z: 1080, label: 'The Vinefall', id: 'the_vinefall' },
+    { x: -270, z: 950, label: 'The Sapphire Lagoon', id: 'the_sapphire_lagoon' },
+    { x: -256, z: 1090, label: 'The Sunken Idol', id: 'the_sunken_idol' },
   ],
   welcome:
     'Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you.',

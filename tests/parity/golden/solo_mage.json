@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 659,
-      "state": "5b0728b8",
+      "nextId": 662,
+      "state": "006ea629",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,9 +41,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 661,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -82,7 +92,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 658,
+          "id": 661,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -126,9 +136,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 660,
-      "state": "db55fbfa",
-      "events": "25aadc7e",
+      "nextId": 663,
+      "state": "3c9b1286",
+      "events": "82eada3b",
       "rng": {
         "draws": 2,
         "digest": "4a38cbdb"
@@ -137,9 +147,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 660,
-      "state": "a6d78e55",
-      "events": "81271662",
+      "nextId": 663,
+      "state": "1276ee45",
+      "events": "d0ed15f8",
       "rng": {
         "draws": 2,
         "digest": "4a38cbdb"
@@ -148,9 +158,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 660,
-      "state": "698f7475",
-      "events": "fe66a5a5",
+      "nextId": 663,
+      "state": "e7150494",
+      "events": "794d54a1",
       "rng": {
         "draws": 128,
         "digest": "2f615206"
@@ -159,8 +169,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 660,
-      "state": "19ad615c",
+      "nextId": 663,
+      "state": "e6c248f3",
       "events": "741638a5",
       "rng": {
         "draws": 283,
@@ -170,9 +180,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 660,
-      "state": "ac5ee3c5",
-      "events": "ef030b78",
+      "nextId": 663,
+      "state": "f00e6693",
+      "events": "9d97b252",
       "rng": {
         "draws": 478,
         "digest": "cc4a6bf8"
@@ -181,9 +191,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 660,
-      "state": "4b6089cf",
-      "events": "cb2c71a1",
+      "nextId": 663,
+      "state": "d2ce7561",
+      "events": "b87a8fa3",
       "rng": {
         "draws": 656,
         "digest": "e899d3b3"
@@ -192,8 +202,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 660,
-      "state": "0aa6bcc7",
+      "nextId": 663,
+      "state": "f8f92d4d",
       "events": "741638a5",
       "rng": {
         "draws": 748,
@@ -222,9 +232,38 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 89
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 661,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -245,6 +284,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -257,7 +297,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 0.9,
-          "castTargetId": 659,
+          "castTargetId": 662,
           "castTotal": 2.5,
           "castingAbility": "fireball",
           "combatTimer": 0.65,
@@ -269,7 +309,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 2.05,
           "hp": 49992,
-          "id": 658,
+          "id": 661,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -302,7 +342,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 659,
+          "targetId": 662,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -311,7 +351,7 @@
           }
         },
         {
-          "aggroTargetId": 658,
+          "aggroTargetId": 661,
           "aiState": "attack",
           "auras": [
             {
@@ -321,7 +361,7 @@
               "name": "Cinderbolt",
               "remaining": 2.55,
               "school": "fire",
-              "sourceId": 658,
+              "sourceId": 661,
               "tickInterval": 2,
               "tickTimer": 0.55,
               "value": 1
@@ -333,7 +373,7 @@
               "name": "Rimelance",
               "remaining": 4.4,
               "school": "frost",
-              "sourceId": 658,
+              "sourceId": 661,
               "value": 0.6
             }
           ],
@@ -347,7 +387,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8911,
-          "id": 659,
+          "id": 662,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -377,11 +417,11 @@
             "armor": 40
           },
           "swingTimer": 1.35,
-          "tappedById": 658,
+          "tappedById": 661,
           "templateId": "forest_wolf",
           "threat": [
             [
-              658,
+              661,
               90
             ]
           ],
