@@ -16,6 +16,7 @@ import {
   worldXBoundsAt,
   ZONES,
 } from './data';
+import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
@@ -2199,8 +2200,22 @@ export function sowfieldFlattenWeight(x: number, z: number): number {
   return 1 - smoothstep(0, 1, d / f.falloff);
 }
 
+// The renderer seats each dock section relative to its shore anchor, then uses
+// the plank top as a raised walkable surface. Return the matching absolute
+// surface height, or -Infinity outside every deck footprint.
+function dockSurfaceHeight(x: number, z: number, seed: number): number {
+  let surface = -Infinity;
+  for (const dock of getActiveWorldContent().props.docks) {
+    const local = dockLocalPoint(dock, x, z);
+    if (dockSectionAtLocal(local.x, local.z) < 0) continue;
+    const line = dockSurfaceLine(dock, (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed));
+    surface = Math.max(surface, dockSurfaceYAt(line, local.z));
+  }
+  return surface;
+}
+
 // Ground height including instanced dungeon floors (flat, far off-world), the
-// walkable Vale Cup grandstand lift, and the custom-map sculpt edits.
+// walkable Vale Cup grandstand lift, raised docks, and custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
   // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
@@ -2210,7 +2225,8 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // ramp just raises where the player stands. Zero outside the stand footprints,
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
-  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -2246,6 +2262,9 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       const pass = edge.sealed
         ? 1
         : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(along - edge.passAt));
+      // Inside a road pass, the final wall term is exactly +0. Skip the crest
+      // noise and shaping work while keeping the heightfield bit-identical.
+      if (pass === 0) continue;
       // jagged crest so the wall reads as mountains, not a berm
       // Thornpeak's edges carry real peaks: the mountain realm's borders
       // are taller and craggier than the rest of the grid's low ranges
