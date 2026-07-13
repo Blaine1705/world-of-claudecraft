@@ -42,7 +42,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
     { x: 150, z: -46, label: 'The Farshore Causeway', id: 'the_farshore_causeway' },
   ],
-  welcome: 'Find Marshal Redbrook in town — he has work for you.',
+  welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
 };
 

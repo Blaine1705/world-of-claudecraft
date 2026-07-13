@@ -2862,8 +2862,9 @@ async function startGame(
   }
   const controller = {
     move(moveInput: unknown, facing?: unknown) {
-      if (arguments.length > 1) input.setControllerMoveInput(moveInput, facing);
-      else input.setControllerMoveInput(moveInput);
+      // setControllerMoveInput ignores an undefined facing, so the 1- and
+      // 2-argument caller shapes collapse into one call.
+      input.setControllerMoveInput(moveInput, facing);
     },
     face(facing: unknown) {
       input.setControllerFacing(facing);

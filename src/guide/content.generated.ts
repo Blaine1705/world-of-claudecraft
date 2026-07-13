@@ -1269,7 +1269,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Sowfield",
       "The Farshore Causeway"
     ],
-    "welcome": "Find Marshal Redbrook in town — he has work for you.",
+    "welcome": "Find Marshal Redbrook in town - he has work for you.",
     "families": [
       "beast",
       "spider",
@@ -1325,7 +1325,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Revenant Fields",
       "Gravewyrm Sanctum"
     ],
-    "welcome": "Captain Thessaly holds the wall at Highwatch — barely.",
+    "welcome": "Captain Thessaly holds the wall at Highwatch - barely.",
     "families": [
       "beast",
       "mudfin",
