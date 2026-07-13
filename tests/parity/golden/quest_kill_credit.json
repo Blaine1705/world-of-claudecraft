@@ -10,13 +10,13 @@
     "turnInQuest (xp + copper reward)"
   ],
   "draws": 40,
-  "drawDigest": "c86047e4",
+  "drawDigest": "0e96c13c",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 659,
-      "state": "58fef937",
+      "nextId": 409,
+      "state": "6bd4c62d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,9 +42,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -79,7 +88,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 658,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -122,9 +131,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 659,
-      "state": "4fb6d6c0",
-      "events": "fce9a281",
+      "nextId": 409,
+      "state": "071e6604",
+      "events": "89f30ebf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -149,9 +158,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -199,7 +217,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 658,
+          "id": 408,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -242,12 +260,12 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 667,
-      "state": "6eb916b9",
-      "events": "c90d8bb2",
+      "nextId": 417,
+      "state": "9ef81b67",
+      "events": "dcf84fee",
       "rng": {
         "draws": 40,
-        "digest": "c86047e4"
+        "digest": "0e96c13c"
       },
       "label": "quest-ready",
       "players": [
@@ -273,9 +291,43 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 8432,
+              "kills": 8
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "chr_vale_packbreaker",
+              ""
+            ],
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -304,6 +356,7 @@
               }
             ]
           ],
+          "renown": 30,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -323,7 +376,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 658,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -367,12 +420,12 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 667,
-      "state": "868041e0",
-      "events": "8eaf13bb",
+      "nextId": 417,
+      "state": "46b3dede",
+      "events": "d35319ab",
       "rng": {
         "draws": 40,
-        "digest": "c86047e4"
+        "digest": "0e96c13c"
       },
       "label": "quest-turned-in",
       "players": [
@@ -401,9 +454,43 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 8432,
+              "kills": 8
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "chr_vale_packbreaker",
+              ""
+            ],
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -423,6 +510,7 @@
           "questsDone": [
             "q_wolves"
           ],
+          "renown": 30,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -443,7 +531,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 658,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -487,12 +575,12 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 667,
-      "state": "3670d848",
+      "nextId": 417,
+      "state": "e48b1366",
       "events": "741638a5",
       "rng": {
         "draws": 40,
-        "digest": "c86047e4"
+        "digest": "0e96c13c"
       },
       "label": "final",
       "players": [
@@ -521,9 +609,43 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 8432,
+              "kills": 8
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "chr_vale_packbreaker",
+              ""
+            ],
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 658,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -543,6 +665,7 @@
           "questsDone": [
             "q_wolves"
           ],
+          "renown": 30,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -563,7 +686,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 658,
+          "id": 408,
           "inCombat": true,
           "kind": "player",
           "level": 10,
