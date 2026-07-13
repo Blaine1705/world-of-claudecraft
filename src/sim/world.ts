@@ -252,7 +252,7 @@ const HOLLOW_SHAPING = [
   // the crystal cove highland: a broad gentle shoulder east of the Shallows
   // that slopes long and smooth down to the cove, so the crystal mound
   // reads as breaking out of a cliffside above the water
-  { x: 118, z: 1168, r: 30, h: 6.5 },
+  { x: 120, z: 1170, r: 34, h: 4.2 },
   { x: 20, z: 1005, r: 35, h: -2.2 }, // soft meadow bowl south of the town road
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
   // the Tablecrag's bulk (its flat crown is leveled after the rims, below)
@@ -2322,11 +2322,32 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     }
   }
   // the crystal cove plaza: a level shelf at the cove's edge where the
-  // mound's cave mouth opens, blending long into the highland behind it
+  // mound's cave mouth opens, blending wide into the slope behind it
   const dCove = Math.hypot(x - 100, z - 1162);
-  if (dCove < 10) {
-    const t = smoothstep(5.5, 10, dCove);
-    h = h * t + -1.4 * (1 - t);
+  if (dCove < 14) {
+    const t = smoothstep(7, 14, dCove);
+    h = h * t + -1.2 * (1 - t);
+  }
+  // the cove ramp: a broad walkable path descending from the glade to the
+  // plaza, leveled across its width and lerped gently along its length so
+  // nothing on the approach beats the climb gate
+  {
+    const ax = 80;
+    const az = 1174;
+    const bx = 100;
+    const bz = 1163;
+    const dx = bx - ax;
+    const dz = bz - az;
+    const len2 = dx * dx + dz * dz;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len2));
+    const px = ax + dx * t;
+    const pz = az + dz * t;
+    const dRamp = Math.hypot(x - px, z - pz);
+    if (dRamp < 6) {
+      const rampH = lerp(1.4, -1.2, t);
+      const w = smoothstep(3, 6, dRamp);
+      h = h * w + rampH * (1 - w);
+    }
   }
   // Beyond a row's own columns the world is open water: past the rim range
   // the ground dives to the sea floor, so rows without an east or west

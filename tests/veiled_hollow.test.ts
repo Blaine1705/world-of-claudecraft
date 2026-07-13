@@ -292,3 +292,27 @@ describe('the storybook decor set (decorProps)', () => {
     expect(p2.pos.z).toBeGreaterThan(bed.z + 2);
   });
 });
+
+describe('the crystal cove ramp', () => {
+  it('is walkable from the glade down to the cave shelf', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
+    const p = sim.player;
+    p.pos.x = 82;
+    p.pos.z = 1174;
+    p.pos.y = terrainHeight(82, 1174, SEED);
+    p.prevPos = { ...p.pos };
+    p.maxHp = 99999;
+    p.hp = 99999;
+    sim.moveInput.forward = true;
+    const goal = { x: 100, z: 1163 };
+    for (let s = 0; s < 14; s++) {
+      p.facing = Math.atan2(goal.x - p.pos.x, goal.z - p.pos.z);
+      for (let t = 0; t < 20; t++) sim.tick();
+      if (Math.hypot(p.pos.x - goal.x, p.pos.z - goal.z) < 6) break;
+    }
+    expect(
+      Math.hypot(p.pos.x - goal.x, p.pos.z - goal.z),
+      `stuck at ${p.pos.x.toFixed(1)},${p.pos.z.toFixed(1)}`,
+    ).toBeLessThan(6);
+  });
+});
