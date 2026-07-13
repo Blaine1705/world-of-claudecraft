@@ -1219,13 +1219,12 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
   if (biome === 'cave') return r < 0.5 ? 'mushroom' : 'fern';
   if (biome === 'volcano') return 'bush';
   if (biome === 'dusk') {
-    // glade floor: ferns and flowering bushes carry the ground cover, with
-    // mushrooms as a sparser accent (the big glowing ones live in
-    // realm_flora, so the tiny dressing kind stays scattered and natural)
-    if (r < 0.12) return 'bush';
-    if (r < 0.34) return 'bushFlowers';
-    if (r < 0.78) return 'fern';
-    return 'mushroom';
+    // glade floor: ferns and flowering bushes carry the ground cover. No
+    // dressing mushrooms here: the biome tint turned them neon pink and they
+    // clashed with the realm_flora glow mushrooms (user pass, 2026-07).
+    if (r < 0.16) return 'bush';
+    if (r < 0.4) return 'bushFlowers';
+    return 'fern';
   }
   if (biome === 'fen') {
     // the fen floor blooms: flowering hedges everywhere, mushrooms thick in
