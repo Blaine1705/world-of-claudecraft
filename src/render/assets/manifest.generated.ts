@@ -637,6 +637,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/column_broken.glb": "/media/models/props/column_broken.cce25b1216e8.glb",
   "models/props/crate_wooden.glb": "/media/models/props/crate_wooden.7a5f880c07a6.glb",
   "models/props/crystal_amethyst_cluster.glb": "/media/models/props/crystal_amethyst_cluster.4ffb8fb255cd.glb",
+  "models/props/crystal_mound_cave.glb": "/media/models/props/crystal_mound_cave.bac527ffe24c.glb",
   "models/props/demon_idol.glb": "/media/models/props/demon_idol.626f71142c70.glb",
   "models/props/dock_platform.glb": "/media/models/props/dock_platform.e8ddba57f493.glb",
   "models/props/farmcrate_apple.glb": "/media/models/props/farmcrate_apple.18a006c1149b.glb",

@@ -119,6 +119,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // Consumed via ZonePropsDef.decorProps.
   pixieMushroomHouse: { url: '/models/props/pixie_mushroom_house.glb', kit: 'hollow' },
   crystalAmethystCluster: { url: '/models/props/crystal_amethyst_cluster.glb', kit: 'hollow' },
+  crystalMoundCave: { url: '/models/props/crystal_mound_cave.glb', kit: 'hollow' },
   starHeartCrystal: { url: '/models/props/star_heart_crystal.glb', kit: 'hollow' },
   kkWall: { url: '/models/dungeon/wall.glb', kit: 'dungeon' },
   kkWallCracked: { url: '/models/dungeon/wall_cracked.glb', kit: 'dungeon' },

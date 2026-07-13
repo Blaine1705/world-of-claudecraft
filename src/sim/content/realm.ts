@@ -1093,10 +1093,13 @@ export const REALM_PROPS: ZonePropsDef = {
     { key: 'crystalAmethystCluster', x: 97, z: 1145, rot: 2.3, r: 1.6, h: 4, scale: 0.65 },
     { key: 'crystalAmethystCluster', x: 88, z: 1183, rot: -1.1, r: 2.9, h: 7.5, scale: 1.25 },
     { key: 'crystalAmethystCluster', x: 52, z: 1166, rot: 3.0, r: 1.2, h: 3, scale: 0.5 },
+    // the crystal mound: a walk-up cave mouth on the east shore, its mass
+    // rising out of the lake water behind it
+    { key: 'crystalMoundCave', x: 100, z: 1163, rot: 1.57, r: 5.2, h: 11 },
     // size-scatter around the whole lake: from knee-high shards to towers
     { key: 'crystalAmethystCluster', x: 66, z: 1142, rot: 1.2, r: 1.9, h: 4.8, scale: 0.8 },
     { key: 'crystalAmethystCluster', x: 82, z: 1140, rot: -0.6, r: 3.6, h: 9, scale: 1.5 },
-    { key: 'crystalAmethystCluster', x: 100, z: 1160, rot: 2.0, r: 2.2, h: 5.4, scale: 0.9 },
+    { key: 'crystalAmethystCluster', x: 104, z: 1152, rot: 2.0, r: 2.2, h: 5.4, scale: 0.9 },
     { key: 'crystalAmethystCluster', x: 95, z: 1178, rot: 0.3, r: 1.3, h: 3.3, scale: 0.55 },
     { key: 'crystalAmethystCluster', x: 50, z: 1186, rot: -2.2, r: 2.9, h: 7.2, scale: 1.2 },
     { key: 'crystalAmethystCluster', x: 48, z: 1176, rot: 1.7, r: 1.0, h: 2.4, scale: 0.4 },
