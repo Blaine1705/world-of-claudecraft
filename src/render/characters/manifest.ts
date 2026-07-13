@@ -158,13 +158,13 @@ const animal = (attack: string[]): ClipMap => ({
 });
 
 // Rideable mounts generated via scripts/asset_pipeline (Tripo creature lane).
-// The retarget presets rename to the game vocabulary; the quadruped preset set
-// is walk-only, so Idle here is the same walk cycle. The renderer freezes
-// frame 0 while the mount stands (CharacterVisual.poseFreeze) instead of
-// letting it walk in place; the clipless prop-lane mounts resolve no actions
-// from this map and rest in their generated standing pose (procedural bob in
-// src/render/mount_visuals.ts). No attack one-shots: the RIDER swings, the
-// mount does not.
+// The Tripo quadruped retarget was near-static (4-5 animated joints), so the
+// shipped clips are baked locally instead: scripts/bake_mount_gaits.mjs
+// authors Idle/Walk/Run/Death gait cycles directly against each rig's bind
+// pose (a live idle loop replaces the old frame-0 pose freeze). The clipless
+// prop-lane mounts resolve no actions from this map and rest in their
+// generated standing pose (procedural bob in src/render/mount_visuals.ts).
+// No attack one-shots: the RIDER swings, the mount does not.
 const MOUNT_RIGGED: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
@@ -566,49 +566,61 @@ export const VISUALS: Record<string, VisualDef> = {
   // All lazyPreload: fetched on the first sight of a mounted player
   // (preloadMountAssets in assets.ts), never in the boot sweep. Baked Tripo
   // textures, no tint. Seat heights + procedural bob live in
-  // src/render/mount_visuals.ts; heights here follow the wolf(1.6)/boar(1.45)
-  // creature scale against the 2.6 humanoid.
+  // src/render/mount_visuals.ts. Heights are deliberately imposing (a mount
+  // should tower over the 2.6 humanoid the way a horse towers over a person);
+  // walkRef/runRef foot-match the bake_mount_gaits.mjs cycle cadence to
+  // mounted ground speed. The valorsteed auto-rig faces -Z (its bind head
+  // sits at negative Z), so it alone carries the flip yaw.
   mount_valorsteed: {
     url: `${MOUNTS_DIR}/valorsteed.glb`,
-    height: 1.9,
+    height: 3.8,
     clips: MOUNT_RIGGED,
+    yaw: Math.PI,
+    walkRef: 2.6,
+    runRef: 9,
     lazyPreload: true,
   },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
-    height: 2.0,
+    height: 4.0,
     clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
     lazyPreload: true,
   },
   mount_stalkglider_snail: {
     url: `${MOUNTS_DIR}/stalkglider_snail.glb`,
-    height: 1.55,
+    height: 3.1,
     clips: MOUNT_RIGGED,
     lazyPreload: true,
   },
   mount_aether_hover_cycle: {
     url: `${MOUNTS_DIR}/aether_hover_cycle.glb`,
-    height: 1.15,
+    height: 2.3,
     clips: MOUNT_RIGGED,
-    hover: 0.3,
+    hover: 0.6,
     lazyPreload: true,
   },
   mount_shadowjump_toad: {
     url: `${MOUNTS_DIR}/shadowjump_toad.glb`,
-    height: 1.6,
+    height: 3.2,
     clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
     lazyPreload: true,
   },
   mount_stormfeather_griffin: {
     url: `${MOUNTS_DIR}/stormfeather_griffin.glb`,
-    height: 2.05,
+    height: 4.1,
     clips: MOUNT_RIGGED,
     lazyPreload: true,
   },
   mount_lunar_cheshire: {
     url: `${MOUNTS_DIR}/lunar_cheshire.glb`,
-    height: 1.75,
+    height: 3.5,
     clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
     lazyPreload: true,
   },
 

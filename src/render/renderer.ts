@@ -537,9 +537,6 @@ export interface EntityView {
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
-  /** rigged mount pose-frozen while standing (its retargeted Idle is the same
-   *  walk cycle, so the live loop would pace in place) */
-  mountFrozen: boolean;
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -3569,7 +3566,6 @@ export class Renderer {
       mountVisual: null,
       mountVisualKey: '',
       mountLift: 0,
-      mountFrozen: false,
       height,
       clickTarget,
       nameplate: np,
@@ -4517,7 +4513,6 @@ export class Renderer {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
-          v.mountFrozen = false;
         } else {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
@@ -4612,18 +4607,22 @@ export class Renderer {
       st.speed = loco.speed;
       st.moving = moving;
       st.running = loco.running;
-      st.airborne = airborne;
+      // A mounted rider stays planted in the saddle: the MOUNT carries the
+      // jump arc (its anim scratch below keeps the real airborne flag), while
+      // the rider holds the seated pose instead of replaying the jump clip.
+      const riderMounted = v.mountLift > 0;
+      st.airborne = airborne && !riderMounted;
       st.backwards = loco.backwards;
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = e.castingAbility !== null && !visuallyDead;
       st.swimming = swimming;
       // A mounted rider holds the seated pose (the sit loop reads as riding);
-      // swim/jump/cast still outrank it in desiredBaseState, so mounted
-      // casting and airborne arcs animate normally.
+      // swim/cast still outrank it in desiredBaseState, so mounted casting
+      // and swimming animate normally.
       st.sitting =
         e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || v.mountLift > 0);
+        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -4682,28 +4681,20 @@ export class Renderer {
       active.update(dt, st, animate);
 
       // The mount animates from the same locomotion inputs as its rider: the
-      // rigged quadrupeds play Walk/Run and freeze a neutral frame while
-      // standing (their retargeted Idle is the same walk cycle; a live loop
-      // would pace in place), and the clipless mounts bob procedurally (the
-      // hover cycle floats, the griffin canters, the snail glides flat).
+      // rigged quadrupeds run their baked gait clips (a live Idle loop while
+      // standing, Walk/Run on the move, scripts/bake_mount_gaits.mjs), and
+      // the clipless mounts bob procedurally (the hover cycle floats, the
+      // griffin canters, the snail glides flat). `airborne` here is the real
+      // flag, not the rider's suppressed one: the mount carries the jump.
       if (v.mountVisual && mountSpec && mountShown) {
-        if (moving || st.airborne || st.swimming) {
-          if (v.mountFrozen) {
-            v.mountVisual.clearPose();
-            v.mountFrozen = false;
-          }
-          const mst = this.mountAnimScratch;
-          mst.speed = st.speed;
-          mst.moving = st.moving;
-          mst.running = st.running;
-          mst.airborne = st.airborne;
-          mst.backwards = st.backwards;
-          mst.swimming = st.swimming;
-          v.mountVisual.update(dt, mst, animate);
-        } else if (!v.mountFrozen) {
-          v.mountVisual.poseFreeze(['Idle'], 0);
-          v.mountFrozen = true;
-        }
+        const mst = this.mountAnimScratch;
+        mst.speed = st.speed;
+        mst.moving = st.moving;
+        mst.running = st.running;
+        mst.airborne = airborne;
+        mst.backwards = st.backwards;
+        mst.swimming = st.swimming;
+        v.mountVisual.update(dt, mst, animate);
         v.mountVisual.root.position.y = mountBobY(mountSpec, this.time, moving);
       }
 

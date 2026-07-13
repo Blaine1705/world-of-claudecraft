@@ -13,8 +13,9 @@ export interface MountVisualSpec {
   visualKey: string;
   /** World-unit rider lift onto the saddle at e.scale = 1. */
   seat: number;
-  /** Carries retargeted Idle/Walk/Run clips (the quadruped rigs). The clipless
-   *  rest render their generated standing pose and move via the bob below. */
+  /** Carries baked Idle/Walk/Run gait clips (scripts/bake_mount_gaits.mjs).
+   *  The clipless rest render their generated standing pose and move via the
+   *  bob below. */
   rigged: boolean;
   /** Procedural bob amplitude in world units (0 = none). */
   bobAmp: number;
@@ -42,18 +43,18 @@ const spec = (
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
-  valorsteed: spec('mount_valorsteed', 1.42, true),
-  grag_bear: spec('mount_grag_bear', 1.5, true),
-  stalkglider_snail: spec('mount_stalkglider_snail', 1.24, false),
-  aether_hover_cycle: spec('mount_aether_hover_cycle', 0.92, false, {
-    amp: 0.07,
+  valorsteed: spec('mount_valorsteed', 2.84, true),
+  grag_bear: spec('mount_grag_bear', 3.0, true),
+  stalkglider_snail: spec('mount_stalkglider_snail', 2.48, false),
+  aether_hover_cycle: spec('mount_aether_hover_cycle', 1.84, false, {
+    amp: 0.14,
     hz: 1.1,
     idle: true,
     shape: 'hover',
   }),
-  shadowjump_toad: spec('mount_shadowjump_toad', 1.26, true),
-  stormfeather_griffin: spec('mount_stormfeather_griffin', 1.5, false, { amp: 0.09, hz: 2.4 }),
-  lunar_cheshire: spec('mount_lunar_cheshire', 1.3, true),
+  shadowjump_toad: spec('mount_shadowjump_toad', 2.52, true),
+  stormfeather_griffin: spec('mount_stormfeather_griffin', 3.0, false, { amp: 0.18, hz: 2.4 }),
+  lunar_cheshire: spec('mount_lunar_cheshire', 2.6, true),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */
