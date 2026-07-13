@@ -2328,13 +2328,14 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     const t = smoothstep(7, 14, dCove);
     h = h * t + -1.2 * (1 - t);
   }
-  // the cove ramp: a broad walkable path descending from the glade to the
-  // plaza, leveled across its width and lerped gently along its length so
-  // nothing on the approach beats the climb gate
+  // the cove apron: one wide, gently graded shelf of dry ground covering the
+  // whole northeast shore walk from the glade to the cave plaza. Broad on
+  // purpose: a narrow ramp here left carved-water slivers and trench walls
+  // beside the path (the floor stays well above WATER_LEVEL throughout).
   {
-    const ax = 80;
-    const az = 1174;
-    const bx = 100;
+    const ax = 78;
+    const az = 1176;
+    const bx = 101;
     const bz = 1163;
     const dx = bx - ax;
     const dz = bz - az;
@@ -2342,11 +2343,11 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len2));
     const px = ax + dx * t;
     const pz = az + dz * t;
-    const dRamp = Math.hypot(x - px, z - pz);
-    if (dRamp < 6) {
-      const rampH = lerp(1.4, -1.2, t);
-      const w = smoothstep(3, 6, dRamp);
-      h = h * w + rampH * (1 - w);
+    const dApron = Math.hypot(x - px, z - pz);
+    if (dApron < 13) {
+      const apronH = lerp(1.3, -1.2, t);
+      const w = smoothstep(8, 13, dApron);
+      h = h * w + apronH * (1 - w);
     }
   }
   // Beyond a row's own columns the world is open water: past the rim range
