@@ -484,6 +484,20 @@ Shear's cliffs face the Farshore's torn sky across the water.
 - **World of Warcraft:** sundered dragonflights keeping vigil (Drakelands);
   elemental unrest as a symptom of a buried titan; death cults with
   infrastructure; rifts and portals as endgame texture.
+- **Dark Souls:** the kept flame in a fading age (the Old Beacon — keepers
+  feeding a fire whose promise nobody living remembers, and the quiet dread
+  of what happens if it dies); the undead curse as worldwide condition rather
+  than local monster problem (the dead who cannot find the Sleep); tragic
+  jailers who became their own prisons (the Smith as Thornpeak, Korgath the
+  Bound); melancholy ruins that were somebody's golden age (every Court
+  site); the Statuary Walk's petitioners, hollowed mid-bow.
+- **Warhammer:** the Other as the Chaos-beyond-the-veil — a hostile
+  intelligence pressing through a wound in reality, with Rifts as its
+  incursion mechanic and matching cult-idols at both poles; corruption that
+  works through schism and doctrine rather than armies (the Gravecallers as
+  a cult *inside* the Chapel of the Sleep); the sealed Frostveil wall as the
+  grim northern front held by too few; ogres and trolls as mercenary muscle
+  bought by whoever pays (Drogmar's clans, the Trollmoot).
 
 ## 7. Open hooks (deliberately unresolved)
 
