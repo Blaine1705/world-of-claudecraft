@@ -18,6 +18,7 @@
 // by the extraction.
 
 import { isRooted, isStunned } from './combat/cc';
+import { mountMoveSpeedPct } from './content/mounts';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
 import { DT, type Entity, type MoveInput, normAngle, RUN_SPEED, TURN_SPEED } from './types';
@@ -61,6 +62,11 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     // buff_speed and form_travel both carry a 1+fraction multiplier (1.4 = +40%).
     if (a.kind === 'buff_speed' || a.kind === 'form_travel') speed = Math.max(speed, a.value);
   }
+  // Mounted travel: the active ground mount rides the entity mirror (mountKey,
+  // synced over the wire like skin), so the online self-extrapolator predicts
+  // mounted speed in lockstep with the server. Additive with buff_speed like
+  // the Fiesta augment below; slows still bite multiplicatively.
+  if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
   return slow * speed;

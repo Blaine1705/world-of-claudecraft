@@ -52,7 +52,8 @@ export type UiIconName =
   | 'vibrate'
   | 'lock'
   | 'mail'
-  | 'ball';
+  | 'ball'
+  | 'mount';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -133,7 +134,11 @@ const ICONS: Record<UiIconName, string> = {
   mail: '<path d="M48 128a32 32 0 0 1 32-32h352a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H80a32 32 0 0 1-32-32V128zm52 8 156 122 156-122H100zm312 50L288 296a52 52 0 0 1-64 0L100 186v190h312V186z"/>',
   // hand-authored boarball (the Vale Cup): a stitched ball, ring + two seams
   // with cross-stitch ticks so it reads at micro-button size
-  ball: '<path fill-rule="evenodd" d="M256 64a192 192 0 1 0 0 384 192 192 0 0 0 0-384zm0 40a152 152 0 1 1 0 304 152 152 0 0 1 0-304z"/><path d="M148 148c60 52 60 164 0 216l24 24c72-64 72-200 0-264zM364 148c-60 52-60 164 0 216l-24 24c-72-64-72-200 0-264z"/><path d="M238 160h36v28h-36zM238 324h36v28h-36zM220 238h72v36h-72z"/>',
+  ball: '<path fill-rule="evenodd" d="M256 64a192 192 0 1 0 0 384 192 192 0 0 0 0-384zm0 40a152 152 0 1 1 0 304 152 152 0 0 1 0-304z"/><path d="M148 148c60 52 60 164 0 216l24 24c72-64 72-200 0-264zM364 148c-60 52-60 164 0 216l-24 24c-72-64-72-200 0-264z"/><path d="M238 160h36v28h-36zM238 324h36v28h-36z"/><path d="M220 238h72v36h-72z"/>',
+  // hand-authored horseshoe (the Mounts window / mount keybind), opening up,
+  // matching the bar glyph weight
+  mount:
+    '<path d="M120 140 A176 176 0 1 0 392 140 L340 188 A104 104 0 1 1 172 188 Z"/><path d="M96 108h84v36H96zM332 108h84v36h-84z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

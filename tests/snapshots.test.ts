@@ -2005,6 +2005,7 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mnt',
   'party',
   'prof',
   'qdone',
@@ -2050,6 +2051,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
+  mnt: 'selectedMount',
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
@@ -2145,6 +2147,7 @@ function dirtyEveryDeltaField(): {
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  meta.selectedMount = 'valorsteed';
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
@@ -2240,6 +2243,8 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
+    // mnt -> selfSelectedMount (private), via the selectedMount() accessor
+    expect(client.selectedMount()).toBe('valorsteed');
     expect(client.partyInfo).not.toBeNull(); // party -> partyInfo
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
@@ -2323,9 +2328,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(36);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
+  it('ALL_DELTA_KEYS contains exactly 37 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(37);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(37);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2337,7 +2342,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(36);
+    expect(scraped.size).toBe(37);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

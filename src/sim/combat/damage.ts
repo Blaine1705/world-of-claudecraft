@@ -566,6 +566,11 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // Death force-dismounts (the mount bolts); the persisted selection stays,
+    // so remounting after the corpse run is one keypress. Stats recalc on the
+    // next mount toggle / resurrect recalc, and a dead player draws no swings,
+    // so the stale crit mirror is inert. Draws no rng.
+    e.mountKey = '';
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;

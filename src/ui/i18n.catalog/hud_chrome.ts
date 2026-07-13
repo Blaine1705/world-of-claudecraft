@@ -245,6 +245,7 @@ export const hudChromeStrings = {
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Rewards',
+    mounts: 'Mounts',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -422,6 +423,47 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
+    // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
+    mount: 'Mount / Dismount',
+  },
+  // The Mounts window (the stable): pick the stable ground mount, see each
+  // card's level gate + specialty numbers, and mount/dismount. Names and
+  // descriptions come from the reference cards (src/sim/content/mounts.ts
+  // carries the canonical English names for the sim side).
+  mounts: {
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
+    mount: 'Mount',
+    dismount: 'Dismount',
+    requiresLevel: 'Requires level {level}',
+    pickFirst: 'Pick a mount to ride.',
+    keybindHint: 'Press the Mount / Dismount key (default Z) to ride.',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
+    spec_speed: '+{pct}% extra mobility',
+    spec_block: '+{pct}% melee damage block',
+    spec_crit: '+{pct}% critical strike chance',
+    name_valorsteed: 'Valorsteed',
+    name_grag_bear: 'Goliath Grag-Bear',
+    name_stalkglider_snail: 'Moss-Shell Stalk-Glider',
+    name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
+    name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
+    name_stormfeather_griffin: 'Sky-Reach Stormfeather',
+    name_lunar_cheshire: 'Lunar Cheshire',
+    desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
+    desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
+    desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
+    desc_aether_hover_cycle:
+      'A powerful magitech bike designed for swift, low-hovering combat traversal.',
+    desc_shadowjump_toad:
+      'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
+    desc_stormfeather_griffin:
+      'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+    desc_lunar_cheshire: 'A moonstruck feline that pads between shadows with an unfading grin.',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event

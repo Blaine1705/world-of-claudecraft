@@ -6742,4 +6742,44 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Debes estar en un grupo para iniciar una comprobación de disponibilidad.',
   'hudChrome.readyCheck.inProgressError': 'Ya hay una comprobación de disponibilidad en curso.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Montar / Desmontar',
+  'hudChrome.mobile.mounts': 'Monturas',
+  'hudChrome.mounts.title': 'Monturas',
+  'hudChrome.mounts.close': 'Cerrar',
+  'hudChrome.mounts.select': 'Elegir',
+  'hudChrome.mounts.selected': 'Elegida',
+  'hudChrome.mounts.riding': 'Montada',
+  'hudChrome.mounts.mount': 'Montar',
+  'hudChrome.mounts.dismount': 'Desmontar',
+  'hudChrome.mounts.requiresLevel': 'Requiere nivel {level}',
+  'hudChrome.mounts.pickFirst': 'Elige una montura para montar.',
+  'hudChrome.mounts.keybindHint': 'Pulsa la tecla Montar / Desmontar (Z por defecto) para montar.',
+  'hudChrome.mounts.rarity_common': 'Común',
+  'hudChrome.mounts.rarity_rare': 'Rara',
+  'hudChrome.mounts.rarity_epic': 'Épica',
+  'hudChrome.mounts.spec_speed': '+{pct}% de movilidad adicional',
+  'hudChrome.mounts.spec_block': '+{pct}% de bloqueo de daño cuerpo a cuerpo',
+  'hudChrome.mounts.spec_crit': '+{pct}% de probabilidad de golpe crítico',
+  'hudChrome.mounts.name_valorsteed': 'Corcel del Valor',
+  'hudChrome.mounts.name_grag_bear': 'Oso Grag Goliat',
+  'hudChrome.mounts.name_stalkglider_snail': 'Deslizador de Caparazón Musgoso',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aerocicleta Justadora del Éter',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, el Sapo Saltasombras',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Plumatormenta Alcanzacielos',
+  'hudChrome.mounts.name_lunar_cheshire': 'Cheshire Lunar',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un corcel resistente y de paso firme que aumenta la velocidad de viaje.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un oso resistente y de paso firme que aumenta la velocidad de viaje.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
+  'hudChrome.mounts.desc_lunar_cheshire':
+    'Un felino lunático que se desliza entre las sombras con una sonrisa imborrable.',
 };

@@ -273,6 +273,7 @@ type ClientMessage = Record<string, unknown> & {
   mode?: string;
   n?: string;
   name?: string;
+  mount?: string;
   nation?: string;
   node?: string;
   npc?: number;
@@ -406,6 +407,8 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
+  'mount_select',
+  'mount_toggle',
   'prestige',
   'market_list',
   'market_buy',
@@ -692,6 +695,9 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
+  // Active rideable mount ('' omitted). Identity ride = a mount/dismount bumps
+  // idVer and pushes a fresh full record to everyone who can see the player.
+  if (e.mountKey) out.mnt = e.mountKey;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
@@ -3298,6 +3304,14 @@ export class GameServer {
       case 'unequip_mech_chroma':
         if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
         break;
+      // Rideable mounts: the Sim re-validates everything (catalog key, level
+      // gate, combat gate); the entity mirror + self `mnt` field carry the result.
+      case 'mount_select':
+        if (typeof msg.mount === 'string') sim.selectMountFor(pid, msg.mount);
+        break;
+      case 'mount_toggle':
+        sim.toggleMountFor(pid);
+        break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -4369,6 +4383,11 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    // The persisted mount pick (IWorldMounts.selectedMount; '' rides as null).
+    // Kept per-tick like the other small scalars: one short string, negligible
+    // diff. Wire key `mnt`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in
+    // tests/snapshots.test.ts.
+    maybe('mnt', meta.selectedMount || null);
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety

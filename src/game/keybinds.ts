@@ -187,6 +187,21 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyY'],
   },
+  // Mount / dismount toggle; opens the Mounts window while nothing is picked.
+  {
+    id: 'mount',
+    label: 'Mount / Dismount',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyZ'],
+  },
+  {
+    id: 'mounts',
+    label: 'Mounts',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyZ'],
+  },
   {
     id: 'leaderboard',
     label: 'Leaderboard',

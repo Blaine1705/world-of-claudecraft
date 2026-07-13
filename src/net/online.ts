@@ -8,6 +8,7 @@ import {
 } from '../runtime';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { type MountKey, mountDef, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
   cloneAllocation,
@@ -991,6 +992,7 @@ function blankEntity(id: number): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mountKey: '',
     mainhandItemId: null,
     equippedItems: {},
     equippedInstances: {},
@@ -1622,6 +1624,7 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
@@ -1920,6 +1923,9 @@ export class ClientWorld implements IWorld {
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
+      // IWorldMounts self-decode: mnt is delta-guarded (omitted keeps the prior
+      // mirror; null decodes to '' = nothing picked).
+      if (s.mnt !== undefined) this.selfSelectedMount = normalizeMountKey(s.mnt);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
@@ -2246,6 +2252,23 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  // --- IWorldMounts: pick + mount/dismount. The pick gets an optimistic local
+  // nudge (level-checked, like changeSkin); the toggle stays authoritative
+  // because the server's combat gate can refuse it, and the identity mirror
+  // (mnt) lands on the next snapshot either way. ---
+  selectedMount(): MountKey | '' {
+    return this.selfSelectedMount;
+  }
+  selectMount(key: MountKey): void {
+    const def = mountDef(key);
+    const p = this.entities.get(this.playerId);
+    if (!def || !p || p.level < def.level) return;
+    this.selfSelectedMount = def.key;
+    this.cmd({ cmd: 'mount_select', mount: def.key });
+  }
+  toggleMounted(): void {
+    this.cmd({ cmd: 'mount_toggle' });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
@@ -2579,6 +2602,8 @@ export class ClientWorld implements IWorld {
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
+  // The persisted mount pick, mirrored from the snapshot `s.mnt` (IWorldMounts).
+  private selfSelectedMount: MountKey | '' = '';
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};

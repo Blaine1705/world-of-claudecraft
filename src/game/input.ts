@@ -70,7 +70,9 @@ export interface InputCallbacks {
       | 'leaderboard'
       | 'calendar'
       | 'discord'
-      | 'crafting',
+      | 'crafting'
+      | 'mount'
+      | 'mounts',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -840,6 +842,12 @@ export class Input {
         return;
       case 'arena':
         this.cb.onUiKey('arena');
+        return;
+      case 'mount':
+        this.cb.onUiKey('mount');
+        return;
+      case 'mounts':
+        this.cb.onUiKey('mounts');
         return;
       case 'valecup':
         this.cb.onUiKey('valecup');

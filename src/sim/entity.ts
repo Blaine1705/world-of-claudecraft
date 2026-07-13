@@ -1,3 +1,4 @@
+import { mountCritPct } from './content/mounts';
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
@@ -153,6 +154,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mountKey: '',
     mainhandItemId: null,
     equippedItems: {},
     equippedInstances: {},
@@ -431,13 +433,16 @@ export function recalcPlayerStats(
   e.spellHaste = hasteFrac;
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
-  // Crit: ~1% per 20 agi at low level
+  // Crit: ~1% per 20 agi at low level. The active mount's bonus (epic tier)
+  // rides here so it covers melee, ranged, and ability crit uniformly; mount
+  // and dismount recalc stats (src/sim/mounts.ts) exactly like an equip does.
   e.critChance =
     0.05 +
     s.agi * 0.0005 +
     (mods?.stats.crit ?? 0) +
     setEff.crit +
-    critFractionFromRating(e.critRating);
+    critFractionFromRating(e.critRating) +
+    mountCritPct(e.mountKey);
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.

@@ -44,8 +44,18 @@ import type { SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
-import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
-import { mechAssetsReady, preloadMechAssets } from './characters/assets';
+import {
+  type AnimState,
+  type CharacterVisual,
+  createCharacterVisual,
+  createMountVisual,
+} from './characters';
+import {
+  mechAssetsReady,
+  mountAssetsReady,
+  preloadMechAssets,
+  preloadMountAssets,
+} from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
@@ -81,6 +91,7 @@ import { buildJailScene } from './jail_scene';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
+import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -521,6 +532,14 @@ export interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
+  mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
+  /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
+   *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
+  mountLift: number;
+  /** rigged mount pose-frozen while standing (its retargeted Idle is the same
+   *  walk cycle, so the live loop would pace in place) */
+  mountFrozen: boolean;
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -837,6 +856,20 @@ export class Renderer {
   // preview drives a shared constant too), so one buffer avoids allocating a
   // fresh state object per entity per frame, reducing GC churn that scales with crowd.
   private readonly animScratch: AnimState = {
+    speed: 0,
+    moving: false,
+    running: false,
+    airborne: false,
+    backwards: false,
+    reverseBackpedal: false,
+    dead: false,
+    casting: false,
+    swimming: false,
+    sitting: false,
+  };
+  // Second scratch for the mount rig: the rider's state minus the rider-only
+  // facts (casting/sitting/dead never reach the mount's locomotion clips).
+  private readonly mountAnimScratch: AnimState = {
     speed: 0,
     moving: false,
     running: false,
@@ -3533,6 +3566,10 @@ export class Renderer {
       bearVisual: null,
       catVisual: null,
       travelVisual: null,
+      mountVisual: null,
+      mountVisualKey: '',
+      mountLift: 0,
+      mountFrozen: false,
       height,
       clickTarget,
       nameplate: np,
@@ -4032,6 +4069,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
+      v.mountVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
@@ -4285,9 +4323,11 @@ export class Renderer {
           v.visual.setShadow(wantShadow);
           v.isFar = d2 > lodRangeSq;
           // past the articulated gate the static-pose proxy carries the
-          // shadow; an active form's own rig keeps casting instead
+          // shadow; an active form's own rig keeps casting instead. A mounted
+          // rider also skips the proxy: its baked ground-level idle silhouette
+          // would render under the raised body.
           v.visual.setProxyShadow(
-            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel,
+            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel && !v.mountVisual,
           );
           // sheep/forms keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
@@ -4296,6 +4336,7 @@ export class Renderer {
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
+          v.mountVisual?.setShadow(wantFormShadow);
         } else if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
           for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -4458,6 +4499,38 @@ export class Renderer {
       if (v.bearVisual) v.bearVisual.root.visible = bear;
       if (v.catVisual) v.catVisual.root.visible = cat;
       if (v.travelVisual) v.travelVisual.root.visible = travel;
+      // rideable mount under the player (the lazy form-visual pattern). Mount
+      // GLBs are lazyPreload: the first sight of a rider kicks the fetch and
+      // the visual appears once ready. A druid form replaces the whole body,
+      // so the form wins visually and the mount hides (the sim's speed math
+      // is untouched either way).
+      const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
+      const mountShown = !!mountSpec && !(polyed || bear || cat || travel) && !e.dead;
+      if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
+        if (v.mountVisual) {
+          v.group.remove(v.mountVisual.root);
+          v.mountVisual.dispose();
+          v.mountVisual = null;
+        }
+        v.mountVisualKey = '';
+        if (mountAssetsReady(mountSpec.visualKey)) {
+          v.mountVisual = createMountVisual(mountSpec.visualKey);
+          v.group.add(v.mountVisual.root); // group.scale already carries e.scale
+          v.mountVisualKey = mountSpec.visualKey;
+          v.mountFrozen = false;
+        } else {
+          void preloadMountAssets(mountSpec.visualKey).catch((err) =>
+            console.error('Failed to preload mount model:', err),
+          );
+        }
+      } else if (!mountSpec && v.mountVisual) {
+        v.group.remove(v.mountVisual.root);
+        v.mountVisual.dispose();
+        v.mountVisual = null;
+        v.mountVisualKey = '';
+      }
+      if (v.mountVisual) v.mountVisual.root.visible = mountShown;
+      v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active =
         polyed && v.sheepVisual
           ? v.sheepVisual
@@ -4477,6 +4550,9 @@ export class Renderer {
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
       v.visual.root.visible = active === v.visual;
+      // saddle lift: the rider (click proxy included, a root child) sits at
+      // the seat height while mounted; 0 whenever the mount is absent/hidden.
+      v.visual.root.position.y = v.mountLift;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
 
@@ -4542,7 +4618,12 @@ export class Renderer {
       st.dead = visuallyDead;
       st.casting = e.castingAbility !== null && !visuallyDead;
       st.swimming = swimming;
-      st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
+      // A mounted rider holds the seated pose (the sit loop reads as riding);
+      // swim/jump/cast still outrank it in desiredBaseState, so mounted
+      // casting and airborne arcs animate normally.
+      st.sitting =
+        e.kind === 'player' &&
+        (e.sitting || e.eating !== null || e.drinking !== null || v.mountLift > 0);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -4599,6 +4680,32 @@ export class Renderer {
         else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }
       active.update(dt, st, animate);
+
+      // The mount animates from the same locomotion inputs as its rider: the
+      // rigged quadrupeds play Walk/Run and freeze a neutral frame while
+      // standing (their retargeted Idle is the same walk cycle; a live loop
+      // would pace in place), and the clipless mounts bob procedurally (the
+      // hover cycle floats, the griffin canters, the snail glides flat).
+      if (v.mountVisual && mountSpec && mountShown) {
+        if (moving || st.airborne || st.swimming) {
+          if (v.mountFrozen) {
+            v.mountVisual.clearPose();
+            v.mountFrozen = false;
+          }
+          const mst = this.mountAnimScratch;
+          mst.speed = st.speed;
+          mst.moving = st.moving;
+          mst.running = st.running;
+          mst.airborne = st.airborne;
+          mst.backwards = st.backwards;
+          mst.swimming = st.swimming;
+          v.mountVisual.update(dt, mst, animate);
+        } else if (!v.mountFrozen) {
+          v.mountVisual.poseFreeze(['Idle'], 0);
+          v.mountFrozen = true;
+        }
+        v.mountVisual.root.position.y = mountBobY(mountSpec, this.time, moving);
+      }
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -5476,7 +5583,7 @@ export class Renderer {
       // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
-      this.tmpV.y += v.height * e.scale + 1.0;
+      this.tmpV.y += (v.height + v.mountLift) * e.scale + 1.0;
       if (!isProjectedNameplateAnchorVisible(this.camera, this.tmpV, this.tmpV2)) {
         b.el.style.display = 'none';
         continue;
@@ -5586,7 +5693,7 @@ export class Renderer {
       let topY = midY;
       if (!dead) {
         this.tmpV2.copy(v.group.position);
-        this.tmpV2.y += v.height * e.scale + 1.0;
+        this.tmpV2.y += (v.height + v.mountLift) * e.scale + 1.0;
         if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV2, this.tmpV3)) {
           this.tmpV2.project(this.camera);
           if (this.tmpV2.z <= 1) {

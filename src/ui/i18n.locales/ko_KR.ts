@@ -6505,4 +6505,41 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
   'loading.tips.pvp':
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': '탑승 / 하차',
+  'hudChrome.mobile.mounts': '탈것',
+  'hudChrome.mounts.title': '탈것',
+  'hudChrome.mounts.close': '닫기',
+  'hudChrome.mounts.select': '선택',
+  'hudChrome.mounts.selected': '선택됨',
+  'hudChrome.mounts.riding': '탑승 중',
+  'hudChrome.mounts.mount': '탑승',
+  'hudChrome.mounts.dismount': '내리기',
+  'hudChrome.mounts.requiresLevel': '{level}레벨 필요',
+  'hudChrome.mounts.pickFirst': '탈 탈것을 선택하세요.',
+  'hudChrome.mounts.keybindHint': '탑승 / 하차 키(기본 Z)를 눌러 탑승합니다.',
+  'hudChrome.mounts.rarity_common': '일반',
+  'hudChrome.mounts.rarity_rare': '희귀',
+  'hudChrome.mounts.rarity_epic': '서사',
+  'hudChrome.mounts.spec_speed': '+{pct}% 추가 기동력',
+  'hudChrome.mounts.spec_block': '+{pct}% 근접 피해 방어',
+  'hudChrome.mounts.spec_crit': '+{pct}% 치명타 확률',
+  'hudChrome.mounts.name_valorsteed': '발러스티드',
+  'hudChrome.mounts.name_grag_bear': '골리앗 그라그곰',
+  'hudChrome.mounts.name_stalkglider_snail': '이끼껍질 활공달팽이',
+  'hudChrome.mounts.name_aether_hover_cycle': '에테르 기사 호버사이클',
+  'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
+  'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
+  'hudChrome.mounts.name_lunar_cheshire': '달의 체셔',
+  'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
+  'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
+  'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    '낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    '어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
+  'hudChrome.mounts.desc_lunar_cheshire':
+    '사라지지 않는 미소를 띠고 그림자 사이를 거니는 달빛 고양이입니다.',
 };

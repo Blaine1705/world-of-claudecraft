@@ -1944,6 +1944,13 @@ export interface Entity {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Active rideable ground mount ('' = dismounted; players only). Unlike the
+  // render-only cosmetics below, the sim READS this: player_motion.moveSpeedMult
+  // (speed), auto_attack.meleeSwing (melee block), and recalcPlayerStats (crit)
+  // key off it, so it syncs in identity fields (terse `mnt`) like `skin` and the
+  // online self-extrapolator predicts mounted speed in lockstep. The persisted
+  // selection lives on PlayerMeta.selectedMount (src/sim/content/mounts.ts).
+  mountKey: string;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.

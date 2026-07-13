@@ -6727,4 +6727,44 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Devi essere in un gruppo per avviare un controllo di prontezza.',
   'hudChrome.readyCheck.inProgressError': 'È già in corso un controllo di prontezza.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Monta / Smonta',
+  'hudChrome.mobile.mounts': 'Cavalcature',
+  'hudChrome.mounts.title': 'Cavalcature',
+  'hudChrome.mounts.close': 'Chiudi',
+  'hudChrome.mounts.select': 'Scegli',
+  'hudChrome.mounts.selected': 'Scelta',
+  'hudChrome.mounts.riding': 'In sella',
+  'hudChrome.mounts.mount': 'Monta',
+  'hudChrome.mounts.dismount': 'Smonta',
+  'hudChrome.mounts.requiresLevel': 'Richiede livello {level}',
+  'hudChrome.mounts.pickFirst': 'Scegli una cavalcatura da cavalcare.',
+  'hudChrome.mounts.keybindHint': 'Premi il tasto Monta / Smonta (Z predefinito) per cavalcare.',
+  'hudChrome.mounts.rarity_common': 'Comune',
+  'hudChrome.mounts.rarity_rare': 'Rara',
+  'hudChrome.mounts.rarity_epic': 'Epica',
+  'hudChrome.mounts.spec_speed': '+{pct}% di mobilità extra',
+  'hudChrome.mounts.spec_block': '+{pct}% di blocco dei danni in mischia',
+  'hudChrome.mounts.spec_crit': '+{pct}% di probabilità di colpo critico',
+  'hudChrome.mounts.name_valorsteed': 'Destriero del Valore',
+  'hudChrome.mounts.name_grag_bear': 'Orso Grag Golia',
+  'hudChrome.mounts.name_stalkglider_snail': 'Aliante dal Guscio Muschioso',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aerociclo del Giostratore d’Etere',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, il Rospo Saltombra',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Piumatempesta Toccacielo',
+  'hudChrome.mounts.name_lunar_cheshire': 'Cheshire Lunare',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
+  'hudChrome.mounts.desc_lunar_cheshire':
+    'Un felino lunatico che scivola tra le ombre con un sorriso indelebile.',
 };

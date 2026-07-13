@@ -63,6 +63,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
+import { type MountKey, normalizeMountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import {
   classHasSkin,
@@ -192,6 +193,7 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import { selectMount as selectMountImpl, toggleMount as toggleMountImpl } from './mounts';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -801,6 +803,10 @@ export interface PlayerMeta {
   pendingSkinRank: SkinRank | null;
   pendingSkinCatalog: SkinCatalog | null;
   pendingSkinItemId: string | null;
+  // Rideable ground mount pick ('' = none chosen yet). Persisted; the live
+  // "riding right now" state is Entity.mountKey, which starts '' on login and
+  // clears on death. Rules live in src/sim/mounts.ts.
+  selectedMount: MountKey | '';
   moveInput: MoveInput;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
@@ -1115,6 +1121,9 @@ export interface CharacterState {
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
   pendingSkinItemId?: string | null;
+  // Rideable mount pick (JSONB; optional AND absent until first picked, so
+  // pre-mount saves stay byte-equal and load unmounted).
+  selectedMount?: string;
   delveMarks?: number;
   delveClears?: Record<string, number>;
   companionUpgrades?: Record<string, number>;
@@ -1739,6 +1748,7 @@ export class Sim {
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
+      selectedMount: normalizeMountKey(savedState?.selectedMount),
       moveInput: emptyMoveInput(),
       wireRev: 0,
       inventory: [],
@@ -2277,6 +2287,8 @@ export class Sim {
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
+      // Absent until a mount is picked (back-compat + parity-stable saves).
+      ...(meta.selectedMount ? { selectedMount: meta.selectedMount } : {}),
       craftSkills: { ...meta.craftSkills },
       knownRecipes: [...meta.knownRecipes],
       archetype: { ...meta.archetype },
@@ -2315,6 +2327,26 @@ export class Sim {
 
   changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     this.setPlayerSkin(this.primaryId, skin, catalog);
+  }
+
+  /** Per-pid mount selection + toggle (the server command path); the IWorld
+   *  members below ride primaryId. Rules live in src/sim/mounts.ts. */
+  selectMountFor(pid: number, key: string): boolean {
+    return selectMountImpl(this.ctx, pid, key);
+  }
+  toggleMountFor(pid: number): boolean {
+    return toggleMountImpl(this.ctx, pid);
+  }
+
+  // --- IWorldMounts ---
+  selectedMount(): MountKey | '' {
+    return this.players.get(this.primaryId)?.selectedMount ?? '';
+  }
+  selectMount(key: MountKey): void {
+    this.selectMountFor(this.primaryId, key);
+  }
+  toggleMounted(): void {
+    this.toggleMountFor(this.primaryId);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and

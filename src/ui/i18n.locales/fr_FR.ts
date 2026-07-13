@@ -6793,4 +6793,45 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Vous devez être dans un groupe pour lancer une vérification de disponibilité.',
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Monter / Descendre',
+  'hudChrome.mobile.mounts': 'Montures',
+  'hudChrome.mounts.title': 'Montures',
+  'hudChrome.mounts.close': 'Fermer',
+  'hudChrome.mounts.select': 'Choisir',
+  'hudChrome.mounts.selected': 'Choisie',
+  'hudChrome.mounts.riding': 'En selle',
+  'hudChrome.mounts.mount': 'Monter',
+  'hudChrome.mounts.dismount': 'Descendre',
+  'hudChrome.mounts.requiresLevel': 'Niveau {level} requis',
+  'hudChrome.mounts.pickFirst': 'Choisissez une monture à chevaucher.',
+  'hudChrome.mounts.keybindHint':
+    'Appuyez sur la touche Monter / Descendre (Z par défaut) pour chevaucher.',
+  'hudChrome.mounts.rarity_common': 'Commune',
+  'hudChrome.mounts.rarity_rare': 'Rare',
+  'hudChrome.mounts.rarity_epic': 'Épique',
+  'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
+  'hudChrome.mounts.spec_block': '+{pct}% de blocage des dégâts de mêlée',
+  'hudChrome.mounts.spec_crit': '+{pct}% de chances de coup critique',
+  'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
+  'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',
+  'hudChrome.mounts.name_stalkglider_snail': 'Glisseur à Coquille Moussue',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aérocycle du Jouteur d’Éther',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
+  'hudChrome.mounts.name_lunar_cheshire': 'Cheshire Lunaire',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un ours robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
+  'hudChrome.mounts.desc_lunar_cheshire':
+    'Un félin lunaire qui se faufile entre les ombres avec un sourire immuable.',
 };

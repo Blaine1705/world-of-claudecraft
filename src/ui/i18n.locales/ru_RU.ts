@@ -6648,4 +6648,45 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  'hudChrome.mobile.mounts': 'Транспорт',
+  'hudChrome.mounts.title': 'Транспорт',
+  'hudChrome.mounts.close': 'Закрыть',
+  'hudChrome.mounts.select': 'Выбрать',
+  'hudChrome.mounts.selected': 'Выбран',
+  'hudChrome.mounts.riding': 'Верхом',
+  'hudChrome.mounts.mount': 'Сесть',
+  'hudChrome.mounts.dismount': 'Спешиться',
+  'hudChrome.mounts.requiresLevel': 'Требуется {level} уровень',
+  'hudChrome.mounts.pickFirst': 'Выберите транспорт для езды.',
+  'hudChrome.mounts.keybindHint':
+    'Нажмите клавишу «Сесть / Спешиться» (по умолчанию Z), чтобы поехать.',
+  'hudChrome.mounts.rarity_common': 'Обычный',
+  'hudChrome.mounts.rarity_rare': 'Редкий',
+  'hudChrome.mounts.rarity_epic': 'Эпический',
+  'hudChrome.mounts.spec_speed': '+{pct}% к скорости передвижения',
+  'hudChrome.mounts.spec_block': '+{pct}% блока урона в ближнем бою',
+  'hudChrome.mounts.spec_crit': '+{pct}% к шансу критического удара',
+  'hudChrome.mounts.name_valorsteed': 'Доблестный скакун',
+  'hudChrome.mounts.name_grag_bear': 'Голиаф Граг-медведь',
+  'hudChrome.mounts.name_stalkglider_snail': 'Мохопанцирный скользень',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
+  'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
+  'hudChrome.mounts.name_lunar_cheshire': 'Лунный Чешир',
+  'hudChrome.mounts.desc_valorsteed':
+    'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Стойкая неторопливая улитка, повышающая скорость передвижения.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Мощный магитех-байк для быстрых боевых рейдов на бреющем ходу.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
+  'hudChrome.mounts.desc_lunar_cheshire':
+    'Лунный кот, скользящий между тенями с неизменной ухмылкой.',
 };

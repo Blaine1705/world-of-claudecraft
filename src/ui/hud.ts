@@ -309,6 +309,7 @@ import {
   sourceSlotForMobileButton,
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
+import { MountsWindow } from './mounts_window';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -2242,6 +2243,9 @@ export class Hud {
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
         break;
+      case 'mounts-window':
+        this.mountsWindow.close();
+        break;
       case 'emote-editor':
         this.closeEmoteEditor();
         break;
@@ -3841,6 +3845,15 @@ export class Hud {
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
+  // Mounts window (mounts_view.ts core + mounts_window.ts painter): pick the
+  // stable ground mount and mount/dismount (the Z keybind's window half).
+  private readonly mountsWindow = new MountsWindow({
+    root: () => $('#mounts-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#mounts-window'),
+    ...this.windowFocus('#mounts-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -13040,6 +13053,10 @@ export class Hud {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.toggle();
     this.refreshDailyRewardsLauncher(true);
+  }
+
+  toggleMounts(): void {
+    this.mountsWindow.toggle();
   }
 
   // -------------------------------------------------------------------------

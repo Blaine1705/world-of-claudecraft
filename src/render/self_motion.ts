@@ -263,6 +263,9 @@ export class SelfMotionPredictor {
     actor.sitting = self.sitting;
     actor.castingAbility = self.castingAbility;
     actor.maxHp = self.maxHp;
+    // Mount speed reads the entity mirror (player_motion.moveSpeedMult), so a
+    // mid-session mount/dismount must reach the scratch actor the same frame.
+    actor.mountKey = self.mountKey;
 
     // Fixed-step advance with the held intent. Turn flags are stripped: the
     // heading is assigned from the one display source each step, and letting

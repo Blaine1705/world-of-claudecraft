@@ -27,6 +27,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
+import { mountMeleeBlockPct } from '../content/mounts';
 import { CLASSES, isArenaPos, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
@@ -302,6 +303,11 @@ export function meleeSwing(
   const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
   if (crit) dmg *= 2;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
+  // Mounted melee block (rare+ mounts, src/sim/content/mounts.ts): a flat
+  // fraction shaved off melee swings only, applied with the other upstream
+  // mitigation so dealDamage's amp/absorb math sees the reduced amount. Draws
+  // no rng, so the swing's draw order is unchanged for unmounted targets.
+  dmg *= 1 - mountMeleeBlockPct(target.mountKey);
   ctx.dealDamage(
     attacker,
     target,

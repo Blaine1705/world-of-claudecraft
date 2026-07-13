@@ -6764,4 +6764,45 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen.',
   'loading.tips.talents':
     'Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Aufsitzen / Absitzen',
+  'hudChrome.mobile.mounts': 'Reittiere',
+  'hudChrome.mounts.title': 'Reittiere',
+  'hudChrome.mounts.close': 'Schließen',
+  'hudChrome.mounts.select': 'Auswählen',
+  'hudChrome.mounts.selected': 'Ausgewählt',
+  'hudChrome.mounts.riding': 'Im Sattel',
+  'hudChrome.mounts.mount': 'Aufsitzen',
+  'hudChrome.mounts.dismount': 'Absitzen',
+  'hudChrome.mounts.requiresLevel': 'Benötigt Stufe {level}',
+  'hudChrome.mounts.pickFirst': 'Wählt ein Reittier zum Reiten.',
+  'hudChrome.mounts.keybindHint':
+    'Drückt die Aufsitzen-/Absitzen-Taste (Standard Z), um zu reiten.',
+  'hudChrome.mounts.rarity_common': 'Verbreitet',
+  'hudChrome.mounts.rarity_rare': 'Selten',
+  'hudChrome.mounts.rarity_epic': 'Episch',
+  'hudChrome.mounts.spec_speed': '+{pct}% zusätzliche Mobilität',
+  'hudChrome.mounts.spec_block': '+{pct}% Nahkampfschadensblock',
+  'hudChrome.mounts.spec_crit': '+{pct}% kritische Trefferchance',
+  'hudChrome.mounts.name_valorsteed': 'Valorross',
+  'hudChrome.mounts.name_grag_bear': 'Goliath-Gragbär',
+  'hudChrome.mounts.name_stalkglider_snail': 'Moosschalen-Stielgleiter',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Ätherlanzen-Schwebrad',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage die Schattensprungkröte',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Himmelsgreif Sturmfeder',
+  'hudChrome.mounts.name_lunar_cheshire': 'Mond-Grinsekatze',
+  'hudChrome.mounts.desc_valorsteed':
+    'Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
+  'hudChrome.mounts.desc_lunar_cheshire':
+    'Eine mondsüchtige Katze, die mit unvergänglichem Grinsen durch die Schatten streift.',
 };

@@ -396,6 +396,28 @@ export function mechAssetsReady(): boolean {
   );
 }
 
+// Lazy fetch for rideable mount GLBs (the mech pattern, per visual key): a
+// mount loads on the first sight of a rider, so seven mount models never
+// weigh on every client's boot. Memoized per key; mounts have no skin or
+// emissive atlases, so the GLB is the whole job.
+const mountAssetPromises = new Map<string, Promise<void>>();
+export function preloadMountAssets(visualKey: string): Promise<void> {
+  const existing = mountAssetPromises.get(visualKey);
+  if (existing) return existing;
+  const def = VISUALS[visualKey];
+  if (!def) return Promise.resolve();
+  const job = loadGltf(def.url).then((g) => {
+    gltfByUrl.set(def.url, g);
+  });
+  mountAssetPromises.set(visualKey, job);
+  return job;
+}
+
+export function mountAssetsReady(visualKey: string): boolean {
+  const def = VISUALS[visualKey];
+  return !!def && gltfByUrl.has(assetUrl(def.url));
+}
+
 function resolvedGltf(url: string): GLTF {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);

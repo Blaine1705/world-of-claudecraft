@@ -157,6 +157,22 @@ const animal = (attack: string[]): ClipMap => ({
   death: 'Death',
 });
 
+// Rideable mounts generated via scripts/asset_pipeline (Tripo creature lane).
+// The retarget presets rename to the game vocabulary; the quadruped preset set
+// is walk-only, so Idle here is the same walk cycle. The renderer freezes
+// frame 0 while the mount stands (CharacterVisual.poseFreeze) instead of
+// letting it walk in place; the clipless prop-lane mounts resolve no actions
+// from this map and rest in their generated standing pose (procedural bob in
+// src/render/mount_visuals.ts). No attack one-shots: the RIDER swings, the
+// mount does not.
+const MOUNT_RIGGED: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Death',
+};
+
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
 // animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
 // jump properly, and a Walk swim base (a paddling gait at the gentle clip
@@ -261,6 +277,7 @@ const PLAYERS = 'models/chars/players';
 const ENEMIES = 'models/chars/enemies';
 const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
+const MOUNTS_DIR = 'models/mounts';
 
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item
  *  has no mapped model (then the class default attach is kept). Mirrors the bag
@@ -543,6 +560,56 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/chicken_cow.glb`,
     height: 2.3,
     clips: CHICKEN_COW,
+  },
+
+  // -- rideable mounts (src/sim/content/mounts.ts catalog) -------------------
+  // All lazyPreload: fetched on the first sight of a mounted player
+  // (preloadMountAssets in assets.ts), never in the boot sweep. Baked Tripo
+  // textures, no tint. Seat heights + procedural bob live in
+  // src/render/mount_visuals.ts; heights here follow the wolf(1.6)/boar(1.45)
+  // creature scale against the 2.6 humanoid.
+  mount_valorsteed: {
+    url: `${MOUNTS_DIR}/valorsteed.glb`,
+    height: 1.9,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_grag_bear: {
+    url: `${MOUNTS_DIR}/grag_bear.glb`,
+    height: 2.0,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_stalkglider_snail: {
+    url: `${MOUNTS_DIR}/stalkglider_snail.glb`,
+    height: 1.55,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_aether_hover_cycle: {
+    url: `${MOUNTS_DIR}/aether_hover_cycle.glb`,
+    height: 1.15,
+    clips: MOUNT_RIGGED,
+    hover: 0.3,
+    lazyPreload: true,
+  },
+  mount_shadowjump_toad: {
+    url: `${MOUNTS_DIR}/shadowjump_toad.glb`,
+    height: 1.6,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_stormfeather_griffin: {
+    url: `${MOUNTS_DIR}/stormfeather_griffin.glb`,
+    height: 2.05,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  mount_lunar_cheshire: {
+    url: `${MOUNTS_DIR}/lunar_cheshire.glb`,
+    height: 1.75,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
   },
 
   // -- mob families --------------------------------------------------------

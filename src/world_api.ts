@@ -42,6 +42,7 @@
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
+//   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -68,6 +69,7 @@ import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
+import type { IWorldMounts } from './world_api/mounts';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
@@ -180,7 +182,8 @@ export interface IWorld
     IWorldTelemetry,
     IWorldProfessions,
     IWorldBank,
-    IWorldValeCup {}
+    IWorldValeCup,
+    IWorldMounts {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -342,6 +345,8 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'mount_select',
+  'mount_toggle',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -407,7 +412,8 @@ export type WorldFacet =
   | 'IWorldDailyRewards'
   | 'IWorldTelemetry'
   | 'IWorldBank'
-  | 'IWorldValeCup';
+  | 'IWorldValeCup'
+  | 'IWorldMounts';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -560,4 +566,8 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
+  // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
+  // selectedMount is a self-snapshot read (terse `mnt`, no send, untagged).
+  mount_select: 'IWorldMounts',
+  mount_toggle: 'IWorldMounts',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;
