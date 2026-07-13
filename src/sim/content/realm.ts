@@ -1091,5 +1091,10 @@ export const REALM_PROPS: ZonePropsDef = {
     { key: 'crystalAmethystCluster', x: 97, z: 1145, rot: 2.3, r: 1.6, h: 4, scale: 0.65 },
     { key: 'crystalAmethystCluster', x: 88, z: 1183, rot: -1.1, r: 2.9, h: 7.5, scale: 1.25 },
     { key: 'crystalAmethystCluster', x: 52, z: 1166, rot: 3.0, r: 1.2, h: 3, scale: 0.5 },
+    // -- Starfall Basin: the Star's Cradle on the southern rim (the fallen
+    //    star's open face turned toward the road approach) and the stags'
+    //    antler shrine on the meadow where the herd grazes --
+    { key: 'starHeartCrystal', x: 110, z: 962, rot: -1.6, r: 4.2, h: 5.5 },
+    { key: 'stagShrine', x: 86, z: 948, rot: 0.4, r: 1.5, h: 3.2 },
   ],
 };
