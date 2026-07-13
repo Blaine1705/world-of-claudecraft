@@ -2300,6 +2300,23 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     const t = smoothstep(11, 26, dMesaS);
     h = h * t + 30 * (1 - t);
   }
+  // the Star's Cradle: a level plateau at Starfall Basin's heart (flattened
+  // after the shaping bump so the shrine floor is true), plus a flat
+  // causeway strip west to the shore so the moat frames it as a C
+  const dCradle = Math.hypot(x - 110, z - 985);
+  if (dCradle < 13) {
+    const t = smoothstep(8.5, 13, dCradle);
+    h = h * t + -1.0 * (1 - t);
+  }
+  if (z > 979 && z < 991 && x > 86 && x < 111) {
+    const segT = Math.max(0, Math.min(1, (x - 88) / (110 - 88)));
+    const segZ = 982 + (985 - 982) * segT;
+    const dCause = Math.abs(z - segZ);
+    if (dCause < 4.5) {
+      const t = smoothstep(2.2, 4.5, dCause);
+      h = h * t + -1.2 * (1 - t);
+    }
+  }
   // Beyond a row's own columns the world is open water: past the rim range
   // the ground dives to the sea floor, so rows without an east or west
   // column read as coast, not as an endless mountain shelf. Two gates keep

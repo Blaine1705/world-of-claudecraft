@@ -83,7 +83,9 @@ export const REALM_ROADS: { x: number; z: number }[][] = [
     { x: -30, z: 1010 },
     { x: 15, z: 982 },
     { x: 70, z: 975 },
-  ], // Eldergleam -> Starfall Basin shore
+    { x: 88, z: 982 },
+    { x: 100, z: 984 },
+  ], // Eldergleam -> Starfall Basin shore -> the Star's Cradle causeway
   [
     { x: -62, z: 1155 },
     { x: -10, z: 1172 },
@@ -1062,9 +1064,6 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: 112, z: 1098, ringR: 5, columns: 4 },
     // the Duskfall Overlook: a broken vantage ring at the first viewpoint
     { x: -118, z: 988, ringR: 4, columns: 3 },
-    // the Star's Cradle: an ancient shrine ring built around the fallen star
-    // on its islet at the heart of Starfall Basin
-    { x: 110, z: 985, ringR: 6.2, columns: 6 },
     // a lone forgotten monument in the far northeast (no POI: a secret)
     { x: 160, z: 1230, ringR: 4, columns: 3 },
   ],
@@ -1098,6 +1097,29 @@ export const REALM_PROPS: ZonePropsDef = {
     //    star's open face turned toward the road approach) and the stags'
     //    antler shrine on the meadow where the herd grazes --
     { key: 'starHeartCrystal', x: 110, z: 985, rot: -1.6, r: 4.2, h: 5.5 },
+    // the C-shaped shrine wall (KayKit dungeon stone), gap west at the causeway
+    { key: 'kkWall', x: 102.7, z: 988.3, rot: 0.42, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 103.9, z: 990.1, rot: 0.69, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 105.5, z: 991.6, rot: 0.97, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 107.4, z: 992.6, rot: 1.25, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 109.6, z: 993.0, rot: 1.52, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 111.8, z: 992.8, rot: 1.79, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 113.8, z: 992.0, rot: 2.07, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 115.6, z: 990.7, rot: 2.35, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 116.9, z: 989.0, rot: 2.62, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 117.8, z: 987.0, rot: 2.9, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 118.0, z: 984.8, rot: 3.17, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 117.6, z: 982.6, rot: 3.44, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 116.7, z: 980.6, rot: 3.72, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 115.3, z: 979.0, rot: 3.99, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 113.4, z: 977.8, rot: 4.27, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 111.3, z: 977.1, rot: 4.54, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 109.1, z: 977.0, rot: 4.82, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 107.0, z: 977.6, rot: 5.09, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWall', x: 105.1, z: 978.7, rot: 5.37, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkWallCracked', x: 103.6, z: 980.2, rot: 5.64, r: 1.1, h: 2.4, scale: 0.55 },
+    { key: 'kkPillar', x: 102.5, z: 987.8, rot: 0.36, r: 0.7, h: 3, scale: 0.6 },
+    { key: 'kkPillar', x: 102.5, z: 982.2, rot: 5.92, r: 0.7, h: 3, scale: 0.6 },
     { key: 'stagShrine', x: 86, z: 948, rot: 0.4, r: 1.5, h: 3.2 },
   ],
 };
