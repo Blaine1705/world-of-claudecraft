@@ -61,8 +61,14 @@ who leave*, and the world is what remains of them.)
    from that night on, the dead *linger*. Necromancy became possible. Every
    restless corpse in the game is downstream of this one event.
 4. **The Long Waking** (now, ~1,200 years later). The Dreamer is not dead —
-   she sleeps where she fell, and the world still creeps northward as she
-   dreams on, wounded and slow. But she has begun to *stir*. Rifts tear open
+   she sleeps where she fell, and the world still grows at its rim as she
+   dreams on, wounded and slow. At every horizon stands **the Hem** — the
+   standing sea-mist where the weave runs out. No ship has ever sailed
+   through it; when the Dreamer's dream advances, the Hem recedes somewhere
+   and finished land surfaces where it stood. For most of the Long Waking it
+   receded northward. Lately — and the Vigil's oldest keepers find this
+   either hopeful or terrifying — it has begun thinning to the **east and
+   west** instead: the dream has changed direction. But she has begun to *stir*. Rifts tear open
    where her raw dream leaks through. The dead are no longer merely restless
    but gathering. The Gardener, who spent twelve centuries triaging the broken
    world, walked north past her own garden about a hundred years ago and has
@@ -459,9 +465,13 @@ Shear's cliffs face the Farshore's torn sky across the water.
 - **Rifts:** unfinished rooms of the Sleeping World pressing through the torn
   sky. Procedural = the dream never repeats. First-clear races = the leak
   seals when someone finishes the dream properly.
-- **World growth northward:** the Dreamer dreams on, slow and wounded. New
-  realms surfacing at the northern edge is *canon*, not retcon — the world is
-  literally unfinished, and every new zone shipped is her dream advancing.
+- **World growth at the rim:** the Dreamer dreams on, slow and wounded. New
+  realms surfacing wherever the Hem recedes is *canon*, not retcon — the
+  world is literally unfinished, and every new zone shipped is her dream
+  advancing. The long northward run is history; the Hem is thinning east and
+  west now, so new maps landing on either flank need no explanation at all.
+  (The Galecrest, the world's first east-column realm, is remembered as the
+  first sign the dream had turned.)
 
 ## 6. Inspiration ledger
 
@@ -521,9 +531,34 @@ dreaming the world northward, so every realm we ship is simply land that has
 already wired into the existing threads, ready to pull from whenever a new
 map is needed. None of them is dated or promised; they are seeds, not specs.
 
+## 8.0 The two new edges
+
+The Hem is thinning east and west, and the two flanks surface with different
+tempers — use these as the flavor baseline for whichever side a new map
+lands on:
+
+- **East — the Morrowlands** (toward the dawn). The Loom rose in the east,
+  so the eastern weave is the *freshest* dream: brighter, stranger, less
+  settled — coasts, archipelagos, glass, and morning light. Eastern realms
+  skew wondrous-with-teeth. The Galecrest and the Farshore are the existing
+  eastern column; new east maps extend their line. (Zelda's wonder, early
+  Elden Ring's golden strangeness.)
+- **West — the Evenlands** (toward the dusk). The sun goes west, and the old
+  funeral rites followed it — west was the direction of the honored dead
+  even before the Night of Glass. The western weave is *older* dream,
+  surfacing out of order: grey light, long shadows, memory standing around
+  in fields. Western realms skew elegiac and haunted. (Dark Souls' fading
+  kingdoms, the Wraithwood's register.)
+
+Rule of thumb: the east asks "what is this new thing?", the west asks "whose
+was this?" — and the north road stays what it always was: the Gardener's
+trail toward the Dreamer and the Other.
+
 ## 8.1 Realm concepts, ready to grow
 
-### The Thornway — *the Gardener's Trail* (temperate bramble-wilds)
+Each concept below carries a suggested compass fit, but none is locked to it.
+
+### The Thornway — *the Gardener's Trail* (temperate bramble-wilds · north)
 The land beyond the Great Maze, reachable only by solving it. A hundred years
 of the Gardener's footprints: hedgerows grown over her campsites, a rose
 blooming in the dead of winter wherever she slept, and her pruning-hook left
@@ -532,7 +567,7 @@ trail gets *younger* as you go north — as if she is still just ahead.
 **Pulls threads:** Evergarden (the Maze), Veiled Hollow (Eldergleam feels her
 pass), the Other (what she walked north to face).
 
-### The Tidecourt — *the Drowned Capital* (shallow-sea ruin realm)
+### The Tidecourt — *the Drowned Capital* (shallow-sea ruin realm · west)
 The Gleaming Court's capital, drowned intact on the Night of Glass, its
 towers now a reef between low tide and memory. Streets walkable at ebb,
 swimmable at flood; the Great Mirrors still stand in the throne-plaza,
@@ -542,8 +577,8 @@ who track mud on the mosaics. Somewhere below sits the Mirror That Pulled,
 cracked from rim to rim. **Pulls threads:** the Night of Glass origin site;
 the Huntsman's people; the true names of the Three, spoken nowhere else.
 
-### The Cindershelf — *the Smith's Workshop* (basalt flows and dead forges)
-Between the Drakelands and the world's edge: the Smith's proving-grounds,
+### The Cindershelf — *the Smith's Workshop* (basalt flows and dead forges · west)
+Between the Drakelands and the western Hem: the Smith's proving-grounds,
 littered with his rejected drafts — half-made mountains, a river he never
 lit, anvils the size of villages. The trolls make pilgrimage here to argue
 with their maker's leavings. The wrongness: one forge, deepest in, is still
@@ -551,8 +586,8 @@ warm and *tidy*, its tools recently cleaned — but the Smith lies as Thornpeak,
 so who keeps the shop? **Pulls threads:** trolls (Mirefen, Trollmoot),
 Drakemaw and Firemount (the forge lineage), Thunzharr (splinters of wrath).
 
-### The Hushwold — *where the wind stops* (still, snowless white forest)
-Far northeast, past the Galecrest's gale: a realm of total calm — the one
+### The Hushwold — *where the wind stops* (still, snowless white forest · east)
+East past the Galecrest's gale: a realm of total calm — the one
 place the world's escaping breath does not reach, because something on the
 other side of the wound is *inhaling*. Sound behaves wrongly; bells ring a
 day late. The Other's front porch, and the Gardener's last confirmed
@@ -560,8 +595,10 @@ sighting. Frostveil's wall wardens speak of it only as "the quiet."
 **Pulls threads:** the Other (idols, the awake cold), the Galecrest (wind
 lore inverted), the Gardener's trail terminus candidate.
 
-### The Sleepless Road — *the old way of the dead* (grey twilight marchland)
-Before the Night of Glass, the dead walked a road into the Dreamer's keeping.
+### The Sleepless Road — *the old way of the dead* (grey twilight marchland · west)
+Before the Night of Glass, the dead walked a road into the Dreamer's keeping,
+and the road ran west, after the sun — which is why the west was the
+direction of funerals long before anyone remembered why.
 The road is still there — a grey causeway across a colorless heath — but it
 now ends at a broken gate, and twelve centuries of arrivals wait in queue,
 patient as weather. The Wraithwood's lost souls drift here eventually; the
@@ -570,8 +607,8 @@ through the gate. A realm about grief with almost no combat pressure — the
 Willowfen's dark mirror. **Pulls threads:** the whole death cosmology;
 Wraithwood; the Gravecallers (who would pay anything to hold the gate).
 
-### The Glasswold — *where a shard fell on sand* (crystal desert)
-A southern-sea desert isle where a Loom-shard struck dunes: the impact fused
+### The Glasswold — *where a shard fell on sand* (crystal desert · east)
+An eastern-sea desert isle where a Loom-shard struck dunes: the impact fused
 a hundred miles of sand into a rolling country of smoked glass. By day it is
 blinding; by night the buried shard-light rises through the glass like a slow
 dawn underfoot. Court prospectors mined it once — their cutting-camps and
@@ -580,7 +617,7 @@ well: you see what you looked for, plus one thing you did not.
 **Pulls threads:** shard-sites (Starfall Basin, Glimmermere), Court
 mirror-craft, a shard the Gravecallers could actually reach.
 
-### The Wavebreak Isles — *the scattered fleet* (storm archipelago)
+### The Wavebreak Isles — *the scattered fleet* (storm archipelago · east)
 The Court's navy put to sea on the Night of Glass and was thrown across a
 hundred islands, each now home to descendants of one ship: an archipelago of
 tiny cultures, one per crew, some noble, some gone strange (the Odyssey as a
@@ -589,7 +626,7 @@ with faces that locals swear change expression before storms.
 **Pulls threads:** the Court diaspora, Galecrest's Wreckfields, Palmreach
 sea-glass; a natural sailing/naval-content realm.
 
-### The Halfdream — *the Sleeping World itself* (endgame sky realm)
+### The Halfdream — *the Sleeping World itself* (endgame sky realm · above)
 The far end of the story: setting foot inside the Dreamer's unfinished second
 world, via the Nightbloom or a stabilized Rift. Geography obeys dream-rules —
 districts unfinished mid-thought, a horizon with visible weave, rooms the
