@@ -937,89 +937,9 @@ export function buildRealmFlora(seed: number): RealmFloraView {
   // basin. A scrolling canvas-streak sheet reads as falling water in the
   // game's low-poly style; two foam discs churn at the base; a translucent
   // pool caps the terrace behind the lip. All render-only.
-  let fallsMap: THREE.CanvasTexture | null = null;
-  const foamDiscs: THREE.Mesh[] = [];
-  {
-    const lip = HOLLOW_FALLS.lip;
-    const t = HOLLOW_FALLS.terrace;
-    const dirX = (110 - t.x) / 29.2,
-      dirZ = (985 - t.z) / 29.2; // toward the lake
-    const topX = lip.x - dirX * 3,
-      topZ = lip.z - dirZ * 3;
-    const baseX = lip.x + dirX * 4,
-      baseZ = lip.z + dirZ * 4;
-    const topY = terrainHeight(topX, topZ, seed);
-    const baseY = Math.max(WATER_LEVEL - 0.5, terrainHeight(baseX, baseZ, seed));
-    const drop = Math.max(4, topY - baseY);
-    if (typeof document !== 'undefined') {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, 64, 128);
-        for (let i = 0; i < 26; i++) {
-          const sx = hash2(i, 3, seed) * 64;
-          const len = 24 + hash2(i, 7, seed) * 70;
-          const sy = hash2(i, 11, seed) * 128;
-          ctx.fillStyle = `rgba(255,255,255,${0.25 + hash2(i, 13, seed) * 0.45})`;
-          ctx.fillRect(sx, sy, 1.6 + hash2(i, 17, seed) * 2.2, len);
-        }
-        fallsMap = new THREE.CanvasTexture(canvas);
-        fallsMap.wrapS = THREE.RepeatWrapping;
-        fallsMap.wrapT = THREE.RepeatWrapping;
-        const sheet = new THREE.Mesh(
-          new THREE.PlaneGeometry(6.5, drop + 1.5, 1, 4),
-          new THREE.MeshBasicMaterial({
-            map: fallsMap,
-            transparent: true,
-            opacity: 0.85,
-            color: 0xcfe4f2,
-            side: THREE.DoubleSide,
-            depthWrite: false,
-          }),
-        );
-        sheet.position.set(lip.x, (topY + baseY) / 2 + 0.4, lip.z);
-        sheet.rotation.y = Math.atan2(dirX, dirZ);
-        sheet.rotation.x = -0.08; // lean back into the cliff
-        group.add(sheet);
-        const foamMat = new THREE.MeshBasicMaterial({
-          color: 0xeaf4fa,
-          transparent: true,
-          opacity: 0.4,
-          depthWrite: false,
-        });
-        for (const [fs, fx, fz] of [
-          [2.6, baseX, baseZ],
-          [1.7, baseX + dirZ * 1.6, baseZ - dirX * 1.6],
-        ] as const) {
-          const foam = new THREE.Mesh(new THREE.CircleGeometry(fs, 10), foamMat);
-          foam.rotation.x = -Math.PI / 2;
-          foam.position.set(fx, WATER_LEVEL + 0.12, fz);
-          foamDiscs.push(foam);
-          group.add(foam);
-        }
-        // the terrace pool feeding the lip
-        const pool = new THREE.Mesh(
-          new THREE.CircleGeometry(5.5, 14),
-          new THREE.MeshBasicMaterial({
-            color: 0x9fc8e0,
-            transparent: true,
-            opacity: 0.55,
-            depthWrite: false,
-          }),
-        );
-        pool.rotation.x = -Math.PI / 2;
-        pool.position.set(topX - dirX * 4, topY + 0.15, topZ - dirZ * 4);
-        group.add(pool);
-        const fallsLight = new THREE.PointLight(0xbfe0f2, 5, 13, 2);
-        fallsLight.position.set(lip.x, baseY + 2.5, lip.z);
-        fallsLight.userData.baseIntensity = 5;
-        glowLights.push(fallsLight);
-        group.add(fallsLight);
-      }
-    }
-  }
+  // (the waterfall visual is retired: the flat streak sheet read as glitch
+  // bars under the dusk grade and poured straight at the new shrine; a real
+  // animated falls can return as a water.ts feature)
 
   // The ocean's atmosphere: low mist banks over the far water, soft light
   // rays leaning from the sky, and a distant flock tracing slow circles.
@@ -1182,14 +1102,6 @@ export function buildRealmFlora(seed: number): RealmFloraView {
       // one gentle shared breath across the glowing materials
       const breathe = 1 + Math.sin(time * 0.9) * 0.16;
       for (const entry of pulsing) entry.mat.emissiveIntensity = entry.base * breathe;
-      // the falls pour and the foam churns
-      if (fallsMap) fallsMap.offset.y = -((time * 0.55) % 1);
-      for (let i = 0; i < foamDiscs.length; i++) {
-        const foam = foamDiscs[i];
-        foam.rotation.z = time * (i === 0 ? 0.35 : -0.5);
-        const churn = 1 + Math.sin(time * 2.1 + i * 1.9) * 0.08;
-        foam.scale.setScalar(churn);
-      }
       // the surf rings around stacks and shore rocks swell and relax
       for (const f of seaFoam) {
         f.mesh.scale.setScalar(1 + Math.sin(time * 1.4 + f.phase) * 0.12);
