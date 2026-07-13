@@ -61,18 +61,21 @@ describe('procedural bob math', () => {
     expect(at(3 * quarter)).toBeCloseTo(-spec.bobAmp, 5);
   });
 
-  it('the griffin hops only while moving and never dips below ground', () => {
+  it('the griffin is gait-rigged (its clips carry the motion, no bob)', () => {
     const spec = MOUNT_VISUAL_SPECS.stormfeather_griffin;
-    expect(mountBobY(spec, 0.7, false)).toBe(0);
-    for (let t = 0; t < 2; t += 0.05) {
-      const y = mountBobY(spec, t, true);
-      expect(y).toBeGreaterThanOrEqual(0);
-      expect(y).toBeLessThanOrEqual(spec.bobAmp);
-    }
+    expect(spec.rigged).toBe(true);
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
   });
 
   it('the snail glides flat (no bob at all)', () => {
     const spec = MOUNT_VISUAL_SPECS.stalkglider_snail;
     expect(mountBobY(spec, 0.5, true)).toBe(0);
+  });
+
+  it('pins the ambient particle effects: snail slime, hover-cycle exhaust', () => {
+    expect(MOUNT_VISUAL_SPECS.stalkglider_snail.fx).toBe('slime');
+    expect(MOUNT_VISUAL_SPECS.aether_hover_cycle.fx).toBe('exhaust');
+    expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
   });
 });

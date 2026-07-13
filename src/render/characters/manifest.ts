@@ -611,6 +611,8 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${MOUNTS_DIR}/stormfeather_griffin.glb`,
     height: 4.1,
     clips: MOUNT_RIGGED,
+    walkRef: 2.6,
+    runRef: 9,
     lazyPreload: true,
   },
 

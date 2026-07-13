@@ -694,6 +694,48 @@ export class Vfx {
     );
   }
 
+  /** Mossy slime path a gliding snail mount leaves while moving: near-still
+   *  ground-level motes that linger, so the ride draws a fading trail. */
+  mountSlimeTrail(at: THREE.Vector3, dt: number): void {
+    if (!this.emitChance(16, dt)) return;
+    this.spawn(
+      at.x + (Math.random() - 0.5) * 0.5,
+      at.y + 0.07,
+      at.z + (Math.random() - 0.5) * 0.5,
+      0,
+      0.02,
+      0,
+      Math.random() < 0.35 ? 0x9fd94f : 0x5da83e,
+      0.55 + Math.random() * 0.35,
+      2.6 + Math.random() * 1.2,
+      0,
+      SPR.glowSoft,
+    );
+  }
+
+  /** Aether exhaust streaming off the back of a hover mount (yaw = facing,
+   *  forward = (sin yaw, cos yaw)): a soft dribble at idle, a stream on the
+   *  move. */
+  mountExhaust(at: THREE.Vector3, yaw: number, dt: number, moving: boolean): void {
+    if (!this.emitChance(moving ? 34 : 12, dt)) return;
+    const bx = -Math.sin(yaw);
+    const bz = -Math.cos(yaw);
+    const speed = moving ? 3.2 : 1.1;
+    this.spawn(
+      at.x + bx * 1.1 + (Math.random() - 0.5) * 0.3,
+      at.y + 0.85 + (Math.random() - 0.5) * 0.25,
+      at.z + bz * 1.1 + (Math.random() - 0.5) * 0.3,
+      bx * speed + (Math.random() - 0.5) * 0.6,
+      0.25 + Math.random() * 0.4,
+      bz * speed + (Math.random() - 0.5) * 0.6,
+      Math.random() < 0.3 ? 0xd98aff : 0x8ed2ff,
+      0.28 + Math.random() * 0.2,
+      0.5 + Math.random() * 0.3,
+      0,
+      SPR.sparkle,
+    );
+  }
+
   campfireEmber(at: THREE.Vector3, dt: number): void {
     if (!this.emitChance(6, dt)) return;
     if (Math.random() < 0.3) {

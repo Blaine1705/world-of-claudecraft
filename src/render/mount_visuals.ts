@@ -28,6 +28,9 @@ export interface MountVisualSpec {
   bobIdle: boolean;
   /** Bob shape: a smooth hover sine, or gallop-style hops (abs sine). */
   bobShape: 'hover' | 'hop';
+  /** Ambient particle effect the renderer emits for this mount: the snail's
+   *  slime path while moving, the hover cycle's aether exhaust. */
+  fx: 'slime' | 'exhaust' | null;
 }
 
 const spec = (
@@ -36,6 +39,7 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
+  fx: 'slime' | 'exhaust' | null = null,
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -45,20 +49,25 @@ const spec = (
   bobHz: bob?.hz ?? 0,
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
+  fx,
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   valorsteed: spec('mount_valorsteed', 2.55, true, undefined, -0.3),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
-  stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3),
-  aether_hover_cycle: spec('mount_aether_hover_cycle', 2.1, false, {
-    amp: 0.14,
-    hz: 1.1,
-    idle: true,
-    shape: 'hover',
-  }),
+  stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
+  aether_hover_cycle: spec(
+    'mount_aether_hover_cycle',
+    2.1,
+    false,
+    { amp: 0.14, hz: 1.1, idle: true, shape: 'hover' },
+    0,
+    'exhaust',
+  ),
   shadowjump_toad: spec('mount_shadowjump_toad', 2.52, true, undefined, -0.5),
-  stormfeather_griffin: spec('mount_stormfeather_griffin', 2.75, false, { amp: 0.18, hz: 2.4 }),
+  // gait-rigged by bake_mount_gaits.mjs (buildPropRig): real Walk/Run clips
+  // replaced the old procedural canter hop
+  stormfeather_griffin: spec('mount_stormfeather_griffin', 2.75, true),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

@@ -4698,11 +4698,18 @@ export class Renderer {
         mst.backwards = st.backwards;
         mst.swimming = st.swimming;
         v.mountVisual.update(dt, mst, animate);
-        // the rider floats/hops WITH the procedural bob (the hover cycle's
-        // idle float, the griffin's canter hops), not just the mount body
+        // the rider floats WITH the procedural bob (the hover cycle's idle
+        // float), not just the mount body
         const bob = mountBobY(mountSpec, this.time, moving);
         v.mountVisual.root.position.y = bob;
         v.visual.root.position.y = v.mountLift + bob;
+        // ambient mount particles: the snail paints its slime path while
+        // gliding, the hover cycle streams aether exhaust off its tail
+        if (mountSpec.fx === 'slime') {
+          if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
+        } else if (mountSpec.fx === 'exhaust') {
+          this.vfx.mountExhaust(v.group.position, facing, dt, moving);
+        }
       }
 
       const emoteId =
