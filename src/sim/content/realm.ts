@@ -1095,7 +1095,7 @@ export const REALM_PROPS: ZonePropsDef = {
     { key: 'crystalAmethystCluster', x: 52, z: 1166, rot: 3.0, r: 1.2, h: 3, scale: 0.5 },
     // the crystal mound: a walk-up cave mouth on the east shore, its mass
     // rising out of the lake water behind it
-    { key: 'crystalMoundCave', x: 100, z: 1163, rot: 1.57, r: 5.2, h: 11 },
+    { key: 'crystalMoundCave', x: 102, z: 1162, rot: -1.57, r: 5.2, h: 11 },
     // size-scatter around the whole lake: from knee-high shards to towers
     { key: 'crystalAmethystCluster', x: 66, z: 1142, rot: 1.2, r: 1.9, h: 4.8, scale: 0.8 },
     { key: 'crystalAmethystCluster', x: 82, z: 1140, rot: -0.6, r: 3.6, h: 9, scale: 1.5 },

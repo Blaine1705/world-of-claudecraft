@@ -249,6 +249,10 @@ const HOLLOW_SHAPING = [
   // the Star's Cradle islet: a dry rise at Starfall Basin's heart, so the
   // fallen star sits ringed by a swimmable moat of lake water
   { x: 110, z: 985, r: 14, h: 8 },
+  // the crystal cove highland: a broad gentle shoulder east of the Shallows
+  // that slopes long and smooth down to the cove, so the crystal mound
+  // reads as breaking out of a cliffside above the water
+  { x: 118, z: 1168, r: 30, h: 6.5 },
   { x: 20, z: 1005, r: 35, h: -2.2 }, // soft meadow bowl south of the town road
   { x: -110, z: 1210, r: 28, h: 6 }, // a crescent knoll sheltering the Deep's north rings
   // the Tablecrag's bulk (its flat crown is leveled after the rims, below)
@@ -2316,6 +2320,13 @@ export function terrainHeight(x: number, z: number, seed: number): number {
       const t = smoothstep(2.2, 4.5, dCause);
       h = h * t + -1.2 * (1 - t);
     }
+  }
+  // the crystal cove plaza: a level shelf at the cove's edge where the
+  // mound's cave mouth opens, blending long into the highland behind it
+  const dCove = Math.hypot(x - 100, z - 1162);
+  if (dCove < 10) {
+    const t = smoothstep(5.5, 10, dCove);
+    h = h * t + -1.4 * (1 - t);
   }
   // Beyond a row's own columns the world is open water: past the rim range
   // the ground dives to the sea floor, so rows without an east or west
