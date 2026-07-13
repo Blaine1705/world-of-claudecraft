@@ -122,6 +122,7 @@ import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
+import { runBackgroundPrewarm } from './prewarm_pass';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
@@ -1913,34 +1914,37 @@ export class Renderer {
       // GROUPS, one idle slot apart, never the whole scene: compileAsync's
       // synchronous prologue walks and re-initializes every material it is
       // handed, and a full-scene walk was a measured multi-hundred-ms stall
-      // per streamed zone. The gating path (behind the loading screen) keeps
-      // render-first, which also covers renderers without
+      // per streamed zone. Live frames keep rendering across that whole
+      // awaited window, so runBackgroundPrewarm keeps both groups invisible
+      // until the synchronous warm pass (a visible group is a grid of T-posed
+      // rigs stacked next to the player). The gating path (behind the loading
+      // screen) keeps render-first, which also covers renderers without
       // KHR_parallel_shader_compile.
-      if (opts?.background && this.asyncCompileSupported) {
-        // One TEMPLATE per idle slot: even compileAsync's synchronous prologue
-        // (shader-string assembly per program) is a measured multi-hundred-ms
-        // stall when handed a whole zone's batch at once.
-        for (const group of [mobGroup, npcGroup]) {
-          for (const child of [...group.children]) {
-            await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
+      if (opts?.background) {
+        await runBackgroundPrewarm([mobGroup, npcGroup], {
+          supportsAsyncCompile: this.asyncCompileSupported,
+          idleSlot: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+          compileChild: async (child) => {
             await Promise.race([
-              this.webgl.compileAsync(child, this.camera, this.scene),
+              this.webgl.compileAsync(child as THREE.Object3D, this.camera, this.scene),
               sleep(PREWARM_COMPILE_MAX_MS),
             ]);
-          }
+          },
+          renderWarmPass: () => {
+            tCompile = performance.now();
+            this.renderPrewarmPass(1 / 60, { offscreen: true });
+          },
+        });
+      } else {
+        tCompile = performance.now();
+        this.renderPrewarmPass(1 / 60);
+        // The gating path compiles after the pass, exactly as before.
+        if (this.asyncCompileSupported) {
+          await Promise.race([
+            this.webgl.compileAsync(this.scene, this.camera),
+            sleep(PREWARM_COMPILE_MAX_MS),
+          ]);
         }
-        await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
-      }
-      tCompile = performance.now();
-      this.renderPrewarmPass(1 / 60);
-      // The background path precompiled both groups above, so the pass ran on
-      // ready programs and there is nothing left to link. The gating path
-      // compiles after the pass, exactly as before.
-      if (!opts?.background && this.asyncCompileSupported) {
-        await Promise.race([
-          this.webgl.compileAsync(this.scene, this.camera),
-          sleep(PREWARM_COMPILE_MAX_MS),
-        ]);
       }
       this.prewarmedZonePrograms.add(zoneId);
     } finally {
@@ -3012,8 +3016,27 @@ export class Renderer {
     return count;
   }
 
-  private renderPrewarmPass(dt: number): void {
+  // A tiny throwaway target for the background warm pass, so the warm frame
+  // (the prewarm grid is visible during that one call) is never presented on
+  // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
+  private prewarmRenderTarget: THREE.WebGLRenderTarget | null = null;
+
+  private renderPrewarmPass(dt: number, opts?: { offscreen?: boolean }): void {
     this.prewarmWorldFrame(dt);
+    // Offscreen only applies on a composer tier: there gameplay's scene pass
+    // renders into the composer's buffer, so its programs are the
+    // render-target variants and an offscreen pass warms the exact same ones
+    // (the post chain itself is already warm from live frames). Without a
+    // composer the live variant is the canvas one, so the pass keeps
+    // rendering to the canvas; at worst that is a single presented frame.
+    if (opts?.offscreen && this.post) {
+      this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+      const previousTarget = this.webgl.getRenderTarget();
+      this.webgl.setRenderTarget(this.prewarmRenderTarget);
+      this.webgl.render(this.scene, this.camera);
+      this.webgl.setRenderTarget(previousTarget);
+      return;
+    }
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
   }

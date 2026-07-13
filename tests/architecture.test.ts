@@ -218,6 +218,7 @@ const RENDER_PURE_CORES = [
   'src/render/day_night_core.ts',
   'src/render/authored_walls_core.ts',
   'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -230,6 +231,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/options_ia.ts',
   'src/ui/options_focus_model.ts',
