@@ -1096,7 +1096,7 @@ export const REALM_PROPS: ZonePropsDef = {
     // -- Starfall Basin: the Star's Cradle on the southern rim (the fallen
     //    star's open face turned toward the road approach) and the stags'
     //    antler shrine on the meadow where the herd grazes --
-    { key: 'starHeartCrystal', x: 110, z: 985, rot: -1.6, r: 4.2, h: 5.5 },
+    { key: 'starHeartCrystal', x: 110, z: 985, rot: -1.6, r: 4.6, h: 5.5 },
     // the C-shaped shrine wall (KayKit dungeon stone), gap west at the causeway
     { key: 'kkWall', x: 103.21, z: 989.23, rot: -1.01, r: 1.1, h: 2.4, scale: 0.55 },
     { key: 'kkWall', x: 104.6, z: 990.9, rot: -0.74, r: 1.1, h: 2.4, scale: 0.55 },
