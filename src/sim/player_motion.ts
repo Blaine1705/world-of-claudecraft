@@ -353,7 +353,22 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
           standZ = slide.z;
         }
       }
-      if (terrainSteepnessAt(standX, standZ, deps.seed) <= MAX_CLIMB_SLOPE) {
+      // Commit the nudge once it clears the climb limit outright, OR once it
+      // strictly reduces steepness versus the current spot. A single tick's
+      // push is not always enough to escape a concave wall pocket (a notch
+      // where two faces meet, e.g. a coastline cliff cove or a ridge/rim
+      // corner); requiring full clearance in one shot silently discards
+      // every partial improvement, so the position never changes and the
+      // player is frozen there forever (this tick's push is recomputed from
+      // the SAME unmoved spot next tick too). Accepting any strict
+      // improvement instead lets each of the sim's 20 ticks/sec inch the
+      // player further from the wall, guaranteeing eventual escape instead
+      // of a permanent wedge.
+      const standSteep = terrainSteepnessAt(standX, standZ, deps.seed);
+      if (
+        standSteep <= MAX_CLIMB_SLOPE ||
+        standSteep <= terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed)
+      ) {
         p.pos.x = standX;
         p.pos.z = standZ;
         p.pos.y = groundHeight(standX, standZ, deps.seed);
