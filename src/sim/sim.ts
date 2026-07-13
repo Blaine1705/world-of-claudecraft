@@ -14,6 +14,7 @@ import * as bagsMod from './bags';
 import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { campSpawnOffset } from './camp_scatter';
 import {
   allocRiftCollisionToken,
   lineOfSightClear,
@@ -1579,17 +1580,20 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
-        const ang = this.rng.range(0, Math.PI * 2);
-        const r = Math.sqrt(this.rng.next()) * camp.radius;
+        // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
+        // spiral) instead of independent uniform sampling, which let mobs stack.
+        // The two draws below feed campSpawnOffset as jitter and are consumed in the
+        // SAME order/count as the old angle/radius rolls, so the global rng stream
+        // position is unchanged: only spawn positions move (see camp_scatter.ts).
+        const jitterAngle = this.rng.range(0, Math.PI * 2);
+        const jitterFrac = this.rng.next();
+        const off = campSpawnOffset(i, camp.count, camp.radius, jitterAngle, jitterFrac);
         // Keep camp mobs out of every dungeon door's clear ring so approaching or
         // zoning out of a dungeon never lands the player in a pack's aggro radius.
         // Pure geometry on the already-rolled point: it draws no rng, so the spawn
         // loop's own draw order is untouched (mob positions do shift, which moves
         // their later idle-wander draws, but that is downstream in the drive phase).
-        const cleared = projectOutsideDungeonDoors(
-          camp.center.x + Math.sin(ang) * r,
-          camp.center.z + Math.cos(ang) * r,
-        );
+        const cleared = projectOutsideDungeonDoors(camp.center.x + off.x, camp.center.z + off.z);
         // findSafePos's inward spiral can walk a shore-side ring-edge point back
         // toward land, i.e. back INTO the ring; re-project the safe point so the
         // "never inside a door ring" guarantee holds for every seed, not just the
