@@ -220,25 +220,6 @@ export function waterNormalish(): THREE.CanvasTexture {
   return tex;
 }
 
-// Soft round cloud sprite. Vary puff count/spread for distinct cloud shapes.
-export function cloudTexture(puffs = 14, spread = 0.5): THREE.CanvasTexture {
-  return makeCanvas(256, (ctx, s) => {
-    ctx.clearRect(0, 0, s, s);
-    for (let i = 0; i < puffs; i++) {
-      const x = s * (0.5 - spread / 2) + rnd() * s * spread;
-      const y = s * 0.35 + rnd() * s * 0.3;
-      const r = s * 0.1 + rnd() * s * 0.14;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, 'rgba(255,255,255,0.55)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  });
-}
-
 // Large-scale smooth value noise: breaks up terrain texture tiling at
 // distance (sampled at ~80u period in the splat shader).
 export function macroNoiseTexture(): THREE.CanvasTexture {
@@ -284,31 +265,126 @@ export function skyTexture(): THREE.CanvasTexture {
   return tex;
 }
 
-export function grassTuftTexture(blades = 18): THREE.CanvasTexture {
+export function grassTuftTexture(blades = 18): THREE.Texture {
+  // Tapered, curved blades on a 128px card (was 64px uniform strokes, which
+  // read as dark spikes in-world). Each blade is a filled path, wide at the
+  // root and sharp at the tip, with a root-to-tip lightening gradient, per
+  // blade hue jitter, and a faint center rib on the broad ones. A short
+  // under-layer fills the base so tufts sit into the ground.
+  const S = 128;
   const c = document.createElement('canvas');
-  c.width = 64;
-  c.height = 64;
+  c.width = S;
+  c.height = S;
   const ctx = c.getContext('2d')!;
-  ctx.clearRect(0, 0, 64, 64);
-  for (let i = 0; i < blades; i++) {
-    const x = 8 + rnd() * 48;
-    const sway = (rnd() - 0.5) * 14;
-    const h = 26 + rnd() * 30;
-    // olive blades, darker at the root — the old neon green detached from the
-    // ground and glowed in shadow/night scenes
-    const g = 95 + Math.floor(rnd() * 55);
-    const grad = ctx.createLinearGradient(x, 64, x + sway, 64 - h);
-    grad.addColorStop(0, `rgba(${34 + rnd() * 18},${g - 38},${30 + rnd() * 14},0.9)`);
-    grad.addColorStop(1, `rgba(${52 + rnd() * 30},${g},${44 + rnd() * 20},0.9)`);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 1.5 + rnd();
+  ctx.clearRect(0, 0, S, S);
+
+  const blade = (x: number, h: number, sway: number, w: number, light: number): void => {
+    const tipX = x + sway;
+    const tipY = S - h;
+    const midX = x + sway * 0.35;
+    const midY = S - h * 0.55;
+    // olive base -> brighter yellow-green tip; light scales the whole blade
+    const g0 = Math.floor((74 + rnd() * 18) * light);
+    const g1 = Math.floor((138 + rnd() * 48) * light);
+    const grad = ctx.createLinearGradient(x, S, tipX, tipY);
+    grad.addColorStop(0, `rgba(${Math.floor(g0 * 0.62)},${g0},${Math.floor(g0 * 0.44)},0.95)`);
+    grad.addColorStop(
+      1,
+      `rgba(${Math.floor(g1 * 0.62 + rnd() * 18)},${g1},${Math.floor(g1 * 0.4)},0.95)`,
+    );
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.moveTo(x, 64);
-    ctx.quadraticCurveTo(x + sway * 0.4, 64 - h * 0.6, x + sway, 64 - h);
-    ctx.stroke();
+    ctx.moveTo(x - w, S);
+    ctx.quadraticCurveTo(midX - w * 0.55, midY, tipX, tipY);
+    ctx.quadraticCurveTo(midX + w * 0.55, midY, x + w, S);
+    ctx.closePath();
+    ctx.fill();
+    // center rib on the broad blades: a hint of structure when lit
+    if (w > 2.4) {
+      ctx.strokeStyle = `rgba(${Math.floor(g1 * 0.72)},${Math.floor(g1 * 1.08)},${Math.floor(
+        g1 * 0.5,
+      )},0.5)`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(x, S);
+      ctx.quadraticCurveTo(midX, midY, tipX, tipY);
+      ctx.stroke();
+    }
+  };
+
+  // under-layer: short filler blades so the tuft base reads dense
+  for (let i = 0; i < Math.floor(blades * 0.7); i++) {
+    blade(
+      10 + rnd() * (S - 20),
+      S * (0.16 + rnd() * 0.16),
+      (rnd() - 0.5) * 16,
+      1.6 + rnd() * 1.6,
+      0.85 + rnd() * 0.18,
+    );
   }
-  const tex = new THREE.CanvasTexture(c);
+  // main blades: tall, curved, individually shaded
+  for (let i = 0; i < blades; i++) {
+    blade(
+      12 + rnd() * (S - 24),
+      S * (0.42 + rnd() * 0.42),
+      (rnd() - 0.5) * 34,
+      2.0 + rnd() * 2.4,
+      0.95 + rnd() * 0.32,
+    );
+  }
+
+  // Mip-darkening fix: transparent canvas texels are black, so distance mips
+  // average every blade toward black (the old "dark spikes" look). Bleed
+  // blade color into the transparent texels (kept invisible by alphaTest),
+  // then upload the raw RGBA via DataTexture so the canvas's premultiplied
+  // backing store cannot zero those RGB values on upload.
+  const img = ctx.getImageData(0, 0, S, S);
+  const d = img.data;
+  for (let pass = 0; pass < 10; pass++) {
+    const src = d.slice();
+    for (let y = 0; y < S; y++) {
+      for (let x = 0; x < S; x++) {
+        const i4 = (y * S + x) * 4;
+        if (src[i4 + 3] !== 0) continue;
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let n = 0;
+        for (const [dx, dy] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || ny < 0 || nx >= S || ny >= S) continue;
+          const j4 = (ny * S + nx) * 4;
+          // a neighbor with color (opaque, or already bled in a prior pass)
+          if (src[j4 + 3] === 0 && src[j4] === 0 && src[j4 + 1] === 0 && src[j4 + 2] === 0) {
+            continue;
+          }
+          r += src[j4];
+          g += src[j4 + 1];
+          b += src[j4 + 2];
+          n++;
+        }
+        if (n > 0) {
+          d[i4] = Math.round(r / n);
+          d[i4 + 1] = Math.round(g / n);
+          d[i4 + 2] = Math.round(b / n);
+        }
+      }
+    }
+  }
+
+  const tex = new THREE.DataTexture(d, S, S, THREE.RGBAFormat);
+  tex.flipY = true;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
   return tex;
 }
 
