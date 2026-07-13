@@ -218,6 +218,8 @@ function placeFlora(seed: number): Placements {
       const inCrystalCountry = area === 'shallows' || area === 'court';
 
       const pushShroom = (scale: number) => {
+        // spore rings retired with the other small mushrooms (user pass,
+        // 2026-07): giants stand alone now
         out.mushrooms.push({
           x,
           z,
@@ -227,27 +229,6 @@ function placeFlora(seed: number): Placements {
           variant,
           tint: scale >= 3.2 ? giantTint : shroomTint,
         });
-        if (scale >= 3.2) {
-          // a giant seeds a spore-ring of small ones around its foot
-          const kids = 2 + Math.floor(hash2(gx, gz, seed + 251) * 3);
-          for (let k = 0; k < kids; k++) {
-            const ang = hash2(gx + k + 1, gz, seed + 261) * Math.PI * 2;
-            const dist = 1.6 + hash2(gx, gz + k + 1, seed + 271) * (1.2 + scale * 0.35);
-            const kx = x + Math.sin(ang) * dist;
-            const kz = z + Math.cos(ang) * dist;
-            const ky = usable(kx, kz, 2.5);
-            if (ky === null) continue;
-            out.mushrooms.push({
-              x: kx,
-              z: kz,
-              y: ky,
-              scale: 0.45 + hash2(gx + k, gz + k, seed + 281) * 0.7,
-              rot: ang * 2.3,
-              variant: hash2(gx - k, gz + k, seed + 291) < 0.5 ? 0 : 1,
-              tint: shroomTint,
-            });
-          }
-        }
       };
 
       // Only the landmark giants remain (user pass, 2026-07): the small
