@@ -1085,5 +1085,11 @@ export const REALM_PROPS: ZonePropsDef = {
     { key: 'mushroomGiantPurple', x: -95, z: 1186, rot: 0.8, r: 1.9, h: 10, scale: 10 },
     { key: 'mushroomGlowCluster', x: -104, z: 1174, scale: 2.5 },
     { key: 'flowerGlow', x: -90, z: 1190, scale: 1.6 },
+    // -- the Crystalline Shallows: generated crystal formations, a first
+    //    amethyst set (more colorways to come); trunk-tight colliders --
+    { key: 'crystalAmethystCluster', x: 58, z: 1150, rot: 0.7, r: 2.4, h: 6 },
+    { key: 'crystalAmethystCluster', x: 97, z: 1145, rot: 2.3, r: 1.6, h: 4, scale: 0.65 },
+    { key: 'crystalAmethystCluster', x: 88, z: 1183, rot: -1.1, r: 2.9, h: 7.5, scale: 1.25 },
+    { key: 'crystalAmethystCluster', x: 52, z: 1166, rot: 3.0, r: 1.2, h: 3, scale: 0.5 },
   ],
 };

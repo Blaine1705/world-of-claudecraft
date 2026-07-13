@@ -118,6 +118,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // an explicit scale; propAsset re-bases min-y to 0 at extraction).
   // Consumed via ZonePropsDef.decorProps.
   pixieMushroomHouse: { url: '/models/props/pixie_mushroom_house.glb', kit: 'hollow' },
+  crystalAmethystCluster: { url: '/models/props/crystal_amethyst_cluster.glb', kit: 'hollow' },
   mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
   flowerGlow: { url: '/models/props/flower_glow.glb', kit: 'hollow' },
