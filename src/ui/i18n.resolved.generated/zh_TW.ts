@@ -857,6 +857,7 @@ export const zh_TW: EnTranslations = {
       "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
+      "showAttackButton": "顯示攻擊按鈕",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "showItemLevel": "顯示物品等級",
@@ -5357,6 +5358,7 @@ export const zh_TW: EnTranslations = {
     "actionBar": {
       "attackName": "攻擊",
       "attackTooltip": "對目標開啟或關閉自動攻擊。右鍵點擊敵人也會發起攻擊。",
+      "attackRemoveHint": "右鍵點擊可將其從動作列移除並空出欄位。",
       "emptySlot": "空欄位",
       "slotAria": "動作欄位 {slot}：{ability}",
       "emptySlotAria": "動作欄位 {slot}：空",

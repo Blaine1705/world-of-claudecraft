@@ -553,6 +553,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.energy': 'エネルギー',
   'hudChrome.options.interfaceMode': '操作モード',
   'hudChrome.options.groundReticle': '地面ターゲットのレティクル',
+  'hudChrome.options.showAttackButton': '攻撃ボタンを表示',
   'hudChrome.options.interfaceModeAuto': '自動',
   'hudChrome.options.interfaceModeDesktop': 'デスクトップ',
   'hudChrome.options.interfaceModeTouch': 'タッチ',
@@ -1808,6 +1809,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackName': '攻撃',
   'abilityUi.actionBar.attackTooltip':
     '対象への自動攻撃を切り替えます。敵を右クリックしても攻撃します。',
+  'abilityUi.actionBar.attackRemoveHint': '右クリックでバーから外し、スロットを空けます。',
   'abilityUi.actionBar.emptySlot': '空きスロット',
   'abilityUi.actionBar.slotAria': 'アクションスロット {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': 'アクションスロット {slot}: 空き',

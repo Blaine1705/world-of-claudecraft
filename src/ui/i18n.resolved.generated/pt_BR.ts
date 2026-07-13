@@ -857,6 +857,7 @@ export const pt_BR: EnTranslations = {
       "aurasOnPlayerFrame": "Benefícios no Quadro do Jogador",
       "highContrastBackground": "Fundo de alto contraste",
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
+      "showAttackButton": "Show Attack Button",
       "walkByAutoloot": "Saque Automático ao Passar",
       "groundReticle": "Retícula de mira no chão",
       "showItemLevel": "Mostrar nível do item",
@@ -5357,6 +5358,7 @@ export const pt_BR: EnTranslations = {
     "actionBar": {
       "attackName": "Atacar",
       "attackTooltip": "Ativa ou desativa o autoataque no alvo. Clicar com o botão direito em um inimigo também ataca.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Espaço vazio",
       "slotAria": "Espaço de ação {slot}: {ability}",
       "emptySlotAria": "Espaço de ação {slot}: vazio",

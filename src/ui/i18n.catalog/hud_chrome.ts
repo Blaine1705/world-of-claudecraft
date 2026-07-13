@@ -812,6 +812,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
     startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle: show the fixed Attack (auto-attack) button in slot 0
+    // of the action bar (on by default). Off frees slot 0 for a normal action.
+    showAttackButton: 'Show Attack Button',
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',

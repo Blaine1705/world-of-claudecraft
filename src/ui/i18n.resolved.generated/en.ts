@@ -857,6 +857,7 @@ export const en: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
+      "showAttackButton": "Show Attack Button",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
       "showItemLevel": "Show Item Level",
@@ -5357,6 +5358,7 @@ export const en: EnTranslations = {
     "actionBar": {
       "attackName": "Attack",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",

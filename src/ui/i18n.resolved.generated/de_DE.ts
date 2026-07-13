@@ -857,6 +857,7 @@ export const de_DE: EnTranslations = {
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
+      "showAttackButton": "Show Attack Button",
       "walkByAutoloot": "Plündern im Vorbeigehen",
       "groundReticle": "Bodenziel-Fadenkreuz",
       "showItemLevel": "Gegenstandsstufe anzeigen",
@@ -5357,6 +5358,7 @@ export const de_DE: EnTranslations = {
     "actionBar": {
       "attackName": "Angreifen",
       "attackTooltip": "Schaltet den automatischen Angriff auf Euer Ziel um. Ein Rechtsklick auf einen Gegner greift ebenfalls an.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Leerer Platz",
       "slotAria": "Aktionsplatz {slot}: {ability}",
       "emptySlotAria": "Aktionsplatz {slot}: leer",

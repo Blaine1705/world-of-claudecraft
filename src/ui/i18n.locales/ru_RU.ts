@@ -552,6 +552,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.energy': 'Энергия',
   'hudChrome.options.interfaceMode': 'Режим интерфейса',
   'hudChrome.options.groundReticle': 'Прицел наземного наведения',
+  'hudChrome.options.showAttackButton': 'Показывать кнопку атаки',
   'hudChrome.options.interfaceModeAuto': 'Авто',
   'hudChrome.options.interfaceModeDesktop': 'Компьютер',
   'hudChrome.options.interfaceModeTouch': 'Сенсорный',
@@ -1829,6 +1830,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackName': 'Атака',
   'abilityUi.actionBar.attackTooltip':
     'Включает или выключает автоатаку по вашей цели. Щелчок правой кнопкой по врагу также начинает атаку.',
+  'abilityUi.actionBar.attackRemoveHint':
+    'Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.',
   'abilityUi.actionBar.emptySlot': 'Пустая ячейка',
   'abilityUi.actionBar.slotAria': 'Ячейка действия {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': 'Ячейка действия {slot}: пусто',

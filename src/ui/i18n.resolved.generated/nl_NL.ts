@@ -857,6 +857,7 @@ export const nl_NL: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
+      "showAttackButton": "Show Attack Button",
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
       "groundReticle": "Grondrichtkruis",
       "showItemLevel": "Itemniveau tonen",
@@ -5357,6 +5358,7 @@ export const nl_NL: EnTranslations = {
     "actionBar": {
       "attackName": "Aanvallen",
       "attackTooltip": "Schakel auto-aanval op je doelwit in of uit. Rechtsklikken op een vijand valt ook aan.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Lege sleuf",
       "slotAria": "Actiesleuf {slot}: {ability}",
       "emptySlotAria": "Actiesleuf {slot}: leeg",

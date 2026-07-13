@@ -120,7 +120,7 @@ function ringDescriptor(
   const slots: ActionBarSlotDescriptor[] = [];
   slots.push({
     slotIndex: 0,
-    isAttack: true,
+    isAttack: () => true,
     hasAction: () => false,
     ability: () => null,
     item: () => null,
@@ -129,7 +129,7 @@ function ringDescriptor(
   for (let i = 0; i < 5; i++) {
     slots.push({
       slotIndex: i + 1,
-      isAttack: false,
+      isAttack: () => false,
       hasAction: () => abilitiesBySourceSlot.has(sourceSlotForMobileButton(pageBox.page, i)),
       ability: () => abilitiesBySourceSlot.get(sourceSlotForMobileButton(pageBox.page, i)) ?? null,
       item: () => null,

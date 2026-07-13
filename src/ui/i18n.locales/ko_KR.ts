@@ -545,6 +545,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.energy': '에너지',
   'hudChrome.options.interfaceMode': '인터페이스 모드',
   'hudChrome.options.groundReticle': '지면 조준 표시기',
+  'hudChrome.options.showAttackButton': '공격 버튼 표시',
   'hudChrome.options.interfaceModeAuto': '자동',
   'hudChrome.options.interfaceModeDesktop': '데스크톱',
   'hudChrome.options.interfaceModeTouch': '터치',
@@ -1790,6 +1791,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackName': '공격',
   'abilityUi.actionBar.attackTooltip':
     '대상에게 자동 공격을 켜거나 끕니다. 적을 우클릭해도 공격합니다.',
+  'abilityUi.actionBar.attackRemoveHint': '우클릭하면 바에서 제거하고 칸을 비웁니다.',
   'abilityUi.actionBar.emptySlot': '빈 칸',
   'abilityUi.actionBar.slotAria': '행동 칸 {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': '행동 칸 {slot}: 비어 있음',

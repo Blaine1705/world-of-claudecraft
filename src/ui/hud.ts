@@ -5417,7 +5417,38 @@ export class Hud {
     this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
 
+  // Slot 0 (the first key) mode. With the Interface option "Show Attack Button" ON
+  // (default) it is the classic fixed auto-attack toggle. OFF turns it into a normal
+  // assignable slot: right-click on the Attack button flips the option off (the
+  // "remove it from the bar" gesture), the freed slot accepts a drag like any other,
+  // and its key then casts the assigned action. The Options toggle restores Attack.
+  // The assignment is backed by its own persisted action (attackSlotAction), shared
+  // across forms, so it never disturbs the hotbarActions array layout.
+  private attackSlotAction: HotbarAction = null;
+  private attackSlotIsAttack(): boolean {
+    return this.optionsHooks?.settings.get('showAttackButton') ?? true;
+  }
+  private attackSlotKey(): string {
+    return `${this.slotMapKey('normal')}:s0`;
+  }
+  private loadAttackSlotAction(): void {
+    try {
+      const raw = localStorage.getItem(this.attackSlotKey());
+      const parsed = raw ? (JSON.parse(raw) as HotbarAction) : null;
+      this.attackSlotAction =
+        parsed && (parsed.type === 'ability' || parsed.type === 'item') ? parsed : null;
+    } catch {
+      this.attackSlotAction = null;
+    }
+  }
+  private saveAttackSlotAction(): void {
+    localStorage.setItem(this.attackSlotKey(), JSON.stringify(this.attackSlotAction));
+  }
+
   private actionForSlot(barSlot: number): HotbarAction {
+    // barSlot 0 is the attack slot: it resolves an action only when the Attack
+    // toggle was removed (showAttackButton off) and something was dropped in.
+    if (barSlot === 0) return this.attackSlotIsAttack() ? null : this.attackSlotAction;
     // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     return this.hotbarActions[barSlot - 1] ?? null;
   }
@@ -5644,10 +5675,11 @@ export class Hud {
       }
       this.cancelGroundAim();
     }
-    if (barSlot === 0) {
+    if (barSlot === 0 && this.attackSlotIsAttack()) {
       // On the pitch, key 1 casts your first sport move (Kick) instead of the
       // harvest-truce-inert auto-attack, which would be a dead key with no useful
-      // effect. Off the pitch it is the normal auto-attack toggle.
+      // effect. Off the pitch it is the normal auto-attack toggle. (With the Attack
+      // button removed, slot 0 falls through to the generic action path below.)
       const sportFirst = this.firstSportAbilityId();
       if (sportFirst) {
         this.castSportTap(sportFirst, this.sim.known[0]?.def.range ?? MELEE_RANGE);
@@ -5780,6 +5812,8 @@ export class Hud {
     // the secondary bar. One button list (this.abilityButtons), indexed by slot.
     // An entry whose template omits #actionbar2 leaves those buttons detached
     // rather than crashing on appendChild (keybind dispatch by slot still works).
+    // Restore any action assigned to the freed attack slot (showAttackButton off).
+    this.loadAttackSlotAction();
     const totalButtons = 1 + Hud.BAR_ABILITY_SLOTS;
     for (let i = 0; i < totalButtons; i++) {
       const container = i <= Hud.PRIMARY_BAR_ABILITY_SLOTS ? bar : bar2;
@@ -5824,8 +5858,8 @@ export class Hud {
         e.stopPropagation();
       });
       this.attachTooltip(btn, () => {
-        if (slot === 0) {
-          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>`;
+        if (slot === 0 && this.attackSlotIsAttack()) {
+          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
         const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
@@ -5931,6 +5965,50 @@ export class Hud {
           this.saveSlotMap();
           this.hideTooltip();
         });
+      } else {
+        // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
+        // (Interface option showAttackButton -> off), freeing the slot and its key
+        // for a normal action; right-click again clears whatever was dropped in.
+        // The Options toggle restores Attack at any time.
+        btn.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          if (this.attackSlotIsAttack()) {
+            this.optionsHooks?.settings.set('showAttackButton', false);
+          } else if (this.attackSlotAction !== null) {
+            this.attackSlotAction = null;
+            this.saveAttackSlotAction();
+          }
+          this.hideTooltip();
+        });
+        // With Attack removed, the freed slot accepts a drag like any other slot.
+        btn.addEventListener('dragover', (e) => {
+          if (this.attackSlotIsAttack()) return;
+          const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
+          if (!dragged) return;
+          e.preventDefault();
+          btn.classList.add('drop-target');
+        });
+        btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
+        btn.addEventListener('drop', (e) => {
+          e.preventDefault();
+          btn.classList.remove('drop-target');
+          if (this.attackSlotIsAttack()) return;
+          const dragged = this.dragAction ?? {
+            action: this.readDraggedAction(e.dataTransfer),
+            sourceIndex: null,
+          };
+          if (!dragged.action) return;
+          this.attackSlotAction = dragged.action;
+          this.saveAttackSlotAction();
+          // A drag from another bar slot MOVES the action there (the attack slot
+          // holds nothing to swap back); spellbook/bag drags simply assign.
+          if (dragged.sourceIndex !== null && dragged.sourceIndex !== undefined) {
+            this.hotbarActions = clearHotbarSlot(this.hotbarActions, dragged.sourceIndex);
+            this.saveSlotMap();
+          }
+          this.dragAction = null;
+          this.hideTooltip();
+        });
       }
       container?.appendChild(btn);
       this.abilityButtons.push({
@@ -5955,7 +6033,9 @@ export class Hud {
           const slotKey = `slot${i}`;
           return {
             slotIndex: i,
-            isAttack: i === 0,
+            // Live accessor: slot 0 stops being the Attack toggle when the player
+            // removes it (Interface option showAttackButton off / right-click).
+            isAttack: () => i === 0 && this.attackSlotIsAttack(),
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
@@ -6096,7 +6176,7 @@ export class Hud {
         slots: [
           {
             slotIndex: 0,
-            isAttack: true,
+            isAttack: () => true,
             hasAction: () => false,
             ability: () => null,
             item: () => null,
@@ -6104,7 +6184,7 @@ export class Hud {
           },
           ...Array.from({ length: 5 }, (_, i) => ({
             slotIndex: i + 1,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () =>
               this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null,
             ability: () => this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
@@ -6227,7 +6307,7 @@ export class Hud {
       {
         slots: Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => ({
           slotIndex: i,
-          isAttack: false,
+          isAttack: () => false,
           hasAction: () => this.consumableBarIds[i] !== undefined,
           ability: () => null,
           item: () => {

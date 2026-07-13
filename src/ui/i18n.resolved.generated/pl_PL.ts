@@ -857,6 +857,7 @@ export const pl_PL: EnTranslations = {
       "aurasOnPlayerFrame": "Wzmocnienia na ramce gracza",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
+      "showAttackButton": "Show Attack Button",
       "walkByAutoloot": "Automatyczny łup w przelocie",
       "groundReticle": "Celownik naziemny",
       "showItemLevel": "Pokaż poziom przedmiotu",
@@ -5357,6 +5358,7 @@ export const pl_PL: EnTranslations = {
     "actionBar": {
       "attackName": "Atak",
       "attackTooltip": "Przełącza automatyczny atak na cel. Kliknięcie wroga prawym przyciskiem również go atakuje.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Puste pole",
       "slotAria": "Pole akcji {slot}: {ability}",
       "emptySlotAria": "Pole akcji {slot}: puste",

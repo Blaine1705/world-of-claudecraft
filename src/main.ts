@@ -1535,6 +1535,13 @@ async function startGame(
       settings.set('startAttackOnAbilityUse', !!value);
       return;
     }
+    if (key === 'showAttackButton') {
+      // Slot-0 mode switch, read LIVE by the HUD (attackSlotIsAttack): ON keeps the
+      // classic Attack toggle; OFF turns the first slot into a normal assignable one
+      // (its key then casts the assigned action). Persistence is the only page work.
+      settings.set('showAttackButton', !!value);
+      return;
+    }
     if (key === 'groundReticle') {
       const v = settings.set('groundReticle', !!value);
       if (!v) hud.cancelGroundAim();
