@@ -360,7 +360,7 @@ export function flowerTuftTexture(kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS): T
 
   const img = ctx.getImageData(0, 0, S, S);
   const d = img.data;
-  for (let pass = 0; pass < 10; pass++) {
+  for (let pass = 0; pass < 6; pass++) {
     const src = d.slice();
     for (let y = 0; y < S; y++) {
       for (let x = 0; x < S; x++) {
@@ -481,7 +481,7 @@ export function grassTuftTexture(blades = 18): THREE.Texture {
   // backing store cannot zero those RGB values on upload.
   const img = ctx.getImageData(0, 0, S, S);
   const d = img.data;
-  for (let pass = 0; pass < 10; pass++) {
+  for (let pass = 0; pass < 6; pass++) {
     const src = d.slice();
     for (let y = 0; y < S; y++) {
       for (let x = 0; x < S; x++) {

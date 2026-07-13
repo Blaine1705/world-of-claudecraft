@@ -1669,6 +1669,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     }
     return fmMat;
   };
+  // build every palette texture up front: a first-visit texture generation
+  // plus shader compile mid-walk reads as a lag spike
+  for (const b of ['vale', 'dusk', 'ember', 'amber'] as BiomeId[]) flowerMatFor(b);
 
   const chunks = new Map<string, GrassChunk>();
   const buildQueue: GrassChunk[] = [];
