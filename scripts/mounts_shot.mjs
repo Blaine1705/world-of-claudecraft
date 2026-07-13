@@ -20,7 +20,10 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 
-await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
+// `load` rather than networkidle0: a cold vite dev server streams module
+// transforms well past the idle window on first hit.
+await page.goto(URL, { waitUntil: 'load', timeout: 90000 });
+await page.waitForSelector('#btn-offline', { timeout: 90000 });
 const jsClick = (sel) =>
   page.evaluate((s) => {
     const el = document.querySelector(s);
@@ -52,7 +55,16 @@ await page.evaluate(() => {
   sim.setPlayerLevel(20, sim.playerId);
 });
 await sleep(300);
-await page.keyboard.press('z');
+// Z with nothing picked opens the stable (the real keybind path).
+await page.waitForFunction(
+  () => {
+    if (document.querySelector('#mounts-window')?.style.display !== 'block') {
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ', key: 'z', bubbles: true }));
+    }
+    return document.querySelector('#mounts-window')?.style.display === 'block';
+  },
+  { timeout: 10000, polling: 250 },
+);
 await sleep(600);
 await page.screenshot({ path: 'tmp/mounts_window.png' });
 console.log('mounts window: tmp/mounts_window.png');
@@ -62,10 +74,38 @@ await page.evaluate(() => {
   window.__game.sim.selectMount('valorsteed');
 });
 await sleep(300);
-await page.keyboard.press('Escape');
-await sleep(300);
-await page.keyboard.press('z');
-await sleep(1200); // lazy mount GLB fetch + visual build
+// Close the stable (synthetic Escape; retry until the window actually hides).
+await page.waitForFunction(
+  () => {
+    const win = document.querySelector('#mounts-window');
+    if (win?.style.display === 'block') {
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { code: 'Escape', key: 'Escape', bubbles: true }),
+      );
+    }
+    return win?.style.display !== 'block';
+  },
+  { timeout: 10000, polling: 250 },
+);
+await sleep(400);
+// Ride via the real Z keybind (synthetic KeyboardEvent through the live input
+// handler); retry until the sim reports mounted, then let the GLB lazy-load.
+await page.waitForFunction(
+  () => {
+    const sim = window.__game.sim;
+    if (!sim.player.mountKey) {
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ', key: 'z', bubbles: true }));
+    }
+    return sim.player.mountKey === 'valorsteed';
+  },
+  { timeout: 10000, polling: 250 },
+);
+// Wait for the lazy GLB fetch + the renderer's mount visual, not a fixed nap.
+await page.waitForFunction(
+  () => !!window.__game.renderer?.views?.get(window.__game.sim.playerId)?.mountVisual,
+  { timeout: 20000, polling: 300 },
+);
+await sleep(800);
 // A short run so the shot shows the gallop clip mid-stride.
 await page.keyboard.down('w');
 await sleep(900);
@@ -84,19 +124,24 @@ console.log(
   }),
 );
 
-// Swap live onto the epic Lunar Cheshire, then the clipless hover cycle.
-await page.evaluate(() => {
-  window.__game.sim.selectMount('lunar_cheshire');
-});
-await sleep(1200);
-await page.screenshot({ path: 'tmp/mounts_cheshire.png' });
-console.log('lunar cheshire: tmp/mounts_cheshire.png');
-
-await page.evaluate(() => {
-  window.__game.sim.selectMount('aether_hover_cycle');
-});
-await sleep(1200);
-await page.screenshot({ path: 'tmp/mounts_hover_cycle.png' });
-console.log('hover cycle: tmp/mounts_hover_cycle.png');
+// Swap live onto the epic Lunar Cheshire, then the clipless hover cycle,
+// waiting out each lazy GLB fetch via the renderer's view state.
+const swapTo = async (key, path) => {
+  await page.evaluate((k) => {
+    window.__game.sim.selectMount(k);
+  }, key);
+  await page.waitForFunction(
+    (k) =>
+      window.__game.renderer?.views?.get(window.__game.sim.playerId)?.mountVisualKey ===
+      `mount_${k}`,
+    { timeout: 20000, polling: 300 },
+    key,
+  );
+  await sleep(800);
+  await page.screenshot({ path });
+  console.log(`${key}: ${path}`);
+};
+await swapTo('lunar_cheshire', 'tmp/mounts_cheshire.png');
+await swapTo('aether_hover_cycle', 'tmp/mounts_hover_cycle.png');
 
 await browser.close();

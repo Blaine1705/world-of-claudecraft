@@ -12,7 +12,7 @@ export type { AnimState } from './visual';
 export { CharacterVisual } from './visual';
 
 /** Build a rideable mount's visual: no skin, no held weapon, authored colours
- *  (mount defs carry no tint). The caller gates on mountAssetsReady() first —
+ *  (mount defs carry no tint). The caller gates on mountAssetsReady() first:
  *  mount GLBs are lazyPreload and resolvedGltf throws when not yet fetched. */
 export function createMountVisual(visualKey: string): CharacterVisual {
   return new CharacterVisual(visualKey, 0xffffff, 0, null, null);
