@@ -265,7 +265,18 @@ export function skyTexture(): THREE.CanvasTexture {
   return tex;
 }
 
-export function flowerTuftTexture(): THREE.Texture {
+export interface FlowerKind {
+  p: [number, number, number];
+  c: [number, number, number];
+}
+
+const DEFAULT_FLOWER_KINDS: FlowerKind[] = [
+  { p: [246, 246, 250], c: [244, 200, 70] }, // daisy
+  { p: [238, 150, 190], c: [180, 90, 40] }, // cosmos pink
+  { p: [245, 195, 60], c: [150, 90, 20] }, // buttercup
+];
+
+export function flowerTuftTexture(kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS): THREE.Texture {
   // Ground-cover flowers on a card: green stems with leaf pairs topped by
   // layered petal heads (white daisies, pink cosmos, golden buttercups),
   // drawn realistically enough to read as flowers at tuft scale. Same
@@ -277,14 +288,9 @@ export function flowerTuftTexture(): THREE.Texture {
   const ctx = c.getContext('2d')!;
   ctx.clearRect(0, 0, S, S);
 
-  const head = (x: number, y: number, rad: number, kind: number): void => {
+  const head = (x: number, y: number, rad: number): void => {
     const petals = 6 + Math.floor(rnd() * 3);
-    const pal =
-      kind === 0
-        ? { p: [246, 246, 250], c: [244, 200, 70] } // daisy
-        : kind === 1
-          ? { p: [238, 150, 190], c: [180, 90, 40] } // cosmos pink
-          : { p: [245, 195, 60], c: [150, 90, 20] }; // buttercup
+    const pal = kinds[Math.floor(rnd() * kinds.length) % kinds.length];
     for (let i = 0; i < petals; i++) {
       const a = (i / petals) * Math.PI * 2 + rnd() * 0.25;
       const px = x + Math.cos(a) * rad * 0.62;
@@ -343,7 +349,7 @@ export function flowerTuftTexture(): THREE.Texture {
     }
     // flower head or bud
     if (rnd() < 0.82) {
-      head(topX, topY, 7 + rnd() * 4.5, Math.floor(rnd() * 3));
+      head(topX, topY, 7 + rnd() * 4.5);
     } else {
       ctx.fillStyle = 'rgba(150,190,90,0.95)';
       ctx.beginPath();

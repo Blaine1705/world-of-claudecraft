@@ -22,7 +22,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-import { flowerTuftTexture, grassTuftTexture } from './textures';
+import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
@@ -1626,21 +1626,49 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   applyGrassShader(mat, uniforms);
 
   // ground-cover flowers: a sparse companion set in the same chunks, sharing
-  // the sway/fade shader so they move and thin exactly like the grass
+  // the sway/fade shader so they move and thin exactly like the grass.
+  // Each biome gets its own petal palette (chunk-level pick), and the dusk
+  // realm grows dense flower-field drifts.
   const fquad = new THREE.PlaneGeometry(0.95, 0.8);
   fquad.translate(0, 0.38, 0);
   const fquad2 = fquad.clone().rotateY(Math.PI / 2);
   const flowerGeo = mergeGeometries([fquad, fquad2]);
-  const flowerMat = configureMaskedDoubleSidedVegetationMaterial(
-    lush
-      ? new THREE.MeshStandardMaterial({
-          map: flowerTuftTexture(),
-          alphaTest: 0.3,
-          roughness: 0.85,
-        })
-      : new THREE.MeshLambertMaterial({ map: flowerTuftTexture(), alphaTest: 0.35 }),
-  );
-  applyGrassShader(flowerMat, uniforms);
+  const FLOWER_PALETTES: Partial<Record<BiomeId, FlowerKind[]>> = {
+    // the Veiled Hollow: pinks, purples, whites
+    dusk: [
+      { p: [238, 150, 190], c: [180, 90, 40] },
+      { p: [190, 150, 235], c: [240, 220, 120] },
+      { p: [246, 242, 250], c: [244, 200, 70] },
+    ],
+    // Drakelands: reds and embers
+    ember: [
+      { p: [225, 70, 60], c: [120, 30, 20] },
+      { p: [240, 110, 60], c: [140, 60, 20] },
+      { p: [200, 50, 80], c: [90, 20, 30] },
+    ],
+    // Amberfall: oranges, yellows, whites
+    amber: [
+      { p: [245, 150, 50], c: [150, 80, 20] },
+      { p: [248, 205, 70], c: [160, 100, 25] },
+      { p: [248, 244, 235], c: [230, 170, 60] },
+    ],
+  };
+  const flowerMatCache = new Map<string, THREE.Material>();
+  const flowerMatFor = (biome: BiomeId): THREE.Material => {
+    const key = FLOWER_PALETTES[biome] ? biome : 'default';
+    let fmMat = flowerMatCache.get(key);
+    if (!fmMat) {
+      const tex = flowerTuftTexture(FLOWER_PALETTES[biome]);
+      fmMat = configureMaskedDoubleSidedVegetationMaterial(
+        lush
+          ? new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.3, roughness: 0.85 })
+          : new THREE.MeshLambertMaterial({ map: tex, alphaTest: 0.35 }),
+      );
+      applyGrassShader(fmMat, uniforms);
+      flowerMatCache.set(key, fmMat);
+    }
+    return fmMat;
+  };
 
   const chunks = new Map<string, GrassChunk>();
   const buildQueue: GrassChunk[] = [];
@@ -1684,8 +1712,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
-    const flowerCap = Math.max(8, Math.floor(maxChunkCount * 0.14));
-    const fm = new THREE.InstancedMesh(flowerGeo, flowerMat, flowerCap);
+    const chunkBiome = zoneBiomeAt(chunk.centerX, chunk.centerZ);
+    const duskFields = chunkBiome === 'dusk';
+    const flowerCap = Math.max(8, Math.floor(maxChunkCount * (duskFields ? 0.45 : 0.14)));
+    const fm = new THREE.InstancedMesh(flowerGeo, flowerMatFor(chunkBiome), flowerCap);
     fm.userData.renderCategory = 'grass';
     fm.frustumCulled = true;
     fm.receiveShadow = true;
@@ -1736,14 +1766,22 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         );
         im.setColorAt(n, c);
         n++;
-        // roughly one tuft in nine sprouts a flower cluster beside it
-        if (fn < flowerCap && hashAt(i, j, 6) < 0.11) {
-          const fx = x + (hashAt(i, j, 7) - 0.5) * 1.4;
-          const fz = z + (hashAt(i, j, 8) - 0.5) * 1.4;
-          const fh = terrainHeight(fx, fz, seed);
-          if (fh >= WATER_LEVEL + 1.6 && !tooSteep(fx, fz, seed) && roadDistance(fx, fz) >= 3.2) {
-            const fs = 0.55 + hashAt(i, j, 9) * 0.5;
-            q.setFromAxisAngle(up, hashAt(i, j, 10) * 12.4);
+        // roughly one tuft in nine sprouts a flower cluster beside it; in
+        // the dusk realm, coarse field cells bloom into dense drifts
+        const fieldCell = duskFields ? hashAt(Math.floor(x / 22), Math.floor(z / 22), 13) : 1;
+        const inField = duskFields && fieldCell < 0.42;
+        const flowerChance = inField ? 0.6 : duskFields ? 0.05 : 0.11;
+        const reps = inField ? 3 : 1;
+        if (hashAt(i, j, 6) < flowerChance) {
+          for (let rep = 0; rep < reps && fn < flowerCap; rep++) {
+            const fx = x + (hashAt(i + rep, j, 7) - 0.5) * (1.4 + rep * 1.3);
+            const fz = z + (hashAt(i, j + rep, 8) - 0.5) * (1.4 + rep * 1.3);
+            const fh = terrainHeight(fx, fz, seed);
+            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
+              continue;
+            }
+            const fs = 0.55 + hashAt(i + rep, j + rep, 9) * 0.5;
+            q.setFromAxisAngle(up, hashAt(i, j, 10 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
             fm.setMatrixAt(fn, m);
             // flowers keep their own petal colors: light jitter only
