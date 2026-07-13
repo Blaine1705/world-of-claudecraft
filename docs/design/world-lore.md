@@ -510,3 +510,122 @@ Shear's cliffs face the Farshore's torn sky across the water.
 6. **The falling leaves** — the trigger nobody wants to test in the Amberfall.
 7. **The Mirror Tarn** — the last image of the unbroken sky, and everyone who
    wants it.
+
+---
+
+# 8. The Undreamed Lands — lore store for future maps
+
+The cosmology makes new maps canon by construction: the Dreamer is still
+dreaming the world northward, so every realm we ship is simply land that has
+*finished surfacing*. This section is the standing stockpile — realm concepts
+already wired into the existing threads, ready to pull from whenever a new
+map is needed. None of them is dated or promised; they are seeds, not specs.
+
+## 8.1 Realm concepts, ready to grow
+
+### The Thornway — *the Gardener's Trail* (temperate bramble-wilds)
+The land beyond the Great Maze, reachable only by solving it. A hundred years
+of the Gardener's footprints: hedgerows grown over her campsites, a rose
+blooming in the dead of winter wherever she slept, and her pruning-hook left
+hanging on a gate no wall was ever built around. The realm's wrongness: her
+trail gets *younger* as you go north — as if she is still just ahead.
+**Pulls threads:** Evergarden (the Maze), Veiled Hollow (Eldergleam feels her
+pass), the Other (what she walked north to face).
+
+### The Tidecourt — *the Drowned Capital* (shallow-sea ruin realm)
+The Gleaming Court's capital, drowned intact on the Night of Glass, its
+towers now a reef between low tide and memory. Streets walkable at ebb,
+swimmable at flood; the Great Mirrors still stand in the throne-plaza,
+face-down. The drowned here are not hostile by default — they hold court,
+twelve centuries into a session that never adjourned, and attack only those
+who track mud on the mosaics. Somewhere below sits the Mirror That Pulled,
+cracked from rim to rim. **Pulls threads:** the Night of Glass origin site;
+the Huntsman's people; the true names of the Three, spoken nowhere else.
+
+### The Cindershelf — *the Smith's Workshop* (basalt flows and dead forges)
+Between the Drakelands and the world's edge: the Smith's proving-grounds,
+littered with his rejected drafts — half-made mountains, a river he never
+lit, anvils the size of villages. The trolls make pilgrimage here to argue
+with their maker's leavings. The wrongness: one forge, deepest in, is still
+warm and *tidy*, its tools recently cleaned — but the Smith lies as Thornpeak,
+so who keeps the shop? **Pulls threads:** trolls (Mirefen, Trollmoot),
+Drakemaw and Firemount (the forge lineage), Thunzharr (splinters of wrath).
+
+### The Hushwold — *where the wind stops* (still, snowless white forest)
+Far northeast, past the Galecrest's gale: a realm of total calm — the one
+place the world's escaping breath does not reach, because something on the
+other side of the wound is *inhaling*. Sound behaves wrongly; bells ring a
+day late. The Other's front porch, and the Gardener's last confirmed
+sighting. Frostveil's wall wardens speak of it only as "the quiet."
+**Pulls threads:** the Other (idols, the awake cold), the Galecrest (wind
+lore inverted), the Gardener's trail terminus candidate.
+
+### The Sleepless Road — *the old way of the dead* (grey twilight marchland)
+Before the Night of Glass, the dead walked a road into the Dreamer's keeping.
+The road is still there — a grey causeway across a colorless heath — but it
+now ends at a broken gate, and twelve centuries of arrivals wait in queue,
+patient as weather. The Wraithwood's lost souls drift here eventually; the
+Huntsman drives his gathered dead up this road and has never once gotten one
+through the gate. A realm about grief with almost no combat pressure — the
+Willowfen's dark mirror. **Pulls threads:** the whole death cosmology;
+Wraithwood; the Gravecallers (who would pay anything to hold the gate).
+
+### The Glasswold — *where a shard fell on sand* (crystal desert)
+A southern-sea desert isle where a Loom-shard struck dunes: the impact fused
+a hundred miles of sand into a rolling country of smoked glass. By day it is
+blinding; by night the buried shard-light rises through the glass like a slow
+dawn underfoot. Court prospectors mined it once — their cutting-camps and
+one intact Great Lens remain. Scrying anywhere in the Glasswold works too
+well: you see what you looked for, plus one thing you did not.
+**Pulls threads:** shard-sites (Starfall Basin, Glimmermere), Court
+mirror-craft, a shard the Gravecallers could actually reach.
+
+### The Wavebreak Isles — *the scattered fleet* (storm archipelago)
+The Court's navy put to sea on the Night of Glass and was thrown across a
+hundred islands, each now home to descendants of one ship: an archipelago of
+tiny cultures, one per crew, some noble, some gone strange (the Odyssey as a
+zone map — every island one episode). The wrecks' figureheads are carved
+with faces that locals swear change expression before storms.
+**Pulls threads:** the Court diaspora, Galecrest's Wreckfields, Palmreach
+sea-glass; a natural sailing/naval-content realm.
+
+### The Halfdream — *the Sleeping World itself* (endgame sky realm)
+The far end of the story: setting foot inside the Dreamer's unfinished second
+world, via the Nightbloom or a stabilized Rift. Geography obeys dream-rules —
+districts unfinished mid-thought, a horizon with visible weave, rooms the
+player has seen before in Rifts now standing in their true positions. There
+is no death here yet, which is exactly why everyone from Korzul's shard-heirs
+to the Other wants to move in. **Pulls threads:** everything — Rifts, the
+Nightbloom, the Loom, the endgame question of who inherits a deathless world.
+
+## 8.2 The realm-minting recipe
+
+Any new map — including ones invented long after this document — stays canon
+if it answers six questions:
+
+1. **Which Age marked it?** Weaving-era god-work, a Gleaming Age province or
+   colony, a Night-of-Glass scar, or newly surfaced Long-Waking land.
+2. **Which of the Three touched it?** One fingerprint minimum: the Smith's
+   stone and fire, the Gardener's green and order, or the Dreamer's sleep,
+   night, and dream-logic. (Newly surfaced land = the Dreamer by default.)
+3. **Which order had a chapter here?** A Vigil flame, a Chapel of the Sleep
+   chapter-house, or pointedly *neither* — absence is also a story.
+4. **Where does it gleam?** One mirror/gleam/glimmer-named water or glass
+   site per realm — Court ruin or shard-light. This is the setting's
+   signature motif; keep the streak alive.
+5. **What is its one wrongness?** Each realm carries exactly one impossible,
+   quietly dreadful fact (leaves that never land, hedges that trim
+   themselves, wind that never stops). One is haunting; three is noise.
+6. **Which two existing realms does it touch?** Every new map connects to at
+   least two shipped ones through history, an order, a bloodline, or a
+   pointing monument — never geography alone.
+
+## 8.3 Name bank (house style)
+
+Unclaimed names in the established voice, free to assign: **Emberhold,
+Duskmoor, the Silverfen, Thornharrow, the Palegrove, Stormlade, the
+Brinemarch, Gloamharbor, the Cindervale, Wightmoor, the Lanternwaste,
+Fernward, the Greywater, Hollowmere, Bellstrand, the Murkspire, Ashenholt,
+the Quietfields**. Villain/god-adjacent names in the Korzul/Velkhar register:
+**Zhargall, Morvenna, Ulkharion, Dreszara, Vhorlag, Netheska**.
+
