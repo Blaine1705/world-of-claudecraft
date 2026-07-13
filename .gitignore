@@ -27,6 +27,12 @@ private/*
 
 # test artifacts & screenshots
 tmp/
+# tests/sfx_studio_server_security.test.ts drops a per-pid symlink probe here
+# (public/models/sfx-studio-security-<pid>.glb) and removes it in afterAll, but a
+# killed run can strand one. Never commit these: a stranded symlink points at the
+# runner's absolute path, so it is broken everywhere else and fails vite build's
+# public/ copy (the whole client build dies in prepare-out-dir).
+public/models/sfx-studio-security-*.glb
 # PR-assist screenshot tour output + its CI-only ephemerals
 pr-shots/
 pr.diff
