@@ -124,6 +124,8 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kkWall: { url: '/models/dungeon/wall.glb', kit: 'dungeon' },
   kkWallCracked: { url: '/models/dungeon/wall_cracked.glb', kit: 'dungeon' },
   kkPillar: { url: '/models/dungeon/pillar.glb', kit: 'dungeon' },
+  kkFloorLarge: { url: '/models/dungeon/floor_tile_large.glb', kit: 'dungeon' },
+  kkFloorRocks: { url: '/models/dungeon/floor_tile_large_rocks.glb', kit: 'dungeon' },
   stagShrine: { url: '/models/props/stag_shrine.glb', kit: 'hollow' },
   mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
