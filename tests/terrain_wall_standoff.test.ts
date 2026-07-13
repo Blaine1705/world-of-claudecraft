@@ -9,7 +9,7 @@ import { groundHeight, terrainSteepnessAt, terrainWallStandoff } from '../src/si
 // corners, where the x-rim and z-rim walls press in from two directions at
 // once) a single pass is not always enough to clear the wall, and the caller
 // (stepPlayerMotion) only ever committed the pushed position once it read as
-// fully walkable — so an unconverged single pass silently discarded every
+// fully walkable, so an unconverged single pass silently discarded every
 // partial improvement. This is defensive hardening: on THIS world's simpler
 // terrain the downhill-slide fallback (terrainDownhill in stepPlayerMotion)
 // happens to always have a valid escape gradient wherever standoff alone
