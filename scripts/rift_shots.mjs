@@ -138,5 +138,5 @@ console.log(`boss floor: ${JSON.stringify(bossInfo)}`);
 
 await browser.close();
 console.log(`\nerrors during run: ${errors.length}`);
-for (const e of errors.slice(0, 20)) console.log('  ' + e);
+for (const e of errors.slice(0, 20)) console.log(`  ${e}`);
 process.exit(errors.some((e) => e.startsWith('PAGEERROR')) ? 1 : 0);

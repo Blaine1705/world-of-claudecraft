@@ -1447,7 +1447,7 @@ export class ClientWorld implements IWorld {
 
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
-    if (arguments.length > 1) this.setMouselookFacing(facing);
+    if (facing !== undefined) this.setMouselookFacing(facing);
   }
 
   setMouselookFacing(facing: unknown): void {
