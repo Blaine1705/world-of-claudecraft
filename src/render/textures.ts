@@ -265,6 +265,141 @@ export function skyTexture(): THREE.CanvasTexture {
   return tex;
 }
 
+export function flowerTuftTexture(): THREE.Texture {
+  // Ground-cover flowers on a card: green stems with leaf pairs topped by
+  // layered petal heads (white daisies, pink cosmos, golden buttercups),
+  // drawn realistically enough to read as flowers at tuft scale. Same
+  // mip-bleed + DataTexture upload as the grass so distance never darkens.
+  const S = 128;
+  const c = document.createElement('canvas');
+  c.width = S;
+  c.height = S;
+  const ctx = c.getContext('2d')!;
+  ctx.clearRect(0, 0, S, S);
+
+  const head = (x: number, y: number, rad: number, kind: number): void => {
+    const petals = 6 + Math.floor(rnd() * 3);
+    const pal =
+      kind === 0
+        ? { p: [246, 246, 250], c: [244, 200, 70] } // daisy
+        : kind === 1
+          ? { p: [238, 150, 190], c: [180, 90, 40] } // cosmos pink
+          : { p: [245, 195, 60], c: [150, 90, 20] }; // buttercup
+    for (let i = 0; i < petals; i++) {
+      const a = (i / petals) * Math.PI * 2 + rnd() * 0.25;
+      const px = x + Math.cos(a) * rad * 0.62;
+      const py = y + Math.sin(a) * rad * 0.62;
+      const jr = 0.85 + rnd() * 0.3;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, rad * 0.62 * jr);
+      g.addColorStop(0, `rgba(${pal.p[0]},${pal.p[1]},${pal.p[2]},0.98)`);
+      g.addColorStop(
+        1,
+        `rgba(${Math.floor(pal.p[0] * 0.78)},${Math.floor(pal.p[1] * 0.72)},${Math.floor(
+          pal.p[2] * 0.8,
+        )},0.95)`,
+      );
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(px, py, rad * 0.52 * jr, rad * 0.3 * jr, a, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const cg = ctx.createRadialGradient(x, y, 0, x, y, rad * 0.34);
+    cg.addColorStop(0, `rgba(${pal.c[0]},${pal.c[1]},${pal.c[2]},1)`);
+    cg.addColorStop(
+      1,
+      `rgba(${Math.floor(pal.c[0] * 0.7)},${Math.floor(pal.c[1] * 0.7)},${Math.floor(pal.c[2] * 0.7)},1)`,
+    );
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(x, y, rad * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  const stems = 5 + Math.floor(rnd() * 2);
+  for (let i = 0; i < stems; i++) {
+    const x = 16 + (i + rnd() * 0.7) * ((S - 32) / stems);
+    const h = S * (0.4 + rnd() * 0.4);
+    const sway = (rnd() - 0.5) * 22;
+    const topX = x + sway;
+    const topY = S - h;
+    // stem
+    const sg = ctx.createLinearGradient(x, S, topX, topY);
+    sg.addColorStop(0, 'rgba(52,88,40,0.95)');
+    sg.addColorStop(1, 'rgba(92,138,62,0.95)');
+    ctx.strokeStyle = sg;
+    ctx.lineWidth = 1.6 + rnd() * 0.8;
+    ctx.beginPath();
+    ctx.moveTo(x, S);
+    ctx.quadraticCurveTo(x + sway * 0.3, S - h * 0.55, topX, topY);
+    ctx.stroke();
+    // leaf pair partway up
+    const ly = S - h * (0.35 + rnd() * 0.2);
+    const lx = x + sway * 0.25;
+    ctx.fillStyle = 'rgba(74,118,52,0.92)';
+    for (const dir of [-1, 1]) {
+      ctx.beginPath();
+      ctx.ellipse(lx + dir * 4.5, ly, 5.5, 2.1, dir * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // flower head or bud
+    if (rnd() < 0.82) {
+      head(topX, topY, 7 + rnd() * 4.5, Math.floor(rnd() * 3));
+    } else {
+      ctx.fillStyle = 'rgba(150,190,90,0.95)';
+      ctx.beginPath();
+      ctx.ellipse(topX, topY, 2.4, 3.6, sway * 0.02, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const img = ctx.getImageData(0, 0, S, S);
+  const d = img.data;
+  for (let pass = 0; pass < 10; pass++) {
+    const src = d.slice();
+    for (let y = 0; y < S; y++) {
+      for (let x = 0; x < S; x++) {
+        const i4 = (y * S + x) * 4;
+        if (src[i4 + 3] !== 0) continue;
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let n = 0;
+        for (const [dx, dy] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || ny < 0 || nx >= S || ny >= S) continue;
+          const j4 = (ny * S + nx) * 4;
+          if (src[j4 + 3] === 0 && src[j4] === 0 && src[j4 + 1] === 0 && src[j4 + 2] === 0) {
+            continue;
+          }
+          r += src[j4];
+          g += src[j4 + 1];
+          b += src[j4 + 2];
+          n++;
+        }
+        if (n > 0) {
+          d[i4] = Math.round(r / n);
+          d[i4 + 1] = Math.round(g / n);
+          d[i4 + 2] = Math.round(b / n);
+        }
+      }
+    }
+  }
+  const tex = new THREE.DataTexture(d, S, S, THREE.RGBAFormat);
+  tex.flipY = true;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 export function grassTuftTexture(blades = 18): THREE.Texture {
   // Tapered, curved blades on a 128px card (was 64px uniform strokes, which
   // read as dark spikes in-world). Each blade is a filled path, wide at the

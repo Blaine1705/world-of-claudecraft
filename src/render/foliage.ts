@@ -22,7 +22,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-import { grassTuftTexture } from './textures';
+import { flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
@@ -1475,6 +1475,7 @@ interface GrassChunk {
   lastUsed: number;
   prioritySq: number;
   mesh?: THREE.InstancedMesh;
+  flowerMesh?: THREE.InstancedMesh;
 }
 
 // wind sway + masked edge fade for the grass tufts; the fade keys off the
@@ -1624,6 +1625,23 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   );
   applyGrassShader(mat, uniforms);
 
+  // ground-cover flowers: a sparse companion set in the same chunks, sharing
+  // the sway/fade shader so they move and thin exactly like the grass
+  const fquad = new THREE.PlaneGeometry(0.95, 0.8);
+  fquad.translate(0, 0.38, 0);
+  const fquad2 = fquad.clone().rotateY(Math.PI / 2);
+  const flowerGeo = mergeGeometries([fquad, fquad2]);
+  const flowerMat = configureMaskedDoubleSidedVegetationMaterial(
+    lush
+      ? new THREE.MeshStandardMaterial({
+          map: flowerTuftTexture(),
+          alphaTest: 0.3,
+          roughness: 0.85,
+        })
+      : new THREE.MeshLambertMaterial({ map: flowerTuftTexture(), alphaTest: 0.35 }),
+  );
+  applyGrassShader(flowerMat, uniforms);
+
   const chunks = new Map<string, GrassChunk>();
   const buildQueue: GrassChunk[] = [];
   let generation = 0;
@@ -1666,6 +1684,13 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     im.frustumCulled = true;
     im.receiveShadow = true; // tufts must darken inside canopy shade, not glow through it
     im.count = 0;
+    const flowerCap = Math.max(8, Math.floor(maxChunkCount * 0.14));
+    const fm = new THREE.InstancedMesh(flowerGeo, flowerMat, flowerCap);
+    fm.userData.renderCategory = 'grass';
+    fm.frustumCulled = true;
+    fm.receiveShadow = true;
+    fm.count = 0;
+    let fn = 0;
 
     const minX = chunk.cx * GRASS_CHUNK_SIZE;
     const maxX = minX + GRASS_CHUNK_SIZE;
@@ -1711,6 +1736,23 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         );
         im.setColorAt(n, c);
         n++;
+        // roughly one tuft in nine sprouts a flower cluster beside it
+        if (fn < flowerCap && hashAt(i, j, 6) < 0.11) {
+          const fx = x + (hashAt(i, j, 7) - 0.5) * 1.4;
+          const fz = z + (hashAt(i, j, 8) - 0.5) * 1.4;
+          const fh = terrainHeight(fx, fz, seed);
+          if (fh >= WATER_LEVEL + 1.6 && !tooSteep(fx, fz, seed) && roadDistance(fx, fz) >= 3.2) {
+            const fs = 0.55 + hashAt(i, j, 9) * 0.5;
+            q.setFromAxisAngle(up, hashAt(i, j, 10) * 12.4);
+            m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
+            fm.setMatrixAt(fn, m);
+            // flowers keep their own petal colors: light jitter only
+            c.setHex(0xffffff);
+            c.offsetHSL((hashAt(i, j, 11) - 0.5) * 0.04, 0, (hashAt(i, j, 12) - 0.5) * 0.12);
+            fm.setColorAt(fn, c);
+            fn++;
+          }
+        }
       }
     }
     if (n > 0) {
@@ -1722,6 +1764,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       chunk.mesh = im;
       parent.add(im);
     }
+    if (fn > 0) {
+      fm.count = fn;
+      fm.instanceMatrix.needsUpdate = true;
+      if (fm.instanceColor) fm.instanceColor.needsUpdate = true;
+      fm.computeBoundingSphere();
+      fm.visible = chunk.lastSeen === generation;
+      chunk.flowerMesh = fm;
+      parent.add(fm);
+    }
     chunk.ready = true;
     builtChunks++;
     lastBuildMs = Math.round((performance.now() - started) * 100) / 100;
@@ -1732,6 +1783,10 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     if (chunk.mesh) {
       parent.remove(chunk.mesh);
       chunk.mesh.dispose();
+    }
+    if (chunk.flowerMesh) {
+      parent.remove(chunk.flowerMesh);
+      chunk.flowerMesh.dispose();
     }
     disposedChunks++;
     chunks.delete(chunk.key);
@@ -1798,6 +1853,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
           chunk.lastUsed = generation;
           chunk.prioritySq = prioritySq;
           if (chunk.mesh) chunk.mesh.visible = true;
+          if (chunk.flowerMesh) chunk.flowerMesh.visible = true;
           queueChunk(chunk);
         }
       }
@@ -1805,6 +1861,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       for (const chunk of chunks.values()) {
         if (chunk.lastSeen === generation) continue;
         if (chunk.mesh?.visible) chunk.mesh.visible = false;
+        if (chunk.flowerMesh?.visible) chunk.flowerMesh.visible = false;
       }
       buildQueuedChunks();
       retireStaleChunks();
