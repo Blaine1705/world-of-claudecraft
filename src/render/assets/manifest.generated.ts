@@ -675,7 +675,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/rowboat.glb": "/media/models/props/rowboat.4532f6dee8c6.glb",
   "models/props/shrub_flowering.glb": "/media/models/props/shrub_flowering.6b0f22de536f.glb",
   "models/props/slag_cauldron.glb": "/media/models/props/slag_cauldron.307b42ac1d88.glb",
-  "models/props/stag_shrine.glb": "/media/models/props/stag_shrine.e9b07c405ed3.glb",
+  "models/props/stag_shrine.glb": "/media/models/props/stag_shrine.c12676004810.glb",
   "models/props/star_heart_crystal.glb": "/media/models/props/star_heart_crystal.eff95335e508.glb",
   "models/props/statue_block.glb": "/media/models/props/statue_block.522cacbeb3b0.glb",
   "models/props/statue_head.glb": "/media/models/props/statue_head.2835dc7f475e.glb",
