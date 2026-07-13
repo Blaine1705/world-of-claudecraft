@@ -239,44 +239,7 @@ function placeFlora(seed: number): Placements {
     }
   }
 
-  // --- the Crystalline Shallows: giant crystal formations along the shore,
-  //     clustered spires in family colorways stepping down from an anchor ---
-  {
-    const FAMILIES = [
-      [0xb392e8, 0xc9a8ff], // amethyst
-      [0xe8a0d8, 0xffc0ec], // rose quartz
-      [0x9fb8f2, 0xbcd4ff], // sky sapphire
-      [0x8fe8d8, 0xb0ffe8], // spirit aqua
-    ];
-    for (let k = 0; k < 26; k++) {
-      const ang = (k / 26) * Math.PI * 2 + hash2(k, 7, seed + 601) * 0.4;
-      if (hash2(k, 11, seed + 611) > 0.72) continue;
-      const dist = SHALLOWS_LAKE.r + 4 + hash2(k, 13, seed + 621) * 16;
-      const cxp = SHALLOWS_LAKE.x + Math.sin(ang) * dist;
-      const czp = SHALLOWS_LAKE.z + Math.cos(ang) * dist;
-      const fam = FAMILIES[Math.floor(hash2(k, 17, seed + 631) * 41) % FAMILIES.length];
-      const count = 2 + Math.floor(hash2(k, 19, seed + 641) * 4);
-      for (let j = 0; j < count; j++) {
-        const jx = cxp + (hash2(k + j, 23, seed + 651) - 0.5) * 6;
-        const jz = czp + (hash2(k, 29 + j, seed + 661) - 0.5) * 6;
-        const y = usable(jx, jz, 3);
-        if (y === null) continue;
-        const giant = j === 0;
-        out.crystals.push({
-          x: jx,
-          z: jz,
-          y,
-          scale: giant
-            ? 4.5 + hash2(k, 31 + j, seed + 671) * 5
-            : 1.2 + hash2(k, 31 + j, seed + 671) * 3,
-          rot: hash2(k + j, 37, seed + 681) * Math.PI * 2,
-          variant: j % 2,
-          tint: fam[j % fam.length],
-          lean: terrainGradient(jx, jz, seed),
-        });
-      }
-    }
-  }
+  // (crystal formations: replaced by generated crystal assets, see decorProps)
 
   // --- weeping willows around the two lakeshores ---
   for (const lake of [STARFALL_LAKE, SHALLOWS_LAKE]) {
