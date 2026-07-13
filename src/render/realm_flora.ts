@@ -231,12 +231,8 @@ function placeFlora(seed: number): Placements {
         });
       };
 
-      // Only the landmark giants remain (user pass, 2026-07): the small
-      // ambient mushrooms read as clutter under the area tints (teal in the
-      // Deep, rose on the path).
-      if (inShroomCountry && r < 0.085) {
-        pushShroom(4 + r * 55); // giants, 4 to ~8.5
-      }
+      // Mushroom scatter fully retired (user pass, 2026-07): the hand-placed
+      // village giants carry the mushroom identity now.
 
       // (duskbell flowers and starbuds retired in the same pass: the sprig
       // silhouettes read as unfinished next to the modeled flora set)
@@ -269,7 +265,48 @@ function placeFlora(seed: number): Placements {
 
   // (blossom trees retired: user pass, 2026-07)
 
-  // (mossy boulders retired: user pass, 2026-07)
+  // --- boulders: natural stone scatter across the valley floor ---
+  {
+    const STONE_TINTS = [0x9aa0a6, 0x8b9096, 0xa8adb2, 0x7f8489];
+    for (let gx = -168; gx <= 168; gx += 10) {
+      for (let gz = REALM_ZONE.zMin + 16; gz <= REALM_ZONE.zMax - 20; gz += 10) {
+        const r = hash2(gx, gz, seed + 491);
+        if (r > 0.06) continue;
+        const x = gx + (hash2(gx, gz, seed + 501) - 0.5) * 8;
+        const z = gz + (hash2(gx, gz, seed + 511) - 0.5) * 8;
+        const y = usable(x, z, 4);
+        if (y === null) continue;
+        const tint = STONE_TINTS[Math.floor(hash2(gx, gz, seed + 531) * 97) % STONE_TINTS.length];
+        out.boulders.push({
+          x,
+          z,
+          y,
+          scale: 0.9 + hash2(gx, gz, seed + 521) * 2.2,
+          rot: r * Math.PI * 33,
+          variant: 0,
+          tint,
+        });
+        // some boulders come in pairs: a smaller companion stone
+        if (hash2(gx, gz, seed + 541) < 0.35) {
+          const ang = hash2(gx, gz, seed + 551) * Math.PI * 2;
+          const bx = x + Math.sin(ang) * 2.2;
+          const bz = z + Math.cos(ang) * 2.2;
+          const by = usable(bx, bz, 4);
+          if (by !== null) {
+            out.boulders.push({
+              x: bx,
+              z: bz,
+              y: by,
+              scale: 0.6 + hash2(gx, gz, seed + 561) * 0.9,
+              rot: ang * 5,
+              variant: 0,
+              tint,
+            });
+          }
+        }
+      }
+    }
+  }
 
   // --- the rugged coast: where cliffs meet the open sea, fallen boulders
   // pile half-sunk at the waterline, stacks stand just offshore, and crest
@@ -593,7 +630,6 @@ const FLOWER_TINTS = [
   0x9a7fd8, // deep violet
 ]; // duskbell colorways
 const STARBUD_TINTS = [0xf8f0ff, 0xf2d8a8, 0xf2b8c8]; // tiny understory flowers
-const BOULDER_MOSS = 0x9caa96;
 const SEA_STONE = 0x6f6570; // dusk basalt multiply over the painted rock kit
 const SEA_ROCK_TINTS = [0xfff2ea, 0xd8d2dc, 0xb4aab4, 0xe8d8c8]; // weathering
 // Approximate unscaled heights of the kit (the large rocks are broad low
@@ -831,12 +867,11 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     );
   }
 
-  // --- mossy boulders (bundled rock, moss tint) ---
+  // --- boulders (bundled rock, natural stone; per-spot grey tints) ---
   const boulderParts = loadedParts.get(BOULDER_URL);
   if (boulderParts) {
     for (const part of boulderParts) {
       const mat = part.material.clone() as THREE.MeshStandardMaterial;
-      if ('color' in mat) mat.color.multiply(new THREE.Color(BOULDER_MOSS));
       instance(part.geometry, mat, spots.boulders, { sink: 0.12, castShadow: true });
     }
   }
