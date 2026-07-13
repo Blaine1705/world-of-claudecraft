@@ -438,14 +438,12 @@ export const it_IT: EnTranslations = {
       "name_aether_hover_cycle": "Aerociclo del Giostratore d’Etere",
       "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
       "name_stormfeather_griffin": "Piumatempesta Toccacielo",
-      "name_lunar_cheshire": "Cheshire Lunare",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
       "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
       "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
-      "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
-      "desc_lunar_cheshire": "Un felino lunatico che scivola tra le ombre con un sorriso indelebile."
+      "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate."
     },
     "vcup": {
       "title": "La Coppa della Valle",

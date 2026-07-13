@@ -438,14 +438,12 @@ export const ko_KR: EnTranslations = {
       "name_aether_hover_cycle": "에테르 기사 호버사이클",
       "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
-      "name_lunar_cheshire": "달의 체셔",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
       "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
-      "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
-      "desc_lunar_cheshire": "사라지지 않는 미소를 띠고 그림자 사이를 거니는 달빛 고양이입니다."
+      "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다."
     },
     "vcup": {
       "title": "베일 컵",

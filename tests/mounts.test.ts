@@ -44,9 +44,9 @@ function errorTexts(events: SimEvent[]): string[] {
     .map((e) => e.text);
 }
 
-describe('mount catalog (the seven ground mounts from the cards)', () => {
-  it('has exactly the seven mounts with the horse first (the base mount)', () => {
-    expect(MOUNT_KEYS).toHaveLength(7);
+describe('mount catalog (the six ground mounts from the cards)', () => {
+  it('has exactly the six mounts with the horse first (the base mount)', () => {
+    expect(MOUNT_KEYS).toHaveLength(6);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
   });
 
@@ -61,7 +61,6 @@ describe('mount catalog (the seven ground mounts from the cards)', () => {
     expect(spec('aether_hover_cycle')).toEqual([15, 'rare', 0.5, 0.05, 0]);
     expect(spec('shadowjump_toad')).toEqual([15, 'rare', 0.5, 0.05, 0]);
     expect(spec('stormfeather_griffin')).toEqual([20, 'epic', 0.65, 0.05, 0.05]);
-    expect(spec('lunar_cheshire')).toEqual([20, 'epic', 0.65, 0.05, 0.05]);
   });
 
   it('normalizeMountKey coerces unknown or absent keys to "" (unmounted)', () => {
@@ -99,8 +98,8 @@ describe('mount selection', () => {
     selectMount(sim.ctx, pid, 'valorsteed');
     toggleMount(sim.ctx, pid);
     expect(e.mountKey).toBe('valorsteed');
-    selectMount(sim.ctx, pid, 'lunar_cheshire');
-    expect(e.mountKey).toBe('lunar_cheshire');
+    selectMount(sim.ctx, pid, 'stormfeather_griffin');
+    expect(e.mountKey).toBe('stormfeather_griffin');
   });
 
   it('never live-swaps in combat (the pick updates, the ridden mount stays)', () => {
@@ -112,9 +111,9 @@ describe('mount selection', () => {
     selectMount(sim.ctx, pid, 'valorsteed');
     toggleMount(sim.ctx, pid);
     e.inCombat = true;
-    expect(selectMount(sim.ctx, pid, 'lunar_cheshire')).toBe(true);
+    expect(selectMount(sim.ctx, pid, 'stormfeather_griffin')).toBe(true);
     expect(e.mountKey).toBe('valorsteed');
-    expect(sim.players.get(pid)?.selectedMount).toBe('lunar_cheshire');
+    expect(sim.players.get(pid)?.selectedMount).toBe('stormfeather_griffin');
   });
 
   it('persists the pick (absent until chosen) and restores it on load', () => {
@@ -206,7 +205,7 @@ describe('mount specialty stats', () => {
     selectMount(sim.ctx, pid, 'valorsteed');
     toggleMount(sim.ctx, pid);
     expect(moveSpeedMult(e)).toBeCloseTo(1.4, 10);
-    selectMount(sim.ctx, pid, 'lunar_cheshire');
+    selectMount(sim.ctx, pid, 'stormfeather_griffin');
     expect(moveSpeedMult(e)).toBeCloseTo(1.65, 10);
     e.auras.push({
       id: 'slow_test',

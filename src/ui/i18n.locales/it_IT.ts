@@ -6752,7 +6752,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aerociclo del Giostratore d’Etere',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, il Rospo Saltombra',
   'hudChrome.mounts.name_stormfeather_griffin': 'Piumatempesta Toccacielo',
-  'hudChrome.mounts.name_lunar_cheshire': 'Cheshire Lunare',
   'hudChrome.mounts.desc_valorsteed':
     'Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6765,6 +6764,4 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
-  'hudChrome.mounts.desc_lunar_cheshire':
-    'Un felino lunatico che scivola tra le ombre con un sorriso indelebile.',
 };

@@ -6201,7 +6201,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': '乙太騎士懸浮機車',
   'hudChrome.mounts.name_shadowjump_toad': '影躍蟾蜍卡瑪影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天風暴之羽',
-  'hudChrome.mounts.name_lunar_cheshire': '月光柴郡貓',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一頭堅韌穩健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一隻堅毅耐久的蝸牛，可提升旅行速度。',
@@ -6211,5 +6210,4 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     '一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。',
-  'hudChrome.mounts.desc_lunar_cheshire': '一隻月光下的貓，帶著永不消失的笑容穿行於陰影之間。',
 };

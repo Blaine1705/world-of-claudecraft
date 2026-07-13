@@ -438,14 +438,12 @@ export const pt_BR: EnTranslations = {
       "name_aether_hover_cycle": "Aerociclo do Justador do Éter",
       "name_shadowjump_toad": "Kama-Kage, o Sapo Salta-Sombras",
       "name_stormfeather_griffin": "Pluma-Tormenta Alcança-Céu",
-      "name_lunar_cheshire": "Cheshire Lunar",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
       "desc_aether_hover_cycle": "Uma poderosa moto magitec projetada para travessias de combate rápidas e rente ao chão.",
       "desc_shadowjump_toad": "Um sapo gigante, maciço e de passo firme, treinado em saltos sombrios relâmpago por qualquer terreno.",
-      "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
-      "desc_lunar_cheshire": "Um felino lunar que desliza entre as sombras com um sorriso permanente."
+      "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas."
     },
     "vcup": {
       "title": "A Copa do Vale",

@@ -4547,7 +4547,10 @@ export class Renderer {
       v.visual.root.visible = active === v.visual;
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
+      // seatFwd slides the rider along facing onto saddles that sit off the
+      // model origin (the toad's is well back toward the tail).
       v.visual.root.position.y = v.mountLift;
+      v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
 

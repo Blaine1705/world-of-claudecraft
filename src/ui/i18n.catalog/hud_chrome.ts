@@ -453,7 +453,6 @@ export const hudChromeStrings = {
     name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
-    name_lunar_cheshire: 'Lunar Cheshire',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -463,7 +462,6 @@ export const hudChromeStrings = {
       'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
     desc_stormfeather_griffin:
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
-    desc_lunar_cheshire: 'A moonstruck feline that pads between shadows with an unfading grin.',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event

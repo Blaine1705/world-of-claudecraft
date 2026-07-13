@@ -6790,7 +6790,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Ätherlanzen-Schwebrad',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage die Schattensprungkröte',
   'hudChrome.mounts.name_stormfeather_griffin': 'Himmelsgreif Sturmfeder',
-  'hudChrome.mounts.name_lunar_cheshire': 'Mond-Grinsekatze',
   'hudChrome.mounts.desc_valorsteed':
     'Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6803,6 +6802,4 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
-  'hudChrome.mounts.desc_lunar_cheshire':
-    'Eine mondsüchtige Katze, die mit unvergänglichem Grinsen durch die Schatten streift.',
 };

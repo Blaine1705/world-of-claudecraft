@@ -17,8 +17,7 @@ export type MountKey =
   | 'valorsteed'
   | 'aether_hover_cycle'
   | 'shadowjump_toad'
-  | 'stormfeather_griffin'
-  | 'lunar_cheshire';
+  | 'stormfeather_griffin';
 
 export type MountRarity = 'common' | 'rare' | 'epic';
 
@@ -87,15 +86,6 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   stormfeather_griffin: {
     key: 'stormfeather_griffin',
     name: 'Sky-Reach Stormfeather',
-    rarity: 'epic',
-    level: 20,
-    moveSpeedPct: 0.65,
-    meleeBlockPct: 0.05,
-    critPct: 0.05,
-  },
-  lunar_cheshire: {
-    key: 'lunar_cheshire',
-    name: 'Lunar Cheshire',
     rarity: 'epic',
     level: 20,
     moveSpeedPct: 0.65,

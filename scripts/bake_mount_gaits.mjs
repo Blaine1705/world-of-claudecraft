@@ -5,7 +5,7 @@
 // authored directly against each rig's own bind pose: every rotation key is
 // rest * delta, so the pose can never leave the authored bind space.
 //
-//   node scripts/bake_mount_gaits.mjs            (all four rigged mounts)
+//   node scripts/bake_mount_gaits.mjs            (all rigged mounts)
 //   node scripts/bake_mount_gaits.mjs valorsteed (one)
 //
 // Rewrites public/models/mounts/<key>.glb in place. Idempotent: existing
@@ -54,7 +54,7 @@ const AXES = { pitch: [1, 0, 0], yaw: [0, 1, 0], roll: [0, 0, 1] };
 // flips swing so a positive angle moves feet toward the model's nose:
 // valorsteed faces -Z, the other three face +Z.
 //
-// legs: [upperBone, lowerBone|null, phase (cycle fraction), ampScale]
+// legs: [upperBone, lowerBone|null, phase (cycle fraction), ampScale, 'rear'?]
 // ---------------------------------------------------------------------------
 const RIGS = {
   valorsteed: {
@@ -75,12 +75,13 @@ const RIGS = {
   grag_bear: {
     root: 'tripo::Root',
     fwd: -1,
-    // full quadruped trot: diagonal pairs (FL+RR, FR+RL)
+    // full quadruped trot: diagonal pairs (FL+RR, FR+RL). A bear lumbers,
+    // it does not scamper: keep the leg swing well under the horse's.
     legs: [
-      ['bone_8', 'bone_9', 0, 1], // front left
-      ['tripo::Spine_3', 'tripo::Spine_4', 0.5, 1], // front right
-      ['bone_18', 'bone_19', 0.5, 1], // rear left
-      ['bone_22', 'bone_23', 0, 1], // rear right
+      ['bone_8', 'bone_9', 0, 0.55], // front left
+      ['tripo::Spine_3', 'tripo::Spine_4', 0.5, 0.55], // front right
+      ['bone_18', 'bone_19', 0.5, 0.55], // rear left
+      ['bone_22', 'bone_23', 0, 0.55], // rear right
     ],
     sway: { bone: 'tripo::0_Left_Limb_0', walk: 2.5, run: 3.5 }, // lumbering roll
     head: { bone: 'tripo::Head_0', amp: 3.5 },
@@ -89,25 +90,15 @@ const RIGS = {
     root: 'tripo::Root',
     fwd: -1,
     hop: true, // Walk/Run are hop cycles: crouch, launch, land
+    // rear flagged explicitly: the big legs read stilt-like when they swing
+    // toward full extension, so both pairs stay folded through the hop.
     legs: [
-      ['tripo::1_Right_Limb_0', 'tripo::1_Right_Limb_1', 0, 1.4], // big rear legs
-      ['tripo::1_Left_Limb_0', 'tripo::1_Left_Limb_1', 0, 1.4],
-      ['tripo::Spine_2', 'tripo::0_Right_Limb_0', 0, 0.8], // front reach
-      ['bone_7', 'tripo::0_Left_Limb_0', 0, 0.8],
+      ['tripo::1_Right_Limb_0', 'tripo::1_Right_Limb_1', 0, 0.85, 'rear'],
+      ['tripo::1_Left_Limb_0', 'tripo::1_Left_Limb_1', 0, 0.85, 'rear'],
+      ['tripo::Spine_2', 'tripo::0_Right_Limb_0', 0, 0.6], // front reach
+      ['bone_7', 'tripo::0_Left_Limb_0', 0, 0.6],
     ],
     head: { bone: 'tripo::Head_0', amp: 3 },
-  },
-  lunar_cheshire: {
-    root: 'tripo::Root',
-    fwd: -1,
-    legs: [
-      ['tripo::0_Left_Limb_0', 'tripo::0_Left_Limb_1', 0, 1], // front left
-      ['tripo::0_Right_Limb_0', 'tripo::0_Right_Limb_1', 0.5, 1], // front right
-      ['tripo::1_Left_Limb_0', null, 0.25, 0.7], // one shared rear bone
-    ],
-    head: { bone: 'tripo::Head_0', amp: 3 },
-    tail: { bone: 'tripo::Tail_0', axis: 'roll', amp: 12 },
-    tail2: { bone: 'tripo::Tail_2', axis: 'roll', amp: 10, phase: 0.25 },
   },
 };
 
@@ -250,17 +241,17 @@ for (const key of targets) {
       // Walk/Run as a hop: crouch into the jump, extend through the air.
       // Rear legs fold at the crouch (u=0) and extend mid-cycle; the body
       // arcs with a soft |sin| so it never dips below its rest height.
-      for (const [upper, lower, , scale] of cfg.legs) {
-        const rear = scale > 1;
+      for (const [upper, lower, , scale, tag] of cfg.legs) {
+        const rear = tag === 'rear';
         const amp = g.upper * scale * DEG * cfg.fwd;
         addRot(bone(upper), (u) => ({
           axis: 'pitch',
-          angle: -amp * 0.8 * Math.cos(u * Math.PI * 2),
+          angle: -amp * 0.6 * Math.cos(u * Math.PI * 2),
         }));
         if (lower)
           addRot(bone(lower), (u) => ({
             axis: 'pitch',
-            angle: (rear ? 1 : -0.6) * amp * 0.7 * Math.cos((u + 0.1) * Math.PI * 2),
+            angle: (rear ? 0.55 : -0.6) * amp * 0.7 * Math.cos((u + 0.1) * Math.PI * 2),
           }));
       }
       if (cfg.head)

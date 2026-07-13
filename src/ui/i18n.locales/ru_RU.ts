@@ -6674,7 +6674,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
-  'hudChrome.mounts.name_lunar_cheshire': 'Лунный Чешир',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6687,6 +6686,4 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
-  'hudChrome.mounts.desc_lunar_cheshire':
-    'Лунный кот, скользящий между тенями с неизменной ухмылкой.',
 };

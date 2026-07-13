@@ -6545,7 +6545,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'エーテルジャウスター・ホバーサイクル',
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
-  'hudChrome.mounts.name_lunar_cheshire': 'ルナ・チェシャ',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
   'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
@@ -6555,5 +6554,4 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
-  'hudChrome.mounts.desc_lunar_cheshire': '消えない笑みを浮かべ、影から影へと歩む月光の猫。',
 };

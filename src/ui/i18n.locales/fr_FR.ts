@@ -6819,7 +6819,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aérocycle du Jouteur d’Éther',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
   'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
-  'hudChrome.mounts.name_lunar_cheshire': 'Cheshire Lunaire',
   'hudChrome.mounts.desc_valorsteed':
     'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6832,6 +6831,4 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
-  'hudChrome.mounts.desc_lunar_cheshire':
-    'Un félin lunaire qui se faufile entre les ombres avec un sourire immuable.',
 };

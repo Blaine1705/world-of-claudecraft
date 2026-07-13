@@ -6767,7 +6767,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_aether_hover_cycle': 'Aerocicleta Justadora del Éter',
   'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, el Sapo Saltasombras',
   'hudChrome.mounts.name_stormfeather_griffin': 'Plumatormenta Alcanzacielos',
-  'hudChrome.mounts.name_lunar_cheshire': 'Cheshire Lunar',
   'hudChrome.mounts.desc_valorsteed':
     'Un corcel resistente y de paso firme que aumenta la velocidad de viaje.',
   'hudChrome.mounts.desc_grag_bear':
@@ -6780,6 +6779,4 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.',
   'hudChrome.mounts.desc_stormfeather_griffin':
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
-  'hudChrome.mounts.desc_lunar_cheshire':
-    'Un felino lunático que se desliza entre las sombras con una sonrisa imborrable.',
 };

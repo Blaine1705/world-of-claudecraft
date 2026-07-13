@@ -438,14 +438,12 @@ export const de_DE: EnTranslations = {
       "name_aether_hover_cycle": "Ätherlanzen-Schwebrad",
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
-      "name_lunar_cheshire": "Mond-Grinsekatze",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
       "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
-      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
-      "desc_lunar_cheshire": "Eine mondsüchtige Katze, die mit unvergänglichem Grinsen durch die Schatten streift."
+      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht."
     },
     "vcup": {
       "title": "Der Talpokal",

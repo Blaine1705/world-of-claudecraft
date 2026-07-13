@@ -30,7 +30,6 @@ const NAME_KEYS: Record<string, TranslationKey> = {
   aether_hover_cycle: 'hudChrome.mounts.name_aether_hover_cycle',
   shadowjump_toad: 'hudChrome.mounts.name_shadowjump_toad',
   stormfeather_griffin: 'hudChrome.mounts.name_stormfeather_griffin',
-  lunar_cheshire: 'hudChrome.mounts.name_lunar_cheshire',
 };
 
 const DESC_KEYS: Record<string, TranslationKey> = {
@@ -40,7 +39,6 @@ const DESC_KEYS: Record<string, TranslationKey> = {
   aether_hover_cycle: 'hudChrome.mounts.desc_aether_hover_cycle',
   shadowjump_toad: 'hudChrome.mounts.desc_shadowjump_toad',
   stormfeather_griffin: 'hudChrome.mounts.desc_stormfeather_griffin',
-  lunar_cheshire: 'hudChrome.mounts.desc_lunar_cheshire',
 };
 
 const RARITY_KEYS: Record<string, TranslationKey> = {

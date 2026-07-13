@@ -438,14 +438,12 @@ export const zh_TW: EnTranslations = {
       "name_aether_hover_cycle": "乙太騎士懸浮機車",
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
-      "name_lunar_cheshire": "月光柴郡貓",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
-      "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
-      "desc_lunar_cheshire": "一隻月光下的貓，帶著永不消失的笑容穿行於陰影之間。"
+      "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。"
     },
     "vcup": {
       "title": "溪谷盃",

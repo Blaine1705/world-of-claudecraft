@@ -124,7 +124,7 @@ console.log(
   }),
 );
 
-// Swap live onto the epic Lunar Cheshire, then the clipless hover cycle,
+// Swap live onto the epic Sky-Reach Stormfeather, then the clipless hover cycle,
 // waiting out each lazy GLB fetch via the renderer's view state.
 const swapTo = async (key, path) => {
   await page.evaluate((k) => {
@@ -141,7 +141,7 @@ const swapTo = async (key, path) => {
   await page.screenshot({ path });
   console.log(`${key}: ${path}`);
 };
-await swapTo('lunar_cheshire', 'tmp/mounts_cheshire.png');
+await swapTo('stormfeather_griffin', 'tmp/mounts_griffin.png');
 await swapTo('aether_hover_cycle', 'tmp/mounts_hover_cycle.png');
 
 await browser.close();

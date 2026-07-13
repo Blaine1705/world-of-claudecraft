@@ -438,14 +438,12 @@ export const ja_JP: EnTranslations = {
       "name_aether_hover_cycle": "エーテルジャウスター・ホバーサイクル",
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
-      "name_lunar_cheshire": "ルナ・チェシャ",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
-      "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
-      "desc_lunar_cheshire": "消えない笑みを浮かべ、影から影へと歩む月光の猫。"
+      "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。"
     },
     "vcup": {
       "title": "ヴェイルカップ",

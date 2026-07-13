@@ -569,13 +569,11 @@ export const VISUALS: Record<string, VisualDef> = {
   // src/render/mount_visuals.ts. Heights are deliberately imposing (a mount
   // should tower over the 2.6 humanoid the way a horse towers over a person);
   // walkRef/runRef foot-match the bake_mount_gaits.mjs cycle cadence to
-  // mounted ground speed. The valorsteed auto-rig faces -Z (its bind head
-  // sits at negative Z), so it alone carries the flip yaw.
+  // mounted ground speed.
   mount_valorsteed: {
     url: `${MOUNTS_DIR}/valorsteed.glb`,
     height: 3.8,
     clips: MOUNT_RIGGED,
-    yaw: Math.PI,
     walkRef: 2.6,
     runRef: 9,
     lazyPreload: true,
@@ -613,14 +611,6 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${MOUNTS_DIR}/stormfeather_griffin.glb`,
     height: 4.1,
     clips: MOUNT_RIGGED,
-    lazyPreload: true,
-  },
-  mount_lunar_cheshire: {
-    url: `${MOUNTS_DIR}/lunar_cheshire.glb`,
-    height: 3.5,
-    clips: MOUNT_RIGGED,
-    walkRef: 2.6,
-    runRef: 9,
     lazyPreload: true,
   },
 

@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { buildMountsView } from '../src/ui/mounts_view';
 
 describe('buildMountsView', () => {
-  it('lists all seven catalog mounts with the horse first', () => {
+  it('lists all six catalog mounts with the horse first', () => {
     const view = buildMountsView(1, '', '');
-    expect(view.rows).toHaveLength(7);
+    expect(view.rows).toHaveLength(6);
     expect(view.rows[0].key).toBe('valorsteed');
   });
 
@@ -15,8 +15,8 @@ describe('buildMountsView', () => {
     expect(at(10).valorsteed).toBe(false);
     expect(at(10).aether_hover_cycle).toBe(true);
     expect(at(15).aether_hover_cycle).toBe(false);
-    expect(at(15).lunar_cheshire).toBe(true);
-    expect(at(20).lunar_cheshire).toBe(false);
+    expect(at(15).stormfeather_griffin).toBe(true);
+    expect(at(20).stormfeather_griffin).toBe(false);
   });
 
   it('carries the card specialty percents per rarity tier', () => {
