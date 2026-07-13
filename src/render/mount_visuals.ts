@@ -48,10 +48,10 @@ const spec = (
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
-  valorsteed: spec('mount_valorsteed', 2.84, true),
-  grag_bear: spec('mount_grag_bear', 3.35, true),
-  stalkglider_snail: spec('mount_stalkglider_snail', 2.48, false),
-  aether_hover_cycle: spec('mount_aether_hover_cycle', 1.84, false, {
+  valorsteed: spec('mount_valorsteed', 2.55, true, undefined, -0.3),
+  grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
+  stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3),
+  aether_hover_cycle: spec('mount_aether_hover_cycle', 2.1, false, {
     amp: 0.14,
     hz: 1.1,
     idle: true,

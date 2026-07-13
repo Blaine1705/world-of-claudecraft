@@ -60,17 +60,21 @@ const RIGS = {
   valorsteed: {
     root: 'tripo::Root',
     fwd: 1,
-    // one shared front-leg chain (the auto-rig gave both forelegs one chain),
-    // so the horse canters: forelegs together, hindlegs together, half a
-    // cycle apart, with a rocking-horse body pitch.
+    // proper trot on diagonal pairs (FR+RL, FL+RR). The front-left leg's
+    // lower half is skin-welded to bone_12 (the whole head/front-assembly
+    // root, unusable), so that leg swings from its one dedicated thigh joint
+    // (bone_22) with a touch more amplitude to read evenly.
     legs: [
-      ['tripo::0_Left_Limb_0', 'tripo::0_Left_Limb_1', 0, 1],
-      ['tripo::Spine_3', 'tripo::0_Right_Limb_0', 0.5, 1],
-      ['bone_10', 'tripo::1_Left_Limb_0', 0.5, 1],
+      ['tripo::0_Left_Limb_0', 'tripo::0_Left_Limb_1', 0, 1], // front right
+      ['bone_10', 'tripo::1_Left_Limb_0', 0, 1], // rear left
+      ['bone_22', null, 0.5, 1.15], // front left (single-joint chain)
+      ['tripo::Spine_3', 'tripo::0_Right_Limb_0', 0.5, 1], // rear right
     ],
-    rock: { bone: 'tripo::Root', walk: 2.5, run: 4.5 },
+    rock: { bone: 'tripo::Root', walk: 1.5, run: 2.5 },
     head: { bone: 'bone_13', amp: 4 },
-    tail: { bone: 'bone_4', axis: 'yaw', amp: 10 },
+    // bone_5 carries the braid; its parent bone_4 also holds saddle-bag
+    // vertices, which must not wag with the tail.
+    tail: { bone: 'bone_5', axis: 'yaw', amp: 10 },
   },
   grag_bear: {
     root: 'tripo::Root',
@@ -98,6 +102,15 @@ const RIGS = {
       ['tripo::Spine_2', 'tripo::0_Right_Limb_0', 0, 0.6], // front reach
       ['bone_7', 'tripo::0_Left_Limb_0', 0, 0.6],
     ],
+    // the generated mesh's legs are outsized for a mount: shrink each leg
+    // uniformly around its shoulder/hip joint (children inherit the scale,
+    // the normalization pass re-grounds the shorter legs)
+    boneScale: {
+      'tripo::1_Right_Limb_0': 0.6,
+      'tripo::1_Left_Limb_0': 0.6,
+      'tripo::Spine_2': 0.75,
+      bone_7: 0.75,
+    },
     head: { bone: 'tripo::Head_0', amp: 3 },
   },
 };
@@ -143,6 +156,9 @@ for (const key of targets) {
   };
 
   for (const anim of root.listAnimations()) anim.dispose();
+
+  // static rest-scale adjustments (idempotent: setScale overwrites)
+  for (const [n, f] of Object.entries(cfg.boneScale ?? {})) bone(n).setScale([f, f, f]);
 
   const makeClip = (name) => {
     const g = GAITS[name];

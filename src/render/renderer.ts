@@ -4698,7 +4698,11 @@ export class Renderer {
         mst.backwards = st.backwards;
         mst.swimming = st.swimming;
         v.mountVisual.update(dt, mst, animate);
-        v.mountVisual.root.position.y = mountBobY(mountSpec, this.time, moving);
+        // the rider floats/hops WITH the procedural bob (the hover cycle's
+        // idle float, the griffin's canter hops), not just the mount body
+        const bob = mountBobY(mountSpec, this.time, moving);
+        v.mountVisual.root.position.y = bob;
+        v.visual.root.position.y = v.mountLift + bob;
       }
 
       const emoteId =
