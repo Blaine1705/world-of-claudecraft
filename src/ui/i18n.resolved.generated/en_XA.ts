@@ -7471,9 +7471,6 @@ export const en_XA: EnTranslations = {
       "duskwisp": {
         "name": "[Ðúšķŵíšþ]"
       },
-      "hollow_spirit": {
-        "name": "[Ĥóļļóŵ Šþíŕíţ]"
-      },
       "veiled_stag": {
         "name": "[Ʋéíļéð Šţáĝ]"
       },
@@ -7485,6 +7482,9 @@ export const en_XA: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "[Çóŕŕúþţéð Šþóŕéļíñĝ]"
+      },
+      "mushroom_pixie": {
+        "name": "[Ĝļéáɱƒóļķ Þíẋíé]"
       },
       "treant_elder": {
         "name": "[Ţŕéáñţ Éļðéŕ]"

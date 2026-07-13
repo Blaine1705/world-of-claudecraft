@@ -157,25 +157,6 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     scale: 0.8,
     color: 0x7a5f9e,
   },
-  hollow_spirit: {
-    id: 'hollow_spirit',
-    name: 'Hollow Spirit',
-    minLevel: 16,
-    maxLevel: 17,
-    family: 'elemental',
-    hpBase: 58,
-    hpPerLevel: 21,
-    dmgBase: 12,
-    dmgPerLevel: 2.6,
-    attackSpeed: 2.0,
-    armorPerLevel: 14,
-    moveSpeed: 7.5,
-    aggroRadius: 5, // defends itself and its kin, never hunts
-    mendAlly: { healMin: 38, healMax: 52, radius: 14, every: 9, name: 'Spirit Mending' },
-    loot: [{ copper: 80, chance: 1 }],
-    scale: 0.9,
-    color: 0x8fe8d8,
-  },
   veiled_stag: {
     id: 'veiled_stag',
     name: 'Veiled Stag',
@@ -217,6 +198,24 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0xf2dcff,
+  },
+  mushroom_pixie: {
+    id: 'mushroom_pixie',
+    name: 'Gleamfolk Pixie',
+    minLevel: 15,
+    maxLevel: 16,
+    family: 'kobold',
+    hpBase: 50,
+    hpPerLevel: 17,
+    dmgBase: 8,
+    dmgPerLevel: 2.0,
+    attackSpeed: 2.2,
+    armorPerLevel: 10,
+    moveSpeed: 7.5,
+    aggroRadius: 0, // the little folk of the village never strike first
+    loot: [],
+    scale: 1.0,
+    color: 0xd8c4f0,
   },
   sporeling_gatherer: {
     id: 'sporeling_gatherer',
@@ -778,7 +777,6 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'glimmerwisp', center: { x: 60, z: 1150 }, radius: 14, count: 4 },
   { mobId: 'duskwisp', center: { x: 126, z: 1120 }, radius: 12, count: 4 },
   { mobId: 'duskwisp', center: { x: -30, z: 1200 }, radius: 14, count: 4 },
-  { mobId: 'hollow_spirit', center: { x: -75, z: 1170 }, radius: 18, count: 5 },
   { mobId: 'veiled_stag', center: { x: 92, z: 962 }, radius: 18, count: 6 },
   { mobId: 'sporeling_gatherer', center: { x: -95, z: 1180 }, radius: 14, count: 5 },
   { mobId: 'corrupted_sporeling', center: { x: -25, z: 1218 }, radius: 14, count: 6 },
@@ -792,6 +790,8 @@ export const REALM_CAMPS: CampDef[] = [
   // wandering bosses (rare elites, long respawns, appended last for rng order)
   { mobId: 'old_marrowshell', center: { x: 103, z: 1144 }, radius: 5, count: 1 },
   { mobId: 'aurelhorn', center: { x: 70, z: 995 }, radius: 6, count: 1 },
+  // the Gleamfolk going about their village (appended last for rng order)
+  { mobId: 'mushroom_pixie', center: { x: -95, z: 1186 }, radius: 16, count: 5 },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1021,9 +1021,14 @@ export const REALM_PROPS: ZonePropsDef = {
   greatTrees: [{ x: -40, z: 1026, r: 2.6 }],
   buildings: [
     { kind: 'inn', x: -58, z: 1046, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: -22, z: 1048, w: 7, d: 6, rot: -0.4 },
-    { kind: 'house', x: -62, z: 1016, w: 6, d: 6, rot: 1.2 },
+    // hollowHouse: the same crisp village house geometry in the Hollow's dusk
+    // palette (violet roofs, glowing amethyst windows; render/props.ts)
+    { kind: 'hollowHouse', x: -22, z: 1048, w: 7, d: 6, rot: -0.4 },
+    { kind: 'hollowHouse', x: -62, z: 1016, w: 6, d: 6, rot: 1.2 },
     { kind: 'chapel', x: -18, z: 1012, w: 5, d: 7, rot: -1.9 }, // the shrine
+    // the two homes on the fringe (these replaced the generated cottages)
+    { kind: 'hollowHouse', x: -72, z: 1034, w: 7, d: 6, rot: 1.35 },
+    { kind: 'hollowHouse', x: -12, z: 1046, w: 7, d: 6, rot: -1.8 },
   ],
   wells: [{ x: -40, z: 1042, r: 1.5 }],
   stalls: [
@@ -1061,4 +1066,24 @@ export const REALM_PROPS: ZonePropsDef = {
     { x: 160, z: 1230, ringR: 4, columns: 3 },
   ],
   graveyards: [{ x: -60, z: 1004 }],
+  // Hand-placed decor (render/props.ts PROP_ASSET_DEFS). Only the user-made
+  // set remains: the pixie mushroom houses and the flora one-offs that the
+  // realm_flora scatter already uses (the giant mushroom is the village
+  // heart). Collider radii match the model footprints.
+  decorProps: [
+    // -- the pixie village in the Gleaming Deep: mushroom houses around the
+    //    sporeling rings. Scaled 2x from the authored 4yd so they stand at
+    //    regular village-house height (8yd); r doubles in lockstep. --
+    { key: 'pixieMushroomHouse', x: -108, z: 1168, rot: 0.9, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -84, z: 1194, rot: -2.1, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -112, z: 1188, rot: 1.9, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -78, z: 1162, rot: -0.7, r: 3.4, h: 8, scale: 2 },
+    { key: 'pixieMushroomHouse', x: -96, z: 1206, rot: 2.8, r: 3.4, h: 8, scale: 2 },
+    // the village heart: the great mushroom (the user's own model, also the
+    // Gleaming Deep giants), risen as the pixies' moot hall. Kept taller
+    // than the 8yd houses so it stays the village centerpiece.
+    { key: 'mushroomGiantPurple', x: -95, z: 1186, rot: 0.8, r: 1.9, h: 10, scale: 10 },
+    { key: 'mushroomGlowCluster', x: -104, z: 1174, scale: 2.5 },
+    { key: 'flowerGlow', x: -90, z: 1190, scale: 1.6 },
+  ],
 };

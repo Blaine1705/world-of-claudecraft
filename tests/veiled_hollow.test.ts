@@ -211,3 +211,84 @@ describe('the Pale Causeway', () => {
     expect(p.hp).toBe(1000);
   });
 });
+
+describe('the storybook decor set (decorProps)', () => {
+  const decor = REALM_PROPS.decorProps ?? [];
+
+  it('has entries (the set is placed) and every one sits on dry land', () => {
+    expect(decor.length).toBeGreaterThan(0);
+    for (const d of decor) {
+      if (d.z >= 960 && d.z <= 1262) {
+        expect(hollowLandness(d.x, d.z), `${d.key} at ${d.x},${d.z} landness`).toBeGreaterThan(
+          0.14,
+        );
+      }
+      expect(terrainHeight(d.x, d.z, SEED), `${d.key} at ${d.x},${d.z} height`).toBeGreaterThan(
+        WATER_LEVEL,
+      );
+    }
+  });
+
+  it('keeps every colliding prop clear of the road network', () => {
+    // A collider straddling a road would wall the path players are funneled
+    // down. Point-to-segment distance against every road polyline.
+    function roadDistance(x: number, z: number): number {
+      let best = Number.POSITIVE_INFINITY;
+      for (const road of REALM_ROADS) {
+        for (let i = 0; i < road.length - 1; i++) {
+          const ax = road[i].x;
+          const az = road[i].z;
+          const dx = road[i + 1].x - ax;
+          const dz = road[i + 1].z - az;
+          const len2 = dx * dx + dz * dz;
+          const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len2));
+          const px = ax + dx * t - x;
+          const pz = az + dz * t - z;
+          best = Math.min(best, Math.hypot(px, pz));
+        }
+      }
+      return best;
+    }
+    for (const d of decor) {
+      if (!d.r) continue;
+      expect(roadDistance(d.x, d.z), `${d.key} at ${d.x},${d.z} road clearance`).toBeGreaterThan(
+        d.r + 1.2,
+      );
+    }
+  });
+
+  it('collider entries block live-sim movement; dressing does not', () => {
+    // Walk straight at a pixie mushroom house: the circle collider must hold
+    // the player outside its radius.
+    const cottage = decor.find((d) => d.key === 'pixieMushroomHouse');
+    if (!cottage?.r) throw new Error('expected a colliding pixieMushroomHouse entry');
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
+    const p = sim.player;
+    p.pos.x = cottage.x;
+    p.pos.z = cottage.z + cottage.r + 4;
+    p.pos.y = terrainHeight(p.pos.x, p.pos.z, SEED);
+    p.prevPos = { ...p.pos };
+    p.facing = Math.PI; // 0 faces +z; walk south into the cottage
+    sim.moveInput.forward = true;
+    let minDist = Number.POSITIVE_INFINITY;
+    for (let t = 0; t < 20 * 4; t++) {
+      sim.tick();
+      minDist = Math.min(minDist, Math.hypot(p.pos.x - cottage.x, p.pos.z - cottage.z));
+    }
+    expect(minDist).toBeGreaterThan(cottage.r - 0.1);
+
+    // Walk clean across a glow-flower patch: r 0 dressing never blocks.
+    const bed = decor.find((d) => d.key === 'flowerGlow' && !d.r);
+    if (!bed) throw new Error('expected a walk-through flowerGlow entry');
+    const sim2 = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
+    const p2 = sim2.player;
+    p2.pos.x = bed.x;
+    p2.pos.z = bed.z - 4;
+    p2.pos.y = terrainHeight(p2.pos.x, p2.pos.z, SEED);
+    p2.prevPos = { ...p2.pos };
+    p2.facing = 0; // walk north across the bed
+    sim2.moveInput.forward = true;
+    for (let t = 0; t < 20 * 4; t++) sim2.tick();
+    expect(p2.pos.z).toBeGreaterThan(bed.z + 2);
+  });
+});

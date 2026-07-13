@@ -7471,9 +7471,6 @@ export const ja_JP: EnTranslations = {
       "duskwisp": {
         "name": "ダスクウィスプ"
       },
-      "hollow_spirit": {
-        "name": "幽谷の精霊"
-      },
       "veiled_stag": {
         "name": "ヴェールの牡鹿"
       },
@@ -7485,6 +7482,9 @@ export const ja_JP: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "堕落したスポアリング"
+      },
+      "mushroom_pixie": {
+        "name": "Gleamfolk Pixie"
       },
       "treant_elder": {
         "name": "トレントの長老"

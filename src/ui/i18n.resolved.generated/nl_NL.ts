@@ -7471,9 +7471,6 @@ export const nl_NL: EnTranslations = {
       "duskwisp": {
         "name": "Duskwisp"
       },
-      "hollow_spirit": {
-        "name": "Hollow Spirit"
-      },
       "veiled_stag": {
         "name": "Veiled Stag"
       },
@@ -7485,6 +7482,9 @@ export const nl_NL: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "Corrupted Sporeling"
+      },
+      "mushroom_pixie": {
+        "name": "Gleamfolk Pixie"
       },
       "treant_elder": {
         "name": "Treant Elder"

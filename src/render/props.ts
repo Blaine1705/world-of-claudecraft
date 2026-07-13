@@ -67,6 +67,11 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },
   house3: { url: '/models/props/house_3.glb', kit: 'village' },
+  // Veiled Hollow restyles: the same crisp village house geometry under the
+  // 'hvillage' material overrides (violet roofs, amethyst windows, dusk
+  // timber). Placed via BuildingDef kind 'hollowHouse'.
+  hollowHouse1: { url: '/models/props/house_1.glb', kit: 'hvillage' },
+  hollowHouse2: { url: '/models/props/house_2.glb', kit: 'hvillage', yaw: -Math.PI / 2 },
   blacksmith: { url: '/models/props/blacksmith.glb', kit: 'village' },
   inn: { url: '/models/props/inn.glb', kit: 'village' },
   bellTower: { url: '/models/props/bell_tower.glb', kit: 'village' },
@@ -107,6 +112,16 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // No yaw here: the geometry is CACHED and shared by every delve marker, so a
   // per-delve flip is applied to the placed group in buildProps, never baked.
   delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
+  // Veiled Hollow hand-placed decor, all user-made models: the Tripo pixie
+  // house (pipeline-normalized: world scale, front on +z) and the flora
+  // GLBs realm_flora.ts also scatters (near unit size, so decor entries set
+  // an explicit scale; propAsset re-bases min-y to 0 at extraction).
+  // Consumed via ZonePropsDef.decorProps.
+  pixieMushroomHouse: { url: '/models/props/pixie_mushroom_house.glb', kit: 'hollow' },
+  mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
+  mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
+  flowerGlow: { url: '/models/props/flower_glow.glb', kit: 'hollow' },
+  shrubFlowering: { url: '/models/props/shrub_flowering.glb', kit: 'hollow' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -220,6 +235,20 @@ const MAT_OVERRIDES: Record<
   'minerock:_defaultMat': { color: 0x6f7376 },
   // graveyard colormap is near-white; knock it toward weathered stone
   'grave:colormap': { color: 0xd2d2c8 },
+  // Veiled Hollow village restyle: dusk palette over the crisp house kit.
+  // Violet roof tiles, amethyst glass lit from within, timber and stone
+  // shifted cool so the buildings sit under the permanent dusk.
+  'hvillage:RoofTiles': { color: 0x5c4180 },
+  'hvillage:RoofTiles_Red': { color: 0x5c4180 },
+  'hvillage:Windows': { emissive: 0x9a5fd8, emissiveIntensity: 1.5, roughness: 0.4 },
+  'hvillage:Plaster': { color: 0xe6dccd },
+  'hvillage:Beige': { color: 0xe6dccd },
+  'hvillage:Wood': { color: 0x66507a },
+  'hvillage:Wood_Side': { color: 0x584468 },
+  'hvillage:Wood_Light': { color: 0x84699c },
+  'hvillage:Stone': { color: 0x86808f },
+  'hvillage:Stone_Light': { color: 0xa19aad },
+  'hvillage:Stone_Dark': { color: 0x6b6577 },
 };
 
 // ---------------------------------------------------------------------------
@@ -272,28 +301,39 @@ function convertMaterial(
       ? new THREE.Color(ov.color)
       : (s.color?.clone() ?? new THREE.Color(0xffffff));
   const map = s.map ?? null;
+  // Tripo-generated 'hollow' kit: one baked painterly albedo per model, glow
+  // painted in, smooth normals. Two nudges make them sit beside the
+  // hand-authored kits: flat shading (faceted low-poly light response) and a
+  // soft albedo re-emit (the realm_flora mushroom trick) so painted windows,
+  // lanterns, and crystals actually shine under the permanent dusk.
+  const hollow = kit === 'hollow';
+  const hollowEmissive = hollow && map;
   let mat: THREE.Material;
   if (GFX.standardMaterials) {
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
       vertexColors: hasVertexColors,
+      flatShading: hollow,
       normalMap: s.normalMap ?? null,
       roughnessMap: s.roughnessMap ?? null,
       metalnessMap: s.metalnessMap ?? null,
       aoMap: s.aoMap ?? null,
-      roughness: ov?.roughness ?? (s.isMeshStandardMaterial ? s.roughness : 0.9),
+      roughness: ov?.roughness ?? (hollow ? 0.85 : s.isMeshStandardMaterial ? s.roughness : 0.9),
       metalness: ov?.metalness ?? (s.isMeshStandardMaterial ? Math.min(s.metalness, 0.85) : 0),
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
-      emissiveIntensity: ov?.emissiveIntensity ?? 1,
+      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
+      emissiveMap: hollowEmissive ? map : null,
+      emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),
     });
   } else {
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
       vertexColors: hasVertexColors,
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
-      emissiveIntensity: (ov?.emissiveIntensity ?? 1) * 0.6,
+      flatShading: hollow,
+      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
+      emissiveMap: hollowEmissive ? map : null,
+      emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
   mat.name = `${kit}:${s.name}`;
@@ -780,11 +820,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   // ---- buildings: village houses / inn / composed chapel ------------------
   const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
+  const hollowPool: PropKey[] = ['hollowHouse1', 'hollowHouse2'];
   const houseHeight: Record<string, number> = {
     house1: 8.0,
     house2: 7.6,
     blacksmith: 6.6,
     inn: 7.6,
+    hollowHouse1: 8.0,
+    hollowHouse2: 7.6,
   };
 
   for (const b of getActiveWorldContent().props.buildings) {
@@ -812,8 +855,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
       continue;
     }
+    const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
     const asset: PropKey =
-      b.kind === 'inn' ? 'inn' : housePool[Math.floor(keyRand(key, 3) * 0.999 * housePool.length)];
+      b.kind === 'inn' ? 'inn' : pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -821,6 +865,25 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = b.rot;
     group.add(shadowed(g));
     registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
+  }
+
+  // ---- hand-placed GLB decor (the generated storybook set) -----------------
+  // World-scale, front-on-+z models: place at scale 1, orient with rot alone.
+  // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
+  // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
+  for (const d of getActiveWorldContent().props.decorProps ?? []) {
+    if (!(d.key in PROP_ASSET_DEFS)) {
+      console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
+      continue;
+    }
+    const g = new THREE.Group();
+    addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    g.position.set(d.x, ground(d.x, d.z) - 0.05, d.z);
+    g.rotation.y = d.rot ?? 0;
+    group.add(shadowed(g));
+    if (d.r) {
+      registerHideable(g, circleFootprint(d.x, d.z, d.r, ground(d.x, d.z) + (d.h ?? 4)));
+    }
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------

@@ -1693,7 +1693,9 @@ export interface PortalDef {
 }
 
 export interface BuildingDef {
-  kind: 'house' | 'inn' | 'chapel';
+  // hollowHouse is the Veiled Hollow restyle of the village house models
+  // (same geometry and colliders, dusk-palette materials; see render/props.ts)
+  kind: 'house' | 'inn' | 'chapel' | 'hollowHouse';
   x: number;
   z: number;
   w: number;
@@ -1727,6 +1729,23 @@ export interface ZonePropsDef {
   // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
   // colliders here, rendered by render/realm_flora.ts from the same record.
   greatTrees?: { x: number; z: number; r: number }[];
+  // Hand-placed one-off GLB props (the generated storybook set). `key` names a
+  // PROP_ASSET_DEFS entry (render/props.ts); the GLB is authored at world scale
+  // with its front on +z, so `rot` alone orients it. r > 0 adds a circle
+  // collider of that radius (keep it matched to the model's measured footprint,
+  // or to the trunk for canopy trees); r 0/absent is walk-through dressing.
+  // h is the visual height, used only for the camera-ghost top. scale is a
+  // uniform visual multiplier over the authored world-scale model; when set,
+  // keep r and h matched to the SCALED footprint by hand.
+  decorProps?: {
+    key: string;
+    x: number;
+    z: number;
+    rot?: number;
+    r?: number;
+    h?: number;
+    scale?: number;
+  }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {

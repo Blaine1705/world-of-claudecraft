@@ -334,49 +334,70 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/knight/alt_a.png`,
     `${SKINS_DIR}/knight/alt_b.png`,
     `${SKINS_DIR}/knight/alt_c.png`,
+    `${SKINS_DIR}/knight/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/knight/alt_suit_chrome.png`,
   ],
-  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],
+  player_paladin: [
+    null,
+    `${SKINS_DIR}/paladin/alt_a.png`,
+    `${SKINS_DIR}/paladin/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/paladin/alt_suit_chrome.png`,
+  ],
   player_hunter: [
     null,
     `${SKINS_DIR}/ranger/alt_a.png`,
     `${SKINS_DIR}/ranger/alt_b.png`,
     `${SKINS_DIR}/ranger/alt_c.png`,
+    `${SKINS_DIR}/ranger/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/ranger/alt_suit_chrome.png`,
   ],
   player_rogue: [
     null,
     `${SKINS_DIR}/rogue/alt_a.png`,
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
+    `${SKINS_DIR}/rogue/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/rogue/alt_suit_chrome.png`,
   ],
   player_priest: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_mage: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_warlock: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
     `${SKINS_DIR}/mage/alt_b.png`,
     `${SKINS_DIR}/mage/alt_c.png`,
+    `${SKINS_DIR}/mage/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/mage/alt_suit_chrome.png`,
   ],
   player_shaman: [
     null,
     `${SKINS_DIR}/barbarian/alt_a.png`,
     `${SKINS_DIR}/barbarian/alt_b.png`,
     `${SKINS_DIR}/barbarian/alt_c.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/barbarian/alt_suit_chrome.png`,
   ],
   player_druid: [
     null,
     `${SKINS_DIR}/druid/alt_a.png`,
     `${SKINS_DIR}/druid/alt_b.png`,
     `${SKINS_DIR}/druid/alt_c.png`,
+    `${SKINS_DIR}/druid/alt_suit_prismatic.png`,
+    `${SKINS_DIR}/druid/alt_suit_chrome.png`,
   ],
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
@@ -575,6 +596,28 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: WOLF_BAKED,
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // The Gleamfolk pixie villager (Veiled Hollow): Tripo biped from the user's
+  // game-style concept, auto-rigged, clips renamed to the game vocabulary at
+  // bake time. A light entity tint gives individual villagers variety.
+  mob_mushroom_pixie: {
+    url: `${CREATURES}/mushroom_pixie.glb`,
+    height: HUMANOID_H, // villagers stand player-height, cap and all
+    // The Tripo rig rests facing +x; yaw swings the model onto the game's
+    // +z-forward convention so walking and combat face the right way.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+    },
+    tint: 'entity',
+    tintStrength: 0.2,
   },
   greyjaw: {
     // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
@@ -1202,11 +1245,11 @@ const MOB_KEYS: Record<string, string> = {
   waking_warden: 'skel_golem',
   glimmerwisp: 'mob_ghost',
   duskwisp: 'mob_ghost',
-  hollow_spirit: 'mob_ghost',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
+  mushroom_pixie: 'mob_mushroom_pixie',
   treant_elder: 'mob_treant',
   old_marrowshell: 'mob_crab',
   aurelhorn: 'mob_bull',

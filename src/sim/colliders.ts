@@ -142,6 +142,20 @@ function staticWorldColliders(seed: number): Collider[] {
       camGhost: true,
     });
 
+  // hand-placed GLB decor: circle collider matched to the model footprint;
+  // r 0/absent entries are walk-through dressing and add no collider
+  for (const d of PROPS.decorProps ?? []) {
+    if (!d.r) continue;
+    out.push({
+      type: 'circle',
+      x: d.x,
+      z: d.z,
+      r: d.r,
+      cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
+      camGhost: true,
+    });
+  }
+
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
     const mound = rotY(0, -3.4, m.rot);

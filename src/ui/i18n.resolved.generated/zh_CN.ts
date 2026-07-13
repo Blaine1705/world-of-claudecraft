@@ -7471,9 +7471,6 @@ export const zh_CN: EnTranslations = {
       "duskwisp": {
         "name": "暮光灵"
       },
-      "hollow_spirit": {
-        "name": "幽谷之灵"
-      },
       "veiled_stag": {
         "name": "帷纱雄鹿"
       },
@@ -7485,6 +7482,9 @@ export const zh_CN: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "堕落的孢子人"
+      },
+      "mushroom_pixie": {
+        "name": "Gleamfolk Pixie"
       },
       "treant_elder": {
         "name": "树人长者"

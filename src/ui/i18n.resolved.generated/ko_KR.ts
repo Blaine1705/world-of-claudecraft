@@ -7471,9 +7471,6 @@ export const ko_KR: EnTranslations = {
       "duskwisp": {
         "name": "황혼 위습"
       },
-      "hollow_spirit": {
-        "name": "골짜기 정령"
-      },
       "veiled_stag": {
         "name": "장막 수사슴"
       },
@@ -7485,6 +7482,9 @@ export const ko_KR: EnTranslations = {
       },
       "corrupted_sporeling": {
         "name": "타락한 포자꾼"
+      },
+      "mushroom_pixie": {
+        "name": "Gleamfolk Pixie"
       },
       "treant_elder": {
         "name": "나무정령 원로"
