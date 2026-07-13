@@ -241,27 +241,7 @@ function placeFlora(seed: number): Placements {
 
   // (crystal formations: replaced by generated crystal assets, see decorProps)
 
-  // --- weeping willows around the two lakeshores ---
-  for (const lake of [STARFALL_LAKE, SHALLOWS_LAKE]) {
-    for (let k = 0; k < 14; k++) {
-      const ang = (k / 14) * Math.PI * 2 + hash2(k, lake.x, seed + 411) * 0.5;
-      const dist = lake.r + 5 + hash2(lake.x, k, seed + 421) * 7;
-      const x = lake.x + Math.sin(ang) * dist;
-      const z = lake.z + Math.cos(ang) * dist;
-      const y = usable(x, z, 3);
-      if (y === null) continue;
-      if (hash2(Math.round(x), Math.round(z), seed + 431) > 0.7) continue;
-      out.willows.push({
-        x,
-        z,
-        y,
-        scale: 0.85 + hash2(k, k + 1, seed + 441) * 0.5,
-        rot: ang,
-        variant: 0,
-        tint: 0xffffff,
-      });
-    }
-  }
+  // (willows retired: user pass, 2026-07-14)
 
   // (blossom trees retired: user pass, 2026-07)
 
