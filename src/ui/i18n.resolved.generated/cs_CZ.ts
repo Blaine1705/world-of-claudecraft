@@ -8780,7 +8780,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_gleaming_antlers": {
         "title": "Gleaming Antlers",
-        "text": "The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds at Starfall Basin, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.",
+        "text": "The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds on the Westway meadow, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.",
         "completion": "Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.",
         "objectives": {
           "0": {

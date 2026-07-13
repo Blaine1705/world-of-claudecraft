@@ -605,7 +605,7 @@ export const REALM_QUESTS: Record<string, QuestDef> = {
     name: 'Gleaming Antlers',
     giverNpcId: 'provisioner_fenna',
     turnInNpcId: 'provisioner_fenna',
-    text: 'The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds at Starfall Basin, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.',
+    text: 'The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds on the Westway meadow, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.',
     completionText:
       'Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.',
     objectives: [
@@ -779,7 +779,7 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'glimmerwisp', center: { x: 60, z: 1150 }, radius: 14, count: 4 },
   { mobId: 'duskwisp', center: { x: 126, z: 1120 }, radius: 12, count: 4 },
   { mobId: 'duskwisp', center: { x: -30, z: 1200 }, radius: 14, count: 4 },
-  { mobId: 'veiled_stag', center: { x: 92, z: 962 }, radius: 18, count: 6 },
+  { mobId: 'veiled_stag', center: { x: 132, z: 1108 }, radius: 16, count: 6 },
   { mobId: 'sporeling_gatherer', center: { x: -95, z: 1180 }, radius: 14, count: 5 },
   { mobId: 'corrupted_sporeling', center: { x: -25, z: 1218 }, radius: 14, count: 6 },
   { mobId: 'corrupted_sporeling', center: { x: -60, z: 1226 }, radius: 12, count: 5 },
@@ -791,7 +791,7 @@ export const REALM_CAMPS: CampDef[] = [
   { mobId: 'gleamstag', center: { x: -145, z: 1100 }, radius: 4, count: 1 },
   // wandering bosses (rare elites, long respawns, appended last for rng order)
   { mobId: 'old_marrowshell', center: { x: 103, z: 1144 }, radius: 5, count: 1 },
-  { mobId: 'aurelhorn', center: { x: 70, z: 995 }, radius: 6, count: 1 },
+  { mobId: 'aurelhorn', center: { x: 140, z: 1098 }, radius: 6, count: 1 },
   // the Gleamfolk going about their village (appended last for rng order)
   { mobId: 'mushroom_pixie', center: { x: -95, z: 1186 }, radius: 16, count: 5 },
 ];
@@ -1117,8 +1117,8 @@ export const REALM_PROPS: ZonePropsDef = {
     { key: 'kkWall', x: 108.3, z: 977.18, rot: 3.36, r: 1.1, h: 2.4, scale: 0.55 },
     { key: 'kkWall', x: 106.26, z: 977.93, rot: 3.63, r: 1.1, h: 2.4, scale: 0.55 },
     { key: 'kkWall', x: 104.49, z: 979.2, rot: 3.9, r: 1.1, h: 2.4, scale: 0.55 },
-    { key: 'kkPillar', x: 102.57, z: 987.97, rot: -1.19, r: 0.7, h: 3, scale: 0.6 },
+    { key: 'kkPillar', x: 102.98, z: 988.84, rot: -1.07, r: 0.7, h: 3, scale: 0.6 },
     { key: 'kkPillar', x: 102.57, z: 982.03, rot: 4.33, r: 0.7, h: 3, scale: 0.6 },
-    { key: 'stagShrine', x: 86, z: 948, rot: 0.4, r: 1.5, h: 3.2 },
+    { key: 'stagShrine', x: 126, z: 1100, rot: 0.64, r: 1.5, h: 3.2 },
   ],
 };
