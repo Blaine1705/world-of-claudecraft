@@ -54,8 +54,6 @@ export interface UnitFrameDescriptor {
   hpFrac: number;
   /** Preformatted, localized health text ("523 / 600", or a localized "Dead"). */
   hpText: string;
-  /** Append the resolved absorb total to hpText, for player/target frames only. */
-  showAbsorbText?: boolean;
   /** The unit's power kind; `none` for a frame with no resource bar (target). */
   resourceKind: UnitResourceKind;
   /** resource / max(1, maxResource); ignored when resourceKind is `none`. */
@@ -67,6 +65,13 @@ export interface UnitFrameDescriptor {
   levelText: string | null;
   /** The unit's display name. */
   name: string;
+  /** The name line's title decoration (the Book of Deeds display title),
+   *  PRE-LOCALIZED at the call site (the core stays i18n-free): everything the
+   *  locale pattern places before the name (`titlePre`) and after it
+   *  (`titlePost`). Optional and absent for instances without a title surface
+   *  (player, party); absent means empty decoration. */
+  titlePre?: string;
+  titlePost?: string;
   /** The portrait identity. The PAINTER owns the repaint gate (repaint only when
    *  this key changes); the core just exposes it so target's lastPortraitTarget
    *  gating is the same code path. */
@@ -94,13 +99,14 @@ export interface UnitFrameView {
   resText: string;
   levelText: string | null;
   name: string;
+  /** The pre-localized title decoration around the name ('' when untitled or
+   *  the instance has no title surface). */
+  titlePre: string;
+  titlePost: string;
   portraitKey: string;
-  /** The absorb-shield overlay right edge, clamped by absorbBarView. */
+  /** The absorb-shield overlay fraction (hp + absorb) / maxHp, clamped by
+   *  absorbBarView; equals hpFrac when there is no shield. */
   absorbFrac: number;
-  /** The left edge of the visible shield segment. */
-  absorbStartFrac: number;
-  /** The width of the visible shield segment. */
-  absorbSizeFrac: number;
   /** The shield reaches/passes the bar's right edge (fully shielded). */
   absorbOvershield: boolean;
   dead: boolean;
@@ -118,24 +124,18 @@ const HIDDEN: UnitFrameView = {
   resText: '',
   levelText: null,
   name: '',
+  titlePre: '',
+  titlePost: '',
   portraitKey: '',
   absorbFrac: 0,
-  absorbStartFrac: 0,
-  absorbSizeFrac: 0,
   absorbOvershield: false,
   dead: false,
   outOfRange: false,
 };
 
 // The no-shield absorb result, matching the inline updateAbsorb fallback for a
-// null entity.
-const NO_ABSORB = {
-  total: 0,
-  fillFrac: 0,
-  startFrac: 0,
-  sizeFrac: 0,
-  overshield: false,
-} as const;
+// null entity (`{ fillFrac: 0, overshield: false }`).
+const NO_ABSORB = { fillFrac: 0, overshield: false } as const;
 
 /**
  * Map the descriptor's resource kind to the painter's class discriminator. This
@@ -157,20 +157,19 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
 export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
   if (!d.present) return HIDDEN;
   const absorb = d.absorb ? absorbBarView(d.absorb) : NO_ABSORB;
-  const hpText = d.showAbsorbText && absorb.total > 0 ? `${d.hpText} (${absorb.total})` : d.hpText;
   return {
     present: true,
     hpFrac: d.hpFrac,
-    hpText,
+    hpText: d.hpText,
     resClass: unitResourceClass(d.resourceKind),
     resFrac: d.resFrac,
     resText: d.resText,
     levelText: d.levelText,
     name: d.name,
+    titlePre: d.titlePre ?? '',
+    titlePost: d.titlePost ?? '',
     portraitKey: d.portraitKey,
     absorbFrac: absorb.fillFrac,
-    absorbStartFrac: absorb.startFrac,
-    absorbSizeFrac: absorb.sizeFrac,
     absorbOvershield: absorb.overshield,
     dead: d.dead,
     outOfRange: d.outOfRange,

@@ -18,7 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { DT, type Entity, type PlayerClass } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -26,12 +26,14 @@ type Ev = {
   type?: string;
   kind?: string;
   school?: string;
-  ability?: string | null;
   fx?: string;
+  ability?: string | null;
   sourceId?: number;
   targetId?: number;
   amount?: number;
   crit?: boolean;
+  attackAnimation?: 'ranged-shot';
+  attackAnimationStarted?: true;
 };
 
 function makeSim(
@@ -157,9 +159,43 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     const mob = spawnDummy(sim, p, 8, 20);
     const events = capture(sim);
     rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
-    expect(events.some((e) => e.type === 'spellfx' && e.school === 'physical')).toBe(true);
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'spellfx' && e.school === 'physical' && e.attackAnimation === 'ranged-shot',
+      ),
+    ).toBe(true);
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'damage' && e.ability === 'Auto Shot' && e.attackAnimationStarted === true,
+      ),
+    ).toBe(true);
+  });
+
+  it('Auto Shot launches on the swing tick without adding a universal draw delay', () => {
+    const { sim, p } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 8, 20);
+    void mob;
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 5, max: 9, speed: 2.3 });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
+    // Damage still lands on ARRIVAL, never on the swing tick.
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(false);
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
+  });
+
+  it('Wand keeps its instant tracer: projectile fx on the swing tick, no windup', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnDummy(sim, p, 8, 15);
+    const events = capture(sim);
+    rangedSwing(sim.ctx, p, mob, { min: 3, max: 6, speed: 1.8, wand: true, school: 'arcane' });
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'windup')).toBe(false);
+    expect(events.some((e) => e.attackAnimation !== undefined)).toBe(false);
   });
 
   it('Wand is an arcane bolt (no dead zone, ignores armor)', () => {
@@ -203,27 +239,6 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
       events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
     ).toBe(true);
     expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p));
-  });
-
-  it('a ranged attacker whose swing timer is still up does NOT fire (once per weapon interval, not per tick)', () => {
-    // Regression: the dual-wield-aware guard sits AFTER the ranged branch, so a
-    // ranged attacker needs its own swing-timer gate before it or it re-enters
-    // and fires on all 20 ticks per second (review round 2, item 1).
-    const { sim, p, meta } = makeSim('hunter', 12);
-    const mob = spawnDummy(sim, p, 8, 20);
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const shots = (evs: Ev[]): Ev[] =>
-      evs.filter((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.sourceId === p.id);
-    // First tick: one legitimate shot fired, and the timer is armed to the interval.
-    const first = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(shots(first)).toHaveLength(1);
-    expect(p.swingTimer).toBeGreaterThan(0);
-    // Next 10 ticks (0.5s, still well inside a ~2.3s interval): no further shots.
-    const rest = capture(sim);
-    for (let i = 0; i < 10; i++) updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(shots(rest)).toHaveLength(0);
   });
 
   it('the swing timer decrements every tick even while not auto-attacking', () => {

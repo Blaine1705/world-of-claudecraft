@@ -3378,6 +3378,38 @@ export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';
 // the boss driver. Shared with mob/locomotion.ts so the AI dispatcher skips it.
 export const TOLLING_BELL_TEMPLATE_ID = 'tolling_bell';
 
+export const NYTHRAXIS_ROOM_RADIUS = 260;
+
+export type DeedStatKey =
+  | 'kills'
+  | 'deaths'
+  | 'damageDealt'
+  | 'crits'
+  | 'dummyDamage'
+  | 'lootCopper'
+  | 'duelsWon'
+  | 'duelsLost'
+  | 'tradesCompleted'
+  | 'mailAttachmentsSent'
+  | 'craftsPerformed'
+  | 'partiesJoined'
+  | 'fullPartyDungeonClears'
+  | 'guildsFounded'
+  | 'marketSaleCopper'
+  | 'groundObjectsLooted'
+  | 'dungeonFinalBossKills'
+  | 'thunzharrKills'
+  | 'bloatCleanKills'
+  | 'hubCraftsPerformed';
+
+export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
+  'kills', 'deaths', 'damageDealt', 'crits', 'dummyDamage', 'lootCopper',
+  'duelsWon', 'duelsLost', 'tradesCompleted', 'mailAttachmentsSent',
+  'craftsPerformed', 'partiesJoined', 'fullPartyDungeonClears', 'guildsFounded',
+  'marketSaleCopper', 'groundObjectsLooted', 'dungeonFinalBossKills',
+  'thunzharrKills', 'bloatCleanKills', 'hubCraftsPerformed',
+];
+
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
 }

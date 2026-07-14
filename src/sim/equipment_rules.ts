@@ -1,4 +1,11 @@
-import type { ArmorType, EquipSlot, ItemDef, PlayerClass, WeaponItemDef } from './types';
+import {
+  ALL_CLASSES,
+  type ArmorType,
+  type EquipSlot,
+  type ItemDef,
+  type PlayerClass,
+  type WeaponItemDef,
+} from './types';
 
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
@@ -73,34 +80,38 @@ export function weaponArchetypeForItem(item: ItemDef): WeaponArchetype | null {
   return null;
 }
 
-export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
-  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
-}
-
-// Titan's Grip (owner decision 2026-07-10): a Fury warrior dual-wields
-// two-handers, one in EACH weapon slot (and may mix 2H with 1H). Weapons only:
-// a shield still never sits with a two-handed mainhand, for anyone.
-export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {
-  return cls === 'warrior' && spec === 'fury';
-}
-
-export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
-  return item.hand ?? 'onehand';
+// The full set of classes `canEquipItem` actually admits for a given armor weight,
+// i.e. every class whose max armor rank is at least `armorType`'s rank. Used to tell
+// a genuinely enforced armor class list (one that names exactly this set, e.g. mail
+// naming only warrior/paladin/shaman) apart from `requiredClass` values that are
+// narrower loot-targeting metadata `canEquipItem` never reads (armor short-circuits
+// on weight before it would reach `requiredClass`).
+export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[] {
+  const rank = ARMOR_RANK[armorType];
+  return ALL_CLASSES.filter((cls) => ARMOR_RANK[maxArmorTypeForClass(cls)] >= rank);
 }
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
-  if (item.kind === 'shield' || item.kind === 'held_offhand') {
-    if (item.requiredClass) return item.requiredClass.includes(cls);
-    return true;
-  }
   const weaponArchetype = weaponArchetypeForItem(item);
   if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'rogue') return ROGUE_WEAPON_CLASSES.has(cls);
   if (item.requiredClass) return item.requiredClass.includes(cls);
   return true;
+}
+
+export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
+  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+}
+
+export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {
+  return cls === 'warrior' && spec === 'fury';
+}
+
+export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
+  return item.hand ?? 'onehand';
 }
 
 export function canEquipItemInSlot(
@@ -111,7 +122,6 @@ export function canEquipItemInSlot(
 ): boolean {
   if (!canEquipItem(cls, item)) return false;
   if (item.kind === 'armor') {
-    // Rings declare slot 'ring' but bind to either physical ring slot.
     if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
     return item.slot === slot;
   }

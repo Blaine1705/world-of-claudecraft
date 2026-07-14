@@ -141,7 +141,6 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'name',
       'netInterval',
       'netUpdatedAt',
-      'offhandItemId',
       'overheadEmoteId',
       'overheadEmoteSeq',
       'overheadEmoteUntil',
@@ -155,6 +154,8 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'vx',
       'vy',
       'vz',
+      'weaponSkinId',
+      'weaponSkinLoadout',
     ]);
   });
 

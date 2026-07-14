@@ -169,8 +169,6 @@ export class SpellbookWindow {
     const view = buildSpellbookView({
       classId,
       abilities: [...kit, ...grantedExtra],
-      spec: world.talents.spec,
-      level: world.player.level,
       known: world.known,
       barAbilityIds: this.deps.barAbilityIds(),
       abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),

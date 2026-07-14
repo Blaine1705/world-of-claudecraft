@@ -608,14 +608,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
   // #1127's crafting action existed to consume them). `kind: 'junk'`, same
   // generic-material shape as bone_fragments/linen_scrap/spider_leg below:
-  // not gathered from a dedicated node yet (see gathering.ts NODE_HARVEST_TABLE),
-  // vendor/loot-sourced for now.
+  // not gathered from a dedicated node yet (see gathering.ts NODE_HARVEST_TABLE).
+  // Sold by Quartermaster Bree at the Highwatch hub (zone3.ts) so every hub
+  // recipe has a live reagent source; buyValue is the trade-goods staple
+  // markup already used in this file (4x sellValue, travelers_knapsack's
+  // exact ratio, with linen_pouch and spring_water close by at 4.17x), not
+  // a new balance number.
   thorium_ore: {
     id: 'thorium_ore',
     name: 'Thorium Ore',
     kind: 'junk',
     quality: 'rare',
     sellValue: 15,
+    buyValue: 60,
   },
   arcanite_bar: {
     id: 'arcanite_bar',
@@ -623,6 +628,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'epic',
     sellValue: 40,
+    buyValue: 160,
   },
   ashwood_log: {
     id: 'ashwood_log',
@@ -630,6 +636,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 15,
+    buyValue: 60,
   },
   elderwood_log: {
     id: 'elderwood_log',
@@ -637,6 +644,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'epic',
     sellValue: 40,
+    buyValue: 160,
   },
   goldleaf_herb: {
     id: 'goldleaf_herb',
@@ -644,6 +652,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 15,
+    buyValue: 60,
   },
   sunpetal_herb: {
     id: 'sunpetal_herb',
@@ -651,6 +660,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'epic',
     sellValue: 40,
+    buyValue: 160,
   },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
@@ -663,7 +673,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
   },
   // Heroic-dungeon participation token: the final boss of a heroic instance
-  // drops one personal mark per eligible participant (awardHeroicMarks in
+  // directly awards marks to every eligible participant (awardHeroicMarks in
   // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
   heroic_mark: {
     id: 'heroic_mark',
@@ -675,8 +685,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     // Bound to the earner: marks can only be spent at the Heroic Quartermaster,
-    // never traded, mailed, listed, or destroyed. See the soulbound flag in types.ts.
+    // never traded, mailed, listed, or destroyed.
     soulbound: true,
+    noDiscard: true,
   },
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
@@ -917,19 +928,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
     buyValue: 1400,
   },
-  eastbrook_greatsword: {
-    id: 'eastbrook_greatsword',
-    name: 'Eastbrook Greatsword',
-    kind: 'weapon',
-    slot: 'mainhand',
-    hand: 'twohand',
-    quality: 'common',
-    // Two-handers trade the offhand (no shield, no dual wield) for a slow, heavy
-    // swing at a 10 to 15% DPS premium over the one-hand whites of the same stock.
-    weapon: { min: 9, max: 15, speed: 3.4 },
-    sellValue: 160,
-    buyValue: 1600,
-  },
   vale_carving_knife: {
     id: 'vale_carving_knife',
     name: 'Vale Carving Knife',
@@ -950,18 +948,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1 },
     sellValue: 150,
     buyValue: 1500,
-  },
-  eastbrook_buckler: {
-    id: 'eastbrook_buckler',
-    name: 'Eastbrook Buckler',
-    kind: 'shield',
-    slot: 'offhand',
-    blockValue: 6,
-    quality: 'common',
-    stats: { armor: 34, sta: 1 },
-    sellValue: 130,
-    buyValue: 1300,
-    requiredClass: WAR,
   },
   eastbrook_chain_vest: {
     id: 'eastbrook_chain_vest',

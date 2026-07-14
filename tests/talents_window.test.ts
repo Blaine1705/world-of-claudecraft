@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 // Source-level guards for the talents painter. The window paints DOM (not a Canvas),
@@ -43,28 +43,61 @@ describe('talents_window: no magic values', () => {
     expect(painter.includes('–'), 'en dash found').toBe(false);
   });
 
-  it('commits a spec pick to the world (not just the local stage)', () => {
-    // Regression pin: clicking a spec card must reach IWorld.setSpec. Before
-    // this, the pick only mutated the staged buffer, so the spec (its kit,
-    // signature, and mastery) never actually applied unless the player took
-    // the save-a-loadout detour.
-    expect(painter).toContain('commitSpec(specId: string | null): void;');
-    expect(painter).toContain('this.deps.commitSpec(specId);');
-    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    expect(hud).toContain('commitSpec: (specId) => this.sim.setSpec(specId),');
+  // The warrior-overhaul window rework (2dc432c4a) moved the Choices rows out of the
+  // painter into talent_rows_tab.ts and replaced the div-radio + roving-tabindex wiring
+  // with NATIVE <button> options (tabbable and Enter/Space-activatable for free), so the
+  // keyboard contract is now: real buttons, pressed state, a full accessible name (name +
+  // description), and locked rows disabled.
+  it('renders Choices row options as native buttons with pressed state and accessible names', () => {
+    const rowsTab = readFileSync(new URL('../src/ui/talent_rows_tab.ts', import.meta.url), 'utf8');
+    expect(painter).toContain('paintTalentRowsTab(body, rowsVm, {');
+    expect(rowsTab).toContain('`<button type="button" class="tal-row-opt${o.picked ?');
+    expect(rowsTab).toContain('aria-pressed="${o.picked}"');
+    expect(rowsTab).toContain('aria-label="${esc(aria)}"');
+    expect(rowsTab).toContain("${row.unlocked && !o.pending ? '' : 'disabled'}");
+    expect(rowsTab).toContain('deps.pickRow(rowIndex, wasPicked ? null : optId);');
   });
 
-  it('wires Choices row radios to roving tabindex and arrow-key selection', () => {
-    expect(painter).toContain('const rowOptCards: HTMLElement[] = [];');
-    expect(painter).toContain(
-      "card.setAttribute('tabindex', row.unlocked && optionIndex === rovingIndex ? '0' : '-1')",
-    );
-    expect(painter).toContain("const next = rovingTarget(ke.key, i, rowOptCards.length, 'both');");
-    expect(painter).toMatch(
-      /this\.deps\s*\.root\(\)\s*\.querySelectorAll\('\.tal-row-opts'\)\s*\[rowIndex\]/,
-    );
-    expect(painter).toContain(
-      'this.keyboardActivate(ke, () => this.pickRowChoice(stage, row.level, option.id));',
-    );
+  // The spec-commit fix: ALL TEN classes (the overhauled 'warrior' included,
+  // operator decision 2026-07-11) commit an uncommitted spec through
+  // deps.commitSpec (IWorld.setSpec via Hud) from the Select specialization
+  // button; the committed spec keeps the navigation-only View talents button.
+  // Behavior is pinned functionally in talents_window_spec_commit.test.ts; these
+  // pins keep the source shape (the gate + the two labels + the dep) from drifting.
+  it('gates the spec commit on the committed allocation only (no class exclusion)', () => {
+    expect(painter).toContain('const committed = this.deps.currentAllocation().spec === sp.id;');
+    expect(painter).toContain('const commits = !committed;');
+    expect(painter).not.toContain("cls !== 'warrior'");
+    expect(painter).toContain('if (commits) this.deps.commitSpec(sp.id);');
+  });
+
+  it('reads both button labels from the specPanel catalog keys', () => {
+    expect(painter).toContain("t('hudChrome.specPanel.selectSpec')");
+    expect(painter).toContain("t('hudChrome.specPanel.viewTalents')");
+  });
+
+  it('uses authored mage spec art and shows the localized class description', () => {
+    expect(painter).toContain("cls === 'mage'");
+    expect(painter).toContain("field: 'description'");
+    expect(painter).toContain('ts-class-description');
+  });
+
+  it('ships square mage spec art at a UI-appropriate size', () => {
+    for (const specId of ['arcane', 'fire', 'frost']) {
+      const file = new URL(`../public/ui/specs/mage/${specId}.png`, import.meta.url);
+      expect(existsSync(file), `${specId} art is missing`).toBe(true);
+      const png = readFileSync(file);
+      expect(png.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+      expect(png.readUInt32BE(16), `${specId} art must stay <= 512px wide`).toBeLessThanOrEqual(
+        512,
+      );
+      expect(png.readUInt32BE(20), `${specId} art must stay <= 512px tall`).toBeLessThanOrEqual(
+        512,
+      );
+      expect(png.readUInt32BE(16)).toBe(png.readUInt32BE(20));
+      expect(png.byteLength, `${specId} art is too heavy for a 48px card icon`).toBeLessThan(
+        1024 * 1024,
+      );
+    }
   });
 });

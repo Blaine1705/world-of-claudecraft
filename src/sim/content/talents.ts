@@ -291,6 +291,12 @@ export function talentPointsAtLevel(level: number): number {
   return Math.max(0, Math.min(level, MAX_LEVEL) - (FIRST_TALENT_LEVEL - 1));
 }
 
+export function pointsSpent(alloc: TalentAllocation): number {
+  let n = 0;
+  for (const k in alloc.ranks) n += alloc.ranks[k];
+  return n;
+}
+
 export function rowsUnlockedAtLevel(cls: PlayerClass, level: number): number {
   const capped = Math.max(1, Math.min(level, MAX_LEVEL));
   return (CHOICE_ROWS[cls]?.rows ?? []).filter((row) => row.level <= capped).length;

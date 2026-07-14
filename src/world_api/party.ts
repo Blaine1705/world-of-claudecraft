@@ -28,7 +28,6 @@ export interface PartyMemberInfo {
   level: number;
   hp: number;
   mhp: number;
-  absorb: number;
   res: number;
   mres: number;
   rtype: ResourceType | null;
@@ -63,6 +62,8 @@ export interface IWorldParty {
   partyInfo: PartyInfo | null;
   partyInvite(targetPid: number): void;
   partyAccept(): void;
+  // Answer the leader's active ready check (yes/no prompt on readyCheckStart).
+  readyCheckRespond(ready: boolean): void;
   partyDecline(): void;
   partyLeave(): void;
   partyKick(targetPid: number): void;

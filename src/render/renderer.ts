@@ -33,29 +33,39 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
-import type { SpatialAudioSink, Surface } from './audio_sink';
+import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
-import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
+import {
+  type AnimState,
+  type CharacterVisual,
+  createCharacterVisual,
+  setWeaponVfxViewportHeight,
+} from './characters';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
+import {
+  playerRangedAttackAlreadyStarted,
+  playerRangedAttackStartsAtLaunch,
+} from './characters/skin_attack';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
+import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
+import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
-import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -107,6 +117,11 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
+import {
+  applyPointLightBudget,
+  type RankedPointLight,
+  reconcileViewPointLights,
+} from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
@@ -115,7 +130,6 @@ import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import { advanceSelfLeapArc, createSelfLeapArc, type SelfLeapArc } from './self_leap_arc';
 import { type SelfMotionFrame, SelfMotionPredictor } from './self_motion';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, type SkyView } from './sky';
@@ -142,88 +156,13 @@ import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_tea
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
+import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
 
-// Damage events carry the ability's English NAME (not its id); the per-ability
-// swing-animation override (VisualDef.attackByAbility) is keyed by id, so map
-// name -> id once at load to resolve a swing clip from a damage event.
-const ABILITY_ID_BY_NAME: Map<string, string> = new Map(
-  Object.entries(ABILITIES).map(([id, def]) => [def.name, id]),
-);
-function attackAbilityId(nameOrId: string | null): string | undefined {
-  if (!nameOrId) return undefined;
-  // A value that is already a known id wins; otherwise resolve the display name.
-  return ABILITIES[nameOrId] ? nameOrId : ABILITY_ID_BY_NAME.get(nameOrId);
-}
-
-// Instant melee abilities that animate as a one-shot self-spin (a little
-// tornado) instead of a normal swing. Bladestorm keeps its held channel spin.
-const SPIN_ATTACK_ABILITIES: ReadonlySet<string> = new Set(['whirlwind']);
-
-// Warrior shout shockwave colours (spellfx fx:'shout'): one hue per shout so
-// they read differently at a glance. Iron Bellow is the blood-red reference
-// ring; unmapped shouts fall back to that red.
-const SHOUT_WAVE_COLORS: Record<string, number> = {
-  battle_shout: 0xff2a1a, // Iron Bellow: blood red
-  commanding_shout: 0xffc94d, // Bolstering Cry: rallying gold
-  demoralizing_shout: 0x9a5df0, // Direhowl: cowing violet
-  emboldening_roar: 0xff5470, // Emboldening Roar: hot crimson
-  defiant_bellow: 0xff8c2a, // Defiant Bellow: ember orange
-  rallying_cry: 0xffe9a0, // Rallying Cry: warm gold-white
-  intimidating_shout: 0x7f8ad0, // Intimidating Shout: cold dread blue
-};
-// Visual footprint of the shout wave (yards): the embers travel about this far.
-const SHOUT_RING_RADIUS = 8;
-
-// Recklessness overhead skull: seconds the sprite lives above the caster.
-const RECKLESS_SKULL_LIFETIME = 1.0;
-
-// The red skull sprite for the Recklessness cast, drawn once on a canvas (the
-// repo's procedural-texture pattern: no image asset) and shared by every spawn.
-let recklessSkullTex: THREE.CanvasTexture | null = null;
-function recklessSkullTexture(): THREE.CanvasTexture {
-  if (recklessSkullTex) return recklessSkullTex;
-  const s = 96;
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = s;
-  const g = canvas.getContext('2d')!;
-  g.clearRect(0, 0, s, s);
-  // fiery glow behind everything
-  g.shadowColor = '#ff2210';
-  g.shadowBlur = 14;
-  // cranium: rounded dome with slightly pinched cheeks
-  g.fillStyle = '#ff2a18';
-  g.beginPath();
-  g.arc(s / 2, s * 0.42, s * 0.3, Math.PI * 0.98, Math.PI * 0.02); // dome
-  g.quadraticCurveTo(s * 0.8, s * 0.62, s * 0.68, s * 0.66); // right cheek
-  g.lineTo(s * 0.32, s * 0.66); // chin line of the upper skull
-  g.quadraticCurveTo(s * 0.2, s * 0.62, s * 0.2, s * 0.42); // left cheek
-  g.closePath();
-  g.fill();
-  // jaw: small rounded block under the cranium
-  g.fillRect(s * 0.36, s * 0.68, s * 0.28, s * 0.14);
-  g.shadowBlur = 0;
-  // eye sockets: two big punched-out holes (destination-out keeps the glow edge)
-  g.globalCompositeOperation = 'destination-out';
-  g.beginPath();
-  g.arc(s * 0.38, s * 0.44, s * 0.085, 0, Math.PI * 2);
-  g.arc(s * 0.62, s * 0.44, s * 0.085, 0, Math.PI * 2);
-  g.fill();
-  // nasal cavity: a small triangle
-  g.beginPath();
-  g.moveTo(s * 0.5, s * 0.5);
-  g.lineTo(s * 0.455, s * 0.6);
-  g.lineTo(s * 0.545, s * 0.6);
-  g.closePath();
-  g.fill();
-  // teeth gaps in the jaw
-  for (let i = 0; i < 3; i++) g.fillRect(s * (0.415 + i * 0.075), s * 0.68, s * 0.02, s * 0.13);
-  g.globalCompositeOperation = 'source-over';
-  recklessSkullTex = new THREE.CanvasTexture(canvas);
-  recklessSkullTex.colorSpace = THREE.SRGBColorSpace;
-  return recklessSkullTex;
-}
+// Festival gold/white celebration palette, shared by the Vale Cup full-time
+// draw show and the Book of Deeds unlock burst (one palette, two sites).
+const FESTIVAL_GOLD_COLORS: readonly number[] = [0xffd14d, 0xfff2c0];
 
 // Entities further than this from the player are hidden entirely: their rigs
 // are several draw calls each and read as sub-pixel specks long before this.
@@ -270,25 +209,9 @@ const SPARKLE_DRAW_RANGE_SQ = 40 * 40;
 // weapons stay readable on low while the 80u draw cap still bounds total cost.
 const ENTITY_LOD_RANGE_SQ = 58 * 58;
 
-// Crowd-adaptive character LOD. In a dense scene (capital, raid, world boss) the
-// dominant client cost is many full-articulated rigs plus their shadow passes,
-// which the frame-budget governor cannot shed (characters are non-governable).
-// Once the visible-rig count climbs past a soft knee, pull the articulated-LOD
-// and full-shadow distances in toward a floor so more of the throng collapses to
-// the single-draw far LOD + static proxy shadow. Below the knee (ordinary play,
-// a handful of rigs) the scale is exactly 1, so normal scenes are untouched.
-// FPS-first: in a crowd the frozen far-pose that shows a little sooner is a fair
-// trade for staying above 60. Distances compare squared, so scale is squared.
-const CROWD_LOD_SOFT_RIGS = 14;
-const CROWD_LOD_HARD_RIGS = 48;
-const CROWD_LOD_MIN_SCALE = 0.6;
-function crowdLodScaleSq(visibleRigs: number): number {
-  if (visibleRigs <= CROWD_LOD_SOFT_RIGS) return 1;
-  const span = CROWD_LOD_HARD_RIGS - CROWD_LOD_SOFT_RIGS;
-  const t = Math.min(1, (visibleRigs - CROWD_LOD_SOFT_RIGS) / span);
-  const scale = 1 - t * (1 - CROWD_LOD_MIN_SCALE);
-  return scale * scale;
-}
+// Crowd-adaptive character LOD (articulated-rig + shadow ranges, and the mid-band
+// animation cadence) lives in `crowd_lod.ts`: pure policy, unit-tested there.
+//
 // Feet-above-terrain margin that counts as "airborne" for the jump pose. Mirrors
 // the sim's own 0.4u grounded tolerance (sim.ts), so walking slopes doesn't trip
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
@@ -632,8 +555,8 @@ export interface EntityView {
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
-  mainhandItemId: string | null; // last-rendered equipped mainhand, diffed for live held-item swaps
-  offhandItemId: string | null; // last-rendered equipped offhand, diffed for live held-item swaps
+  mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -642,6 +565,7 @@ export interface EntityView {
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
   nameEl: HTMLDivElement;
+  titleEl: HTMLDivElement; // Book of Deeds title subtitle (players only)
   guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
   hpBar: HTMLDivElement;
   hpFill: HTMLDivElement;
@@ -659,6 +583,7 @@ export interface EntityView {
   nameplateTransform: string;
   nameplateSig: string;
   nameplateHpWidth: string;
+  titleSig: string; // cheap-diff for the deed-title subtitle (lang|deed id)
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
@@ -666,6 +591,7 @@ export interface EntityView {
   devTierValue: number; // last-applied devTier, to diff cheaply
   discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
   discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
+  aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -681,9 +607,6 @@ export interface EntityView {
   // hidden until its shader programs finish linking off-thread (async-compile gate)
   compilePending: boolean;
   lastOverheadEmoteKey: string | null;
-  // Recklessness imbue latch: true while the buff_reckless body-flame loop runs,
-  // so the 1s overhead skull edge-triggers exactly once per buff application.
-  recklessOn?: boolean;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
@@ -967,7 +890,6 @@ export class Renderer {
     reverseBackpedal: false,
     dead: false,
     casting: false,
-    spinning: false,
     swimming: false,
     sitting: false,
   };
@@ -987,13 +909,17 @@ export class Renderer {
       : null;
   }
 
-  private selfLeapArc: SelfLeapArc | null = null;
   private lastSelfId: number | null = null;
   // Last yaw applied to the local player while the camera was driving its facing
   // (mouselook / mouse-camera). Null when the override is disengaged, so the next
   // engage re-seeds from the live interpolated facing instead of snapping. See
   // facing_smooth.ts for why the camera-driven yaw must be rate-limited.
   private selfFacingOverride: number | null = null;
+  // Camera yaw applied on the previous camera-driven frame. advanceSelfFacing
+  // subtracts it to tell the camera's ongoing rotation (applied 1:1) apart from
+  // the residual engage gap (rate-limited), so a fast flick never lags. Null
+  // while disengaged so the next engage re-seeds cleanly.
+  private selfFacingLastTarget: number | null = null;
   private cameraLookAt = new THREE.Vector3();
   // floating /say-/yell bubbles, keyed by speaker entity id
   private chatBubbles = new Map<number, { el: HTMLDivElement; until: number }>();
@@ -1037,12 +963,7 @@ export class Renderer {
       fogFar: number,
     ): void;
   };
-  private lightRank: {
-    light: THREE.PointLight;
-    d2: number;
-    worldPos: THREE.Vector3;
-    base: number | null; // view-light base intensity (no external flicker restores it); null for fire lights
-  }[] = [];
+  private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
@@ -1066,6 +987,7 @@ export class Renderer {
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
+  private readonly ambientPointSources: readonly AmbientPointSource[];
 
   // 2v2 Fiesta juice: trauma-based screen shake (decays each frame) and the
   // hazard-ring wall (built lazily the first time a Fiesta bout asks for it).
@@ -1160,6 +1082,7 @@ export class Renderer {
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
+    this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
     // composer's MSAA HalfFloat target, low is meant to run without AA — and
     // requesting it here would hit software GL (the autodetect can only run
@@ -1394,7 +1317,14 @@ export class Renderer {
       this.scene.add(cl);
     }
 
-    this.terrainView = buildTerrain(this.sim.cfg.seed);
+    // A returning character can log out anywhere in a zone, not only at a
+    // hub, so the far streaming queue is ordered by distance to the actual
+    // entry position (entity_roster.ts: this.sim.player.pos.x/z) rather than
+    // whatever row-major order the chunk grid happens to walk.
+    this.terrainView = buildTerrain(this.sim.cfg.seed, {
+      x: this.sim.player.pos.x,
+      z: this.sim.player.pos.z,
+    });
     setRenderCategory(this.terrainView.group, 'terrain');
     this.scene.add(this.terrainView.group);
     // Terrain chunks never move after build (the LOD update only toggles
@@ -1721,7 +1651,12 @@ export class Renderer {
       this.post.composer.setPixelRatio(ratio);
       this.post.setSize(this.viewport.width, this.viewport.height);
     }
-    this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
+    this.vfx.setViewportScale(devicePxHeight, 60);
+    // Weapon-skin VFX point sprites size against the device-pixel height too:
+    // future rigs read the module value, live rigs re-scale in place.
+    setWeaponVfxViewportHeight(devicePxHeight);
+    for (const v of this.views.values()) v.visual?.setWeaponVfxPixelScale(devicePxHeight);
   }
 
   /** Tone-mapping exposure multiplier (1.0 = the default look). */
@@ -1742,13 +1677,7 @@ export class Renderer {
 
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
-    if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevelAt(x, z);
-    if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
-    const biome = zoneBiomeAt(z);
-    if (biome === 'vale') return 'grass';
-    if (biome === 'marsh') return 'dirt';
-    return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
+    return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
   }
 
   /** Vertical camera field of view in degrees (55..100, default 60). */
@@ -3100,27 +3029,19 @@ export class Renderer {
           break;
         }
         if (ev.fx === 'windup') {
-          // A petSpell windup telegraph: start the throw animation NOW; the
+          // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
-          // the clip's release pose (the acolyte def's attackTimeScale is
-          // tuned so both meet).
+          // the clip's release pose.
           this.triggerAttack(ev.sourceId);
           break;
         }
-        if (ev.fx === 'shout') {
-          // A warrior shout: the caster roars (the cheer one-shot reads as a
-          // battle cry at speed) while a per-shout coloured shockwave ring rolls
-          // out along the ground from their feet.
-          this.playShoutFx(ev.targetId, ev.ability);
-          break;
-        }
-        if (ev.fx === 'weaponAura' || ev.fx === 'flourish') {
-          // A pure cast gesture: play the ability's mapped one-shot clip
-          // (manifest attackByAbility: Sanguine Aura raises the blade skyward,
-          // Raised Guard plants behind the shield). No particles by owner
-          // request; Sanguine's green mainhand imbue stays aura-driven.
-          this.triggerAttack(ev.sourceId, ev.ability);
-          break;
+        // Player ranged attacks begin when their projectile launches. The live
+        // CharacterVisual chooses the authored crossbow/default clip or the bow
+        // skin's cosmetic draw override without changing the sim timeline.
+        if (ev.fx === 'projectile' && ev.attackAnimation === 'ranged-shot') {
+          const source = this.sim.entities.get(ev.sourceId);
+          if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
+            this.triggerAttack(ev.sourceId);
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'heavyBolt')
@@ -3237,17 +3158,24 @@ export class Renderer {
         if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
         break;
       }
-      case 'damage':
-        // every melee/ranged swing animates the attacker for all to see; a
-        // mapped ability picks its own swing clip (attackByAbility), else rotates
-        if (ev.school === 'physical' && ev.sourceId !== -1)
-          this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
+      case 'damage': {
+        // Every melee/ranged hit animates the attacker. A ranged projectile
+        // carrying the typed launch cue already began its cosmetic one-shot,
+        // so do not restart that same shot when its damage lands.
+        const source = this.sim.entities.get(ev.sourceId);
+        const rangedShotAlreadyStarted = playerRangedAttackAlreadyStarted(
+          source?.kind,
+          ev.attackAnimationStarted,
+        );
+        if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
+          this.triggerAttack(ev.sourceId);
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
         break;
+      }
       case 'heal2':
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
         // simultaneous heals (a Chronomancy group echo converting an AoE that hit
@@ -3277,6 +3205,25 @@ export class Renderer {
       case 'levelup':
         this.vfx.levelUpPillar(this.sim.playerId);
         break;
+      case 'deedUnlocked': {
+        // Book of Deeds earned moment: one festival-gold shell just above the
+        // player's head (the hud pid gate already dropped other players'
+        // copies). Retro back-credits (the on-join catch-up) draw nothing;
+        // the HUD folds them into a single summary line. A reduced-motion
+        // player skips the burst too: it is a sudden personal flash at the
+        // camera's focus, and the banner plus gold log line carry the moment.
+        if (!shouldPlayDeedFirework(ev, this.reducedMotion())) break;
+        const v = this.views.get(this.sim.playerId);
+        if (!v) break;
+        const p = this.sim.player;
+        this.tmpV.set(
+          v.group.position.x,
+          v.group.position.y + v.height * (p.scale ?? 1) + 2.2,
+          v.group.position.z,
+        );
+        this.vfx.fireworkBurst(this.tmpV, FESTIVAL_GOLD_COLORS, 46, 1.1);
+        break;
+      }
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
@@ -3345,7 +3292,7 @@ export class Renderer {
           const nation = ev.winner === 'A' ? ev.nationA : ev.nationB;
           this.queueValeCupFireworks(ev.x, ev.z, nationColors(nation, away), 10);
         } else {
-          this.queueValeCupFireworks(ev.x, ev.z, [0xffd14d, 0xfff2c0], 5);
+          this.queueValeCupFireworks(ev.x, ev.z, FESTIVAL_GOLD_COLORS, 5);
         }
         break;
       }
@@ -3769,9 +3716,21 @@ export class Renderer {
     // CDN); if it fails to load, hide it rather than leave the browser's broken-image
     // placeholder on the plate. Attached once here; the element is reused per entity.
     attachAvatarFallback(discordEl);
+    // operator-set AI-account tag, inline before the name. A SEPARATE span, never a
+    // restyled .np-name: the name's black text-shadow is what keeps it legible over
+    // bright terrain, and the tag's background-clip: text cannot coexist with it.
+    // Keeping them apart also lets an AI account who is also Discord staff keep its
+    // role colour on the name. Hidden by CSS until the painter toggles .ai-tag on.
+    const aiEl = document.createElement('span');
+    aiEl.className = 'np-ai';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
+    // Book of Deeds title subtitle under the name (players only); hidden
+    // until the entity's `title` wire field resolves to real text
+    const titleEl = document.createElement('div');
+    titleEl.className = 'np-title';
+    titleEl.style.display = 'none';
     // guild tag under the name (players in a guild); hidden until set
     const guildEl = document.createElement('div');
     guildEl.className = 'np-guild';
@@ -3798,7 +3757,9 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       nameEl,
+      titleEl,
       guildEl,
       hpBar,
       castBar,
@@ -3810,22 +3771,12 @@ export class Renderer {
     if (!visual) collectCasters(group, objectCasters);
     // Register any point lights this view owns (e.g. the quest-object glow) into the
     // constant point-light budget so numPointLights never changes as it streams in.
-    const viewLights: THREE.PointLight[] = [];
-    group.traverse((o) => {
-      if ((o as THREE.PointLight).isPointLight) viewLights.push(o as THREE.PointLight);
-    });
-    if (viewLights.length > 0) {
-      for (const light of viewLights) {
-        // Remember the design intensity ONCE: pooled object views are reused, and by
-        // the time one is re-taken the budget may have dimmed the light to 0, so
-        // reading it again would stick it dark. userData persists on the pooled light.
-        if (typeof light.userData.budgetBase !== 'number')
-          light.userData.budgetBase = light.intensity;
-        this.viewLights.push(light);
-      }
+    const reconciledLights = reconcileViewPointLights(group, [], this.viewLights);
+    const viewLights = reconciledLights.lights;
+    if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light-budget rebuild caches light.getWorldPosition, and r165's
+      // the light budget reads light.getWorldPosition, and r165's
       // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
       // ancestor, so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
@@ -3846,6 +3797,7 @@ export class Renderer {
       clickTarget,
       nameplate: np,
       nameEl,
+      titleEl,
       guildEl,
       hpBar,
       hpFill,
@@ -3862,6 +3814,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      aiEl,
       sparkle,
       objectMesh,
       objectPoolKey,
@@ -3871,6 +3824,7 @@ export class Renderer {
       nameplateTransform: '',
       nameplateSig: '',
       nameplateHpWidth: '',
+      titleSig: '',
       comboSig: '',
       tierValue: 0,
       devTierValue: 0,
@@ -3885,7 +3839,8 @@ export class Renderer {
       lastZ: e.pos.z,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
-      offhandItemId: e.offhandItemId,
+      // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
+      weaponSkinId: null,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3961,38 +3916,29 @@ export class Renderer {
     v.clickTarget = next.clickProxy;
     v.height = next.height;
     v.skin = e.skin;
-    v.mainhandItemId = e.mainhandItemId; // next was built holding the current held items
-    v.offhandItemId = e.offhandItemId;
+    v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
+    v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
     v.group.add(next.root);
+    this.reconcileViewLights(v);
   }
 
-  triggerAttack(entityId: number, abilityId?: string): void {
+  private reconcileViewLights(v: EntityView): void {
+    const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
+    if (!reconciled.changed) return;
+    v.viewLights = reconciled.lights;
+    this.lightRankDirty = true;
+    if (v.viewLights.length > 0) this.lightOwnerGroups.add(v.group);
+    else this.lightOwnerGroups.delete(v.group);
+  }
+
+  triggerAttack(entityId: number): void {
     const v = this.views.get(entityId);
-    const vis = v && this.activeVisual(v);
-    if (!vis) return;
-    if (abilityId && SPIN_ATTACK_ABILITIES.has(abilityId)) vis.playWhirl();
-    else vis.playAttack(abilityId);
+    if (v) this.activeVisual(v)?.playAttack();
   }
 
   triggerHit(entityId: number): void {
     const v = this.views.get(entityId);
     if (v) this.activeVisual(v)?.playHit();
-  }
-
-  // A warrior shout (spellfx fx:'shout'): the caster plays the cheer one-shot
-  // sped up (arms thrown up, reads as a roar) and a shout-coloured ember
-  // shockwave rolls outward along the ground, with the terrain-draped ring flash
-  // marking the wave's footprint (the reference look: an expanding fiery ring).
-  private playShoutFx(entityId: number, abilityId?: string): void {
-    const e = this.sim.entities.get(entityId);
-    if (!e) return;
-    const color = SHOUT_WAVE_COLORS[abilityId ?? ''] ?? 0xff3220;
-    this.vfx.shoutwave(entityId, color);
-    this.spawnAoeRing(e.pos.x, e.pos.z, SHOUT_RING_RADIUS, 'physical', color);
-    const v = this.views.get(entityId);
-    const vis = v && this.activeVisual(v);
-    // One single arms-up pump: the chat /cheer double-pumps, a war shout roars once.
-    if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
   }
 
   private isHostileSelectionTarget(target: Entity): boolean {
@@ -4343,6 +4289,7 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.scene.remove(v.group);
+    this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
         const i = this.viewLights.indexOf(light);
@@ -4497,8 +4444,8 @@ export class Renderer {
     if (this.lastSelfId !== p.id) {
       this.lastSelfId = p.id;
       this.selfRenderPositionReady = false;
-      this.selfLeapArc = null;
       this.selfFacingOverride = null;
+      this.selfFacingLastTarget = null;
       // A still-decaying predictor-handoff offset belongs to the previous
       // character; leaking it would displace the new one for a few frames.
       this.selfMotionOffset.set(0, 0, 0);
@@ -4550,6 +4497,7 @@ export class Renderer {
     const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
     const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
     const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
+    const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -4672,12 +4620,16 @@ export class Renderer {
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
       if (id === p.id && renderFacingOverride !== null) {
-        // Rate-limit the camera-driven heading so engaging mouselook (or starting
-        // to move in Mouse Camera mode) rotates the model smoothly toward the
-        // camera instead of teleporting it up to 180deg in a single frame. Seed
-        // from the current interpolated facing on first engage.
-        facing = stepSelfFacing(this.selfFacingOverride ?? facing, renderFacingOverride, dt);
+        // Follow the camera-driven heading, easing in the one-time engage gap
+        // (up to 180deg when engaging after an orbit) under the rate limiter
+        // while applying the camera's ongoing rotation 1:1. Seed the model and
+        // the last-target from the current values on first engage so the whole
+        // seed gap is treated as residual and a fast flick never trails behind.
+        const prevModel = this.selfFacingOverride ?? facing;
+        const lastTarget = this.selfFacingLastTarget ?? renderFacingOverride;
+        facing = advanceSelfFacing(prevModel, renderFacingOverride, lastTarget, dt);
         this.selfFacingOverride = facing;
+        this.selfFacingLastTarget = renderFacingOverride;
       } else if (id === p.id && this.selfFacingOverride !== null) {
         // Disengage frame: route the return to the interpolated sim facing
         // through the SAME rate limiter so releasing mouselook mid-flick (before
@@ -4686,6 +4638,7 @@ export class Renderer {
         const r = releaseSelfFacing(this.selfFacingOverride, facing, dt);
         facing = r.facing;
         this.selfFacingOverride = r.done ? null : r.facing;
+        this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
 
@@ -4779,14 +4732,21 @@ export class Renderer {
         v.visual.setSkin(e.skin);
       }
 
-      // live held-item swap, equipped mainhand/offhand changed (self equip or a
-      // peer's gear update); classes with fixed props no-op.
-      if (e.mainhandItemId !== v.mainhandItemId || e.offhandItemId !== v.offhandItemId) {
+      // live held-weapon swap — equipped mainhand changed (self equip or a peer's
+      // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
+      if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
-        v.offhandItemId = e.offhandItemId;
-        v.visual.setWeapons(e.mainhandItemId, e.offhandItemId);
+        v.visual.setWeapon(e.mainhandItemId);
+        this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(e.auras.some((a) => a.id === 'sanguine_aura'));
+
+      // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
+      // or a peer, via the identity wire); replaces the held model + rarity VFX
+      if (e.weaponSkinId !== v.weaponSkinId) {
+        v.weaponSkinId = e.weaponSkinId;
+        v.visual.setWeaponSkin(e.weaponSkinId);
+        this.reconcileViewLights(v);
+      }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the
       // rig, click proxy, and any form visual grow/shrink together.
@@ -4975,14 +4935,24 @@ export class Renderer {
       }
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
-      // distance-tiered mixer updates: near = every frame, mid = every 2nd,
-      // far (static LOD mesh visible) = every 6th; edges latch regardless
+      // Distance-tiered mixer updates: near = every frame, mid = every Nth,
+      // far (static LOD mesh visible) = every 6th; edges latch regardless.
+      // Both the near band and the mid cadence follow the same crowd-adaptive
+      // LOD the shadow bands use, because sampling clips + rebuilding bone
+      // matrices is the per-rig cost that actually scales with the crowd.
+      //
+      // Animation smoothness is cosmetic, but a cast windup is a telegraph the
+      // player reacts to, so the local player, the current target, and anything
+      // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
-      if (id !== p.id) {
+      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
         if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
-        else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
+        else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }
       active.update(dt, st, animate);
+      // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
+      // few uniform writes per handle, so they stay smooth at every LOD tier
+      v.visual.updateWeaponVfx(dt);
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -5012,17 +4982,13 @@ export class Renderer {
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
-      // Recklessness: the body burns red for the whole buff, and the cast pops a
-      // 1s skull over the head (edge-triggered on the buff appearing, so it works
-      // identically for the local player and mirrored online players).
-      if (e.auras.some((a) => a.kind === 'buff_reckless')) {
-        this.vfx.recklessFlame(e.id, dt);
-        if (!v.recklessOn) {
-          v.recklessOn = true;
-          this.spawnRecklessSkull(v, e);
-        }
-      } else if (v.recklessOn) {
-        v.recklessOn = false;
+      // Shapeshift-form particle auras riding the tints above: metamorph fire,
+      // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
+      // (the auras themselves drop, but a corpse must not smolder for a frame).
+      if (!e.dead) {
+        if (hasMetamorph) this.vfx.formAura(e.id, 'metamorph', dt);
+        else if (hasMoonkin) this.vfx.formAura(e.id, 'moonkin', dt);
+        else if (hasShadowform) this.vfx.formAura(e.id, 'shadowform', dt);
       }
       // Shapeshift-form particle auras riding the tints above: metamorph fire,
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
@@ -5105,7 +5071,6 @@ export class Renderer {
     }
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
-    this.updateSkullFx(dt);
     this.updateGroundAimReticle(dt);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
@@ -5459,9 +5424,9 @@ export class Renderer {
 
   // Forward-renderer point-light budget: every campfire/torch light exists,
   // but only the nearest GFX.maxPointLights within range shine each frame.
-  // Rank entries are pooled (extended only when interiors add lights) and
-  // world positions cached once — the lights never move — so this hot loop
-  // allocates nothing and skips the sort while the budget isn't contended.
+  // Rank entries are pooled (extended only when interiors or view lights change).
+  // Static world positions stay cached; moving weapon VFX refresh into their
+  // existing vectors, so this hot loop allocates nothing.
   private budgetFireLights(px: number, pz: number): void {
     const ranked = this.lightRank;
     // Rank the union of static fire lights AND entity-view lights (e.g. quest-object
@@ -5469,7 +5434,8 @@ export class Renderer {
     // numPointLights would change as it streams in/out and recompile every lit
     // material. Rebuild only when the set changes (dirty), or when fire lights grow
     // (dungeon interiors push to fireLights) - both rare, so the hot path just
-    // refreshes distances. View positions are cached at rebuild; lights never move.
+    // refreshes distances. Static positions are cached; dynamic weapon-light
+    // positions refresh in applyPointLightBudget.
     const want = this.fireLights.length + this.viewLights.length;
     if (this.lightRankDirty || ranked.length !== want) {
       ranked.length = 0;
@@ -5479,19 +5445,22 @@ export class Renderer {
           d2: 0,
           worldPos: light.getWorldPosition(new THREE.Vector3()),
           base: null,
+          dynamic: false,
         });
       }
       for (const light of this.viewLights) {
         const stored = light.userData.budgetBase;
         const base = typeof stored === 'number' ? stored : light.intensity;
-        ranked.push({ light, d2: 0, worldPos: light.getWorldPosition(new THREE.Vector3()), base });
+        const dynamic = light.userData.budgetDynamic === true;
+        ranked.push({
+          light,
+          d2: 0,
+          worldPos: light.getWorldPosition(new THREE.Vector3()),
+          base: dynamic ? null : base,
+          dynamic,
+        });
       }
       this.lightRankDirty = false;
-    }
-    for (const entry of ranked) {
-      const dx = entry.worldPos.x - px,
-        dz = entry.worldPos.z - pz;
-      entry.d2 = dx * dx + dz * dz;
     }
     // Keep a CONSTANT number of point lights `visible` so numPointLights in every
     // material's program cache key never changes as the player travels. Three counts
@@ -5504,19 +5473,7 @@ export class Renderer {
     // governor (effectivePointLights) only changes how many SHINE, not the count.
     const visibleCount = GFX.maxPointLights;
     const liveBudget = this.effectivePointLights || GFX.maxPointLights;
-    if (ranked.length > visibleCount) ranked.sort((a, b) => a.d2 - b.d2);
-    for (let i = 0; i < ranked.length; i++) {
-      const entry = ranked[i];
-      const counted = i < visibleCount;
-      entry.light.visible = counted;
-      const shine = counted && i < liveBudget && entry.d2 < LIGHT_BUDGET_RANGE_SQ;
-      if (entry.base !== null) {
-        // view light: no flicker pass restores it, so drive its intensity directly
-        entry.light.intensity = shine ? entry.base : 0;
-      } else if (counted && !shine) {
-        entry.light.intensity = 0; // fire light: dark now; the flicker pass relights it when it shines
-      }
-    }
+    applyPointLightBudget(ranked, px, pz, visibleCount, liveBudget, LIGHT_BUDGET_RANGE_SQ);
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only
@@ -5592,37 +5549,22 @@ export class Renderer {
     const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
     const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
     const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-    const targetX = p.pos.x;
-    const targetY = p.pos.y;
-    const targetZ = p.pos.z;
-    if (this.selfLeapArc) {
-      const next = advanceSelfLeapArc(this.selfLeapArc, dt);
-      this.selfLeapArc = next.done ? null : next.arc;
-      this.selfRenderPosition.set(next.point.x, next.point.y, next.point.z);
-      this.selfRenderPositionReady = true;
-      return this.selfRenderPosition;
-    }
-    const dx = px - this.selfRenderPosition.x;
-    const dy = py - this.selfRenderPosition.y;
-    const dz = pz - this.selfRenderPosition.z;
-    if (!this.selfRenderPositionReady || dx * dx + dy * dy + dz * dz > SELF_RENDER_SNAP_DIST_SQ) {
-      const leapArc = this.selfRenderPositionReady
-        ? createSelfLeapArc(this.selfRenderPosition, { x: targetX, y: targetY, z: targetZ })
-        : null;
-      if (leapArc) {
-        const next = advanceSelfLeapArc(leapArc, dt);
-        this.selfLeapArc = next.done ? null : next.arc;
-        this.selfRenderPosition.set(next.point.x, next.point.y, next.point.z);
-        this.selfRenderPositionReady = true;
-      } else {
+    if (selfAlphaLead > 0) {
+      const dx = px - this.selfRenderPosition.x;
+      const dy = py - this.selfRenderPosition.y;
+      const dz = pz - this.selfRenderPosition.z;
+      if (!this.selfRenderPositionReady || dx * dx + dy * dy + dz * dz > SELF_RENDER_SNAP_DIST_SQ) {
         this.selfRenderPosition.set(px, py, pz);
         this.selfRenderPositionReady = true;
+      } else {
+        const t = 1 - Math.exp(-SELF_RENDER_SMOOTH_RATE * Math.max(0, dt));
+        this.selfRenderPosition.x += dx * t;
+        this.selfRenderPosition.y += dy * t;
+        this.selfRenderPosition.z += dz * t;
       }
     } else {
-      const t = 1 - Math.exp(-SELF_RENDER_SMOOTH_RATE * Math.max(0, dt));
-      this.selfRenderPosition.x += dx * t;
-      this.selfRenderPosition.y += dy * t;
-      this.selfRenderPosition.z += dz * t;
+      this.selfRenderPosition.set(px, py, pz);
+      this.selfRenderPositionReady = true;
     }
     return this.selfRenderPosition;
   }
@@ -5666,6 +5608,7 @@ export class Renderer {
       this.terrainView.rebuildRegion(region.minX, region.minZ, region.maxX, region.maxZ);
       return;
     }
+    this.terrainView.cancelStreaming();
     const old = this.terrainView.group;
     this.scene.remove(old);
     const firstMesh = old.children.find((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh | undefined;
@@ -5864,8 +5807,8 @@ export class Renderer {
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
-      const crowd = !inDungeon && isAtSowfield(px, pz) ? (this.sim.cupInfo?.live ? 1 : 0.4) : 0;
-      sink.ambience(biome, inDungeon, precip, nearWater, crowd);
+      const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
+      sink.ambience(biome, inDungeon, precip, nearWater, crowd, this.ambientPointSources);
     }
   }
 
@@ -6067,7 +6010,7 @@ export class Renderer {
 
   // Flash a school-colored AoE ring on the terrain at a ground-targeted blast's
   // landing spot, sized to the blast radius (see aoe_ring.ts for the curves).
-  spawnAoeRing(x: number, z: number, radius: number, school: string, colorHex?: number): void {
+  spawnAoeRing(x: number, z: number, radius: number, school: string): void {
     if (this.aoeRings.length === 0) return;
     const slot = this.aoeRings[this.aoeRingNext];
     this.aoeRingNext = (this.aoeRingNext + 1) % this.aoeRings.length;
@@ -6075,8 +6018,7 @@ export class Renderer {
     slot.ring.position.set(x, y, z);
     slot.radius = radius;
     slot.elapsed = 0;
-    // An explicit colour (the per-shout shockwave hue) beats the school palette.
-    slot.mat.color.setHex(colorHex ?? SCHOOL_COLORS[school] ?? 0xffffff);
+    slot.mat.color.setHex(SCHOOL_COLORS[school] ?? 0xffffff);
     if (!this.lowGfx) slot.mat.color.multiplyScalar(SELECTION_RING_BOOST);
     slot.ring.visible = true;
   }
@@ -6108,41 +6050,6 @@ export class Renderer {
       }
       slot.ring.scale.setScalar(slot.radius * a.ringScale);
       slot.mat.opacity = a.ringAlpha;
-    }
-  }
-
-  // Recklessness cast flourish: a red skull sprite popping up over the caster's
-  // head for RECKLESS_SKULL_LIFETIME, riding the entity group so it tracks them.
-  private spawnRecklessSkull(v: EntityView, e: Entity): void {
-    const vis = this.activeVisual(v);
-    const sprite = new THREE.Sprite(
-      new THREE.SpriteMaterial({
-        map: recklessSkullTexture(),
-        transparent: true,
-        depthWrite: false,
-        opacity: 1,
-      }),
-    );
-    sprite.position.set(0, (vis?.height ?? 1.8) * e.scale + 1.05, 0);
-    sprite.scale.setScalar(0.9);
-    v.group.add(sprite);
-    this.skullFx.push({ sprite, parent: v.group, elapsed: 0 });
-  }
-
-  private updateSkullFx(dt: number): void {
-    for (let i = this.skullFx.length - 1; i >= 0; i--) {
-      const fx = this.skullFx[i];
-      fx.elapsed += dt;
-      if (fx.elapsed >= RECKLESS_SKULL_LIFETIME) {
-        fx.parent.remove(fx.sprite);
-        fx.sprite.material.dispose(); // the map texture is the shared singleton: keep it
-        this.skullFx.splice(i, 1);
-        continue;
-      }
-      // drift up, hold bright, then fade out over the last 40%
-      fx.sprite.position.y += dt * 0.45;
-      const t = fx.elapsed / RECKLESS_SKULL_LIFETIME;
-      fx.sprite.material.opacity = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
     }
   }
 

@@ -38,8 +38,10 @@ import {
   type TalentModifiers,
 } from '../content/talents';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
+import * as deedsMod from '../deeds';
 import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
+import { awardFiestaKillHonor } from '../pvp';
 import { Rng } from '../rng';
 import type { ArenaMatch, FiestaPowerup, FiestaState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -87,6 +89,7 @@ export function createFiestaState(ctx: SimContext): FiestaState {
     respawn: new Map(),
     deaths: new Map(),
     kills: new Map(),
+    honorKillsByPair: new Map(),
     streak: new Map(),
     lastKill: new Map(),
     pending: new Map(),
@@ -158,7 +161,6 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           castPct: 0,
           buffPct: 0,
           castWhileMoving: false,
-          bonusCharges: 0,
           addEffects: [],
         };
       }
@@ -313,7 +315,6 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.sitting = false;
   e.chargeTargetId = null;
   e.chargePath = [];
-  e.leap = null;
   e.followTargetId = null;
   e.targetId = null;
   const meta = ctx.players.get(e.id);
@@ -359,6 +360,9 @@ export function fiestaTakedown(
   else if (killerTeam === 'B') f.scoreB += points;
   if (killerMeta) killerMeta.counters.kills++;
   f.kills.set(killerPid, (f.kills.get(killerPid) ?? 0) + 1);
+  if (killerMeta && !match.practice && ctx.isArenaCrossTeam(match, killerPid, victim.id)) {
+    awardFiestaKillHonor(ctx, killerMeta, victim.id, f.honorKillsByPair);
+  }
 
   fiestaDown(ctx, match, victim, killerPid);
 
@@ -367,6 +371,13 @@ export function fiestaTakedown(
   f.lastKill.set(killerPid, now);
   const ks = (f.streak.get(killerPid) ?? 0) + 1;
   f.streak.set(killerPid, ks);
+  // Deed moments read the sim-side tallies, independent of the word-cue
+  // else-if chain below (which reports only the loudest cue).
+  deedsMod.onFiestaTakedownForDeeds(ctx, match, killerPid, {
+    rapid,
+    victimStreak,
+    killerKills: f.kills.get(killerPid) ?? 0,
+  });
   if (!f.firstBlood) {
     f.firstBlood = true;
     ctx.emit({ type: 'fiestaWord', flavor: 'firstblood', pid: killerPid });
@@ -583,7 +594,7 @@ export function fiestaSpawnPowerup(match: ArenaMatch): void {
 
 export function fiestaGrabPowerup(
   ctx: SimContext,
-  _match: ArenaMatch,
+  match: ArenaMatch,
   e: Entity,
   p: FiestaPowerup,
 ): void {
@@ -612,4 +623,5 @@ export function fiestaGrabPowerup(
     glow: def.glow,
     duration: def.duration,
   });
+  deedsMod.onFiestaPowerupForDeeds(ctx, match, e.id, def.id);
 }

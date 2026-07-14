@@ -79,8 +79,6 @@ export interface PartyFramesPainterDeps {
   classCss: (cls: string) => string;
   onTarget: (pid: number) => void;
   onContextMenu: (pid: number, name: string, x: number, y: number) => void;
-  /** Hover tracking for Clique-style mouseover casts: pid on enter, null on leave. */
-  onHover: (pid: number | null) => void;
   /** The localized "Party" chip caption, re-read each update so an in-game language
    *  switch re-localizes it (through the elided setText). Mobile only. */
   chipLabel: () => string;
@@ -137,11 +135,7 @@ export class PartyFramesPainter {
     // enough to make row construction Node-safe.
     private readonly doc: Document = document,
   ) {
-    this.rowDeps = {
-      onTarget: deps.onTarget,
-      onContextMenu: deps.onContextMenu,
-      onHover: deps.onHover,
-    };
+    this.rowDeps = { onTarget: deps.onTarget, onContextMenu: deps.onContextMenu };
   }
 
   /** Toggle the below-target offset on the container, every frame (cheap and elided),

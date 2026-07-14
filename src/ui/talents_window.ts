@@ -25,6 +25,7 @@ import {
   exportBuild,
   importBuild,
   type SavedLoadout,
+  type SpecDef,
   type TalentAllocation,
   talentsFor,
   validateAllocation,
@@ -80,14 +81,18 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   rowPicks(): RowPicks;
   playerLevel(): number;
   pickRow(rowIndex: number, optionId: string | null): void;
-  /** Server-validated spec commit (IWorld.setSpec), pickRow's sibling: clicking
-   *  a spec card commits it immediately. Before this, the pick only mutated the
-   *  local stage and NEVER reached the world: the spec's kit and mastery never
-   *  arrived unless the player took the save-a-loadout detour. */
-  commitSpec(specId: string | null): void;
+  /**
+   * Commit a specialization to the server-authoritative IWorld (IWorld.setSpec).
+   * Mirrors pickRow: a fire-and-forget command the sim re-validates (combat
+   * lock, spec unlock level); a rejection surfaces through the shared
+   * error-event toast, never a local decision. Used by every class's Select
+   * specialization button (the warrior included since 2026-07-11).
+   */
+  commitSpec(specId: string): void;
   /** The current per-class action-bar ability ids, for saving alongside a build. */
   currentBar(): (string | null)[];
-  // Loadout commit surface (server-authoritative IWorld; the only commit path).
+  // Loadout commit surface (server-authoritative IWorld; commits the full
+  // build, spec included, alongside the Select specialization button).
   saveLoadout(name: string, bar: (string | null)[], alloc: TalentAllocation): void;
   switchLoadout(index: number): void;
   deleteLoadout(index: number): void;
@@ -134,7 +139,10 @@ const TAL_COLOR = {
 const SPEC_ICON_DIR = '/ui/specs';
 
 function specIconUrl(cls: PlayerClass, specId: string): string | null {
-  if (cls === 'warrior' && (specId === 'arms' || specId === 'fury' || specId === 'prot')) {
+  if (
+    (cls === 'warrior' || cls === 'warrior_classic') &&
+    (specId === 'arms' || specId === 'fury' || specId === 'prot')
+  ) {
     return `${SPEC_ICON_DIR}/${cls}/${specId}.webp`;
   }
   if (cls === 'mage' && (specId === 'arcane' || specId === 'fire' || specId === 'frost')) {
@@ -149,11 +157,20 @@ function signatureName(abilityId: string): string {
     : abilityId;
 }
 
-function specIconHtml(cls: PlayerClass, specId: string, fallbackIcon: string): string {
-  const url = specIconUrl(cls, specId);
-  return url
-    ? `<div class="ts-icon ts-icon-art" style="background-image:url(${url})" aria-hidden="true"></div>`
-    : `<div class="ts-icon">${esc(fallbackIcon)}</div>`;
+function specIconHtml(cls: PlayerClass, sp: SpecDef): string {
+  const url = specIconUrl(cls, sp.id);
+  if (url) {
+    return `<div class="ts-icon ts-icon-art" style="background-image:url(${url})" aria-hidden="true"></div>`;
+  }
+  // No authored spec art: render the spec's signature ability through the shared
+  // procedural icon pipeline (the same iconDataUrl the example abilities and the
+  // guide's spec cards use), so a shaman/mage/... card shows real icon art. The
+  // bare text glyph (sp.icon) survives only as the last resort for a signature
+  // id with no ability definition.
+  if (ABILITIES[sp.signature]) {
+    return `<div class="ts-icon ts-icon-art" style="background-image:url(${iconDataUrl('ability', sp.signature)})" aria-hidden="true"></div>`;
+  }
+  return `<div class="ts-icon">${esc(sp.icon)}</div>`;
 }
 
 export class TalentsWindow {
@@ -322,7 +339,7 @@ export class TalentsWindow {
       panel.setAttribute('aria-checked', String(selected));
       panel.setAttribute('aria-label', `${specName}, ${roleLabel(sp.role)}`);
       let html =
-        `<div class="ts-panel-head">${specIconHtml(cls, sp.id, sp.icon)}` +
+        `<div class="ts-panel-head">${specIconHtml(cls, sp)}` +
         `<div class="ts-panel-title"><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(sp.role)}</div></div></div>` +
         `<div class="ts-det-desc">${esc(specDesc)}</div>`;
       if (info) {
@@ -357,16 +374,28 @@ export class TalentsWindow {
         exEl.setAttribute('aria-label', signatureName(id));
         this.deps.attachTooltip(exEl, () => this.deps.abilityTooltip(id) ?? esc(signatureName(id)));
       }
-      // Every panel gets a View talents button: clicking it SELECTS that spec (it
-      // stages the choice, exactly like clicking the panel) and jumps to the
-      // Choices tab, so a new player picks a spec and lands on its talents in one
-      // click. The selected spec's button reads as the primary action.
+      // Every panel gets a primary action button. For ALL TEN classes a spec
+      // that is NOT the committed one reads Select specialization and COMMITS
+      // it via deps.commitSpec (IWorld.setSpec, sim re-validated) before
+      // staging + jumping to the Choices tab, so the spec choice actually
+      // grants the signature ability + mastery (and, for the warrior, unlocks
+      // the spec-gated kit and fury dual wield). The committed spec's button
+      // keeps the View talents navigation-only behavior. The warrior's old
+      // staged-edit-plus-loadout-Save rule was superseded 2026-07-11: it left
+      // the window with no discoverable committing control at all (see
+      // docs/prd/warrior-talents.md). The sim already handles a warrior spec
+      // swap safely (kit re-gate + revalidateOffhandForSpec).
+      const committed = this.deps.currentAllocation().spec === sp.id;
+      const commits = !committed;
       const viewBtn = document.createElement('button');
       viewBtn.type = 'button';
       viewBtn.className = `btn ts-view-talents${selected ? ' primary' : ''}${info?.examples.length ? ' has-ex' : ''}`;
-      viewBtn.textContent = t('hudChrome.specPanel.viewTalents');
+      viewBtn.textContent = commits
+        ? t('hudChrome.specPanel.selectSpec')
+        : t('hudChrome.specPanel.viewTalents');
       viewBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (commits) this.deps.commitSpec(sp.id);
         if (stage.spec !== sp.id) this.setSpec(stage, sp.id);
         this.tab = 'rows';
         this.render();
@@ -393,13 +422,12 @@ export class TalentsWindow {
 
   private setSpec(stage: TalentAllocation, specId: string): void {
     if (stage.spec === specId) return;
-    // Rows model: switching spec picks the new spec and clears every chosen row
-    // (rows are spec-scoped, so none carry over).
+    // Staged buffer only. Clearing stage.rows touches the LEGACY allocation
+    // rows nothing here reads (the Choices tab reads deps.rowPicks(), which
+    // commit instantly via pickRow); committed row picks are class-wide and
+    // spec-independent sim-side, so a spec switch never clears them.
     stage.spec = specId;
     stage.rows = {};
-    // Commit the pick to the world (server re-validates level/spec): rows
-    // commit on click via pickRow, and the spec card behaves the same way.
-    this.deps.commitSpec(specId);
     this.render();
   }
 
