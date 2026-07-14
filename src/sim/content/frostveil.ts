@@ -36,12 +36,12 @@ export const FROSTVEIL_ZONE: ZoneDef = {
     { x: -90, z: 1760, radius: 12 }, // the Shiverfen pool
   ],
   pois: [
-    { x: -30, z: 1560, label: 'Icemantle' },
-    { x: -10, z: 1495, label: 'The Snowline' },
-    { x: 60, z: 1640, label: 'Glacier Tarn' },
-    { x: 30, z: 1740, label: 'The Aurora Steps' },
-    { x: -90, z: 1760, label: 'The Shiverfen' },
-    { x: 100, z: 1810, label: 'The Howling Terraces' },
+    { x: -30, z: 1560, label: 'Icemantle', id: 'icemantle' },
+    { x: -10, z: 1495, label: 'The Snowline', id: 'the_snowline' },
+    { x: 60, z: 1640, label: 'Glacier Tarn', id: 'glacier_tarn' },
+    { x: 30, z: 1740, label: 'The Aurora Steps', id: 'the_aurora_steps' },
+    { x: -90, z: 1760, label: 'The Shiverfen', id: 'the_shiverfen' },
+    { x: 100, z: 1810, label: 'The Howling Terraces', id: 'the_howling_terraces' },
   ],
   welcome: 'Snow swallows every sound. Under the dancing lights, the cold itself feels awake.',
 };

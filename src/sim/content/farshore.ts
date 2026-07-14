@@ -45,11 +45,11 @@ export const FARSHORE_ZONE: ZoneDef = {
     { x: 388, z: 26, radius: 8 }, // the Hilltop Spring, under the Watch Meadow
   ],
   pois: [
-    { x: 305, z: 70, label: 'Gullhaven' },
-    { x: 250, z: 14, label: 'The Landing' },
-    { x: 375, z: -5, label: 'The Watch Meadow' },
-    { x: 402, z: -72, label: 'The Sundered Cliffs' },
-    { x: 434, z: 58, label: 'The Riftfields' },
+    { x: 305, z: 70, label: 'Gullhaven', id: 'gullhaven' },
+    { x: 250, z: 14, label: 'The Landing', id: 'the_landing' },
+    { x: 375, z: -5, label: 'The Watch Meadow', id: 'the_watch_meadow' },
+    { x: 402, z: -72, label: 'The Sundered Cliffs', id: 'the_sundered_cliffs' },
+    { x: 434, z: 58, label: 'The Riftfields', id: 'the_riftfields' },
   ],
   welcome:
     "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",

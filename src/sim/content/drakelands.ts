@@ -40,12 +40,12 @@ export const DRAKELANDS_ZONE: ZoneDef = {
     { x: 300, z: 2110, radius: 10 }, // Mirage Hollow, a dune oasis
   ],
   pois: [
-    { x: 404, z: 1900, label: 'Wyrmwatch' },
-    { x: 360, z: 1940, label: 'The Gatewood' },
-    { x: 330, z: 2100, label: 'Cinder Dunes' },
-    { x: 460, z: 2140, label: 'Trollmoot' },
-    { x: 270, z: 2270, label: 'Bloodglass Fields' },
-    { x: 390, z: 2320, label: 'Drakemaw Caldera' },
+    { x: 404, z: 1900, label: 'Wyrmwatch', id: 'wyrmwatch' },
+    { x: 360, z: 1940, label: 'The Gatewood', id: 'the_gatewood' },
+    { x: 330, z: 2100, label: 'Cinder Dunes', id: 'cinder_dunes' },
+    { x: 460, z: 2140, label: 'Trollmoot', id: 'trollmoot' },
+    { x: 270, z: 2270, label: 'Bloodglass Fields', id: 'bloodglass_fields' },
+    { x: 390, z: 2320, label: 'Drakemaw Caldera', id: 'drakemaw_caldera' },
   ],
   welcome:
     'Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.',
